@@ -11,7 +11,8 @@ import 'package:hentai_library/ui/core/widgets/actions/page_size_menu.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.dart';
-import 'package:hentai_library/ui/features/library/views/widgets/catalog_selection_actions.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/catalog_selection_header_section.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/edit_series_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
@@ -22,16 +23,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SeriesDetailHeader extends ConsumerWidget {
-  const SeriesDetailHeader({super.key, required this.series});
+  const SeriesDetailHeader({
+    super.key,
+    required this.series,
+    required this.pageComicIds,
+  });
 
   final Series series;
+  final List<String> pageComicIds;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final ThemeData theme = Theme.of(context);
-    final int activePageSize = ref.watch(seriesDetailActivePageSizeProvider);
-    final AppLocalizations l10n = context.l10n;
+    final bool selectionActive = ref.watch(
+      catalogSelectionProvider.select((CatalogSelectionState s) => s.active),
+    );
+    final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
+      MediaQuery.sizeOf(context).width,
+    );
     return DecoratedBox(
       decoration: BoxDecoration(
         color: cs.surface,
@@ -47,53 +56,84 @@ class SeriesDetailHeader extends ConsumerWidget {
         bottom: false,
         child: SizedBox(
           height: 48,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: <Widget>[
-                GhostButton.icon(
-                  icon: LucideIcons.arrowLeft,
-                  tooltip: l10n.shellBack,
-                  semanticLabel: l10n.shellBack,
-                  iconSize: 16,
-                  size: 32,
-                  borderRadius: 8,
-                  foregroundColor: cs.hentai.iconDefault,
-                  hoverColor: theme.hoverColor,
-                  overlayColor: theme.hoverColor,
-                  onPressed: () =>
-                      ComicDetailBackHeader.popOrGoLibrary(context),
-                ),
-                const SizedBox(width: 4),
-                _SeriesDetailOverflowMenuButton(series: series),
-                const SizedBox(width: 4),
-                GhostButton.icon(
-                  icon: LucideIcons.pencil,
-                  tooltip: l10n.seriesDetailEdit,
-                  semanticLabel: l10n.seriesDetailEdit,
-                  iconSize: 16,
-                  size: 32,
-                  borderRadius: 8,
-                  foregroundColor: cs.hentai.iconDefault,
-                  hoverColor: theme.hoverColor,
-                  overlayColor: theme.hoverColor,
-                  onPressed: () {
-                    showEditSeriesDialog(context: context, series: series);
-                  },
-                ),
-                const Spacer(),
-                PageSizeMenuButton(
-                  activePageSize: activePageSize,
-                  onSelected: (int pageSize) {
-                    ref
-                        .read(seriesDetailPageSizeProvider.notifier)
-                        .setPageSize(pageSize);
-                  },
-                ),
-              ],
-            ),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            child: selectionActive
+                ? Padding(
+                    key: const ValueKey<String>('series-detail-selection-header'),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: CatalogSelectionHeaderToolbar(
+                      layoutTier: layoutTier,
+                      pageComicIds: pageComicIds,
+                    ),
+                  )
+                : _SeriesDetailDefaultHeaderRow(
+                    key: const ValueKey<String>('series-detail-default-header'),
+                    series: series,
+                  ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SeriesDetailDefaultHeaderRow extends ConsumerWidget {
+  const _SeriesDetailDefaultHeaderRow({super.key, required this.series});
+
+  final Series series;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final int activePageSize = ref.watch(seriesDetailActivePageSizeProvider);
+    final AppLocalizations l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        children: <Widget>[
+          GhostButton.icon(
+            icon: LucideIcons.arrowLeft,
+            tooltip: l10n.shellBack,
+            semanticLabel: l10n.shellBack,
+            iconSize: 16,
+            size: 32,
+            borderRadius: 8,
+            foregroundColor: cs.hentai.iconDefault,
+            hoverColor: theme.hoverColor,
+            overlayColor: theme.hoverColor,
+            onPressed: () => ComicDetailBackHeader.popOrGoLibrary(context),
+          ),
+          const SizedBox(width: 4),
+          _SeriesDetailOverflowMenuButton(series: series),
+          const SizedBox(width: 4),
+          GhostButton.icon(
+            icon: LucideIcons.pencil,
+            tooltip: l10n.seriesDetailEdit,
+            semanticLabel: l10n.seriesDetailEdit,
+            iconSize: 16,
+            size: 32,
+            borderRadius: 8,
+            foregroundColor: cs.hentai.iconDefault,
+            hoverColor: theme.hoverColor,
+            overlayColor: theme.hoverColor,
+            onPressed: () {
+              showEditSeriesDialog(context: context, series: series);
+            },
+          ),
+          const Spacer(),
+          PageSizeMenuButton(
+            activePageSize: activePageSize,
+            onSelected: (int pageSize) {
+              ref
+                  .read(seriesDetailPageSizeProvider.notifier)
+                  .setPageSize(pageSize);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -168,15 +208,12 @@ class _SeriesDetailOverflowMenuButtonState
                 },
               ),
               _SeriesDetailOverflowMenuItem(
-                icon: LucideIcons.pencil,
-                label: l10n.seriesDetailEditMembersMetadata,
+                icon: LucideIcons.squareCheck,
+                label: l10n.catalogSelectionEnter,
                 enabled: !otherWriteBusy && widget.series.items.isNotEmpty,
                 onTap: () {
                   hideMenu();
-                  final List<String> comicIds = widget.series.items
-                      .map((item) => item.comicId)
-                      .toList(growable: false);
-                  openComicMetadataEditorForIds(context, ref, comicIds);
+                  ref.read(catalogSelectionProvider.notifier).enter();
                 },
               ),
               _SeriesDetailOverflowMenuItem(

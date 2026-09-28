@@ -8,6 +8,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_primary_row_layout.dart';
+import 'package:hentai_library/ui/features/library/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
@@ -33,6 +34,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
 
   @override
   void dispose() {
+    exitCatalogSelectionFromContext(context);
     _scrollController.dispose();
     super.dispose();
   }
@@ -86,11 +88,19 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
     final SeriesComicsMetadata? metadata = metadataAsync.value;
     final bool hasMetadata = metadata?.hasMetadataBlock ?? false;
     final double sectionGap = tokens.spacing.xl + 8;
+    final List<String> pageComicIds =
+        catalogAsync.value?.items
+            .map((SeriesComicPageItem item) => item.comic.comicId)
+            .toList(growable: false) ??
+        const <String>[];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SeriesDetailHeader(series: widget.series),
+        SeriesDetailHeader(
+          series: widget.series,
+          pageComicIds: pageComicIds,
+        ),
         Expanded(
           child: CustomScrollView(
             controller: _scrollController,
