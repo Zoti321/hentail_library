@@ -623,14 +623,56 @@ abstract class AppLocalizations {
   /// No description provided for @homeEmptyTitle.
   ///
   /// In zh, this message translates to:
-  /// **'尚未导入漫画'**
+  /// **'开始建立你的漫画库'**
   String get homeEmptyTitle;
 
   /// No description provided for @homeEmptyHint.
   ///
   /// In zh, this message translates to:
-  /// **'请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。'**
+  /// **'添加本地或远程 Library 后即可在侧栏对该库执行 Library sync。'**
   String get homeEmptyHint;
+
+  /// No description provided for @homeRecentlyAdded.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近入库'**
+  String get homeRecentlyAdded;
+
+  /// No description provided for @homeViewAllHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看全部'**
+  String get homeViewAllHistory;
+
+  /// No description provided for @homeAlertDismissLater.
+  ///
+  /// In zh, this message translates to:
+  /// **'稍后'**
+  String get homeAlertDismissLater;
+
+  /// No description provided for @homeAlertRemoteUnreachable.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 无法连接，建议检查网络或凭证'**
+  String homeAlertRemoteUnreachable(String libraryName);
+
+  /// No description provided for @homeAlertSyncFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 同步失败，建议重试'**
+  String homeAlertSyncFailed(String libraryName);
+
+  /// No description provided for @homeAlertStaleSync.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 距上次同步已 {days} 天，建议同步'**
+  String homeAlertStaleSync(String libraryName, int days);
+
+  /// No description provided for @homeAlertPendingResources.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 发现 {count} 个新/变更 Resource，建议同步'**
+  String homeAlertPendingResources(String libraryName, int count);
 
   /// No description provided for @homeStatSeries.
   ///
@@ -3617,6 +3659,202 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'启动失败：{error}'**
   String bootstrapStartupFailed(String error);
+
+  /// No description provided for @catalogSelectionEnter.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择漫画'**
+  String get catalogSelectionEnter;
+
+  /// No description provided for @catalogSelectionExit.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get catalogSelectionExit;
+
+  /// No description provided for @catalogSelectionSelectPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'全选本页'**
+  String get catalogSelectionSelectPage;
+
+  /// No description provided for @catalogSelectionClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除选择'**
+  String get catalogSelectionClear;
+
+  /// No description provided for @catalogSelectionEditMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑元数据'**
+  String get catalogSelectionEditMetadata;
+
+  /// No description provided for @catalogSelectionSelectedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'已选 {count} 本'**
+  String catalogSelectionSelectedCount(int count);
+
+  /// No description provided for @bulkEditMetadataTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量编辑 · {count} 本'**
+  String bulkEditMetadataTitle(int count);
+
+  /// No description provided for @bulkEditMetadataConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认批量保存？'**
+  String get bulkEditMetadataConfirmTitle;
+
+  /// No description provided for @bulkEditMetadataConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'将对 {comicCount} 本漫画应用 {fieldCount} 个启用字段。'**
+  String bulkEditMetadataConfirmBody(int comicCount, int fieldCount);
+
+  /// No description provided for @bulkEditMetadataFieldTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get bulkEditMetadataFieldTags;
+
+  /// No description provided for @bulkEditMetadataFieldAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get bulkEditMetadataFieldAuthors;
+
+  /// No description provided for @bulkEditMetadataFieldLanguages.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get bulkEditMetadataFieldLanguages;
+
+  /// No description provided for @bulkEditMetadataFieldParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get bulkEditMetadataFieldParodies;
+
+  /// No description provided for @bulkEditMetadataFieldCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get bulkEditMetadataFieldCharacters;
+
+  /// No description provided for @bulkEditMetadataFieldContentRating.
+  ///
+  /// In zh, this message translates to:
+  /// **'内容分级'**
+  String get bulkEditMetadataFieldContentRating;
+
+  /// No description provided for @bulkEditMetadataFieldDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'概要'**
+  String get bulkEditMetadataFieldDescription;
+
+  /// No description provided for @bulkEditMetadataFieldPublishedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'发布日期'**
+  String get bulkEditMetadataFieldPublishedAt;
+
+  /// No description provided for @bulkEditMetadataOpClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get bulkEditMetadataOpClear;
+
+  /// No description provided for @seriesDetailEditMembersMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量编辑元数据'**
+  String get seriesDetailEditMembersMetadata;
+
+  /// No description provided for @bulkEditMetadataOpAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加'**
+  String get bulkEditMetadataOpAdd;
+
+  /// No description provided for @bulkEditMetadataOpRemove.
+  ///
+  /// In zh, this message translates to:
+  /// **'移除'**
+  String get bulkEditMetadataOpRemove;
+
+  /// No description provided for @bulkEditMetadataOpReplace.
+  ///
+  /// In zh, this message translates to:
+  /// **'替换'**
+  String get bulkEditMetadataOpReplace;
+
+  /// No description provided for @bulkEditMetadataMixedValues.
+  ///
+  /// In zh, this message translates to:
+  /// **'多种值'**
+  String get bulkEditMetadataMixedValues;
+
+  /// No description provided for @bulkEditMetadataOperationLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'操作'**
+  String get bulkEditMetadataOperationLabel;
+
+  /// No description provided for @bulkEditMetadataCancelBatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消批量编辑'**
+  String get bulkEditMetadataCancelBatch;
+
+  /// No description provided for @bulkEditMetadataBusy.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在批量编辑 {count} 本漫画…'**
+  String bulkEditMetadataBusy(int count);
+
+  /// No description provided for @bulkEditMetadataBatchDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量编辑完成：已更新 {succeeded}，失败 {failed}，无变化 {unchanged}'**
+  String bulkEditMetadataBatchDone(int succeeded, int failed, int unchanged);
+
+  /// No description provided for @bulkEditMetadataBatchCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消批量编辑（已更新 {succeeded}，失败 {failed}，无变化 {unchanged}）'**
+  String bulkEditMetadataBatchCancelled(
+    int succeeded,
+    int failed,
+    int unchanged,
+  );
+
+  /// No description provided for @bulkEditMetadataSelectFieldHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'在左侧选择要编辑的字段'**
+  String get bulkEditMetadataSelectFieldHint;
+
+  /// No description provided for @bulkEditMetadataFieldSummaryCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{opLabel} · {count} 项'**
+  String bulkEditMetadataFieldSummaryCount(String opLabel, int count);
+
+  /// No description provided for @bulkEditMetadataFieldSummaryReplace.
+  ///
+  /// In zh, this message translates to:
+  /// **'替换'**
+  String get bulkEditMetadataFieldSummaryReplace;
+
+  /// No description provided for @bulkEditMetadataFieldSummaryClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get bulkEditMetadataFieldSummaryClear;
 }
 
 class _AppLocalizationsDelegate

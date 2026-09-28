@@ -27,6 +27,9 @@ abstract class AppSetting with _$AppSetting {
 
     /// 用户选择「稍后提醒」所忽略的远程版本号；空字符串表示未忽略。
     @Default('') String dismissedUpdateVersion,
+
+    /// 库页目录切换排序时是否播放卡片 FLIP 位置过渡动画（内部偏好，暂无设置 UI）。
+    @Default(false) bool libraryCatalogSortFlipEnabled,
   }) = _AppSetting;
 
   factory AppSetting.fromJson(Map<String, dynamic> json) =>

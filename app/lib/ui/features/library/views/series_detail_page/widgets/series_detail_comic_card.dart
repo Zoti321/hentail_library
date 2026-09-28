@@ -11,6 +11,7 @@ import 'package:hentai_library/ui/core/widgets/element/card/catalog_cover_card_s
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item_context_menu.dart';
+import 'package:hentai_library/ui/features/library/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/library/comic_delete_flow.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,29 +34,84 @@ class SeriesDetailComicCard extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final Comic comic = item.comic;
+    final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
     final bool compact = AppLayoutBreakpoints.isCompact(
       MediaQuery.sizeOf(context).width,
     );
 
-    return CatalogCoverCardShell(
-      onTap: onTap,
-      onSecondaryTapUp: (TapUpDetails details) {
-        _showContextMenu(context, ref, details.globalPosition);
-      },
-      onLongPressStart: (LongPressStartDetails details) {
-        _showContextMenu(context, ref, details.globalPosition);
-      },
-      cover: _SeriesDetailComicCover(
-        comicId: comic.comicId,
-        gridIndex: gridIndex,
-        showEditOnHover: !compact,
-        onEdit: () => _openEditMetadata(context, ref),
-      ),
-      info: (bool isHover) => _SeriesDetailComicCardInfo(
-        title: comic.title,
-        pageCount: comic.pageCount,
-        isHover: isHover,
-      ),
+    if (!selection.active) {
+      return CatalogCoverCardShell(
+        onTap: onTap,
+        onSecondaryTapUp: (TapUpDetails details) {
+          _showContextMenu(context, ref, details.globalPosition);
+        },
+        onLongPressStart: (LongPressStartDetails details) {
+          _showContextMenu(context, ref, details.globalPosition);
+        },
+        cover: _SeriesDetailComicCover(
+          comicId: comic.comicId,
+          gridIndex: gridIndex,
+          showEditOnHover: !compact,
+          onEdit: () => _openEditMetadata(context, ref),
+        ),
+        info: (bool isHover) => _SeriesDetailComicCardInfo(
+          title: comic.title,
+          pageCount: comic.pageCount,
+          isHover: isHover,
+        ),
+      );
+    }
+
+    final bool selected = selection.selectedIds.contains(comic.comicId);
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    void toggleSelection() {
+      ref.read(catalogSelectionProvider.notifier).toggle(comic.comicId);
+    }
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        CatalogCoverCardShell(
+          onTap: toggleSelection,
+          onSecondaryTapUp: (_) => toggleSelection(),
+          onLongPressStart: (_) => toggleSelection(),
+          cover: _SeriesDetailComicCover(
+            comicId: comic.comicId,
+            gridIndex: gridIndex,
+            showEditOnHover: false,
+            onEdit: () => _openEditMetadata(context, ref),
+          ),
+          info: (bool isHover) => _SeriesDetailComicCardInfo(
+            title: comic.title,
+            pageCount: comic.pageCount,
+            isHover: isHover,
+          ),
+        ),
+        Positioned(
+          top: tokens.spacing.xs,
+          left: tokens.spacing.xs,
+          child: Material(
+            color: selected ? cs.primary : cs.surface.withValues(alpha: 0.92),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(tokens.radius.xs),
+              side: BorderSide(
+                color: selected ? cs.primary : cs.hentai.borderSubtle,
+              ),
+            ),
+            child: InkWell(
+              onTap: toggleSelection,
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: selected
+                    ? Icon(Icons.check, size: 16, color: cs.onPrimary)
+                    : null,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

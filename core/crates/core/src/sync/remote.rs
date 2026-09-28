@@ -100,7 +100,7 @@ pub fn scan_remote_lightweight(
     Ok(RemoteScanOutcome::Scanned(items))
 }
 
-fn collect_remote_files(
+pub(crate) fn collect_remote_files(
     access: &dyn ResourceAccess,
     dir: &str,
     out: &mut Vec<String>,
@@ -186,7 +186,7 @@ fn register_remote_file(
     }))
 }
 
-fn remote_resource_type_from_location(location: &str) -> Option<&'static str> {
+pub(crate) fn remote_resource_type_from_location(location: &str) -> Option<&'static str> {
     let name = location.rsplit('/').next().unwrap_or(location);
     let ext = extension_lower(Path::new(name));
     match ext.as_str() {

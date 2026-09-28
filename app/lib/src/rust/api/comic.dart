@@ -6,8 +6,12 @@
 import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+import 'sync.dart';
+part 'comic.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
+// These functions are ignored because they are not marked as `pub`: `map_bulk_patch`, `map_multi_value_op`, `map_multi_value_patch`, `map_published_at_patch`, `map_scalar_patch`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 void initDbFrb({required String appDataDir, required String dbFileName}) =>
     RustLib.instance.api.crateApiComicInitDbFrb(
@@ -71,6 +75,16 @@ void setComicMetaLocksFrb({
 Future<void> refreshComicMetadataFrb({required String comicId}) =>
     RustLib.instance.api.crateApiComicRefreshComicMetadataFrb(comicId: comicId);
 
+Future<BulkPatchResultFrbDto> applyComicMetadataBulkPatchFrb({
+  required List<String> comicIds,
+  required ComicMetadataBulkPatchFrbDto patch,
+  required SyncHandleDto handle,
+}) => RustLib.instance.api.crateApiComicApplyComicMetadataBulkPatchFrb(
+  comicIds: comicIds,
+  patch: patch,
+  handle: handle,
+);
+
 Future<List<ComicDto>> searchByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
@@ -100,6 +114,44 @@ Future<PlatformInt64> countAllComicsFrb() =>
 
 Stream<int> watchComicChanges() =>
     RustLib.instance.api.crateApiComicWatchComicChanges();
+
+class BulkPatchResultFrbDto {
+  final int succeeded;
+  final int failed;
+  final int unchanged;
+  final bool cancelled;
+  final List<String> errorSamples;
+
+  const BulkPatchResultFrbDto({
+    required this.succeeded,
+    required this.failed,
+    required this.unchanged,
+    required this.cancelled,
+    required this.errorSamples,
+  });
+
+  static Future<BulkPatchResultFrbDto> default_() =>
+      RustLib.instance.api.crateApiComicBulkPatchResultFrbDtoDefault();
+
+  @override
+  int get hashCode =>
+      succeeded.hashCode ^
+      failed.hashCode ^
+      unchanged.hashCode ^
+      cancelled.hashCode ^
+      errorSamples.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BulkPatchResultFrbDto &&
+          runtimeType == other.runtimeType &&
+          succeeded == other.succeeded &&
+          failed == other.failed &&
+          unchanged == other.unchanged &&
+          cancelled == other.cancelled &&
+          errorSamples == other.errorSamples;
+}
 
 class ComicDto {
   final String comicId;
@@ -314,6 +366,56 @@ class ComicMetaLocksDto {
           characters == other.characters;
 }
 
+class ComicMetadataBulkPatchFrbDto {
+  final MultiValuePatchFrbDto? tags;
+  final MultiValuePatchFrbDto? authors;
+  final MultiValuePatchFrbDto? languages;
+  final MultiValuePatchFrbDto? parodies;
+  final MultiValuePatchFrbDto? characters;
+  final String? contentRating;
+  final ScalarPatchFrbDto? description;
+  final PublishedAtPatchFrbDto? publishedAt;
+
+  const ComicMetadataBulkPatchFrbDto({
+    this.tags,
+    this.authors,
+    this.languages,
+    this.parodies,
+    this.characters,
+    this.contentRating,
+    this.description,
+    this.publishedAt,
+  });
+
+  static Future<ComicMetadataBulkPatchFrbDto> default_() =>
+      RustLib.instance.api.crateApiComicComicMetadataBulkPatchFrbDtoDefault();
+
+  @override
+  int get hashCode =>
+      tags.hashCode ^
+      authors.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode ^
+      contentRating.hashCode ^
+      description.hashCode ^
+      publishedAt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ComicMetadataBulkPatchFrbDto &&
+          runtimeType == other.runtimeType &&
+          tags == other.tags &&
+          authors == other.authors &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters &&
+          contentRating == other.contentRating &&
+          description == other.description &&
+          publishedAt == other.publishedAt;
+}
+
 enum ComicSortFieldDto {
   title,
   createdAt,
@@ -343,6 +445,26 @@ class ComicSortOptionDto {
           runtimeType == other.runtimeType &&
           field == other.field &&
           descending == other.descending;
+}
+
+enum MultiValueOpFrbDto { add, remove, replace }
+
+class MultiValuePatchFrbDto {
+  final MultiValueOpFrbDto op;
+  final List<String> values;
+
+  const MultiValuePatchFrbDto({required this.op, required this.values});
+
+  @override
+  int get hashCode => op.hashCode ^ values.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MultiValuePatchFrbDto &&
+          runtimeType == other.runtimeType &&
+          op == other.op &&
+          values == other.values;
 }
 
 class PageRequestDto {
@@ -389,6 +511,24 @@ class PagedComicResultDto {
           totalCount == other.totalCount &&
           page == other.page &&
           pageSize == other.pageSize;
+}
+
+@freezed
+sealed class PublishedAtPatchFrbDto with _$PublishedAtPatchFrbDto {
+  const PublishedAtPatchFrbDto._();
+
+  const factory PublishedAtPatchFrbDto.replace(PlatformInt64 field0) =
+      PublishedAtPatchFrbDto_Replace;
+  const factory PublishedAtPatchFrbDto.clear() = PublishedAtPatchFrbDto_Clear;
+}
+
+@freezed
+sealed class ScalarPatchFrbDto with _$ScalarPatchFrbDto {
+  const ScalarPatchFrbDto._();
+
+  const factory ScalarPatchFrbDto.replace(String field0) =
+      ScalarPatchFrbDto_Replace;
+  const factory ScalarPatchFrbDto.clear() = ScalarPatchFrbDto_Clear;
 }
 
 class SetComicMetaLocksFrbDto {

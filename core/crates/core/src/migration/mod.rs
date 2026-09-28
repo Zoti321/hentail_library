@@ -19,6 +19,7 @@ mod m20260817_000017_library_sidebar_pin_order;
 mod m20260903_000018_comic_languages;
 mod m20260903_000019_comic_parodies;
 mod m20260903_000020_comic_characters;
+mod m20260927_000021_home_sync_and_resource_snapshots;
 
 pub struct Migrator;
 
@@ -45,6 +46,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260903_000018_comic_languages::Migration),
             Box::new(m20260903_000019_comic_parodies::Migration),
             Box::new(m20260903_000020_comic_characters::Migration),
+            Box::new(m20260927_000021_home_sync_and_resource_snapshots::Migration),
         ]
     }
 }

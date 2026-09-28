@@ -20,6 +20,7 @@ class ComicCard extends ConsumerWidget {
     required this.onTap,
     required this.onEditMetadata,
     this.gridIndex,
+    this.selectionMode = false,
   });
 
   final Comic comic;
@@ -28,18 +29,23 @@ class ComicCard extends ConsumerWidget {
   /// 由 feature 打开元数据编辑表面并负责持久化。
   final VoidCallback onEditMetadata;
   final int? gridIndex;
+  final bool selectionMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return CatalogCoverCardShell(
       semanticLabel: comic.title,
       onTap: onTap,
-      onSecondaryTapUp: (TapUpDetails details) {
-        _showContextMenu(context, ref, details.globalPosition);
-      },
-      onLongPressStart: (LongPressStartDetails details) {
-        _showContextMenu(context, ref, details.globalPosition);
-      },
+      onSecondaryTapUp: selectionMode
+          ? (_) => onTap()
+          : (TapUpDetails details) {
+              _showContextMenu(context, ref, details.globalPosition);
+            },
+      onLongPressStart: selectionMode
+          ? (_) => onTap()
+          : (LongPressStartDetails details) {
+              _showContextMenu(context, ref, details.globalPosition);
+            },
       cover: ComicCoverContent(comicId: comic.comicId, gridIndex: gridIndex),
       info: (bool isHover) => _ComicCardInfo(
         title: comic.title,

@@ -285,10 +285,39 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get homeEmptyTitle => '尚未导入漫画';
+  String get homeEmptyTitle => '开始建立你的漫画库';
 
   @override
-  String get homeEmptyHint => '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。';
+  String get homeEmptyHint => '添加本地或远程 Library 后即可在侧栏对该库执行 Library sync。';
+
+  @override
+  String get homeRecentlyAdded => '最近入库';
+
+  @override
+  String get homeViewAllHistory => '查看全部';
+
+  @override
+  String get homeAlertDismissLater => '稍后';
+
+  @override
+  String homeAlertRemoteUnreachable(String libraryName) {
+    return '$libraryName 无法连接，建议检查网络或凭证';
+  }
+
+  @override
+  String homeAlertSyncFailed(String libraryName) {
+    return '$libraryName 同步失败，建议重试';
+  }
+
+  @override
+  String homeAlertStaleSync(String libraryName, int days) {
+    return '$libraryName 距上次同步已 $days 天，建议同步';
+  }
+
+  @override
+  String homeAlertPendingResources(String libraryName, int count) {
+    return '$libraryName 发现 $count 个新/变更 Resource，建议同步';
+  }
 
   @override
   String get homeStatSeries => '系列';
@@ -1961,4 +1990,118 @@ class AppLocalizationsZh extends AppLocalizations {
   String bootstrapStartupFailed(String error) {
     return '启动失败：$error';
   }
+
+  @override
+  String get catalogSelectionEnter => '选择漫画';
+
+  @override
+  String get catalogSelectionExit => '取消';
+
+  @override
+  String get catalogSelectionSelectPage => '全选本页';
+
+  @override
+  String get catalogSelectionClear => '清除选择';
+
+  @override
+  String get catalogSelectionEditMetadata => '编辑元数据';
+
+  @override
+  String catalogSelectionSelectedCount(int count) {
+    return '已选 $count 本';
+  }
+
+  @override
+  String bulkEditMetadataTitle(int count) {
+    return '批量编辑 · $count 本';
+  }
+
+  @override
+  String get bulkEditMetadataConfirmTitle => '确认批量保存？';
+
+  @override
+  String bulkEditMetadataConfirmBody(int comicCount, int fieldCount) {
+    return '将对 $comicCount 本漫画应用 $fieldCount 个启用字段。';
+  }
+
+  @override
+  String get bulkEditMetadataFieldTags => '标签';
+
+  @override
+  String get bulkEditMetadataFieldAuthors => '作者';
+
+  @override
+  String get bulkEditMetadataFieldLanguages => '语言';
+
+  @override
+  String get bulkEditMetadataFieldParodies => '原作';
+
+  @override
+  String get bulkEditMetadataFieldCharacters => '角色';
+
+  @override
+  String get bulkEditMetadataFieldContentRating => '内容分级';
+
+  @override
+  String get bulkEditMetadataFieldDescription => '概要';
+
+  @override
+  String get bulkEditMetadataFieldPublishedAt => '发布日期';
+
+  @override
+  String get bulkEditMetadataOpClear => '清除';
+
+  @override
+  String get seriesDetailEditMembersMetadata => '批量编辑元数据';
+
+  @override
+  String get bulkEditMetadataOpAdd => '添加';
+
+  @override
+  String get bulkEditMetadataOpRemove => '移除';
+
+  @override
+  String get bulkEditMetadataOpReplace => '替换';
+
+  @override
+  String get bulkEditMetadataMixedValues => '多种值';
+
+  @override
+  String get bulkEditMetadataOperationLabel => '操作';
+
+  @override
+  String get bulkEditMetadataCancelBatch => '取消批量编辑';
+
+  @override
+  String bulkEditMetadataBusy(int count) {
+    return '正在批量编辑 $count 本漫画…';
+  }
+
+  @override
+  String bulkEditMetadataBatchDone(int succeeded, int failed, int unchanged) {
+    return '批量编辑完成：已更新 $succeeded，失败 $failed，无变化 $unchanged';
+  }
+
+  @override
+  String bulkEditMetadataBatchCancelled(
+    int succeeded,
+    int failed,
+    int unchanged,
+  ) {
+    return '已取消批量编辑（已更新 $succeeded，失败 $failed，无变化 $unchanged）';
+  }
+
+  @override
+  String get bulkEditMetadataSelectFieldHint => '在左侧选择要编辑的字段';
+
+  @override
+  String bulkEditMetadataFieldSummaryCount(String opLabel, int count) {
+    return '$opLabel · $count 项';
+  }
+
+  @override
+  String get bulkEditMetadataFieldSummaryReplace => '替换';
+
+  @override
+  String get bulkEditMetadataFieldSummaryClear => '清除';
 }

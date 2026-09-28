@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
@@ -43,6 +44,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   void dispose() {
+    exitCatalogSelectionFromContext(context);
     _coverViewportThrottleTimer?.cancel();
     _scrollController.removeListener(_scheduleCoverViewportUpdate);
     _scrollController.dispose();
@@ -202,6 +204,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         _scaffoldKey.currentState?.closeEndDrawer();
       }
     });
+    ref.listen<CatalogSelectionState>(catalogSelectionProvider, (
+      CatalogSelectionState? previous,
+      CatalogSelectionState next,
+    ) {
+      if (previous?.active == next.active) {
+        return;
+      }
+      WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+    });
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -211,9 +222,25 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         final double horizontalPadding = libraryContentHorizontalPadding(
           layoutTier,
         );
-        final Widget headerSection = LibraryPageHeaderSection(
+        final bool selectionActive = ref.watch(
+          catalogSelectionProvider.select(
+            (CatalogSelectionState s) => s.active,
+          ),
+        );
+        final List<String> pageComicIds = selectionActive
+            ? ref
+                      .watch(libraryComicsCatalogControllerProvider)
+                      .value
+                      ?.items
+                      .map((c) => c.comicId)
+                      .toList(growable: false) ??
+                  const <String>[]
+            : const <String>[];
+        final Widget headerSection = LibraryPageAnimatedHeader(
+          selectionActive: selectionActive,
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
+          pageComicIds: pageComicIds,
           onOpenFilterSort: _openFilterSortDrawer,
           onOpenNavigation: appShellPageNavigationOpener(context),
         );

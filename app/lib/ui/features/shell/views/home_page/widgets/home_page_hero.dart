@@ -15,23 +15,20 @@ class HomePageHeroSection extends ConsumerWidget {
     super.key,
     required this.layoutTier,
     required this.comicCount,
-    required this.isLibraryEmpty,
-    required this.onScan,
+    required this.showEmptyOnboarding,
     required this.enableHeavyStats,
   });
 
   final HomePageLayoutTier layoutTier;
   final int comicCount;
-  final bool isLibraryEmpty;
-  final VoidCallback onScan;
+  final bool showEmptyOnboarding;
   final bool enableHeavyStats;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (isLibraryEmpty) {
+    if (showEmptyOnboarding) {
       return _EmptyLibraryHero(
         layoutTier: layoutTier,
-        onScan: onScan,
         onAddLocalLibrary: () =>
             LibraryManagementActions.addLocalLibrary(ref, context),
         onAddRemoteLibrary: () =>
@@ -51,13 +48,11 @@ class HomePageHeroSection extends ConsumerWidget {
 class _EmptyLibraryHero extends StatelessWidget {
   const _EmptyLibraryHero({
     required this.layoutTier,
-    required this.onScan,
     required this.onAddLocalLibrary,
     required this.onAddRemoteLibrary,
   });
 
   final HomePageLayoutTier layoutTier;
-  final VoidCallback onScan;
   final VoidCallback onAddLocalLibrary;
   final VoidCallback onAddRemoteLibrary;
 
@@ -192,9 +187,9 @@ class _EmptyLibraryHero extends StatelessWidget {
                     runSpacing: tokens.spacing.sm,
                     children: <Widget>[
                       FilledButton.icon(
-                        onPressed: onScan,
-                        icon: const Icon(LucideIcons.scanSearch, size: 18),
-                        label: Text(l10n.homeScanLibrary),
+                        onPressed: onAddLocalLibrary,
+                        icon: const Icon(LucideIcons.folderPlus, size: 18),
+                        label: Text(l10n.sidebarAddLocalLibrary),
                         style: FilledButton.styleFrom(
                           backgroundColor: colorScheme.primary,
                           foregroundColor: colorScheme.onPrimary,
@@ -209,21 +204,9 @@ class _EmptyLibraryHero extends StatelessWidget {
                         ),
                       ),
                       OutlinedButton.icon(
-                        onPressed: onAddLocalLibrary,
-                        icon: const Icon(LucideIcons.folderPlus, size: 18),
-                        label: Text(l10n.sidebarAddLocalLibrary),
-                        style: outlinedActionStyle,
-                      ),
-                      OutlinedButton.icon(
                         onPressed: onAddRemoteLibrary,
                         icon: const Icon(LucideIcons.cloudUpload, size: 18),
                         label: Text(l10n.sidebarAddRemoteLibrary),
-                        style: outlinedActionStyle,
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: () => context.go('/settings'),
-                        icon: const Icon(LucideIcons.settings, size: 18),
-                        label: Text(l10n.navSettings),
                         style: outlinedActionStyle,
                       ),
                     ],
@@ -283,7 +266,7 @@ class _StatsCards extends ConsumerWidget {
           caption: l10n.homeTagCount(c.tagCount),
           icon: LucideIcons.tags,
           accentColor: accents.tags,
-        )),
+        ), onTap: () => context.go('/metadata?tab=tags')),
         authorCard: _buildStatCard(context, (
           label: l10n.homeStatAuthors,
           valueText: '${c.authorCount}',
@@ -292,7 +275,7 @@ class _StatsCards extends ConsumerWidget {
               : l10n.homeAuthorCount(c.authorCount),
           icon: LucideIcons.penLine,
           accentColor: accents.authors,
-        )),
+        ), onTap: () => context.go('/metadata?tab=authors')),
       ),
       loading: () => _HomeStatsCardLayout(
         layoutTier: layoutTier,
@@ -421,13 +404,18 @@ class _HomeStatAccentColors {
   final Color authors;
 }
 
-Widget _buildStatCard(BuildContext context, _HomeStatCardData data) {
+Widget _buildStatCard(
+  BuildContext context,
+  _HomeStatCardData data, {
+  VoidCallback? onTap,
+}) {
   return _StatSummaryCard(
     label: data.label,
     valueText: data.valueText,
     caption: data.caption,
     icon: data.icon,
     accentColor: data.accentColor,
+    onTap: onTap,
   );
 }
 
@@ -495,6 +483,7 @@ class _StatSummaryCard extends StatefulWidget {
     required this.caption,
     required this.icon,
     required this.accentColor,
+    this.onTap,
   });
 
   final String label;
@@ -502,6 +491,7 @@ class _StatSummaryCard extends StatefulWidget {
   final String caption;
   final IconData icon;
   final Color accentColor;
+  final VoidCallback? onTap;
 
   @override
   State<_StatSummaryCard> createState() => _StatSummaryCardState();
@@ -517,129 +507,135 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
     final ColorScheme colorScheme = theme.colorScheme;
     final Color accent = widget.accentColor;
     final Curve curve = Curves.easeOutCubic;
-    return MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: AnimatedContainer(
-        duration: heroStatCardHoverDuration,
-        curve: curve,
-        transformAlignment: Alignment.bottomCenter,
-        transform: Matrix4.identity()..translate(0.0, isHovered ? -3.0 : 0.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(heroStatCardRadius),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: <Color>[
-              Color.alphaBlend(accent.withAlpha(26), colorScheme.surface),
-              Color.alphaBlend(accent.withAlpha(8), colorScheme.surface),
-              colorScheme.surface,
-            ],
-            stops: const <double>[0, 0.38, 1],
+    final Widget card = AnimatedContainer(
+      duration: heroStatCardHoverDuration,
+      curve: curve,
+      transformAlignment: Alignment.bottomCenter,
+      transform: Matrix4.identity()..translate(0.0, isHovered ? -3.0 : 0.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(heroStatCardRadius),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color.alphaBlend(accent.withAlpha(26), colorScheme.surface),
+            Color.alphaBlend(accent.withAlpha(8), colorScheme.surface),
+            colorScheme.surface,
+          ],
+          stops: const <double>[0, 0.38, 1],
+        ),
+        border: Border.all(
+          color: Color.alphaBlend(
+            accent.withAlpha(52),
+            colorScheme.hentai.borderSubtle,
           ),
-          border: Border.all(
-            color: Color.alphaBlend(
-              accent.withAlpha(52),
-              colorScheme.hentai.borderSubtle,
-            ),
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: colorScheme.shadow.withAlpha(36),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: colorScheme.shadow.withAlpha(36),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
+          BoxShadow(
+            color: accent.withAlpha(14),
+            blurRadius: 0,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(heroStatCardRadius),
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              right: -8,
+              bottom: -12,
+              child: Icon(widget.icon, size: 88, color: accent.withAlpha(16)),
             ),
-            BoxShadow(
-              color: accent.withAlpha(14),
-              blurRadius: 0,
-              offset: const Offset(0, 4),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                tokens.spacing.lg + 4,
+                tokens.spacing.lg + 6,
+                tokens.spacing.lg + 4,
+                tokens.spacing.lg + 4,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          widget.label,
+                          style: TextStyle(
+                            fontSize: tokens.text.labelXs,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
+                            color: Color.alphaBlend(
+                              accent.withAlpha(200),
+                              colorScheme.hentai.textTertiary,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: tokens.spacing.sm + 2),
+                        Text(
+                          widget.valueText,
+                          style: TextStyle(
+                            fontSize: tokens.text.titleLg + 6,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.8,
+                            height: 1.05,
+                            color: colorScheme.hentai.textPrimary,
+                          ),
+                        ),
+                        SizedBox(height: tokens.spacing.sm - 1),
+                        Text(
+                          widget.caption,
+                          style: TextStyle(
+                            fontSize: tokens.text.bodySm,
+                            color: colorScheme.hentai.textSecondary,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  AnimatedContainer(
+                    duration: heroStatCardHoverDuration,
+                    curve: curve,
+                    padding: const EdgeInsets.all(11),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: <Color>[
+                          accent.withAlpha(30),
+                          accent.withAlpha(14),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: accent.withAlpha(58)),
+                      boxShadow: const <BoxShadow>[],
+                    ),
+                    child: Icon(widget.icon, size: 28, color: accent),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(heroStatCardRadius),
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                right: -8,
-                bottom: -12,
-                child: Icon(widget.icon, size: 88, color: accent.withAlpha(16)),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  tokens.spacing.lg + 4,
-                  tokens.spacing.lg + 6,
-                  tokens.spacing.lg + 4,
-                  tokens.spacing.lg + 4,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            widget.label,
-                            style: TextStyle(
-                              fontSize: tokens.text.labelXs,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                              color: Color.alphaBlend(
-                                accent.withAlpha(200),
-                                colorScheme.hentai.textTertiary,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: tokens.spacing.sm + 2),
-                          Text(
-                            widget.valueText,
-                            style: TextStyle(
-                              fontSize: tokens.text.titleLg + 6,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.8,
-                              height: 1.05,
-                              color: colorScheme.hentai.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: tokens.spacing.sm - 1),
-                          Text(
-                            widget.caption,
-                            style: TextStyle(
-                              fontSize: tokens.text.bodySm,
-                              color: colorScheme.hentai.textSecondary,
-                              height: 1.35,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    AnimatedContainer(
-                      duration: heroStatCardHoverDuration,
-                      curve: curve,
-                      padding: const EdgeInsets.all(11),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: <Color>[
-                            accent.withAlpha(30),
-                            accent.withAlpha(14),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: accent.withAlpha(58)),
-                        boxShadow: const <BoxShadow>[],
-                      ),
-                      child: Icon(widget.icon, size: 28, color: accent),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
+    );
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      cursor: widget.onTap == null
+          ? SystemMouseCursors.basic
+          : SystemMouseCursors.click,
+      child: widget.onTap == null
+          ? card
+          : GestureDetector(onTap: widget.onTap, child: card),
     );
   }
 }

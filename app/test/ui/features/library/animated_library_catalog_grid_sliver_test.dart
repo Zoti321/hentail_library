@@ -21,6 +21,7 @@ void main() {
                   layoutTier: LibraryLayoutTier.compact,
                   itemCount: 40,
                   positionAnimationKey: 'sort-a',
+                  sortFlipEnabled: false,
                   suppressAnimationKey:
                       const LibraryCatalogGridSuppressAnimationKey(
                         keyword: '',

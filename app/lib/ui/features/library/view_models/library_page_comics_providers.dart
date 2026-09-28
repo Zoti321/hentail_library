@@ -25,3 +25,11 @@ Future<Comic?> libraryComicDetail(Ref ref, String comicId) {
   );
   return ref.read(comicRepoProvider).findById(comicId);
 }
+
+@Riverpod(keepAlive: true)
+Future<List<Comic>> bulkEditComicsByIds(Ref ref, List<String> comicIds) {
+  ref.watch(
+    libraryRevisionProvider.select((LibraryRevisionState s) => s.revision),
+  );
+  return ref.read(comicRepoProvider).findByIds(comicIds);
+}

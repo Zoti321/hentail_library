@@ -53,6 +53,12 @@ class LibrarySeriesBlock extends ConsumerWidget {
       librarySeriesTabAgeRestrictionFilterProvider,
     );
     final int pageSize = ref.watch(librarySeriesTabPageSizeProvider);
+    final bool sortFlipEnabled = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) =>
+            async.asData?.value.libraryCatalogSortFlipEnabled ?? false,
+      ),
+    );
     final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey =
         LibraryCatalogGridSuppressAnimationKey(
           keyword: catalog.filterQuery,
@@ -76,6 +82,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
             isReloading: catalogAsync.isLoading,
             positionAnimationKey: sortOption,
             suppressAnimationKey: suppressAnimationKey,
+            sortFlipEnabled: sortFlipEnabled,
           ),
           if (showPagination)
             const LibraryPaginationBarSliver(
@@ -95,6 +102,7 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
     required this.isSeriesTableEmpty,
     required this.positionAnimationKey,
     required this.suppressAnimationKey,
+    required this.sortFlipEnabled,
     this.isReloading = false,
   });
 
@@ -103,6 +111,7 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
   final bool isSeriesTableEmpty;
   final Object positionAnimationKey;
   final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey;
+  final bool sortFlipEnabled;
   final bool isReloading;
 
   @override
@@ -123,6 +132,7 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
       itemCount: series.length,
       positionAnimationKey: positionAnimationKey,
       suppressAnimationKey: suppressAnimationKey,
+      sortFlipEnabled: sortFlipEnabled,
       itemBuilder: (BuildContext context, int index) {
         final Series s = series[index];
         return Center(

@@ -57,6 +57,18 @@ impl ScanInterval {
             Self::Weekly => "weekly",
         }
     }
+
+    /// Staleness window for Home library alert; `None` when interval is disabled.
+    pub fn staleness_threshold_ms(self) -> Option<i64> {
+        match self {
+            Self::Disabled => None,
+            Self::Hourly => Some(60 * 60 * 1000),
+            Self::Every6Hours => Some(6 * 60 * 60 * 1000),
+            Self::Every12Hours => Some(12 * 60 * 60 * 1000),
+            Self::Daily => Some(24 * 60 * 60 * 1000),
+            Self::Weekly => Some(7 * 24 * 60 * 60 * 1000),
+        }
+    }
 }
 
 pub fn parse_scan_interval(raw: &str) -> Result<ScanInterval, HentaiError> {
@@ -203,6 +215,41 @@ fn model_to_dto(model: libraries::Model) -> LibraryDto {
     }
 }
 
+pub async fn record_library_sync_success(library_id: &str) -> Result<(), HentaiError> {
+    let db = connection()?;
+    let now = now_ms();
+    let mut active: libraries::ActiveModel = Libraries::find_by_id(library_id.to_string())
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::validation(format!("Library 不存在: {library_id}")))?
+        .into();
+    active.last_successful_sync_at = Set(Some(now));
+    active.last_sync_error = Set(None);
+    active.update(&db).await.map_err(map_db_err)?;
+    Ok(())
+}
+
+pub async fn record_library_sync_failure(
+    library_id: &str,
+    error_message: &str,
+) -> Result<(), HentaiError> {
+    let trimmed = error_message.trim();
+    if trimmed.is_empty() {
+        return Ok(());
+    }
+    let db = connection()?;
+    let mut active: libraries::ActiveModel = Libraries::find_by_id(library_id.to_string())
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::validation(format!("Library 不存在: {library_id}")))?
+        .into();
+    active.last_sync_error = Set(Some(trimmed.to_string()));
+    active.update(&db).await.map_err(map_db_err)?;
+    Ok(())
+}
+
 fn resolve_library_name(explicit: Option<&str>, derived: String) -> String {
     explicit
         .map(str::trim)
@@ -337,6 +384,8 @@ pub async fn create_local_library(
         scan_interval: Set(ScanInterval::Disabled.as_str().to_string()),
         pinned: Set(1),
         sidebar_order: Set(sidebar_order),
+        last_successful_sync_at: Set(None),
+        last_sync_error: Set(None),
     };
     Libraries::insert(active)
         .exec(&db)
@@ -405,6 +454,8 @@ pub async fn create_remote_library(
         scan_interval: Set(ScanInterval::Disabled.as_str().to_string()),
         pinned: Set(1),
         sidebar_order: Set(sidebar_order),
+        last_successful_sync_at: Set(None),
+        last_sync_error: Set(None),
     };
     Libraries::insert(active)
         .exec(&db)
@@ -902,6 +953,7 @@ pub async fn delete_library(library_id: &str) -> Result<(), HentaiError> {
     }
 
     let txn = db.begin().await.map_err(map_db_err)?;
+    crate::probe::delete_snapshots_for_library(&txn, id).await?;
     let comic_ids = load_comic_ids_for_library(&txn, id).await?;
     delete_comics_side_effects(&txn, &comic_ids).await?;
     txn.execute(Statement::from_sql_and_values(

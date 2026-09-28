@@ -28,6 +28,26 @@ _Avoid_: 活动库、选中书架
 跨多个 Library 的聚合浏览面（趋近 Komga「全部库」）；不是一个 Library。路由占位为 `/libraries/all`；本阶段仅占位提示，不实现聚合目录。
 _Avoid_: 全部库（若被理解成一个 Library）、合并库、全局书架
 
+**Home page**:
+应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**展示 Current library 指示，**不**提供常驻 Library sync 入口。详见 ADR-0020。
+_Avoid_: 当前库仪表盘、首页扫描、Home dashboard（口语可用；文档与 issue 用 Home page）
+
+**Home library alert**:
+Home page 上可 dismiss 的、按 Library 粒度的态势条：远程根不可达、上次 Library sync 失败、距上次成功 sync 过久而建议再次 sync、Library resource probe 发现待同步 Resource 等。用户可从 alert 对该 Library 触发 Library sync；非常驻全局扫描按钮。
+_Avoid_: 首页扫描按钮、当前库健康面板、库通知中心
+
+**Library resource probe**:
+对某 Library 的 Library root 做只读枚举，与 **Library resource snapshot** diff，得到新增/变更/移除 Resource 计数；不解析 archive、不写 Comic/Series、不持 library 写锁。结果供 Home library alert 等 UI；用户确认后再执行 Library sync。详见 ADR-0021。
+_Avoid_: 轻量扫描、预扫描、自动 sync、文件监听（口语可用；领域与 issue 用 Library resource probe）
+
+**Library resource snapshot**:
+某 Library 在 **上次成功 Library sync 结束** 时持久化的 Resource 索引（规范化 location_key + modified_ms + size + resource_type）；供 Library resource probe diff。sync 失败或取消不更新；不是 Metadata backup，也不是 Comic 身份。
+_Avoid_: 扫描缓存、thumbnail stat、内容哈希索引
+
+**Recently added on Home**:
+Home page 横滑区块：跨全部 Library 取最近入库的 Comic（按库内记录时间降序，Top N），卡片标注来源 Library 显示名；点击进 Comic 详情或 Read session。不是推荐算法流。
+_Avoid_: 首页推荐、发现流、For you
+
 **Local library**:
 Library root 为本机目录的 Library；Resource 来自本地文件系统；入库后可离线阅读。
 _Avoid_: 本地书架、磁盘库（口语可用，文档用 Local library）
@@ -199,6 +219,14 @@ _Avoid_: 分级、年龄限制、路径自动标 r18
 **Comic metadata form**:
 编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
+
+**Catalog selection mode**:
+库页 Comics Tab 漫画网格上短暂多选 Comic 的 UI 模式；跨页 `Set<comicId>` 供 **Comic metadata bulk patch** 编排；与 **Library reorder mode**、Series reorder mode 互斥。换库、筛选/排序变化或离库页路由时清空。不含搜索页。
+_Avoid_: 多选模式（口语可用）、批量选择（易与 bulk patch 混淆）
+
+**Comic metadata bulk patch**:
+对同一 Library 内 Comic 集合的一次稀疏用户元数据变更：用户仅启用需要修改的字段（多值字段可为添加、移除或整字段替换；标量字段可为替换或清除）。core 逐本 merge 后写库，实际写入的字段自动加上 Metadata field lock。Metadata field lock 不阻挡本次写入（锁防的是 Library sync / Metadata refresh 覆盖）。单次 batch 不可跨 Library。用户入口：**库页**（经 Catalog selection mode）与 **Series 详情**（成员快捷入口，跳过选择模式）。不是 Metadata refresh、Library sync，也不是单本 Comic metadata form。详见 ADR-0022。
+_Avoid_: 批量编辑（口语可用）、批量刷新、批量表单
 
 **Series metadata form**:
 编辑 Series 用户元数据（名称、连载状态、计划总卷数）时的可提交草稿；计划总卷数以原始文本持有，空串表示清除、正整数表示设置；校验失败以字段级结果返回，由 UI 在字段下方展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。

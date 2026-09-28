@@ -36,7 +36,7 @@ void main() {
         of: find.byType(HomePageHeaderToolbar),
         matching: find.text('扫描漫画库'),
       ),
-      findsOneWidget,
+      findsNothing,
     );
   });
 
@@ -104,6 +104,7 @@ List<Override> _shellHomeOverrides() {
     tagCount: 0,
     seriesCount: 0,
     authorCount: 0,
+    libraryCount: 0,
   );
   return <Override>[
     settingsProvider.overrideWith(_FakeSettingsNotifier.new),
@@ -114,6 +115,15 @@ List<Override> _shellHomeOverrides() {
       (Ref ref) => Stream<List<HomeContinueReadingEntry>>.value(
         const <HomeContinueReadingEntry>[],
       ),
+    ),
+    homeRecentlyAddedStreamProvider.overrideWith(
+      (Ref ref) => Stream<List<HomeRecentlyAddedEntry>>.value(
+        const <HomeRecentlyAddedEntry>[],
+      ),
+    ),
+    homeLibraryAlertsStreamProvider.overrideWith(
+      (Ref ref) =>
+          Stream<List<HomeLibraryAlert>>.value(const <HomeLibraryAlert>[]),
     ),
     scanLibraryControllerProvider.overrideWith(_IdleScanLibraryController.new),
   ];

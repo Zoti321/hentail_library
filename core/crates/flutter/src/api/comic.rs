@@ -329,6 +329,116 @@ pub async fn refresh_comic_metadata_frb(comic_id: String) -> Result<(), HentaiEr
         .map_err(HentaiErrorDto::from)
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MultiValueOpFrbDto {
+    Add,
+    Remove,
+    Replace,
+}
+
+#[derive(Debug, Clone)]
+pub struct MultiValuePatchFrbDto {
+    pub op: MultiValueOpFrbDto,
+    pub values: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub enum ScalarPatchFrbDto {
+    Replace(String),
+    Clear,
+}
+
+#[derive(Debug, Clone)]
+pub enum PublishedAtPatchFrbDto {
+    Replace(i64),
+    Clear,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ComicMetadataBulkPatchFrbDto {
+    pub tags: Option<MultiValuePatchFrbDto>,
+    pub authors: Option<MultiValuePatchFrbDto>,
+    pub languages: Option<MultiValuePatchFrbDto>,
+    pub parodies: Option<MultiValuePatchFrbDto>,
+    pub characters: Option<MultiValuePatchFrbDto>,
+    pub content_rating: Option<String>,
+    pub description: Option<ScalarPatchFrbDto>,
+    pub published_at: Option<PublishedAtPatchFrbDto>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct BulkPatchResultFrbDto {
+    pub succeeded: i32,
+    pub failed: i32,
+    pub unchanged: i32,
+    pub cancelled: bool,
+    pub error_samples: Vec<String>,
+}
+
+fn map_multi_value_op(op: MultiValueOpFrbDto) -> hentai_core::MultiValueOp {
+    match op {
+        MultiValueOpFrbDto::Add => hentai_core::MultiValueOp::Add,
+        MultiValueOpFrbDto::Remove => hentai_core::MultiValueOp::Remove,
+        MultiValueOpFrbDto::Replace => hentai_core::MultiValueOp::Replace,
+    }
+}
+
+fn map_multi_value_patch(patch: MultiValuePatchFrbDto) -> hentai_core::MultiValuePatch {
+    hentai_core::MultiValuePatch {
+        op: map_multi_value_op(patch.op),
+        values: patch.values,
+    }
+}
+
+fn map_scalar_patch(patch: ScalarPatchFrbDto) -> hentai_core::ScalarPatch {
+    match patch {
+        ScalarPatchFrbDto::Replace(value) => hentai_core::ScalarPatch::Replace(value),
+        ScalarPatchFrbDto::Clear => hentai_core::ScalarPatch::Clear,
+    }
+}
+
+fn map_published_at_patch(patch: PublishedAtPatchFrbDto) -> hentai_core::PublishedAtPatch {
+    match patch {
+        PublishedAtPatchFrbDto::Replace(value) => hentai_core::PublishedAtPatch::Replace(value),
+        PublishedAtPatchFrbDto::Clear => hentai_core::PublishedAtPatch::Clear,
+    }
+}
+
+fn map_bulk_patch(patch: ComicMetadataBulkPatchFrbDto) -> hentai_core::ComicMetadataBulkPatch {
+    hentai_core::ComicMetadataBulkPatch {
+        tags: patch.tags.map(map_multi_value_patch),
+        authors: patch.authors.map(map_multi_value_patch),
+        languages: patch.languages.map(map_multi_value_patch),
+        parodies: patch.parodies.map(map_multi_value_patch),
+        characters: patch.characters.map(map_multi_value_patch),
+        content_rating: patch.content_rating,
+        description: patch.description.map(map_scalar_patch),
+        published_at: patch.published_at.map(map_published_at_patch),
+    }
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn apply_comic_metadata_bulk_patch_frb(
+    comic_ids: Vec<String>,
+    patch: ComicMetadataBulkPatchFrbDto,
+    handle: super::sync::SyncHandleDto,
+) -> Result<BulkPatchResultFrbDto, HentaiErrorDto> {
+    let result = hentai_core::apply_comic_metadata_bulk_patch(
+        comic_ids,
+        map_bulk_patch(patch),
+        &handle.inner,
+    )
+    .await
+    .map_err(HentaiErrorDto::from)?;
+    Ok(BulkPatchResultFrbDto {
+        succeeded: result.succeeded,
+        failed: result.failed,
+        unchanged: result.unchanged,
+        cancelled: result.cancelled,
+        error_samples: result.error_samples,
+    })
+}
+
 #[flutter_rust_bridge::frb]
 pub async fn search_by_tag_expression_frb(
     must_include: Vec<String>,

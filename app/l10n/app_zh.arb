@@ -113,8 +113,37 @@
       }
     }
   },
-  "homeEmptyTitle": "尚未导入漫画",
-  "homeEmptyHint": "请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。",
+  "homeEmptyTitle": "开始建立你的漫画库",
+  "homeEmptyHint": "添加本地或远程 Library 后即可在侧栏对该库执行 Library sync。",
+  "homeRecentlyAdded": "最近入库",
+  "homeViewAllHistory": "查看全部",
+  "homeAlertDismissLater": "稍后",
+  "homeAlertRemoteUnreachable": "{libraryName} 无法连接，建议检查网络或凭证",
+  "@homeAlertRemoteUnreachable": {
+    "placeholders": {
+      "libraryName": { "type": "String" }
+    }
+  },
+  "homeAlertSyncFailed": "{libraryName} 同步失败，建议重试",
+  "@homeAlertSyncFailed": {
+    "placeholders": {
+      "libraryName": { "type": "String" }
+    }
+  },
+  "homeAlertStaleSync": "{libraryName} 距上次同步已 {days} 天，建议同步",
+  "@homeAlertStaleSync": {
+    "placeholders": {
+      "libraryName": { "type": "String" },
+      "days": { "type": "int" }
+    }
+  },
+  "homeAlertPendingResources": "{libraryName} 发现 {count} 个新/变更 Resource，建议同步",
+  "@homeAlertPendingResources": {
+    "placeholders": {
+      "libraryName": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
   "homeStatSeries": "系列",
   "homeStatTags": "标签",
   "homeStatAuthors": "作者",
@@ -941,5 +970,78 @@
     "placeholders": {
       "error": {"type": "String"}
     }
-  }
+  },
+  "catalogSelectionEnter": "选择漫画",
+  "catalogSelectionExit": "取消",
+  "catalogSelectionSelectPage": "全选本页",
+  "catalogSelectionClear": "清除选择",
+  "catalogSelectionEditMetadata": "编辑元数据",
+  "catalogSelectionSelectedCount": "已选 {count} 本",
+  "@catalogSelectionSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataTitle": "批量编辑 · {count} 本",
+  "@bulkEditMetadataTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataConfirmTitle": "确认批量保存？",
+  "bulkEditMetadataConfirmBody": "将对 {comicCount} 本漫画应用 {fieldCount} 个启用字段。",
+  "@bulkEditMetadataConfirmBody": {
+    "placeholders": {
+      "comicCount": {"type": "int"},
+      "fieldCount": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataFieldTags": "标签",
+  "bulkEditMetadataFieldAuthors": "作者",
+  "bulkEditMetadataFieldLanguages": "语言",
+  "bulkEditMetadataFieldParodies": "原作",
+  "bulkEditMetadataFieldCharacters": "角色",
+  "bulkEditMetadataFieldContentRating": "内容分级",
+  "bulkEditMetadataFieldDescription": "概要",
+  "bulkEditMetadataFieldPublishedAt": "发布日期",
+  "bulkEditMetadataOpClear": "清除",
+  "seriesDetailEditMembersMetadata": "批量编辑元数据",
+  "bulkEditMetadataOpAdd": "添加",
+  "bulkEditMetadataOpRemove": "移除",
+  "bulkEditMetadataOpReplace": "替换",
+  "bulkEditMetadataMixedValues": "多种值",
+  "bulkEditMetadataOperationLabel": "操作",
+  "bulkEditMetadataCancelBatch": "取消批量编辑",
+  "bulkEditMetadataBusy": "正在批量编辑 {count} 本漫画…",
+  "@bulkEditMetadataBusy": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataBatchDone": "批量编辑完成：已更新 {succeeded}，失败 {failed}，无变化 {unchanged}",
+  "@bulkEditMetadataBatchDone": {
+    "placeholders": {
+      "succeeded": {"type": "int"},
+      "failed": {"type": "int"},
+      "unchanged": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataBatchCancelled": "已取消批量编辑（已更新 {succeeded}，失败 {failed}，无变化 {unchanged}）",
+  "@bulkEditMetadataBatchCancelled": {
+    "placeholders": {
+      "succeeded": {"type": "int"},
+      "failed": {"type": "int"},
+      "unchanged": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataSelectFieldHint": "在左侧选择要编辑的字段",
+  "bulkEditMetadataFieldSummaryCount": "{opLabel} · {count} 项",
+  "@bulkEditMetadataFieldSummaryCount": {
+    "placeholders": {
+      "opLabel": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataFieldSummaryReplace": "替换",
+  "bulkEditMetadataFieldSummaryClear": "清除"
 }

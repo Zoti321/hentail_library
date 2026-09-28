@@ -21,7 +21,7 @@ void main() {
       await _pumpHomePage(tester, const Size(360, 900));
 
       expect(tester.takeException(), isNull);
-      _expectHeaderRow(tester);
+      _expectHeaderWithoutScan(tester);
       _expectMenuIcon(tester, findsOneWidget);
       _expectStatsSingleColumn(tester);
     });
@@ -32,7 +32,7 @@ void main() {
       await _pumpHomePage(tester, const Size(700, 900));
 
       expect(tester.takeException(), isNull);
-      _expectHeaderRow(tester);
+      _expectHeaderWithoutScan(tester);
       _expectMenuIcon(tester, findsNothing);
       _expectStatsGrid2x2(tester);
     });
@@ -43,19 +43,73 @@ void main() {
       await _pumpHomePage(tester, const Size(1200, 900));
 
       expect(tester.takeException(), isNull);
-      _expectHeaderRow(tester);
+      _expectHeaderWithoutScan(tester);
       _expectMenuIcon(tester, findsNothing);
       _expectStatsSingleRow(tester);
     });
 
-    testWidgets('does not render shortcut entries section', (
+    testWidgets('does not render header scan button', (
       WidgetTester tester,
     ) async {
       await _pumpHomePage(tester, const Size(1200, 900));
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      expect(find.text('快捷入口'), findsNothing);
+      expect(find.text('扫描漫画库'), findsNothing);
+    });
+
+    testWidgets('renders continue reading history link', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHomePage(tester, const Size(700, 900));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('查看全部'), findsOneWidget);
+    });
+
+    testWidgets('renders home library alert when provided', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHomePage(
+        tester,
+        const Size(700, 900),
+        overrides: _homePageTestOverrides(
+          alerts: <HomeLibraryAlert>[
+            const HomeLibraryAlert(
+              libraryId: 'lib-1',
+              displayName: '测试库',
+              kind: HomeLibraryAlertKind.staleSync,
+              staleDays: 3,
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('测试库'), findsOneWidget);
+      expect(find.text('扫描漫画库'), findsOneWidget);
+    });
+
+    testWidgets('shows empty onboarding without scan CTA when library empty', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHomePage(
+        tester,
+        const Size(700, 900),
+        overrides: _homePageTestOverrides(
+          counts: const HomePageCounts(
+            comicCount: 0,
+            tagCount: 0,
+            seriesCount: 0,
+            authorCount: 0,
+            libraryCount: 0,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('扫描漫画库'), findsNothing);
+      expect(find.textContaining('添加本地库'), findsOneWidget);
     });
 
     testWidgets('moves greeting subtitle into body below header', (
@@ -87,8 +141,6 @@ void main() {
     testWidgets(
       'medium window with sidebar-narrowed content hides header menu',
       (WidgetTester tester) async {
-        // Window is medium (≥600) so shell uses icon rail, not drawer.
-        // Content area is window − collapsed rail (72) and falls under 600.
         const Size windowSize = Size(650, 900);
         const double contentWidth = 650 - DesktopSidebar.collapsedWidth;
         expect(contentWidth, lessThan(AppLayoutBreakpoints.compact));
@@ -107,6 +159,7 @@ Future<void> _pumpHomePage(
   WidgetTester tester,
   Size viewportSize, {
   double? contentWidth,
+  List<Override>? overrides,
 }) async {
   tester.view.physicalSize = viewportSize;
   tester.view.devicePixelRatio = 1.0;
@@ -114,7 +167,7 @@ Future<void> _pumpHomePage(
 
   await tester.pumpWidget(
     ProviderScope(
-      overrides: _homePageTestOverrides(),
+      overrides: overrides ?? _homePageTestOverrides(),
       child: MaterialApp(
         locale: const Locale('zh'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -137,13 +190,16 @@ Future<void> _pumpHomePage(
   await tester.pump();
 }
 
-List<Override> _homePageTestOverrides() {
-  const HomePageCounts counts = HomePageCounts(
+List<Override> _homePageTestOverrides({
+  HomePageCounts counts = const HomePageCounts(
     comicCount: 12,
     tagCount: 8,
     seriesCount: 3,
     authorCount: 5,
-  );
+    libraryCount: 1,
+  ),
+  List<HomeLibraryAlert> alerts = const <HomeLibraryAlert>[],
+}) {
   return <Override>[
     homePageCountsStreamProvider.overrideWith(
       (Ref ref) => Stream<HomePageCounts>.value(counts),
@@ -152,6 +208,14 @@ List<Override> _homePageTestOverrides() {
       (Ref ref) => Stream<List<HomeContinueReadingEntry>>.value(
         const <HomeContinueReadingEntry>[],
       ),
+    ),
+    homeRecentlyAddedStreamProvider.overrideWith(
+      (Ref ref) => Stream<List<HomeRecentlyAddedEntry>>.value(
+        const <HomeRecentlyAddedEntry>[],
+      ),
+    ),
+    homeLibraryAlertsStreamProvider.overrideWith(
+      (Ref ref) => Stream<List<HomeLibraryAlert>>.value(alerts),
     ),
     scanLibraryControllerProvider.overrideWith(_IdleScanLibraryController.new),
   ];
@@ -166,15 +230,6 @@ Offset _labelOffset(WidgetTester tester, String label) {
   return tester.getTopLeft(find.text(label).first);
 }
 
-Offset _headerScanButtonOffset(WidgetTester tester) {
-  return tester.getTopLeft(
-    find.descendant(
-      of: find.byType(HomePageHeaderToolbar),
-      matching: find.text('扫描漫画库'),
-    ),
-  );
-}
-
 void _expectMenuIcon(WidgetTester tester, Matcher matcher) {
   expect(
     find.byWidgetPredicate(
@@ -184,11 +239,9 @@ void _expectMenuIcon(WidgetTester tester, Matcher matcher) {
   );
 }
 
-void _expectHeaderRow(WidgetTester tester) {
-  final Offset title = _labelOffset(tester, '首页');
-  final Offset scanAction = _headerScanButtonOffset(tester);
-  expect(scanAction.dx, greaterThan(title.dx + 40));
-  expect((scanAction.dy - title.dy).abs(), lessThan(24));
+void _expectHeaderWithoutScan(WidgetTester tester) {
+  expect(find.text('扫描漫画库'), findsNothing);
+  expect(find.text('首页'), findsOneWidget);
 }
 
 void _expectStatsSingleColumn(WidgetTester tester) {

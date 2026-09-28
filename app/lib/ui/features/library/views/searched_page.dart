@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
@@ -231,7 +231,6 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                       child: ComicCard(
                         key: Key('search-comic-${comic.comicId}'),
                         comic: comic,
-                        gridIndex: index,
                         onEditMetadata: () => showEditMetadataDialog(
                           context: context,
                           comic: comic,

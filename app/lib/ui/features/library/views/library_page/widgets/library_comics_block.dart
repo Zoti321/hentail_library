@@ -53,6 +53,12 @@ class LibraryComicsBlock extends ConsumerWidget {
       libraryComicsTabAgeRestrictionFilterProvider,
     );
     final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
+    final bool sortFlipEnabled = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) =>
+            async.asData?.value.libraryCatalogSortFlipEnabled ?? false,
+      ),
+    );
     final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey =
         LibraryCatalogGridSuppressAnimationKey(
           keyword: catalog.filterQuery,
@@ -76,6 +82,7 @@ class LibraryComicsBlock extends ConsumerWidget {
             isReloading: catalogAsync.isLoading,
             positionAnimationKey: sortOption,
             suppressAnimationKey: suppressAnimationKey,
+            sortFlipEnabled: sortFlipEnabled,
           ),
           if (showPagination)
             const LibraryPaginationBarSliver(
@@ -95,6 +102,7 @@ class _LibraryComicsGridSliver extends StatelessWidget {
     required this.isComicTableEmpty,
     required this.positionAnimationKey,
     required this.suppressAnimationKey,
+    required this.sortFlipEnabled,
     this.isReloading = false,
   });
 
@@ -103,6 +111,7 @@ class _LibraryComicsGridSliver extends StatelessWidget {
   final bool isComicTableEmpty;
   final Object positionAnimationKey;
   final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey;
+  final bool sortFlipEnabled;
   final bool isReloading;
 
   @override
@@ -123,16 +132,17 @@ class _LibraryComicsGridSliver extends StatelessWidget {
       itemCount: comics.length,
       positionAnimationKey: positionAnimationKey,
       suppressAnimationKey: suppressAnimationKey,
+      sortFlipEnabled: sortFlipEnabled,
       itemBuilder: (BuildContext context, int index) {
         final Comic manga = comics[index];
         return Center(
           key: ValueKey<String>(manga.comicId),
-          child: ComicCard(
+          child: CatalogSelectableComicCard(
             comic: manga,
             gridIndex: index,
             onEditMetadata: () =>
                 showEditMetadataDialog(context: context, comic: manga),
-            onTap: () {
+            onOpenDetail: () {
               ProviderScope.containerOf(
                 context,
               ).read(comicDetailReturnSeriesProvider.notifier).clear();

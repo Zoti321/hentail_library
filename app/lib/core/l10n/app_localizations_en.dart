@@ -291,11 +291,40 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeEmptyTitle => 'No comics imported yet';
+  String get homeEmptyTitle => 'Start building your library';
 
   @override
   String get homeEmptyHint =>
-      'Add library folders in Settings and scan. If already configured, check Selected Paths or scan again.';
+      'Add a local or remote Library, then run Library sync from the sidebar.';
+
+  @override
+  String get homeRecentlyAdded => 'Recently added';
+
+  @override
+  String get homeViewAllHistory => 'View all';
+
+  @override
+  String get homeAlertDismissLater => 'Later';
+
+  @override
+  String homeAlertRemoteUnreachable(String libraryName) {
+    return '$libraryName is unreachable — check network or credentials';
+  }
+
+  @override
+  String homeAlertSyncFailed(String libraryName) {
+    return '$libraryName sync failed — retry when ready';
+  }
+
+  @override
+  String homeAlertStaleSync(String libraryName, int days) {
+    return '$libraryName last synced $days days ago — sync recommended';
+  }
+
+  @override
+  String homeAlertPendingResources(String libraryName, int count) {
+    return '$libraryName: $count new/changed Resources detected — sync recommended';
+  }
 
   @override
   String get homeStatSeries => 'Series';
@@ -2033,4 +2062,119 @@ class AppLocalizationsEn extends AppLocalizations {
   String bootstrapStartupFailed(String error) {
     return 'Startup failed: $error';
   }
+
+  @override
+  String get catalogSelectionEnter => 'Select comics';
+
+  @override
+  String get catalogSelectionExit => 'Cancel';
+
+  @override
+  String get catalogSelectionSelectPage => 'Select page';
+
+  @override
+  String get catalogSelectionClear => 'Clear selection';
+
+  @override
+  String get catalogSelectionEditMetadata => 'Edit metadata';
+
+  @override
+  String catalogSelectionSelectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String bulkEditMetadataTitle(int count) {
+    return 'Bulk edit · $count comics';
+  }
+
+  @override
+  String get bulkEditMetadataConfirmTitle => 'Save bulk changes?';
+
+  @override
+  String bulkEditMetadataConfirmBody(int comicCount, int fieldCount) {
+    return 'Apply $fieldCount enabled field(s) to $comicCount comics.';
+  }
+
+  @override
+  String get bulkEditMetadataFieldTags => 'Tags';
+
+  @override
+  String get bulkEditMetadataFieldAuthors => 'Authors';
+
+  @override
+  String get bulkEditMetadataFieldLanguages => 'Languages';
+
+  @override
+  String get bulkEditMetadataFieldParodies => 'Parodies';
+
+  @override
+  String get bulkEditMetadataFieldCharacters => 'Characters';
+
+  @override
+  String get bulkEditMetadataFieldContentRating => 'Content rating';
+
+  @override
+  String get bulkEditMetadataFieldDescription => 'Description';
+
+  @override
+  String get bulkEditMetadataFieldPublishedAt => 'Published date';
+
+  @override
+  String get bulkEditMetadataOpClear => 'Clear';
+
+  @override
+  String get seriesDetailEditMembersMetadata => 'Bulk edit metadata';
+
+  @override
+  String get bulkEditMetadataOpAdd => 'Add';
+
+  @override
+  String get bulkEditMetadataOpRemove => 'Remove';
+
+  @override
+  String get bulkEditMetadataOpReplace => 'Replace';
+
+  @override
+  String get bulkEditMetadataMixedValues => 'Mixed values';
+
+  @override
+  String get bulkEditMetadataOperationLabel => 'Operation';
+
+  @override
+  String get bulkEditMetadataCancelBatch => 'Cancel bulk edit';
+
+  @override
+  String bulkEditMetadataBusy(int count) {
+    return 'Bulk editing $count comics…';
+  }
+
+  @override
+  String bulkEditMetadataBatchDone(int succeeded, int failed, int unchanged) {
+    return 'Bulk edit done: $succeeded updated, $failed failed, $unchanged unchanged';
+  }
+
+  @override
+  String bulkEditMetadataBatchCancelled(
+    int succeeded,
+    int failed,
+    int unchanged,
+  ) {
+    return 'Bulk edit cancelled ($succeeded updated, $failed failed, $unchanged unchanged)';
+  }
+
+  @override
+  String get bulkEditMetadataSelectFieldHint =>
+      'Select a field on the left to edit';
+
+  @override
+  String bulkEditMetadataFieldSummaryCount(String opLabel, int count) {
+    return '$opLabel · $count item(s)';
+  }
+
+  @override
+  String get bulkEditMetadataFieldSummaryReplace => 'Replace';
+
+  @override
+  String get bulkEditMetadataFieldSummaryClear => 'Clear';
 }

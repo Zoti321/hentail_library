@@ -7,7 +7,6 @@ import 'package:hentai_library/domain/models/read_models/home_page_read_models.d
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/scan_progress_dialog.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -28,9 +27,16 @@ class _HomePageState extends ConsumerState<HomePage> {
       if (!mounted) {
         return;
       }
+      ref.read(homePageVisibleProvider.notifier).setVisible(true);
       setState(() => deferredSectionsReady = true);
     });
     WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  @override
+  void deactivate() {
+    ref.read(homePageVisibleProvider.notifier).setVisible(false);
+    super.deactivate();
   }
 
   @override
@@ -51,44 +57,28 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
-  void onTapScanLibrary(BuildContext context, WidgetRef ref) {
-    final bool running = ref.read(
-      scanLibraryControllerProvider.select((ScanLibraryState state) {
-        return state.running;
-      }),
-    );
-    if (!running) {
-      ref.read(scanLibraryControllerProvider.notifier).start();
-    }
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const ScanProgressDialog(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final ({int comicCount, bool isLibraryEmpty}) homeCountsLeaf = ref.watch(
+    final ({int comicCount, int libraryCount, bool showEmptyOnboarding})
+    homeCountsLeaf = ref.watch(
       homePageCountsStreamProvider.select((AsyncValue<HomePageCounts> async) {
         return async.maybeWhen(
-          data: (HomePageCounts c) =>
-              (comicCount: c.comicCount, isLibraryEmpty: c.comicCount == 0),
-          orElse: () => (comicCount: 0, isLibraryEmpty: false),
+          data: (HomePageCounts c) => (
+            comicCount: c.comicCount,
+            libraryCount: c.libraryCount,
+            showEmptyOnboarding: c.libraryCount == 0 || c.comicCount == 0,
+          ),
+          orElse: () =>
+              (comicCount: 0, libraryCount: 0, showEmptyOnboarding: false),
         );
       }),
     );
-    final int comicCount = homeCountsLeaf.comicCount;
-    final bool isLibraryEmpty = homeCountsLeaf.isLibraryEmpty;
     final l10n = context.l10n;
     final String greetingText = l10n.homeGreetingReader(
       l10n.homeGreetingPhraseForHour(DateTime.now().hour),
     );
-    void onScan() {
-      onTapScanLibrary(context, ref);
-    }
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -108,7 +98,6 @@ class _HomePageState extends ConsumerState<HomePage> {
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
           contentMaxWidth: innerMaxWidth,
-          onScan: onScan,
           onOpenNavigation: appShellPageNavigationOpener(context),
         );
         final Widget header = KeyedSubtree(
@@ -145,18 +134,24 @@ class _HomePageState extends ConsumerState<HomePage> {
                         greetingText,
                         style: homePageSubtitleStyle(colorScheme),
                       ),
-                      SizedBox(height: tokens.spacing.xl + 12),
-                      HomePageHeroSection(
-                        layoutTier: layoutTier,
-                        comicCount: comicCount,
-                        isLibraryEmpty: isLibraryEmpty,
-                        onScan: onScan,
-                        enableHeavyStats: deferredSectionsReady,
-                      ),
-                      SizedBox(height: tokens.spacing.lg + 8),
+                      SizedBox(height: tokens.spacing.lg),
+                      HomeLibraryAlertStack(enabled: deferredSectionsReady),
+                      SizedBox(height: tokens.spacing.lg),
                       HomePageContinueReadingSection(
                         layoutTier: layoutTier,
                         enabled: deferredSectionsReady,
+                      ),
+                      SizedBox(height: tokens.spacing.xl),
+                      HomeRecentlyAddedSection(
+                        layoutTier: layoutTier,
+                        enabled: deferredSectionsReady,
+                      ),
+                      SizedBox(height: tokens.spacing.xl),
+                      HomePageHeroSection(
+                        layoutTier: layoutTier,
+                        comicCount: homeCountsLeaf.comicCount,
+                        showEmptyOnboarding: homeCountsLeaf.showEmptyOnboarding,
+                        enableHeavyStats: deferredSectionsReady,
                       ),
                       SizedBox(height: tokens.spacing.xl + 8),
                     ],

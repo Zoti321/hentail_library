@@ -489,11 +489,19 @@ class _LibraryOverflowMenuButtonState
             },
           );
         }
+        final LibraryDisplayTarget displayTarget = ref.read(
+          libraryDisplayTargetProvider,
+        );
         return _LibraryOverflowMenu(
           layoutTier: widget.layoutTier,
+          showSelectionEntry: displayTarget == LibraryDisplayTarget.comics,
           onRefresh: () {
             _controller.hideMenu();
             ref.read(libraryRefreshActionProvider).call();
+          },
+          onEnterSelection: () {
+            _controller.hideMenu();
+            ref.read(catalogSelectionProvider.notifier).enter();
           },
           onScan: () {
             _controller.hideMenu();
@@ -595,15 +603,19 @@ class _LibraryOverflowScanningMenu extends StatelessWidget {
 class _LibraryOverflowMenu extends StatelessWidget {
   const _LibraryOverflowMenu({
     required this.layoutTier,
+    required this.showSelectionEntry,
     required this.onRefresh,
     required this.onScan,
     required this.onDeepScan,
+    required this.onEnterSelection,
   });
 
   final LibraryLayoutTier layoutTier;
+  final bool showSelectionEntry;
   final VoidCallback onRefresh;
   final VoidCallback onScan;
   final VoidCallback onDeepScan;
+  final VoidCallback onEnterSelection;
 
   @override
   Widget build(BuildContext context) {
@@ -626,6 +638,12 @@ class _LibraryOverflowMenu extends StatelessWidget {
               label: l10n.libraryRefresh,
               onTap: onRefresh,
             ),
+            if (showSelectionEntry)
+              _LibraryOverflowMenuItem(
+                icon: LucideIcons.squareCheck,
+                label: l10n.catalogSelectionEnter,
+                onTap: onEnterSelection,
+              ),
             _LibraryOverflowMenuItem(
               icon: LucideIcons.scanSearch,
               label: l10n.libraryScan,

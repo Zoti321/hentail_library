@@ -15,6 +15,7 @@ pub mod metadata_lock;
 pub mod migration;
 pub mod named_facet;
 pub mod parody;
+pub mod probe;
 pub mod reader;
 pub mod resource;
 pub mod revision;
@@ -32,11 +33,13 @@ pub use author::{
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
-    count_all, delete_comics_by_ids, fetch_comics_page, find_comic_by_id, find_comics_by_ids,
-    read_data_version, search_by_keyword, search_by_keyword_page, search_by_tag_expression,
-    search_by_tag_expression_page, set_comic_meta_locks, update_comic_user_meta, ComicDto,
-    ComicFilterDto, ComicMetaLocks, ComicSortFieldDto, ComicSortOptionDto, PageRequestDto,
-    PagedComicResultDto, SetComicMetaLocksDto, UpdateComicUserMetaDto,
+    apply_comic_metadata_bulk_patch, count_all, delete_comics_by_ids, fetch_comics_page,
+    find_comic_by_id, find_comics_by_ids, read_data_version, search_by_keyword,
+    search_by_keyword_page, search_by_tag_expression, search_by_tag_expression_page,
+    set_comic_meta_locks, update_comic_user_meta, BulkPatchResultDto, ComicDto, ComicFilterDto,
+    ComicMetaLocks, ComicMetadataBulkPatch, ComicSortFieldDto, ComicSortOptionDto, MultiValueOp,
+    MultiValuePatch, PageRequestDto, PagedComicResultDto, PublishedAtPatch, ScalarPatch,
+    SetComicMetaLocksDto, UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
@@ -47,12 +50,15 @@ pub use history::{
     PagedReadingHistoryDto, ReadingHistoryDto,
 };
 pub use home::{
-    watch_continue_reading_top5, watch_home_page_counts, HomeContinueReadingDto, HomePageCountsDto,
+    watch_continue_reading_top5, watch_home_library_alerts, watch_home_page_counts,
+    watch_recently_added_on_home, HomeContinueReadingDto, HomeLibraryAlertDto,
+    HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
     get_current_library_id, library_id_from_root, library_id_from_webdav_root, list_libraries,
-    normalize_webdav_root, parse_format_groups_json, parse_scan_interval, resolve_access_for_comic,
+    normalize_webdav_root, parse_format_groups_json, parse_scan_interval,
+    record_library_sync_failure, record_library_sync_success, resolve_access_for_comic,
     resolve_browse_library_id, serialize_format_groups, set_all_libraries_scan_on_startup,
     set_current_library_id, set_remote_library_credentials, update_library_format_groups,
     update_library_settings, update_library_sidebar_layout, update_local_library_root,
@@ -73,6 +79,7 @@ pub use named_facet::{
     replace_comic_named_facet, JunctionNamedFacet, NamedFacetFormEntry,
 };
 pub use parody::{list_all_parodies, list_distinct_parodies};
+pub use probe::{probe_library, rebuild_snapshot_from_scan_items, LibraryProbeResultDto};
 pub use reader::{
     clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
     load_reader_page, open_reader, open_reader_with, prefetch_reader_pages, writeback_after_open,

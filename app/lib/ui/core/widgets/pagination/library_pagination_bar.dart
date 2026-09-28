@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
+import 'package:hentai_library/ui/core/interaction/app_motion.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+const Duration _kPageIndicatorTransitionDuration = Duration(milliseconds: 200);
 
 enum LibraryPaginationPlacement { top, bottom }
 
@@ -50,8 +53,9 @@ class LibraryPaginationBar extends StatelessWidget {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
-            child: Text(
-              l10n.seriesDetailPaginationPage(page, totalPages),
+            child: _LibraryPaginationPageIndicator(
+              page: page,
+              label: l10n.seriesDetailPaginationPage(page, totalPages),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -82,5 +86,60 @@ class LibraryPaginationBar extends StatelessWidget {
         bottom: tokens.spacing.lg,
       ),
     };
+  }
+}
+
+class _LibraryPaginationPageIndicator extends StatelessWidget {
+  const _LibraryPaginationPageIndicator({
+    required this.page,
+    required this.label,
+    required this.style,
+  });
+
+  final int page;
+  final String label;
+  final TextStyle? style;
+
+  static const Offset _kEnterSlideBegin = Offset(0, 0.18);
+
+  @override
+  Widget build(BuildContext context) {
+    final Duration duration = motionDurationOf(
+      context,
+      _kPageIndicatorTransitionDuration,
+    );
+    return AnimatedSwitcher(
+      duration: duration,
+      reverseDuration: duration,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+        return Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.hardEdge,
+          children: <Widget>[
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
+        );
+      },
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        final Animation<double> curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: _kEnterSlideBegin,
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          ),
+        );
+      },
+      child: Text(key: ValueKey<int>(page), label, style: style),
+    );
   }
 }

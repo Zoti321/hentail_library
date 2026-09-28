@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -69,13 +70,23 @@ class HomePageContinueReadingSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          l10n.homeContinueReading,
-          style: TextStyle(
-            fontSize: tokens.text.titleSm,
-            fontWeight: FontWeight.w600,
-            color: colorScheme.hentai.textPrimary,
-          ),
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                l10n.homeContinueReading,
+                style: TextStyle(
+                  fontSize: tokens.text.titleSm,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.hentai.textPrimary,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => context.go('/history'),
+              child: Text('${l10n.homeViewAllHistory} →'),
+            ),
+          ],
         ),
         SizedBox(height: tokens.spacing.sm),
         SizedBox(
