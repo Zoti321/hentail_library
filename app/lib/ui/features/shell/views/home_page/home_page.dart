@@ -27,9 +27,16 @@ class _HomePageState extends ConsumerState<HomePage> {
       if (!mounted) {
         return;
       }
+      ref.read(homePageVisibleProvider.notifier).setVisible(true);
       setState(() => deferredSectionsReady = true);
     });
     WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  @override
+  void deactivate() {
+    ref.read(homePageVisibleProvider.notifier).setVisible(false);
+    super.deactivate();
   }
 
   @override
@@ -52,7 +59,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(homePageVisibilityLifecycleProvider);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final ({int comicCount, int libraryCount, bool showEmptyOnboarding})

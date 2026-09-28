@@ -33,23 +33,6 @@ final homePageVisibleProvider = NotifierProvider<HomePageVisibleNotifier, bool>(
   HomePageVisibleNotifier.new,
 );
 
-/// [HomePage] 挂载期间保持 `homePageVisibleProvider` 为 true；卸载后自动复位。
-final homePageVisibilityLifecycleProvider = Provider.autoDispose<void>((
-  Ref ref,
-) {
-  final HomePageVisibleNotifier visibleNotifier = ref.read(
-    homePageVisibleProvider.notifier,
-  );
-  ref.onDispose(() {
-    visibleNotifier.setVisible(false);
-  });
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (ref.mounted) {
-      visibleNotifier.setVisible(true);
-    }
-  });
-});
-
 @Riverpod(keepAlive: true)
 class HomeProbeResults extends _$HomeProbeResults {
   @override

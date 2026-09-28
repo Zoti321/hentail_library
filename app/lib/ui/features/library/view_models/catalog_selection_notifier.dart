@@ -31,28 +31,28 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
   CatalogSelectionState build() {
     ref.listen(
       currentLibraryProvider.select((s) => s.asData?.value.currentId),
-      (_, __) {
+      (_, _) {
         _reset();
       },
     );
     ref.listen(libraryQueryIntentProvider.select((intent) => intent.keyword), (
       _,
-      __,
+      _,
     ) {
       _reset();
     });
-    ref.listen(libraryComicsTabSortOptionProvider, (_, __) => _reset());
+    ref.listen(libraryComicsTabSortOptionProvider, (_, _) => _reset());
     ref.listen(
       libraryComicsTabAgeRestrictionFilterProvider,
-      (_, __) => _reset(),
+      (_, _) => _reset(),
     );
-    ref.listen(libraryComicsTabMediaTypeFilterProvider, (_, __) => _reset());
-    ref.listen(libraryComicsTabTagFilterProvider, (_, __) => _reset());
-    ref.listen(libraryComicsTabAuthorFilterProvider, (_, __) => _reset());
-    ref.listen(libraryComicsTabLanguageFilterProvider, (_, __) => _reset());
-    ref.listen(libraryComicsTabParodyFilterProvider, (_, __) => _reset());
-    ref.listen(libraryComicsTabCharacterFilterProvider, (_, __) => _reset());
-    ref.listen(libraryComicsTabExpandBySeriesProvider, (_, __) => _reset());
+    ref.listen(libraryComicsTabMediaTypeFilterProvider, (_, _) => _reset());
+    ref.listen(libraryComicsTabTagFilterProvider, (_, _) => _reset());
+    ref.listen(libraryComicsTabAuthorFilterProvider, (_, _) => _reset());
+    ref.listen(libraryComicsTabLanguageFilterProvider, (_, _) => _reset());
+    ref.listen(libraryComicsTabParodyFilterProvider, (_, _) => _reset());
+    ref.listen(libraryComicsTabCharacterFilterProvider, (_, _) => _reset());
+    ref.listen(libraryComicsTabExpandBySeriesProvider, (_, _) => _reset());
     ref.listen(libraryDisplayTargetProvider, (_, LibraryDisplayTarget target) {
       if (target == LibraryDisplayTarget.series && state.active) {
         exit();
