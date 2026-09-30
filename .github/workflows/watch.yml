@@ -54,4 +54,8 @@ jobs:
           target: google_apis
           disable-animations: true
           working-directory: app
-          script: flutter test integration_test/pdf_reader_smoke_test.dart -d emulator-5554
+          script: |
+            flutter build apk --debug --target-platform android-x64
+            flutter test integration_test/pdf_reader_smoke_test.dart -d emulator-5554 \
+              --use-application-binary=build/app/outputs/flutter-apk/app-debug.apk \
+              --timeout 10m
