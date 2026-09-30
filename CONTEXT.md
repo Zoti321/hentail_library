@@ -201,7 +201,7 @@ _Avoid_: 引用次数、usage count、ref_count、热度
 _Avoid_: 拼音搜索引擎、fuzzy search、拼音索引、全文检索
 
 **Smart facet match**:
-Comic metadata form 候选列表的排序增强：在对应 Named metadata facet 全局字典内，将信号命中的名字排在 Named facet attachment count 之前，并在下拉候选行提示来源；不自动写入表单已选值，不从信号发明典外新名。Author 信号为标题与相对 Library root 的 Resource 路径；Tag / Parody / Character 信号为同一非根 Folder series 内其它成员已附着的名字。可由应用级偏好开关，默认开启。
+Comic metadata form 候选列表的排序增强：在对应 Named metadata facet 全局字典内，将信号命中的名字排在 Named facet attachment count 之前，并在下拉候选行提示来源；不自动写入表单已选值，不从信号发明典外新名。Author 信号为三个独立来源的字典名 whole-string、大小写不敏感 substring 命中：Comic 标题、Resource 文件名（去扩展名）、相对 Library root 的 Resource 路径中全部父目录段；三源各自独立计分，同一名字命中源越多排序越靠前（标题与文件名相同时只计一次）；不解析方括号等命名惯例、不拆分括号内子串。Tag / Parody / Character 信号为同一非根 Folder series 内其它成员已附着的名字。可由应用级偏好开关，默认开启。
 _Avoid_: 智能匹配、自动打标、建议填充、引用次数排序（后者仅指 attachment count）
 
 **Comic catalog query**:

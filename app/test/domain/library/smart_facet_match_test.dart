@@ -15,7 +15,7 @@ void main() {
       () {
         final List<SmartFacetMatchCandidate> ranked = applySmartFacetMatch(
           candidates: catalog,
-          matchedNames: <String>{'beta'},
+          matchedSourceCounts: <String, int>{'beta': 1},
           enabled: false,
         );
 
@@ -29,7 +29,7 @@ void main() {
     test('when enabled, matched names rank before attachment count', () {
       final List<SmartFacetMatchCandidate> ranked = applySmartFacetMatch(
         candidates: catalog,
-        matchedNames: <String>{'beta'},
+        matchedSourceCounts: <String, int>{'beta': 1},
         enabled: true,
       );
 
@@ -51,7 +51,12 @@ void main() {
 
       final List<SmartFacetMatchCandidate> ranked = applySmartFacetMatch(
         candidates: candidates,
-        matchedNames: <String>{'m-low', 'm-high', 'm-mid-b', 'm-mid-a'},
+        matchedSourceCounts: <String, int>{
+          'm-low': 1,
+          'm-high': 1,
+          'm-mid-b': 1,
+          'm-mid-a': 1,
+        },
         enabled: true,
       );
 
@@ -61,10 +66,35 @@ void main() {
       );
     });
 
+    test('within matched group, sorts by source count before attachment', () {
+      final List<NamedFacetFormCandidate> candidates =
+          <NamedFacetFormCandidate>[
+            namedFacetFormCandidate(name: 'one-source', attachmentCount: 100),
+            namedFacetFormCandidate(name: 'three-source', attachmentCount: 1),
+            namedFacetFormCandidate(name: 'two-source', attachmentCount: 50),
+            namedFacetFormCandidate(name: 'other', attachmentCount: 200),
+          ];
+
+      final List<SmartFacetMatchCandidate> ranked = applySmartFacetMatch(
+        candidates: candidates,
+        matchedSourceCounts: <String, int>{
+          'one-source': 1,
+          'two-source': 2,
+          'three-source': 3,
+        },
+        enabled: true,
+      );
+
+      expect(
+        ranked.map((SmartFacetMatchCandidate c) => c.name).toList(),
+        <String>['three-source', 'two-source', 'one-source', 'other'],
+      );
+    });
+
     test('dictionary-only: matched names absent from catalog are ignored', () {
       final List<SmartFacetMatchCandidate> ranked = applySmartFacetMatch(
         candidates: catalog,
-        matchedNames: <String>{'ghost', 'beta'},
+        matchedSourceCounts: <String, int>{'ghost': 2, 'beta': 1},
         enabled: true,
       );
 
@@ -80,6 +110,9 @@ void main() {
     final List<NamedFacetFormCandidate> authors = <NamedFacetFormCandidate>[
       namedFacetFormCandidate(name: 'Alice', attachmentCount: 2),
       namedFacetFormCandidate(name: 'Bob', attachmentCount: 1),
+      namedFacetFormCandidate(name: 'Carol', attachmentCount: 1),
+      namedFacetFormCandidate(name: 'エス書店 (さんい)', attachmentCount: 5),
+      namedFacetFormCandidate(name: 'エス書店', attachmentCount: 3),
       namedFacetFormCandidate(name: 'あ', attachmentCount: 1),
       namedFacetFormCandidate(name: 'X', attachmentCount: 1),
       namedFacetFormCandidate(name: '画', attachmentCount: 1),
@@ -90,20 +123,70 @@ void main() {
         authorSmartMatchNames(
           dictionary: authors,
           title: 'Works by ALICE vol.1',
-          relativeResourcePath: 'series/file.cbz',
+          filenameStem: 'chapter01',
+          parentDirectorySegments: const <String>[],
         ),
-        <String>{'Alice'},
+        <String, int>{'Alice': 1},
       );
     });
 
-    test('matches author substring in relative path segments', () {
+    test('matches author substring in filename stem independently', () {
       expect(
         authorSmartMatchNames(
           dictionary: authors,
           title: 'Untitled',
-          relativeResourcePath: 'Bob/chapter01.cbz',
+          filenameStem: 'Works by Bob vol.1',
+          parentDirectorySegments: const <String>[],
         ),
-        <String>{'Bob'},
+        <String, int>{'Bob': 1},
+      );
+    });
+
+    test('matches author substring in parent directory segments', () {
+      expect(
+        authorSmartMatchNames(
+          dictionary: authors,
+          title: 'Untitled',
+          filenameStem: 'chapter01',
+          parentDirectorySegments: const <String>['Bob', 'series'],
+        ),
+        <String, int>{'Bob': 1},
+      );
+    });
+
+    test('counts multiple independent sources for the same author', () {
+      expect(
+        authorSmartMatchNames(
+          dictionary: authors,
+          title: 'Works by Alice',
+          filenameStem: 'Alice special',
+          parentDirectorySegments: const <String>['Alice'],
+        ),
+        <String, int>{'Alice': 3},
+      );
+    });
+
+    test('dedupes title and filename when normalized content is identical', () {
+      expect(
+        authorSmartMatchNames(
+          dictionary: authors,
+          title: 'Alice Collection',
+          filenameStem: 'Alice Collection',
+          parentDirectorySegments: const <String>[],
+        ),
+        <String, int>{'Alice': 1},
+      );
+    });
+
+    test('matches doujin filename stem as whole dictionary substring', () {
+      expect(
+        authorSmartMatchNames(
+          dictionary: authors,
+          title: 'THE YOUTH',
+          filenameStem: '(COMIC1☆9) [エス書店 (さんい)] THE YOUTH (アイドルマスター)',
+          parentDirectorySegments: const <String>[],
+        ),
+        <String, int>{'エス書店 (さんい)': 1, 'エス書店': 1},
       );
     });
 
@@ -112,7 +195,8 @@ void main() {
         authorSmartMatchNames(
           dictionary: authors,
           title: 'X marks',
-          relativeResourcePath: 'x/file.cbz',
+          filenameStem: 'x',
+          parentDirectorySegments: const <String>['x'],
         ),
         isEmpty,
       );
@@ -123,18 +207,90 @@ void main() {
         authorSmartMatchNames(
           dictionary: authors,
           title: '画集',
-          relativeResourcePath: 'folder/file.cbz',
+          filenameStem: 'file',
+          parentDirectorySegments: const <String>[],
         ),
-        <String>{'画'},
+        <String, int>{'画': 1},
       );
       expect(
         authorSmartMatchNames(
           dictionary: authors,
           title: 'あいう',
-          relativeResourcePath: 'a.cbz',
+          filenameStem: 'a',
+          parentDirectorySegments: const <String>[],
         ),
-        <String>{'あ'},
+        <String, int>{'あ': 1},
       );
+    });
+
+    test('does not count filename stem as a parent directory segment', () {
+      expect(
+        authorSmartMatchNames(
+          dictionary: authors,
+          title: 'Untitled',
+          filenameStem: 'Carol edition',
+          parentDirectorySegments: const <String>['Carol'],
+        ),
+        <String, int>{'Carol': 2},
+      );
+    });
+  });
+
+  group('resolveAuthorSmartMatchPathSources', () {
+    test('uses relative path when resource is under library root', () {
+      final AuthorSmartMatchPathSources sources =
+          resolveAuthorSmartMatchPathSources(
+            resourcePath: r'E:\libs\mine\Bob\chapter01.cbz',
+            relativeUnderLibraryRoot: r'Bob\chapter01.cbz',
+            libraryRootKnown: true,
+          );
+
+      expect(sources.filenameStem, 'chapter01');
+      expect(sources.parentDirectorySegments, <String>['Bob']);
+    });
+
+    test('uses full resource path when library root is unknown', () {
+      final AuthorSmartMatchPathSources sources =
+          resolveAuthorSmartMatchPathSources(
+            resourcePath: r'E:\drop\Carol\chapter01.cbz',
+            relativeUnderLibraryRoot: null,
+            libraryRootKnown: false,
+          );
+
+      expect(sources.filenameStem, 'chapter01');
+      expect(sources.parentDirectorySegments, <String>['E:', 'drop', 'Carol']);
+    });
+
+    test('uses basename only when resource is outside known library root', () {
+      final AuthorSmartMatchPathSources sources =
+          resolveAuthorSmartMatchPathSources(
+            resourcePath: r'D:\outside\Carol edition.cbz',
+            relativeUnderLibraryRoot: null,
+            libraryRootKnown: true,
+          );
+
+      expect(sources.filenameStem, 'Carol edition');
+      expect(sources.parentDirectorySegments, isEmpty);
+    });
+  });
+
+  group('authorSmartMatchPathSources', () {
+    test('splits relative path into stem and parent segments', () {
+      final AuthorSmartMatchPathSources sources = authorSmartMatchPathSources(
+        relativeResourcePath: r'Bob\series\chapter01.cbz',
+      );
+
+      expect(sources.filenameStem, 'chapter01');
+      expect(sources.parentDirectorySegments, <String>['Bob', 'series']);
+    });
+
+    test('returns empty parent segments for basename-only path', () {
+      final AuthorSmartMatchPathSources sources = authorSmartMatchPathSources(
+        relativeResourcePath: 'chapter01.cbz',
+      );
+
+      expect(sources.filenameStem, 'chapter01');
+      expect(sources.parentDirectorySegments, isEmpty);
     });
   });
 
