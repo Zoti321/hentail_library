@@ -82,12 +82,12 @@ Future<List<SmartFacetMatchCandidate>> _rankFacet({
   if (!enabled) {
     return applySmartFacetMatch(
       candidates: catalog,
-      matchedNames: const <String>{},
+      matchedSourceCounts: const <String, int>{},
       enabled: false,
     );
   }
 
-  final Set<String> matched = await _matchedNamesForKind(
+  final Map<String, int> matched = await _matchedSourceCountsForKind(
     ref: ref,
     scope: scope,
     kind: kind,
@@ -95,12 +95,12 @@ Future<List<SmartFacetMatchCandidate>> _rankFacet({
   );
   return applySmartFacetMatch(
     candidates: catalog,
-    matchedNames: matched,
+    matchedSourceCounts: matched,
     enabled: true,
   );
 }
 
-Future<Set<String>> _matchedNamesForKind({
+Future<Map<String, int>> _matchedSourceCountsForKind({
   required Ref ref,
   required ComicMetadataSmartFacetScope scope,
   required NamedFacetFormKind kind,
@@ -109,16 +109,23 @@ Future<Set<String>> _matchedNamesForKind({
   switch (kind) {
     case NamedFacetFormKind.author:
       final String? libraryRoot = _libraryRootForPath(ref, scope.resourcePath);
-      final String relative =
-          relativeResourcePathUnderRoot(
+      final String? relative = libraryRoot == null
+          ? null
+          : relativeResourcePathUnderRoot(
+              resourcePath: scope.resourcePath,
+              libraryRoot: libraryRoot,
+            );
+      final AuthorSmartMatchPathSources pathSources =
+          resolveAuthorSmartMatchPathSources(
             resourcePath: scope.resourcePath,
-            libraryRoot: libraryRoot ?? '',
-          ) ??
-          _basename(scope.resourcePath);
+            relativeUnderLibraryRoot: relative,
+            libraryRootKnown: libraryRoot != null,
+          );
       return authorSmartMatchNames(
         dictionary: catalog,
         title: scope.title,
-        relativeResourcePath: relative,
+        filenameStem: pathSources.filenameStem,
+        parentDirectorySegments: pathSources.parentDirectorySegments,
       );
     case NamedFacetFormKind.tag:
     case NamedFacetFormKind.parody:
@@ -146,7 +153,7 @@ String? _libraryRootForPath(Ref ref, String resourcePath) {
   );
 }
 
-Future<Set<String>> _siblingMatchedNames({
+Future<Map<String, int>> _siblingMatchedNames({
   required Ref ref,
   required ComicMetadataSmartFacetScope scope,
   required NamedFacetFormKind kind,
@@ -154,17 +161,19 @@ Future<Set<String>> _siblingMatchedNames({
 }) async {
   final String? seriesId = scope.seriesId;
   if (seriesId == null || seriesId.isEmpty) {
-    return siblingSmartMatchNames(
-      dictionary: catalog,
-      siblingAttachedNames: const <String>{},
-      isLibraryRootSeries: false,
+    return _siblingMatchSourceCounts(
+      siblingSmartMatchNames(
+        dictionary: catalog,
+        siblingAttachedNames: const <String>{},
+        isLibraryRootSeries: false,
+      ),
     );
   }
 
   final SeriesRepository seriesRepo = ref.read(seriesRepoProvider);
   final Series? series = await seriesRepo.findById(seriesId);
   if (series == null) {
-    return const <String>{};
+    return const <String, int>{};
   }
 
   final String? libraryRoot = _libraryRootForPath(ref, scope.resourcePath);
@@ -173,10 +182,12 @@ Future<Set<String>> _siblingMatchedNames({
     libraryRoot: libraryRoot,
   );
   if (rootSeries) {
-    return siblingSmartMatchNames(
-      dictionary: catalog,
-      siblingAttachedNames: const <String>{},
-      isLibraryRootSeries: true,
+    return _siblingMatchSourceCounts(
+      siblingSmartMatchNames(
+        dictionary: catalog,
+        siblingAttachedNames: const <String>{},
+        isLibraryRootSeries: true,
+      ),
     );
   }
 
@@ -202,18 +213,15 @@ Future<Set<String>> _siblingMatchedNames({
     }
   }
 
-  return siblingSmartMatchNames(
-    dictionary: catalog,
-    siblingAttachedNames: siblingNames,
-    isLibraryRootSeries: false,
+  return _siblingMatchSourceCounts(
+    siblingSmartMatchNames(
+      dictionary: catalog,
+      siblingAttachedNames: siblingNames,
+      isLibraryRootSeries: false,
+    ),
   );
 }
 
-String _basename(String path) {
-  final String normalized = path.replaceAll('\\', '/');
-  final int slash = normalized.lastIndexOf('/');
-  if (slash < 0 || slash >= normalized.length - 1) {
-    return path;
-  }
-  return normalized.substring(slash + 1);
+Map<String, int> _siblingMatchSourceCounts(Set<String> matchedNames) {
+  return <String, int>{for (final String name in matchedNames) name: 1};
 }
