@@ -63,6 +63,30 @@ function Import-CodeSigningCertificate {
     return $imported.Thumbprint
 }
 
+function Install-SelfSignedTrustForVerify {
+    param([string] $Thumbprint)
+
+    $cert = Get-Item -Path "Cert:\CurrentUser\My\$Thumbprint"
+    if ($cert.Subject -ne $cert.Issuer) {
+        return
+    }
+
+    Write-Host 'Self-signed certificate; adding to CurrentUser Root and TrustedPublisher for verify.'
+    foreach ($storeName in @('Root', 'TrustedPublisher')) {
+        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store(
+            $storeName,
+            [System.Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser
+        )
+        $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+        try {
+            $store.Add($cert)
+        }
+        finally {
+            $store.Close()
+        }
+    }
+}
+
 function Sign-ReleaseFile {
     param(
         [string] $SignTool,
@@ -92,6 +116,7 @@ $signTool = Resolve-SignTool
 Write-Host "Using signtool: $signTool"
 
 $thumbprint = Import-CodeSigningCertificate
+Install-SelfSignedTrustForVerify -Thumbprint $thumbprint
 
 foreach ($file in $Files) {
     $resolved = $file.Trim()
