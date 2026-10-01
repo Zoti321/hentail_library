@@ -42,7 +42,10 @@ function Import-CodeSigningCertificate {
             -HashAlgorithm SHA256 `
             -KeyExportPolicy Exportable `
             -NotAfter (Get-Date).AddDays(825)
-        return $cert.Thumbprint
+        return @{
+            Thumbprint = $cert.Thumbprint
+            SelfSigned = $true
+        }
     }
 
     if ([string]::IsNullOrWhiteSpace($env:WINDOWS_CODESIGN_PFX_PASSWORD)) {
@@ -60,13 +63,17 @@ function Import-CodeSigningCertificate {
         -Password $securePassword `
         -Exportable
     Remove-Item -LiteralPath $pfxPath -Force -ErrorAction SilentlyContinue
-    return $imported.Thumbprint
+    return @{
+        Thumbprint = $imported.Thumbprint
+        SelfSigned = ($imported.Subject -eq $imported.Issuer)
+    }
 }
 
 function Sign-ReleaseFile {
     param(
         [string] $SignTool,
         [string] $Thumbprint,
+        [bool] $SelfSigned,
         [string] $Path
     )
 
@@ -75,12 +82,31 @@ function Sign-ReleaseFile {
     }
 
     Write-Host "Signing: $Path"
-    & $SignTool sign `
-        /fd sha256 `
-        /td sha256 `
-        /tr http://timestamp.digicert.com `
-        /sha1 $Thumbprint `
-        $Path
+    if ($SelfSigned) {
+        # Avoid timestamp + chain-trust verify on CI: both can hang or fail for ephemeral certs.
+        & $SignTool sign /fd sha256 /sha1 $Thumbprint $Path
+    }
+    else {
+        & $SignTool sign `
+            /fd sha256 `
+            /td sha256 `
+            /tr http://timestamp.digicert.com `
+            /sha1 $Thumbprint `
+            $Path
+    }
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "signtool sign failed for: $Path"
+    }
+
+    if ($SelfSigned) {
+        $signature = Get-AuthenticodeSignature -FilePath $Path
+        if ($null -eq $signature.SignerCertificate) {
+            throw "No Authenticode signature found on: $Path"
+        }
+        Write-Host "Self-signed signature present (skipped chain-trust verify): $Path"
+        return
+    }
 
     & $SignTool verify /pa $Path
     if ($LASTEXITCODE -ne 0) {
@@ -91,14 +117,18 @@ function Sign-ReleaseFile {
 $signTool = Resolve-SignTool
 Write-Host "Using signtool: $signTool"
 
-$thumbprint = Import-CodeSigningCertificate
+$certInfo = Import-CodeSigningCertificate
 
 foreach ($file in $Files) {
     $resolved = $file.Trim()
     if ([string]::IsNullOrWhiteSpace($resolved)) {
         continue
     }
-    Sign-ReleaseFile -SignTool $signTool -Thumbprint $thumbprint -Path $resolved
+    Sign-ReleaseFile `
+        -SignTool $signTool `
+        -Thumbprint $certInfo.Thumbprint `
+        -SelfSigned $certInfo.SelfSigned `
+        -Path $resolved
 }
 
 Write-Host 'All files signed successfully.'
