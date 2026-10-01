@@ -77,8 +77,20 @@ _Avoid_: 内容 ID、文件指纹
 _Avoid_: 自动迁移身份、内容指纹身份、系列内容哈希、搬家、重命名保留、rekey（实现用语）
 
 **Comic deletion**:
-用户主动删除 Comic：从 Library 移除该 Comic 及其库内关联数据；对 Local library 在路径安全校验后永久删除其 Resource（成功或路径已不存在后再清库；删盘失败则不改库）；对 Remote library 仅清库、不删远程 Resource。不是 Library sync 的 orphan 清理，也不是删除整个 Library（后两者仍只动库记录）。详见 ADR-0012。
-_Avoid_: 删文件、从库移除（若暗示不删 Local Resource）、回收站删除、自动 orphan 删盘
+用户主动删除 Comic 的两段式流程之旧称：先 Comic trash，再（由用户在「已删除」页）Comic purge。新表述按具体阶段用 Comic trash / Comic restore / Comic purge。不是 Library sync 的 orphan 清理，也不是删除整个 Library（后两者仍只动库记录、不删 Resource）。详见 ADR-0012（部分被 ADR-0023 取代）、ADR-0023。
+_Avoid_: 删文件、从库移除（若暗示不删 Local Resource）、自动 orphan 删盘
+
+**Comic trash**:
+用户主动删除 Comic 的第一段：Comic 从所有浏览面（Library、Home、搜索、Series、阅读历史）隐藏且不可打开阅读，但库记录、用户元数据、Metadata field lock、阅读历史与 Resource 均原样保留，可 Comic restore。Local 与 Remote library 一致。Library sync 不会使其复活或重新导入；其 Resource 消失时按 orphan 清理移除。界面称「已删除」。详见 ADR-0023。
+_Avoid_: 回收站（易与系统回收站混淆）、隐藏、归档
+
+**Comic restore**:
+将处于 Comic trash 的 Comic 恢复为正常可见、可阅读状态，用户元数据与阅读历史随之回来。详见 ADR-0023。
+_Avoid_: 撤销删除、还原文件
+
+**Comic purge**:
+用户在「已删除」页对处于 Comic trash 的 Comic 执行的永久删除：对 Local library 在路径安全校验后永久删除其 Resource（成功或路径已不存在后再清库；删盘失败则该 Comic 不改库、留在 Comic trash）；对 Remote library 仅清库、不删远程 Resource。仅作用于已 trash 的 Comic，不自动触发。详见 ADR-0012、ADR-0023。
+_Avoid_: 清空回收站、彻底删除（口语可用，不作领域词）、自动清理
 
 **Resource**:
 可被发现并（校验后）入库为 Comic 的原始载体：本地文件/目录，或 WebDAV 上的文件。解析中间结果在入库前独立于 Comic 身份与用户元数据；Library sync / Metadata refresh / 阅读与缩略图共用同一套 Resource 访问与解析规则（经 Resource access）。
