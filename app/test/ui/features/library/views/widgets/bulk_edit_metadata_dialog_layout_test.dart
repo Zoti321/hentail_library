@@ -8,6 +8,7 @@ import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_fie
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/bulk_edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
@@ -26,6 +27,13 @@ class _FakeComicRepo implements ComicRepository {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeLibraryRevision extends LibraryRevisionNotifier {
+  @override
+  LibraryRevisionState build() {
+    return const LibraryRevisionState(revision: 1, hasReceivedFirstEmit: true);
+  }
 }
 
 Comic _comic(String id, {String title = 'Comic'}) {
@@ -59,6 +67,7 @@ Future<void> _pumpDialog(
     tester,
     wrapProviderScope: true,
     overrides: <Override>[
+      libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
       comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo(resolved)),
     ],
     home: Scaffold(
