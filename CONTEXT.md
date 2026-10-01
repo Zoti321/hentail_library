@@ -220,6 +220,10 @@ _Avoid_: 分级、年龄限制、路径自动标 r18
 编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
 
+**Needs metadata**:
+Comic 当前除标题外没有任何用户元数据的状态：无 Tag、Author、Parody、Character，Language 为空，无概要、无发布日期，Content rating 为 `unknown`。由现值派生，不是编辑历史；元数据来自用户还是扫描都不区分，Metadata field lock 不参与判定。库页 Comics Tab 用它筛出待整理的 Comic。
+_Avoid_: untagged、unstaged、未编辑、未整理（口语可用）
+
 **Catalog selection mode**:
 库页 Comics Tab 漫画网格上短暂多选 Comic 的 UI 模式；跨页 `Set<comicId>` 供 **Comic metadata bulk patch** 编排；与 **Library reorder mode**、Series reorder mode 互斥。换库、筛选/排序变化或离库页路由时清空。不含搜索页。
 _Avoid_: 多选模式（口语可用）、批量选择（易与 bulk patch 混淆）
