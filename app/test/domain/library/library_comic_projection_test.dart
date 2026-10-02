@@ -107,5 +107,29 @@ void main() {
         const LibraryTagPick(name: 'R18'),
       });
     });
+
+    test('buildListFilter leaves needs metadata off by default', () {
+      final LibraryComicFilter filter = projection.buildListFilter(
+        ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+        mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+        tagFilter: emptyMetadataFilter,
+        authorFilter: emptyMetadataFilter,
+      );
+      expect(filter.needsMetadataOnly, isFalse);
+    });
+
+    test('buildListFilter carries needs metadata browse preference', () {
+      final LibraryComicFilter filter = projection.buildListFilter(
+        ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+        mediaTypeFilter: const LibraryMediaTypeFilterSelection({
+          LibraryMediaTypeFilterOption.pdf,
+        }),
+        tagFilter: emptyMetadataFilter,
+        authorFilter: emptyMetadataFilter,
+        needsMetadataOnly: true,
+      );
+      expect(filter.needsMetadataOnly, isTrue);
+      expect(filter.resourceTypes, <ResourceType>{ResourceType.pdf});
+    });
   });
 }

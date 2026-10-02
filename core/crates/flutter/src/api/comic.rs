@@ -20,6 +20,7 @@ pub struct ComicFilterDto {
     pub languages: Vec<String>,
     pub parodies: Vec<String>,
     pub characters: Vec<String>,
+    pub needs_metadata_only: bool,
     pub library_id: Option<String>,
 }
 
@@ -143,6 +144,7 @@ impl From<ComicFilterDto> for hentai_core::ComicFilterDto {
             languages: value.languages,
             parodies: value.parodies,
             characters: value.characters,
+            needs_metadata_only: value.needs_metadata_only,
             library_id: value.library_id,
         }
     }

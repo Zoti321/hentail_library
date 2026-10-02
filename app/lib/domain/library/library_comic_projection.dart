@@ -18,6 +18,7 @@ class LibraryComicProjection {
     Set<String> languages = const <String>{},
     Set<String> parodies = const <String>{},
     Set<String> characters = const <String>{},
+    bool needsMetadataOnly = false,
     String? keyword,
   }) {
     final String? query = keyword?.trim().isEmpty ?? true
@@ -40,6 +41,7 @@ class LibraryComicProjection {
       languages: languages.isEmpty ? null : languages,
       parodies: parodies.isEmpty ? null : parodies,
       characters: characters.isEmpty ? null : characters,
+      needsMetadataOnly: needsMetadataOnly,
     );
   }
 

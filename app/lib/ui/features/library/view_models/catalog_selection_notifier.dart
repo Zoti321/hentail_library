@@ -52,6 +52,7 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     ref.listen(libraryComicsTabLanguageFilterProvider, (_, _) => _reset());
     ref.listen(libraryComicsTabParodyFilterProvider, (_, _) => _reset());
     ref.listen(libraryComicsTabCharacterFilterProvider, (_, _) => _reset());
+    ref.listen(libraryComicsTabNeedsMetadataOnlyProvider, (_, _) => _reset());
     ref.listen(libraryComicsTabExpandBySeriesProvider, (_, _) => _reset());
     ref.listen(libraryDisplayTargetProvider, (_, LibraryDisplayTarget target) {
       if (target == LibraryDisplayTarget.series && state.active) {

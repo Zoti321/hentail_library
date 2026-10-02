@@ -10,6 +10,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_needs_metadata_only_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_accordion.dart';
@@ -272,6 +273,87 @@ class _LibrarySerializationStatusFilterControlsState
                   ),
                 )
                 .toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 库页抽屉筛选控件（漫画 Tab「整理」手风琴）。
+class LibraryOrganizeFilterControls extends ConsumerStatefulWidget {
+  const LibraryOrganizeFilterControls({super.key});
+
+  @override
+  ConsumerState<LibraryOrganizeFilterControls> createState() =>
+      _LibraryOrganizeFilterControlsState();
+}
+
+class _LibraryOrganizeFilterControlsState
+    extends ConsumerState<LibraryOrganizeFilterControls> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    if (displayTarget != LibraryDisplayTarget.comics) {
+      return const SizedBox.shrink();
+    }
+
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final bool needsMetadataOnly = ref.watch(
+      libraryComicsTabNeedsMetadataOnlyProvider,
+    );
+
+    final AppLocalizations l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            hoverColor: theme.hoverColor,
+            splashColor: theme.splashColor,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                kLibraryFilterSortDrawerContentInset,
+                10,
+                kLibraryFilterSortDrawerContentInset,
+                10,
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      l10n.libraryOrganizeFilter,
+                      style: TextStyle(
+                        fontSize: tokens.text.bodySm,
+                        fontWeight: FontWeight.w500,
+                        color: cs.hentai.textPrimary,
+                      ),
+                    ),
+                  ),
+                  LibraryFilterAccordionChevron(expanded: _expanded),
+                ],
+              ),
+            ),
+          ),
+        ),
+        LibraryFilterAccordionBody(
+          expanded: _expanded,
+          child: _FilterCheckboxOptionRow(
+            label: l10n.libraryNeedsMetadataOnlyFilter,
+            selected: needsMetadataOnly,
+            onTap: () {
+              ref
+                  .read(libraryNeedsMetadataOnlyProvider.notifier)
+                  .setEnabled(!needsMetadataOnly);
+            },
           ),
         ),
       ],

@@ -67,6 +67,7 @@ rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
     languages: _mapStringSet(filter.languages),
     parodies: _mapStringSet(filter.parodies),
     characters: _mapStringSet(filter.characters),
+    needsMetadataOnly: filter.needsMetadataOnly,
   );
 }
 
@@ -146,5 +147,6 @@ rust.ComicFilterDto unrestrictedListFilter() {
     languages: <String>[],
     parodies: <String>[],
     characters: <String>[],
+    needsMetadataOnly: false,
   );
 }

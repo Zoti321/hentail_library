@@ -926,6 +926,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryAuthorFilter => 'Authors';
 
   @override
+  String get libraryOrganizeFilter => 'Organize';
+
+  @override
+  String get libraryNeedsMetadataOnlyFilter => 'Needs metadata only';
+
+  @override
   String get libraryMetadataFilterClear => 'Clear';
 
   @override

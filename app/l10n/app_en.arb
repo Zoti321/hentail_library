@@ -394,6 +394,8 @@
   "libraryCharacterFilter": "Characters",
   "libraryTagFilter": "Tags",
   "libraryAuthorFilter": "Authors",
+  "libraryOrganizeFilter": "Organize",
+  "libraryNeedsMetadataOnlyFilter": "Needs metadata only",
   "libraryMetadataFilterClear": "Clear",
   "libraryMetadataFilterSearchHint": "Search…",
   "libraryMetadataFilterEmpty": "No matches",

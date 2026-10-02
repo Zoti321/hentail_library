@@ -98,6 +98,23 @@ void main() {
         isTrue,
       );
     });
+
+    test('needs metadata only counts as customized', () {
+      expect(
+        isLibraryComicFilterSortCustomized(
+          ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+          mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+          tagFilter: _emptyTagFilter,
+          authorFilter: _emptyAuthorFilter,
+          languageFilter: const <String>{},
+          parodyFilter: const <String>{},
+          characterFilter: const <String>{},
+          needsMetadataOnly: true,
+          sortOption: kLibraryDefaultSortOption,
+        ),
+        isTrue,
+      );
+    });
   });
 
   group('isLibrarySeriesFilterSortCustomized', () {

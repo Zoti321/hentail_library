@@ -134,6 +134,20 @@ fn push_facet_exclude_in(
     }
 }
 
+/// **Needs metadata**: nothing but the title. Locks and physical fields are ignored;
+/// blank description / Language entries count as empty because the scan write
+/// path does not normalize them.
+const NEEDS_METADATA_SQL: &str = "(\
+     NOT EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id) \
+     AND NOT EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id) \
+     AND NOT EXISTS (SELECT 1 FROM comic_parodies cp WHERE cp.comic_id = c.comic_id) \
+     AND NOT EXISTS (SELECT 1 FROM comic_characters cc WHERE cc.comic_id = c.comic_id) \
+     AND (NOT json_valid(m.languages) OR NOT EXISTS (\
+         SELECT 1 FROM json_each(m.languages) je WHERE trim(je.value) != '')) \
+     AND (m.description IS NULL OR trim(m.description) = '') \
+     AND m.published_at IS NULL \
+     AND m.content_rating = 'unknown')";
+
 /// Catalog page / count WHERE (AND-combined predicates).
 pub(super) fn build_catalog_where_clause(
     filter: &ComicFilterDto,
@@ -216,6 +230,9 @@ pub(super) fn build_catalog_where_clause(
         ComicNameFacet::Character,
         &filter.characters,
     );
+    if filter.needs_metadata_only {
+        parts.push(NEEDS_METADATA_SQL.to_string());
+    }
     parts.join(" AND ")
 }
 

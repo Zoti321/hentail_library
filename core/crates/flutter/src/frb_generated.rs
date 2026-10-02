@@ -4702,6 +4702,7 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
         let mut var_languages = <Vec<String>>::sse_decode(deserializer);
         let mut var_parodies = <Vec<String>>::sse_decode(deserializer);
         let mut var_characters = <Vec<String>>::sse_decode(deserializer);
+        let mut var_needsMetadataOnly = <bool>::sse_decode(deserializer);
         let mut var_libraryId = <Option<String>>::sse_decode(deserializer);
         return crate::api::comic::ComicFilterDto {
             show_r18: var_showR18,
@@ -4717,6 +4718,7 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
             languages: var_languages,
             parodies: var_parodies,
             characters: var_characters,
+            needs_metadata_only: var_needsMetadataOnly,
             library_id: var_libraryId,
         };
     }
@@ -7012,6 +7014,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicFilterDto {
             self.languages.into_into_dart().into_dart(),
             self.parodies.into_into_dart().into_dart(),
             self.characters.into_into_dart().into_dart(),
+            self.needs_metadata_only.into_into_dart().into_dart(),
             self.library_id.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -8834,6 +8837,7 @@ impl SseEncode for crate::api::comic::ComicFilterDto {
         <Vec<String>>::sse_encode(self.languages, serializer);
         <Vec<String>>::sse_encode(self.parodies, serializer);
         <Vec<String>>::sse_encode(self.characters, serializer);
+        <bool>::sse_encode(self.needs_metadata_only, serializer);
         <Option<String>>::sse_encode(self.library_id, serializer);
     }
 }

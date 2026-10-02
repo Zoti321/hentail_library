@@ -37,6 +37,20 @@ void main() {
     expect(mapped.characters, unorderedEquals(<String>['sakura']));
   });
 
+  test('mapLibraryFilter forwards needs metadata flag', () {
+    expect(mapLibraryFilter(LibraryComicFilter()).needsMetadataOnly, isFalse);
+    expect(
+      mapLibraryFilter(
+        LibraryComicFilter(needsMetadataOnly: true),
+      ).needsMetadataOnly,
+      isTrue,
+    );
+  });
+
+  test('unrestrictedListFilter keeps needs metadata off', () {
+    expect(unrestrictedListFilter().needsMetadataOnly, isFalse);
+  });
+
   test('mapRustComic maps identity facets UTC timestamps and locks', () {
     final rust.ComicDto dto = _comicDto(
       description: '简介',

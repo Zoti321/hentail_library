@@ -4833,8 +4833,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicFilterDto dco_decode_comic_filter_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 14)
-      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
+    if (arr.length != 15)
+      throw Exception('unexpected arr length: expect 15 but see ${arr.length}');
     return ComicFilterDto(
       showR18: dco_decode_bool(arr[0]),
       query: dco_decode_opt_String(arr[1]),
@@ -4849,7 +4849,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       languages: dco_decode_list_String(arr[10]),
       parodies: dco_decode_list_String(arr[11]),
       characters: dco_decode_list_String(arr[12]),
-      libraryId: dco_decode_opt_String(arr[13]),
+      needsMetadataOnly: dco_decode_bool(arr[13]),
+      libraryId: dco_decode_opt_String(arr[14]),
     );
   }
 
@@ -6527,6 +6528,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_languages = sse_decode_list_String(deserializer);
     var var_parodies = sse_decode_list_String(deserializer);
     var var_characters = sse_decode_list_String(deserializer);
+    var var_needsMetadataOnly = sse_decode_bool(deserializer);
     var var_libraryId = sse_decode_opt_String(deserializer);
     return ComicFilterDto(
       showR18: var_showR18,
@@ -6542,6 +6544,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       languages: var_languages,
       parodies: var_parodies,
       characters: var_characters,
+      needsMetadataOnly: var_needsMetadataOnly,
       libraryId: var_libraryId,
     );
   }
@@ -8685,6 +8688,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.languages, serializer);
     sse_encode_list_String(self.parodies, serializer);
     sse_encode_list_String(self.characters, serializer);
+    sse_encode_bool(self.needsMetadataOnly, serializer);
     sse_encode_opt_String(self.libraryId, serializer);
   }
 

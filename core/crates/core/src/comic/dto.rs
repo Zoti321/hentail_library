@@ -18,6 +18,9 @@ pub struct ComicFilterDto {
     pub parodies: Vec<String>,
     /// Character names to include (OR semantics); empty = no filter.
     pub characters: Vec<String>,
+    /// Keep only Comics in **Needs metadata** state (see `CONTEXT.md`).
+    #[serde(default)]
+    pub needs_metadata_only: bool,
     /// When `None`, browse APIs resolve to Current library.
     pub library_id: Option<String>,
 }
@@ -38,6 +41,7 @@ impl Default for ComicFilterDto {
             languages: vec![],
             parodies: vec![],
             characters: vec![],
+            needs_metadata_only: false,
             library_id: None,
         }
     }
@@ -59,6 +63,7 @@ impl ComicFilterDto {
             languages: normalize_tags(self.languages),
             parodies: normalize_tags(self.parodies),
             characters: normalize_tags(self.characters),
+            needs_metadata_only: self.needs_metadata_only,
             library_id: self
                 .library_id
                 .map(|s| s.trim().to_string())

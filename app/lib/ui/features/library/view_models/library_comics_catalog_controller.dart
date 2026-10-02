@@ -50,6 +50,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
       ref.watch(libraryComicsTabLanguageFilterProvider),
       ref.watch(libraryComicsTabParodyFilterProvider),
       ref.watch(libraryComicsTabCharacterFilterProvider),
+      ref.watch(libraryComicsTabNeedsMetadataOnlyProvider),
       ref.watch(libraryComicsTabExpandBySeriesProvider),
       ref.watch(libraryComicsTabSortOptionProvider),
       ref.watch(libraryComicsTabPageSizeProvider),
@@ -112,6 +113,9 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     final Set<String> characterFilter = ref.read(
       libraryComicsTabCharacterFilterProvider,
     );
+    final bool needsMetadataOnly = ref.read(
+      libraryComicsTabNeedsMetadataOnlyProvider,
+    );
     final bool expandBySeries = ref.read(
       libraryComicsTabExpandBySeriesProvider,
     );
@@ -123,6 +127,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
       languages: languageFilter,
       parodies: parodyFilter,
       characters: characterFilter,
+      needsMetadataOnly: needsMetadataOnly,
       keyword: keyword,
     );
     final int pageSize = ref.read(libraryComicsTabPageSizeProvider);

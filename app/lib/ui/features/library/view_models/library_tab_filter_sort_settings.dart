@@ -3,6 +3,7 @@ import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_expand_by_series.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
+import 'package:hentai_library/domain/library/library_needs_metadata_only.dart';
 import 'package:hentai_library/domain/library/library_prefer_library_root_series.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
@@ -86,6 +87,7 @@ bool isLibraryComicFilterSortCustomized({
   required Set<String> characterFilter,
   required LibraryComicSortOption sortOption,
   bool expandBySeries = LibraryExpandBySeries.defaultValue,
+  bool needsMetadataOnly = LibraryNeedsMetadataOnly.defaultValue,
 }) {
   return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
       mediaTypeFilter.isActive ||
@@ -95,6 +97,7 @@ bool isLibraryComicFilterSortCustomized({
       parodyFilter.isNotEmpty ||
       characterFilter.isNotEmpty ||
       expandBySeries != LibraryExpandBySeries.defaultValue ||
+      needsMetadataOnly != LibraryNeedsMetadataOnly.defaultValue ||
       sortOption.field != kLibraryDefaultSortOption.field ||
       sortOption.descending != kLibraryDefaultSortOption.descending;
 }
@@ -125,6 +128,7 @@ bool isLibraryFilterSortCustomizedForTarget({
   required LibrarySerializationStatusFilter serializationStatusFilter,
   required LibraryTabSortSettings sortSettings,
   bool expandBySeries = LibraryExpandBySeries.defaultValue,
+  bool needsMetadataOnly = LibraryNeedsMetadataOnly.defaultValue,
   bool preferLibraryRootSeries = LibraryPreferLibraryRootSeries.defaultValue,
 }) {
   return switch (target) {
@@ -137,6 +141,7 @@ bool isLibraryFilterSortCustomizedForTarget({
       parodyFilter: parodyFilter,
       characterFilter: characterFilter,
       expandBySeries: expandBySeries,
+      needsMetadataOnly: needsMetadataOnly,
       sortOption: sortSettings.comics,
     ),
     LibraryDisplayTarget.series => isLibrarySeriesFilterSortCustomized(

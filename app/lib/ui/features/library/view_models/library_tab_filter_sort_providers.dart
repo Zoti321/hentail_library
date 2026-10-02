@@ -3,6 +3,7 @@ import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_expand_by_series.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
+import 'package:hentai_library/domain/library/library_needs_metadata_only.dart';
 import 'package:hentai_library/domain/library/library_prefer_library_root_series.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
@@ -13,6 +14,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_catalog_s
 import 'package:hentai_library/ui/features/library/view_models/library_expand_by_series_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_needs_metadata_only_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_prefer_library_root_series_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
@@ -145,6 +147,17 @@ bool libraryComicsTabExpandBySeries(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+bool libraryComicsTabNeedsMetadataOnly(Ref ref) {
+  final AsyncValue<bool> settingsAsync = ref.watch(
+    libraryNeedsMetadataOnlyProvider,
+  );
+  return settingsAsync.maybeWhen(
+    data: (bool enabled) => enabled,
+    orElse: () => LibraryNeedsMetadataOnly.defaultValue,
+  );
+}
+
+@Riverpod(keepAlive: true)
 LibraryMediaTypeFilterSelection libraryComicsTabMediaTypeFilter(Ref ref) {
   final AsyncValue<LibraryMediaTypeFilterSelection> selectionAsync = ref.watch(
     libraryMediaTypeFilterProvider,
@@ -226,6 +239,9 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
     libraryComicsTabCharacterFilterProvider,
   );
   final bool expandBySeries = ref.watch(libraryComicsTabExpandBySeriesProvider);
+  final bool needsMetadataOnly = ref.watch(
+    libraryComicsTabNeedsMetadataOnlyProvider,
+  );
   final LibrarySerializationStatusFilter serializationStatusFilter = ref.watch(
     librarySeriesTabSerializationStatusFilterProvider,
   );
@@ -251,6 +267,7 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
     characterFilter: characterFilter,
     serializationStatusFilter: serializationStatusFilter,
     expandBySeries: expandBySeries,
+    needsMetadataOnly: needsMetadataOnly,
     preferLibraryRootSeries: preferLibraryRootSeries,
     sortSettings: sortSettings,
   );

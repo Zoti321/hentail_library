@@ -1670,6 +1670,18 @@ abstract class AppLocalizations {
   /// **'作者'**
   String get libraryAuthorFilter;
 
+  /// No description provided for @libraryOrganizeFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'整理'**
+  String get libraryOrganizeFilter;
+
+  /// No description provided for @libraryNeedsMetadataOnlyFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅显示待补元数据'**
+  String get libraryNeedsMetadataOnlyFilter;
+
   /// No description provided for @libraryMetadataFilterClear.
   ///
   /// In zh, this message translates to:

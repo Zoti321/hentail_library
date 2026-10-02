@@ -885,6 +885,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryAuthorFilter => '作者';
 
   @override
+  String get libraryOrganizeFilter => '整理';
+
+  @override
+  String get libraryNeedsMetadataOnlyFilter => '仅显示待补元数据';
+
+  @override
   String get libraryMetadataFilterClear => '清除';
 
   @override

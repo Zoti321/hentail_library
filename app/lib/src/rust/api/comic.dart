@@ -258,6 +258,7 @@ class ComicFilterDto {
   final List<String> languages;
   final List<String> parodies;
   final List<String> characters;
+  final bool needsMetadataOnly;
   final String? libraryId;
 
   const ComicFilterDto({
@@ -274,6 +275,7 @@ class ComicFilterDto {
     required this.languages,
     required this.parodies,
     required this.characters,
+    required this.needsMetadataOnly,
     this.libraryId,
   });
 
@@ -292,6 +294,7 @@ class ComicFilterDto {
       languages.hashCode ^
       parodies.hashCode ^
       characters.hashCode ^
+      needsMetadataOnly.hashCode ^
       libraryId.hashCode;
 
   @override
@@ -312,6 +315,7 @@ class ComicFilterDto {
           languages == other.languages &&
           parodies == other.parodies &&
           characters == other.characters &&
+          needsMetadataOnly == other.needsMetadataOnly &&
           libraryId == other.libraryId;
 }
 

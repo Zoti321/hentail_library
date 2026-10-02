@@ -394,6 +394,8 @@
   "libraryCharacterFilter": "角色",
   "libraryTagFilter": "标签",
   "libraryAuthorFilter": "作者",
+  "libraryOrganizeFilter": "整理",
+  "libraryNeedsMetadataOnlyFilter": "仅显示待补元数据",
   "libraryMetadataFilterClear": "清除",
   "libraryMetadataFilterSearchHint": "搜索…",
   "libraryMetadataFilterEmpty": "无匹配项",
