@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
@@ -281,20 +282,12 @@ class _LibrarySerializationStatusFilterControlsState
 }
 
 /// 库页抽屉筛选控件（漫画 Tab「整理」手风琴）。
-class LibraryOrganizeFilterControls extends ConsumerStatefulWidget {
+class LibraryOrganizeFilterControls extends HookConsumerWidget {
   const LibraryOrganizeFilterControls({super.key});
 
   @override
-  ConsumerState<LibraryOrganizeFilterControls> createState() =>
-      _LibraryOrganizeFilterControlsState();
-}
-
-class _LibraryOrganizeFilterControlsState
-    extends ConsumerState<LibraryOrganizeFilterControls> {
-  bool _expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ValueNotifier<bool> expanded = useState(false);
     final LibraryDisplayTarget displayTarget = ref.watch(
       libraryDisplayTargetProvider,
     );
@@ -316,7 +309,7 @@ class _LibraryOrganizeFilterControlsState
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => setState(() => _expanded = !_expanded),
+            onTap: () => expanded.value = !expanded.value,
             hoverColor: theme.hoverColor,
             splashColor: theme.splashColor,
             child: Padding(
@@ -338,14 +331,14 @@ class _LibraryOrganizeFilterControlsState
                       ),
                     ),
                   ),
-                  LibraryFilterAccordionChevron(expanded: _expanded),
+                  LibraryFilterAccordionChevron(expanded: expanded.value),
                 ],
               ),
             ),
           ),
         ),
         LibraryFilterAccordionBody(
-          expanded: _expanded,
+          expanded: expanded.value,
           child: _FilterCheckboxOptionRow(
             label: l10n.libraryNeedsMetadataOnlyFilter,
             selected: needsMetadataOnly,
