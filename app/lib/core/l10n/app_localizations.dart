@@ -4011,6 +4011,168 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'我了解将从库中永久移除，此操作不可撤销'**
   String get comicPurgeRemoteAcknowledge;
+
+  /// No description provided for @authorDetailTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get authorDetailTitle;
+
+  /// No description provided for @authorDetailVerified.
+  ///
+  /// In zh, this message translates to:
+  /// **'认证作者'**
+  String get authorDetailVerified;
+
+  /// No description provided for @authorDetailAddLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加链接'**
+  String get authorDetailAddLink;
+
+  /// No description provided for @authorDetailEditLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑链接'**
+  String get authorDetailEditLink;
+
+  /// No description provided for @authorDetailLinkUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'链接'**
+  String get authorDetailLinkUrl;
+
+  /// No description provided for @authorDetailLinkUrlHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'https://…'**
+  String get authorDetailLinkUrlHint;
+
+  /// No description provided for @authorDetailPlatform.
+  ///
+  /// In zh, this message translates to:
+  /// **'平台'**
+  String get authorDetailPlatform;
+
+  /// No description provided for @authorDetailPlatformPixiv.
+  ///
+  /// In zh, this message translates to:
+  /// **'Pixiv'**
+  String get authorDetailPlatformPixiv;
+
+  /// No description provided for @authorDetailPlatformX.
+  ///
+  /// In zh, this message translates to:
+  /// **'X'**
+  String get authorDetailPlatformX;
+
+  /// No description provided for @authorDetailPlatformPatreon.
+  ///
+  /// In zh, this message translates to:
+  /// **'Patreon'**
+  String get authorDetailPlatformPatreon;
+
+  /// No description provided for @authorDetailPlatformFanbox.
+  ///
+  /// In zh, this message translates to:
+  /// **'FANBOX'**
+  String get authorDetailPlatformFanbox;
+
+  /// No description provided for @authorDetailPlatformDiscord.
+  ///
+  /// In zh, this message translates to:
+  /// **'Discord'**
+  String get authorDetailPlatformDiscord;
+
+  /// No description provided for @authorDetailPlatformOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get authorDetailPlatformOther;
+
+  /// No description provided for @authorDetailPlatformOtherName.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义名称'**
+  String get authorDetailPlatformOtherName;
+
+  /// No description provided for @authorDetailDeleteLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除链接'**
+  String get authorDetailDeleteLink;
+
+  /// No description provided for @authorDetailTagsSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get authorDetailTagsSection;
+
+  /// No description provided for @authorDetailParodiesSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get authorDetailParodiesSection;
+
+  /// No description provided for @authorDetailCharactersSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get authorDetailCharactersSection;
+
+  /// No description provided for @authorDetailComicsSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画'**
+  String get authorDetailComicsSection;
+
+  /// No description provided for @authorDetailTagsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无标签'**
+  String get authorDetailTagsEmpty;
+
+  /// No description provided for @authorDetailParodiesEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无原作'**
+  String get authorDetailParodiesEmpty;
+
+  /// No description provided for @authorDetailCharactersEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无角色'**
+  String get authorDetailCharactersEmpty;
+
+  /// No description provided for @authorDetailComicsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无漫画'**
+  String get authorDetailComicsEmpty;
+
+  /// No description provided for @authorDetailViewInSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'在搜索中查看'**
+  String get authorDetailViewInSearch;
+
+  /// No description provided for @authorDetailRename.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名'**
+  String get authorDetailRename;
+
+  /// No description provided for @authorDetailInvalidUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入以 http:// 或 https:// 开头的链接'**
+  String get authorDetailInvalidUrl;
+
+  /// No description provided for @authorDetailOpenLinkFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法打开链接'**
+  String get authorDetailOpenLinkFailed;
 }
 
 class _AppLocalizationsDelegate

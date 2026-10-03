@@ -5,7 +5,7 @@ use sea_orm::{
 
 use crate::comic::{now_ms, ComicDto};
 use crate::db::map_db_err;
-use crate::entity::{comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*};
+use crate::entity::{comic_meta, comic_tags, comic_thumbnails, comics, prelude::*};
 use crate::error::HentaiError;
 use crate::history::normalize_reading_history_titles;
 use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
@@ -500,14 +500,8 @@ async fn load_author_names_for_comic<C: ConnectionTrait>(
     db: &C,
     comic_id: &str,
 ) -> Result<Vec<String>, HentaiError> {
-    let rows = ComicAuthors::find()
-        .filter(comic_authors::Column::ComicId.eq(comic_id))
-        .all(db)
-        .await
-        .map_err(map_db_err)?;
-    let mut names: Vec<String> = rows.into_iter().map(|r| r.author_name).collect();
-    names.sort();
-    Ok(names)
+    let map = crate::author::load_author_names_for_comics(db, &[comic_id.to_string()]).await?;
+    Ok(map.get(comic_id).cloned().unwrap_or_default())
 }
 
 async fn load_tag_names_for_comic<C: ConnectionTrait>(
@@ -529,7 +523,7 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
     comic_id: &str,
     author_names: &[String],
 ) -> Result<(), HentaiError> {
-    replace_comic_named_facet(db, JunctionNamedFacet::Author, comic_id, author_names).await
+    crate::author::replace_comic_authors(db, comic_id, author_names).await
 }
 
 pub async fn replace_comic_tags<C: ConnectionTrait>(

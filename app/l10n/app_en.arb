@@ -1152,5 +1152,32 @@
       }
     }
   },
-  "comicPurgeRemoteAcknowledge": "I understand this will permanently remove them from the library and cannot be undone"
+  "comicPurgeRemoteAcknowledge": "I understand this will permanently remove them from the library and cannot be undone",
+  "authorDetailTitle": "Author",
+  "authorDetailVerified": "Verified author",
+  "authorDetailAddLink": "Add link",
+  "authorDetailEditLink": "Edit link",
+  "authorDetailLinkUrl": "URL",
+  "authorDetailLinkUrlHint": "https://…",
+  "authorDetailPlatform": "Platform",
+  "authorDetailPlatformPixiv": "Pixiv",
+  "authorDetailPlatformX": "X",
+  "authorDetailPlatformPatreon": "Patreon",
+  "authorDetailPlatformFanbox": "FANBOX",
+  "authorDetailPlatformDiscord": "Discord",
+  "authorDetailPlatformOther": "Other",
+  "authorDetailPlatformOtherName": "Custom name",
+  "authorDetailDeleteLink": "Delete link",
+  "authorDetailTagsSection": "Tags",
+  "authorDetailParodiesSection": "Parody",
+  "authorDetailCharactersSection": "Characters",
+  "authorDetailComicsSection": "Comics",
+  "authorDetailTagsEmpty": "No tags yet",
+  "authorDetailParodiesEmpty": "No parodies yet",
+  "authorDetailCharactersEmpty": "No characters yet",
+  "authorDetailComicsEmpty": "No comics yet",
+  "authorDetailViewInSearch": "View in search",
+  "authorDetailRename": "Rename",
+  "authorDetailInvalidUrl": "Enter a URL starting with http:// or https://",
+  "authorDetailOpenLinkFailed": "Could not open the link"
 }

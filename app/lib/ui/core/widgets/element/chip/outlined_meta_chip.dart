@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 描边胶囊 chip，用于详情页作者/标签等元数据展示。
 ///
@@ -15,7 +16,10 @@ class OutlinedMetaChip extends StatelessWidget {
     this.borderColor,
     this.textColor,
     this.compact = false,
+    this.verified = false,
+    this.icon,
     this.onTap,
+    this.onLongPress,
     this.onRemove,
   });
 
@@ -25,7 +29,10 @@ class OutlinedMetaChip extends StatelessWidget {
 
   /// 为 true 时使用更紧的 padding（`10×4`，对齐 [R18RatingChip]）。
   final bool compact;
+  final bool verified;
+  final IconData? icon;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final VoidCallback? onRemove;
 
   @override
@@ -42,6 +49,8 @@ class OutlinedMetaChip extends StatelessWidget {
     final Widget label = _OutlinedMetaChipLabel(
       text: text,
       color: effectiveTextColor,
+      verified: verified,
+      icon: icon,
     );
     final Widget content = onRemove == null
         ? label
@@ -57,7 +66,7 @@ class OutlinedMetaChip extends StatelessWidget {
             ],
           );
 
-    if (onTap == null) {
+    if (onTap == null && onLongPress == null) {
       return Semantics(
         label: text,
         child: _OutlinedMetaChipChrome(
@@ -75,7 +84,8 @@ class OutlinedMetaChip extends StatelessWidget {
       borderColor: effectiveBorder,
       borderRadius: borderRadius,
       padding: padding,
-      onTap: onTap!,
+      onTap: onTap,
+      onLongPress: onLongPress,
       child: content,
     );
   }
@@ -114,15 +124,17 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
     required this.borderColor,
     required this.borderRadius,
     required this.padding,
-    required this.onTap,
     required this.child,
+    this.onTap,
+    this.onLongPress,
   });
 
   final String text;
   final Color borderColor;
   final BorderRadius borderRadius;
   final EdgeInsets padding;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final Widget child;
 
   @override
@@ -139,12 +151,13 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
 
     return FocusableActionDetector(
       actions: <Type, Action<Intent>>{
-        ActivateIntent: CallbackAction<ActivateIntent>(
-          onInvoke: (ActivateIntent intent) {
-            onTap();
-            return null;
-          },
-        ),
+        if (onTap != null)
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (ActivateIntent intent) {
+              onTap!();
+              return null;
+            },
+          ),
       },
       onShowFocusHighlight: (bool focused) {
         if (!focused && !isHovered.value) {
@@ -176,10 +189,13 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTapDown: (_) => isPressed.value = true,
-                onTapUp: (_) => isPressed.value = false,
-                onTapCancel: () => isPressed.value = false,
+                onTapDown: onTap == null ? null : (_) => isPressed.value = true,
+                onTapUp: onTap == null ? null : (_) => isPressed.value = false,
+                onTapCancel: onTap == null
+                    ? null
+                    : () => isPressed.value = false,
                 onTap: onTap,
+                onLongPress: onLongPress,
                 child: _OutlinedMetaChipChrome(
                   backgroundColor: resolvedBackground,
                   borderColor: borderColor,
@@ -235,15 +251,23 @@ class _OutlinedMetaChipChrome extends StatelessWidget {
 }
 
 class _OutlinedMetaChipLabel extends StatelessWidget {
-  const _OutlinedMetaChipLabel({required this.text, required this.color});
+  const _OutlinedMetaChipLabel({
+    required this.text,
+    required this.color,
+    this.verified = false,
+    this.icon,
+  });
 
   final String text;
   final Color color;
+  final bool verified;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    return Text(
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final Text label = Text(
       text,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
@@ -253,6 +277,23 @@ class _OutlinedMetaChipLabel extends StatelessWidget {
         color: color,
         fontWeight: FontWeight.w500,
       ),
+    );
+    if (!verified && icon == null) {
+      return label;
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        if (icon != null) ...<Widget>[
+          Icon(icon, size: 12, color: color),
+          SizedBox(width: tokens.spacing.xs),
+        ],
+        Flexible(child: label),
+        if (verified) ...<Widget>[
+          SizedBox(width: tokens.spacing.xs),
+          Icon(LucideIcons.badgeCheck, size: 12, color: cs.primary),
+        ],
+      ],
     );
   }
 }

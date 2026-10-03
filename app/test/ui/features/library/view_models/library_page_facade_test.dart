@@ -27,6 +27,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../support/fakes/author_repository_test_fakes.dart';
 import '../../../../support/fakes/revision_throttle_test_fakes.dart';
 
 class _FakeLibraryRevision extends LibraryRevisionNotifier {
@@ -123,6 +124,7 @@ void main() {
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
         comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo()),
         seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo()),
+        authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
       ],
     );
     addTearDown(container.dispose);

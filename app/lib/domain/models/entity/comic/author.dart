@@ -2,8 +2,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'author.freezed.dart';
 
-/// 作者（最小建模，与 [Tag] 对称）。
+/// Author 稳定身份：可变显示名 + 可选认证态。
 @freezed
 abstract class Author with _$Author {
-  factory Author({required String name}) = _Author;
+  factory Author({
+    int? id,
+    required String name,
+    @Default(false) bool verified,
+  }) = _Author;
 }

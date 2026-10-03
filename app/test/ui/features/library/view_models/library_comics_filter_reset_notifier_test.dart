@@ -10,8 +10,12 @@ import 'package:hentai_library/ui/features/library/view_models/library_expand_by
 import 'package:hentai_library/ui/features/library/view_models/library_needs_metadata_only_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../support/fakes/author_repository_test_fakes.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +27,11 @@ void main() {
   test(
     'comics resetAll restores age, expand-by-series, needs metadata, and sort',
     () async {
-      final ProviderContainer container = ProviderContainer();
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
+        ],
+      );
       addTearDown(container.dispose);
 
       await container.read(libraryAgeRestrictionFilterProvider.future);

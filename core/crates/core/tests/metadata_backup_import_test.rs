@@ -360,6 +360,7 @@ fn preview_reports_ambiguous_candidates() {
                     include_orphan_facets: false,
                 },
                 orphan_facets: Default::default(),
+                author_links: vec![],
                 comics: vec![hentai_core::ComicExportRecord {
                     comic_id: "backup-id".to_string(),
                     path: "E:/lib/dup.cbz".to_string(),

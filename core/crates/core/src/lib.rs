@@ -28,8 +28,11 @@ pub mod thumbnail;
 pub mod util;
 
 pub use author::{
-    add_author, count_all_authors, delete_authors_by_names, fetch_authors_page, list_all_authors,
-    rename_author, watch_authors,
+    add_author, add_author_link, count_all_authors, delete_author_link, delete_authors_by_names,
+    fetch_authors_page, get_author_detail, list_all_authors, list_author_links, rename_author,
+    replace_comic_authors, resolve_author_image, update_author_link, watch_authors,
+    AuthorDetailDto, AuthorFacetCountDto, AuthorIdentity, AuthorImageRef, AuthorImageSource,
+    AuthorLinkDto, AuthorLinkPlatform, AuthorTopComicDto,
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{

@@ -35,9 +35,9 @@ class LibraryComicProjection {
       tagsAll: _mapTagNames(tagSets.all),
       tagsAny: _mapTagNames(tagSets.any),
       tagsExclude: _mapTagNames(tagSets.exclude),
-      authorsAll: _mapAuthorNames(authorSets.all),
-      authorsAny: _mapAuthorNames(authorSets.any),
-      authorsExclude: _mapAuthorNames(authorSets.exclude),
+      authorsAll: _mapAuthorIds(authorSets.all),
+      authorsAny: _mapAuthorIds(authorSets.any),
+      authorsExclude: _mapAuthorIds(authorSets.exclude),
       languages: languages.isEmpty ? null : languages,
       parodies: parodies.isEmpty ? null : parodies,
       characters: characters.isEmpty ? null : characters,
@@ -52,10 +52,19 @@ class LibraryComicProjection {
     return names.map((String name) => LibraryTagPick(name: name)).toSet();
   }
 
-  Set<LibraryAuthorPick>? _mapAuthorNames(Set<String> names) {
-    if (names.isEmpty) {
+  Set<LibraryAuthorPick>? _mapAuthorIds(Set<String> ids) {
+    if (ids.isEmpty) {
       return null;
     }
-    return names.map((String name) => LibraryAuthorPick(name: name)).toSet();
+    return ids
+        .map((String raw) {
+          final int? id = int.tryParse(raw);
+          if (id == null) {
+            return null;
+          }
+          return LibraryAuthorPick(id: id, name: raw);
+        })
+        .whereType<LibraryAuthorPick>()
+        .toSet();
   }
 }

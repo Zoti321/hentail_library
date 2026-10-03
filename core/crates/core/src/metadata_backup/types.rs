@@ -54,6 +54,17 @@ pub struct ComicExportRecord {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct AuthorLinkExportRecord {
+    pub author_name: String,
+    pub platform: String,
+    pub url: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub platform_display_name: Option<String>,
+    #[serde(default)]
+    pub sort_key: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct MetadataBackupPayload {
     pub schema_version: u32,
     pub exported_at: String,
@@ -61,6 +72,8 @@ pub struct MetadataBackupPayload {
     pub options: ExportOptionsRecord,
     #[serde(default, skip_serializing_if = "OrphanFacetsRecord::is_empty")]
     pub orphan_facets: OrphanFacetsRecord,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub author_links: Vec<AuthorLinkExportRecord>,
     pub comics: Vec<ComicExportRecord>,
 }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -10,6 +11,8 @@ import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dar
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/show_author_detail.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
@@ -153,13 +156,34 @@ class _NamedFacetListSection extends ConsumerWidget {
                 (String item) => OutlinedMetaChip(
                   text: item,
                   compact: true,
-                  onTap: () => showAdaptiveFormSurfaceWidget<void>(
-                    context: context,
-                    surface: _NamedFacetDetailSurface(
-                      kind: kind,
-                      initialName: item,
-                    ),
-                  ),
+                  verified:
+                      kind == ManagedNamedFacetKind.author &&
+                      ref
+                          .watch(allAuthorsProvider)
+                          .maybeWhen(
+                            data: (List<Author> authors) => authors.any(
+                              (author) =>
+                                  author.name == item && author.verified,
+                            ),
+                            orElse: () => false,
+                          ),
+                  onTap: () async {
+                    if (kind == ManagedNamedFacetKind.author) {
+                      await showAuthorDetailByName(
+                        context: context,
+                        ref: ref,
+                        name: item,
+                      );
+                      return;
+                    }
+                    await showAdaptiveFormSurfaceWidget<void>(
+                      context: context,
+                      surface: _NamedFacetDetailSurface(
+                        kind: kind,
+                        initialName: item,
+                      ),
+                    );
+                  },
                 ),
               )
               .toList(),

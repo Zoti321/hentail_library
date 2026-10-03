@@ -7,8 +7,8 @@ use sea_orm::{
 
 use crate::db::{connection, map_db_err, version_connection};
 use crate::entity::{
-    comic_authors, comic_characters, comic_meta, comic_parodies, comic_reading_histories,
-    comic_tags, comics, prelude::*,
+    comic_characters, comic_meta, comic_parodies, comic_reading_histories, comic_tags, comics,
+    prelude::*,
 };
 use crate::error::HentaiError;
 
@@ -284,7 +284,7 @@ pub async fn load_comics_ordered(
         .map(|m| (m.comic_id.clone(), m))
         .collect();
     let tag_map = load_tag_names(db, &comic_ids).await?;
-    let author_map = load_author_names(db, &comic_ids).await?;
+    let author_map = crate::author::load_author_names_for_comics(db, &comic_ids).await?;
     let parody_map = load_parody_names(db, &comic_ids).await?;
     let character_map = load_character_names(db, &comic_ids).await?;
     let last_read_map = load_last_read_times(db, &comic_ids).await?;
@@ -365,23 +365,6 @@ async fn load_tag_names(
     let mut map: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
         map.entry(row.comic_id).or_default().push(row.tag_name);
-    }
-    Ok(map)
-}
-
-async fn load_author_names(
-    db: &DatabaseConnection,
-    comic_ids: &[String],
-) -> Result<HashMap<String, Vec<String>>, HentaiError> {
-    let rows = ComicAuthors::find()
-        .filter(Expr::col(comic_authors::Column::ComicId).is_in(comic_ids.to_vec()))
-        .order_by_asc(comic_authors::Column::AuthorName)
-        .all(db)
-        .await
-        .map_err(map_db_err)?;
-    let mut map: HashMap<String, Vec<String>> = HashMap::new();
-    for row in rows {
-        map.entry(row.comic_id).or_default().push(row.author_name);
     }
     Ok(map)
 }

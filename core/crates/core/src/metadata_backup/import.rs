@@ -74,6 +74,7 @@ pub struct ImportPlan {
     pub samples_ambiguous: Vec<AmbiguousSample>,
     applications: Vec<ComicImportApplication>,
     orphan_facets: OrphanFacetsRecord,
+    author_links: Vec<crate::metadata_backup::types::AuthorLinkExportRecord>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -140,6 +141,7 @@ pub async fn import_comic_metadata(bytes: &[u8]) -> Result<ImportComicMetadataRe
     result.skipped_ambiguous = plan.skipped_ambiguous;
 
     upsert_orphan_facets(&db, &plan.orphan_facets).await?;
+    upsert_author_links(&db, &plan.author_links).await?;
     Ok(result)
 }
 
@@ -218,6 +220,7 @@ async fn plan_comic_metadata_import(bytes: &[u8]) -> Result<ImportPlan, HentaiEr
         samples_ambiguous,
         applications,
         orphan_facets: payload.orphan_facets,
+        author_links: payload.author_links,
     })
 }
 
@@ -432,6 +435,27 @@ async fn upsert_orphan_facets(
     upsert_orphan_names(db, JunctionNamedFacet::Author, &orphans.authors).await?;
     upsert_orphan_names(db, JunctionNamedFacet::Parody, &orphans.parodies).await?;
     upsert_orphan_names(db, JunctionNamedFacet::Character, &orphans.characters).await?;
+    Ok(())
+}
+
+async fn upsert_author_links(
+    db: &DatabaseConnection,
+    links: &[crate::metadata_backup::types::AuthorLinkExportRecord],
+) -> Result<(), HentaiError> {
+    use crate::author::AuthorLinkPlatform;
+    let mut grouped: HashMap<String, Vec<(AuthorLinkPlatform, String, Option<String>)>> =
+        HashMap::new();
+    for link in links {
+        let platform = AuthorLinkPlatform::parse(&link.platform)?;
+        grouped.entry(link.author_name.clone()).or_default().push((
+            platform,
+            link.url.clone(),
+            link.platform_display_name.clone(),
+        ));
+    }
+    for (name, items) in grouped {
+        crate::author::merge_author_links_by_name(db, &name, &items).await?;
+    }
     Ok(())
 }
 

@@ -75,6 +75,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<List<AuthorIdentityFrbDto>>
+  dco_decode_StreamSink_list_author_identity_frb_dto_Sse(dynamic raw);
+
+  @protected
   RustStreamSink<List<HomeContinueReadingDto>>
   dco_decode_StreamSink_list_home_continue_reading_dto_Sse(dynamic raw);
 
@@ -109,10 +113,37 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AmbiguousSampleDto dco_decode_ambiguous_sample_dto(dynamic raw);
 
   @protected
-  AuthorPagedNamesDto dco_decode_author_paged_names_dto(dynamic raw);
+  AuthorDetailFrbDto dco_decode_author_detail_frb_dto(dynamic raw);
+
+  @protected
+  AuthorFacetCountFrbDto dco_decode_author_facet_count_frb_dto(dynamic raw);
+
+  @protected
+  AuthorIdentityFrbDto dco_decode_author_identity_frb_dto(dynamic raw);
+
+  @protected
+  AuthorImageRefFrbDto dco_decode_author_image_ref_frb_dto(dynamic raw);
+
+  @protected
+  AuthorImageSourceFrb dco_decode_author_image_source_frb(dynamic raw);
+
+  @protected
+  AuthorLinkFrbDto dco_decode_author_link_frb_dto(dynamic raw);
+
+  @protected
+  AuthorLinkPlatformFrb dco_decode_author_link_platform_frb(dynamic raw);
+
+  @protected
+  AuthorPagedDto dco_decode_author_paged_dto(dynamic raw);
+
+  @protected
+  AuthorTopComicFrbDto dco_decode_author_top_comic_frb_dto(dynamic raw);
 
   @protected
   bool dco_decode_bool(dynamic raw);
+
+  @protected
+  AuthorDetailFrbDto dco_decode_box_autoadd_author_detail_frb_dto(dynamic raw);
 
   @protected
   bool dco_decode_box_autoadd_bool(dynamic raw);
@@ -299,6 +330,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AmbiguousSampleDto> dco_decode_list_ambiguous_sample_dto(dynamic raw);
 
   @protected
+  List<AuthorFacetCountFrbDto> dco_decode_list_author_facet_count_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
+  List<AuthorIdentityFrbDto> dco_decode_list_author_identity_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
+  List<AuthorLinkFrbDto> dco_decode_list_author_link_frb_dto(dynamic raw);
+
+  @protected
+  List<AuthorTopComicFrbDto> dco_decode_list_author_top_comic_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
   List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
 
   @protected
@@ -399,6 +448,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
+
+  @protected
+  AuthorDetailFrbDto? dco_decode_opt_box_autoadd_author_detail_frb_dto(
+    dynamic raw,
+  );
 
   @protected
   bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
@@ -650,6 +704,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<List<AuthorIdentityFrbDto>>
+  sse_decode_StreamSink_list_author_identity_frb_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   RustStreamSink<List<HomeContinueReadingDto>>
   sse_decode_StreamSink_list_home_continue_reading_dto_Sse(
     SseDeserializer deserializer,
@@ -698,12 +758,53 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  AuthorPagedNamesDto sse_decode_author_paged_names_dto(
+  AuthorDetailFrbDto sse_decode_author_detail_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AuthorFacetCountFrbDto sse_decode_author_facet_count_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AuthorIdentityFrbDto sse_decode_author_identity_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AuthorImageRefFrbDto sse_decode_author_image_ref_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AuthorImageSourceFrb sse_decode_author_image_source_frb(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AuthorLinkFrbDto sse_decode_author_link_frb_dto(SseDeserializer deserializer);
+
+  @protected
+  AuthorLinkPlatformFrb sse_decode_author_link_platform_frb(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AuthorPagedDto sse_decode_author_paged_dto(SseDeserializer deserializer);
+
+  @protected
+  AuthorTopComicFrbDto sse_decode_author_top_comic_frb_dto(
     SseDeserializer deserializer,
   );
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  AuthorDetailFrbDto sse_decode_box_autoadd_author_detail_frb_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
@@ -946,6 +1047,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<AuthorFacetCountFrbDto> sse_decode_list_author_facet_count_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<AuthorIdentityFrbDto> sse_decode_list_author_identity_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<AuthorLinkFrbDto> sse_decode_list_author_link_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<AuthorTopComicFrbDto> sse_decode_list_author_top_comic_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
 
   @protected
@@ -1068,6 +1189,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
+  AuthorDetailFrbDto? sse_decode_opt_box_autoadd_author_detail_frb_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
@@ -1393,6 +1519,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_list_author_identity_frb_dto_Sse(
+    RustStreamSink<List<AuthorIdentityFrbDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_list_home_continue_reading_dto_Sse(
     RustStreamSink<List<HomeContinueReadingDto>> self,
     SseSerializer serializer,
@@ -1444,13 +1576,67 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_author_paged_names_dto(
-    AuthorPagedNamesDto self,
+  void sse_encode_author_detail_frb_dto(
+    AuthorDetailFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_facet_count_frb_dto(
+    AuthorFacetCountFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_identity_frb_dto(
+    AuthorIdentityFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_image_ref_frb_dto(
+    AuthorImageRefFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_image_source_frb(
+    AuthorImageSourceFrb self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_link_frb_dto(
+    AuthorLinkFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_link_platform_frb(
+    AuthorLinkPlatformFrb self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_paged_dto(
+    AuthorPagedDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_top_comic_frb_dto(
+    AuthorTopComicFrbDto self,
     SseSerializer serializer,
   );
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_author_detail_frb_dto(
+    AuthorDetailFrbDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
@@ -1747,6 +1933,30 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_author_facet_count_frb_dto(
+    List<AuthorFacetCountFrbDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_author_identity_frb_dto(
+    List<AuthorIdentityFrbDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_author_link_frb_dto(
+    List<AuthorLinkFrbDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_author_top_comic_frb_dto(
+    List<AuthorTopComicFrbDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
 
   @protected
@@ -1907,6 +2117,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_author_detail_frb_dto(
+    AuthorDetailFrbDto? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);

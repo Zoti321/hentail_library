@@ -715,14 +715,7 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
         .all(db)
         .await
         .map_err(map_db_err)?;
-    let author_map = load_named_rows(
-        db,
-        "comic_authors",
-        "author_name",
-        comic_ids,
-        "ORDER BY author_name ASC",
-    )
-    .await?;
+    let author_map = crate::author::load_author_names_for_comics(db, comic_ids).await?;
     let tag_map = load_named_rows(
         db,
         "comic_tags",

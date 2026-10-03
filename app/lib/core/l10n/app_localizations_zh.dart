@@ -2239,4 +2239,85 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get comicPurgeRemoteAcknowledge => '我了解将从库中永久移除，此操作不可撤销';
+
+  @override
+  String get authorDetailTitle => '作者';
+
+  @override
+  String get authorDetailVerified => '认证作者';
+
+  @override
+  String get authorDetailAddLink => '添加链接';
+
+  @override
+  String get authorDetailEditLink => '编辑链接';
+
+  @override
+  String get authorDetailLinkUrl => '链接';
+
+  @override
+  String get authorDetailLinkUrlHint => 'https://…';
+
+  @override
+  String get authorDetailPlatform => '平台';
+
+  @override
+  String get authorDetailPlatformPixiv => 'Pixiv';
+
+  @override
+  String get authorDetailPlatformX => 'X';
+
+  @override
+  String get authorDetailPlatformPatreon => 'Patreon';
+
+  @override
+  String get authorDetailPlatformFanbox => 'FANBOX';
+
+  @override
+  String get authorDetailPlatformDiscord => 'Discord';
+
+  @override
+  String get authorDetailPlatformOther => '其他';
+
+  @override
+  String get authorDetailPlatformOtherName => '自定义名称';
+
+  @override
+  String get authorDetailDeleteLink => '删除链接';
+
+  @override
+  String get authorDetailTagsSection => '标签';
+
+  @override
+  String get authorDetailParodiesSection => '原作';
+
+  @override
+  String get authorDetailCharactersSection => '角色';
+
+  @override
+  String get authorDetailComicsSection => '漫画';
+
+  @override
+  String get authorDetailTagsEmpty => '暂无标签';
+
+  @override
+  String get authorDetailParodiesEmpty => '暂无原作';
+
+  @override
+  String get authorDetailCharactersEmpty => '暂无角色';
+
+  @override
+  String get authorDetailComicsEmpty => '暂无漫画';
+
+  @override
+  String get authorDetailViewInSearch => '在搜索中查看';
+
+  @override
+  String get authorDetailRename => '重命名';
+
+  @override
+  String get authorDetailInvalidUrl => '请输入以 http:// 或 https:// 开头的链接';
+
+  @override
+  String get authorDetailOpenLinkFailed => '无法打开链接';
 }

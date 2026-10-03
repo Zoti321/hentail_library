@@ -76,7 +76,7 @@ void main() {
         ),
         authorFilter: LibraryMetadataFilterSelection(
           picks: <String, LibraryTriStatePick>{
-            '画师A': LibraryTriStatePick.include,
+            '7': LibraryTriStatePick.include,
           },
           includeMode: LibraryMetadataIncludeMode.any,
         ),
@@ -87,7 +87,7 @@ void main() {
       });
       expect(filter.tagsAny, isNull);
       expect(filter.authorsAny, <LibraryAuthorPick>{
-        const LibraryAuthorPick(name: '画师A'),
+        const LibraryAuthorPick(id: 7, name: '7'),
       });
       expect(filter.authorsAll, isNull);
     });

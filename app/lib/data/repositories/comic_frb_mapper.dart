@@ -96,10 +96,7 @@ List<String> _mapAuthorPicks(Set<LibraryAuthorPick>? picks) {
   if (picks == null || picks.isEmpty) {
     return const <String>[];
   }
-  return picks
-      .map((LibraryAuthorPick pick) => pick.name.trim().toLowerCase())
-      .where((String name) => name.isNotEmpty)
-      .toList();
+  return picks.map((LibraryAuthorPick pick) => '${pick.id}').toList();
 }
 
 rust.PageRequestDto mapPageRequest(PageRequest request) {

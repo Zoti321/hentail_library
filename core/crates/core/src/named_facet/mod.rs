@@ -8,6 +8,8 @@ use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 
+use crate::author::replace_comic_authors;
+
 /// Named metadata facet stored as a global dictionary table + comic junction.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JunctionNamedFacet {
@@ -39,7 +41,7 @@ impl JunctionNamedFacet {
     pub fn junction_name_column(self) -> &'static str {
         match self {
             Self::Tag => "tag_name",
-            Self::Author => "author_name",
+            Self::Author => "author_id",
             Self::Parody => "parody_name",
             Self::Character => "character_name",
         }
@@ -47,16 +49,28 @@ impl JunctionNamedFacet {
 
     /// Library-scoped distinct attached names (ORDER BY name COLLATE NOCASE).
     pub fn distinct_attached_sql(self) -> String {
-        let junction = self.junction_table();
-        let name_col = self.junction_name_column();
         let visible = visible_comic_sql("c");
-        format!(
-            "SELECT DISTINCT j.{name_col} AS name \
-             FROM {junction} j \
-             INNER JOIN comics c ON c.comic_id = j.comic_id \
-             WHERE c.library_id = ? AND {visible} \
-             ORDER BY j.{name_col} COLLATE NOCASE"
-        )
+        match self {
+            Self::Author => format!(
+                "SELECT DISTINCT a.name AS name \
+                 FROM comic_authors j \
+                 INNER JOIN authors a ON a.id = j.author_id \
+                 INNER JOIN comics c ON c.comic_id = j.comic_id \
+                 WHERE c.library_id = ? AND {visible} \
+                 ORDER BY a.name COLLATE NOCASE"
+            ),
+            _ => {
+                let junction = self.junction_table();
+                let name_col = self.junction_name_column();
+                format!(
+                    "SELECT DISTINCT j.{name_col} AS name \
+                     FROM {junction} j \
+                     INNER JOIN comics c ON c.comic_id = j.comic_id \
+                     WHERE c.library_id = ? AND {visible} \
+                     ORDER BY j.{name_col} COLLATE NOCASE"
+                )
+            }
+        }
     }
 
     /// Form picker candidates: name + global attachment count.
@@ -65,15 +79,26 @@ impl JunctionNamedFacet {
     pub fn form_listing_sql(self) -> String {
         let dict = self.dict_table();
         let junction = self.junction_table();
-        let name_col = self.junction_name_column();
         let visible = visible_comic_id_sql("j.comic_id");
-        format!(
-            "SELECT d.name AS name, COUNT(j.{name_col}) AS attachment_count \
-             FROM {dict} d \
-             LEFT JOIN {junction} j ON j.{name_col} = d.name AND {visible} \
-             GROUP BY d.name \
-             ORDER BY attachment_count DESC, d.name ASC"
-        )
+        match self {
+            Self::Author => format!(
+                "SELECT d.name AS name, COUNT(j.author_id) AS attachment_count \
+                 FROM authors d \
+                 LEFT JOIN comic_authors j ON j.author_id = d.id AND {visible} \
+                 GROUP BY d.id, d.name \
+                 ORDER BY attachment_count DESC, d.name ASC"
+            ),
+            _ => {
+                let name_col = self.junction_name_column();
+                format!(
+                    "SELECT d.name AS name, COUNT(j.{name_col}) AS attachment_count \
+                     FROM {dict} d \
+                     LEFT JOIN {junction} j ON j.{name_col} = d.name AND {visible} \
+                     GROUP BY d.name \
+                     ORDER BY attachment_count DESC, d.name ASC"
+                )
+            }
+        }
     }
 }
 
@@ -91,6 +116,9 @@ pub async fn replace_comic_named_facet<C: ConnectionTrait>(
     comic_id: &str,
     names: &[String],
 ) -> Result<(), HentaiError> {
+    if facet == JunctionNamedFacet::Author {
+        return replace_comic_authors(db, comic_id, names).await;
+    }
     let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
     let dict = facet.dict_table();
@@ -217,6 +245,10 @@ pub async fn add_named_facet_name(
     facet: JunctionNamedFacet,
     name: &str,
 ) -> Result<(), HentaiError> {
+    if facet == JunctionNamedFacet::Author {
+        crate::author::add_author(name).await?;
+        return Ok(());
+    }
     let db = connection()?;
     let dict = facet.dict_table();
     db.execute(Statement::from_sql_and_values(
@@ -235,6 +267,9 @@ pub async fn delete_named_facet_by_names(
 ) -> Result<(), HentaiError> {
     if names.is_empty() {
         return Ok(());
+    }
+    if facet == JunctionNamedFacet::Author {
+        return crate::author::delete_authors_by_names(names).await;
     }
     let db = connection()?;
     let dict = facet.dict_table();
@@ -260,6 +295,9 @@ pub async fn rename_named_facet_name(
     old_name: &str,
     new_name: &str,
 ) -> Result<(), HentaiError> {
+    if facet == JunctionNamedFacet::Author {
+        return crate::author::rename_author(old_name, new_name).await;
+    }
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
     let dict = facet.dict_table();
@@ -333,6 +371,24 @@ pub async fn count_named_facet_attachments(
     name: &str,
 ) -> Result<i64, HentaiError> {
     let db = connection()?;
+    if facet == JunctionNamedFacet::Author {
+        let rows = db
+            .query_all(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                crate::author::author_attachment_count_sql(),
+                [Value::String(Some(Box::new(name.to_string())))],
+            ))
+            .await
+            .map_err(map_db_err)?;
+        return rows
+            .into_iter()
+            .next()
+            .ok_or_else(|| HentaiError::db_query_failed("count row missing".to_string(), None))
+            .and_then(|row| {
+                row.try_get_by_index::<i64>(0)
+                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+            });
+    }
     let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
     let rows = db
@@ -370,7 +426,9 @@ mod tests {
             let sql = facet.distinct_attached_sql();
             assert!(sql.contains(facet.junction_table()), "{facet:?}");
             assert!(sql.contains("c.library_id = ?"), "{facet:?}");
-            assert!(sql.contains(facet.junction_name_column()), "{facet:?}");
+            if facet != JunctionNamedFacet::Author {
+                assert!(sql.contains(facet.junction_name_column()), "{facet:?}");
+            }
         }
     }
 

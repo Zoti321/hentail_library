@@ -36,16 +36,17 @@ final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((
       );
 });
 
-/// Sorted author names for the library filter drawer.
+/// Sorted author ids for the library filter drawer; labels are display names.
 final libraryFilterAuthorNamesProvider = Provider<AsyncValue<List<String>>>((
   Ref ref,
 ) {
   return ref.watch(allAuthorsProvider).whenData((List<Author> authors) {
-    final List<String> names = authors
-        .map((Author author) => author.name)
+    final List<Author> sorted = List<Author>.of(authors)
+      ..sort((Author a, Author b) => a.name.compareTo(b.name));
+    return sorted
+        .where((Author author) => author.id != null)
+        .map((Author author) => '${author.id}')
         .toList();
-    names.sort();
-    return names;
   });
 });
 
@@ -120,6 +121,20 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
       names: names,
       selection: selection,
       isLoading: namesAsync.isLoading,
+      labelFor: (String id) {
+        final authors = ref
+            .watch(allAuthorsProvider)
+            .maybeWhen(
+              data: (List<Author> value) => value,
+              orElse: () => const <Author>[],
+            );
+        for (final Author author in authors) {
+          if ('${author.id}' == id) {
+            return author.name;
+          }
+        }
+        return id;
+      },
       onToggle: ref.read(libraryAuthorFilterProvider.notifier).toggle,
       onIncludeModeChanged: ref
           .read(libraryAuthorFilterProvider.notifier)

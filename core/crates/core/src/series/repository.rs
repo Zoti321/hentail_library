@@ -684,12 +684,13 @@ async fn query_series_author_names(
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!(
-            "SELECT DISTINCT ca.author_name \
+            "SELECT DISTINCT a.name \
              FROM series_items si \
              INNER JOIN comics c ON c.comic_id = si.comic_id \
              INNER JOIN comic_authors ca ON ca.comic_id = si.comic_id \
+             INNER JOIN authors a ON a.id = ca.author_id \
              WHERE si.series_id = ? AND {} \
-             ORDER BY ca.author_name ASC",
+             ORDER BY a.name ASC",
             visible_comic_sql("c")
         ),
         vec![sea_orm::Value::String(Some(Box::new(

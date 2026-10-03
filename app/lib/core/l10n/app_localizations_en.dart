@@ -2324,4 +2324,86 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get comicPurgeRemoteAcknowledge =>
       'I understand this will permanently remove them from the library and cannot be undone';
+
+  @override
+  String get authorDetailTitle => 'Author';
+
+  @override
+  String get authorDetailVerified => 'Verified author';
+
+  @override
+  String get authorDetailAddLink => 'Add link';
+
+  @override
+  String get authorDetailEditLink => 'Edit link';
+
+  @override
+  String get authorDetailLinkUrl => 'URL';
+
+  @override
+  String get authorDetailLinkUrlHint => 'https://…';
+
+  @override
+  String get authorDetailPlatform => 'Platform';
+
+  @override
+  String get authorDetailPlatformPixiv => 'Pixiv';
+
+  @override
+  String get authorDetailPlatformX => 'X';
+
+  @override
+  String get authorDetailPlatformPatreon => 'Patreon';
+
+  @override
+  String get authorDetailPlatformFanbox => 'FANBOX';
+
+  @override
+  String get authorDetailPlatformDiscord => 'Discord';
+
+  @override
+  String get authorDetailPlatformOther => 'Other';
+
+  @override
+  String get authorDetailPlatformOtherName => 'Custom name';
+
+  @override
+  String get authorDetailDeleteLink => 'Delete link';
+
+  @override
+  String get authorDetailTagsSection => 'Tags';
+
+  @override
+  String get authorDetailParodiesSection => 'Parody';
+
+  @override
+  String get authorDetailCharactersSection => 'Characters';
+
+  @override
+  String get authorDetailComicsSection => 'Comics';
+
+  @override
+  String get authorDetailTagsEmpty => 'No tags yet';
+
+  @override
+  String get authorDetailParodiesEmpty => 'No parodies yet';
+
+  @override
+  String get authorDetailCharactersEmpty => 'No characters yet';
+
+  @override
+  String get authorDetailComicsEmpty => 'No comics yet';
+
+  @override
+  String get authorDetailViewInSearch => 'View in search';
+
+  @override
+  String get authorDetailRename => 'Rename';
+
+  @override
+  String get authorDetailInvalidUrl =>
+      'Enter a URL starting with http:// or https://';
+
+  @override
+  String get authorDetailOpenLinkFailed => 'Could not open the link';
 }

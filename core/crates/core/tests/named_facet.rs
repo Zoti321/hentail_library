@@ -296,7 +296,6 @@ fn replace_comic_named_facet_works_for_all_junction_facets() {
 
             for (facet, table, col) in [
                 (JunctionNamedFacet::Tag, "comic_tags", "tag_name"),
-                (JunctionNamedFacet::Author, "comic_authors", "author_name"),
                 (JunctionNamedFacet::Parody, "comic_parodies", "parody_name"),
                 (
                     JunctionNamedFacet::Character,
@@ -313,6 +312,29 @@ fn replace_comic_named_facet_works_for_all_junction_facets() {
                     "{facet:?}"
                 );
             }
+            replace_comic_named_facet(
+                &db,
+                JunctionNamedFacet::Author,
+                "c-a",
+                &["Alpha".to_string()],
+            )
+            .await
+            .expect("replace author");
+            let author_names = db
+                .query_all(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "SELECT a.name FROM comic_authors ca \
+                     INNER JOIN authors a ON a.id = ca.author_id \
+                     WHERE ca.comic_id = ? ORDER BY a.name",
+                    ["c-a".into()],
+                ))
+                .await
+                .expect("query authors");
+            let names: Vec<String> = author_names
+                .into_iter()
+                .map(|row| row.try_get_by_index::<String>(0).expect("name"))
+                .collect();
+            assert_eq!(names, vec!["Alpha".to_string()]);
         });
     });
 }
