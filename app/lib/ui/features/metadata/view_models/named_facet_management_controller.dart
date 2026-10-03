@@ -18,6 +18,7 @@ class NamedFacetManagementState {
     required this.isLoading,
     required this.isLoadingMore,
     required this.hasMore,
+    this.attachmentCounts = const <String, int>{},
     this.error,
   });
 
@@ -37,6 +38,7 @@ class NamedFacetManagementState {
   final bool isLoading;
   final bool isLoadingMore;
   final bool hasMore;
+  final Map<String, int> attachmentCounts;
   final Object? error;
 
   bool get hasSearchQuery => query.trim().isNotEmpty;
@@ -49,6 +51,7 @@ class NamedFacetManagementState {
     bool? isLoading,
     bool? isLoadingMore,
     bool? hasMore,
+    Map<String, int>? attachmentCounts,
     Object? error = _sentinel,
   }) {
     return NamedFacetManagementState(
@@ -58,6 +61,7 @@ class NamedFacetManagementState {
       isLoading: isLoading ?? this.isLoading,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       hasMore: hasMore ?? this.hasMore,
+      attachmentCounts: attachmentCounts ?? this.attachmentCounts,
       error: identical(error, _sentinel) ? this.error : error,
     );
   }
@@ -96,6 +100,7 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
           hasMore: false,
           error: null,
         );
+        unawaited(_prefetchAttachmentCounts(filtered));
         return;
       }
 
@@ -114,6 +119,7 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
         hasMore: result.items.length < result.totalCount,
         error: null,
       );
+      unawaited(_prefetchAttachmentCounts(result.items));
     } catch (error) {
       state = state.copyWith(
         isLoading: false,
@@ -161,6 +167,7 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
         hasMore: merged.length < result.totalCount,
         error: null,
       );
+      unawaited(_prefetchAttachmentCounts(result.items));
     } catch (error) {
       state = state.copyWith(isLoadingMore: false, error: error);
     }
@@ -194,5 +201,25 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
     return ref
         .read(namedFacetManagementRepoProvider)
         .countAttachments(kind, name);
+  }
+
+  Future<void> _prefetchAttachmentCounts(List<String> names) async {
+    if (kind == ManagedNamedFacetKind.author || names.isEmpty) {
+      return;
+    }
+    final Map<String, int> next = Map<String, int>.of(state.attachmentCounts);
+    await Future.wait(
+      names.map((String name) async {
+        try {
+          next[name] = await ref
+              .read(namedFacetManagementRepoProvider)
+              .countAttachments(kind, name);
+        } catch (_) {}
+      }),
+    );
+    if (!ref.mounted) {
+      return;
+    }
+    state = state.copyWith(attachmentCounts: next);
   }
 }

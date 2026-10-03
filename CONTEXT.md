@@ -221,7 +221,7 @@ Comic 上可筛选的元数据面：Tag / Parody / Character 以「名称字符�
 _Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
 
 **Named facet attachment count**:
-某个 Named metadata facet 当前附着到多少 Comic（跨全部 Library 的可见附着；Author 按稳定身份计）。未附着的字典项 / Author 为 0。用于 Comic metadata form 候选排序等，不是阅读器 session 引用计数。
+某个 Named metadata facet 当前附着到多少 Comic（跨全部 Library 的可见附着；Author 按稳定身份计）。未附着的字典项 / Author 为 0。用于 Comic metadata form 候选排序、元数据管理页 Tag / Parody / Character chip 右侧计数等，不是阅读器 session 引用计数。
 _Avoid_: 引用次数、usage count、ref_count、热度
 
 **Pinyin-assisted name match**:

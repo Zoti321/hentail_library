@@ -706,6 +706,7 @@
   "metadataAdd": "Add",
   "metadataSearchNameHint": "Search by name…",
   "metadataRename": "Rename",
+  "metadataMerge": "Merge",
   "metadataDelete": "Delete",
   "metadataMoreActions": "More actions",
   "metadataAllAuthors": "All authors",

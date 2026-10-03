@@ -18,8 +18,10 @@ class OutlinedMetaChip extends HookWidget {
     this.compact = false,
     this.verified = false,
     this.icon,
+    this.count,
     this.onTap,
     this.onLongPress,
+    this.onSecondaryTapUp,
     this.onRemove,
     this.removeTooltip,
     this.removeOnDesktopHoverOnly = false,
@@ -34,8 +36,12 @@ class OutlinedMetaChip extends HookWidget {
   final bool compact;
   final bool verified;
   final IconData? icon;
+
+  /// Named facet attachment count, rendered to the right of [text].
+  final int? count;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final GestureTapUpCallback? onSecondaryTapUp;
   final VoidCallback? onRemove;
   final String? removeTooltip;
 
@@ -66,6 +72,7 @@ class OutlinedMetaChip extends HookWidget {
       color: effectiveTextColor,
       verified: verified,
       icon: icon,
+      count: count,
     );
     final ValueNotifier<bool> isHovered = useState(false);
     final bool desktop = switch (Theme.of(context).platform) {
@@ -100,9 +107,24 @@ class OutlinedMetaChip extends HookWidget {
             ],
           );
 
-    final Widget chip = (onTap == null && onLongPress == null)
-        ? Semantics(
-            label: text,
+    final String semanticsLabel = count == null ? text : '$text $count';
+    final bool interactive =
+        onTap != null || onLongPress != null || onSecondaryTapUp != null;
+    final Widget chip = interactive
+        ? _InteractiveOutlinedMetaChip(
+            text: semanticsLabel,
+            borderColor: effectiveBorder,
+            restBackground: restBackground,
+            borderRadius: borderRadius,
+            padding: padding,
+            showClickCursor: onTap != null,
+            onTap: onTap,
+            onLongPress: onLongPress,
+            onSecondaryTapUp: onSecondaryTapUp,
+            child: content,
+          )
+        : Semantics(
+            label: semanticsLabel,
             child: _OutlinedMetaChipChrome(
               backgroundColor: restBackground,
               borderColor: effectiveBorder,
@@ -110,16 +132,6 @@ class OutlinedMetaChip extends HookWidget {
               padding: padding,
               child: content,
             ),
-          )
-        : _InteractiveOutlinedMetaChip(
-            text: text,
-            borderColor: effectiveBorder,
-            restBackground: restBackground,
-            borderRadius: borderRadius,
-            padding: padding,
-            onTap: onTap,
-            onLongPress: onLongPress,
-            child: content,
           );
     if (!removeOnDesktopHoverOnly || !desktop) {
       return chip;
@@ -171,9 +183,11 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
     required this.restBackground,
     required this.borderRadius,
     required this.padding,
+    required this.showClickCursor,
     required this.child,
     this.onTap,
     this.onLongPress,
+    this.onSecondaryTapUp,
   });
 
   final String text;
@@ -181,8 +195,10 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
   final Color restBackground;
   final BorderRadius borderRadius;
   final EdgeInsets padding;
+  final bool showClickCursor;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final GestureTapUpCallback? onSecondaryTapUp;
   final Widget child;
 
   @override
@@ -238,7 +254,9 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
             button: true,
             label: text,
             child: MouseRegion(
-              cursor: SystemMouseCursors.click,
+              cursor: showClickCursor
+                  ? SystemMouseCursors.click
+                  : MouseCursor.defer,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTapDown: onTap == null ? null : (_) => isPressed.value = true,
@@ -248,6 +266,7 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
                     : () => isPressed.value = false,
                 onTap: onTap,
                 onLongPress: onLongPress,
+                onSecondaryTapUp: onSecondaryTapUp,
                 child: _OutlinedMetaChipChrome(
                   backgroundColor: resolvedBackground,
                   borderColor: borderColor,
@@ -308,12 +327,14 @@ class _OutlinedMetaChipLabel extends StatelessWidget {
     required this.color,
     this.verified = false,
     this.icon,
+    this.count,
   });
 
   final String text;
   final Color color;
   final bool verified;
   final IconData? icon;
+  final int? count;
 
   @override
   Widget build(BuildContext context) {
@@ -330,7 +351,7 @@ class _OutlinedMetaChipLabel extends StatelessWidget {
         fontWeight: FontWeight.w500,
       ),
     );
-    if (!verified && icon == null) {
+    if (!verified && icon == null && count == null) {
       return label;
     }
     return Row(
@@ -341,6 +362,19 @@ class _OutlinedMetaChipLabel extends StatelessWidget {
           SizedBox(width: tokens.spacing.xs),
         ],
         Flexible(child: label),
+        if (count != null) ...<Widget>[
+          SizedBox(width: tokens.spacing.xs),
+          Text(
+            '$count',
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: tokens.text.labelXs,
+              height: 1.2,
+              color: cs.hentai.textTertiary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
         if (verified) ...<Widget>[
           SizedBox(width: tokens.spacing.xs),
           Icon(LucideIcons.badgeCheck, size: 12, color: cs.primary),

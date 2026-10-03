@@ -1436,6 +1436,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataRename => '重命名';
 
   @override
+  String get metadataMerge => '合并';
+
+  @override
   String get metadataDelete => '删除';
 
   @override

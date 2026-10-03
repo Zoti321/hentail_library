@@ -2684,6 +2684,12 @@ abstract class AppLocalizations {
   /// **'重命名'**
   String get metadataRename;
 
+  /// No description provided for @metadataMerge.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并'**
+  String get metadataMerge;
+
   /// No description provided for @metadataDelete.
   ///
   /// In zh, this message translates to:

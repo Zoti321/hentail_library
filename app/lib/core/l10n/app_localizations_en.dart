@@ -1491,6 +1491,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataRename => 'Rename';
 
   @override
+  String get metadataMerge => 'Merge';
+
+  @override
   String get metadataDelete => 'Delete';
 
   @override

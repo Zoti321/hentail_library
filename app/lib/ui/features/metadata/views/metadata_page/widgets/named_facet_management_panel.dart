@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -10,7 +12,7 @@ import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/context_menu/named_facet_context_menu.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/show_author_detail.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
@@ -153,37 +155,10 @@ class _NamedFacetListSection extends ConsumerWidget {
           runSpacing: tokens.spacing.sm,
           children: state.items
               .map(
-                (String item) => OutlinedMetaChip(
-                  text: item,
-                  compact: true,
-                  verified:
-                      kind == ManagedNamedFacetKind.author &&
-                      ref
-                          .watch(allAuthorsProvider)
-                          .maybeWhen(
-                            data: (List<Author> authors) => authors.any(
-                              (author) =>
-                                  author.name == item && author.verified,
-                            ),
-                            orElse: () => false,
-                          ),
-                  onTap: () async {
-                    if (kind == ManagedNamedFacetKind.author) {
-                      await showAuthorDetailByName(
-                        context: context,
-                        ref: ref,
-                        name: item,
-                      );
-                      return;
-                    }
-                    await showAdaptiveFormSurfaceWidget<void>(
-                      context: context,
-                      surface: _NamedFacetDetailSurface(
-                        kind: kind,
-                        initialName: item,
-                      ),
-                    );
-                  },
+                (String item) => _ManagedNamedFacetChip(
+                  kind: kind,
+                  name: item,
+                  attachmentCount: state.attachmentCounts[item],
                 ),
               )
               .toList(),
@@ -198,6 +173,84 @@ class _NamedFacetListSection extends ConsumerWidget {
         SizedBox(height: tokens.spacing.lg),
         _NamedFacetListFooter(kind: kind, state: state),
       ],
+    );
+  }
+}
+
+class _ManagedNamedFacetChip extends ConsumerWidget {
+  const _ManagedNamedFacetChip({
+    required this.kind,
+    required this.name,
+    required this.attachmentCount,
+  });
+
+  final ManagedNamedFacetKind kind;
+  final String name;
+  final int? attachmentCount;
+
+  bool _isDesktop(BuildContext context) {
+    return switch (Theme.of(context).platform) {
+      TargetPlatform.windows ||
+      TargetPlatform.linux ||
+      TargetPlatform.macOS => true,
+      TargetPlatform.android ||
+      TargetPlatform.iOS ||
+      TargetPlatform.fuchsia => false,
+    };
+  }
+
+  void _showMenu(BuildContext context, WidgetRef ref, Offset position) {
+    NamedFacetContextMenu.show(
+      context,
+      position: position,
+      onAction: (NamedFacetContextAction action) {
+        switch (action) {
+          case NamedFacetContextAction.rename:
+            unawaited(_renameNamedFacet(context, ref, kind, name));
+          case NamedFacetContextAction.merge:
+            break;
+          case NamedFacetContextAction.delete:
+            unawaited(_deleteNamedFacet(context, ref, kind, name));
+        }
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool isAuthor = kind == ManagedNamedFacetKind.author;
+    final bool desktop = _isDesktop(context);
+    return OutlinedMetaChip(
+      text: name,
+      compact: true,
+      count: isAuthor ? null : attachmentCount,
+      verified:
+          isAuthor &&
+          ref
+              .watch(allAuthorsProvider)
+              .maybeWhen(
+                data: (List<Author> authors) => authors.any(
+                  (Author author) => author.name == name && author.verified,
+                ),
+                orElse: () => false,
+              ),
+      onTap: isAuthor
+          ? () {
+              unawaited(
+                showAuthorDetailByName(context: context, ref: ref, name: name),
+              );
+            }
+          : null,
+      onLongPress: isAuthor || desktop
+          ? null
+          : () {
+              final RenderBox box = context.findRenderObject()! as RenderBox;
+              _showMenu(context, ref, box.localToGlobal(Offset.zero));
+            },
+      onSecondaryTapUp: isAuthor || !desktop
+          ? null
+          : (TapUpDetails details) =>
+                _showMenu(context, ref, details.globalPosition),
     );
   }
 }
@@ -430,193 +483,6 @@ class _NamedFacetManagementEmptyState extends StatelessWidget {
   }
 }
 
-class _NamedFacetDetailSurface extends ConsumerStatefulWidget {
-  const _NamedFacetDetailSurface({
-    required this.kind,
-    required this.initialName,
-  });
-
-  final ManagedNamedFacetKind kind;
-  final String initialName;
-
-  @override
-  ConsumerState<_NamedFacetDetailSurface> createState() =>
-      _NamedFacetDetailSurfaceState();
-}
-
-class _NamedFacetDetailSurfaceState
-    extends ConsumerState<_NamedFacetDetailSurface> {
-  late String _name = widget.initialName;
-  int? _attachmentCount;
-  Object? _countError;
-  bool _busy = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCount();
-  }
-
-  Future<void> _loadCount() async {
-    setState(() {
-      _countError = null;
-    });
-    try {
-      final count = await ref
-          .read(namedFacetManagementControllerProvider(widget.kind).notifier)
-          .countAttachments(_name);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _attachmentCount = count;
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _countError = error;
-      });
-    }
-  }
-
-  Future<void> _rename() async {
-    final l10n = context.l10n;
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) => TagNameEditorDialog(
-        title: l10n.metadataRenameTitle(widget.kind),
-        labelText: l10n.metadataNewName,
-        hintText: l10n.metadataRenameHint(widget.kind),
-        initialValue: _name,
-        shouldCloseOnUnchanged: true,
-        onSubmit: (String value) async {
-          await ref
-              .read(
-                namedFacetManagementControllerProvider(widget.kind).notifier,
-              )
-              .rename(_name, value);
-          if (!mounted) {
-            return;
-          }
-          setState(() {
-            _name = value.trim();
-            _attachmentCount = null;
-          });
-          await _loadCount();
-        },
-      ),
-    );
-  }
-
-  Future<void> _delete() async {
-    final int? count = _attachmentCount;
-    if (count == null) {
-      return;
-    }
-    final bool confirmed =
-        await showDialog<bool>(
-          context: context,
-          builder: (BuildContext dialogContext) =>
-              _NamedFacetConfirmDeleteDialog(
-                name: _name,
-                attachmentCount: count,
-              ),
-        ) ??
-        false;
-    if (!confirmed || !mounted) {
-      return;
-    }
-
-    setState(() => _busy = true);
-    try {
-      await ref
-          .read(namedFacetManagementControllerProvider(widget.kind).notifier)
-          .delete(_name);
-      if (!mounted) {
-        return;
-      }
-      showSuccessToast(context, context.l10n.metadataDeletedToast(widget.kind));
-      Navigator.of(context).pop();
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      showErrorToast(context, error);
-    } finally {
-      if (mounted) {
-        setState(() => _busy = false);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final int? count = _attachmentCount;
-    final Object? countError = _countError;
-
-    return AdaptiveFormSurface(
-      title: _name,
-      maxDialogWidth: 360,
-      borderRadius: tokens.radius.xs,
-      fitContentHeight: true,
-      showFooterDivider: false,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            l10n.metadataAttachedComicsCaption,
-            style: TextStyle(
-              fontSize: tokens.text.labelXs,
-              fontWeight: FontWeight.w600,
-              color: cs.hentai.textSecondary,
-            ),
-          ),
-          SizedBox(height: tokens.spacing.xs),
-          if (countError != null)
-            Text(
-              '$countError',
-              style: TextStyle(
-                fontSize: tokens.text.bodySm,
-                color: cs.hentai.error,
-              ),
-            )
-          else
-            Text(
-              count?.toString() ?? l10n.shellLoading,
-              style: TextStyle(
-                fontSize: tokens.text.titleMd,
-                fontWeight: FontWeight.w600,
-                color: count == null
-                    ? cs.hentai.textSecondary
-                    : cs.hentai.textPrimary,
-              ),
-            ),
-        ],
-      ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: _busy ? null : () => Navigator.of(context).maybePop(),
-          child: Text(l10n.commonClose),
-        ),
-        OutlinedButton(
-          onPressed: _busy ? null : _rename,
-          child: Text(l10n.metadataRename),
-        ),
-        FilledButton(
-          onPressed: _busy || count == null ? null : _delete,
-          child: Text(l10n.metadataDelete),
-        ),
-      ],
-    );
-  }
-}
-
 class _NamedFacetConfirmDeleteDialog extends StatelessWidget {
   const _NamedFacetConfirmDeleteDialog({
     required this.name,
@@ -644,6 +510,74 @@ class _NamedFacetConfirmDeleteDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+Future<void> _renameNamedFacet(
+  BuildContext context,
+  WidgetRef ref,
+  ManagedNamedFacetKind kind,
+  String name,
+) async {
+  final l10n = context.l10n;
+  await showDialog<void>(
+    context: context,
+    builder: (BuildContext dialogContext) => TagNameEditorDialog(
+      title: l10n.metadataRenameTitle(kind),
+      labelText: l10n.metadataNewName,
+      hintText: l10n.metadataRenameHint(kind),
+      initialValue: name,
+      shouldCloseOnUnchanged: true,
+      onSubmit: (String value) async {
+        await ref
+            .read(namedFacetManagementControllerProvider(kind).notifier)
+            .rename(name, value);
+      },
+    ),
+  );
+}
+
+Future<void> _deleteNamedFacet(
+  BuildContext context,
+  WidgetRef ref,
+  ManagedNamedFacetKind kind,
+  String name,
+) async {
+  final int count;
+  try {
+    count = await ref
+        .read(namedFacetManagementControllerProvider(kind).notifier)
+        .countAttachments(name);
+  } catch (error) {
+    if (context.mounted) {
+      showErrorToast(context, error);
+    }
+    return;
+  }
+  if (!context.mounted) {
+    return;
+  }
+  final bool confirmed =
+      await showDialog<bool>(
+        context: context,
+        builder: (BuildContext dialogContext) =>
+            _NamedFacetConfirmDeleteDialog(name: name, attachmentCount: count),
+      ) ??
+      false;
+  if (!confirmed || !context.mounted) {
+    return;
+  }
+  try {
+    await ref
+        .read(namedFacetManagementControllerProvider(kind).notifier)
+        .delete(name);
+    if (context.mounted) {
+      showSuccessToast(context, context.l10n.metadataDeletedToast(kind));
+    }
+  } catch (error) {
+    if (context.mounted) {
+      showErrorToast(context, error);
+    }
   }
 }
 

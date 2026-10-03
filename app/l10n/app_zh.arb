@@ -706,6 +706,7 @@
   "metadataAdd": "添加",
   "metadataSearchNameHint": "搜索名称…",
   "metadataRename": "重命名",
+  "metadataMerge": "合并",
   "metadataDelete": "删除",
   "metadataMoreActions": "更多操作",
   "metadataAllAuthors": "全部作者",
