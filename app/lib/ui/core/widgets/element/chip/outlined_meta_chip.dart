@@ -23,6 +23,7 @@ class OutlinedMetaChip extends HookWidget {
     this.onRemove,
     this.removeTooltip,
     this.removeOnDesktopHoverOnly = false,
+    this.showBorder = true,
   });
 
   final String text;
@@ -38,15 +39,23 @@ class OutlinedMetaChip extends HookWidget {
   final VoidCallback? onRemove;
   final String? removeTooltip;
 
-  /// 桌面（Windows / macOS / Linux）仅在 hover 时渲染移除按钮；移动端始终渲染。
+  /// 桌面（Windows / macOS / Linux）仅在 hover 时露出移除按钮；移动端始终露出。
+  ///
+  /// 无论是否露出，有 [onRemove] 时都会预留按钮占位，避免 hover 改变 chip 尺寸。
   final bool removeOnDesktopHoverOnly;
+
+  /// 为 false 时去掉描边与实心底，用 [textColor] 与背景区分（外链等轻量操作）。
+  final bool showBorder;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final BorderRadius borderRadius = BorderRadius.circular(tokens.radius.pill);
-    final Color effectiveBorder = borderColor ?? cs.hentai.borderSubtle;
+    final Color effectiveBorder = showBorder
+        ? (borderColor ?? cs.hentai.borderSubtle)
+        : Colors.transparent;
+    final Color restBackground = showBorder ? cs.surface : Colors.transparent;
     final Color effectiveTextColor = textColor ?? cs.hentai.textSecondary;
     final EdgeInsets padding = compact
         ? const EdgeInsets.symmetric(horizontal: 10, vertical: 4)
@@ -67,29 +76,35 @@ class OutlinedMetaChip extends HookWidget {
       TargetPlatform.iOS ||
       TargetPlatform.fuchsia => false,
     };
-    final bool showRemove =
+    final bool revealRemove =
         onRemove != null &&
         (!removeOnDesktopHoverOnly || !desktop || isHovered.value);
-    final Widget content = showRemove
-        ? Row(
+    final Widget content = onRemove == null
+        ? label
+        : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Flexible(child: label),
               SizedBox(width: tokens.spacing.xs),
-              _OutlinedMetaChipRemoveButton(
-                color: effectiveTextColor,
-                tooltip: removeTooltip,
-                onRemove: onRemove!,
+              Visibility(
+                visible: revealRemove,
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                child: _OutlinedMetaChipRemoveButton(
+                  color: effectiveTextColor,
+                  tooltip: removeTooltip,
+                  onRemove: onRemove!,
+                ),
               ),
             ],
-          )
-        : label;
+          );
 
     final Widget chip = (onTap == null && onLongPress == null)
         ? Semantics(
             label: text,
             child: _OutlinedMetaChipChrome(
-              backgroundColor: cs.surface,
+              backgroundColor: restBackground,
               borderColor: effectiveBorder,
               borderRadius: borderRadius,
               padding: padding,
@@ -99,6 +114,7 @@ class OutlinedMetaChip extends HookWidget {
         : _InteractiveOutlinedMetaChip(
             text: text,
             borderColor: effectiveBorder,
+            restBackground: restBackground,
             borderRadius: borderRadius,
             padding: padding,
             onTap: onTap,
@@ -129,19 +145,22 @@ class _OutlinedMetaChipRemoveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 16,
-      height: 16,
-      child: IconButton(
-        tooltip: tooltip ?? '',
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints.tightFor(width: 16, height: 16),
-        visualDensity: VisualDensity.compact,
-        splashRadius: 10,
-        onPressed: onRemove,
-        icon: Icon(Icons.close, size: 12, color: color),
+    final Widget button = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onRemove,
+        child: SizedBox(
+          width: 16,
+          height: 16,
+          child: Icon(LucideIcons.x, size: 12, color: color),
+        ),
       ),
     );
+    if (tooltip == null || tooltip!.isEmpty) {
+      return button;
+    }
+    return Tooltip(message: tooltip!, child: button);
   }
 }
 
@@ -149,6 +168,7 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
   const _InteractiveOutlinedMetaChip({
     required this.text,
     required this.borderColor,
+    required this.restBackground,
     required this.borderRadius,
     required this.padding,
     required this.child,
@@ -158,6 +178,7 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
 
   final String text;
   final Color borderColor;
+  final Color restBackground;
   final BorderRadius borderRadius;
   final EdgeInsets padding;
   final VoidCallback? onTap;
@@ -171,6 +192,10 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
     final ValueNotifier<bool> isPressed = useState(false);
 
     final Color hoverFill = cs.surfaceContainer;
+    // `Colors.transparent` is black at alpha 0; Color.lerp then flashes dark gray.
+    final Color restFill = restBackground.a == 0
+        ? hoverFill.withAlpha(0)
+        : restBackground;
     final Color pressFill = Color.alphaBlend(
       hoverFill.withAlpha(110),
       hoverFill,
@@ -202,13 +227,13 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
           final bool focused = Focus.of(context).hasFocus;
           final Color focusedFill = Color.alphaBlend(
             hoverFill.withAlpha(80),
-            cs.surface,
+            restFill,
           );
           final Color resolvedBackground = isPressed.value
               ? pressFill
               : isHovered.value || focused
               ? (isHovered.value ? hoverFill : focusedFill)
-              : cs.surface;
+              : restFill;
           return Semantics(
             button: true,
             label: text,
@@ -262,7 +287,7 @@ class _OutlinedMetaChipChrome extends StatelessWidget {
     final BoxDecoration decoration = BoxDecoration(
       color: backgroundColor,
       borderRadius: borderRadius,
-      border: Border.all(color: borderColor),
+      border: borderColor.a == 0 ? null : Border.all(color: borderColor),
     );
     if (!animate) {
       return Container(padding: padding, decoration: decoration, child: child);

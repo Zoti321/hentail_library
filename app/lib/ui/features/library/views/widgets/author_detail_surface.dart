@@ -254,11 +254,7 @@ class _AuthorNameRow extends HookConsumerWidget {
         if (detail.verified) ...<Widget>[
           Tooltip(
             message: l10n.authorDetailVerified,
-            child: Icon(
-              LucideIcons.badgeCheck,
-              size: 20,
-              color: cs.hentai.success,
-            ),
+            child: Icon(LucideIcons.badgeCheck, size: 20, color: cs.primary),
           ),
           SizedBox(width: tokens.spacing.xs),
         ],
@@ -332,6 +328,7 @@ class _AuthorLinksWrap extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final ValueNotifier<bool> adding = useState(false);
     final ObjectRef<bool> busy = useRef(false);
     final TextEditingController controller = useTextEditingController();
@@ -385,7 +382,7 @@ class _AuthorLinksWrap extends HookConsumerWidget {
     }, <Object?>[focusNode]);
 
     return Wrap(
-      spacing: tokens.spacing.sm,
+      spacing: tokens.spacing.md,
       runSpacing: tokens.spacing.sm,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
@@ -396,6 +393,8 @@ class _AuthorLinksWrap extends HookConsumerWidget {
             child: OutlinedMetaChip(
               text: _linkChipLabel(l10n, link),
               compact: true,
+              showBorder: false,
+              textColor: cs.primary,
               icon: _platformIcon(link.platform),
               onTap: () => _openLink(context, link.url),
               onRemove: () => _deleteLink(context, ref, link),

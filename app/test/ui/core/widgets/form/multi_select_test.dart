@@ -153,7 +153,7 @@ void main() {
     expect(find.widgetWithText(OutlinedMetaChip, 'alpha'), findsOneWidget);
     expect(find.widgetWithText(OutlinedMetaChip, 'beta'), findsOneWidget);
     expect(find.text('已选 2 个'), findsNothing);
-    expect(find.byIcon(Icons.close), findsNWidgets(2));
+    expect(find.byIcon(LucideIcons.x), findsNWidgets(2));
   });
 
   testWidgets('remove chip calls onRemove and returns name to dropdown', (
@@ -207,7 +207,7 @@ void main() {
     await tester.tap(find.byType(TextField));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.close).first);
+    await tester.tap(find.byIcon(LucideIcons.x).first);
     await tester.pumpAndSettle();
 
     expect(removed, <String>['alpha']);
@@ -512,7 +512,7 @@ void main() {
         .pixels;
     expect(offsetBefore, greaterThan(0));
 
-    await tester.tap(find.byIcon(Icons.close).first);
+    await tester.tap(find.byIcon(LucideIcons.x).first);
     await tester.pumpAndSettle();
 
     final double offsetAfter = tester

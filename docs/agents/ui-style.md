@@ -92,6 +92,8 @@ Key semantic groups in `HentaiColorScheme`:
 
 **Primary accent:** light `#005FB8`, dark `#6EB3FF`. Secondary green for positive actions.
 
+**Animating fills (do not lerp from `Colors.transparent`):** `AnimatedContainer` / `BoxDecoration` / implicit color tweens use [`Color.lerp`](https://api.flutter.dev/flutter/dart-ui/Color/lerp.html). `Colors.transparent` is **transparent black** (`Color(0x00000000)`), so interpolating to a light hover fill flashes dark gray first. This is engine design, not a widget bug — see [flutter/flutter#48534](https://github.com/flutter/flutter/issues/48534) and [flutter/flutter#48674](https://github.com/flutter/flutter/issues/48674). Rest fill must be the **target color at alpha 0** (e.g. `hoverFill.withAlpha(0)`). Same rule for gradients: a transparent stop must share the adjacent stop’s RGB. In-repo: `OutlinedMetaChip` borderless hover.
+
 ### Surfaces & chrome
 
 - App background: `cs.hentai.winBackground`
@@ -192,6 +194,7 @@ When narrowing: keep **desktop visual style** (colors, borders, GhostButton, cus
 
 - Adding `Card` + `ListTile` + `OutlineInputBorder` pages in new code
 - Using `Color(0xFF…)` in widgets when `cs.hentai.*` or `colorScheme.*` exists
+- Animating `BoxDecoration.color` / `AnimatedContainer` from `Colors.transparent` (transparent black) — rest must be the destination fill at alpha 0 (see **Animating fills** above)
 - Creating `views/mobile/` (or any platform page tree) instead of making shared widgets responsive
 - `SnackBar` on desktop — use `showCustomToast`
 - Material `Icons` in desktop-target UI — use `LucideIcons`

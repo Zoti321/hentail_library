@@ -10,10 +10,12 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/author_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/author_detail_surface.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _StubAuthorRepository implements AuthorRepository {
@@ -218,14 +220,23 @@ void main() {
       ];
     await _openSurface(tester, repo);
 
-    await tester.tap(find.byIcon(Icons.close));
+    await tester.tap(find.byIcon(LucideIcons.x));
     await tester.pumpAndSettle();
 
     expect(find.text('删除链接「Pixiv」？'), findsNothing);
     expect(repo.deletedLinks, <(int, int)>[(1, 7)]);
   });
 
-  testWidgets('desktop hides link remove until hover', (
+  testWidgets('verified badge uses primary like metadata author chips', (
+    WidgetTester tester,
+  ) async {
+    await _openSurface(tester, _StubAuthorRepository());
+
+    final Icon badge = tester.widget<Icon>(find.byIcon(LucideIcons.badgeCheck));
+    expect(badge.color, buildAppTheme(Brightness.light).colorScheme.primary);
+  });
+
+  testWidgets('desktop hover reveals reserved remove without resizing dialog', (
     WidgetTester tester,
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
@@ -243,7 +254,21 @@ void main() {
       ];
     await _openSurface(tester, repo);
 
-    expect(find.byIcon(Icons.close), findsNothing);
+    final Finder remove = find.byIcon(LucideIcons.x);
+    expect(remove, findsOneWidget);
+    expect(
+      tester
+          .widget<Visibility>(
+            find.ancestor(of: remove, matching: find.byType(Visibility)).first,
+          )
+          .visible,
+      isFalse,
+    );
+
+    final double heightBefore = tester
+        .getSize(find.byKey(AdaptiveFormSurface.dialogChromeKey))
+        .height;
+    final Size chipBefore = tester.getSize(find.byType(OutlinedMetaChip).first);
 
     final TestGesture gesture = await tester.createGesture(
       kind: PointerDeviceKind.mouse,
@@ -253,8 +278,21 @@ void main() {
     await gesture.moveTo(tester.getCenter(find.text('Pixiv')));
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.close), findsOneWidget);
-    await tester.tap(find.byIcon(Icons.close));
+    expect(
+      tester
+          .widget<Visibility>(
+            find.ancestor(of: remove, matching: find.byType(Visibility)).first,
+          )
+          .visible,
+      isTrue,
+    );
+    expect(
+      tester.getSize(find.byKey(AdaptiveFormSurface.dialogChromeKey)).height,
+      heightBefore,
+    );
+    expect(tester.getSize(find.byType(OutlinedMetaChip).first), chipBefore);
+
+    await tester.tap(remove);
     await tester.pumpAndSettle();
     expect(repo.deletedLinks, <(int, int)>[(1, 7)]);
     debugDefaultTargetPlatformOverride = null;
