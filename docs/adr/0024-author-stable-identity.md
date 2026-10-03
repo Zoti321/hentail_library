@@ -14,7 +14,7 @@ Author 原为名字主键的 Named metadata facet（`authors.name` + `comic_auth
 
 - **Author** 升级为稳定身份实体（见 `CONTEXT.md`）：有稳定 id、可变且全局唯一的显示名（大小写敏感）；Comic 经 junction 附着 `author_id`。
 - 现有名字字典行一次性迁移为 Author（生成 id，原 name 作显示名）；`comic_authors` 改为挂 id。
-- **Author link** 由用户手填（平台 + URL；可空 `platform_display_name` 供后续解析写入）。**Creative platform** 闭集与优先级：Pixiv > X > Patreon > FANBOX > Discord；Other 可存但不参与 Verified author、Author alias、形象解析。
+- **Author link** 由用户手填 URL；平台按主机名推断（`pixiv.net` → Pixiv，`x.com` / `twitter.com` → X，`patreon.com` → Patreon，`fanbox.cc` 及 `pixiv.net/fanbox` → FANBOX，`discord.gg` / `discord.com` → Discord，其余 → Other），不由用户选择——平台域名稳定，手选反而易错；可空 `platform_display_name` 供后续解析写入。**Creative platform** 闭集与优先级：Pixiv > X > Patreon > FANBOX > Discord；Other 可存但不参与 Verified author、Author alias、形象解析。
 - **Verified author** = 至少一条 Creative platform 链接；非外部平台官方认证同步。
 - **Author alias** 为领域词：平台显示名与当前显示名不一致者按 Creative platform 优先级展示；本决策不要求首版 UI 渲染 alias。
 - Author 形象解析为可替换端口：按上列平台序尝试，失败则回退全库可见（含 Healthy mode）下 `title_sort_key` 第一本封面；平台抓取与缓存表不在本 ADR 范围内。

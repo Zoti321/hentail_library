@@ -205,8 +205,8 @@ Author link 的创作平台闭集，优先级为 Pixiv > X > Patreon > FANBOX > 
 _Avoid_: 社交平台（太泛）、把 Other 算进认证或形象优先级
 
 **Author link**:
-用户为 Author 手填的外链（平台 + URL）；同一 Author 可有多条。Creative platform 上的链接参与 Verified author 与后续形象解析；Other 仅供打开访问。
-_Avoid_: 社交账号绑定、OAuth、平台登录
+用户为 Author 手填的外链 URL；平台按 URL 主机名推断（无法识别者为 Other），不由用户选择。同一 Author 可有多条。Creative platform 上的链接参与 Verified author 与后续形象解析；Other 仅供打开访问。
+_Avoid_: 社交账号绑定、OAuth、平台登录、手选平台
 
 **Parody**:
 Comic 所同人化的原作 / IP 名（可多值）；无所属 IP 时可用字面值如「原创」。与 Folder series（本库 Series）无关。
