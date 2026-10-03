@@ -201,12 +201,16 @@ _Avoid_: 官方认证、平台 verified、蓝V
 _Avoid_: 又名、昵称字典、手填别名列表
 
 **Creative platform**:
-Author link 的创作平台闭集，优先级为 Pixiv > X > Patreon > FANBOX > Discord；用于 Verified author 判定、Author alias 排序，以及后续 Author 形象（头像/背景）解析顺序。另有 Other 外链平台，但不属 Creative platform。
+Author link 的创作平台闭集，优先级为 Pixiv > X > Patreon > FANBOX > Discord；用于 Verified author 判定、Author alias 排序，以及 Author image 解析顺序。另有 Other 外链平台，但不属 Creative platform。
 _Avoid_: 社交平台（太泛）、把 Other 算进认证或形象优先级
 
 **Author link**:
-用户为 Author 手填的外链 URL；平台按 URL 主机名推断（无法识别者为 Other），不由用户选择。同一 Author 可有多条。Creative platform 上的链接参与 Verified author 与后续形象解析；Other 仅供打开访问。
+用户为 Author 手填的外链 URL；平台按 URL 主机名推断（无法识别者为 Other），不由用户选择。同一 Author 可有多条。Creative platform 上的链接参与 Verified author 与 Author image 解析；Other 仅供打开访问。
 _Avoid_: 社交账号绑定、OAuth、平台登录、手选平台
+
+**Author image**:
+Author 的视觉形象，分头像（avatar）与背景（background）两个位置，各自解析来源：先按 Creative platform 优先级取平台资料图，全部不可用时回退为该 Author 全库可见作品中自然序第一本 Comic 的封面（Comic 有用户指定封面页时以该页为准），再无则为空。Author 详情以高清位图显示 Author image，不复用为网格性能压缩的库缩略图规格；库缩略图只可作高清就绪前的过渡。
+_Avoid_: Cover preview、作者封面、作者缩略图、Author profile picture
 
 **Parody**:
 Comic 所同人化的原作 / IP 名（可多值）；无所属 IP 时可用字面值如「原创」。与 Folder series（本库 Series）无关。
