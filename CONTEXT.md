@@ -169,7 +169,7 @@ _Avoid_: 分组浏览、按系列折叠、group by series、系列模式列表
 _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
 
 **Library browse preference**:
-库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Expand by series、Prefer library root series、Smart facet match、年龄限制筛选等。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
+库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Expand by series、Prefer library root series、Smart facet match、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
 _Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
 
 **Library property**:
@@ -189,8 +189,24 @@ _Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag
 _Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:
-Comic 的署名，用于展示与筛选；社团、画师、原作者等展示用名字均记为 Author，不区分类型。
-_Avoid_: 画师、创作者、社团、Circle（领域模型中统一用 Author）
+具有稳定身份的署名实体，可多值附着到 Comic；有可变显示名，并可含用户维护的 Author link 等资料。社团、画师、原作者等均记为 Author，不区分类型。现有「仅名字」的作者数据迁移为 Author（尚无外链者即为非认证）。
+_Avoid_: 画师、创作者、社团、Circle；把 Author 仅当成无身份的名字字符串；Author profile（口语可用；领域词用 Author）
+
+**Verified author**:
+至少拥有一条创作平台（Creative platform）Author link 的 Author；否则为非认证 Author。仅表示应用内资料完备度，不是任何外部平台的官方认证同步。
+_Avoid_: 官方认证、平台 verified、蓝V
+
+**Author alias**:
+某 Author 在其 Creative platform 外链上的平台显示名中，与该 Author 当前显示名不一致者；展示时按 Creative platform 优先级排序，以英文逗号拼接；与显示名一致则不展示。平台显示名由后续平台资料解析写入，非用户手建的独立别名表。
+_Avoid_: 又名、昵称字典、手填别名列表
+
+**Creative platform**:
+Author link 的创作平台闭集，优先级为 Pixiv > X > Patreon > FANBOX > Discord；用于 Verified author 判定、Author alias 排序，以及后续 Author 形象（头像/背景）解析顺序。另有 Other 外链平台，但不属 Creative platform。
+_Avoid_: 社交平台（太泛）、把 Other 算进认证或形象优先级
+
+**Author link**:
+用户为 Author 手填的外链（平台 + URL）；同一 Author 可有多条。Creative platform 上的链接参与 Verified author 与后续形象解析；Other 仅供打开访问。
+_Avoid_: 社交账号绑定、OAuth、平台登录
 
 **Parody**:
 Comic 所同人化的原作 / IP 名（可多值）；无所属 IP 时可用字面值如「原创」。与 Folder series（本库 Series）无关。
@@ -201,11 +217,11 @@ Comic 中出场人物名（可多值）；用于展示与筛选，与 Tag / Auth
 _Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
 
 **Named metadata facet**:
-Comic 上以「名称字符串」附着的元数据面：Tag、Author、Parody、Character 为字典表 + junction 全量 replace（core `named_facet`）；Language 为 `comic_meta.languages` JSON 闭集特例，不走 junction。新增同类 junction facet 应扩展 `JunctionNamedFacet`，而非再复制一套 replace/list/list_distinct 管道。
+Comic 上可筛选的元数据面：Tag / Parody / Character 以「名称字符串」字典 + junction 全量 replace；Author 为稳定身份实体 + junction（显示名可变），管理入口仍与其它 facet 并列；Language 为 `comic_meta.languages` JSON 闭集特例。新增与 Tag 同类的名字字典 facet 应扩展 `JunctionNamedFacet`；Author 身份管线单独演进，不强迫塞回纯名字字典模型。
 _Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
 
 **Named facet attachment count**:
-某个 Named metadata facet 名字当前附着到多少 Comic（跨全部 Library 的 junction 行数）；未附着的字典项为 0。用于 Comic metadata form 候选排序等，不是阅读器 session 引用计数。
+某个 Named metadata facet 当前附着到多少 Comic（跨全部 Library 的可见附着；Author 按稳定身份计）。未附着的字典项 / Author 为 0。用于 Comic metadata form 候选排序等，不是阅读器 session 引用计数。
 _Avoid_: 引用次数、usage count、ref_count、热度
 
 **Pinyin-assisted name match**:
