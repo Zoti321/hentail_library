@@ -1151,5 +1151,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "comicPurgeRemoteAcknowledge": "I understand this will permanently remove them from the library and cannot be undone"
 }

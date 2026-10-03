@@ -2236,4 +2236,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String comicPurgeMixedConfirm(int localCount, int remoteCount) {
     return '$localCount 本本地漫画将永久删除磁盘文件；$remoteCount 本远程漫画仅从库中移除，不会删除远程资源。此操作不可撤销。';
   }
+
+  @override
+  String get comicPurgeRemoteAcknowledge => '我了解将从库中永久移除，此操作不可撤销';
 }

@@ -4005,6 +4005,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'{localCount} 本本地漫画将永久删除磁盘文件；{remoteCount} 本远程漫画仅从库中移除，不会删除远程资源。此操作不可撤销。'**
   String comicPurgeMixedConfirm(int localCount, int remoteCount);
+
+  /// No description provided for @comicPurgeRemoteAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解将从库中永久移除，此操作不可撤销'**
+  String get comicPurgeRemoteAcknowledge;
 }
 
 class _AppLocalizationsDelegate

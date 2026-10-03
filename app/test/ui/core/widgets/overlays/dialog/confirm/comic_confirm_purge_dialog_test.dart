@@ -30,7 +30,7 @@ void main() {
   });
 
   testWidgets(
-    'remote purge shows library-only copy without acknowledgement gate',
+    'remote purge shows library-only copy and requires acknowledgement',
     (WidgetTester tester) async {
       await pumpLocalizedApp(
         tester,
@@ -44,7 +44,16 @@ void main() {
         find.textContaining('removed from the library only'),
         findsOneWidget,
       );
-      expect(find.byType(CheckboxListTile), findsNothing);
+      expect(
+        find.textContaining('permanently remove them from the library'),
+        findsOneWidget,
+      );
+      expect(find.byType(CheckboxListTile), findsOneWidget);
+      expect(_confirmButton(tester).onPressed, isNull);
+
+      await tester.tap(find.byType(CheckboxListTile));
+      await tester.pumpAndSettle();
+
       expect(_confirmButton(tester).onPressed, isNotNull);
     },
   );
@@ -65,7 +74,7 @@ void main() {
     expect(_confirmButton(tester).onPressed, isNull);
   });
 
-  testWidgets('remote-only batch purge needs no acknowledgement', (
+  testWidgets('remote-only batch purge requires acknowledgement', (
     WidgetTester tester,
   ) async {
     await pumpLocalizedApp(
@@ -76,7 +85,13 @@ void main() {
     );
 
     expect(find.textContaining('4 本远程漫画'), findsOneWidget);
-    expect(find.byType(CheckboxListTile), findsNothing);
+    expect(find.text('我了解将从库中永久移除，此操作不可撤销'), findsOneWidget);
+    expect(find.byType(CheckboxListTile), findsOneWidget);
+    expect(_confirmButton(tester).onPressed, isNull);
+
+    await tester.tap(find.byType(CheckboxListTile));
+    await tester.pumpAndSettle();
+
     expect(_confirmButton(tester).onPressed, isNotNull);
   });
 

@@ -9,8 +9,8 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dar
 
 /// Comic purge 前的危险确认对话框（与标签/路径等确认框同一套 HentaiDialog 壳）。
 ///
-/// 含 Local 目标时须勾选「我了解磁盘上的资源将被永久删除」才能确认；
-/// 混选 Local / Remote 时分别显示两类数量。
+/// 一律须勾选闸门才能确认（ADR-0023）；含 Local 时勾选文案强调删盘，
+/// 纯 Remote 时勾选文案强调从库中永久移除。混选时分别显示两类数量。
 class ComicConfirmPurgeDialog extends HookWidget {
   /// 单本 Comic purge。
   const ComicConfirmPurgeDialog({
@@ -52,7 +52,9 @@ class ComicConfirmPurgeDialog extends HookWidget {
               contentPadding: EdgeInsets.zero,
               controlAffinity: ListTileControlAffinity.leading,
               title: Text(
-                l10n.comicDetailDeleteLocalAcknowledge,
+                counts.local > 0
+                    ? l10n.comicDetailDeleteLocalAcknowledge
+                    : l10n.comicPurgeRemoteAcknowledge,
                 style: TextStyle(fontSize: 14, color: cs.hentai.textPrimary),
               ),
             ),

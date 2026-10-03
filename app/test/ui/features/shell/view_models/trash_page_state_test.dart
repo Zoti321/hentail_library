@@ -134,9 +134,11 @@ void main() {
       );
     });
 
-    test('acknowledgement gate only when Local targets are present', () {
+    test('acknowledgement gate required for Local and Remote targets', () {
       expect(purgeRequiresAcknowledgement((local: 1, remote: 5)), isTrue);
-      expect(purgeRequiresAcknowledgement((local: 0, remote: 5)), isFalse);
+      expect(purgeRequiresAcknowledgement((local: 0, remote: 5)), isTrue);
+      expect(purgeRequiresAcknowledgement((local: 2, remote: 0)), isTrue);
+      expect(purgeRequiresAcknowledgement((local: 0, remote: 0)), isFalse);
     });
   });
 

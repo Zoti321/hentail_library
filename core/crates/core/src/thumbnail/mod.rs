@@ -198,7 +198,8 @@ pub async fn find_series_thumbnail_by_series_id(
     }))
 }
 
-/// 系列封面解析：自定义系列缩略图优先，否则回退到 sort_order 最大的成员漫画。
+/// 系列封面解析：自定义系列缩略图优先，否则回退到 sort_order 最大的**可见**成员漫画
+///（跳过 Comic trash，ADR-0023）。
 pub async fn resolve_series_cover(series_id: &str) -> Result<SeriesCoverSource, HentaiError> {
     if let Some(custom) = find_series_thumbnail_by_series_id(series_id).await? {
         return Ok(SeriesCoverSource::CustomThumbnail {
@@ -206,13 +207,16 @@ pub async fn resolve_series_cover(series_id: &str) -> Result<SeriesCoverSource, 
         });
     }
 
+    use crate::comic::visibility::visible_comic_id_sql;
     use crate::db::{connection, map_db_err};
     use crate::entity::series_items;
+    use sea_orm::sea_query::Expr;
     use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
 
     let db = connection()?;
     let items = series_items::Entity::find()
         .filter(series_items::Column::SeriesId.eq(series_id))
+        .filter(Expr::cust(visible_comic_id_sql("series_items.comic_id")))
         .order_by_desc(series_items::Column::SortOrder)
         .order_by_asc(series_items::Column::ComicId)
         .all(&db)

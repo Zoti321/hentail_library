@@ -8,14 +8,14 @@ use hentai_core::{
     delete_library, export_comic_metadata, fetch_comics_page, fetch_reading_page,
     fetch_series_comics_page, fetch_series_page, fetch_trashed_comics_page, find_comic_by_id,
     find_series_by_id, import_comic_metadata, init_db_at_path, list_distinct_named_facet_names,
-    open_reader, peek_metadata_backup_manifest, purge_comics, record_reading, restore_comics,
-    search_by_keyword_page, search_by_tag_expression, series_id_from_folder_path,
+    open_reader, peek_metadata_backup_manifest, purge_comics, record_reading, resolve_series_cover,
+    restore_comics, search_by_keyword_page, search_by_tag_expression, series_id_from_folder_path,
     set_current_library_id, sync_library, trash_comics, try_acquire_library_write_lock,
     update_comic_user_meta, update_series_user_meta, watch_continue_reading_top5,
     watch_home_page_counts, watch_recently_added_on_home, ComicFilterDto, ComicSortOptionDto,
     ExportComicMetadataOptions, HentaiError, HentaiErrorCode, JunctionNamedFacet, LibraryDto,
-    PageRequestDto, ReadingHistoryDto, SeriesFilterDto, SeriesSortOptionDto, SyncScanMode,
-    UpdateComicUserMetaDto, UpdateSeriesUserMetaDto,
+    PageRequestDto, ReadingHistoryDto, SeriesCoverSource, SeriesFilterDto, SeriesSortOptionDto,
+    SyncScanMode, UpdateComicUserMetaDto, UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -350,6 +350,62 @@ fn series_members_count_only_visible_and_fully_trashed_series_hidden_but_kept() 
             assert_eq!(series.total_count, Some(5));
             assert!(series.locks.name);
             assert_eq!(series.items.len(), 1);
+        });
+    });
+}
+
+#[test]
+fn series_cover_fallback_skips_trashed_members() {
+    run(|fixture, runtime| {
+        let series_id = series_id_of(&fixture);
+        let a = id_of(&fixture.series_a);
+        let b = id_of(&fixture.series_b);
+        runtime.block_on(async {
+            setup_local(&fixture).await;
+            let series = find_series_by_id(&series_id)
+                .await
+                .expect("find")
+                .expect("series");
+            let mut by_order = series.items;
+            by_order.sort_by(|left, right| {
+                right
+                    .sort_order
+                    .partial_cmp(&left.sort_order)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+                    .then_with(|| left.comic_id.cmp(&right.comic_id))
+            });
+            assert_eq!(by_order.len(), 2, "expected two series members");
+            let highest = by_order[0].comic_id.clone();
+            let remaining = by_order[1].comic_id.clone();
+            assert!(
+                (highest == a && remaining == b) || (highest == b && remaining == a),
+                "fixture members should be a/b"
+            );
+
+            assert_eq!(
+                resolve_series_cover(&series_id).await.expect("cover"),
+                SeriesCoverSource::FallbackComic {
+                    comic_id: highest.clone()
+                }
+            );
+
+            trash_comics(vec![highest.clone()])
+                .await
+                .expect("trash highest");
+            assert_eq!(
+                resolve_series_cover(&series_id).await.expect("cover"),
+                SeriesCoverSource::FallbackComic {
+                    comic_id: remaining.clone()
+                }
+            );
+
+            trash_comics(vec![remaining.clone()])
+                .await
+                .expect("trash remaining");
+            assert_eq!(
+                resolve_series_cover(&series_id).await.expect("cover"),
+                SeriesCoverSource::Missing
+            );
         });
     });
 }

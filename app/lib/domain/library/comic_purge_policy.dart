@@ -40,8 +40,9 @@ PurgeConfirmCopy purgeConfirmCopyFor(PurgeTargetCounts counts) {
       : PurgeConfirmCopy.batchLocal;
 }
 
-/// 含 Local 目标时需勾选「我了解磁盘资源将被永久删除」才能确认。
-bool purgeRequiresAcknowledgement(PurgeTargetCounts counts) => counts.local > 0;
+/// Comic purge 一律需要勾选闸门（ADR-0023）；Local / Remote 文案由对话框分支。
+bool purgeRequiresAcknowledgement(PurgeTargetCounts counts) =>
+    counts.local + counts.remote > 0;
 
 /// Comic purge 结果汇总 toast 分支。
 enum PurgeSummaryKind { nothing, allSucceeded, partial, allFailed }

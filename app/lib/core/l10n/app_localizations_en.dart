@@ -2320,4 +2320,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String comicPurgeMixedConfirm(int localCount, int remoteCount) {
     return '$localCount local comics will have their files on disk permanently deleted; $remoteCount remote comics will be removed from the library only (remote resources are not deleted). This cannot be undone.';
   }
+
+  @override
+  String get comicPurgeRemoteAcknowledge =>
+      'I understand this will permanently remove them from the library and cannot be undone';
 }

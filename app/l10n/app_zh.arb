@@ -1151,5 +1151,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "comicPurgeRemoteAcknowledge": "我了解将从库中永久移除，此操作不可撤销"
 }
