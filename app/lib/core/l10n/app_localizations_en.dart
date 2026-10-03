@@ -2372,7 +2372,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get authorDetailComicsSection => 'Comics';
+  String authorDetailComicsSection(int count) {
+    return 'Comics · $count';
+  }
 
   @override
   String get authorDetailComicsEmpty => 'No comics yet';

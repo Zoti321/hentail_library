@@ -1167,7 +1167,12 @@
   "authorDetailDeleteLink": "Delete link",
   "authorDetailDeleteLinkConfirm": "Delete link \"{label}\"?",
   "authorDetailLinkTooltip": "{url}",
-  "authorDetailComicsSection": "Comics",
+  "authorDetailComicsSection": "Comics · {count}",
+  "@authorDetailComicsSection": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "authorDetailComicsEmpty": "No comics yet",
   "authorDetailViewInSearch": "View in search",
   "authorDetailRename": "Rename",

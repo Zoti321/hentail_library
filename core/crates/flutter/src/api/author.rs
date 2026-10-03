@@ -105,6 +105,7 @@ pub struct AuthorDetailFrbDto {
     pub parodies: Vec<AuthorFacetCountFrbDto>,
     pub characters: Vec<AuthorFacetCountFrbDto>,
     pub top_comics: Vec<AuthorTopComicFrbDto>,
+    pub comic_count: i64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -270,6 +271,7 @@ pub async fn get_author_detail_frb(
                 title: c.title,
             })
             .collect(),
+        comic_count: d.comic_count,
     }))
 }
 

@@ -70,6 +70,7 @@ class _StubAuthorRepository implements AuthorRepository {
       parodies: const <AuthorFacetCount>[],
       characters: const <AuthorFacetCount>[],
       topComics: const <AuthorTopComic>[],
+      comicCount: 0,
       image: (
         avatarSource: AuthorImageSource.none,
         avatarComicId: null,
@@ -160,7 +161,7 @@ void main() {
 
     expect(find.byKey(AdaptiveFormSurface.dialogChromeKey), findsOneWidget);
     expect(find.text('Alice'), findsWidgets);
-    expect(find.text('漫画'), findsOneWidget);
+    expect(find.text('漫画 · 0'), findsOneWidget);
     expect(find.text('在搜索中查看'), findsOneWidget);
     expect(find.text('重命名'), findsNothing);
   });

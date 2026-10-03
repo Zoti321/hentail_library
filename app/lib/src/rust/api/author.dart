@@ -92,6 +92,7 @@ class AuthorDetailFrbDto {
   final List<AuthorFacetCountFrbDto> parodies;
   final List<AuthorFacetCountFrbDto> characters;
   final List<AuthorTopComicFrbDto> topComics;
+  final PlatformInt64 comicCount;
 
   const AuthorDetailFrbDto({
     required this.identity,
@@ -100,6 +101,7 @@ class AuthorDetailFrbDto {
     required this.parodies,
     required this.characters,
     required this.topComics,
+    required this.comicCount,
   });
 
   @override
@@ -109,7 +111,8 @@ class AuthorDetailFrbDto {
       tags.hashCode ^
       parodies.hashCode ^
       characters.hashCode ^
-      topComics.hashCode;
+      topComics.hashCode ^
+      comicCount.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -121,7 +124,8 @@ class AuthorDetailFrbDto {
           tags == other.tags &&
           parodies == other.parodies &&
           characters == other.characters &&
-          topComics == other.topComics;
+          topComics == other.topComics &&
+          comicCount == other.comicCount;
 }
 
 class AuthorFacetCountFrbDto {

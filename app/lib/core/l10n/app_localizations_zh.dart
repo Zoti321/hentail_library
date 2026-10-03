@@ -2287,7 +2287,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get authorDetailComicsSection => '漫画';
+  String authorDetailComicsSection(int count) {
+    return '漫画 · $count';
+  }
 
   @override
   String get authorDetailComicsEmpty => '暂无漫画';

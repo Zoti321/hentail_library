@@ -465,7 +465,7 @@ class _AuthorComicsSection extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: Text(
-                l10n.authorDetailComicsSection,
+                l10n.authorDetailComicsSection(detail.comicCount),
                 style: TextStyle(
                   fontSize: tokens.text.titleSm,
                   fontWeight: FontWeight.w600,

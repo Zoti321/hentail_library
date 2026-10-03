@@ -87,6 +87,7 @@ pub struct AuthorDetailDto {
     pub parodies: Vec<AuthorFacetCountDto>,
     pub characters: Vec<AuthorFacetCountDto>,
     pub top_comics: Vec<AuthorTopComicDto>,
+    pub comic_count: i64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -555,6 +556,7 @@ pub async fn get_author_detail(
         )
         .await?,
         top_comics: top_comics_for_author(&db, author_id, &healthy).await?,
+        comic_count: comic_count_for_author(&db, author_id, &healthy).await?,
     }))
 }
 
@@ -793,6 +795,30 @@ async fn top_comics_for_author<C: ConnectionTrait>(
             })
         })
         .collect()
+}
+
+async fn comic_count_for_author<C: ConnectionTrait>(
+    db: &C,
+    author_id: i64,
+    healthy: &str,
+) -> Result<i64, HentaiError> {
+    let row = db
+        .query_one(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!(
+                "SELECT COUNT(*) \
+                 FROM comic_authors ca \
+                 INNER JOIN comics c ON c.comic_id = ca.comic_id \
+                 INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+                 WHERE ca.author_id = ? AND {healthy}"
+            ),
+            [Value::from(author_id)],
+        ))
+        .await
+        .map_err(map_db_err)?;
+    Ok(row
+        .and_then(|r| r.try_get_by_index::<i64>(0).ok())
+        .unwrap_or(0))
 }
 
 pub fn author_attachment_count_sql() -> String {

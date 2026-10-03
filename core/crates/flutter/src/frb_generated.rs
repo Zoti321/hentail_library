@@ -1407,7 +1407,8 @@ let mut var_tags = <Vec<crate::api::author::AuthorFacetCountFrbDto>>::sse_decode
 let mut var_parodies = <Vec<crate::api::author::AuthorFacetCountFrbDto>>::sse_decode(deserializer);
 let mut var_characters = <Vec<crate::api::author::AuthorFacetCountFrbDto>>::sse_decode(deserializer);
 let mut var_topComics = <Vec<crate::api::author::AuthorTopComicFrbDto>>::sse_decode(deserializer);
-return crate::api::author::AuthorDetailFrbDto{identity: var_identity, links: var_links, tags: var_tags, parodies: var_parodies, characters: var_characters, top_comics: var_topComics};}
+let mut var_comicCount = <i64>::sse_decode(deserializer);
+return crate::api::author::AuthorDetailFrbDto{identity: var_identity, links: var_links, tags: var_tags, parodies: var_parodies, characters: var_characters, top_comics: var_topComics, comic_count: var_comicCount};}
                 }
                 
                 impl SseDecode for crate::api::author::AuthorFacetCountFrbDto {
@@ -2838,7 +2839,8 @@ self.links.into_into_dart().into_dart(),
 self.tags.into_into_dart().into_dart(),
 self.parodies.into_into_dart().into_dart(),
 self.characters.into_into_dart().into_dart(),
-self.top_comics.into_into_dart().into_dart()
+self.top_comics.into_into_dart().into_dart(),
+self.comic_count.into_into_dart().into_dart()
                 ].into_dart()
                 }
             }
@@ -4386,7 +4388,8 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::metadata_backup::WouldApplySa
 <Vec<crate::api::author::AuthorFacetCountFrbDto>>::sse_encode(self.tags, serializer);
 <Vec<crate::api::author::AuthorFacetCountFrbDto>>::sse_encode(self.parodies, serializer);
 <Vec<crate::api::author::AuthorFacetCountFrbDto>>::sse_encode(self.characters, serializer);
-<Vec<crate::api::author::AuthorTopComicFrbDto>>::sse_encode(self.top_comics, serializer);}
+<Vec<crate::api::author::AuthorTopComicFrbDto>>::sse_encode(self.top_comics, serializer);
+<i64>::sse_encode(self.comic_count, serializer);}
                 }
                 
                 impl SseEncode for crate::api::author::AuthorFacetCountFrbDto {

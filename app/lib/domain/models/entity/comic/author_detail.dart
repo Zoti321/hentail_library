@@ -66,6 +66,7 @@ class AuthorDetail {
     required this.parodies,
     required this.characters,
     required this.topComics,
+    required this.comicCount,
     required this.image,
   });
 
@@ -77,5 +78,6 @@ class AuthorDetail {
   final List<AuthorFacetCount> parodies;
   final List<AuthorFacetCount> characters;
   final List<AuthorTopComic> topComics;
+  final int comicCount;
   final AuthorImageRef image;
 }

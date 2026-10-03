@@ -1181,7 +1181,12 @@
       }
     }
   },
-  "authorDetailComicsSection": "漫画",
+  "authorDetailComicsSection": "漫画 · {count}",
+  "@authorDetailComicsSection": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "authorDetailComicsEmpty": "暂无漫画",
   "authorDetailViewInSearch": "在搜索中查看",
   "authorDetailRename": "重命名",

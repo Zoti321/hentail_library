@@ -5094,8 +5094,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AuthorDetailFrbDto dco_decode_author_detail_frb_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return AuthorDetailFrbDto(
       identity: dco_decode_author_identity_frb_dto(arr[0]),
       links: dco_decode_list_author_link_frb_dto(arr[1]),
@@ -5103,6 +5103,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       parodies: dco_decode_list_author_facet_count_frb_dto(arr[3]),
       characters: dco_decode_list_author_facet_count_frb_dto(arr[4]),
       topComics: dco_decode_list_author_top_comic_frb_dto(arr[5]),
+      comicCount: dco_decode_i_64(arr[6]),
     );
   }
 
@@ -6958,6 +6959,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       deserializer,
     );
     var var_topComics = sse_decode_list_author_top_comic_frb_dto(deserializer);
+    var var_comicCount = sse_decode_i_64(deserializer);
     return AuthorDetailFrbDto(
       identity: var_identity,
       links: var_links,
@@ -6965,6 +6967,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       parodies: var_parodies,
       characters: var_characters,
       topComics: var_topComics,
+      comicCount: var_comicCount,
     );
   }
 
@@ -9405,6 +9408,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_author_facet_count_frb_dto(self.parodies, serializer);
     sse_encode_list_author_facet_count_frb_dto(self.characters, serializer);
     sse_encode_list_author_top_comic_frb_dto(self.topComics, serializer);
+    sse_encode_i_64(self.comicCount, serializer);
   }
 
   @protected

@@ -4099,8 +4099,8 @@ abstract class AppLocalizations {
   /// No description provided for @authorDetailComicsSection.
   ///
   /// In zh, this message translates to:
-  /// **'漫画'**
-  String get authorDetailComicsSection;
+  /// **'漫画 · {count}'**
+  String authorDetailComicsSection(int count);
 
   /// No description provided for @authorDetailComicsEmpty.
   ///

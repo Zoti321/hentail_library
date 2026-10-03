@@ -193,6 +193,7 @@ AuthorDetail _mapDetail(
               (comicId: e.comicId, title: e.title),
         )
         .toList(),
+    comicCount: detail.comicCount.toInt(),
     image: (
       avatarSource: _mapImageSource(image.avatarSource),
       avatarComicId: image.avatarComicId,

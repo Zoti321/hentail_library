@@ -243,6 +243,7 @@ fn detail_aggregation_excludes_trash_and_healthy_hidden() {
             );
             assert_eq!(healthy.top_comics.len(), 1);
             assert_eq!(healthy.top_comics[0].comic_id, "vis");
+            assert_eq!(healthy.comic_count, 1);
 
             let all = get_author_detail(id, true)
                 .await
@@ -255,6 +256,7 @@ fn detail_aggregation_excludes_trash_and_healthy_hidden() {
             assert_eq!(all.top_comics.len(), 2);
             assert_eq!(all.top_comics[0].comic_id, "r18");
             assert_eq!(all.top_comics[1].comic_id, "vis");
+            assert_eq!(all.comic_count, 2);
 
             add_author_link(id, AuthorLinkPlatform::Other, "https://example.com", None)
                 .await
