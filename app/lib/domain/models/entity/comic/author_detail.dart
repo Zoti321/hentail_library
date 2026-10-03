@@ -4,6 +4,37 @@ extension AuthorLinkPlatformX on AuthorLinkPlatform {
   bool get isCreative => this != AuthorLinkPlatform.other;
 }
 
+/// 按 URL 主机名推断作者链接平台；无法识别时为 [AuthorLinkPlatform.other]。
+AuthorLinkPlatform detectAuthorLinkPlatform(String url) {
+  final Uri? uri = Uri.tryParse(url.trim());
+  final String host = (uri?.host ?? '').toLowerCase();
+  if (host.isEmpty) {
+    return AuthorLinkPlatform.other;
+  }
+  bool matches(String domain) => host == domain || host.endsWith('.$domain');
+  if (matches('fanbox.cc')) {
+    return AuthorLinkPlatform.fanbox;
+  }
+  if (matches('pixiv.net')) {
+    final String path = uri!.path.toLowerCase();
+    return path.startsWith('/fanbox')
+        ? AuthorLinkPlatform.fanbox
+        : AuthorLinkPlatform.pixiv;
+  }
+  if (matches('x.com') || matches('twitter.com')) {
+    return AuthorLinkPlatform.x;
+  }
+  if (matches('patreon.com')) {
+    return AuthorLinkPlatform.patreon;
+  }
+  if (matches('discord.gg') ||
+      matches('discord.com') ||
+      matches('discordapp.com')) {
+    return AuthorLinkPlatform.discord;
+  }
+  return AuthorLinkPlatform.other;
+}
+
 enum AuthorImageSource { platformCached, comicCover, none }
 
 typedef AuthorLink = ({

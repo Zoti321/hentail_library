@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+const double _bannerHeight = 140;
+const double _avatarSize = 88;
+const double _avatarRing = 4;
+const double _comicCardWidth = 96;
+const double _comicCardHeight = 144;
 
 class AuthorDetailSurface extends ConsumerWidget {
   const AuthorDetailSurface({super.key, required this.authorId});
@@ -28,10 +36,9 @@ class AuthorDetailSurface extends ConsumerWidget {
     final AsyncValue<AuthorDetail?> asyncDetail = ref.watch(
       authorDetailProvider(authorId),
     );
-    final AuthorDetail? detail = asyncDetail.asData?.value;
     return AdaptiveFormSurface(
-      title: detail?.name ?? l10n.authorDetailTitle,
-      maxDialogWidth: 520,
+      title: l10n.authorDetailTitle,
+      maxDialogWidth: 560,
       borderRadius: tokens.radius.xs,
       fitContentHeight: false,
       body: asyncDetail.when(
@@ -49,55 +56,246 @@ class AuthorDetailSurface extends ConsumerWidget {
           onPressed: () => Navigator.of(context).maybePop(),
           child: Text(l10n.commonClose),
         ),
-        OutlinedButton(
-          onPressed: detail == null
-              ? null
-              : () => _rename(context, ref, detail),
-          child: Text(l10n.authorDetailRename),
-        ),
-        FilledButton(
-          onPressed: detail == null
-              ? null
-              : () => _openSearch(context, detail.name),
-          child: Text(l10n.authorDetailViewInSearch),
-        ),
       ],
     );
   }
 }
 
-Future<void> _openSearch(BuildContext context, String name) async {
+void _openSearch(BuildContext context, String name) {
   final String query = formatLibrarySearchExactMetaQuery(name);
   final String encoded = Uri.encodeQueryComponent(query);
   Navigator.of(context).maybePop();
   appRouter.push('/searched?q=$encoded');
 }
 
-Future<void> _rename(
-  BuildContext context,
-  WidgetRef ref,
-  AuthorDetail detail,
-) async {
-  final l10n = context.l10n;
-  await showDialog<void>(
-    context: context,
-    builder: (BuildContext dialogContext) => TagNameEditorDialog(
-      title: l10n.authorDetailRename,
-      labelText: l10n.metadataNameLabel,
-      hintText: l10n.metadataRenameAuthorHint,
-      initialValue: detail.name,
-      shouldCloseOnUnchanged: true,
-      onSubmit: (String value) async {
+class _AuthorDetailBody extends StatelessWidget {
+  const _AuthorDetailBody({required this.detail});
+
+  final AuthorDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _AuthorHeader(detail: detail),
+        SizedBox(height: tokens.spacing.lg),
+        _AuthorComicsSection(detail: detail),
+      ],
+    );
+  }
+}
+
+class _AuthorHeader extends StatelessWidget {
+  const _AuthorHeader({required this.detail});
+
+  final AuthorDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final String? backgroundId =
+        detail.image.backgroundComicId ?? detail.image.avatarComicId;
+    final String? avatarId = detail.image.avatarComicId;
+    final double avatarLeft = tokens.spacing.md;
+    const double avatarOuter = _avatarSize + _avatarRing * 2;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(tokens.radius.md),
+              child: SizedBox(
+                height: _bannerHeight,
+                child: backgroundId == null
+                    ? ColoredBox(color: cs.surfaceContainerHighest)
+                    : ComicCoverContent(
+                        comicId: backgroundId,
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: avatarOuter / 2 + 4),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: avatarLeft + avatarOuter + tokens.spacing.md,
+                  top: tokens.spacing.sm,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _AuthorNameRow(detail: detail),
+                    SizedBox(height: tokens.spacing.xs),
+                    _AuthorLinksWrap(detail: detail),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        Positioned(
+          left: avatarLeft,
+          top: _bannerHeight - avatarOuter / 2,
+          child: Container(
+            width: avatarOuter,
+            height: avatarOuter,
+            padding: const EdgeInsets.all(_avatarRing),
+            decoration: BoxDecoration(
+              color: cs.surface,
+              shape: BoxShape.circle,
+            ),
+            child: ClipOval(
+              child: avatarId == null
+                  ? ColoredBox(
+                      color: cs.surfaceContainerHighest,
+                      child: Icon(
+                        LucideIcons.user,
+                        size: 36,
+                        color: cs.hentai.iconSecondary,
+                      ),
+                    )
+                  : ComicCoverContent(comicId: avatarId, fit: BoxFit.cover),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 作者名 + 铅笔按钮；点击后原位变为输入框（Enter / 失焦提交，Esc 取消）。
+class _AuthorNameRow extends HookConsumerWidget {
+  const _AuthorNameRow({required this.detail});
+
+  final AuthorDetail detail;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ValueNotifier<bool> editing = useState(false);
+    final ObjectRef<bool> busy = useRef(false);
+    final TextEditingController controller = useTextEditingController();
+    final FocusNode focusNode = useFocusNode();
+    final TextStyle nameStyle = TextStyle(
+      fontSize: tokens.text.titleLg,
+      fontWeight: FontWeight.w700,
+      color: cs.hentai.textPrimary,
+    );
+
+    Future<void> submit() async {
+      if (!editing.value || busy.value) {
+        return;
+      }
+      final String value = controller.text.trim();
+      if (value.isEmpty || value == detail.name) {
+        editing.value = false;
+        return;
+      }
+      busy.value = true;
+      try {
         await ref
             .read(authorDetailCommandsProvider)
             .rename(authorId: detail.id, oldName: detail.name, newName: value);
-      },
-    ),
-  );
+        if (context.mounted) {
+          editing.value = false;
+        }
+      } catch (error) {
+        if (context.mounted) {
+          showErrorToast(context, error);
+          editing.value = false;
+        }
+      } finally {
+        busy.value = false;
+      }
+    }
+
+    useEffect(() {
+      void onFocusChange() {
+        if (!focusNode.hasFocus) {
+          submit();
+        }
+      }
+
+      focusNode.addListener(onFocusChange);
+      return () => focusNode.removeListener(onFocusChange);
+    }, <Object?>[focusNode, detail.name]);
+
+    if (editing.value) {
+      return CallbackShortcuts(
+        bindings: <ShortcutActivator, VoidCallback>{
+          const SingleActivator(LogicalKeyboardKey.escape): () =>
+              editing.value = false,
+        },
+        child: SizedBox(
+          width: 260,
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            autofocus: true,
+            style: nameStyle,
+            decoration: InputDecoration(
+              isDense: true,
+              hintText: l10n.metadataRenameAuthorHint,
+            ),
+            onSubmitted: (_) => submit(),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        if (detail.verified) ...<Widget>[
+          Tooltip(
+            message: l10n.authorDetailVerified,
+            child: Icon(
+              LucideIcons.badgeCheck,
+              size: 20,
+              color: cs.hentai.success,
+            ),
+          ),
+          SizedBox(width: tokens.spacing.xs),
+        ],
+        Flexible(
+          child: Text(
+            detail.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: nameStyle,
+          ),
+        ),
+        SizedBox(width: tokens.spacing.xs),
+        IconButton(
+          tooltip: l10n.authorDetailRename,
+          visualDensity: VisualDensity.compact,
+          iconSize: 16,
+          color: cs.hentai.iconSecondary,
+          onPressed: () {
+            controller.text = detail.name;
+            controller.selection = TextSelection(
+              baseOffset: 0,
+              extentOffset: detail.name.length,
+            );
+            editing.value = true;
+          },
+          icon: const Icon(LucideIcons.pencil),
+        ),
+      ],
+    );
+  }
 }
 
-class _AuthorDetailBody extends ConsumerWidget {
-  const _AuthorDetailBody({required this.detail});
+/// 链接 chip 列表 + 「添加链接」；添加时原位变为输入框，平台按 URL 自动识别。
+class _AuthorLinksWrap extends HookConsumerWidget {
+  const _AuthorLinksWrap({required this.detail});
 
   final AuthorDetail detail;
 
@@ -116,177 +314,216 @@ class _AuthorDetailBody extends ConsumerWidget {
     }
   }
 
-  Future<void> _editLink(
+  Future<void> _confirmDelete(
     BuildContext context,
-    WidgetRef ref, {
-    AuthorLink? existing,
-  }) async {
-    await showDialog<void>(
+    WidgetRef ref,
+    AuthorLink link,
+  ) async {
+    final l10n = context.l10n;
+    final bool? confirmed = await showDialog<bool>(
       context: context,
-      builder: (BuildContext dialogContext) => _AuthorLinkEditorDialog(
-        initial: existing,
-        onSubmit:
-            (
-              AuthorLinkPlatform platform,
-              String url,
-              String? displayName,
-            ) async {
-              final AuthorDetailCommands commands = ref.read(
-                authorDetailCommandsProvider,
-              );
-              if (existing == null) {
-                await commands.addLink(
-                  authorId: detail.id,
-                  platform: platform,
-                  url: url,
-                  platformDisplayName: displayName,
-                );
-              } else {
-                await commands.updateLink(
-                  authorId: detail.id,
-                  linkId: existing.id,
-                  platform: platform,
-                  url: url,
-                  platformDisplayName: displayName,
-                );
-              }
-            },
-        onDelete: existing == null
-            ? null
-            : () async {
-                await ref
-                    .read(authorDetailCommandsProvider)
-                    .deleteLink(authorId: detail.id, linkId: existing.id);
-              },
+      builder: (BuildContext dialogContext) => HentaiDialog(
+        title: l10n.authorDetailDeleteLink,
+        content: Text(
+          l10n.authorDetailDeleteLinkConfirm(_linkChipLabel(l10n, link)),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.commonCancel),
+          ),
+          const SizedBox(width: 8),
+          DestructiveFilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.commonDelete),
+          ),
+        ],
       ),
     );
+    if (confirmed != true) {
+      return;
+    }
+    try {
+      await ref
+          .read(authorDetailCommandsProvider)
+          .deleteLink(authorId: detail.id, linkId: link.id);
+    } catch (error) {
+      if (context.mounted) {
+        showErrorToast(context, error);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final AppThemeTokens tokens = context.tokens;
+    final ValueNotifier<bool> adding = useState(false);
+    final ObjectRef<bool> busy = useRef(false);
+    final TextEditingController controller = useTextEditingController();
+    final FocusNode focusNode = useFocusNode();
+
+    Future<void> submit() async {
+      if (!adding.value || busy.value) {
+        return;
+      }
+      final String url = controller.text.trim();
+      if (url.isEmpty) {
+        adding.value = false;
+        return;
+      }
+      final String lower = url.toLowerCase();
+      if (!(lower.startsWith('http://') || lower.startsWith('https://'))) {
+        showErrorToast(context, l10n.authorDetailInvalidUrl);
+        return;
+      }
+      busy.value = true;
+      try {
+        await ref
+            .read(authorDetailCommandsProvider)
+            .addLink(
+              authorId: detail.id,
+              platform: detectAuthorLinkPlatform(url),
+              url: url,
+            );
+        if (context.mounted) {
+          controller.clear();
+          adding.value = false;
+        }
+      } catch (error) {
+        if (context.mounted) {
+          showErrorToast(context, error);
+        }
+      } finally {
+        busy.value = false;
+      }
+    }
+
+    useEffect(() {
+      void onFocusChange() {
+        if (!focusNode.hasFocus && controller.text.trim().isEmpty) {
+          adding.value = false;
+        }
+      }
+
+      focusNode.addListener(onFocusChange);
+      return () => focusNode.removeListener(onFocusChange);
+    }, <Object?>[focusNode]);
+
+    return Wrap(
+      spacing: tokens.spacing.sm,
+      runSpacing: tokens.spacing.sm,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: <Widget>[
+        for (final AuthorLink link in detail.links)
+          Tooltip(
+            message: l10n.authorDetailLinkTooltip(link.url),
+            waitDuration: const Duration(milliseconds: 500),
+            child: GestureDetector(
+              onSecondaryTap: () => _confirmDelete(context, ref, link),
+              child: OutlinedMetaChip(
+                text: _linkChipLabel(l10n, link),
+                compact: true,
+                icon: _platformIcon(link.platform),
+                onTap: () => _openLink(context, link.url),
+                onLongPress: () => _confirmDelete(context, ref, link),
+              ),
+            ),
+          ),
+        if (adding.value)
+          CallbackShortcuts(
+            bindings: <ShortcutActivator, VoidCallback>{
+              const SingleActivator(LogicalKeyboardKey.escape): () {
+                controller.clear();
+                adding.value = false;
+              },
+            },
+            child: SizedBox(
+              width: 260,
+              child: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                autofocus: true,
+                keyboardType: TextInputType.url,
+                style: TextStyle(fontSize: tokens.text.bodySm),
+                decoration: InputDecoration(
+                  isDense: true,
+                  prefixIcon: const Icon(LucideIcons.link, size: 14),
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 28,
+                    minHeight: 20,
+                  ),
+                  hintText: l10n.authorDetailLinkPasteHint,
+                ),
+                onSubmitted: (_) => submit(),
+              ),
+            ),
+          )
+        else
+          OutlinedMetaChip(
+            text: l10n.authorDetailAddLink,
+            compact: true,
+            icon: LucideIcons.plus,
+            onTap: () => adding.value = true,
+          ),
+      ],
+    );
+  }
+}
+
+class _AuthorComicsSection extends StatelessWidget {
+  const _AuthorComicsSection({required this.detail});
+
+  final AuthorDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
-    final String? coverId = detail.image.avatarComicId;
+    final List<AuthorFacetCount> facets = <AuthorFacetCount>[
+      ...detail.parodies,
+      ...detail.characters,
+      ...detail.tags,
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SizedBox(
-          height: 120,
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              if (coverId != null)
-                Opacity(
-                  opacity: 0.35,
-                  child: ComicCoverContent(comicId: coverId),
-                )
-              else
-                ColoredBox(color: cs.surfaceContainerHighest),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Padding(
-                  padding: EdgeInsets.all(tokens.spacing.sm),
-                  child: Row(
-                    children: <Widget>[
-                      SizedBox(
-                        width: 56,
-                        height: 56,
-                        child: ClipOval(
-                          child: coverId == null
-                              ? ColoredBox(
-                                  color: cs.surface,
-                                  child: Icon(
-                                    LucideIcons.user,
-                                    color: cs.hentai.iconSecondary,
-                                  ),
-                                )
-                              : ComicCoverContent(comicId: coverId),
-                        ),
-                      ),
-                      SizedBox(width: tokens.spacing.sm),
-                      Expanded(
-                        child: Row(
-                          children: <Widget>[
-                            Flexible(
-                              child: Text(
-                                detail.name,
-                                style: TextStyle(
-                                  fontSize: tokens.text.titleMd,
-                                  fontWeight: FontWeight.w600,
-                                  color: cs.hentai.textPrimary,
-                                ),
-                              ),
-                            ),
-                            if (detail.verified) ...<Widget>[
-                              SizedBox(width: tokens.spacing.xs),
-                              Semantics(
-                                label: l10n.authorDetailVerified,
-                                child: Icon(
-                                  LucideIcons.badgeCheck,
-                                  size: 18,
-                                  color: cs.primary,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                l10n.authorDetailComicsSection,
+                style: TextStyle(
+                  fontSize: tokens.text.titleSm,
+                  fontWeight: FontWeight.w600,
+                  color: cs.hentai.textPrimary,
                 ),
               ),
-            ],
-          ),
-        ),
-        SizedBox(height: tokens.spacing.md),
-        Wrap(
-          spacing: tokens.spacing.sm,
-          runSpacing: tokens.spacing.sm,
-          children: <Widget>[
-            for (final AuthorLink link in detail.links)
-              OutlinedMetaChip(
-                text: _linkChipLabel(l10n, link),
-                compact: true,
-                icon: LucideIcons.link,
-                onTap: () => _openLink(context, link.url),
-                onLongPress: () => _editLink(context, ref, existing: link),
-              ),
-            OutlinedMetaChip(
-              text: l10n.authorDetailAddLink,
-              compact: true,
-              onTap: () => _editLink(context, ref),
+            ),
+            TextButton.icon(
+              onPressed: () => _openSearch(context, detail.name),
+              icon: const Icon(LucideIcons.search, size: 14),
+              label: Text(l10n.authorDetailViewInSearch),
             ),
           ],
         ),
-        SizedBox(height: tokens.spacing.lg),
-        _FacetSection(
-          title: l10n.authorDetailParodiesSection,
-          empty: l10n.authorDetailParodiesEmpty,
-          items: detail.parodies,
-          onChipTap: (String name) => _openSearch(context, name),
-        ),
-        _FacetSection(
-          title: l10n.authorDetailCharactersSection,
-          empty: l10n.authorDetailCharactersEmpty,
-          items: detail.characters,
-          onChipTap: (String name) => _openSearch(context, name),
-        ),
-        _FacetSection(
-          title: l10n.authorDetailTagsSection,
-          empty: l10n.authorDetailTagsEmpty,
-          items: detail.tags,
-          onChipTap: (String name) => _openSearch(context, name),
-        ),
-        Text(
-          l10n.authorDetailComicsSection,
-          style: TextStyle(
-            fontSize: tokens.text.titleSm,
-            fontWeight: FontWeight.w600,
-            color: cs.hentai.textPrimary,
+        if (facets.isNotEmpty) ...<Widget>[
+          SizedBox(height: tokens.spacing.sm),
+          Wrap(
+            spacing: tokens.spacing.sm,
+            runSpacing: tokens.spacing.sm,
+            children: <Widget>[
+              for (final AuthorFacetCount item in facets)
+                OutlinedMetaChip(
+                  text: '${item.name} ${item.attachmentCount}',
+                  compact: true,
+                  onTap: () => _openSearch(context, item.name),
+                ),
+            ],
           ),
-        ),
-        SizedBox(height: tokens.spacing.sm),
+        ],
+        SizedBox(height: tokens.spacing.md),
         if (detail.topComics.isEmpty)
           Text(
             l10n.authorDetailComicsEmpty,
@@ -296,105 +533,67 @@ class _AuthorDetailBody extends ConsumerWidget {
             ),
           )
         else
-          SizedBox(
-            height: 140,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: detail.topComics.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  SizedBox(width: tokens.spacing.sm),
-              itemBuilder: (BuildContext context, int index) {
-                final AuthorTopComic comic = detail.topComics[index];
-                return SizedBox(
-                  width: 90,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.of(context).maybePop();
-                      appRouter.push(
-                        '/comic/${Uri.encodeComponent(comic.comicId)}',
-                      );
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: ComicCoverContent(comicId: comic.comicId),
-                        ),
-                        SizedBox(height: tokens.spacing.xs),
-                        Text(
-                          comic.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: tokens.text.labelXs),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+          Wrap(
+            spacing: tokens.spacing.sm,
+            runSpacing: tokens.spacing.sm,
+            children: <Widget>[
+              for (final AuthorTopComic comic in detail.topComics)
+                _AuthorComicCoverCard(comic: comic),
+            ],
           ),
       ],
     );
   }
 }
 
-class _FacetSection extends StatelessWidget {
-  const _FacetSection({
-    required this.title,
-    required this.empty,
-    required this.items,
-    required this.onChipTap,
-  });
+class _AuthorComicCoverCard extends StatelessWidget {
+  const _AuthorComicCoverCard({required this.comic});
 
-  final String title;
-  final String empty;
-  final List<AuthorFacetCount> items;
-  final ValueChanged<String> onChipTap;
+  final AuthorTopComic comic;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: EdgeInsets.only(bottom: tokens.spacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: tokens.text.titleSm,
-              fontWeight: FontWeight.w600,
-              color: cs.hentai.textPrimary,
+    final BorderRadius radius = BorderRadius.circular(tokens.radius.sm);
+    return Tooltip(
+      message: comic.title,
+      waitDuration: const Duration(milliseconds: 600),
+      child: Semantics(
+        button: true,
+        label: comic.title,
+        child: SizedBox(
+          width: _comicCardWidth,
+          height: _comicCardHeight,
+          child: ClipRRect(
+            borderRadius: radius,
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).maybePop();
+                  appRouter.push(
+                    '/comic/${Uri.encodeComponent(comic.comicId)}',
+                  );
+                },
+                child: ComicCoverContent(comicId: comic.comicId),
+              ),
             ),
           ),
-          SizedBox(height: tokens.spacing.sm),
-          if (items.isEmpty)
-            Text(
-              empty,
-              style: TextStyle(
-                fontSize: tokens.text.bodySm,
-                color: cs.hentai.textSecondary,
-              ),
-            )
-          else
-            Wrap(
-              spacing: tokens.spacing.sm,
-              runSpacing: tokens.spacing.sm,
-              children: items
-                  .map(
-                    (AuthorFacetCount item) => OutlinedMetaChip(
-                      text: '${item.name} ${item.attachmentCount}',
-                      compact: true,
-                      onTap: () => onChipTap(item.name),
-                    ),
-                  )
-                  .toList(),
-            ),
-        ],
+        ),
       ),
     );
   }
+}
+
+IconData _platformIcon(AuthorLinkPlatform platform) {
+  return switch (platform) {
+    AuthorLinkPlatform.pixiv => LucideIcons.palette,
+    AuthorLinkPlatform.x => LucideIcons.twitter,
+    AuthorLinkPlatform.patreon => LucideIcons.heart,
+    AuthorLinkPlatform.fanbox => LucideIcons.brush,
+    AuthorLinkPlatform.discord => LucideIcons.messageCircle,
+    AuthorLinkPlatform.other => LucideIcons.globe,
+  };
 }
 
 String _platformLabel(AppLocalizations l10n, AuthorLinkPlatform platform) {
@@ -414,158 +613,10 @@ String _linkChipLabel(AppLocalizations l10n, AuthorLink link) {
     if (custom != null && custom.isNotEmpty) {
       return custom;
     }
+    final String host = Uri.tryParse(link.url)?.host ?? '';
+    if (host.isNotEmpty) {
+      return host.startsWith('www.') ? host.substring(4) : host;
+    }
   }
   return _platformLabel(l10n, link.platform);
-}
-
-class _AuthorLinkEditorDialog extends StatefulWidget {
-  const _AuthorLinkEditorDialog({
-    required this.onSubmit,
-    this.initial,
-    this.onDelete,
-  });
-
-  final AuthorLink? initial;
-  final Future<void> Function(
-    AuthorLinkPlatform platform,
-    String url,
-    String? displayName,
-  )
-  onSubmit;
-  final Future<void> Function()? onDelete;
-
-  @override
-  State<_AuthorLinkEditorDialog> createState() =>
-      _AuthorLinkEditorDialogState();
-}
-
-class _AuthorLinkEditorDialogState extends State<_AuthorLinkEditorDialog> {
-  late AuthorLinkPlatform _platform =
-      widget.initial?.platform ?? AuthorLinkPlatform.pixiv;
-  late final TextEditingController _url = TextEditingController(
-    text: widget.initial?.url ?? '',
-  );
-  late final TextEditingController _otherName = TextEditingController(
-    text: widget.initial?.platformDisplayName ?? '',
-  );
-  bool _saving = false;
-
-  @override
-  void dispose() {
-    _url.dispose();
-    _otherName.dispose();
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    final String url = _url.text.trim();
-    final String lower = url.toLowerCase();
-    if (url.isEmpty ||
-        !(lower.startsWith('http://') || lower.startsWith('https://'))) {
-      showErrorToast(context, context.l10n.authorDetailInvalidUrl);
-      return;
-    }
-    setState(() => _saving = true);
-    try {
-      await widget.onSubmit(
-        _platform,
-        url,
-        _platform == AuthorLinkPlatform.other ? _otherName.text.trim() : null,
-      );
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    } catch (error) {
-      if (mounted) {
-        showErrorToast(context, error);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _saving = false);
-      }
-    }
-  }
-
-  Future<void> _delete() async {
-    final Future<void> Function()? onDelete = widget.onDelete;
-    if (onDelete == null) {
-      return;
-    }
-    setState(() => _saving = true);
-    try {
-      await onDelete();
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-    } catch (error) {
-      if (mounted) {
-        showErrorToast(context, error);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _saving = false);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return HentaiDialog(
-      title: widget.initial == null
-          ? l10n.authorDetailAddLink
-          : l10n.authorDetailEditLink,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          DropdownButton<AuthorLinkPlatform>(
-            value: _platform,
-            isExpanded: true,
-            items: AuthorLinkPlatform.values
-                .map(
-                  (AuthorLinkPlatform p) => DropdownMenuItem(
-                    value: p,
-                    child: Text(_platformLabel(l10n, p)),
-                  ),
-                )
-                .toList(),
-            onChanged: (AuthorLinkPlatform? value) {
-              if (value != null) {
-                setState(() => _platform = value);
-              }
-            },
-          ),
-          if (_platform == AuthorLinkPlatform.other)
-            TextField(
-              controller: _otherName,
-              decoration: InputDecoration(
-                labelText: l10n.authorDetailPlatformOtherName,
-              ),
-            ),
-          TextField(
-            controller: _url,
-            decoration: InputDecoration(
-              labelText: l10n.authorDetailLinkUrl,
-              hintText: l10n.authorDetailLinkUrlHint,
-            ),
-          ),
-        ],
-      ),
-      actions: <Widget>[
-        if (widget.onDelete != null)
-          TextButton(
-            onPressed: _saving ? null : _delete,
-            child: Text(l10n.authorDetailDeleteLink),
-          ),
-        TextButton(
-          onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          child: Text(l10n.commonCancel),
-        ),
-        FilledButton(
-          onPressed: _saving ? null : _save,
-          child: Text(l10n.commonSave),
-        ),
-      ],
-    );
-  }
 }

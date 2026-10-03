@@ -1156,25 +1156,31 @@
   "authorDetailTitle": "作者",
   "authorDetailVerified": "认证作者",
   "authorDetailAddLink": "添加链接",
-  "authorDetailEditLink": "编辑链接",
-  "authorDetailLinkUrl": "链接",
-  "authorDetailLinkUrlHint": "https://…",
-  "authorDetailPlatform": "平台",
+  "authorDetailLinkPasteHint": "粘贴主页链接",
   "authorDetailPlatformPixiv": "Pixiv",
   "authorDetailPlatformX": "X",
   "authorDetailPlatformPatreon": "Patreon",
   "authorDetailPlatformFanbox": "FANBOX",
   "authorDetailPlatformDiscord": "Discord",
   "authorDetailPlatformOther": "其他",
-  "authorDetailPlatformOtherName": "自定义名称",
   "authorDetailDeleteLink": "删除链接",
-  "authorDetailTagsSection": "标签",
-  "authorDetailParodiesSection": "原作",
-  "authorDetailCharactersSection": "角色",
+  "authorDetailDeleteLinkConfirm": "删除链接「{label}」？",
+  "@authorDetailDeleteLinkConfirm": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "authorDetailLinkTooltip": "{url}\n长按或右键删除",
+  "@authorDetailLinkTooltip": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
   "authorDetailComicsSection": "漫画",
-  "authorDetailTagsEmpty": "暂无标签",
-  "authorDetailParodiesEmpty": "暂无原作",
-  "authorDetailCharactersEmpty": "暂无角色",
   "authorDetailComicsEmpty": "暂无漫画",
   "authorDetailViewInSearch": "在搜索中查看",
   "authorDetailRename": "重命名",

@@ -2335,16 +2335,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authorDetailAddLink => 'Add link';
 
   @override
-  String get authorDetailEditLink => 'Edit link';
-
-  @override
-  String get authorDetailLinkUrl => 'URL';
-
-  @override
-  String get authorDetailLinkUrlHint => 'https://…';
-
-  @override
-  String get authorDetailPlatform => 'Platform';
+  String get authorDetailLinkPasteHint => 'Paste a profile link';
 
   @override
   String get authorDetailPlatformPixiv => 'Pixiv';
@@ -2365,31 +2356,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authorDetailPlatformOther => 'Other';
 
   @override
-  String get authorDetailPlatformOtherName => 'Custom name';
-
-  @override
   String get authorDetailDeleteLink => 'Delete link';
 
   @override
-  String get authorDetailTagsSection => 'Tags';
+  String authorDetailDeleteLinkConfirm(String label) {
+    return 'Delete link \"$label\"?';
+  }
 
   @override
-  String get authorDetailParodiesSection => 'Parody';
-
-  @override
-  String get authorDetailCharactersSection => 'Characters';
+  String authorDetailLinkTooltip(String url) {
+    return '$url\nLong-press or right-click to delete';
+  }
 
   @override
   String get authorDetailComicsSection => 'Comics';
-
-  @override
-  String get authorDetailTagsEmpty => 'No tags yet';
-
-  @override
-  String get authorDetailParodiesEmpty => 'No parodies yet';
-
-  @override
-  String get authorDetailCharactersEmpty => 'No characters yet';
 
   @override
   String get authorDetailComicsEmpty => 'No comics yet';

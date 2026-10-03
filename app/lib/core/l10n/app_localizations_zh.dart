@@ -2250,16 +2250,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get authorDetailAddLink => '添加链接';
 
   @override
-  String get authorDetailEditLink => '编辑链接';
-
-  @override
-  String get authorDetailLinkUrl => '链接';
-
-  @override
-  String get authorDetailLinkUrlHint => 'https://…';
-
-  @override
-  String get authorDetailPlatform => '平台';
+  String get authorDetailLinkPasteHint => '粘贴主页链接';
 
   @override
   String get authorDetailPlatformPixiv => 'Pixiv';
@@ -2280,31 +2271,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get authorDetailPlatformOther => '其他';
 
   @override
-  String get authorDetailPlatformOtherName => '自定义名称';
-
-  @override
   String get authorDetailDeleteLink => '删除链接';
 
   @override
-  String get authorDetailTagsSection => '标签';
+  String authorDetailDeleteLinkConfirm(String label) {
+    return '删除链接「$label」？';
+  }
 
   @override
-  String get authorDetailParodiesSection => '原作';
-
-  @override
-  String get authorDetailCharactersSection => '角色';
+  String authorDetailLinkTooltip(String url) {
+    return '$url\n长按或右键删除';
+  }
 
   @override
   String get authorDetailComicsSection => '漫画';
-
-  @override
-  String get authorDetailTagsEmpty => '暂无标签';
-
-  @override
-  String get authorDetailParodiesEmpty => '暂无原作';
-
-  @override
-  String get authorDetailCharactersEmpty => '暂无角色';
 
   @override
   String get authorDetailComicsEmpty => '暂无漫画';
