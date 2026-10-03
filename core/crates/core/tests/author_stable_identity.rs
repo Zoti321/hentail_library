@@ -303,11 +303,28 @@ fn author_link_crud_validates_url() {
             )
             .await
             .expect("update");
-            delete_author_link(link.id).await.expect("delete");
+            delete_author_link(created.id, link.id)
+                .await
+                .expect("delete");
             assert!(list_author_links(created.id)
                 .await
                 .expect("list")
                 .is_empty());
+            let missing = delete_author_link(created.id, link.id).await;
+            assert!(missing.is_err());
+            let other = add_author("OtherOwner").await.expect("other");
+            let owned = add_author_link(created.id, AuthorLinkPlatform::X, "https://x.com/a", None)
+                .await
+                .expect("owned");
+            let cross = delete_author_link(other.id, owned.id).await;
+            assert!(cross.is_err());
+            assert_eq!(
+                list_author_links(created.id)
+                    .await
+                    .expect("still there")
+                    .len(),
+                1
+            );
         });
     });
 }

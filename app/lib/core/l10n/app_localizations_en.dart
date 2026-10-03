@@ -2365,7 +2365,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String authorDetailLinkTooltip(String url) {
-    return '$url\nLong-press or right-click to delete';
+    return '$url';
   }
 
   @override

@@ -4087,7 +4087,7 @@ abstract class AppLocalizations {
   /// No description provided for @authorDetailLinkTooltip.
   ///
   /// In zh, this message translates to:
-  /// **'{url}\n长按或右键删除'**
+  /// **'{url}'**
   String authorDetailLinkTooltip(String url);
 
   /// No description provided for @authorDetailComicsSection.

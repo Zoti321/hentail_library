@@ -416,12 +416,17 @@ pub async fn update_author_link(
     Ok(())
 }
 
-pub async fn delete_author_link(link_id: i64) -> Result<(), HentaiError> {
+pub async fn delete_author_link(author_id: i64, link_id: i64) -> Result<(), HentaiError> {
     let db = connection()?;
-    AuthorLinks::delete_by_id(link_id)
+    let result = AuthorLinks::delete_many()
+        .filter(author_links::Column::Id.eq(link_id))
+        .filter(author_links::Column::AuthorId.eq(author_id))
         .exec(&db)
         .await
         .map_err(map_db_err)?;
+    if result.rows_affected == 0 {
+        return Err(HentaiError::validation("Author link 不存在"));
+    }
     Ok(())
 }
 

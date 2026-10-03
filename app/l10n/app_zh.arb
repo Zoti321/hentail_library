@@ -1172,7 +1172,7 @@
       }
     }
   },
-  "authorDetailLinkTooltip": "{url}\n长按或右键删除",
+  "authorDetailLinkTooltip": "{url}",
   "@authorDetailLinkTooltip": {
     "placeholders": {
       "url": {

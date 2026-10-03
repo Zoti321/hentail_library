@@ -309,8 +309,8 @@ pub async fn update_author_link_frb(
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn delete_author_link_frb(link_id: i64) -> Result<(), HentaiErrorDto> {
-    core_delete_link(link_id)
+pub async fn delete_author_link_frb(author_id: i64, link_id: i64) -> Result<(), HentaiErrorDto> {
+    core_delete_link(author_id, link_id)
         .await
         .map_err(HentaiErrorDto::from)
 }

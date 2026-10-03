@@ -166,6 +166,7 @@ abstract class RustLibApi extends BaseApi {
   SyncHandleDto crateApiSyncCreateSyncHandleFrb();
 
   Future<void> crateApiAuthorDeleteAuthorLinkFrb({
+    required PlatformInt64 authorId,
     required PlatformInt64 linkId,
   });
 
@@ -1271,12 +1272,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<void> crateApiAuthorDeleteAuthorLinkFrb({
+    required PlatformInt64 authorId,
     required PlatformInt64 linkId,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_i_64(authorId, serializer);
           sse_encode_i_64(linkId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
@@ -1290,7 +1293,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiAuthorDeleteAuthorLinkFrbConstMeta,
-        argValues: [linkId],
+        argValues: [authorId, linkId],
         apiImpl: this,
       ),
     );
@@ -1299,7 +1302,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiAuthorDeleteAuthorLinkFrbConstMeta =>
       const TaskConstMeta(
         debugName: "delete_author_link_frb",
-        argNames: ["linkId"],
+        argNames: ["authorId", "linkId"],
       );
 
   @override

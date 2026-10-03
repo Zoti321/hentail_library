@@ -139,9 +139,12 @@ class AuthorRepositoryImpl implements AuthorRepository {
   }
 
   @override
-  Future<void> deleteLink(int linkId) async {
+  Future<void> deleteLink({required int authorId, required int linkId}) async {
     await guardFrb(
-      () => rust_author.deleteAuthorLinkFrb(linkId: _toI64(linkId)),
+      () => rust_author.deleteAuthorLinkFrb(
+        authorId: _toI64(authorId),
+        linkId: _toI64(linkId),
+      ),
       fallbackMessage: '删除作者链接失败',
     );
   }

@@ -36,5 +36,5 @@ abstract class AuthorRepository {
     String? platformDisplayName,
   });
 
-  Future<void> deleteLink(int linkId);
+  Future<void> deleteLink({required int authorId, required int linkId});
 }

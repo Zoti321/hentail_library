@@ -258,9 +258,10 @@ let api_name = <Option<String>>::sse_decode(&mut deserializer);deserializer.end(
                 FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "delete_author_link_frb", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
             let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_link_id = <i64>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+            let api_author_id = <i64>::sse_decode(&mut deserializer);
+let api_link_id = <i64>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
                     transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || async move {
-                         let output_ok = crate::api::author::delete_author_link_frb(api_link_id).await?;   Ok(output_ok)
+                         let output_ok = crate::api::author::delete_author_link_frb(api_author_id, api_link_id).await?;   Ok(output_ok)
                     })().await)
                 } })
             }fn wire__crate__api__author__delete_authors_by_names_frb_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {

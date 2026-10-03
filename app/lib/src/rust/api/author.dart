@@ -69,8 +69,13 @@ Future<void> updateAuthorLinkFrb({
   platformDisplayName: platformDisplayName,
 );
 
-Future<void> deleteAuthorLinkFrb({required PlatformInt64 linkId}) =>
-    RustLib.instance.api.crateApiAuthorDeleteAuthorLinkFrb(linkId: linkId);
+Future<void> deleteAuthorLinkFrb({
+  required PlatformInt64 authorId,
+  required PlatformInt64 linkId,
+}) => RustLib.instance.api.crateApiAuthorDeleteAuthorLinkFrb(
+  authorId: authorId,
+  linkId: linkId,
+);
 
 Future<AuthorImageRefFrbDto> resolveAuthorImageFrb({
   required PlatformInt64 authorId,

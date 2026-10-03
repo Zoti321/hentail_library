@@ -2280,7 +2280,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String authorDetailLinkTooltip(String url) {
-    return '$url\n长按或右键删除';
+    return '$url';
   }
 
   @override

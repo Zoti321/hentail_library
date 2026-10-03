@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,6 +20,8 @@ class _StubAuthorRepository implements AuthorRepository {
   final List<(String, String)> renames = <(String, String)>[];
   final List<(AuthorLinkPlatform, String)> addedLinks =
       <(AuthorLinkPlatform, String)>[];
+  final List<(int, int)> deletedLinks = <(int, int)>[];
+  List<AuthorLink> links = const <AuthorLink>[];
 
   @override
   Future<List<Author>> listAll() async => <Author>[
@@ -59,7 +63,7 @@ class _StubAuthorRepository implements AuthorRepository {
       id: authorId,
       name: 'Alice',
       verified: true,
-      links: const <AuthorLink>[],
+      links: links,
       tags: const <AuthorFacetCount>[],
       parodies: const <AuthorFacetCount>[],
       characters: const <AuthorFacetCount>[],
@@ -99,7 +103,9 @@ class _StubAuthorRepository implements AuthorRepository {
   }) async {}
 
   @override
-  Future<void> deleteLink(int linkId) async {}
+  Future<void> deleteLink({required int authorId, required int linkId}) async {
+    deletedLinks.add((authorId, linkId));
+  }
 }
 
 Future<void> _openSurface(
@@ -195,5 +201,62 @@ void main() {
     expect(repo.addedLinks, <(AuthorLinkPlatform, String)>[
       (AuthorLinkPlatform.pixiv, 'https://www.pixiv.net/users/42'),
     ]);
+  });
+
+  testWidgets('link chip remove button deletes without confirm', (
+    WidgetTester tester,
+  ) async {
+    final _StubAuthorRepository repo = _StubAuthorRepository()
+      ..links = <AuthorLink>[
+        (
+          id: 7,
+          platform: AuthorLinkPlatform.pixiv,
+          url: 'https://www.pixiv.net/users/42',
+          platformDisplayName: null,
+          sortKey: 0,
+        ),
+      ];
+    await _openSurface(tester, repo);
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    expect(find.text('删除链接「Pixiv」？'), findsNothing);
+    expect(repo.deletedLinks, <(int, int)>[(1, 7)]);
+  });
+
+  testWidgets('desktop hides link remove until hover', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    final _StubAuthorRepository repo = _StubAuthorRepository()
+      ..links = <AuthorLink>[
+        (
+          id: 7,
+          platform: AuthorLinkPlatform.pixiv,
+          url: 'https://www.pixiv.net/users/42',
+          platformDisplayName: null,
+          sortKey: 0,
+        ),
+      ];
+    await _openSurface(tester, repo);
+
+    expect(find.byIcon(Icons.close), findsNothing);
+
+    final TestGesture gesture = await tester.createGesture(
+      kind: PointerDeviceKind.mouse,
+    );
+    await gesture.addPointer(location: Offset.zero);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(find.text('Pixiv')));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.close), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    expect(repo.deletedLinks, <(int, int)>[(1, 7)]);
+    debugDefaultTargetPlatformOverride = null;
   });
 }

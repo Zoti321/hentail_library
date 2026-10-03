@@ -78,7 +78,9 @@ class AuthorDetailCommands {
   }
 
   Future<void> deleteLink({required int authorId, required int linkId}) async {
-    await _ref.read(authorRepoProvider).deleteLink(linkId);
+    await _ref
+        .read(authorRepoProvider)
+        .deleteLink(authorId: authorId, linkId: linkId);
     _ref.invalidate(authorDetailProvider(authorId));
   }
 }

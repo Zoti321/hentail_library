@@ -1165,7 +1165,7 @@
   "authorDetailPlatformOther": "Other",
   "authorDetailDeleteLink": "Delete link",
   "authorDetailDeleteLinkConfirm": "Delete link \"{label}\"?",
-  "authorDetailLinkTooltip": "{url}\nLong-press or right-click to delete",
+  "authorDetailLinkTooltip": "{url}",
   "authorDetailComicsSection": "Comics",
   "authorDetailComicsEmpty": "No comics yet",
   "authorDetailViewInSearch": "View in search",

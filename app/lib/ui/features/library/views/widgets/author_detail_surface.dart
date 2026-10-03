@@ -5,12 +5,10 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
@@ -61,8 +59,8 @@ class AuthorDetailSurface extends ConsumerWidget {
   }
 }
 
-void _openSearch(BuildContext context, String name) {
-  final String query = formatLibrarySearchExactMetaQuery(name);
+void _openSearch(BuildContext context, Iterable<String> names) {
+  final String query = formatLibrarySearchAndExactMetaQuery(names);
   final String encoded = Uri.encodeQueryComponent(query);
   Navigator.of(context).maybePop();
   appRouter.push('/searched?q=$encoded');
@@ -314,35 +312,11 @@ class _AuthorLinksWrap extends HookConsumerWidget {
     }
   }
 
-  Future<void> _confirmDelete(
+  Future<void> _deleteLink(
     BuildContext context,
     WidgetRef ref,
     AuthorLink link,
   ) async {
-    final l10n = context.l10n;
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) => HentaiDialog(
-        title: l10n.authorDetailDeleteLink,
-        content: Text(
-          l10n.authorDetailDeleteLinkConfirm(_linkChipLabel(l10n, link)),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.commonCancel),
-          ),
-          const SizedBox(width: 8),
-          DestructiveFilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n.commonDelete),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) {
-      return;
-    }
     try {
       await ref
           .read(authorDetailCommandsProvider)
@@ -419,15 +393,14 @@ class _AuthorLinksWrap extends HookConsumerWidget {
           Tooltip(
             message: l10n.authorDetailLinkTooltip(link.url),
             waitDuration: const Duration(milliseconds: 500),
-            child: GestureDetector(
-              onSecondaryTap: () => _confirmDelete(context, ref, link),
-              child: OutlinedMetaChip(
-                text: _linkChipLabel(l10n, link),
-                compact: true,
-                icon: _platformIcon(link.platform),
-                onTap: () => _openLink(context, link.url),
-                onLongPress: () => _confirmDelete(context, ref, link),
-              ),
+            child: OutlinedMetaChip(
+              text: _linkChipLabel(l10n, link),
+              compact: true,
+              icon: _platformIcon(link.platform),
+              onTap: () => _openLink(context, link.url),
+              onRemove: () => _deleteLink(context, ref, link),
+              removeTooltip: l10n.authorDetailDeleteLink,
+              removeOnDesktopHoverOnly: true,
             ),
           ),
         if (adding.value)
@@ -502,7 +475,7 @@ class _AuthorComicsSection extends StatelessWidget {
               ),
             ),
             TextButton.icon(
-              onPressed: () => _openSearch(context, detail.name),
+              onPressed: () => _openSearch(context, <String>[detail.name]),
               icon: const Icon(LucideIcons.search, size: 14),
               label: Text(l10n.authorDetailViewInSearch),
             ),
@@ -518,7 +491,8 @@ class _AuthorComicsSection extends StatelessWidget {
                 OutlinedMetaChip(
                   text: '${item.name} ${item.attachmentCount}',
                   compact: true,
-                  onTap: () => _openSearch(context, item.name),
+                  onTap: () =>
+                      _openSearch(context, <String>[item.name, detail.name]),
                 ),
             ],
           ),

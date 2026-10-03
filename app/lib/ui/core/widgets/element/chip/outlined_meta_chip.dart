@@ -9,7 +9,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 ///（对齐 [GhostButton]：`surfaceContainer` + `withAlpha(110)` overlay）。
 ///
 /// 传入 [onRemove] 时在文案右侧渲染移除按钮（表单多选字段）。
-class OutlinedMetaChip extends StatelessWidget {
+class OutlinedMetaChip extends HookWidget {
   const OutlinedMetaChip({
     super.key,
     required this.text,
@@ -21,6 +21,8 @@ class OutlinedMetaChip extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.onRemove,
+    this.removeTooltip,
+    this.removeOnDesktopHoverOnly = false,
   });
 
   final String text;
@@ -34,6 +36,10 @@ class OutlinedMetaChip extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onRemove;
+  final String? removeTooltip;
+
+  /// 桌面（Windows / macOS / Linux）仅在 hover 时渲染移除按钮；移动端始终渲染。
+  final bool removeOnDesktopHoverOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -52,41 +58,60 @@ class OutlinedMetaChip extends StatelessWidget {
       verified: verified,
       icon: icon,
     );
-    final Widget content = onRemove == null
-        ? label
-        : Row(
+    final ValueNotifier<bool> isHovered = useState(false);
+    final bool desktop = switch (Theme.of(context).platform) {
+      TargetPlatform.windows ||
+      TargetPlatform.linux ||
+      TargetPlatform.macOS => true,
+      TargetPlatform.android ||
+      TargetPlatform.iOS ||
+      TargetPlatform.fuchsia => false,
+    };
+    final bool showRemove =
+        onRemove != null &&
+        (!removeOnDesktopHoverOnly || !desktop || isHovered.value);
+    final Widget content = showRemove
+        ? Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Flexible(child: label),
               SizedBox(width: tokens.spacing.xs),
               _OutlinedMetaChipRemoveButton(
                 color: effectiveTextColor,
+                tooltip: removeTooltip,
                 onRemove: onRemove!,
               ),
             ],
+          )
+        : label;
+
+    final Widget chip = (onTap == null && onLongPress == null)
+        ? Semantics(
+            label: text,
+            child: _OutlinedMetaChipChrome(
+              backgroundColor: cs.surface,
+              borderColor: effectiveBorder,
+              borderRadius: borderRadius,
+              padding: padding,
+              child: content,
+            ),
+          )
+        : _InteractiveOutlinedMetaChip(
+            text: text,
+            borderColor: effectiveBorder,
+            borderRadius: borderRadius,
+            padding: padding,
+            onTap: onTap,
+            onLongPress: onLongPress,
+            child: content,
           );
-
-    if (onTap == null && onLongPress == null) {
-      return Semantics(
-        label: text,
-        child: _OutlinedMetaChipChrome(
-          backgroundColor: cs.surface,
-          borderColor: effectiveBorder,
-          borderRadius: borderRadius,
-          padding: padding,
-          child: content,
-        ),
-      );
+    if (!removeOnDesktopHoverOnly || !desktop) {
+      return chip;
     }
-
-    return _InteractiveOutlinedMetaChip(
-      text: text,
-      borderColor: effectiveBorder,
-      borderRadius: borderRadius,
-      padding: padding,
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: content,
+    return MouseRegion(
+      onEnter: (_) => isHovered.value = true,
+      onExit: (_) => isHovered.value = false,
+      child: chip,
     );
   }
 }
@@ -95,10 +120,12 @@ class _OutlinedMetaChipRemoveButton extends StatelessWidget {
   const _OutlinedMetaChipRemoveButton({
     required this.color,
     required this.onRemove,
+    this.tooltip,
   });
 
   final Color color;
   final VoidCallback onRemove;
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +133,7 @@ class _OutlinedMetaChipRemoveButton extends StatelessWidget {
       width: 16,
       height: 16,
       child: IconButton(
-        tooltip: '',
+        tooltip: tooltip ?? '',
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints.tightFor(width: 16, height: 16),
         visualDensity: VisualDensity.compact,

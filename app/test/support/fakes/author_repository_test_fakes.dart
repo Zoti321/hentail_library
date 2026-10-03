@@ -64,5 +64,5 @@ class EmptyAuthorRepository implements AuthorRepository {
   }) async {}
 
   @override
-  Future<void> deleteLink(int linkId) async {}
+  Future<void> deleteLink({required int authorId, required int linkId}) async {}
 }
