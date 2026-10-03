@@ -18,6 +18,8 @@ pub enum HentaiErrorCode {
     RemoteTlsFailed,
     /// Resource access or reader open exceeded its deadline.
     TimedOut,
+    /// Comic is in trash and cannot be opened for reading.
+    ComicTrashed,
 }
 
 #[derive(Debug, Clone, Error)]
@@ -122,6 +124,14 @@ impl HentaiError {
             code: HentaiErrorCode::TimedOut,
             message: message.into(),
             context: None,
+        }
+    }
+
+    pub fn comic_trashed(comic_id: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::ComicTrashed,
+            message: "该漫画已删除".to_string(),
+            context: Some(comic_id.into()),
         }
     }
 

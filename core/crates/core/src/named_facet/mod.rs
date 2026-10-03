@@ -4,6 +4,7 @@
 
 use sea_orm::{ConnectionTrait, Statement, TransactionTrait, Value};
 
+use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 
@@ -48,11 +49,12 @@ impl JunctionNamedFacet {
     pub fn distinct_attached_sql(self) -> String {
         let junction = self.junction_table();
         let name_col = self.junction_name_column();
+        let visible = visible_comic_sql("c");
         format!(
             "SELECT DISTINCT j.{name_col} AS name \
              FROM {junction} j \
              INNER JOIN comics c ON c.comic_id = j.comic_id \
-             WHERE c.library_id = ? \
+             WHERE c.library_id = ? AND {visible} \
              ORDER BY j.{name_col} COLLATE NOCASE"
         )
     }
@@ -64,10 +66,11 @@ impl JunctionNamedFacet {
         let dict = self.dict_table();
         let junction = self.junction_table();
         let name_col = self.junction_name_column();
+        let visible = visible_comic_id_sql("j.comic_id");
         format!(
             "SELECT d.name AS name, COUNT(j.{name_col}) AS attachment_count \
              FROM {dict} d \
-             LEFT JOIN {junction} j ON j.{name_col} = d.name \
+             LEFT JOIN {junction} j ON j.{name_col} = d.name AND {visible} \
              GROUP BY d.name \
              ORDER BY attachment_count DESC, d.name ASC"
         )
@@ -335,7 +338,10 @@ pub async fn count_named_facet_attachments(
     let rows = db
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
-            format!("SELECT COUNT(*) FROM {junction} WHERE {name_col} = ?"),
+            format!(
+                "SELECT COUNT(*) FROM {junction} j WHERE j.{name_col} = ? AND {}",
+                visible_comic_id_sql("j.comic_id")
+            ),
             [Value::String(Some(Box::new(name.to_string())))],
         ))
         .await

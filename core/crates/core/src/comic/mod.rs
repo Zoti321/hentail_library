@@ -3,6 +3,8 @@ mod dto;
 mod filter_predicate;
 mod page_query;
 pub mod repository;
+mod trash;
+pub(crate) mod visibility;
 pub mod write;
 
 pub use bulk_patch::{
@@ -17,8 +19,12 @@ pub use repository::{
     count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, load_comics_ordered,
     read_data_version, search_by_keyword, search_by_keyword_page,
 };
+pub use trash::{
+    count_trashed_comics, fetch_trashed_comics_page, is_comic_trashed, list_trashed_comic_ids,
+    purge_comics, restore_comics, trash_comics, ComicPurgeResultDto, PagedTrashedComicResultDto,
+    TrashedComicCountsDto, TrashedComicDto,
+};
 pub use write::{
-    delete_comics_by_ids, search_by_tag_expression, search_by_tag_expression_page,
-    search_comic_ids_by_tag_expression, set_comic_meta_locks, update_comic_user_meta,
-    SetComicMetaLocksDto, UpdateComicUserMetaDto,
+    search_by_tag_expression, search_by_tag_expression_page, search_comic_ids_by_tag_expression,
+    set_comic_meta_locks, update_comic_user_meta, SetComicMetaLocksDto, UpdateComicUserMetaDto,
 };

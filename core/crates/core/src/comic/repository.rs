@@ -16,13 +16,17 @@ use super::dto::{
     ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
 use super::page_query::{build_count_query, build_ids_page_query};
+use super::visibility::visible_comic_sql;
 
 pub async fn count_all() -> Result<i64, HentaiError> {
     let db = connection()?;
     let row = db
         .query_one(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
-            "SELECT COUNT(*) AS c FROM comics".to_string(),
+            format!(
+                "SELECT COUNT(*) AS c FROM comics c WHERE {}",
+                visible_comic_sql("c")
+            ),
         ))
         .await
         .map_err(map_db_err)?
@@ -153,9 +157,12 @@ pub async fn search_by_keyword_page(
     let db = connection()?;
     let count_stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT COUNT(*) FROM comics c \
-         INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
-         WHERE c.library_id = ? AND lower(m.title) LIKE ?",
+        format!(
+            "SELECT COUNT(*) FROM comics c \
+             INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+             WHERE c.library_id = ? AND {} AND lower(m.title) LIKE ?",
+            visible_comic_sql("c")
+        ),
         vec![
             Value::String(Some(Box::new(library_id.clone()))),
             Value::String(Some(Box::new(format!("%{q}%")))),
@@ -171,11 +178,14 @@ pub async fn search_by_keyword_page(
     let offset = (page - 1) as i64 * page_size as i64;
     let ids_stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT c.comic_id FROM comics c \
-         INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
-         WHERE c.library_id = ? AND lower(m.title) LIKE ? \
-         ORDER BY lower(m.title) ASC \
-         LIMIT ? OFFSET ?",
+        format!(
+            "SELECT c.comic_id FROM comics c \
+             INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+             WHERE c.library_id = ? AND {} AND lower(m.title) LIKE ? \
+             ORDER BY lower(m.title) ASC \
+             LIMIT ? OFFSET ?",
+            visible_comic_sql("c")
+        ),
         vec![
             Value::String(Some(Box::new(library_id))),
             Value::String(Some(Box::new(format!("%{q}%")))),

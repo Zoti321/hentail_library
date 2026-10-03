@@ -153,7 +153,7 @@ pub(super) fn build_catalog_where_clause(
     filter: &ComicFilterDto,
     values: &mut Vec<Value>,
 ) -> String {
-    let mut parts = vec!["1=1".to_string()];
+    let mut parts = vec![crate::comic::visibility::visible_comic_sql("c")];
     if let Some(library_id) = &filter.library_id {
         parts.push("c.library_id = ?".to_string());
         push_sqlite_text(values, library_id.clone());

@@ -225,11 +225,11 @@ class _ComicDetailOverflowMenuButtonState
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
-    await confirmAndDeleteComic(
+    await confirmAndTrashComic(
       context,
       ref,
       widget.comic,
-      onDeleted: () {
+      onTrashed: () {
         if (!context.mounted) {
           return;
         }

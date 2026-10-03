@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/domain/models/value_objects/library_author_pick.dart';
 import 'package:hentai_library/domain/models/value_objects/library_tag_pick.dart';
@@ -130,6 +131,44 @@ PagedResult<Comic> mapPagedResult(rust.PagedComicResultDto page) {
     totalCount: page.totalCount.toInt(),
     page: page.page,
     pageSize: page.pageSize,
+  );
+}
+
+const String _kRemoteLibraryKind = 'remote';
+
+TrashedComic mapTrashedComic(rust.TrashedComicFrbDto dto) {
+  return (
+    comic: mapRustComic(dto.comic),
+    deletedAt: comicTimestampFromMs(dto.deletedAt.toInt()),
+    libraryName: dto.libraryName,
+    isRemote: dto.libraryKind == _kRemoteLibraryKind,
+  );
+}
+
+PagedResult<TrashedComic> mapTrashedComicsPage(
+  rust.PagedTrashedComicResultFrbDto page,
+) {
+  return PagedResult<TrashedComic>(
+    items: page.items.map(mapTrashedComic).toList(),
+    totalCount: page.totalCount.toInt(),
+    page: page.page,
+    pageSize: page.pageSize,
+  );
+}
+
+TrashedComicCounts mapTrashedComicCounts(rust.TrashedComicCountsFrbDto dto) {
+  return (
+    total: dto.total.toInt(),
+    local: dto.local.toInt(),
+    remote: dto.remote.toInt(),
+  );
+}
+
+ComicPurgeResult mapComicPurgeResult(rust.ComicPurgeResultFrbDto dto) {
+  return (
+    succeeded: dto.succeeded,
+    failed: dto.failed,
+    errorSamples: List<String>.unmodifiable(dto.errorSamples),
   );
 }
 

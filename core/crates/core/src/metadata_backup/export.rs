@@ -87,13 +87,17 @@ async fn load_export_comic_ids(
     db: &DatabaseConnection,
     library_id: Option<&str>,
 ) -> Result<Vec<String>, HentaiError> {
+    let visible = crate::comic::visibility::visible_comic_sql("c");
     let (sql, values) = match library_id {
         Some(id) => (
-            "SELECT comic_id FROM comics WHERE library_id = ? ORDER BY comic_id ASC".to_string(),
+            format!(
+                "SELECT c.comic_id FROM comics c WHERE c.library_id = ? AND {visible} \
+                 ORDER BY c.comic_id ASC"
+            ),
             vec![Value::String(Some(Box::new(id.to_string())))],
         ),
         None => (
-            "SELECT comic_id FROM comics ORDER BY comic_id ASC".to_string(),
+            format!("SELECT c.comic_id FROM comics c WHERE {visible} ORDER BY c.comic_id ASC"),
             vec![],
         ),
     };

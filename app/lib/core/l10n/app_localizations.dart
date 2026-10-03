@@ -2078,18 +2078,6 @@ abstract class AppLocalizations {
   /// **'取消'**
   String get comicDetailCancel;
 
-  /// No description provided for @comicDetailDeletedWithResourceToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'已删除漫画及磁盘资源'**
-  String get comicDetailDeletedWithResourceToast;
-
-  /// No description provided for @comicDetailRemovedFromLibraryToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'已从库中移除漫画'**
-  String get comicDetailRemovedFromLibraryToast;
-
   /// No description provided for @comicDetailNotFound.
   ///
   /// In zh, this message translates to:
@@ -3867,6 +3855,156 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'清除'**
   String get bulkEditMetadataFieldSummaryClear;
+
+  /// No description provided for @navTrash.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除'**
+  String get navTrash;
+
+  /// No description provided for @readerOpenComicTrashed.
+  ///
+  /// In zh, this message translates to:
+  /// **'该漫画已删除，恢复后才能阅读。'**
+  String get readerOpenComicTrashed;
+
+  /// No description provided for @comicTrashConfirmContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'「{title}」将移入「已删除」，可随时在那里恢复。'**
+  String comicTrashConfirmContent(String title);
+
+  /// No description provided for @comicTrashedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已移入「已删除」'**
+  String get comicTrashedToast;
+
+  /// No description provided for @trashPageSummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{共 {count} 本 • 可恢复或永久删除}}'**
+  String trashPageSummary(int count);
+
+  /// No description provided for @trashEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有已删除的漫画'**
+  String get trashEmptyTitle;
+
+  /// No description provided for @trashEmptyDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除的漫画会先放在这里，可恢复或永久删除。'**
+  String get trashEmptyDescription;
+
+  /// No description provided for @trashRestore.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复'**
+  String get trashRestore;
+
+  /// No description provided for @trashPurge.
+  ///
+  /// In zh, this message translates to:
+  /// **'永久删除'**
+  String get trashPurge;
+
+  /// No description provided for @trashPurgeAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部永久删除'**
+  String get trashPurgeAll;
+
+  /// No description provided for @trashSelect.
+  ///
+  /// In zh, this message translates to:
+  /// **'多选'**
+  String get trashSelect;
+
+  /// No description provided for @trashExitSelection.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成'**
+  String get trashExitSelection;
+
+  /// No description provided for @trashSelectAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全选'**
+  String get trashSelectAll;
+
+  /// No description provided for @trashSelectedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已选 {count} 本}}'**
+  String trashSelectedCount(int count);
+
+  /// No description provided for @trashDeletedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除于 {time}'**
+  String trashDeletedAt(String time);
+
+  /// No description provided for @trashBadgeLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'本地'**
+  String get trashBadgeLocal;
+
+  /// No description provided for @trashBadgeRemote.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程'**
+  String get trashBadgeRemote;
+
+  /// No description provided for @trashRestoredToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已恢复 {count} 本漫画}}'**
+  String trashRestoredToast(int count);
+
+  /// No description provided for @trashPurgeSucceededToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已永久删除 {count} 本漫画}}'**
+  String trashPurgeSucceededToast(int count);
+
+  /// No description provided for @trashPurgePartialToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已永久删除 {succeeded} 本，{failed} 本失败（仍保留在「已删除」中）'**
+  String trashPurgePartialToast(int succeeded, int failed);
+
+  /// No description provided for @trashPurgeFailedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 本永久删除失败，仍保留在「已删除」中}}'**
+  String trashPurgeFailedToast(int count);
+
+  /// No description provided for @comicPurgeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'永久删除漫画？'**
+  String get comicPurgeTitle;
+
+  /// No description provided for @comicPurgeLocalBatchConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{将从库中移除 {count} 本漫画，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。}}'**
+  String comicPurgeLocalBatchConfirm(int count);
+
+  /// No description provided for @comicPurgeRemoteBatchConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{将从库中移除 {count} 本远程漫画。仅从库中移除，不会删除远程资源。}}'**
+  String comicPurgeRemoteBatchConfirm(int count);
+
+  /// No description provided for @comicPurgeMixedConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{localCount} 本本地漫画将永久删除磁盘文件；{remoteCount} 本远程漫画仅从库中移除，不会删除远程资源。此操作不可撤销。'**
+  String comicPurgeMixedConfirm(int localCount, int remoteCount);
 }
 
 class _AppLocalizationsDelegate

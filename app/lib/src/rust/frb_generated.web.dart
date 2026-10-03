@@ -224,6 +224,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ComicPurgeResultFrbDto dco_decode_comic_purge_result_frb_dto(dynamic raw);
+
+  @protected
   ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw);
 
   @protected
@@ -364,6 +367,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw);
 
   @protected
+  List<TrashedComicFrbDto> dco_decode_list_trashed_comic_frb_dto(dynamic raw);
+
+  @protected
   List<WouldApplySampleDto> dco_decode_list_would_apply_sample_dto(dynamic raw);
 
   @protected
@@ -470,6 +476,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw);
 
   @protected
+  PagedTrashedComicResultFrbDto dco_decode_paged_trashed_comic_result_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
   PreviewImportComicMetadataResultDto
   dco_decode_preview_import_comic_metadata_result_dto(dynamic raw);
 
@@ -573,6 +584,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ThumbnailPriorityDto dco_decode_thumbnail_priority_dto(dynamic raw);
+
+  @protected
+  TrashedComicCountsFrbDto dco_decode_trashed_comic_counts_frb_dto(dynamic raw);
+
+  @protected
+  TrashedComicFrbDto dco_decode_trashed_comic_frb_dto(dynamic raw);
 
   @protected
   BigInt dco_decode_u_64(dynamic raw);
@@ -828,6 +845,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ComicPurgeResultFrbDto sse_decode_comic_purge_result_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ComicSortFieldDto sse_decode_comic_sort_field_dto(
     SseDeserializer deserializer,
   );
@@ -1002,6 +1024,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<TrashedComicFrbDto> sse_decode_list_trashed_comic_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<WouldApplySampleDto> sse_decode_list_would_apply_sample_dto(
     SseDeserializer deserializer,
   );
@@ -1128,6 +1155,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PagedSeriesResultDto sse_decode_paged_series_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  PagedTrashedComicResultFrbDto sse_decode_paged_trashed_comic_result_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -1275,6 +1307,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ThumbnailPriorityDto sse_decode_thumbnail_priority_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  TrashedComicCountsFrbDto sse_decode_trashed_comic_counts_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  TrashedComicFrbDto sse_decode_trashed_comic_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -1582,6 +1624,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_comic_purge_result_frb_dto(
+    ComicPurgeResultFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_comic_sort_field_dto(
     ComicSortFieldDto self,
     SseSerializer serializer,
@@ -1807,6 +1855,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_trashed_comic_frb_dto(
+    List<TrashedComicFrbDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_would_apply_sample_dto(
     List<WouldApplySampleDto> self,
     SseSerializer serializer,
@@ -1962,6 +2016,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_paged_series_result_dto(
     PagedSeriesResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_paged_trashed_comic_result_frb_dto(
+    PagedTrashedComicResultFrbDto self,
     SseSerializer serializer,
   );
 
@@ -2145,6 +2205,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_thumbnail_priority_dto(
     ThumbnailPriorityDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_trashed_comic_counts_frb_dto(
+    TrashedComicCountsFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_trashed_comic_frb_dto(
+    TrashedComicFrbDto self,
     SseSerializer serializer,
   );
 

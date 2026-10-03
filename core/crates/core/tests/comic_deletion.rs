@@ -4,10 +4,21 @@ use std::path::Path;
 
 use hentai_core::{
     comic_id_from_path, create_local_library, create_remote_library, create_sync_handle,
-    delete_comics_by_ids, find_comic_by_id, init_db_at_path, sync_library, SyncScanMode,
+    find_comic_by_id, init_db_at_path, purge_comics, sync_library, trash_comics,
+    ComicPurgeResultDto, SyncScanMode,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
+
+async fn trash_then_purge(comic_id: &str) -> ComicPurgeResultDto {
+    trash_comics(vec![comic_id.to_string()])
+        .await
+        .expect("trash");
+    purge_comics(vec![comic_id.to_string()])
+        .await
+        .expect("purge")
+}
+
 fn write_image_comic(dir: &Path) {
     std::fs::create_dir_all(dir).expect("mkdir comic");
     std::fs::write(dir.join("01.jpg"), b"fake-jpeg").expect("jpg");
@@ -79,9 +90,7 @@ fn local_file_deletion_removes_disk_resource_and_db_row() {
             .await
             .expect("sync");
 
-            delete_comics_by_ids(vec![comic_id.clone()])
-                .await
-                .expect("delete");
+            assert_eq!(trash_then_purge(&comic_id).await.succeeded, 1);
 
             assert!(
                 !comic_path.exists(),
@@ -121,9 +130,7 @@ fn local_dir_deletion_removes_directory_resource() {
             .await
             .expect("sync");
 
-            delete_comics_by_ids(vec![comic_id.clone()])
-                .await
-                .expect("delete");
+            assert_eq!(trash_then_purge(&comic_id).await.succeeded, 1);
 
             assert!(
                 !comic_dir.exists(),
@@ -164,9 +171,7 @@ fn missing_local_resource_still_allows_library_removal() {
             .expect("sync");
             std::fs::remove_file(&comic_path).expect("remove manually");
 
-            delete_comics_by_ids(vec![comic_id.clone()])
-                .await
-                .expect("delete");
+            assert_eq!(trash_then_purge(&comic_id).await.succeeded, 1);
 
             assert!(find_comic_by_id(&comic_id).await.expect("find").is_none());
         });
@@ -202,10 +207,9 @@ fn rejects_local_resource_outside_library_root() {
             .await
             .expect("force local");
 
-            let err = delete_comics_by_ids(vec![comic_id.clone()])
-                .await
-                .expect_err("outside-root delete should fail");
-            assert!(err.message.contains("不在所属 Library root 下"));
+            let result = trash_then_purge(&comic_id).await;
+            assert_eq!((result.succeeded, result.failed), (0, 1));
+            assert!(result.error_samples[0].contains("不在所属 Library root 下"));
             assert!(outside.exists(), "outside file must not be deleted");
             assert!(find_comic_by_id(&comic_id).await.expect("find").is_some());
         });
@@ -229,9 +233,7 @@ fn remote_deletion_only_clears_library_row() {
                     .expect("create remote");
             insert_remote_comic(&comic_id, fake_remote_path, &library.library_id).await;
 
-            delete_comics_by_ids(vec![comic_id.clone()])
-                .await
-                .expect("delete remote");
+            assert_eq!(trash_then_purge(&comic_id).await.succeeded, 1);
 
             assert!(find_comic_by_id(&comic_id).await.expect("find").is_none());
         });

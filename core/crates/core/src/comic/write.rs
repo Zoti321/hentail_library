@@ -1,16 +1,11 @@
-use std::path::Path;
-
 use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
 
 use crate::comic::dto::{now_ms, serialize_languages, ComicDto, PagedComicResultDto};
 use crate::comic::repository::load_comics_ordered;
-use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
 use crate::metadata_lock::ComicAutoLocks;
-use crate::sync::series_rebuild::rebuild_series_from_comics;
-use crate::sync::writer::delete_comics_side_effects;
 use crate::sync::writer::{
     replace_comic_authors, replace_comic_characters, replace_comic_parodies, replace_comic_tags,
 };
@@ -44,14 +39,6 @@ pub struct SetComicMetaLocksDto {
     pub characters: Option<bool>,
 }
 
-struct ComicDeletionTarget {
-    comic_id: String,
-    path: String,
-    resource_type: String,
-    library_kind: String,
-    library_root_path: String,
-}
-
 pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(), HentaiError> {
     let active = comics::ActiveModel {
         comic_id: Set(comic_id.to_string()),
@@ -59,111 +46,6 @@ pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(
         ..Default::default()
     };
     active.update(db).await.map_err(map_db_err)?;
-    Ok(())
-}
-
-pub async fn delete_comics_by_ids(comic_ids: Vec<String>) -> Result<(), HentaiError> {
-    if comic_ids.is_empty() {
-        return Ok(());
-    }
-    let db = connection()?;
-    let targets = load_deletion_targets(&db, &comic_ids).await?;
-    for target in &targets {
-        maybe_delete_local_resource(target)?;
-    }
-    let txn = db.begin().await.map_err(map_db_err)?;
-    delete_comics_side_effects(&txn, &comic_ids).await?;
-    rebuild_series_from_comics(&txn, None).await?;
-    txn.commit().await.map_err(map_db_err)?;
-    Ok(())
-}
-
-async fn load_deletion_targets<C: ConnectionTrait>(
-    db: &C,
-    comic_ids: &[String],
-) -> Result<Vec<ComicDeletionTarget>, HentaiError> {
-    if comic_ids.is_empty() {
-        return Ok(Vec::new());
-    }
-    let placeholders = comic_ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
-    let values: Vec<sea_orm::Value> = comic_ids
-        .iter()
-        .map(|id| sea_orm::Value::String(Some(Box::new(id.clone()))))
-        .collect();
-    let rows = db
-        .query_all(Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::Sqlite,
-            format!(
-                "SELECT c.comic_id, c.path, c.resource_type, l.kind, l.root_path \
-                 FROM comics c \
-                 INNER JOIN libraries l ON l.library_id = c.library_id \
-                 WHERE c.comic_id IN ({placeholders})"
-            ),
-            values,
-        ))
-        .await
-        .map_err(map_db_err)?;
-    rows.into_iter()
-        .map(|row| {
-            Ok(ComicDeletionTarget {
-                comic_id: row
-                    .try_get_by_index::<String>(0)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
-                path: row
-                    .try_get_by_index::<String>(1)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
-                resource_type: row
-                    .try_get_by_index::<String>(2)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
-                library_kind: row
-                    .try_get_by_index::<String>(3)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
-                library_root_path: row
-                    .try_get_by_index::<String>(4)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
-            })
-        })
-        .collect()
-}
-
-fn maybe_delete_local_resource(target: &ComicDeletionTarget) -> Result<(), HentaiError> {
-    if target.library_kind == "remote" {
-        return Ok(());
-    }
-    ensure_local_resource_within_library_root(target)?;
-    let path = Path::new(&target.path);
-    if !path.exists() {
-        return Ok(());
-    }
-    let delete_result = if target.resource_type == "dir" {
-        std::fs::remove_dir_all(path)
-    } else {
-        std::fs::remove_file(path)
-    };
-    delete_result.map_err(|error| {
-        HentaiError::validation(format!("无法删除磁盘资源，漫画仍保留在库中。{error}"))
-    })?;
-    Ok(())
-}
-
-fn ensure_local_resource_within_library_root(
-    target: &ComicDeletionTarget,
-) -> Result<(), HentaiError> {
-    let normalized_root = normalize_path_for_key(&target.library_root_path);
-    let normalized_path = normalize_path_for_key(&target.path);
-    if normalized_root.is_empty() || normalized_path.is_empty() {
-        return Err(HentaiError::validation(format!(
-            "漫画资源路径异常，已取消删除：{}",
-            target.comic_id
-        )));
-    }
-    if normalized_path == normalized_root
-        || !normalized_path.starts_with(&format!("{normalized_root}/"))
-    {
-        return Err(HentaiError::validation(
-            "漫画资源不在所属 Library root 下，已取消删除。",
-        ));
-    }
     Ok(())
 }
 
@@ -357,9 +239,10 @@ pub async fn search_comic_ids_by_tag_expression(
     let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
         return Ok(vec![]);
     };
-    let mut sql = String::from(
+    let mut sql = format!(
         "SELECT c.comic_id FROM comics c INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
-         WHERE c.library_id = ?",
+         WHERE c.library_id = ? AND {}",
+        super::visibility::visible_comic_sql("c")
     );
     let mut values: Vec<sea_orm::Value> = vec![sea_orm::Value::String(Some(Box::new(library_id)))];
     super::filter_predicate::append_metadata_expression_predicates(

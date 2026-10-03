@@ -1161,13 +1161,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailCancel => 'Cancel';
 
   @override
-  String get comicDetailDeletedWithResourceToast =>
-      'Comic and disk resource deleted';
-
-  @override
-  String get comicDetailRemovedFromLibraryToast => 'Comic removed from library';
-
-  @override
   String get comicDetailNotFound => 'Comic not found or removed';
 
   @override
@@ -2183,4 +2176,148 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bulkEditMetadataFieldSummaryClear => 'Clear';
+
+  @override
+  String get navTrash => 'Deleted';
+
+  @override
+  String get readerOpenComicTrashed =>
+      'This comic has been deleted. Restore it to read.';
+
+  @override
+  String comicTrashConfirmContent(String title) {
+    return '\"$title\" will be moved to Deleted. You can restore it from there at any time.';
+  }
+
+  @override
+  String get comicTrashedToast => 'Moved to Deleted';
+
+  @override
+  String trashPageSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count comics · restore or delete permanently',
+      one: '1 comic · restore or delete permanently',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trashEmptyTitle => 'No deleted comics';
+
+  @override
+  String get trashEmptyDescription =>
+      'Deleted comics are kept here first. You can restore them or delete them permanently.';
+
+  @override
+  String get trashRestore => 'Restore';
+
+  @override
+  String get trashPurge => 'Delete permanently';
+
+  @override
+  String get trashPurgeAll => 'Delete all permanently';
+
+  @override
+  String get trashSelect => 'Select';
+
+  @override
+  String get trashExitSelection => 'Done';
+
+  @override
+  String get trashSelectAll => 'Select all';
+
+  @override
+  String trashSelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trashDeletedAt(String time) {
+    return 'Deleted $time';
+  }
+
+  @override
+  String get trashBadgeLocal => 'Local';
+
+  @override
+  String get trashBadgeRemote => 'Remote';
+
+  @override
+  String trashRestoredToast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Restored $count comics',
+      one: 'Restored 1 comic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trashPurgeSucceededToast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Permanently deleted $count comics',
+      one: 'Permanently deleted 1 comic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trashPurgePartialToast(int succeeded, int failed) {
+    return 'Permanently deleted $succeeded; $failed failed and remain in Deleted';
+  }
+
+  @override
+  String trashPurgeFailedToast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count comics could not be deleted and remain in Deleted',
+      one: '1 comic could not be deleted and remains in Deleted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get comicPurgeTitle => 'Delete comics permanently?';
+
+  @override
+  String comicPurgeLocalBatchConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count comics will be removed from the library and their resources on disk (files or image folders) permanently deleted. This cannot be undone.',
+      one:
+          '1 comic will be removed from the library and its resource on disk (file or image folder) permanently deleted. This cannot be undone.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String comicPurgeRemoteBatchConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count remote comics will be removed from the library only. Remote resources are not deleted.',
+      one:
+          '1 remote comic will be removed from the library only. Remote resources are not deleted.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String comicPurgeMixedConfirm(int localCount, int remoteCount) {
+    return '$localCount local comics will have their files on disk permanently deleted; $remoteCount remote comics will be removed from the library only (remote resources are not deleted). This cannot be undone.';
+  }
 }

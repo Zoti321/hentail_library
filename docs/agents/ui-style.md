@@ -106,7 +106,7 @@ Key semantic groups in `HentaiColorScheme`:
 ### Interaction patterns
 
 - **Primary actions:** filled buttons with `tokens.radius.md` shape
-- **Destructive confirms:** delete / remove / clear confirmation dialogs use `DestructiveFilledButton` (`cs.hentai.destructive` / `onDestructive`). Cancel stays a plain `TextButton`. Do **not** paint non-delete confirms (e.g. save library root, disable all formats) with destructive. Menu / overflow / sidebar delete entry styling may still use `contextMenuDanger` until a follow-up issue.
+- **Destructive confirms:** delete / remove / clear confirmation dialogs use `DestructiveFilledButton` (`cs.hentai.destructive` / `onDestructive`). Cancel stays a plain `TextButton`. Do **not** paint non-delete confirms (e.g. save library root, disable all formats) with destructive. Menu / overflow / sidebar delete entry styling may still use `contextMenuDanger` until a follow-up issue. Exception: moving a Comic to trash (`ComicConfirmTrashDialog`, ADR-0023) is reversible and uses a light confirm with a plain `FilledButton`; only Comic purge uses `DestructiveFilledButton`.
 - **Secondary / toolbar:** `GhostButton.icon`, `.iconText`, `.text` — hover fill, no splash
 - **In-page tabs:** `CapsuleTabBar` (pill container, selected segment tinted with `primary`)
 - **Context actions:** right-click → `*ContextMenu.show` (comic, series, series item)

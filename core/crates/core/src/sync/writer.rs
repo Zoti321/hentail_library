@@ -1,6 +1,6 @@
 use sea_orm::{
-    ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, Set, Statement,
-    TransactionTrait,
+    ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, NotSet, QueryFilter, Set,
+    Statement, TransactionTrait,
 };
 
 use crate::comic::{now_ms, ComicDto};
@@ -143,6 +143,11 @@ pub(crate) async fn apply_comic_rekey<C: ConnectionTrait>(
     let from_id = &migration.from_comic_id;
     let comic = &migration.to_comic;
     let to_id = &comic.comic_id;
+    let deleted_at = Comics::find_by_id(from_id.clone())
+        .one(db)
+        .await
+        .map_err(map_db_err)?
+        .and_then(|row| row.deleted_at);
 
     let comic_active = comics::ActiveModel {
         comic_id: Set(to_id.clone()),
@@ -152,6 +157,7 @@ pub(crate) async fn apply_comic_rekey<C: ConnectionTrait>(
         created_at: Set(comic.created_at),
         last_updated_at: Set(comic.last_updated_at),
         library_id: Set(comic.library_id.clone()),
+        deleted_at: Set(deleted_at),
     };
     Comics::insert(comic_active)
         .exec(db)
@@ -417,6 +423,8 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
             created_at: Set(created_at),
             last_updated_at: Set(last_updated_at),
             library_id: Set(comic.library_id.clone()),
+            // Not in the conflict update list: sync keeps Comic trash as-is.
+            deleted_at: NotSet,
         };
         Comics::insert(comic_active)
             .on_conflict(

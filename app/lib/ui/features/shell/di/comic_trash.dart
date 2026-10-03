@@ -1,12 +1,12 @@
-import 'package:hentai_library/domain/library/comic_deletion_service.dart';
+import 'package:hentai_library/domain/library/comic_trash_service.dart';
 import 'package:hentai_library/ui/features/shell/di/ports.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'comic_deletion.g.dart';
+part 'comic_trash.g.dart';
 
 @Riverpod(keepAlive: true)
-ComicDeletionService comicDeletionService(Ref ref) => ComicDeletionService(
+ComicTrashService comicTrashService(Ref ref) => ComicTrashService(
   comicRepository: ref.read(comicRepoProvider),
   readerSessionPort: ref.read(readerSessionPortProvider),
 );
