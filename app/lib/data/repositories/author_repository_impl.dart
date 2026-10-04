@@ -102,6 +102,26 @@ class AuthorRepositoryImpl implements AuthorRepository {
   }
 
   @override
+  Future<Uint8List?> loadImage({
+    required int authorId,
+    required AuthorImageSlot slot,
+    required bool showR18,
+  }) {
+    return guardFrb(
+      () => rust_author.loadAuthorImageFrb(
+        authorId: _toI64(authorId),
+        slot: switch (slot) {
+          AuthorImageSlot.avatar => rust_author.AuthorImageSlotFrb.avatar,
+          AuthorImageSlot.background =>
+            rust_author.AuthorImageSlotFrb.background,
+        },
+        showR18: showR18,
+      ),
+      fallbackMessage: '读取作者形象高清图失败',
+    );
+  }
+
+  @override
   Future<AuthorLink> addLink({
     required int authorId,
     required AuthorLinkPlatform platform,

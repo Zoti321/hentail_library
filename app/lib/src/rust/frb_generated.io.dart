@@ -123,6 +123,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AuthorImageRefFrbDto dco_decode_author_image_ref_frb_dto(dynamic raw);
 
   @protected
+  AuthorImageSlotFrb dco_decode_author_image_slot_frb(dynamic raw);
+
+  @protected
   AuthorImageSourceFrb dco_decode_author_image_source_frb(dynamic raw);
 
   @protected
@@ -511,6 +514,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<String>? dco_decode_opt_list_String(dynamic raw);
 
   @protected
+  Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
+
+  @protected
   PageRequestDto dco_decode_page_request_dto(dynamic raw);
 
   @protected
@@ -772,6 +778,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AuthorImageRefFrbDto sse_decode_author_image_ref_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  AuthorImageSlotFrb sse_decode_author_image_slot_frb(
     SseDeserializer deserializer,
   );
 
@@ -1260,6 +1271,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
 
   @protected
+  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
   PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer);
 
   @protected
@@ -1594,6 +1608,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_author_image_ref_frb_dto(
     AuthorImageRefFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_author_image_slot_frb(
+    AuthorImageSlotFrb self,
     SseSerializer serializer,
   );
 
@@ -2202,6 +2222,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_list_prim_u_8_strict(
+    Uint8List? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_page_request_dto(

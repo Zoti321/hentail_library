@@ -22,6 +22,7 @@ mod m20260903_000020_comic_characters;
 mod m20260927_000021_home_sync_and_resource_snapshots;
 mod m20261002_000022_comic_trash;
 mod m20261003_000023_author_stable_identity;
+mod m20261004_000024_comic_thumbnail_source_page;
 
 pub struct Migrator;
 
@@ -51,6 +52,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260927_000021_home_sync_and_resource_snapshots::Migration),
             Box::new(m20261002_000022_comic_trash::Migration),
             Box::new(m20261003_000023_author_stable_identity::Migration),
+            Box::new(m20261004_000024_comic_thumbnail_source_page::Migration),
         ]
     }
 }

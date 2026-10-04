@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -36,6 +38,13 @@ class EmptyAuthorRepository implements AuthorRepository {
   @override
   Future<AuthorDetail?> getDetail({
     required int authorId,
+    required bool showR18,
+  }) async => null;
+
+  @override
+  Future<Uint8List?> loadImage({
+    required int authorId,
+    required AuthorImageSlot slot,
     required bool showR18,
   }) async => null;
 

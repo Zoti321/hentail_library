@@ -1,4 +1,6 @@
-//! Author 稳定身份：字典、Comic 附着、Author link、详情聚合与形象端口 stub。
+//! Author 稳定身份：字典、Comic 附着、Author link、详情聚合与 Author image 解析。
+
+mod image;
 
 use std::collections::HashSet;
 
@@ -11,6 +13,8 @@ use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
 use crate::db::{connection, map_db_err};
 use crate::entity::{author_links, authors, prelude::*};
 use crate::error::HentaiError;
+
+pub use image::{load_author_image, AuthorImageSlot};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AuthorIdentity {

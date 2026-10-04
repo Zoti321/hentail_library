@@ -2,9 +2,10 @@ use hentai_core::{
     add_author as core_add, add_author_link as core_add_link, count_all_authors as core_count,
     delete_author_link as core_delete_link, delete_authors_by_names,
     fetch_authors_page as core_fetch, get_author_detail as core_detail, list_all_authors,
-    list_author_links as core_list_links, rename_author as core_rename,
-    resolve_author_image as core_image, update_author_link as core_update_link, watch_authors,
-    AuthorIdentity, AuthorImageRef, AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform,
+    list_author_links as core_list_links, load_author_image as core_load_image,
+    rename_author as core_rename, resolve_author_image as core_image,
+    update_author_link as core_update_link, watch_authors, AuthorIdentity, AuthorImageRef,
+    AuthorImageSlot, AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform,
 };
 
 use super::comic::PageRequestDto;
@@ -325,5 +326,34 @@ pub async fn resolve_author_image_frb(
     core_image(author_id, show_r18)
         .await
         .map(AuthorImageRefFrbDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AuthorImageSlotFrb {
+    Avatar,
+    Background,
+}
+
+impl From<AuthorImageSlotFrb> for AuthorImageSlot {
+    fn from(value: AuthorImageSlotFrb) -> Self {
+        match value {
+            AuthorImageSlotFrb::Avatar => Self::Avatar,
+            AuthorImageSlotFrb::Background => Self::Background,
+        }
+    }
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn load_author_image_frb(
+    author_id: i64,
+    slot: AuthorImageSlotFrb,
+    show_r18: bool,
+) -> Result<Option<Vec<u8>>, HentaiErrorDto> {
+    tokio::task::spawn_blocking(move || core_load_image(author_id, slot.into(), show_r18))
+        .await
+        .map_err(|error| {
+            HentaiErrorDto::from(hentai_core::HentaiError::validation(error.to_string()))
+        })?
         .map_err(HentaiErrorDto::from)
 }

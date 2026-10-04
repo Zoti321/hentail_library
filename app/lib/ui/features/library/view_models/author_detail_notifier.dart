@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/domain/repositories/author_repository.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final authorDetailProvider = FutureProvider.autoDispose
@@ -16,6 +20,44 @@ final authorDetailProvider = FutureProvider.autoDispose
             authorId: authorId,
             showR18: settings.comics.comicShowR18(),
           );
+    });
+
+typedef AuthorImageRequest = ({int authorId, AuthorImageSlot slot});
+
+/// Author image 高清字节；所用 Comic 的缩略图被替换（缩略图重新生成、用户设置封面）时重取。
+final authorImageProvider = FutureProvider.autoDispose
+    .family<Uint8List?, AuthorImageRequest>((
+      Ref ref,
+      AuthorImageRequest request,
+    ) async {
+      final AuthorRepository repo = ref.read(authorRepoProvider);
+      final String? comicId = await ref.watch(
+        authorDetailProvider(request.authorId).selectAsync(
+          (AuthorDetail? detail) => switch (request.slot) {
+            AuthorImageSlot.avatar => detail?.image.avatarComicId,
+            AuthorImageSlot.background => detail?.image.backgroundComicId,
+          },
+        ),
+      );
+      if (comicId == null || !ref.mounted) {
+        return null;
+      }
+      ref.listen<Uint8List?>(comicCoverThumbnailCacheProvider(comicId), (
+        Uint8List? previous,
+        Uint8List? next,
+      ) {
+        if (previous != null && next != null && !identical(previous, next)) {
+          ref.invalidateSelf();
+        }
+      });
+      final LibraryTabAgeRestrictionSettings settings = await ref.watch(
+        libraryAgeRestrictionFilterProvider.future,
+      );
+      return repo.loadImage(
+        authorId: request.authorId,
+        slot: request.slot,
+        showR18: settings.comics.comicShowR18(),
+      );
     });
 
 class AuthorDetailCommands {

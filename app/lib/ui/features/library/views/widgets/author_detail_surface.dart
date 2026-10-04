@@ -11,12 +11,16 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/features/library/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/author_image_view.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const double _bannerHeight = 140;
+
+/// 横幅从竖版封面裁横条时偏上保留（人物面部多在上半部）。
+const Alignment _bannerAlignment = Alignment(0, -0.4);
 const double _avatarSize = 88;
 const double _avatarRing = 4;
 const double _comicCardWidth = 96;
@@ -111,9 +115,11 @@ class _AuthorHeader extends StatelessWidget {
                 height: _bannerHeight,
                 child: backgroundId == null
                     ? ColoredBox(color: cs.surfaceContainerHighest)
-                    : ComicCoverContent(
+                    : AuthorImageView(
+                        authorId: detail.id,
+                        slot: AuthorImageSlot.background,
                         comicId: backgroundId,
-                        fit: BoxFit.cover,
+                        alignment: _bannerAlignment,
                       ),
               ),
             ),
@@ -157,7 +163,11 @@ class _AuthorHeader extends StatelessWidget {
                         color: cs.hentai.iconSecondary,
                       ),
                     )
-                  : ComicCoverContent(comicId: avatarId, fit: BoxFit.cover),
+                  : AuthorImageView(
+                      authorId: detail.id,
+                      slot: AuthorImageSlot.avatar,
+                      comicId: avatarId,
+                    ),
             ),
           ),
         ),

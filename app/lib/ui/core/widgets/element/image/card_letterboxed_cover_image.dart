@@ -13,11 +13,13 @@ class CardLetterboxedCoverImage extends StatelessWidget {
     required this.cover,
     this.onDecodeError,
     this.fit = BoxFit.contain,
+    this.alignment = Alignment.center,
   });
 
   final ComicCoverImage cover;
   final VoidCallback? onDecodeError;
   final BoxFit fit;
+  final AlignmentGeometry alignment;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,7 @@ class CardLetterboxedCoverImage extends StatelessWidget {
             filePath: cover.filePath,
             memoryBytes: cover.memoryBytes,
             fit: fit,
+            alignment: alignment,
             cacheWidth: cacheSize.cacheWidth,
             placeholder: const ComicCoverPlaceholder(
               variant: ComicCoverPlaceholderVariant.card,

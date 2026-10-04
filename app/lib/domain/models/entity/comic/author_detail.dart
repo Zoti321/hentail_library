@@ -37,6 +37,9 @@ AuthorLinkPlatform detectAuthorLinkPlatform(String url) {
 
 enum AuthorImageSource { platformCached, comicCover, none }
 
+/// Author image 的位置：头像或背景横幅。
+enum AuthorImageSlot { avatar, background }
+
 typedef AuthorLink = ({
   int id,
   AuthorLinkPlatform platform,

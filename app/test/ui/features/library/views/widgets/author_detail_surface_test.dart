@@ -81,6 +81,13 @@ class _StubAuthorRepository implements AuthorRepository {
   }
 
   @override
+  Future<Uint8List?> loadImage({
+    required int authorId,
+    required AuthorImageSlot slot,
+    required bool showR18,
+  }) async => null;
+
+  @override
   Future<AuthorLink> addLink({
     required int authorId,
     required AuthorLinkPlatform platform,

@@ -107,6 +107,7 @@ pub async fn init_db_async(app_data_dir: &str, db_file_name: &str) -> Result<(),
     }
     register_version_connection(&db_file_path).await?;
     tracing::info!(path = %db_file_path.display(), "database initialized");
+    crate::image_cache::spawn_startup_maintenance();
     Ok(())
 }
 

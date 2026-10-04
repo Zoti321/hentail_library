@@ -8,7 +8,7 @@ import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Future<List<AuthorIdentityFrbDto>> listAllAuthorsFrb() =>
     RustLib.instance.api.crateApiAuthorListAllAuthorsFrb();
@@ -82,6 +82,16 @@ Future<AuthorImageRefFrbDto> resolveAuthorImageFrb({
   required bool showR18,
 }) => RustLib.instance.api.crateApiAuthorResolveAuthorImageFrb(
   authorId: authorId,
+  showR18: showR18,
+);
+
+Future<Uint8List?> loadAuthorImageFrb({
+  required PlatformInt64 authorId,
+  required AuthorImageSlotFrb slot,
+  required bool showR18,
+}) => RustLib.instance.api.crateApiAuthorLoadAuthorImageFrb(
+  authorId: authorId,
+  slot: slot,
   showR18: showR18,
 );
 
@@ -203,6 +213,8 @@ class AuthorImageRefFrbDto {
           backgroundSource == other.backgroundSource &&
           backgroundComicId == other.backgroundComicId;
 }
+
+enum AuthorImageSlotFrb { avatar, background }
 
 enum AuthorImageSourceFrb { platformCached, comicCover, none }
 

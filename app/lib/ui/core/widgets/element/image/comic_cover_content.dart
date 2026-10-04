@@ -17,10 +17,14 @@ class ComicCoverContent extends ConsumerWidget {
     this.gridIndex,
     this.coverViewport,
     this.fit = BoxFit.contain,
+    this.alignment = Alignment.center,
   });
 
   /// [BoxFit.cover] 时填满并裁剪（横幅、头像）。
   final BoxFit fit;
+
+  /// [BoxFit.cover] 裁剪时保留的区域。
+  final AlignmentGeometry alignment;
 
   final String comicId;
   final ThumbnailPriority priority;
@@ -45,6 +49,7 @@ class ComicCoverContent extends ConsumerWidget {
       ComicCoverReady(:final data) => CardLetterboxedCoverImage(
         cover: data,
         fit: fit,
+        alignment: alignment,
         onDecodeError: () {
           ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
         },
@@ -53,6 +58,7 @@ class ComicCoverContent extends ConsumerWidget {
         CardLetterboxedCoverImage(
           cover: previous,
           fit: fit,
+          alignment: alignment,
           onDecodeError: () {
             ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
           },

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -19,6 +21,13 @@ abstract class AuthorRepository {
 
   Future<AuthorDetail?> getDetail({
     required int authorId,
+    required bool showR18,
+  });
+
+  /// Author image 高清字节；`null` 表示无高清图（仅显示库缩略图）。
+  Future<Uint8List?> loadImage({
+    required int authorId,
+    required AuthorImageSlot slot,
     required bool showR18,
   });
 
