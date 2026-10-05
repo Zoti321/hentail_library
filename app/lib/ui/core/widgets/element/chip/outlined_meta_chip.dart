@@ -14,6 +14,7 @@ class OutlinedMetaChip extends HookWidget {
     super.key,
     required this.text,
     this.borderColor,
+    this.backgroundColor,
     this.textColor,
     this.compact = false,
     this.verified = false,
@@ -30,6 +31,7 @@ class OutlinedMetaChip extends HookWidget {
 
   final String text;
   final Color? borderColor;
+  final Color? backgroundColor;
   final Color? textColor;
 
   /// 为 true 时使用更紧的 padding（`10×4`，对齐 [R18RatingChip]）。
@@ -61,7 +63,8 @@ class OutlinedMetaChip extends HookWidget {
     final Color effectiveBorder = showBorder
         ? (borderColor ?? cs.hentai.borderSubtle)
         : Colors.transparent;
-    final Color restBackground = showBorder ? cs.surface : Colors.transparent;
+    final Color restBackground =
+        backgroundColor ?? (showBorder ? cs.surface : Colors.transparent);
     final Color effectiveTextColor = textColor ?? cs.hentai.textSecondary;
     final EdgeInsets padding = compact
         ? const EdgeInsets.symmetric(horizontal: 10, vertical: 4)
@@ -212,9 +215,13 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
     final Color restFill = restBackground.a == 0
         ? hoverFill.withAlpha(0)
         : restBackground;
-    final Color pressFill = Color.alphaBlend(
+    final Color hoverStateFill = Color.alphaBlend(
       hoverFill.withAlpha(110),
-      hoverFill,
+      restFill,
+    );
+    final Color pressFill = Color.alphaBlend(
+      hoverFill.withAlpha(160),
+      restFill,
     );
 
     return FocusableActionDetector(
@@ -248,7 +255,7 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
           final Color resolvedBackground = isPressed.value
               ? pressFill
               : isHovered.value || focused
-              ? (isHovered.value ? hoverFill : focusedFill)
+              ? (isHovered.value ? hoverStateFill : focusedFill)
               : restFill;
           return Semantics(
             button: true,

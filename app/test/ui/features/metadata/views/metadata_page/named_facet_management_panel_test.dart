@@ -67,7 +67,7 @@ void main() {
             .ancestor(of: find.text('合并'), matching: find.byType(InkWell))
             .first,
       );
-      expect(mergeItem.onTap, isNull);
+      expect(mergeItem.onTap, isNotNull);
       debugDefaultTargetPlatformOverride = null;
     });
 
@@ -375,7 +375,6 @@ class _FakeRepo implements NamedFacetManagementRepository {
   _FakeRepo({
     List<String>? authors,
     List<String>? tags,
-    this.countCompleter,
     this.countError,
     this.failOnPage,
     this.pageCompleters = const <int, Completer<PagedResult<String>>>{},
@@ -386,7 +385,6 @@ class _FakeRepo implements NamedFacetManagementRepository {
        };
 
   final Map<ManagedNamedFacetKind, List<String>> _items;
-  final Completer<int>? countCompleter;
   final Object? countError;
   final int? failOnPage;
   final Map<int, Completer<PagedResult<String>>> pageCompleters;
@@ -444,14 +442,17 @@ class _FakeRepo implements NamedFacetManagementRepository {
   ) async {}
 
   @override
+  Future<void> merge(
+    ManagedNamedFacetKind kind,
+    String sourceName,
+    String targetName,
+  ) async {}
+
+  @override
   Future<int> countAttachments(ManagedNamedFacetKind kind, String name) async {
     final Object? error = countError;
     if (error != null) {
       throw error;
-    }
-    final Completer<int>? completer = countCompleter;
-    if (completer != null) {
-      return completer.future;
     }
     return 3;
   }

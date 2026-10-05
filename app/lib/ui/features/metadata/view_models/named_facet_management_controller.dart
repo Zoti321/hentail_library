@@ -197,6 +197,17 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
     await refresh();
   }
 
+  Future<void> merge({
+    required String targetName,
+    required List<String> sourceNames,
+  }) async {
+    final repo = ref.read(namedFacetManagementRepoProvider);
+    for (final String sourceName in sourceNames) {
+      await repo.merge(kind, sourceName, targetName);
+    }
+    await refresh();
+  }
+
   Future<int> countAttachments(String name) {
     return ref
         .read(namedFacetManagementRepoProvider)

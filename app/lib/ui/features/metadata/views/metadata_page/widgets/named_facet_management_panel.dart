@@ -28,6 +28,11 @@ class NamedFacetManagementSliverGroup extends ConsumerWidget {
     required this.viewportWidth,
     required this.horizontalPadding,
     required this.contentMaxWidth,
+    this.mergeTarget,
+    this.mergeSources = const <String>{},
+    this.onMergeTargetSelected,
+    this.onMergeSourceSelected,
+    this.onMergeSelectionExited,
     super.key,
   });
 
@@ -36,6 +41,11 @@ class NamedFacetManagementSliverGroup extends ConsumerWidget {
   final double viewportWidth;
   final double horizontalPadding;
   final double contentMaxWidth;
+  final String? mergeTarget;
+  final Set<String> mergeSources;
+  final ValueChanged<String>? onMergeTargetSelected;
+  final ValueChanged<String>? onMergeSourceSelected;
+  final VoidCallback? onMergeSelectionExited;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -96,6 +106,11 @@ class NamedFacetManagementSliverGroup extends ConsumerWidget {
             kind: kind,
             layoutTier: layoutTier,
             state: state,
+            mergeTarget: mergeTarget,
+            mergeSources: mergeSources,
+            onMergeTargetSelected: onMergeTargetSelected,
+            onMergeSourceSelected: onMergeSourceSelected,
+            onMergeSelectionExited: onMergeSelectionExited,
           ),
         ),
       ),
@@ -131,11 +146,21 @@ class _NamedFacetListSection extends ConsumerWidget {
     required this.kind,
     required this.layoutTier,
     required this.state,
+    this.mergeTarget,
+    required this.mergeSources,
+    this.onMergeTargetSelected,
+    this.onMergeSourceSelected,
+    this.onMergeSelectionExited,
   });
 
   final ManagedNamedFacetKind kind;
   final MetadataLayoutTier layoutTier;
   final NamedFacetManagementState state;
+  final String? mergeTarget;
+  final Set<String> mergeSources;
+  final ValueChanged<String>? onMergeTargetSelected;
+  final ValueChanged<String>? onMergeSourceSelected;
+  final VoidCallback? onMergeSelectionExited;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -159,6 +184,11 @@ class _NamedFacetListSection extends ConsumerWidget {
                   kind: kind,
                   name: item,
                   attachmentCount: state.attachmentCounts[item],
+                  mergeTarget: mergeTarget,
+                  isMergeSource: mergeSources.contains(item),
+                  onMergeTargetSelected: onMergeTargetSelected,
+                  onMergeSourceSelected: onMergeSourceSelected,
+                  onMergeSelectionExited: onMergeSelectionExited,
                 ),
               )
               .toList(),
@@ -182,11 +212,21 @@ class _ManagedNamedFacetChip extends ConsumerWidget {
     required this.kind,
     required this.name,
     required this.attachmentCount,
+    this.mergeTarget,
+    this.isMergeSource = false,
+    this.onMergeTargetSelected,
+    this.onMergeSourceSelected,
+    this.onMergeSelectionExited,
   });
 
   final ManagedNamedFacetKind kind;
   final String name;
   final int? attachmentCount;
+  final String? mergeTarget;
+  final bool isMergeSource;
+  final ValueChanged<String>? onMergeTargetSelected;
+  final ValueChanged<String>? onMergeSourceSelected;
+  final VoidCallback? onMergeSelectionExited;
 
   bool _isDesktop(BuildContext context) {
     return switch (Theme.of(context).platform) {
@@ -203,12 +243,13 @@ class _ManagedNamedFacetChip extends ConsumerWidget {
     NamedFacetContextMenu.show(
       context,
       position: position,
+      mergeEnabled: kind != ManagedNamedFacetKind.author,
       onAction: (NamedFacetContextAction action) {
         switch (action) {
           case NamedFacetContextAction.rename:
             unawaited(_renameNamedFacet(context, ref, kind, name));
           case NamedFacetContextAction.merge:
-            break;
+            onMergeTargetSelected?.call(name);
           case NamedFacetContextAction.delete:
             unawaited(_deleteNamedFacet(context, ref, kind, name));
         }
@@ -220,9 +261,23 @@ class _ManagedNamedFacetChip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isAuthor = kind == ManagedNamedFacetKind.author;
     final bool desktop = _isDesktop(context);
+    final bool isMergeTarget = mergeTarget == name;
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    final Color? selectionFill = isMergeTarget
+        ? colors.hentai.success.withValues(alpha: 0.22)
+        : isMergeSource
+        ? colors.error.withValues(alpha: 0.22)
+        : null;
+    final Color? selectionBorder = isMergeTarget
+        ? colors.hentai.success
+        : isMergeSource
+        ? colors.error
+        : null;
     return OutlinedMetaChip(
       text: name,
       compact: true,
+      backgroundColor: selectionFill,
+      borderColor: selectionBorder,
       count: isAuthor ? null : attachmentCount,
       verified:
           isAuthor &&
@@ -240,14 +295,22 @@ class _ManagedNamedFacetChip extends ConsumerWidget {
                 showAuthorDetailByName(context: context, ref: ref, name: name),
               );
             }
+          : mergeTarget != null
+          ? () {
+              if (isMergeTarget) {
+                onMergeSelectionExited?.call();
+              } else {
+                onMergeSourceSelected?.call(name);
+              }
+            }
           : null,
-      onLongPress: isAuthor || desktop
+      onLongPress: isAuthor || desktop || mergeTarget != null
           ? null
           : () {
               final RenderBox box = context.findRenderObject()! as RenderBox;
               _showMenu(context, ref, box.localToGlobal(Offset.zero));
             },
-      onSecondaryTapUp: isAuthor || !desktop
+      onSecondaryTapUp: isAuthor || !desktop || mergeTarget != null
           ? null
           : (TapUpDetails details) =>
                 _showMenu(context, ref, details.globalPosition),

@@ -335,6 +335,75 @@ pub async fn rename_named_facet_name(
     Ok(())
 }
 
+/// Merge one non-author Named facet name into another in a single transaction.
+pub async fn merge_named_facet_name(
+    facet: JunctionNamedFacet,
+    source_name: &str,
+    target_name: &str,
+) -> Result<(), HentaiError> {
+    if facet == JunctionNamedFacet::Author {
+        return Err(HentaiError::validation("作者暂不支持合并"));
+    }
+    let source = source_name.trim();
+    let target = target_name.trim();
+    if source.is_empty() || target.is_empty() {
+        return Err(HentaiError::validation("合并名称不能为空"));
+    }
+    if source == target {
+        return Err(HentaiError::validation("合并源与目标不能相同"));
+    }
+
+    let db = connection()?;
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let dict = facet.dict_table();
+    let junction = facet.junction_table();
+    let name_col = facet.junction_name_column();
+
+    for (name, label) in [(source, "源名称"), (target, "目标名称")] {
+        let rows = txn
+            .query_all(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                format!("SELECT 1 FROM {dict} WHERE name = ? LIMIT 1"),
+                [Value::String(Some(Box::new(name.to_string())))],
+            ))
+            .await
+            .map_err(map_db_err)?;
+        if rows.is_empty() {
+            return Err(HentaiError::validation(format!("{label}不存在: {name}")));
+        }
+    }
+
+    txn.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!(
+            "INSERT OR IGNORE INTO {junction} (comic_id, {name_col}) \
+             SELECT comic_id, ? FROM {junction} WHERE {name_col} = ?"
+        ),
+        [
+            Value::String(Some(Box::new(target.to_string()))),
+            Value::String(Some(Box::new(source.to_string()))),
+        ],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    txn.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("DELETE FROM {junction} WHERE {name_col} = ?"),
+        [Value::String(Some(Box::new(source.to_string())))],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    txn.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("DELETE FROM {dict} WHERE name = ?"),
+        [Value::String(Some(Box::new(source.to_string())))],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    txn.commit().await.map_err(map_db_err)?;
+    Ok(())
+}
+
 /// Dictionary names with Named facet attachment count for Comic metadata form pickers.
 ///
 /// Sorted by attachment count descending, then name ascending. Does not mutate

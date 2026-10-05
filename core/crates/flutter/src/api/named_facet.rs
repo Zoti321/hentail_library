@@ -1,7 +1,8 @@
 use hentai_core::{
     add_named_facet_name, count_all_named_facet_names, count_named_facet_attachments,
     delete_named_facet_by_names, fetch_named_facet_page, list_all_named_facet_names,
-    list_named_facet_for_form, rename_named_facet_name, JunctionNamedFacet, NamedFacetFormEntry,
+    list_named_facet_for_form, merge_named_facet_name, rename_named_facet_name, JunctionNamedFacet,
+    NamedFacetFormEntry,
 };
 
 use super::comic::PageRequestDto;
@@ -120,6 +121,20 @@ pub fn rename_named_facet_name_frb(
 ) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(rename_named_facet_name(facet.into(), &old_name, &new_name))
         .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn merge_named_facet_name_frb(
+    facet: JunctionNamedFacetFrb,
+    source_name: String,
+    target_name: String,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(merge_named_facet_name(
+        facet.into(),
+        &source_name,
+        &target_name,
+    ))
+    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]

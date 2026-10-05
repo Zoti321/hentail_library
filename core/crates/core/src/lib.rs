@@ -81,7 +81,8 @@ pub use metadata_backup::{
 pub use named_facet::{
     add_named_facet_name, count_all_named_facet_names, count_named_facet_attachments,
     delete_named_facet_by_names, fetch_named_facet_page, list_all_named_facet_names,
-    list_distinct_named_facet_names, list_named_facet_for_form, rename_named_facet_name,
+    list_distinct_named_facet_names, list_named_facet_for_form, merge_named_facet_name,
+    rename_named_facet_name,
     replace_comic_named_facet, JunctionNamedFacet, NamedFacetFormEntry,
 };
 pub use parody::{list_all_parodies, list_distinct_parodies};

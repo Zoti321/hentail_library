@@ -9,6 +9,7 @@ class NamedFacetContextMenu {
   static void show(
     BuildContext context, {
     required Offset position,
+    required bool mergeEnabled,
     required ValueChanged<NamedFacetContextAction> onAction,
   }) {
     ContextMenuCommon.show(
@@ -16,17 +17,25 @@ class NamedFacetContextMenu {
       position: position,
       width: 236,
       height: 140,
-      builder: (VoidCallback onClose) =>
-          _MenuContent(onClose: onClose, onAction: onAction),
+      builder: (VoidCallback onClose) => _MenuContent(
+        onClose: onClose,
+        onAction: onAction,
+        mergeEnabled: mergeEnabled,
+      ),
     );
   }
 }
 
 class _MenuContent extends StatelessWidget {
-  const _MenuContent({required this.onClose, required this.onAction});
+  const _MenuContent({
+    required this.onClose,
+    required this.onAction,
+    required this.mergeEnabled,
+  });
 
   final VoidCallback onClose;
   final ValueChanged<NamedFacetContextAction> onAction;
+  final bool mergeEnabled;
 
   void _handle(NamedFacetContextAction action) {
     onAction(action);
@@ -51,9 +60,8 @@ class _MenuContent extends StatelessWidget {
             ContextMenuActionItem(
               icon: LucideIcons.merge,
               label: l10n.metadataMerge,
-              // Placeholder until core/FRB merge exists: #203.
-              enabled: false,
-              onTap: () {},
+              enabled: mergeEnabled,
+              onTap: () => _handle(NamedFacetContextAction.merge),
             ),
             ContextMenuActionItem(
               icon: LucideIcons.trash2,
