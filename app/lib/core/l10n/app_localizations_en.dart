@@ -2181,7 +2181,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bulkEditMetadataFieldSummaryClear => 'Clear';
 
   @override
-  String get navTrash => 'Deleted';
+  String get navTrash => 'Trash';
 
   @override
   String get readerOpenComicTrashed =>
@@ -2220,16 +2220,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trashPurge => 'Delete permanently';
 
   @override
-  String get trashPurgeAll => 'Delete all permanently';
+  String get trashPurgeAll => 'Delete all';
 
   @override
-  String get trashSelect => 'Select';
+  String get trashRestoreAll => 'Restore all';
 
   @override
-  String get trashExitSelection => 'Done';
+  String get trashRestoreSelected => 'Restore selected';
 
   @override
-  String get trashSelectAll => 'Select all';
+  String get trashPurgeSelected => 'Delete selected';
 
   @override
   String trashSelectedCount(int count) {

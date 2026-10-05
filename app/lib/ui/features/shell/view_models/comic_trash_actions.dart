@@ -35,6 +35,15 @@ class ComicTrashActions extends _$ComicTrashActions {
     _notifyChanged();
   }
 
+  Future<int> restoreAll() async {
+    _ensureLibraryIdle();
+    final int restored = await _service.restoreAll();
+    if (restored > 0) {
+      _notifyChanged();
+    }
+    return restored;
+  }
+
   Future<ComicPurgeResult> purge(List<String> comicIds) async {
     _ensureLibraryIdle();
     final ComicPurgeResult result = await _service.purgeComics(comicIds);

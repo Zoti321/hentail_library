@@ -3865,7 +3865,7 @@ abstract class AppLocalizations {
   /// No description provided for @navTrash.
   ///
   /// In zh, this message translates to:
-  /// **'已删除'**
+  /// **'垃圾桶'**
   String get navTrash;
 
   /// No description provided for @readerOpenComicTrashed.
@@ -3919,26 +3919,26 @@ abstract class AppLocalizations {
   /// No description provided for @trashPurgeAll.
   ///
   /// In zh, this message translates to:
-  /// **'全部永久删除'**
+  /// **'全部删除'**
   String get trashPurgeAll;
 
-  /// No description provided for @trashSelect.
+  /// No description provided for @trashRestoreAll.
   ///
   /// In zh, this message translates to:
-  /// **'多选'**
-  String get trashSelect;
+  /// **'全部恢复'**
+  String get trashRestoreAll;
 
-  /// No description provided for @trashExitSelection.
+  /// No description provided for @trashRestoreSelected.
   ///
   /// In zh, this message translates to:
-  /// **'完成'**
-  String get trashExitSelection;
+  /// **'恢复选中'**
+  String get trashRestoreSelected;
 
-  /// No description provided for @trashSelectAll.
+  /// No description provided for @trashPurgeSelected.
   ///
   /// In zh, this message translates to:
-  /// **'全选'**
-  String get trashSelectAll;
+  /// **'删除选中'**
+  String get trashPurgeSelected;
 
   /// No description provided for @trashSelectedCount.
   ///

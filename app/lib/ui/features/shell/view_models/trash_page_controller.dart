@@ -93,15 +93,23 @@ class TrashPageController extends _$TrashPageController {
   /// 恢复给定漫画并退出多选；列表随 library revision 刷新。返回恢复数量。
   Future<int> restore(List<String> comicIds) async {
     await ref.read(comicTrashActionsProvider.notifier).restore(comicIds);
-    _update((TrashPageState s) => s.exitSelection());
+    _update((TrashPageState s) => s.clearSelection());
     return comicIds.length;
+  }
+
+  Future<int> restoreAll() async {
+    final int restored = await ref
+        .read(comicTrashActionsProvider.notifier)
+        .restoreAll();
+    _update((TrashPageState s) => s.clearSelection());
+    return restored;
   }
 
   Future<ComicPurgeResult> purge(List<String> comicIds) async {
     final ComicPurgeResult result = await ref
         .read(comicTrashActionsProvider.notifier)
         .purge(comicIds);
-    _update((TrashPageState s) => s.exitSelection());
+    _update((TrashPageState s) => s.clearSelection());
     return result;
   }
 
@@ -109,7 +117,7 @@ class TrashPageController extends _$TrashPageController {
     final ComicPurgeResult result = await ref
         .read(comicTrashActionsProvider.notifier)
         .purgeAll();
-    _update((TrashPageState s) => s.exitSelection());
+    _update((TrashPageState s) => s.clearSelection());
     return result;
   }
 

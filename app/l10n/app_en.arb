@@ -1045,7 +1045,7 @@
   },
   "bulkEditMetadataFieldSummaryReplace": "Replace",
   "bulkEditMetadataFieldSummaryClear": "Clear",
-  "navTrash": "Deleted",
+  "navTrash": "Trash",
   "readerOpenComicTrashed": "This comic has been deleted. Restore it to read.",
   "comicTrashConfirmContent": "\"{title}\" will be moved to Deleted. You can restore it from there at any time.",
   "@comicTrashConfirmContent": {
@@ -1068,10 +1068,10 @@
   "trashEmptyDescription": "Deleted comics are kept here first. You can restore them or delete them permanently.",
   "trashRestore": "Restore",
   "trashPurge": "Delete permanently",
-  "trashPurgeAll": "Delete all permanently",
-  "trashSelect": "Select",
-  "trashExitSelection": "Done",
-  "trashSelectAll": "Select all",
+  "trashPurgeAll": "Delete all",
+  "trashRestoreAll": "Restore all",
+  "trashRestoreSelected": "Restore selected",
+  "trashPurgeSelected": "Delete selected",
   "trashSelectedCount": "{count, plural, other{{count} selected}}",
   "@trashSelectedCount": {
     "placeholders": {

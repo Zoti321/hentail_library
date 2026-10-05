@@ -3,7 +3,6 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:intl/intl.dart';
@@ -17,19 +16,13 @@ class TrashComicTile extends StatelessWidget {
   const TrashComicTile({
     super.key,
     required this.item,
-    required this.selectionMode,
     required this.selected,
     required this.onToggleSelected,
-    required this.onRestore,
-    required this.onPurge,
   });
 
   final TrashedComic item;
-  final bool selectionMode;
   final bool selected;
   final VoidCallback onToggleSelected;
-  final VoidCallback onRestore;
-  final VoidCallback onPurge;
 
   @override
   Widget build(BuildContext context) {
@@ -46,24 +39,56 @@ class TrashComicTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(tokens.radius.xs),
       child: InkWell(
         borderRadius: BorderRadius.circular(tokens.radius.xs),
-        onTap: selectionMode ? onToggleSelected : null,
-        onLongPress: selectionMode ? null : onToggleSelected,
+        onTap: onToggleSelected,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Row(
             children: <Widget>[
-              if (selectionMode)
-                Checkbox(value: selected, onChanged: (_) => onToggleSelected()),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: SizedBox(
-                  width: _kTrashCoverWidth,
-                  height: _kTrashCoverHeight,
-                  child: ComicCoverContent(
-                    comicId: item.comic.comicId,
-                    priority: ThumbnailPriority.low,
+              Stack(
+                clipBehavior: Clip.none,
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: SizedBox(
+                      width: _kTrashCoverWidth,
+                      height: _kTrashCoverHeight,
+                      child: ComicCoverContent(
+                        comicId: item.comic.comicId,
+                        priority: ThumbnailPriority.low,
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                    top: tokens.spacing.xs,
+                    left: tokens.spacing.xs,
+                    child: Material(
+                      color: selected
+                          ? cs.primary
+                          : cs.surface.withValues(alpha: 0.92),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(tokens.radius.xs),
+                        side: BorderSide(
+                          color: selected ? cs.primary : cs.hentai.borderSubtle,
+                        ),
+                      ),
+                      child: InkWell(
+                        onTap: onToggleSelected,
+                        borderRadius: BorderRadius.circular(tokens.radius.xs),
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: selected
+                              ? Icon(
+                                  LucideIcons.check,
+                                  size: 16,
+                                  color: cs.onPrimary,
+                                )
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -113,22 +138,6 @@ class TrashComicTile extends StatelessWidget {
                   ],
                 ),
               ),
-              if (!selectionMode) ...<Widget>[
-                GhostButton.iconText(
-                  icon: LucideIcons.undo2,
-                  text: l10n.trashRestore,
-                  onPressed: onRestore,
-                ),
-                GhostButton.icon(
-                  icon: LucideIcons.trash2,
-                  tooltip: l10n.trashPurge,
-                  semanticLabel: l10n.trashPurge,
-                  foregroundColor: cs.hentai.contextMenuDanger,
-                  hoverColor: cs.hentai.contextMenuDanger.withAlpha(24),
-                  overlayColor: cs.hentai.contextMenuDanger.withAlpha(20),
-                  onPressed: onPurge,
-                ),
-              ],
             ],
           ),
         ),

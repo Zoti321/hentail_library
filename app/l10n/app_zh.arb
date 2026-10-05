@@ -1045,7 +1045,7 @@
   },
   "bulkEditMetadataFieldSummaryReplace": "替换",
   "bulkEditMetadataFieldSummaryClear": "清除",
-  "navTrash": "已删除",
+  "navTrash": "垃圾桶",
   "readerOpenComicTrashed": "该漫画已删除，恢复后才能阅读。",
   "comicTrashConfirmContent": "「{title}」将移入「已删除」，可随时在那里恢复。",
   "@comicTrashConfirmContent": {
@@ -1068,10 +1068,10 @@
   "trashEmptyDescription": "删除的漫画会先放在这里，可恢复或永久删除。",
   "trashRestore": "恢复",
   "trashPurge": "永久删除",
-  "trashPurgeAll": "全部永久删除",
-  "trashSelect": "多选",
-  "trashExitSelection": "完成",
-  "trashSelectAll": "全选",
+  "trashPurgeAll": "全部删除",
+  "trashRestoreAll": "全部恢复",
+  "trashRestoreSelected": "恢复选中",
+  "trashPurgeSelected": "删除选中",
   "trashSelectedCount": "{count, plural, other{已选 {count} 本}}",
   "@trashSelectedCount": {
     "placeholders": {

@@ -2109,7 +2109,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bulkEditMetadataFieldSummaryClear => '清除';
 
   @override
-  String get navTrash => '已删除';
+  String get navTrash => '垃圾桶';
 
   @override
   String get readerOpenComicTrashed => '该漫画已删除，恢复后才能阅读。';
@@ -2145,16 +2145,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trashPurge => '永久删除';
 
   @override
-  String get trashPurgeAll => '全部永久删除';
+  String get trashPurgeAll => '全部删除';
 
   @override
-  String get trashSelect => '多选';
+  String get trashRestoreAll => '全部恢复';
 
   @override
-  String get trashExitSelection => '完成';
+  String get trashRestoreSelected => '恢复选中';
 
   @override
-  String get trashSelectAll => '全选';
+  String get trashPurgeSelected => '删除选中';
 
   @override
   String trashSelectedCount(int count) {

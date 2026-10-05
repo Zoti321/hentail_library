@@ -32,6 +32,15 @@ class ComicTrashService {
     await _comicRepository.restoreByIds(ids);
   }
 
+  Future<int> restoreAll() async {
+    final List<String> ids = await listTrashedIds();
+    if (ids.isEmpty) {
+      return 0;
+    }
+    await _comicRepository.restoreByIds(ids);
+    return ids.length;
+  }
+
   Future<ComicPurgeResult> purgeComics(Iterable<String> comicIds) async {
     final List<String> ids = comicIds.toSet().toList();
     if (ids.isEmpty) {

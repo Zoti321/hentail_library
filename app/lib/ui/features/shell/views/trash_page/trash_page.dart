@@ -23,6 +23,8 @@ const double _kTrashLoadMoreThreshold = 400;
 class TrashPage extends ConsumerWidget {
   const TrashPage({super.key});
 
+  static const double _headerExtent = kHistoryHeaderVerticalPadding * 2 + 44;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
@@ -51,17 +53,21 @@ class TrashPage extends ConsumerWidget {
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
-              SliverToBoxAdapter(
-                child: PageContentWidthAlign(
-                  horizontalPadding: horizontalPadding,
-                  maxWidth: innerMaxWidth,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: kHistoryHeaderVerticalPadding,
-                    ),
-                    child: _TrashHeader(
-                      layoutTier: layoutTier,
-                      onOpenNavigation: appShellPageNavigationOpener(context),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: HistoryPinnedHeaderDelegate(
+                  extent: TrashPage._headerExtent,
+                  child: PageContentWidthAlign(
+                    horizontalPadding: horizontalPadding,
+                    maxWidth: innerMaxWidth,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: kHistoryHeaderVerticalPadding,
+                      ),
+                      child: _TrashHeader(
+                        layoutTier: layoutTier,
+                        onOpenNavigation: appShellPageNavigationOpener(context),
+                      ),
                     ),
                   ),
                 ),
@@ -97,104 +103,134 @@ class _TrashHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final TrashPageState? state = ref
         .watch(trashPageControllerProvider)
         .asData
         ?.value;
-    final bool selectionMode = state?.selectionMode ?? false;
     final bool hasItems = state != null && !state.isEmpty;
     final int selectedCount = state?.selectedIds.length ?? 0;
-    final TrashPageController controller = ref.read(
-      trashPageControllerProvider.notifier,
-    );
-
-    final List<Widget> actions = selectionMode
-        ? <Widget>[
-            Text(
-              l10n.trashSelectedCount(selectedCount),
-              style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
-            ),
-            const SizedBox(width: 8),
-            GhostButton.text(
-              text: l10n.trashSelectAll,
-              onPressed: hasItems ? controller.toggleSelectAllLoaded : null,
-            ),
-            GhostButton.iconText(
-              icon: LucideIcons.undo2,
-              text: l10n.trashRestore,
-              onPressed: selectedCount > 0
+    final bool hasSelection = selectedCount > 0;
+    final List<Widget> actions = <Widget>[
+      if (hasSelection)
+        Text(
+          l10n.trashSelectedCount(selectedCount),
+          style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
+        ),
+      if (hasSelection) SizedBox(width: tokens.spacing.sm),
+      _TrashHeaderAction(
+        layoutTier: layoutTier,
+        icon: LucideIcons.undo2,
+        text: hasSelection ? l10n.trashRestoreSelected : l10n.trashRestoreAll,
+        onPressed: hasItems
+            ? hasSelection
                   ? () => restoreTrashedComics(
                       context,
                       ref,
-                      state!.selectedItems
+                      state.selectedItems
                           .map((TrashedComic item) => item.comic.comicId)
                           .toList(),
                     )
-                  : null,
-            ),
-            GhostButton.iconText(
-              icon: LucideIcons.trash2,
-              text: l10n.trashPurge,
-              foregroundColor: cs.hentai.contextMenuDanger,
-              hoverColor: cs.hentai.contextMenuDanger.withAlpha(24),
-              overlayColor: cs.hentai.contextMenuDanger.withAlpha(20),
-              onPressed: selectedCount > 0
-                  ? () => purgeTrashedComics(context, ref, state!.selectedItems)
-                  : null,
-            ),
-            GhostButton.text(
-              text: l10n.trashExitSelection,
-              onPressed: controller.exitSelection,
-            ),
-          ]
-        : <Widget>[
-            GhostButton.iconText(
-              icon: LucideIcons.squareCheck,
-              text: l10n.trashSelect,
-              onPressed: hasItems ? controller.enterSelection : null,
-            ),
-            GhostButton.iconText(
-              icon: LucideIcons.trash2,
-              text: l10n.trashPurgeAll,
-              foregroundColor: cs.hentai.contextMenuDanger,
-              hoverColor: cs.hentai.contextMenuDanger.withAlpha(24),
-              overlayColor: cs.hentai.contextMenuDanger.withAlpha(20),
-              onPressed: hasItems
-                  ? () => purgeAllTrashedComics(
+                  : () => restoreAllTrashedComics(context, ref)
+            : null,
+      ),
+      _TrashHeaderAction(
+        layoutTier: layoutTier,
+        icon: LucideIcons.trash2,
+        text: hasSelection ? l10n.trashPurgeSelected : l10n.trashPurgeAll,
+        foregroundColor: cs.hentai.contextMenuDanger,
+        hoverColor: cs.hentai.contextMenuDanger.withAlpha(24),
+        overlayColor: cs.hentai.contextMenuDanger.withAlpha(20),
+        onPressed: hasItems
+            ? hasSelection
+                  ? () => purgeTrashedComics(context, ref, state.selectedItems)
+                  : () => purgeAllTrashedComics(
                       context,
                       ref,
                       state.allPurgeCounts,
                     )
-                  : null,
-            ),
-          ];
+            : null,
+      ),
+    ];
 
-    return Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      runSpacing: 8,
-      children: <Widget>[
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (onOpenNavigation != null) ...<Widget>[
-              GhostButton.icon(
-                icon: LucideIcons.menu,
-                semanticLabel: l10n.shellOpenNavMenu,
-                tooltip: '',
-                foregroundColor: cs.hentai.iconDefault,
-                hoverColor: theme.hoverColor,
-                overlayColor: theme.hoverColor,
-                onPressed: onOpenNavigation,
+    return SizedBox(
+      height: 44,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  if (onOpenNavigation != null) ...<Widget>[
+                    GhostButton.icon(
+                      icon: LucideIcons.menu,
+                      semanticLabel: l10n.shellOpenNavMenu,
+                      tooltip: '',
+                      foregroundColor: cs.hentai.iconDefault,
+                      hoverColor: theme.hoverColor,
+                      overlayColor: theme.hoverColor,
+                      onPressed: onOpenNavigation,
+                    ),
+                    SizedBox(width: tokens.spacing.sm),
+                  ],
+                  Text(
+                    l10n.navTrash,
+                    style: historyPageTitleStyle(cs, layoutTier),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-            ],
-            Text(l10n.navTrash, style: historyPageTitleStyle(cs, layoutTier)),
-          ],
-        ),
-        Row(mainAxisSize: MainAxisSize.min, children: actions),
-      ],
+            ),
+          ),
+          Row(mainAxisSize: MainAxisSize.min, children: actions),
+        ],
+      ),
+    );
+  }
+}
+
+class _TrashHeaderAction extends StatelessWidget {
+  const _TrashHeaderAction({
+    required this.layoutTier,
+    required this.icon,
+    required this.text,
+    required this.onPressed,
+    this.foregroundColor,
+    this.hoverColor,
+    this.overlayColor,
+  });
+
+  final HistoryLayoutTier layoutTier;
+  final IconData icon;
+  final String text;
+  final VoidCallback? onPressed;
+  final Color? foregroundColor;
+  final Color? hoverColor;
+  final Color? overlayColor;
+
+  @override
+  Widget build(BuildContext context) {
+    if (layoutTier == HistoryLayoutTier.compact) {
+      return GhostButton.icon(
+        icon: icon,
+        tooltip: text,
+        semanticLabel: text,
+        foregroundColor: foregroundColor,
+        hoverColor: hoverColor,
+        overlayColor: overlayColor,
+        onPressed: onPressed,
+      );
+    }
+    return GhostButton.iconText(
+      icon: icon,
+      text: text,
+      foregroundColor: foregroundColor,
+      hoverColor: hoverColor,
+      overlayColor: overlayColor,
+      onPressed: onPressed,
     );
   }
 }
@@ -249,15 +285,9 @@ class _TrashBody extends ConsumerWidget {
               TrashComicTile(
                 key: ValueKey<String>(item.comic.comicId),
                 item: item,
-                selectionMode: state.selectionMode,
                 selected: state.selectedIds.contains(item.comic.comicId),
                 onToggleSelected: () =>
                     controller.toggleSelected(item.comic.comicId),
-                onRestore: () => restoreTrashedComics(context, ref, <String>[
-                  item.comic.comicId,
-                ]),
-                onPurge: () =>
-                    purgeTrashedComics(context, ref, <TrashedComic>[item]),
               ),
             if (state.isLoadingMore)
               const Padding(
@@ -313,6 +343,25 @@ Future<void> restoreTrashedComics(
         .read(trashPageControllerProvider.notifier)
         .restore(comicIds);
     if (context.mounted) {
+      showSuccessToast(context, l10n.trashRestoredToast(restored));
+    }
+  } catch (err) {
+    if (context.mounted) {
+      showErrorToast(context, err);
+    }
+  }
+}
+
+Future<void> restoreAllTrashedComics(
+  BuildContext context,
+  WidgetRef ref,
+) async {
+  final AppLocalizations l10n = context.l10n;
+  try {
+    final int restored = await ref
+        .read(trashPageControllerProvider.notifier)
+        .restoreAll();
+    if (context.mounted && restored > 0) {
       showSuccessToast(context, l10n.trashRestoredToast(restored));
     }
   } catch (err) {

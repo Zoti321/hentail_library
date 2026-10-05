@@ -10,7 +10,7 @@ class TrashPageState {
     this.loadedPage = 0,
     this.hasReachedEnd = true,
     this.isLoadingMore = false,
-    this.selectionMode = false,
+    this.selectionMode = true,
     this.selectedIds = const <String>{},
   });
 
@@ -44,6 +44,9 @@ class TrashPageState {
 
   TrashPageState exitSelection() =>
       copyWith(selectionMode: false, selectedIds: const <String>{});
+
+  TrashPageState clearSelection() =>
+      copyWith(selectionMode: true, selectedIds: const <String>{});
 
   TrashPageState toggleSelected(String comicId) {
     final Set<String> next = <String>{...selectedIds};

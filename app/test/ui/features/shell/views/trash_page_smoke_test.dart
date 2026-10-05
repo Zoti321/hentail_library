@@ -14,6 +14,7 @@ import 'package:hentai_library/ui/features/shell/di/ports.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/views/trash_page/trash_page.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/pump_localized_app.dart';
@@ -121,20 +122,23 @@ void main() {
     expect(find.text('WebDAV'), findsOneWidget);
     expect(find.text('本地'), findsOneWidget);
     expect(find.text('远程'), findsOneWidget);
-    expect(find.text('全部永久删除'), findsOneWidget);
+    expect(find.text('全部恢复'), findsOneWidget);
+    expect(find.text('全部删除'), findsOneWidget);
   });
 
-  testWidgets('select mode shows selection count and checkboxes', (
+  testWidgets('starts in selection mode and uses cover corner badges', (
     WidgetTester tester,
   ) async {
     await _pumpTrash(tester, <TrashedComic>[_trashed('a'), _trashed('b')]);
 
-    await tester.tap(find.text('多选'));
-    await tester.pumpAndSettle();
-    expect(find.byType(Checkbox), findsNWidgets(2));
+    expect(find.byType(Checkbox), findsNothing);
+    expect(find.byIcon(LucideIcons.check), findsNothing);
 
     await tester.tap(find.text('Title a'));
     await tester.pumpAndSettle();
     expect(find.text('已选 1 本'), findsOneWidget);
+    expect(find.byIcon(LucideIcons.check), findsOneWidget);
+    expect(find.text('恢复选中'), findsOneWidget);
+    expect(find.text('删除选中'), findsOneWidget);
   });
 }
