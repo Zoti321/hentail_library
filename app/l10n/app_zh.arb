@@ -1190,6 +1190,8 @@
   "authorDetailComicsEmpty": "暂无漫画",
   "authorDetailViewInSearch": "在搜索中查看",
   "authorDetailRename": "重命名",
+  "authorDetailAliases": "别名：{aliases}",
+  "@authorDetailAliases": { "placeholders": { "aliases": { "type": "String" } } },
   "authorDetailInvalidUrl": "请输入以 http:// 或 https:// 开头的链接",
   "authorDetailOpenLinkFailed": "无法打开链接"
 }

@@ -197,7 +197,7 @@ _Avoid_: 画师、创作者、社团、Circle；把 Author 仅当成无身份的
 _Avoid_: 官方认证、平台 verified、蓝V
 
 **Author alias**:
-某 Author 在其 Creative platform 外链上的平台显示名中，与该 Author 当前显示名不一致者；展示时按 Creative platform 优先级排序，以英文逗号拼接；与显示名一致则不展示。平台显示名由后续平台资料解析写入，非用户手建的独立别名表。
+某 Author 在其 Creative platform 外链上的平台显示名中，与该 Author 当前显示名不一致者；比较与去重均大小写敏感；展示时按 Creative platform 优先级排序，以英文逗号拼接；与显示名一致则不展示。平台显示名由后续平台资料解析写入，非用户手建的独立别名表。
 _Avoid_: 又名、昵称字典、手填别名列表
 
 **Creative platform**:

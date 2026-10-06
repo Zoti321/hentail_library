@@ -5222,14 +5222,18 @@ impl SseDecode for crate::api::author::AuthorImageRefFrbDto {
         let mut var_avatarSource =
             <crate::api::author::AuthorImageSourceFrb>::sse_decode(deserializer);
         let mut var_avatarComicId = <Option<String>>::sse_decode(deserializer);
+        let mut var_avatarLinkId = <Option<i64>>::sse_decode(deserializer);
         let mut var_backgroundSource =
             <crate::api::author::AuthorImageSourceFrb>::sse_decode(deserializer);
         let mut var_backgroundComicId = <Option<String>>::sse_decode(deserializer);
+        let mut var_backgroundLinkId = <Option<i64>>::sse_decode(deserializer);
         return crate::api::author::AuthorImageRefFrbDto {
             avatar_source: var_avatarSource,
             avatar_comic_id: var_avatarComicId,
+            avatar_link_id: var_avatarLinkId,
             background_source: var_backgroundSource,
             background_comic_id: var_backgroundComicId,
+            background_link_id: var_backgroundLinkId,
         };
     }
 }
@@ -7908,8 +7912,10 @@ impl flutter_rust_bridge::IntoDart for crate::api::author::AuthorImageRefFrbDto 
         [
             self.avatar_source.into_into_dart().into_dart(),
             self.avatar_comic_id.into_into_dart().into_dart(),
+            self.avatar_link_id.into_into_dart().into_dart(),
             self.background_source.into_into_dart().into_dart(),
             self.background_comic_id.into_into_dart().into_dart(),
+            self.background_link_id.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -10028,8 +10034,10 @@ impl SseEncode for crate::api::author::AuthorImageRefFrbDto {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <crate::api::author::AuthorImageSourceFrb>::sse_encode(self.avatar_source, serializer);
         <Option<String>>::sse_encode(self.avatar_comic_id, serializer);
+        <Option<i64>>::sse_encode(self.avatar_link_id, serializer);
         <crate::api::author::AuthorImageSourceFrb>::sse_encode(self.background_source, serializer);
         <Option<String>>::sse_encode(self.background_comic_id, serializer);
+        <Option<i64>>::sse_encode(self.background_link_id, serializer);
     }
 }
 

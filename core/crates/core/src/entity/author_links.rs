@@ -10,6 +10,7 @@ pub struct Model {
     pub url: String,
     pub platform_display_name: Option<String>,
     pub sort_key: i64,
+    pub version: i64,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

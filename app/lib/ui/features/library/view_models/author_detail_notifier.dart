@@ -6,11 +6,20 @@ import 'package:hentai_library/domain/repositories/author_repository.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final authorDetailProvider = FutureProvider.autoDispose
     .family<AuthorDetail?, int>((Ref ref, int authorId) async {
+      ref.listen<LibraryRevisionState>(libraryRevisionProvider, (
+        LibraryRevisionState? previous,
+        LibraryRevisionState next,
+      ) {
+        if (previous?.revision != next.revision && ref.mounted) {
+          ref.invalidateSelf();
+        }
+      });
       final LibraryTabAgeRestrictionSettings settings = await ref.watch(
         libraryAgeRestrictionFilterProvider.future,
       );
@@ -31,25 +40,37 @@ final authorImageProvider = FutureProvider.autoDispose
       AuthorImageRequest request,
     ) async {
       final AuthorRepository repo = ref.read(authorRepoProvider);
-      final String? comicId = await ref.watch(
+      final ({String? comicId, int? linkId})? imageRef = await ref.watch(
         authorDetailProvider(request.authorId).selectAsync(
-          (AuthorDetail? detail) => switch (request.slot) {
-            AuthorImageSlot.avatar => detail?.image.avatarComicId,
-            AuthorImageSlot.background => detail?.image.backgroundComicId,
-          },
+          (AuthorDetail? detail) => detail == null
+              ? null
+              : switch (request.slot) {
+                  AuthorImageSlot.avatar => (
+                    comicId: detail.image.avatarComicId,
+                    linkId: detail.image.avatarLinkId,
+                  ),
+                  AuthorImageSlot.background => (
+                    comicId: detail.image.backgroundComicId,
+                    linkId: detail.image.backgroundLinkId,
+                  ),
+                },
         ),
       );
-      if (comicId == null || !ref.mounted) {
+      if (imageRef == null || !ref.mounted) {
         return null;
       }
-      ref.listen<Uint8List?>(comicCoverThumbnailCacheProvider(comicId), (
-        Uint8List? previous,
-        Uint8List? next,
-      ) {
-        if (previous != null && next != null && !identical(previous, next)) {
-          ref.invalidateSelf();
-        }
-      });
+      if (imageRef.comicId != null) {
+        ref.listen<Uint8List?>(
+          comicCoverThumbnailCacheProvider(imageRef.comicId!),
+          (Uint8List? previous, Uint8List? next) {
+            if (previous != null &&
+                next != null &&
+                !identical(previous, next)) {
+              ref.invalidateSelf();
+            }
+          },
+        );
+      }
       final LibraryTabAgeRestrictionSettings settings = await ref.watch(
         libraryAgeRestrictionFilterProvider.future,
       );

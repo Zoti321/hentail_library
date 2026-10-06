@@ -5225,13 +5225,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AuthorImageRefFrbDto dco_decode_author_image_ref_frb_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return AuthorImageRefFrbDto(
       avatarSource: dco_decode_author_image_source_frb(arr[0]),
       avatarComicId: dco_decode_opt_String(arr[1]),
-      backgroundSource: dco_decode_author_image_source_frb(arr[2]),
-      backgroundComicId: dco_decode_opt_String(arr[3]),
+      avatarLinkId: dco_decode_opt_box_autoadd_i_64(arr[2]),
+      backgroundSource: dco_decode_author_image_source_frb(arr[3]),
+      backgroundComicId: dco_decode_opt_String(arr[4]),
+      backgroundLinkId: dco_decode_opt_box_autoadd_i_64(arr[5]),
     );
   }
 
@@ -7107,13 +7109,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_avatarSource = sse_decode_author_image_source_frb(deserializer);
     var var_avatarComicId = sse_decode_opt_String(deserializer);
+    var var_avatarLinkId = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_backgroundSource = sse_decode_author_image_source_frb(deserializer);
     var var_backgroundComicId = sse_decode_opt_String(deserializer);
+    var var_backgroundLinkId = sse_decode_opt_box_autoadd_i_64(deserializer);
     return AuthorImageRefFrbDto(
       avatarSource: var_avatarSource,
       avatarComicId: var_avatarComicId,
+      avatarLinkId: var_avatarLinkId,
       backgroundSource: var_backgroundSource,
       backgroundComicId: var_backgroundComicId,
+      backgroundLinkId: var_backgroundLinkId,
     );
   }
 
@@ -9561,8 +9567,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_author_image_source_frb(self.avatarSource, serializer);
     sse_encode_opt_String(self.avatarComicId, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.avatarLinkId, serializer);
     sse_encode_author_image_source_frb(self.backgroundSource, serializer);
     sse_encode_opt_String(self.backgroundComicId, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.backgroundLinkId, serializer);
   }
 
   @protected

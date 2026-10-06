@@ -6,7 +6,7 @@ use crate::runtime::block_on;
 use crate::thumbnail::hd::load_comic_hd_cover_with;
 use crate::thumbnail::{find_thumbnail_cover_meta, load_page_image_bytes};
 
-use super::{resolve_author_image, AuthorImageSource};
+use super::{platform_images::load_cached_platform_image, resolve_author_image, AuthorImageSource};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuthorImageSlot {
@@ -23,10 +23,24 @@ pub fn load_author_image(
     show_r18: bool,
 ) -> Result<Option<Vec<u8>>, HentaiError> {
     let image = block_on(resolve_author_image(author_id, show_r18))?;
-    let (source, comic_id) = match slot {
-        AuthorImageSlot::Avatar => (image.avatar_source, image.avatar_comic_id),
-        AuthorImageSlot::Background => (image.background_source, image.background_comic_id),
+    let (source, comic_id, link_id) = match slot {
+        AuthorImageSlot::Avatar => (
+            image.avatar_source,
+            image.avatar_comic_id,
+            image.avatar_link_id,
+        ),
+        AuthorImageSlot::Background => (
+            image.background_source,
+            image.background_comic_id,
+            image.background_link_id,
+        ),
     };
+    if source == AuthorImageSource::PlatformCached {
+        return load_cached_platform_image(
+            link_id.ok_or_else(|| HentaiError::validation("platform image link missing"))?,
+            slot,
+        );
+    }
     let comic_id = match (source, comic_id) {
         (AuthorImageSource::ComicCover, Some(comic_id)) => comic_id,
         _ => return Ok(None),

@@ -1,6 +1,8 @@
 //! Author 稳定身份：字典、Comic 附着、Author link、详情聚合与 Author image 解析。
 
 mod image;
+mod platform;
+mod platform_images;
 
 use std::collections::HashSet;
 
@@ -15,6 +17,7 @@ use crate::entity::{author_links, authors, prelude::*};
 use crate::error::HentaiError;
 
 pub use image::{load_author_image, AuthorImageSlot};
+pub use platform_images::schedule_author_image_refresh;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AuthorIdentity {
@@ -105,8 +108,10 @@ pub enum AuthorImageSource {
 pub struct AuthorImageRef {
     pub avatar_source: AuthorImageSource,
     pub avatar_comic_id: Option<String>,
+    pub avatar_link_id: Option<i64>,
     pub background_source: AuthorImageSource,
     pub background_comic_id: Option<String>,
+    pub background_link_id: Option<i64>,
 }
 
 pub async fn list_all_authors() -> Result<Vec<AuthorIdentity>, HentaiError> {
@@ -376,18 +381,21 @@ pub async fn add_author_link(
         url: Set(url.clone()),
         platform_display_name: Set(display.clone()),
         sort_key: Set(next_key),
+        version: Set(1),
     };
     let inserted = AuthorLinks::insert(active)
         .exec(&db)
         .await
         .map_err(map_db_err)?;
-    Ok(AuthorLinkDto {
+    let link = AuthorLinkDto {
         id: inserted.last_insert_id,
         platform,
         url,
         platform_display_name: display,
         sort_key: next_key,
-    })
+    };
+    schedule_author_image_refresh(author_id);
+    Ok(link)
 }
 
 pub async fn update_author_link(
@@ -399,17 +407,28 @@ pub async fn update_author_link(
     let url = validate_http_url(url)?;
     let db = connection()?;
     let display = normalize_optional_text(platform_display_name);
+    let existing = AuthorLinks::find_by_id(link_id)
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::validation("Author link does not exist"))?;
+    let url_changed = existing.url != url || existing.platform != platform.as_str();
+    let refresh_lock = platform_images::author_refresh_lock(existing.author_id);
+    let refresh_guard = refresh_lock.lock().await;
     let result = db
         .execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
-            "UPDATE author_links SET platform = ?, url = ?, platform_display_name = ? WHERE id = ?",
+            "UPDATE author_links SET platform = ?, url = ?, platform_display_name = ?, \
+             version = version + CASE WHEN platform != ? OR url != ? THEN 1 ELSE 0 END WHERE id = ?",
             [
                 Value::from(platform.as_str().to_string()),
-                Value::from(url),
+                Value::from(url.clone()),
                 match display {
                     Some(text) => Value::from(text),
                     None => Value::String(None),
                 },
+                Value::from(platform.as_str().to_string()),
+                Value::from(url),
                 Value::from(link_id),
             ],
         ))
@@ -418,10 +437,26 @@ pub async fn update_author_link(
     if result.rows_affected() == 0 {
         return Err(HentaiError::validation("Author link 不存在"));
     }
+    if url_changed {
+        db.execute(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            "DELETE FROM author_image_cache WHERE author_link_id = ?",
+            [Value::from(link_id)],
+        ))
+        .await
+        .map_err(map_db_err)?;
+        if let Ok(cache) = crate::image_cache::ImageCache::app() {
+            let _ = cache.invalidate_platform_link(link_id);
+        }
+    }
+    drop(refresh_guard);
+    schedule_author_image_refresh(existing.author_id);
     Ok(())
 }
 
 pub async fn delete_author_link(author_id: i64, link_id: i64) -> Result<(), HentaiError> {
+    let refresh_lock = platform_images::author_refresh_lock(author_id);
+    let refresh_guard = refresh_lock.lock().await;
     let db = connection()?;
     let result = AuthorLinks::delete_many()
         .filter(author_links::Column::Id.eq(link_id))
@@ -432,6 +467,10 @@ pub async fn delete_author_link(author_id: i64, link_id: i64) -> Result<(), Hent
     if result.rows_affected == 0 {
         return Err(HentaiError::validation("Author link 不存在"));
     }
+    if let Ok(cache) = crate::image_cache::ImageCache::app() {
+        let _ = cache.invalidate_platform_link(link_id);
+    }
+    drop(refresh_guard);
     Ok(())
 }
 
@@ -535,7 +574,7 @@ pub async fn get_author_detail(
     let links = list_author_links_on(&db, author_id).await?;
     let verified = links.iter().any(|l| l.platform.is_creative());
     let healthy = healthy_visible_sql("c", "m", show_r18);
-    Ok(Some(AuthorDetailDto {
+    let detail = AuthorDetailDto {
         identity: AuthorIdentity {
             id: row.id,
             name: row.name,
@@ -561,31 +600,49 @@ pub async fn get_author_detail(
         .await?,
         top_comics: top_comics_for_author(&db, author_id, &healthy).await?,
         comic_count: comic_count_for_author(&db, author_id, &healthy).await?,
-    }))
+    };
+    schedule_author_image_refresh(author_id);
+    Ok(Some(detail))
 }
 
 pub async fn resolve_author_image(
     author_id: i64,
     show_r18: bool,
 ) -> Result<AuthorImageRef, HentaiError> {
+    let platform = platform_images::resolve_cached_author_image(author_id).await?;
     let db = connection()?;
     let healthy = healthy_visible_sql("c", "m", show_r18);
     let top = top_comics_for_author(&db, author_id, &healthy).await?;
     let comic_id = top.first().map(|c| c.comic_id.clone());
-    match comic_id {
-        Some(id) => Ok(AuthorImageRef {
-            avatar_source: AuthorImageSource::ComicCover,
-            avatar_comic_id: Some(id.clone()),
-            background_source: AuthorImageSource::ComicCover,
-            background_comic_id: Some(id),
-        }),
-        None => Ok(AuthorImageRef {
-            avatar_source: AuthorImageSource::None,
-            avatar_comic_id: None,
-            background_source: AuthorImageSource::None,
-            background_comic_id: None,
-        }),
-    }
+    let fallback = comic_id;
+    Ok(AuthorImageRef {
+        avatar_source: if platform.avatar_link_id.is_some() {
+            AuthorImageSource::PlatformCached
+        } else if fallback.is_some() {
+            AuthorImageSource::ComicCover
+        } else {
+            AuthorImageSource::None
+        },
+        avatar_comic_id: platform
+            .avatar_link_id
+            .is_none()
+            .then(|| fallback.clone())
+            .flatten(),
+        avatar_link_id: platform.avatar_link_id,
+        background_source: if platform.background_link_id.is_some() {
+            AuthorImageSource::PlatformCached
+        } else if fallback.is_some() {
+            AuthorImageSource::ComicCover
+        } else {
+            AuthorImageSource::None
+        },
+        background_comic_id: platform
+            .background_link_id
+            .is_none()
+            .then(|| fallback.clone())
+            .flatten(),
+        background_link_id: platform.background_link_id,
+    })
 }
 
 pub async fn ensure_author_id<C: ConnectionTrait>(db: &C, name: &str) -> Result<i64, HentaiError> {

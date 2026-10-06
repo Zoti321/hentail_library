@@ -14,7 +14,7 @@ class AuthorImageView extends ConsumerWidget {
     super.key,
     required this.authorId,
     required this.slot,
-    required this.comicId,
+    this.comicId,
     this.alignment = Alignment.center,
   });
 
@@ -24,7 +24,7 @@ class AuthorImageView extends ConsumerWidget {
   final AuthorImageSlot slot;
 
   /// 过渡用缩略图所属 Comic。
-  final String comicId;
+  final String? comicId;
   final AlignmentGeometry alignment;
 
   @override
@@ -42,11 +42,12 @@ class AuthorImageView extends ConsumerWidget {
         return Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            ComicCoverContent(
-              comicId: comicId,
-              fit: BoxFit.cover,
-              alignment: alignment,
-            ),
+            if (comicId != null)
+              ComicCoverContent(
+                comicId: comicId!,
+                fit: BoxFit.cover,
+                alignment: alignment,
+              ),
             if (hd != null && hd.isNotEmpty)
               Image.memory(
                 hd,

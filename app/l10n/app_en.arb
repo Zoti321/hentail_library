@@ -1176,6 +1176,8 @@
   "authorDetailComicsEmpty": "No comics yet",
   "authorDetailViewInSearch": "View in search",
   "authorDetailRename": "Rename",
+  "authorDetailAliases": "Aliases: {aliases}",
+  "@authorDetailAliases": { "placeholders": { "aliases": { "type": "String" } } },
   "authorDetailInvalidUrl": "Enter a URL starting with http:// or https://",
   "authorDetailOpenLinkFailed": "Could not open the link"
 }

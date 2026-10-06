@@ -4120,6 +4120,12 @@ abstract class AppLocalizations {
   /// **'重命名'**
   String get authorDetailRename;
 
+  /// No description provided for @authorDetailAliases.
+  ///
+  /// In zh, this message translates to:
+  /// **'别名：{aliases}'**
+  String authorDetailAliases(String aliases);
+
   /// No description provided for @authorDetailInvalidUrl.
   ///
   /// In zh, this message translates to:

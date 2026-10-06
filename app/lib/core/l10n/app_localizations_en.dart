@@ -2386,6 +2386,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authorDetailRename => 'Rename';
 
   @override
+  String authorDetailAliases(String aliases) {
+    return 'Aliases: $aliases';
+  }
+
+  @override
   String get authorDetailInvalidUrl =>
       'Enter a URL starting with http:// or https://';
 

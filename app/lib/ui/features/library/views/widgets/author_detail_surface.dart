@@ -258,8 +258,13 @@ class _AuthorNameRow extends HookConsumerWidget {
       );
     }
 
+    final List<String> aliases = authorAliases(
+      authorName: detail.name,
+      links: detail.links,
+    );
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         if (detail.verified) ...<Widget>[
           Tooltip(
@@ -269,11 +274,26 @@ class _AuthorNameRow extends HookConsumerWidget {
           SizedBox(width: tokens.spacing.xs),
         ],
         Flexible(
-          child: Text(
-            detail.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: nameStyle,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                detail.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: nameStyle,
+              ),
+              if (aliases.isNotEmpty)
+                Text(
+                  l10n.authorDetailAliases(aliases.join(', ')),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: tokens.text.bodySm,
+                    color: cs.hentai.textSecondary,
+                  ),
+                ),
+            ],
           ),
         ),
         SizedBox(width: tokens.spacing.xs),

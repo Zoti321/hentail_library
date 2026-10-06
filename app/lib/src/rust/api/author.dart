@@ -186,22 +186,28 @@ class AuthorIdentityFrbDto {
 class AuthorImageRefFrbDto {
   final AuthorImageSourceFrb avatarSource;
   final String? avatarComicId;
+  final PlatformInt64? avatarLinkId;
   final AuthorImageSourceFrb backgroundSource;
   final String? backgroundComicId;
+  final PlatformInt64? backgroundLinkId;
 
   const AuthorImageRefFrbDto({
     required this.avatarSource,
     this.avatarComicId,
+    this.avatarLinkId,
     required this.backgroundSource,
     this.backgroundComicId,
+    this.backgroundLinkId,
   });
 
   @override
   int get hashCode =>
       avatarSource.hashCode ^
       avatarComicId.hashCode ^
+      avatarLinkId.hashCode ^
       backgroundSource.hashCode ^
-      backgroundComicId.hashCode;
+      backgroundComicId.hashCode ^
+      backgroundLinkId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -210,8 +216,10 @@ class AuthorImageRefFrbDto {
           runtimeType == other.runtimeType &&
           avatarSource == other.avatarSource &&
           avatarComicId == other.avatarComicId &&
+          avatarLinkId == other.avatarLinkId &&
           backgroundSource == other.backgroundSource &&
-          backgroundComicId == other.backgroundComicId;
+          backgroundComicId == other.backgroundComicId &&
+          backgroundLinkId == other.backgroundLinkId;
 }
 
 enum AuthorImageSlotFrb { avatar, background }

@@ -2301,6 +2301,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get authorDetailRename => '重命名';
 
   @override
+  String authorDetailAliases(String aliases) {
+    return '别名：$aliases';
+  }
+
+  @override
   String get authorDetailInvalidUrl => '请输入以 http:// 或 https:// 开头的链接';
 
   @override

@@ -1,4 +1,5 @@
 pub mod app_prefs;
+pub mod author_image_cache;
 pub mod author_links;
 pub mod authors;
 pub mod characters;
@@ -21,6 +22,7 @@ pub mod tags;
 
 pub mod prelude {
     pub use super::app_prefs::Entity as AppPrefs;
+    pub use super::author_image_cache::Entity as AuthorImageCache;
     pub use super::author_links::Entity as AuthorLinks;
     pub use super::authors::Entity as Authors;
     pub use super::characters::Entity as Characters;

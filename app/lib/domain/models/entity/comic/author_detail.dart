@@ -55,9 +55,46 @@ typedef AuthorTopComic = ({String comicId, String title});
 typedef AuthorImageRef = ({
   AuthorImageSource avatarSource,
   String? avatarComicId,
+  int? avatarLinkId,
   AuthorImageSource backgroundSource,
   String? backgroundComicId,
+  int? backgroundLinkId,
 });
+
+List<String> authorAliases({
+  required String authorName,
+  required List<AuthorLink> links,
+}) {
+  final List<AuthorLink> ordered = <AuthorLink>[...links]
+    ..sort((AuthorLink a, AuthorLink b) {
+      final int platform = a.platform.priority.compareTo(b.platform.priority);
+      return platform != 0 ? platform : a.sortKey.compareTo(b.sortKey);
+    });
+  final Set<String> seen = <String>{};
+  final List<String> aliases = <String>[];
+  for (final AuthorLink link in ordered) {
+    final String? value = link.platformDisplayName?.trim();
+    if (link.platform.isCreative &&
+        value != null &&
+        value.isNotEmpty &&
+        value != authorName &&
+        seen.add(value)) {
+      aliases.add(value);
+    }
+  }
+  return aliases;
+}
+
+extension AuthorLinkPlatformPriority on AuthorLinkPlatform {
+  int get priority => switch (this) {
+    AuthorLinkPlatform.pixiv => 0,
+    AuthorLinkPlatform.x => 1,
+    AuthorLinkPlatform.patreon => 2,
+    AuthorLinkPlatform.fanbox => 3,
+    AuthorLinkPlatform.discord => 4,
+    AuthorLinkPlatform.other => 5,
+  };
+}
 
 class AuthorDetail {
   const AuthorDetail({

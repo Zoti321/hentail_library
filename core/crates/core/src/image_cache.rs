@@ -15,6 +15,7 @@ use crate::error::HentaiError;
 pub const IMAGE_CACHE_LIMIT_BYTES: u64 = 512 * 1024 * 1024;
 const EVICT_TARGET_PERCENT: u64 = 80;
 const COMIC_COVER_DIR: &str = "comic_cover";
+const PLATFORM_IMAGE_DIR: &str = "platform_image";
 const PARTIAL_PREFIX: &str = ".partial_";
 
 /// Comic 高清封面缓存键：源版本（modified_ms + size）或页码变化即换键。
@@ -24,6 +25,12 @@ pub struct ComicCoverKey<'a> {
     pub source_modified_ms: i64,
     pub source_size: i64,
     pub page_index: Option<i32>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PlatformImageKey<'a> {
+    pub author_link_id: i64,
+    pub slot: &'a str,
 }
 
 impl ComicCoverKey<'_> {
@@ -117,6 +124,59 @@ impl ImageCache {
         Ok(())
     }
 
+    pub fn read_platform_image(&self, key: &PlatformImageKey<'_>) -> Option<Vec<u8>> {
+        let path = self.platform_path(key);
+        let bytes = fs::read(&path).ok()?;
+        touch(&path);
+        Some(bytes)
+    }
+
+    pub fn write_platform_image(
+        &self,
+        key: &PlatformImageKey<'_>,
+        bytes: &[u8],
+    ) -> Result<(), HentaiError> {
+        let path = self.platform_path(key);
+        let dir = path
+            .parent()
+            .ok_or_else(|| HentaiError::validation("invalid platform image cache path"))?;
+        fs::create_dir_all(dir).map_err(map_io_err)?;
+        let tmp_path = dir.join(format!(
+            "{PARTIAL_PREFIX}{}",
+            SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        if let Err(err) = write_file(&tmp_path, bytes) {
+            let _ = fs::remove_file(&tmp_path);
+            return Err(err);
+        }
+        if let Err(err) = fs::rename(&tmp_path, &path) {
+            let _ = fs::remove_file(&tmp_path);
+            return Err(map_io_err(err));
+        }
+        self.spawn_eviction();
+        Ok(())
+    }
+
+    pub fn invalidate_platform_link(&self, author_link_id: i64) -> Result<(), HentaiError> {
+        let dir = self
+            .root
+            .join(PLATFORM_IMAGE_DIR)
+            .join(author_link_id.to_string());
+        for slot in ["avatar", "background"] {
+            let path = dir.join(format!("{slot}.img"));
+            if path.is_file() {
+                fs::remove_file(path).map_err(map_io_err)?;
+            }
+        }
+        if dir.is_dir() {
+            let _ = fs::remove_dir(dir);
+        }
+        Ok(())
+    }
+
     /// 超出上限时从最久未访问的条目删起，直到总量降到上限的约 80%。
     pub fn enforce_limit(&self) -> Result<(), HentaiError> {
         if !self.root.is_dir() {
@@ -172,6 +232,24 @@ impl ImageCache {
 
     fn comic_dir(&self, comic_id: &str) -> PathBuf {
         self.root.join(COMIC_COVER_DIR).join(comic_id)
+    }
+
+    fn platform_path(&self, key: &PlatformImageKey<'_>) -> PathBuf {
+        self.root
+            .join(PLATFORM_IMAGE_DIR)
+            .join(key.author_link_id.to_string())
+            .join(format!("{}.img", key.slot))
+    }
+
+    fn spawn_eviction(&self) {
+        if self.evict_in_background {
+            let cache = self.clone();
+            std::thread::spawn(move || {
+                if let Err(err) = cache.enforce_limit() {
+                    tracing::warn!(error = %err, "image cache eviction failed");
+                }
+            });
+        }
     }
 }
 
