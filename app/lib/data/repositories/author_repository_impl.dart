@@ -218,9 +218,11 @@ AuthorDetail _mapDetail(
       avatarSource: _mapImageSource(image.avatarSource),
       avatarComicId: image.avatarComicId,
       avatarLinkId: image.avatarLinkId?.toInt(),
+      avatarImageUrl: image.avatarImageUrl,
       backgroundSource: _mapImageSource(image.backgroundSource),
       backgroundComicId: image.backgroundComicId,
       backgroundLinkId: image.backgroundLinkId?.toInt(),
+      backgroundImageUrl: image.backgroundImageUrl,
     ),
   );
 }

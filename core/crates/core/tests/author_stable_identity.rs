@@ -380,6 +380,10 @@ fn expired_platform_image_remains_available_until_refresh_succeeds() {
             let image = resolve_author_image(author.id, false).await.expect("image");
             assert_eq!(image.avatar_source, AuthorImageSource::PlatformCached);
             assert_eq!(image.avatar_link_id, Some(link_id));
+            assert_eq!(
+                image.avatar_image_url.as_deref(),
+                Some("https://img.example/avatar.png")
+            );
         });
     });
 }

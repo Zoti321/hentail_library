@@ -9,10 +9,13 @@ import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/ui/features/library/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/author_image_view.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart' show ProviderScope, Ref;
 import 'package:riverpod/misc.dart' show Override;
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../../support/fakes/author_repository_test_fakes.dart';
 import '../../../../../support/fakes/comic_cover_test_fakes.dart';
 import '../../../../../support/pump_localized_app.dart';
 
@@ -55,6 +58,49 @@ Future<void> _pump(
     ),
   );
   await tester.pump();
+}
+
+class _PlatformAuthorRepository extends EmptyAuthorRepository {
+  String avatarUrl = 'https://img.example/avatar-a.png';
+  int loads = 0;
+
+  @override
+  Future<AuthorDetail?> getDetail({
+    required int authorId,
+    required bool showR18,
+  }) async {
+    return AuthorDetail(
+      id: authorId,
+      name: 'Alice',
+      verified: true,
+      links: const <AuthorLink>[],
+      tags: const <AuthorFacetCount>[],
+      parodies: const <AuthorFacetCount>[],
+      characters: const <AuthorFacetCount>[],
+      topComics: const <AuthorTopComic>[],
+      comicCount: 0,
+      image: (
+        avatarSource: AuthorImageSource.platformCached,
+        avatarComicId: null,
+        avatarLinkId: 7,
+        avatarImageUrl: avatarUrl,
+        backgroundSource: AuthorImageSource.none,
+        backgroundComicId: null,
+        backgroundLinkId: null,
+        backgroundImageUrl: null,
+      ),
+    );
+  }
+
+  @override
+  Future<Uint8List?> loadImage({
+    required int authorId,
+    required AuthorImageSlot slot,
+    required bool showR18,
+  }) async {
+    loads += 1;
+    return _png;
+  }
 }
 
 void main() {
@@ -112,5 +158,38 @@ void main() {
 
     expect(find.byType(CardLetterboxedCoverImage), findsOneWidget);
     expect(find.byKey(AuthorImageView.hdImageKey), findsNothing);
+  });
+
+  testWidgets('reloads the platform image when the image url changes', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final _PlatformAuthorRepository repo = _PlatformAuthorRepository();
+    await pumpLocalizedApp(
+      tester,
+      overrides: <Override>[authorRepoProvider.overrideWithValue(repo)],
+      home: const Scaffold(
+        body: SizedBox(
+          width: 400,
+          height: 140,
+          child: AuthorImageView(authorId: 1, slot: AuthorImageSlot.avatar),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(repo.loads, 1);
+
+    // 平台换了新图：URL 变化应触发重取（linkId 不变）。
+    repo.avatarUrl = 'https://img.example/avatar-b.png';
+    ProviderScope.containerOf(
+      tester.element(find.byType(AuthorImageView)),
+    ).invalidate(authorDetailProvider(1));
+    await tester.pump();
+    await tester.pump();
+    await tester.pump();
+
+    expect(repo.loads, 2);
+    expect(find.byKey(AuthorImageView.hdImageKey), findsOneWidget);
   });
 }

@@ -5225,15 +5225,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AuthorImageRefFrbDto dco_decode_author_image_ref_frb_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return AuthorImageRefFrbDto(
       avatarSource: dco_decode_author_image_source_frb(arr[0]),
       avatarComicId: dco_decode_opt_String(arr[1]),
       avatarLinkId: dco_decode_opt_box_autoadd_i_64(arr[2]),
-      backgroundSource: dco_decode_author_image_source_frb(arr[3]),
-      backgroundComicId: dco_decode_opt_String(arr[4]),
-      backgroundLinkId: dco_decode_opt_box_autoadd_i_64(arr[5]),
+      avatarImageUrl: dco_decode_opt_String(arr[3]),
+      backgroundSource: dco_decode_author_image_source_frb(arr[4]),
+      backgroundComicId: dco_decode_opt_String(arr[5]),
+      backgroundLinkId: dco_decode_opt_box_autoadd_i_64(arr[6]),
+      backgroundImageUrl: dco_decode_opt_String(arr[7]),
     );
   }
 
@@ -7110,16 +7112,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_avatarSource = sse_decode_author_image_source_frb(deserializer);
     var var_avatarComicId = sse_decode_opt_String(deserializer);
     var var_avatarLinkId = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_avatarImageUrl = sse_decode_opt_String(deserializer);
     var var_backgroundSource = sse_decode_author_image_source_frb(deserializer);
     var var_backgroundComicId = sse_decode_opt_String(deserializer);
     var var_backgroundLinkId = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_backgroundImageUrl = sse_decode_opt_String(deserializer);
     return AuthorImageRefFrbDto(
       avatarSource: var_avatarSource,
       avatarComicId: var_avatarComicId,
       avatarLinkId: var_avatarLinkId,
+      avatarImageUrl: var_avatarImageUrl,
       backgroundSource: var_backgroundSource,
       backgroundComicId: var_backgroundComicId,
       backgroundLinkId: var_backgroundLinkId,
+      backgroundImageUrl: var_backgroundImageUrl,
     );
   }
 
@@ -9568,9 +9574,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_author_image_source_frb(self.avatarSource, serializer);
     sse_encode_opt_String(self.avatarComicId, serializer);
     sse_encode_opt_box_autoadd_i_64(self.avatarLinkId, serializer);
+    sse_encode_opt_String(self.avatarImageUrl, serializer);
     sse_encode_author_image_source_frb(self.backgroundSource, serializer);
     sse_encode_opt_String(self.backgroundComicId, serializer);
     sse_encode_opt_box_autoadd_i_64(self.backgroundLinkId, serializer);
+    sse_encode_opt_String(self.backgroundImageUrl, serializer);
   }
 
   @protected

@@ -23,7 +23,8 @@ KK Library 的公开产品行为提供了本决策的产品参考：本地优先
 
 ### Source model
 
-- 五个平台首版均提供真实平台适配器：Pixiv、X、Patreon、FANBOX、Discord。
+- 五个平台首版均提供平台适配器：Pixiv、X、Patreon、FANBOX、Discord。
+- 其中 Discord 无公开用户资料 API，适配器只校验公开链接形状，不抓取显示名与图片（见文末修订）。
 - “可用”定义为：平台有适配器并支持明确的公开资料 URL 形状；不承诺任意作品页、帖子页、首页、邀请页或其他非资料页 URL 都能解析。
 - 平台级 URL 规则和解析能力随应用版本发布，不从远程服务器下载规则。
 - 不符合 URL 规则的 Author link 保留原样，解析状态为 Unsupported，不写入新的显示名或图片缓存。
@@ -66,6 +67,7 @@ KK Library 的公开产品行为提供了本决策的产品参考：本地优先
 ### Domain and Flutter boundary
 
 - `AuthorImageRef` 增加 `avatar_link_id` 与 `background_link_id`，与现有 source 和 Comic id 一起跨 FRB 返回。
+- `AuthorImageRef` 另外携带 `avatar_image_url` 与 `background_image_url`（平台缓存当前图片 URL），用于让前端只在平台图片确实变化时重取并淡入。
 - 保留 `resolve_author_image_frb` 和 `load_author_image_frb`；首版不新增用户可见的手动刷新 API。
 - Author alias 在 Dart domain 纯逻辑中计算：比较和去重均大小写敏感，按 Creative platform 优先级排序，以英文逗号拼接。
 - Rust 通过现有 revision/watch 机制通知数据变化，不新增专用平台事件流。
@@ -87,6 +89,26 @@ KK Library 的公开产品行为提供了本决策的产品参考：本地优先
 - 不使用 OAuth 或平台 token 意味着无法保证所有平台链接都能解析。
 - 需要新增缓存元数据迁移、统一 downloader、五个平台 fixture 和并发测试。
 - 平台源失败对用户静默，诊断依赖脱敏日志。
+
+## 修订（2026-10-07）
+
+### Discord 不抓取，只校验链接
+
+Discord 没有可用于解析 Author 形象的公开用户资料 API：唯一无需 OAuth/token 的公开资源是邀请 API，而它返回的是服务器（guild）而非作者用户，语义不符。因此 Discord 适配器**不做任何网络请求**：
+
+- 只校验链接是否为合法的公开 Discord 链接形状（`discord.gg/{code}`、`discord.com/invite/{code}`、`discord.com/users/{id}`），形状不合法时记脱敏 debug 日志。
+- 不产生 `platform_display_name`，不产生 avatar/background，因此 Discord slot 始终回退 Comic 封面。
+- Discord link 仍算 Creative platform（参与 Verified author 与 alias 的链接判定），只是不提供形象。
+
+这取代本文档上文「五个平台首版均提供真实平台适配器」中关于 Discord 的表述。
+
+### Patreon 只接受 Creator 资料 URL
+
+Patreon 适配器仅接受 Creator 资料页形状：`/c/{vanity}`、`/user?u={id}` 或历史 `/{vanity}`。`/posts/{id}` 等非资料页判定为 Unsupported，保留原 link，不写入显示名或图片缓存。
+
+### AuthorImageRef 携带平台图片 URL
+
+`AuthorImageRef` 增加 `avatar_image_url` 与 `background_image_url`。前端以该 URL 作为「平台图片是否变化」的信号：link 未变但平台换了图时，URL 变化会触发重取并淡入替换；仅凭 `link_id` 无法感知这种变化。
 
 ## References
 

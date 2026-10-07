@@ -75,9 +75,11 @@ class _StubAuthorRepository implements AuthorRepository {
         avatarSource: AuthorImageSource.none,
         avatarComicId: null,
         avatarLinkId: null,
+        avatarImageUrl: null,
         backgroundSource: AuthorImageSource.none,
         backgroundComicId: null,
         backgroundLinkId: null,
+        backgroundImageUrl: null,
       ),
     );
   }

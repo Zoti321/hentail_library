@@ -40,22 +40,27 @@ final authorImageProvider = FutureProvider.autoDispose
       AuthorImageRequest request,
     ) async {
       final AuthorRepository repo = ref.read(authorRepoProvider);
-      final ({String? comicId, int? linkId})? imageRef = await ref.watch(
-        authorDetailProvider(request.authorId).selectAsync(
-          (AuthorDetail? detail) => detail == null
-              ? null
-              : switch (request.slot) {
-                  AuthorImageSlot.avatar => (
-                    comicId: detail.image.avatarComicId,
-                    linkId: detail.image.avatarLinkId,
-                  ),
-                  AuthorImageSlot.background => (
-                    comicId: detail.image.backgroundComicId,
-                    linkId: detail.image.backgroundLinkId,
-                  ),
-                },
-        ),
-      );
+      // 选择集里带上平台图片 URL：URL 变化（平台换了头像/横幅）时记录不相等，
+      // 从而触发本 provider 重取，实现"确认图片变化后才替换并淡入"。
+      final ({String? comicId, int? linkId, String? platformUrl})? imageRef =
+          await ref.watch(
+            authorDetailProvider(request.authorId).selectAsync(
+              (AuthorDetail? detail) => detail == null
+                  ? null
+                  : switch (request.slot) {
+                      AuthorImageSlot.avatar => (
+                        comicId: detail.image.avatarComicId,
+                        linkId: detail.image.avatarLinkId,
+                        platformUrl: detail.image.avatarImageUrl,
+                      ),
+                      AuthorImageSlot.background => (
+                        comicId: detail.image.backgroundComicId,
+                        linkId: detail.image.backgroundLinkId,
+                        platformUrl: detail.image.backgroundImageUrl,
+                      ),
+                    },
+            ),
+          );
       if (imageRef == null || !ref.mounted) {
         return null;
       }

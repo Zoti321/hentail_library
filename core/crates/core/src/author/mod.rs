@@ -109,9 +109,13 @@ pub struct AuthorImageRef {
     pub avatar_source: AuthorImageSource,
     pub avatar_comic_id: Option<String>,
     pub avatar_link_id: Option<i64>,
+    /// 平台头像的图片 URL；仅用于让前端感知平台缓存内容变化以触发重取。
+    pub avatar_image_url: Option<String>,
     pub background_source: AuthorImageSource,
     pub background_comic_id: Option<String>,
     pub background_link_id: Option<i64>,
+    /// 平台背景的图片 URL；语义同 [`AuthorImageRef::avatar_image_url`]。
+    pub background_image_url: Option<String>,
 }
 
 pub async fn list_all_authors() -> Result<Vec<AuthorIdentity>, HentaiError> {
@@ -662,6 +666,7 @@ pub async fn resolve_author_image(
             .then(|| fallback.clone())
             .flatten(),
         avatar_link_id: platform.avatar_link_id,
+        avatar_image_url: platform.avatar_image_url,
         background_source: if platform.background_link_id.is_some() {
             AuthorImageSource::PlatformCached
         } else if fallback.is_some() {
@@ -675,6 +680,7 @@ pub async fn resolve_author_image(
             .then(|| fallback.clone())
             .flatten(),
         background_link_id: platform.background_link_id,
+        background_image_url: platform.background_image_url,
     })
 }
 

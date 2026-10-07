@@ -56,9 +56,11 @@ typedef AuthorImageRef = ({
   AuthorImageSource avatarSource,
   String? avatarComicId,
   int? avatarLinkId,
+  String? avatarImageUrl,
   AuthorImageSource backgroundSource,
   String? backgroundComicId,
   int? backgroundLinkId,
+  String? backgroundImageUrl,
 });
 
 List<String> authorAliases({

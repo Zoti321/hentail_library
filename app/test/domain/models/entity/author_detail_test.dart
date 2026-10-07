@@ -77,4 +77,30 @@ void main() {
       );
     },
   );
+
+  test('author alias comparison and deduplication are case-sensitive', () {
+    final List<String> aliases = authorAliases(
+      authorName: 'Main',
+      links: <AuthorLink>[
+        (
+          id: 1,
+          platform: AuthorLinkPlatform.pixiv,
+          url: 'https://pixiv.net/users/1',
+          // 与 Author 名仅大小写不同：仍应作为 alias 保留。
+          platformDisplayName: 'MAIN',
+          sortKey: 0,
+        ),
+        (
+          id: 2,
+          platform: AuthorLinkPlatform.x,
+          url: 'https://x.com/name',
+          // 与上一条仅大小写不同：大小写敏感去重，两条都保留。
+          platformDisplayName: 'main',
+          sortKey: 0,
+        ),
+      ],
+    );
+
+    expect(aliases, <String>['MAIN', 'main']);
+  });
 }

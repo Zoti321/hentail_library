@@ -61,9 +61,11 @@ void main() {
       expect(image.avatarSource, AuthorImageSourceFrb.none);
       expect(image.avatarComicId, isNull);
       expect(image.avatarLinkId, isNull);
+      expect(image.avatarImageUrl, isNull);
       expect(image.backgroundSource, AuthorImageSourceFrb.none);
       expect(image.backgroundComicId, isNull);
       expect(image.backgroundLinkId, isNull);
+      expect(image.backgroundImageUrl, isNull);
     },
   );
 

@@ -131,9 +131,11 @@ pub struct AuthorImageRefFrbDto {
     pub avatar_source: AuthorImageSourceFrb,
     pub avatar_comic_id: Option<String>,
     pub avatar_link_id: Option<i64>,
+    pub avatar_image_url: Option<String>,
     pub background_source: AuthorImageSourceFrb,
     pub background_comic_id: Option<String>,
     pub background_link_id: Option<i64>,
+    pub background_image_url: Option<String>,
 }
 
 impl From<AuthorImageRef> for AuthorImageRefFrbDto {
@@ -142,9 +144,11 @@ impl From<AuthorImageRef> for AuthorImageRefFrbDto {
             avatar_source: value.avatar_source.into(),
             avatar_comic_id: value.avatar_comic_id,
             avatar_link_id: value.avatar_link_id,
+            avatar_image_url: value.avatar_image_url,
             background_source: value.background_source.into(),
             background_comic_id: value.background_comic_id,
             background_link_id: value.background_link_id,
+            background_image_url: value.background_image_url,
         }
     }
 }

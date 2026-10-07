@@ -38,7 +38,9 @@ pub(crate) fn author_refresh_lock(author_id: i64) -> Arc<tokio::sync::Mutex<()>>
 #[derive(Debug, Clone, Default)]
 pub struct CachedAuthorImages {
     pub avatar_link_id: Option<i64>,
+    pub avatar_image_url: Option<String>,
     pub background_link_id: Option<i64>,
+    pub background_image_url: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -92,8 +94,14 @@ async fn resolve_cached_author_image_on<C: ConnectionTrait>(
             };
             if cache.read_platform_image(&key).is_some() {
                 match slot {
-                    AuthorImageSlot::Avatar => result.avatar_link_id = Some(link.id),
-                    AuthorImageSlot::Background => result.background_link_id = Some(link.id),
+                    AuthorImageSlot::Avatar => {
+                        result.avatar_link_id = Some(link.id);
+                        result.avatar_image_url = cache_row.image_url.clone();
+                    }
+                    AuthorImageSlot::Background => {
+                        result.background_link_id = Some(link.id);
+                        result.background_image_url = cache_row.image_url.clone();
+                    }
                 }
                 break;
             }
@@ -687,6 +695,14 @@ mod tests {
 
         assert_eq!(selected.avatar_link_id, Some(3));
         assert_eq!(selected.background_link_id, Some(1));
+        assert_eq!(
+            selected.avatar_image_url.as_deref(),
+            Some("https://img/pixiv-avatar.png")
+        );
+        assert_eq!(
+            selected.background_image_url.as_deref(),
+            Some("https://img/x-bg.png")
+        );
         assert_eq!(ordered_ids, vec![3, 5, 2, 1, 6, 7, 8]);
     }
 
