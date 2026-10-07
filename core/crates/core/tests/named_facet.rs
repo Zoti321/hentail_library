@@ -6,8 +6,7 @@ use hentai_core::{
     add_named_facet_name, connection, count_all_named_facet_names, count_named_facet_attachments,
     create_local_library, delete_named_facet_by_names, fetch_named_facet_page, init_db_at_path,
     list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
-    merge_named_facet_name, rename_named_facet_name, replace_comic_named_facet,
-    JunctionNamedFacet,
+    merge_named_facet_name, rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -400,12 +399,16 @@ fn merge_named_facet_moves_and_deduplicates_attachments() {
                 vec!["Target".to_string()]
             );
 
-            assert!(merge_named_facet_name(JunctionNamedFacet::Tag, "Missing", "Target")
-                .await
-                .is_err());
-            assert!(merge_named_facet_name(JunctionNamedFacet::Tag, "Target", "Target")
-                .await
-                .is_err());
+            assert!(
+                merge_named_facet_name(JunctionNamedFacet::Tag, "Missing", "Target")
+                    .await
+                    .is_err()
+            );
+            assert!(
+                merge_named_facet_name(JunctionNamedFacet::Tag, "Target", "Target")
+                    .await
+                    .is_err()
+            );
         });
     });
 }
