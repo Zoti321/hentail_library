@@ -10,7 +10,7 @@ import 'package:hentai_library/ui/core/widgets/element/image/card_letterboxed_co
 import 'package:hentai_library/ui/features/library/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/author_image_view.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart' show Ref;
+import 'package:hooks_riverpod/hooks_riverpod.dart' show ProviderScope, Ref;
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/fakes/comic_cover_test_fakes.dart';
@@ -81,6 +81,28 @@ void main() {
 
     expect(find.byType(CardLetterboxedCoverImage), findsOneWidget);
     expect(find.byKey(AuthorImageView.hdImageKey), findsNothing);
+  });
+
+  testWidgets('keeps the previous platform image when refresh fails', (
+    WidgetTester tester,
+  ) async {
+    int loads = 0;
+    await _pump(tester, () async {
+      loads += 1;
+      if (loads == 1) return _png;
+      throw StateError('refresh failed');
+    });
+    expect(find.byKey(AuthorImageView.hdImageKey), findsOneWidget);
+
+    final BuildContext context = tester.element(find.byType(AuthorImageView));
+    ProviderScope.containerOf(
+      context,
+    ).invalidate(authorImageProvider(_request));
+    await tester.pump();
+    await tester.pump();
+
+    expect(loads, 2);
+    expect(find.byKey(AuthorImageView.hdImageKey), findsOneWidget);
   });
 
   testWidgets('stays on thumbnail when no hd image exists', (

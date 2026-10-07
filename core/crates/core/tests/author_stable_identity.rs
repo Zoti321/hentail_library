@@ -2,6 +2,7 @@
 
 mod common;
 
+use hentai_core::image_cache::{ImageCache, PlatformImageKey};
 use hentai_core::{
     add_author, add_author_link, connection, create_local_library, delete_author_link,
     delete_authors_by_names, fetch_comics_page, get_author_detail, init_db_at_path,
@@ -263,9 +264,14 @@ fn detail_aggregation_excludes_trash_and_healthy_hidden() {
                 .expect("other");
             let still = get_author_detail(id, true).await.expect("d").expect("f");
             assert!(!still.identity.verified);
-            add_author_link(id, AuthorLinkPlatform::X, "https://x.com/a", None)
-                .await
-                .expect("x");
+            add_author_link(
+                id,
+                AuthorLinkPlatform::X,
+                "https://x.com/a/status/unsupported",
+                None,
+            )
+            .await
+            .expect("x");
             let verified = get_author_detail(id, true).await.expect("d").expect("f");
             assert!(verified.identity.verified);
 
@@ -291,7 +297,7 @@ fn author_link_crud_validates_url() {
             let link = add_author_link(
                 created.id,
                 AuthorLinkPlatform::Patreon,
-                "https://patreon.com/x",
+                "https://patreon.com",
                 Some(" display ".to_string()),
             )
             .await
@@ -327,6 +333,230 @@ fn author_link_crud_validates_url() {
                     .len(),
                 1
             );
+        });
+    });
+}
+
+#[test]
+fn expired_platform_image_remains_available_until_refresh_succeeds() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let author = add_author("Cached").await.expect("author");
+            let db = connection().expect("connection");
+            let link_id = db
+                .execute(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "INSERT INTO author_links (author_id, platform, url, sort_key, version) \
+                     VALUES (?, 'pixiv', 'https://www.pixiv.net/users/42', 0, 1)",
+                    [author.id.into()],
+                ))
+                .await
+                .expect("link")
+                .last_insert_id() as i64;
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "INSERT INTO author_image_cache \
+                 (author_link_id, slot, profile_url, image_url, checked_at, fetched_at, cache_key, link_version) \
+                 VALUES (?, 'avatar', 'https://www.pixiv.net/users/42', 'https://img.example/avatar.png', 1, 1, 'cached', 1)",
+                [link_id.into()],
+            ))
+            .await
+            .expect("cache row");
+            ImageCache::app()
+                .expect("cache")
+                .write_platform_image(
+                    &PlatformImageKey {
+                        author_link_id: link_id,
+                        slot: "avatar",
+                    },
+                    b"previous image",
+                )
+                .expect("cache file");
+
+            let image = resolve_author_image(author.id, false).await.expect("image");
+            assert_eq!(image.avatar_source, AuthorImageSource::PlatformCached);
+            assert_eq!(image.avatar_link_id, Some(link_id));
+        });
+    });
+}
+
+#[test]
+fn deleting_author_link_removes_cache_rows_and_files() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let author = add_author("DeleteCached").await.expect("author");
+            let db = connection().expect("connection");
+            let link_id = db
+                .execute(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "INSERT INTO author_links (author_id, platform, url, sort_key, version) \
+                     VALUES (?, 'pixiv', 'https://www.pixiv.net/users/42', 0, 1)",
+                    [author.id.into()],
+                ))
+                .await
+                .expect("link")
+                .last_insert_id() as i64;
+            let cache = ImageCache::app().expect("cache");
+            for slot in ["avatar", "background"] {
+                db.execute(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "INSERT INTO author_image_cache \
+                     (author_link_id, slot, profile_url, image_url, checked_at, fetched_at, cache_key, link_version) \
+                     VALUES (?, ?, 'https://www.pixiv.net/users/42', 'https://img.example/image.png', 1, 1, 'cached', 1)",
+                    [link_id.into(), slot.into()],
+                ))
+                .await
+                .expect("cache row");
+                cache
+                    .write_platform_image(
+                        &PlatformImageKey {
+                            author_link_id: link_id,
+                            slot,
+                        },
+                        b"cached image",
+                    )
+                    .expect("cache file");
+            }
+
+            delete_author_link(author.id, link_id).await.expect("delete");
+
+            let row_count = db
+                .query_one(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "SELECT COUNT(*) FROM author_image_cache WHERE author_link_id = ?",
+                    [link_id.into()],
+                ))
+                .await
+                .expect("count")
+                .expect("row")
+                .try_get_by_index::<i64>(0)
+                .expect("value");
+            assert_eq!(row_count, 0);
+            for slot in ["avatar", "background"] {
+                assert!(cache
+                    .read_platform_image(&PlatformImageKey {
+                        author_link_id: link_id,
+                        slot,
+                    })
+                    .is_none());
+            }
+        });
+    });
+}
+
+#[test]
+fn link_update_invalidates_both_slots_while_author_rename_keeps_cache() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let author = add_author("RenameCached").await.expect("author");
+            let db = connection().expect("connection");
+            let link_id = db
+                .execute(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "INSERT INTO author_links (author_id, platform, url, sort_key, version) \
+                     VALUES (?, 'pixiv', 'https://www.pixiv.net/users/42', 0, 1)",
+                    [author.id.into()],
+                ))
+                .await
+                .expect("link")
+                .last_insert_id() as i64;
+            let cache = ImageCache::app().expect("cache");
+            for slot in ["avatar", "background"] {
+                db.execute(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "INSERT INTO author_image_cache \
+                     (author_link_id, slot, profile_url, image_url, checked_at, fetched_at, cache_key, link_version) \
+                     VALUES (?, ?, 'https://www.pixiv.net/users/42', 'https://img.example/image.png', 1, 1, 'cached', 1)",
+                    [link_id.into(), slot.into()],
+                ))
+                .await
+                .expect("cache row");
+                cache
+                    .write_platform_image(
+                        &PlatformImageKey {
+                            author_link_id: link_id,
+                            slot,
+                        },
+                        b"cached image",
+                    )
+                    .expect("cache file");
+            }
+
+            rename_author("RenameCached", "Renamed").await.expect("rename");
+            let rows_after_rename = db
+                .query_one(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "SELECT COUNT(*) FROM author_image_cache WHERE author_link_id = ?",
+                    [link_id.into()],
+                ))
+                .await
+                .expect("count")
+                .expect("row")
+                .try_get_by_index::<i64>(0)
+                .expect("value");
+            assert_eq!(rows_after_rename, 2);
+            assert!(cache
+                .read_platform_image(&PlatformImageKey {
+                    author_link_id: link_id,
+                    slot: "avatar",
+                })
+                .is_some());
+
+            update_author_link(
+                link_id,
+                AuthorLinkPlatform::Other,
+                "https://example.com/changed",
+                None,
+            )
+            .await
+            .expect("update");
+
+            let row = db
+                .query_one(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "SELECT version, url FROM author_links WHERE id = ?",
+                    [link_id.into()],
+                ))
+                .await
+                .expect("link query")
+                .expect("link row");
+            assert_eq!(row.try_get_by_index::<i64>(0).expect("version"), 2);
+            assert_eq!(
+                row.try_get_by_index::<String>(1).expect("url"),
+                "https://example.com/changed"
+            );
+            let rows_after_update = db
+                .query_one(Statement::from_sql_and_values(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "SELECT COUNT(*) FROM author_image_cache WHERE author_link_id = ?",
+                    [link_id.into()],
+                ))
+                .await
+                .expect("count")
+                .expect("row")
+                .try_get_by_index::<i64>(0)
+                .expect("value");
+            assert_eq!(rows_after_update, 0);
+            for slot in ["avatar", "background"] {
+                assert!(cache
+                    .read_platform_image(&PlatformImageKey {
+                        author_link_id: link_id,
+                        slot,
+                    })
+                    .is_none());
+            }
         });
     });
 }

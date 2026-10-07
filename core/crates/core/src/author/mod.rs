@@ -8,7 +8,7 @@ use std::collections::HashSet;
 
 use sea_orm::{
     ColumnTrait, ConnectionTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder,
-    QuerySelect, Set, Statement, Value,
+    QuerySelect, Set, Statement, TransactionTrait, Value,
 };
 
 use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
@@ -415,7 +415,14 @@ pub async fn update_author_link(
     let url_changed = existing.url != url || existing.platform != platform.as_str();
     let refresh_lock = platform_images::author_refresh_lock(existing.author_id);
     let refresh_guard = refresh_lock.lock().await;
-    let result = db
+    // 解析缓存句柄失败不应阻止 DB 提交；文件失效在提交后按尽力而为处理。
+    let cache = if url_changed {
+        crate::image_cache::ImageCache::app().ok()
+    } else {
+        None
+    };
+    let transaction = db.begin().await.map_err(map_db_err)?;
+    let result = transaction
         .execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             "UPDATE author_links SET platform = ?, url = ?, platform_display_name = ?, \
@@ -438,15 +445,23 @@ pub async fn update_author_link(
         return Err(HentaiError::validation("Author link 不存在"));
     }
     if url_changed {
-        db.execute(Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::Sqlite,
-            "DELETE FROM author_image_cache WHERE author_link_id = ?",
-            [Value::from(link_id)],
-        ))
-        .await
-        .map_err(map_db_err)?;
-        if let Ok(cache) = crate::image_cache::ImageCache::app() {
-            let _ = cache.invalidate_platform_link(link_id);
+        transaction
+            .execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "DELETE FROM author_image_cache WHERE author_link_id = ?",
+                [Value::from(link_id)],
+            ))
+            .await
+            .map_err(map_db_err)?;
+    }
+    transaction.commit().await.map_err(map_db_err)?;
+    if let Some(cache) = cache {
+        if let Err(error) = cache.invalidate_platform_link(link_id) {
+            tracing::debug!(
+                link_id,
+                error = %error,
+                "author platform image file invalidation failed"
+            );
         }
     }
     drop(refresh_guard);
@@ -458,17 +473,35 @@ pub async fn delete_author_link(author_id: i64, link_id: i64) -> Result<(), Hent
     let refresh_lock = platform_images::author_refresh_lock(author_id);
     let refresh_guard = refresh_lock.lock().await;
     let db = connection()?;
+    // 解析缓存句柄失败不应阻止 DB 提交；文件失效在提交后按尽力而为处理。
+    let cache = crate::image_cache::ImageCache::app().ok();
+    let transaction = db.begin().await.map_err(map_db_err)?;
+    transaction
+        .execute(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            "DELETE FROM author_image_cache WHERE author_link_id = ?",
+            [Value::from(link_id)],
+        ))
+        .await
+        .map_err(map_db_err)?;
     let result = AuthorLinks::delete_many()
         .filter(author_links::Column::Id.eq(link_id))
         .filter(author_links::Column::AuthorId.eq(author_id))
-        .exec(&db)
+        .exec(&transaction)
         .await
         .map_err(map_db_err)?;
     if result.rows_affected == 0 {
         return Err(HentaiError::validation("Author link 不存在"));
     }
-    if let Ok(cache) = crate::image_cache::ImageCache::app() {
-        let _ = cache.invalidate_platform_link(link_id);
+    transaction.commit().await.map_err(map_db_err)?;
+    if let Some(cache) = cache {
+        if let Err(error) = cache.invalidate_platform_link(link_id) {
+            tracing::debug!(
+                link_id,
+                error = %error,
+                "author platform image file invalidation failed"
+            );
+        }
     }
     drop(refresh_guard);
     Ok(())

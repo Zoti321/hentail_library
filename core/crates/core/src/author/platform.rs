@@ -143,6 +143,11 @@ pub async fn download_platform_image(
             IMAGE_MAX_BYTES,
         )
         .await?;
+    if response.bytes.len() > IMAGE_MAX_BYTES {
+        return Err(HentaiError::validation(
+            "platform image response is too large",
+        ));
+    }
     let content_type = response
         .content_type
         .unwrap_or_default()
@@ -476,6 +481,23 @@ fn map_network_error(error: impl std::fmt::Display) -> HentaiError {
 mod tests {
     use super::*;
 
+    #[derive(Debug)]
+    struct FixtureTransport {
+        response: FetchResponse,
+    }
+
+    #[async_trait]
+    impl HttpTransport for FixtureTransport {
+        async fn get(
+            &self,
+            _url: &Url,
+            _headers: HeaderMap,
+            _max_bytes: usize,
+        ) -> Result<FetchResponse, HentaiError> {
+            Ok(self.response.clone())
+        }
+    }
+
     #[test]
     fn profile_url_shapes_are_explicit() {
         assert!(profile_request(
@@ -544,5 +566,50 @@ mod tests {
         assert!(!is_public_ip("10.0.0.1".parse().unwrap()));
         assert!(!is_public_ip("::1".parse().unwrap()));
         assert!(is_public_ip("1.1.1.1".parse().unwrap()));
+    }
+
+    #[tokio::test]
+    async fn downloader_rejects_unsafe_urls_content_and_size() {
+        assert!(
+            validate_remote_url(&Url::parse("ftp://example.com/image.png").unwrap())
+                .await
+                .is_err()
+        );
+        assert!(validate_remote_url(
+            &Url::parse("https://user:pass@example.com/image.png").unwrap()
+        )
+        .await
+        .is_err());
+        assert!(
+            validate_remote_url(&Url::parse("https://localhost/image.png").unwrap())
+                .await
+                .is_err()
+        );
+
+        let not_image = FixtureTransport {
+            response: FetchResponse {
+                final_url: Url::parse("https://cdn.example/image.png").unwrap(),
+                content_type: Some("text/html".to_string()),
+                bytes: b"not an image".to_vec(),
+            },
+        };
+        assert!(
+            download_platform_image(&not_image, "https://cdn.example/image.png")
+                .await
+                .is_err()
+        );
+
+        let oversized = FixtureTransport {
+            response: FetchResponse {
+                final_url: Url::parse("https://cdn.example/image.png").unwrap(),
+                content_type: Some("image/png".to_string()),
+                bytes: vec![0; IMAGE_MAX_BYTES + 1],
+            },
+        };
+        assert!(
+            download_platform_image(&oversized, "https://cdn.example/image.png")
+                .await
+                .is_err()
+        );
     }
 }
