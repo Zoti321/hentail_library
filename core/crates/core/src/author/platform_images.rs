@@ -21,6 +21,12 @@ fn refresh_locks() -> &'static Mutex<HashMap<i64, Arc<tokio::sync::Mutex<()>>>> 
     LOCKS.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
+/// 每个 Author 一把刷新锁：串行化平台形象刷新与 link 的增改删。
+///
+/// 该锁是「刷新期间 link 的 url/version 不会变化」的唯一保证。有了它，
+/// [`refresh_author_images_with`] 在 `link_is_current` 校验与缓存文件写入之间的
+/// 竞态窗口不可达；否则可能留下无 DB 行引用的孤儿缓存文件，甚至旧内容覆盖新内容。
+/// 不要绕过此锁直接调用刷新路径，也不要让 link 的增改删跳过此锁。
 pub(crate) fn author_refresh_lock(author_id: i64) -> Arc<tokio::sync::Mutex<()>> {
     let mut locks = refresh_locks().lock().expect("author refresh locks");
     locks
@@ -207,6 +213,8 @@ async fn refresh_author_images_with<C: ConnectionTrait>(
                 continue;
             }
             cache.write_platform_image(&key, &bytes)?;
+            // upsert_cache_row 内部会再次校验 link。两次校验之间的窗口由
+            // author_refresh_lock 串行化保证不可达（见 author_refresh_lock 注释）。
             upsert_cache_row(db, &link, slot, Some(&image_url), now).await?;
         }
     }
