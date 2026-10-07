@@ -122,6 +122,13 @@ pub async fn fetch_platform_profile(
 ) -> Result<Option<PlatformProfile>, HentaiError> {
     let profile_url =
         Url::parse(profile_url).map_err(|error| HentaiError::validation(error.to_string()))?;
+    if platform == AuthorLinkPlatform::Discord {
+        // Discord 无公开用户资料 API：只校验链接形状，不抓取头像/横幅。
+        if !discord_link_shape_supported(&profile_url) {
+            tracing::debug!("discord author link is not a supported public link");
+        }
+        return Ok(None);
+    }
     let Some(request) = profile_request(platform, &profile_url)? else {
         return Ok(None);
     };
@@ -173,7 +180,6 @@ impl ProfileRequest {
             Parser::X => parse_x(&response.bytes),
             Parser::Patreon => parse_open_graph(&response.bytes, &response.final_url),
             Parser::Fanbox => parse_fanbox(&response.bytes),
-            Parser::Discord => parse_discord(&response.bytes),
         }
     }
 }
@@ -184,7 +190,6 @@ enum Parser {
     X,
     Patreon,
     Fanbox,
-    Discord,
 }
 
 fn profile_request(
@@ -235,7 +240,9 @@ fn profile_request(
             }
         }
         AuthorLinkPlatform::Patreon => {
-            if !domain_matches(&host, "patreon.com") || segments.is_empty() {
+            if !domain_matches(&host, "patreon.com")
+                || !patreon_creator_path(profile_url, &segments)
+            {
                 return Ok(None);
             }
             ProfileRequest {
@@ -267,26 +274,76 @@ fn profile_request(
             }
         }
         AuthorLinkPlatform::Discord => {
-            if !(domain_matches(&host, "discord.gg") || domain_matches(&host, "discord.com")) {
-                return Ok(None);
-            }
-            let code = match segments.as_slice() {
-                [code] if host.ends_with("discord.gg") => *code,
-                ["invite", code, ..] => *code,
-                _ => return Ok(None),
-            };
-            ProfileRequest {
-                url: Url::parse(&format!(
-                    "https://discord.com/api/v10/invites/{code}?with_counts=true&with_expiration=true"
-                ))
-                .expect("static Discord URL"),
-                headers: default_headers("application/json"),
-                parser: Parser::Discord,
-            }
+            // Discord 无公开用户资料 API：仅校验链接形状，不抓取头像/横幅。
+            return Ok(None);
         }
         AuthorLinkPlatform::Other => return Ok(None),
     };
     Ok(Some(request))
+}
+
+/// Patreon 仅支持 Creator 资料页：`/c/{vanity}`、`/user?u={id}` 或历史 `/{vanity}`。
+/// `/posts/...`、`/c`（缺 slug）等非资料页视为 Unsupported。
+fn patreon_creator_path(url: &Url, segments: &[&str]) -> bool {
+    const RESERVED: &[&str] = &[
+        "posts",
+        "post",
+        "c",
+        "user",
+        "join",
+        "login",
+        "signup",
+        "home",
+        "explore",
+        "search",
+        "settings",
+        "api",
+        "about",
+        "careers",
+        "policy",
+        "legal",
+        "support",
+        "help",
+        "create",
+        "stream",
+        "downloads",
+        "gift",
+        "checkout",
+        "billing",
+        "membership",
+    ];
+    match segments {
+        ["c", _] => true,
+        ["user"] => url
+            .query_pairs()
+            .any(|(key, value)| key == "u" && !value.is_empty()),
+        [vanity] => !RESERVED.contains(vanity),
+        _ => false,
+    }
+}
+
+/// Discord 首版只校验链接是否为合法的公开 Discord 链接（邀请页或用户页），不解析资料。
+fn discord_link_shape_supported(profile_url: &Url) -> bool {
+    let host = profile_url
+        .host_str()
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+    if !(domain_matches(&host, "discord.gg")
+        || domain_matches(&host, "discord.com")
+        || domain_matches(&host, "discordapp.com"))
+    {
+        return false;
+    }
+    let segments: Vec<&str> = profile_url
+        .path_segments()
+        .map(|parts| parts.filter(|part| !part.is_empty()).collect())
+        .unwrap_or_default();
+    match segments.as_slice() {
+        [_code] => host == "discord.gg",
+        ["invite", _code] => true,
+        ["users", id] => !id.is_empty() && id.chars().all(|c| c.is_ascii_digit()),
+        _ => false,
+    }
 }
 
 fn parse_pixiv(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
@@ -322,30 +379,6 @@ fn parse_fanbox(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
             .or_else(|| string_at(body, &["creatorId"])),
         avatar_url: string_at(body, &["user", "iconUrl"]),
         background_url: string_at(body, &["coverImageUrl"]),
-    })
-}
-
-fn parse_discord(bytes: &[u8]) -> Result<PlatformProfile, HentaiError> {
-    let json: Value = serde_json::from_slice(bytes).map_err(parse_error)?;
-    let guild = &json["guild"];
-    let guild_id = string_at(guild, &["id"]);
-    let avatar_url = guild_id.as_deref().and_then(|id| {
-        string_at(guild, &["icon"])
-            .map(|hash| format!("https://cdn.discordapp.com/icons/{id}/{hash}.png?size=2048"))
-    });
-    let background_url = guild_id.as_deref().and_then(|id| {
-        string_at(guild, &["banner"])
-            .map(|hash| format!("https://cdn.discordapp.com/banners/{id}/{hash}.png?size=2048"))
-            .or_else(|| {
-                string_at(guild, &["splash"]).map(|hash| {
-                    format!("https://cdn.discordapp.com/splashes/{id}/{hash}.png?size=2048")
-                })
-            })
-    });
-    Ok(PlatformProfile {
-        display_name: string_at(guild, &["name"]),
-        avatar_url,
-        background_url,
     })
 }
 
@@ -479,11 +512,35 @@ fn map_network_error(error: impl std::fmt::Display) -> HentaiError {
 
 #[cfg(test)]
 mod tests {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
     use super::*;
 
     #[derive(Debug)]
     struct FixtureTransport {
         response: FetchResponse,
+        calls: AtomicUsize,
+    }
+
+    impl FixtureTransport {
+        fn new(response: FetchResponse) -> Self {
+            Self {
+                response,
+                calls: AtomicUsize::new(0),
+            }
+        }
+
+        fn calls(&self) -> usize {
+            self.calls.load(Ordering::SeqCst)
+        }
+    }
+
+    fn fixture_response(url: &str, content_type: &str, bytes: Vec<u8>) -> FetchResponse {
+        FetchResponse {
+            final_url: Url::parse(url).unwrap(),
+            content_type: Some(content_type.to_string()),
+            bytes,
+        }
     }
 
     #[async_trait]
@@ -494,30 +551,170 @@ mod tests {
             _headers: HeaderMap,
             _max_bytes: usize,
         ) -> Result<FetchResponse, HentaiError> {
+            self.calls.fetch_add(1, Ordering::SeqCst);
             Ok(self.response.clone())
         }
     }
 
+    fn request_ok(platform: AuthorLinkPlatform, url: &str) -> bool {
+        profile_request(platform, &Url::parse(url).unwrap())
+            .unwrap()
+            .is_some()
+    }
+
     #[test]
-    fn profile_url_shapes_are_explicit() {
-        assert!(profile_request(
+    fn pixiv_profile_url_shapes_are_explicit() {
+        assert!(request_ok(
             AuthorLinkPlatform::Pixiv,
-            &Url::parse("https://www.pixiv.net/users/42").unwrap()
-        )
-        .unwrap()
-        .is_some());
-        assert!(profile_request(
+            "https://www.pixiv.net/users/42"
+        ));
+        assert!(request_ok(
             AuthorLinkPlatform::Pixiv,
-            &Url::parse("https://www.pixiv.net/artworks/42").unwrap()
+            "https://pixiv.net/users/42"
+        ));
+        // 作品页 / 首页 / 非资料页 => Unsupported，原 link 保留。
+        assert!(!request_ok(
+            AuthorLinkPlatform::Pixiv,
+            "https://www.pixiv.net/artworks/42"
+        ));
+        assert!(!request_ok(
+            AuthorLinkPlatform::Pixiv,
+            "https://www.pixiv.net/"
+        ));
+        assert!(!request_ok(
+            AuthorLinkPlatform::Pixiv,
+            "https://www.pixiv.net/en/users/42"
+        ));
+        // 非 pixiv 主机不被误判。
+        assert!(!request_ok(
+            AuthorLinkPlatform::Pixiv,
+            "https://example.com/users/42"
+        ));
+    }
+
+    #[test]
+    fn x_profile_url_shapes_are_explicit() {
+        assert!(request_ok(AuthorLinkPlatform::X, "https://x.com/handle"));
+        assert!(request_ok(
+            AuthorLinkPlatform::X,
+            "https://www.twitter.com/handle"
+        ));
+        // 帖子页 / 多段路径 => Unsupported。
+        assert!(!request_ok(
+            AuthorLinkPlatform::X,
+            "https://x.com/handle/status/42"
+        ));
+        assert!(!request_ok(AuthorLinkPlatform::X, "https://x.com/"));
+        // 超长或非法 handle => Unsupported。
+        assert!(!request_ok(
+            AuthorLinkPlatform::X,
+            "https://x.com/this_handle_is_far_too_long"
+        ));
+    }
+
+    #[test]
+    fn patreon_only_creator_profiles_are_supported() {
+        assert!(request_ok(
+            AuthorLinkPlatform::Patreon,
+            "https://www.patreon.com/c/creator"
+        ));
+        assert!(request_ok(
+            AuthorLinkPlatform::Patreon,
+            "https://www.patreon.com/creator"
+        ));
+        assert!(request_ok(
+            AuthorLinkPlatform::Patreon,
+            "https://www.patreon.com/user?u=42"
+        ));
+        // 帖子页 / 缺 slug / 缺 u 参数 / 首页 => Unsupported。
+        assert!(!request_ok(
+            AuthorLinkPlatform::Patreon,
+            "https://www.patreon.com/posts/42"
+        ));
+        assert!(!request_ok(
+            AuthorLinkPlatform::Patreon,
+            "https://www.patreon.com/c"
+        ));
+        assert!(!request_ok(
+            AuthorLinkPlatform::Patreon,
+            "https://www.patreon.com/user"
+        ));
+        assert!(!request_ok(
+            AuthorLinkPlatform::Patreon,
+            "https://patreon.com/"
+        ));
+    }
+
+    #[test]
+    fn fanbox_and_pixiv_profiles_are_not_confused() {
+        assert!(request_ok(
+            AuthorLinkPlatform::Fanbox,
+            "https://maker.fanbox.cc/"
+        ));
+        assert!(request_ok(
+            AuthorLinkPlatform::Fanbox,
+            "https://www.pixiv.net/fanbox/creator/42"
+        ));
+        // 普通 Pixiv profile 不是 FANBOX。
+        assert!(!request_ok(
+            AuthorLinkPlatform::Fanbox,
+            "https://www.pixiv.net/users/42"
+        ));
+        assert!(!request_ok(
+            AuthorLinkPlatform::Fanbox,
+            "https://www.fanbox.cc/"
+        ));
+        assert!(!request_ok(
+            AuthorLinkPlatform::Fanbox,
+            "https://example.com/"
+        ));
+    }
+
+    #[test]
+    fn discord_links_are_validated_but_never_fetched() {
+        // Discord 无公开用户资料 API：合法链接形状仅用于校验，不产生解析请求。
+        assert!(discord_link_shape_supported(
+            &Url::parse("https://discord.gg/example").unwrap()
+        ));
+        assert!(discord_link_shape_supported(
+            &Url::parse("https://discord.com/invite/example").unwrap()
+        ));
+        assert!(discord_link_shape_supported(
+            &Url::parse("https://discord.com/users/42").unwrap()
+        ));
+        // 频道页 / 根路径 / 非 Discord 主机 => 不是合法公开链接。
+        assert!(!discord_link_shape_supported(
+            &Url::parse("https://discord.com/channels/1/2").unwrap()
+        ));
+        assert!(!discord_link_shape_supported(
+            &Url::parse("https://discord.com/").unwrap()
+        ));
+        assert!(!discord_link_shape_supported(
+            &Url::parse("https://example.com/example").unwrap()
+        ));
+        // profile_request 对 Discord 一律返回 None。
+        assert!(!request_ok(
+            AuthorLinkPlatform::Discord,
+            "https://discord.gg/example"
+        ));
+    }
+
+    #[tokio::test]
+    async fn discord_profile_fetch_skips_network_entirely() {
+        let transport = FixtureTransport::new(fixture_response(
+            "https://cdn.example/x.png",
+            "image/png",
+            Vec::new(),
+        ));
+        assert!(fetch_platform_profile(
+            &transport,
+            AuthorLinkPlatform::Discord,
+            "https://discord.gg/example"
         )
+        .await
         .unwrap()
         .is_none());
-        assert!(profile_request(
-            AuthorLinkPlatform::Discord,
-            &Url::parse("https://discord.gg/example").unwrap()
-        )
-        .unwrap()
-        .is_some());
+        assert_eq!(transport.calls(), 0);
     }
 
     #[test]
@@ -541,12 +738,6 @@ mod tests {
         )
         .unwrap();
         assert_eq!(fanbox.display_name.as_deref(), Some("Maker"));
-
-        let discord =
-            parse_discord(br#"{"guild":{"id":"1","name":"Guild","icon":"abc","banner":"def"}}"#)
-                .unwrap();
-        assert_eq!(discord.display_name.as_deref(), Some("Guild"));
-        assert!(discord.avatar_url.unwrap().contains("/icons/1/abc"));
 
         let patreon = parse_open_graph(
             br#"<html><head><meta property="og:title" content="Creator"><meta property="og:image" content="/image.jpg"></head></html>"#,
@@ -586,26 +777,22 @@ mod tests {
                 .is_err()
         );
 
-        let not_image = FixtureTransport {
-            response: FetchResponse {
-                final_url: Url::parse("https://cdn.example/image.png").unwrap(),
-                content_type: Some("text/html".to_string()),
-                bytes: b"not an image".to_vec(),
-            },
-        };
+        let not_image = FixtureTransport::new(fixture_response(
+            "https://cdn.example/image.png",
+            "text/html",
+            b"not an image".to_vec(),
+        ));
         assert!(
             download_platform_image(&not_image, "https://cdn.example/image.png")
                 .await
                 .is_err()
         );
 
-        let oversized = FixtureTransport {
-            response: FetchResponse {
-                final_url: Url::parse("https://cdn.example/image.png").unwrap(),
-                content_type: Some("image/png".to_string()),
-                bytes: vec![0; IMAGE_MAX_BYTES + 1],
-            },
-        };
+        let oversized = FixtureTransport::new(fixture_response(
+            "https://cdn.example/image.png",
+            "image/png",
+            vec![0; IMAGE_MAX_BYTES + 1],
+        ));
         assert!(
             download_platform_image(&oversized, "https://cdn.example/image.png")
                 .await
