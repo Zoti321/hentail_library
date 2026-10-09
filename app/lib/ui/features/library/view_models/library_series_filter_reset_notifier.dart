@@ -1,12 +1,11 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_prefer_library_root_series.dart';
 import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_prefer_library_root_series_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_sort_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_series_filter_reset_notifier.g.dart';
@@ -19,18 +18,17 @@ class LibrarySeriesFilterResetNotifier
 
   Future<void> resetAll() async {
     await ref
-        .read(libraryAgeRestrictionFilterProvider.notifier)
-        .setFilter(
-          LibraryDisplayTarget.series,
-          LibraryAgeRestrictionFilter.unrestricted,
-        );
+        .read(librarySeriesAgeRestrictionFilterProvider.notifier)
+        .setFilter(LibraryAgeRestrictionFilter.unrestricted);
     await ref
         .read(librarySerializationStatusFilterProvider.notifier)
         .setFilter(LibrarySerializationStatusFilter.unrestricted);
     await ref
         .read(libraryPreferLibraryRootSeriesProvider.notifier)
         .setEnabled(LibraryPreferLibraryRootSeries.defaultValue);
-    await ref.read(libraryTabSortProvider.notifier).resetSeriesSortToDefault();
+    await ref
+        .read(librarySeriesSortProvider.notifier)
+        .resetSeriesSortToDefault();
     ref.invalidate(librarySeriesCatalogControllerProvider);
   }
 }

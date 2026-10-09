@@ -3,7 +3,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_comics_filter_reset_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
@@ -94,7 +94,7 @@ class LibraryPageFacadeNotifier extends _$LibraryPageFacadeNotifier {
     }
     switch (state.displayTarget) {
       case LibraryDisplayTarget.comics:
-        await ref.read(libraryComicsFilterResetProvider.notifier).resetAll();
+        await ref.read(libraryComicFiltersProvider.notifier).resetAll();
       case LibraryDisplayTarget.series:
         await ref.read(librarySeriesFilterResetProvider.notifier).resetAll();
     }

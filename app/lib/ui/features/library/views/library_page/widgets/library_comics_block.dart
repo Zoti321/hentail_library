@@ -47,10 +47,17 @@ class LibraryComicsBlock extends ConsumerWidget {
     final bool isComicTableEmpty = catalog.isComicTableEmpty;
     final bool showPagination = catalog.showPagination;
     final LibraryComicSortOption sortOption = ref.watch(
-      libraryComicsTabSortOptionProvider,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.sortOption ?? kLibraryDefaultSortOption,
+      ),
     );
     final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
-      libraryComicsTabAgeRestrictionFilterProvider,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.ageRestriction ??
+            LibraryAgeRestrictionFilter.unrestricted,
+      ),
     );
     final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
     final bool sortFlipEnabled = ref.watch(

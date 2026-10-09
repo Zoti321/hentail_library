@@ -3,8 +3,7 @@ import 'dart:typed_data';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/domain/repositories/author_repository.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
@@ -20,14 +19,14 @@ final authorDetailProvider = FutureProvider.autoDispose
           ref.invalidateSelf();
         }
       });
-      final LibraryTabAgeRestrictionSettings settings = await ref.watch(
-        libraryAgeRestrictionFilterProvider.future,
+      final LibraryComicFiltersState filters = await ref.watch(
+        libraryComicFiltersProvider.future,
       );
       return ref
           .read(authorRepoProvider)
           .getDetail(
             authorId: authorId,
-            showR18: settings.comics.comicShowR18(),
+            showR18: filters.ageRestriction.comicShowR18(),
           );
     });
 
@@ -76,13 +75,13 @@ final authorImageProvider = FutureProvider.autoDispose
           },
         );
       }
-      final LibraryTabAgeRestrictionSettings settings = await ref.watch(
-        libraryAgeRestrictionFilterProvider.future,
+      final LibraryComicFiltersState filters = await ref.watch(
+        libraryComicFiltersProvider.future,
       );
       return repo.loadImage(
         authorId: request.authorId,
         slot: request.slot,
-        showR18: settings.comics.comicShowR18(),
+        showR18: filters.ageRestriction.comicShowR18(),
       );
     });
 

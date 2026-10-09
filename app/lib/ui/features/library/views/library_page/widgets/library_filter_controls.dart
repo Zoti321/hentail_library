@@ -8,11 +8,10 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_needs_metadata_only_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_accordion.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
@@ -86,11 +85,19 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                         label: l10n.libraryAgeRestrictionFilterLabel(option),
                         selected: selected == option,
                         onTap: () {
-                          ref
-                              .read(
-                                libraryAgeRestrictionFilterProvider.notifier,
-                              )
-                              .toggleFilterOption(displayTarget, option);
+                          switch (displayTarget) {
+                            case LibraryDisplayTarget.comics:
+                              ref
+                                  .read(libraryComicFiltersProvider.notifier)
+                                  .toggleAgeRestrictionOption(option);
+                            case LibraryDisplayTarget.series:
+                              ref
+                                  .read(
+                                    librarySeriesAgeRestrictionFilterProvider
+                                        .notifier,
+                                  )
+                                  .toggleFilterOption(option);
+                          }
                         },
                       ),
                 )
@@ -128,7 +135,11 @@ class _LibraryMediaTypeFilterControlsState
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final LibraryMediaTypeFilterSelection selected = ref.watch(
-      libraryComicsTabMediaTypeFilterProvider,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.mediaTypeFilter ??
+            const LibraryMediaTypeFilterSelection(),
+      ),
     );
 
     final AppLocalizations l10n = context.l10n;
@@ -177,8 +188,8 @@ class _LibraryMediaTypeFilterControlsState
                         selected: selected.selected.contains(option),
                         onTap: () {
                           ref
-                              .read(libraryMediaTypeFilterProvider.notifier)
-                              .toggleOption(option);
+                              .read(libraryComicFiltersProvider.notifier)
+                              .toggleMediaType(option);
                         },
                       ),
                 )
@@ -299,7 +310,10 @@ class LibraryOrganizeFilterControls extends HookConsumerWidget {
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final bool needsMetadataOnly = ref.watch(
-      libraryComicsTabNeedsMetadataOnlyProvider,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.needsMetadataOnly ?? false,
+      ),
     );
 
     final AppLocalizations l10n = context.l10n;
@@ -344,8 +358,8 @@ class LibraryOrganizeFilterControls extends HookConsumerWidget {
             selected: needsMetadataOnly,
             onTap: () {
               ref
-                  .read(libraryNeedsMetadataOnlyProvider.notifier)
-                  .setEnabled(!needsMetadataOnly);
+                  .read(libraryComicFiltersProvider.notifier)
+                  .setNeedsMetadataOnly(!needsMetadataOnly);
             },
           ),
         ),

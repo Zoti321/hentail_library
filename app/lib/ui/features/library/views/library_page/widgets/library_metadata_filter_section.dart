@@ -7,11 +7,9 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_distinct_metadata_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_controls.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
@@ -65,12 +63,12 @@ class LibraryTagFilterControls extends ConsumerWidget {
     final AsyncValue<List<String>> namesAsync = ref.watch(
       libraryFilterTagNamesProvider,
     );
-    final LibraryMetadataFilterSelection selection = ref
-        .watch(libraryTagFilterProvider)
-        .maybeWhen(
-          data: (LibraryMetadataFilterSelection value) => value,
-          orElse: () => const LibraryMetadataFilterSelection(),
-        );
+    final LibraryMetadataFilterSelection selection = ref.watch(
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.tagFilter ?? const LibraryMetadataFilterSelection(),
+      ),
+    );
     final List<String> names = namesAsync.maybeWhen(
       data: (List<String> value) => value,
       orElse: () => const <String>[],
@@ -81,11 +79,11 @@ class LibraryTagFilterControls extends ConsumerWidget {
       names: names,
       selection: selection,
       isLoading: namesAsync.isLoading,
-      onToggle: ref.read(libraryTagFilterProvider.notifier).toggle,
+      onToggle: ref.read(libraryComicFiltersProvider.notifier).toggleTag,
       onIncludeModeChanged: ref
-          .read(libraryTagFilterProvider.notifier)
-          .setIncludeMode,
-      onClear: ref.read(libraryTagFilterProvider.notifier).clear,
+          .read(libraryComicFiltersProvider.notifier)
+          .setTagIncludeMode,
+      onClear: ref.read(libraryComicFiltersProvider.notifier).clearTag,
     );
   }
 }
@@ -105,12 +103,12 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
     final AsyncValue<List<String>> namesAsync = ref.watch(
       libraryFilterAuthorNamesProvider,
     );
-    final LibraryMetadataFilterSelection selection = ref
-        .watch(libraryAuthorFilterProvider)
-        .maybeWhen(
-          data: (LibraryMetadataFilterSelection value) => value,
-          orElse: () => const LibraryMetadataFilterSelection(),
-        );
+    final LibraryMetadataFilterSelection selection = ref.watch(
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.authorFilter ?? const LibraryMetadataFilterSelection(),
+      ),
+    );
     final List<String> names = namesAsync.maybeWhen(
       data: (List<String> value) => value,
       orElse: () => const <String>[],
@@ -135,11 +133,11 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
         }
         return id;
       },
-      onToggle: ref.read(libraryAuthorFilterProvider.notifier).toggle,
+      onToggle: ref.read(libraryComicFiltersProvider.notifier).toggleAuthor,
       onIncludeModeChanged: ref
-          .read(libraryAuthorFilterProvider.notifier)
-          .setIncludeMode,
-      onClear: ref.read(libraryAuthorFilterProvider.notifier).clear,
+          .read(libraryComicFiltersProvider.notifier)
+          .setAuthorIncludeMode,
+      onClear: ref.read(libraryComicFiltersProvider.notifier).clearAuthor,
     );
   }
 }
@@ -157,7 +155,10 @@ class LibraryLanguageFilterControls extends ConsumerWidget {
     }
 
     final Set<String> selected = ref.watch(
-      libraryComicsTabLanguageFilterProvider,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.languageFilter ?? const <String>{},
+      ),
     );
 
     return LibraryMetadataFilterControls(
@@ -167,20 +168,12 @@ class LibraryLanguageFilterControls extends ConsumerWidget {
       includeOnly: true,
       enablePinyinAssistedNameMatch: false,
       labelFor: context.l10n.comicLanguageLabel,
-      onToggle: ref
-          .read(
-            libraryIncludeSetFilterProvider(
-              LibraryIncludeSetKind.language,
-            ).notifier,
-          )
-          .toggle,
-      onClear: ref
-          .read(
-            libraryIncludeSetFilterProvider(
-              LibraryIncludeSetKind.language,
-            ).notifier,
-          )
-          .clear,
+      onToggle: (String name) => ref
+          .read(libraryComicFiltersProvider.notifier)
+          .toggleIncludeSet(LibraryIncludeSetKind.language, name),
+      onClear: () => ref
+          .read(libraryComicFiltersProvider.notifier)
+          .clearIncludeSet(LibraryIncludeSetKind.language),
     );
   }
 }
@@ -201,7 +194,10 @@ class LibraryParodyFilterControls extends ConsumerWidget {
       libraryDistinctParodiesProvider,
     );
     final Set<String> selected = ref.watch(
-      libraryComicsTabParodyFilterProvider,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.parodyFilter ?? const <String>{},
+      ),
     );
     final List<String> names = parodiesAsync.maybeWhen(
       data: (List<String> parodies) => parodies.toList()..sort(),
@@ -214,20 +210,12 @@ class LibraryParodyFilterControls extends ConsumerWidget {
       selection: includeOnlyFilterSelection(selected),
       includeOnly: true,
       isLoading: parodiesAsync.isLoading,
-      onToggle: ref
-          .read(
-            libraryIncludeSetFilterProvider(
-              LibraryIncludeSetKind.parody,
-            ).notifier,
-          )
-          .toggle,
-      onClear: ref
-          .read(
-            libraryIncludeSetFilterProvider(
-              LibraryIncludeSetKind.parody,
-            ).notifier,
-          )
-          .clear,
+      onToggle: (String name) => ref
+          .read(libraryComicFiltersProvider.notifier)
+          .toggleIncludeSet(LibraryIncludeSetKind.parody, name),
+      onClear: () => ref
+          .read(libraryComicFiltersProvider.notifier)
+          .clearIncludeSet(LibraryIncludeSetKind.parody),
     );
   }
 }
@@ -248,7 +236,10 @@ class LibraryCharacterFilterControls extends ConsumerWidget {
       libraryDistinctCharactersProvider,
     );
     final Set<String> selected = ref.watch(
-      libraryComicsTabCharacterFilterProvider,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.characterFilter ?? const <String>{},
+      ),
     );
     final List<String> names = charactersAsync.maybeWhen(
       data: (List<String> characters) => characters.toList()..sort(),
@@ -261,20 +252,12 @@ class LibraryCharacterFilterControls extends ConsumerWidget {
       selection: includeOnlyFilterSelection(selected),
       includeOnly: true,
       isLoading: charactersAsync.isLoading,
-      onToggle: ref
-          .read(
-            libraryIncludeSetFilterProvider(
-              LibraryIncludeSetKind.character,
-            ).notifier,
-          )
-          .toggle,
-      onClear: ref
-          .read(
-            libraryIncludeSetFilterProvider(
-              LibraryIncludeSetKind.character,
-            ).notifier,
-          )
-          .clear,
+      onToggle: (String name) => ref
+          .read(libraryComicFiltersProvider.notifier)
+          .toggleIncludeSet(LibraryIncludeSetKind.character, name),
+      onClear: () => ref
+          .read(libraryComicFiltersProvider.notifier)
+          .clearIncludeSet(LibraryIncludeSetKind.character),
     );
   }
 }

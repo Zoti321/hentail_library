@@ -2,13 +2,14 @@ import 'package:hentai_library/domain/library/library_age_restriction_filter.dar
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/view_models/home_alert_dismiss_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/home_probe_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_revision_throttle_busy.dart';
 import 'package:hentai_library/ui/features/shell/view_models/stream_throttle.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_page_dashboard_notifier.g.dart';
@@ -19,12 +20,21 @@ bool _homeExcludeR18(LibraryAgeRestrictionFilter filter) {
   return filter == LibraryAgeRestrictionFilter.allAges;
 }
 
+/// 首页计数/列表使用的 Comics 年龄限制（模块当前意图）。
+LibraryAgeRestrictionFilter _comicsAgeRestriction(Ref ref) {
+  return ref.watch(
+    libraryComicFiltersProvider.select(
+      (AsyncValue<LibraryComicFiltersState> state) =>
+          state.value?.ageRestriction ??
+          LibraryAgeRestrictionFilter.unrestricted,
+    ),
+  );
+}
+
 @Riverpod(keepAlive: true)
 Stream<HomePageCounts> homePageCountsStream(Ref ref) {
   final HomePageRepository repository = ref.watch(homePageRepoProvider);
-  final bool excludeR18 = _homeExcludeR18(
-    ref.watch(libraryComicsTabAgeRestrictionFilterProvider),
-  );
+  final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
   ref.watch(libraryRevisionThrottleBusyProvider);
   return throttleWhile(
     repository.watchHomePageCounts(excludeR18: excludeR18),
@@ -36,9 +46,7 @@ Stream<HomePageCounts> homePageCountsStream(Ref ref) {
 @Riverpod(keepAlive: true)
 Stream<List<HomeContinueReadingEntry>> homeContinueReadingTop5Stream(Ref ref) {
   final HomePageRepository repository = ref.watch(homePageRepoProvider);
-  final bool excludeR18 = _homeExcludeR18(
-    ref.watch(libraryComicsTabAgeRestrictionFilterProvider),
-  );
+  final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
   ref.watch(libraryRevisionThrottleBusyProvider);
   return throttleWhile(
     repository.watchContinueReadingTop5(excludeR18: excludeR18),
@@ -50,9 +58,7 @@ Stream<List<HomeContinueReadingEntry>> homeContinueReadingTop5Stream(Ref ref) {
 @Riverpod(keepAlive: true)
 Stream<List<HomeRecentlyAddedEntry>> homeRecentlyAddedStream(Ref ref) {
   final HomePageRepository repository = ref.watch(homePageRepoProvider);
-  final bool excludeR18 = _homeExcludeR18(
-    ref.watch(libraryComicsTabAgeRestrictionFilterProvider),
-  );
+  final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
   ref.watch(libraryRevisionThrottleBusyProvider);
   return throttleWhile(
     repository.watchRecentlyAddedOnHome(excludeR18: excludeR18),
