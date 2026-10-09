@@ -13,6 +13,27 @@ use crate::util::compute_sort_key;
 
 use super::pairing::{ComicMigration, SeriesMigrationPair};
 
+/// rekey 时按 `comic_id` 批量重指的 Comic 子表（唯一来源）。
+///
+/// [`apply_comic_rekey`] 只遍历本清单。`comics` 与 `comic_meta` 由显式 re-insert
+/// 处理，故列在 `COMIC_REKEY_VIA_REINSERT`。模块测试
+/// `comic_child_tables_cover_all_comic_id_columns` 断言 schema 中任何带 `comic_id`
+/// 列的表都被覆盖，新增子表若漏登记会红灯。
+const COMIC_CHILD_TABLES: &[&str] = &[
+    "comic_tags",
+    "comic_authors",
+    "comic_parodies",
+    "comic_characters",
+    "comic_reading_histories",
+    "comic_thumbnails",
+    "series_items",
+];
+
+/// 带 `comic_id`、但在 rekey 时由显式 re-insert 处理（非批量 UPDATE）的表。
+/// 仅守卫测试使用；生产路径不读取它。
+#[cfg(test)]
+const COMIC_REKEY_VIA_REINSERT: &[&str] = &["comics", "comic_meta"];
+
 /// 批量 rekey Comic（参与调用方事务）。
 pub(crate) async fn apply_comic_rekeys<C: ConnectionTrait>(
     db: &C,
@@ -76,13 +97,9 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
         .await
         .map_err(map_db_err)?;
 
-    rekey_comic_child_table(db, "comic_tags", from_id, to_id).await?;
-    rekey_comic_child_table(db, "comic_authors", from_id, to_id).await?;
-    rekey_comic_child_table(db, "comic_parodies", from_id, to_id).await?;
-    rekey_comic_child_table(db, "comic_characters", from_id, to_id).await?;
-    rekey_comic_child_table(db, "comic_reading_histories", from_id, to_id).await?;
-    rekey_comic_child_table(db, "comic_thumbnails", from_id, to_id).await?;
-    rekey_comic_child_table(db, "series_items", from_id, to_id).await?;
+    for table in COMIC_CHILD_TABLES {
+        rekey_comic_child_table(db, table, from_id, to_id).await?;
+    }
     rekey_reference_column(db, "series_thumbnails", "source_comic_id", from_id, to_id).await?;
 
     Comics::delete_by_id(from_id.clone())
@@ -215,4 +232,68 @@ async fn rekey_reference_column<C: ConnectionTrait>(
     .await
     .map_err(map_db_err)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sea_orm::Database;
+    use sea_orm_migration::MigratorTrait;
+
+    /// 迁移到最新 schema 后，列出所有带 `comic_id` 列的表。
+    async fn tables_with_comic_id() -> Vec<String> {
+        let db = Database::connect("sqlite::memory:")
+            .await
+            .expect("in-memory db");
+        crate::migration::Migrator::up(&db, None)
+            .await
+            .expect("run migrations");
+        let rows = db
+            .query_all(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "SELECT name FROM sqlite_master WHERE type = 'table'".to_string(),
+            ))
+            .await
+            .expect("list tables");
+        let mut with_comic_id = Vec::new();
+        for row in rows {
+            let name: String = row.try_get_by_index(0).expect("table name");
+            let cols = db
+                .query_all(Statement::from_string(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    format!("PRAGMA table_info('{name}')"),
+                ))
+                .await
+                .expect("table_info");
+            let has_comic_id = cols.iter().any(|col| {
+                col.try_get_by_index::<String>(1)
+                    .map(|col_name| col_name == "comic_id")
+                    .unwrap_or(false)
+            });
+            if has_comic_id {
+                with_comic_id.push(name);
+            }
+        }
+        with_comic_id
+    }
+
+    #[tokio::test]
+    async fn comic_child_tables_cover_all_comic_id_columns() {
+        let with_comic_id = tables_with_comic_id().await;
+
+        for table in COMIC_CHILD_TABLES {
+            assert!(
+                with_comic_id.iter().any(|t| t == table),
+                "COMIC_CHILD_TABLES 中的 {table} 在 schema 中不存在或已无 comic_id 列"
+            );
+        }
+        for table in &with_comic_id {
+            let covered = COMIC_CHILD_TABLES.contains(&table.as_str())
+                || COMIC_REKEY_VIA_REINSERT.contains(&table.as_str());
+            assert!(
+                covered,
+                "表 {table} 带 comic_id 列但未纳入 rekey；请加入 COMIC_CHILD_TABLES 或 COMIC_REKEY_VIA_REINSERT"
+            );
+        }
+    }
 }
