@@ -16,6 +16,7 @@ pub mod metadata_lock;
 pub mod migration;
 pub mod named_facet;
 pub mod parody;
+pub mod path_migration;
 pub mod probe;
 pub mod reader;
 pub mod resource;

@@ -1,3 +1,8 @@
+//! Path migration 的配对计算：在 removed / added Resource 之间识别同一 Comic / Series。
+//!
+//! 仅做纯计算（资源弱指纹 1:1 配对、Series 成员整体迁移判定），不触碰数据库；
+//! 落库见 [`super::persist`]。
+
 use std::collections::{HashMap, HashSet};
 
 use crate::comic::ComicDto;

@@ -10,7 +10,6 @@ pub mod dto;
 pub mod format_group;
 pub mod handle;
 pub mod library_lock;
-pub mod migrate;
 pub mod orchestrator;
 pub mod plan;
 pub mod refresh;
