@@ -11,6 +11,7 @@ pub mod history;
 pub mod home;
 pub mod image_cache;
 pub mod library;
+pub mod library_write;
 pub mod metadata_backup;
 pub mod metadata_lock;
 pub mod migration;

@@ -15,9 +15,9 @@ use crate::series_id::series_name_from_folder_path;
 use crate::util::compute_sort_key;
 
 use super::handle::SyncHandle;
-use super::library_lock::try_acquire_library_write_lock;
 use super::remote::normalize_remote_location_key;
 use super::writer::upsert_comics;
+use crate::library_write::with_library_write;
 
 #[derive(Debug, Clone)]
 pub struct RefreshSeriesProgressDto {
@@ -46,8 +46,7 @@ pub struct RefreshLibraryResultDto {
 
 /// 重解析单本 Comic 的 Resource 元数据，按字段锁 merge 后写回（不动缩略图）。
 pub async fn refresh_comic_metadata(comic_id: &str) -> Result<(), HentaiError> {
-    let _guard = try_acquire_library_write_lock()?;
-    refresh_comic_metadata_locked(comic_id).await
+    with_library_write(|| refresh_comic_metadata_locked(comic_id)).await
 }
 
 pub(crate) async fn refresh_comic_metadata_locked(comic_id: &str) -> Result<(), HentaiError> {
@@ -87,9 +86,16 @@ pub async fn refresh_comic_metadata_with(
 pub async fn refresh_series_metadata(
     series_id: &str,
     handle: &SyncHandle,
+    emit: impl FnMut(RefreshSeriesProgressDto),
+) -> Result<RefreshSeriesResultDto, HentaiError> {
+    with_library_write(|| refresh_series_metadata_locked(series_id, handle, emit)).await
+}
+
+async fn refresh_series_metadata_locked(
+    series_id: &str,
+    handle: &SyncHandle,
     mut emit: impl FnMut(RefreshSeriesProgressDto),
 ) -> Result<RefreshSeriesResultDto, HentaiError> {
-    let _guard = try_acquire_library_write_lock()?;
     let db = connection()?;
 
     let series_row = Series::find_by_id(series_id.to_string())
@@ -166,9 +172,16 @@ pub async fn refresh_series_metadata(
 pub async fn refresh_library_metadata(
     library_id: &str,
     handle: &SyncHandle,
+    emit: impl FnMut(RefreshSeriesProgressDto),
+) -> Result<RefreshLibraryResultDto, HentaiError> {
+    with_library_write(|| refresh_library_metadata_locked(library_id, handle, emit)).await
+}
+
+async fn refresh_library_metadata_locked(
+    library_id: &str,
+    handle: &SyncHandle,
     mut emit: impl FnMut(RefreshSeriesProgressDto),
 ) -> Result<RefreshLibraryResultDto, HentaiError> {
-    let _guard = try_acquire_library_write_lock()?;
     let db = connection()?;
 
     let library = find_library_by_id(library_id)

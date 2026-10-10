@@ -8,6 +8,7 @@ use sea_orm::{
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_tags, prelude::*, tags};
 use crate::error::HentaiError;
+use crate::library_write::with_library_write;
 
 pub async fn list_all_tags() -> Result<Vec<String>, HentaiError> {
     let db = connection()?;
@@ -62,6 +63,10 @@ pub async fn delete_tags_by_names(names: Vec<String>) -> Result<(), HentaiError>
     if names.is_empty() {
         return Ok(());
     }
+    with_library_write(|| delete_tags_by_names_locked(names)).await
+}
+
+async fn delete_tags_by_names_locked(names: Vec<String>) -> Result<(), HentaiError> {
     let db = connection()?;
     Tags::delete_many()
         .filter(tags::Column::Name.is_in(names))
@@ -72,6 +77,10 @@ pub async fn delete_tags_by_names(names: Vec<String>) -> Result<(), HentaiError>
 }
 
 pub async fn rename_tag(old_name: &str, new_name: &str) -> Result<(), HentaiError> {
+    with_library_write(|| rename_tag_locked(old_name, new_name)).await
+}
+
+async fn rename_tag_locked(old_name: &str, new_name: &str) -> Result<(), HentaiError> {
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
     let active = tags::ActiveModel {

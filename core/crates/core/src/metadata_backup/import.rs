@@ -1,12 +1,13 @@
 use std::collections::{HashMap, HashSet};
 
-use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, Value};
+use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, TransactionTrait, Value};
 
-use crate::comic::write::{set_comic_meta_locks, update_comic_user_meta};
-use crate::comic::{SetComicMetaLocksDto, UpdateComicUserMetaDto};
+use crate::comic::write::update_comic_user_meta_in;
+use crate::comic::UpdateComicUserMetaDto;
 use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
+use crate::library_write::with_library_write;
 use crate::named_facet::JunctionNamedFacet;
 
 use super::path_util::compute_relative_path;
@@ -123,6 +124,12 @@ pub async fn preview_import_comic_metadata(bytes: &[u8]) -> Result<ImportPlan, H
 }
 
 pub async fn import_comic_metadata(bytes: &[u8]) -> Result<ImportComicMetadataResult, HentaiError> {
+    with_library_write(|| import_comic_metadata_locked(bytes)).await
+}
+
+async fn import_comic_metadata_locked(
+    bytes: &[u8],
+) -> Result<ImportComicMetadataResult, HentaiError> {
     let plan = plan_comic_metadata_import(bytes).await?;
     let db = connection()?;
     let mut result = ImportComicMetadataResult::default();
@@ -384,11 +391,15 @@ async fn count_new_orphan_names<C: ConnectionTrait>(
 }
 
 async fn apply_comic_record(
-    _db: &DatabaseConnection,
+    db: &DatabaseConnection,
     comic_id: &str,
     record: &ComicExportRecord,
 ) -> Result<(), HentaiError> {
-    update_comic_user_meta(
+    // One transaction per record: the metadata row, the junction tables and the
+    // auto-locks land together (the library write lock is held by the import entry).
+    let txn = db.begin().await.map_err(map_db_err)?;
+    update_comic_user_meta_in(
+        &txn,
         comic_id,
         UpdateComicUserMetaDto {
             title: Some(record.meta.title.clone()),
@@ -403,22 +414,10 @@ async fn apply_comic_record(
         },
     )
     .await?;
-
-    set_comic_meta_locks(
-        comic_id,
-        SetComicMetaLocksDto {
-            title: Some(true),
-            description: Some(true),
-            published_at: Some(true),
-            content_rating: Some(true),
-            authors: Some(true),
-            tags: Some(true),
-            languages: Some(true),
-            parodies: Some(true),
-            characters: Some(true),
-        },
-    )
-    .await?;
+    // All nine fields are written, so the auto-lock (ADR-0007) already pins every lock
+    // column; an extra set_comic_meta_locks(true × 9) pass would be a second transaction
+    // with no additional effect.
+    txn.commit().await.map_err(map_db_err)?;
     Ok(())
 }
 

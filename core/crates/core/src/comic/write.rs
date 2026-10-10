@@ -113,6 +113,17 @@ pub async fn update_comic_user_meta(
 ) -> Result<(), HentaiError> {
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
+    update_comic_user_meta_in(&txn, comic_id, meta).await?;
+    txn.commit().await.map_err(map_db_err)?;
+    Ok(())
+}
+
+/// [`update_comic_user_meta`] body for callers that own the transaction (ADR-0026).
+pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
+    db: &C,
+    comic_id: &str,
+    meta: UpdateComicUserMetaDto,
+) -> Result<(), HentaiError> {
     // A written field is auto-locked; the field table decides which fields and locks exist.
     let auto_locks = ComicAutoLocks::from_written(|field| meta.is_written(field));
     let mut meta_touched = false;
@@ -149,29 +160,28 @@ pub async fn update_comic_user_meta(
         for field in auto_locks.written() {
             apply_comic_lock(&mut active, field, true);
         }
-        active.update(&txn).await.map_err(map_db_err)?;
+        active.update(db).await.map_err(map_db_err)?;
         meta_touched = true;
     }
     if let Some(authors) = meta.authors {
-        replace_comic_authors(&txn, comic_id, &authors).await?;
+        replace_comic_authors(db, comic_id, &authors).await?;
         meta_touched = true;
     }
     if let Some(tags) = meta.tags {
-        replace_comic_tags(&txn, comic_id, &tags).await?;
+        replace_comic_tags(db, comic_id, &tags).await?;
         meta_touched = true;
     }
     if let Some(parodies) = meta.parodies {
-        replace_comic_parodies(&txn, comic_id, &parodies).await?;
+        replace_comic_parodies(db, comic_id, &parodies).await?;
         meta_touched = true;
     }
     if let Some(characters) = meta.characters {
-        replace_comic_characters(&txn, comic_id, &characters).await?;
+        replace_comic_characters(db, comic_id, &characters).await?;
         meta_touched = true;
     }
     if meta_touched {
-        touch_comic(&txn, comic_id).await?;
+        touch_comic(db, comic_id).await?;
     }
-    txn.commit().await.map_err(map_db_err)?;
     Ok(())
 }
 

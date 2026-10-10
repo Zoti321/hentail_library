@@ -86,3 +86,4 @@ MVP 无 core plan/dry-run API；确认 dialog 仅静态「N 本 · M 字段」�
 - ADR-0006 — Series item sort order lock（reorder mode 互斥）
 - ADR-0018 — 测试三层缝（Rust 真值缝优先）
 - Metadata refresh 实现：`core/crates/core/src/sync/refresh.rs`、`SyncHandle`
+- ADR-0026 — Library-level write seam（批量写持锁 + 逐本事务）

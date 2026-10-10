@@ -8,6 +8,7 @@ use crate::comic::visibility::comic_id_not_trashed_sql;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_reading_histories, prelude::*};
 use crate::error::HentaiError;
+use crate::library_write::with_library_write;
 use crate::util::decode_basic_html_entities;
 
 use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto};
@@ -150,6 +151,10 @@ pub async fn delete_reading_by_comic_ids(comic_ids: &[String]) -> Result<i32, He
 }
 
 pub async fn clear_all_reading() -> Result<i32, HentaiError> {
+    with_library_write(clear_all_reading_locked).await
+}
+
+async fn clear_all_reading_locked() -> Result<i32, HentaiError> {
     let db = connection()?;
     let res = ComicReadingHistories::delete_many()
         .filter(not_trashed_history_expr())

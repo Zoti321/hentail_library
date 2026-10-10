@@ -7,6 +7,7 @@ use sea_orm::{ConnectionTrait, Statement, TransactionTrait, Value};
 use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
+use crate::library_write::with_library_write;
 
 use crate::author::replace_comic_authors;
 
@@ -269,8 +270,15 @@ pub async fn delete_named_facet_by_names(
     if names.is_empty() {
         return Ok(());
     }
+    with_library_write(|| delete_named_facet_by_names_locked(facet, names)).await
+}
+
+async fn delete_named_facet_by_names_locked(
+    facet: JunctionNamedFacet,
+    names: Vec<String>,
+) -> Result<(), HentaiError> {
     if facet == JunctionNamedFacet::Author {
-        return crate::author::delete_authors_by_names(names).await;
+        return crate::author::delete_authors_by_names_locked(names).await;
     }
     let db = connection()?;
     let dict = facet.dict_table();
@@ -296,8 +304,16 @@ pub async fn rename_named_facet_name(
     old_name: &str,
     new_name: &str,
 ) -> Result<(), HentaiError> {
+    with_library_write(|| rename_named_facet_name_locked(facet, old_name, new_name)).await
+}
+
+async fn rename_named_facet_name_locked(
+    facet: JunctionNamedFacet,
+    old_name: &str,
+    new_name: &str,
+) -> Result<(), HentaiError> {
     if facet == JunctionNamedFacet::Author {
-        return crate::author::rename_author(old_name, new_name).await;
+        return crate::author::rename_author_locked(old_name, new_name).await;
     }
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
@@ -338,6 +354,14 @@ pub async fn rename_named_facet_name(
 
 /// Merge one non-author Named facet name into another in a single transaction.
 pub async fn merge_named_facet_name(
+    facet: JunctionNamedFacet,
+    source_name: &str,
+    target_name: &str,
+) -> Result<(), HentaiError> {
+    with_library_write(|| merge_named_facet_name_locked(facet, source_name, target_name)).await
+}
+
+async fn merge_named_facet_name_locked(
     facet: JunctionNamedFacet,
     source_name: &str,
     target_name: &str,

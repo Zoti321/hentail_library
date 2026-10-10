@@ -69,3 +69,4 @@ ADR-0012 规定用户 Comic deletion 立即永久删除 Local Resource，且「�
 - ADR-0013 — Path migration
 - ADR-0018 — 测试三层缝
 - ADR-0022 — `library_write_lock` 单飞先例
+- ADR-0026 — Library-level write seam（trash / restore 单事务，purge 逐本事务）

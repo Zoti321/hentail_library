@@ -15,6 +15,7 @@ use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
 use crate::db::{connection, map_db_err};
 use crate::entity::{author_links, authors, prelude::*};
 use crate::error::HentaiError;
+use crate::library_write::with_library_write;
 
 pub use image::{load_author_image, AuthorImageSlot};
 pub use platform_images::schedule_author_image_refresh;
@@ -189,9 +190,18 @@ pub async fn delete_authors_by_names(names: Vec<String>) -> Result<(), HentaiErr
     if names.is_empty() {
         return Ok(());
     }
+    with_library_write(|| delete_authors_by_names_locked(names)).await
+}
+
+/// [`delete_authors_by_names`] body for callers that already hold the library write
+/// lock (ADR-0026). One transaction covers author links, comic links and the authors.
+pub(crate) async fn delete_authors_by_names_locked(names: Vec<String>) -> Result<(), HentaiError> {
     let db = connection()?;
-    let ids = author_ids_for_names(&db, &names).await?;
-    delete_authors_by_ids(&db, &ids).await
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let ids = author_ids_for_names(&txn, &names).await?;
+    delete_authors_by_ids(&txn, &ids).await?;
+    txn.commit().await.map_err(map_db_err)?;
+    Ok(())
 }
 
 pub async fn delete_authors_by_ids<C: ConnectionTrait>(
@@ -230,6 +240,14 @@ pub async fn delete_authors_by_ids<C: ConnectionTrait>(
 }
 
 pub async fn rename_author(old_name: &str, new_name: &str) -> Result<(), HentaiError> {
+    with_library_write(|| rename_author_locked(old_name, new_name)).await
+}
+
+/// [`rename_author`] body for callers that already hold the library write lock (ADR-0026).
+pub(crate) async fn rename_author_locked(
+    old_name: &str,
+    new_name: &str,
+) -> Result<(), HentaiError> {
     let new_name = validate_author_name(new_name)?;
     let db = connection()?;
     let Some(id) = find_author_id_by_name(&db, old_name).await? else {

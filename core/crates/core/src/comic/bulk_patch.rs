@@ -4,9 +4,9 @@ use crate::comic::dto::ComicDto;
 use crate::comic::repository::find_comics_by_ids;
 use crate::comic::write::{update_comic_user_meta, UpdateComicUserMetaDto};
 use crate::error::HentaiError;
+use crate::library_write::with_library_write;
 use crate::metadata_lock::merge_multi_value;
 use crate::sync::handle::SyncHandle;
-use crate::sync::library_lock::try_acquire_library_write_lock;
 
 pub const BULK_PATCH_MAX_IDS: usize = 2000;
 const MAX_ERROR_SAMPLES: usize = 5;
@@ -179,8 +179,14 @@ pub async fn apply_comic_metadata_bulk_patch(
         }
     }
 
-    let _guard = try_acquire_library_write_lock()?;
+    with_library_write(|| apply_comic_metadata_bulk_patch_locked(comic_ids, patch, handle)).await
+}
 
+async fn apply_comic_metadata_bulk_patch_locked(
+    comic_ids: Vec<String>,
+    patch: ComicMetadataBulkPatch,
+    handle: &SyncHandle,
+) -> Result<BulkPatchResultDto, HentaiError> {
     let comics = find_comics_by_ids(comic_ids.clone()).await?;
     let library_ids: HashSet<String> = comics.iter().map(|c| c.library_id.clone()).collect();
     if library_ids.len() > 1 {

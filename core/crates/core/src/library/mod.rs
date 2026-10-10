@@ -21,6 +21,7 @@ use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::entity::{app_prefs, libraries, prelude::*};
 use crate::error::HentaiError;
+use crate::library_write::with_library_write;
 use crate::path_migration::{
     apply_comic_rekeys, apply_series_rekeys, ComicMigration, SeriesMigrationPair,
 };
@@ -28,7 +29,6 @@ use crate::reader::clear_reader_sessions;
 use crate::resource::{local_access, ResourceAccess, ResourceKind};
 use crate::series_id::series_id_from_folder_path;
 use crate::sync::format_group::FormatGroup;
-use crate::sync::try_acquire_library_write_lock;
 use crate::sync::writer::delete_comics_side_effects;
 
 const PREF_CURRENT_LIBRARY_ID: &str = "current_library_id";
@@ -524,7 +524,13 @@ pub async fn update_local_library_root(
     if root.is_empty() {
         return Err(HentaiError::validation("Library root 不能为空"));
     }
-    let _guard = try_acquire_library_write_lock()?;
+    with_library_write(|| update_local_library_root_locked(id, root)).await
+}
+
+/// [`update_local_library_root`] body for callers that already hold the library write
+/// lock (ADR-0026). The Library root probe runs before the transaction opens, so the
+/// SQLite transaction never spans filesystem I/O.
+async fn update_local_library_root_locked(id: &str, root: &str) -> Result<LibraryDto, HentaiError> {
     let db = connection()?;
     let Some(model) = Libraries::find_by_id(id.to_string())
         .one(&db)

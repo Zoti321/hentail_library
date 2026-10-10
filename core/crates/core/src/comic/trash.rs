@@ -10,8 +10,8 @@ use crate::comic::repository::load_comics_ordered;
 use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
+use crate::library_write::{begin_library_write_txn, with_library_write};
 use crate::reader::close_reader;
-use crate::sync::library_lock::try_acquire_library_write_lock;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::delete_comics_side_effects;
 
@@ -65,25 +65,25 @@ pub async fn trash_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
     if ids.is_empty() {
         return Ok(());
     }
-    let _guard = try_acquire_library_write_lock()?;
-    let db = connection()?;
+    let write = begin_library_write_txn().await?;
     let deleted_at = now_ms();
-    let txn = db.begin().await.map_err(map_db_err)?;
     for chunk in ids.chunks(ID_BATCH_SIZE) {
         let (placeholders, mut values) = id_placeholders(chunk);
         values.insert(0, Value::BigInt(Some(deleted_at)));
-        txn.execute(Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::Sqlite,
-            format!(
-                "UPDATE comics SET deleted_at = ? \
-                 WHERE comic_id IN ({placeholders}) AND deleted_at IS NULL"
-            ),
-            values,
-        ))
-        .await
-        .map_err(map_db_err)?;
+        write
+            .txn()
+            .execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                format!(
+                    "UPDATE comics SET deleted_at = ? \
+                     WHERE comic_id IN ({placeholders}) AND deleted_at IS NULL"
+                ),
+                values,
+            ))
+            .await
+            .map_err(map_db_err)?;
     }
-    txn.commit().await.map_err(map_db_err)?;
+    write.commit().await?;
     for id in &ids {
         close_reader(id);
     }
@@ -96,20 +96,20 @@ pub async fn restore_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
     if ids.is_empty() {
         return Ok(());
     }
-    let _guard = try_acquire_library_write_lock()?;
-    let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
+    let write = begin_library_write_txn().await?;
     for chunk in ids.chunks(ID_BATCH_SIZE) {
         let (placeholders, values) = id_placeholders(chunk);
-        txn.execute(Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::Sqlite,
-            format!("UPDATE comics SET deleted_at = NULL WHERE comic_id IN ({placeholders})"),
-            values,
-        ))
-        .await
-        .map_err(map_db_err)?;
+        write
+            .txn()
+            .execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                format!("UPDATE comics SET deleted_at = NULL WHERE comic_id IN ({placeholders})"),
+                values,
+            ))
+            .await
+            .map_err(map_db_err)?;
     }
-    txn.commit().await.map_err(map_db_err)?;
+    write.commit().await?;
     Ok(())
 }
 
@@ -117,11 +117,14 @@ pub async fn restore_comics(comic_ids: Vec<String>) -> Result<(), HentaiError> {
 /// 未处于 trash 的 id 计入失败。
 pub async fn purge_comics(comic_ids: Vec<String>) -> Result<ComicPurgeResultDto, HentaiError> {
     let ids = dedupe_ids(comic_ids);
-    let mut result = ComicPurgeResultDto::default();
     if ids.is_empty() {
-        return Ok(result);
+        return Ok(ComicPurgeResultDto::default());
     }
-    let _guard = try_acquire_library_write_lock()?;
+    with_library_write(|| purge_comics_locked(ids)).await
+}
+
+async fn purge_comics_locked(ids: Vec<String>) -> Result<ComicPurgeResultDto, HentaiError> {
+    let mut result = ComicPurgeResultDto::default();
     let db = connection()?;
     let targets = load_purge_targets(&db, &ids).await?;
     for id in &ids {

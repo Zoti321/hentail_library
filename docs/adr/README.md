@@ -78,3 +78,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0023](./0023-comic-trash-before-purge.md) | 用户删除改为 Comic trash → Comic purge 两段式 | Accepted |
 | [0024](./0024-author-stable-identity.md) | Author 稳定身份与创作平台外链 | Accepted |
 | [0025](./0025-author-platform-image-sources.md) | Author 平台形象解析采用本地可信来源适配器 | Accepted |
+| [0026](./0026-library-write-seam.md) | Library-level write seam（库级写的锁与事务边界） | Accepted |
