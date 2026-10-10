@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::metadata_lock::normalize_match_tokens;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComicFilterDto {
     pub show_r18: bool,
@@ -54,15 +56,15 @@ impl ComicFilterDto {
             query: normalize_query(self.query),
             resource_types: self.resource_types,
             content_ratings: self.content_ratings,
-            tags_all: normalize_tags(self.tags_all),
-            tags_any: normalize_tags(self.tags_any),
-            tags_exclude: normalize_tags(self.tags_exclude),
-            authors_all: normalize_tags(self.authors_all),
-            authors_any: normalize_tags(self.authors_any),
-            authors_exclude: normalize_tags(self.authors_exclude),
-            languages: normalize_tags(self.languages),
-            parodies: normalize_tags(self.parodies),
-            characters: normalize_tags(self.characters),
+            tags_all: normalize_match_tokens(&self.tags_all),
+            tags_any: normalize_match_tokens(&self.tags_any),
+            tags_exclude: normalize_match_tokens(&self.tags_exclude),
+            authors_all: normalize_match_tokens(&self.authors_all),
+            authors_any: normalize_match_tokens(&self.authors_any),
+            authors_exclude: normalize_match_tokens(&self.authors_exclude),
+            languages: normalize_match_tokens(&self.languages),
+            parodies: normalize_match_tokens(&self.parodies),
+            characters: normalize_match_tokens(&self.characters),
             needs_metadata_only: self.needs_metadata_only,
             library_id: self
                 .library_id
@@ -75,13 +77,6 @@ impl ComicFilterDto {
 fn normalize_query(raw: Option<String>) -> Option<String> {
     raw.map(|s| s.trim().to_lowercase())
         .filter(|s| !s.is_empty())
-}
-
-fn normalize_tags(tags: Vec<String>) -> Vec<String> {
-    tags.into_iter()
-        .map(|t| t.trim().to_lowercase())
-        .filter(|t| !t.is_empty())
-        .collect()
 }
 
 /// Per-field locks for Comic metadata (Komga-style). Default: all unlocked.

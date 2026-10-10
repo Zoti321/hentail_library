@@ -357,13 +357,8 @@ async fn count_new_orphan_names<C: ConnectionTrait>(
     facet: JunctionNamedFacet,
     names: &[String],
 ) -> Result<u32, HentaiError> {
-    let mut unique = HashSet::new();
-    for name in names {
-        let trimmed = name.trim();
-        if !trimmed.is_empty() {
-            unique.insert(trimmed.to_string());
-        }
-    }
+    // The same name rule as the write path (ADR-0007): trim, drop empties, dedupe first-seen.
+    let unique = crate::metadata_lock::normalize_names(names);
     if unique.is_empty() {
         return Ok(0);
     }

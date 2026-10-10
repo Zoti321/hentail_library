@@ -286,9 +286,8 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
     .await
     .map_err(map_db_err)?;
 
-    let unique: HashSet<&String> = author_names.iter().filter(|n| !n.is_empty()).collect();
-    for name in unique {
-        let id = ensure_author_id(db, name).await?;
+    for name in crate::metadata_lock::normalize_names(author_names) {
+        let id = ensure_author_id(db, &name).await?;
         db.execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             "INSERT INTO comic_authors (comic_id, author_id) VALUES (?, ?)",

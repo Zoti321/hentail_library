@@ -24,6 +24,7 @@
 - **筛选**：`LibraryComicProjection` 留 Dart 构 `ComicFilterDto`；查询在 Rust（SeaORM）。
 - **设置**：App preference 与 Library browse preference 经 SharedPreferences 留 Dart（ADR-0016）；Library 的 Scan on startup / Scan interval 在 SQLite（每库属性），由 Flutter 编排触发。
 - **Named metadata facet**：Tag / Author / Parody / Character 走 core `named_facet`（字典 + junction）；Language 是 `comic_meta.languages` 闭集特例。
+- **Metadata 写入策略（ADR-0007）**：字段清单、auto-lock、归一化、多值补丁代数集中在 `core/crates/core/src/metadata_lock/`；sea-orm 持久化仍留在 `comic` / `series` 的 write 路径（该模块不在 FRB 导出面上）。
 - **错误**：Rust `HentaiError { code, message, context }` → Dart `AppException` 子类。
 - **取消**：`create_sync_handle` / `sync_library` / `cancel_sync`；取消语义对齐原 Dart sync。
 

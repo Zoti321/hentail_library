@@ -131,8 +131,9 @@ pub async fn replace_comic_named_facet<C: ConnectionTrait>(
     .await
     .map_err(map_db_err)?;
 
-    let unique: std::collections::HashSet<&String> = names.iter().collect();
-    for name in unique {
+    // Trimmed, empty-free, first-seen order — dictionary and junction rows agree.
+    let names = crate::metadata_lock::normalize_names(names);
+    for name in &names {
         db.execute(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             format!("INSERT OR IGNORE INTO {dict} (name) VALUES (?)"),
