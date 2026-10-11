@@ -36,7 +36,12 @@ pub async fn apply_scan_replace_plan(
             .await
             .map_err(map_db_err)?;
     }
-    upsert_comics(&txn, &plan.to_upsert).await?;
+    let skipped = upsert_comics(&txn, &plan.to_upsert).await?;
+    if !skipped.is_empty() {
+        // Scan plans carry a parsed page count (Remote placeholder is 1), so a
+        // skip here means the resource yielded no pages at all.
+        tracing::debug!(?skipped, "scan upsert skipped comics without pages");
+    }
     normalize_reading_history_titles(&txn).await?;
     rebuild_series_from_comics(&txn, Some(library_id)).await?;
     txn.commit().await.map_err(map_db_err)?;
@@ -176,12 +181,21 @@ async fn delete_comics_side_effects_batch<C: ConnectionTrait>(
     Ok(())
 }
 
+/// Upsert a comic write set: `comics` + `comic_meta` + the four junction facets.
+///
+/// A comic whose `page_count <= 0` is not written at all, so that a placeholder
+/// scan result never clobbers a real page count. Such comics are returned so the
+/// caller can tell "wrote nothing" apart from "wrote successfully"; every write
+/// the function does perform happens on the connection it was handed, so wrapping
+/// the call in one transaction keeps the whole write set atomic.
 pub(crate) async fn upsert_comics<C: ConnectionTrait>(
     db: &C,
     comics_list: &[ComicDto],
-) -> Result<(), HentaiError> {
+) -> Result<Vec<String>, HentaiError> {
+    let mut skipped_without_pages = Vec::new();
     for comic in comics_list {
         if comic.page_count <= 0 {
+            skipped_without_pages.push(comic.comic_id.clone());
             continue;
         }
         let existing_comic = Comics::find_by_id(comic.comic_id.clone())
@@ -293,7 +307,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
         replace_comic_parodies(db, &comic.comic_id, &comic.parodies).await?;
         replace_comic_characters(db, &comic.comic_id, &comic.characters).await?;
     }
-    Ok(())
+    Ok(skipped_without_pages)
 }
 
 async fn load_author_names_for_comic<C: ConnectionTrait>(

@@ -1,4 +1,6 @@
-use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
+use sea_orm::{
+    ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set, TransactionTrait,
+};
 
 use crate::comic::find_comic_by_id;
 use crate::db::{connection, map_db_err};
@@ -59,6 +61,9 @@ pub(crate) async fn refresh_comic_metadata_locked(comic_id: &str) -> Result<(), 
 }
 
 /// Injected-access refresh (FakeResourceAccess / tests).
+///
+/// File I/O (stat + parse) happens before the transaction opens, per ADR-0026:
+/// the transaction covers exactly one Comic's write set, one Comic at a time.
 pub async fn refresh_comic_metadata_with(
     access: &dyn ResourceAccess,
     comic_id: &str,
@@ -77,7 +82,19 @@ pub async fn refresh_comic_metadata_with(
     })?;
     let scanned = parsed_to_comic(&parsed);
     let merged = merge_refresh_scan_with_existing(&scanned, &existing);
-    upsert_comics(&db, &[merged]).await?;
+
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let skipped = upsert_comics(&txn, std::slice::from_ref(&merged)).await?;
+    if skipped.iter().any(|id| id == &merged.comic_id) {
+        // Nothing was written (upsert skips page_count <= 0). Reporting success
+        // here would tell the user the refresh worked while the library kept its
+        // previous values, so treat it as a per-Comic failure.
+        return Err(HentaiError::validation(format!(
+            "无法刷新元数据（未获得有效页数，已保留库内数据）: {}",
+            existing.path
+        )));
+    }
+    txn.commit().await.map_err(map_db_err)?;
     Ok(())
 }
 
