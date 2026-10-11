@@ -31,63 +31,31 @@ CREATE TABLE IF NOT EXISTS series_items (
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let conn = manager.get_connection();
-        let backend = conn.get_database_backend();
 
         if !table_exists(manager, "series").await? {
-            conn.execute(Statement::from_string(
-                backend,
-                SQL_CREATE_SERIES.to_string(),
-            ))
-            .await?;
-            conn.execute(Statement::from_string(
-                backend,
-                SQL_CREATE_SERIES_ITEMS.to_string(),
-            ))
-            .await?;
+            conn.execute_unprepared(SQL_CREATE_SERIES).await?;
+            conn.execute_unprepared(SQL_CREATE_SERIES_ITEMS).await?;
             return Ok(());
         }
 
-        conn.execute(Statement::from_string(
-            backend,
-            "DELETE FROM series_items".to_string(),
-        ))
-        .await?;
-        conn.execute(Statement::from_string(
-            backend,
-            "DELETE FROM series".to_string(),
-        ))
-        .await?;
-
-        conn.execute(Statement::from_string(
-            backend,
-            "PRAGMA foreign_keys = OFF".to_string(),
-        ))
-        .await?;
-        conn.execute(Statement::from_string(
-            backend,
-            "DROP TABLE IF EXISTS series_items".to_string(),
-        ))
-        .await?;
-        conn.execute(Statement::from_string(
-            backend,
-            "DROP TABLE IF EXISTS series".to_string(),
-        ))
-        .await?;
-        conn.execute(Statement::from_string(
-            backend,
-            SQL_CREATE_SERIES.to_string(),
-        ))
-        .await?;
-        conn.execute(Statement::from_string(
-            backend,
-            SQL_CREATE_SERIES_ITEMS.to_string(),
-        ))
-        .await?;
-        conn.execute(Statement::from_string(
-            backend,
-            "PRAGMA foreign_keys = ON".to_string(),
-        ))
-        .await?;
+        // 清空 + 重建必须在**同一个连接**上完成：`PRAGMA foreign_keys` 是连接级状态，而
+        // SchemaManager 背后是连接池（sea-orm-migration 只对 Postgres 包事务，SQLite 上
+        // 每条 execute 各自 acquire）。逐条 execute 会让 OFF/ON 落到不同连接，把
+        // `foreign_keys=OFF` 的连接留在池里，之后该连接上 `ON DELETE CASCADE` 静默失效。
+        // 因此与 m20260801_000011 一致：pragma + DDL 合成一个多语句串（一次 acquire）。
+        let sql = format!(
+            "DELETE FROM series_items;
+DELETE FROM series;
+PRAGMA foreign_keys = OFF;
+DROP TABLE IF EXISTS series_items;
+DROP TABLE IF EXISTS series;
+{};
+{};
+PRAGMA foreign_keys = ON",
+            SQL_CREATE_SERIES.trim(),
+            SQL_CREATE_SERIES_ITEMS.trim()
+        );
+        conn.execute_unprepared(&sql).await?;
 
         Ok(())
     }
