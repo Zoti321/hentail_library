@@ -190,17 +190,8 @@ fn detail_aggregation_excludes_trash_and_healthy_hidden() {
                 "safe",
             )
             .await;
-            db.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                "INSERT INTO comic_tags (comic_id, tag_name) SELECT 'vis', 'tag-a' \
-                 WHERE NOT EXISTS (SELECT 1 FROM tags WHERE name = 'tag-a'); \
-                 INSERT OR IGNORE INTO tags (name) VALUES ('tag-a'), ('tag-r18'), ('tag-gone'); \
-                 INSERT INTO comic_tags (comic_id, tag_name) VALUES ('vis', 'tag-a'), \
-                 ('r18', 'tag-r18'), ('gone', 'tag-gone')"
-                    .to_string(),
-            ))
-            .await
-            .ok();
+            // 幂等播种：先补 tags 再挂关联，两者都用 OR IGNORE，
+            // 因此结果不依赖执行连接的 PRAGMA foreign_keys 状态。
             db.execute(Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
                 "INSERT OR IGNORE INTO tags (name) VALUES ('tag-a'), ('tag-r18'), ('tag-gone')"
@@ -210,7 +201,7 @@ fn detail_aggregation_excludes_trash_and_healthy_hidden() {
             .expect("tags");
             db.execute(Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
-                "INSERT INTO comic_tags (comic_id, tag_name) VALUES ('vis', 'tag-a'), \
+                "INSERT OR IGNORE INTO comic_tags (comic_id, tag_name) VALUES ('vis', 'tag-a'), \
                  ('r18', 'tag-r18'), ('gone', 'tag-gone')"
                     .to_string(),
             ))
