@@ -5,7 +5,8 @@ use std::path::Path;
 
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, TransactionTrait, Value};
 
-use crate::comic::dto::{now_ms, ComicDto};
+use crate::comic::dto::{now_ms, ComicDto, PageRequestDto};
+use crate::comic::pagination::paginate;
 use crate::comic::repository::load_comics_ordered;
 use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
@@ -181,11 +182,13 @@ pub async fn fetch_trashed_comics_page(
     page: i32,
     page_size: i32,
 ) -> Result<PagedTrashedComicResultDto, HentaiError> {
-    let page = page.max(1);
-    let page_size = page_size.max(1);
     let db = connection()?;
     let total_count = count_trashed_comics().await?.total;
-    let offset = (page as i64 - 1) * page_size as i64;
+    // 越界页保持原样：本路径是顺序翻页，不钳到末页。
+    let window = paginate(PageRequestDto { page, page_size }, total_count);
+    let page = window.page;
+    let page_size = window.page_size;
+    let offset = window.offset;
     let rows = db
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,

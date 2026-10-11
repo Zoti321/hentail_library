@@ -1,6 +1,9 @@
 use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
 
-use crate::comic::dto::{now_ms, serialize_languages, ComicDto, PagedComicResultDto};
+use crate::comic::dto::{
+    now_ms, serialize_languages, ComicDto, PageRequestDto, PagedComicResultDto,
+};
+use crate::comic::pagination::paginate;
 use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
@@ -282,16 +285,18 @@ pub async fn search_by_tag_expression_page(
             page_size,
         });
     }
-    let start = ((page - 1) as i64 * page_size as i64).min(total_count) as usize;
-    let end = (start as i64 + page_size as i64).min(total_count) as usize;
+    // 越界页保持原样，只把窗口按总行数截断（与关键字搜索同属顺序翻页路径）。
+    let window = paginate(PageRequestDto { page, page_size }, total_count);
+    let start = window.offset.min(total_count) as usize;
+    let end = (start as i64 + window.page_size as i64).min(total_count) as usize;
     let page_ids = ids[start..end].to_vec();
     let db = connection()?;
     let items = load_comics_ordered(&db, page_ids).await?;
     Ok(PagedComicResultDto {
         items,
         total_count,
-        page,
-        page_size,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 

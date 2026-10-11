@@ -16,6 +16,7 @@ use super::dto::{
     ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
 use super::page_query::{build_count_query, build_ids_page_query};
+use super::pagination::paginate;
 use super::visibility::visible_comic_sql;
 
 pub async fn count_all() -> Result<i64, HentaiError> {
@@ -52,42 +53,32 @@ pub async fn fetch_comics_page(
             page_size: request.page_size.max(1),
         });
     }
-    let page_size = request.page_size.max(1);
     let total_count = count_filtered(&db, &filter).await?;
-    let total_pages = if total_count <= 0 {
-        0
-    } else {
-        (total_count + page_size as i64 - 1) / page_size as i64
-    };
-    let mut effective_page = request.page.max(1);
-    if total_pages > 0 && effective_page as i64 > total_pages {
-        effective_page = total_pages as i32;
-    }
+    let window = paginate(request, total_count).clamped();
     if total_count <= 0 {
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
-            page_size,
+            page_size: window.page_size,
         });
     }
-    let offset = (effective_page - 1) * page_size;
     let library_root_path = resolve_library_root_path(&filter, expand_by_series).await?;
     let ids_query = build_ids_page_query(
         &filter,
         &sort,
         expand_by_series,
         library_root_path.as_deref(),
-        page_size,
-        offset,
+        window.page_size,
+        window.offset as i32,
     );
     let comic_ids = query_string_ids(&db, &ids_query).await?;
     let items = load_comics_ordered(&db, comic_ids).await?;
     Ok(PagedComicResultDto {
         items,
         total_count,
-        page: effective_page,
-        page_size,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 
@@ -175,7 +166,11 @@ pub async fn search_by_keyword_page(
         .ok_or_else(|| HentaiError::db_query_failed("search count 无结果", None))?
         .try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
-    let offset = (page - 1) as i64 * page_size as i64;
+    // 越界页保持原样：本路径是顺序翻页（由 `has_next` 驱动），不钳到末页。
+    let window = paginate(PageRequestDto { page, page_size }, total_count);
+    let offset = window.offset;
+    let page = window.page;
+    let page_size = window.page_size;
     let ids_stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!(

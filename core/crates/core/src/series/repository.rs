@@ -9,7 +9,7 @@ use sea_orm::sea_query::Expr;
 
 use crate::comic::visibility::{series_browsable_sql, visible_comic_id_sql, visible_comic_sql};
 use crate::comic::{
-    load_comics_ordered, search_comic_ids_by_tag_expression, ComicDto, PageRequestDto,
+    load_comics_ordered, paginate, search_comic_ids_by_tag_expression, ComicDto, PageRequestDto,
 };
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
@@ -116,41 +116,31 @@ pub async fn fetch_series_page(
             page_size: request.page_size.max(1),
         });
     }
-    let page_size = request.page_size.max(1);
     let total_count = count_filtered_series(&db, &filter).await?;
-    let total_pages = if total_count <= 0 {
-        0
-    } else {
-        (total_count + page_size as i64 - 1) / page_size as i64
-    };
-    let mut effective_page = request.page.max(1);
-    if total_pages > 0 && effective_page as i64 > total_pages {
-        effective_page = total_pages as i32;
-    }
+    let window = paginate(request, total_count).clamped();
     if total_count <= 0 {
         return Ok(PagedSeriesResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
-            page_size,
+            page_size: window.page_size,
         });
     }
-    let offset = (effective_page - 1) * page_size;
     let prefer_root_folder_path = resolve_prefer_root_folder_path(&filter).await?;
     let ids_query = build_ids_page_query(
         &filter,
         &sort,
         prefer_root_folder_path.as_deref(),
-        page_size,
-        offset,
+        window.page_size,
+        window.offset as i32,
     );
     let series_ids = query_series_ids(&db, &ids_query).await?;
     let items = load_series_by_ids(&db, series_ids).await?;
     Ok(PagedSeriesResultDto {
         items,
         total_count,
-        page: effective_page,
-        page_size,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 
@@ -216,27 +206,19 @@ pub async fn fetch_series_comics_page(
             page_size: request.page_size.max(1),
         });
     }
-    let page_size = request.page_size.max(1);
     let total_count = count_series_items(&db, series_id).await?;
-    let total_pages = if total_count <= 0 {
-        0
-    } else {
-        (total_count + page_size as i64 - 1) / page_size as i64
-    };
-    let mut effective_page = request.page.max(1);
-    if total_pages > 0 && effective_page as i64 > total_pages {
-        effective_page = total_pages as i32;
-    }
+    let window = paginate(request, total_count).clamped();
     if total_count <= 0 {
         return Ok(PagedSeriesComicsResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
-            page_size,
+            page_size: window.page_size,
         });
     }
-    let offset = (effective_page - 1) * page_size;
-    let id_orders = query_series_comic_id_orders_page(&db, series_id, page_size, offset).await?;
+    let id_orders =
+        query_series_comic_id_orders_page(&db, series_id, window.page_size, window.offset as i32)
+            .await?;
     let comic_ids: Vec<String> = id_orders.iter().map(|(id, _, _)| id.clone()).collect();
     let order_by_id: HashMap<String, (f64, bool)> = id_orders
         .into_iter()
@@ -260,8 +242,8 @@ pub async fn fetch_series_comics_page(
     Ok(PagedSeriesComicsResultDto {
         items,
         total_count,
-        page: effective_page,
-        page_size,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 

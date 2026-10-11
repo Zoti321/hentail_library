@@ -2,7 +2,7 @@ use hentai_core::{
     add_author as core_add, add_author_link as core_add_link, count_all_authors as core_count,
     delete_author_link as core_delete_link, delete_authors_by_names,
     fetch_authors_page as core_fetch, get_author_detail as core_detail, list_all_authors,
-    list_author_links as core_list_links, load_author_image as core_load_image,
+    list_author_links as core_list_links, load_author_image as core_load_image, paginate,
     rename_author as core_rename, resolve_author_image as core_image,
     update_author_link as core_update_link, watch_authors, AuthorIdentity, AuthorImageRef,
     AuthorImageSlot, AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform,
@@ -174,29 +174,23 @@ pub async fn fetch_authors_page_frb(
     request: PageRequestDto,
 ) -> Result<AuthorPagedDto, HentaiErrorDto> {
     let total = core_count().await.map_err(HentaiErrorDto::from)?;
-    let page_size = request.page_size.max(1);
+    let window = paginate(request.into(), total).clamped();
     if total <= 0 {
         return Ok(AuthorPagedDto {
             items: vec![],
             total_count: 0,
             page: 1,
-            page_size,
+            page_size: window.page_size,
         });
     }
-    let total_pages = (total + page_size as i64 - 1) / page_size as i64;
-    let mut page = request.page.max(1);
-    if page as i64 > total_pages {
-        page = total_pages as i32;
-    }
-    let offset = (page - 1) * page_size;
-    let items = core_fetch(page_size, offset)
+    let items = core_fetch(window.page_size, window.offset as i32)
         .await
         .map_err(HentaiErrorDto::from)?;
     Ok(AuthorPagedDto {
         items: items.into_iter().map(AuthorIdentityFrbDto::from).collect(),
         total_count: total,
-        page,
-        page_size,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 
