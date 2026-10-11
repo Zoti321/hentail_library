@@ -10,8 +10,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_series_age_restriction_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_accordion.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
@@ -92,11 +91,8 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                                   .toggleAgeRestrictionOption(option);
                             case LibraryDisplayTarget.series:
                               ref
-                                  .read(
-                                    librarySeriesAgeRestrictionFilterProvider
-                                        .notifier,
-                                  )
-                                  .toggleFilterOption(option);
+                                  .read(librarySeriesFiltersProvider.notifier)
+                                  .toggleAgeRestrictionOption(option);
                           }
                         },
                       ),
@@ -270,19 +266,18 @@ class _LibrarySerializationStatusFilterControlsState
           child: Column(
             children: LibrarySerializationStatusFilter.selectableOptions
                 .map(
-                  (
-                    LibrarySerializationStatusFilter option,
-                  ) => _FilterCheckboxOptionRow(
-                    label: l10n.librarySerializationStatusFilterLabel(option),
-                    selected: selected == option,
-                    onTap: () {
-                      ref
-                          .read(
-                            librarySerializationStatusFilterProvider.notifier,
-                          )
-                          .toggleFilterOption(option);
-                    },
-                  ),
+                  (LibrarySerializationStatusFilter option) =>
+                      _FilterCheckboxOptionRow(
+                        label: l10n.librarySerializationStatusFilterLabel(
+                          option,
+                        ),
+                        selected: selected == option,
+                        onTap: () {
+                          ref
+                              .read(librarySeriesFiltersProvider.notifier)
+                              .toggleSerializationStatusFilterOption(option);
+                        },
+                      ),
                 )
                 .toList(),
           ),

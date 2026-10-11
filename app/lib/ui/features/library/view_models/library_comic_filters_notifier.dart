@@ -135,7 +135,7 @@ class LibraryComicFiltersState {
 }
 
 /// 年龄限制存储键：Comics 归本模块，Series 归
-/// [librarySeriesAgeRestrictionFilterProvider]。
+/// [LibrarySeriesFiltersNotifier]。
 const String kLibraryComicsAgeRestrictionStorageKey =
     'library_age_restriction_filter_comics';
 const String kLibrarySeriesAgeRestrictionStorageKey =

@@ -7,7 +7,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_comic_fil
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_series_filter_reset_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
@@ -96,7 +96,7 @@ class LibraryPageFacadeNotifier extends _$LibraryPageFacadeNotifier {
       case LibraryDisplayTarget.comics:
         await ref.read(libraryComicFiltersProvider.notifier).resetAll();
       case LibraryDisplayTarget.series:
-        await ref.read(librarySeriesFilterResetProvider.notifier).resetAll();
+        await ref.read(librarySeriesFiltersProvider.notifier).resetAll();
     }
   }
 

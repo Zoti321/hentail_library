@@ -34,7 +34,6 @@ test/ui/core/interaction/app_motion_test.dart
 test/ui/core/interaction/interactive_target_test.dart
 test/ui/core/interaction/reader_input_test.dart
 test/ui/core/theme/hentai_color_scheme_tokens_test.dart
-test/ui/features/library/library_series_sort_codec_test.dart
 test/ui/features/library/stable_page_count_test.dart
 test/ui/features/library/view_models/catalog_pagination_engine_test.dart
 test/ui/features/library/view_models/comic_detail_return_series_notifier_test.dart
@@ -43,7 +42,7 @@ test/ui/features/library/view_models/comic_metadata_editor_notifier_test.dart
 test/ui/features/library/view_models/library_comic_filters_notifier_test.dart
 test/ui/features/library/view_models/library_page_facade_test.dart
 test/ui/features/library/view_models/library_search_query_parser_test.dart
-test/ui/features/library/view_models/library_series_filter_reset_notifier_test.dart
+test/ui/features/library/view_models/library_series_filters_notifier_test.dart
 test/ui/features/library/view_models/series_item_sort_persist_test.dart
 test/ui/features/library/view_models/series_metadata_editor_notifier_test.dart
 test/ui/features/reader/reader_exit_location_test.dart

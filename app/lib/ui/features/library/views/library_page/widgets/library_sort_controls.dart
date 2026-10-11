@@ -8,7 +8,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_series_sort_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -172,7 +172,7 @@ class _SeriesSortListRow extends ConsumerWidget {
         onTap: isImplemented
             ? () {
                 ref
-                    .read(librarySeriesSortProvider.notifier)
+                    .read(librarySeriesFiltersProvider.notifier)
                     .setSortField(field);
               }
             : null,
