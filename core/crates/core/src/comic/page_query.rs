@@ -199,7 +199,7 @@ mod tests {
             0,
         );
         assert!(sql.sql.contains("comic_authors ca"));
-        assert!(sql.sql.contains("ca.author_id = ?"));
+        assert!(sql.sql.contains("lower(ca.author_name) = ?"));
     }
 
     #[test]

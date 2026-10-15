@@ -41,13 +41,12 @@ async fn seed_export_fixture(db: &impl ConnectionTrait, library_id: &str) {
 
     db.execute(Statement::from_string(
         sea_orm::DatabaseBackend::Sqlite,
-        "         INSERT INTO tags (name) VALUES ('冒险'), ('孤立标签'); \
+        "INSERT INTO tags (name) VALUES ('冒险'), ('孤立标签'); \
          INSERT INTO authors (name) VALUES ('作者A'); \
          INSERT INTO parodies (name) VALUES ('原神'); \
          INSERT INTO characters (name) VALUES ('角色A'); \
          INSERT INTO comic_tags (comic_id, tag_name) VALUES ('c1', '冒险'); \
-         INSERT INTO comic_authors (comic_id, author_id) \
-           SELECT 'c1', id FROM authors WHERE name = '作者A'; \
+         INSERT INTO comic_authors (comic_id, author_name) VALUES ('c1', '作者A'); \
          INSERT INTO comic_parodies (comic_id, parody_name) VALUES ('c1', '原神'); \
          INSERT INTO comic_characters (comic_id, character_name) VALUES ('c1', '角色A')"
             .to_string(),

@@ -8,276 +8,36 @@ import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
 
-Future<List<AuthorIdentityFrbDto>> listAllAuthorsFrb() =>
+List<String> listAllAuthorsFrb() =>
     RustLib.instance.api.crateApiAuthorListAllAuthorsFrb();
 
-Future<AuthorPagedDto> fetchAuthorsPageFrb({required PageRequestDto request}) =>
+AuthorPagedNamesDto fetchAuthorsPageFrb({required PageRequestDto request}) =>
     RustLib.instance.api.crateApiAuthorFetchAuthorsPageFrb(request: request);
 
-Future<AuthorIdentityFrbDto> addAuthorFrb({required String name}) =>
+void addAuthorFrb({required String name}) =>
     RustLib.instance.api.crateApiAuthorAddAuthorFrb(name: name);
 
-Future<void> deleteAuthorsByNamesFrb({required List<String> names}) =>
+void deleteAuthorsByNamesFrb({required List<String> names}) =>
     RustLib.instance.api.crateApiAuthorDeleteAuthorsByNamesFrb(names: names);
 
-Future<void> renameAuthorFrb({
-  required String oldName,
-  required String newName,
-}) => RustLib.instance.api.crateApiAuthorRenameAuthorFrb(
-  oldName: oldName,
-  newName: newName,
-);
+void renameAuthorFrb({required String oldName, required String newName}) =>
+    RustLib.instance.api.crateApiAuthorRenameAuthorFrb(
+      oldName: oldName,
+      newName: newName,
+    );
 
-Stream<List<AuthorIdentityFrbDto>> watchAuthorsFrb() =>
+Stream<List<String>> watchAuthorsFrb() =>
     RustLib.instance.api.crateApiAuthorWatchAuthorsFrb();
 
-Future<AuthorDetailFrbDto?> getAuthorDetailFrb({
-  required PlatformInt64 authorId,
-  required bool showR18,
-}) => RustLib.instance.api.crateApiAuthorGetAuthorDetailFrb(
-  authorId: authorId,
-  showR18: showR18,
-);
-
-Future<List<AuthorLinkFrbDto>> listAuthorLinksFrb({
-  required PlatformInt64 authorId,
-}) => RustLib.instance.api.crateApiAuthorListAuthorLinksFrb(authorId: authorId);
-
-Future<AuthorLinkFrbDto> addAuthorLinkFrb({
-  required PlatformInt64 authorId,
-  required AuthorLinkPlatformFrb platform,
-  required String url,
-  String? platformDisplayName,
-}) => RustLib.instance.api.crateApiAuthorAddAuthorLinkFrb(
-  authorId: authorId,
-  platform: platform,
-  url: url,
-  platformDisplayName: platformDisplayName,
-);
-
-Future<void> updateAuthorLinkFrb({
-  required PlatformInt64 linkId,
-  required AuthorLinkPlatformFrb platform,
-  required String url,
-  String? platformDisplayName,
-}) => RustLib.instance.api.crateApiAuthorUpdateAuthorLinkFrb(
-  linkId: linkId,
-  platform: platform,
-  url: url,
-  platformDisplayName: platformDisplayName,
-);
-
-Future<void> deleteAuthorLinkFrb({
-  required PlatformInt64 authorId,
-  required PlatformInt64 linkId,
-}) => RustLib.instance.api.crateApiAuthorDeleteAuthorLinkFrb(
-  authorId: authorId,
-  linkId: linkId,
-);
-
-Future<AuthorImageRefFrbDto> resolveAuthorImageFrb({
-  required PlatformInt64 authorId,
-  required bool showR18,
-}) => RustLib.instance.api.crateApiAuthorResolveAuthorImageFrb(
-  authorId: authorId,
-  showR18: showR18,
-);
-
-Future<Uint8List?> loadAuthorImageFrb({
-  required PlatformInt64 authorId,
-  required AuthorImageSlotFrb slot,
-  required bool showR18,
-}) => RustLib.instance.api.crateApiAuthorLoadAuthorImageFrb(
-  authorId: authorId,
-  slot: slot,
-  showR18: showR18,
-);
-
-class AuthorDetailFrbDto {
-  final AuthorIdentityFrbDto identity;
-  final List<AuthorLinkFrbDto> links;
-  final List<AuthorFacetCountFrbDto> tags;
-  final List<AuthorFacetCountFrbDto> parodies;
-  final List<AuthorFacetCountFrbDto> characters;
-  final List<AuthorTopComicFrbDto> topComics;
-  final PlatformInt64 comicCount;
-
-  const AuthorDetailFrbDto({
-    required this.identity,
-    required this.links,
-    required this.tags,
-    required this.parodies,
-    required this.characters,
-    required this.topComics,
-    required this.comicCount,
-  });
-
-  @override
-  int get hashCode =>
-      identity.hashCode ^
-      links.hashCode ^
-      tags.hashCode ^
-      parodies.hashCode ^
-      characters.hashCode ^
-      topComics.hashCode ^
-      comicCount.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthorDetailFrbDto &&
-          runtimeType == other.runtimeType &&
-          identity == other.identity &&
-          links == other.links &&
-          tags == other.tags &&
-          parodies == other.parodies &&
-          characters == other.characters &&
-          topComics == other.topComics &&
-          comicCount == other.comicCount;
-}
-
-class AuthorFacetCountFrbDto {
-  final String name;
-  final PlatformInt64 attachmentCount;
-
-  const AuthorFacetCountFrbDto({
-    required this.name,
-    required this.attachmentCount,
-  });
-
-  @override
-  int get hashCode => name.hashCode ^ attachmentCount.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthorFacetCountFrbDto &&
-          runtimeType == other.runtimeType &&
-          name == other.name &&
-          attachmentCount == other.attachmentCount;
-}
-
-class AuthorIdentityFrbDto {
-  final PlatformInt64 id;
-  final String name;
-  final bool verified;
-
-  const AuthorIdentityFrbDto({
-    required this.id,
-    required this.name,
-    required this.verified,
-  });
-
-  @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ verified.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthorIdentityFrbDto &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name &&
-          verified == other.verified;
-}
-
-class AuthorImageRefFrbDto {
-  final AuthorImageSourceFrb avatarSource;
-  final String? avatarComicId;
-  final PlatformInt64? avatarLinkId;
-  final String? avatarImageUrl;
-  final AuthorImageSourceFrb backgroundSource;
-  final String? backgroundComicId;
-  final PlatformInt64? backgroundLinkId;
-  final String? backgroundImageUrl;
-
-  const AuthorImageRefFrbDto({
-    required this.avatarSource,
-    this.avatarComicId,
-    this.avatarLinkId,
-    this.avatarImageUrl,
-    required this.backgroundSource,
-    this.backgroundComicId,
-    this.backgroundLinkId,
-    this.backgroundImageUrl,
-  });
-
-  @override
-  int get hashCode =>
-      avatarSource.hashCode ^
-      avatarComicId.hashCode ^
-      avatarLinkId.hashCode ^
-      avatarImageUrl.hashCode ^
-      backgroundSource.hashCode ^
-      backgroundComicId.hashCode ^
-      backgroundLinkId.hashCode ^
-      backgroundImageUrl.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthorImageRefFrbDto &&
-          runtimeType == other.runtimeType &&
-          avatarSource == other.avatarSource &&
-          avatarComicId == other.avatarComicId &&
-          avatarLinkId == other.avatarLinkId &&
-          avatarImageUrl == other.avatarImageUrl &&
-          backgroundSource == other.backgroundSource &&
-          backgroundComicId == other.backgroundComicId &&
-          backgroundLinkId == other.backgroundLinkId &&
-          backgroundImageUrl == other.backgroundImageUrl;
-}
-
-enum AuthorImageSlotFrb { avatar, background }
-
-enum AuthorImageSourceFrb { platformCached, comicCover, none }
-
-class AuthorLinkFrbDto {
-  final PlatformInt64 id;
-  final AuthorLinkPlatformFrb platform;
-  final String url;
-  final String? platformDisplayName;
-  final PlatformInt64 sortKey;
-
-  const AuthorLinkFrbDto({
-    required this.id,
-    required this.platform,
-    required this.url,
-    this.platformDisplayName,
-    required this.sortKey,
-  });
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      platform.hashCode ^
-      url.hashCode ^
-      platformDisplayName.hashCode ^
-      sortKey.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthorLinkFrbDto &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          platform == other.platform &&
-          url == other.url &&
-          platformDisplayName == other.platformDisplayName &&
-          sortKey == other.sortKey;
-}
-
-enum AuthorLinkPlatformFrb { pixiv, x, patreon, fanbox, discord, other }
-
-class AuthorPagedDto {
-  final List<AuthorIdentityFrbDto> items;
+class AuthorPagedNamesDto {
+  final List<String> items;
   final PlatformInt64 totalCount;
   final int page;
   final int pageSize;
 
-  const AuthorPagedDto({
+  const AuthorPagedNamesDto({
     required this.items,
     required this.totalCount,
     required this.page,
@@ -291,28 +51,10 @@ class AuthorPagedDto {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AuthorPagedDto &&
+      other is AuthorPagedNamesDto &&
           runtimeType == other.runtimeType &&
           items == other.items &&
           totalCount == other.totalCount &&
           page == other.page &&
           pageSize == other.pageSize;
-}
-
-class AuthorTopComicFrbDto {
-  final String comicId;
-  final String title;
-
-  const AuthorTopComicFrbDto({required this.comicId, required this.title});
-
-  @override
-  int get hashCode => comicId.hashCode ^ title.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthorTopComicFrbDto &&
-          runtimeType == other.runtimeType &&
-          comicId == other.comicId &&
-          title == other.title;
 }

@@ -50,16 +50,6 @@ void renameNamedFacetNameFrb({
   newName: newName,
 );
 
-void mergeNamedFacetNameFrb({
-  required JunctionNamedFacetFrb facet,
-  required String sourceName,
-  required String targetName,
-}) => RustLib.instance.api.crateApiNamedFacetMergeNamedFacetNameFrb(
-  facet: facet,
-  sourceName: sourceName,
-  targetName: targetName,
-);
-
 Future<PlatformInt64> countNamedFacetAttachmentsFrb({
   required JunctionNamedFacetFrb facet,
   required String name,

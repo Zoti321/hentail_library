@@ -22,7 +22,6 @@
 | [searched.md](pages/searched.md) | `/searched?q=` | `SearchedPage` |
 | [settings.md](pages/settings.md) | `/settings` | `SettingsPage` |
 | [metadata.md](pages/metadata.md) | `/metadata?tab=` | `MetadataManagementPage` |
-| [author-detail.md](pages/author-detail.md) | modal (`AuthorDetailSurface`) | `AuthorDetailSurface` |
 | [comic-detail.md](pages/comic-detail.md) | `/comic/:id` | `ComicDetailPage` |
 | [series-detail.md](pages/series-detail.md) | `/series/:id` | `SeriesDetailPage` |
 | [reader.md](pages/reader.md) | `/reader?...` | `ReaderPage` |

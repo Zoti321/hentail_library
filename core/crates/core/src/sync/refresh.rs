@@ -1,6 +1,4 @@
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set, TransactionTrait,
-};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
 
 use crate::comic::find_comic_by_id;
 use crate::db::{connection, map_db_err};
@@ -17,9 +15,9 @@ use crate::series_id::series_name_from_folder_path;
 use crate::util::compute_sort_key;
 
 use super::handle::SyncHandle;
+use super::library_lock::try_acquire_library_write_lock;
 use super::remote::normalize_remote_location_key;
 use super::writer::upsert_comics;
-use crate::library_write::with_library_write;
 
 #[derive(Debug, Clone)]
 pub struct RefreshSeriesProgressDto {
@@ -48,7 +46,8 @@ pub struct RefreshLibraryResultDto {
 
 /// 重解析单本 Comic 的 Resource 元数据，按字段锁 merge 后写回（不动缩略图）。
 pub async fn refresh_comic_metadata(comic_id: &str) -> Result<(), HentaiError> {
-    with_library_write(|| refresh_comic_metadata_locked(comic_id)).await
+    let _guard = try_acquire_library_write_lock()?;
+    refresh_comic_metadata_locked(comic_id).await
 }
 
 pub(crate) async fn refresh_comic_metadata_locked(comic_id: &str) -> Result<(), HentaiError> {
@@ -61,9 +60,6 @@ pub(crate) async fn refresh_comic_metadata_locked(comic_id: &str) -> Result<(), 
 }
 
 /// Injected-access refresh (FakeResourceAccess / tests).
-///
-/// File I/O (stat + parse) happens before the transaction opens, per ADR-0026:
-/// the transaction covers exactly one Comic's write set, one Comic at a time.
 pub async fn refresh_comic_metadata_with(
     access: &dyn ResourceAccess,
     comic_id: &str,
@@ -82,19 +78,7 @@ pub async fn refresh_comic_metadata_with(
     })?;
     let scanned = parsed_to_comic(&parsed);
     let merged = merge_refresh_scan_with_existing(&scanned, &existing);
-
-    let txn = db.begin().await.map_err(map_db_err)?;
-    let skipped = upsert_comics(&txn, std::slice::from_ref(&merged)).await?;
-    if skipped.iter().any(|id| id == &merged.comic_id) {
-        // Nothing was written (upsert skips page_count <= 0). Reporting success
-        // here would tell the user the refresh worked while the library kept its
-        // previous values, so treat it as a per-Comic failure.
-        return Err(HentaiError::validation(format!(
-            "无法刷新元数据（未获得有效页数，已保留库内数据）: {}",
-            existing.path
-        )));
-    }
-    txn.commit().await.map_err(map_db_err)?;
+    upsert_comics(&db, &[merged]).await?;
     Ok(())
 }
 
@@ -103,16 +87,9 @@ pub async fn refresh_comic_metadata_with(
 pub async fn refresh_series_metadata(
     series_id: &str,
     handle: &SyncHandle,
-    emit: impl FnMut(RefreshSeriesProgressDto),
-) -> Result<RefreshSeriesResultDto, HentaiError> {
-    with_library_write(|| refresh_series_metadata_locked(series_id, handle, emit)).await
-}
-
-async fn refresh_series_metadata_locked(
-    series_id: &str,
-    handle: &SyncHandle,
     mut emit: impl FnMut(RefreshSeriesProgressDto),
 ) -> Result<RefreshSeriesResultDto, HentaiError> {
+    let _guard = try_acquire_library_write_lock()?;
     let db = connection()?;
 
     let series_row = Series::find_by_id(series_id.to_string())
@@ -189,16 +166,9 @@ async fn refresh_series_metadata_locked(
 pub async fn refresh_library_metadata(
     library_id: &str,
     handle: &SyncHandle,
-    emit: impl FnMut(RefreshSeriesProgressDto),
-) -> Result<RefreshLibraryResultDto, HentaiError> {
-    with_library_write(|| refresh_library_metadata_locked(library_id, handle, emit)).await
-}
-
-async fn refresh_library_metadata_locked(
-    library_id: &str,
-    handle: &SyncHandle,
     mut emit: impl FnMut(RefreshSeriesProgressDto),
 ) -> Result<RefreshLibraryResultDto, HentaiError> {
+    let _guard = try_acquire_library_write_lock()?;
     let db = connection()?;
 
     let library = find_library_by_id(library_id)

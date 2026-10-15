@@ -10,7 +10,6 @@ pub struct Model {
     pub source_modified_ms: Option<i64>,
     pub source_size: Option<i64>,
     pub is_user_set: bool,
-    pub source_page_index: Option<i32>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

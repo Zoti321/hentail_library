@@ -69,6 +69,4 @@ core/vendor/**/libpdfium.dylib
 
 development.md
 .cursor
-.codex/
-app/.flutter_tool_state
 /dist_installer/

@@ -14,9 +14,6 @@ enum ReadSessionFailureKind {
   /// 打开或 Resource access 超时。
   timedOut,
 
-  /// Comic 处于 trash（「已删除」），拒绝打开。
-  comicTrashed,
-
   /// 空页、损坏、类型不匹配等无效内容。
   invalidOrEmptyContent,
 

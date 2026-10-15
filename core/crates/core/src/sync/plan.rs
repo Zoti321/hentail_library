@@ -7,12 +7,12 @@ use crate::db::map_db_err;
 use crate::entity::prelude::*;
 use crate::error::HentaiError;
 
-use super::scanner::ScanItem;
-use crate::metadata_lock::merge_kept_scan_with_existing;
-use crate::path_migration::{
+use super::migrate::{
     comic_migration_new_paths, detect_path_migration_pairs, detect_series_path_migration_pairs,
     migrated_id_sets, ComicMigration, ComicMigrationPair, SeriesMigrationPair,
 };
+use super::scanner::ScanItem;
+use crate::metadata_lock::merge_kept_scan_with_existing;
 use crate::resource::can_generate_thumbnail;
 
 pub struct ComicScanReplacePlan {

@@ -7,9 +7,11 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_distinct_metadata_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_controls.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
@@ -34,17 +36,16 @@ final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((
       );
 });
 
-/// Sorted author ids for the library filter drawer; labels are display names.
+/// Sorted author names for the library filter drawer.
 final libraryFilterAuthorNamesProvider = Provider<AsyncValue<List<String>>>((
   Ref ref,
 ) {
   return ref.watch(allAuthorsProvider).whenData((List<Author> authors) {
-    final List<Author> sorted = List<Author>.of(authors)
-      ..sort((Author a, Author b) => a.name.compareTo(b.name));
-    return sorted
-        .where((Author author) => author.id != null)
-        .map((Author author) => '${author.id}')
+    final List<String> names = authors
+        .map((Author author) => author.name)
         .toList();
+    names.sort();
+    return names;
   });
 });
 
@@ -63,12 +64,12 @@ class LibraryTagFilterControls extends ConsumerWidget {
     final AsyncValue<List<String>> namesAsync = ref.watch(
       libraryFilterTagNamesProvider,
     );
-    final LibraryMetadataFilterSelection selection = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.tagFilter ?? const LibraryMetadataFilterSelection(),
-      ),
-    );
+    final LibraryMetadataFilterSelection selection = ref
+        .watch(libraryTagFilterProvider)
+        .maybeWhen(
+          data: (LibraryMetadataFilterSelection value) => value,
+          orElse: () => const LibraryMetadataFilterSelection(),
+        );
     final List<String> names = namesAsync.maybeWhen(
       data: (List<String> value) => value,
       orElse: () => const <String>[],
@@ -79,11 +80,11 @@ class LibraryTagFilterControls extends ConsumerWidget {
       names: names,
       selection: selection,
       isLoading: namesAsync.isLoading,
-      onToggle: ref.read(libraryComicFiltersProvider.notifier).toggleTag,
+      onToggle: ref.read(libraryTagFilterProvider.notifier).toggle,
       onIncludeModeChanged: ref
-          .read(libraryComicFiltersProvider.notifier)
-          .setTagIncludeMode,
-      onClear: ref.read(libraryComicFiltersProvider.notifier).clearTag,
+          .read(libraryTagFilterProvider.notifier)
+          .setIncludeMode,
+      onClear: ref.read(libraryTagFilterProvider.notifier).clear,
     );
   }
 }
@@ -103,12 +104,12 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
     final AsyncValue<List<String>> namesAsync = ref.watch(
       libraryFilterAuthorNamesProvider,
     );
-    final LibraryMetadataFilterSelection selection = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.authorFilter ?? const LibraryMetadataFilterSelection(),
-      ),
-    );
+    final LibraryMetadataFilterSelection selection = ref
+        .watch(libraryAuthorFilterProvider)
+        .maybeWhen(
+          data: (LibraryMetadataFilterSelection value) => value,
+          orElse: () => const LibraryMetadataFilterSelection(),
+        );
     final List<String> names = namesAsync.maybeWhen(
       data: (List<String> value) => value,
       orElse: () => const <String>[],
@@ -119,25 +120,11 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
       names: names,
       selection: selection,
       isLoading: namesAsync.isLoading,
-      labelFor: (String id) {
-        final authors = ref
-            .watch(allAuthorsProvider)
-            .maybeWhen(
-              data: (List<Author> value) => value,
-              orElse: () => const <Author>[],
-            );
-        for (final Author author in authors) {
-          if ('${author.id}' == id) {
-            return author.name;
-          }
-        }
-        return id;
-      },
-      onToggle: ref.read(libraryComicFiltersProvider.notifier).toggleAuthor,
+      onToggle: ref.read(libraryAuthorFilterProvider.notifier).toggle,
       onIncludeModeChanged: ref
-          .read(libraryComicFiltersProvider.notifier)
-          .setAuthorIncludeMode,
-      onClear: ref.read(libraryComicFiltersProvider.notifier).clearAuthor,
+          .read(libraryAuthorFilterProvider.notifier)
+          .setIncludeMode,
+      onClear: ref.read(libraryAuthorFilterProvider.notifier).clear,
     );
   }
 }
@@ -155,10 +142,7 @@ class LibraryLanguageFilterControls extends ConsumerWidget {
     }
 
     final Set<String> selected = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.languageFilter ?? const <String>{},
-      ),
+      libraryComicsTabLanguageFilterProvider,
     );
 
     return LibraryMetadataFilterControls(
@@ -168,12 +152,20 @@ class LibraryLanguageFilterControls extends ConsumerWidget {
       includeOnly: true,
       enablePinyinAssistedNameMatch: false,
       labelFor: context.l10n.comicLanguageLabel,
-      onToggle: (String name) => ref
-          .read(libraryComicFiltersProvider.notifier)
-          .toggleIncludeSet(LibraryIncludeSetKind.language, name),
-      onClear: () => ref
-          .read(libraryComicFiltersProvider.notifier)
-          .clearIncludeSet(LibraryIncludeSetKind.language),
+      onToggle: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.language,
+            ).notifier,
+          )
+          .toggle,
+      onClear: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.language,
+            ).notifier,
+          )
+          .clear,
     );
   }
 }
@@ -194,10 +186,7 @@ class LibraryParodyFilterControls extends ConsumerWidget {
       libraryDistinctParodiesProvider,
     );
     final Set<String> selected = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.parodyFilter ?? const <String>{},
-      ),
+      libraryComicsTabParodyFilterProvider,
     );
     final List<String> names = parodiesAsync.maybeWhen(
       data: (List<String> parodies) => parodies.toList()..sort(),
@@ -210,12 +199,20 @@ class LibraryParodyFilterControls extends ConsumerWidget {
       selection: includeOnlyFilterSelection(selected),
       includeOnly: true,
       isLoading: parodiesAsync.isLoading,
-      onToggle: (String name) => ref
-          .read(libraryComicFiltersProvider.notifier)
-          .toggleIncludeSet(LibraryIncludeSetKind.parody, name),
-      onClear: () => ref
-          .read(libraryComicFiltersProvider.notifier)
-          .clearIncludeSet(LibraryIncludeSetKind.parody),
+      onToggle: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.parody,
+            ).notifier,
+          )
+          .toggle,
+      onClear: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.parody,
+            ).notifier,
+          )
+          .clear,
     );
   }
 }
@@ -236,10 +233,7 @@ class LibraryCharacterFilterControls extends ConsumerWidget {
       libraryDistinctCharactersProvider,
     );
     final Set<String> selected = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.characterFilter ?? const <String>{},
-      ),
+      libraryComicsTabCharacterFilterProvider,
     );
     final List<String> names = charactersAsync.maybeWhen(
       data: (List<String> characters) => characters.toList()..sort(),
@@ -252,12 +246,20 @@ class LibraryCharacterFilterControls extends ConsumerWidget {
       selection: includeOnlyFilterSelection(selected),
       includeOnly: true,
       isLoading: charactersAsync.isLoading,
-      onToggle: (String name) => ref
-          .read(libraryComicFiltersProvider.notifier)
-          .toggleIncludeSet(LibraryIncludeSetKind.character, name),
-      onClear: () => ref
-          .read(libraryComicFiltersProvider.notifier)
-          .clearIncludeSet(LibraryIncludeSetKind.character),
+      onToggle: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.character,
+            ).notifier,
+          )
+          .toggle,
+      onClear: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.character,
+            ).notifier,
+          )
+          .clear,
     );
   }
 }

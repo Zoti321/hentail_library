@@ -11,7 +11,7 @@ import 'package:hentai_library/ui/core/widgets/element/chip/detail_meta_chip_ban
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
-import 'package:hentai_library/ui/features/library/views/widgets/show_author_detail.dart';
+import 'package:hentai_library/ui/features/reader/reader.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -209,13 +209,13 @@ class ComicDetailDescription extends StatelessWidget {
 }
 
 /// 作者、标签与资源信息统一信息区。
-class ComicDetailMetadataBlock extends ConsumerWidget {
+class ComicDetailMetadataBlock extends StatelessWidget {
   const ComicDetailMetadataBlock({super.key, required this.comic});
 
   final Comic comic;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
     final List<String> authors = comic.authors.map((a) => a.name).toList();
@@ -237,9 +237,6 @@ class ComicDetailMetadataBlock extends ConsumerWidget {
           label: l10n.comicDetailAuthors,
           items: authors,
           maxRows: kDetailMetaChipBandMaxRowsSingle,
-          onItemTap: (String name) {
-            showAuthorDetailByName(context: context, ref: ref, name: name);
-          },
         ),
       );
     }

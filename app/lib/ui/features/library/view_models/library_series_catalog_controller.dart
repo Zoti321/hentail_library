@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/library/library_series_projection.dart';
+import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/domain/library/library_series_projection.dart';
+import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
@@ -11,7 +13,6 @@ import 'package:hentai_library/ui/features/library/view_models/library_catalog_s
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -19,6 +20,9 @@ import 'package:hentai_library/ui/features/shell/view_models/library_revision_no
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_series_catalog_controller.g.dart';
+
+const LibrarySeriesProjection _librarySeriesProjection =
+    LibrarySeriesProjection();
 
 @Riverpod(keepAlive: true)
 class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
@@ -40,7 +44,9 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
     _pagination.syncQueryKey((
       keyword,
-      ref.watch(librarySeriesFiltersQueryProvider),
+      ref.watch(librarySeriesTabAgeRestrictionFilterProvider),
+      ref.watch(librarySeriesTabSerializationStatusFilterProvider),
+      ref.watch(librarySeriesTabPreferLibraryRootSeriesProvider),
       ref.watch(librarySeriesTabSortOptionProvider),
       ref.watch(librarySeriesTabPageSizeProvider),
     ));
@@ -61,7 +67,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
-    final PagedResult<Series> page = await _fetchPage();
+    final PagedResult<Series> page = await _fetchPage(keyword);
     final int tableTotalCount = await ref.read(seriesRepoProvider).countAll();
 
     return LibrarySeriesCatalogState(
@@ -78,12 +84,24 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
   }
 
-  Future<PagedResult<Series>> _fetchPage() async {
-    final LibrarySeriesFilter filter = ref.read(
-      librarySeriesFiltersQueryProvider,
+  Future<PagedResult<Series>> _fetchPage(String keyword) async {
+    final LibraryAgeRestrictionFilter ageRestriction = ref.read(
+      librarySeriesTabAgeRestrictionFilterProvider,
+    );
+    final LibrarySerializationStatusFilter serializationStatusFilter = ref.read(
+      librarySeriesTabSerializationStatusFilterProvider,
+    );
+    final bool preferLibraryRootSeries = ref.read(
+      librarySeriesTabPreferLibraryRootSeriesProvider,
     );
     final LibrarySeriesSortOption sortOption = ref.read(
       librarySeriesTabSortOptionProvider,
+    );
+    final LibrarySeriesFilter filter = _librarySeriesProjection.buildListFilter(
+      ageRestriction: ageRestriction,
+      serializationStatusFilter: serializationStatusFilter,
+      preferLibraryRootSeries: preferLibraryRootSeries,
+      keyword: keyword,
     );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);
     return _pagination.fetchPage<Series>(

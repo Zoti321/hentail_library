@@ -18,7 +18,6 @@ String readSessionOpenFailureMessageFor(AppLocalizations l10n, Object error) {
       l10n.readerOpenRemoteUnreachable,
     ReadSessionFailureKind.remoteAuthFailed => l10n.readerOpenRemoteAuthFailed,
     ReadSessionFailureKind.timedOut => l10n.readerOpenTimedOut,
-    ReadSessionFailureKind.comicTrashed => l10n.readerOpenComicTrashed,
     ReadSessionFailureKind.invalidOrEmptyContent =>
       l10n.readerOpenInvalidContent,
     ReadSessionFailureKind.loadFailed => l10n.readerOpenLoadFailed,

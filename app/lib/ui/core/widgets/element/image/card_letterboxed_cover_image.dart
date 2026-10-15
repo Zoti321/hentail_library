@@ -4,7 +4,7 @@ import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_placeholder.dart';
 
-/// Catalog-card cover: white letterbox + [BoxFit.contain] by default.
+/// Catalog-card cover: white letterbox + [BoxFit.contain].
 ///
 /// Decode uses [cacheWidth] only so intrinsic aspect is preserved.
 class CardLetterboxedCoverImage extends StatelessWidget {
@@ -12,14 +12,10 @@ class CardLetterboxedCoverImage extends StatelessWidget {
     super.key,
     required this.cover,
     this.onDecodeError,
-    this.fit = BoxFit.contain,
-    this.alignment = Alignment.center,
   });
 
   final ComicCoverImage cover;
   final VoidCallback? onDecodeError;
-  final BoxFit fit;
-  final AlignmentGeometry alignment;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +31,7 @@ class CardLetterboxedCoverImage extends StatelessWidget {
           child: AppComicImage(
             filePath: cover.filePath,
             memoryBytes: cover.memoryBytes,
-            fit: fit,
-            alignment: alignment,
+            fit: BoxFit.contain,
             cacheWidth: cacheSize.cacheWidth,
             placeholder: const ComicCoverPlaceholder(
               variant: ComicCoverPlaceholderVariant.card,

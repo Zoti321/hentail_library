@@ -4,16 +4,24 @@ use crate::comic::dto::ComicDto;
 use crate::comic::repository::find_comics_by_ids;
 use crate::comic::write::{update_comic_user_meta, UpdateComicUserMetaDto};
 use crate::error::HentaiError;
-use crate::library_write::with_library_write;
-use crate::metadata_lock::merge_multi_value;
 use crate::sync::handle::SyncHandle;
+use crate::sync::library_lock::try_acquire_library_write_lock;
 
 pub const BULK_PATCH_MAX_IDS: usize = 2000;
 const MAX_ERROR_SAMPLES: usize = 5;
 
-// Re-exported so `crate::comic::bulk_patch::*` and the FRB export surface keep these paths;
-// the implementation lives in `metadata_lock::multi_value` (ADR-0007).
-pub use crate::metadata_lock::{MultiValueOp, MultiValuePatch};
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MultiValueOp {
+    Add,
+    Remove,
+    Replace,
+}
+
+#[derive(Debug, Clone)]
+pub struct MultiValuePatch {
+    pub op: MultiValueOp,
+    pub values: Vec<String>,
+}
 
 #[derive(Debug, Clone)]
 pub enum ScalarPatch {
@@ -63,6 +71,26 @@ impl ComicMetadataBulkPatch {
             || self.content_rating.is_some()
             || self.description.is_some()
             || self.published_at.is_some()
+    }
+}
+
+fn merge_multi_value(current: &[String], patch: &MultiValuePatch) -> Vec<String> {
+    match patch.op {
+        MultiValueOp::Add => {
+            let mut out = current.to_vec();
+            for value in &patch.values {
+                if !out.iter().any(|existing| existing == value) {
+                    out.push(value.clone());
+                }
+            }
+            out
+        }
+        MultiValueOp::Remove => current
+            .iter()
+            .filter(|value| !patch.values.iter().any(|remove| remove == *value))
+            .cloned()
+            .collect(),
+        MultiValueOp::Replace => patch.values.clone(),
     }
 }
 
@@ -179,14 +207,8 @@ pub async fn apply_comic_metadata_bulk_patch(
         }
     }
 
-    with_library_write(|| apply_comic_metadata_bulk_patch_locked(comic_ids, patch, handle)).await
-}
+    let _guard = try_acquire_library_write_lock()?;
 
-async fn apply_comic_metadata_bulk_patch_locked(
-    comic_ids: Vec<String>,
-    patch: ComicMetadataBulkPatch,
-    handle: &SyncHandle,
-) -> Result<BulkPatchResultDto, HentaiError> {
     let comics = find_comics_by_ids(comic_ids.clone()).await?;
     let library_ids: HashSet<String> = comics.iter().map(|c| c.library_id.clone()).collect();
     if library_ids.len() > 1 {
@@ -222,4 +244,45 @@ async fn apply_comic_metadata_bulk_patch_locked(
     }
 
     Ok(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn merge_add_dedupes_preserving_order() {
+        let current = vec!["a".to_string(), "b".to_string()];
+        let patch = MultiValuePatch {
+            op: MultiValueOp::Add,
+            values: vec!["b".to_string(), "c".to_string()],
+        };
+        assert_eq!(
+            merge_multi_value(&current, &patch),
+            vec!["a", "b", "c"]
+                .into_iter()
+                .map(String::from)
+                .collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn merge_remove_is_noop_when_missing() {
+        let current = vec!["a".to_string()];
+        let patch = MultiValuePatch {
+            op: MultiValueOp::Remove,
+            values: vec!["z".to_string()],
+        };
+        assert_eq!(merge_multi_value(&current, &patch), current);
+    }
+
+    #[test]
+    fn merge_replace_replaces_whole_list() {
+        let current = vec!["a".to_string(), "b".to_string()];
+        let patch = MultiValuePatch {
+            op: MultiValueOp::Replace,
+            values: vec!["x".to_string()],
+        };
+        assert_eq!(merge_multi_value(&current, &patch), vec!["x".to_string()]);
+    }
 }

@@ -6,7 +6,7 @@ use hentai_core::{
     add_named_facet_name, connection, count_all_named_facet_names, count_named_facet_attachments,
     create_local_library, delete_named_facet_by_names, fetch_named_facet_page, init_db_at_path,
     list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
-    merge_named_facet_name, rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
+    rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -296,6 +296,7 @@ fn replace_comic_named_facet_works_for_all_junction_facets() {
 
             for (facet, table, col) in [
                 (JunctionNamedFacet::Tag, "comic_tags", "tag_name"),
+                (JunctionNamedFacet::Author, "comic_authors", "author_name"),
                 (JunctionNamedFacet::Parody, "comic_parodies", "parody_name"),
                 (
                     JunctionNamedFacet::Character,
@@ -312,103 +313,6 @@ fn replace_comic_named_facet_works_for_all_junction_facets() {
                     "{facet:?}"
                 );
             }
-            replace_comic_named_facet(
-                &db,
-                JunctionNamedFacet::Author,
-                "c-a",
-                &["Alpha".to_string()],
-            )
-            .await
-            .expect("replace author");
-            let author_names = db
-                .query_all(Statement::from_sql_and_values(
-                    sea_orm::DatabaseBackend::Sqlite,
-                    "SELECT a.name FROM comic_authors ca \
-                     INNER JOIN authors a ON a.id = ca.author_id \
-                     WHERE ca.comic_id = ? ORDER BY a.name",
-                    ["c-a".into()],
-                ))
-                .await
-                .expect("query authors");
-            let names: Vec<String> = author_names
-                .into_iter()
-                .map(|row| row.try_get_by_index::<String>(0).expect("name"))
-                .collect();
-            assert_eq!(names, vec!["Alpha".to_string()]);
-        });
-    });
-}
-
-#[test]
-fn merge_named_facet_moves_and_deduplicates_attachments() {
-    common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let runtime = tokio::runtime::Runtime::new().expect("runtime");
-        runtime.block_on(async {
-            init_db_at_path(temp.path().join("merge.sqlite"))
-                .await
-                .expect("init db");
-            let db = connection().expect("connection");
-            clear_facet_tables(&db).await;
-            let root = temp.path().join("library");
-            let library = create_local_library(&root.to_string_lossy(), None)
-                .await
-                .expect("library");
-            seed_comic(&db, "c-source", &library.library_id, "/source.cbz").await;
-            seed_comic(&db, "c-both", &library.library_id, "/both.cbz").await;
-            add_named_facet_name(JunctionNamedFacet::Tag, "Source")
-                .await
-                .expect("source");
-            add_named_facet_name(JunctionNamedFacet::Tag, "Target")
-                .await
-                .expect("target");
-            replace_comic_named_facet(
-                &db,
-                JunctionNamedFacet::Tag,
-                "c-source",
-                &["Source".to_string()],
-            )
-            .await
-            .expect("source attach");
-            replace_comic_named_facet(
-                &db,
-                JunctionNamedFacet::Tag,
-                "c-both",
-                &["Source".to_string(), "Target".to_string()],
-            )
-            .await
-            .expect("both attach");
-
-            merge_named_facet_name(JunctionNamedFacet::Tag, " Source ", " Target ")
-                .await
-                .expect("merge");
-            assert_eq!(
-                count_named_facet_attachments(JunctionNamedFacet::Tag, "Target")
-                    .await
-                    .expect("count"),
-                2
-            );
-            assert_eq!(
-                list_all_named_facet_names(JunctionNamedFacet::Tag)
-                    .await
-                    .expect("names"),
-                vec!["Target".to_string()]
-            );
-            assert_eq!(
-                junction_names(&db, "comic_tags", "tag_name", "c-both").await,
-                vec!["Target".to_string()]
-            );
-
-            assert!(
-                merge_named_facet_name(JunctionNamedFacet::Tag, "Missing", "Target")
-                    .await
-                    .is_err()
-            );
-            assert!(
-                merge_named_facet_name(JunctionNamedFacet::Tag, "Target", "Target")
-                    .await
-                    .is_err()
-            );
         });
     });
 }

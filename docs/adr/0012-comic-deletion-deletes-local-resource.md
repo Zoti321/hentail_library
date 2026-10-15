@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted；「用户删除立即删盘、不使用回收站」部分被 ADR-0023 取代（改为 Comic trash → Comic purge），删盘语义与路径安全、sync / 删库不删盘仍有效
+Accepted
 
 ## Context
 

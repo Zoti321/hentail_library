@@ -368,15 +368,6 @@ void main() {
     });
   });
 
-  group('formatLibrarySearchAndExactMetaQuery', () {
-    test('joins quoted tokens with +', () {
-      expect(
-        formatLibrarySearchAndExactMetaQuery(<String>['战斗', '张三']),
-        '"战斗"+"张三"',
-      );
-    });
-  });
-
   group('unwrapFullyQuotedLibrarySearchQuery', () {
     test('unwraps single quoted query', () {
       expect(unwrapFullyQuotedLibrarySearchQuery('"战斗"'), '战斗');

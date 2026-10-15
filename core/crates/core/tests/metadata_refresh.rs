@@ -19,9 +19,6 @@ use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 
-/// The title the CBZ fixtures carry; the atomicity test's trigger fires on it.
-const COMIC_INFO_TITLE: &str = "FreshRefresh";
-
 fn create_cbz_with_title(path: &Path, title: &str) {
     let file = File::create(path).expect("create cbz");
     let mut zip = ZipWriter::new(file);
@@ -59,28 +56,6 @@ async fn upsert_paths(db: &DatabaseConnection, paths: &[&Path]) {
 
 async fn upsert_path(db: &DatabaseConnection, path: &Path) {
     upsert_paths(db, &[path]).await;
-}
-
-async fn seed_failing_comic_meta_trigger(db: &DatabaseConnection) {
-    db.execute(Statement::from_string(
-        sea_orm::DatabaseBackend::Sqlite,
-        format!(
-            "CREATE TRIGGER block_refresh_meta_upsert BEFORE UPDATE ON comic_meta \
-             WHEN NEW.title = '{COMIC_INFO_TITLE}' \
-             BEGIN SELECT RAISE(ABORT, 'title upsert blocked'); END"
-        ),
-    ))
-    .await
-    .expect("seed trigger");
-}
-
-async fn drop_failing_comic_meta_trigger(db: &DatabaseConnection) {
-    db.execute(Statement::from_string(
-        sea_orm::DatabaseBackend::Sqlite,
-        "DROP TRIGGER IF EXISTS block_refresh_meta_upsert".to_string(),
-    ))
-    .await
-    .expect("drop trigger");
 }
 
 #[test]
@@ -193,67 +168,6 @@ fn refresh_comic_metadata_fails_when_file_missing_without_changing_db() {
                 .expect("find")
                 .expect("exists");
             assert_eq!(comic.title, "OldTitle");
-        });
-    });
-}
-
-#[test]
-fn refresh_comic_metadata_is_atomic_per_comic() {
-    common::with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = common::create_fixture_db(temp.path());
-        let runtime = tokio::runtime::Runtime::new().expect("runtime");
-        runtime.block_on(async {
-            init_db_at_path(&db_path).await.expect("init_db");
-            let db = connection().expect("connection");
-
-            let cbz = temp.path().join("book.cbz");
-            create_cbz_with_title(&cbz, "FreshRefresh");
-            upsert_path(&db, &cbz).await;
-
-            let comic_id = comic_id_from_path(&cbz.to_string_lossy());
-            db.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                format!(
-                    "UPDATE comic_meta SET title='OldTitle', title_locked=0 WHERE comic_id='{comic_id}'"
-                ),
-            ))
-            .await
-            .expect("set old title");
-
-            // Fail the comic_meta upsert of this refresh, after its comics row
-            // has been written. Without a transaction the comics row stays
-            // updated and the refresh result is torn.
-            seed_failing_comic_meta_trigger(&db).await;
-
-            let err = refresh_comic_metadata(&comic_id)
-                .await
-                .expect_err("trigger aborts the write");
-            assert!(
-                err.message.contains("title upsert blocked"),
-                "unexpected error: {err:?}"
-            );
-
-            drop_failing_comic_meta_trigger(&db).await;
-
-            let comic = find_comic_by_id(&comic_id)
-                .await
-                .expect("find")
-                .expect("exists");
-            assert_eq!(comic.title, "OldTitle");
-
-            let rows = db
-                .query_all(Statement::from_string(
-                    sea_orm::DatabaseBackend::Sqlite,
-                    format!("SELECT title FROM comic_meta WHERE comic_id='{comic_id}'"),
-                ))
-                .await
-                .expect("query");
-            assert_eq!(rows.len(), 1);
-            assert_eq!(
-                rows[0].try_get::<String>("", "title").expect("title"),
-                "OldTitle"
-            );
         });
     });
 }

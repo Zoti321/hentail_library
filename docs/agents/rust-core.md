@@ -24,9 +24,6 @@
 - **筛选**：`LibraryComicProjection` 留 Dart 构 `ComicFilterDto`；查询在 Rust（SeaORM）。
 - **设置**：App preference 与 Library browse preference 经 SharedPreferences 留 Dart（ADR-0016）；Library 的 Scan on startup / Scan interval 在 SQLite（每库属性），由 Flutter 编排触发。
 - **Named metadata facet**：Tag / Author / Parody / Character 走 core `named_facet`（字典 + junction）；Language 是 `comic_meta.languages` 闭集特例。
-- **Metadata 写入策略（ADR-0007）**：字段清单、auto-lock、归一化、多值补丁代数集中在 `core/crates/core/src/metadata_lock/`；sea-orm 持久化仍留在 `comic` / `series` 的 write 路径（该模块不在 FRB 导出面上）。
-- **库级写接缝（ADR-0026）**：跨 Comic 的批量写经 `core/crates/core/src/library_write.rs` 的 `with_library_write`（只持锁）或 `begin_library_write_txn`（持锁 + 单事务，另有 `rollback`）；单 Comic 用户写不持锁。锁 fail-fast 且不可重入，公开入口取锁一次、内部 `*_locked` 体不再走接缝（此处的 `*_locked` 指库级写锁，与 Metadata field lock 的同名后缀无关）。
-- **SQLite 迁移与 `PRAGMA foreign_keys`**：迁移里 `manager.get_connection()` 拿到的是**连接池**（sea-orm-migration 只对 Postgres 包事务），而 `PRAGMA foreign_keys` 是**连接级**状态（事务内改它无效）。所以 pragma + DDL 必须放进**一个** `execute_unprepared` 多语句串（范例 `core/crates/core/src/migration/m20260801_000011_series_item_sort_order_real.rs`），否则 OFF/ON 会落到不同连接，被留下 `foreign_keys=OFF` 的连接随池存活整个进程，其上 `ON DELETE CASCADE` 静默失效。守卫测试：`core/crates/core/tests/migration_foreign_keys.rs`。
 - **错误**：Rust `HentaiError { code, message, context }` → Dart `AppException` 子类。
 - **取消**：`create_sync_handle` / `sync_library` / `cancel_sync`；取消语义对齐原 Dart sync。
 

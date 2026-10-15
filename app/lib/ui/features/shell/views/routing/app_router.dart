@@ -12,7 +12,6 @@ import 'package:hentai_library/ui/features/shell/views/history_page.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/shared_content_routes.dart';
-import 'package:hentai_library/ui/features/shell/views/trash_page/trash_page.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -96,12 +95,6 @@ final GoRouter appRouter = GoRouter(
               child: SearchedPage(query: query),
             );
           },
-        ),
-        GoRoute(
-          path: '/trash',
-          name: '已删除',
-          pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const TrashPage()),
         ),
         GoRoute(
           path: '/settings',

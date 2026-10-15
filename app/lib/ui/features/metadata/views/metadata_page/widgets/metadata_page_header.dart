@@ -35,9 +35,6 @@ class MetadataPageHeaderSection extends StatelessWidget {
     required this.onAdd,
     this.onDeleteAllTags,
     this.onOpenNavigation,
-    this.mergeSelectionCount = 0,
-    this.onExitMergeSelection,
-    this.onMergeSelection,
     super.key,
   });
 
@@ -49,9 +46,6 @@ class MetadataPageHeaderSection extends StatelessWidget {
   final VoidCallback onAdd;
   final VoidCallback? onDeleteAllTags;
   final VoidCallback? onOpenNavigation;
-  final int mergeSelectionCount;
-  final VoidCallback? onExitMergeSelection;
-  final VoidCallback? onMergeSelection;
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +63,6 @@ class MetadataPageHeaderSection extends StatelessWidget {
           onAdd: onAdd,
           onDeleteAllTags: onDeleteAllTags,
           onOpenNavigation: onOpenNavigation,
-          mergeSelectionCount: mergeSelectionCount,
-          onExitMergeSelection: onExitMergeSelection,
-          onMergeSelection: onMergeSelection,
         ),
       ),
     );
@@ -86,9 +77,6 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
     required this.onAdd,
     this.onDeleteAllTags,
     this.onOpenNavigation,
-    this.mergeSelectionCount = 0,
-    this.onExitMergeSelection,
-    this.onMergeSelection,
     super.key,
   });
 
@@ -98,9 +86,6 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
   final VoidCallback onAdd;
   final VoidCallback? onDeleteAllTags;
   final VoidCallback? onOpenNavigation;
-  final int mergeSelectionCount;
-  final VoidCallback? onExitMergeSelection;
-  final VoidCallback? onMergeSelection;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -109,40 +94,6 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
     final String addTooltip = l10n.metadataAddEntityTooltip(selectedTabIndex);
     final bool showEntityTabs = metadataHeaderShowsEntityTabs(layoutTier);
     final bool showCountChip = metadataHeaderShowsCountChip(layoutTier);
-    final bool mergeSelectionMode = onExitMergeSelection != null;
-    if (mergeSelectionMode) {
-      return SizedBox(
-        height: 44,
-        child: Row(
-          children: <Widget>[
-            GhostButton.icon(
-              icon: LucideIcons.x,
-              tooltip: l10n.commonCancel,
-              semanticLabel: l10n.commonCancel,
-              iconSize: 16,
-              size: 32,
-              borderRadius: 8,
-              foregroundColor: cs.hentai.iconDefault,
-              hoverColor: Theme.of(context).hoverColor,
-              overlayColor: Theme.of(context).hoverColor,
-              onPressed: onExitMergeSelection,
-            ),
-            const Spacer(),
-            FilledButton.icon(
-              icon: const Icon(LucideIcons.merge, size: 16),
-              label: Text('${l10n.metadataMerge} $mergeSelectionCount tags'),
-              onPressed: mergeSelectionCount > 1 ? onMergeSelection : null,
-              style: FilledButton.styleFrom(
-                backgroundColor: cs.primary,
-                foregroundColor: cs.onPrimary,
-                disabledBackgroundColor: cs.primary.withAlpha(102),
-                disabledForegroundColor: cs.onPrimary.withAlpha(153),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
     return SizedBox(
       height: 44,
       child: Stack(

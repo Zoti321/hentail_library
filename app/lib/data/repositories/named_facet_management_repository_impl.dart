@@ -83,22 +83,6 @@ class NamedFacetManagementRepositoryImpl
   }
 
   @override
-  Future<void> merge(
-    ManagedNamedFacetKind kind,
-    String sourceName,
-    String targetName,
-  ) async {
-    guardFrbSync(
-      () => rust_named_facet.mergeNamedFacetNameFrb(
-        facet: kind.toFrb(),
-        sourceName: sourceName,
-        targetName: targetName,
-      ),
-      fallbackMessage: _mergeFallbackMessage(kind),
-    );
-  }
-
-  @override
   Future<int> countAttachments(ManagedNamedFacetKind kind, String name) async {
     final result = await guardFrb(
       () => rust_named_facet.countNamedFacetAttachmentsFrb(
@@ -163,11 +147,4 @@ String _countFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
   ManagedNamedFacetKind.tag => '读取标签 Named facet attachment count 失败',
   ManagedNamedFacetKind.parody => '读取原作 Named facet attachment count 失败',
   ManagedNamedFacetKind.character => '读取角色 Named facet attachment count 失败',
-};
-
-String _mergeFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => '作者暂不支持合并',
-  ManagedNamedFacetKind.tag => '合并标签失败',
-  ManagedNamedFacetKind.parody => '合并原作失败',
-  ManagedNamedFacetKind.character => '合并角色失败',
 };

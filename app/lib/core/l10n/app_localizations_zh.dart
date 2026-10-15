@@ -885,12 +885,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryAuthorFilter => '作者';
 
   @override
-  String get libraryOrganizeFilter => '整理';
-
-  @override
-  String get libraryNeedsMetadataOnlyFilter => '仅显示待补元数据';
-
-  @override
   String get libraryMetadataFilterClear => '清除';
 
   @override
@@ -1112,6 +1106,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get comicDetailCancel => '取消';
+
+  @override
+  String get comicDetailDeletedWithResourceToast => '已删除漫画及磁盘资源';
+
+  @override
+  String get comicDetailRemovedFromLibraryToast => '已从库中移除漫画';
 
   @override
   String get comicDetailNotFound => '漫画不存在或已移除';
@@ -1434,9 +1434,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get metadataRename => '重命名';
-
-  @override
-  String get metadataMerge => '合并';
 
   @override
   String get metadataDelete => '删除';
@@ -2107,207 +2104,4 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bulkEditMetadataFieldSummaryClear => '清除';
-
-  @override
-  String get navTrash => '垃圾桶';
-
-  @override
-  String get readerOpenComicTrashed => '该漫画已删除，恢复后才能阅读。';
-
-  @override
-  String comicTrashConfirmContent(String title) {
-    return '「$title」将移入「已删除」，可随时在那里恢复。';
-  }
-
-  @override
-  String get comicTrashedToast => '已移入「已删除」';
-
-  @override
-  String trashPageSummary(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '共 $count 本 • 可恢复或永久删除',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get trashEmptyTitle => '没有已删除的漫画';
-
-  @override
-  String get trashEmptyDescription => '删除的漫画会先放在这里，可恢复或永久删除。';
-
-  @override
-  String get trashRestore => '恢复';
-
-  @override
-  String get trashPurge => '永久删除';
-
-  @override
-  String get trashPurgeAll => '全部删除';
-
-  @override
-  String get trashRestoreAll => '全部恢复';
-
-  @override
-  String get trashRestoreSelected => '恢复选中';
-
-  @override
-  String get trashPurgeSelected => '删除选中';
-
-  @override
-  String trashSelectedCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已选 $count 本',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String trashDeletedAt(String time) {
-    return '删除于 $time';
-  }
-
-  @override
-  String get trashBadgeLocal => '本地';
-
-  @override
-  String get trashBadgeRemote => '远程';
-
-  @override
-  String trashRestoredToast(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已恢复 $count 本漫画',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String trashPurgeSucceededToast(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '已永久删除 $count 本漫画',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String trashPurgePartialToast(int succeeded, int failed) {
-    return '已永久删除 $succeeded 本，$failed 本失败（仍保留在「已删除」中）';
-  }
-
-  @override
-  String trashPurgeFailedToast(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count 本永久删除失败，仍保留在「已删除」中',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get comicPurgeTitle => '永久删除漫画？';
-
-  @override
-  String comicPurgeLocalBatchConfirm(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '将从库中移除 $count 本漫画，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String comicPurgeRemoteBatchConfirm(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '将从库中移除 $count 本远程漫画。仅从库中移除，不会删除远程资源。',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String comicPurgeMixedConfirm(int localCount, int remoteCount) {
-    return '$localCount 本本地漫画将永久删除磁盘文件；$remoteCount 本远程漫画仅从库中移除，不会删除远程资源。此操作不可撤销。';
-  }
-
-  @override
-  String get comicPurgeRemoteAcknowledge => '我了解将从库中永久移除，此操作不可撤销';
-
-  @override
-  String get authorDetailTitle => '作者';
-
-  @override
-  String get authorDetailVerified => '认证作者';
-
-  @override
-  String get authorDetailAddLink => '添加链接';
-
-  @override
-  String get authorDetailLinkPasteHint => '粘贴主页链接';
-
-  @override
-  String get authorDetailPlatformPixiv => 'Pixiv';
-
-  @override
-  String get authorDetailPlatformX => 'X';
-
-  @override
-  String get authorDetailPlatformPatreon => 'Patreon';
-
-  @override
-  String get authorDetailPlatformFanbox => 'FANBOX';
-
-  @override
-  String get authorDetailPlatformDiscord => 'Discord';
-
-  @override
-  String get authorDetailPlatformOther => '其他';
-
-  @override
-  String get authorDetailDeleteLink => '删除链接';
-
-  @override
-  String authorDetailDeleteLinkConfirm(String label) {
-    return '删除链接「$label」？';
-  }
-
-  @override
-  String authorDetailLinkTooltip(String url) {
-    return '$url';
-  }
-
-  @override
-  String authorDetailComicsSection(int count) {
-    return '漫画 · $count';
-  }
-
-  @override
-  String get authorDetailComicsEmpty => '暂无漫画';
-
-  @override
-  String get authorDetailViewInSearch => '在搜索中查看';
-
-  @override
-  String get authorDetailRename => '重命名';
-
-  @override
-  String authorDetailAliases(String aliases) {
-    return '别名：$aliases';
-  }
-
-  @override
-  String get authorDetailInvalidUrl => '请输入以 http:// 或 https:// 开头的链接';
-
-  @override
-  String get authorDetailOpenLinkFailed => '无法打开链接';
 }

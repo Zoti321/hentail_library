@@ -9,8 +9,8 @@ use crate::named_facet::JunctionNamedFacet;
 
 use super::path_util::compute_relative_path;
 use super::types::{
-    AuthorLinkExportRecord, ComicExportRecord, ComicMetaExportRecord, ExportOptionsRecord,
-    MetadataBackupPayload, OrphanFacetsRecord, SCHEMA_VERSION,
+    ComicExportRecord, ComicMetaExportRecord, ExportOptionsRecord, MetadataBackupPayload,
+    OrphanFacetsRecord, SCHEMA_VERSION,
 };
 
 #[derive(Debug, Clone, Default)]
@@ -76,7 +76,6 @@ pub async fn export_comic_metadata(
             include_orphan_facets: options.include_orphan_facets,
         },
         orphan_facets,
-        author_links: load_author_links(&db).await?,
         comics: export_comics,
     };
 
@@ -88,17 +87,13 @@ async fn load_export_comic_ids(
     db: &DatabaseConnection,
     library_id: Option<&str>,
 ) -> Result<Vec<String>, HentaiError> {
-    let visible = crate::comic::visibility::visible_comic_sql("c");
     let (sql, values) = match library_id {
         Some(id) => (
-            format!(
-                "SELECT c.comic_id FROM comics c WHERE c.library_id = ? AND {visible} \
-                 ORDER BY c.comic_id ASC"
-            ),
+            "SELECT comic_id FROM comics WHERE library_id = ? ORDER BY comic_id ASC".to_string(),
             vec![Value::String(Some(Box::new(id.to_string())))],
         ),
         None => (
-            format!("SELECT c.comic_id FROM comics c WHERE {visible} ORDER BY c.comic_id ASC"),
+            "SELECT comic_id FROM comics ORDER BY comic_id ASC".to_string(),
             vec![],
         ),
     };
@@ -157,18 +152,11 @@ async fn load_orphan_names(
     let dict = facet.dict_table();
     let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
-    let sql = match facet {
-        JunctionNamedFacet::Author => format!(
-            "SELECT d.name FROM {dict} d \
-             WHERE NOT EXISTS (SELECT 1 FROM {junction} j WHERE j.author_id = d.id) \
-             ORDER BY d.name COLLATE NOCASE ASC"
-        ),
-        _ => format!(
-            "SELECT d.name FROM {dict} d \
-             WHERE NOT EXISTS (SELECT 1 FROM {junction} j WHERE j.{name_col} = d.name) \
-             ORDER BY d.name COLLATE NOCASE ASC"
-        ),
-    };
+    let sql = format!(
+        "SELECT d.name FROM {dict} d \
+         WHERE NOT EXISTS (SELECT 1 FROM {junction} j WHERE j.{name_col} = d.name) \
+         ORDER BY d.name COLLATE NOCASE ASC"
+    );
     let rows = db
         .query_all(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
@@ -182,22 +170,6 @@ async fn load_orphan_names(
                 .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
         })
         .collect()
-}
-
-async fn load_author_links(
-    db: &DatabaseConnection,
-) -> Result<Vec<AuthorLinkExportRecord>, HentaiError> {
-    let rows = crate::author::list_all_author_links_for_export(db).await?;
-    Ok(rows
-        .into_iter()
-        .map(|(author_name, link)| AuthorLinkExportRecord {
-            author_name,
-            platform: link.platform.as_str().to_string(),
-            url: link.url,
-            platform_display_name: link.platform_display_name,
-            sort_key: link.sort_key,
-        })
-        .collect())
 }
 
 fn utc_now_rfc3339() -> String {

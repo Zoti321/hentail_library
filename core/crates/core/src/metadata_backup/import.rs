@@ -1,13 +1,12 @@
 use std::collections::{HashMap, HashSet};
 
-use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, TransactionTrait, Value};
+use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, Value};
 
-use crate::comic::write::update_comic_user_meta_in;
-use crate::comic::UpdateComicUserMetaDto;
+use crate::comic::write::{set_comic_meta_locks, update_comic_user_meta};
+use crate::comic::{SetComicMetaLocksDto, UpdateComicUserMetaDto};
 use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
-use crate::library_write::with_library_write;
 use crate::named_facet::JunctionNamedFacet;
 
 use super::path_util::compute_relative_path;
@@ -75,7 +74,6 @@ pub struct ImportPlan {
     pub samples_ambiguous: Vec<AmbiguousSample>,
     applications: Vec<ComicImportApplication>,
     orphan_facets: OrphanFacetsRecord,
-    author_links: Vec<crate::metadata_backup::types::AuthorLinkExportRecord>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -124,12 +122,6 @@ pub async fn preview_import_comic_metadata(bytes: &[u8]) -> Result<ImportPlan, H
 }
 
 pub async fn import_comic_metadata(bytes: &[u8]) -> Result<ImportComicMetadataResult, HentaiError> {
-    with_library_write(|| import_comic_metadata_locked(bytes)).await
-}
-
-async fn import_comic_metadata_locked(
-    bytes: &[u8],
-) -> Result<ImportComicMetadataResult, HentaiError> {
     let plan = plan_comic_metadata_import(bytes).await?;
     let db = connection()?;
     let mut result = ImportComicMetadataResult::default();
@@ -148,7 +140,6 @@ async fn import_comic_metadata_locked(
     result.skipped_ambiguous = plan.skipped_ambiguous;
 
     upsert_orphan_facets(&db, &plan.orphan_facets).await?;
-    upsert_author_links(&db, &plan.author_links).await?;
     Ok(result)
 }
 
@@ -227,7 +218,6 @@ async fn plan_comic_metadata_import(bytes: &[u8]) -> Result<ImportPlan, HentaiEr
         samples_ambiguous,
         applications,
         orphan_facets: payload.orphan_facets,
-        author_links: payload.author_links,
     })
 }
 
@@ -364,8 +354,13 @@ async fn count_new_orphan_names<C: ConnectionTrait>(
     facet: JunctionNamedFacet,
     names: &[String],
 ) -> Result<u32, HentaiError> {
-    // The same name rule as the write path (ADR-0007): trim, drop empties, dedupe first-seen.
-    let unique = crate::metadata_lock::normalize_names(names);
+    let mut unique = HashSet::new();
+    for name in names {
+        let trimmed = name.trim();
+        if !trimmed.is_empty() {
+            unique.insert(trimmed.to_string());
+        }
+    }
     if unique.is_empty() {
         return Ok(0);
     }
@@ -391,15 +386,11 @@ async fn count_new_orphan_names<C: ConnectionTrait>(
 }
 
 async fn apply_comic_record(
-    db: &DatabaseConnection,
+    _db: &DatabaseConnection,
     comic_id: &str,
     record: &ComicExportRecord,
 ) -> Result<(), HentaiError> {
-    // One transaction per record: the metadata row, the junction tables and the
-    // auto-locks land together (the library write lock is held by the import entry).
-    let txn = db.begin().await.map_err(map_db_err)?;
-    update_comic_user_meta_in(
-        &txn,
+    update_comic_user_meta(
         comic_id,
         UpdateComicUserMetaDto {
             title: Some(record.meta.title.clone()),
@@ -414,10 +405,22 @@ async fn apply_comic_record(
         },
     )
     .await?;
-    // All nine fields are written, so the auto-lock (ADR-0007) already pins every lock
-    // column; an extra set_comic_meta_locks(true × 9) pass would be a second transaction
-    // with no additional effect.
-    txn.commit().await.map_err(map_db_err)?;
+
+    set_comic_meta_locks(
+        comic_id,
+        SetComicMetaLocksDto {
+            title: Some(true),
+            description: Some(true),
+            published_at: Some(true),
+            content_rating: Some(true),
+            authors: Some(true),
+            tags: Some(true),
+            languages: Some(true),
+            parodies: Some(true),
+            characters: Some(true),
+        },
+    )
+    .await?;
     Ok(())
 }
 
@@ -429,27 +432,6 @@ async fn upsert_orphan_facets(
     upsert_orphan_names(db, JunctionNamedFacet::Author, &orphans.authors).await?;
     upsert_orphan_names(db, JunctionNamedFacet::Parody, &orphans.parodies).await?;
     upsert_orphan_names(db, JunctionNamedFacet::Character, &orphans.characters).await?;
-    Ok(())
-}
-
-async fn upsert_author_links(
-    db: &DatabaseConnection,
-    links: &[crate::metadata_backup::types::AuthorLinkExportRecord],
-) -> Result<(), HentaiError> {
-    use crate::author::AuthorLinkPlatform;
-    let mut grouped: HashMap<String, Vec<(AuthorLinkPlatform, String, Option<String>)>> =
-        HashMap::new();
-    for link in links {
-        let platform = AuthorLinkPlatform::parse(&link.platform)?;
-        grouped.entry(link.author_name.clone()).or_default().push((
-            platform,
-            link.url.clone(),
-            link.platform_display_name.clone(),
-        ));
-    }
-    for (name, items) in grouped {
-        crate::author::merge_author_links_by_name(db, &name, &items).await?;
-    }
     Ok(())
 }
 

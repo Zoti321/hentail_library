@@ -9,15 +9,12 @@ pub mod error;
 pub mod formats;
 pub mod history;
 pub mod home;
-pub mod image_cache;
 pub mod library;
-pub mod library_write;
 pub mod metadata_backup;
 pub mod metadata_lock;
 pub mod migration;
 pub mod named_facet;
 pub mod parody;
-pub mod path_migration;
 pub mod probe;
 pub mod reader;
 pub mod resource;
@@ -31,24 +28,18 @@ pub mod thumbnail;
 pub mod util;
 
 pub use author::{
-    add_author, add_author_link, count_all_authors, delete_author_link, delete_authors_by_names,
-    fetch_authors_page, get_author_detail, list_all_authors, list_author_links, load_author_image,
-    rename_author, replace_comic_authors, resolve_author_image, update_author_link, watch_authors,
-    AuthorDetailDto, AuthorFacetCountDto, AuthorIdentity, AuthorImageRef, AuthorImageSlot,
-    AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform, AuthorTopComicDto,
+    add_author, count_all_authors, delete_authors_by_names, fetch_authors_page, list_all_authors,
+    rename_author, watch_authors,
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
-    apply_comic_metadata_bulk_patch, count_all, count_trashed_comics, fetch_comics_page,
-    fetch_trashed_comics_page, find_comic_by_id, find_comics_by_ids, is_comic_trashed,
-    list_trashed_comic_ids, paginate, purge_comics, read_data_version, restore_comics,
-    search_by_keyword, search_by_keyword_page, search_by_tag_expression,
-    search_by_tag_expression_page, set_comic_meta_locks, trash_comics, update_comic_user_meta,
-    BulkPatchResultDto, ComicDto, ComicFilterDto, ComicMetaLocks, ComicMetadataBulkPatch,
-    ComicPurgeResultDto, ComicSortFieldDto, ComicSortOptionDto, MultiValueOp, MultiValuePatch,
-    PageRequestDto, PageWindow, PagedComicResultDto, PagedTrashedComicResultDto, PublishedAtPatch,
-    ScalarPatch, SetComicMetaLocksDto, TrashedComicCountsDto, TrashedComicDto,
-    UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
+    apply_comic_metadata_bulk_patch, count_all, delete_comics_by_ids, fetch_comics_page,
+    find_comic_by_id, find_comics_by_ids, read_data_version, search_by_keyword,
+    search_by_keyword_page, search_by_tag_expression, search_by_tag_expression_page,
+    set_comic_meta_locks, update_comic_user_meta, BulkPatchResultDto, ComicDto, ComicFilterDto,
+    ComicMetaLocks, ComicMetadataBulkPatch, ComicSortFieldDto, ComicSortOptionDto, MultiValueOp,
+    MultiValuePatch, PageRequestDto, PagedComicResultDto, PublishedAtPatch, ScalarPatch,
+    SetComicMetaLocksDto, UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
@@ -84,8 +75,8 @@ pub use metadata_backup::{
 pub use named_facet::{
     add_named_facet_name, count_all_named_facet_names, count_named_facet_attachments,
     delete_named_facet_by_names, fetch_named_facet_page, list_all_named_facet_names,
-    list_distinct_named_facet_names, list_named_facet_for_form, merge_named_facet_name,
-    rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet, NamedFacetFormEntry,
+    list_distinct_named_facet_names, list_named_facet_for_form, rename_named_facet_name,
+    replace_comic_named_facet, JunctionNamedFacet, NamedFacetFormEntry,
 };
 pub use parody::{list_all_parodies, list_distinct_parodies};
 pub use probe::{probe_library, rebuild_snapshot_from_scan_items, LibraryProbeResultDto};

@@ -1,9 +1,6 @@
 use sea_orm::Value;
 
 use super::dto::{SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto};
-use crate::comic::visibility::{
-    series_browsable_sql, series_has_visible_member_sql, visible_comic_sql,
-};
 
 pub struct PageSqlQuery {
     pub sql: String,
@@ -55,11 +52,8 @@ fn build_order_by_clause(
         SeriesSortFieldDto::ComicCount => {
             let direction = if sort.descending { "DESC" } else { "ASC" };
             format!(
-                "(SELECT COUNT(*) FROM series_items si \
-                 INNER JOIN comics sc ON sc.comic_id = si.comic_id \
-                 WHERE si.series_id = s.series_id AND {}) {direction}, \
-                 s.name_sort_key ASC, s.series_id ASC",
-                visible_comic_sql("sc")
+                "(SELECT COUNT(*) FROM series_items si WHERE si.series_id = s.series_id) {direction}, \
+                 s.name_sort_key ASC, s.series_id ASC"
             )
         }
         SeriesSortFieldDto::Random => {
@@ -77,27 +71,32 @@ fn build_order_by_clause(
 }
 
 fn build_where_clause(filter: &SeriesFilterDto, values: &mut Vec<Value>) -> String {
-    let mut parts = vec![series_browsable_sql("s.series_id")];
+    let mut parts = vec!["1=1".to_string()];
     if let Some(library_id) = &filter.library_id {
         parts.push("s.library_id = ?".to_string());
         push_sqlite_text(values, library_id.clone());
     }
     if filter.require_items {
-        parts.push(series_has_visible_member_sql("s.series_id"));
+        parts.push(
+            "EXISTS (SELECT 1 FROM series_items si WHERE si.series_id = s.series_id)".to_string(),
+        );
     }
-    let visible_r18_member = format!(
-        "EXISTS (\
-         SELECT 1 FROM series_items si \
-         INNER JOIN comics sc ON sc.comic_id = si.comic_id \
-         INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
-         WHERE si.series_id = s.series_id AND {} \
-         AND cm.content_rating = 'r18')",
-        visible_comic_sql("sc")
-    );
     if filter.r18_only {
-        parts.push(visible_r18_member);
+        parts.push(
+            "EXISTS (\
+             SELECT 1 FROM series_items si \
+             INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
+             WHERE si.series_id = s.series_id AND cm.content_rating = 'r18')"
+                .to_string(),
+        );
     } else if !filter.show_r18 {
-        parts.push(format!("NOT {visible_r18_member}"));
+        parts.push(
+            "NOT EXISTS (\
+             SELECT 1 FROM series_items si \
+             INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
+             WHERE si.series_id = s.series_id AND cm.content_rating = 'r18')"
+                .to_string(),
+        );
     }
     if let Some(query) = &filter.query {
         parts.push("(lower(s.name) LIKE ? OR lower(s.folder_path) LIKE ?)".to_string());

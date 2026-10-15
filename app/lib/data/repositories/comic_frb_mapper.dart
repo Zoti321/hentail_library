@@ -5,7 +5,6 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/domain/models/value_objects/library_author_pick.dart';
 import 'package:hentai_library/domain/models/value_objects/library_tag_pick.dart';
@@ -68,7 +67,6 @@ rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
     languages: _mapStringSet(filter.languages),
     parodies: _mapStringSet(filter.parodies),
     characters: _mapStringSet(filter.characters),
-    needsMetadataOnly: filter.needsMetadataOnly,
   );
 }
 
@@ -96,7 +94,10 @@ List<String> _mapAuthorPicks(Set<LibraryAuthorPick>? picks) {
   if (picks == null || picks.isEmpty) {
     return const <String>[];
   }
-  return picks.map((LibraryAuthorPick pick) => '${pick.id}').toList();
+  return picks
+      .map((LibraryAuthorPick pick) => pick.name.trim().toLowerCase())
+      .where((String name) => name.isNotEmpty)
+      .toList();
 }
 
 rust.PageRequestDto mapPageRequest(PageRequest request) {
@@ -131,44 +132,6 @@ PagedResult<Comic> mapPagedResult(rust.PagedComicResultDto page) {
   );
 }
 
-const String _kRemoteLibraryKind = 'remote';
-
-TrashedComic mapTrashedComic(rust.TrashedComicFrbDto dto) {
-  return (
-    comic: mapRustComic(dto.comic),
-    deletedAt: comicTimestampFromMs(dto.deletedAt.toInt()),
-    libraryName: dto.libraryName,
-    isRemote: dto.libraryKind == _kRemoteLibraryKind,
-  );
-}
-
-PagedResult<TrashedComic> mapTrashedComicsPage(
-  rust.PagedTrashedComicResultFrbDto page,
-) {
-  return PagedResult<TrashedComic>(
-    items: page.items.map(mapTrashedComic).toList(),
-    totalCount: page.totalCount.toInt(),
-    page: page.page,
-    pageSize: page.pageSize,
-  );
-}
-
-TrashedComicCounts mapTrashedComicCounts(rust.TrashedComicCountsFrbDto dto) {
-  return (
-    total: dto.total.toInt(),
-    local: dto.local.toInt(),
-    remote: dto.remote.toInt(),
-  );
-}
-
-ComicPurgeResult mapComicPurgeResult(rust.ComicPurgeResultFrbDto dto) {
-  return (
-    succeeded: dto.succeeded,
-    failed: dto.failed,
-    errorSamples: List<String>.unmodifiable(dto.errorSamples),
-  );
-}
-
 rust.ComicFilterDto unrestrictedListFilter() {
   return const rust.ComicFilterDto(
     showR18: true,
@@ -183,6 +146,5 @@ rust.ComicFilterDto unrestrictedListFilter() {
     languages: <String>[],
     parodies: <String>[],
     characters: <String>[],
-    needsMetadataOnly: false,
   );
 }

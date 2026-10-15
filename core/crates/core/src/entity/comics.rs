@@ -11,8 +11,6 @@ pub struct Model {
     pub created_at: i64,
     pub last_updated_at: i64,
     pub library_id: String,
-    /// Comic trash 时间（毫秒）；`None` 即未 trash（ADR-0023）。
-    pub deleted_at: Option<i64>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

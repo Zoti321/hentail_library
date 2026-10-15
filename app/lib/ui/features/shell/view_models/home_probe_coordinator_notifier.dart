@@ -23,9 +23,6 @@ class HomePageVisibleNotifier extends Notifier<bool> {
   bool build() => false;
 
   void setVisible(bool visible) {
-    if (!ref.mounted) {
-      return;
-    }
     if (state != visible) {
       state = visible;
     }

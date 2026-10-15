@@ -1,16 +1,16 @@
+use std::path::Path;
+
 use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
 
-use crate::comic::dto::{
-    now_ms, serialize_languages, ComicDto, PageRequestDto, PagedComicResultDto,
-};
-use crate::comic::pagination::paginate;
+use crate::comic::dto::{now_ms, serialize_languages, ComicDto, PagedComicResultDto};
 use crate::comic::repository::load_comics_ordered;
+use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
-use crate::metadata_lock::{
-    normalize_names, normalize_tag_expression_tokens, ComicAutoLocks, ComicMetaField,
-};
+use crate::metadata_lock::ComicAutoLocks;
+use crate::sync::series_rebuild::rebuild_series_from_comics;
+use crate::sync::writer::delete_comics_side_effects;
 use crate::sync::writer::{
     replace_comic_authors, replace_comic_characters, replace_comic_parodies, replace_comic_tags,
 };
@@ -44,60 +44,12 @@ pub struct SetComicMetaLocksDto {
     pub characters: Option<bool>,
 }
 
-impl UpdateComicUserMetaDto {
-    /// Whether this write sets `field`; a written field is auto-locked (ADR-0007).
-    pub fn is_written(&self, field: ComicMetaField) -> bool {
-        match field {
-            ComicMetaField::Title => self.title.is_some(),
-            ComicMetaField::Description => self.description.is_some(),
-            ComicMetaField::PublishedAt => self.published_at.is_some(),
-            ComicMetaField::ContentRating => self.content_rating.is_some(),
-            ComicMetaField::Authors => self.authors.is_some(),
-            ComicMetaField::Tags => self.tags.is_some(),
-            ComicMetaField::Languages => self.languages.is_some(),
-            ComicMetaField::Parodies => self.parodies.is_some(),
-            ComicMetaField::Characters => self.characters.is_some(),
-        }
-    }
-}
-
-impl SetComicMetaLocksDto {
-    pub fn any(&self) -> bool {
-        ComicMetaField::ALL
-            .iter()
-            .any(|field| self.patch(*field).is_some())
-    }
-
-    /// `Some(locked)` when this patch sets `field`'s lock, `None` when it leaves it unchanged.
-    pub fn patch(&self, field: ComicMetaField) -> Option<bool> {
-        match field {
-            ComicMetaField::Title => self.title,
-            ComicMetaField::Description => self.description,
-            ComicMetaField::PublishedAt => self.published_at,
-            ComicMetaField::ContentRating => self.content_rating,
-            ComicMetaField::Authors => self.authors,
-            ComicMetaField::Tags => self.tags,
-            ComicMetaField::Languages => self.languages,
-            ComicMetaField::Parodies => self.parodies,
-            ComicMetaField::Characters => self.characters,
-        }
-    }
-}
-
-/// Write one ADR-0007 lock column. Exhaustive over the field table: adding a field makes this
-/// (and the DTO accessors above) fail to compile until the new lock column is wired.
-fn apply_comic_lock(active: &mut comic_meta::ActiveModel, field: ComicMetaField, locked: bool) {
-    match field {
-        ComicMetaField::Title => active.title_locked = Set(locked),
-        ComicMetaField::Description => active.description_locked = Set(locked),
-        ComicMetaField::PublishedAt => active.published_at_locked = Set(locked),
-        ComicMetaField::ContentRating => active.content_rating_locked = Set(locked),
-        ComicMetaField::Authors => active.authors_locked = Set(locked),
-        ComicMetaField::Tags => active.tags_locked = Set(locked),
-        ComicMetaField::Languages => active.languages_locked = Set(locked),
-        ComicMetaField::Parodies => active.parodies_locked = Set(locked),
-        ComicMetaField::Characters => active.characters_locked = Set(locked),
-    }
+struct ComicDeletionTarget {
+    comic_id: String,
+    path: String,
+    resource_type: String,
+    library_kind: String,
+    library_root_path: String,
 }
 
 pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(), HentaiError> {
@@ -110,27 +62,139 @@ pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(
     Ok(())
 }
 
+pub async fn delete_comics_by_ids(comic_ids: Vec<String>) -> Result<(), HentaiError> {
+    if comic_ids.is_empty() {
+        return Ok(());
+    }
+    let db = connection()?;
+    let targets = load_deletion_targets(&db, &comic_ids).await?;
+    for target in &targets {
+        maybe_delete_local_resource(target)?;
+    }
+    let txn = db.begin().await.map_err(map_db_err)?;
+    delete_comics_side_effects(&txn, &comic_ids).await?;
+    rebuild_series_from_comics(&txn, None).await?;
+    txn.commit().await.map_err(map_db_err)?;
+    Ok(())
+}
+
+async fn load_deletion_targets<C: ConnectionTrait>(
+    db: &C,
+    comic_ids: &[String],
+) -> Result<Vec<ComicDeletionTarget>, HentaiError> {
+    if comic_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+    let placeholders = comic_ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
+    let values: Vec<sea_orm::Value> = comic_ids
+        .iter()
+        .map(|id| sea_orm::Value::String(Some(Box::new(id.clone()))))
+        .collect();
+    let rows = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!(
+                "SELECT c.comic_id, c.path, c.resource_type, l.kind, l.root_path \
+                 FROM comics c \
+                 INNER JOIN libraries l ON l.library_id = c.library_id \
+                 WHERE c.comic_id IN ({placeholders})"
+            ),
+            values,
+        ))
+        .await
+        .map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            Ok(ComicDeletionTarget {
+                comic_id: row
+                    .try_get_by_index::<String>(0)
+                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+                path: row
+                    .try_get_by_index::<String>(1)
+                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+                resource_type: row
+                    .try_get_by_index::<String>(2)
+                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+                library_kind: row
+                    .try_get_by_index::<String>(3)
+                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+                library_root_path: row
+                    .try_get_by_index::<String>(4)
+                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+            })
+        })
+        .collect()
+}
+
+fn maybe_delete_local_resource(target: &ComicDeletionTarget) -> Result<(), HentaiError> {
+    if target.library_kind == "remote" {
+        return Ok(());
+    }
+    ensure_local_resource_within_library_root(target)?;
+    let path = Path::new(&target.path);
+    if !path.exists() {
+        return Ok(());
+    }
+    let delete_result = if target.resource_type == "dir" {
+        std::fs::remove_dir_all(path)
+    } else {
+        std::fs::remove_file(path)
+    };
+    delete_result.map_err(|error| {
+        HentaiError::validation(format!("无法删除磁盘资源，漫画仍保留在库中。{error}"))
+    })?;
+    Ok(())
+}
+
+fn ensure_local_resource_within_library_root(
+    target: &ComicDeletionTarget,
+) -> Result<(), HentaiError> {
+    let normalized_root = normalize_path_for_key(&target.library_root_path);
+    let normalized_path = normalize_path_for_key(&target.path);
+    if normalized_root.is_empty() || normalized_path.is_empty() {
+        return Err(HentaiError::validation(format!(
+            "漫画资源路径异常，已取消删除：{}",
+            target.comic_id
+        )));
+    }
+    if normalized_path == normalized_root
+        || !normalized_path.starts_with(&format!("{normalized_root}/"))
+    {
+        return Err(HentaiError::validation(
+            "漫画资源不在所属 Library root 下，已取消删除。",
+        ));
+    }
+    Ok(())
+}
+
 pub async fn update_comic_user_meta(
     comic_id: &str,
     meta: UpdateComicUserMetaDto,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
-    update_comic_user_meta_in(&txn, comic_id, meta).await?;
-    txn.commit().await.map_err(map_db_err)?;
-    Ok(())
-}
-
-/// [`update_comic_user_meta`] body for callers that own the transaction (ADR-0026).
-pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
-    db: &C,
-    comic_id: &str,
-    meta: UpdateComicUserMetaDto,
-) -> Result<(), HentaiError> {
-    // A written field is auto-locked; the field table decides which fields and locks exist.
-    let auto_locks = ComicAutoLocks::from_written(|field| meta.is_written(field));
     let mut meta_touched = false;
-    if auto_locks.any() {
+    let touch_meta_row = meta.title.is_some()
+        || meta.content_rating.is_some()
+        || meta.description.is_some()
+        || meta.published_at.is_some()
+        || meta.authors.is_some()
+        || meta.tags.is_some()
+        || meta.languages.is_some()
+        || meta.parodies.is_some()
+        || meta.characters.is_some();
+    let auto_locks = ComicAutoLocks {
+        title: meta.title.is_some(),
+        description: meta.description.is_some(),
+        published_at: meta.published_at.is_some(),
+        content_rating: meta.content_rating.is_some(),
+        authors: meta.authors.is_some(),
+        tags: meta.tags.is_some(),
+        languages: meta.languages.is_some(),
+        parodies: meta.parodies.is_some(),
+        characters: meta.characters.is_some(),
+    };
+    if touch_meta_row {
         let mut active = comic_meta::ActiveModel {
             comic_id: Set(comic_id.to_string()),
             ..Default::default()
@@ -139,9 +203,11 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
             let decoded = decode_basic_html_entities(&title);
             active.title_sort_key = Set(compute_sort_key(&decoded));
             active.title = Set(decoded);
+            meta_touched = true;
         }
         if let Some(content_rating) = meta.content_rating {
             active.content_rating = Set(content_rating);
+            meta_touched = true;
         }
         if let Some(description) = meta.description {
             active.description = Set(if description.is_empty() {
@@ -149,6 +215,7 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
             } else {
                 Some(description)
             });
+            meta_touched = true;
         }
         if let Some(published_at) = meta.published_at {
             active.published_at = Set(if published_at < 0 {
@@ -156,35 +223,68 @@ pub(crate) async fn update_comic_user_meta_in<C: ConnectionTrait>(
             } else {
                 Some(published_at)
             });
+            meta_touched = true;
         }
         if let Some(languages) = meta.languages {
-            active.languages = Set(serialize_languages(&normalize_names(&languages)));
+            active.languages = Set(serialize_languages(&normalize_languages(languages)));
+            meta_touched = true;
         }
-        for field in auto_locks.written() {
-            apply_comic_lock(&mut active, field, true);
+        if auto_locks.title {
+            active.title_locked = Set(true);
         }
-        active.update(db).await.map_err(map_db_err)?;
-        meta_touched = true;
+        if auto_locks.description {
+            active.description_locked = Set(true);
+        }
+        if auto_locks.published_at {
+            active.published_at_locked = Set(true);
+        }
+        if auto_locks.content_rating {
+            active.content_rating_locked = Set(true);
+        }
+        if auto_locks.authors {
+            active.authors_locked = Set(true);
+            meta_touched = true;
+        }
+        if auto_locks.tags {
+            active.tags_locked = Set(true);
+            meta_touched = true;
+        }
+        if auto_locks.languages {
+            active.languages_locked = Set(true);
+        }
+        if auto_locks.parodies {
+            active.parodies_locked = Set(true);
+            meta_touched = true;
+        }
+        if auto_locks.characters {
+            active.characters_locked = Set(true);
+            meta_touched = true;
+        }
+        if meta_touched || auto_locks.any() {
+            active.update(&txn).await.map_err(map_db_err)?;
+            meta_touched = true;
+        }
     }
     if let Some(authors) = meta.authors {
-        replace_comic_authors(db, comic_id, &authors).await?;
+        replace_comic_authors(&txn, comic_id, &authors).await?;
         meta_touched = true;
     }
     if let Some(tags) = meta.tags {
-        replace_comic_tags(db, comic_id, &tags).await?;
+        replace_comic_tags(&txn, comic_id, &tags).await?;
         meta_touched = true;
     }
     if let Some(parodies) = meta.parodies {
-        replace_comic_parodies(db, comic_id, &parodies).await?;
+        replace_comic_parodies(&txn, comic_id, &parodies).await?;
         meta_touched = true;
     }
     if let Some(characters) = meta.characters {
-        replace_comic_characters(db, comic_id, &characters).await?;
+        replace_comic_characters(&txn, comic_id, &characters).await?;
         meta_touched = true;
     }
     if meta_touched {
-        touch_comic(db, comic_id).await?;
+        touch_comic(&txn, comic_id).await?;
     }
+    txn.commit().await.map_err(map_db_err)?;
     Ok(())
 }
 
@@ -192,7 +292,16 @@ pub async fn set_comic_meta_locks(
     comic_id: &str,
     locks: SetComicMetaLocksDto,
 ) -> Result<(), HentaiError> {
-    if !locks.any() {
+    if locks.title.is_none()
+        && locks.description.is_none()
+        && locks.published_at.is_none()
+        && locks.content_rating.is_none()
+        && locks.authors.is_none()
+        && locks.tags.is_none()
+        && locks.languages.is_none()
+        && locks.parodies.is_none()
+        && locks.characters.is_none()
+    {
         return Ok(());
     }
     let db = connection()?;
@@ -201,10 +310,32 @@ pub async fn set_comic_meta_locks(
         comic_id: Set(comic_id.to_string()),
         ..Default::default()
     };
-    for field in ComicMetaField::ALL {
-        if let Some(locked) = locks.patch(field) {
-            apply_comic_lock(&mut active, field, locked);
-        }
+    if let Some(v) = locks.title {
+        active.title_locked = Set(v);
+    }
+    if let Some(v) = locks.description {
+        active.description_locked = Set(v);
+    }
+    if let Some(v) = locks.published_at {
+        active.published_at_locked = Set(v);
+    }
+    if let Some(v) = locks.content_rating {
+        active.content_rating_locked = Set(v);
+    }
+    if let Some(v) = locks.authors {
+        active.authors_locked = Set(v);
+    }
+    if let Some(v) = locks.tags {
+        active.tags_locked = Set(v);
+    }
+    if let Some(v) = locks.languages {
+        active.languages_locked = Set(v);
+    }
+    if let Some(v) = locks.parodies {
+        active.parodies_locked = Set(v);
+    }
+    if let Some(v) = locks.characters {
+        active.characters_locked = Set(v);
     }
     active.update(&txn).await.map_err(map_db_err)?;
     touch_comic(&txn, comic_id).await?;
@@ -217,19 +348,18 @@ pub async fn search_comic_ids_by_tag_expression(
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
 ) -> Result<Vec<String>, HentaiError> {
-    let includes = normalize_tag_expression_tokens(&must_include);
-    let optional = normalize_tag_expression_tokens(&optional_or);
-    let excludes = normalize_tag_expression_tokens(&must_exclude);
+    let includes = normalize_tag_set(must_include);
+    let optional = normalize_tag_set(optional_or);
+    let excludes = normalize_tag_set(must_exclude);
     if includes.is_empty() && optional.is_empty() && excludes.is_empty() {
         return Ok(vec![]);
     }
     let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
         return Ok(vec![]);
     };
-    let mut sql = format!(
+    let mut sql = String::from(
         "SELECT c.comic_id FROM comics c INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
-         WHERE c.library_id = ? AND {}",
-        super::visibility::visible_comic_sql("c")
+         WHERE c.library_id = ?",
     );
     let mut values: Vec<sea_orm::Value> = vec![sea_orm::Value::String(Some(Box::new(library_id)))];
     super::filter_predicate::append_metadata_expression_predicates(
@@ -285,86 +415,41 @@ pub async fn search_by_tag_expression_page(
             page_size,
         });
     }
-    // 越界页保持原样，只把窗口按总行数截断（与关键字搜索同属顺序翻页路径）。
-    let window = paginate(PageRequestDto { page, page_size }, total_count);
-    let start = window.offset.min(total_count) as usize;
-    let end = (start as i64 + window.page_size as i64).min(total_count) as usize;
+    let start = ((page - 1) as i64 * page_size as i64).min(total_count) as usize;
+    let end = (start as i64 + page_size as i64).min(total_count) as usize;
     let page_ids = ids[start..end].to_vec();
     let db = connection()?;
     let items = load_comics_ordered(&db, page_ids).await?;
     Ok(PagedComicResultDto {
         items,
         total_count,
-        page: window.page,
-        page_size: window.page_size,
+        page,
+        page_size,
     })
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// A DTO that writes exactly `field`.
-    fn dto_writing(field: ComicMetaField) -> UpdateComicUserMetaDto {
-        let mut meta = UpdateComicUserMetaDto::default();
-        match field {
-            ComicMetaField::Title => meta.title = Some("title".to_string()),
-            ComicMetaField::Description => meta.description = Some("description".to_string()),
-            ComicMetaField::PublishedAt => meta.published_at = Some(0),
-            ComicMetaField::ContentRating => meta.content_rating = Some("safe".to_string()),
-            ComicMetaField::Authors => meta.authors = Some(vec!["author".to_string()]),
-            ComicMetaField::Tags => meta.tags = Some(vec!["tag".to_string()]),
-            ComicMetaField::Languages => meta.languages = Some(vec!["ja".to_string()]),
-            ComicMetaField::Parodies => meta.parodies = Some(vec!["parody".to_string()]),
-            ComicMetaField::Characters => meta.characters = Some(vec!["character".to_string()]),
-        }
-        meta
-    }
-
-    /// Every variant reports itself written; the field table (its `ALL` order and `from_written`
-    /// round-trip) is covered by `metadata_lock::auto_lock`'s own tests.
-    #[test]
-    fn is_written_reports_exactly_the_written_field() {
-        for field in ComicMetaField::ALL {
-            let meta = dto_writing(field);
-            assert!(meta.is_written(field), "{field:?} 应视为已写入");
-        }
-        let empty = UpdateComicUserMetaDto::default();
-        assert!(!ComicMetaField::ALL
-            .iter()
-            .any(|field| empty.is_written(*field)));
-    }
-
-    #[test]
-    fn lock_patch_reports_only_the_set_lock() {
-        let empty = SetComicMetaLocksDto::default();
-        assert!(!empty.any());
-        assert!(ComicMetaField::ALL
-            .iter()
-            .all(|field| empty.patch(*field).is_none()));
-
-        for field in ComicMetaField::ALL {
-            let mut locks = SetComicMetaLocksDto::default();
-            match field {
-                ComicMetaField::Title => locks.title = Some(false),
-                ComicMetaField::Description => locks.description = Some(false),
-                ComicMetaField::PublishedAt => locks.published_at = Some(false),
-                ComicMetaField::ContentRating => locks.content_rating = Some(false),
-                ComicMetaField::Authors => locks.authors = Some(false),
-                ComicMetaField::Tags => locks.tags = Some(false),
-                ComicMetaField::Languages => locks.languages = Some(false),
-                ComicMetaField::Parodies => locks.parodies = Some(false),
-                ComicMetaField::Characters => locks.characters = Some(false),
-            }
-            assert!(locks.any());
-            assert_eq!(locks.patch(field), Some(false));
-            assert_eq!(
-                ComicMetaField::ALL
-                    .iter()
-                    .filter(|candidate| locks.patch(**candidate).is_some())
-                    .count(),
-                1
-            );
+fn normalize_tag_set(source: Vec<String>) -> Vec<String> {
+    let mut set = std::collections::BTreeSet::new();
+    for value in source {
+        let trimmed = value.trim().to_lowercase();
+        if !trimmed.is_empty() {
+            set.insert(trimmed);
         }
     }
+    set.into_iter().collect()
+}
+
+/// Trim empties; preserve order and first-seen duplicates removed.
+fn normalize_languages(source: Vec<String>) -> Vec<String> {
+    let mut out = Vec::new();
+    for value in source {
+        let trimmed = value.trim().to_string();
+        if trimmed.is_empty() {
+            continue;
+        }
+        if !out.iter().any(|existing: &String| existing == &trimmed) {
+            out.push(trimmed);
+        }
+    }
+    out
 }

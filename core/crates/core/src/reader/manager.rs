@@ -197,12 +197,6 @@ fn release_reader(comic_id: &str) {
 /// Flutter / explicit open: acquire a session (create or reuse).
 #[tracing::instrument(err, fields(comic_id, resource_type, path))]
 pub fn open_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<(), HentaiError> {
-    match block_on(crate::comic::is_comic_trashed(comic_id)) {
-        Ok(true) => return Err(HentaiError::comic_trashed(comic_id)),
-        Ok(false) => {}
-        Err(err) if is_db_unavailable_for_open(&err) => {}
-        Err(err) => return Err(err),
-    }
     acquire_reader(comic_id, path, resource_type)
 }
 

@@ -4,11 +4,9 @@ use sea_orm::{
     QueryOrder, Set,
 };
 
-use crate::comic::visibility::comic_id_not_trashed_sql;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_reading_histories, prelude::*};
 use crate::error::HentaiError;
-use crate::library_write::with_library_write;
 use crate::util::decode_basic_html_entities;
 
 use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto};
@@ -73,7 +71,6 @@ pub async fn get_reading_by_comic_id(
 pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
     let db = connection()?;
     let rows = ComicReadingHistories::find()
-        .filter(not_trashed_history_expr())
         .order_by_desc(comic_reading_histories::Column::LastReadTime)
         .all(&db)
         .await
@@ -110,7 +107,7 @@ pub async fn fetch_reading_page(
 }
 
 fn reading_history_list_query(keyword: Option<&str>) -> sea_orm::Select<ComicReadingHistories> {
-    let mut query = ComicReadingHistories::find().filter(not_trashed_history_expr());
+    let mut query = ComicReadingHistories::find();
     let normalized = keyword.map(str::trim).filter(|value| !value.is_empty());
     if let Some(keyword) = normalized {
         let pattern = format!("%{}%", keyword.to_lowercase());
@@ -122,10 +119,6 @@ fn reading_history_list_query(keyword: Option<&str>) -> sea_orm::Select<ComicRea
         );
     }
     query
-}
-
-fn not_trashed_history_expr() -> sea_orm::sea_query::SimpleExpr {
-    Expr::cust(comic_id_not_trashed_sql("comic_reading_histories.comic_id"))
 }
 
 pub async fn delete_reading_by_comic_id(comic_id: &str) -> Result<i32, HentaiError> {
@@ -151,13 +144,8 @@ pub async fn delete_reading_by_comic_ids(comic_ids: &[String]) -> Result<i32, He
 }
 
 pub async fn clear_all_reading() -> Result<i32, HentaiError> {
-    with_library_write(clear_all_reading_locked).await
-}
-
-async fn clear_all_reading_locked() -> Result<i32, HentaiError> {
     let db = connection()?;
     let res = ComicReadingHistories::delete_many()
-        .filter(not_trashed_history_expr())
         .exec(&db)
         .await
         .map_err(map_db_err)?;

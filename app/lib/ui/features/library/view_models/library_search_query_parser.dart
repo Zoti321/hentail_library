@@ -27,11 +27,6 @@ String formatLibrarySearchExactMetaQuery(String name) {
   return '"$escaped"';
 }
 
-/// Joins [names] as quoted exact tokens with `+` (AND).
-String formatLibrarySearchAndExactMetaQuery(Iterable<String> names) {
-  return names.map(formatLibrarySearchExactMetaQuery).join('+');
-}
-
 /// If [input] is exactly one fully quoted string, returns its unescaped content.
 String? unwrapFullyQuotedLibrarySearchQuery(String input) {
   final String trimmed = input.trim();

@@ -64,7 +64,7 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0009](./0009-library-sidebar-pin-and-order.md) | Library pin 与 sidebar order 落在 libraries 表 | Accepted |
 | [0010](./0010-windows-app-data-profile-isolation.md) | Windows 上按构建变体隔离 App data profile | Accepted |
 | [0011](./0011-tag-dictionary-no-ehtag.md) | 移除 EhTagTranslation 接入，保留通用标签字典导入 | Accepted |
-| [0012](./0012-comic-deletion-deletes-local-resource.md) | 用户 Comic deletion 删除 Local Resource；sync / 删库不删盘 | Accepted（部分被 0023 取代） |
+| [0012](./0012-comic-deletion-deletes-local-resource.md) | 用户 Comic deletion 删除 Local Resource；sync / 删库不删盘 | Accepted |
 | [0013](./0013-path-migration.md) | Path migration：弱指纹 + Local 库根相对路径 remapping | Accepted |
 | [0014](./0014-retire-saved-path-ui-and-api.md) | 退役 Saved path / Selected Paths UI 与 Path API | Accepted |
 | [0015](./0015-ios-pdf-via-vendored-pdfium.md) | iOS PDF 经 vendored pdfium 一等支持（去除 stub） | Accepted |
@@ -75,7 +75,3 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0020](./0020-home-page-multi-library-entry.md) | 首页 reposition 为多库阅读入口 | Accepted |
 | [0021](./0021-library-resource-probe.md) | Library resource probe：轻量发现未入库 Resource | Accepted |
 | [0022](./0022-comic-metadata-bulk-patch.md) | Comic metadata bulk patch（core 批量用户元数据写入） | Accepted |
-| [0023](./0023-comic-trash-before-purge.md) | 用户删除改为 Comic trash → Comic purge 两段式 | Accepted |
-| [0024](./0024-author-stable-identity.md) | Author 稳定身份与创作平台外链 | Accepted |
-| [0025](./0025-author-platform-image-sources.md) | Author 平台形象解析采用本地可信来源适配器 | Accepted |
-| [0026](./0026-library-write-seam.md) | Library-level write seam（库级写的锁与事务边界） | Accepted |

@@ -59,9 +59,6 @@ unrar-ng = "0.7"
 tempfile = "3"
 url = "2"
 reqwest_dav = { version = "0.3", default-features = false, features = ["rustls-tls"] }
-reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
-async-trait = "0.1"
-scraper = "0.24"
 # PDF 后端跨平台共用：桌面/Android/iOS 均经 pdfium-render 运行时绑定 vendored pdfium。
 pdfium-render = "0.8"
 rusqlite = { version = "0.32", features = ["backup"] }

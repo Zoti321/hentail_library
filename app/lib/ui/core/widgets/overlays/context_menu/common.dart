@@ -117,14 +117,12 @@ class ContextMenuActionItem extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.isDestructive = false,
-    this.enabled = true,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final bool isDestructive;
-  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -133,23 +131,17 @@ class ContextMenuActionItem extends StatelessWidget {
     final Color hoverColor = isDestructive
         ? palette.contextMenuDanger.withAlpha(26)
         : cs.primary.withAlpha(10);
-    final Color iconColor = enabled
-        ? (isDestructive ? palette.contextMenuDanger : palette.iconDefault)
-        : palette.iconSecondary;
-    final Color labelColor = enabled
-        ? (isDestructive ? palette.contextMenuDanger : palette.textPrimary)
-        : palette.textTertiary;
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: enabled ? onTap : null,
+        onTap: onTap,
         hoverColor: hoverColor,
         splashColor: hoverColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: <Widget>[
-              Icon(icon, size: 16, color: iconColor),
+              Icon(icon, size: 16, color: palette.iconDefault),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -157,7 +149,7 @@ class ContextMenuActionItem extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: labelColor,
+                    color: palette.textPrimary,
                   ),
                 ),
               ),

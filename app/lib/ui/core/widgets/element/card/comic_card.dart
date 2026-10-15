@@ -101,7 +101,7 @@ class ComicCard extends ConsumerWidget {
               );
             });
           case ComicContextAction.delete:
-            confirmAndTrashComic(context, ref, comic);
+            confirmAndDeleteComic(context, ref, comic);
         }
       },
     );

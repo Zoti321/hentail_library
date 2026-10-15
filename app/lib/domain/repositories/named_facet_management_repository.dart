@@ -21,11 +21,5 @@ abstract class NamedFacetManagementRepository {
     String newName,
   );
 
-  Future<void> merge(
-    ManagedNamedFacetKind kind,
-    String sourceName,
-    String targetName,
-  );
-
   Future<int> countAttachments(ManagedNamedFacetKind kind, String name);
 }

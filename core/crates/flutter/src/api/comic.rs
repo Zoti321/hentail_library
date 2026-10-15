@@ -20,7 +20,6 @@ pub struct ComicFilterDto {
     pub languages: Vec<String>,
     pub parodies: Vec<String>,
     pub characters: Vec<String>,
-    pub needs_metadata_only: bool,
     pub library_id: Option<String>,
 }
 
@@ -144,7 +143,6 @@ impl From<ComicFilterDto> for hentai_core::ComicFilterDto {
             languages: value.languages,
             parodies: value.parodies,
             characters: value.characters,
-            needs_metadata_only: value.needs_metadata_only,
             library_id: value.library_id,
         }
     }
@@ -261,105 +259,9 @@ pub struct UpdateComicUserMetaFrbDto {
     pub characters: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone)]
-pub struct TrashedComicFrbDto {
-    pub comic: ComicDto,
-    pub deleted_at: i64,
-    pub library_name: String,
-    pub library_kind: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct PagedTrashedComicResultFrbDto {
-    pub items: Vec<TrashedComicFrbDto>,
-    pub total_count: i64,
-    pub page: i32,
-    pub page_size: i32,
-}
-
-#[derive(Debug, Clone)]
-pub struct TrashedComicCountsFrbDto {
-    pub total: i64,
-    pub local: i64,
-    pub remote: i64,
-}
-
-#[derive(Debug, Clone)]
-pub struct ComicPurgeResultFrbDto {
-    pub succeeded: i32,
-    pub failed: i32,
-    pub error_samples: Vec<String>,
-}
-
-#[flutter_rust_bridge::frb]
-pub async fn trash_comics_frb(comic_ids: Vec<String>) -> Result<(), HentaiErrorDto> {
-    hentai_core::trash_comics(comic_ids)
-        .await
-        .map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb]
-pub async fn restore_comics_frb(comic_ids: Vec<String>) -> Result<(), HentaiErrorDto> {
-    hentai_core::restore_comics(comic_ids)
-        .await
-        .map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb]
-pub async fn purge_comics_frb(
-    comic_ids: Vec<String>,
-) -> Result<ComicPurgeResultFrbDto, HentaiErrorDto> {
-    let result = hentai_core::purge_comics(comic_ids)
-        .await
-        .map_err(HentaiErrorDto::from)?;
-    Ok(ComicPurgeResultFrbDto {
-        succeeded: result.succeeded,
-        failed: result.failed,
-        error_samples: result.error_samples,
-    })
-}
-
-#[flutter_rust_bridge::frb]
-pub async fn fetch_trashed_comics_page_frb(
-    page: i32,
-    page_size: i32,
-) -> Result<PagedTrashedComicResultFrbDto, HentaiErrorDto> {
-    let result = hentai_core::fetch_trashed_comics_page(page, page_size)
-        .await
-        .map_err(HentaiErrorDto::from)?;
-    Ok(PagedTrashedComicResultFrbDto {
-        items: result
-            .items
-            .into_iter()
-            .map(|item| TrashedComicFrbDto {
-                comic: ComicDto::from(item.comic),
-                deleted_at: item.deleted_at,
-                library_name: item.library_name,
-                library_kind: item.library_kind,
-            })
-            .collect(),
-        total_count: result.total_count,
-        page: result.page,
-        page_size: result.page_size,
-    })
-}
-
-#[flutter_rust_bridge::frb]
-pub async fn count_trashed_comics_frb() -> Result<TrashedComicCountsFrbDto, HentaiErrorDto> {
-    let counts = hentai_core::count_trashed_comics()
-        .await
-        .map_err(HentaiErrorDto::from)?;
-    Ok(TrashedComicCountsFrbDto {
-        total: counts.total,
-        local: counts.local,
-        remote: counts.remote,
-    })
-}
-
-#[flutter_rust_bridge::frb]
-pub async fn list_trashed_comic_ids_frb() -> Result<Vec<String>, HentaiErrorDto> {
-    hentai_core::list_trashed_comic_ids()
-        .await
+#[flutter_rust_bridge::frb(sync)]
+pub fn delete_comics_by_ids_frb(comic_ids: Vec<String>) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(hentai_core::delete_comics_by_ids(comic_ids))
         .map_err(HentaiErrorDto::from)
 }
 

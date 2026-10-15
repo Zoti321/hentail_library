@@ -1,21 +1,27 @@
-import 'package:hentai_library/domain/library/library_comic_filter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/domain/library/comic_list_query.dart';
+import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_revision_coordinator.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_comics_catalog_controller.g.dart';
+
+const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
 
 @Riverpod(keepAlive: true)
 class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
@@ -29,14 +35,25 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     return _load();
   }
 
-  /// 分页查询键 =（关键词，整份筛选意图，每页数量）；任一变化即回到第 1 页。
   void _syncPaginationWithQueryKey() {
-    final String keyword = ref.watch(libraryFilterQueryProvider);
-    final LibraryComicFiltersState filters =
-        ref.watch(libraryComicFiltersProvider).value ??
-        LibraryComicFiltersState.defaults;
-    final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
-    _pagination.syncQueryKey((keyword, filters, pageSize));
+    final String keyword = ref.watch(
+      libraryQueryIntentProvider.select(
+        (LibraryQueryIntent intent) => intent.keyword,
+      ),
+    );
+    _pagination.syncQueryKey((
+      keyword,
+      ref.watch(libraryComicsTabAgeRestrictionFilterProvider),
+      ref.watch(libraryComicsTabMediaTypeFilterProvider),
+      ref.watch(libraryComicsTabTagFilterProvider),
+      ref.watch(libraryComicsTabAuthorFilterProvider),
+      ref.watch(libraryComicsTabLanguageFilterProvider),
+      ref.watch(libraryComicsTabParodyFilterProvider),
+      ref.watch(libraryComicsTabCharacterFilterProvider),
+      ref.watch(libraryComicsTabExpandBySeriesProvider),
+      ref.watch(libraryComicsTabSortOptionProvider),
+      ref.watch(libraryComicsTabPageSizeProvider),
+    ));
   }
 
   Future<LibraryComicsCatalogState> _load() async {
@@ -52,7 +69,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     }
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
-    final PagedResult<Comic> page = await _fetchPage();
+    final PagedResult<Comic> page = await _fetchPage(keyword);
     final int tableTotalCount = await ref.read(comicRepoProvider).countAll();
 
     return LibraryComicsCatalogState(
@@ -70,11 +87,44 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     );
   }
 
-  Future<PagedResult<Comic>> _fetchPage() async {
-    final LibraryComicFilter filter = ref.read(libraryComicFilterQueryProvider);
-    final LibraryComicFiltersState filters =
-        ref.read(libraryComicFiltersProvider).value ??
-        LibraryComicFiltersState.defaults;
+  Future<PagedResult<Comic>> _fetchPage(String keyword) async {
+    final LibraryAgeRestrictionFilter ageRestriction = ref.read(
+      libraryComicsTabAgeRestrictionFilterProvider,
+    );
+    final LibraryMediaTypeFilterSelection mediaTypeFilter = ref.read(
+      libraryComicsTabMediaTypeFilterProvider,
+    );
+    final LibraryMetadataFilterSelection tagFilter = ref.read(
+      libraryComicsTabTagFilterProvider,
+    );
+    final LibraryMetadataFilterSelection authorFilter = ref.read(
+      libraryComicsTabAuthorFilterProvider,
+    );
+    final LibraryComicSortOption sortOption = ref.read(
+      libraryComicsTabSortOptionProvider,
+    );
+    final Set<String> languageFilter = ref.read(
+      libraryComicsTabLanguageFilterProvider,
+    );
+    final Set<String> parodyFilter = ref.read(
+      libraryComicsTabParodyFilterProvider,
+    );
+    final Set<String> characterFilter = ref.read(
+      libraryComicsTabCharacterFilterProvider,
+    );
+    final bool expandBySeries = ref.read(
+      libraryComicsTabExpandBySeriesProvider,
+    );
+    final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
+      ageRestriction: ageRestriction,
+      mediaTypeFilter: mediaTypeFilter,
+      tagFilter: tagFilter,
+      authorFilter: authorFilter,
+      languages: languageFilter,
+      parodies: parodyFilter,
+      characters: characterFilter,
+      keyword: keyword,
+    );
     final int pageSize = ref.read(libraryComicsTabPageSizeProvider);
     return _pagination.fetchPage<Comic>(
       pageSize: pageSize,
@@ -83,8 +133,8 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
           .fetchComicsPage(
             request: request,
             filter: filter,
-            expandBySeries: filters.expandBySeries,
-            sortOption: filters.sortOption,
+            expandBySeries: expandBySeries,
+            sortOption: sortOption,
           ),
     );
   }

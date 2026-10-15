@@ -7,9 +7,8 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -72,10 +71,7 @@ class _ComicSortListRow extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final bool expandBySeries = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.expandBySeries ?? false,
-      ),
+      libraryComicsTabExpandBySeriesProvider,
     );
     final LibraryComicSortOption sortOption = ref.watch(
       libraryActiveComicSortOptionProvider,
@@ -97,8 +93,8 @@ class _ComicSortListRow extends ConsumerWidget {
         onTap: isEnabled
             ? () {
                 ref
-                    .read(libraryComicFiltersProvider.notifier)
-                    .setSortField(field);
+                    .read(libraryTabSortProvider.notifier)
+                    .setComicSortField(field);
               }
             : null,
         hoverColor: isEnabled ? theme.hoverColor : null,
@@ -172,8 +168,8 @@ class _SeriesSortListRow extends ConsumerWidget {
         onTap: isImplemented
             ? () {
                 ref
-                    .read(librarySeriesFiltersProvider.notifier)
-                    .setSortField(field);
+                    .read(libraryTabSortProvider.notifier)
+                    .setSeriesSortField(field);
               }
             : null,
         hoverColor: isImplemented ? theme.hoverColor : null,

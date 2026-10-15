@@ -13,7 +13,6 @@ abstract final class AppNavigation {
   static const String navIdLibrary = 'library';
   static const String navIdMetadata = 'metadata';
   static const String navIdHistory = 'history';
-  static const String navIdTrash = 'trash';
   static const String navIdSettings = 'settings';
 
   /// Flat main items (Libraries section is rendered separately after Home).
@@ -27,7 +26,6 @@ abstract final class AppNavigation {
   static List<NavItemData> desktopSystemNavItems(
     AppLocalizations l10n,
   ) => <NavItemData>[
-    (id: navIdTrash, label: l10n.navTrash, icon: LucideIcons.trash2),
     (id: navIdSettings, label: l10n.navSettings, icon: LucideIcons.settings),
   ];
 
@@ -53,8 +51,6 @@ abstract final class AppNavigation {
         return '';
       case '/history':
         return navIdHistory;
-      case '/trash':
-        return navIdTrash;
       case '/settings':
         return navIdSettings;
       default:
@@ -83,9 +79,6 @@ abstract final class AppNavigation {
         break;
       case navIdHistory:
         context.go('/history');
-        break;
-      case navIdTrash:
-        context.go('/trash');
         break;
       case navIdSettings:
         context.go('/settings');

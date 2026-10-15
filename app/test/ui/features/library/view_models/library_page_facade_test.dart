@@ -13,20 +13,20 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../support/fakes/author_repository_test_fakes.dart';
 import '../../../../support/fakes/revision_throttle_test_fakes.dart';
 
 class _FakeLibraryRevision extends LibraryRevisionNotifier {
@@ -123,7 +123,6 @@ void main() {
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
         comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo()),
         seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo()),
-        authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
       ],
     );
     addTearDown(container.dispose);
@@ -185,10 +184,14 @@ void main() {
       final LibraryPageFacadeNotifier facade = container.read(
         libraryPageFacadeProvider.notifier,
       );
-      await container.read(libraryComicFiltersProvider.future);
+      await container.read(libraryAgeRestrictionFilterProvider.future);
+      await container.read(libraryTabSortProvider.future);
       await container
-          .read(libraryComicFiltersProvider.notifier)
-          .setAgeRestriction(LibraryAgeRestrictionFilter.r18Only);
+          .read(libraryAgeRestrictionFilterProvider.notifier)
+          .setFilter(
+            LibraryDisplayTarget.comics,
+            LibraryAgeRestrictionFilter.r18Only,
+          );
       facade.setKeyword('kw');
       await tester.pump(const Duration(milliseconds: 300));
       expect(
@@ -210,10 +213,14 @@ void main() {
 
   test('resetFilters only touches the active tab', () async {
     final ProviderContainer container = createContainer();
-    await container.read(libraryComicFiltersProvider.future);
+    await container.read(libraryAgeRestrictionFilterProvider.future);
+    await container.read(libraryTabSortProvider.future);
     await container
-        .read(libraryComicFiltersProvider.notifier)
-        .setAgeRestriction(LibraryAgeRestrictionFilter.r18Only);
+        .read(libraryAgeRestrictionFilterProvider.notifier)
+        .setFilter(
+          LibraryDisplayTarget.comics,
+          LibraryAgeRestrictionFilter.r18Only,
+        );
     final LibraryPageFacadeNotifier facade = container.read(
       libraryPageFacadeProvider.notifier,
     );
@@ -222,7 +229,7 @@ void main() {
     await facade.resetFilters();
 
     expect(
-      (await container.read(libraryComicFiltersProvider.future)).ageRestriction,
+      (await container.read(libraryAgeRestrictionFilterProvider.future)).comics,
       LibraryAgeRestrictionFilter.r18Only,
     );
   });

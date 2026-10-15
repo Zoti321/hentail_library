@@ -394,8 +394,6 @@
   "libraryCharacterFilter": "Characters",
   "libraryTagFilter": "Tags",
   "libraryAuthorFilter": "Authors",
-  "libraryOrganizeFilter": "Organize",
-  "libraryNeedsMetadataOnlyFilter": "Needs metadata only",
   "libraryMetadataFilterClear": "Clear",
   "libraryMetadataFilterSearchHint": "Search…",
   "libraryMetadataFilterEmpty": "No matches",
@@ -550,6 +548,8 @@
   },
   "comicDetailDeleteLocalAcknowledge": "I understand the disk resource will be permanently deleted",
   "comicDetailCancel": "Cancel",
+  "comicDetailDeletedWithResourceToast": "Comic and disk resource deleted",
+  "comicDetailRemovedFromLibraryToast": "Comic removed from library",
   "comicDetailNotFound": "Comic not found or removed",
   "comicDetailLoadFailedRetry": "Failed to load. Please retry.",
   "comicDetailGoToLibrary": "Go to library",
@@ -706,7 +706,6 @@
   "metadataAdd": "Add",
   "metadataSearchNameHint": "Search by name…",
   "metadataRename": "Rename",
-  "metadataMerge": "Merge",
   "metadataDelete": "Delete",
   "metadataMoreActions": "More actions",
   "metadataAllAuthors": "All authors",
@@ -1044,140 +1043,5 @@
     }
   },
   "bulkEditMetadataFieldSummaryReplace": "Replace",
-  "bulkEditMetadataFieldSummaryClear": "Clear",
-  "navTrash": "Trash",
-  "readerOpenComicTrashed": "This comic has been deleted. Restore it to read.",
-  "comicTrashConfirmContent": "\"{title}\" will be moved to Deleted. You can restore it from there at any time.",
-  "@comicTrashConfirmContent": {
-    "placeholders": {
-      "title": {
-        "type": "String"
-      }
-    }
-  },
-  "comicTrashedToast": "Moved to Deleted",
-  "trashPageSummary": "{count, plural, one{1 comic · restore or delete permanently} other{{count} comics · restore or delete permanently}}",
-  "@trashPageSummary": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "trashEmptyTitle": "No deleted comics",
-  "trashEmptyDescription": "Deleted comics are kept here first. You can restore them or delete them permanently.",
-  "trashRestore": "Restore",
-  "trashPurge": "Delete permanently",
-  "trashPurgeAll": "Delete all",
-  "trashRestoreAll": "Restore all",
-  "trashRestoreSelected": "Restore selected",
-  "trashPurgeSelected": "Delete selected",
-  "trashSelectedCount": "{count, plural, other{{count} selected}}",
-  "@trashSelectedCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "trashDeletedAt": "Deleted {time}",
-  "@trashDeletedAt": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "trashBadgeLocal": "Local",
-  "trashBadgeRemote": "Remote",
-  "trashRestoredToast": "{count, plural, one{Restored 1 comic} other{Restored {count} comics}}",
-  "@trashRestoredToast": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "trashPurgeSucceededToast": "{count, plural, one{Permanently deleted 1 comic} other{Permanently deleted {count} comics}}",
-  "@trashPurgeSucceededToast": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "trashPurgePartialToast": "Permanently deleted {succeeded}; {failed} failed and remain in Deleted",
-  "@trashPurgePartialToast": {
-    "placeholders": {
-      "succeeded": {
-        "type": "int"
-      },
-      "failed": {
-        "type": "int"
-      }
-    }
-  },
-  "trashPurgeFailedToast": "{count, plural, one{1 comic could not be deleted and remains in Deleted} other{{count} comics could not be deleted and remain in Deleted}}",
-  "@trashPurgeFailedToast": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "comicPurgeTitle": "Delete comics permanently?",
-  "comicPurgeLocalBatchConfirm": "{count, plural, one{1 comic will be removed from the library and its resource on disk (file or image folder) permanently deleted. This cannot be undone.} other{{count} comics will be removed from the library and their resources on disk (files or image folders) permanently deleted. This cannot be undone.}}",
-  "@comicPurgeLocalBatchConfirm": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "comicPurgeRemoteBatchConfirm": "{count, plural, one{1 remote comic will be removed from the library only. Remote resources are not deleted.} other{{count} remote comics will be removed from the library only. Remote resources are not deleted.}}",
-  "@comicPurgeRemoteBatchConfirm": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "comicPurgeMixedConfirm": "{localCount} local comics will have their files on disk permanently deleted; {remoteCount} remote comics will be removed from the library only (remote resources are not deleted). This cannot be undone.",
-  "@comicPurgeMixedConfirm": {
-    "placeholders": {
-      "localCount": {
-        "type": "int"
-      },
-      "remoteCount": {
-        "type": "int"
-      }
-    }
-  },
-  "comicPurgeRemoteAcknowledge": "I understand this will permanently remove them from the library and cannot be undone",
-  "authorDetailTitle": "Author",
-  "authorDetailVerified": "Verified author",
-  "authorDetailAddLink": "Add link",
-  "authorDetailLinkPasteHint": "Paste a profile link",
-  "authorDetailPlatformPixiv": "Pixiv",
-  "authorDetailPlatformX": "X",
-  "authorDetailPlatformPatreon": "Patreon",
-  "authorDetailPlatformFanbox": "FANBOX",
-  "authorDetailPlatformDiscord": "Discord",
-  "authorDetailPlatformOther": "Other",
-  "authorDetailDeleteLink": "Delete link",
-  "authorDetailDeleteLinkConfirm": "Delete link \"{label}\"?",
-  "authorDetailLinkTooltip": "{url}",
-  "authorDetailComicsSection": "Comics · {count}",
-  "@authorDetailComicsSection": {
-    "placeholders": {
-      "count": { "type": "int" }
-    }
-  },
-  "authorDetailComicsEmpty": "No comics yet",
-  "authorDetailViewInSearch": "View in search",
-  "authorDetailRename": "Rename",
-  "authorDetailAliases": "Aliases: {aliases}",
-  "@authorDetailAliases": { "placeholders": { "aliases": { "type": "String" } } },
-  "authorDetailInvalidUrl": "Enter a URL starting with http:// or https://",
-  "authorDetailOpenLinkFailed": "Could not open the link"
+  "bulkEditMetadataFieldSummaryClear": "Clear"
 }

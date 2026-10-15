@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/src/rust/api/author.dart';
 import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/metadata_backup.dart';
@@ -51,21 +50,6 @@ void main() {
       initDbFrb(appDataDir: appDataDir.path, dbFileName: 'frb_wire');
 
       expect(await countAllComicsFrb(), 0);
-      final AuthorIdentityFrbDto author = await addAuthorFrb(
-        name: 'Wire Author',
-      );
-      final AuthorImageRefFrbDto image = await resolveAuthorImageFrb(
-        authorId: author.id,
-        showR18: false,
-      );
-      expect(image.avatarSource, AuthorImageSourceFrb.none);
-      expect(image.avatarComicId, isNull);
-      expect(image.avatarLinkId, isNull);
-      expect(image.avatarImageUrl, isNull);
-      expect(image.backgroundSource, AuthorImageSourceFrb.none);
-      expect(image.backgroundComicId, isNull);
-      expect(image.backgroundLinkId, isNull);
-      expect(image.backgroundImageUrl, isNull);
     },
   );
 

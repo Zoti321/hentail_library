@@ -7,8 +7,8 @@ use sea_orm::{
 
 use crate::db::{connection, map_db_err, version_connection};
 use crate::entity::{
-    comic_characters, comic_meta, comic_parodies, comic_reading_histories, comic_tags, comics,
-    prelude::*,
+    comic_authors, comic_characters, comic_meta, comic_parodies, comic_reading_histories,
+    comic_tags, comics, prelude::*,
 };
 use crate::error::HentaiError;
 
@@ -16,18 +16,13 @@ use super::dto::{
     ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
 use super::page_query::{build_count_query, build_ids_page_query};
-use super::pagination::paginate;
-use super::visibility::visible_comic_sql;
 
 pub async fn count_all() -> Result<i64, HentaiError> {
     let db = connection()?;
     let row = db
         .query_one(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
-            format!(
-                "SELECT COUNT(*) AS c FROM comics c WHERE {}",
-                visible_comic_sql("c")
-            ),
+            "SELECT COUNT(*) AS c FROM comics".to_string(),
         ))
         .await
         .map_err(map_db_err)?
@@ -53,32 +48,42 @@ pub async fn fetch_comics_page(
             page_size: request.page_size.max(1),
         });
     }
+    let page_size = request.page_size.max(1);
     let total_count = count_filtered(&db, &filter).await?;
-    let window = paginate(request, total_count).clamped();
+    let total_pages = if total_count <= 0 {
+        0
+    } else {
+        (total_count + page_size as i64 - 1) / page_size as i64
+    };
+    let mut effective_page = request.page.max(1);
+    if total_pages > 0 && effective_page as i64 > total_pages {
+        effective_page = total_pages as i32;
+    }
     if total_count <= 0 {
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
-            page_size: window.page_size,
+            page_size,
         });
     }
+    let offset = (effective_page - 1) * page_size;
     let library_root_path = resolve_library_root_path(&filter, expand_by_series).await?;
     let ids_query = build_ids_page_query(
         &filter,
         &sort,
         expand_by_series,
         library_root_path.as_deref(),
-        window.page_size,
-        window.offset as i32,
+        page_size,
+        offset,
     );
     let comic_ids = query_string_ids(&db, &ids_query).await?;
     let items = load_comics_ordered(&db, comic_ids).await?;
     Ok(PagedComicResultDto {
         items,
         total_count,
-        page: window.page,
-        page_size: window.page_size,
+        page: effective_page,
+        page_size,
     })
 }
 
@@ -148,12 +153,9 @@ pub async fn search_by_keyword_page(
     let db = connection()?;
     let count_stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        format!(
-            "SELECT COUNT(*) FROM comics c \
-             INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
-             WHERE c.library_id = ? AND {} AND lower(m.title) LIKE ?",
-            visible_comic_sql("c")
-        ),
+        "SELECT COUNT(*) FROM comics c \
+         INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+         WHERE c.library_id = ? AND lower(m.title) LIKE ?",
         vec![
             Value::String(Some(Box::new(library_id.clone()))),
             Value::String(Some(Box::new(format!("%{q}%")))),
@@ -166,21 +168,14 @@ pub async fn search_by_keyword_page(
         .ok_or_else(|| HentaiError::db_query_failed("search count 无结果", None))?
         .try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
-    // 越界页保持原样：本路径是顺序翻页（由 `has_next` 驱动），不钳到末页。
-    let window = paginate(PageRequestDto { page, page_size }, total_count);
-    let offset = window.offset;
-    let page = window.page;
-    let page_size = window.page_size;
+    let offset = (page - 1) as i64 * page_size as i64;
     let ids_stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        format!(
-            "SELECT c.comic_id FROM comics c \
-             INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
-             WHERE c.library_id = ? AND {} AND lower(m.title) LIKE ? \
-             ORDER BY lower(m.title) ASC \
-             LIMIT ? OFFSET ?",
-            visible_comic_sql("c")
-        ),
+        "SELECT c.comic_id FROM comics c \
+         INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+         WHERE c.library_id = ? AND lower(m.title) LIKE ? \
+         ORDER BY lower(m.title) ASC \
+         LIMIT ? OFFSET ?",
         vec![
             Value::String(Some(Box::new(library_id))),
             Value::String(Some(Box::new(format!("%{q}%")))),
@@ -279,7 +274,7 @@ pub async fn load_comics_ordered(
         .map(|m| (m.comic_id.clone(), m))
         .collect();
     let tag_map = load_tag_names(db, &comic_ids).await?;
-    let author_map = crate::author::load_author_names_for_comics(db, &comic_ids).await?;
+    let author_map = load_author_names(db, &comic_ids).await?;
     let parody_map = load_parody_names(db, &comic_ids).await?;
     let character_map = load_character_names(db, &comic_ids).await?;
     let last_read_map = load_last_read_times(db, &comic_ids).await?;
@@ -360,6 +355,23 @@ async fn load_tag_names(
     let mut map: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
         map.entry(row.comic_id).or_default().push(row.tag_name);
+    }
+    Ok(map)
+}
+
+async fn load_author_names(
+    db: &DatabaseConnection,
+    comic_ids: &[String],
+) -> Result<HashMap<String, Vec<String>>, HentaiError> {
+    let rows = ComicAuthors::find()
+        .filter(Expr::col(comic_authors::Column::ComicId).is_in(comic_ids.to_vec()))
+        .order_by_asc(comic_authors::Column::AuthorName)
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut map: HashMap<String, Vec<String>> = HashMap::new();
+    for row in rows {
+        map.entry(row.comic_id).or_default().push(row.author_name);
     }
     Ok(map)
 }

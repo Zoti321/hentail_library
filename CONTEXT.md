@@ -77,20 +77,8 @@ _Avoid_: 内容 ID、文件指纹
 _Avoid_: 自动迁移身份、内容指纹身份、系列内容哈希、搬家、重命名保留、rekey（实现用语）
 
 **Comic deletion**:
-用户主动删除 Comic 的两段式流程之旧称：先 Comic trash，再（由用户在「已删除」页）Comic purge。新表述按具体阶段用 Comic trash / Comic restore / Comic purge。不是 Library sync 的 orphan 清理，也不是删除整个 Library（后两者仍只动库记录、不删 Resource）。详见 ADR-0012（部分被 ADR-0023 取代）、ADR-0023。
-_Avoid_: 删文件、从库移除（若暗示不删 Local Resource）、自动 orphan 删盘
-
-**Comic trash**:
-用户主动删除 Comic 的第一段：Comic 从所有浏览面（Library、Home、搜索、Series、阅读历史）隐藏且不可打开阅读，但库记录、用户元数据、Metadata field lock、阅读历史与 Resource 均原样保留，可 Comic restore。Local 与 Remote library 一致。Library sync 不会使其复活或重新导入；其 Resource 消失时按 orphan 清理移除。界面称「已删除」。详见 ADR-0023。
-_Avoid_: 回收站（易与系统回收站混淆）、隐藏、归档
-
-**Comic restore**:
-将处于 Comic trash 的 Comic 恢复为正常可见、可阅读状态，用户元数据与阅读历史随之回来。详见 ADR-0023。
-_Avoid_: 撤销删除、还原文件
-
-**Comic purge**:
-用户在「已删除」页对处于 Comic trash 的 Comic 执行的永久删除：对 Local library 在路径安全校验后永久删除其 Resource（成功或路径已不存在后再清库；删盘失败则该 Comic 不改库、留在 Comic trash）；对 Remote library 仅清库、不删远程 Resource。仅作用于已 trash 的 Comic，不自动触发。详见 ADR-0012、ADR-0023。
-_Avoid_: 清空回收站、彻底删除（口语可用，不作领域词）、自动清理
+用户主动删除 Comic：从 Library 移除该 Comic 及其库内关联数据；对 Local library 在路径安全校验后永久删除其 Resource（成功或路径已不存在后再清库；删盘失败则不改库）；对 Remote library 仅清库、不删远程 Resource。不是 Library sync 的 orphan 清理，也不是删除整个 Library（后两者仍只动库记录）。详见 ADR-0012。
+_Avoid_: 删文件、从库移除（若暗示不删 Local Resource）、回收站删除、自动 orphan 删盘
 
 **Resource**:
 可被发现并（校验后）入库为 Comic 的原始载体：本地文件/目录，或 WebDAV 上的文件。解析中间结果在入库前独立于 Comic 身份与用户元数据；Library sync / Metadata refresh / 阅读与缩略图共用同一套 Resource 访问与解析规则（经 Resource access）。
@@ -169,7 +157,7 @@ _Avoid_: 分组浏览、按系列折叠、group by series、系列模式列表
 _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
 
 **Library browse preference**:
-库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Expand by series、Prefer library root series、Smart facet match、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
+库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Expand by series、Prefer library root series、Smart facet match、年龄限制筛选等。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
 _Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
 
 **Library property**:
@@ -189,28 +177,8 @@ _Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag
 _Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:
-具有稳定身份的署名实体，可多值附着到 Comic；有可变显示名，并可含用户维护的 Author link 等资料。社团、画师、原作者等均记为 Author，不区分类型。现有「仅名字」的作者数据迁移为 Author（尚无外链者即为非认证）。
-_Avoid_: 画师、创作者、社团、Circle；把 Author 仅当成无身份的名字字符串；Author profile（口语可用；领域词用 Author）
-
-**Verified author**:
-至少拥有一条创作平台（Creative platform）Author link 的 Author；否则为非认证 Author。仅表示应用内资料完备度，不是任何外部平台的官方认证同步。
-_Avoid_: 官方认证、平台 verified、蓝V
-
-**Author alias**:
-某 Author 在其 Creative platform 外链上的平台显示名中，与该 Author 当前显示名不一致者；比较与去重均大小写敏感；展示时按 Creative platform 优先级排序，以英文逗号拼接；与显示名一致则不展示。平台显示名由后续平台资料解析写入，非用户手建的独立别名表。
-_Avoid_: 又名、昵称字典、手填别名列表
-
-**Creative platform**:
-Author link 的创作平台闭集，优先级为 Pixiv > X > Patreon > FANBOX > Discord；用于 Verified author 判定、Author alias 排序，以及 Author image 解析顺序。另有 Other 外链平台，但不属 Creative platform。
-_Avoid_: 社交平台（太泛）、把 Other 算进认证或形象优先级
-
-**Author link**:
-用户为 Author 手填的外链 URL；平台按 URL 主机名推断（无法识别者为 Other），不由用户选择。同一 Author 可有多条。Creative platform 上的链接参与 Verified author 与 Author image 解析；Other 仅供打开访问。
-_Avoid_: 社交账号绑定、OAuth、平台登录、手选平台
-
-**Author image**:
-Author 的视觉形象，分头像（avatar）与背景（background）两个位置，各自解析来源：先按 Creative platform 优先级取平台资料图，全部不可用时回退为该 Author 全库可见作品中自然序第一本 Comic 的封面（Comic 有用户指定封面页时以该页为准），再无则为空。Author 详情以高清位图显示 Author image，不复用为网格性能压缩的库缩略图规格；库缩略图只可作高清就绪前的过渡。平台图片地址已确认、文件尚未就绪时，详情可在该位置保留当前过渡图并叠加轻量加载提示；资料解析尚未得到图片地址时不进入该加载态。
-_Avoid_: Cover preview、作者封面、作者缩略图、Author profile picture
+Comic 的署名，用于展示与筛选；社团、画师、原作者等展示用名字均记为 Author，不区分类型。
+_Avoid_: 画师、创作者、社团、Circle（领域模型中统一用 Author）
 
 **Parody**:
 Comic 所同人化的原作 / IP 名（可多值）；无所属 IP 时可用字面值如「原创」。与 Folder series（本库 Series）无关。
@@ -221,11 +189,11 @@ Comic 中出场人物名（可多值）；用于展示与筛选，与 Tag / Auth
 _Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
 
 **Named metadata facet**:
-Comic 上可筛选的元数据面：Tag / Parody / Character 以「名称字符串」字典 + junction 全量 replace；Author 为稳定身份实体 + junction（显示名可变），管理入口仍与其它 facet 并列；Language 为 `comic_meta.languages` JSON 闭集特例。新增与 Tag 同类的名字字典 facet 应扩展 `JunctionNamedFacet`；Author 身份管线单独演进，不强迫塞回纯名字字典模型。
+Comic 上以「名称字符串」附着的元数据面：Tag、Author、Parody、Character 为字典表 + junction 全量 replace（core `named_facet`）；Language 为 `comic_meta.languages` JSON 闭集特例，不走 junction。新增同类 junction facet 应扩展 `JunctionNamedFacet`，而非再复制一套 replace/list/list_distinct 管道。
 _Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
 
 **Named facet attachment count**:
-某个 Named metadata facet 当前附着到多少 Comic（跨全部 Library 的可见附着；Author 按稳定身份计）。未附着的字典项 / Author 为 0。用于 Comic metadata form 候选排序、元数据管理页 Tag / Parody / Character chip 右侧计数等，不是阅读器 session 引用计数。
+某个 Named metadata facet 名字当前附着到多少 Comic（跨全部 Library 的 junction 行数）；未附着的字典项为 0。用于 Comic metadata form 候选排序等，不是阅读器 session 引用计数。
 _Avoid_: 引用次数、usage count、ref_count、热度
 
 **Pinyin-assisted name match**:
@@ -251,10 +219,6 @@ _Avoid_: 分级、年龄限制、路径自动标 r18
 **Comic metadata form**:
 编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
-
-**Needs metadata**:
-Comic 当前除标题外没有任何用户元数据的状态：无 Tag、Author、Parody、Character，Language 为空，无概要、无发布日期，Content rating 为 `unknown`。由现值派生，不是编辑历史；元数据来自用户还是扫描都不区分，Metadata field lock 不参与判定。库页 Comics Tab 用它筛出待整理的 Comic。
-_Avoid_: untagged、unstaged、未编辑、未整理（口语可用）
 
 **Catalog selection mode**:
 库页 Comics Tab 漫画网格上短暂多选 Comic 的 UI 模式；跨页 `Set<comicId>` 供 **Comic metadata bulk patch** 编排；与 **Library reorder mode**、Series reorder mode 互斥。换库、筛选/排序变化或离库页路由时清空。不含搜索页。

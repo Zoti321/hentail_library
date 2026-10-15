@@ -35,8 +35,7 @@ impl ComicNameFacet {
             }
             Self::Author => {
                 "EXISTS (SELECT 1 FROM comic_authors ca \
-                 INNER JOIN authors au ON au.id = ca.author_id \
-                 WHERE ca.comic_id = c.comic_id AND lower(au.name) = ?)"
+                 WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) = ?)"
             }
             Self::Parody => {
                 "EXISTS (SELECT 1 FROM comic_parodies cp \
@@ -61,8 +60,7 @@ impl ComicNameFacet {
             ),
             Self::Author => format!(
                 "EXISTS (SELECT 1 FROM comic_authors ca \
-                 INNER JOIN authors au ON au.id = ca.author_id \
-                 WHERE ca.comic_id = c.comic_id AND lower(au.name) IN ({placeholders}))"
+                 WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))"
             ),
             Self::Parody => format!(
                 "EXISTS (SELECT 1 FROM comic_parodies cp \
@@ -136,58 +134,12 @@ fn push_facet_exclude_in(
     }
 }
 
-fn push_facet_any_in_author_ids(parts: &mut Vec<String>, values: &mut Vec<Value>, ids: &[String]) {
-    if ids.is_empty() {
-        return;
-    }
-    let ph = placeholders(ids.len());
-    parts.push(format!(
-        "EXISTS (SELECT 1 FROM comic_authors ca \
-         WHERE ca.comic_id = c.comic_id AND ca.author_id IN ({ph}))"
-    ));
-    for id in ids {
-        push_sqlite_text(values, id.clone());
-    }
-}
-
-fn push_facet_exclude_in_author_ids(
-    parts: &mut Vec<String>,
-    values: &mut Vec<Value>,
-    ids: &[String],
-) {
-    if ids.is_empty() {
-        return;
-    }
-    let ph = placeholders(ids.len());
-    parts.push(format!(
-        "NOT EXISTS (SELECT 1 FROM comic_authors ca \
-         WHERE ca.comic_id = c.comic_id AND ca.author_id IN ({ph}))"
-    ));
-    for id in ids {
-        push_sqlite_text(values, id.clone());
-    }
-}
-
-/// **Needs metadata**: nothing but the title. Locks and physical fields are ignored;
-/// blank description / Language entries count as empty because the scan write
-/// path does not normalize them.
-const NEEDS_METADATA_SQL: &str = "(\
-     NOT EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id) \
-     AND NOT EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id) \
-     AND NOT EXISTS (SELECT 1 FROM comic_parodies cp WHERE cp.comic_id = c.comic_id) \
-     AND NOT EXISTS (SELECT 1 FROM comic_characters cc WHERE cc.comic_id = c.comic_id) \
-     AND (NOT json_valid(m.languages) OR NOT EXISTS (\
-         SELECT 1 FROM json_each(m.languages) je WHERE trim(je.value) != '')) \
-     AND (m.description IS NULL OR trim(m.description) = '') \
-     AND m.published_at IS NULL \
-     AND m.content_rating = 'unknown')";
-
 /// Catalog page / count WHERE (AND-combined predicates).
 pub(super) fn build_catalog_where_clause(
     filter: &ComicFilterDto,
     values: &mut Vec<Value>,
 ) -> String {
-    let mut parts = vec![crate::comic::visibility::visible_comic_sql("c")];
+    let mut parts = vec!["1=1".to_string()];
     if let Some(library_id) = &filter.library_id {
         parts.push("c.library_id = ?".to_string());
         push_sqlite_text(values, library_id.clone());
@@ -200,8 +152,7 @@ pub(super) fn build_catalog_where_clause(
         parts.push(
             "(lower(m.title) LIKE ? OR EXISTS (\
              SELECT 1 FROM comic_authors ca \
-             INNER JOIN authors au ON au.id = ca.author_id \
-             WHERE ca.comic_id = c.comic_id AND lower(au.name) LIKE ?) OR EXISTS (\
+             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) LIKE ?) OR EXISTS (\
              SELECT 1 FROM comic_parodies cp \
              WHERE cp.comic_id = c.comic_id AND lower(cp.parody_name) LIKE ?) OR EXISTS (\
              SELECT 1 FROM comic_characters cc \
@@ -238,15 +189,20 @@ pub(super) fn build_catalog_where_clause(
         &filter.tags_exclude,
     );
     for author in &filter.authors_all {
-        parts.push(
-            "EXISTS (SELECT 1 FROM comic_authors ca \
-             WHERE ca.comic_id = c.comic_id AND ca.author_id = ?)"
-                .to_string(),
-        );
-        push_sqlite_text(values, author.clone());
+        push_facet_eq(&mut parts, values, ComicNameFacet::Author, author);
     }
-    push_facet_any_in_author_ids(&mut parts, values, &filter.authors_any);
-    push_facet_exclude_in_author_ids(&mut parts, values, &filter.authors_exclude);
+    push_facet_any_in(
+        &mut parts,
+        values,
+        ComicNameFacet::Author,
+        &filter.authors_any,
+    );
+    push_facet_exclude_in(
+        &mut parts,
+        values,
+        ComicNameFacet::Author,
+        &filter.authors_exclude,
+    );
     push_facet_any_in(
         &mut parts,
         values,
@@ -260,9 +216,6 @@ pub(super) fn build_catalog_where_clause(
         ComicNameFacet::Character,
         &filter.characters,
     );
-    if filter.needs_metadata_only {
-        parts.push(NEEDS_METADATA_SQL.to_string());
-    }
     parts.join(" AND ")
 }
 

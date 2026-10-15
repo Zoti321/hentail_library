@@ -56,13 +56,11 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
     final AppLocalizations l10n = context.l10n;
     final String query = searchQuery.value;
     final List<String> filteredNames = names.where((String name) {
-      final String haystack = labelFor?.call(name) ?? name;
       if (!enablePinyinAssistedNameMatch) {
         final String normalized = query.trim().toLowerCase();
-        return normalized.isEmpty ||
-            haystack.toLowerCase().contains(normalized);
+        return normalized.isEmpty || name.toLowerCase().contains(normalized);
       }
-      return nameMatchesPinyinAssistedFilter(haystack, query);
+      return nameMatchesPinyinAssistedFilter(name, query);
     }).toList();
 
     return Column(

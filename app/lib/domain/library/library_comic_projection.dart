@@ -18,7 +18,6 @@ class LibraryComicProjection {
     Set<String> languages = const <String>{},
     Set<String> parodies = const <String>{},
     Set<String> characters = const <String>{},
-    bool needsMetadataOnly = false,
     String? keyword,
   }) {
     final String? query = keyword?.trim().isEmpty ?? true
@@ -35,13 +34,12 @@ class LibraryComicProjection {
       tagsAll: _mapTagNames(tagSets.all),
       tagsAny: _mapTagNames(tagSets.any),
       tagsExclude: _mapTagNames(tagSets.exclude),
-      authorsAll: _mapAuthorIds(authorSets.all),
-      authorsAny: _mapAuthorIds(authorSets.any),
-      authorsExclude: _mapAuthorIds(authorSets.exclude),
+      authorsAll: _mapAuthorNames(authorSets.all),
+      authorsAny: _mapAuthorNames(authorSets.any),
+      authorsExclude: _mapAuthorNames(authorSets.exclude),
       languages: languages.isEmpty ? null : languages,
       parodies: parodies.isEmpty ? null : parodies,
       characters: characters.isEmpty ? null : characters,
-      needsMetadataOnly: needsMetadataOnly,
     );
   }
 
@@ -52,19 +50,10 @@ class LibraryComicProjection {
     return names.map((String name) => LibraryTagPick(name: name)).toSet();
   }
 
-  Set<LibraryAuthorPick>? _mapAuthorIds(Set<String> ids) {
-    if (ids.isEmpty) {
+  Set<LibraryAuthorPick>? _mapAuthorNames(Set<String> names) {
+    if (names.isEmpty) {
       return null;
     }
-    return ids
-        .map((String raw) {
-          final int? id = int.tryParse(raw);
-          if (id == null) {
-            return null;
-          }
-          return LibraryAuthorPick(id: id, name: raw);
-        })
-        .whereType<LibraryAuthorPick>()
-        .toSet();
+    return names.map((String name) => LibraryAuthorPick(name: name)).toSet();
   }
 }

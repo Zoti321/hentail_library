@@ -29,8 +29,7 @@ Job id 形如 `{tier}-{domain}-{intent}`（词汇表见 ADR-0018）。
 | Job | Workflow | 本地复现 | 内容 |
 |-----|----------|----------|------|
 | `nightly-dart-ui` | `nightly.yml` | `cd app && flutter test test/ui` | 全量 `test/ui`（含慢轨） |
-| `nightly-dart-coverage` | `nightly.yml` | `cargo build --manifest-path core/Cargo.toml -p hentai_flutter && cd app && flutter test --coverage` | **Dart 侧**全量测试行覆盖率趋势：Step Summary + `dart-coverage-lcov` artifact；**不是**门禁 |
-| `nightly-rust-coverage` | `nightly-rust-coverage.yml`（仅 `workflow_dispatch`） | `RUST_COVERAGE_HTML=1 ./scripts/run-rust-coverage.sh`（需 `cargo-llvm-cov` + `llvm-tools-preview`） | `hentai-core` 行覆盖率趋势：Summary `LH/LF` + `rust-coverage-lcov` + HTML zip；**不是**门禁；**不可与 Dart % 横向比较** |
+| `nightly-coverage` | `nightly.yml` | `cargo build --manifest-path core/Cargo.toml -p hentai_flutter && cd app && flutter test --coverage` | 全量 Dart 覆盖率趋势：Step Summary 行覆盖率 + `lcov.info` artifact；**不是**门禁 |
 | `watch-platform-android-pdf` | `watch.yml` | 连接 Android 设备/模拟器后 `cd app && flutter test integration_test/pdf_reader_smoke_test.dart` | x86_64 模拟器上真机链路打开 PDF 并读首页；发布时并行跑，失败不挡 `release-publish` |
 | `release-verify` | `release.yml` | `./scripts/run-gate.sh` | 完整 Gate 拓扑（含 codegen 漂移与 FRB 线缝）；`release-build-*` 均 `needs` 它 |
 | `release-build-{windows,macos,linux,android,ios}` | `release.yml` | — | 各平台打包产物 |
@@ -67,9 +66,7 @@ Nightly 的定时触发只在默认分支（`main`）生效；其他分支用 `w
 cd app && flutter test         # 全量 Dart（含慢轨 test/ui）
 ```
 
-Gate **不会**跑全量 `test/ui`（由 `nightly-dart-ui` 覆盖）、不会跑 `integration_test`（由 `watch-platform-android-pdf` 覆盖）、不上 coverage 门禁（`nightly-dart-coverage` / `nightly-rust-coverage` 只出趋势；Rust 行覆盖率 Gate 见 issue #206 PR-B 的 `gate-rust-coverage`）。
-
-**Dart 与 Rust 覆盖率不可比**：Dart 为 `app/` 全量测试插桩；Rust 仅为 `hentai-core` 产品 crate（排除 `vendor/` 与 `crates/core/tests/` harness），工具链为 `cargo-llvm-cov`。
+Gate **不会**跑全量 `test/ui`（由 `nightly-dart-ui` 覆盖）、不会跑 `integration_test`（由 `watch-platform-android-pdf` 覆盖）、不上 coverage 门禁（`nightly-coverage` 只出趋势）。
 
 ## ADR-0002 测试含义
 
@@ -106,7 +103,7 @@ Gate **不会**跑全量 `test/ui`（由 `nightly-dart-ui` 覆盖）、不会跑
 | Flutter | `app/test/support/`（如 `pump_localized_app.dart`、`fakes/`） | 本地化 pump、常用 overrides/fakes |
 | Rust | `core/crates/core/tests/common/` | DB init 锁、`create_fixture_db`、fixture SQL |
 
-触及全局 DB 或 `drift_v2.sql` fixture 的 Rust 集成测走 `mod common;`；纯解析 / 纯函数测试不必引入。**schema / 字段表守卫测试**（自建内存库跑迁移 + `PRAGMA table_info`，不碰全局连接，故无需 harness）留在模块内：`core/crates/core/src/metadata_lock/field.rs`、`core/crates/core/src/path_migration/persist.rs`。新 Dart 测试放在 `test/ui`、`test/data`、`test/domain` 或 `test/core`。
+触及全局 DB 或 `drift_v2.sql` fixture 的 Rust 集成测走 `mod common;`；纯解析 / 纯函数测试不必引入。新 Dart 测试放在 `test/ui`、`test/data`、`test/domain` 或 `test/core`。
 
 ### Flutter 示例
 
