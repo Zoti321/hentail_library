@@ -30,7 +30,7 @@ Job id 形如 `{tier}-{domain}-{intent}`（词汇表见 ADR-0018）。
 |-----|----------|----------|------|
 | `nightly-dart-ui` | `nightly.yml` | `cd app && flutter test test/ui` | 全量 `test/ui`（含慢轨） |
 | `nightly-dart-coverage` | `nightly.yml` | `cargo build --manifest-path core/Cargo.toml -p hentai_flutter && cd app && flutter test --coverage` | **Dart 侧**全量测试行覆盖率趋势：Step Summary + `dart-coverage-lcov` artifact；**不是**门禁 |
-| `nightly-rust-coverage` | `nightly-rust-coverage.yml`（仅 `workflow_dispatch`） | `RUST_COVERAGE_HTML=1 ./scripts/run-rust-coverage.sh`（需 `cargo-llvm-cov` + `llvm-tools-preview`） | `hentai-core` 行覆盖率趋势：Summary `LH/LF` + `rust-coverage-lcov` + HTML zip；**不是**门禁；**不可与 Dart % 横向比较** |
+| `nightly-rust-coverage` | `nightly.yml`（与 `nightly-dart-*` 并行；定时仅 main） | `RUST_COVERAGE_HTML=1 ./scripts/run-rust-coverage.sh`（需 `cargo-llvm-cov` + `llvm-tools-preview`） | `hentai-core` 行覆盖率趋势：Summary `LH/LF` + `rust-coverage-lcov` + HTML zip；**不是**门禁；**不可与 Dart % 横向比较** |
 | `watch-platform-android-pdf` | `watch.yml` | 连接 Android 设备/模拟器后 `cd app && flutter test integration_test/pdf_reader_smoke_test.dart` | x86_64 模拟器上真机链路打开 PDF 并读首页；发布时并行跑，失败不挡 `release-publish` |
 | `release-verify` | `release.yml` | `./scripts/run-gate.sh` | 完整 Gate 拓扑（含 codegen 漂移与 FRB 线缝）；`release-build-*` 均 `needs` 它 |
 | `release-build-{windows,macos,linux,android,ios}` | `release.yml` | — | 各平台打包产物 |
