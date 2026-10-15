@@ -28,6 +28,8 @@ test/ui/features/library/views/widgets/author_image_view_test.dart
 test/ui/features/reader/reader_viewport_pages_test.dart
 test/ui/features/reader/reader_open_error_message_test.dart
 test/ui/features/reader/views/reader_page/reader_chrome_layout_test.dart
+test/ui/features/shell/views/navigation/library_form_dialog_test.dart
+test/ui/features/library/views/widgets/edit_series_dialog_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
 test/ui/core/interaction/app_motion_test.dart
