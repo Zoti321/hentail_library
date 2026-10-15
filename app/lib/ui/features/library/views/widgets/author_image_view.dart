@@ -20,7 +20,9 @@ class AuthorImageView extends ConsumerWidget {
   });
 
   static const Key hdImageKey = ValueKey<String>('author-image-hd');
-  static const Key slotLoadingKey = ValueKey<String>('author-image-slot-loading');
+  static const Key slotLoadingKey = ValueKey<String>(
+    'author-image-slot-loading',
+  );
 
   final int authorId;
   final AuthorImageSlot slot;
