@@ -98,9 +98,10 @@ class _AuthorHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final String? backgroundId =
-        detail.image.backgroundComicId ?? detail.image.avatarComicId;
-    final String? avatarId = detail.image.avatarComicId;
+    final AuthorImageRef image = detail.image;
+    final String? backgroundComicId =
+        image.backgroundComicId ?? image.avatarComicId;
+    final String? avatarComicId = image.avatarComicId;
     final double avatarLeft = tokens.spacing.md;
     const double avatarOuter = _avatarSize + _avatarRing * 2;
     return Stack(
@@ -113,14 +114,17 @@ class _AuthorHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(tokens.radius.md),
               child: SizedBox(
                 height: _bannerHeight,
-                child: backgroundId == null
-                    ? ColoredBox(color: cs.surfaceContainerHighest)
-                    : AuthorImageView(
+                child: image.showsAuthorImageView(AuthorImageSlot.background)
+                    ? AuthorImageView(
                         authorId: detail.id,
                         slot: AuthorImageSlot.background,
-                        comicId: backgroundId,
+                        comicId: backgroundComicId,
+                        platformImageUrl: image.platformImageUrlFor(
+                          AuthorImageSlot.background,
+                        ),
                         alignment: _bannerAlignment,
-                      ),
+                      )
+                    : ColoredBox(color: cs.surfaceContainerHighest),
               ),
             ),
             ConstrainedBox(
@@ -154,19 +158,22 @@ class _AuthorHeader extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: ClipOval(
-              child: avatarId == null
-                  ? ColoredBox(
+              child: image.showsAuthorImageView(AuthorImageSlot.avatar)
+                  ? AuthorImageView(
+                      authorId: detail.id,
+                      slot: AuthorImageSlot.avatar,
+                      comicId: avatarComicId,
+                      platformImageUrl: image.platformImageUrlFor(
+                        AuthorImageSlot.avatar,
+                      ),
+                    )
+                  : ColoredBox(
                       color: cs.surfaceContainerHighest,
                       child: Icon(
                         LucideIcons.user,
                         size: 36,
                         color: cs.hentai.iconSecondary,
                       ),
-                    )
-                  : AuthorImageView(
-                      authorId: detail.id,
-                      slot: AuthorImageSlot.avatar,
-                      comicId: avatarId,
                     ),
             ),
           ),

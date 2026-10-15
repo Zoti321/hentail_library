@@ -15,23 +15,33 @@ class AuthorImageView extends ConsumerWidget {
     required this.authorId,
     required this.slot,
     this.comicId,
+    this.platformImageUrl,
     this.alignment = Alignment.center,
   });
 
   static const Key hdImageKey = ValueKey<String>('author-image-hd');
+  static const Key slotLoadingKey = ValueKey<String>('author-image-slot-loading');
 
   final int authorId;
   final AuthorImageSlot slot;
 
   /// 过渡用缩略图所属 Comic。
   final String? comicId;
+
+  /// 平台缓存已确认的图片 URL；非空且高清字节仍在加载时显示 slot loading。
+  final String? platformImageUrl;
   final AlignmentGeometry alignment;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Uint8List? hd = ref
-        .watch(authorImageProvider((authorId: authorId, slot: slot)))
-        .value;
+    final AsyncValue<Uint8List?> asyncHd = ref.watch(
+      authorImageProvider((authorId: authorId, slot: slot)),
+    );
+    final Uint8List? hd = asyncHd.value;
+    final bool showSlotLoading =
+        platformImageUrl != null &&
+        platformImageUrl!.isNotEmpty &&
+        asyncHd.isLoading;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final ImageDecodeCacheSize cacheSize = decodeCacheSizeForContext(
@@ -80,6 +90,19 @@ class AuthorImageView extends ConsumerWidget {
                 errorBuilder:
                     (BuildContext context, Object error, StackTrace? stack) =>
                         const SizedBox.shrink(),
+              ),
+            if (showSlotLoading)
+              const Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: EdgeInsets.all(6),
+                  child: SizedBox(
+                    key: slotLoadingKey,
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
               ),
           ],
         );

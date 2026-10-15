@@ -103,4 +103,36 @@ void main() {
 
     expect(aliases, <String>['MAIN', 'main']);
   });
+
+  test('showsAuthorImageView includes platform-only slots without comic fallback', () {
+    const AuthorImageRef platformOnly = (
+      avatarSource: AuthorImageSource.platformCached,
+      avatarComicId: null,
+      avatarLinkId: 1,
+      avatarImageUrl: 'https://img.example/a.png',
+      backgroundSource: AuthorImageSource.platformCached,
+      backgroundComicId: null,
+      backgroundLinkId: 2,
+      backgroundImageUrl: 'https://img.example/b.png',
+    );
+
+    expect(platformOnly.showsAuthorImageView(AuthorImageSlot.avatar), isTrue);
+    expect(platformOnly.showsAuthorImageView(AuthorImageSlot.background), isTrue);
+  });
+
+  test('showsAuthorImageView is false when slot has no comic or platform source', () {
+    const AuthorImageRef empty = (
+      avatarSource: AuthorImageSource.none,
+      avatarComicId: null,
+      avatarLinkId: null,
+      avatarImageUrl: null,
+      backgroundSource: AuthorImageSource.none,
+      backgroundComicId: null,
+      backgroundLinkId: null,
+      backgroundImageUrl: null,
+    );
+
+    expect(empty.showsAuthorImageView(AuthorImageSlot.avatar), isFalse);
+    expect(empty.showsAuthorImageView(AuthorImageSlot.background), isFalse);
+  });
 }

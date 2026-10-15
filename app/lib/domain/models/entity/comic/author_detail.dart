@@ -63,6 +63,26 @@ typedef AuthorImageRef = ({
   String? backgroundImageUrl,
 });
 
+extension AuthorImageRefSlot on AuthorImageRef {
+  String? platformImageUrlFor(AuthorImageSlot slot) => switch (slot) {
+    AuthorImageSlot.avatar => avatarImageUrl,
+    AuthorImageSlot.background => backgroundImageUrl,
+  };
+
+  /// 该 slot 在详情头图区是否应挂载 [AuthorImageView]（含仅平台图、无 Comic 回退）。
+  bool showsAuthorImageView(AuthorImageSlot slot) => switch (slot) {
+    AuthorImageSlot.avatar =>
+      avatarComicId != null ||
+          avatarLinkId != null ||
+          avatarSource == AuthorImageSource.platformCached,
+    AuthorImageSlot.background =>
+      backgroundComicId != null ||
+          avatarComicId != null ||
+          backgroundLinkId != null ||
+          backgroundSource == AuthorImageSource.platformCached,
+  };
+}
+
 List<String> authorAliases({
   required String authorName,
   required List<AuthorLink> links,

@@ -35,8 +35,9 @@ final Uint8List _png = Uint8List.fromList(<int>[
 
 Future<void> _pump(
   WidgetTester tester,
-  Future<Uint8List?> Function() hd,
-) async {
+  Future<Uint8List?> Function() hd, {
+  String? platformImageUrl,
+}) async {
   await pumpLocalizedApp(
     tester,
     overrides: <Override>[
@@ -45,7 +46,7 @@ Future<void> _pump(
       ),
       authorImageProvider(_request).overrideWith((Ref ref) => hd()),
     ],
-    home: const Scaffold(
+    home: Scaffold(
       body: SizedBox(
         width: 400,
         height: 140,
@@ -53,6 +54,7 @@ Future<void> _pump(
           authorId: 1,
           slot: AuthorImageSlot.background,
           comicId: 'comic-1',
+          platformImageUrl: platformImageUrl,
         ),
       ),
     ),
@@ -111,7 +113,22 @@ void main() {
 
     expect(find.byType(CardLetterboxedCoverImage), findsOneWidget);
     expect(find.byKey(AuthorImageView.hdImageKey), findsNothing);
+    expect(find.byKey(AuthorImageView.slotLoadingKey), findsNothing);
   });
+
+  testWidgets(
+    'shows corner slot loading only after platform image url is confirmed',
+    (WidgetTester tester) async {
+      await _pump(
+        tester,
+        () => Completer<Uint8List?>().future,
+        platformImageUrl: 'https://img.example/platform.png',
+      );
+
+      expect(find.byType(CardLetterboxedCoverImage), findsOneWidget);
+      expect(find.byKey(AuthorImageView.slotLoadingKey), findsOneWidget);
+    },
+  );
 
   testWidgets('overlays hd image once ready', (WidgetTester tester) async {
     await _pump(tester, () async => _png);

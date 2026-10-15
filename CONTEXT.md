@@ -209,7 +209,7 @@ _Avoid_: 社交平台（太泛）、把 Other 算进认证或形象优先级
 _Avoid_: 社交账号绑定、OAuth、平台登录、手选平台
 
 **Author image**:
-Author 的视觉形象，分头像（avatar）与背景（background）两个位置，各自解析来源：先按 Creative platform 优先级取平台资料图，全部不可用时回退为该 Author 全库可见作品中自然序第一本 Comic 的封面（Comic 有用户指定封面页时以该页为准），再无则为空。Author 详情以高清位图显示 Author image，不复用为网格性能压缩的库缩略图规格；库缩略图只可作高清就绪前的过渡。
+Author 的视觉形象，分头像（avatar）与背景（background）两个位置，各自解析来源：先按 Creative platform 优先级取平台资料图，全部不可用时回退为该 Author 全库可见作品中自然序第一本 Comic 的封面（Comic 有用户指定封面页时以该页为准），再无则为空。Author 详情以高清位图显示 Author image，不复用为网格性能压缩的库缩略图规格；库缩略图只可作高清就绪前的过渡。平台图片地址已确认、文件尚未就绪时，详情可在该位置保留当前过渡图并叠加轻量加载提示；资料解析尚未得到图片地址时不进入该加载态。
 _Avoid_: Cover preview、作者封面、作者缩略图、Author profile picture
 
 **Parody**:
