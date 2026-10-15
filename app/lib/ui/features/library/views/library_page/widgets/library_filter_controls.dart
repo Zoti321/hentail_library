@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
@@ -7,10 +8,9 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_accordion.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
@@ -84,11 +84,16 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                         label: l10n.libraryAgeRestrictionFilterLabel(option),
                         selected: selected == option,
                         onTap: () {
-                          ref
-                              .read(
-                                libraryAgeRestrictionFilterProvider.notifier,
-                              )
-                              .toggleFilterOption(displayTarget, option);
+                          switch (displayTarget) {
+                            case LibraryDisplayTarget.comics:
+                              ref
+                                  .read(libraryComicFiltersProvider.notifier)
+                                  .toggleAgeRestrictionOption(option);
+                            case LibraryDisplayTarget.series:
+                              ref
+                                  .read(librarySeriesFiltersProvider.notifier)
+                                  .toggleAgeRestrictionOption(option);
+                          }
                         },
                       ),
                 )
@@ -126,7 +131,11 @@ class _LibraryMediaTypeFilterControlsState
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final LibraryMediaTypeFilterSelection selected = ref.watch(
-      libraryComicsTabMediaTypeFilterProvider,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.mediaTypeFilter ??
+            const LibraryMediaTypeFilterSelection(),
+      ),
     );
 
     final AppLocalizations l10n = context.l10n;
@@ -175,8 +184,8 @@ class _LibraryMediaTypeFilterControlsState
                         selected: selected.selected.contains(option),
                         onTap: () {
                           ref
-                              .read(libraryMediaTypeFilterProvider.notifier)
-                              .toggleOption(option);
+                              .read(libraryComicFiltersProvider.notifier)
+                              .toggleMediaType(option);
                         },
                       ),
                 )
@@ -257,21 +266,96 @@ class _LibrarySerializationStatusFilterControlsState
           child: Column(
             children: LibrarySerializationStatusFilter.selectableOptions
                 .map(
-                  (
-                    LibrarySerializationStatusFilter option,
-                  ) => _FilterCheckboxOptionRow(
-                    label: l10n.librarySerializationStatusFilterLabel(option),
-                    selected: selected == option,
-                    onTap: () {
-                      ref
-                          .read(
-                            librarySerializationStatusFilterProvider.notifier,
-                          )
-                          .toggleFilterOption(option);
-                    },
-                  ),
+                  (LibrarySerializationStatusFilter option) =>
+                      _FilterCheckboxOptionRow(
+                        label: l10n.librarySerializationStatusFilterLabel(
+                          option,
+                        ),
+                        selected: selected == option,
+                        onTap: () {
+                          ref
+                              .read(librarySeriesFiltersProvider.notifier)
+                              .toggleSerializationStatusFilterOption(option);
+                        },
+                      ),
                 )
                 .toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 库页抽屉筛选控件（漫画 Tab「整理」手风琴）。
+class LibraryOrganizeFilterControls extends HookConsumerWidget {
+  const LibraryOrganizeFilterControls({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ValueNotifier<bool> expanded = useState(false);
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    if (displayTarget != LibraryDisplayTarget.comics) {
+      return const SizedBox.shrink();
+    }
+
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final bool needsMetadataOnly = ref.watch(
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.needsMetadataOnly ?? false,
+      ),
+    );
+
+    final AppLocalizations l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => expanded.value = !expanded.value,
+            hoverColor: theme.hoverColor,
+            splashColor: theme.splashColor,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                kLibraryFilterSortDrawerContentInset,
+                10,
+                kLibraryFilterSortDrawerContentInset,
+                10,
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      l10n.libraryOrganizeFilter,
+                      style: TextStyle(
+                        fontSize: tokens.text.bodySm,
+                        fontWeight: FontWeight.w500,
+                        color: cs.hentai.textPrimary,
+                      ),
+                    ),
+                  ),
+                  LibraryFilterAccordionChevron(expanded: expanded.value),
+                ],
+              ),
+            ),
+          ),
+        ),
+        LibraryFilterAccordionBody(
+          expanded: expanded.value,
+          child: _FilterCheckboxOptionRow(
+            label: l10n.libraryNeedsMetadataOnlyFilter,
+            selected: needsMetadataOnly,
+            onTap: () {
+              ref
+                  .read(libraryComicFiltersProvider.notifier)
+                  .setNeedsMetadataOnly(!needsMetadataOnly);
+            },
           ),
         ),
       ],

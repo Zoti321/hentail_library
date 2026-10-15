@@ -15,12 +15,12 @@ use super::dto::{
     SyncScanMode,
 };
 use super::handle::SyncHandle;
-use super::library_lock::try_acquire_library_write_lock;
 use super::plan::{build_scan_replace_plan, load_existing_comics_map, load_thumbnail_stats};
 use super::remote::{scan_remote_lightweight, RemoteScanOutcome};
 use super::scanner::{scan_roots_excluding, ScanContext, ScanItem};
 use super::writer::apply_scan_replace_plan;
 use crate::library::{set_remote_library_credentials, RemoteLibraryCredential};
+use crate::library_write::with_library_write;
 use crate::thumbnail::enqueue_thumbnails_low;
 
 fn return_if_cancelled(handle: &SyncHandle, phase: &str) -> bool {
@@ -43,9 +43,29 @@ pub async fn sync_library(
     sync_all: bool,
     target_library_id: Option<&str>,
     credentials: Vec<RemoteLibraryCredential>,
+    emit: impl FnMut(SyncLibraryProgressDto),
+) -> Result<(), HentaiError> {
+    with_library_write(|| {
+        sync_library_locked(
+            handle,
+            scan_mode,
+            sync_all,
+            target_library_id,
+            credentials,
+            emit,
+        )
+    })
+    .await
+}
+
+async fn sync_library_locked(
+    handle: SyncHandle,
+    scan_mode: SyncScanMode,
+    sync_all: bool,
+    target_library_id: Option<&str>,
+    credentials: Vec<RemoteLibraryCredential>,
     mut emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
-    let _guard = try_acquire_library_write_lock()?;
     let db = connection()?;
     set_remote_library_credentials(credentials.clone());
     let cred_map: HashMap<String, String> = credentials

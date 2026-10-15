@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
@@ -86,12 +87,65 @@ class ComicRepositoryImpl implements ComicRepository {
   }
 
   @override
-  Future<void> deleteByIds(List<String> comicIds) async {
-    guardFrbSync(
-      () => rust.deleteComicsByIdsFrb(comicIds: comicIds),
-      fallbackMessage: '删除漫画失败',
+  Future<void> trashByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return;
+    }
+    await guardFrb(
+      () => rust.trashComicsFrb(comicIds: comicIds),
+      fallbackMessage: '移入已删除失败',
     );
   }
+
+  @override
+  Future<void> restoreByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return;
+    }
+    await guardFrb(
+      () => rust.restoreComicsFrb(comicIds: comicIds),
+      fallbackMessage: '恢复漫画失败',
+    );
+  }
+
+  @override
+  Future<ComicPurgeResult> purgeByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return (succeeded: 0, failed: 0, errorSamples: const <String>[]);
+    }
+    final rust.ComicPurgeResultFrbDto result = await guardFrb(
+      () => rust.purgeComicsFrb(comicIds: comicIds),
+      fallbackMessage: '永久删除漫画失败',
+    );
+    return mapComicPurgeResult(result);
+  }
+
+  @override
+  Future<PagedResult<TrashedComic>> fetchTrashedPage(
+    PageRequest request,
+  ) async {
+    final rust.PagedTrashedComicResultFrbDto page = await guardFrb(
+      () => rust.fetchTrashedComicsPageFrb(
+        page: request.page,
+        pageSize: request.pageSize,
+      ),
+      fallbackMessage: '读取已删除漫画失败',
+    );
+    return mapTrashedComicsPage(page);
+  }
+
+  @override
+  Future<TrashedComicCounts> countTrashed() async {
+    final rust.TrashedComicCountsFrbDto counts = await guardFrb(
+      rust.countTrashedComicsFrb,
+      fallbackMessage: '统计已删除漫画失败',
+    );
+    return mapTrashedComicCounts(counts);
+  }
+
+  @override
+  Future<List<String>> listTrashedIds() =>
+      guardFrb(rust.listTrashedComicIdsFrb, fallbackMessage: '读取已删除漫画失败');
 
   @override
   Future<void> updateUserMeta(

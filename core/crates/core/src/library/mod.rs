@@ -21,13 +21,15 @@ use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::entity::{app_prefs, libraries, prelude::*};
 use crate::error::HentaiError;
+use crate::library_write::with_library_write;
+use crate::path_migration::{
+    apply_comic_rekeys, apply_series_rekeys, ComicMigration, SeriesMigrationPair,
+};
 use crate::reader::clear_reader_sessions;
 use crate::resource::{local_access, ResourceAccess, ResourceKind};
 use crate::series_id::series_id_from_folder_path;
 use crate::sync::format_group::FormatGroup;
-use crate::sync::migrate::ComicMigration;
-use crate::sync::try_acquire_library_write_lock;
-use crate::sync::writer::{apply_comic_rekeys, delete_comics_side_effects, rekey_reference_column};
+use crate::sync::writer::delete_comics_side_effects;
 
 const PREF_CURRENT_LIBRARY_ID: &str = "current_library_id";
 const KIND_LOCAL: &str = "local";
@@ -522,7 +524,13 @@ pub async fn update_local_library_root(
     if root.is_empty() {
         return Err(HentaiError::validation("Library root 不能为空"));
     }
-    let _guard = try_acquire_library_write_lock()?;
+    with_library_write(|| update_local_library_root_locked(id, root)).await
+}
+
+/// [`update_local_library_root`] body for callers that already hold the library write
+/// lock (ADR-0026). The Library root probe runs before the transaction opens, so the
+/// SQLite transaction never spans filesystem I/O.
+async fn update_local_library_root_locked(id: &str, root: &str) -> Result<LibraryDto, HentaiError> {
     let db = connection()?;
     let Some(model) = Libraries::find_by_id(id.to_string())
         .one(&db)
@@ -611,6 +619,7 @@ async fn rekey_local_root_series<C: ConnectionTrait>(
         .all(db)
         .await
         .map_err(map_db_err)?;
+    let mut migrations = Vec::new();
     for row in rows {
         let Some(new_folder_path) = remap_root_relative_path(&row.folder_path, old_root, new_root)
         else {
@@ -623,43 +632,13 @@ async fn rekey_local_root_series<C: ConnectionTrait>(
         if new_series_id == row.series_id {
             continue;
         }
-        let from_series_id = row.series_id.clone();
-        let active = crate::entity::series::ActiveModel {
-            series_id: Set(new_series_id.clone()),
-            folder_path: Set(new_folder_path),
-            name: Set(row.name.clone()),
-            name_sort_key: Set(row.name_sort_key.clone()),
-            serialization_status: Set(row.serialization_status.clone()),
-            total_count: Set(row.total_count),
-            name_locked: Set(row.name_locked),
-            serialization_status_locked: Set(row.serialization_status_locked),
-            total_count_locked: Set(row.total_count_locked),
-            library_id: Set(row.library_id.clone()),
-        };
-        Series::insert(active).exec(db).await.map_err(map_db_err)?;
-        db.execute(Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::Sqlite,
-            "UPDATE series_items SET series_id = ? WHERE series_id = ?",
-            [
-                sea_orm::Value::String(Some(Box::new(new_series_id.clone()))),
-                sea_orm::Value::String(Some(Box::new(from_series_id.clone()))),
-            ],
-        ))
-        .await
-        .map_err(map_db_err)?;
-        rekey_reference_column(
-            db,
-            "series_thumbnails",
-            "series_id",
-            &from_series_id,
-            &new_series_id,
-        )
-        .await?;
-        Series::delete_by_id(from_series_id)
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
+        migrations.push(SeriesMigrationPair {
+            from_series_id: row.series_id.clone(),
+            to_series_id: new_series_id,
+            to_folder_path: new_folder_path,
+        });
     }
+    apply_series_rekeys(db, &migrations).await?;
     Ok(())
 }
 
@@ -715,14 +694,7 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
         .all(db)
         .await
         .map_err(map_db_err)?;
-    let author_map = load_named_rows(
-        db,
-        "comic_authors",
-        "author_name",
-        comic_ids,
-        "ORDER BY author_name ASC",
-    )
-    .await?;
+    let author_map = crate::author::load_author_names_for_comics(db, comic_ids).await?;
     let tag_map = load_named_rows(
         db,
         "comic_tags",

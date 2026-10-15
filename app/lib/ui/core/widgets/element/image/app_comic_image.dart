@@ -11,6 +11,7 @@ class AppComicImage extends StatelessWidget {
     this.filePath,
     this.memoryBytes,
     this.fit = BoxFit.cover,
+    this.alignment = Alignment.center,
     this.cacheWidth,
     this.cacheHeight,
     this.placeholder,
@@ -24,6 +25,7 @@ class AppComicImage extends StatelessWidget {
   final String? filePath;
   final Uint8List? memoryBytes;
   final BoxFit fit;
+  final AlignmentGeometry alignment;
   final int? cacheWidth;
   final int? cacheHeight;
 
@@ -59,6 +61,7 @@ class AppComicImage extends StatelessWidget {
       return ExtendedImage.memory(
         bytes,
         fit: fit,
+        alignment: alignment,
         cacheWidth: cacheWidth,
         cacheHeight: cacheHeight,
         filterQuality: filterQuality,
@@ -83,6 +86,7 @@ class AppComicImage extends StatelessWidget {
     return ExtendedImage.file(
       File(resolvedPath),
       fit: fit,
+      alignment: alignment,
       cacheWidth: cacheWidth,
       cacheHeight: cacheHeight,
       filterQuality: filterQuality,
@@ -104,6 +108,7 @@ class AppComicImage extends StatelessWidget {
     return ExtendedImage(
       image: provider,
       fit: fit,
+      alignment: alignment,
       filterQuality: filterQuality,
       loadStateChanged: (ExtendedImageState state) {
         if (state.extendedImageLoadState == LoadState.failed) {

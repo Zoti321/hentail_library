@@ -34,9 +34,28 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   @override
+  void activate() {
+    super.activate();
+    _setHomeVisibleAfterFrame(true);
+  }
+
+  @override
   void deactivate() {
-    ref.read(homePageVisibleProvider.notifier).setVisible(false);
+    _setHomeVisibleAfterFrame(false);
     super.deactivate();
+  }
+
+  /// Riverpod 禁止在 widget 树构建期间修改 provider，故推迟到帧结束。
+  void _setHomeVisibleAfterFrame(bool visible) {
+    final HomePageVisibleNotifier notifier = ref.read(
+      homePageVisibleProvider.notifier,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (visible && !mounted) {
+        return;
+      }
+      notifier.setVisible(visible);
+    });
   }
 
   @override

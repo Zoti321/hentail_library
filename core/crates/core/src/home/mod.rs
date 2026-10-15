@@ -1,6 +1,10 @@
 use sea_orm::{ConnectionTrait, DatabaseConnection, EntityTrait, Statement, Value};
 
 use crate::comic::now_ms;
+use crate::comic::visibility::{
+    comic_id_not_trashed_sql, series_browsable_sql, series_has_visible_member_sql,
+    visible_comic_id_sql, visible_comic_sql,
+};
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 use crate::library::ScanInterval;
@@ -48,69 +52,89 @@ pub struct HomeRecentlyAddedDto {
     pub created_at_ms: i64,
 }
 
-const SQL_COUNTS: &str = r#"
-SELECT
-  (SELECT COUNT(*) FROM comics) AS c_comic,
-  (SELECT COUNT(*) FROM tags) AS c_tag,
-  (SELECT COUNT(*) FROM series) AS c_series,
-  (SELECT COUNT(*) FROM authors) AS c_author,
-  (SELECT COUNT(*) FROM libraries) AS c_library
-"#;
-
-const SQL_COUNTS_HEALTHY: &str = r#"
-SELECT
-  (SELECT COUNT(*) FROM comics c INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id
-     WHERE cm.content_rating != ?) AS c_comic,
-  (SELECT COUNT(*) FROM tags) AS c_tag,
-  (
-    SELECT COUNT(*)
-    FROM series s
-    WHERE EXISTS (SELECT 1 FROM series_items si0 WHERE si0.series_id = s.series_id)
-    AND NOT EXISTS (
-      SELECT 1
-      FROM series_items si1
-      INNER JOIN comic_meta cm1 ON cm1.comic_id = si1.comic_id
-      WHERE si1.series_id = s.series_id AND cm1.content_rating = ?
+fn counts_sql(exclude_r18: bool) -> String {
+    let (c_comic, c_series) = if exclude_r18 {
+        (
+            format!(
+                "SELECT COUNT(*) FROM comics c INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id \
+                 WHERE {} AND cm.content_rating != ?",
+                visible_comic_sql("c")
+            ),
+            format!(
+                "SELECT COUNT(*) FROM series s WHERE {} AND NOT EXISTS ( \
+                 SELECT 1 FROM series_items si1 \
+                 INNER JOIN comic_meta cm1 ON cm1.comic_id = si1.comic_id \
+                 WHERE si1.series_id = s.series_id AND {} AND cm1.content_rating = ?)",
+                series_has_visible_member_sql("s.series_id"),
+                visible_comic_id_sql("si1.comic_id")
+            ),
+        )
+    } else {
+        (
+            format!(
+                "SELECT COUNT(*) FROM comics c WHERE {}",
+                visible_comic_sql("c")
+            ),
+            format!(
+                "SELECT COUNT(*) FROM series s WHERE {}",
+                series_browsable_sql("s.series_id")
+            ),
+        )
+    };
+    format!(
+        "SELECT ({c_comic}) AS c_comic, \
+         (SELECT COUNT(*) FROM tags) AS c_tag, \
+         ({c_series}) AS c_series, \
+         (SELECT COUNT(*) FROM authors) AS c_author, \
+         (SELECT COUNT(*) FROM libraries) AS c_library"
     )
-  ) AS c_series,
-  (SELECT COUNT(*) FROM authors) AS c_author,
-  (SELECT COUNT(*) FROM libraries) AS c_library
-"#;
+}
 
-const SQL_TOP5: &str = r#"
-SELECT h.last_read_time, h.comic_id, h.title, h.page_index
-FROM comic_reading_histories h
-ORDER BY h.last_read_time DESC
-LIMIT 5
-"#;
+fn continue_reading_sql(exclude_r18: bool) -> String {
+    let (rating_join, rating_filter) = if exclude_r18 {
+        (
+            "INNER JOIN comic_meta cm ON cm.comic_id = h.comic_id",
+            "cm.content_rating != ? AND ",
+        )
+    } else {
+        ("", "")
+    };
+    format!(
+        "SELECT h.last_read_time, h.comic_id, h.title, h.page_index \
+         FROM comic_reading_histories h {rating_join} \
+         WHERE {rating_filter}{} \
+         ORDER BY h.last_read_time DESC \
+         LIMIT 5",
+        comic_id_not_trashed_sql("h.comic_id")
+    )
+}
 
-const SQL_TOP5_HEALTHY: &str = r#"
-SELECT h.last_read_time, h.comic_id, h.title, h.page_index
-FROM comic_reading_histories h
-INNER JOIN comic_meta cm ON cm.comic_id = h.comic_id
-WHERE cm.content_rating != ?
-ORDER BY h.last_read_time DESC
-LIMIT 5
-"#;
+/// `count` copies of the `'r18'` bind value, or none when R18 content is shown.
+fn r18_values(exclude_r18: bool, count: usize) -> Vec<Value> {
+    if exclude_r18 {
+        vec![Value::from("r18"); count]
+    } else {
+        Vec::new()
+    }
+}
 
-const SQL_RECENTLY_ADDED: &str = r#"
-SELECT c.comic_id, cm.title, c.library_id, l.name AS library_name, c.created_at
-FROM comics c
-INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id
-INNER JOIN libraries l ON l.library_id = c.library_id
-ORDER BY c.created_at DESC
-LIMIT 8
-"#;
-
-const SQL_RECENTLY_ADDED_HEALTHY: &str = r#"
-SELECT c.comic_id, cm.title, c.library_id, l.name AS library_name, c.created_at
-FROM comics c
-INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id
-INNER JOIN libraries l ON l.library_id = c.library_id
-WHERE cm.content_rating != ?
-ORDER BY c.created_at DESC
-LIMIT 8
-"#;
+fn recently_added_sql(exclude_r18: bool) -> String {
+    let rating_filter = if exclude_r18 {
+        " AND cm.content_rating != ?"
+    } else {
+        ""
+    };
+    format!(
+        "SELECT c.comic_id, cm.title, c.library_id, l.name AS library_name, c.created_at \
+         FROM comics c \
+         INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id \
+         INNER JOIN libraries l ON l.library_id = c.library_id \
+         WHERE {}{rating_filter} \
+         ORDER BY c.created_at DESC \
+         LIMIT 8",
+        visible_comic_sql("c")
+    )
+}
 
 pub async fn watch_home_page_counts(
     exclude_r18: bool,
@@ -167,17 +191,12 @@ async fn load_continue_reading(
     db: &DatabaseConnection,
     exclude_r18: bool,
 ) -> Result<Vec<HomeContinueReadingDto>, HentaiError> {
-    let rows = if exclude_r18 {
-        let stmt = Statement::from_sql_and_values(
-            db.get_database_backend(),
-            SQL_TOP5_HEALTHY,
-            vec![Value::from("r18")],
-        );
-        db.query_all(stmt).await.map_err(map_db_err)?
-    } else {
-        let stmt = Statement::from_sql_and_values(db.get_database_backend(), SQL_TOP5, []);
-        db.query_all(stmt).await.map_err(map_db_err)?
-    };
+    let stmt = Statement::from_sql_and_values(
+        db.get_database_backend(),
+        continue_reading_sql(exclude_r18),
+        r18_values(exclude_r18, 1),
+    );
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
     rows.into_iter()
         .map(|row| {
             Ok(HomeContinueReadingDto {
@@ -194,18 +213,12 @@ async fn load_recently_added(
     db: &DatabaseConnection,
     exclude_r18: bool,
 ) -> Result<Vec<HomeRecentlyAddedDto>, HentaiError> {
-    let rows = if exclude_r18 {
-        let stmt = Statement::from_sql_and_values(
-            db.get_database_backend(),
-            SQL_RECENTLY_ADDED_HEALTHY,
-            vec![Value::from("r18")],
-        );
-        db.query_all(stmt).await.map_err(map_db_err)?
-    } else {
-        let stmt =
-            Statement::from_sql_and_values(db.get_database_backend(), SQL_RECENTLY_ADDED, []);
-        db.query_all(stmt).await.map_err(map_db_err)?
-    };
+    let stmt = Statement::from_sql_and_values(
+        db.get_database_backend(),
+        recently_added_sql(exclude_r18),
+        r18_values(exclude_r18, 1),
+    );
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
     rows.into_iter()
         .map(|row| {
             Ok(HomeRecentlyAddedDto {
@@ -223,17 +236,12 @@ async fn load_counts(
     db: &DatabaseConnection,
     exclude_r18: bool,
 ) -> Result<HomePageCountsDto, HentaiError> {
-    let row = if exclude_r18 {
-        let stmt = Statement::from_sql_and_values(
-            db.get_database_backend(),
-            SQL_COUNTS_HEALTHY,
-            vec![Value::from("r18"), Value::from("r18")],
-        );
-        db.query_one(stmt).await.map_err(map_db_err)?
-    } else {
-        let stmt = Statement::from_sql_and_values(db.get_database_backend(), SQL_COUNTS, []);
-        db.query_one(stmt).await.map_err(map_db_err)?
-    };
+    let stmt = Statement::from_sql_and_values(
+        db.get_database_backend(),
+        counts_sql(exclude_r18),
+        r18_values(exclude_r18, 2),
+    );
+    let row = db.query_one(stmt).await.map_err(map_db_err)?;
     let Some(row) = row else {
         return Ok(HomePageCountsDto::default());
     };

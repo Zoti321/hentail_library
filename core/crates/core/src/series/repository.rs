@@ -5,8 +5,11 @@ use sea_orm::{
     QueryOrder, Statement, TransactionTrait,
 };
 
+use sea_orm::sea_query::Expr;
+
+use crate::comic::visibility::{series_browsable_sql, visible_comic_id_sql, visible_comic_sql};
 use crate::comic::{
-    load_comics_ordered, search_comic_ids_by_tag_expression, ComicDto, PageRequestDto,
+    load_comics_ordered, paginate, search_comic_ids_by_tag_expression, ComicDto, PageRequestDto,
 };
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
@@ -90,6 +93,7 @@ pub struct SeriesReadingContextDto {
 pub async fn count_all_series() -> Result<i64, HentaiError> {
     let db = connection()?;
     Series::find()
+        .filter(Expr::cust(series_browsable_sql("series.series_id")))
         .count(&db)
         .await
         .map_err(map_db_err)
@@ -112,41 +116,31 @@ pub async fn fetch_series_page(
             page_size: request.page_size.max(1),
         });
     }
-    let page_size = request.page_size.max(1);
     let total_count = count_filtered_series(&db, &filter).await?;
-    let total_pages = if total_count <= 0 {
-        0
-    } else {
-        (total_count + page_size as i64 - 1) / page_size as i64
-    };
-    let mut effective_page = request.page.max(1);
-    if total_pages > 0 && effective_page as i64 > total_pages {
-        effective_page = total_pages as i32;
-    }
+    let window = paginate(request, total_count).clamped();
     if total_count <= 0 {
         return Ok(PagedSeriesResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
-            page_size,
+            page_size: window.page_size,
         });
     }
-    let offset = (effective_page - 1) * page_size;
     let prefer_root_folder_path = resolve_prefer_root_folder_path(&filter).await?;
     let ids_query = build_ids_page_query(
         &filter,
         &sort,
         prefer_root_folder_path.as_deref(),
-        page_size,
-        offset,
+        window.page_size,
+        window.offset as i32,
     );
     let series_ids = query_series_ids(&db, &ids_query).await?;
     let items = load_series_by_ids(&db, series_ids).await?;
     Ok(PagedSeriesResultDto {
         items,
         total_count,
-        page: effective_page,
-        page_size,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 
@@ -212,27 +206,19 @@ pub async fn fetch_series_comics_page(
             page_size: request.page_size.max(1),
         });
     }
-    let page_size = request.page_size.max(1);
     let total_count = count_series_items(&db, series_id).await?;
-    let total_pages = if total_count <= 0 {
-        0
-    } else {
-        (total_count + page_size as i64 - 1) / page_size as i64
-    };
-    let mut effective_page = request.page.max(1);
-    if total_pages > 0 && effective_page as i64 > total_pages {
-        effective_page = total_pages as i32;
-    }
+    let window = paginate(request, total_count).clamped();
     if total_count <= 0 {
         return Ok(PagedSeriesComicsResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
-            page_size,
+            page_size: window.page_size,
         });
     }
-    let offset = (effective_page - 1) * page_size;
-    let id_orders = query_series_comic_id_orders_page(&db, series_id, page_size, offset).await?;
+    let id_orders =
+        query_series_comic_id_orders_page(&db, series_id, window.page_size, window.offset as i32)
+            .await?;
     let comic_ids: Vec<String> = id_orders.iter().map(|(id, _, _)| id.clone()).collect();
     let order_by_id: HashMap<String, (f64, bool)> = id_orders
         .into_iter()
@@ -256,8 +242,8 @@ pub async fn fetch_series_comics_page(
     Ok(PagedSeriesComicsResultDto {
         items,
         total_count,
-        page: effective_page,
-        page_size,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 
@@ -503,8 +489,11 @@ pub async fn search_series_by_keyword(keyword: &str) -> Result<Vec<SeriesDto>, H
     let db = connection()?;
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT series_id FROM series \
-         WHERE library_id = ? AND (lower(name) LIKE ? OR lower(folder_path) LIKE ?)",
+        format!(
+            "SELECT series_id FROM series \
+             WHERE library_id = ? AND (lower(name) LIKE ? OR lower(folder_path) LIKE ?) AND {}",
+            series_browsable_sql("series.series_id")
+        ),
         vec![
             sea_orm::Value::String(Some(Box::new(library_id))),
             sea_orm::Value::String(Some(Box::new(format!("%{q}%")))),
@@ -553,7 +542,12 @@ async fn series_exists(db: &DatabaseConnection, series_id: &str) -> Result<bool,
 async fn count_series_items(db: &DatabaseConnection, series_id: &str) -> Result<i64, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT COUNT(*) FROM series_items WHERE series_id = ?",
+        format!(
+            "SELECT COUNT(*) FROM series_items si \
+             INNER JOIN comics c ON c.comic_id = si.comic_id \
+             WHERE si.series_id = ? AND {}",
+            visible_comic_sql("c")
+        ),
         vec![sea_orm::Value::String(Some(Box::new(
             series_id.to_string(),
         )))],
@@ -573,9 +567,13 @@ async fn query_all_series_comic_ids(
 ) -> Result<Vec<String>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT comic_id FROM series_items \
-         WHERE series_id = ? \
-         ORDER BY sort_order ASC, comic_id ASC",
+        format!(
+            "SELECT si.comic_id FROM series_items si \
+             INNER JOIN comics c ON c.comic_id = si.comic_id \
+             WHERE si.series_id = ? AND {} \
+             ORDER BY si.sort_order ASC, si.comic_id ASC",
+            visible_comic_sql("c")
+        ),
         vec![sea_orm::Value::String(Some(Box::new(
             series_id.to_string(),
         )))],
@@ -597,10 +595,14 @@ async fn query_series_comic_id_orders_page(
 ) -> Result<Vec<(String, f64, bool)>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT comic_id, sort_order, sort_order_locked FROM series_items \
-         WHERE series_id = ? \
-         ORDER BY sort_order ASC, comic_id ASC \
-         LIMIT ? OFFSET ?",
+        format!(
+            "SELECT si.comic_id, si.sort_order, si.sort_order_locked FROM series_items si \
+             INNER JOIN comics c ON c.comic_id = si.comic_id \
+             WHERE si.series_id = ? AND {} \
+             ORDER BY si.sort_order ASC, si.comic_id ASC \
+             LIMIT ? OFFSET ?",
+            visible_comic_sql("c")
+        ),
         vec![
             sea_orm::Value::String(Some(Box::new(series_id.to_string()))),
             sea_orm::Value::Int(Some(page_size)),
@@ -663,11 +665,16 @@ async fn query_series_author_names(
 ) -> Result<Vec<String>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT DISTINCT ca.author_name \
-         FROM series_items si \
-         INNER JOIN comic_authors ca ON ca.comic_id = si.comic_id \
-         WHERE si.series_id = ? \
-         ORDER BY ca.author_name ASC",
+        format!(
+            "SELECT DISTINCT a.name \
+             FROM series_items si \
+             INNER JOIN comics c ON c.comic_id = si.comic_id \
+             INNER JOIN comic_authors ca ON ca.comic_id = si.comic_id \
+             INNER JOIN authors a ON a.id = ca.author_id \
+             WHERE si.series_id = ? AND {} \
+             ORDER BY a.name ASC",
+            visible_comic_sql("c")
+        ),
         vec![sea_orm::Value::String(Some(Box::new(
             series_id.to_string(),
         )))],
@@ -681,11 +688,15 @@ async fn query_series_tag_names(
 ) -> Result<Vec<String>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT DISTINCT ct.tag_name \
-         FROM series_items si \
-         INNER JOIN comic_tags ct ON ct.comic_id = si.comic_id \
-         WHERE si.series_id = ? \
-         ORDER BY ct.tag_name ASC",
+        format!(
+            "SELECT DISTINCT ct.tag_name \
+             FROM series_items si \
+             INNER JOIN comics c ON c.comic_id = si.comic_id \
+             INNER JOIN comic_tags ct ON ct.comic_id = si.comic_id \
+             WHERE si.series_id = ? AND {} \
+             ORDER BY ct.tag_name ASC",
+            visible_comic_sql("c")
+        ),
         vec![sea_orm::Value::String(Some(Box::new(
             series_id.to_string(),
         )))],
@@ -699,12 +710,16 @@ async fn query_series_has_r18(
 ) -> Result<bool, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT EXISTS( \
-           SELECT 1 \
-           FROM series_items si \
-           INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
-           WHERE si.series_id = ? AND cm.content_rating = 'r18' \
-         )",
+        format!(
+            "SELECT EXISTS( \
+               SELECT 1 \
+               FROM series_items si \
+               INNER JOIN comics c ON c.comic_id = si.comic_id \
+               INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
+               WHERE si.series_id = ? AND {} AND cm.content_rating = 'r18' \
+             )",
+            visible_comic_sql("c")
+        ),
         vec![sea_orm::Value::String(Some(Box::new(
             series_id.to_string(),
         )))],
@@ -746,6 +761,7 @@ async fn load_series_by_ids(
         .map_err(map_db_err)?;
     let item_rows = SeriesItems::find()
         .filter(series_items::Column::SeriesId.is_in(ids.clone()))
+        .filter(Expr::cust(visible_comic_id_sql("series_items.comic_id")))
         .order_by_asc(series_items::Column::SeriesId)
         .order_by_asc(series_items::Column::SortOrder)
         .all(db)

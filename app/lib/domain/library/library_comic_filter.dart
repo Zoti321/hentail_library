@@ -23,5 +23,6 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
     Set<String>? languages,
     Set<String>? parodies,
     Set<String>? characters,
+    @Default(false) bool needsMetadataOnly,
   }) = _LibraryComicFilter;
 }

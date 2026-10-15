@@ -6,7 +6,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_prefer_library_root_series_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
 
@@ -36,8 +36,8 @@ class LibraryPreferLibraryRootSeriesControls extends ConsumerWidget {
       child: InkWell(
         onTap: () {
           ref
-              .read(libraryPreferLibraryRootSeriesProvider.notifier)
-              .setEnabled(!enabled);
+              .read(librarySeriesFiltersProvider.notifier)
+              .setPreferLibraryRootSeries(!enabled);
         },
         hoverColor: theme.hoverColor,
         splashColor: theme.splashColor,

@@ -1,9 +1,10 @@
 mod common;
 
 use hentai_core::{
-    create_local_library, export_comic_metadata, find_comic_by_id, import_comic_metadata,
-    init_db_at_path, peek_metadata_backup_manifest, preview_import_comic_metadata,
-    set_current_library_id, ExportComicMetadataOptions, MatchTier, UpdateComicUserMetaDto,
+    add_author, add_author_link, create_local_library, export_comic_metadata, find_comic_by_id,
+    import_comic_metadata, init_db_at_path, list_author_links, peek_metadata_backup_manifest,
+    preview_import_comic_metadata, set_current_library_id, AuthorLinkPlatform,
+    ExportComicMetadataOptions, MatchTier, UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -106,6 +107,92 @@ fn export_import_round_trip_restores_user_metadata_and_locks() {
             assert!(comic.locks.content_rating);
             assert!(comic.locks.parodies);
             assert!(comic.locks.characters);
+        });
+    });
+}
+
+#[test]
+fn import_merges_author_links_idempotently_without_dropping_existing() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = temp.path().join("author_links.sqlite");
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let lib = create_local_library("E:/lib", None).await.expect("library");
+            set_current_library_id(Some(&lib.library_id))
+                .await
+                .expect("current");
+            let db = hentai_core::connection().expect("connection");
+            seed_round_trip_fixture(&db, &lib.library_id).await;
+            hentai_core::update_comic_user_meta(
+                "c1",
+                UpdateComicUserMetaDto {
+                    authors: Some(vec!["作者A".to_string()]),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("attach author");
+            let author = add_author("作者A").await.expect("author");
+            add_author_link(
+                author.id,
+                AuthorLinkPlatform::Pixiv,
+                "https://pixiv.net/u/1",
+                None,
+            )
+            .await
+            .expect("pixiv");
+            add_author_link(
+                author.id,
+                AuthorLinkPlatform::Other,
+                "https://example.com/a",
+                Some("主页".to_string()),
+            )
+            .await
+            .expect("other");
+
+            let bytes = export_comic_metadata(ExportComicMetadataOptions::default())
+                .await
+                .expect("export");
+
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "DELETE FROM author_links WHERE author_id = ? AND platform = 'other'",
+                [author.id.into()],
+            ))
+            .await
+            .expect("drop other");
+            add_author_link(author.id, AuthorLinkPlatform::X, "https://x.com/a", None)
+                .await
+                .expect("target-only link");
+
+            import_comic_metadata(&bytes).await.expect("import");
+            import_comic_metadata(&bytes).await.expect("re-import");
+
+            let links = list_author_links(author.id).await.expect("links");
+            let summary: Vec<(AuthorLinkPlatform, &str, Option<&str>)> = links
+                .iter()
+                .map(|l| {
+                    (
+                        l.platform,
+                        l.url.as_str(),
+                        l.platform_display_name.as_deref(),
+                    )
+                })
+                .collect();
+            assert_eq!(
+                summary,
+                vec![
+                    (AuthorLinkPlatform::Pixiv, "https://pixiv.net/u/1", None),
+                    (AuthorLinkPlatform::X, "https://x.com/a", None),
+                    (
+                        AuthorLinkPlatform::Other,
+                        "https://example.com/a",
+                        Some("主页")
+                    ),
+                ]
+            );
         });
     });
 }
@@ -360,6 +447,7 @@ fn preview_reports_ambiguous_candidates() {
                     include_orphan_facets: false,
                 },
                 orphan_facets: Default::default(),
+                author_links: vec![],
                 comics: vec![hentai_core::ComicExportRecord {
                     comic_id: "backup-id".to_string(),
                     path: "E:/lib/dup.cbz".to_string(),

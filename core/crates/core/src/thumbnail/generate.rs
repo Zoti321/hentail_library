@@ -84,6 +84,7 @@ pub async fn store_thumbnail_for_comic_with(
         source_modified_ms: Set(Some(modified_ms)),
         source_size: Set(Some(size)),
         is_user_set: Set(false),
+        source_page_index: Set(None),
     };
     ComicThumbnails::insert(active)
         .on_conflict(
@@ -93,6 +94,7 @@ pub async fn store_thumbnail_for_comic_with(
                     comic_thumbnails::Column::UpdatedAt,
                     comic_thumbnails::Column::SourceModifiedMs,
                     comic_thumbnails::Column::SourceSize,
+                    comic_thumbnails::Column::SourcePageIndex,
                 ])
                 .to_owned(),
         )
@@ -138,7 +140,7 @@ pub fn encode_thumbnail_jpeg(source_bytes: &[u8]) -> Result<Option<Vec<u8>>, Hen
     Ok(Some(buf))
 }
 
-fn flatten_alpha_on_white(img: &DynamicImage) -> DynamicImage {
+pub(super) fn flatten_alpha_on_white(img: &DynamicImage) -> DynamicImage {
     if !img.color().has_alpha() {
         return img.clone();
     }
@@ -149,7 +151,7 @@ fn flatten_alpha_on_white(img: &DynamicImage) -> DynamicImage {
     DynamicImage::ImageRgba8(canvas)
 }
 
-fn resize_to_max_long_edge(img: &DynamicImage, max_long_edge: u32) -> DynamicImage {
+pub(super) fn resize_to_max_long_edge(img: &DynamicImage, max_long_edge: u32) -> DynamicImage {
     let (w, h) = img.dimensions();
     let long_edge = w.max(h);
     if long_edge <= max_long_edge {
@@ -162,7 +164,7 @@ fn resize_to_max_long_edge(img: &DynamicImage, max_long_edge: u32) -> DynamicIma
     }
 }
 
-fn load_cover_bytes(
+pub(super) fn load_cover_bytes(
     access: &dyn ResourceAccess,
     location: &str,
     resource_type: &str,

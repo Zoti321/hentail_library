@@ -6,8 +6,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_expand_by_series_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
 
 /// Comics Tab：Expand by series 开关（排序区顶部）。
@@ -27,13 +26,20 @@ class LibraryExpandBySeriesControls extends ConsumerWidget {
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
-    final bool enabled = ref.watch(libraryComicsTabExpandBySeriesProvider);
+    final bool enabled = ref.watch(
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.expandBySeries ?? false,
+      ),
+    );
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          ref.read(libraryExpandBySeriesProvider.notifier).setEnabled(!enabled);
+          ref
+              .read(libraryComicFiltersProvider.notifier)
+              .setExpandBySeries(!enabled);
         },
         hoverColor: theme.hoverColor,
         splashColor: theme.splashColor,

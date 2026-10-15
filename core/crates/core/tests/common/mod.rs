@@ -56,3 +56,62 @@ pub fn create_fixture_db(dir: &Path) -> PathBuf {
     });
     db_path
 }
+
+/// Writes a minimal CBZ (`pages` stored page entries) at [path].
+pub fn write_cbz(path: &Path, pages: usize) {
+    use std::io::Write as _;
+
+    fs::create_dir_all(path.parent().expect("parent")).expect("mkdir");
+    let file = fs::File::create(path).expect("create cbz");
+    let mut archive = zip::ZipWriter::new(file);
+    let options =
+        zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
+    for page in 0..pages {
+        archive
+            .start_file(format!("{page:03}.jpg"), options)
+            .expect("start");
+        archive.write_all(b"page").expect("write");
+    }
+    archive.finish().expect("finish");
+}
+
+/// Creates a Local library holding [comics] (`(relative path, page count)`) and syncs it.
+///
+/// Runs under [with_global_db] and hands the synced library plus the setup runtime
+/// to [test], so the caller can `runtime.block_on` the assertions.
+pub fn with_local_library<F>(db_file: &str, comics: &[(&str, usize)], test: F)
+where
+    F: FnOnce(hentai_core::LibraryDto, &tokio::runtime::Runtime),
+{
+    with_global_db(|| {
+        let temp = tempfile::TempDir::new().expect("tempdir");
+        let root = temp.path().join("lib");
+        for (relative, pages) in comics {
+            write_cbz(&root.join(relative), *pages);
+        }
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        let library = runtime.block_on(async {
+            hentai_core::init_db_at_path(&temp.path().join(db_file))
+                .await
+                .expect("init db");
+            let library = hentai_core::create_local_library(&root.to_string_lossy(), Some("Lib"))
+                .await
+                .expect("create local library");
+            hentai_core::set_current_library_id(Some(&library.library_id))
+                .await
+                .expect("set current library");
+            hentai_core::sync_library(
+                hentai_core::create_sync_handle(),
+                hentai_core::SyncScanMode::Full,
+                false,
+                Some(library.library_id.as_str()),
+                vec![],
+                |_| {},
+            )
+            .await
+            .expect("sync local library");
+            library
+        });
+        test(library, &runtime);
+    });
+}

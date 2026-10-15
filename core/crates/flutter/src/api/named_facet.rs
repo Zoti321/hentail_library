@@ -1,7 +1,8 @@
 use hentai_core::{
     add_named_facet_name, count_all_named_facet_names, count_named_facet_attachments,
     delete_named_facet_by_names, fetch_named_facet_page, list_all_named_facet_names,
-    list_named_facet_for_form, rename_named_facet_name, JunctionNamedFacet, NamedFacetFormEntry,
+    list_named_facet_for_form, merge_named_facet_name, paginate, rename_named_facet_name,
+    JunctionNamedFacet, NamedFacetFormEntry,
 };
 
 use super::comic::PageRequestDto;
@@ -68,29 +69,23 @@ pub async fn fetch_named_facet_page_frb(
     let total = count_all_named_facet_names(facet.into())
         .await
         .map_err(HentaiErrorDto::from)?;
-    let page_size = request.page_size.max(1);
+    let window = paginate(request.into(), total).clamped();
     if total <= 0 {
         return Ok(NamedFacetPagedNamesDto {
             items: vec![],
             total_count: 0,
             page: 1,
-            page_size,
+            page_size: window.page_size,
         });
     }
-    let total_pages = (total + page_size as i64 - 1) / page_size as i64;
-    let mut page = request.page.max(1);
-    if page as i64 > total_pages {
-        page = total_pages as i32;
-    }
-    let offset = (page - 1) * page_size;
-    let items = fetch_named_facet_page(facet.into(), page_size, offset)
+    let items = fetch_named_facet_page(facet.into(), window.page_size, window.offset as i32)
         .await
         .map_err(HentaiErrorDto::from)?;
     Ok(NamedFacetPagedNamesDto {
         items,
         total_count: total,
-        page,
-        page_size,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 
@@ -120,6 +115,20 @@ pub fn rename_named_facet_name_frb(
 ) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(rename_named_facet_name(facet.into(), &old_name, &new_name))
         .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn merge_named_facet_name_frb(
+    facet: JunctionNamedFacetFrb,
+    source_name: String,
+    target_name: String,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(merge_named_facet_name(
+        facet.into(),
+        &source_name,
+        &target_name,
+    ))
+    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]
