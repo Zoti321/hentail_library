@@ -35,8 +35,8 @@ jobs:
         working-directory: app
         run: flutter test test/ui
 
-  nightly-coverage:
-    name: nightly · coverage report
+  nightly-dart-coverage:
+    name: nightly · dart test coverage
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -58,7 +58,7 @@ jobs:
         working-directory: app
         run: flutter test --coverage
 
-      - name: Run coverage summary
+      - name: Summarize Dart line coverage
         working-directory: app
         run: |
           awk -F: '/^LF:/{found+=$2} /^LH:/{hit+=$2} END {
@@ -66,7 +66,7 @@ jobs:
             printf "Dart line coverage: %.1f%% (%d / %d lines)\n", pct, hit, found
           }' coverage/lcov.info | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Run coverage report upload
+      - name: Upload Dart coverage lcov artifact
         uses: actions/upload-artifact@v4
         with:
           name: dart-coverage-lcov

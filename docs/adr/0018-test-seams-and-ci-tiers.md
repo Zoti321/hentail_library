@@ -61,7 +61,7 @@ Gate (gate.yml)
 ```
 Nightly (nightly.yml)            定时 / workflow_dispatch
 ├── nightly-dart-ui              全量 test/ui（慢轨）
-└── nightly-coverage             全量 Dart 覆盖率趋势（非门禁）
+└── nightly-dart-coverage        Dart 侧全量测试行覆盖率趋势（非门禁）
 
 Nightly Rust coverage (nightly-rust-coverage.yml)   仅 workflow_dispatch
 └── nightly-rust-coverage        hentai-core 行覆盖率 lcov + HTML zip（非门禁；与 Dart % 不可比）

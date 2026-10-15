@@ -1,4 +1,4 @@
-# hentai-core 行覆盖率（lcov + HTML zip，非门禁）。与 Dart nightly-coverage 分离，便于单独调试。
+# hentai-core 行覆盖率（lcov + HTML zip，非门禁）。与 nightly-dart-coverage 分离，便于单独调试。
 # 触发：仅 workflow_dispatch（稳定后可再加 schedule）。
 name: Nightly Rust coverage
 
