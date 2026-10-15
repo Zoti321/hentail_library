@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Canonical hentai-core line coverage via cargo-llvm-cov (Nightly + Gate + local rust-coverage).
 # Same package scope and ignore rules as gate-rust-test product code; see docs/agents/testing.md.
+# cargo-llvm-cov 0.9+ cannot pass --lcov and --html on the same invocation; use report subcommands.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -33,26 +34,25 @@ fi
 
 mkdir -p "$OUTPUT_DIR"
 
-llvm_cov_args=(
-  llvm-cov
+common_cov_args=(
   --manifest-path "$CORE_MANIFEST"
   -p hentai-core
   --ignore-filename-regex "$RUST_COVERAGE_IGNORE_REGEX"
-  --lcov
-  --output-path "$LCOV_PATH"
 )
+
+echo "==> rust-coverage (hentai-core, ignore=$RUST_COVERAGE_IGNORE_REGEX)"
+cargo llvm-cov "${common_cov_args[@]}" --no-report
+
+report_args=(llvm-cov report "${common_cov_args[@]}" --lcov --output-path "$LCOV_PATH")
+if [[ -n "${RUST_COVERAGE_FAIL_UNDER_LINES:-}" ]]; then
+  report_args+=(--fail-under-lines "$RUST_COVERAGE_FAIL_UNDER_LINES")
+fi
+cargo "${report_args[@]}"
 
 if [[ "${RUST_COVERAGE_HTML:-0}" == "1" ]]; then
   mkdir -p "$HTML_DIR"
-  llvm_cov_args+=(--html --output-dir "$HTML_DIR")
+  cargo llvm-cov report "${common_cov_args[@]}" --html --output-dir "$HTML_DIR"
 fi
-
-if [[ -n "${RUST_COVERAGE_FAIL_UNDER_LINES:-}" ]]; then
-  llvm_cov_args+=(--fail-under-lines "$RUST_COVERAGE_FAIL_UNDER_LINES")
-fi
-
-echo "==> rust-coverage (hentai-core, ignore=$RUST_COVERAGE_IGNORE_REGEX)"
-cargo "${llvm_cov_args[@]}"
 
 if [[ -f "$LCOV_PATH" ]]; then
   summary_line="$(
