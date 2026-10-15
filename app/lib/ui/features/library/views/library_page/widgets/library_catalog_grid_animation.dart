@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reorderable_grid_view/entities/reorderable_animation_config.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
-
-const Duration kLibraryCatalogSortFlipDuration = Duration(milliseconds: 400);
 
 /// 库页翻页动效时长（对齐桌面短动效 180–220 ms）。
 const Duration kLibraryCatalogPageTransitionDuration = Duration(
@@ -11,7 +8,7 @@ const Duration kLibraryCatalogPageTransitionDuration = Duration(
 
 enum LibraryCatalogPageTransitionDirection { none, forward, backward }
 
-/// 分页、筛选、每页条数变化时用于关闭 FLIP 动画的键（不含排序字段）。
+/// 分页、筛选、每页条数变化时用于区分「仅翻页」与「目录重载」的键。
 @immutable
 class LibraryCatalogGridSuppressAnimationKey {
   const LibraryCatalogGridSuppressAnimationKey({
@@ -60,34 +57,4 @@ LibraryCatalogPageTransitionDirection libraryCatalogPageTransitionDirection({
   return nextPage > previousPage
       ? LibraryCatalogPageTransitionDirection.forward
       : LibraryCatalogPageTransitionDirection.backward;
-}
-
-bool nextLibraryCatalogSortFlipAnimationEnabled({
-  required bool userEnabled,
-  required bool current,
-  required bool sortChanged,
-  required bool suppressChanged,
-}) {
-  if (!userEnabled) {
-    return false;
-  }
-  if (sortChanged) {
-    return true;
-  }
-  if (suppressChanged) {
-    return false;
-  }
-  return current;
-}
-
-ReorderableAnimationConfig libraryCatalogSortFlipAnimationConfig({
-  required bool enableAnimations,
-}) {
-  return ReorderableAnimationConfig(
-    positionChangeDuration: kLibraryCatalogSortFlipDuration,
-    positionChangeCurve: Curves.ease,
-    defaultAnimationCurve: Curves.ease,
-    fadeInDuration: Duration.zero,
-    enableAnimations: enableAnimations,
-  );
 }
