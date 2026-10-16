@@ -208,7 +208,7 @@
 | 现状路径 | 目标路径 |
 |----------|----------|
 | `ui/features/reader/**` | `features/read_session/presentation/**` | **已迁**（2026-10-17）；`module/controller` 阶段二另票 |
-| `read_session_launcher.dart` | `ui/features/shell/views/routing/read_session_launcher.dart` | **已迁**（#220 R5：library 经 shell 路由打开阅读，不进 read_session presentation） |
+| `read_session_launcher.dart` | `features/bootstrap/presentation/views/routing/read_session_launcher.dart` | **已迁**（#220 R5） |
 | `domain/reading/*`（read_session 专属） | `features/read_session/domain/**` | **已迁** |
 | `reading_mode.dart` / `series_reading_context.dart` | `shared/domain/reading/` | **已迁** |
 
