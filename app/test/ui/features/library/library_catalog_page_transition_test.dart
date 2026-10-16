@@ -38,8 +38,6 @@ void main() {
                   AnimatedLibraryCatalogGridSliver(
                     layoutTier: LibraryLayoutTier.compact,
                     itemCount: 4,
-                    positionAnimationKey: 'sort-a',
-                    sortFlipEnabled: false,
                     suppressAnimationKey: suppressKey,
                     itemBuilder: (BuildContext context, int index) {
                       return Center(

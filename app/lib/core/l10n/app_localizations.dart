@@ -1670,6 +1670,18 @@ abstract class AppLocalizations {
   /// **'作者'**
   String get libraryAuthorFilter;
 
+  /// No description provided for @libraryOrganizeFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'整理'**
+  String get libraryOrganizeFilter;
+
+  /// No description provided for @libraryNeedsMetadataOnlyFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅显示待补元数据'**
+  String get libraryNeedsMetadataOnlyFilter;
+
   /// No description provided for @libraryMetadataFilterClear.
   ///
   /// In zh, this message translates to:
@@ -2065,18 +2077,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'取消'**
   String get comicDetailCancel;
-
-  /// No description provided for @comicDetailDeletedWithResourceToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'已删除漫画及磁盘资源'**
-  String get comicDetailDeletedWithResourceToast;
-
-  /// No description provided for @comicDetailRemovedFromLibraryToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'已从库中移除漫画'**
-  String get comicDetailRemovedFromLibraryToast;
 
   /// No description provided for @comicDetailNotFound.
   ///
@@ -2683,6 +2683,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'重命名'**
   String get metadataRename;
+
+  /// No description provided for @metadataMerge.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并'**
+  String get metadataMerge;
 
   /// No description provided for @metadataDelete.
   ///
@@ -3855,6 +3861,282 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'清除'**
   String get bulkEditMetadataFieldSummaryClear;
+
+  /// No description provided for @navTrash.
+  ///
+  /// In zh, this message translates to:
+  /// **'垃圾桶'**
+  String get navTrash;
+
+  /// No description provided for @readerOpenComicTrashed.
+  ///
+  /// In zh, this message translates to:
+  /// **'该漫画已删除，恢复后才能阅读。'**
+  String get readerOpenComicTrashed;
+
+  /// No description provided for @comicTrashConfirmContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'「{title}」将移入「已删除」，可随时在那里恢复。'**
+  String comicTrashConfirmContent(String title);
+
+  /// No description provided for @comicTrashedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已移入「已删除」'**
+  String get comicTrashedToast;
+
+  /// No description provided for @trashPageSummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{共 {count} 本 • 可恢复或永久删除}}'**
+  String trashPageSummary(int count);
+
+  /// No description provided for @trashEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有已删除的漫画'**
+  String get trashEmptyTitle;
+
+  /// No description provided for @trashEmptyDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除的漫画会先放在这里，可恢复或永久删除。'**
+  String get trashEmptyDescription;
+
+  /// No description provided for @trashRestore.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复'**
+  String get trashRestore;
+
+  /// No description provided for @trashPurge.
+  ///
+  /// In zh, this message translates to:
+  /// **'永久删除'**
+  String get trashPurge;
+
+  /// No description provided for @trashPurgeAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部删除'**
+  String get trashPurgeAll;
+
+  /// No description provided for @trashRestoreAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部恢复'**
+  String get trashRestoreAll;
+
+  /// No description provided for @trashRestoreSelected.
+  ///
+  /// In zh, this message translates to:
+  /// **'恢复选中'**
+  String get trashRestoreSelected;
+
+  /// No description provided for @trashPurgeSelected.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除选中'**
+  String get trashPurgeSelected;
+
+  /// No description provided for @trashSelectedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已选 {count} 本}}'**
+  String trashSelectedCount(int count);
+
+  /// No description provided for @trashDeletedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除于 {time}'**
+  String trashDeletedAt(String time);
+
+  /// No description provided for @trashBadgeLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'本地'**
+  String get trashBadgeLocal;
+
+  /// No description provided for @trashBadgeRemote.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程'**
+  String get trashBadgeRemote;
+
+  /// No description provided for @trashRestoredToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已恢复 {count} 本漫画}}'**
+  String trashRestoredToast(int count);
+
+  /// No description provided for @trashPurgeSucceededToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{已永久删除 {count} 本漫画}}'**
+  String trashPurgeSucceededToast(int count);
+
+  /// No description provided for @trashPurgePartialToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已永久删除 {succeeded} 本，{failed} 本失败（仍保留在「已删除」中）'**
+  String trashPurgePartialToast(int succeeded, int failed);
+
+  /// No description provided for @trashPurgeFailedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 本永久删除失败，仍保留在「已删除」中}}'**
+  String trashPurgeFailedToast(int count);
+
+  /// No description provided for @comicPurgeTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'永久删除漫画？'**
+  String get comicPurgeTitle;
+
+  /// No description provided for @comicPurgeLocalBatchConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{将从库中移除 {count} 本漫画，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。}}'**
+  String comicPurgeLocalBatchConfirm(int count);
+
+  /// No description provided for @comicPurgeRemoteBatchConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{将从库中移除 {count} 本远程漫画。仅从库中移除，不会删除远程资源。}}'**
+  String comicPurgeRemoteBatchConfirm(int count);
+
+  /// No description provided for @comicPurgeMixedConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'{localCount} 本本地漫画将永久删除磁盘文件；{remoteCount} 本远程漫画仅从库中移除，不会删除远程资源。此操作不可撤销。'**
+  String comicPurgeMixedConfirm(int localCount, int remoteCount);
+
+  /// No description provided for @comicPurgeRemoteAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解将从库中永久移除，此操作不可撤销'**
+  String get comicPurgeRemoteAcknowledge;
+
+  /// No description provided for @authorDetailTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get authorDetailTitle;
+
+  /// No description provided for @authorDetailVerified.
+  ///
+  /// In zh, this message translates to:
+  /// **'认证作者'**
+  String get authorDetailVerified;
+
+  /// No description provided for @authorDetailAddLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加链接'**
+  String get authorDetailAddLink;
+
+  /// No description provided for @authorDetailLinkPasteHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'粘贴主页链接'**
+  String get authorDetailLinkPasteHint;
+
+  /// No description provided for @authorDetailPlatformPixiv.
+  ///
+  /// In zh, this message translates to:
+  /// **'Pixiv'**
+  String get authorDetailPlatformPixiv;
+
+  /// No description provided for @authorDetailPlatformX.
+  ///
+  /// In zh, this message translates to:
+  /// **'X'**
+  String get authorDetailPlatformX;
+
+  /// No description provided for @authorDetailPlatformPatreon.
+  ///
+  /// In zh, this message translates to:
+  /// **'Patreon'**
+  String get authorDetailPlatformPatreon;
+
+  /// No description provided for @authorDetailPlatformFanbox.
+  ///
+  /// In zh, this message translates to:
+  /// **'FANBOX'**
+  String get authorDetailPlatformFanbox;
+
+  /// No description provided for @authorDetailPlatformDiscord.
+  ///
+  /// In zh, this message translates to:
+  /// **'Discord'**
+  String get authorDetailPlatformDiscord;
+
+  /// No description provided for @authorDetailPlatformOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get authorDetailPlatformOther;
+
+  /// No description provided for @authorDetailDeleteLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除链接'**
+  String get authorDetailDeleteLink;
+
+  /// No description provided for @authorDetailDeleteLinkConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除链接「{label}」？'**
+  String authorDetailDeleteLinkConfirm(String label);
+
+  /// No description provided for @authorDetailLinkTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'{url}'**
+  String authorDetailLinkTooltip(String url);
+
+  /// No description provided for @authorDetailComicsSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画 · {count}'**
+  String authorDetailComicsSection(int count);
+
+  /// No description provided for @authorDetailComicsEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无漫画'**
+  String get authorDetailComicsEmpty;
+
+  /// No description provided for @authorDetailViewInSearch.
+  ///
+  /// In zh, this message translates to:
+  /// **'在搜索中查看'**
+  String get authorDetailViewInSearch;
+
+  /// No description provided for @authorDetailRename.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名'**
+  String get authorDetailRename;
+
+  /// No description provided for @authorDetailAliases.
+  ///
+  /// In zh, this message translates to:
+  /// **'别名：{aliases}'**
+  String authorDetailAliases(String aliases);
+
+  /// No description provided for @authorDetailInvalidUrl.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入以 http:// 或 https:// 开头的链接'**
+  String get authorDetailInvalidUrl;
+
+  /// No description provided for @authorDetailOpenLinkFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法打开链接'**
+  String get authorDetailOpenLinkFailed;
 }
 
 class _AppLocalizationsDelegate

@@ -24,6 +24,7 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
   migrated.remove('readerAutoPlayEnabled');
   migrated.remove('autoScan');
   migrated.remove('enabledFormatGroups');
+  migrated.remove('libraryCatalogSortFlipEnabled');
   if (migrated.containsKey('autoPlayMode')) {
     migrated['autoPlayMode'] = autoPlayModeToJson(
       autoPlayModeFromJson(migrated['autoPlayMode']),

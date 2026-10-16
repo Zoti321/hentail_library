@@ -3,7 +3,7 @@ import 'package:hentai_library/domain/library/metadata_refresh_types.dart';
 
 /// UI-side helper: FRB Metadata refresh + catalog revision bump.
 ///
-/// Mutual exclusion with Library sync is enforced by Rust `library_lock`.
+/// Mutual exclusion with Library sync is enforced by Rust `library_write`.
 /// Controllers may still pre-check UI `running` for friendlier errors.
 class MetadataRefreshCoordinator {
   const MetadataRefreshCoordinator({

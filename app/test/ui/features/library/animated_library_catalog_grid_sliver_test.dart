@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reorderable_grid_view/widgets/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -20,8 +19,6 @@ void main() {
                 AnimatedLibraryCatalogGridSliver(
                   layoutTier: LibraryLayoutTier.compact,
                   itemCount: 40,
-                  positionAnimationKey: 'sort-a',
-                  sortFlipEnabled: false,
                   suppressAnimationKey:
                       const LibraryCatalogGridSuppressAnimationKey(
                         keyword: '',
@@ -45,7 +42,6 @@ void main() {
       await tester.pump();
 
       expect(find.byType(SliverGrid), findsOneWidget);
-      expect(find.byType(ReorderableBuilder), findsNothing);
       expect(find.byType(GridView), findsNothing);
 
       // Virtualization: not all 40 items are built in a small viewport.

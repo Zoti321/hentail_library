@@ -17,3 +17,8 @@ Comic identity 仍锚定资源位置键（ADR-0001）。位置变化会生成新
 - 整库根目录改名/搬家在相对树不变且新根可读时，Comic 与 Series 用户态可保留。
 - 同库内系列夹 rename/move（及 Remote 同库父路径变化）在 F0 成立时可保留 Series 用户态；部分成员换夹或指纹歧义则不迁 Series。
 - 文档与实现以「Path migration」为领域用语；避免把弱指纹或 F0 误称为内容身份 / 系列内容哈希。
+
+## References
+
+- 实现：`core/src/path_migration/`（配对 `pairing` + 落库 `persist`）。Library sync 的 Series rekey（F0）与 Local 改根共用同一 `apply_series_rekeys`，故两者对未锁显示名的处理一致——均随新文件夹 basename 更新。
+- ADR-0026 — Library-level write seam（Local 改根持锁 + 单事务）

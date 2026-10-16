@@ -76,7 +76,7 @@ void main() {
         ),
         authorFilter: LibraryMetadataFilterSelection(
           picks: <String, LibraryTriStatePick>{
-            '画师A': LibraryTriStatePick.include,
+            '7': LibraryTriStatePick.include,
           },
           includeMode: LibraryMetadataIncludeMode.any,
         ),
@@ -87,7 +87,7 @@ void main() {
       });
       expect(filter.tagsAny, isNull);
       expect(filter.authorsAny, <LibraryAuthorPick>{
-        const LibraryAuthorPick(name: '画师A'),
+        const LibraryAuthorPick(id: 7, name: '7'),
       });
       expect(filter.authorsAll, isNull);
     });
@@ -106,6 +106,30 @@ void main() {
       expect(filter.tagsExclude, <LibraryTagPick>{
         const LibraryTagPick(name: 'R18'),
       });
+    });
+
+    test('buildListFilter leaves needs metadata off by default', () {
+      final LibraryComicFilter filter = projection.buildListFilter(
+        ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+        mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+        tagFilter: emptyMetadataFilter,
+        authorFilter: emptyMetadataFilter,
+      );
+      expect(filter.needsMetadataOnly, isFalse);
+    });
+
+    test('buildListFilter carries needs metadata browse preference', () {
+      final LibraryComicFilter filter = projection.buildListFilter(
+        ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+        mediaTypeFilter: const LibraryMediaTypeFilterSelection({
+          LibraryMediaTypeFilterOption.pdf,
+        }),
+        tagFilter: emptyMetadataFilter,
+        authorFilter: emptyMetadataFilter,
+        needsMetadataOnly: true,
+      );
+      expect(filter.needsMetadataOnly, isTrue);
+      expect(filter.resourceTypes, <ResourceType>{ResourceType.pdf});
     });
   });
 }

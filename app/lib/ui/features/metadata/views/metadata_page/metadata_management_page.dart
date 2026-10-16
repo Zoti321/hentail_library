@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_scroll_to_top_button.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_content_search.dart';
@@ -15,6 +17,7 @@ import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/named_facet_management_panel.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
@@ -36,6 +39,8 @@ class _MetadataManagementPageState
   final ScrollController _scrollController = ScrollController();
   int? _selectedTabIndex;
   double? _headerExtent;
+  String? _mergeTarget;
+  final Set<String> _mergeSources = <String>{};
 
   @override
   void initState() {
@@ -152,6 +157,9 @@ class _MetadataManagementPageState
           ? () => _deleteAllTags(context)
           : null,
       onOpenNavigation: appShellPageNavigationOpener(context),
+      mergeSelectionCount: _mergeTarget == null ? 0 : 1 + _mergeSources.length,
+      onExitMergeSelection: _mergeTarget == null ? null : _exitMergeSelection,
+      onMergeSelection: _mergeTarget == null ? null : _mergeSelectedNames,
     );
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
@@ -192,6 +200,11 @@ class _MetadataManagementPageState
                 viewportWidth: viewportWidth,
                 horizontalPadding: horizontalPadding,
                 contentMaxWidth: innerMaxWidth,
+                mergeTarget: _mergeTarget,
+                mergeSources: _mergeSources,
+                onMergeTargetSelected: _enterMergeSelection,
+                onMergeSourceSelected: _selectMergeSource,
+                onMergeSelectionExited: _exitMergeSelection,
               ),
           ],
         ),
@@ -223,11 +236,73 @@ class _MetadataManagementPageState
     if (_selectedTabIndex == index) {
       return;
     }
+    _exitMergeSelection();
     setState(() {
       _selectedTabIndex = index;
     });
     context.go('/metadata?tab=${_tabQueryForIndex(index)}');
     _scrollToContentTop();
+  }
+
+  void _enterMergeSelection(String target) {
+    if (metadataTabKind(_selectedTabIndex ?? 1) ==
+        ManagedNamedFacetKind.author) {
+      return;
+    }
+    setState(() {
+      _mergeTarget = target;
+      _mergeSources.clear();
+    });
+  }
+
+  void _selectMergeSource(String source) {
+    if (_mergeTarget == null || source == _mergeTarget) return;
+    setState(() {
+      if (!_mergeSources.add(source)) _mergeSources.remove(source);
+    });
+  }
+
+  void _exitMergeSelection() {
+    if (_mergeTarget == null && _mergeSources.isEmpty) return;
+    setState(() {
+      _mergeTarget = null;
+      _mergeSources.clear();
+    });
+  }
+
+  Future<void> _mergeSelectedNames() async {
+    final String? target = _mergeTarget;
+    final List<String> sources = _mergeSources.toList(growable: false);
+    if (target == null || sources.isEmpty) return;
+    final prefs = await SharedPreferences.getInstance();
+    final bool skip = prefs.getBool('metadata_merge_confirm_skip') ?? false;
+    if (!skip && mounted) {
+      final bool? confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => _MergeConfirmDialog(
+          target: target,
+          sources: sources,
+          onSkipChanged: (value) =>
+              prefs.setBool('metadata_merge_confirm_skip', value),
+        ),
+      );
+      if (confirmed != true || !mounted) return;
+    }
+    try {
+      await ref
+          .read(
+            namedFacetManagementControllerProvider(
+              metadataTabKind(_selectedTabIndex ?? 1),
+            ).notifier,
+          )
+          .merge(targetName: target, sourceNames: sources);
+      if (mounted) {
+        _exitMergeSelection();
+        showSuccessToast(context, '合并完成');
+      }
+    } catch (error) {
+      if (mounted) showErrorToast(context, error);
+    }
   }
 
   Future<void> _invokeAddForTab(BuildContext context, int tabIndex) async {
@@ -320,4 +395,61 @@ String _tabQueryForIndex(int index) {
     3 => 'characters',
     _ => 'tags',
   };
+}
+
+class _MergeConfirmDialog extends StatefulWidget {
+  const _MergeConfirmDialog({
+    required this.target,
+    required this.sources,
+    required this.onSkipChanged,
+  });
+
+  final String target;
+  final List<String> sources;
+  final ValueChanged<bool> onSkipChanged;
+
+  @override
+  State<_MergeConfirmDialog> createState() => _MergeConfirmDialogState();
+}
+
+class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
+  bool skip = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return HentaiDialog(
+      title: '确认合并',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            '将 ${widget.sources.length} 个 tag 合并到「${widget.target}」？源 tag 的 Comic 附着会转移到目标，源 tag 将被删除。',
+            style: TextStyle(color: cs.hentai.textSecondary),
+          ),
+          CheckboxListTile(
+            value: skip,
+            contentPadding: EdgeInsets.zero,
+            controlAffinity: ListTileControlAffinity.leading,
+            title: const Text('以后不再提示'),
+            onChanged: (value) {
+              setState(() => skip = value ?? false);
+              widget.onSkipChanged(skip);
+            },
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(context.l10n.commonCancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(context.l10n.metadataMerge),
+        ),
+      ],
+    );
+  }
 }

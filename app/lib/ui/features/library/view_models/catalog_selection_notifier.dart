@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_reorder_mode_notifier.dart';
@@ -41,18 +41,8 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     ) {
       _reset();
     });
-    ref.listen(libraryComicsTabSortOptionProvider, (_, _) => _reset());
-    ref.listen(
-      libraryComicsTabAgeRestrictionFilterProvider,
-      (_, _) => _reset(),
-    );
-    ref.listen(libraryComicsTabMediaTypeFilterProvider, (_, _) => _reset());
-    ref.listen(libraryComicsTabTagFilterProvider, (_, _) => _reset());
-    ref.listen(libraryComicsTabAuthorFilterProvider, (_, _) => _reset());
-    ref.listen(libraryComicsTabLanguageFilterProvider, (_, _) => _reset());
-    ref.listen(libraryComicsTabParodyFilterProvider, (_, _) => _reset());
-    ref.listen(libraryComicsTabCharacterFilterProvider, (_, _) => _reset());
-    ref.listen(libraryComicsTabExpandBySeriesProvider, (_, _) => _reset());
+    // 任一 Comics 筛选 / 排序变化即退出选择模式（整份意图为单一来源）。
+    ref.listen(libraryComicFiltersProvider, (_, _) => _reset());
     ref.listen(libraryDisplayTargetProvider, (_, LibraryDisplayTarget target) {
       if (target == LibraryDisplayTarget.series && state.active) {
         exit();

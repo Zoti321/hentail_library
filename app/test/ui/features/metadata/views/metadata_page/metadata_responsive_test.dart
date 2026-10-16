@@ -240,6 +240,13 @@ class _FakeNamedFacetManagementRepository
   }
 
   @override
+  Future<void> merge(
+    ManagedNamedFacetKind kind,
+    String sourceName,
+    String targetName,
+  ) async {}
+
+  @override
   Future<int> countAttachments(ManagedNamedFacetKind kind, String name) async =>
       name == '作者 A' ? 3 : 0;
 }

@@ -3,7 +3,7 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
-use crate::metadata_lock::series_auto_locks;
+use crate::metadata_lock::{series_auto_locks, SeriesMetaField};
 use crate::util::compute_sort_key;
 
 #[derive(Debug, Clone, Default)]
@@ -20,6 +20,32 @@ pub struct SetSeriesMetaLocksDto {
     pub name: Option<bool>,
     pub serialization_status: Option<bool>,
     pub total_count: Option<bool>,
+}
+
+impl SetSeriesMetaLocksDto {
+    pub fn any(&self) -> bool {
+        SeriesMetaField::ALL
+            .iter()
+            .any(|field| self.patch(*field).is_some())
+    }
+
+    /// `Some(locked)` when this patch sets `field`'s lock, `None` when it leaves it unchanged.
+    pub fn patch(&self, field: SeriesMetaField) -> Option<bool> {
+        match field {
+            SeriesMetaField::Name => self.name,
+            SeriesMetaField::SerializationStatus => self.serialization_status,
+            SeriesMetaField::TotalCount => self.total_count,
+        }
+    }
+}
+
+/// Write one ADR-0007 lock column (exhaustive over the Series field table).
+fn apply_series_lock(active: &mut series::ActiveModel, field: SeriesMetaField, locked: bool) {
+    match field {
+        SeriesMetaField::Name => active.name_locked = Set(locked),
+        SeriesMetaField::SerializationStatus => active.serialization_status_locked = Set(locked),
+        SeriesMetaField::TotalCount => active.total_count_locked = Set(locked),
+    }
 }
 
 pub async fn update_series_user_meta(
@@ -62,14 +88,8 @@ pub async fn update_series_user_meta(
     } else if let Some(total_count) = meta.total_count {
         active.total_count = Set(Some(total_count));
     }
-    if auto_locks.name {
-        active.name_locked = Set(true);
-    }
-    if auto_locks.serialization_status {
-        active.serialization_status_locked = Set(true);
-    }
-    if auto_locks.total_count {
-        active.total_count_locked = Set(true);
+    for field in auto_locks.written() {
+        apply_series_lock(&mut active, field, true);
     }
     active.update(&db).await.map_err(map_db_err)?;
     Ok(())
@@ -79,7 +99,7 @@ pub async fn set_series_meta_locks(
     series_id: &str,
     locks: SetSeriesMetaLocksDto,
 ) -> Result<(), HentaiError> {
-    if locks.name.is_none() && locks.serialization_status.is_none() && locks.total_count.is_none() {
+    if !locks.any() {
         return Ok(());
     }
     let db = connection()?;
@@ -90,14 +110,10 @@ pub async fn set_series_meta_locks(
         .ok_or_else(|| HentaiError::validation(format!("系列不存在: {series_id}")))?;
 
     let mut active: series::ActiveModel = existing.into();
-    if let Some(v) = locks.name {
-        active.name_locked = Set(v);
-    }
-    if let Some(v) = locks.serialization_status {
-        active.serialization_status_locked = Set(v);
-    }
-    if let Some(v) = locks.total_count {
-        active.total_count_locked = Set(v);
+    for field in SeriesMetaField::ALL {
+        if let Some(locked) = locks.patch(field) {
+            apply_series_lock(&mut active, field, locked);
+        }
     }
     active.update(&db).await.map_err(map_db_err)?;
     Ok(())
@@ -163,4 +179,46 @@ pub async fn set_series_item_sort_order_locked(
     active.sort_order_locked = Set(locked);
     active.update(&db).await.map_err(map_db_err)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn lock_patch_reports_only_the_set_lock() {
+        let empty = SetSeriesMetaLocksDto::default();
+        assert!(!empty.any());
+        assert!(SeriesMetaField::ALL
+            .iter()
+            .all(|field| empty.patch(*field).is_none()));
+
+        for field in SeriesMetaField::ALL {
+            let mut locks = SetSeriesMetaLocksDto::default();
+            match field {
+                SeriesMetaField::Name => locks.name = Some(true),
+                SeriesMetaField::SerializationStatus => locks.serialization_status = Some(true),
+                SeriesMetaField::TotalCount => locks.total_count = Some(true),
+            }
+            assert!(locks.any());
+            assert_eq!(locks.patch(field), Some(true));
+            assert_eq!(
+                SeriesMetaField::ALL
+                    .iter()
+                    .filter(|candidate| locks.patch(**candidate).is_some())
+                    .count(),
+                1
+            );
+        }
+    }
+
+    #[test]
+    fn auto_locks_follow_the_written_fields() {
+        assert_eq!(
+            series_auto_locks(true, false, false).written(),
+            vec![SeriesMetaField::Name]
+        );
+        assert!(series_auto_locks(false, true, true).any());
+        assert!(!series_auto_locks(false, false, false).any());
+    }
 }

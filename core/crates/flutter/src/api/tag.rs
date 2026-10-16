@@ -1,7 +1,7 @@
 use hentai_core::{
     add_tag as core_add, count_all_tags as core_count, delete_tags_by_names,
     fetch_tags_page as core_fetch, import_tag_dictionary as core_import_tag_dictionary,
-    list_all_tags, rename_tag as core_rename, watch_tags, TagDictionaryImportResult,
+    list_all_tags, paginate, rename_tag as core_rename, watch_tags, TagDictionaryImportResult,
 };
 
 use super::comic::PageRequestDto;
@@ -51,27 +51,21 @@ pub fn list_all_tags_frb() -> Result<Vec<String>, HentaiErrorDto> {
 pub fn fetch_tags_page_frb(request: PageRequestDto) -> Result<TagPagedNamesDto, HentaiErrorDto> {
     hentai_core::runtime::block_on(async {
         let total = core_count().await?;
-        let page_size = request.page_size.max(1);
+        let window = paginate(request.into(), total).clamped();
         if total <= 0 {
             return Ok::<TagPagedNamesDto, hentai_core::HentaiError>(TagPagedNamesDto {
                 items: vec![],
                 total_count: 0,
                 page: 1,
-                page_size,
+                page_size: window.page_size,
             });
         }
-        let total_pages = (total + page_size as i64 - 1) / page_size as i64;
-        let mut page = request.page.max(1);
-        if page as i64 > total_pages {
-            page = total_pages as i32;
-        }
-        let offset = (page - 1) * page_size;
-        let items = core_fetch(page_size, offset).await?;
+        let items = core_fetch(window.page_size, window.offset as i32).await?;
         Ok(TagPagedNamesDto {
             items,
             total_count: total,
-            page,
-            page_size,
+            page: window.page,
+            page_size: window.page_size,
         })
     })
     .map_err(HentaiErrorDto::from)

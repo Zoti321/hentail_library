@@ -1,4 +1,5 @@
 mod generate;
+pub mod hd;
 mod queue;
 
 pub use generate::{
@@ -15,6 +16,7 @@ use sea_orm::DatabaseConnection;
 use crate::comic::ComicDto;
 use crate::error::HentaiError;
 use crate::sync::handle::SyncHandle;
+use hd::ThumbnailCoverMeta;
 
 pub struct ComicThumbnailDto {
     pub thumbnail: Vec<u8>,
@@ -40,7 +42,7 @@ pub struct ThumbnailBatchResult {
     pub failed_count: i32,
 }
 
-fn load_page_image_bytes(
+pub(crate) fn load_page_image_bytes(
     comic_id: &str,
     path: &str,
     resource_type: &str,
@@ -91,6 +93,30 @@ pub async fn find_thumbnail_by_comic_id(
     }))
 }
 
+/// 缩略图的封面来源字段（不读缩略图字节）；无缩略图行时为 `None`。
+pub async fn find_thumbnail_cover_meta(
+    comic_id: &str,
+) -> Result<Option<ThumbnailCoverMeta>, HentaiError> {
+    use crate::db::{connection, map_db_err};
+    use crate::entity::{comic_thumbnails, prelude::*};
+    use sea_orm::{EntityTrait, QuerySelect};
+    let db = connection()?;
+    let row: Option<(bool, Option<i32>)> = ComicThumbnails::find_by_id(comic_id)
+        .select_only()
+        .column(comic_thumbnails::Column::IsUserSet)
+        .column(comic_thumbnails::Column::SourcePageIndex)
+        .into_tuple()
+        .one(&db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(
+        row.map(|(is_user_set, source_page_index)| ThumbnailCoverMeta {
+            is_user_set,
+            source_page_index,
+        }),
+    )
+}
+
 /// 将漫画指定页（0-based）编码为缩略图并标记为用户设置封面。
 pub async fn set_comic_thumbnail_from_page(
     comic_id: &str,
@@ -118,6 +144,7 @@ pub async fn set_comic_thumbnail_from_page(
         source_modified_ms: Set(Some(modified_ms)),
         source_size: Set(Some(size)),
         is_user_set: Set(true),
+        source_page_index: Set(Some(page_index)),
     };
     ComicThumbnails::insert(active)
         .on_conflict(
@@ -128,6 +155,7 @@ pub async fn set_comic_thumbnail_from_page(
                     comic_thumbnails::Column::SourceModifiedMs,
                     comic_thumbnails::Column::SourceSize,
                     comic_thumbnails::Column::IsUserSet,
+                    comic_thumbnails::Column::SourcePageIndex,
                 ])
                 .to_owned(),
         )
@@ -198,7 +226,8 @@ pub async fn find_series_thumbnail_by_series_id(
     }))
 }
 
-/// 系列封面解析：自定义系列缩略图优先，否则回退到 sort_order 最大的成员漫画。
+/// 系列封面解析：自定义系列缩略图优先，否则回退到 sort_order 最大的**可见**成员漫画
+///（跳过 Comic trash，ADR-0023）。
 pub async fn resolve_series_cover(series_id: &str) -> Result<SeriesCoverSource, HentaiError> {
     if let Some(custom) = find_series_thumbnail_by_series_id(series_id).await? {
         return Ok(SeriesCoverSource::CustomThumbnail {
@@ -206,13 +235,16 @@ pub async fn resolve_series_cover(series_id: &str) -> Result<SeriesCoverSource, 
         });
     }
 
+    use crate::comic::visibility::visible_comic_id_sql;
     use crate::db::{connection, map_db_err};
     use crate::entity::series_items;
+    use sea_orm::sea_query::Expr;
     use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
 
     let db = connection()?;
     let items = series_items::Entity::find()
         .filter(series_items::Column::SeriesId.eq(series_id))
+        .filter(Expr::cust(visible_comic_id_sql("series_items.comic_id")))
         .order_by_desc(series_items::Column::SortOrder)
         .order_by_asc(series_items::Column::ComicId)
         .all(&db)

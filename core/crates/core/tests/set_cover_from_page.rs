@@ -4,7 +4,8 @@ use std::fs;
 use std::path::Path;
 
 use hentai_core::comic::ComicDto;
-use hentai_core::thumbnail::thumbnail_needs_generation;
+use hentai_core::thumbnail::hd::ThumbnailCoverMeta;
+use hentai_core::thumbnail::{find_thumbnail_cover_meta, thumbnail_needs_generation};
 use hentai_core::{
     connection, find_series_thumbnail_by_series_id, find_thumbnail_by_comic_id, init_db_at_path,
     resolve_series_cover, set_comic_thumbnail_from_page, set_series_thumbnail_from_page,
@@ -75,6 +76,63 @@ fn set_comic_thumbnail_from_page_marks_user_set_cover() {
             .expect("thumbnail exists");
         assert!(!thumb.thumbnail.is_empty());
         assert!(thumb.is_user_set);
+    });
+}
+
+#[test]
+fn legacy_thumbnail_has_no_cover_page_until_user_sets_cover() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let legacy_id = "86408880d30b0de95ca959feb60a3b72dcb1889b";
+        {
+            let conn = rusqlite::Connection::open(&db_path).expect("open fixture");
+            conn.execute(
+                "INSERT INTO comic_thumbnails (comic_id, thumbnail, updated_at) VALUES (?1, X'01', 1)",
+                [legacy_id],
+            )
+            .expect("seed legacy thumbnail");
+        }
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime
+            .block_on(init_db_at_path(&db_path))
+            .expect("init db");
+
+        let legacy = runtime
+            .block_on(find_thumbnail_cover_meta(legacy_id))
+            .expect("meta")
+            .expect("legacy row survives migration");
+        assert_eq!(
+            legacy,
+            ThumbnailCoverMeta {
+                is_user_set: false,
+                source_page_index: None,
+            }
+        );
+
+        let comic_dir = temp.path().join("comic");
+        fs::create_dir_all(&comic_dir).expect("mkdir");
+        write_solid_jpeg(&comic_dir.join("001.jpg"), 255, 0, 0);
+        write_solid_jpeg(&comic_dir.join("002.jpg"), 0, 0, 255);
+        let comic_id = "cover-comic-page";
+        let path = comic_dir.to_string_lossy().replace('\\', "/");
+        seed_comic(comic_id, &path, "dir");
+
+        runtime
+            .block_on(set_comic_thumbnail_from_page(comic_id, &path, "dir", 1))
+            .expect("set cover");
+
+        let meta = runtime
+            .block_on(find_thumbnail_cover_meta(comic_id))
+            .expect("meta")
+            .expect("row");
+        assert_eq!(
+            meta,
+            ThumbnailCoverMeta {
+                is_user_set: true,
+                source_page_index: Some(1),
+            }
+        );
     });
 }
 

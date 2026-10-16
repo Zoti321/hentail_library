@@ -89,6 +89,7 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
               const LibraryLanguageFilterControls(),
               const LibraryParodyFilterControls(),
               const LibraryCharacterFilterControls(),
+              const LibraryOrganizeFilterControls(),
               SizedBox(height: tokens.spacing.lg),
               Padding(
                 padding: const EdgeInsets.only(

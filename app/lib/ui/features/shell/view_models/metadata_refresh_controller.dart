@@ -136,7 +136,8 @@ class MetadataRefreshController extends _$MetadataRefreshController {
         state.targetId == seriesId;
   }
 
-  /// UI-friendly precheck only; authoritative mutual exclusion is Rust `library_lock`.
+  /// UI-friendly precheck only; authoritative mutual exclusion is Rust
+  /// `library_write`.
   void _ensureScanIdle() {
     if (ref.read(scanLibraryControllerProvider).running) {
       throw AppException('库同步进行中，请稍后再试');

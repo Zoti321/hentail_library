@@ -6,19 +6,13 @@ class AnimatedLibraryCatalogGridSliver extends StatefulWidget {
     required this.layoutTier,
     required this.itemCount,
     required this.itemBuilder,
-    required this.positionAnimationKey,
     required this.suppressAnimationKey,
-    required this.sortFlipEnabled,
   });
 
   final LibraryLayoutTier layoutTier;
   final int itemCount;
-
-  /// 每个格子根节点必须带唯一 [ValueKey]（传给 [ReorderableBuilder] 的外层 widget）。
   final Widget Function(BuildContext context, int index) itemBuilder;
-  final Object positionAnimationKey;
   final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey;
-  final bool sortFlipEnabled;
 
   @override
   State<AnimatedLibraryCatalogGridSliver> createState() =>
@@ -28,13 +22,9 @@ class AnimatedLibraryCatalogGridSliver extends StatefulWidget {
 class _AnimatedLibraryCatalogGridSliverState
     extends State<AnimatedLibraryCatalogGridSliver>
     with SingleTickerProviderStateMixin {
-  final GlobalKey _gridViewKey = GlobalKey();
-  bool _enableSortFlipAnimation = false;
   AppThemeTokens? _lastTokens;
   LibraryLayoutTier? _lastLayoutTier;
   SliverGridDelegate? _cachedDelegate;
-  Timer? _returnToVirtualizedTimer;
-  int _flipEpoch = 0;
   late final AnimationController _pageTransitionController =
       AnimationController(vsync: this);
   Animation<double>? _pageOpacity;
@@ -56,7 +46,6 @@ class _AnimatedLibraryCatalogGridSliverState
 
   @override
   void dispose() {
-    _returnToVirtualizedTimer?.cancel();
     _pageTransitionController.removeStatusListener(_onPageTransitionStatus);
     _pageTransitionController.dispose();
     super.dispose();
@@ -96,9 +85,6 @@ class _AnimatedLibraryCatalogGridSliverState
     LibraryCatalogGridSuppressAnimationKey next,
   ) {
     if (!libraryCatalogGridPageOnlyChanged(previous: previous, next: next)) {
-      return;
-    }
-    if (_enableSortFlipAnimation) {
       return;
     }
     _pageDirection = libraryCatalogPageTransitionDirection(
@@ -144,49 +130,16 @@ class _AnimatedLibraryCatalogGridSliverState
   @override
   void didUpdateWidget(AnimatedLibraryCatalogGridSliver oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final bool sortChanged =
-        widget.positionAnimationKey != oldWidget.positionAnimationKey;
-    final bool suppressChanged =
-        widget.suppressAnimationKey != oldWidget.suppressAnimationKey;
     if (widget.layoutTier != oldWidget.layoutTier) {
       _cachedDelegate = null;
     }
 
-    if (!widget.sortFlipEnabled && _enableSortFlipAnimation) {
-      _returnToVirtualizedTimer?.cancel();
-      _enableSortFlipAnimation = false;
-    }
-
-    _enableSortFlipAnimation = nextLibraryCatalogSortFlipAnimationEnabled(
-      userEnabled: widget.sortFlipEnabled,
-      current: _enableSortFlipAnimation,
-      sortChanged: sortChanged,
-      suppressChanged: suppressChanged,
-    );
-
-    if (suppressChanged) {
+    if (widget.suppressAnimationKey != oldWidget.suppressAnimationKey) {
       _maybeStartPageTransition(
         oldWidget.suppressAnimationKey,
         widget.suppressAnimationKey,
       );
     }
-
-    if (sortChanged && _enableSortFlipAnimation) {
-      _scheduleReturnToVirtualizedGrid();
-    }
-  }
-
-  void _scheduleReturnToVirtualizedGrid() {
-    _returnToVirtualizedTimer?.cancel();
-    final int epoch = ++_flipEpoch;
-    _returnToVirtualizedTimer = Timer(kLibraryCatalogSortFlipDuration, () {
-      if (!mounted || epoch != _flipEpoch || !_enableSortFlipAnimation) {
-        return;
-      }
-      setState(() {
-        _enableSortFlipAnimation = false;
-      });
-    });
   }
 
   SliverGridDelegate _delegateFor(BuildContext context) {
@@ -208,41 +161,15 @@ class _AnimatedLibraryCatalogGridSliverState
   Widget build(BuildContext context) {
     final SliverGridDelegate gridDelegate = _delegateFor(context);
 
-    // Steady-state path: true SliverGrid so CustomScrollView virtualizes.
-    // Sort FLIP briefly uses shrinkWrap ReorderableBuilder, then returns.
-    if (!_enableSortFlipAnimation) {
-      return SliverGrid(
-        key: ValueKey<int>(_pageTransitionGeneration),
-        gridDelegate: gridDelegate,
-        delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) {
-            return _wrapGridItem(widget.itemBuilder(context, index));
-          },
-          childCount: widget.itemCount,
-          addAutomaticKeepAlives: false,
-        ),
-      );
-    }
-
-    return SliverToBoxAdapter(
-      child: ReorderableBuilder<void>.builder(
-        enableDraggable: false,
-        itemCount: widget.itemCount,
-        animationConfig: libraryCatalogSortFlipAnimationConfig(
-          enableAnimations: !reduceMotionOf(context),
-        ),
-        childBuilder: (Widget Function(Widget child, int index) wrapGridChild) {
-          return GridView.builder(
-            key: _gridViewKey,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: gridDelegate,
-            itemCount: widget.itemCount,
-            itemBuilder: (BuildContext context, int index) {
-              return wrapGridChild(widget.itemBuilder(context, index), index);
-            },
-          );
+    return SliverGrid(
+      key: ValueKey<int>(_pageTransitionGeneration),
+      gridDelegate: gridDelegate,
+      delegate: SliverChildBuilderDelegate(
+        (BuildContext context, int index) {
+          return _wrapGridItem(widget.itemBuilder(context, index));
         },
+        childCount: widget.itemCount,
+        addAutomaticKeepAlives: false,
       ),
     );
   }

@@ -11,7 +11,7 @@ import 'sync.dart';
 part 'comic.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_bulk_patch`, `map_multi_value_op`, `map_multi_value_patch`, `map_published_at_patch`, `map_scalar_patch`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 void initDbFrb({required String appDataDir, required String dbFileName}) =>
     RustLib.instance.api.crateApiComicInitDbFrb(
@@ -53,8 +53,29 @@ Future<PagedComicResultDto> searchByKeywordPageFrb({
   pageSize: pageSize,
 );
 
-void deleteComicsByIdsFrb({required List<String> comicIds}) =>
-    RustLib.instance.api.crateApiComicDeleteComicsByIdsFrb(comicIds: comicIds);
+Future<void> trashComicsFrb({required List<String> comicIds}) =>
+    RustLib.instance.api.crateApiComicTrashComicsFrb(comicIds: comicIds);
+
+Future<void> restoreComicsFrb({required List<String> comicIds}) =>
+    RustLib.instance.api.crateApiComicRestoreComicsFrb(comicIds: comicIds);
+
+Future<ComicPurgeResultFrbDto> purgeComicsFrb({
+  required List<String> comicIds,
+}) => RustLib.instance.api.crateApiComicPurgeComicsFrb(comicIds: comicIds);
+
+Future<PagedTrashedComicResultFrbDto> fetchTrashedComicsPageFrb({
+  required int page,
+  required int pageSize,
+}) => RustLib.instance.api.crateApiComicFetchTrashedComicsPageFrb(
+  page: page,
+  pageSize: pageSize,
+);
+
+Future<TrashedComicCountsFrbDto> countTrashedComicsFrb() =>
+    RustLib.instance.api.crateApiComicCountTrashedComicsFrb();
+
+Future<List<String>> listTrashedComicIdsFrb() =>
+    RustLib.instance.api.crateApiComicListTrashedComicIdsFrb();
 
 void updateComicUserMetaFrb({
   required String comicId,
@@ -258,6 +279,7 @@ class ComicFilterDto {
   final List<String> languages;
   final List<String> parodies;
   final List<String> characters;
+  final bool needsMetadataOnly;
   final String? libraryId;
 
   const ComicFilterDto({
@@ -274,6 +296,7 @@ class ComicFilterDto {
     required this.languages,
     required this.parodies,
     required this.characters,
+    required this.needsMetadataOnly,
     this.libraryId,
   });
 
@@ -292,6 +315,7 @@ class ComicFilterDto {
       languages.hashCode ^
       parodies.hashCode ^
       characters.hashCode ^
+      needsMetadataOnly.hashCode ^
       libraryId.hashCode;
 
   @override
@@ -312,6 +336,7 @@ class ComicFilterDto {
           languages == other.languages &&
           parodies == other.parodies &&
           characters == other.characters &&
+          needsMetadataOnly == other.needsMetadataOnly &&
           libraryId == other.libraryId;
 }
 
@@ -416,6 +441,31 @@ class ComicMetadataBulkPatchFrbDto {
           publishedAt == other.publishedAt;
 }
 
+class ComicPurgeResultFrbDto {
+  final int succeeded;
+  final int failed;
+  final List<String> errorSamples;
+
+  const ComicPurgeResultFrbDto({
+    required this.succeeded,
+    required this.failed,
+    required this.errorSamples,
+  });
+
+  @override
+  int get hashCode =>
+      succeeded.hashCode ^ failed.hashCode ^ errorSamples.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ComicPurgeResultFrbDto &&
+          runtimeType == other.runtimeType &&
+          succeeded == other.succeeded &&
+          failed == other.failed &&
+          errorSamples == other.errorSamples;
+}
+
 enum ComicSortFieldDto {
   title,
   createdAt,
@@ -513,6 +563,34 @@ class PagedComicResultDto {
           pageSize == other.pageSize;
 }
 
+class PagedTrashedComicResultFrbDto {
+  final List<TrashedComicFrbDto> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
+
+  const PagedTrashedComicResultFrbDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PagedTrashedComicResultFrbDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
+}
+
 @freezed
 sealed class PublishedAtPatchFrbDto with _$PublishedAtPatchFrbDto {
   const PublishedAtPatchFrbDto._();
@@ -583,6 +661,61 @@ class SetComicMetaLocksFrbDto {
           languages == other.languages &&
           parodies == other.parodies &&
           characters == other.characters;
+}
+
+class TrashedComicCountsFrbDto {
+  final PlatformInt64 total;
+  final PlatformInt64 local;
+  final PlatformInt64 remote;
+
+  const TrashedComicCountsFrbDto({
+    required this.total,
+    required this.local,
+    required this.remote,
+  });
+
+  @override
+  int get hashCode => total.hashCode ^ local.hashCode ^ remote.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TrashedComicCountsFrbDto &&
+          runtimeType == other.runtimeType &&
+          total == other.total &&
+          local == other.local &&
+          remote == other.remote;
+}
+
+class TrashedComicFrbDto {
+  final ComicDto comic;
+  final PlatformInt64 deletedAt;
+  final String libraryName;
+  final String libraryKind;
+
+  const TrashedComicFrbDto({
+    required this.comic,
+    required this.deletedAt,
+    required this.libraryName,
+    required this.libraryKind,
+  });
+
+  @override
+  int get hashCode =>
+      comic.hashCode ^
+      deletedAt.hashCode ^
+      libraryName.hashCode ^
+      libraryKind.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TrashedComicFrbDto &&
+          runtimeType == other.runtimeType &&
+          comic == other.comic &&
+          deletedAt == other.deletedAt &&
+          libraryName == other.libraryName &&
+          libraryKind == other.libraryKind;
 }
 
 class UpdateComicUserMetaFrbDto {

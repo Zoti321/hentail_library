@@ -71,6 +71,10 @@ void main() {
     );
     expect(mapReaderErrorKind('TimedOut'), ReadSessionFailureKind.timedOut);
     expect(
+      mapReaderErrorKind('ComicTrashed'),
+      ReadSessionFailureKind.comicTrashed,
+    );
+    expect(
       mapReaderErrorKind('ReaderInvalidContent'),
       ReadSessionFailureKind.invalidOrEmptyContent,
     );

@@ -10,6 +10,7 @@ ReadSessionFailureKind mapReaderErrorKind(String code) {
     'RemoteTlsFailed' => ReadSessionFailureKind.remoteUnreachable,
     'RemoteAuthFailed' => ReadSessionFailureKind.remoteAuthFailed,
     'TimedOut' => ReadSessionFailureKind.timedOut,
+    'ComicTrashed' => ReadSessionFailureKind.comicTrashed,
     'ReaderInvalidContent' ||
     'ReaderKindMismatch' ||
     'ReaderUnsupportedType' => ReadSessionFailureKind.invalidOrEmptyContent,

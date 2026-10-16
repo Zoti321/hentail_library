@@ -177,7 +177,7 @@ class SeriesDetailComicCard extends HookConsumerWidget {
           );
         });
       case SeriesItemContextAction.delete:
-        confirmAndDeleteComic(context, ref, item.comic);
+        confirmAndTrashComic(context, ref, item.comic);
     }
   }
 }

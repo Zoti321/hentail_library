@@ -46,19 +46,14 @@ class LibraryComicsBlock extends ConsumerWidget {
     final List<Comic> comics = catalog.items;
     final bool isComicTableEmpty = catalog.isComicTableEmpty;
     final bool showPagination = catalog.showPagination;
-    final LibraryComicSortOption sortOption = ref.watch(
-      libraryComicsTabSortOptionProvider,
-    );
     final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
-      libraryComicsTabAgeRestrictionFilterProvider,
-    );
-    final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
-    final bool sortFlipEnabled = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> async) =>
-            async.asData?.value.libraryCatalogSortFlipEnabled ?? false,
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.ageRestriction ??
+            LibraryAgeRestrictionFilter.unrestricted,
       ),
     );
+    final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
     final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey =
         LibraryCatalogGridSuppressAnimationKey(
           keyword: catalog.filterQuery,
@@ -80,9 +75,7 @@ class LibraryComicsBlock extends ConsumerWidget {
             comics: comics,
             isComicTableEmpty: isComicTableEmpty,
             isReloading: catalogAsync.isLoading,
-            positionAnimationKey: sortOption,
             suppressAnimationKey: suppressAnimationKey,
-            sortFlipEnabled: sortFlipEnabled,
           ),
           if (showPagination)
             const LibraryPaginationBarSliver(
@@ -100,18 +93,14 @@ class _LibraryComicsGridSliver extends StatelessWidget {
     required this.layoutTier,
     required this.comics,
     required this.isComicTableEmpty,
-    required this.positionAnimationKey,
     required this.suppressAnimationKey,
-    required this.sortFlipEnabled,
     this.isReloading = false,
   });
 
   final LibraryLayoutTier layoutTier;
   final List<Comic> comics;
   final bool isComicTableEmpty;
-  final Object positionAnimationKey;
   final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey;
-  final bool sortFlipEnabled;
   final bool isReloading;
 
   @override
@@ -130,9 +119,7 @@ class _LibraryComicsGridSliver extends StatelessWidget {
     return AnimatedLibraryCatalogGridSliver(
       layoutTier: layoutTier,
       itemCount: comics.length,
-      positionAnimationKey: positionAnimationKey,
       suppressAnimationKey: suppressAnimationKey,
-      sortFlipEnabled: sortFlipEnabled,
       itemBuilder: (BuildContext context, int index) {
         final Comic manga = comics[index];
         return Center(

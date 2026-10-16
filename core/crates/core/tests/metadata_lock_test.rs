@@ -1,7 +1,7 @@
 use hentai_core::comic::{ComicDto, ComicMetaLocks};
 use hentai_core::metadata_lock::{
     merge_kept_scan_with_existing, merge_series_name, resolve_member_sort_order, series_auto_locks,
-    series_name_needs_write, ComicAutoLocks,
+    series_name_needs_write, ComicAutoLocks, ComicMetaField, SeriesMetaField,
 };
 
 fn comic(id: &str, path: &str, resource_type: &str, title: &str, page_count: i32) -> ComicDto {
@@ -201,17 +201,20 @@ fn member_sort_order_unlocked_uses_natural_index() {
 
 #[test]
 fn comic_auto_locks_only_written_fields() {
-    let locks = ComicAutoLocks {
-        title: true,
-        content_rating: true,
-        ..Default::default()
-    };
-    assert!(locks.title);
-    assert!(!locks.description);
-    assert!(locks.content_rating);
-    assert!(!locks.languages);
-    assert!(!locks.parodies);
-    assert!(!locks.characters);
+    let locks = ComicAutoLocks::from_written(|field| {
+        matches!(field, ComicMetaField::Title | ComicMetaField::ContentRating)
+    });
+    assert!(locks.get(ComicMetaField::Title));
+    assert!(locks.get(ComicMetaField::ContentRating));
+    assert!(!locks.get(ComicMetaField::Description));
+    assert!(!locks.get(ComicMetaField::Languages));
+    assert!(!locks.get(ComicMetaField::Parodies));
+    assert!(!locks.get(ComicMetaField::Characters));
+    // `written()` follows the field table order, not the write order.
+    assert_eq!(
+        locks.written(),
+        vec![ComicMetaField::Title, ComicMetaField::ContentRating]
+    );
     assert!(locks.any());
 }
 
@@ -311,6 +314,7 @@ fn merge_locked_characters_preserves_existing() {
 #[test]
 fn series_auto_locks_includes_clear_total_count() {
     let locks = series_auto_locks(false, false, true);
-    assert!(locks.total_count);
-    assert!(!locks.name);
+    assert!(locks.get(SeriesMetaField::TotalCount));
+    assert!(!locks.get(SeriesMetaField::Name));
+    assert_eq!(locks.written(), vec![SeriesMetaField::TotalCount]);
 }

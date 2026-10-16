@@ -926,6 +926,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryAuthorFilter => 'Authors';
 
   @override
+  String get libraryOrganizeFilter => 'Organize';
+
+  @override
+  String get libraryNeedsMetadataOnlyFilter => 'Needs metadata only';
+
+  @override
   String get libraryMetadataFilterClear => 'Clear';
 
   @override
@@ -1153,13 +1159,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get comicDetailCancel => 'Cancel';
-
-  @override
-  String get comicDetailDeletedWithResourceToast =>
-      'Comic and disk resource deleted';
-
-  @override
-  String get comicDetailRemovedFromLibraryToast => 'Comic removed from library';
 
   @override
   String get comicDetailNotFound => 'Comic not found or removed';
@@ -1490,6 +1489,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metadataRename => 'Rename';
+
+  @override
+  String get metadataMerge => 'Merge';
 
   @override
   String get metadataDelete => 'Delete';
@@ -2177,4 +2179,221 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bulkEditMetadataFieldSummaryClear => 'Clear';
+
+  @override
+  String get navTrash => 'Trash';
+
+  @override
+  String get readerOpenComicTrashed =>
+      'This comic has been deleted. Restore it to read.';
+
+  @override
+  String comicTrashConfirmContent(String title) {
+    return '\"$title\" will be moved to Deleted. You can restore it from there at any time.';
+  }
+
+  @override
+  String get comicTrashedToast => 'Moved to Deleted';
+
+  @override
+  String trashPageSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count comics · restore or delete permanently',
+      one: '1 comic · restore or delete permanently',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trashEmptyTitle => 'No deleted comics';
+
+  @override
+  String get trashEmptyDescription =>
+      'Deleted comics are kept here first. You can restore them or delete them permanently.';
+
+  @override
+  String get trashRestore => 'Restore';
+
+  @override
+  String get trashPurge => 'Delete permanently';
+
+  @override
+  String get trashPurgeAll => 'Delete all';
+
+  @override
+  String get trashRestoreAll => 'Restore all';
+
+  @override
+  String get trashRestoreSelected => 'Restore selected';
+
+  @override
+  String get trashPurgeSelected => 'Delete selected';
+
+  @override
+  String trashSelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trashDeletedAt(String time) {
+    return 'Deleted $time';
+  }
+
+  @override
+  String get trashBadgeLocal => 'Local';
+
+  @override
+  String get trashBadgeRemote => 'Remote';
+
+  @override
+  String trashRestoredToast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Restored $count comics',
+      one: 'Restored 1 comic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trashPurgeSucceededToast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Permanently deleted $count comics',
+      one: 'Permanently deleted 1 comic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trashPurgePartialToast(int succeeded, int failed) {
+    return 'Permanently deleted $succeeded; $failed failed and remain in Deleted';
+  }
+
+  @override
+  String trashPurgeFailedToast(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count comics could not be deleted and remain in Deleted',
+      one: '1 comic could not be deleted and remains in Deleted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get comicPurgeTitle => 'Delete comics permanently?';
+
+  @override
+  String comicPurgeLocalBatchConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count comics will be removed from the library and their resources on disk (files or image folders) permanently deleted. This cannot be undone.',
+      one:
+          '1 comic will be removed from the library and its resource on disk (file or image folder) permanently deleted. This cannot be undone.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String comicPurgeRemoteBatchConfirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count remote comics will be removed from the library only. Remote resources are not deleted.',
+      one:
+          '1 remote comic will be removed from the library only. Remote resources are not deleted.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String comicPurgeMixedConfirm(int localCount, int remoteCount) {
+    return '$localCount local comics will have their files on disk permanently deleted; $remoteCount remote comics will be removed from the library only (remote resources are not deleted). This cannot be undone.';
+  }
+
+  @override
+  String get comicPurgeRemoteAcknowledge =>
+      'I understand this will permanently remove them from the library and cannot be undone';
+
+  @override
+  String get authorDetailTitle => 'Author';
+
+  @override
+  String get authorDetailVerified => 'Verified author';
+
+  @override
+  String get authorDetailAddLink => 'Add link';
+
+  @override
+  String get authorDetailLinkPasteHint => 'Paste a profile link';
+
+  @override
+  String get authorDetailPlatformPixiv => 'Pixiv';
+
+  @override
+  String get authorDetailPlatformX => 'X';
+
+  @override
+  String get authorDetailPlatformPatreon => 'Patreon';
+
+  @override
+  String get authorDetailPlatformFanbox => 'FANBOX';
+
+  @override
+  String get authorDetailPlatformDiscord => 'Discord';
+
+  @override
+  String get authorDetailPlatformOther => 'Other';
+
+  @override
+  String get authorDetailDeleteLink => 'Delete link';
+
+  @override
+  String authorDetailDeleteLinkConfirm(String label) {
+    return 'Delete link \"$label\"?';
+  }
+
+  @override
+  String authorDetailLinkTooltip(String url) {
+    return '$url';
+  }
+
+  @override
+  String authorDetailComicsSection(int count) {
+    return 'Comics · $count';
+  }
+
+  @override
+  String get authorDetailComicsEmpty => 'No comics yet';
+
+  @override
+  String get authorDetailViewInSearch => 'View in search';
+
+  @override
+  String get authorDetailRename => 'Rename';
+
+  @override
+  String authorDetailAliases(String aliases) {
+    return 'Aliases: $aliases';
+  }
+
+  @override
+  String get authorDetailInvalidUrl =>
+      'Enter a URL starting with http:// or https://';
+
+  @override
+  String get authorDetailOpenLinkFailed => 'Could not open the link';
 }

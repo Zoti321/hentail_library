@@ -129,6 +129,9 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       case '/history':
         return navHistory;
 
+      case '/trash':
+        return navTrash;
+
       case '/settings':
         return navSettings;
 
