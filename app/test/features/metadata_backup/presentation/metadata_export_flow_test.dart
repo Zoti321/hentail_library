@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/metadata_export_flow.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 
-import '../../support/pump_localized_app.dart';
+import '../../../support/pump_localized_app.dart';
 
 void main() {
   testWidgets('export options dialog confirms gzip and library scoping', (

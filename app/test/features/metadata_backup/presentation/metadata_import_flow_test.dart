@@ -7,7 +7,7 @@ import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_b
 import 'package:hentai_library/features/metadata_backup/presentation/metadata_import_flow.dart';
 import 'package:hentai_library/src/rust/api/metadata_backup.dart';
 
-import '../../support/pump_localized_app.dart';
+import '../../../support/pump_localized_app.dart';
 
 void main() {
   const MetadataBackupManifestDto manifest = MetadataBackupManifestDto(
