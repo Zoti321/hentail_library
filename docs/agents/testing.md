@@ -67,6 +67,18 @@ Nightly 的定时触发只在默认分支（`main`）生效；其他分支用 `w
 
 本地：`cd app && flutter test test/gate/import_boundary_test.dart`。修复跨模块耦合后须在同一 PR 缩减 baseline（`dart run tool/generate_import_boundary_baseline.dart` 在 L1 已绿时重写条目）。分类表与 `scripts/research/cross_feature_import_audit.py` 应对齐。
 
+### Wayfinder 布局缝（#219）
+
+| 断言 | 机制 |
+|------|------|
+| Phase A 顶层 `lib/` 目录白名单；`features/<id>/` 模块与层目录 | `test/project_layout_test.dart` |
+| 禁止 `presentation/state/` | 同上 |
+| Strangler shim 仅 export、且必须在白名单 | `test/gate/strangler_shims.txt` + `test/gate/strangler_shims_test.dart` |
+| Phase B（仅 `features`/`shared`/`src`） | `wayfinder_layout_helpers.dart` 中 `kEnforceWayfinderPhaseBLayout`，bootstrap 收尾 slice 启用 |
+| Feature 有向图 import（R1 以外） | `import_boundary_test.dart`（#220） |
+
+Slice 新增 shim 时同步更新 `strangler_shims.txt` 与 #225 §F；slice 关闭前删尽 shim 并清空白名单行。
+
 ## 本地全量
 
 合并前若你改了 UI 或怀疑 widget 回归，本地再跑：

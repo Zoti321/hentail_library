@@ -1,0 +1,3 @@
+# Wayfinder strangler shim allowlist (#219 / #225 §F).
+# One legacy path per line, relative to app/lib/ (POSIX slashes).
+# Only export-only re-export shims may exist during migration; unlisted shims fail Gate.
