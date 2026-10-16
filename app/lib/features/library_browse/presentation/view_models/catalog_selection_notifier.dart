@@ -4,8 +4,8 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
-import 'package:hentai_library/ui/features/shell/view_models/library_reorder_mode_notifier.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
 
 class CatalogSelectionState {
   const CatalogSelectionState({

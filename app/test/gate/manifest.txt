@@ -28,7 +28,7 @@ test/features/library_browse/presentation/views/widgets/author_image_view_test.d
 test/features/read_session/presentation/reader_viewport_pages_test.dart
 test/features/read_session/presentation/reader_open_error_message_test.dart
 test/features/read_session/presentation/views/reader_page/reader_chrome_layout_test.dart
-test/ui/features/shell/views/navigation/library_form_dialog_test.dart
+test/features/library_admin/presentation/views/navigation/library_form_dialog_test.dart
 test/features/library_browse/presentation/views/widgets/edit_series_dialog_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
@@ -55,7 +55,7 @@ test/features/read_session/presentation/resume_visible_sync_gate_test.dart
 test/features/read_session/presentation/view_models/reader_cover_editor_notifier_test.dart
 test/features/app_settings/presentation/view_models/locale_preference_persist_test.dart
 test/features/app_settings/presentation/view_models/reading_mode_persist_test.dart
-test/ui/features/shell/view_models/current_library_notifier_commands_test.dart
+test/features/library_admin/presentation/view_models/current_library_notifier_commands_test.dart
 test/features/home/presentation/view_models/history_load_more_throttle_test.dart
 test/features/home/presentation/view_models/history_paged_feed_controller_test.dart
 test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dart
@@ -64,7 +64,11 @@ test/features/home/presentation/views/history_page/history_layout_constants_test
 test/features/home/presentation/views/history_page/history_responsive_test.dart
 test/features/home/presentation/views/home_page/home_page_constants_test.dart
 test/features/home/presentation/views/home_page/home_page_responsive_test.dart
-test/ui/features/shell/view_models/library_revision_throttle_busy_test.dart
-test/ui/features/shell/view_models/library_scan_toasts_test.dart
-test/ui/features/shell/view_models/metadata_refresh_toasts_test.dart
+test/features/library_admin/presentation/view_models/library_revision_throttle_busy_test.dart
+test/features/library_admin/presentation/view_models/library_scan_toasts_test.dart
+test/features/library_admin/presentation/view_models/metadata_refresh_toasts_test.dart
+test/features/library_admin/domain/library_scan_scheduler_test.dart
+test/features/library_admin/domain/library_sidebar_layout_test.dart
+test/features/library_admin/domain/library_sync_coordinator_test.dart
+test/features/library_admin/domain/metadata_refresh_coordinator_test.dart
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart

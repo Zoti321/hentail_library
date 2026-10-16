@@ -1,4 +1,4 @@
-import 'package:hentai_library/ui/features/shell/view_models/scan_library_controller.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 

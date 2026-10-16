@@ -1,7 +1,7 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/repositories/flutter_secure_remote_library_credential_store.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
+import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';

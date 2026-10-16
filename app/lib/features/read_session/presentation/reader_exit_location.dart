@@ -1,4 +1,4 @@
-import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_routes.dart';
 
 /// Resolves where to [go] when leaving the reader (not used when popping).
 ///

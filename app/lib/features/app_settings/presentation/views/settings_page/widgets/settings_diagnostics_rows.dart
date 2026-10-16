@@ -8,7 +8,7 @@ import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_page_primitives.dart';
-import 'package:hentai_library/ui/features/shell/view_models/scan_library_controller.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class DiagnosticModeRow extends ConsumerWidget {

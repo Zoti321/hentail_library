@@ -7,11 +7,11 @@ import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/diagnostic_mode_banner.dart';
 import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
-import 'package:hentai_library/ui/features/shell/views/comic_metadata_bulk_patch_shell_feedback.dart';
-import 'package:hentai_library/ui/features/shell/views/library_scan_shell_feedback.dart';
-import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
-import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_section.dart';
-import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_reorder_pane.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/comic_metadata_bulk_patch_shell_feedback.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library_scan_shell_feedback.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_sidebar_section.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_sidebar_reorder_pane.dart';
 import 'package:hentai_library/ui/providers.dart';
 
 enum _ShellLayoutMode { compact, medium, expanded }

@@ -52,34 +52,6 @@ def classify(relative: str) -> str:
         return "shared"
     if p == "ui/providers.dart" or p.startswith("ui/providers/"):
         return "bootstrap"
-    if p.startswith("ui/features/shell/view_models/scan_library_controller"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/metadata_refresh"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/library_scan"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/library_revision"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/library_series_providers"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/current_library_notifier"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/library_reorder_mode"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/comic_metadata_bulk_patch"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/views/navigation/"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/views/library_scan"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/views/comic_metadata_bulk_patch"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/di/library_sync"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/di/metadata_refresh"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/di/comic_metadata_bulk_patch"):
-        return "library_admin"
     if p.startswith("ui/features/shell/"):
         return "bootstrap"
     if p == "main.dart":

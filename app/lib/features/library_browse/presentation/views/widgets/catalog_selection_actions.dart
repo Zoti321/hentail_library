@@ -7,8 +7,8 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/bulk_edit_metadata_dialog.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
-import 'package:hentai_library/ui/features/shell/view_models/comic_metadata_bulk_patch_controller.dart';
-import 'package:hentai_library/ui/features/shell/view_models/comic_metadata_bulk_patch_toasts.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> openCatalogSelectionMetadataEditor(

@@ -187,24 +187,10 @@
 
 | 现状路径 | 目标路径 |
 |----------|----------|
-| `ui/features/shell/views/navigation/**` | `features/library_admin/presentation/views/navigation/**` |
-| `ui/features/shell/view_models/current_library_notifier.dart` | `features/library_admin/presentation/view_models/current_library_notifier.dart` |
-| `ui/features/shell/view_models/scan_library_controller.dart` | `features/library_admin/presentation/view_models/scan_library_controller.dart` |
-| `ui/features/shell/view_models/library_revision_notifier.dart` | `features/library_admin/presentation/view_models/library_revision_notifier.dart` |
-| `ui/features/shell/view_models/library_revision_throttle_busy.dart` | `features/library_admin/presentation/view_models/library_revision_throttle_busy.dart` |
-| `ui/features/shell/view_models/library_reorder_mode_notifier.dart` | `features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart` |
-| `ui/features/shell/view_models/library_series_providers.dart` | `features/library_admin/presentation/view_models/library_series_providers.dart` |
-| `ui/features/shell/view_models/metadata_refresh_controller.dart` | `features/library_admin/presentation/view_models/metadata_refresh_controller.dart` |
-| `ui/features/shell/view_models/metadata_refresh_toasts.dart` | `features/library_admin/presentation/view_models/metadata_refresh_toasts.dart` |
-| `ui/features/shell/view_models/library_scan_toasts.dart` | `features/library_admin/presentation/view_models/library_scan_toasts.dart` |
-| `ui/features/shell/view_models/comic_metadata_bulk_patch_controller.dart` | `features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart` |
-| `ui/features/shell/view_models/comic_metadata_bulk_patch_toasts.dart` | `features/library_admin/presentation/view_models/comic_metadata_bulk_patch_toasts.dart` |
-| `ui/features/shell/views/library_scan_shell_feedback.dart` | `features/library_admin/presentation/views/library_scan_shell_feedback.dart` |
-| `ui/features/shell/views/comic_metadata_bulk_patch_shell_feedback.dart` | `features/library_admin/presentation/views/comic_metadata_bulk_patch_shell_feedback.dart` |
-| `ui/features/shell/di/library_sync.dart` | `features/library_admin/di/library_sync.dart` |
-| `ui/features/shell/di/metadata_refresh.dart` | `features/library_admin/di/metadata_refresh.dart` |
-| `ui/features/shell/di/comic_metadata_bulk_patch.dart` | `features/library_admin/di/comic_metadata_bulk_patch.dart` |
-| `domain/library/*` coordinator 等 | 见 §1.3 | |
+| shell navigation + library 管理 VM + shell feedback + `di/*_sync` 等 | `features/library_admin/{presentation,di}/**` | **已迁**（2026-10-17） |
+| §1.3 coordinators / `library_scan_scheduler` / `library_sidebar_layout` | `features/library_admin/domain/` | **已迁** |
+
+端口与共用 types（`sync_library_types` 等）仍见 `domain/library/` → 后续 `shared/domain/library`。
 
 ---
 
@@ -323,3 +309,4 @@
 | 2026-10-17 | `library_browse` slice：library presentation + browse domain + 共用 author/scroll UI |
 | 2026-10-17 | `comic_trash` slice：trash UI/VM/di + domain + `trashed_comic` → shared |
 | 2026-10-17 | `home` slice：home/history presentation + `home_page_read_models` → shared |
+| 2026-10-17 | `library_admin` slice：navigation/VM/di + domain coordinators |

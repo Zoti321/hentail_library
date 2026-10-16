@@ -13,7 +13,7 @@ import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_page_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page/widgets/searched_page_header.dart';
-import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;

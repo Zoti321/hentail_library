@@ -1,5 +1,5 @@
 import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
+import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 
