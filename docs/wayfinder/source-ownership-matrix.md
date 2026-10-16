@@ -241,7 +241,7 @@
 | `comic_trash_service` / `comic_purge_policy` | `features/comic_trash/domain/` | **已迁** |
 | `trashed_comic` | `shared/domain/models/read_models/` | **已迁** |
 
-⚠️ `trash_page` 仍引用 `history_page` header（M1 baseline）；抽 shared/ui 或 home 另票（#223）。
+⚠️ `trash_page` 仍引用 `features/home` 的 `history_page` header（M1 baseline）；抽 shared/ui 另票（#223）。
 
 ---
 
