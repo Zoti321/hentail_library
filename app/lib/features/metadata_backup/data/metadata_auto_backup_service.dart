@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:hentai_library/core/metadata/metadata_auto_backup_logic.dart';
-import 'package:hentai_library/core/metadata/metadata_backup_paths.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
+import 'package:hentai_library/features/metadata_backup/data/metadata_backup_paths.dart';
 import 'package:hentai_library/data/adapters/metadata_backup_frb_types.dart';
 import 'package:path/path.dart' as p;
 

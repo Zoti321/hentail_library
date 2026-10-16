@@ -40,8 +40,6 @@ def classify(relative: str) -> str:
         return "shared"
     if p.startswith("domain/"):
         return "shared"
-    if p.startswith("core/metadata/"):
-        return "metadata_backup"
     if p.startswith("features/"):
         parts = p.split("/")
         if len(parts) >= 2:

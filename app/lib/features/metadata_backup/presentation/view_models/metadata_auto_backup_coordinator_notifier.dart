@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/core/metadata/metadata_auto_backup_logic.dart';
-import 'package:hentai_library/core/metadata/metadata_auto_backup_service.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
+import 'package:hentai_library/features/metadata_backup/data/metadata_auto_backup_service.dart';
 import 'package:hentai_library/data/adapters/metadata_backup_frb_adapter.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/metadata_auto_backup_notifier.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/metadata_last_auto_backup_notifier.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/debouncer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

@@ -282,7 +282,7 @@
 
 | 文件 | 目标 |
 |------|------|
-| `metadata_auto_backup_coordinator_notifier.dart` | `features/metadata_backup/presentation/view_models/` 或保留 `app_settings` presentation 仅 **委托** metadata_backup notifier | **推荐**：notifier 实现放 `metadata_backup`，settings 行 `ref.watch` 该 provider |
+| `metadata_auto_backup_coordinator_notifier.dart` | `features/metadata_backup/presentation/view_models/` | **已迁**（2026-10-17）；设置页 `ref.watch` canonical provider |
 
 ---
 
@@ -290,14 +290,15 @@
 
 | 现状路径 | 目标 |
 |----------|------|
-| `core/metadata/metadata_import_flow.dart` | `features/metadata_backup/domain/` |
-| `core/metadata/metadata_export_flow.dart` | `features/metadata_backup/domain/` |
-| `core/metadata/metadata_auto_backup_service.dart` | `features/metadata_backup/data/` 或 `domain/` |
-| `core/metadata/metadata_auto_backup_logic.dart` | `features/metadata_backup/domain/` |
-| `core/metadata/metadata_backup_paths.dart` | `features/metadata_backup/data/` |
-| `core/metadata/metadata_backup_bytes.dart` | `features/metadata_backup/domain/` |
-| `core/metadata/metadata_export_options.dart` | `features/metadata_backup/domain/` |
-| `data/adapters/metadata_backup_frb_adapter.dart` | `shared/data/adapters/` | FRB 仍在 shared data |
+| `core/metadata/metadata_import_flow.dart` | `features/metadata_backup/presentation/` | **已迁**（含 FRB adapter 依赖） |
+| `core/metadata/metadata_export_flow.dart` | `features/metadata_backup/presentation/` | **已迁** |
+| `core/metadata/metadata_auto_backup_service.dart` | `features/metadata_backup/data/` | **已迁** |
+| `core/metadata/metadata_auto_backup_logic.dart` | `features/metadata_backup/domain/` | **已迁** |
+| `core/metadata/metadata_backup_paths.dart` | `features/metadata_backup/data/` | **已迁** |
+| `core/metadata/metadata_backup_bytes.dart` | `features/metadata_backup/domain/` | **已迁** |
+| `core/metadata/metadata_export_options.dart` | `features/metadata_backup/domain/` | **已迁** |
+| `app_settings/.../metadata_auto_backup_*.dart` | `features/metadata_backup/presentation/view_models/` | **已迁** |
+| `data/adapters/metadata_backup_frb_adapter.dart` | `shared/data/adapters/` | 待 `shared/data` slice |
 
 ---
 
@@ -331,3 +332,4 @@
 | 2026-10-16 | 初版（#224） |
 | 2026-10-16 | `app_settings` slice：presentation + `app_data_wipe_flow` + `app_update` 已落目标路径 |
 | 2026-10-17 | `named_metadata` slice：presentation + `tag_dictionary` + `named_facet_form_candidate` → `shared/domain` |
+| 2026-10-17 | `metadata_backup` slice：`core/metadata` + 自动备份 ViewModel 归位 |

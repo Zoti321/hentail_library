@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/metadata/metadata_backup_bytes.dart';
-import 'package:hentai_library/core/metadata/metadata_import_flow.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_bytes.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/metadata_import_flow.dart';
 import 'package:hentai_library/src/rust/api/metadata_backup.dart';
 
 import '../../support/pump_localized_app.dart';

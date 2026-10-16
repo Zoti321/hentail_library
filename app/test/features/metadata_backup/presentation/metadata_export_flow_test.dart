@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/metadata/metadata_export_flow.dart';
-import 'package:hentai_library/core/metadata/metadata_export_options.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/metadata_export_flow.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 
 import '../../support/pump_localized_app.dart';
 

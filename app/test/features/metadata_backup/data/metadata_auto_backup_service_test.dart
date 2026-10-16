@@ -2,8 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/metadata/metadata_auto_backup_service.dart';
-import 'package:hentai_library/core/metadata/metadata_backup_paths.dart';
+import 'package:hentai_library/features/metadata_backup/data/metadata_auto_backup_service.dart';
+import 'package:hentai_library/features/metadata_backup/data/metadata_backup_paths.dart';
 
 void main() {
   test(

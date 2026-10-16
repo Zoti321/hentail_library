@@ -81,9 +81,6 @@ String classifyLibPath(String relativePosix) {
   if (path.startsWith('domain/')) {
     return 'shared';
   }
-  if (path.startsWith('core/metadata/')) {
-    return 'metadata_backup';
-  }
   if (path.startsWith('core/')) {
     return 'shared';
   }
