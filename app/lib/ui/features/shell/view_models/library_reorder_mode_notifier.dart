@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/ui/features/library/view_models/catalog_selection_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 
 class LibraryReorderModeNotifier extends Notifier<bool> {
   @override

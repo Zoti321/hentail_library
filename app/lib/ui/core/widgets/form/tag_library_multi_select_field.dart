@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hentai_library/ui/core/widgets/form/named_facet_multi_select_field.dart';
-import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 全库标签多选：字段内 chip + 内联输入；浮层列出未选字典项。

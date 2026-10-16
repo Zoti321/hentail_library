@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/library/smart_facet_match_preference.dart';
+import 'package:hentai_library/features/library_browse/domain/smart_facet_match_preference.dart';
 import 'package:test/test.dart';
 
 void main() {

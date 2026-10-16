@@ -1,5 +1,5 @@
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
-import 'package:hentai_library/domain/library/library_tri_state_pick.dart';
+import 'package:hentai_library/features/library_browse/domain/library_tri_state_pick.dart';
 import 'package:test/test.dart';
 
 void main() {

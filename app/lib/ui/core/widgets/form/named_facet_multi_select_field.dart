@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/library/smart_facet_match.dart';
+import 'package:hentai_library/features/library_browse/domain/smart_facet_match.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;

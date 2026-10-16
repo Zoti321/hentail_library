@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/library/library_prefer_library_root_series.dart';
+import 'package:hentai_library/features/library_browse/domain/library_prefer_library_root_series.dart';
 import 'package:test/test.dart';
 
 void main() {

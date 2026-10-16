@@ -4,8 +4,8 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_settings.dart';
-import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/library_tab_page_size_settings.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class PageSizeMenuButton extends StatefulWidget {

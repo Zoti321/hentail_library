@@ -1,0 +1,171 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'library_search_page_providers.g.dart';
+
+/// 搜索结果区默认每页条数（垂直网格触底按页追加）。
+const int kLibrarySearchPageSize = 40;
+
+typedef LibrarySearchVocabulary = ({
+  Set<String> tags,
+  Set<String> authors,
+  Set<String> parodies,
+  Set<String> characters,
+  Set<String> languages,
+});
+
+typedef LibrarySearchComicsPage = ({
+  List<Comic> items,
+  int totalCount,
+  bool hasMore,
+  bool loadingMore,
+});
+
+/// Vocabulary keepAlive：避免每次改 query 全表 listAll。
+/// 监听 revision 叶子，元数据写库 bump 后重取，新建 facet 可精确解析。
+///
+/// 注意：搜索结果列表（[LibrarySearchPageComicsController]）不得
+/// `watch` 本 provider——缩略图等写库也会 bump revision，否则结果区会反复
+/// 重抓并闪烁。Vocabulary 供新一次解析/搜索读取即可。
+@Riverpod(keepAlive: true)
+Future<LibrarySearchVocabulary> librarySearchVocabulary(Ref ref) async {
+  ref.watch(
+    libraryRevisionProvider.select((LibraryRevisionState s) => s.revision),
+  );
+  final String? libraryId = ref
+      .watch(currentLibraryProvider)
+      .asData
+      ?.value
+      .currentId;
+  final List<Tag> tags = await ref.read(tagRepoProvider).listAll();
+  final List<Author> authors = await ref.read(authorRepoProvider).listAll();
+  final List<String> parodies = await ref
+      .read(parodyRepoProvider)
+      .listDistinct(libraryId: libraryId);
+  final List<String> characters = await ref
+      .read(characterRepoProvider)
+      .listDistinct(libraryId: libraryId);
+  return (
+    tags: tags.map((Tag t) => t.name).toSet(),
+    authors: authors.map((Author a) => a.name).toSet(),
+    parodies: parodies.toSet(),
+    characters: characters.toSet(),
+    languages: ComicLanguageNames.closedSet.toSet(),
+  );
+}
+
+LibrarySearchQuery _parse(String trimmed, LibrarySearchVocabulary vocabulary) {
+  return parseLibrarySearchQuery(
+    trimmed,
+    knownTagNames: vocabulary.tags,
+    knownAuthorNames: vocabulary.authors,
+    knownParodyNames: vocabulary.parodies,
+    knownCharacterNames: vocabulary.characters,
+    knownLanguageNames: vocabulary.languages,
+  );
+}
+
+@Riverpod()
+class LibrarySearchPageComicsController
+    extends _$LibrarySearchPageComicsController {
+  int _loadedPage = 0;
+  LibrarySearchQuery? _query;
+
+  @override
+  Future<LibrarySearchComicsPage> build(String keyword) async {
+    final String trimmed = keyword.trim();
+    if (trimmed.isEmpty) {
+      _loadedPage = 0;
+      _query = null;
+      return (
+        items: const <Comic>[],
+        totalCount: 0,
+        hasMore: false,
+        loadingMore: false,
+      );
+    }
+    // 切库时重搜；不要 watch vocabulary/raw revision（缩略图写库会持续 bump）。
+    ref.watch(
+      currentLibraryProvider.select(
+        (AsyncValue<CurrentLibraryState> asyncValue) =>
+            asyncValue.asData?.value.currentId,
+      ),
+    );
+    final LibrarySearchVocabulary vocabulary = await ref.read(
+      librarySearchVocabularyProvider.future,
+    );
+    _query = _parse(trimmed, vocabulary);
+    _loadedPage = 1;
+    final PagedResult<Comic> page = await _fetchPage(1);
+    return (
+      items: page.items,
+      totalCount: page.totalCount,
+      hasMore: page.hasNextPage,
+      loadingMore: false,
+    );
+  }
+
+  Future<void> loadMore() async {
+    final LibrarySearchComicsPage? current = state.asData?.value;
+    if (current == null || !current.hasMore || current.loadingMore) {
+      return;
+    }
+    state = AsyncData((
+      items: current.items,
+      totalCount: current.totalCount,
+      hasMore: current.hasMore,
+      loadingMore: true,
+    ));
+    try {
+      final int nextPage = _loadedPage + 1;
+      final PagedResult<Comic> page = await _fetchPage(nextPage);
+      _loadedPage = nextPage;
+      final List<Comic> merged = <Comic>[...current.items, ...page.items];
+      state = AsyncData((
+        items: merged,
+        totalCount: page.totalCount,
+        hasMore: page.hasNextPage,
+        loadingMore: false,
+      ));
+    } on Object catch (error, stackTrace) {
+      state = AsyncError(error, stackTrace);
+    }
+  }
+
+  Future<PagedResult<Comic>> _fetchPage(int page) {
+    final LibrarySearchQuery query = _query!;
+    final PageRequest request = pageRequest(
+      page: page,
+      pageSize: kLibrarySearchPageSize,
+    );
+    return switch (query) {
+      LibrarySearchKeywordQuery(:final keyword) =>
+        ref
+            .read(comicRepoProvider)
+            .searchByKeywordPage(keyword: keyword, request: request),
+      LibrarySearchMetadataQuery(
+        :final mustInclude,
+        :final optionalOr,
+        :final mustExclude,
+      ) =>
+        ref
+            .read(comicRepoProvider)
+            .searchByMetadataExpressionPage(
+              mustInclude: mustInclude,
+              optionalOr: optionalOr,
+              mustExclude: mustExclude,
+              request: request,
+            ),
+    };
+  }
+}

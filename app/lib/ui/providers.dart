@@ -1,4 +1,4 @@
-export 'features/library/library.dart';
+export 'package:hentai_library/features/library_browse/presentation/library.dart';
 export 'package:hentai_library/features/named_metadata/presentation/metadata.dart';
 export 'package:hentai_library/features/read_session/presentation/reader.dart';
 export 'package:hentai_library/features/app_settings/presentation/settings.dart';

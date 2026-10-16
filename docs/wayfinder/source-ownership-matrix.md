@@ -214,22 +214,15 @@
 
 ## 5. `features/library_browse`
 
-**整树**：`ui/features/library/**` → `features/library_browse/presentation/**`（保持 `views/`、`view_models/` 子结构）
+**整树**：`ui/features/library/**` → `features/library_browse/presentation/**` | **已迁**（2026-10-17）
 
 | 现状路径 | 目标 | 备注 |
 |----------|------|------|
-| `ui/features/library/comic_delete_flow.dart` | `features/library_browse/presentation/comic_delete_flow.dart` | 调用 `comic_trash` di；#223 待收敛 |
-| `ui/features/library/library.dart` | `features/library_browse/presentation/library.dart` | barrel |
-| 其余 96 个文件 | 路径一一对应替换前缀 | 见仓库 `find ui/features/library` |
-
-⚠️ **Ambiguous（#223 §6）**：
-
-| 文件 | 决策 |
-|------|------|
-| `views/widgets/show_author_detail.dart`、`author_detail_surface.dart`、`author_image_view.dart` | 迁 **`shared/ui/widgets/author/`**（`library_browse` + `named_metadata` 共用） |
-| `views/widgets/library_scroll_to_top_button.dart` | **`shared/ui/widgets/navigation/`** 若 `named_metadata` 复用 |
-
-`domain/library/` 中 browse 专属 → `features/library_browse/domain/`（§1.3）。
+| `ui/features/library/**` | `features/library_browse/presentation/**` | **已迁** |
+| Author 三件套 | `shared/ui/widgets/author/` | **已迁** |
+| `library_scroll_to_top_button` | `shared/ui/widgets/navigation/` | **已迁** |
+| §1.3 browse 专属 `domain/library/*` | `features/library_browse/domain/` | **已迁**（`library_comic_sort_option` 等待 `shared/domain/library`） |
+| `comic_delete_flow.dart` | 同路径 under presentation | 仍调 `comic_trash` di（#223） |
 
 ---
 
@@ -335,3 +328,4 @@
 | 2026-10-17 | `named_metadata` slice：presentation + `tag_dictionary` + `named_facet_form_candidate` → `shared/domain` |
 | 2026-10-17 | `metadata_backup` slice：`core/metadata` + 自动备份 ViewModel 归位 |
 | 2026-10-17 | `read_session` slice：reader presentation + domain/reading 拆分 + launcher 归 shell 路由 |
+| 2026-10-17 | `library_browse` slice：library presentation + browse domain + 共用 author/scroll UI |
