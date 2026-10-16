@@ -3,10 +3,10 @@ import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/named_facet_dictionary_providers.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_dictionary_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_distinct_metadata_providers.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:riverpod/misc.dart' show ProviderOrFamily;
 import 'package:test/test.dart';
 

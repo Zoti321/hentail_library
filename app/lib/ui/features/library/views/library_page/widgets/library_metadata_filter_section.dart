@@ -11,8 +11,8 @@ import 'package:hentai_library/ui/features/library/view_models/library_catalog_s
 import 'package:hentai_library/ui/features/library/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_distinct_metadata_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_controls.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 
 LibraryMetadataFilterSelection includeOnlyFilterSelection(Set<String> names) {
   return LibraryMetadataFilterSelection(

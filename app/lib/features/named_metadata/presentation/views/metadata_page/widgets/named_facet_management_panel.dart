@@ -14,11 +14,11 @@ import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.d
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/named_facet_context_menu.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/show_author_detail.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class NamedFacetManagementSliverGroup extends ConsumerWidget {

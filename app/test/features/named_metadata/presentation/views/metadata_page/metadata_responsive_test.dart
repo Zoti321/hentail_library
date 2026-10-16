@@ -11,9 +11,9 @@ import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/content_switcher_bottom_bar.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata_management_page.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/named_facet_management_panel.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/metadata_management_page.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_management_panel.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod/misc.dart' show Override;
 

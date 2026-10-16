@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/named_facet_fill_viewport.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_fill_viewport.dart';
 
 void main() {
   group('namedFacetShouldAutoLoadMore', () {

@@ -54,8 +54,6 @@ def classify(relative: str) -> str:
         return "shared"
     if p == "ui/providers.dart" or p.startswith("ui/providers/"):
         return "bootstrap"
-    if p.startswith("ui/features/metadata/"):
-        return "named_metadata"
     if p.startswith("ui/features/library/"):
         return "library_browse"
     if p.startswith("ui/features/reader/"):

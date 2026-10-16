@@ -263,9 +263,10 @@
 
 | 现状路径 | 目标路径 |
 |----------|----------|
-| `ui/features/metadata/**`（14 文件） | `features/named_metadata/presentation/**` | |
-| `domain/models/named_facet_form_candidate.dart` | `shared/domain/models/` | |
-| `domain/models/tag_dictionary_import_result.dart` | `features/named_metadata/domain/` 或 `shared/domain` | ⚠️ 仅 metadata 用 → feature domain |
+| `ui/features/metadata/**` | `features/named_metadata/presentation/**` | **已迁**（2026-10-17） |
+| `data/services/tag_dictionary/**` | `features/named_metadata/data/services/tag_dictionary/**` | **已迁** |
+| `domain/models/named_facet_form_candidate.dart` | `shared/domain/models/named_facet_form_candidate.dart` | **已迁** |
+| `domain/models/tag_dictionary_import_result.dart` | `features/named_metadata/domain/` 或 `shared/domain` | ⚠️ 暂留 `domain/models/`（`tag_repository` 在 shared domain） |
 
 ---
 
@@ -329,3 +330,4 @@
 |------|------|
 | 2026-10-16 | 初版（#224） |
 | 2026-10-16 | `app_settings` slice：presentation + `app_data_wipe_flow` + `app_update` 已落目标路径 |
+| 2026-10-17 | `named_metadata` slice：presentation + `tag_dictionary` + `named_facet_form_candidate` → `shared/domain` |

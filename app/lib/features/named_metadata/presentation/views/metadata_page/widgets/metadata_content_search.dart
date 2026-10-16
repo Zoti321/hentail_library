@@ -4,9 +4,9 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_page_header.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_page_header.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_layout_constants.dart';
 
 class MetadataContentSearch extends ConsumerWidget {
   const MetadataContentSearch({

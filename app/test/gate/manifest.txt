@@ -22,7 +22,7 @@ test/widget_test.dart
 # Dart hard-manifest UI（已晋升快轨）
 test/ui/core/widgets/actions/destructive_filled_button_test.dart
 test/ui/core/widgets/overlays/dialog/confirm
-test/ui/features/metadata/views/metadata_page/named_facet_fill_viewport_test.dart
+test/features/named_metadata/presentation/views/metadata_page/named_facet_fill_viewport_test.dart
 test/ui/features/library/views/widgets/author_detail_surface_test.dart
 test/ui/features/library/views/widgets/author_image_view_test.dart
 test/ui/features/reader/reader_viewport_pages_test.dart

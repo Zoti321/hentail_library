@@ -8,9 +8,9 @@ import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/content_switcher_bottom_bar.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_tags_overflow_menu.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_tags_overflow_menu.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 TextStyle metadataPageTitleStyle(
