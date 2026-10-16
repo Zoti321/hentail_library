@@ -1,7 +1,7 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/library/comic_metadata_bulk_patch_types.dart';
-import 'package:hentai_library/ui/features/settings/view_models/metadata_auto_backup_coordinator_notifier.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/comic_metadata_bulk_patch.dart';
 import 'package:hentai_library/ui/features/shell/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/ui/features/shell/view_models/scan_library_controller.dart';

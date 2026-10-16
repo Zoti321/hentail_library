@@ -42,16 +42,18 @@ def classify(relative: str) -> str:
         return "shared"
     if p.startswith("core/metadata/"):
         return "metadata_backup"
-    if p.startswith("core/app_data/"):
-        return "app_settings"
+    if p.startswith("features/"):
+        parts = p.split("/")
+        if len(parts) >= 2:
+            return parts[1]
+    if p.startswith("shared/"):
+        return "shared"
     if p.startswith("core/"):
         return "shared"
     if p.startswith("ui/core/"):
         return "shared"
     if p == "ui/providers.dart" or p.startswith("ui/providers/"):
         return "bootstrap"
-    if p.startswith("ui/features/settings/"):
-        return "app_settings"
     if p.startswith("ui/features/metadata/"):
         return "named_metadata"
     if p.startswith("ui/features/library/"):

@@ -1,7 +1,7 @@
 export 'features/library/library.dart';
 export 'features/metadata/metadata.dart';
 export 'features/reader/reader.dart';
-export 'features/settings/settings.dart';
+export 'package:hentai_library/features/app_settings/presentation/settings.dart';
 export 'features/shell/di/deps.dart';
 export 'features/shell/view_models/aggregates.dart';
 export 'features/shell/view_models/comic_metadata_bulk_patch_controller.dart';

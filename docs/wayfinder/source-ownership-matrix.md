@@ -41,7 +41,7 @@
 
 | 现状路径 | 目标路径 | Slice | 备注 |
 |----------|----------|-------|------|
-| `core/app_data/app_data_wipe_flow.dart` | `features/app_settings/domain/app_data_wipe_flow.dart` | `app_settings` | 编排，非 core 工具 |
+| `core/app_data/app_data_wipe_flow.dart` | `features/app_settings/presentation/app_data_wipe_flow.dart` | `app_settings` | UI 编排（#220 R1：避免 feature `domain`→`data`）；矩阵原写 `domain/` |
 | `core/constants/**` | `shared/core/constants/**` | `app_settings` 或 `bootstrap` | |
 | `core/errors/**` | `shared/core/errors/**` | `bootstrap` | |
 | `core/image/**` | `shared/core/image/**` | `bootstrap` | `main` 引用 |
@@ -273,8 +273,9 @@
 
 | 现状路径 | 目标路径 |
 |----------|----------|
-| `ui/features/settings/**`（20 文件） | `features/app_settings/presentation/**` | |
-| `core/app_data/app_data_wipe_flow.dart` | `features/app_settings/domain/` | §1.2 |
+| `ui/features/settings/**` | `features/app_settings/presentation/**` | **已迁**（2026-10-16） |
+| `core/app_data/app_data_wipe_flow.dart` | `features/app_settings/presentation/app_data_wipe_flow.dart` | **已迁**；§1.2 |
+| `data/services/app_update/**` | `features/app_settings/data/services/app_update/**` | **已迁** |
 
 ⚠️ **Ambiguous**：`settings/view_models/metadata_auto_backup_*.dart` — UI 在设置页，领域属 **metadata_backup**：
 
@@ -327,3 +328,4 @@
 | 版本 | 说明 |
 |------|------|
 | 2026-10-16 | 初版（#224） |
+| 2026-10-16 | `app_settings` slice：presentation + `app_data_wipe_flow` + `app_update` 已落目标路径 |

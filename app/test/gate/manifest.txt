@@ -7,7 +7,7 @@ test/gate
 # Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）
 test/domain
 test/core
-test/core/app_data/app_data_wipe_flow_test.dart
+test/features/app_settings/presentation/app_data_wipe_flow_test.dart
 test/data
 
 # FRB 线缝冒烟（真实 cdylib；run-gate.sh dart-test 会先 cargo build）
@@ -53,8 +53,8 @@ test/ui/features/reader/reader_page_crossfade_policy_test.dart
 test/ui/features/reader/reader_prefetch_generation_test.dart
 test/ui/features/reader/resume_visible_sync_gate_test.dart
 test/ui/features/reader/view_models/reader_cover_editor_notifier_test.dart
-test/ui/features/settings/view_models/locale_preference_persist_test.dart
-test/ui/features/settings/view_models/reading_mode_persist_test.dart
+test/features/app_settings/presentation/view_models/locale_preference_persist_test.dart
+test/features/app_settings/presentation/view_models/reading_mode_persist_test.dart
 test/ui/features/shell/view_models/current_library_notifier_commands_test.dart
 test/ui/features/shell/view_models/history_load_more_throttle_test.dart
 test/ui/features/shell/view_models/library_revision_throttle_busy_test.dart

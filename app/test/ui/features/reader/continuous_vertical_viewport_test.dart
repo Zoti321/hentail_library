@@ -15,7 +15,7 @@ import 'package:hentai_library/ui/features/reader/module/widgets/viewport/contin
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;

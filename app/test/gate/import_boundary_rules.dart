@@ -84,9 +84,6 @@ String classifyLibPath(String relativePosix) {
   if (path.startsWith('core/metadata/')) {
     return 'metadata_backup';
   }
-  if (path.startsWith('core/app_data/')) {
-    return 'app_settings';
-  }
   if (path.startsWith('core/')) {
     return 'shared';
   }
@@ -95,9 +92,6 @@ String classifyLibPath(String relativePosix) {
   }
   if (path == 'ui/providers.dart' || path.startsWith('ui/providers/')) {
     return 'bootstrap';
-  }
-  if (path.startsWith('ui/features/settings/')) {
-    return 'app_settings';
   }
   if (path.startsWith('ui/features/metadata/')) {
     return 'named_metadata';
