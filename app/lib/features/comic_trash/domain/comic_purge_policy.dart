@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 
 /// Comic purge 目标中 Local / Remote 的数量（决定确认文案与勾选闸门）。
 typedef PurgeTargetCounts = ({int local, int remote});

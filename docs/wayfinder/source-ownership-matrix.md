@@ -241,15 +241,11 @@
 
 | 现状路径 | 目标路径 |
 |----------|----------|
-| `ui/features/shell/views/trash_page/**` | `features/comic_trash/presentation/views/trash_page/**` |
-| `ui/features/shell/view_models/trash_page_controller.dart` | `features/comic_trash/presentation/view_models/trash_page_controller.dart` |
-| `ui/features/shell/view_models/trash_page_state.dart` | `features/comic_trash/presentation/view_models/trash_page_state.dart` |
-| `ui/features/shell/view_models/comic_trash_actions.dart` | `features/comic_trash/presentation/view_models/comic_trash_actions.dart` |
-| `ui/features/shell/di/comic_trash.dart` | `features/comic_trash/di/comic_trash.dart` |
-| `domain/library/comic_trash_service.dart` 等 | `features/comic_trash/domain/**` | §1.3 |
-| `domain/models/read_models/trashed_comic.dart` | `shared/domain/models/read_models/trashed_comic.dart` | |
+| shell `trash_page` + trash view_models + `di/comic_trash` | `features/comic_trash/{presentation,di}/**` | **已迁**（2026-10-17） |
+| `comic_trash_service` / `comic_purge_policy` | `features/comic_trash/domain/` | **已迁** |
+| `trashed_comic` | `shared/domain/models/read_models/` | **已迁** |
 
-⚠️ `trash_page` 复用 `history_page` header → 抽 **`shared/ui`** 或 `home` 暴露 dumb header（#223）。
+⚠️ `trash_page` 仍引用 `history_page` header（M1 baseline）；抽 shared/ui 或 home 另票（#223）。
 
 ---
 

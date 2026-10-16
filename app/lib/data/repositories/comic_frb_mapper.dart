@@ -5,7 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/domain/models/value_objects/library_author_pick.dart';
 import 'package:hentai_library/domain/models/value_objects/library_tag_pick.dart';

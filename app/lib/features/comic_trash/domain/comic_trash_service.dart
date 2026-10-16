@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/ports/reader_session_port.dart';

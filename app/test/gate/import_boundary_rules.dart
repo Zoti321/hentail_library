@@ -102,12 +102,6 @@ String classifyLibPath(String relativePosix) {
   if (path.startsWith('ui/features/shell/view_models/history_')) {
     return 'home';
   }
-  if (path.contains('trash') && path.startsWith('ui/features/shell/')) {
-    return 'comic_trash';
-  }
-  if (path.startsWith('ui/features/shell/di/comic_trash')) {
-    return 'comic_trash';
-  }
   if (path.startsWith('ui/features/shell/view_models/scan_library_controller')) {
     return 'library_admin';
   }

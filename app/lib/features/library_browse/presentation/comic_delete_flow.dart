@@ -5,7 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_trash_dialog.dart';
-import 'package:hentai_library/ui/features/shell/view_models/comic_trash_actions.dart';
+import 'package:hentai_library/features/comic_trash/presentation/view_models/comic_trash_actions.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 删除入口：轻量确认 → Comic trash（可在「已删除」页恢复）。封面缓存不清。

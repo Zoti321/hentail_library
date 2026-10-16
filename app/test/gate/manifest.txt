@@ -60,4 +60,4 @@ test/ui/features/shell/view_models/history_load_more_throttle_test.dart
 test/ui/features/shell/view_models/library_revision_throttle_busy_test.dart
 test/ui/features/shell/view_models/library_scan_toasts_test.dart
 test/ui/features/shell/view_models/metadata_refresh_toasts_test.dart
-test/ui/features/shell/view_models/trash_page_state_test.dart
+test/features/comic_trash/presentation/view_models/trash_page_state_test.dart

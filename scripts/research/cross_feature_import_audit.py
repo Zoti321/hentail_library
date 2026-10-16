@@ -60,10 +60,6 @@ def classify(relative: str) -> str:
         return "home"
     if p.startswith("ui/features/shell/view_models/history_"):
         return "home"
-    if "trash" in p and p.startswith("ui/features/shell/"):
-        return "comic_trash"
-    if p.startswith("ui/features/shell/di/comic_trash"):
-        return "comic_trash"
     if p.startswith("ui/features/shell/view_models/scan_library_controller"):
         return "library_admin"
     if p.startswith("ui/features/shell/view_models/metadata_refresh"):
