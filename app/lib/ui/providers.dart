@@ -1,6 +1,6 @@
 export 'features/library/library.dart';
 export 'package:hentai_library/features/named_metadata/presentation/metadata.dart';
-export 'features/reader/reader.dart';
+export 'package:hentai_library/features/read_session/presentation/reader.dart';
 export 'package:hentai_library/features/app_settings/presentation/settings.dart';
 export 'features/shell/di/deps.dart';
 export 'features/shell/view_models/aggregates.dart';

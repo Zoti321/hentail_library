@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/reading/read_session_page.dart';
-import 'package:hentai_library/domain/reading/reader_page_payload.dart';
+import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
+import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
 
 /// 阅读会话页面来源 seam：acquire 与按页读取。
 abstract class ComicPageSourcePort {

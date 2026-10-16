@@ -5,7 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
-import 'package:hentai_library/domain/reading/series_reading_context.dart';
+import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';

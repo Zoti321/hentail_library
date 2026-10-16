@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
-import 'package:hentai_library/ui/features/reader/module/controller/reader_image_cache.dart';
+import 'package:hentai_library/features/read_session/presentation/module/controller/reader_image_cache.dart';
 
 void main() {
   setUp(ensureReaderImageCacheConfigured);

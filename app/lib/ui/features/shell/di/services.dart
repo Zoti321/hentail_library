@@ -1,7 +1,7 @@
 import 'package:hentai_library/features/app_settings/data/services/app_update/app_update_service.dart';
 import 'package:hentai_library/features/named_metadata/data/services/tag_dictionary/tag_dictionary_download_service.dart';
-import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
-import 'package:hentai_library/domain/reading/reader_session_service.dart';
+import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';
+import 'package:hentai_library/features/read_session/domain/reader_session_service.dart';
 import 'package:hentai_library/ui/features/shell/di/ports.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

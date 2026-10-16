@@ -237,9 +237,10 @@
 
 | 现状路径 | 目标路径 |
 |----------|----------|
-| `ui/features/reader/**`（全部 41 文件） | `features/read_session/presentation/**` | `module/controller` → `view_models/`（ADR-0017 阶段二） |
-| `ui/features/reader/read_session_launcher.dart` | `features/read_session/presentation/read_session_launcher.dart` | bootstrap 路由调用 |
-| `domain/reading/*`（非 shared） | `features/read_session/domain/**` | §1.3 |
+| `ui/features/reader/**` | `features/read_session/presentation/**` | **已迁**（2026-10-17）；`module/controller` 阶段二另票 |
+| `read_session_launcher.dart` | `ui/features/shell/views/routing/read_session_launcher.dart` | **已迁**（#220 R5：library 经 shell 路由打开阅读，不进 read_session presentation） |
+| `domain/reading/*`（read_session 专属） | `features/read_session/domain/**` | **已迁** |
+| `reading_mode.dart` / `series_reading_context.dart` | `shared/domain/reading/` | **已迁** |
 
 ---
 
@@ -333,3 +334,4 @@
 | 2026-10-16 | `app_settings` slice：presentation + `app_data_wipe_flow` + `app_update` 已落目标路径 |
 | 2026-10-17 | `named_metadata` slice：presentation + `tag_dictionary` + `named_facet_form_candidate` → `shared/domain` |
 | 2026-10-17 | `metadata_backup` slice：`core/metadata` + 自动备份 ViewModel 归位 |
+| 2026-10-17 | `read_session` slice：reader presentation + domain/reading 拆分 + launcher 归 shell 路由 |

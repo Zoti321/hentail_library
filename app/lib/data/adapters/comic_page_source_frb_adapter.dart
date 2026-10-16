@@ -5,8 +5,8 @@ import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/ports/comic_page_source_port.dart';
-import 'package:hentai_library/domain/reading/read_session_page.dart';
-import 'package:hentai_library/domain/reading/reader_page_payload.dart';
+import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
+import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 

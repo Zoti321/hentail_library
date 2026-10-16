@@ -1,0 +1,206 @@
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/ports/comic_page_source_port.dart';
+import 'package:hentai_library/domain/ports/reader_session_port.dart';
+import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
+import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
+import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
+import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
+import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
+
+/// 阅读 I/O 编排：显式 open/close、页码约定与 session snapshot。
+///
+/// 同一 comicId 在 close 前复用页列表，避免 open 与 loadPages 双次列页。
+class ReaderSessionService {
+  ReaderSessionService({
+    required ComicRepository comicRepo,
+    required ComicPageSourcePort pageSource,
+    required ReadingHistoryRepository readingHistoryRepo,
+    required ReaderSessionPort sessionPort,
+    Duration openTimeout = defaultOpenTimeout,
+  }) : _comicRepo = comicRepo,
+       _pageSource = pageSource,
+       _readingHistoryRepo = readingHistoryRepo,
+       _sessionPort = sessionPort,
+       _openTimeout = openTimeout;
+
+  /// Resource access / reader open 的默认有界时限（Local + Remote）。
+  static const Duration defaultOpenTimeout = Duration(seconds: 30);
+
+  final ComicRepository _comicRepo;
+  final ComicPageSourcePort _pageSource;
+  final ReadingHistoryRepository _readingHistoryRepo;
+  final ReaderSessionPort _sessionPort;
+  final Duration _openTimeout;
+  final Map<String, ({Comic comic, List<ReadSessionPage> pages})> _openedPages =
+      <String, ({Comic comic, List<ReadSessionPage> pages})>{};
+
+  /// UI 页码为 1-based；归档页字节 API 为 0-based。
+  static int uiToArchivePageIndex(int oneBasedPageIndex) =>
+      oneBasedPageIndex - 1;
+
+  static int clampOneBasedResumeIndex({
+    required int? storedPageIndex,
+    required int totalPages,
+  }) {
+    final int fallback = storedPageIndex ?? 1;
+    if (totalPages <= 0) {
+      return fallback.clamp(1, 1);
+    }
+    return fallback.clamp(1, totalPages);
+  }
+
+  Future<ReaderSessionSnapshot> open({
+    required String comicId,
+    bool incognito = false,
+    bool startFromFirstPage = false,
+  }) async {
+    final ({Comic comic, List<ReadSessionPage> pages}) opened =
+        await _openPages(comicId);
+    final int resumePageIndex = (incognito || startFromFirstPage)
+        ? 1
+        : clampOneBasedResumeIndex(
+            storedPageIndex: (await _readingHistoryRepo.getByComicId(
+              comicId,
+            ))?.pageIndex,
+            totalPages: opened.pages.length,
+          );
+    return ReaderSessionSnapshot(
+      comic: opened.comic,
+      pages: opened.pages,
+      resumePageIndex: resumePageIndex,
+    );
+  }
+
+  Future<List<ReadSessionPage>> loadPages(String comicId) async {
+    final ({Comic comic, List<ReadSessionPage> pages}) opened =
+        await _openPages(comicId);
+    return opened.pages;
+  }
+
+  Future<void> close(String comicId) async {
+    _openedPages.remove(comicId);
+    await _sessionPort.closeComic(comicId);
+  }
+
+  Future<Uint8List?> loadPageBytes({
+    required Comic comic,
+    required int archivePageIndex,
+  }) {
+    return _pageSource.loadPageBytes(comic: comic, pageIndex: archivePageIndex);
+  }
+
+  /// [archivePageIndex] 为 0-based 归档页索引。
+  Future<ReaderPagePayload> loadReaderPage({
+    required String comicId,
+    required int archivePageIndex,
+  }) async {
+    final Comic? comic = await _comicRepo.findById(comicId);
+    if (comic == null) {
+      throw ReadSessionPageLoadException.comicNotFound(comicId);
+    }
+    try {
+      return await _pageSource.loadReaderPage(
+        comic: comic,
+        pageIndex: archivePageIndex,
+      );
+    } on ReadSessionPageLoadException {
+      rethrow;
+    } on Object catch (error, stackTrace) {
+      throw ReadSessionPageLoadException.loadFailed(
+        comicId: comic.comicId,
+        path: comic.path,
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// [archivePageIndexes] 为 0-based 归档页索引；目录漫不预取。
+  Future<void> prefetchPages({
+    required String comicId,
+    required List<int> archivePageIndexes,
+    required int generation,
+  }) async {
+    if (archivePageIndexes.isEmpty) {
+      return;
+    }
+    final Comic? comic = await _comicRepo.findById(comicId);
+    if (comic == null || comic.resourceType == ResourceType.dir) {
+      return;
+    }
+    await _pageSource.prefetchPages(
+      comic: comic,
+      pageIndexes: archivePageIndexes,
+      generation: generation,
+    );
+  }
+
+  Future<void> clearPageCache({required String comicId}) {
+    return _pageSource.clearPageCache(comicId: comicId);
+  }
+
+  Future<({Comic comic, List<ReadSessionPage> pages})> _openPages(
+    String comicId,
+  ) async {
+    final ({Comic comic, List<ReadSessionPage> pages})? cached =
+        _openedPages[comicId];
+    if (cached != null) {
+      return cached;
+    }
+    final Comic? comic = await _comicRepo.findById(comicId);
+    if (comic == null) {
+      throw ReadSessionPageLoadException.comicNotFound(comicId);
+    }
+    try {
+      final ({Comic comic, List<ReadSessionPage> pages}) opened =
+          await _openPagesUncached(comic).timeout(_openTimeout);
+      _openedPages[comicId] = opened;
+      return opened;
+    } on TimeoutException {
+      await _bestEffortClose(comic.comicId);
+      throw ReadSessionPageLoadException.timedOut(
+        comicId: comic.comicId,
+        path: comic.path,
+      );
+    } on ReadSessionPageLoadException {
+      await _bestEffortClose(comic.comicId);
+      rethrow;
+    } on Object catch (error, stackTrace) {
+      await _bestEffortClose(comic.comicId);
+      throw ReadSessionPageLoadException.loadFailed(
+        comicId: comic.comicId,
+        path: comic.path,
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  Future<({Comic comic, List<ReadSessionPage> pages})> _openPagesUncached(
+    Comic comic,
+  ) async {
+    await _sessionPort.openComic(comic);
+    final List<ReadSessionPage> pages = await _pageSource.loadPages(comic);
+    if (pages.isEmpty) {
+      throw ReadSessionPageLoadException.emptyPages(
+        comicId: comic.comicId,
+        path: comic.path,
+      );
+    }
+    return (comic: comic, pages: List<ReadSessionPage>.unmodifiable(pages));
+  }
+
+  Future<void> _bestEffortClose(String comicId) async {
+    _openedPages.remove(comicId);
+    try {
+      await _sessionPort.closeComic(comicId);
+    } on Object {
+      // Open failure cleanup must not mask the original error.
+    }
+  }
+}

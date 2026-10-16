@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/models/app_setting_migration.dart';
-import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 
 void main() {
   group('migrateAppSettingJson', () {

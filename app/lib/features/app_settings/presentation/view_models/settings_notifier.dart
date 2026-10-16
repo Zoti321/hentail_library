@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:hentai_library/domain/models/models.dart'
     show AppLocalePreference, AppSetting, AppThemePreference;
-import 'package:hentai_library/domain/reading/auto_play_mode.dart';
-import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

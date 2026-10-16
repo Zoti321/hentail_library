@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
+import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
 void main() {

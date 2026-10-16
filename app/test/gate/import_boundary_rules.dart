@@ -93,9 +93,6 @@ String classifyLibPath(String relativePosix) {
   if (path.startsWith('ui/features/library/')) {
     return 'library_browse';
   }
-  if (path.startsWith('ui/features/reader/')) {
-    return 'read_session';
-  }
   if (path.startsWith('ui/features/shell/views/home_page/')) {
     return 'home';
   }

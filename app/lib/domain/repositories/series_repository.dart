@@ -7,7 +7,7 @@ import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/domain/reading/series_reading_context.dart';
+import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 
 /// Series 仓储：文件夹 sync 自动生成；用户可编辑连载状态与计划总卷数。
 abstract class SeriesRepository {

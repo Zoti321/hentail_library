@@ -54,8 +54,6 @@ def classify(relative: str) -> str:
         return "bootstrap"
     if p.startswith("ui/features/library/"):
         return "library_browse"
-    if p.startswith("ui/features/reader/"):
-        return "read_session"
     if p.startswith("ui/features/shell/views/home_page/"):
         return "home"
     if p.startswith("ui/features/shell/views/history_page"):

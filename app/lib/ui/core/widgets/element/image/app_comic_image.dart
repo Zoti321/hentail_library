@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/features/reader/module/controller/reader_image_cache.dart';
+import 'package:hentai_library/features/read_session/presentation/module/controller/reader_image_cache.dart';
 
 class AppComicImage extends StatelessWidget {
   const AppComicImage({

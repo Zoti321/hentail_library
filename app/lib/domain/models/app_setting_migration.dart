@@ -1,6 +1,6 @@
 import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/reading/auto_play_mode.dart';
-import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 
 /// Normalizes legacy `settings.json` / aggregate JSON into [AppSetting] shape.
 Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {

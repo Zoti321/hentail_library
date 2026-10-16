@@ -9,7 +9,7 @@ import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/domain/reading/series_reading_context.dart';
+import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 

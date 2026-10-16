@@ -1,0 +1,61 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
+import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/continuous_vertical_viewport.dart';
+import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/dual_page_viewport.dart';
+import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/paged_viewport.dart';
+
+class ReaderViewportHost extends StatelessWidget {
+  const ReaderViewportHost({
+    super.key,
+    required this.comicId,
+    required this.incognito,
+    this.startFromFirstPage = false,
+    required this.initialPage,
+    required this.preferredPageIndex,
+    required this.readingMode,
+    this.onRequestNextPage,
+    this.onRequestPrevPage,
+  });
+
+  final String comicId;
+  final bool incognito;
+  final bool startFromFirstPage;
+  final int initialPage;
+  final int? preferredPageIndex;
+  final ReadingMode readingMode;
+  final Future<void> Function()? onRequestNextPage;
+  final Future<void> Function()? onRequestPrevPage;
+
+  @override
+  Widget build(BuildContext context) {
+    if (readingMode.isWebtoon) {
+      return ContinuousVerticalViewport(
+        comicId: comicId,
+        incognito: incognito,
+        startFromFirstPage: startFromFirstPage,
+        preferredPageIndex: preferredPageIndex,
+      );
+    }
+    if (readingMode.isDualPageMode) {
+      return DualPageViewport(
+        comicId: comicId,
+        incognito: incognito,
+        startFromFirstPage: startFromFirstPage,
+        readingMode: readingMode,
+        initialPage: initialPage,
+        preferredPageIndex: preferredPageIndex,
+        onRequestNextPage: onRequestNextPage,
+        onRequestPrevPage: onRequestPrevPage,
+      );
+    }
+    return PagedViewport(
+      comicId: comicId,
+      incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
+      initialPage: initialPage,
+      preferredPageIndex: preferredPageIndex,
+      onRequestNextPage: onRequestNextPage,
+      onRequestPrevPage: onRequestPrevPage,
+    );
+  }
+}

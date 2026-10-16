@@ -1,5 +1,5 @@
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
+import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
 /// 将 FRB [HentaiErrorDto.code] 映射为 Read session 用户可见分类。

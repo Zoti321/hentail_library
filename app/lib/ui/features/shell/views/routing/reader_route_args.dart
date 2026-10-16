@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/reading/read_session.dart';
+import 'package:hentai_library/features/read_session/domain/read_session.dart';
 
 class ReaderRouteArgs {
   const ReaderRouteArgs({
