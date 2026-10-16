@@ -16,7 +16,10 @@ class _RecordingCurrentLibraryNotifier extends CurrentLibraryNotifier {
 
   @override
   Future<CurrentLibraryState> build() async {
-    return const CurrentLibraryState(libraries: <LocalLibrary>[], currentId: null);
+    return const CurrentLibraryState(
+      libraries: <LocalLibrary>[],
+      currentId: null,
+    );
   }
 
   @override
@@ -76,9 +79,7 @@ Future<void> _pumpLibraryForm(
 
   await pumpLocalizedApp(
     tester,
-    overrides: <Override>[
-      currentLibraryProvider.overrideWith(() => notifier),
-    ],
+    overrides: <Override>[currentLibraryProvider.overrideWith(() => notifier)],
     home: Scaffold(
       body: LibraryFormDialog(mode: mode, library: library),
     ),
@@ -167,44 +168,49 @@ void main() {
     expect(find.text('留空表示保持原密码'), findsOneWidget);
   });
 
-  testWidgets('disabling all format groups shows confirm; cancel skips submit', (
-    WidgetTester tester,
-  ) async {
-    final _RecordingCurrentLibraryNotifier notifier =
-        _RecordingCurrentLibraryNotifier();
-    await _pumpLibraryForm(
-      tester,
-      mode: LibraryFormMode.edit,
-      library: _localLibrary(),
-      notifier: notifier,
-    );
+  testWidgets(
+    'disabling all format groups shows confirm; cancel skips submit',
+    (WidgetTester tester) async {
+      final _RecordingCurrentLibraryNotifier notifier =
+          _RecordingCurrentLibraryNotifier();
+      await _pumpLibraryForm(
+        tester,
+        mode: LibraryFormMode.edit,
+        library: _localLibrary(),
+        notifier: notifier,
+      );
 
-    await tester.tap(find.text('扫描'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
+      await tester.tap(find.text('扫描'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
-    for (final FormatGroup group in FormatGroup.all) {
-      final Finder tile = find.widgetWithText(CheckboxListTile, _formatLabel(group));
-      if (tile.evaluate().isNotEmpty) {
-        final CheckboxListTile checkbox =
-            tester.widget<CheckboxListTile>(tile);
-        if (checkbox.value == true) {
-          await tester.tap(tile);
-          await tester.pump();
+      for (final FormatGroup group in FormatGroup.all) {
+        final Finder tile = find.widgetWithText(
+          CheckboxListTile,
+          _formatLabel(group),
+        );
+        if (tile.evaluate().isNotEmpty) {
+          final CheckboxListTile checkbox = tester.widget<CheckboxListTile>(
+            tile,
+          );
+          if (checkbox.value == true) {
+            await tester.tap(tile);
+            await tester.pump();
+          }
         }
       }
-    }
 
-    await _tapPrimaryAction(tester, '保存更改');
+      await _tapPrimaryAction(tester, '保存更改');
 
-    expect(find.text('关闭全部格式？'), findsOneWidget);
-    await tester.tap(find.widgetWithText(TextButton, '取消').last);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
+      expect(find.text('关闭全部格式？'), findsOneWidget);
+      await tester.tap(find.widgetWithText(TextButton, '取消').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
-    expect(notifier.submitCalls, isEmpty);
-    expect(find.text('编辑库'), findsOneWidget);
-  });
+      expect(notifier.submitCalls, isEmpty);
+      expect(find.text('编辑库'), findsOneWidget);
+    },
+  );
 
   testWidgets('confirming disable-all proceeds to submitLibraryForm', (
     WidgetTester tester,
@@ -223,10 +229,12 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
 
     for (final FormatGroup group in FormatGroup.all) {
-      final Finder tile = find.widgetWithText(CheckboxListTile, _formatLabel(group));
+      final Finder tile = find.widgetWithText(
+        CheckboxListTile,
+        _formatLabel(group),
+      );
       if (tile.evaluate().isNotEmpty) {
-        final CheckboxListTile checkbox =
-            tester.widget<CheckboxListTile>(tile);
+        final CheckboxListTile checkbox = tester.widget<CheckboxListTile>(tile);
         if (checkbox.value == true) {
           await tester.tap(tile);
           await tester.pump();
@@ -242,10 +250,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(notifier.submitCalls, hasLength(1));
-    expect(
-      notifier.submitCalls.single.form.enabledFormatGroups,
-      isEmpty,
-    );
+    expect(notifier.submitCalls.single.form.enabledFormatGroups, isEmpty);
     expect(find.byType(LibraryFormDialog), findsNothing);
   });
 
@@ -289,7 +294,6 @@ void main() {
     expect(notifier.submitCalls.single.form.password, 'secret');
     expect(find.byType(LibraryFormDialog), findsNothing);
   });
-
 }
 
 String _formatLabel(FormatGroup group) {

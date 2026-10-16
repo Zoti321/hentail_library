@@ -33,6 +33,7 @@ pub struct FetchResponse {
 }
 
 #[async_trait]
+#[allow(clippy::double_must_use)]
 pub trait HttpTransport: Send + Sync {
     async fn get(
         &self,

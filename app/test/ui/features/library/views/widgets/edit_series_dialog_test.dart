@@ -41,11 +41,7 @@ class _RecordingSeriesMetadataEditor extends SeriesMetadataEditorNotifier {
 }
 
 Series _series() {
-  return Series(
-    id: 'series-1',
-    name: '系列甲',
-    folderPath: '/library/series-1',
-  );
+  return Series(id: 'series-1', name: '系列甲', folderPath: '/library/series-1');
 }
 
 Future<void> _pumpEditSeriesDialog(
@@ -70,10 +66,12 @@ Future<void> _pumpEditSeriesDialog(
 }
 
 Finder _nameField(WidgetTester tester) {
-  return find.descendant(
-    of: find.byType(EditSeriesDialog),
-    matching: find.byType(TextField),
-  ).first;
+  return find
+      .descendant(
+        of: find.byType(EditSeriesDialog),
+        matching: find.byType(TextField),
+      )
+      .first;
 }
 
 void main() {
@@ -102,10 +100,12 @@ void main() {
     await _pumpEditSeriesDialog(tester, editor: editor);
 
     await tester.tap(
-      find.descendant(
-        of: find.byType(EditSeriesDialog),
-        matching: find.byType(IconButton),
-      ).first,
+      find
+          .descendant(
+            of: find.byType(EditSeriesDialog),
+            matching: find.byType(IconButton),
+          )
+          .first,
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));

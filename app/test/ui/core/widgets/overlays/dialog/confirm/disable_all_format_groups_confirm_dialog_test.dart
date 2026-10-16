@@ -56,10 +56,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.text('关闭全部格式？'), findsOneWidget);
-    expect(
-      find.textContaining('下次库同步将清空当前本地库中的全部 Comic'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('下次库同步将清空当前本地库中的全部 Comic'), findsOneWidget);
 
     await tester.tap(find.text('取消'));
     await tester.pump();
