@@ -6,8 +6,8 @@ import 'package:hentai_library/domain/models/entity/reading_history.dart'
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/view_models/debouncer.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/core/util/debouncer.dart';
 import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

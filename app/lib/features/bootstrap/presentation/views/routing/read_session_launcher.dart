@@ -1,7 +1,7 @@
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 打开阅读器；系列上下文由 comicId 在阅读器内派生（ADR-0005）。

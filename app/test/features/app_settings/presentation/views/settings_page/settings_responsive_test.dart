@@ -9,7 +9,7 @@ import 'package:hentai_library/features/app_settings/presentation/views/settings
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_page_header.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
-import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;

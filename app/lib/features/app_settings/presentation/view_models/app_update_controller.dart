@@ -12,7 +12,7 @@ import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/app_update_dialog.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/services.dart';
+import 'package:hentai_library/features/bootstrap/di/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

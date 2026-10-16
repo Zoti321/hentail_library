@@ -1,6 +1,6 @@
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/value_objects/form/series_metadata_form.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'series_metadata_editor_notifier.g.dart';

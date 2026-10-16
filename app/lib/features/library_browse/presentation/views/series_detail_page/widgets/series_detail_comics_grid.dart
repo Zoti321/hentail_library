@@ -7,7 +7,7 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_page_widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_page/widgets/series_detail_comic_card.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SeriesDetailComicsGridSliver extends ConsumerWidget {

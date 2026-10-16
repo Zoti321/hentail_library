@@ -12,7 +12,7 @@ import 'package:hentai_library/features/library_browse/domain/library_tri_state_
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_query_intent.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';

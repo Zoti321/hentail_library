@@ -12,7 +12,7 @@ import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.d
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/shared/ui/widgets/author/show_author_detail.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';

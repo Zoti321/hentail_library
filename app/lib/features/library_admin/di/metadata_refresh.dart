@@ -1,6 +1,6 @@
 import 'package:hentai_library/data/adapters/metadata_refresh_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_coordinator.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

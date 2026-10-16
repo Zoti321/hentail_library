@@ -158,17 +158,12 @@
 
 | 现状路径 | 目标路径 | 备注 |
 |----------|----------|------|
-| `ui/features/shell/views/app.dart` | `features/bootstrap/presentation/views/app.dart` | |
-| `ui/features/shell/views/routing/**` | `features/bootstrap/presentation/views/routing/**` | 含 `app_router` |
-| `ui/features/shell/views/responsive_app_shell.dart` | `features/bootstrap/presentation/views/responsive_app_shell.dart` | |
-| `ui/features/shell/views/all_libraries_browse_page.dart` | `features/bootstrap/presentation/views/all_libraries_browse_page.dart` | 占位 |
-| `ui/features/shell/view_models/app_startup_coordinator_notifier.dart` | `features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart` | |
-| `ui/features/shell/view_models/aggregates.dart` | `features/bootstrap/presentation/view_models/aggregates.dart` | ⚠️ 若仅 re-export 其他 feature，改为 bootstrap 薄 barrel |
-| `ui/features/shell/view_models/debouncer.dart` | `shared/core/util/debouncer.dart` 或 `bootstrap/...` | ⚠️ 通用工具 → **shared/core** |
-| `ui/features/shell/view_models/stream_throttle.dart` | `shared/core/util/stream_throttle.dart` | 同上 |
-| `ui/features/shell/di/deps.dart` | `features/bootstrap/di/deps.dart` | 组合根 |
-| `ui/features/shell/shell.dart` | 删除或 bootstrap barrel | |
-| `ui/features/shell/di/repos.dart` 等 | 见 §3 各 feature + `shared/di` | #222 |
+| shell `app` / `routing` / `responsive_app_shell` / startup VM | `features/bootstrap/presentation/**` | **已迁**（2026-10-17） |
+| `debouncer` / `stream_throttle` | `shared/core/util/` | **已迁** |
+| `deps` + `repos` / `ports` / `services` | `features/bootstrap/di/` | **已迁**；`shared/di` 见 #258 bootstrap-final |
+| `shell.dart` | 删除 | **已删** |
+
+**未做（#258 bootstrap-final）**：legacy `ui/`/`core/`/`data/`/`domain/` 整树 → `shared/`、Phase B、`ui/providers` 删除。
 
 ---
 
@@ -310,3 +305,4 @@
 | 2026-10-17 | `comic_trash` slice：trash UI/VM/di + domain + `trashed_comic` → shared |
 | 2026-10-17 | `home` slice：home/history presentation + `home_page_read_models` → shared |
 | 2026-10-17 | `library_admin` slice：navigation/VM/di + domain coordinators |
+| 2026-10-17 | `bootstrap` slice（presentation）：shell 残余 → `features/bootstrap` + util → `shared/core` |

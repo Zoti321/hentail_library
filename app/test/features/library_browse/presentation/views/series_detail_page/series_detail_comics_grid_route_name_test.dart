@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 
 /// Feedback loop for: series grid tap → unknown route name: ????
 void main() {

@@ -16,7 +16,7 @@ import 'package:hentai_library/features/read_session/presentation/views/reader_p
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

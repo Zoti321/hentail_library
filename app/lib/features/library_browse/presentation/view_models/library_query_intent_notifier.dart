@@ -1,6 +1,6 @@
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_query_intent.dart';
-import 'package:hentai_library/ui/features/shell/view_models/debouncer.dart';
+import 'package:hentai_library/shared/core/util/debouncer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_query_intent_notifier.g.dart';

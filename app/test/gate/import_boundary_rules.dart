@@ -90,9 +90,6 @@ String classifyLibPath(String relativePosix) {
   if (path == 'ui/providers.dart' || path.startsWith('ui/providers/')) {
     return 'bootstrap';
   }
-  if (path.startsWith('ui/features/shell/')) {
-    return 'bootstrap';
-  }
   if (path == 'main.dart') {
     return 'bootstrap';
   }

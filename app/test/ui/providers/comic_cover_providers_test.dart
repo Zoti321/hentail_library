@@ -7,7 +7,7 @@ import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hentai_library/ui/providers/comic_cover_load_gate.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:logging/logging.dart';

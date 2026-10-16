@@ -6,12 +6,12 @@ import 'package:hentai_library/features/library_browse/presentation/views/librar
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
-import 'package:hentai_library/ui/features/shell/views/all_libraries_browse_page.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/home_page.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_routes.dart';
-import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/shared_content_routes.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_page/trash_page.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

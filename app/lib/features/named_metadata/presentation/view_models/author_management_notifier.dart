@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 
 /// 全部作者列表（用于作者管理页面）；经 FRB stream 监听 Rust 侧作者变化。
 final allAuthorsProvider = StreamProvider<List<Author>>((ref) {

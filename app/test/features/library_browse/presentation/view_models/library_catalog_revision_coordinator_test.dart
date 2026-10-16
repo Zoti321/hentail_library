@@ -6,7 +6,7 @@ import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_revision_coordinator.dart';
-import 'package:hentai_library/ui/features/shell/di/ports.dart';
+import 'package:hentai_library/features/bootstrap/di/ports.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';

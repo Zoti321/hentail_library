@@ -11,8 +11,8 @@ import 'package:hentai_library/domain/repositories/named_facet_dictionary_reposi
 import 'package:hentai_library/domain/repositories/tag_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_page_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
-import 'package:hentai_library/ui/features/shell/di/ports.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/features/bootstrap/di/ports.dart';
+import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;

@@ -5,7 +5,7 @@ import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_settings_dialog.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';

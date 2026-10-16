@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'named_facet_management_controller.g.dart';

@@ -13,7 +13,7 @@ import 'package:hentai_library/features/comic_trash/presentation/view_models/tra
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_state.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
-import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_page/widgets/trash_comic_tile.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

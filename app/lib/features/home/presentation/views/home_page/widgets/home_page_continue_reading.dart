@@ -10,8 +10,8 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_constants.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/reading_history_card.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/horizontal_wheel_scroll_listener.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePageContinueReadingSection extends ConsumerWidget {

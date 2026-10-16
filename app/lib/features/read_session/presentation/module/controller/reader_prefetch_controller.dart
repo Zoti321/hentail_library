@@ -8,7 +8,7 @@ import 'package:hentai_library/features/read_session/presentation/module/control
 import 'package:hentai_library/features/read_session/presentation/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_prefetch_controller.g.dart';

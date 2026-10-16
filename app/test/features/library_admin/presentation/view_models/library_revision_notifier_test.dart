@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:riverpod/riverpod.dart';
 import 'package:hentai_library/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/ui/features/shell/di/ports.dart';
+import 'package:hentai_library/features/bootstrap/di/ports.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';

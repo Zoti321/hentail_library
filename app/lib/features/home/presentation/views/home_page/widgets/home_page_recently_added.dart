@@ -7,8 +7,8 @@ import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content
 import 'package:hentai_library/ui/core/widgets/foundation/horizontal_wheel_scroll_listener.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_constants.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
 
 class HomeRecentlyAddedSection extends ConsumerStatefulWidget {
   const HomeRecentlyAddedSection({

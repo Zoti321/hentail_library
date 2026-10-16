@@ -6,7 +6,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/widgets.dart';
-import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});

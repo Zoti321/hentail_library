@@ -15,7 +15,7 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_page_header.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_fill_viewport.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_management_panel.dart';
-import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';

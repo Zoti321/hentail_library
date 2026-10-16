@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/shared_content_routes.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
 
 class _FakeBuildContext extends Fake implements BuildContext {}
 

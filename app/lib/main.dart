@@ -14,7 +14,7 @@ import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/api/logging.dart';
 import 'package:hentai_library/src/rust/frb_generated.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/ui/features/shell/views/app.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 

@@ -9,8 +9,8 @@ import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/comic_context_menu.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic_delete_flow.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComicCard extends ConsumerWidget {

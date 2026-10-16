@@ -15,7 +15,7 @@ import 'package:hentai_library/features/named_metadata/presentation/view_models/
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_fill_viewport.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_management_panel.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';

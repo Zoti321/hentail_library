@@ -10,7 +10,7 @@ import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/app_release_info.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
-import 'package:hentai_library/ui/features/shell/di/services.dart';
+import 'package:hentai_library/features/bootstrap/di/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> showAppUpdateDownloadDialog({

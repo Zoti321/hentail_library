@@ -8,7 +8,7 @@ import 'package:hentai_library/features/library_browse/domain/library_needs_meta
 import 'package:hentai_library/features/library_browse/domain/library_tri_state_pick.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';

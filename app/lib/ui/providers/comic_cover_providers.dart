@@ -8,7 +8,7 @@ import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
 import 'package:hentai_library/ui/providers/comic_cover_load_gate.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_cover_providers.g.dart';

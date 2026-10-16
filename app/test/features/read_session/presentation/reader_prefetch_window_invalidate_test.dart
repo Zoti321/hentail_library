@@ -12,7 +12,7 @@ import 'package:hentai_library/features/read_session/domain/reader_page_payload.
 import 'package:hentai_library/features/read_session/domain/reader_session_service.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 

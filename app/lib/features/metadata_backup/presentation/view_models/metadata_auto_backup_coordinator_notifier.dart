@@ -7,7 +7,7 @@ import 'package:hentai_library/features/metadata_backup/data/metadata_auto_backu
 import 'package:hentai_library/data/adapters/metadata_backup_frb_adapter.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
-import 'package:hentai_library/ui/features/shell/view_models/debouncer.dart';
+import 'package:hentai_library/shared/core/util/debouncer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata_auto_backup_coordinator_notifier.g.dart';

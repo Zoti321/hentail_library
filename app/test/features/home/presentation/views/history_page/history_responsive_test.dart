@@ -7,7 +7,7 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
