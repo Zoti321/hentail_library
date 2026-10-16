@@ -176,14 +176,10 @@
 
 | 现状路径 | 目标路径 |
 |----------|----------|
-| `ui/features/shell/views/home_page/**` | `features/home/presentation/views/home_page/**` |
-| `ui/features/shell/view_models/home_alert_dismiss_notifier.dart` | `features/home/presentation/view_models/home_alert_dismiss_notifier.dart` |
-| `ui/features/shell/view_models/home_page_dashboard_notifier.dart` | `features/home/presentation/view_models/home_page_dashboard_notifier.dart` |
-| `ui/features/shell/view_models/home_probe_coordinator_notifier.dart` | `features/home/presentation/view_models/home_probe_coordinator_notifier.dart` |
-| `ui/features/shell/views/history_page.dart` | `features/home/presentation/views/history_page.dart` |
-| `ui/features/shell/views/history_page/**` | `features/home/presentation/views/history_page/**` |
-| `ui/features/shell/view_models/history_*.dart` | `features/home/presentation/view_models/history_*.dart` |
-| `domain/models/read_models/home_page_read_models.dart` | `shared/domain/models/read_models/home_page_read_models.dart` |
+| shell `home_page` / `history_page` + home/history view_models | `features/home/presentation/**` | **已迁**（2026-10-17） |
+| `home_page_read_models` | `shared/domain/models/read_models/` | **已迁** |
+
+`home_page_repository` 等仍见 §1.3（`shared/domain/repositories` 待 bootstrap 或后续票）。
 
 ---
 
@@ -325,3 +321,5 @@
 | 2026-10-17 | `metadata_backup` slice：`core/metadata` + 自动备份 ViewModel 归位 |
 | 2026-10-17 | `read_session` slice：reader presentation + domain/reading 拆分 + launcher 归 shell 路由 |
 | 2026-10-17 | `library_browse` slice：library presentation + browse domain + 共用 author/scroll UI |
+| 2026-10-17 | `comic_trash` slice：trash UI/VM/di + domain + `trashed_comic` → shared |
+| 2026-10-17 | `home` slice：home/history presentation + `home_page_read_models` → shared |

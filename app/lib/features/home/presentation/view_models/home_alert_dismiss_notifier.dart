@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
+import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -56,7 +56,14 @@ test/features/read_session/presentation/view_models/reader_cover_editor_notifier
 test/features/app_settings/presentation/view_models/locale_preference_persist_test.dart
 test/features/app_settings/presentation/view_models/reading_mode_persist_test.dart
 test/ui/features/shell/view_models/current_library_notifier_commands_test.dart
-test/ui/features/shell/view_models/history_load_more_throttle_test.dart
+test/features/home/presentation/view_models/history_load_more_throttle_test.dart
+test/features/home/presentation/view_models/history_paged_feed_controller_test.dart
+test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dart
+test/features/home/presentation/view_models/home_probe_coordinator_notifier_test.dart
+test/features/home/presentation/views/history_page/history_layout_constants_test.dart
+test/features/home/presentation/views/history_page/history_responsive_test.dart
+test/features/home/presentation/views/home_page/home_page_constants_test.dart
+test/features/home/presentation/views/home_page/home_page_responsive_test.dart
 test/ui/features/shell/view_models/library_revision_throttle_busy_test.dart
 test/ui/features/shell/view_models/library_scan_toasts_test.dart
 test/ui/features/shell/view_models/metadata_refresh_toasts_test.dart

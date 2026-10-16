@@ -8,9 +8,9 @@ import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/views/history_page.dart';
-import 'package:hentai_library/ui/features/shell/views/history_page/history_layout_constants.dart';
-import 'package:hentai_library/ui/features/shell/views/history_page/widgets/history_page_header.dart';
+import 'package:hentai_library/features/home/presentation/views/history_page.dart';
+import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 

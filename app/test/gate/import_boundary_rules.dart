@@ -90,18 +90,6 @@ String classifyLibPath(String relativePosix) {
   if (path == 'ui/providers.dart' || path.startsWith('ui/providers/')) {
     return 'bootstrap';
   }
-  if (path.startsWith('ui/features/shell/views/home_page/')) {
-    return 'home';
-  }
-  if (path.startsWith('ui/features/shell/views/history_page')) {
-    return 'home';
-  }
-  if (path.startsWith('ui/features/shell/view_models/home_')) {
-    return 'home';
-  }
-  if (path.startsWith('ui/features/shell/view_models/history_')) {
-    return 'home';
-  }
   if (path.startsWith('ui/features/shell/view_models/scan_library_controller')) {
     return 'library_admin';
   }

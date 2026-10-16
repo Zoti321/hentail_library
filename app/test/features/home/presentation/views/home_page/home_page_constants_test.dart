@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
+import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_constants.dart';
 
 void main() {
   group('homePageLayoutTierForWidth', () {

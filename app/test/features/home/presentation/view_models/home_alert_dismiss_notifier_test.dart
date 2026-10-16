@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
-import 'package:hentai_library/ui/features/shell/view_models/home_alert_dismiss_notifier.dart';
+import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
+import 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
 
 void main() {
   group('filterDismissedHomeAlerts', () {

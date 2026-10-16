@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/layout/content_search_width.dart';
-import 'package:hentai_library/ui/features/shell/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
 
 void main() {
   group('historyLayoutTierForWidth', () {

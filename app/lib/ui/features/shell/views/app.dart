@@ -10,7 +10,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/features/app_settings/presentation/settings.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/app_startup_coordinator_notifier.dart';
-import 'package:hentai_library/ui/features/shell/view_models/home_probe_coordinator_notifier.dart';
+import 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:riverpod/misc.dart' show Override;
 

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/ui/features/shell/view_models/history_load_more_throttle.dart';
+import 'package:hentai_library/features/home/presentation/view_models/history_load_more_throttle.dart';
 
 void main() {
   group('shouldAttemptHistoryLoadMore', () {

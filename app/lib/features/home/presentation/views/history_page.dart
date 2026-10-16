@@ -12,11 +12,11 @@ import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args
 import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/reading_history_card.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
-import 'package:hentai_library/ui/features/shell/view_models/history_cover_viewport_notifier.dart';
-import 'package:hentai_library/ui/features/shell/view_models/history_load_more_throttle.dart';
-import 'package:hentai_library/ui/features/shell/view_models/history_paged_feed_state.dart';
-import 'package:hentai_library/ui/features/shell/views/history_page/history_layout_constants.dart';
-import 'package:hentai_library/ui/features/shell/views/history_page/widgets/history_page_header.dart';
+import 'package:hentai_library/features/home/presentation/view_models/history_cover_viewport_notifier.dart';
+import 'package:hentai_library/features/home/presentation/view_models/history_load_more_throttle.dart';
+import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_state.dart';
+import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
