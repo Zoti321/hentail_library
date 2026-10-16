@@ -2,12 +2,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/module/view/reader_viewport_host.dart';

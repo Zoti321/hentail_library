@@ -2,17 +2,14 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-/// Phase B (post-bootstrap): enable in the final bootstrap slice (#219).
-const bool kEnforceWayfinderPhaseBLayout = false;
+/// Phase B (end-state): enabled at bootstrap-final (#258 / #219).
+const bool kEnforceWayfinderPhaseBLayout = true;
 
+/// Phase A allow-list; legacy `core/` `data/` `domain/` `ui/` roots were removed in #258.
 const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
-  'core',
-  'data',
-  'domain',
   'features',
   'shared',
   'src',
-  'ui',
 };
 
 const Set<String> kWayfinderPhaseBTopLevelLibDirs = <String>{
@@ -36,9 +33,19 @@ const Set<String> kWayfinderFeatureModuleIds = <String>{
 
 const Set<String> kWayfinderFeatureLayerDirs = <String>{
   'data',
+  'di',
   'domain',
   'presentation',
 };
+
+/// Canonical lib-relative roots. Only files *outside* these roots can be
+/// legacy strangler shims; barrels inside `features/` or `shared/` are normal.
+bool isCanonicalLibRelativePath(String rel) {
+  final String path = rel.replaceAll(r'\', '/');
+  return path.startsWith('features/') ||
+      path.startsWith('shared/') ||
+      path.startsWith('src/');
+}
 
 List<String> readStranglerShimAllowlist(File manifest) {
   return manifest
@@ -123,9 +130,13 @@ List<String> findPresentationStateDirs(Directory libDir) {
 List<String> collectStranglerShims(Directory libDir) {
   final List<String> shims = <String>[];
   for (final File file in dartFilesUnder(libDir)) {
+    final String rel = libRelativePosixPath(libDir, file);
+    if (isCanonicalLibRelativePath(rel)) {
+      continue;
+    }
     final String source = file.readAsStringSync();
     if (isStranglerShimSource(source)) {
-      shims.add(libRelativePosixPath(libDir, file));
+      shims.add(rel);
     }
   }
   shims.sort();

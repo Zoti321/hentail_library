@@ -118,7 +118,7 @@ void main() {
   group('UI presentation layout (ADR-0017)', () {
     test('features keep ViewModels under view_models/, not state/', () {
       final List<String> stateDirs = <String>['lib', 'test']
-          .map((String root) => Directory(p.join(root, 'ui', 'features')))
+          .map((String root) => Directory(p.join(root, 'features')))
           .where((Directory dir) => dir.existsSync())
           .expand((Directory dir) => dir.listSync(recursive: true))
           .whereType<Directory>()
@@ -128,21 +128,25 @@ void main() {
       expect(stateDirs, isEmpty);
     });
 
-    test('views and ui/core widgets never touch Repository providers', () {
+    test('views and shared/ui widgets never touch Repository providers', () {
       final RegExp repoProvider = RegExp(r'\b\w+RepoProvider\b');
-      final Directory uiRoot = Directory(p.join('lib', 'ui'));
-      if (!uiRoot.existsSync()) {
+      final Directory libRoot = Directory('lib');
+      if (!libRoot.existsSync()) {
         return;
       }
-      final List<String> offenders = uiRoot
+      final List<String> offenders = libRoot
           .listSync(recursive: true)
           .whereType<File>()
           .where((File file) => file.path.endsWith('.dart'))
           .where((File file) {
-            final List<String> segments = p.split(file.path);
-            final bool isView = segments.contains('views');
-            final bool isCoreUi = segments.length > 2 && segments[2] == 'core';
-            return isView || isCoreUi;
+            final String rel = p.posix.joinAll(
+              p.split(p.relative(file.path, from: libRoot.path)),
+            );
+            final bool isView =
+                rel.startsWith('features/') &&
+                rel.split('/').contains('views');
+            final bool isSharedUi = rel.startsWith('shared/ui/');
+            return isView || isSharedUi;
           })
           .where((File file) => repoProvider.hasMatch(file.readAsStringSync()))
           .map((File file) => p.posix.joinAll(p.split(file.path)))

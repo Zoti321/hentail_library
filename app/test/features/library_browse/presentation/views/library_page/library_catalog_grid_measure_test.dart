@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
+import 'package:hentai_library/shared/ui/widgets/responsive_layout/library_blocks_layout.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_cover_viewport_notifier.dart';
 
 void main() {

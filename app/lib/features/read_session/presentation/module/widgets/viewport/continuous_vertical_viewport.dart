@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_viewport_constants.dart';

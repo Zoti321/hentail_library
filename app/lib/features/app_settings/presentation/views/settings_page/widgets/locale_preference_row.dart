@@ -1,15 +1,15 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_page_primitives.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class LocalePreferenceRow extends ConsumerStatefulWidget {

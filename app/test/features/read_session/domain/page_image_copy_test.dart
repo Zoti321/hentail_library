@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/ports/clipboard_image_port.dart';
-import 'package:hentai_library/domain/ports/comic_page_source_port.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/ports/clipboard_image_port.dart';
+import 'package:hentai_library/shared/domain/ports/comic_page_source_port.dart';
 import 'package:hentai_library/features/read_session/domain/page_image_copy.dart';
 
 class _FakeComicPageSourcePort implements ComicPageSourcePort {

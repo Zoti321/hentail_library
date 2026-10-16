@@ -1,0 +1,280 @@
+import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/repositories/comic_frb_mapper.dart';
+import 'package:hentai_library/features/library_browse/domain/library_comic_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/src/rust/api/comic.dart' as rust;
+
+/// Sentinel passed to Rust when the user clears published date.
+const int _kComicPublishedAtClearSentinel = -1;
+
+/// 漫画主表持久化；读写均经 Rust/SeaORM。
+class ComicRepositoryImpl implements ComicRepository {
+  const ComicRepositoryImpl();
+
+  @override
+  Future<int> countAll() async => guardFrb(
+    () async => (await rust.countAllComicsFrb()).toInt(),
+    fallbackMessage: '统计漫画数量失败',
+  );
+
+  @override
+  Future<List<Comic>> getAll() async {
+    final int total = await countAll();
+    if (total <= 0) {
+      return <Comic>[];
+    }
+    final rust.PagedComicResultDto page = await guardFrb(
+      () => rust.fetchComicsPageFrb(
+        request: rust.PageRequestDto(page: 1, pageSize: total),
+        filter: unrestrictedListFilter(),
+        expandBySeries: false,
+        sort: const rust.ComicSortOptionDto(
+          field: rust.ComicSortFieldDto.title,
+          descending: false,
+        ),
+      ),
+      fallbackMessage: '读取漫画列表失败',
+    );
+    return page.items.map(mapRustComic).toList();
+  }
+
+  @override
+  Future<PagedResult<Comic>> fetchComicsPage({
+    required PageRequest request,
+    required LibraryComicFilter filter,
+    required bool expandBySeries,
+    required LibraryComicSortOption sortOption,
+  }) async {
+    final rust.PagedComicResultDto page = await guardFrb(
+      () => rust.fetchComicsPageFrb(
+        request: mapPageRequest(request),
+        filter: mapLibraryFilter(filter),
+        expandBySeries: expandBySeries,
+        sort: mapSortOption(sortOption),
+      ),
+      fallbackMessage: '读取漫画分页失败',
+    );
+    return mapPagedResult(page);
+  }
+
+  @override
+  Future<Comic?> findById(String comicId) async {
+    final rust.ComicDto? dto = await guardFrb(
+      () => rust.findComicByIdFrb(comicId: comicId),
+      fallbackMessage: '读取漫画失败',
+    );
+    return dto == null ? null : mapRustComic(dto);
+  }
+
+  @override
+  Future<List<Comic>> findByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return const <Comic>[];
+    }
+    final List<rust.ComicDto> rows = await guardFrb(
+      () => rust.findComicsByIdsFrb(comicIds: comicIds),
+      fallbackMessage: '批量读取漫画失败',
+    );
+    return rows.map(mapRustComic).toList();
+  }
+
+  @override
+  Future<void> trashByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return;
+    }
+    await guardFrb(
+      () => rust.trashComicsFrb(comicIds: comicIds),
+      fallbackMessage: '移入已删除失败',
+    );
+  }
+
+  @override
+  Future<void> restoreByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return;
+    }
+    await guardFrb(
+      () => rust.restoreComicsFrb(comicIds: comicIds),
+      fallbackMessage: '恢复漫画失败',
+    );
+  }
+
+  @override
+  Future<ComicPurgeResult> purgeByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return (succeeded: 0, failed: 0, errorSamples: const <String>[]);
+    }
+    final rust.ComicPurgeResultFrbDto result = await guardFrb(
+      () => rust.purgeComicsFrb(comicIds: comicIds),
+      fallbackMessage: '永久删除漫画失败',
+    );
+    return mapComicPurgeResult(result);
+  }
+
+  @override
+  Future<PagedResult<TrashedComic>> fetchTrashedPage(
+    PageRequest request,
+  ) async {
+    final rust.PagedTrashedComicResultFrbDto page = await guardFrb(
+      () => rust.fetchTrashedComicsPageFrb(
+        page: request.page,
+        pageSize: request.pageSize,
+      ),
+      fallbackMessage: '读取已删除漫画失败',
+    );
+    return mapTrashedComicsPage(page);
+  }
+
+  @override
+  Future<TrashedComicCounts> countTrashed() async {
+    final rust.TrashedComicCountsFrbDto counts = await guardFrb(
+      rust.countTrashedComicsFrb,
+      fallbackMessage: '统计已删除漫画失败',
+    );
+    return mapTrashedComicCounts(counts);
+  }
+
+  @override
+  Future<List<String>> listTrashedIds() =>
+      guardFrb(rust.listTrashedComicIdsFrb, fallbackMessage: '读取已删除漫画失败');
+
+  @override
+  Future<void> updateUserMeta(
+    String comicId, {
+    String? title,
+    String? description,
+    DateTime? publishedAt,
+    bool clearPublishedAt = false,
+    List<Author>? authors,
+    ContentRating? contentRating,
+    List<Tag>? tags,
+    List<String>? languages,
+    List<String>? parodies,
+    List<String>? characters,
+  }) async {
+    guardFrbSync(
+      () => rust.updateComicUserMetaFrb(
+        comicId: comicId,
+        meta: rust.UpdateComicUserMetaFrbDto(
+          title: title,
+          contentRating: contentRating?.name,
+          description: description,
+          publishedAt: clearPublishedAt
+              ? _kComicPublishedAtClearSentinel
+              : publishedAt == null
+              ? null
+              : comicTimestampToMs(publishedAt),
+          authors: authors?.map((Author a) => a.name).toList(),
+          tags: tags?.map((Tag t) => t.name).toList(),
+          languages: languages,
+          parodies: parodies,
+          characters: characters,
+        ),
+      ),
+      fallbackMessage: '更新漫画元数据失败',
+    );
+  }
+
+  @override
+  Future<void> setMetaLocks(
+    String comicId, {
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
+    bool? languages,
+    bool? parodies,
+    bool? characters,
+  }) async {
+    guardFrbSync(
+      () => rust.setComicMetaLocksFrb(
+        comicId: comicId,
+        locks: rust.SetComicMetaLocksFrbDto(
+          title: title,
+          description: description,
+          publishedAt: publishedAt,
+          contentRating: contentRating,
+          authors: authors,
+          tags: tags,
+          languages: languages,
+          parodies: parodies,
+          characters: characters,
+        ),
+      ),
+      fallbackMessage: '更新漫画元数据锁失败',
+    );
+  }
+
+  @override
+  Future<List<Comic>> searchByKeyword(String keyword) async {
+    final List<rust.ComicDto> rows = await guardFrb(
+      () => rust.searchByKeywordFrb(keyword: keyword),
+      fallbackMessage: '搜索漫画失败',
+    );
+    return rows.map(mapRustComic).toList();
+  }
+
+  @override
+  Future<PagedResult<Comic>> searchByKeywordPage({
+    required String keyword,
+    required PageRequest request,
+  }) async {
+    final rust.PagedComicResultDto page = await guardFrb(
+      () => rust.searchByKeywordPageFrb(
+        keyword: keyword,
+        page: request.page,
+        pageSize: request.pageSize,
+      ),
+      fallbackMessage: '搜索漫画失败',
+    );
+    return mapPagedResult(page);
+  }
+
+  @override
+  Future<List<Comic>> searchByMetadataExpression({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+  }) async {
+    final List<rust.ComicDto> rows = await guardFrb(
+      () => rust.searchByTagExpressionFrb(
+        mustInclude: mustInclude.toList(),
+        optionalOr: optionalOr.toList(),
+        mustExclude: mustExclude.toList(),
+      ),
+      fallbackMessage: '按元数据搜索漫画失败',
+    );
+    return rows.map(mapRustComic).toList();
+  }
+
+  @override
+  Future<PagedResult<Comic>> searchByMetadataExpressionPage({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+    required PageRequest request,
+  }) async {
+    final rust.PagedComicResultDto page = await guardFrb(
+      () => rust.searchByTagExpressionPageFrb(
+        mustInclude: mustInclude.toList(),
+        optionalOr: optionalOr.toList(),
+        mustExclude: mustExclude.toList(),
+        page: request.page,
+        pageSize: request.pageSize,
+      ),
+      fallbackMessage: '按元数据搜索漫画失败',
+    );
+    return mapPagedResult(page);
+  }
+}

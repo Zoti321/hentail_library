@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/widgets.dart';
 
 /// 库页可粘连 header：标题、数量 chip、Tab 切换与操作按钮（单行三栏）。

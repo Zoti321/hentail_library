@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/widgets.dart';
 
 class SettingsPage extends ConsumerWidget {

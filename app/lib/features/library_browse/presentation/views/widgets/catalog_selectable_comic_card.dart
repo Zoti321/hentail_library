@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/element/card/comic_card.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

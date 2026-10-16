@@ -39,7 +39,7 @@ Cross-platform **comic library** app: scan/sync local or WebDAV roots, browse ca
 | Aspect | Rule |
 |--------|------|
 | Layout | `ResponsiveAppShell` + `AppLayoutBreakpoints` |
-| Theme | `buildAppTheme` in `app/lib/ui/features/shell/views/app.dart` |
+| Theme | `buildAppTheme` in `app/lib/features/bootstrap/presentation/views/app.dart` |
 | Breakpoints | compact `<600` · medium `600–1023` · expanded `≥1024` |
 | Window chrome | `isDesktop` (Windows/macOS/Linux only) — **not** for forking page trees |
 | Icons | **Lucide** (`lucide_icons_flutter`) — avoid Material `Icons.*` in new UI |
@@ -76,7 +76,7 @@ Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`colorScheme.hentai
 | Status | — | — | `success`, `warning`, `error` |
 | Reader chrome | — | — | `readerBackground`, `floatingUiBackground` |
 
-**Theme entry:** `app/lib/ui/core/theme/theme_visual_tokens.dart` → `HentaiColorScheme`
+**Theme entry:** `app/lib/shared/ui/theme/theme_visual_tokens.dart` → `HentaiColorScheme`
 
 ### Typography
 
@@ -117,7 +117,7 @@ Use semantic tokens — `cs.hentai.cardShadow`, `cardShadowHover` on catalog car
 
 ## Component Specs
 
-Reuse widgets under `app/lib/ui/core/widgets/` before creating primitives.
+Reuse widgets under `app/lib/shared/ui/widgets/` before creating primitives.
 
 | Category | Path |
 |----------|------|
@@ -198,7 +198,7 @@ Reuse widgets under `app/lib/ui/core/widgets/` before creating primitives.
 
 ## Pre-Delivery Checklist
 
-- [ ] Reused existing widget from `ui/core/widgets/` where applicable
+- [ ] Reused existing widget from `shared/ui/widgets/` where applicable
 - [ ] Tokens from `context.tokens` and `cs.hentai` — no ad-hoc hex/spacing
 - [ ] Lucide icons; consistent 14/24px sizing per context
 - [ ] Hover/transition ~180–220 ms `easeOutCubic`; respect reduced motion

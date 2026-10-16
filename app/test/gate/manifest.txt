@@ -5,10 +5,10 @@
 test/gate
 
 # Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）
-test/domain
-test/core
+test/shared/domain
+test/shared/core
 test/features/app_settings/presentation/app_data_wipe_flow_test.dart
-test/data
+test/shared/data
 
 # FRB 线缝冒烟（真实 cdylib；run-gate.sh dart-test 会先 cargo build）
 test/frb_wire
@@ -20,8 +20,8 @@ test/project_layout_test.dart
 test/widget_test.dart
 
 # Dart hard-manifest UI（已晋升快轨）
-test/ui/core/widgets/actions/destructive_filled_button_test.dart
-test/ui/core/widgets/overlays/dialog/confirm
+test/shared/ui/widgets/actions/destructive_filled_button_test.dart
+test/shared/ui/widgets/overlays/dialog/confirm
 test/features/named_metadata/presentation/views/metadata_page/named_facet_fill_viewport_test.dart
 test/features/library_browse/presentation/views/widgets/author_detail_surface_test.dart
 test/features/library_browse/presentation/views/widgets/author_image_view_test.dart
@@ -32,10 +32,10 @@ test/features/library_admin/presentation/views/navigation/library_form_dialog_te
 test/features/library_browse/presentation/views/widgets/edit_series_dialog_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
-test/ui/core/interaction/app_motion_test.dart
-test/ui/core/interaction/interactive_target_test.dart
-test/ui/core/interaction/reader_input_test.dart
-test/ui/core/theme/hentai_color_scheme_tokens_test.dart
+test/shared/ui/interaction/app_motion_test.dart
+test/shared/ui/interaction/interactive_target_test.dart
+test/shared/ui/interaction/reader_input_test.dart
+test/shared/ui/theme/hentai_color_scheme_tokens_test.dart
 test/features/library_browse/presentation/stable_page_count_test.dart
 test/features/library_browse/presentation/view_models/catalog_pagination_engine_test.dart
 test/features/library_browse/presentation/view_models/comic_detail_return_series_notifier_test.dart

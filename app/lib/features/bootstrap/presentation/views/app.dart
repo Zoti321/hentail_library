@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/util/app_locale.dart';
-import 'package:hentai_library/core/util/app_theme_mode.dart';
-import 'package:hentai_library/core/util/app_window_title.dart';
-import 'package:hentai_library/domain/models/models.dart' show AppSetting;
-import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/core/util/app_locale.dart';
+import 'package:hentai_library/shared/core/util/app_theme_mode.dart';
+import 'package:hentai_library/shared/core/util/app_window_title.dart';
+import 'package:hentai_library/shared/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/app_settings/presentation/settings.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';

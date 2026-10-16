@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 
 typedef LibrarySidebarPlacement = ({
   String libraryId,

@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/domain/library/metadata_refresh_types.dart';
+import 'package:hentai_library/shared/core/errors/app_exception.dart';
+import 'package:hentai_library/shared/core/logging/app_log.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/features/library_admin/di/metadata_refresh.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

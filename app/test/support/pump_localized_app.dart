@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import 'localized_test_app.dart';

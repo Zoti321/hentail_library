@@ -31,7 +31,7 @@ void main() {
 
   test('series detail comics grid pushNamed uses registered route name', () {
     final File source = File(
-      'lib/ui/features/library/views/series_detail_page/widgets/series_detail_comics_grid.dart',
+      'lib/features/library_browse/presentation/views/series_detail_page/widgets/series_detail_comics_grid.dart',
     );
     final String text = source.readAsStringSync();
     expect(

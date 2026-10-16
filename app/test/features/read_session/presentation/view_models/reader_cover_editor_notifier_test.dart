@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_cover_editor_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
+import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/widgets.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComicDetailPage extends ConsumerWidget {

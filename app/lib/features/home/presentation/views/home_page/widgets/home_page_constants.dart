@@ -1,5 +1,5 @@
-import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
+import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
 
 const double continueReadingItemWidth = 304;
 const double continueReadingItemWidthCompact = 272;

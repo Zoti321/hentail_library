@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/library/metadata_refresh_port.dart';
-import 'package:hentai_library/domain/library/metadata_refresh_types.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_port.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 
 /// UI-side helper: FRB Metadata refresh + catalog revision bump.
 ///

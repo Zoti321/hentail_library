@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/core/logging/app_log.dart';
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
-import 'package:hentai_library/domain/models/value_objects/page_request.dart';
-import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/comic_trash/di/comic_trash.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/comic_trash_actions.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';

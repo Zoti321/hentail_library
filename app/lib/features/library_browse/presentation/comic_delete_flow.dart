@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_trash_dialog.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/comic_confirm_trash_dialog.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/comic_trash_actions.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';

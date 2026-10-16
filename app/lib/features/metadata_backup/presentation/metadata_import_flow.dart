@@ -3,15 +3,15 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/core/logging/app_log.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_bytes.dart';
-import 'package:hentai_library/data/adapters/metadata_backup_frb_adapter.dart';
-import 'package:hentai_library/data/adapters/metadata_backup_frb_types.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/shared/data/adapters/metadata_backup_frb_adapter.dart';
+import 'package:hentai_library/shared/data/adapters/metadata_backup_frb_types.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 typedef MetadataPeekInvoker =

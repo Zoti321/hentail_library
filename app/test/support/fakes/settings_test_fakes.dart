@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod/misc.dart' show Override;
 

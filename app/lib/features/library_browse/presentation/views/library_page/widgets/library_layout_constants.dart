@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 
 enum LibraryLayoutTier { compact, medium, expanded }
 

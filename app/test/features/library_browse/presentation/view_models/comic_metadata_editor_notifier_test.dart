@@ -1,10 +1,10 @@
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/domain/repositories/series_repository.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
+import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_editor_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';

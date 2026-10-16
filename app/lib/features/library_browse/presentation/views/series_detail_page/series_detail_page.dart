@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_page/widgets/widgets.dart';
 
 class SeriesDetailPage extends ConsumerWidget {

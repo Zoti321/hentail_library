@@ -1,6 +1,6 @@
-import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/library/scan_interval.dart';
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_sidebar_overflow_actions.dart';
 import 'package:test/test.dart';
 

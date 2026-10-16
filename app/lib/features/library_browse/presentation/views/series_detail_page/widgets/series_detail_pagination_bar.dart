@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/pagination/library_pagination_bar.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_comics_catalog_controller.dart';
 
 class SeriesDetailPaginationBar extends ConsumerWidget {

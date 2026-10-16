@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/form/fluent_select_field.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/form/fluent_select_field.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

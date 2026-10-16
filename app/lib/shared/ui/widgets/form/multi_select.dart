@@ -1,0 +1,954 @@
+import 'dart:math' as math;
+
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/core/utils/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
+import 'package:hentai_library/shared/ui/widgets/form/fluent_text_field.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:riverpod/misc.dart' show ProviderListenable;
+
+const double _kMultiSelectMenuMaxHeight = 240;
+
+/// 漫画元数据「全库关联」多选：作者 / 标签等场景复用；差异在 [MultiSelectCopy] 与数据源。
+class MultiSelectCopy {
+  const MultiSelectCopy({
+    required this.inputPlaceholder,
+    required this.listLoadFailed,
+    required this.emptyCatalog,
+    required this.emptyRemaining,
+  });
+
+  final String inputPlaceholder;
+  final String listLoadFailed;
+  final String emptyCatalog;
+  final String emptyRemaining;
+}
+
+class _MultiSelectDropdownListStyles {
+  const _MultiSelectDropdownListStyles._();
+
+  static const EdgeInsets rowPadding = EdgeInsets.symmetric(
+    horizontal: 14,
+    vertical: 8,
+  );
+}
+
+/// 图书馆实体多选：字段内 chip + 内联输入；浮层列出未选字典项。
+///
+/// Uses [ConsumerStatefulWidget] for [CustomPopupMenuController] + input/filter
+/// notifiers that must outlive overlay rebuilds (hooks impractical here).
+class MultiSelect<T> extends ConsumerStatefulWidget {
+  const MultiSelect({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.selectedNames,
+    required this.onAdd,
+    required this.onRemove,
+    required this.itemsProvider,
+    required this.onRetry,
+    required this.resolveName,
+    required this.copy,
+    this.labelTrailing,
+    this.compactTrigger = false,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
+  });
+
+  static const Key fieldSurfaceKey = Key('multi_select_field_surface');
+  static const Key menuPanelKey = Key('multi_select_menu_panel');
+  static const Key smartMatchedHintKey = Key('multi_select_smart_matched_hint');
+
+  final String label;
+  final Widget? labelTrailing;
+  final IconData icon;
+  final List<String> selectedNames;
+  final ValueChanged<String> onAdd;
+  final ValueChanged<String> onRemove;
+  final ProviderListenable<AsyncValue<List<T>>> itemsProvider;
+  final VoidCallback onRetry;
+  final String Function(T item) resolveName;
+  final MultiSelectCopy copy;
+  final bool compactTrigger;
+
+  /// When true for a dropdown row, show Smart facet match hint icon.
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
+
+  @override
+  ConsumerState<MultiSelect<T>> createState() => _MultiSelectState<T>();
+}
+
+class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
+  final CustomPopupMenuController _menuController = CustomPopupMenuController();
+  final TextEditingController _inputController = TextEditingController();
+  final ScrollController _menuScrollController = ScrollController();
+  final GlobalKey _highlightedRowKey = GlobalKey();
+  late final FocusNode _inputFocusNode;
+  late final ValueNotifier<List<String>> _selectedNamesNotifier;
+  late final ValueNotifier<String> _filterQueryNotifier;
+  late final ValueNotifier<int?> _highlightedIndexNotifier;
+  List<String> _visibleRemainingNames = const <String>[];
+  double _fieldWidth = 0;
+  double _menuScrollOffset = 0;
+  bool _menuSessionActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _inputFocusNode = FocusNode(onKeyEvent: _handleInputKeyEvent);
+    _selectedNamesNotifier = ValueNotifier<List<String>>(
+      List<String>.of(widget.selectedNames),
+    );
+    _filterQueryNotifier = ValueNotifier<String>(_inputController.text);
+    _highlightedIndexNotifier = ValueNotifier<int?>(null);
+    _inputController.addListener(_syncFilterQuery);
+    _inputFocusNode.addListener(_handleInputFocusChange);
+    _menuScrollController.addListener(_storeMenuScrollOffset);
+  }
+
+  @override
+  void didUpdateWidget(covariant MultiSelect<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncSelectedNamesNotifier();
+  }
+
+  @override
+  void dispose() {
+    _inputController.removeListener(_syncFilterQuery);
+    _inputFocusNode.removeListener(_handleInputFocusChange);
+    _menuScrollController.removeListener(_storeMenuScrollOffset);
+    _inputFocusNode.dispose();
+    _inputController.dispose();
+    _menuScrollController.dispose();
+    _selectedNamesNotifier.dispose();
+    _filterQueryNotifier.dispose();
+    _highlightedIndexNotifier.dispose();
+    super.dispose();
+  }
+
+  void _storeMenuScrollOffset() {
+    if (_menuScrollController.hasClients) {
+      _menuScrollOffset = _menuScrollController.offset;
+    }
+  }
+
+  void _syncFilterQuery() {
+    final String next = _inputController.text;
+    if (_filterQueryNotifier.value == next) {
+      return;
+    }
+    _filterQueryNotifier.value = next;
+    // Filter membership changes a lot; reset to a predictable start.
+    _menuScrollOffset = 0;
+    if (_menuScrollController.hasClients) {
+      _menuScrollController.jumpTo(0);
+    }
+  }
+
+  void _syncSelectedNamesNotifier() {
+    if (listEquals(_selectedNamesNotifier.value, widget.selectedNames)) {
+      return;
+    }
+    final List<String> next = List<String>.of(widget.selectedNames);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      if (!listEquals(_selectedNamesNotifier.value, next)) {
+        _selectedNamesNotifier.value = next;
+      }
+    });
+  }
+
+  void _handleInputFocusChange() {
+    if (_inputFocusNode.hasFocus) {
+      _openMenu();
+    }
+  }
+
+  void _openMenu() {
+    _menuSessionActive = true;
+    if (!_menuController.menuIsShowing) {
+      _menuController.showMenu();
+    }
+  }
+
+  void _closeMenu() {
+    _menuSessionActive = false;
+    if (_menuController.menuIsShowing) {
+      _menuController.hideMenu();
+    }
+  }
+
+  void _handleMenuVisibility(bool showing) {
+    if (showing) {
+      _menuSessionActive = true;
+      return;
+    }
+    // Barrier hides before chip onPressed; defer clearing so remove can reopen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _menuController.menuIsShowing) {
+        return;
+      }
+      _menuSessionActive = false;
+      _highlightedIndexNotifier.value = null;
+    });
+  }
+
+  void _reportVisibleRemaining(List<String> names) {
+    final bool listChanged = !listEquals(names, _visibleRemainingNames);
+    _visibleRemainingNames = List<String>.of(names);
+
+    final int? current = _highlightedIndexNotifier.value;
+    final int? next;
+    if (names.isEmpty) {
+      next = null;
+    } else if (listChanged || current == null || current >= names.length) {
+      next = 0;
+    } else {
+      next = current;
+    }
+
+    if (_highlightedIndexNotifier.value != next) {
+      _highlightedIndexNotifier.value = next;
+    }
+  }
+
+  void _highlightAt(int index, {bool scrollIntoView = false}) {
+    if (index < 0 || index >= _visibleRemainingNames.length) {
+      return;
+    }
+    if (_highlightedIndexNotifier.value != index) {
+      _highlightedIndexNotifier.value = index;
+    }
+    if (scrollIntoView) {
+      _scrollHighlightIntoView();
+    }
+  }
+
+  void _scrollHighlightIntoView() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final BuildContext? rowContext = _highlightedRowKey.currentContext;
+      if (rowContext == null) {
+        return;
+      }
+      Scrollable.ensureVisible(
+        rowContext,
+        alignment: 0.5,
+        duration: Duration.zero,
+      );
+    });
+  }
+
+  void _moveHighlight(int delta) {
+    if (!_menuController.menuIsShowing) {
+      if (delta <= 0) {
+        return;
+      }
+      _openMenu();
+      if (_visibleRemainingNames.isNotEmpty) {
+        _highlightAt(0, scrollIntoView: true);
+      }
+      return;
+    }
+    if (_visibleRemainingNames.isEmpty) {
+      return;
+    }
+    final int current = _highlightedIndexNotifier.value ?? 0;
+    final int next = (current + delta).clamp(
+      0,
+      _visibleRemainingNames.length - 1,
+    );
+    _highlightAt(next, scrollIntoView: true);
+  }
+
+  KeyEventResult _handleInputKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    if (_inputController.value.isComposingRangeValid) {
+      return KeyEventResult.ignored;
+    }
+
+    final LogicalKeyboardKey key = event.logicalKey;
+    if (key == LogicalKeyboardKey.arrowDown) {
+      _moveHighlight(1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowUp) {
+      if (!_menuController.menuIsShowing) {
+        return KeyEventResult.ignored;
+      }
+      _moveHighlight(-1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.tab) {
+      if (HardwareKeyboard.instance.isShiftPressed) {
+        return KeyEventResult.ignored;
+      }
+      final int? index = _highlightedIndexNotifier.value;
+      if (index == null ||
+          index < 0 ||
+          index >= _visibleRemainingNames.length) {
+        return KeyEventResult.ignored;
+      }
+      _addFromMenu(_visibleRemainingNames[index]);
+      return KeyEventResult.handled;
+    }
+    // Chip clear: KeyDown only (no KeyRepeat) so holding the key cannot wipe
+    // many selected names in one gesture.
+    if (event is KeyDownEvent &&
+        (key == LogicalKeyboardKey.backspace ||
+            key == LogicalKeyboardKey.delete)) {
+      final TextEditingValue value = _inputController.value;
+      if (value.text.isNotEmpty ||
+          !value.selection.isCollapsed ||
+          widget.selectedNames.isEmpty) {
+        return KeyEventResult.ignored;
+      }
+      _removeSelected(widget.selectedNames.last);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  void _submitInput() {
+    final String trimmed = _inputController.text.trim();
+    if (trimmed.isEmpty) {
+      return;
+    }
+    widget.onAdd(trimmed);
+    _inputController.clear();
+    _inputFocusNode.requestFocus();
+  }
+
+  void _addFromMenu(String name) {
+    widget.onAdd(name);
+    // Align with keyboard submit: clear inline filter so the open menu shows
+    // all remaining unselected candidates.
+    _inputController.clear();
+    _inputFocusNode.requestFocus();
+  }
+
+  void _removeSelected(String name) {
+    final bool restoreMenu = _menuSessionActive;
+    widget.onRemove(name);
+    if (!restoreMenu) {
+      return;
+    }
+    // Transparent CustomPopupMenu barrier hides on chip taps; reopen and
+    // restore scroll so remove matches the "selection-only" retention rule.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _openMenu();
+      _inputFocusNode.requestFocus();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_menuScrollController.hasClients) {
+          return;
+        }
+        final double max = _menuScrollController.position.maxScrollExtent;
+        _menuScrollController.jumpTo(_menuScrollOffset.clamp(0.0, max));
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Parent may mutate the same List instance; always mirror into the notifier
+    // so the open overlay's ValueListenableBuilder can refresh.
+    _syncSelectedNamesNotifier();
+
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final AsyncValue<List<T>> itemsAsync = ref.watch(widget.itemsProvider);
+    final double fieldVerticalPadding = widget.compactTrigger
+        ? tokens.spacing.xs + 1
+        : tokens.spacing.sm + 2;
+    final double fieldMinHeight = widget.compactTrigger ? 32 : 38;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(widget.icon, size: 14, color: cs.hentai.textTertiary),
+            SizedBox(width: tokens.spacing.sm),
+            Expanded(
+              child: FormLabel(widget.label, trailing: widget.labelTrailing),
+            ),
+          ],
+        ),
+        SizedBox(height: tokens.spacing.sm - 2),
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            _fieldWidth = constraints.maxWidth;
+            return CustomPopupMenu(
+              controller: _menuController,
+              barrierColor: Colors.transparent,
+              pressType: PressType.singleClick,
+              showArrow: false,
+              verticalMargin: 4,
+              menuOnChange: _handleMenuVisibility,
+              menuBuilder: () => ValueListenableBuilder<List<String>>(
+                valueListenable: _selectedNamesNotifier,
+                builder:
+                    (
+                      BuildContext context,
+                      List<String> selectedNames,
+                      Widget? _,
+                    ) {
+                      return ValueListenableBuilder<String>(
+                        valueListenable: _filterQueryNotifier,
+                        builder:
+                            (
+                              BuildContext context,
+                              String filterQuery,
+                              Widget? _,
+                            ) {
+                              return _MultiSelectMenuPanel<T>(
+                                // Key only on filter so selection changes do not
+                                // force-rebuild the panel (which jumps scroll).
+                                // Filter changes intentionally reset scroll.
+                                key: ValueKey<String>(filterQuery),
+                                width: _fieldWidth,
+                                itemsProvider: widget.itemsProvider,
+                                selectedNames: selectedNames,
+                                filterQuery: filterQuery,
+                                scrollController: _menuScrollController,
+                                highlightedIndexListenable:
+                                    _highlightedIndexNotifier,
+                                highlightedRowKey: _highlightedRowKey,
+                                onVisibleRemainingChanged:
+                                    _reportVisibleRemaining,
+                                onHighlightIndex: _highlightAt,
+                                onAdd: _addFromMenu,
+                                onRetry: widget.onRetry,
+                                resolveName: widget.resolveName,
+                                resolveSmartMatched: widget.resolveSmartMatched,
+                                smartMatchedTooltip: widget.smartMatchedTooltip,
+                                copy: widget.copy,
+                              );
+                            },
+                      );
+                    },
+              ),
+              child: CallbackShortcuts(
+                bindings: <ShortcutActivator, VoidCallback>{
+                  const SingleActivator(LogicalKeyboardKey.escape): _closeMenu,
+                },
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      _inputFocusNode.requestFocus();
+                      _openMenu();
+                    },
+                    borderRadius: BorderRadius.circular(tokens.radius.md),
+                    child: AnimatedContainer(
+                      key: MultiSelect.fieldSurfaceKey,
+                      duration: const Duration(milliseconds: 150),
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: tokens.spacing.md,
+                        vertical: fieldVerticalPadding,
+                      ),
+                      constraints: BoxConstraints(minHeight: fieldMinHeight),
+                      decoration: BoxDecoration(
+                        color: cs.surface,
+                        borderRadius: BorderRadius.circular(tokens.radius.md),
+                        border: Border.all(
+                          color: cs.hentai.borderSubtle,
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: cs.shadow,
+                            blurRadius: 1,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Wrap(
+                              spacing: tokens.spacing.xs,
+                              runSpacing: tokens.spacing.xs,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                for (final String name in widget.selectedNames)
+                                  OutlinedMetaChip(
+                                    text: name,
+                                    onRemove: () => _removeSelected(name),
+                                  ),
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    minWidth: 72,
+                                    maxWidth: 200,
+                                  ),
+                                  child: IntrinsicWidth(
+                                    child: TextField(
+                                      controller: _inputController,
+                                      focusNode: _inputFocusNode,
+                                      onSubmitted: (_) => _submitInput(),
+                                      style: TextStyle(
+                                        fontSize: tokens.text.bodySm,
+                                        height: 1.35,
+                                        color: cs.hentai.textPrimary,
+                                      ),
+                                      decoration: InputDecoration(
+                                        isDense: true,
+                                        border: InputBorder.none,
+                                        hintText: widget.selectedNames.isEmpty
+                                            ? widget.copy.inputPlaceholder
+                                            : null,
+                                        hintStyle: TextStyle(
+                                          fontSize: tokens.text.bodySm,
+                                          height: 1.35,
+                                          color: cs.hentai.textPlaceholder,
+                                        ),
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (itemsAsync.isLoading)
+                            Padding(
+                              padding: EdgeInsets.only(top: tokens.spacing.xs),
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: cs.primary,
+                                ),
+                              ),
+                            )
+                          else
+                            Padding(
+                              padding: EdgeInsets.only(top: tokens.spacing.xs),
+                              child: Icon(
+                                LucideIcons.chevronsUpDown,
+                                size: 15,
+                                color: cs.hentai.iconSecondary,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        if (itemsAsync.hasError)
+          Padding(
+            padding: EdgeInsets.only(top: tokens.spacing.sm),
+            child: Row(
+              children: [
+                Icon(LucideIcons.circleAlert, size: 14, color: cs.hentai.error),
+                SizedBox(width: tokens.spacing.sm),
+                Text(
+                  widget.copy.listLoadFailed,
+                  style: TextStyle(
+                    fontSize: tokens.text.labelXs,
+                    color: cs.hentai.textSecondary,
+                  ),
+                ),
+                TextButton(
+                  onPressed: widget.onRetry,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: tokens.spacing.sm,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: Text(context.l10n.commonRetry),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _MultiSelectMenuPanel<T> extends ConsumerWidget {
+  const _MultiSelectMenuPanel({
+    super.key,
+    required this.width,
+    required this.itemsProvider,
+    required this.selectedNames,
+    required this.filterQuery,
+    required this.scrollController,
+    required this.highlightedIndexListenable,
+    required this.highlightedRowKey,
+    required this.onVisibleRemainingChanged,
+    required this.onHighlightIndex,
+    required this.onAdd,
+    required this.onRetry,
+    required this.resolveName,
+    required this.copy,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
+  });
+
+  final double width;
+  final ProviderListenable<AsyncValue<List<T>>> itemsProvider;
+  final List<String> selectedNames;
+  final String filterQuery;
+  final ScrollController scrollController;
+  final ValueListenable<int?> highlightedIndexListenable;
+  final GlobalKey highlightedRowKey;
+  final ValueChanged<List<String>> onVisibleRemainingChanged;
+  final void Function(int index, {bool scrollIntoView}) onHighlightIndex;
+  final ValueChanged<String> onAdd;
+  final VoidCallback onRetry;
+  final String Function(T item) resolveName;
+  final MultiSelectCopy copy;
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final AsyncValue<List<T>> asyncItems = ref.watch(itemsProvider);
+    return asyncItems.when(
+      loading: () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onVisibleRemainingChanged(const <String>[]);
+        });
+        return _MultiSelectMenuSizedShell(
+          width: width,
+          maxHeight: 108,
+          child: const Center(
+            child: Padding(
+              padding: EdgeInsets.all(18),
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          ),
+        );
+      },
+      error: (Object err, StackTrace? st) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onVisibleRemainingChanged(const <String>[]);
+        });
+        return _MultiSelectMenuSizedShell(
+          width: width,
+          maxHeight: 148,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  l10n.commonLoadFailed,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.hentai.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextButton(onPressed: onRetry, child: Text(l10n.commonRetry)),
+              ],
+            ),
+          ),
+        );
+      },
+      data: (List<T> items) {
+        final Set<String> selected = selectedNames.toSet();
+        final List<T> remaining = items
+            .where((T item) => !selected.contains(resolveName(item)))
+            .where(
+              (T item) => nameMatchesPinyinAssistedFilter(
+                resolveName(item),
+                filterQuery,
+              ),
+            )
+            .toList();
+        final List<String> remainingNames = remaining
+            .map(resolveName)
+            .toList(growable: false);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onVisibleRemainingChanged(remainingNames);
+        });
+        return _MultiSelectMenuList<T>(
+          width: width,
+          items: remaining,
+          allCatalogEmpty: items.isEmpty,
+          scrollController: scrollController,
+          highlightedIndexListenable: highlightedIndexListenable,
+          highlightedRowKey: highlightedRowKey,
+          onHighlightIndex: onHighlightIndex,
+          onAdd: onAdd,
+          resolveName: resolveName,
+          resolveSmartMatched: resolveSmartMatched,
+          smartMatchedTooltip: smartMatchedTooltip,
+          copy: copy,
+        );
+      },
+    );
+  }
+}
+
+class _MultiSelectMenuSizedShell extends StatelessWidget {
+  const _MultiSelectMenuSizedShell({
+    required this.width,
+    required this.maxHeight,
+    required this.child,
+  });
+
+  final double width;
+  final double maxHeight;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Container(
+      key: MultiSelect.menuPanelKey,
+      width: width > 0 ? width : 240,
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(tokens.radius.xs),
+        border: Border.all(color: cs.hentai.borderSubtle),
+        boxShadow: [
+          BoxShadow(
+            color: cs.hentai.cardShadowHover,
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(tokens.radius.xs),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _MultiSelectMenuList<T> extends StatelessWidget {
+  const _MultiSelectMenuList({
+    required this.width,
+    required this.items,
+    required this.allCatalogEmpty,
+    required this.scrollController,
+    required this.highlightedIndexListenable,
+    required this.highlightedRowKey,
+    required this.onHighlightIndex,
+    required this.onAdd,
+    required this.resolveName,
+    required this.copy,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
+  });
+
+  final double width;
+  final List<T> items;
+  final bool allCatalogEmpty;
+  final ScrollController scrollController;
+  final ValueListenable<int?> highlightedIndexListenable;
+  final GlobalKey highlightedRowKey;
+  final void Function(int index, {bool scrollIntoView}) onHighlightIndex;
+  final ValueChanged<String> onAdd;
+  final String Function(T item) resolveName;
+  final MultiSelectCopy copy;
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final double panelMaxHeight = math.min(
+      _kMultiSelectMenuMaxHeight,
+      MediaQuery.sizeOf(context).height * 0.45,
+    );
+
+    return _MultiSelectMenuSizedShell(
+      width: width,
+      maxHeight: panelMaxHeight,
+      child: items.isEmpty
+          ? Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: tokens.spacing.lg,
+                  vertical: tokens.spacing.md,
+                ),
+                child: Text(
+                  allCatalogEmpty ? copy.emptyCatalog : copy.emptyRemaining,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: tokens.text.bodySm,
+                    color: cs.hentai.textTertiary,
+                  ),
+                ),
+              ),
+            )
+          : ValueListenableBuilder<int?>(
+              valueListenable: highlightedIndexListenable,
+              builder:
+                  (BuildContext context, int? highlightedIndex, Widget? _) {
+                    return ListView.builder(
+                      controller: scrollController,
+                      shrinkWrap: true,
+                      physics: const ClampingScrollPhysics(),
+                      padding: EdgeInsets.only(
+                        top: tokens.spacing.sm,
+                        bottom: tokens.spacing.md + 2,
+                      ),
+                      itemCount: items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final T item = items[index];
+                        final String name = resolveName(item);
+                        final bool smartMatched =
+                            resolveSmartMatched?.call(item) ?? false;
+                        final bool isHighlighted = highlightedIndex == index;
+                        return _MultiSelectDropdownRow(
+                          key: isHighlighted ? highlightedRowKey : null,
+                          displayName: name,
+                          isHighlighted: isHighlighted,
+                          smartMatched: smartMatched,
+                          smartMatchedTooltip: smartMatchedTooltip,
+                          onHover: () => onHighlightIndex(index),
+                          onSelect: () => onAdd(name),
+                        );
+                      },
+                    );
+                  },
+            ),
+    );
+  }
+}
+
+class _MultiSelectDropdownRow extends StatelessWidget {
+  const _MultiSelectDropdownRow({
+    super.key,
+    required this.displayName,
+    required this.onSelect,
+    required this.onHover,
+    this.isHighlighted = false,
+    this.smartMatched = false,
+    this.smartMatchedTooltip,
+  });
+
+  final String displayName;
+  final VoidCallback onSelect;
+  final VoidCallback onHover;
+  final bool isHighlighted;
+  final bool smartMatched;
+  final String? smartMatchedTooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final Color selectedFill = cs.primary.withAlpha(14);
+    final Color hoverFill = cs.primary.withAlpha(10);
+
+    final Widget nameText = Text(
+      displayName,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w500,
+        color: isHighlighted ? cs.primary : cs.hentai.textPrimary,
+      ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+
+    final Widget rowChild;
+    if (smartMatched) {
+      final Widget hint = Icon(
+        LucideIcons.sparkles,
+        key: MultiSelect.smartMatchedHintKey,
+        size: 14,
+        color: cs.hentai.textTertiary,
+      );
+      final String? tip = smartMatchedTooltip;
+      rowChild = Row(
+        children: <Widget>[
+          Expanded(child: nameText),
+          SizedBox(width: tokens.spacing.sm),
+          if (tip == null || tip.isEmpty)
+            hint
+          else
+            Tooltip(message: tip, child: hint),
+        ],
+      );
+    } else {
+      rowChild = nameText;
+    }
+
+    return Theme(
+      data: theme.copyWith(
+        splashFactory: NoSplash.splashFactory,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: isHighlighted ? Colors.transparent : hoverFill,
+      ),
+      child: Semantics(
+        selected: isHighlighted,
+        button: true,
+        label: displayName,
+        child: Material(
+          color: isHighlighted ? selectedFill : Colors.transparent,
+          child: InkWell(
+            onTap: onSelect,
+            onHover: (bool hovering) {
+              if (hovering) {
+                onHover();
+              }
+            },
+            hoverColor: isHighlighted ? Colors.transparent : hoverFill,
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: WidgetStateProperty.resolveWith((
+              Set<WidgetState> states,
+            ) {
+              if (states.contains(WidgetState.pressed)) {
+                return selectedFill;
+              }
+              if (states.contains(WidgetState.hovered) && !isHighlighted) {
+                return hoverFill;
+              }
+              return Colors.transparent;
+            }),
+            child: Padding(
+              padding: _MultiSelectDropdownListStyles.rowPadding,
+              child: rowChild,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

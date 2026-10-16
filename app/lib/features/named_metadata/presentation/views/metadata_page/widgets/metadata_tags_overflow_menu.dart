@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_panel_shell.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/anchored_overlay_menu.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

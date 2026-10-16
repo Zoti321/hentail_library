@@ -1,0 +1,108 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hentai_library/shared/ui/interaction/desktop_page_transition.dart';
+
+part 'theme_layout_tokens.dart';
+part 'theme_typography_tokens.dart';
+part 'theme_visual_tokens.dart';
+
+/// Shell / theme-boundary system bar style for everyday browsing chrome.
+///
+/// Keeps edge-to-edge (transparent system bars). Icon contrast follows
+/// [ColorScheme.brightness]; navigation bar color uses [ColorScheme.surface]
+/// on platforms that still honor it (ignored under forced edge-to-edge where
+/// the app paints behind the bars instead).
+SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
+  final bool isDark = colorScheme.brightness == Brightness.dark;
+  final Brightness iconBrightness = isDark ? Brightness.light : Brightness.dark;
+  return SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: iconBrightness,
+    statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+    systemNavigationBarColor: colorScheme.surface,
+    systemNavigationBarIconBrightness: iconBrightness,
+    systemNavigationBarContrastEnforced: false,
+  );
+}
+
+ThemeData buildAppTheme(Brightness brightness) {
+  final colorScheme = HentaiColorScheme.buildBaseColorScheme(brightness);
+  final tokens = brightness == Brightness.dark
+      ? AppThemeTokens.dark()
+      : AppThemeTokens.light();
+  final RoundedRectangleBorder buttonShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(tokens.radius.md),
+  );
+
+  var themeData = ThemeData(
+    useMaterial3: true,
+    colorScheme: colorScheme,
+    scaffoldBackgroundColor: colorScheme.surface,
+    canvasColor: colorScheme.surface,
+    dividerColor: colorScheme.outlineVariant,
+    splashFactory: NoSplash.splashFactory,
+    highlightColor: Colors.transparent,
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+    fontFamily: 'MI_Sans_Regular',
+    appBarTheme: _buildAppBarThemeData(colorScheme),
+    navigationRailTheme: _buildNavRailThemeData(colorScheme),
+    scrollbarTheme: _buildScrollbarTheme(colorScheme),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(shape: buttonShape),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(shape: buttonShape),
+    ),
+    inputDecorationTheme: const InputDecorationTheme(hintMaxLines: 1),
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.linux: DesktopFadeThroughPageTransitionsBuilder(),
+        TargetPlatform.macOS: DesktopFadeThroughPageTransitionsBuilder(),
+        TargetPlatform.windows: DesktopFadeThroughPageTransitionsBuilder(),
+      },
+    ),
+    extensions: [tokens],
+  );
+  return themeData;
+}
+
+ScrollbarThemeData _buildScrollbarTheme(ColorScheme colorScheme) {
+  return ScrollbarThemeData(
+    thumbVisibility: WidgetStateProperty.all(false),
+    thickness: WidgetStateProperty.all(4),
+    mainAxisMargin: 10,
+    crossAxisMargin: 3,
+    radius: const Radius.circular(999),
+    thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+      final base = colorScheme.onSurfaceVariant;
+      if (states.contains(WidgetState.dragged)) {
+        return base.withOpacity(0.95);
+      }
+      if (states.contains(WidgetState.hovered)) {
+        return base.withOpacity(0.85);
+      }
+      return base.withOpacity(0.65);
+    }),
+    trackColor: WidgetStateProperty.all(Colors.transparent),
+    trackBorderColor: WidgetStateProperty.all(Colors.transparent),
+  );
+}
+
+AppBarTheme _buildAppBarThemeData(ColorScheme colorScheme) {
+  return AppBarTheme(
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: colorScheme.surface,
+    scrolledUnderElevation: 0.0,
+    systemOverlayStyle: appSystemUiOverlayStyle(colorScheme),
+  );
+}
+
+NavigationRailThemeData _buildNavRailThemeData(ColorScheme colorScheme) {
+  return NavigationRailThemeData(
+    labelType: NavigationRailLabelType.all,
+    backgroundColor: colorScheme.surface,
+    useIndicator: true,
+  );
+}

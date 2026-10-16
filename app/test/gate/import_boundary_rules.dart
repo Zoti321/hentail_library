@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import 'wayfinder_layout_helpers.dart';
+
 /// Module ids for Wayfinder import-boundary Gate (#220).
 ///
 /// Keep in sync with `scripts/research/cross_feature_import_audit.py` (`classify`).
@@ -75,21 +77,6 @@ String classifyLibPath(String relativePosix) {
   if (path.startsWith('src/rust/')) {
     return 'frb_generated';
   }
-  if (path.startsWith('data/')) {
-    return 'shared';
-  }
-  if (path.startsWith('domain/')) {
-    return 'shared';
-  }
-  if (path.startsWith('core/')) {
-    return 'shared';
-  }
-  if (path.startsWith('ui/core/')) {
-    return 'shared';
-  }
-  if (path == 'ui/providers.dart' || path.startsWith('ui/providers/')) {
-    return 'bootstrap';
-  }
   if (path == 'main.dart') {
     return 'bootstrap';
   }
@@ -127,7 +114,7 @@ bool isPresentationLayerPath(String libRelativePosix) {
   if (path.startsWith('features/') && path.contains('/presentation/')) {
     return true;
   }
-  return path.startsWith('ui/features/') || path.startsWith('ui/core/');
+  return path.startsWith('shared/ui/');
 }
 
 bool isDomainLayerPath(String libRelativePosix) {
@@ -141,9 +128,6 @@ bool isDomainLayerPath(String libRelativePosix) {
 bool isFrbImportAllowedSource(String libRelativePosix) {
   final String path = libRelativePosix.replaceAll(r'\', '/');
   if (path == 'main.dart') {
-    return true;
-  }
-  if (path.startsWith('data/')) {
     return true;
   }
   if (path.startsWith('shared/data/')) {
@@ -196,7 +180,7 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
       continue;
     }
     final String contents = file.readAsStringSync();
-    if (isStranglerExportOnlyShim(contents)) {
+    if (!isCanonicalLibRelativePath(rel) && isStranglerExportOnlyShim(contents)) {
       continue;
     }
     final String sourceModule = classifyLibPath(rel);
@@ -237,7 +221,7 @@ void _checkStructuralRules({
   required String targetModule,
 }) {
   if (isDomainLayerPath(sourceRel)) {
-    if (importPath.startsWith('data/') || importPath.startsWith('shared/data/')) {
+    if (importPath.startsWith('shared/data/')) {
       found.add(
         violation(
           ruleId: 'R1',
@@ -288,8 +272,7 @@ void _checkStructuralRules({
   }
 
   if (sourceModule == 'library_browse') {
-    if (importPath.startsWith('domain/reading/') ||
-        importPath.startsWith('features/read_session/')) {
+    if (importPath.startsWith('features/read_session/')) {
       found.add(
         violation(
           ruleId: 'R5',

@@ -2,8 +2,8 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 
 /// Unified visual size for reader top-bar action [GhostButton]s (including back).
 const double kReaderTopBarActionSize = 32;

@@ -15,16 +15,16 @@ How agents should build UI in this project: reuse custom components, follow the 
 
 Shell / theme entry points:
 
-- `app/lib/ui/features/shell/views/app.dart` — `buildAppTheme` (light/dark)
-- `app/lib/ui/features/shell/views/routing/app_router.dart` — single `appRouter` + `ResponsiveAppShell`
-- `app/lib/ui/core/layout/app_layout_breakpoints.dart` — compact / medium / expanded
-- `app/lib/core/util/utils.dart` — `isDesktop` for **window chrome only** (Windows / macOS / Linux; not web); do not fork page trees on it
+- `app/lib/features/bootstrap/presentation/views/app.dart` — `buildAppTheme` (light/dark)
+- `app/lib/features/bootstrap/presentation/views/routing/app_router.dart` — single `appRouter` + `ResponsiveAppShell`
+- `app/lib/shared/ui/layout/app_layout_breakpoints.dart` — compact / medium / expanded
+- `app/lib/shared/core/util/utils.dart` — `isDesktop` for **window chrome only** (Windows / macOS / Linux; not web); do not fork page trees on it
 
 ---
 
 ## Design language (desktop = source of truth)
 
-Desktop UI is a **custom, Fluent-inspired** surface — not stock Material. Extracted from `app/lib/ui/core/theme/`.
+Desktop UI is a **custom, Fluent-inspired** surface — not stock Material. Extracted from `app/lib/shared/ui/theme/`.
 
 ### Overall feel
 
@@ -137,7 +137,7 @@ CatalogCoverCardShell
 
 ## Component catalog
 
-Reuse widgets under `app/lib/ui/core/widgets/` before adding a new primitive. The directory is the source of truth — do not maintain a filename inventory here.
+Reuse widgets under `app/lib/shared/ui/widgets/` before adding a new primitive. The directory is the source of truth — do not maintain a filename inventory here.
 
 | Category | Path |
 |----------|------|
@@ -152,12 +152,12 @@ Reuse widgets under `app/lib/ui/core/widgets/` before adding a new primitive. Th
 | Pagination | `pagination/` |
 | Layout | `responsive_layout/` |
 
-Feature-only editors (`EditMetadataDialog`, `EditSeriesDialog`) live under `ui/features/library/views/widgets/`, not the shared overlay catalog.
+Feature-only editors (`EditMetadataDialog`, `EditSeriesDialog`) live under `features/library_browse/presentation/views/**/widgets/`, not the shared overlay catalog.
 
 Theme entry points:
 
-- `app/lib/ui/core/theme/theme.dart` — `buildAppTheme`, `HentaiColorScheme`, extensions
-- `app/lib/ui/core/theme/theme_layout_tokens.dart` — `AppThemeTokens`, `context.tokens`
+- `app/lib/shared/ui/theme/theme.dart` — `buildAppTheme`, `HentaiColorScheme`, extensions
+- `app/lib/shared/ui/theme/theme_layout_tokens.dart` — `AppThemeTokens`, `context.tokens`
 
 ---
 
@@ -165,7 +165,7 @@ Theme entry points:
 
 ### Existing helpers
 
-- **`AppLayoutBreakpoints`** — canonical widths: compact `< 600`, medium `600–1024`, expanded `≥ 1024` (`app/lib/ui/core/layout/app_layout_breakpoints.dart`).
+- **`AppLayoutBreakpoints`** — canonical widths: compact `< 600`, medium `600–1024`, expanded `≥ 1024` (`app/lib/shared/ui/layout/app_layout_breakpoints.dart`).
 - **`ResponsiveAppShell`** — compact drawer / medium collapsed sidebar / expanded sidebar; wraps all app routes.
 - **`DetailPrimaryRowLayout`** — comic/series detail cover + info: single column on compact, row on wider widths.
 - **`LibraryBlocksSliverGroup`** — standard library page sliver composition (series block + comics block).
@@ -206,9 +206,9 @@ When narrowing: keep **desktop visual style** (colors, borders, GhostButton, cus
 ## File layout convention
 
 ```
-app/lib/ui/features/<feature>/views/   # shared screens (no desktop/ vs mobile/ split)
-app/lib/ui/core/widgets/               # shared custom components — extend here first
-app/lib/ui/core/layout/                # breakpoints / layout primitives
+app/lib/features/<feature>/presentation/views/   # feature screens (no desktop/ vs mobile/ split)
+app/lib/shared/ui/widgets/                       # shared custom components — extend here first
+app/lib/shared/ui/layout/                        # breakpoints / layout primitives
 ```
 
 New shared screens: place widgets in `core/widgets` if cross-feature; keep feature-specific composition under `views/` without a `desktop/` / `mobile/` split.

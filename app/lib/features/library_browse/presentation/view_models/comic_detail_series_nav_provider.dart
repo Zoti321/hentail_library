@@ -1,7 +1,7 @@
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_series_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

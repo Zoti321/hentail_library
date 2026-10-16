@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/util/semver_utils.dart';
+import 'package:hentai_library/shared/core/util/semver_utils.dart';
 import 'package:hentai_library/features/app_settings/data/services/app_update/app_update_service.dart';
-import 'package:hentai_library/domain/models/app_release_info.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/app_update_dialog.dart';
+import 'package:hentai_library/shared/domain/models/app_release_info.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/app_update_dialog.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_controller.dart';
 import 'package:hentai_library/features/bootstrap/di/services.dart';
 import 'package:mocktail/mocktail.dart';

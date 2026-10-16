@@ -9,7 +9,7 @@
 | Rust 业务真值缝 | sync / reader / DB / path migration 业务行为 | `core/`（`tests/common/` harness） | `gate-rust-test` |
 | FRB 线缝 | `RustLib.init` 加载真实 cdylib；sync / async / 错误 DTO 跨线缝可通 | `app/test/frb_wire/` | `gate-dart-test` |
 | Dart 薄边缝 | mapper / guard / adapter、domain / core 纯逻辑 | `app/test/{domain,core,data}/` | `gate-dart-test` |
-| UI 双轨 | 快轨 = Dart hard-manifest UI；慢轨 = Dart slow-track UI | `app/test/ui/` | `gate-dart-test` / `nightly-dart-ui` |
+| UI 双轨 | 快轨 = Dart hard-manifest UI；慢轨 = Dart slow-track UI | `app/test/shared/ui/`、`app/test/features/` | `gate-dart-test` / `nightly-dart-ui` |
 
 ## CI tier 命名
 
@@ -28,7 +28,7 @@ Job id 形如 `{tier}-{domain}-{intent}`（词汇表见 ADR-0018）。
 
 | Job | Workflow | 本地复现 | 内容 |
 |-----|----------|----------|------|
-| `nightly-dart-ui` | `nightly.yml` | `cd app && flutter test test/ui` | 全量 `test/ui`（含慢轨） |
+| `nightly-dart-ui` | `nightly.yml` | `cd app && flutter test test/shared/ui test/features` | 全量 `test/shared/ui` + `test/features`（含慢轨） |
 | `nightly-dart-coverage` | `nightly.yml` | `cargo build --manifest-path core/Cargo.toml -p hentai_flutter && cd app && flutter test --coverage` | **Dart 侧**全量测试行覆盖率趋势：Step Summary + `dart-coverage-lcov` artifact；**不是**门禁 |
 | `nightly-rust-coverage` | `nightly.yml`（与 `nightly-dart-*` 并行；定时仅 main） | `RUST_COVERAGE_HTML=1 ./scripts/run-rust-coverage.sh`（需 `cargo-llvm-cov` + `llvm-tools-preview`） | `hentai-core` 行覆盖率趋势：Summary `LH/LF` + `rust-coverage-lcov` + HTML zip；**不是**门禁；**不可与 Dart % 横向比较** |
 | `watch-platform-android-pdf` | `watch.yml` | 连接 Android 设备/模拟器后 `cd app && flutter test integration_test/pdf_reader_smoke_test.dart` | x86_64 模拟器上真机链路打开 PDF 并读首页；发布时并行跑，失败不挡 `release-publish` |
@@ -85,17 +85,17 @@ Slice 新增 shim 时同步更新 `strangler_shims.txt` 与 #225 §F；slice 关
 
 ```bash
 ./scripts/run-gate.sh          # 完整 Gate
-cd app && flutter test         # 全量 Dart（含慢轨 test/ui）
+cd app && flutter test         # 全量 Dart（含慢轨 test/shared/ui、test/features）
 ```
 
-Gate **不会**跑全量 `test/ui`（由 `nightly-dart-ui` 覆盖）、不会跑 `integration_test`（由 `watch-platform-android-pdf` 覆盖）、不上 coverage 门禁（`nightly-dart-coverage` / `nightly-rust-coverage` 只出趋势；Rust 行覆盖率 Gate 见 issue #206 PR-B 的 `gate-rust-coverage`）。
+Gate **不会**跑全量 `test/shared/ui` + `test/features`（由 `nightly-dart-ui` 覆盖）、不会跑 `integration_test`（由 `watch-platform-android-pdf` 覆盖）、不上 coverage 门禁（`nightly-dart-coverage` / `nightly-rust-coverage` 只出趋势；Rust 行覆盖率 Gate 见 issue #206 PR-B 的 `gate-rust-coverage`）。
 
 **Dart 与 Rust 覆盖率不可比**：Dart 为 `app/` 全量测试插桩；Rust 仅为 `hentai-core` 产品 crate（排除 `vendor/` 与 `crates/core/tests/` harness），工具链为 `cargo-llvm-cov`。
 
 ## ADR-0002 测试含义
 
 - **信任 `cargo test`**：Library sync / 阅读 I/O / DB / series 业务行为以 Rust 集成为准。
-- **Dart data**：只测 FRB ↔ domain 的 **mapper / error·call guard / adapter**（见 `app/test/data/`）。**不要**对真 FRB 或 `*_repository_impl` 写全流程集成测（避免第二套集成栈）。
+- **Dart data**：只测 FRB ↔ domain 的 **mapper / error·call guard / adapter**（见 `app/test/shared/data/`）。**不要**对真 FRB 或 `*_repository_impl` 写全流程集成测（避免第二套集成栈）。
 - **FRB 线缝**：唯一碰真实 cdylib 的 Dart 测试，只保留 1–3 条直调 API 的冒烟（`app/test/frb_wire/`），不断言业务。新线缝测必须走 `frb_wire_harness.dart` 的 `initRustLibForWireTest()`；本地需先 `cargo build --manifest-path core/Cargo.toml -p hentai_flutter`（或设置 `HENTAI_FLUTTER_LIB` 指向动态库）。
 - **Dart UI**：widget / 交互；优先薄 smoke + 抽纯逻辑到 unit。
 
@@ -104,7 +104,7 @@ Gate **不会**跑全量 `test/ui`（由 `nightly-dart-ui` 覆盖）、不会跑
 | 轨 | 进入条件 | CI |
 |----|----------|-----|
 | **快轨**（Dart hard-manifest UI） | 低 timing、少 `pumpAndSettle`、无脆弱 viewport 尺寸依赖；优先纯逻辑 unit 或极薄 smoke | 列入 gate manifest 硬门禁 |
-| **慢轨**（Dart slow-track UI） | 大壳、侧栏、多断点 responsive、阅读器 viewport 手势/时序 | 本地 + `nightly-dart-ui`；全量 `test/ui` **不进 Gate** |
+| **慢轨**（Dart slow-track UI） | 大壳、侧栏、多断点 responsive、阅读器 viewport 手势/时序 | 本地 + `nightly-dart-ui`；全量 `test/shared/ui` + `test/features` **不进 Gate** |
 
 ### 晋升快轨检查清单
 
@@ -127,7 +127,7 @@ Gate **不会**跑全量 `test/ui`（由 `nightly-dart-ui` 覆盖）、不会跑
 | Flutter | `app/test/support/`（如 `pump_localized_app.dart`、`fakes/`） | 本地化 pump、常用 overrides/fakes |
 | Rust | `core/crates/core/tests/common/` | DB init 锁、`create_fixture_db`、fixture SQL |
 
-触及全局 DB 或 `drift_v2.sql` fixture 的 Rust 集成测走 `mod common;`；纯解析 / 纯函数测试不必引入。**schema / 字段表守卫测试**（自建内存库跑迁移 + `PRAGMA table_info`，不碰全局连接，故无需 harness）留在模块内：`core/crates/core/src/metadata_lock/field.rs`、`core/crates/core/src/path_migration/persist.rs`。新 Dart 测试放在 `test/ui`、`test/data`、`test/domain` 或 `test/core`。
+触及全局 DB 或 `drift_v2.sql` fixture 的 Rust 集成测走 `mod common;`；纯解析 / 纯函数测试不必引入。**schema / 字段表守卫测试**（自建内存库跑迁移 + `PRAGMA table_info`，不碰全局连接，故无需 harness）留在模块内：`core/crates/core/src/metadata_lock/field.rs`、`core/crates/core/src/path_migration/persist.rs`。新 Dart 测试放在 `test/features/<id>/`、`test/shared/ui`、`test/shared/data`、`test/shared/domain` 或 `test/shared/core`。
 
 ### Flutter 示例
 

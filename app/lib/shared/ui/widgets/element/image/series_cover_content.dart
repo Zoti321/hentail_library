@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
+import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
+import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
+import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
+import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
+import 'package:hentai_library/shared/di/series_cover_providers.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// 系列封面：优先自定义系列缩略图，否则回退到成员漫画封面。
+class SeriesCoverContent extends ConsumerWidget {
+  const SeriesCoverContent({
+    super.key,
+    required this.seriesId,
+    this.priority = ThumbnailPriority.high,
+    this.gridIndex,
+  });
+
+  final String seriesId;
+  final ThumbnailPriority priority;
+  final int? gridIndex;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<SeriesCoverSource> async = ref.watch(
+      seriesCoverSourceProvider(seriesId),
+    );
+    return async.when(
+      loading: () => const ComicCoverPlaceholder(
+        variant: ComicCoverPlaceholderVariant.card,
+        kind: ComicCoverPlaceholderKind.loading,
+      ),
+      error: (_, _) => const ComicCoverPlaceholder(
+        variant: ComicCoverPlaceholderVariant.card,
+        kind: ComicCoverPlaceholderKind.error,
+      ),
+      data: (SeriesCoverSource source) => switch (source) {
+        SeriesCoverCustomThumbnail(:final thumbnail) =>
+          CardLetterboxedCoverImage(cover: ComicCoverImage.bytes(thumbnail)),
+        SeriesCoverFallbackComic(:final comicId) => ComicCoverContent(
+          comicId: comicId,
+          priority: priority,
+          gridIndex: gridIndex,
+        ),
+        SeriesCoverMissing() => const ComicCoverPlaceholder(
+          variant: ComicCoverPlaceholderVariant.card,
+          kind: ComicCoverPlaceholderKind.noCover,
+        ),
+      },
+    );
+  }
+}

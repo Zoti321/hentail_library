@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_tab_page_size_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_tab_page_size_settings.dart';

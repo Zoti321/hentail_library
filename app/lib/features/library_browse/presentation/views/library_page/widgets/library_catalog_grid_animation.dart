@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 
 /// 库页翻页动效时长（对齐桌面短动效 180–220 ms）。
 const Duration kLibraryCatalogPageTransitionDuration = Duration(

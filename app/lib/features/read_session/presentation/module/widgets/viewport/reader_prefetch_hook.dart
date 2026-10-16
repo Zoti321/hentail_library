@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/image/image_decode_cache_size.dart';
+import 'package:hentai_library/shared/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_logic.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';

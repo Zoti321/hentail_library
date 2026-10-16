@@ -1,4 +1,4 @@
-import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
+import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
 
 class HistoryPagedFeedState {
   const HistoryPagedFeedState({

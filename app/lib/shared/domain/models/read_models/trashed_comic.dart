@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 
 /// 处于 Comic trash 的漫画（「已删除」页列表项）。
 typedef TrashedComic = ({

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/library/sync_library_types.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 
 /// Finished silent Library sync outcome for shell-global Toast copy.
 typedef LibraryScanCompletion = ({

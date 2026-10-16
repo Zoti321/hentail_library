@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/library/scan_interval.dart';
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_form_dialog.dart';
 import 'package:riverpod/misc.dart' show Override;

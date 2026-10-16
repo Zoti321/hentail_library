@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
-import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
+import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 
 /// Library sync 进行中，或后台缩略图队列仍活跃（`total > 0 && done < total`）。
 ///

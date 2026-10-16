@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/library/scan_interval.dart';
-import 'package:hentai_library/domain/library/sync_library_types.dart';
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/domain/ports/library_revision_port.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/bootstrap/di/ports.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';

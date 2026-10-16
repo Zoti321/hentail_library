@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/domain/library/scan_interval.dart';
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
-import 'package:hentai_library/domain/repositories/library_repository.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;

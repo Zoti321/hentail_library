@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_coordinator.dart';
-import 'package:hentai_library/domain/library/metadata_refresh_port.dart';
-import 'package:hentai_library/domain/library/metadata_refresh_types.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_port.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:test/test.dart';
 
 class _ScriptedRefreshAdapter implements MetadataRefreshPort {

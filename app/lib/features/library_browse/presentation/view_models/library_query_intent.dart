@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// Intent 层：只表达「用户想看什么」，不处理数据源订阅与派生计算。
 class LibraryQueryIntent {

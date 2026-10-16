@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_serialization_status_filter.dart';
 
 /// 库页系列列表投影：intent 与年龄限制 → [LibrarySeriesFilter]。
 class LibrarySeriesFilter {

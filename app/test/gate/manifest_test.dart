@@ -34,9 +34,9 @@ void main() {
       expect(
         readGateManifestEntries(),
         containsAll(<String>[
-          'test/domain',
-          'test/core',
-          'test/data',
+          'test/shared/domain',
+          'test/shared/core',
+          'test/shared/data',
           'test/frb_wire',
           'test/project_layout_test.dart',
           'test/widget_test.dart',

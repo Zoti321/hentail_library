@@ -1,10 +1,10 @@
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/reading_history.dart';
-import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/entity/reading_history.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_service.dart';
-import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
 import 'package:test/test.dart';
 
 class _RecordingReadingHistoryRepo implements ReadingHistoryRepository {

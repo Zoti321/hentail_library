@@ -22,7 +22,7 @@ Dart layers, widget state, Riverpod / MVVM: `docs/agents/coding-style.md`. Scan 
 
 ### UI
 
-Single responsive shell, desktop Fluent-inspired, reuse `app/lib/ui/core/widgets/`: `docs/agents/ui-style.md`.
+Single responsive shell, desktop Fluent-inspired, reuse `app/lib/shared/ui/widgets/`: `docs/agents/ui-style.md`.
 
 ### Testing
 

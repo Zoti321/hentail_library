@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/library/scan_interval.dart';
-import 'package:hentai_library/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/domain/repositories/author_repository.dart';
-import 'package:hentai_library/domain/repositories/named_facet_dictionary_repository.dart';
-import 'package:hentai_library/domain/repositories/tag_repository.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
+import 'package:hentai_library/shared/domain/repositories/author_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/tag_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_page_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/features/bootstrap/di/ports.dart';

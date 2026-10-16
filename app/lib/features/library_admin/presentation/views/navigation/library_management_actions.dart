@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/library/sync_library_types.dart';
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_form_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_routes.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 
 /// Shared Library create / edit / delete / scan actions for sidebar + paths page.
 abstract final class LibraryManagementActions {

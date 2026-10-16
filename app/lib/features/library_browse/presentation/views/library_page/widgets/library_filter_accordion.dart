@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const Duration kLibraryFilterAccordionDuration = Duration(milliseconds: 200);

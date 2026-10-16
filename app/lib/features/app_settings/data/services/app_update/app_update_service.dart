@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:hentai_library/core/constants/app_update_constants.dart';
-import 'package:hentai_library/core/util/semver_utils.dart';
-import 'package:hentai_library/domain/models/app_release_info.dart';
+import 'package:hentai_library/shared/core/constants/app_update_constants.dart';
+import 'package:hentai_library/shared/core/util/semver_utils.dart';
+import 'package:hentai_library/shared/domain/models/app_release_info.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 

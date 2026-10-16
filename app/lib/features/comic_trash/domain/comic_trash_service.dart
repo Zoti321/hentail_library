@@ -1,8 +1,8 @@
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
-import 'package:hentai_library/domain/models/value_objects/page_request.dart';
-import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/domain/ports/reader_session_port.dart';
-import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 
 /// Comic trash / restore / purge 与「已删除」列表查询（ADR-0023）。
 class ComicTrashService {

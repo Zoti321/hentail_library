@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/library/sync_library_port.dart';
-import 'package:hentai_library/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_port.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 
 /// UI-side helper: FRB Library sync + catalog revision bump.
 ///

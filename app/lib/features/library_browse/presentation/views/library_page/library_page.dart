@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_inactive_subscription.dart';
@@ -12,7 +12,7 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
-import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
+import 'package:hentai_library/shared/ui/widgets/responsive_layout/library_blocks_layout.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});

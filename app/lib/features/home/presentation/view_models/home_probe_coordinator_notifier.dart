@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
-import 'package:hentai_library/domain/repositories/home_page_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';

@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/data/adapters/reader_frb_mapper.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
-import 'package:hentai_library/ui/providers/series_cover_providers.dart';
+import 'package:hentai_library/shared/di/comic_cover_providers.dart';
+import 'package:hentai_library/shared/di/series_cover_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_cover_editor_notifier.g.dart';

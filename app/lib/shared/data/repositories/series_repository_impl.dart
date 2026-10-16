@@ -1,0 +1,194 @@
+import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/adapters/series_frb_mapper.dart';
+import 'package:hentai_library/features/library_browse/domain/library_series_projection.dart';
+import 'package:hentai_library/shared/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
+import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
+import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
+import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
+
+class SeriesRepositoryImpl implements SeriesRepository {
+  const SeriesRepositoryImpl();
+
+  @override
+  Future<int> countAll() async => guardFrb(
+    () async => (await rust_series.countAllSeriesFrb()).toInt(),
+    fallbackMessage: '统计系列数量失败',
+  );
+
+  @override
+  Future<PagedResult<Series>> fetchPage({
+    required PageRequest request,
+    required LibrarySeriesFilter filter,
+    required LibrarySeriesSortOption sortOption,
+  }) async {
+    final rust_series.PagedSeriesResultDto page = await guardFrb(
+      () => rust_series.fetchSeriesPageFrb(
+        request: mapSeriesPageRequest(request),
+        filter: mapLibrarySeriesFilter(filter),
+        sort: mapSeriesSortOption(sortOption: sortOption),
+      ),
+      fallbackMessage: '读取系列分页失败',
+    );
+    return mapPagedSeriesResult(page);
+  }
+
+  @override
+  Future<Series?> findById(String seriesId) async {
+    final rust_series.SeriesDto? dto = await guardFrb(
+      () => rust_series.findSeriesByIdFrb(seriesId: seriesId),
+      fallbackMessage: '读取系列失败',
+    );
+    return dto == null ? null : mapRustSeries(dto);
+  }
+
+  @override
+  Future<SeriesItemMembership?> findMembershipByComicId(String comicId) async {
+    final rust_series.SeriesItemDto? dto = await guardFrb(
+      () => rust_series.findSeriesItemByComicIdFrb(comicId: comicId),
+      fallbackMessage: '读取系列成员归属失败',
+    );
+    return dto == null ? null : mapRustSeriesItemMembership(dto);
+  }
+
+  @override
+  Future<SeriesReadingContext?> getReadingContextByComicId(
+    String comicId,
+  ) async {
+    final rust_series.SeriesReadingContextDto? dto = await guardFrb(
+      () => rust_series.getSeriesReadingContextByComicIdFrb(comicId: comicId),
+      fallbackMessage: '读取系列阅读上下文失败',
+    );
+    return dto == null ? null : mapRustSeriesReadingContext(dto);
+  }
+
+  @override
+  Future<PagedResult<SeriesComicPageItem>> fetchComicsPage({
+    required String seriesId,
+    required PageRequest request,
+  }) async {
+    final rust_series.PagedSeriesComicsResultDto page = await guardFrb(
+      () => rust_series.fetchSeriesComicsPageFrb(
+        seriesId: seriesId,
+        request: mapSeriesPageRequest(request),
+      ),
+      fallbackMessage: '读取系列漫画分页失败',
+    );
+    return mapPagedSeriesComicsResult(page);
+  }
+
+  @override
+  Future<void> updateSeriesItemSortOrder({
+    required String seriesId,
+    required String comicId,
+    required double sortOrder,
+  }) async {
+    guardFrbSync(
+      () => rust_series.updateSeriesItemSortOrderFrb(
+        seriesId: seriesId,
+        comicId: comicId,
+        sortOrder: sortOrder,
+      ),
+      fallbackMessage: '更新系列排序失败',
+    );
+  }
+
+  @override
+  Future<void> setSeriesItemSortOrderLocked({
+    required String seriesId,
+    required String comicId,
+    required bool locked,
+  }) async {
+    guardFrbSync(
+      () => rust_series.setSeriesItemSortOrderLockedFrb(
+        seriesId: seriesId,
+        comicId: comicId,
+        locked: locked,
+      ),
+      fallbackMessage: '更新系列排序锁失败',
+    );
+  }
+
+  @override
+  Future<SeriesComicsMetadata> fetchComicsMetadata(String seriesId) async {
+    final rust_series.SeriesComicsMetadataDto dto = await guardFrb(
+      () => rust_series.fetchSeriesComicsMetadataFrb(seriesId: seriesId),
+      fallbackMessage: '读取系列漫画元数据失败',
+    );
+    return mapRustSeriesComicsMetadata(dto);
+  }
+
+  @override
+  Future<void> updateUserMeta({
+    required String seriesId,
+    String? name,
+    SerializationStatus? serializationStatus,
+    int? totalCount,
+    bool clearTotalCount = false,
+  }) async {
+    guardFrbSync(
+      () => rust_series.updateSeriesUserMetaFrb(
+        seriesId: seriesId,
+        meta: mapUpdateSeriesUserMeta(
+          name: name,
+          serializationStatus: serializationStatus,
+          totalCount: totalCount,
+          clearTotalCount: clearTotalCount,
+        ),
+      ),
+      fallbackMessage: '更新系列元数据失败',
+    );
+  }
+
+  @override
+  Future<void> setMetaLocks({
+    required String seriesId,
+    bool? name,
+    bool? serializationStatus,
+    bool? totalCount,
+  }) async {
+    guardFrbSync(
+      () => rust_series.setSeriesMetaLocksFrb(
+        seriesId: seriesId,
+        locks: rust_series.SetSeriesMetaLocksDto(
+          name: name,
+          serializationStatus: serializationStatus,
+          totalCount: totalCount,
+        ),
+      ),
+      fallbackMessage: '更新系列元数据锁失败',
+    );
+  }
+
+  @override
+  Future<List<Series>> searchByKeyword(String keyword) async {
+    final List<rust_series.SeriesDto> rows = await guardFrb(
+      () => rust_series.searchSeriesByKeywordFrb(keyword: keyword),
+      fallbackMessage: '搜索系列失败',
+    );
+    return rows.map(mapRustSeries).toList();
+  }
+
+  @override
+  Future<List<Series>> searchByMetadataExpression({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+  }) async {
+    final List<rust_series.SeriesDto> rows = await guardFrb(
+      () => rust_series.searchSeriesByTagExpressionFrb(
+        mustInclude: mustInclude.toList(),
+        optionalOr: optionalOr.toList(),
+        mustExclude: mustExclude.toList(),
+      ),
+      fallbackMessage: '按元数据搜索系列失败',
+    );
+    return rows.map(mapRustSeries).toList();
+  }
+}

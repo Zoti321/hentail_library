@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_catalog_grid_animation.dart';
 
 const LibraryCatalogGridSuppressAnimationKey _suppressBase =

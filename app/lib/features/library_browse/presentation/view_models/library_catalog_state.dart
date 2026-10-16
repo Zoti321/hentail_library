@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_snapshot.dart';
 
 /// 漫画 Tab 目录列表状态。

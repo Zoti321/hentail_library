@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/library_admin/domain/library_sync_coordinator.dart';
-import 'package:hentai_library/domain/library/sync_library_port.dart';
-import 'package:hentai_library/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_port.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:test/test.dart';
 
 class _ScriptedSyncAdapter implements SyncLibraryPort {

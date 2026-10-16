@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/domain/models/models.dart'
+import 'package:hentai_library/shared/domain/models/models.dart'
     show AppLocalePreference, AppSetting, AppThemePreference;
 import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';

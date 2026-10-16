@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/shared/ui/widgets/author/author_detail_surface.dart';
 

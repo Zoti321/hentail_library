@@ -1,6 +1,6 @@
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/value_objects/form/series_metadata_form.dart';
-import 'package:hentai_library/domain/repositories/series_repository.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
+import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_metadata_editor_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod/misc.dart' show Override;

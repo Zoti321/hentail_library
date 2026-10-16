@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/domain/repositories/series_repository.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
+import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 
 /// 在 Comic 元数据保存路径中，按草稿与种子差异写入 Series 成员排序 / 锁。
 ///

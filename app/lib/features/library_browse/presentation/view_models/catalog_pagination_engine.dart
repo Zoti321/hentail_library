@@ -1,6 +1,6 @@
-import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
-import 'package:hentai_library/domain/models/value_objects/page_request.dart';
-import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 
 /// Library 漫画/系列 Tab 共用的页码状态机与分页 fetch 骨架。
 class CatalogPaginationEngine {

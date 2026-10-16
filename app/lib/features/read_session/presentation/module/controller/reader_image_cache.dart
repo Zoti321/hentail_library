@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/core/image/image_cache_config.dart';
+import 'package:hentai_library/shared/core/image/image_cache_config.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_logic.dart';
 
 /// 阅读器专用内存图缓存名；与 [AppComicImage] 显示及 [precacheImage] 预热共用。

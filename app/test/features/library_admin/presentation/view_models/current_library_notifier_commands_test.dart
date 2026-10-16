@@ -1,9 +1,9 @@
-import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/library/scan_interval.dart';
-import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/domain/models/value_objects/form/library_form.dart';
-import 'package:hentai_library/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/domain/repositories/library_repository.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
+import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/ports.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';

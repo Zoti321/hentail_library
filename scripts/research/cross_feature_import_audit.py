@@ -36,22 +36,12 @@ def classify(relative: str) -> str:
     p = relative.replace("\\", "/")
     if p.startswith("src/rust/"):
         return "frb_generated"
-    if p.startswith("data/"):
-        return "shared"
-    if p.startswith("domain/"):
-        return "shared"
     if p.startswith("features/"):
         parts = p.split("/")
         if len(parts) >= 2:
             return parts[1]
     if p.startswith("shared/"):
         return "shared"
-    if p.startswith("core/"):
-        return "shared"
-    if p.startswith("ui/core/"):
-        return "shared"
-    if p == "ui/providers.dart" or p.startswith("ui/providers/"):
-        return "bootstrap"
     if p == "main.dart":
         return "bootstrap"
     return "shared"
@@ -78,7 +68,7 @@ def resolve_module(import_path: str) -> str | None:
 
 
 def is_ui_layer(path: str) -> bool:
-    return path.startswith("ui/features/") or path.startswith("ui/core/")
+    return (path.startswith("features/") and "/presentation/" in path) or path.startswith("shared/ui/")
 
 
 def main() -> None:
@@ -105,13 +95,13 @@ def main() -> None:
             if target is None:
                 continue
 
-            if rel.startswith("domain/") and imp.startswith("data/"):
+            if rel.startswith("shared/domain/") and imp.startswith("shared/data/"):
                 domain_to_data.append(f"{rel} -> {imp}")
 
-            if target == "frb_generated" and not rel.startswith("data/"):
+            if target == "frb_generated" and not rel.startswith("shared/data/"):
                 non_data_to_frb.append(rel)
 
-            if mod == "library_browse" and imp.startswith("domain/reading/"):
+            if mod == "library_browse" and imp.startswith("features/read_session/"):
                 browse_to_reading.append(f"{rel} -> {imp}")
 
             if mod != target and mod in MODULES and target in MODULES:

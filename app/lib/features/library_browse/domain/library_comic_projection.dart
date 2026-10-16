@@ -1,10 +1,10 @@
-import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/library_comic_filter.dart';
-import 'package:hentai_library/domain/library/library_media_type_filter.dart';
-import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/models/value_objects/library_author_pick.dart';
-import 'package:hentai_library/domain/models/value_objects/library_tag_pick.dart';
+import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/library_author_pick.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/library_tag_pick.dart';
 
 /// 库页 Comic 列表投影：intent 与年龄限制 → [LibraryComicFilter]。
 class LibraryComicProjection {

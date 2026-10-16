@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_scroll_to_top_button.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_content_search.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_layout_constants.dart';
@@ -16,9 +16,9 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_fill_viewport.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_management_panel.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
   const MetadataManagementPage({super.key});

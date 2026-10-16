@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/element/card/comic_card.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page/widgets/searched_page_header.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kSearchLoadMoreThreshold = 400;

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/shared/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_controller.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

@@ -1,4 +1,4 @@
-import 'package:hentai_library/core/logging/diagnostic_logging.dart';
+import 'package:hentai_library/shared/core/logging/diagnostic_logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'diagnostic_mode_notifier.g.dart';

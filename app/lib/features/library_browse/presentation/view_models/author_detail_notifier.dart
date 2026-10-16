@@ -1,12 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/domain/models/entity/comic/author_detail.dart';
-import 'package:hentai_library/domain/repositories/author_repository.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
+import 'package:hentai_library/shared/domain/repositories/author_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
-import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
+import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final authorDetailProvider = FutureProvider.autoDispose

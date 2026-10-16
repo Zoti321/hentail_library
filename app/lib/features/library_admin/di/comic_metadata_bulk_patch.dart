@@ -1,4 +1,4 @@
-import 'package:hentai_library/data/adapters/comic_metadata_bulk_patch_frb_adapter.dart';
+import 'package:hentai_library/shared/data/adapters/comic_metadata_bulk_patch_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_coordinator.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_distinct_metadata_providers.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';

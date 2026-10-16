@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 
 typedef LibraryTabPageSizeSettings = ({int comics, int series});
 

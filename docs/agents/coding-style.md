@@ -28,14 +28,14 @@ Presentation layer follows **MVVM with Riverpod** (ADR-0017). State management i
 
 | Layer | Path | Role |
 |-------|------|------|
-| View | `ui/features/**/views/`, `ui/core/widgets/` | Render; `ref.watch` ViewModel/Facade; fire commands via Notifier or callbacks |
-| ViewModel | `ui/features/**/view_models/` | UI state, Repository/Service orchestration, command API |
+| View | `features/*/presentation/views/**`, `shared/ui/widgets/` | Render; `ref.watch` ViewModel/Facade; fire commands via Notifier or callbacks |
+| ViewModel | `features/*/presentation/view_models/` | UI state, Repository/Service orchestration, command API |
 | Model | `domain/models/`, `domain/repositories/` | Entities and repository interfaces |
 
 **Hard rules**
 
-- **View must not call Repository** — no `*RepoProvider` in `views/` or `ui/core/widgets/`. Shared widgets use constructor callbacks; feature pages delegate to ViewModel.
-- **ViewModel lives under `view_models/`** — `state/` directories are gone (e.g. `shell/view_models/current_library_notifier.dart`, `settings/view_models/diagnostic_mode_notifier.dart`); `test/project_layout_test.dart` fails if one reappears under `ui/features/`.
+- **View must not call Repository** — no `*RepoProvider` in `views/` or `shared/ui/widgets/`. Shared widgets use constructor callbacks; feature pages delegate to ViewModel.
+- **ViewModel lives under `view_models/`** — `state/` directories are gone (e.g. `library_admin/presentation/view_models/current_library_notifier.dart`, `app_settings/presentation/view_models/diagnostic_mode_notifier.dart`); `test/project_layout_test.dart` fails if one reappears under `features/`.
 - **Complex pages** may keep internal intent→derive chains; expose a **Facade Provider** to the page root. Leaf widgets may still `select` fine-grained fields.
 
 **Class naming**
@@ -122,8 +122,8 @@ Rules:
 
 | Location | Rule |
 |----------|------|
-| `ui/core/widgets/**` | **Strict:** file name = primary public type in `snake_case` (`theme_preference_row.dart` ↔ `ThemePreferenceRow`). |
-| `ui/features/**/widgets/**` | **Loose:** feature prefix allowed; stay consistent within the feature. |
+| `shared/ui/widgets/**` | **Strict:** file name = primary public type in `snake_case` (`theme_preference_row.dart` ↔ `ThemePreferenceRow`). |
+| `features/*/presentation/**/widgets/**` | **Loose:** feature prefix allowed; stay consistent within the feature. |
 | Barrel files (`widgets.dart`, `providers.dart`) | Export-only; file name need not match a type. |
 
 ### UI payload types

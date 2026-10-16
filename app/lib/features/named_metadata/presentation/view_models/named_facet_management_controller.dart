@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
-import 'package:hentai_library/domain/models/value_objects/page_request.dart';
-import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/shared/core/utils/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

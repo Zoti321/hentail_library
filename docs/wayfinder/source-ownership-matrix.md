@@ -163,7 +163,7 @@
 | `deps` + `repos` / `ports` / `services` | `features/bootstrap/di/` | **已迁**；`shared/di` 见 #258 bootstrap-final |
 | `shell.dart` | 删除 | **已删** |
 
-**未做（#258 bootstrap-final）**：legacy `ui/`/`core/`/`data/`/`domain/` 整树 → `shared/`、Phase B、`ui/providers` 删除。
+**已完成（#258 bootstrap-final，2026-10-17）**：legacy `ui/`/`core/`/`data/`/`domain/` 整树 → `shared/`、Phase B 启用、`ui/providers.dart` 删除。
 
 ---
 
@@ -306,3 +306,4 @@
 | 2026-10-17 | `home` slice：home/history presentation + `home_page_read_models` → shared |
 | 2026-10-17 | `library_admin` slice：navigation/VM/di + domain coordinators |
 | 2026-10-17 | `bootstrap` slice（presentation）：shell 残余 → `features/bootstrap` + util → `shared/core` |
+| 2026-10-17 | `bootstrap-final`（#258）：`core/data/domain/ui` 整树 → `shared/*`；`ui/providers` → `shared/di`；删除 `ui/providers.dart`；Phase B 启用；Gate 基线 135 条 feature↔feature 边保留（follow-up 解耦） |

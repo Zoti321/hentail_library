@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
-import 'package:hentai_library/domain/models/tag_dictionary_import_result.dart';
+import 'package:hentai_library/shared/core/logging/app_log.dart';
+import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
+import 'package:hentai_library/shared/domain/models/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_page_crossfade_policy.dart';
 import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_viewport_constants.dart';

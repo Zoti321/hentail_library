@@ -1,5 +1,5 @@
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 
 enum LibraryEmptyStateIcon { library, listFilter }
 
