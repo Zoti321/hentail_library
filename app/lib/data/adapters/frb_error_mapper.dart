@@ -36,6 +36,16 @@ AppException mapFrbError(
   };
 }
 
+String caughtErrorMessage(Object error, {String? fallbackMessage}) {
+  if (error is AppException) {
+    return error.message;
+  }
+  if (error is HentaiErrorDto) {
+    return frbErrorMessage(error, fallbackMessage: fallbackMessage);
+  }
+  return error.toString();
+}
+
 String frbErrorMessage(HentaiErrorDto error, {String? fallbackMessage}) {
   final String detail = _formatDetail(error);
   if (detail.isNotEmpty) {

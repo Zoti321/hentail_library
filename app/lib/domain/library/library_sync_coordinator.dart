@@ -1,4 +1,4 @@
-import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
+import 'package:hentai_library/domain/library/sync_library_port.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 
 /// UI-side helper: FRB Library sync + catalog revision bump.
@@ -7,12 +7,12 @@ import 'package:hentai_library/domain/library/sync_library_types.dart';
 /// invalidation after DB writes, live in Rust `hentai_core::sync` — not here.
 class LibrarySyncCoordinator {
   const LibrarySyncCoordinator({
-    required SyncLibraryFrbAdapter syncAdapter,
+    required SyncLibraryPort syncAdapter,
     required void Function() onSyncSucceeded,
   }) : _syncAdapter = syncAdapter,
        _onSyncSucceeded = onSyncSucceeded;
 
-  final SyncLibraryFrbAdapter _syncAdapter;
+  final SyncLibraryPort _syncAdapter;
   final void Function() _onSyncSucceeded;
 
   Future<void> runSync({

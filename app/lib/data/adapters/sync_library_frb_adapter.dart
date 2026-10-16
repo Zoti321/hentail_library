@@ -1,6 +1,7 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
+import 'package:hentai_library/domain/library/sync_library_port.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
@@ -8,7 +9,7 @@ import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 
 /// Library sync 经 Rust FRB 执行；Dart 负责凭证注入与进度映射。
-class SyncLibraryFrbAdapter {
+class SyncLibraryFrbAdapter implements SyncLibraryPort {
   SyncLibraryFrbAdapter({required LibraryRepository libraryRepository})
     : _libraryRepository = libraryRepository;
 

@@ -2,7 +2,6 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_series_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -156,15 +155,14 @@ Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   Ref ref,
   String comicId,
 ) async {
-  final SeriesReadingContext? ctx = await ref
+  final readingContext = await ref
       .read(seriesRepoProvider)
       .getReadingContextByComicId(comicId);
-  if (ctx == null) {
+  if (readingContext == null) {
     return const ComicDetailSeriesNavNone();
   }
-
   final ComicDetailSeriesNavSeriesData? seriesData = await ref.watch(
-    comicDetailSeriesNavForSeriesProvider(ctx.seriesId).future,
+    comicDetailSeriesNavForSeriesProvider(readingContext.seriesId).future,
   );
   if (seriesData == null) {
     return const ComicDetailSeriesNavNone();

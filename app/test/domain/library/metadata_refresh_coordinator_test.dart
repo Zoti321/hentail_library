@@ -1,20 +1,14 @@
-import 'package:hentai_library/data/adapters/metadata_refresh_frb_adapter.dart';
 import 'package:hentai_library/domain/library/metadata_refresh_coordinator.dart';
+import 'package:hentai_library/domain/library/metadata_refresh_port.dart';
 import 'package:hentai_library/domain/library/metadata_refresh_types.dart';
-import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:test/test.dart';
 
-class _FakeLibraryRepository implements LibraryRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class _ScriptedRefreshAdapter extends MetadataRefreshFrbAdapter {
+class _ScriptedRefreshAdapter implements MetadataRefreshPort {
   _ScriptedRefreshAdapter({
     this.onRefreshComic,
     this.onRefreshSeries,
     this.onRefreshLibrary,
-  }) : super(libraryRepository: _FakeLibraryRepository());
+  });
 
   final Future<void> Function(String comicId)? onRefreshComic;
   final Future<MetadataRefreshBatchResult> Function(String seriesId)?
@@ -38,6 +32,9 @@ class _ScriptedRefreshAdapter extends MetadataRefreshFrbAdapter {
           skipMessage: null,
         ));
   }
+
+  @override
+  void cancelActive() {}
 
   @override
   Future<MetadataRefreshBatchResult> refreshLibrary(String libraryId) {

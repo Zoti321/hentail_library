@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/io/local_library_root_access.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/domain/library/library_sync_coordinator.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
-import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/ui/features/shell/di/library_sync.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -95,14 +93,10 @@ class ScanLibraryController extends _$ScanLibraryController {
             })
             .catchError((Object e, StackTrace st) {
               logError(AppLog.ui('scan'), '漫画库同步失败', e, st);
-              final String message = switch (e) {
-                AppException(:final message) => message,
-                HentaiErrorDto error => frbErrorMessage(
-                  error,
-                  fallbackMessage: '漫画库同步失败',
-                ),
-                _ => e.toString(),
-              };
+              final String message = caughtErrorMessage(
+                e,
+                fallbackMessage: '漫画库同步失败',
+              );
               state = state.copyWith(running: false, error: message);
             });
 

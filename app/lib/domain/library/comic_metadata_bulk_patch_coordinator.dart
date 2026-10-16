@@ -1,10 +1,10 @@
-import 'package:hentai_library/data/adapters/comic_metadata_bulk_patch_frb_adapter.dart';
+import 'package:hentai_library/domain/library/comic_metadata_bulk_patch_port.dart';
 import 'package:hentai_library/domain/library/comic_metadata_bulk_patch_types.dart';
 
 /// UI-side helper: FRB bulk patch + catalog revision bump.
 class ComicMetadataBulkPatchCoordinator {
   const ComicMetadataBulkPatchCoordinator({
-    required ComicMetadataBulkPatchFrbAdapter adapter,
+    required ComicMetadataBulkPatchPort adapter,
     required void Function() onSucceeded,
     required void Function({
       required bool tagsWritten,
@@ -17,7 +17,7 @@ class ComicMetadataBulkPatchCoordinator {
        _onSucceeded = onSucceeded,
        _onDictionariesChanged = onDictionariesChanged;
 
-  final ComicMetadataBulkPatchFrbAdapter _adapter;
+  final ComicMetadataBulkPatchPort _adapter;
   final void Function() _onSucceeded;
   final void Function({
     required bool tagsWritten,

@@ -1,11 +1,12 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/remote_credentials_frb.dart';
+import 'package:hentai_library/domain/library/comic_metadata_bulk_patch_port.dart';
 import 'package:hentai_library/domain/library/comic_metadata_bulk_patch_types.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as comic_rust;
 import 'package:hentai_library/src/rust/api/sync.dart' as sync_rust;
 
-class ComicMetadataBulkPatchFrbAdapter {
+class ComicMetadataBulkPatchFrbAdapter implements ComicMetadataBulkPatchPort {
   ComicMetadataBulkPatchFrbAdapter({
     required LibraryRepository libraryRepository,
   }) : _libraryRepository = libraryRepository;

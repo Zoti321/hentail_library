@@ -1,5 +1,6 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/remote_credentials_frb.dart';
+import 'package:hentai_library/domain/library/metadata_refresh_port.dart';
 import 'package:hentai_library/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as comic_rust;
@@ -7,7 +8,7 @@ import 'package:hentai_library/src/rust/api/series.dart' as series_rust;
 import 'package:hentai_library/src/rust/api/sync.dart' as sync_rust;
 
 /// Metadata refresh 经 Rust FRB 执行。
-class MetadataRefreshFrbAdapter {
+class MetadataRefreshFrbAdapter implements MetadataRefreshPort {
   MetadataRefreshFrbAdapter({required LibraryRepository libraryRepository})
     : _libraryRepository = libraryRepository;
 

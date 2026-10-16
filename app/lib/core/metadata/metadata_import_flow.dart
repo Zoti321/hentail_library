@@ -8,7 +8,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/metadata/metadata_backup_bytes.dart';
 import 'package:hentai_library/data/adapters/metadata_backup_frb_adapter.dart';
-import 'package:hentai_library/src/rust/api/metadata_backup.dart';
+import 'package:hentai_library/data/adapters/metadata_backup_frb_types.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';

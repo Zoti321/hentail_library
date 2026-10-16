@@ -58,6 +58,15 @@ Nightly 的定时触发只在默认分支（`main`）生效；其他分支用 `w
 
 慢轨 viewport / shell / 大 widget（如 `test/ui/features/reader/*viewport*`、大面积 responsive shell）默认只在本地跑，除非按下方双轨规则显式晋升。
 
+### Import 边界缝（#220）
+
+| 层级 | 规则 | 机制 |
+|------|------|------|
+| L1 | R1–R5（domain→data、FRB 白名单、library_browse↔reading 等） | `test/gate/import_boundary_test.dart` **零容忍** |
+| L2 | M1/M2（product↔product 模块边） | 同上 + `test/gate/import_boundary_baseline.json` **ratchet**（只减不增） |
+
+本地：`cd app && flutter test test/gate/import_boundary_test.dart`。修复跨模块耦合后须在同一 PR 缩减 baseline（`dart run tool/generate_import_boundary_baseline.dart` 在 L1 已绿时重写条目）。分类表与 `scripts/research/cross_feature_import_audit.py` 应对齐。
+
 ## 本地全量
 
 合并前若你改了 UI 或怀疑 widget 回归，本地再跑：

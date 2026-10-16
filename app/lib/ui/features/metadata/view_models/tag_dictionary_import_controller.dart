@@ -1,11 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/domain/models/tag_dictionary_import_result.dart';
-import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -115,11 +113,10 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
     required String fallback,
   }) {
     logError(AppLog.ui('tag-import'), fallback, error, stackTrace);
-    final String message = switch (error) {
-      AppException(:final message) => message,
-      HentaiErrorDto dto => frbErrorMessage(dto, fallbackMessage: fallback),
-      _ => error.toString(),
-    };
+    final String message = caughtErrorMessage(
+      error,
+      fallbackMessage: fallback,
+    );
     state = state.copyWith(running: false, error: message);
     return null;
   }
