@@ -47,19 +47,21 @@ Future<void> _prepareApp() async {
 
   await RustLib.init();
 
+  final appDataDir = await getApplicationSupportDirectory();
+  // Log file setup must not gate the database. A denied log path used to skip
+  // init_db, and every later call then failed with "init_db 尚未调用".
   try {
-    final appDataDir = await getApplicationSupportDirectory();
     guardFrbSync(
       () => configureRustLogFrb(appDataDir: appDataDir.path),
       fallbackMessage: 'Rust 日志初始化失败',
     );
-    guardFrbSync(
-      () => initDbFrb(appDataDir: appDataDir.path, dbFileName: 'my_database'),
-      fallbackMessage: '数据库初始化失败',
-    );
   } catch (e, st) {
-    logError(AppLog.dataFrb(), 'Rust 初始化失败', e, st);
+    logError(AppLog.dataFrb(), 'Rust 日志初始化失败', e, st);
   }
+  guardFrbSync(
+    () => initDbFrb(appDataDir: appDataDir.path, dbFileName: 'my_database'),
+    fallbackMessage: '数据库初始化失败',
+  );
 
   configureGlobalImageCache();
 }
