@@ -9,6 +9,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_auto_play_carry.dart';
@@ -604,5 +605,145 @@ void main() {
       );
       expect(_state(container, _incognitoKey)?.currentIndex, 2);
     });
+  });
+
+  group('advanceAutoPlay', () {
+    const String nextComicId = 'next-series-comic';
+    const ReadSessionRouteParams session = ReadSessionRouteParams(
+      comicId: _comicId,
+      incognito: true,
+    );
+
+    test(
+      'series loop on the last spread switches to the next comic without a prompt',
+      () async {
+        final _RecordingSeriesNavigation navigation =
+            _RecordingSeriesNavigation();
+        final ProviderContainer container = _createContainer(
+          key: _incognitoKey,
+          initialSetting: AppSetting(
+            readingMode: ReadingMode.paged,
+            autoPlayMode: AutoPlayMode.seriesLoop,
+          ),
+          snapshot: _snapshot(pageCount: 5, resumePage: 5),
+          seriesNavigation: navigation,
+        );
+        addTearDown(container.dispose);
+
+        await container.read(readerControllerProvider(_incognitoKey).future);
+        final ReaderController controller = _controller(
+          container,
+          _incognitoKey,
+        );
+        controller.setAutoPlayEnabled(true);
+
+        final bool keepTicking = await controller.advanceAutoPlay(
+          navContext: _navContext(nextComicId: nextComicId),
+          session: session,
+          router: _testRouter(),
+        );
+
+        expect(keepTicking, isFalse);
+        expect(navigation.switchedTo, <String>[nextComicId]);
+        expect(_state(container, _incognitoKey)?.currentIndex, 5);
+        expect(_state(container, _incognitoKey)?.autoPlayEnabled, isTrue);
+        expect(
+          _state(container, _incognitoKey)?.seriesBoundaryPrompt,
+          SeriesBoundaryPrompt.none,
+        );
+      },
+    );
+
+    test('tick before the last spread advances one page', () async {
+      final _RecordingSeriesNavigation navigation =
+          _RecordingSeriesNavigation();
+      final ProviderContainer container = _createContainer(
+        key: _incognitoKey,
+        initialSetting: AppSetting(
+          readingMode: ReadingMode.paged,
+          autoPlayMode: AutoPlayMode.seriesLoop,
+        ),
+        snapshot: _snapshot(pageCount: 5, resumePage: 1),
+        seriesNavigation: navigation,
+      );
+      addTearDown(container.dispose);
+
+      await container.read(readerControllerProvider(_incognitoKey).future);
+      final ReaderController controller = _controller(container, _incognitoKey);
+      controller.setAutoPlayEnabled(true);
+
+      final bool keepTicking = await controller.advanceAutoPlay(
+        navContext: _navContext(nextComicId: nextComicId),
+        session: session,
+        router: _testRouter(),
+      );
+
+      expect(keepTicking, isTrue);
+      expect(_state(container, _incognitoKey)?.currentIndex, 2);
+      expect(navigation.switchedTo, isEmpty);
+    });
+
+    test('comic once on the last spread stops autoplay and stays', () async {
+      final _RecordingSeriesNavigation navigation =
+          _RecordingSeriesNavigation();
+      final ProviderContainer container = _createContainer(
+        key: _incognitoKey,
+        initialSetting: AppSetting(
+          readingMode: ReadingMode.paged,
+          autoPlayMode: AutoPlayMode.comicOnce,
+        ),
+        snapshot: _snapshot(pageCount: 5, resumePage: 5),
+        seriesNavigation: navigation,
+      );
+      addTearDown(container.dispose);
+
+      await container.read(readerControllerProvider(_incognitoKey).future);
+      final ReaderController controller = _controller(container, _incognitoKey);
+      controller.setAutoPlayEnabled(true);
+
+      final bool keepTicking = await controller.advanceAutoPlay(
+        navContext: _navContext(nextComicId: nextComicId),
+        session: session,
+        router: _testRouter(),
+      );
+
+      expect(keepTicking, isFalse);
+      expect(_state(container, _incognitoKey)?.autoPlayEnabled, isFalse);
+      expect(_state(container, _incognitoKey)?.currentIndex, 5);
+      expect(navigation.switchedTo, isEmpty);
+    });
+
+    test(
+      'comic loop on the last spread jumps to the first page and keeps autoplay',
+      () async {
+        final ProviderContainer container = _createContainer(
+          key: _incognitoKey,
+          initialSetting: AppSetting(
+            readingMode: ReadingMode.paged,
+            autoPlayMode: AutoPlayMode.comicLoop,
+          ),
+          snapshot: _snapshot(pageCount: 5, resumePage: 5),
+          seriesNavigation: _RecordingSeriesNavigation(),
+        );
+        addTearDown(container.dispose);
+
+        await container.read(readerControllerProvider(_incognitoKey).future);
+        final ReaderController controller = _controller(
+          container,
+          _incognitoKey,
+        );
+        controller.setAutoPlayEnabled(true);
+
+        final bool keepTicking = await controller.advanceAutoPlay(
+          navContext: _navContext(),
+          session: session,
+          router: _testRouter(),
+        );
+
+        expect(keepTicking, isTrue);
+        expect(_state(container, _incognitoKey)?.currentIndex, 1);
+        expect(_state(container, _incognitoKey)?.autoPlayEnabled, isTrue);
+      },
+    );
   });
 }

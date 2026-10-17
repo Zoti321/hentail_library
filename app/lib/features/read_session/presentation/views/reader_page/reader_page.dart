@@ -8,10 +8,8 @@ import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/features/read_session/domain/auto_play_boundary.dart';
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-import 'package:hentai_library/features/read_session/domain/spread_index.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/shared/ui/interaction/app_motion.dart';
 import 'package:hentai_library/shared/ui/interaction/reader_input.dart';
@@ -25,7 +23,6 @@ import 'package:hentai_library/features/read_session/presentation/views/reader_p
 import 'package:hentai_library/features/read_session/di/session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_fullscreen_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_series_navigation.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -674,55 +671,25 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
         );
         Timer? timer;
         timer = Timer.periodic(interval, (_) {
-          final ReaderState? currentState = ref
-              .read(readerControllerProvider(viewKey))
-              .asData
-              ?.value;
-          if (currentState == null) {
-            return;
-          }
-          if (!currentState.readingMode.supportsAutoPlay ||
-              currentState.totalPages <= 0) {
+          if (!context.mounted) {
             timer?.cancel();
             return;
           }
-          final bool onLastSpread = SpreadIndex.isOnLastSpread(
-            mode: currentState.readingMode,
-            totalPages: currentState.totalPages,
-            currentPageIndex: currentState.currentIndex,
-          );
-          if (!onLastSpread) {
-            controller.nextPage();
+          if (ref.read(readerControllerProvider(viewKey)).asData?.value ==
+              null) {
             return;
           }
-          final AutoPlayBoundaryDecision decision = resolveAutoPlayBoundary(
-            mode: autoPlayMode,
-            currentComicId: routeContext.comicId,
-            nextComicId: nextComicId,
-            firstComicId: firstComicId,
-          );
-          switch (decision) {
-            case AutoPlayBoundaryStop():
-              controller.setAutoPlayEnabled(false);
+          final GoRouter router = GoRouter.of(context);
+          unawaited(() async {
+            final bool keepTicking = await controller.advanceAutoPlay(
+              navContext: seriesNavContext,
+              session: routeContext.session,
+              router: router,
+            );
+            if (!keepTicking) {
               timer?.cancel();
-            case AutoPlayBoundaryJumpToFirstPage():
-              controller.setIndex(1);
-            case AutoPlayBoundarySwitchComic(:final String comicId):
-              timer?.cancel();
-              final BuildContext? ctx = context.mounted ? context : null;
-              if (ctx == null) {
-                return;
-              }
-              unawaited(
-                ref
-                    .read(readerSeriesNavigationProvider.notifier)
-                    .switchComic(
-                      router: GoRouter.of(ctx),
-                      currentSession: routeContext.session,
-                      targetComicId: comicId,
-                    ),
-              );
-          }
+            }
+          }());
         });
         return () {
           timer?.cancel();

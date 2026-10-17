@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_boundary.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/spread_index.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_auto_play_carry.dart';
@@ -228,6 +230,62 @@ class ReaderController extends _$ReaderController {
 
   void setAutoPlayEnabled(bool value) {
     _updateDataState((ReaderState s) => s.copyWith(autoPlayEnabled: value));
+  }
+
+  /// 自动播放的一拍到了。定时器留在页面。
+  ///
+  /// 返回 false 时页面应取消定时器：自动播放已停止，或已开始切卷。
+  Future<bool> advanceAutoPlay({
+    required ReaderNavContextData? navContext,
+    required ReadSessionRouteParams session,
+    required GoRouter router,
+  }) async {
+    final ReaderState? current = state.asData?.value;
+    if (current == null || !current.autoPlayEnabled) {
+      return false;
+    }
+    if (!current.readingMode.supportsAutoPlay || current.totalPages <= 0) {
+      return false;
+    }
+    final bool onLastSpread = SpreadIndex.isOnLastSpread(
+      mode: current.readingMode,
+      totalPages: current.totalPages,
+      currentPageIndex: current.currentIndex,
+    );
+    if (!onLastSpread) {
+      nextPage();
+      return true;
+    }
+    final AutoPlayMode mode =
+        ref.read(appSettingsStateProvider).asData?.value.autoPlayMode ??
+        kDefaultAutoPlayMode;
+    final List<ReaderComicListItem>? items = navContext?.items;
+    final String? firstComicId = items != null && items.isNotEmpty
+        ? items.first.comicId
+        : null;
+    final AutoPlayBoundaryDecision decision = resolveAutoPlayBoundary(
+      mode: mode,
+      currentComicId: session.comicId,
+      nextComicId: navContext?.nextItem?.comicId,
+      firstComicId: firstComicId,
+    );
+    switch (decision) {
+      case AutoPlayBoundaryStop():
+        setAutoPlayEnabled(false);
+        return false;
+      case AutoPlayBoundaryJumpToFirstPage():
+        setIndex(1);
+        return true;
+      case AutoPlayBoundarySwitchComic(:final String comicId):
+        await ref
+            .read(readerSeriesNavigationProvider.notifier)
+            .switchComic(
+              router: router,
+              currentSession: session,
+              targetComicId: comicId,
+            );
+        return false;
+    }
   }
 
   void setReadingMode(ReadingMode value) {
