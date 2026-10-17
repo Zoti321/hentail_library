@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
 import 'package:hentai_library/features/library_browse/di/comic_detail_return_series_ports.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_throttle_busy.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_series_providers.dart';
@@ -17,7 +18,6 @@ import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/features/comic_trash/di/comic_trash_command_port.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
-import 'package:hentai_library/features/library_browse/di/catalog_selection_command_port.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
@@ -32,6 +32,9 @@ import 'package:riverpod/misc.dart' show Override;
 List<Override> sharedLibraryStateOverrides() => <Override>[
   currentLibraryPortProvider.overrideWith(createCurrentLibraryPort),
   libraryReorderModePortProvider.overrideWith(createLibraryReorderModePort),
+  libraryReorderActiveStateProvider.overrideWith(
+    (Ref ref) => ref.watch(libraryReorderModeProvider),
+  ),
   libraryRevisionSignalPortProvider.overrideWith(
     createLibraryRevisionSignalPort,
   ),
@@ -90,9 +93,6 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   ),
   readerSettingsCommandPortProvider.overrideWith(
     createReaderSettingsCommandPort,
-  ),
-  catalogSelectionCommandPortProvider.overrideWith(
-    createCatalogSelectionCommandPort,
   ),
   comicTrashCommandPortProvider.overrideWith(createComicTrashCommandPort),
   libraryTagDictionaryStateProvider.overrideWith(

@@ -42,6 +42,11 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     });
     // 任一 Comics 筛选 / 排序变化即退出选择模式（整份意图为单一来源）。
     ref.listen(libraryComicFiltersProvider, (_, _) => _reset());
+    ref.listen<bool>(libraryReorderActiveStateProvider, (_, bool active) {
+      if (active) {
+        exit();
+      }
+    });
     ref.listen(libraryDisplayTargetProvider, (_, LibraryDisplayTarget target) {
       if (target == LibraryDisplayTarget.series && state.active) {
         exit();

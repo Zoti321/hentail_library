@@ -30,6 +30,12 @@ final Provider<LibraryReorderModePort> libraryReorderModePortProvider =
       ),
     );
 
+final Provider<bool> libraryReorderActiveStateProvider = Provider<bool>(
+  (Ref ref) => throw UnimplementedError(
+    'libraryReorderActiveStateProvider 未注入，请在 bootstrap 中 override',
+  ),
+);
+
 final Provider<LibraryRevisionSignalPort> libraryRevisionSignalPortProvider =
     Provider<LibraryRevisionSignalPort>(
       (Ref ref) => throw UnimplementedError(
