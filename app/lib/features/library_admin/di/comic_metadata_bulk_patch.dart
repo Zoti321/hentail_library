@@ -1,9 +1,6 @@
 import 'package:hentai_library/shared/data/adapters/comic_metadata_bulk_patch_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_coordinator.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/library_distinct_metadata_providers.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_dictionary_providers.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -31,20 +28,14 @@ ComicMetadataBulkPatchCoordinator comicMetadataBulkPatchCoordinator(Ref ref) {
           required bool parodiesWritten,
           required bool charactersWritten,
         }) {
-          if (tagsWritten) {
-            ref.invalidate(allTagsProvider);
-          }
-          if (authorsWritten) {
-            ref.invalidate(allAuthorsProvider);
-          }
-          if (parodiesWritten) {
-            ref.invalidate(allParodiesProvider);
-            ref.invalidate(libraryDistinctParodiesProvider);
-          }
-          if (charactersWritten) {
-            ref.invalidate(allCharactersProvider);
-            ref.invalidate(libraryDistinctCharactersProvider);
-          }
+          ref
+              .read(dictionaryInvalidationPortProvider)
+              .invalidate(
+                tagsWritten: tagsWritten,
+                authorsWritten: authorsWritten,
+                parodiesWritten: parodiesWritten,
+                charactersWritten: charactersWritten,
+              );
         },
   );
 }

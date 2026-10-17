@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/dto/nav_item_data.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_return_series_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/core/constants/libraries_routes.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_management_actions.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -66,7 +66,7 @@ abstract final class AppNavigation {
   }
 
   static void goToNavId(BuildContext context, String id, {WidgetRef? ref}) {
-    clearComicDetailReturnSeriesFromContext(context);
+    _clearComicDetailReturnSeries(context);
     switch (id) {
       case navIdHome:
         context.go('/home');
@@ -94,4 +94,13 @@ abstract final class AppNavigation {
         break;
     }
   }
+}
+
+/// 清理「返回系列」记忆；上下文无 ProviderScope 时静默忽略。
+void _clearComicDetailReturnSeries(BuildContext context) {
+  try {
+    ProviderScope.containerOf(
+      context,
+    ).read(comicDetailReturnSeriesPortProvider).clear();
+  } catch (_) {}
 }

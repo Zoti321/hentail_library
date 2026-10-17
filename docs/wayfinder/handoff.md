@@ -6,8 +6,8 @@
 
 - `app/lib` 已收敛为 `features/<id>/{presentation,domain,data,di}`、`shared/{core,data,domain,ui,di}`、`src/rust`、`main.dart`。
 - Phase B 布局校验已启用（`kEnforceWayfinderPhaseBLayout = true`），strangler 白名单为空。
-- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **101** 条 = **26** 条 M1/M2（feature↔feature） + **75** 条 M3（product feature→bootstrap）。
-  - 相对 #261 开始前（212 = 135 M1/M2 + 77 M3）减少 **111** 条（其中 #262 home 再减 **12** 条、#263 comic_trash 再减 **10** 条、#264 app_settings 再减 **18** 条、#265 read_session 再减 **9** 条 M1/M2）。
+- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **91** 条 = **16** 条 M1/M2（feature↔feature） + **75** 条 M3（product feature→bootstrap）。
+  - 相对 #261 开始前（212 = 135 M1/M2 + 77 M3）减少 **121** 条（其中 #262 home 再减 **12** 条、#263 comic_trash 再减 **10** 条、#264 app_settings 再减 **18** 条、#265 read_session 再减 **9** 条、#267 library_admin 再减 **10** 条 M1/M2）。
 - `dart analyze`：0 error；仍有若干 `unnecessary_import` info，来自 `deps.dart` 总桶，属于迁移遗留，待清理。
 - 全量 `flutter test`（约 937 条）在 #261e 合入后全绿。
 
@@ -27,7 +27,7 @@
 
 ## 3. Issue 状态
 
-**已关闭**：#258、#219、#220、#221、#222、#224、#225、#266、**#261**、**#262**、**#263**、**#264**、**#265**。
+**已关闭**：#258、#219、#220、#221、#222、#224、#225、#266、**#261**、**#262**、**#263**、**#264**、**#265**、**#267**。
 
 **未关闭**：
 
@@ -128,7 +128,8 @@ git -c http.version=HTTP/1.1 push origin dev
    - #264（app_settings）：**已完成并关闭**。设置页备份板块改由 bootstrap 经 `shared/di/settings_slot_providers.dart` 的 slot 组装；板块实现迁至 `features/metadata_backup/presentation/views/metadata_backup_settings_detail.dart`；设置原语与布局常量下沉至 `shared/ui/widgets/settings/`；最近备份时间读取迁至 `features/metadata_backup/data/recent_metadata_backup_at.dart`。app_settings 仍有 1 条 M1（`settings_notifier.dart` → read_session `auto_play_mode`），留待 #265 一并处理。
    - #263（comic_trash）：**已完成并关闭**。library_admin 边清零；新增 `libraryMutationBusyStateProvider`、复用 `libraryRevisionSignalPortProvider` / `libraryRevisionStateProvider`。comic_trash 仍对 home 的 `history_layout_constants` / `history_page_header` 有 M1/M2（4 条），属 home 视图共享，可在后续票处理。
    - #265（read_session）：**已完成并关闭**。`AutoPlayMode` 下沉至 `shared/domain/reading/`；新增 `ReaderSettingsCommandPort` 与 `appSettingsStateProvider` / `appSettingsFutureProvider`（适配器在 `features/app_settings/di/shared_state_ports.dart`）；`series_reader_provider` 删除冗余的 library_browse import。read_session 与 app_settings 的 M1/M2 已清零。
-2. **剩余 26 条 M1/M2**：已为 library_admin 开 #267（10 条）、library_browse 开 #268（12 条）。comic_trash→home 的 4 条暂未建票，需另行决定。原分布说明：（分布：library_admin→library_browse 5、library_admin→named_metadata 3、library_admin→metadata_backup 2、library_browse→named_metadata 8、library_browse→comic_trash 2、library_browse→metadata_backup 2、comic_trash→home 4）。需决定：为 library_admin / library_browse 另开消费方票，还是先推进 R1 扩展与 #260 正文更新。
+   - #267（library_admin）：**已完成并关闭**。新增 shared 端口 `CatalogSelectionCommandPort` / `DictionaryInvalidationPort` / `MetadataSavedPort`，声明于 `shared/di/library_command_providers.dart`；适配器分别位于 `features/library_browse/di/`、`features/bootstrap/di/`（组合根，失效 named_metadata 与 library_browse 字典 Provider）、`features/metadata_backup/di/`，由 `sharedLibraryStateOverrides()` 注入。library_admin 的 M1/M2 已清零；返回系列清理改走 shared 的 `comicDetailReturnSeriesPortProvider`。
+2. **剩余 16 条 M1/M2**：library_browse 的 12 条由 #268 处理；comic_trash→home 的 4 条暂未建票，需另行决定。（分布：library_browse→named_metadata 8、library_browse→comic_trash 2、library_browse→metadata_backup 2、comic_trash→home 4）。
 3. 消费方票推进时顺手减少本 feature 对 `deps.dart` 的 M3 边。
 4. 全部消费方完成后：实现 R1 扩展，并更新 #260 正文（R6 → M3 ratchet）。
 5. 全部完成后才能关闭 #260 与 #217（基线为空）。

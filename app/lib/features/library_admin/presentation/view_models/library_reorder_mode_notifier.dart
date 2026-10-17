@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
 
 class LibraryReorderModeNotifier extends Notifier<bool> {
   @override
   bool build() => false;
 
   void enter() {
-    ref.read(catalogSelectionProvider.notifier).exit();
+    ref.read(catalogSelectionCommandPortProvider).exit();
     state = true;
   }
 

@@ -14,7 +14,11 @@ import 'package:hentai_library/features/metadata_backup/presentation/views/metad
 import 'package:hentai_library/features/app_settings/di/shared_state_ports.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:hentai_library/features/bootstrap/di/dictionary_invalidation_port.dart';
+import 'package:hentai_library/features/library_browse/di/catalog_selection_command_port.dart';
+import 'package:hentai_library/features/metadata_backup/di/metadata_saved_port.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
@@ -85,6 +89,13 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   readerSettingsCommandPortProvider.overrideWith(
     createReaderSettingsCommandPort,
   ),
+  catalogSelectionCommandPortProvider.overrideWith(
+    createCatalogSelectionCommandPort,
+  ),
+  dictionaryInvalidationPortProvider.overrideWith(
+    createDictionaryInvalidationPort,
+  ),
+  metadataSavedPortProvider.overrideWith(createMetadataSavedPort),
   libraryScanRunningStateProvider.overrideWith(
     (Ref ref) =>
         ref.watch(scanLibraryControllerProvider.select((s) => s.running)),
