@@ -1,3 +1,4 @@
+import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -8,51 +9,13 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+export 'package:hentai_library/shared/domain/library/current_library_state.dart';
+
 part 'current_library_notifier.g.dart';
 
 const String _kMigratedFormatGroupsPref =
     'migrated_enabled_format_groups_to_libraries_v1';
 const String _kMigratedAutoScanPref = 'migrated_auto_scan_to_libraries_v1';
-
-class CurrentLibraryState {
-  const CurrentLibraryState({required this.libraries, required this.currentId});
-
-  final List<LocalLibrary> libraries;
-  final String? currentId;
-
-  LocalLibrary? get current {
-    final String? id = currentId;
-    if (id == null) {
-      return null;
-    }
-    for (final LocalLibrary library in libraries) {
-      if (library.libraryId == id) {
-        return library;
-      }
-    }
-    return null;
-  }
-
-  LocalLibrary? findByRootPath(String rootPath) {
-    for (final LocalLibrary library in libraries) {
-      if (library.rootPath == rootPath) {
-        return library;
-      }
-    }
-    return null;
-  }
-
-  CurrentLibraryState copyWith({
-    List<LocalLibrary>? libraries,
-    String? currentId,
-    bool clearCurrentId = false,
-  }) {
-    return CurrentLibraryState(
-      libraries: libraries ?? this.libraries,
-      currentId: clearCurrentId ? null : (currentId ?? this.currentId),
-    );
-  }
-}
 
 @Riverpod(keepAlive: true)
 class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {

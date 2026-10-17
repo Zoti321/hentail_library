@@ -59,15 +59,12 @@ class _LibraryRevisionSignalAdapter implements LibraryRevisionSignalPort {
       _ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
 }
 
-final Provider<CurrentLibraryPort> currentLibraryPortProvider =
-    Provider<CurrentLibraryPort>((Ref ref) => _CurrentLibraryAdapter(ref));
+/// 适配器工厂：由 bootstrap 通过 `shared/di` 的端口 Provider `overrideWith` 注入（#261a）。
+CurrentLibraryPort createCurrentLibraryPort(Ref ref) =>
+    _CurrentLibraryAdapter(ref);
 
-final Provider<LibraryReorderModePort> libraryReorderModePortProvider =
-    Provider<LibraryReorderModePort>(
-      (Ref ref) => _LibraryReorderModeAdapter(ref),
-    );
+LibraryReorderModePort createLibraryReorderModePort(Ref ref) =>
+    _LibraryReorderModeAdapter(ref);
 
-final Provider<LibraryRevisionSignalPort> libraryRevisionSignalPortProvider =
-    Provider<LibraryRevisionSignalPort>(
-      (Ref ref) => _LibraryRevisionSignalAdapter(ref),
-    );
+LibraryRevisionSignalPort createLibraryRevisionSignalPort(Ref ref) =>
+    _LibraryRevisionSignalAdapter(ref);

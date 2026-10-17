@@ -20,4 +20,5 @@ export 'package:hentai_library/features/home/presentation/view_models/home_page_
 export 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
 export 'package:hentai_library/shared/core/util/stream_throttle.dart';
 export 'package:hentai_library/shared/di/comic_cover_providers.dart';
+export 'package:hentai_library/shared/di/library_state_providers.dart';
 export 'package:hentai_library/shared/di/series_cover_providers.dart';

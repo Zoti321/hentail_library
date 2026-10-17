@@ -1,37 +1,12 @@
 import 'dart:async';
 
 import 'package:hentai_library/features/bootstrap/di/ports.dart';
+import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+export 'package:hentai_library/shared/domain/library/library_revision_state.dart';
+
 part 'library_revision_notifier.g.dart';
-
-class LibraryRevisionState {
-  const LibraryRevisionState({
-    this.revision = 0,
-    this.hasReceivedFirstEmit = false,
-    this.streamError,
-  });
-
-  final int revision;
-  final bool hasReceivedFirstEmit;
-  final Object? streamError;
-
-  LibraryRevisionState copyWith({
-    int? revision,
-    bool? hasReceivedFirstEmit,
-    Object? streamError = _unsetStreamError,
-  }) {
-    return LibraryRevisionState(
-      revision: revision ?? this.revision,
-      hasReceivedFirstEmit: hasReceivedFirstEmit ?? this.hasReceivedFirstEmit,
-      streamError: identical(streamError, _unsetStreamError)
-          ? this.streamError
-          : streamError,
-    );
-  }
-}
-
-const Object _unsetStreamError = Object();
 
 @Riverpod(keepAlive: true)
 class LibraryRevisionNotifier extends _$LibraryRevisionNotifier {
