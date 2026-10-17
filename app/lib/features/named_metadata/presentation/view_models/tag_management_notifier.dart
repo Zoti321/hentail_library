@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_change_bus.dart';
 
 /// 全部标签列表（用于标签管理页面）
