@@ -14,6 +14,7 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
 
 const String _comicId = 'paged-resume-comic';
 const ReaderControllerKey _viewKey = (
@@ -38,6 +39,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: <Override>[
+            ...dataProviderOverrides(),
             readerControllerProvider(
               _viewKey,
             ).overrideWith(() => _PagedReaderController(resumePage, pageCount)),
@@ -119,6 +121,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: <Override>[
+            ...dataProviderOverrides(),
             readerControllerProvider(
               _viewKey,
             ).overrideWith(() => _PagedReaderController(resumePage, pageCount)),

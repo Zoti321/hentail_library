@@ -13,6 +13,7 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
 
 /// After bottom-bar volume switch, route opens with [startFromFirstPage]: true.
 /// Chrome and viewport must share that controller key or slider updates UI
@@ -44,6 +45,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: <Override>[
+            ...dataProviderOverrides(),
             readerControllerProvider(
               _uiKeyAfterVolumeSwitch,
             ).overrideWith(() => _PagedReaderController(1, pageCount)),

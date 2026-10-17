@@ -4,8 +4,7 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
-import 'package:hentai_library/features/bootstrap/di/ports.dart';
-import 'package:hentai_library/features/bootstrap/di/repos.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;

@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/domain/models/named_facet_form_candidate.d
 import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/smart_facet_match_preference_notifier.dart';
-import 'package:hentai_library/features/bootstrap/di/repos.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

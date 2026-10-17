@@ -6,7 +6,7 @@
 
 - `app/lib` 已收敛为 `features/<id>/{presentation,domain,data,di}`、`shared/{core,data,domain,ui,di}`、`src/rust`、`main.dart`。
 - Phase B 布局校验已启用（`kEnforceWayfinderPhaseBLayout = true`），strangler 白名单为空。
-- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **75** 条 = **0** 条 M1/M2（feature↔feature） + **75** 条 M3（product feature→bootstrap）。
+- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **62** 条 = **0** 条 M1/M2（feature↔feature） + **62** 条 M3（product feature→bootstrap）。
   - 相对 #261 开始前（212 = 135 M1/M2 + 77 M3）减少 **121** 条（其中 #262 home 再减 **12** 条、#263 comic_trash 再减 **10** 条、#264 app_settings 再减 **18** 条、#265 read_session 再减 **9** 条、#267 library_admin 再减 **10** 条、#268 library_browse 再减 **12** 条、#270 comic_trash 再减 **4** 条 M1/M2）。
 - `dart analyze`：0 error；仍有若干 `unnecessary_import` info，来自 `deps.dart` 总桶，属于迁移遗留，待清理。
 - 全量 `flutter test`（约 937 条）在 #261e 合入后全绿。
@@ -132,7 +132,8 @@ git -c http.version=HTTP/1.1 push origin dev
    - #268（library_browse）：**已完成并关闭**。采用**事件 revision 驱动**（C 方案）：新增 `shared/domain/library/library_change.dart`（`LibraryChange`）与 `shared/di/library_change_bus.dart`（`libraryChangeBusProvider`，状态为 `dictionaryRevision` + `metadataSaveRevision`）。写入方只 `publish` 发生了什么；named_metadata 的 `allTags/allAuthors/allParodies/allCharacters` 与 library_browse 的 distinct 字典 Provider 自行 `watch` 字典 revision；metadata_backup 协调器自行 `listen` 保存 revision 并调度备份。filter 抽屉改读 `shared/di/library_dictionary_providers.dart` 的只读 Provider（bootstrap 桥接）；删除入口经 `ComicTrashCommandPort`（生产适配器位于 `comic_trash/di`）。**回收 #267 的 `MetadataSavedPort` 与 `DictionaryInvalidationPort`**（已被事件总线取代，适配器一并删除）。基线 91 → 79。
    - #270（comic_trash）：**已完成并关闭**。历史页布局常量与标题样式下沉为 `shared/ui/layout/page_header_layout.dart`，置顶页头 delegate 下沉为 `shared/ui/layout/page_pinned_header_delegate.dart`，符号去掉 `history` 前缀。comic_trash 的 M1/M2 清零，基线 79 → 75（全部为 M3）。
    - CatalogSelection 事件化（非票，#268 后续决定）：删除 `CatalogSelectionCommandPort`；catalog 多选监听 shared 的 `libraryReorderActiveStateProvider`，reorder 进入时自行退出多选。反向（多选进入退出 reorder）仍经 `libraryReorderModePortProvider`，待后续统一。
-   - M3 实施票（待处理，按 feature 拆分）：#271 library_browse（27 条）、#272 home（16 条）、#273 read_session（10 条）、#274 library_admin（7 条）、#275 named_metadata（7 条）、#276 app_settings（5 条）、#277 comic_trash（3 条）。共 75 条，需先确认基础设施方案（Provider 声明下沉 shared + bootstrap 覆盖，替代 `deps.dart` barrel）。
+   - #278（基础设施，M3 前置）：**已完成（待推送）**。仓储与端口 Provider 声明下沉至 `shared/di/data_providers.dart`（未注入时抛 `UnimplementedError`）；实现类绑定集中在 `features/bootstrap/di/data_overrides.dart` 的 `dataProviderOverrides()`，由 `main.dart` 注入；删除 `features/bootstrap/di/repos.dart` / `ports.dart`，`deps.dart` 改为导出 shared 声明。测试中直接读取真实仓储的用例需显式加入 `...dataProviderOverrides()`。基线 75 → 62。
+   - M3 实施票（待处理，按 feature 拆分）：#271 library_browse（27 条）、#272 home（16 条）、#273 read_session（10 条）、#274 library_admin（7 条）、#275 named_metadata（7 条）、#276 app_settings（5 条）、#277 comic_trash（3 条）。剩余 62 条，基础设施方案已确定（Provider 声明下沉 shared + bootstrap 覆盖，替代 `deps.dart` barrel）。
 2. **M1/M2 已清零**：comic_trash→home 的 4 条由 #270 处理（布局常量与置顶页头下沉至 `shared/ui/layout/`）。
 3. 消费方票推进时顺手减少本 feature 对 `deps.dart` 的 M3 边。
 4. 全部消费方完成后：实现 R1 扩展，并更新 #260 正文（R6 → M3 ratchet）。

@@ -16,10 +16,11 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/features/bootstrap/di/repos.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
 
 const String _testComicId = 'test-comic';
 const ReaderControllerKey _viewKey = (
@@ -49,7 +50,10 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: _viewportTestOverrides(),
+          overrides: <Override>[
+            ..._viewportTestOverrides(),
+            ...dataProviderOverrides(),
+          ],
           child: MaterialApp(
             home: Scaffold(
               body: ReaderViewportHost(
@@ -75,7 +79,10 @@ void main() {
       await tester.pump();
       await tester.pumpWidget(
         ProviderScope(
-          overrides: _viewportTestOverrides(),
+          overrides: <Override>[
+            ..._viewportTestOverrides(),
+            ...dataProviderOverrides(),
+          ],
           child: MaterialApp(
             home: Scaffold(
               body: ReaderViewportHost(
@@ -204,7 +211,10 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: _viewportTestOverrides(),
+          overrides: <Override>[
+            ..._viewportTestOverrides(),
+            ...dataProviderOverrides(),
+          ],
           child: const MaterialApp(
             home: Scaffold(
               body: ContinuousVerticalViewport(

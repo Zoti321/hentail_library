@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/features/bootstrap/di/repos.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 

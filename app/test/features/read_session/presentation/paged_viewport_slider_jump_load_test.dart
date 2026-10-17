@@ -10,18 +10,13 @@ import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_service.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/paged_viewport.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_image_item.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
 
 /// 1x1 PNG — non-empty payload for archive page providers.
 final Uint8List _kTinyPng = Uint8List.fromList(<int>[
@@ -136,6 +131,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: <Override>[
+            ...dataProviderOverrides(),
             readerControllerProvider(
               _viewKey,
             ).overrideWith(() => _PagedReaderController(startPage, pageCount)),

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/bootstrap/di/ports.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

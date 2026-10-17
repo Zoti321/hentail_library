@@ -3,15 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-import 'package:hentai_library/features/read_session/domain/spread_index.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_auto_play_carry.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/module/session/reader_session_bindings.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_series_navigation.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_fullscreen_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/reader_exit_location.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;

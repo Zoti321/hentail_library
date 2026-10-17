@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/bootstrap/di/repos.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:hentai_library/shared/di/library_change_bus.dart';
 

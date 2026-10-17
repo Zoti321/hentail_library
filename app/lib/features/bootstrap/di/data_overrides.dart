@@ -1,0 +1,60 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/shared/data/adapters/comic_page_source_frb_adapter.dart';
+import 'package:hentai_library/shared/data/adapters/library_revision_frb_adapter.dart';
+import 'package:hentai_library/shared/data/adapters/reader_session_frb_adapter.dart';
+import 'package:hentai_library/shared/data/repositories/app_setting_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/author_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/comic_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/comic_thumbnail_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/home_page_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/library_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/named_facet_dictionary_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/named_facet_management_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/reading_history_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/series_repository_impl.dart';
+import 'package:hentai_library/shared/data/repositories/tag_repository_impl.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary_repository.dart';
+import 'package:riverpod/misc.dart' show Override;
+
+List<Override> dataProviderOverrides() => <Override>[
+  comicThumbnailRepoProvider.overrideWith(
+    (Ref ref) => ComicThumbnailRepositoryImpl(
+      libraryRepository: ref.read(libraryRepoProvider),
+    ),
+  ),
+  comicRepoProvider.overrideWith((Ref ref) => const ComicRepositoryImpl()),
+  seriesRepoProvider.overrideWith((Ref ref) => const SeriesRepositoryImpl()),
+  tagRepoProvider.overrideWith((Ref ref) => const TagRepositoryImpl()),
+  authorRepoProvider.overrideWith((Ref ref) => const AuthorRepositoryImpl()),
+  namedFacetManagementRepoProvider.overrideWith(
+    (Ref ref) => const NamedFacetManagementRepositoryImpl(),
+  ),
+  parodyRepoProvider.overrideWith(
+    (Ref ref) =>
+        const NamedFacetDictionaryRepositoryImpl(NamedFacetKind.parody),
+  ),
+  characterRepoProvider.overrideWith(
+    (Ref ref) =>
+        const NamedFacetDictionaryRepositoryImpl(NamedFacetKind.character),
+  ),
+  libraryRepoProvider.overrideWith((Ref ref) => const LibraryRepositoryImpl()),
+  readingHistoryRepoProvider.overrideWith(
+    (Ref ref) => const ReadingHistoryRepositoryImpl(),
+  ),
+  appSettingRepoProvider.overrideWith((Ref ref) => AppSettingRepositoryImpl()),
+  homePageRepoProvider.overrideWith(
+    (Ref ref) => const HomePageRepositoryImpl(),
+  ),
+  readerSessionPortProvider.overrideWith(
+    (Ref ref) => ReaderSessionFrbAdapter(
+      libraryRepository: ref.read(libraryRepoProvider),
+    ),
+  ),
+  comicPageSourcePortProvider.overrideWith(
+    (Ref ref) => const ComicPageSourceFrbAdapter(),
+  ),
+  libraryRevisionPortProvider.overrideWith(
+    (Ref ref) => const LibraryRevisionFrbAdapter(),
+  ),
+];

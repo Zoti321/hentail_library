@@ -5,7 +5,6 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_item_sort_persist.dart';
 import 'package:hentai_library/shared/di/library_change_bus.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_metadata_editor_notifier.g.dart';

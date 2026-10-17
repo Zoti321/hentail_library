@@ -6,7 +6,6 @@ import 'package:hentai_library/shared/domain/models/value_objects/page_request.d
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_controller.dart';
 import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_state.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';

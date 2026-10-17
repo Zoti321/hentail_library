@@ -10,14 +10,14 @@ import 'package:hentai_library/shared/domain/models/value_objects/paged_result.d
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
-import 'package:hentai_library/features/bootstrap/di/ports.dart';
-import 'package:hentai_library/features/bootstrap/di/repos.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_page/trash_page.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/pump_localized_app.dart';
+import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
 
 class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   final StreamController<void> events = StreamController<void>.broadcast();
@@ -48,6 +48,11 @@ class _TrashComicRepo implements ComicRepository {
     remote: items.where((TrashedComic i) => i.isRemote).length,
   );
 
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _NoopReaderSessionPort implements ReaderSessionPort {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -89,6 +94,7 @@ Future<void> _pumpTrash(WidgetTester tester, List<TrashedComic> items) async {
     overrides: <Override>[
       libraryRevisionPortProvider.overrideWithValue(revision),
       comicRepoProvider.overrideWithValue(_TrashComicRepo(items)),
+      readerSessionPortProvider.overrideWithValue(_NoopReaderSessionPort()),
       for (final TrashedComic item in items)
         comicCoverProvider(
           item.comic.comicId,

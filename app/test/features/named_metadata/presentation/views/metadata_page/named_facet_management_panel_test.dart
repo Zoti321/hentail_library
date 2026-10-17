@@ -11,7 +11,6 @@ import 'package:hentai_library/shared/domain/repositories/named_facet_management
 import 'package:hentai_library/shared/ui/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_fill_viewport.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/named_facet_management_panel.dart';
