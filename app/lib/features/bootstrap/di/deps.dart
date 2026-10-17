@@ -4,6 +4,7 @@ export 'services.dart';
 export 'package:hentai_library/features/comic_trash/di/comic_trash.dart';
 export 'package:hentai_library/features/library_admin/di/library_sync.dart';
 export 'package:hentai_library/features/library_admin/di/metadata_refresh.dart';
+export 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
 export 'package:hentai_library/features/library_browse/presentation/library.dart';
 export 'package:hentai_library/features/named_metadata/presentation/metadata.dart';
 export 'package:hentai_library/features/read_session/presentation/reader.dart';
