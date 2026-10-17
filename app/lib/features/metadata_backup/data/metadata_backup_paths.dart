@@ -1,9 +1,8 @@
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_naming.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 const String metadataBackupsDirName = 'metadata_backups';
-const String metadataBackupFilePrefix = 'metadata-';
-const String metadataBackupExtension = '.hlmeta.json.gz';
 
 Future<String> metadataBackupsDirectory() async {
   final directory = await getApplicationSupportDirectory();

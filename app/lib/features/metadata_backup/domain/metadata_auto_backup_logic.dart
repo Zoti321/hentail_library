@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:hentai_library/features/metadata_backup/data/metadata_backup_paths.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_naming.dart';
 import 'package:path/path.dart' as p;
 
 const Duration metadataAutoBackupStartupInterval = Duration(days: 7);

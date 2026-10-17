@@ -28,14 +28,14 @@
 | Issue | 角色 |
 |-------|------|
 | **#256** | **下一主线**：`shared/data` 按 feature owner 回迁（见 §8、§9） |
-| #260 | spec 收尾：Gate **R1 扩展**、正文「R6→M3」同步（可与 #256 并行，不合并票） |
+| #260 | spec 收尾：**已完成**（R1 扩展 + 正文 M3 ratchet 表述） |
 
 ## 4. 已做出的决策（不要重新讨论）
 
 来自 `grilling` 两轮（#260 spec）及 #261–#278 实施过程：
 
 1. #260 消费方路线完成标准：feature↔feature M1/M2 与 M3 ratchet **基线均为空**（已达成）。
-2. Gate R1 扩展（待实现）：禁止 feature `domain/` 依赖本 feature `data/`；`metadata_backup/domain/metadata_auto_backup_logic.dart` 纳入修复。
+2. Gate R1 扩展（**已实现**）：禁止 feature `domain/` 依赖本 feature `data/` 与 `shared/data/`（L1 零容忍）；`metadata_backup` 命名常量已上提到 `domain/metadata_backup_naming.dart`。
 3. 跨 feature 共享状态：**端口 + shared/di 声明 + bootstrap override**（见 §5）。
 4. **R6 → M3 ratchet**：product feature 不得新增对 `features/bootstrap/` 的 import；基线只减不增。
 5. **#256 与 #260 消费方路线分轨**：#256 只动 **data / FRB adapter / repository 实现物理路径**；不改 presentation 依赖方向；不撤销 shared 仓储**接口**。
@@ -128,7 +128,7 @@ cd app && rg -l sync_library_frb_adapter lib
 
 ### 并行（不阻塞 #256）
 
-1. **#260**：实现 Gate R1 扩展；更新 issue 正文（R6 → M3 ratchet）。
+1. **#260**：R1 扩展与正文 M3 表述已落地（可关票）。
 2. **`deps.dart` 瘦身**：删除已无引用的 export（纯清理）。
 
 ### 已完成（勿重开）
@@ -146,4 +146,4 @@ cd app && rg -l sync_library_frb_adapter lib
 
 当前 **shared 端口 + `data_providers` 声明** 是 #256 的稳定外壳：adapter 搬家时，除 `data_overrides` 与 owner `di` 外，presentation 不应改为 import 具体 `*_impl.dart`。
 
-#256 与 #260 **不要合并为一张实施票**；#260 剩余 R1 可在单独 PR 完成。
+#256 与 #260 **不要合并为一张实施票**；#260 消费方与 R1 均已单独 PR 完成。

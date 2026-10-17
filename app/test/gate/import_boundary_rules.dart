@@ -225,7 +225,11 @@ void _checkStructuralRules({
   required String targetModule,
 }) {
   if (isDomainLayerPath(sourceRel)) {
-    if (importPath.startsWith('shared/data/')) {
+    final bool domainImportsSharedData =
+        importPath.startsWith('shared/data/');
+    final bool domainImportsOwnFeatureData = isProductModule(sourceModule) &&
+        importPath.startsWith('features/$sourceModule/data/');
+    if (domainImportsSharedData || domainImportsOwnFeatureData) {
       found.add(
         violation(
           ruleId: 'R1',

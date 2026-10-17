@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
-import 'package:hentai_library/features/metadata_backup/data/metadata_backup_paths.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_naming.dart';
 
 void main() {
   group('shouldRunStartupMetadataAutoBackup', () {

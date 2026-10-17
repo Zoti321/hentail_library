@@ -97,6 +97,14 @@ def main() -> None:
 
             if rel.startswith("shared/domain/") and imp.startswith("shared/data/"):
                 domain_to_data.append(f"{rel} -> {imp}")
+            if (
+                "/domain/" in rel
+                and rel.startswith("features/")
+                and mod in MODULES
+                and mod not in ("shared", "bootstrap", "frb_generated")
+                and imp.startswith(f"features/{mod}/data/")
+            ):
+                domain_to_data.append(f"{rel} -> {imp}")
 
             if target == "frb_generated" and not rel.startswith("shared/data/"):
                 non_data_to_frb.append(rel)
