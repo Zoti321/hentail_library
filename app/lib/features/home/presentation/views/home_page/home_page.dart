@@ -4,9 +4,10 @@ import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/widgets.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
+import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
+import 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
+import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});

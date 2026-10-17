@@ -7,8 +7,8 @@ import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_conte
 import 'package:hentai_library/shared/ui/widgets/foundation/horizontal_wheel_scroll_listener.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_constants.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
+
+import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 
 class HomeRecentlyAddedSection extends ConsumerStatefulWidget {
   const HomeRecentlyAddedSection({
@@ -116,12 +116,9 @@ class _RecentlyAddedCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(tokens.radius.xs),
       child: InkWell(
         borderRadius: BorderRadius.circular(tokens.radius.xs),
-        onTap: () => appRouter.pushNamed(
-          ReaderRouteArgs.readerRouteName,
-          queryParameters: ReaderRouteArgs(
-            comicId: entry.comicId,
-          ).toQueryParameters(),
-        ),
+        onTap: () => ProviderScope.containerOf(
+          context,
+        ).read(readSessionLaunchPortProvider).openComic(comicId: entry.comicId),
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(tokens.radius.xs),

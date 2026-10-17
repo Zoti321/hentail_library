@@ -6,12 +6,12 @@ import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_constants.dart';
 import 'package:hentai_library/shared/ui/widgets/element/card/reading_history_card.dart';
 import 'package:hentai_library/shared/ui/widgets/foundation/horizontal_wheel_scroll_listener.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
+
+import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePageContinueReadingSection extends ConsumerWidget {
@@ -210,12 +210,9 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
               title: item.title,
               lastReadTime: item.lastReadTime,
               pageIndex: item.pageIndex,
-              onTap: () => appRouter.pushNamed(
-                ReaderRouteArgs.readerRouteName,
-                queryParameters: ReaderRouteArgs(
-                  comicId: item.comicId,
-                ).toQueryParameters(),
-              ),
+              onTap: () => ProviderScope.containerOf(context)
+                  .read(readSessionLaunchPortProvider)
+                  .openComic(comicId: item.comicId),
             ),
           );
         },

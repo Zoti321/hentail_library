@@ -1,8 +1,13 @@
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/current_library_state.dart';
+import 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
+import 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
+import 'package:hentai_library/shared/core/util/stream_throttle.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/shared/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_page_dashboard_notifier.g.dart';

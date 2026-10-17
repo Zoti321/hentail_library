@@ -5,9 +5,9 @@ import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_constants.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_management_actions.dart';
+import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePageHeroSection extends ConsumerWidget {

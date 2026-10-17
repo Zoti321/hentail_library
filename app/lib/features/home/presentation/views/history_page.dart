@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/content_search_width.dart';
 import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_visible_range.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
 import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
 import 'package:hentai_library/shared/ui/widgets/element/card/reading_history_card.dart';
 import 'package:hentai_library/shared/ui/widgets/form/custom_text_field.dart';
@@ -18,7 +17,7 @@ import 'package:hentai_library/features/home/presentation/view_models/history_pa
 import 'package:hentai_library/shared/ui/layout/page_header_layout.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
 import 'package:hentai_library/shared/ui/layout/page_pinned_header_delegate.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
+import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kHistoryLoadMoreThreshold = 400;
@@ -364,12 +363,9 @@ class _HistoryListSliver extends ConsumerWidget {
                     pageIndex: item.pageIndex,
                     gridIndex: index,
                     coverViewport: historyCoverViewportProvider,
-                    onTap: () => appRouter.pushNamed(
-                      ReaderRouteArgs.readerRouteName,
-                      queryParameters: ReaderRouteArgs(
-                        comicId: item.comicId,
-                      ).toQueryParameters(),
-                    ),
+                    onTap: () => ref
+                        .read(readSessionLaunchPortProvider)
+                        .openComic(comicId: item.comicId),
                     onDelete: () => _handleDeleteComicHistory(
                       context: context,
                       ref: ref,
