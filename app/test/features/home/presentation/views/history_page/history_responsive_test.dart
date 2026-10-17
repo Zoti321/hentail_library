@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/domain/repositories/reading_history_reposi
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/shared/ui/layout/page_header_layout.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -73,8 +73,8 @@ void main() {
       await _pumpHistoryPage(tester, viewportWidth: 360);
       await tester.pumpAndSettle();
 
-      final HistoryGridMetrics metrics = historyGridMetrics(
-        HistoryLayoutTier.compact,
+      final PageHeaderGridMetrics metrics = pageHeaderGridMetrics(
+        PageHeaderLayoutTier.compact,
         360,
       );
       expect(metrics.crossAxisCount, 1);

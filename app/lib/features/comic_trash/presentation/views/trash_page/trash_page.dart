@@ -11,8 +11,8 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/comic_confirm_purge_dialog.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_controller.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_state.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
+import 'package:hentai_library/shared/ui/layout/page_header_layout.dart';
+import 'package:hentai_library/shared/ui/layout/page_pinned_header_delegate.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_page/widgets/trash_comic_tile.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -23,20 +23,20 @@ const double _kTrashLoadMoreThreshold = 400;
 class TrashPage extends ConsumerWidget {
   const TrashPage({super.key});
 
-  static const double _headerExtent = kHistoryHeaderVerticalPadding * 2 + 44;
+  static const double _headerExtent = kPageHeaderVerticalPadding * 2 + 44;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final HistoryLayoutTier layoutTier = historyLayoutTierForWidth(
+        final PageHeaderLayoutTier layoutTier = pageHeaderLayoutTierForWidth(
           constraints.maxWidth,
         );
-        final double horizontalPadding = historyContentHorizontalPadding(
+        final double horizontalPadding = pageHeaderHorizontalPadding(
           layoutTier,
         );
-        final double innerMaxWidth = historyInnerContentMaxWidth(
+        final double innerMaxWidth = pageHeaderInnerMaxWidth(
           layoutTier,
           constraints.maxWidth,
         );
@@ -55,14 +55,14 @@ class TrashPage extends ConsumerWidget {
             slivers: <Widget>[
               SliverPersistentHeader(
                 pinned: true,
-                delegate: HistoryPinnedHeaderDelegate(
+                delegate: PagePinnedHeaderDelegate(
                   extent: TrashPage._headerExtent,
                   child: PageContentWidthAlign(
                     horizontalPadding: horizontalPadding,
                     maxWidth: innerMaxWidth,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        vertical: kHistoryHeaderVerticalPadding,
+                        vertical: kPageHeaderVerticalPadding,
                       ),
                       child: _TrashHeader(
                         layoutTier: layoutTier,
@@ -96,7 +96,7 @@ class TrashPage extends ConsumerWidget {
 class _TrashHeader extends ConsumerWidget {
   const _TrashHeader({required this.layoutTier, this.onOpenNavigation});
 
-  final HistoryLayoutTier layoutTier;
+  final PageHeaderLayoutTier layoutTier;
   final VoidCallback? onOpenNavigation;
 
   @override
@@ -179,7 +179,7 @@ class _TrashHeader extends ConsumerWidget {
                   ],
                   Text(
                     l10n.navTrash,
-                    style: historyPageTitleStyle(cs, layoutTier),
+                    style: pageHeaderTitleStyle(cs, layoutTier),
                   ),
                 ],
               ),
@@ -203,7 +203,7 @@ class _TrashHeaderAction extends StatelessWidget {
     this.overlayColor,
   });
 
-  final HistoryLayoutTier layoutTier;
+  final PageHeaderLayoutTier layoutTier;
   final IconData icon;
   final String text;
   final VoidCallback? onPressed;
@@ -213,7 +213,7 @@ class _TrashHeaderAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (layoutTier == HistoryLayoutTier.compact) {
+    if (layoutTier == PageHeaderLayoutTier.compact) {
       return GhostButton.icon(
         icon: icon,
         tooltip: text,
@@ -280,7 +280,7 @@ class _TrashBody extends ConsumerWidget {
                 color: theme.colorScheme.hentai.textTertiary,
               ),
             ),
-            const SizedBox(height: kHistorySearchToListSpacing),
+            const SizedBox(height: kPageHeaderSearchToListSpacing),
             for (final TrashedComic item in state.items)
               TrashComicTile(
                 key: ValueKey<String>(item.comic.comicId),

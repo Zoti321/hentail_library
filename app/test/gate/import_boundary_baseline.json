@@ -1,8 +1,4 @@
 [
-  "M1|comic_trash|home|features/comic_trash/presentation/views/trash_page/trash_page.dart|package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart",
-  "M1|comic_trash|home|features/comic_trash/presentation/views/trash_page/trash_page.dart|package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart",
-  "M2|comic_trash|home|features/comic_trash/presentation/views/trash_page/trash_page.dart|package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart",
-  "M2|comic_trash|home|features/comic_trash/presentation/views/trash_page/trash_page.dart|package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart",
   "M3|app_settings|bootstrap|features/app_settings/presentation/view_models/app_update_controller.dart|package:hentai_library/features/bootstrap/di/services.dart",
   "M3|app_settings|bootstrap|features/app_settings/presentation/view_models/settings_notifier.dart|package:hentai_library/features/bootstrap/di/repos.dart",
   "M3|app_settings|bootstrap|features/app_settings/presentation/views/settings_page/settings_page.dart|package:hentai_library/features/bootstrap/di/deps.dart",

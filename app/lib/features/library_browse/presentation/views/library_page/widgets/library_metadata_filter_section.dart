@@ -21,7 +21,6 @@ LibraryMetadataFilterSelection includeOnlyFilterSelection(Set<String> names) {
   );
 }
 
-/// Sorted tag names for the library filter drawer (dictionary already sorted).
 final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((
   Ref ref,
 ) {

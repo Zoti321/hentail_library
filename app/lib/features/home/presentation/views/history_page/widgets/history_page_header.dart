@@ -7,21 +7,9 @@ import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/clear_reading_history_confirm_dialog.dart';
 import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_state.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/shared/ui/layout/page_header_layout.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
-TextStyle historyPageTitleStyle(
-  ColorScheme colorScheme,
-  HistoryLayoutTier layoutTier,
-) {
-  return TextStyle(
-    color: colorScheme.hentai.textPrimary,
-    fontSize: historyPageTitleFontSize(layoutTier),
-    fontWeight: FontWeight.w600,
-    letterSpacing: -0.4,
-  );
-}
 
 class HistoryPageHeaderSection extends ConsumerWidget {
   const HistoryPageHeaderSection({
@@ -32,7 +20,7 @@ class HistoryPageHeaderSection extends ConsumerWidget {
     this.onOpenNavigation,
   });
 
-  final HistoryLayoutTier layoutTier;
+  final PageHeaderLayoutTier layoutTier;
   final double horizontalPadding;
   final double contentMaxWidth;
   final VoidCallback? onOpenNavigation;
@@ -51,7 +39,7 @@ class HistoryPageHeaderSection extends ConsumerWidget {
       maxWidth: contentMaxWidth,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: kHistoryHeaderVerticalPadding,
+          vertical: kPageHeaderVerticalPadding,
         ),
         child: HistoryPageHeaderToolbar(
           layoutTier: layoutTier,
@@ -71,7 +59,7 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
     this.onOpenNavigation,
   });
 
-  final HistoryLayoutTier layoutTier;
+  final PageHeaderLayoutTier layoutTier;
   final bool clearEnabled;
   final VoidCallback? onOpenNavigation;
 
@@ -109,7 +97,7 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
                   ],
                   Text(
                     l10n.historyTitle,
-                    style: historyPageTitleStyle(cs, layoutTier),
+                    style: pageHeaderTitleStyle(cs, layoutTier),
                   ),
                 ],
               ),
@@ -159,63 +147,5 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
         showErrorToast(context, e);
       }
     }
-  }
-}
-
-class HistoryPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
-  HistoryPinnedHeaderDelegate({required this.extent, required this.child});
-
-  final double extent;
-  final Widget child;
-
-  @override
-  double get minExtent => extent;
-
-  @override
-  double get maxExtent => extent;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return ColoredBox(
-      color: cs.surface,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Align(alignment: Alignment.topCenter, child: child),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: kHistoryHeaderShadowGradientHeight,
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: <Color>[
-                      cs.hentai.cardShadow.withValues(alpha: 0),
-                      cs.hentai.cardShadow.withValues(alpha: 0.025),
-                      cs.hentai.cardShadow.withValues(alpha: 0.05),
-                    ],
-                    stops: const <double>[0, 0.75, 1],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(covariant HistoryPinnedHeaderDelegate oldDelegate) {
-    return oldDelegate.extent != extent || oldDelegate.child != child;
   }
 }

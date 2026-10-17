@@ -60,7 +60,7 @@ test/features/home/presentation/view_models/history_load_more_throttle_test.dart
 test/features/home/presentation/view_models/history_paged_feed_controller_test.dart
 test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dart
 test/features/home/presentation/view_models/home_probe_coordinator_notifier_test.dart
-test/features/home/presentation/views/history_page/history_layout_constants_test.dart
+test/shared/ui/layout/page_header_layout_test.dart
 test/features/home/presentation/views/history_page/history_responsive_test.dart
 test/features/home/presentation/views/home_page/home_page_constants_test.dart
 test/features/home/presentation/views/home_page/home_page_responsive_test.dart

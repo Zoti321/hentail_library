@@ -12,6 +12,5 @@ class _ComicTrashCommandAdapter implements ComicTrashCommandPort {
       _ref.read(comicTrashActionsProvider.notifier).trash(comicIds);
 }
 
-/// 适配器工厂：由 bootstrap 注入（#268）。
 ComicTrashCommandPort createComicTrashCommandPort(Ref ref) =>
     _ComicTrashCommandAdapter(ref);

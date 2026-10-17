@@ -2,9 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 
-/// 字典只读状态（#268）：library_browse 等消费方只读，不依赖 named_metadata。
-///
-/// 实现由 bootstrap 通过 `overrideWith` 桥接到 named_metadata 的 Provider。
 final Provider<AsyncValue<List<Tag>>> libraryTagDictionaryStateProvider =
     Provider<AsyncValue<List<Tag>>>(
       (Ref ref) => throw UnimplementedError(

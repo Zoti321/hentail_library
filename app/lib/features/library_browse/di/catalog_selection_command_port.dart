@@ -11,6 +11,5 @@ class _CatalogSelectionCommandAdapter implements CatalogSelectionCommandPort {
   void exit() => _ref.read(catalogSelectionProvider.notifier).exit();
 }
 
-/// 适配器工厂：由 bootstrap 通过 `shared/di` 的端口 Provider `overrideWith` 注入（#267）。
 CatalogSelectionCommandPort createCatalogSelectionCommandPort(Ref ref) =>
     _CatalogSelectionCommandAdapter(ref);

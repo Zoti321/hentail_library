@@ -2,59 +2,59 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
 import 'package:hentai_library/shared/ui/layout/content_search_width.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/shared/ui/layout/page_header_layout.dart';
 
 void main() {
-  group('historyLayoutTierForWidth', () {
+  group('pageHeaderLayoutTierForWidth', () {
     test('maps widths to compact, medium, and expanded tiers', () {
       expect(
-        historyLayoutTierForWidth(AppLayoutBreakpoints.compact - 1),
-        HistoryLayoutTier.compact,
+        pageHeaderLayoutTierForWidth(AppLayoutBreakpoints.compact - 1),
+        PageHeaderLayoutTier.compact,
       );
       expect(
-        historyLayoutTierForWidth(AppLayoutBreakpoints.compact),
-        HistoryLayoutTier.medium,
+        pageHeaderLayoutTierForWidth(AppLayoutBreakpoints.compact),
+        PageHeaderLayoutTier.medium,
       );
       expect(
-        historyLayoutTierForWidth(AppLayoutBreakpoints.medium),
-        HistoryLayoutTier.expanded,
+        pageHeaderLayoutTierForWidth(AppLayoutBreakpoints.medium),
+        PageHeaderLayoutTier.expanded,
       );
     });
   });
 
   group('history responsive sizing helpers', () {
     test('uses tiered padding and title sizes aligned with other pages', () {
-      expect(historyContentHorizontalPadding(HistoryLayoutTier.compact), 16);
-      expect(historyContentHorizontalPadding(HistoryLayoutTier.medium), 28);
-      expect(historyContentHorizontalPadding(HistoryLayoutTier.expanded), 48);
+      expect(pageHeaderHorizontalPadding(PageHeaderLayoutTier.compact), 16);
+      expect(pageHeaderHorizontalPadding(PageHeaderLayoutTier.medium), 28);
+      expect(pageHeaderHorizontalPadding(PageHeaderLayoutTier.expanded), 48);
 
-      expect(historyPageTitleFontSize(HistoryLayoutTier.compact), 18);
-      expect(historyPageTitleFontSize(HistoryLayoutTier.medium), 22);
-      expect(historyPageTitleFontSize(HistoryLayoutTier.expanded), 26);
+      expect(pageHeaderTitleFontSize(PageHeaderLayoutTier.compact), 18);
+      expect(pageHeaderTitleFontSize(PageHeaderLayoutTier.medium), 22);
+      expect(pageHeaderTitleFontSize(PageHeaderLayoutTier.expanded), 26);
     });
 
     test('keeps header chrome constants aligned with home/metadata', () {
-      expect(kHistoryHeaderVerticalPadding, 6);
-      expect(kHistoryHeaderShadowGradientHeight, 6);
-      expect(kHistorySubtitleToSearchSpacing, 12);
-      expect(kHistorySearchToListSpacing, 16);
+      expect(kPageHeaderVerticalPadding, 6);
+      expect(kPageHeaderShadowGradientHeight, 6);
+      expect(kPageHeaderSubtitleToSearchSpacing, 12);
+      expect(kPageHeaderSearchToListSpacing, 16);
     });
   });
 
-  group('historyInnerContentMaxWidth', () {
+  group('pageHeaderInnerMaxWidth', () {
     test('caps expanded content width at 1280', () {
       expect(
-        historyInnerContentMaxWidth(HistoryLayoutTier.expanded, 1600),
+        pageHeaderInnerMaxWidth(PageHeaderLayoutTier.expanded, 1600),
         kPageContentMaxWidth,
       );
-      expect(historyInnerContentMaxWidth(HistoryLayoutTier.compact, 360), 328);
+      expect(pageHeaderInnerMaxWidth(PageHeaderLayoutTier.compact, 360), 328);
     });
   });
 
-  group('historyGridMetrics', () {
+  group('pageHeaderGridMetrics', () {
     test('uses single column on compact widths', () {
-      final HistoryGridMetrics metrics = historyGridMetrics(
-        HistoryLayoutTier.compact,
+      final PageHeaderGridMetrics metrics = pageHeaderGridMetrics(
+        PageHeaderLayoutTier.compact,
         360,
       );
       expect(metrics.crossAxisCount, 1);
@@ -62,8 +62,8 @@ void main() {
     });
 
     test('uses two columns on medium widths', () {
-      final HistoryGridMetrics metrics = historyGridMetrics(
-        HistoryLayoutTier.medium,
+      final PageHeaderGridMetrics metrics = pageHeaderGridMetrics(
+        PageHeaderLayoutTier.medium,
         700,
       );
       expect(metrics.crossAxisCount, 2);
@@ -71,8 +71,8 @@ void main() {
     });
 
     test('uses four columns on wide expanded viewports', () {
-      final HistoryGridMetrics metrics = historyGridMetrics(
-        HistoryLayoutTier.expanded,
+      final PageHeaderGridMetrics metrics = pageHeaderGridMetrics(
+        PageHeaderLayoutTier.expanded,
         1600,
       );
       expect(metrics.crossAxisCount, 4);
@@ -80,8 +80,8 @@ void main() {
     });
 
     test('uses three columns on narrower expanded viewports', () {
-      final HistoryGridMetrics metrics = historyGridMetrics(
-        HistoryLayoutTier.expanded,
+      final PageHeaderGridMetrics metrics = pageHeaderGridMetrics(
+        PageHeaderLayoutTier.expanded,
         1100,
       );
       expect(metrics.crossAxisCount, 3);

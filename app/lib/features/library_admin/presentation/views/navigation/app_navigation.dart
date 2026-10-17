@@ -96,7 +96,6 @@ abstract final class AppNavigation {
   }
 }
 
-/// 清理「返回系列」记忆；上下文无 ProviderScope 时静默忽略。
 void _clearComicDetailReturnSeries(BuildContext context) {
   try {
     ProviderScope.containerOf(

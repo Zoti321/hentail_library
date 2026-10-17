@@ -3,9 +3,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_change_bus.g.dart';
 
-/// 书库写入事件总线的状态：每类事件一个单调递增的 revision。
-///
-/// 订阅方 `select` 自己关心的 revision，变化即重取/调度，互不感知对方。
 class LibraryChangeState {
   const LibraryChangeState({
     this.dictionaryRevision = 0,

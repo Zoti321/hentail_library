@@ -15,8 +15,9 @@ import 'package:hentai_library/shared/ui/widgets/form/custom_text_field.dart';
 import 'package:hentai_library/features/home/presentation/view_models/history_cover_viewport_notifier.dart';
 import 'package:hentai_library/features/home/presentation/view_models/history_load_more_throttle.dart';
 import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_state.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/shared/ui/layout/page_header_layout.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
+import 'package:hentai_library/shared/ui/layout/page_pinned_header_delegate.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -65,13 +66,13 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double viewportWidth = constraints.maxWidth;
-        final HistoryLayoutTier layoutTier = historyLayoutTierForWidth(
+        final PageHeaderLayoutTier layoutTier = pageHeaderLayoutTierForWidth(
           viewportWidth,
         );
-        final double horizontalPadding = historyContentHorizontalPadding(
+        final double horizontalPadding = pageHeaderHorizontalPadding(
           layoutTier,
         );
-        final double innerMaxWidth = historyInnerContentMaxWidth(
+        final double innerMaxWidth = pageHeaderInnerMaxWidth(
           layoutTier,
           viewportWidth,
         );
@@ -100,7 +101,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                 ?.value;
             final int itemCount = feed?.items.length ?? 0;
             if (itemCount > 0) {
-              final HistoryGridMetrics gridMetrics = historyGridMetrics(
+              final PageHeaderGridMetrics gridMetrics = pageHeaderGridMetrics(
                 layoutTier,
                 viewportWidth,
               );
@@ -154,7 +155,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
               else
                 SliverPersistentHeader(
                   pinned: true,
-                  delegate: HistoryPinnedHeaderDelegate(
+                  delegate: PagePinnedHeaderDelegate(
                     extent: _headerExtent!,
                     child: header,
                   ),
@@ -200,7 +201,7 @@ class _HistoryBodyLeading extends ConsumerWidget {
     required this.contentMaxWidth,
   });
 
-  final HistoryLayoutTier layoutTier;
+  final PageHeaderLayoutTier layoutTier;
   final double contentMaxWidth;
 
   @override
@@ -215,9 +216,9 @@ class _HistoryBodyLeading extends ConsumerWidget {
       ),
     );
     final ContentLayoutTier searchTier = switch (layoutTier) {
-      HistoryLayoutTier.compact => ContentLayoutTier.compact,
-      HistoryLayoutTier.medium => ContentLayoutTier.medium,
-      HistoryLayoutTier.expanded => ContentLayoutTier.expanded,
+      PageHeaderLayoutTier.compact => ContentLayoutTier.compact,
+      PageHeaderLayoutTier.medium => ContentLayoutTier.medium,
+      PageHeaderLayoutTier.expanded => ContentLayoutTier.expanded,
     };
     final double searchWidth = contentSearchFieldWidth(
       searchTier,
@@ -235,7 +236,7 @@ class _HistoryBodyLeading extends ConsumerWidget {
             color: theme.colorScheme.hentai.textTertiary,
           ),
         ),
-        const SizedBox(height: kHistorySubtitleToSearchSpacing),
+        const SizedBox(height: kPageHeaderSubtitleToSearchSpacing),
         Align(
           alignment: Alignment.centerLeft,
           child: SizedBox(
@@ -248,7 +249,7 @@ class _HistoryBodyLeading extends ConsumerWidget {
             ),
           ),
         ),
-        const SizedBox(height: kHistorySearchToListSpacing),
+        const SizedBox(height: kPageHeaderSearchToListSpacing),
       ],
     );
   }
@@ -262,7 +263,7 @@ class _HistoryListSliver extends ConsumerWidget {
     required this.contentMaxWidth,
   });
 
-  final HistoryLayoutTier layoutTier;
+  final PageHeaderLayoutTier layoutTier;
   final double viewportWidth;
   final double horizontalPadding;
   final double contentMaxWidth;
@@ -327,7 +328,7 @@ class _HistoryListSliver extends ConsumerWidget {
           );
         }
 
-        final HistoryGridMetrics gridMetrics = historyGridMetrics(
+        final PageHeaderGridMetrics gridMetrics = pageHeaderGridMetrics(
           layoutTier,
           viewportWidth,
         );
