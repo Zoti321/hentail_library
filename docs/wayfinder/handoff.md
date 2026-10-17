@@ -6,8 +6,8 @@
 
 - `app/lib` 已收敛为 `features/<id>/{presentation,domain,data,di}`、`shared/{core,data,domain,ui,di}`、`src/rust`、`main.dart`。
 - Phase B 布局校验已启用（`kEnforceWayfinderPhaseBLayout = true`），strangler 白名单为空。
-- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **150** 条 = **75** 条 M1/M2（feature↔feature） + **75** 条 M3（product feature→bootstrap）。
-  - 相对 #261 开始前（212 = 135 M1/M2 + 77 M3）减少 **62** 条。
+- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **138** 条 = **63** 条 M1/M2（feature↔feature） + **75** 条 M3（product feature→bootstrap）。
+  - 相对 #261 开始前（212 = 135 M1/M2 + 77 M3）减少 **74** 条（其中 #262 home 再减 **12** 条 M1/M2）。
 - `dart analyze`：0 error；仍有若干 `unnecessary_import` info，来自 `deps.dart` 总桶，属于迁移遗留，待清理。
 - 全量 `flutter test`（约 937 条）在 #261e 合入后全绿。
 
@@ -121,7 +121,11 @@ git -c http.version=HTTP/1.1 push origin dev
 
 ## 8. 下一步（下一对话从这里开始）
 
-1. **实现 #262（home）**：去除 home 对 library_admin（及可能的 library_browse）的 M1/M2 边；复用 §5 的 shared Provider / 端口，模式对齐 #261e。
+1. ~~实现 #262（home）~~：**代码层已完成**。home 的 M1/M2 边已清零（基线 150 → 138）。
+   - 新增 shared Provider：`libraryComicAgeRestrictionStateProvider`、`libraryScanRunningStateProvider`（`shared/di/library_state_providers.dart`，由 bootstrap 的 `shared_state_overrides.dart` 注入）。
+   - `visibleCatalogGridIndexRange` 迁至 `shared/ui/layout/catalog_grid_visible_range.dart`。
+   - 涉及 home / 应用壳的测试统一接入 `sharedLibraryStateOverrides()`。
+   - 待办：在 #262 留言并关闭；home 仍有 M3（`deps.dart`）边，可随后续票顺手拆。
 2. 依次 #263（comic_trash）→ #264（app_settings）→ #265（read_session）。
 3. 消费方票推进时顺手减少本 feature 对 `deps.dart` 的 M3 边。
 4. 全部消费方完成后：实现 R1 扩展，并更新 #260 正文（R6 → M3 ratchet）。

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_cover_viewport_notifier.dart';
+import 'package:hentai_library/shared/ui/layout/catalog_grid_visible_range.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
 
 void main() {

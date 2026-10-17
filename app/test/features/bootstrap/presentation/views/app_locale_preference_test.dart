@@ -4,6 +4,7 @@ import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_coordinator_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -64,6 +65,7 @@ void main() {
             appStartupCoordinatorProvider.overrideWith(
               _FakeAppStartupCoordinator.new,
             ),
+            ...sharedLibraryStateOverrides(),
           ],
         ),
       );
@@ -106,6 +108,7 @@ List<Override> _overrides(AppSetting setting) {
     settingsProvider.overrideWith(() => _FakeSettingsNotifier(setting)),
     appUpdateCoordinatorProvider.overrideWith(_FakeAppUpdateCoordinator.new),
     appStartupCoordinatorProvider.overrideWith(_FakeAppStartupCoordinator.new),
+    ...sharedLibraryStateOverrides(),
   ];
 }
 

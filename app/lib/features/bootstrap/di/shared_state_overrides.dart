@@ -5,7 +5,10 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/c
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_throttle_busy.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_series_providers.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 /// bootstrap 组装：把 library_admin 的实现注入 shared/di 声明的状态与端口 Provider（#261a）。
@@ -34,6 +37,20 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
     (Ref ref) => ref.watch(libraryRevisionThrottleBusyProvider),
   ),
   seriesByIdStateProvider.overrideWith(
-    (Ref ref, String seriesId) => ref.watch(seriesByIdProvider(seriesId).future),
+    (Ref ref, String seriesId) =>
+        ref.watch(seriesByIdProvider(seriesId).future),
+  ),
+  libraryComicAgeRestrictionStateProvider.overrideWith(
+    (Ref ref) => ref.watch(
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.ageRestriction ??
+            LibraryAgeRestrictionFilter.unrestricted,
+      ),
+    ),
+  ),
+  libraryScanRunningStateProvider.overrideWith(
+    (Ref ref) =>
+        ref.watch(scanLibraryControllerProvider.select((s) => s.running)),
   ),
 ];

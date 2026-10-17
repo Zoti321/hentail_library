@@ -7,8 +7,8 @@ import 'package:hentai_library/shared/domain/models/read_models/home_page_read_m
 import 'package:hentai_library/shared/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -75,7 +75,7 @@ class HomeProbeCoordinator extends _$HomeProbeCoordinator {
     ref.listen<bool>(homePageVisibleProvider, (bool? _, bool visible) {
       if (visible) {
         final List<LocalLibrary> libraries =
-            ref.read(currentLibraryProvider).asData?.value.libraries ??
+            ref.read(currentLibraryStateProvider).asData?.value.libraries ??
             const <LocalLibrary>[];
         _scheduleProbeWhenHomeVisible(libraries);
       } else {
@@ -83,7 +83,7 @@ class HomeProbeCoordinator extends _$HomeProbeCoordinator {
         _visibleTimer?.cancel();
       }
     });
-    ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryProvider, (
+    ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryStateProvider, (
       AsyncValue<CurrentLibraryState>? _,
       AsyncValue<CurrentLibraryState> next,
     ) {
@@ -91,13 +91,13 @@ class HomeProbeCoordinator extends _$HomeProbeCoordinator {
         _scheduleProbeWhenHomeVisible(state.libraries);
       });
     }, fireImmediately: true);
-    ref.listen<ScanLibraryState>(scanLibraryControllerProvider, (
-      ScanLibraryState? previous,
-      ScanLibraryState next,
+    ref.listen<bool>(libraryScanRunningStateProvider, (
+      bool? previous,
+      bool next,
     ) {
-      if (previous?.running == true && !next.running) {
+      if (previous == true && !next) {
         final List<LocalLibrary> libraries =
-            ref.read(currentLibraryProvider).asData?.value.libraries ??
+            ref.read(currentLibraryStateProvider).asData?.value.libraries ??
             const <LocalLibrary>[];
         _scheduleProbeWhenHomeVisible(libraries, immediate: true);
       }
@@ -148,7 +148,7 @@ class HomeProbeCoordinator extends _$HomeProbeCoordinator {
   }
 
   Future<void> _probeDueLibraries(List<LocalLibrary> libraries) async {
-    if (ref.read(scanLibraryControllerProvider).running) {
+    if (ref.read(libraryScanRunningStateProvider)) {
       return;
     }
     final int token = ++_runToken;
@@ -159,7 +159,7 @@ class HomeProbeCoordinator extends _$HomeProbeCoordinator {
       if (token != _runToken) {
         return;
       }
-      if (ref.read(scanLibraryControllerProvider).running) {
+      if (ref.read(libraryScanRunningStateProvider)) {
         return;
       }
       final DateTime? last = _lastProbedAt[library.libraryId];

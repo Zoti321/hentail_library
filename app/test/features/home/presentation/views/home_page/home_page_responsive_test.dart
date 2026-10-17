@@ -11,6 +11,7 @@ import 'package:hentai_library/features/home/presentation/view_models/home_page_
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_header.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/home_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
@@ -218,6 +219,7 @@ List<Override> _homePageTestOverrides({
       (Ref ref) => Stream<List<HomeLibraryAlert>>.value(alerts),
     ),
     scanLibraryControllerProvider.overrideWith(_IdleScanLibraryController.new),
+    ...sharedLibraryStateOverrides(),
   ];
 }
 

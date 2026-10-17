@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/domain/library/current_library_state.dart'
 import 'package:hentai_library/shared/domain/library/library_scan_command_port.dart';
 import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.dart';
 
@@ -51,12 +52,12 @@ final Provider<LibraryScanCommandPort> libraryScanCommandPortProvider =
       ),
     );
 
-final Provider<ComicDetailReturnSeriesPort> comicDetailReturnSeriesPortProvider =
-    Provider<ComicDetailReturnSeriesPort>(
-      (Ref ref) => throw UnimplementedError(
-        'comicDetailReturnSeriesPortProvider 未注入，请在 bootstrap 中 override',
-      ),
-    );
+final Provider<ComicDetailReturnSeriesPort>
+comicDetailReturnSeriesPortProvider = Provider<ComicDetailReturnSeriesPort>(
+  (Ref ref) => throw UnimplementedError(
+    'comicDetailReturnSeriesPortProvider 未注入，请在 bootstrap 中 override',
+  ),
+);
 
 final Provider<AsyncValue<CurrentLibraryState>> currentLibraryStateProvider =
     Provider<AsyncValue<CurrentLibraryState>>(
@@ -79,9 +80,24 @@ final Provider<bool> libraryRevisionThrottleBusyStateProvider = Provider<bool>(
   ),
 );
 
+/// Home / Catalog 共用的 Comics 年龄限制（原 `libraryComicFiltersProvider` 的 ageRestriction 投影）。
+final Provider<LibraryAgeRestrictionFilter>
+libraryComicAgeRestrictionStateProvider = Provider<LibraryAgeRestrictionFilter>(
+  (Ref ref) => throw UnimplementedError(
+    'libraryComicAgeRestrictionStateProvider 未注入，请在 bootstrap 中 override',
+  ),
+);
+
+/// library_admin 扫描是否进行中（原 `scanLibraryControllerProvider.running`）。
+final Provider<bool> libraryScanRunningStateProvider = Provider<bool>(
+  (Ref ref) => throw UnimplementedError(
+    'libraryScanRunningStateProvider 未注入，请在 bootstrap 中 override',
+  ),
+);
+
 /// 系列详情入口（原 `seriesByIdProvider`，按 id 查询）。
 final seriesByIdStateProvider = FutureProvider.family<Series?, String>(
-      (Ref ref, String seriesId) => throw UnimplementedError(
-        'seriesByIdStateProvider 未注入，请在 bootstrap 中 override',
-      ),
-    );
+  (Ref ref, String seriesId) => throw UnimplementedError(
+    'seriesByIdStateProvider 未注入，请在 bootstrap 中 override',
+  ),
+);

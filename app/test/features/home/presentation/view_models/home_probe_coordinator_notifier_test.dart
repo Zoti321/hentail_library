@@ -7,6 +7,7 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/shared/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
@@ -121,6 +122,7 @@ void main() {
     test('does not probe when home page is not visible', () async {
       container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),
@@ -141,6 +143,7 @@ void main() {
     test('probes libraries after home becomes visible', () async {
       container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),
@@ -163,6 +166,7 @@ void main() {
       HomeProbeCoordinator.probeDebounceForTests = const Duration(hours: 1);
       container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),
@@ -192,6 +196,7 @@ void main() {
       );
       container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),
@@ -216,6 +221,7 @@ void main() {
           _RecordingScanLibraryController();
       container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),

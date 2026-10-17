@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_cover_viewport_notifier.dart';
+import 'package:hentai_library/shared/ui/layout/catalog_grid_visible_range.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
 import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
