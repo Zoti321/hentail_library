@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/library/current_library_port.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_edit_command_port.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
@@ -30,6 +31,14 @@ final Provider<LibraryRevisionSignalPort> libraryRevisionSignalPortProvider =
     Provider<LibraryRevisionSignalPort>(
       (Ref ref) => throw UnimplementedError(
         'libraryRevisionSignalPortProvider 未注入，请在 bootstrap 中 override',
+      ),
+    );
+
+final Provider<ComicMetadataBulkEditCommandPort>
+comicMetadataBulkEditCommandPortProvider =
+    Provider<ComicMetadataBulkEditCommandPort>(
+      (Ref ref) => throw UnimplementedError(
+        'comicMetadataBulkEditCommandPortProvider 未注入，请在 bootstrap 中 override',
       ),
     );
 

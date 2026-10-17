@@ -16,6 +16,9 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   libraryRevisionSignalPortProvider.overrideWith(
     createLibraryRevisionSignalPort,
   ),
+  comicMetadataBulkEditCommandPortProvider.overrideWith(
+    createComicMetadataBulkEditCommandPort,
+  ),
   currentLibraryStateProvider.overrideWith(
     (Ref ref) => ref.watch(currentLibraryProvider),
   ),

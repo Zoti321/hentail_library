@@ -1,6 +1,9 @@
+import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_edit_command_port.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_types.dart';
 import 'package:hentai_library/shared/domain/library/current_library_port.dart';
 import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -44,6 +47,21 @@ class _CurrentLibraryAdapter implements CurrentLibraryPort {
       .submitLibraryForm(form, original: original);
 }
 
+class _ComicMetadataBulkEditCommandAdapter
+    implements ComicMetadataBulkEditCommandPort {
+  _ComicMetadataBulkEditCommandAdapter(this._ref);
+
+  final Ref _ref;
+
+  @override
+  Future<ComicMetadataBulkPatchResult> apply({
+    required List<String> comicIds,
+    required ComicMetadataBulkPatch patch,
+  }) => _ref
+      .read(comicMetadataBulkPatchControllerProvider.notifier)
+      .apply(comicIds: comicIds, patch: patch);
+}
+
 class _LibraryReorderModeAdapter implements LibraryReorderModePort {
   _LibraryReorderModeAdapter(this._ref);
 
@@ -78,3 +96,7 @@ LibraryReorderModePort createLibraryReorderModePort(Ref ref) =>
 
 LibraryRevisionSignalPort createLibraryRevisionSignalPort(Ref ref) =>
     _LibraryRevisionSignalAdapter(ref);
+
+ComicMetadataBulkEditCommandPort createComicMetadataBulkEditCommandPort(
+  Ref ref,
+) => _ComicMetadataBulkEditCommandAdapter(ref);
