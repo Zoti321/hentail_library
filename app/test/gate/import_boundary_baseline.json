@@ -1,7 +1,3 @@
 [
-  "M3|app_settings|bootstrap|features/app_settings/presentation/view_models/app_update_controller.dart|package:hentai_library/features/bootstrap/di/services.dart",
-  "M3|app_settings|bootstrap|features/app_settings/presentation/views/settings_page/settings_page.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|app_settings|bootstrap|features/app_settings/presentation/views/settings_page/widgets/locale_preference_row.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|app_settings|bootstrap|features/app_settings/presentation/views/settings_page/widgets/theme_preference_row.dart|package:hentai_library/features/bootstrap/di/deps.dart",
   "M3|comic_trash|bootstrap|features/comic_trash/presentation/views/trash_page/trash_page.dart|package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart"
 ]

@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/app_update_download_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/features/bootstrap/di/services.dart';
+import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
 import 'package:intl/intl.dart';
 
 Future<void> showAppUpdateDialog({

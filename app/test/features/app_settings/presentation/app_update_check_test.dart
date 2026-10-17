@@ -6,7 +6,7 @@ import 'package:hentai_library/features/app_settings/data/services/app_update/ap
 import 'package:hentai_library/shared/domain/models/app_release_info.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/app_update_dialog.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_controller.dart';
-import 'package:hentai_library/features/bootstrap/di/services.dart';
+import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod/misc.dart' show Override;
 

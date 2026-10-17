@@ -9,7 +9,6 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_page_primitives.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class LocalePreferenceRow extends ConsumerStatefulWidget {
