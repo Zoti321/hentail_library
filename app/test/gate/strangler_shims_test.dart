@@ -20,10 +20,13 @@ void main() {
     });
 
     test('every export-only shim under lib/ is listed', () {
-      final List<String> allowlisted = readStranglerShimAllowlist(allowlistFile);
+      final List<String> allowlisted = readStranglerShimAllowlist(
+        allowlistFile,
+      );
       final List<String> actualShims = collectStranglerShims(libDir);
-      final List<String> unlisted =
-          actualShims.where((String path) => !allowlisted.contains(path)).toList();
+      final List<String> unlisted = actualShims
+          .where((String path) => !allowlisted.contains(path))
+          .toList();
       expect(
         unlisted,
         isEmpty,
@@ -32,7 +35,9 @@ void main() {
     });
 
     test('every allowlisted path exists and is an export-only shim', () {
-      final List<String> allowlisted = readStranglerShimAllowlist(allowlistFile);
+      final List<String> allowlisted = readStranglerShimAllowlist(
+        allowlistFile,
+      );
       final List<String> missing = <String>[];
       final List<String> notShims = <String>[];
       for (final String relative in allowlisted) {
@@ -46,7 +51,11 @@ void main() {
         }
       }
       expect(missing, isEmpty, reason: 'Ghost allowlist entries');
-      expect(notShims, isEmpty, reason: 'Allowlisted files must be export-only shims');
+      expect(
+        notShims,
+        isEmpty,
+        reason: 'Allowlisted files must be export-only shims',
+      );
     });
   });
 }

@@ -12,7 +12,9 @@ void main() {
 
   setUp(() {
     libDir = Directory(p.join(Directory.current.path, 'lib'));
-    baselineFile = File(p.join('test', 'gate', 'import_boundary_baseline.json'));
+    baselineFile = File(
+      p.join('test', 'gate', 'import_boundary_baseline.json'),
+    );
   });
 
   test('import boundaries: L1 structural rules are zero-tolerance', () {

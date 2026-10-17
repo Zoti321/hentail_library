@@ -180,14 +180,18 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
       continue;
     }
     final String contents = file.readAsStringSync();
-    if (!isCanonicalLibRelativePath(rel) && isStranglerExportOnlyShim(contents)) {
+    if (!isCanonicalLibRelativePath(rel) &&
+        isStranglerExportOnlyShim(contents)) {
       continue;
     }
     final String sourceModule = classifyLibPath(rel);
     for (final RegExpMatch match in _importUriRe.allMatches(contents)) {
       final String importPath = match.group(1)!;
       final String importUri = '$_packagePrefix$importPath';
-      final String? targetModule = resolveImportTargetModule(importPath, libDir);
+      final String? targetModule = resolveImportTargetModule(
+        importPath,
+        libDir,
+      );
       if (targetModule == null) {
         continue;
       }
@@ -337,7 +341,8 @@ void _checkModuleGraphRules({
 
   final bool targetIsPresentation =
       isPresentationLayerPath(importPath) ||
-      (importPath.startsWith('features/') && importPath.contains('/presentation/'));
+      (importPath.startsWith('features/') &&
+          importPath.contains('/presentation/'));
   if (isPresentationLayerPath(sourceRel) && targetIsPresentation) {
     found.add(
       violation(

@@ -11,8 +11,7 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_distinct_metadata_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_metadata_filter_controls.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 
 LibraryMetadataFilterSelection includeOnlyFilterSelection(Set<String> names) {
   return LibraryMetadataFilterSelection(
@@ -22,12 +21,12 @@ LibraryMetadataFilterSelection includeOnlyFilterSelection(Set<String> names) {
   );
 }
 
-/// Sorted tag names for the library filter drawer ([allTagsProvider] already sorts).
+/// Sorted tag names for the library filter drawer (dictionary already sorted).
 final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((
   Ref ref,
 ) {
   return ref
-      .watch(allTagsProvider)
+      .watch(libraryTagDictionaryStateProvider)
       .whenData(
         (List<Tag> tags) =>
             tags.map((Tag tag) => tag.name).toList(growable: false),
@@ -38,7 +37,9 @@ final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((
 final libraryFilterAuthorNamesProvider = Provider<AsyncValue<List<String>>>((
   Ref ref,
 ) {
-  return ref.watch(allAuthorsProvider).whenData((List<Author> authors) {
+  return ref.watch(libraryAuthorDictionaryStateProvider).whenData((
+    List<Author> authors,
+  ) {
     final List<Author> sorted = List<Author>.of(authors)
       ..sort((Author a, Author b) => a.name.compareTo(b.name));
     return sorted
@@ -121,7 +122,7 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
       isLoading: namesAsync.isLoading,
       labelFor: (String id) {
         final authors = ref
-            .watch(allAuthorsProvider)
+            .watch(libraryAuthorDictionaryStateProvider)
             .maybeWhen(
               data: (List<Author> value) => value,
               orElse: () => const <Author>[],

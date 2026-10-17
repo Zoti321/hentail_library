@@ -113,10 +113,7 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
     required String fallback,
   }) {
     logError(AppLog.ui('tag-import'), fallback, error, stackTrace);
-    final String message = caughtErrorMessage(
-      error,
-      fallbackMessage: fallback,
-    );
+    final String message = caughtErrorMessage(error, fallbackMessage: fallback);
     state = state.copyWith(running: false, error: message);
     return null;
   }

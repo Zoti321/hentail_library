@@ -14,11 +14,13 @@ import 'package:hentai_library/features/metadata_backup/presentation/views/metad
 import 'package:hentai_library/features/app_settings/di/shared_state_ports.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
-import 'package:hentai_library/features/bootstrap/di/dictionary_invalidation_port.dart';
+import 'package:hentai_library/features/comic_trash/di/comic_trash_command_port.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/features/library_browse/di/catalog_selection_command_port.dart';
-import 'package:hentai_library/features/metadata_backup/di/metadata_saved_port.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
+import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
@@ -92,10 +94,13 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   catalogSelectionCommandPortProvider.overrideWith(
     createCatalogSelectionCommandPort,
   ),
-  dictionaryInvalidationPortProvider.overrideWith(
-    createDictionaryInvalidationPort,
+  comicTrashCommandPortProvider.overrideWith(createComicTrashCommandPort),
+  libraryTagDictionaryStateProvider.overrideWith(
+    (Ref ref) => ref.watch(allTagsProvider),
   ),
-  metadataSavedPortProvider.overrideWith(createMetadataSavedPort),
+  libraryAuthorDictionaryStateProvider.overrideWith(
+    (Ref ref) => ref.watch(allAuthorsProvider),
+  ),
   libraryScanRunningStateProvider.overrideWith(
     (Ref ref) =>
         ref.watch(scanLibraryControllerProvider.select((s) => s.running)),

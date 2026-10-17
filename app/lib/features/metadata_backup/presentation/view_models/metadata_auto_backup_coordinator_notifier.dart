@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
@@ -8,6 +9,7 @@ import 'package:hentai_library/shared/data/adapters/metadata_backup_frb_adapter.
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
 import 'package:hentai_library/shared/core/util/debouncer.dart';
+import 'package:hentai_library/shared/di/library_change_bus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata_auto_backup_coordinator_notifier.g.dart';
@@ -30,10 +32,20 @@ class MetadataAutoBackupCoordinatorNotifier
     ref.onDispose(() {
       _metadataSaveDebouncer?.dispose();
     });
+    ref.listen<int>(
+      libraryChangeBusProvider.select(
+        (LibraryChangeState s) => s.metadataSaveRevision,
+      ),
+      (int? previous, int next) {
+        if (previous != null && previous != next) {
+          _onMetadataSaved();
+        }
+      },
+    );
     _scheduleStartupBackupCheck();
   }
 
-  void notifyMetadataSaved() {
+  void _onMetadataSaved() {
     final bool enabled =
         ref.read(metadataAutoBackupProvider).asData?.value ?? true;
     if (!enabled) {

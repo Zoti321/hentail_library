@@ -7,6 +7,8 @@ import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart
 import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:riverpod/misc.dart' show Override, ProviderException;
+import 'package:hentai_library/features/library_browse/di/catalog_selection_command_port.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
 
 class _SilentRevisionPort implements LibraryRevisionPort {
   @override
@@ -33,6 +35,9 @@ void main() {
       overrides: <Override>[
         libraryReorderModePortProvider.overrideWith(
           createLibraryReorderModePort,
+        ),
+        catalogSelectionCommandPortProvider.overrideWith(
+          createCatalogSelectionCommandPort,
         ),
       ],
     );

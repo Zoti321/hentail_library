@@ -15,6 +15,9 @@ import 'package:hentai_library/features/library_browse/presentation/views/librar
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_page_widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_pinned_header.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 
 void main() {
   group('Library responsive layout', () {
@@ -82,6 +85,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
+          overrides: _dictionaryStateTestOverrides(),
           child: MaterialApp(
             locale: const Locale('zh'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -177,5 +181,17 @@ List<Override> _libraryHeaderTestOverrides() {
       (Ref ref) => false,
     ),
     libraryActivePageSizeProvider.overrideWith((Ref ref) => 20),
+    ..._dictionaryStateTestOverrides(),
+  ];
+}
+
+List<Override> _dictionaryStateTestOverrides() {
+  return <Override>[
+    libraryTagDictionaryStateProvider.overrideWithValue(
+      const AsyncValue<List<Tag>>.data(<Tag>[]),
+    ),
+    libraryAuthorDictionaryStateProvider.overrideWithValue(
+      const AsyncValue<List<Author>>.data(<Author>[]),
+    ),
   ];
 }

@@ -56,7 +56,9 @@ void main() {
           .map((Directory d) => p.basename(d.path))
           .toSet();
       final List<String> unexpected = actualNames
-          .where((String name) => !kWayfinderPhaseATopLevelLibDirs.contains(name))
+          .where(
+            (String name) => !kWayfinderPhaseATopLevelLibDirs.contains(name),
+          )
           .toList();
       expect(
         unexpected,
@@ -143,8 +145,7 @@ void main() {
               p.split(p.relative(file.path, from: libRoot.path)),
             );
             final bool isView =
-                rel.startsWith('features/') &&
-                rel.split('/').contains('views');
+                rel.startsWith('features/') && rel.split('/').contains('views');
             final bool isSharedUi = rel.startsWith('shared/ui/');
             return isView || isSharedUi;
           })

@@ -1,6 +1,7 @@
 import 'package:hentai_library/shared/data/adapters/comic_metadata_bulk_patch_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_coordinator.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
+import 'package:hentai_library/shared/di/library_change_bus.dart';
+import 'package:hentai_library/shared/domain/library/library_change.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -29,12 +30,14 @@ ComicMetadataBulkPatchCoordinator comicMetadataBulkPatchCoordinator(Ref ref) {
           required bool charactersWritten,
         }) {
           ref
-              .read(dictionaryInvalidationPortProvider)
-              .invalidate(
-                tagsWritten: tagsWritten,
-                authorsWritten: authorsWritten,
-                parodiesWritten: parodiesWritten,
-                charactersWritten: charactersWritten,
+              .read(libraryChangeBusProvider.notifier)
+              .publish(
+                LibraryChange(
+                  tagsWritten: tagsWritten,
+                  authorsWritten: authorsWritten,
+                  parodiesWritten: parodiesWritten,
+                  charactersWritten: charactersWritten,
+                ),
               );
         },
   );

@@ -11,6 +11,8 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/c
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_sidebar_reorder_pane.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/library_browse/di/catalog_selection_command_port.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
 
 LocalLibrary _lib(String id, String name, {bool pinned = true}) => (
   libraryId: id,
@@ -31,7 +33,12 @@ Future<ProviderContainer> _pumpPane(
   _FakeCurrentLibraryNotifier fake,
 ) async {
   final ProviderContainer container = ProviderContainer(
-    overrides: <Override>[currentLibraryProvider.overrideWith(() => fake)],
+    overrides: <Override>[
+      currentLibraryProvider.overrideWith(() => fake),
+      catalogSelectionCommandPortProvider.overrideWith(
+        createCatalogSelectionCommandPort,
+      ),
+    ],
   );
   addTearDown(container.dispose);
   await tester.pumpWidget(
