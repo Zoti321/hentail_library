@@ -307,6 +307,20 @@ void _checkModuleGraphRules({
   if (sourceModule == 'bootstrap') {
     return;
   }
+  // R6 (ratchet M3): product feature must not depend on the bootstrap composition
+  // root (#260). Existing edges live in the baseline and must only shrink.
+  if (isProductModule(sourceModule) && targetModule == 'bootstrap') {
+    found.add(
+      violation(
+        ruleId: 'M3',
+        sourceModule: sourceModule,
+        targetModule: targetModule,
+        sourceFile: sourceRel,
+        importUri: importUri,
+      ),
+    );
+    return;
+  }
   if (!isProductModule(sourceModule) || !isProductModule(targetModule)) {
     return;
   }
@@ -343,7 +357,10 @@ List<ImportViolation> structuralViolations(List<ImportViolation> all) {
 
 List<ImportViolation> ratchetViolations(List<ImportViolation> all) {
   return all
-      .where((ImportViolation v) => v.ruleId == 'M1' || v.ruleId == 'M2')
+      .where(
+        (ImportViolation v) =>
+            v.ruleId == 'M1' || v.ruleId == 'M2' || v.ruleId == 'M3',
+      )
       .toList();
 }
 
