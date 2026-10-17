@@ -3,6 +3,8 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/shared/domain/library/current_library_port.dart';
 import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
+import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,6 +34,14 @@ class _CurrentLibraryAdapter implements CurrentLibraryPort {
   @override
   Future<void> deleteLibrary(String libraryId) =>
       _ref.read(currentLibraryProvider.notifier).deleteLibrary(libraryId);
+
+  @override
+  Future<LibraryFormApplyResult> submitLibraryForm(
+    LibraryForm form, {
+    LocalLibrary? original,
+  }) => _ref
+      .read(currentLibraryProvider.notifier)
+      .submitLibraryForm(form, original: original);
 }
 
 class _LibraryReorderModeAdapter implements LibraryReorderModePort {

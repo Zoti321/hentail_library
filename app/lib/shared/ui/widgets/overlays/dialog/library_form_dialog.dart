@@ -21,7 +21,7 @@ import 'package:hentai_library/shared/ui/widgets/overlays/dialog/adaptive_form_s
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/disable_all_format_groups_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:path/path.dart' as p;
@@ -315,7 +315,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
     });
     try {
       final LibraryFormApplyResult result = await ref
-          .read(currentLibraryProvider.notifier)
+          .read(currentLibraryPortProvider)
           .submitLibraryForm(
             _form,
             original: _isCreate ? null : widget.library!,

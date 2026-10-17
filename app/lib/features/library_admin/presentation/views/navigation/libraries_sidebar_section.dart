@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_routes.dart';
+import 'package:hentai_library/shared/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_sidebar_overflow_actions.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_toasts.dart';

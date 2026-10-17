@@ -4,8 +4,10 @@ import 'package:hentai_library/shared/domain/library/format_group.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_form_dialog.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/library_form_dialog.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
@@ -79,7 +81,10 @@ Future<void> _pumpLibraryForm(
 
   await pumpLocalizedApp(
     tester,
-    overrides: <Override>[currentLibraryProvider.overrideWith(() => notifier)],
+    overrides: <Override>[
+      currentLibraryProvider.overrideWith(() => notifier),
+      currentLibraryPortProvider.overrideWith(createCurrentLibraryPort),
+    ],
     home: Scaffold(
       body: LibraryFormDialog(mode: mode, library: library),
     ),
