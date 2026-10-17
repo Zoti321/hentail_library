@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
@@ -123,6 +124,7 @@ void main() {
       container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),
@@ -144,6 +146,7 @@ void main() {
       container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),
@@ -167,6 +170,7 @@ void main() {
       container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),
@@ -197,6 +201,7 @@ void main() {
       container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),
@@ -222,6 +227,7 @@ void main() {
       container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           homePageRepoProvider.overrideWithValue(repo),
           currentLibraryProvider.overrideWith(
             () => _FakeCurrentLibraryNotifier(<LocalLibrary>[_lib('lib-a')]),

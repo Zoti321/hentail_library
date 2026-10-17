@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
@@ -20,6 +21,7 @@ void main() {
       wrapProviderScope: true,
       overrides: <Override>[
         ...sharedLibraryStateOverrides(),
+        ...bootstrapCompositionOverrides(),
         appSettingRepoProvider.overrideWithValue(_MemoryRepo()),
       ],
       home: Builder(

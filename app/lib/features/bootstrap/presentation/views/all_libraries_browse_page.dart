@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
+import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Placeholder for All libraries browse (`/libraries/all`).

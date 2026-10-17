@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -367,6 +368,7 @@ Future<void> _pumpLibrariesShell(
           _IdleScanLibraryController.new,
         ),
         ...sharedLibraryStateOverrides(),
+        ...bootstrapCompositionOverrides(),
       ],
       child: MaterialApp.router(
         locale: const Locale('zh'),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -69,6 +70,7 @@ Future<void> _pumpDialog(
     wrapProviderScope: true,
     overrides: <Override>[
       ...sharedLibraryStateOverrides(),
+      ...bootstrapCompositionOverrides(),
       libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
       comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo(resolved)),
     ],

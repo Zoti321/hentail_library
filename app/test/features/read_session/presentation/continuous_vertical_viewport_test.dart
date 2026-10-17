@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -261,6 +262,7 @@ void main() {
         ProviderScope(
           overrides: <Override>[
             ...sharedLibraryStateOverrides(),
+            ...bootstrapCompositionOverrides(),
             readerControllerProvider(
               _viewKey,
             ).overrideWith(_TestReaderControllerAtPage50.new),
@@ -325,6 +327,7 @@ void main() {
         return ProviderScope(
           overrides: <Override>[
             ...sharedLibraryStateOverrides(),
+            ...bootstrapCompositionOverrides(),
             readerControllerProvider(
               _viewKey,
             ).overrideWith(_TestReaderControllerAtPage50.new),
@@ -398,6 +401,7 @@ List<Override> _viewportTestOverrides() {
 
   return <Override>[
     ...sharedLibraryStateOverrides(),
+    ...bootstrapCompositionOverrides(),
     readerControllerProvider(_viewKey).overrideWith(_TestReaderController.new),
     readerPrefetchControllerProvider.overrideWith(
       _FakeReaderPrefetchController.new,

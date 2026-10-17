@@ -9,8 +9,10 @@ import 'package:hentai_library/shared/ui/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page/widgets/searched_page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_management_actions.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/core/constants/content_routes.dart';
+import 'package:hentai_library/shared/di/app_router_provider.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_return_series_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_page_providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kSearchLoadMoreThreshold = 400;
@@ -239,12 +241,14 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                           ref
                               .read(comicDetailReturnSeriesProvider.notifier)
                               .clear();
-                          appRouter.pushNamed(
-                            '漫画详情',
-                            pathParameters: <String, String>{
-                              'id': comic.comicId,
-                            },
-                          );
+                          ref
+                              .read(appRouterProvider)
+                              .pushNamed(
+                                ContentRoutes.comicDetail,
+                                pathParameters: <String, String>{
+                                  'id': comic.comicId,
+                                },
+                              );
                         },
                       ),
                     );

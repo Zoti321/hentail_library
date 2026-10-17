@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
@@ -153,6 +154,7 @@ void main() {
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           libraryRevisionProvider.overrideWith(
             _ControllableLibraryRevision.new,
           ),

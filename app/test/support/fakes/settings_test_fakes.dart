@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
@@ -12,6 +13,7 @@ List<Override> settingsViewTestOverrides({
 }) {
   return <Override>[
     ...sharedLibraryStateOverrides(),
+    ...bootstrapCompositionOverrides(),
     settingsProvider.overrideWith(
       () => FakeSettingsNotifier(settingBuilder: settingBuilder),
     ),

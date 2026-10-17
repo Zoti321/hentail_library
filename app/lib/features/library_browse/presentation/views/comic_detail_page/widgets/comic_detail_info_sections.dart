@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
@@ -12,8 +13,7 @@ import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip
 import 'package:hentai_library/shared/ui/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/shared/ui/widgets/author/show_author_detail.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -31,11 +31,8 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
     final int? pageCount = ref
-        .watch(comicImagesProvider(comicId: comic.comicId))
-        .maybeWhen(
-          data: (List<ReaderPageImageData> refs) => refs.length,
-          orElse: () => comic.pageCount,
-        );
+        .watch(comicResolvedPageCountProvider(comic.comicId))
+        .maybeWhen(data: (int count) => count, orElse: () => comic.pageCount);
     final String? pageLabel = pageCount == 0 || pageCount == null
         ? null
         : l10n.comicDetailPageCount(pageCount);
@@ -133,7 +130,7 @@ class ComicLanguageSegments extends StatelessWidget {
           onTap: () {
             final String query = formatLibrarySearchExactMetaQuery(canonical);
             final String encoded = Uri.encodeQueryComponent(query);
-            appRouter.push('/searched?q=$encoded');
+            context.push('/searched?q=$encoded');
           },
         ),
       );
@@ -390,7 +387,7 @@ class LabeledMetaChipRow extends StatelessWidget {
                         item,
                       );
                       final String encoded = Uri.encodeQueryComponent(query);
-                      appRouter.push('/searched?q=$encoded');
+                      context.push('/searched?q=$encoded');
                     },
                   ),
                 )

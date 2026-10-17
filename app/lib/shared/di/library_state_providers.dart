@@ -7,6 +7,7 @@ import 'package:hentai_library/shared/domain/library/library_scan_command_port.d
 import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_scan_activity_state.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.dart';
 
@@ -98,6 +99,20 @@ libraryComicAgeRestrictionStateProvider = Provider<LibraryAgeRestrictionFilter>(
 final Provider<bool> libraryScanRunningStateProvider = Provider<bool>(
   (Ref ref) => throw UnimplementedError(
     'libraryScanRunningStateProvider 未注入，请在 bootstrap 中 override',
+  ),
+);
+
+final Provider<LibraryScanActivityState> libraryScanActivityStateProvider =
+    Provider<LibraryScanActivityState>(
+      (Ref ref) => throw UnimplementedError(
+        'libraryScanActivityStateProvider 未注入，请在 bootstrap 中 override',
+      ),
+    );
+
+final Provider<bool>
+libraryMetadataRefreshRunningStateProvider = Provider<bool>(
+  (Ref ref) => throw UnimplementedError(
+    'libraryMetadataRefreshRunningStateProvider 未注入，请在 bootstrap 中 override',
   ),
 );
 

@@ -18,7 +18,10 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/domain/library/library_metadata_refresh_command_port.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -168,15 +171,17 @@ class _SeriesDetailOverflowMenuButtonState
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
-    final MetadataRefreshState refreshState = ref.watch(
-      metadataRefreshControllerProvider,
+    final LibraryMetadataRefreshCommandPort metadataRefresh = ref.read(
+      libraryMetadataRefreshCommandPortProvider,
     );
-    final bool scanning = ref.watch(scanLibraryControllerProvider).running;
-    final bool refreshingThis = ref
-        .read(metadataRefreshControllerProvider.notifier)
-        .isRefreshingSeries(widget.series.id);
+    final bool scanning = ref.watch(libraryScanRunningStateProvider);
+    final bool refreshingThis = metadataRefresh.isRefreshingSeries(
+      widget.series.id,
+    );
     final bool otherWriteBusy =
-        scanning || (refreshState.running && !refreshingThis);
+        scanning ||
+        (ref.watch(libraryMetadataRefreshRunningStateProvider) &&
+            !refreshingThis);
     return AnchoredOverlayMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
@@ -201,9 +206,7 @@ class _SeriesDetailOverflowMenuButtonState
                 onTap: () {
                   hideMenu();
                   if (refreshingThis) {
-                    ref
-                        .read(metadataRefreshControllerProvider.notifier)
-                        .cancel();
+                    metadataRefresh.cancel();
                     return;
                   }
                   _refreshMetadata(context);
@@ -267,7 +270,7 @@ class _SeriesDetailOverflowMenuButtonState
   Future<void> _refreshMetadata(BuildContext context) async {
     try {
       final MetadataRefreshBatchResult result = await ref
-          .read(metadataRefreshControllerProvider.notifier)
+          .read(libraryMetadataRefreshCommandPortProvider)
           .refreshSeries(seriesId: widget.series.id, name: widget.series.name);
       if (!context.mounted) {
         return;

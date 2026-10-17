@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/read_session_launcher.dart';
+import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -95,6 +95,8 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
   }
 
   Future<void> _openReader(WidgetRef ref, {required bool incognito}) async {
-    await openComicReadSession(ref, comic: comic, incognito: incognito);
+    await ref
+        .read(readSessionLaunchPortProvider)
+        .openComic(comicId: comic.comicId, incognito: incognito);
   }
 }

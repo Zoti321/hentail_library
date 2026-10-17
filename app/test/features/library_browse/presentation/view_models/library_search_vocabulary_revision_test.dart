@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
@@ -100,6 +101,7 @@ void main() {
       container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),

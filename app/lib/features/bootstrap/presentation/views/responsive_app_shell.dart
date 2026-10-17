@@ -5,6 +5,7 @@ import 'package:hentai_library/shared/core/util/utils.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
+export 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/chrome/diagnostic_mode_banner.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
@@ -21,17 +22,6 @@ final GlobalKey<ScaffoldState> appShellScaffoldKey = GlobalKey<ScaffoldState>();
 
 void openAppShellNavigationDrawer() {
   appShellScaffoldKey.currentState?.openDrawer();
-}
-
-/// Header 汉堡与 shell 抽屉对齐：只看窗口总宽，不看侧栏右侧 content 宽。
-bool appShellShowsPageNavigationMenu(BuildContext context) {
-  return AppLayoutBreakpoints.isCompact(MediaQuery.sizeOf(context).width);
-}
-
-VoidCallback? appShellPageNavigationOpener(BuildContext context) {
-  return appShellShowsPageNavigationMenu(context)
-      ? openAppShellNavigationDrawer
-      : null;
 }
 
 class ResponsiveAppShell extends ConsumerStatefulWidget {

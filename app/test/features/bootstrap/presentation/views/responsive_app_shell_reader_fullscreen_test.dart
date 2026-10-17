@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -69,6 +70,7 @@ Future<void> _pumpReaderShell(
     ProviderScope(
       overrides: <Override>[
         ...sharedLibraryStateOverrides(),
+        ...bootstrapCompositionOverrides(),
         settingsProvider.overrideWith(_FakeSettingsNotifier.new),
         scanLibraryControllerProvider.overrideWith(
           _IdleScanLibraryController.new,

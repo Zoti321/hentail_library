@@ -159,7 +159,7 @@ class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
       return;
     }
     final String encodedQuery = Uri.encodeQueryComponent(query);
-    appRouter.push('/searched?q=$encodedQuery');
+    ref.read(appRouterProvider).push('/searched?q=$encodedQuery');
   }
 }
 
@@ -465,10 +465,8 @@ class _LibraryOverflowMenuButtonState
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
-    final ({bool running, ScanMode scanMode}) scanLeaf = ref.watch(
-      scanLibraryControllerProvider.select(
-        (ScanLibraryState s) => (running: s.running, scanMode: s.scanMode),
-      ),
+    final LibraryScanActivityState scanLeaf = ref.watch(
+      libraryScanActivityStateProvider,
     );
     final bool scanning = scanLeaf.running;
     final AppLocalizations l10n = context.l10n;
@@ -485,7 +483,7 @@ class _LibraryOverflowMenuButtonState
             layoutTier: widget.layoutTier,
             onCancel: () {
               _controller.hideMenu();
-              ref.read(scanLibraryControllerProvider.notifier).cancel();
+              ref.read(libraryScanCommandPortProvider).cancel();
             },
           );
         }
@@ -505,14 +503,12 @@ class _LibraryOverflowMenuButtonState
           },
           onScan: () {
             _controller.hideMenu();
-            ref
-                .read(scanLibraryControllerProvider.notifier)
-                .start(silent: true);
+            ref.read(libraryScanCommandPortProvider).start(silent: true);
           },
           onDeepScan: () {
             _controller.hideMenu();
             ref
-                .read(scanLibraryControllerProvider.notifier)
+                .read(libraryScanCommandPortProvider)
                 .start(mode: ScanMode.full, silent: true);
           },
         );

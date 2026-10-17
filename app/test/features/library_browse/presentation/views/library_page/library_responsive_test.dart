@@ -15,7 +15,14 @@ import 'package:hentai_library/features/library_browse/presentation/views/librar
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_page_widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_pinned_header.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
+import 'package:hentai_library/shared/domain/library/library_metadata_refresh_command_port.dart';
+import 'package:hentai_library/shared/domain/library/library_scan_command_port.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 
@@ -187,6 +194,18 @@ List<Override> _libraryHeaderTestOverrides() {
 
 List<Override> _dictionaryStateTestOverrides() {
   return <Override>[
+    ...bootstrapCompositionOverrides(),
+    libraryScanActivityStateProvider.overrideWithValue((
+      running: false,
+      scanMode: ScanMode.incremental,
+    )),
+    libraryMetadataRefreshRunningStateProvider.overrideWithValue(false),
+    libraryScanCommandPortProvider.overrideWithValue(
+      _NoopLibraryScanCommandPort(),
+    ),
+    libraryMetadataRefreshCommandPortProvider.overrideWithValue(
+      _NoopLibraryMetadataRefreshCommandPort(),
+    ),
     libraryTagDictionaryStateProvider.overrideWithValue(
       const AsyncValue<List<Tag>>.data(<Tag>[]),
     ),
@@ -194,4 +213,48 @@ List<Override> _dictionaryStateTestOverrides() {
       const AsyncValue<List<Author>>.data(<Author>[]),
     ),
   ];
+}
+
+class _NoopLibraryScanCommandPort implements LibraryScanCommandPort {
+  @override
+  Future<void> start({
+    ScanMode mode = ScanMode.incremental,
+    bool syncAll = false,
+    bool silent = false,
+  }) async {}
+
+  @override
+  void cancel() {}
+}
+
+class _NoopLibraryMetadataRefreshCommandPort
+    implements LibraryMetadataRefreshCommandPort {
+  @override
+  Future<void> refreshComic({
+    required String comicId,
+    required String title,
+  }) async {}
+
+  @override
+  Future<MetadataRefreshBatchResult> refreshSeries({
+    required String seriesId,
+    required String name,
+  }) async {
+    return (
+      succeeded: 0,
+      failed: 0,
+      cancelled: false,
+      skipped: false,
+      skipMessage: null,
+    );
+  }
+
+  @override
+  void cancel() {}
+
+  @override
+  bool isRefreshingSeries(String seriesId) => false;
+
+  @override
+  bool get running => false;
 }

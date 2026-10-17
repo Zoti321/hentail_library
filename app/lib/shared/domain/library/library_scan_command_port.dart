@@ -10,4 +10,6 @@ abstract class LibraryScanCommandPort {
     bool syncAll = false,
     bool silent = false,
   });
+
+  void cancel();
 }

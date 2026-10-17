@@ -1,5 +1,8 @@
 import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
+import 'package:hentai_library/shared/domain/library/library_metadata_refresh_command_port.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/domain/library/library_scan_command_port.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
@@ -78,6 +81,39 @@ class _LibraryScanCommandAdapter implements LibraryScanCommandPort {
   }) => _ref
       .read(scanLibraryControllerProvider.notifier)
       .start(mode: mode, syncAll: syncAll, silent: silent);
+
+  @override
+  void cancel() => _ref.read(scanLibraryControllerProvider.notifier).cancel();
+}
+
+class _LibraryMetadataRefreshCommandAdapter
+    implements LibraryMetadataRefreshCommandPort {
+  _LibraryMetadataRefreshCommandAdapter(this._ref);
+
+  final Ref _ref;
+
+  MetadataRefreshController get _controller =>
+      _ref.read(metadataRefreshControllerProvider.notifier);
+
+  @override
+  Future<void> refreshComic({required String comicId, required String title}) =>
+      _controller.refreshComic(comicId: comicId, title: title);
+
+  @override
+  Future<MetadataRefreshBatchResult> refreshSeries({
+    required String seriesId,
+    required String name,
+  }) => _controller.refreshSeries(seriesId: seriesId, name: name);
+
+  @override
+  void cancel() => _controller.cancel();
+
+  @override
+  bool isRefreshingSeries(String seriesId) =>
+      _controller.isRefreshingSeries(seriesId);
+
+  @override
+  bool get running => _ref.read(metadataRefreshControllerProvider).running;
 }
 
 class _LibraryReorderModeAdapter implements LibraryReorderModePort {
@@ -121,3 +157,7 @@ ComicMetadataBulkEditCommandPort createComicMetadataBulkEditCommandPort(
 
 LibraryScanCommandPort createLibraryScanCommandPort(Ref ref) =>
     _LibraryScanCommandAdapter(ref);
+
+LibraryMetadataRefreshCommandPort createLibraryMetadataRefreshCommandPort(
+  Ref ref,
+) => _LibraryMetadataRefreshCommandAdapter(ref);

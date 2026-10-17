@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -128,6 +129,7 @@ List<Override> _shellHomeOverrides() {
     ),
     scanLibraryControllerProvider.overrideWith(_IdleScanLibraryController.new),
     ...sharedLibraryStateOverrides(),
+    ...bootstrapCompositionOverrides(),
   ];
 }
 

@@ -42,6 +42,9 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
     createComicMetadataBulkEditCommandPort,
   ),
   libraryScanCommandPortProvider.overrideWith(createLibraryScanCommandPort),
+  libraryMetadataRefreshCommandPortProvider.overrideWith(
+    createLibraryMetadataRefreshCommandPort,
+  ),
   comicDetailReturnSeriesPortProvider.overrideWith(
     createComicDetailReturnSeriesPort,
   ),
@@ -104,5 +107,13 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   libraryScanRunningStateProvider.overrideWith(
     (Ref ref) =>
         ref.watch(scanLibraryControllerProvider.select((s) => s.running)),
+  ),
+  libraryScanActivityStateProvider.overrideWith((Ref ref) {
+    final ScanLibraryState scan = ref.watch(scanLibraryControllerProvider);
+    return (running: scan.running, scanMode: scan.scanMode);
+  }),
+  libraryMetadataRefreshRunningStateProvider.overrideWith(
+    (Ref ref) =>
+        ref.watch(metadataRefreshControllerProvider.select((s) => s.running)),
   ),
 ];

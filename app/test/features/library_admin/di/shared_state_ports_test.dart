@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -72,6 +73,7 @@ void main() {
       overrides: <Override>[
         libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
         ...sharedLibraryStateOverrides(),
+        ...bootstrapCompositionOverrides(),
       ],
     );
     addTearDown(container.dispose);

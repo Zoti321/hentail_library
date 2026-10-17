@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_coordinator_notifier.dart';
@@ -66,6 +67,7 @@ void main() {
               _FakeAppStartupCoordinator.new,
             ),
             ...sharedLibraryStateOverrides(),
+            ...bootstrapCompositionOverrides(),
           ],
         ),
       );
@@ -109,6 +111,7 @@ List<Override> _overrides(AppSetting setting) {
     appUpdateCoordinatorProvider.overrideWith(_FakeAppUpdateCoordinator.new),
     appStartupCoordinatorProvider.overrideWith(_FakeAppStartupCoordinator.new),
     ...sharedLibraryStateOverrides(),
+    ...bootstrapCompositionOverrides(),
   ];
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
@@ -173,6 +174,7 @@ ProviderContainer _createContainer({
   return ProviderContainer(
     overrides: <Override>[
       ...sharedLibraryStateOverrides(),
+      ...bootstrapCompositionOverrides(),
       appSettingRepoProvider.overrideWithValue(
         _MemoryAppSettingRepository(initialSetting),
       ),
@@ -255,6 +257,7 @@ void main() {
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           appSettingRepoProvider.overrideWithValue(
             _MemoryAppSettingRepository(
               AppSetting(readingMode: ReadingMode.paged),
@@ -327,6 +330,7 @@ void main() {
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
+          ...bootstrapCompositionOverrides(),
           appSettingRepoProvider.overrideWithValue(
             _MemoryAppSettingRepository(
               AppSetting(readingMode: ReadingMode.paged),

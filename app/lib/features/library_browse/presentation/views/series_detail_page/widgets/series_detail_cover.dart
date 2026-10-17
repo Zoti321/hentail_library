@@ -7,7 +7,8 @@ import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
 import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/comic_cover_providers.dart';
+import 'package:hentai_library/shared/di/series_cover_providers.dart';
 
 class SeriesDetailCover extends ConsumerWidget {
   const SeriesDetailCover({super.key, required this.series});

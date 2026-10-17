@@ -40,7 +40,6 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     ) {
       _reset();
     });
-    // 任一 Comics 筛选 / 排序变化即退出选择模式（整份意图为单一来源）。
     ref.listen(libraryComicFiltersProvider, (_, _) => _reset());
     ref.listen<bool>(libraryReorderActiveStateProvider, (_, bool active) {
       if (active) {
@@ -107,7 +106,6 @@ final catalogSelectionProvider =
       CatalogSelectionNotifier.new,
     );
 
-/// 离库页路由时退出选择模式；[ConsumerState.dispose] 中 [Ref] 已失效，须走 [ProviderScope]。
 void exitCatalogSelectionFromContext(BuildContext context) {
   try {
     ProviderScope.containerOf(

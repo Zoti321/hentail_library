@@ -130,13 +130,16 @@ class _LibraryComicsGridSliver extends StatelessWidget {
             onEditMetadata: () =>
                 showEditMetadataDialog(context: context, comic: manga),
             onOpenDetail: () {
-              ProviderScope.containerOf(
+              final ProviderContainer container = ProviderScope.containerOf(
                 context,
-              ).read(comicDetailReturnSeriesProvider.notifier).clear();
-              appRouter.pushNamed(
-                '漫画详情',
-                pathParameters: <String, String>{'id': manga.comicId},
               );
+              container.read(comicDetailReturnSeriesProvider.notifier).clear();
+              container
+                  .read(appRouterProvider)
+                  .pushNamed(
+                    ContentRoutes.comicDetail,
+                    pathParameters: <String, String>{'id': manga.comicId},
+                  );
             },
           ),
         );

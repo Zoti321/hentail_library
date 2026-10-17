@@ -7,7 +7,8 @@ import 'package:hentai_library/shared/domain/models/value_objects/page_request.d
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page.dart';
 import 'package:hentai_library/shared/ui/layout/page_header_layout.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
@@ -118,6 +119,7 @@ void _expectMenuIcon(WidgetTester tester, Matcher matcher) {
 
 List<Override> _historyPageTestOverrides() {
   return <Override>[
+    ...bootstrapCompositionOverrides(),
     readingHistoryRepoProvider.overrideWithValue(_FakeReadingHistoryRepo()),
   ];
 }

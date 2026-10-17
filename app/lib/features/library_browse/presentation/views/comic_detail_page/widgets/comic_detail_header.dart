@@ -15,7 +15,8 @@ import 'package:hentai_library/features/library_browse/presentation/views/widget
 import 'package:hentai_library/features/library_browse/presentation/comic_delete_flow.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_series_nav.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -200,15 +201,15 @@ class _ComicDetailOverflowMenuButtonState
   }
 
   bool _isLibraryWriteBusy(WidgetRef ref) {
-    return ref.watch(scanLibraryControllerProvider).running ||
-        ref.watch(metadataRefreshControllerProvider).running;
+    return ref.watch(libraryScanRunningStateProvider) ||
+        ref.watch(libraryMetadataRefreshRunningStateProvider);
   }
 
   Future<void> _refreshMetadata(BuildContext context) async {
     final AppLocalizations l10n = context.l10n;
     try {
       await ref
-          .read(metadataRefreshControllerProvider.notifier)
+          .read(libraryMetadataRefreshCommandPortProvider)
           .refreshComic(
             comicId: widget.comic.comicId,
             title: widget.comic.title,

@@ -123,7 +123,7 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
           child: SeriesCard(
             series: s,
             gridIndex: index,
-            onTap: () => _openSeriesDetail(s),
+            onTap: () => _openSeriesDetail(context, s),
           ),
         );
       },
@@ -131,7 +131,9 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
   }
 }
 
-void _openSeriesDetail(Series series) {
+void _openSeriesDetail(BuildContext context, Series series) {
   final String encoded = Uri.encodeComponent(series.id);
-  appRouter.push('/series/$encoded');
+  ProviderScope.containerOf(
+    context,
+  ).read(appRouterProvider).push('/series/$encoded');
 }
