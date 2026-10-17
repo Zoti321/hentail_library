@@ -5,7 +5,8 @@ import 'package:hentai_library/shared/domain/models/value_objects/page_request.d
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/comic_trash/di/comic_trash.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/comic_trash_actions.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,7 +22,9 @@ class TrashPageController extends _$TrashPageController {
   @override
   Future<TrashPageState> build() async {
     ref.listen(
-      libraryRevisionProvider.select((LibraryRevisionState s) => s.revision),
+      libraryRevisionStateProvider.select(
+        (LibraryRevisionState s) => s.revision,
+      ),
       (int? _, int _) => refresh(),
     );
     return _reload(const TrashPageState());

@@ -2,11 +2,8 @@ import 'package:hentai_library/shared/core/errors/app_exception.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_trash_service.dart';
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/features/comic_trash/di/comic_trash.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_trash_actions.g.dart';
@@ -75,14 +72,12 @@ class ComicTrashActions extends _$ComicTrashActions {
   }
 
   void _ensureLibraryIdle() {
-    if (ref.read(scanLibraryControllerProvider).running ||
-        ref.read(metadataRefreshControllerProvider).running ||
-        ref.read(comicMetadataBulkPatchControllerProvider).running) {
+    if (ref.read(libraryMutationBusyStateProvider)) {
       throw AppException(kLibraryBusyMessage);
     }
   }
 
   void _notifyChanged() {
-    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+    ref.read(libraryRevisionSignalPortProvider).notifyExternalChange();
   }
 }

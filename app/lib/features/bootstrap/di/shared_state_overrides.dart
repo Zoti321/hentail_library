@@ -5,6 +5,8 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/c
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_throttle_busy.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_series_providers.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -48,6 +50,14 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
             LibraryAgeRestrictionFilter.unrestricted,
       ),
     ),
+  ),
+  libraryMutationBusyStateProvider.overrideWith(
+    (Ref ref) =>
+        ref.watch(scanLibraryControllerProvider.select((s) => s.running)) ||
+        ref.watch(metadataRefreshControllerProvider.select((s) => s.running)) ||
+        ref.watch(
+          comicMetadataBulkPatchControllerProvider.select((s) => s.running),
+        ),
   ),
   libraryScanRunningStateProvider.overrideWith(
     (Ref ref) =>

@@ -95,6 +95,13 @@ final Provider<bool> libraryScanRunningStateProvider = Provider<bool>(
   ),
 );
 
+/// 书库是否处于变更型后台任务中（扫描 / 元数据刷新 / 批量编辑任一运行），供 trash 等命令门控。
+final Provider<bool> libraryMutationBusyStateProvider = Provider<bool>(
+  (Ref ref) => throw UnimplementedError(
+    'libraryMutationBusyStateProvider 未注入，请在 bootstrap 中 override',
+  ),
+);
+
 /// 系列详情入口（原 `seriesByIdProvider`，按 id 查询）。
 final seriesByIdStateProvider = FutureProvider.family<Series?, String>(
   (Ref ref, String seriesId) => throw UnimplementedError(
