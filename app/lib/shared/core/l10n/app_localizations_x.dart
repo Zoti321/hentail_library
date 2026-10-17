@@ -26,7 +26,7 @@ import 'package:hentai_library/shared/domain/models/value_objects/comic_language
 
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 

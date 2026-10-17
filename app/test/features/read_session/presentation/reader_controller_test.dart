@@ -19,6 +19,7 @@ import 'package:hentai_library/features/read_session/presentation/views/reader_p
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 const String _comicId = 'reader-controller-comic';
@@ -171,6 +172,7 @@ ProviderContainer _createContainer({
   final ReaderSessionSnapshot session = snapshot ?? _snapshot();
   return ProviderContainer(
     overrides: <Override>[
+      ...sharedLibraryStateOverrides(),
       appSettingRepoProvider.overrideWithValue(
         _MemoryAppSettingRepository(initialSetting),
       ),
@@ -252,6 +254,7 @@ void main() {
       );
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           appSettingRepoProvider.overrideWithValue(
             _MemoryAppSettingRepository(
               AppSetting(readingMode: ReadingMode.paged),
@@ -323,6 +326,7 @@ void main() {
       );
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           appSettingRepoProvider.overrideWithValue(
             _MemoryAppSettingRepository(
               AppSetting(readingMode: ReadingMode.paged),

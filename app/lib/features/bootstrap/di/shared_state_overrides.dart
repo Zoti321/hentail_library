@@ -11,6 +11,9 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/s
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/data/recent_metadata_backup_at.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/views/metadata_backup_settings_detail.dart';
+import 'package:hentai_library/features/app_settings/di/shared_state_ports.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
@@ -72,6 +75,15 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   ),
   recentMetadataBackupAtReaderProvider.overrideWithValue(
     readRecentMetadataBackupAt,
+  ),
+  appSettingsStateProvider.overrideWith(
+    (Ref ref) => ref.watch(settingsProvider),
+  ),
+  appSettingsFutureProvider.overrideWith(
+    (Ref ref) => ref.watch(settingsProvider.future),
+  ),
+  readerSettingsCommandPortProvider.overrideWith(
+    createReaderSettingsCommandPort,
   ),
   libraryScanRunningStateProvider.overrideWith(
     (Ref ref) =>

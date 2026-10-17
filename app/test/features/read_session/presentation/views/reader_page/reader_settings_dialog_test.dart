@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/domain/repositories/app_setting_repository
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_settings_dialog.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
@@ -18,6 +19,7 @@ void main() {
       tester,
       wrapProviderScope: true,
       overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
         appSettingRepoProvider.overrideWithValue(_MemoryRepo()),
       ],
       home: Builder(

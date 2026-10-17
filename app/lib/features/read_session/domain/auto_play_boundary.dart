@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 
 /// Decision taken after a full Auto-play interval dwell on the last spread.
 sealed class AutoPlayBoundaryDecision {

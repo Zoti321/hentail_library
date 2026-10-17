@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/models.dart' show AppSetting;
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/models/models.dart'
+    show AppSetting;
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/form/fluent_select_field.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:hentai_library/shared/domain/ports/reader_settings_command_port.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -52,7 +54,9 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final AsyncValue<AppSetting> settingsAsync = ref.watch(settingsProvider);
+    final AsyncValue<AppSetting> settingsAsync = ref.watch(
+      appSettingsStateProvider,
+    );
     final AppSetting? settings = settingsAsync.asData?.value;
     if (settings == null) {
       return const SizedBox.shrink();
@@ -147,7 +151,7 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                                     return;
                                   }
                                   ref
-                                      .read(settingsProvider.notifier)
+                                      .read(readerSettingsCommandPortProvider)
                                       .setAutoPlayMode(value);
                                 },
                               ),
@@ -157,7 +161,7 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                                 controller: _intervalController,
                                 onCommit: (int value) {
                                   ref
-                                      .read(settingsProvider.notifier)
+                                      .read(readerSettingsCommandPortProvider)
                                       .setReaderAutoPlayIntervalSeconds(value);
                                 },
                               ),
@@ -187,7 +191,9 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                                           return;
                                         }
                                         ref
-                                            .read(settingsProvider.notifier)
+                                            .read(
+                                              readerSettingsCommandPortProvider,
+                                            )
                                             .setWebtoonMarginPercent(value);
                                       },
                                     ),
@@ -204,7 +210,9 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                                           return;
                                         }
                                         ref
-                                            .read(settingsProvider.notifier)
+                                            .read(
+                                              readerSettingsCommandPortProvider,
+                                            )
                                             .setWebtoonZoomMode(value);
                                       },
                                     ),
@@ -243,7 +251,9 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
   }
 
   Future<void> _applyReadingMode(ReadingMode mode) async {
-    final SettingsNotifier notifier = ref.read(settingsProvider.notifier);
+    final ReaderSettingsCommandPort notifier = ref.read(
+      readerSettingsCommandPortProvider,
+    );
     await notifier.setReadingMode(mode);
   }
 }

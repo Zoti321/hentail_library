@@ -13,9 +13,10 @@ import 'package:hentai_library/features/read_session/presentation/module/control
 import 'package:hentai_library/features/read_session/presentation/reader_exit_location.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
-import 'package:hentai_library/shared/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/shared/domain/models/models.dart'
+    show AppSetting;
 import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -134,7 +135,7 @@ class ReaderController extends _$ReaderController {
       ).future,
     );
     final ReadingMode initialMode = await _resolveInitialReadingMode();
-    ref.listen<AsyncValue<AppSetting>>(settingsProvider, (
+    ref.listen<AsyncValue<AppSetting>>(appSettingsStateProvider, (
       AsyncValue<AppSetting>? previous,
       AsyncValue<AppSetting> next,
     ) {
@@ -157,12 +158,12 @@ class ReaderController extends _$ReaderController {
   }
 
   Future<ReadingMode> _resolveInitialReadingMode() async {
-    final AppSetting? ready = ref.read(settingsProvider).asData?.value;
+    final AppSetting? ready = ref.read(appSettingsStateProvider).asData?.value;
     if (ready != null) {
       return ready.readingMode;
     }
     try {
-      return (await ref.read(settingsProvider.future)).readingMode;
+      return (await ref.read(appSettingsFutureProvider.future)).readingMode;
     } catch (_) {
       return kDefaultReadingMode;
     }

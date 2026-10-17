@@ -6,9 +6,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/shared/domain/models/models.dart'
+    show AppSetting;
 import 'package:hentai_library/features/read_session/domain/auto_play_boundary.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/shared/ui/interaction/app_motion.dart';
 import 'package:hentai_library/shared/ui/interaction/reader_input.dart';
@@ -21,6 +22,7 @@ import 'package:hentai_library/features/read_session/presentation/views/reader_p
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_top_bar.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 
 /// Stable open-session fields for [ReaderPage] shell (excludes index/chrome/mode).
 typedef ReaderPageShellData = ({
@@ -613,13 +615,13 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
       ),
     );
     final int readerAutoPlayIntervalSeconds = ref.watch(
-      settingsProvider.select(
+      appSettingsStateProvider.select(
         (AsyncValue<AppSetting> value) =>
             value.asData?.value.readerAutoPlayIntervalSeconds ?? 5,
       ),
     );
     final AutoPlayMode autoPlayMode = ref.watch(
-      settingsProvider.select(
+      appSettingsStateProvider.select(
         (AsyncValue<AppSetting> value) =>
             value.asData?.value.autoPlayMode ?? kDefaultAutoPlayMode,
       ),

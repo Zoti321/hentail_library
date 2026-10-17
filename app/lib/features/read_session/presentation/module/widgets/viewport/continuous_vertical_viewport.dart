@@ -13,7 +13,7 @@ import 'package:hentai_library/features/read_session/presentation/module/control
 import 'package:hentai_library/features/read_session/presentation/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_image_item.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -90,7 +90,10 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final int initialScrollIndex = frozenInitialScrollIndex.value ?? 0;
     final Size viewportSize = MediaQuery.sizeOf(context);
     final int totalPages = imageList.length;
-    final AppSetting? settings = ref.watch(settingsProvider).asData?.value;
+    final AppSetting? settings = ref
+        .watch(appSettingsStateProvider)
+        .asData
+        ?.value;
     final int marginPercent =
         settings?.webtoonMarginPercent ?? kDefaultWebtoonMarginPercent;
     final WebtoonZoomMode zoomMode =

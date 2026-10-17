@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/domain/library/format_group.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 
 /// Normalizes legacy `settings.json` / aggregate JSON into [AppSetting] shape.

@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/read_session/domain/auto_play_boundary.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:test/test.dart';
 
 void main() {

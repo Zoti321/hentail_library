@@ -11,6 +11,7 @@ import 'package:hentai_library/features/read_session/presentation/module/control
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
@@ -67,6 +68,7 @@ Future<void> _pumpReaderShell(
   await tester.pumpWidget(
     ProviderScope(
       overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
         settingsProvider.overrideWith(_FakeSettingsNotifier.new),
         scanLibraryControllerProvider.overrideWith(
           _IdleScanLibraryController.new,

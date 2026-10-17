@@ -18,6 +18,7 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 const String _testComicId = 'test-comic';
@@ -249,6 +250,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: <Override>[
+            ...sharedLibraryStateOverrides(),
             readerControllerProvider(
               _viewKey,
             ).overrideWith(_TestReaderControllerAtPage50.new),
@@ -312,6 +314,7 @@ void main() {
       Widget host(ReadingMode mode) {
         return ProviderScope(
           overrides: <Override>[
+            ...sharedLibraryStateOverrides(),
             readerControllerProvider(
               _viewKey,
             ).overrideWith(_TestReaderControllerAtPage50.new),
@@ -384,6 +387,7 @@ List<Override> _viewportTestOverrides() {
   );
 
   return <Override>[
+    ...sharedLibraryStateOverrides(),
     readerControllerProvider(_viewKey).overrideWith(_TestReaderController.new),
     readerPrefetchControllerProvider.overrideWith(
       _FakeReaderPrefetchController.new,

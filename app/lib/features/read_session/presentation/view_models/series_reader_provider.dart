@@ -1,5 +1,4 @@
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
