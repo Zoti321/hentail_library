@@ -3,8 +3,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
+import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_logic.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_image_cache.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/read_session/di/session_providers.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_prefetch_controller.g.dart';

@@ -1,4 +1,6 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/comic/comic_display_title.dart';
+
+export 'package:hentai_library/shared/domain/comic/comic_display_title.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
@@ -70,40 +72,6 @@ final class ComicDetailSeriesNavReady extends ComicDetailSeriesNavResult {
   const ComicDetailSeriesNavReady(this.data);
 
   final ComicDetailSeriesNavData data;
-}
-
-String comicTitleFallbackForDisplay(String comicId) {
-  return comicId.length > 12 ? '${comicId.substring(0, 12)}…' : comicId;
-}
-
-Future<String> resolveComicTitleForDisplay(
-  ComicRepository repo,
-  String comicId,
-) async {
-  final Map<String, String> titles = await resolveComicTitlesForDisplay(
-    repo,
-    <String>[comicId],
-  );
-  return titles[comicId] ?? comicTitleFallbackForDisplay(comicId);
-}
-
-/// Resolves display titles for [comicIds] with one batch repository read.
-/// Missing ids keep the truncated-id fallback; found order follows [comicIds].
-Future<Map<String, String>> resolveComicTitlesForDisplay(
-  ComicRepository repo,
-  List<String> comicIds,
-) async {
-  if (comicIds.isEmpty) {
-    return const <String, String>{};
-  }
-  final List<Comic> comics = await repo.findByIds(comicIds);
-  final Map<String, String> titlesById = <String, String>{
-    for (final Comic comic in comics) comic.comicId: comic.title,
-  };
-  return <String, String>{
-    for (final String comicId in comicIds)
-      comicId: titlesById[comicId] ?? comicTitleFallbackForDisplay(comicId),
-  };
 }
 
 Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(

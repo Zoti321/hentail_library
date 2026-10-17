@@ -11,7 +11,10 @@ import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/common.da
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_image_cache.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/page_image_copy_provider.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_image_filter_quality.dart';
+import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_page_fade_in.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

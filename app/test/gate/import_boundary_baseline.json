@@ -11,14 +11,5 @@
   "M3|named_metadata|bootstrap|features/named_metadata/presentation/view_models/tag_dictionary_import_controller.dart|package:hentai_library/features/bootstrap/di/deps.dart",
   "M3|named_metadata|bootstrap|features/named_metadata/presentation/view_models/tag_management_notifier.dart|package:hentai_library/features/bootstrap/di/deps.dart",
   "M3|named_metadata|bootstrap|features/named_metadata/presentation/views/metadata_page/metadata_management_page.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|named_metadata|bootstrap|features/named_metadata/presentation/views/metadata_page/metadata_management_page.dart|package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/module/controller/reader_controller.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/module/controller/reader_prefetch_controller.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/module/controller/reader_series_navigation.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/module/controller/reader_series_navigation.dart|package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/view_models/read_session_providers.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/view_models/reader_cover_editor_notifier.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/view_models/series_reader_provider.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/views/reader_page/reader_page.dart|package:hentai_library/features/bootstrap/di/deps.dart",
-  "M3|read_session|bootstrap|features/read_session/presentation/views/reader_page/widgets/reader_image_item.dart|package:hentai_library/features/bootstrap/di/deps.dart"
+  "M3|named_metadata|bootstrap|features/named_metadata/presentation/views/metadata_page/metadata_management_page.dart|package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart"
 ]

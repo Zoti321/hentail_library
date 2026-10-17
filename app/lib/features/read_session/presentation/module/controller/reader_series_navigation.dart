@@ -2,8 +2,10 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_auto_play_carry.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
+import 'package:hentai_library/features/read_session/di/session_providers.dart';
+import 'package:hentai_library/features/read_session/presentation/module/controller/reader_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/routing/reader_route_args.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_series_navigation.g.dart';

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
+import 'package:hentai_library/features/read_session/domain/spread_index.dart';
+import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/read_session/presentation/reader_exit_location.dart';
@@ -10,7 +12,12 @@ import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/read_session/di/session_providers.dart';
+import 'package:hentai_library/features/read_session/presentation/module/controller/reader_fullscreen_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/module/controller/reader_series_navigation.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
