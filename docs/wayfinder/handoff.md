@@ -1,41 +1,38 @@
 # Wayfinder 交接文档（整洁架构迁移）
 
-最后更新：2026-10-17。分支：`dev`。远端：`origin dev`。
+最后更新：2026-10-17（#271–#277 M3 清零）。分支：`dev`。远端：推送后运行 `scripts/wayfinder/sync-github-after-m3.sh` 同步 Issue。
 
 ## 1. 当前状态概览
 
 - `app/lib` 已收敛为 `features/<id>/{presentation,domain,data,di}`、`shared/{core,data,domain,ui,di}`、`src/rust`、`main.dart`。
 - Phase B 布局校验已启用（`kEnforceWayfinderPhaseBLayout = true`），strangler 白名单为空。
-- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **62** 条 = **0** 条 M1/M2（feature↔feature） + **62** 条 M3（product feature→bootstrap）。
-  - 相对 #261 开始前（212 = 135 M1/M2 + 77 M3）减少 **121** 条（其中 #262 home 再减 **12** 条、#263 comic_trash 再减 **10** 条、#264 app_settings 再减 **18** 条、#265 read_session 再减 **9** 条、#267 library_admin 再减 **10** 条、#268 library_browse 再减 **12** 条、#270 comic_trash 再减 **4** 条 M1/M2）。
-- `dart analyze`：0 error；仍有若干 `unnecessary_import` info，来自 `deps.dart` 总桶，属于迁移遗留，待清理。
-- 全量 `flutter test`（约 937 条）在 #261e 合入后全绿。
+- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **0** 条（M1/M2 与 M3 ratchet 均已清零）。
+  - #278 + #271–#277：M3 自 62 条降至 0（`24a46e5b`）。
+- `dart analyze`：0 error；仍有若干 `annotate_overrides` info（既有）。
+- 全量 `flutter test`：**941** 条全绿。
 
 ## 2. 最近提交（dev）
 
 | commit | 内容 |
 |--------|------|
-| `4d6c8be4` | #261e：library_browse 切换至 shared 状态与端口 Provider |
-| `dc8971da` | #261d：`library_management_actions` → shared/ui；扫描与返回系列端口化 |
-| `c2897e27` | #261c：toast → shared/ui；批量编辑命令端口 |
-| `12ba146a` | #261b：`libraries_routes` → shared/core；`library_form_dialog` → shared/ui |
-| `774f8a50` | #261a：状态类型迁 shared/domain；shared/di 声明 + bootstrap override |
-| `679ae8d4` | docs：新增本交接文档 |
-| `d93543f2` | Gate 新增 M3 ratchet |
-| `eb9d1213` | #266 步骤0：三端口 + library_admin 适配器 |
-| `d478cbad` | #258 bootstrap-final |
+| `24a46e5b` | #277 comic_trash M3 清零 |
+| `da358722` | #276 app_settings M3 |
+| `cc7bd404` | #275 named_metadata M3 |
+| `03c3f7bf` | #274 library_admin M3 |
+| `6d9ac7f9` | #273 read_session M3 |
+| `05b9dfdc` | #272 home M3 |
+| `50db95d0` | #271 library_browse M3 |
+| `f5fdc514` | #278 仓储 Provider 下沉 shared |
 
 ## 3. Issue 状态
 
-**已关闭**：#258、#219、#220、#221、#222、#224、#225、#266、**#261**、**#262**、**#263**、**#264**、**#265**、**#267**、**#268**、**#270**。
+**已关闭（代码已合入，GitHub 待 `sync-github-after-m3.sh`）**：#258、#219–#225、#266、#261–#268、#270、**#271–#277**、**#278**。
 
-**未关闭**：
+**未关闭 / 待收尾**：
 
-- #217（路线图，DoD "基线为空" 未达成）
+- #217（路线图）：ratchet 基线已空，可关；运行同步脚本后关闭。
 - #256（延后，不实施；见 §9）
-- #260（spec：消除 feature↔feature 边）
-  - 注意：正文中 "R6 零容忍" 已被留言改为 M3 ratchet，正文尚未同步修改，下次更新时应改正文。
-  - 正文中 R1 扩展（禁止 feature domain→本 feature data）**尚未在 Gate 中实现**。
+- #260（spec）：M1/M2 与 M3 ratchet DoD 已达成；**R1 扩展**与正文「R6→M3」同步仍待做，建议保留 open 或拆 follow-up。
 
 ## 4. 已做出的决策（不要重新讨论）
 
@@ -120,7 +117,7 @@ git -c http.version=HTTP/1.1 push origin dev
 
 ## 8. 下一步（下一对话从这里开始）
 
-0. **优先级调整（2026-10-17）**：先优化深模块设计，再继续迁移。剩余 M3 边（62 条）与 #271–#277 的迁移，按已确定的事件/revision 驱动方向（C 方案）和 shared 声明 + bootstrap 覆盖的基础设施推进，避免每票各自补丁式修改。完成设计收敛后再开 #271 起的实施。CatalogSelection 反向依赖（多选进入退出 reorder）与 `appShellPageNavigationOpener` 的统一注入方式，作为设计阶段的待定项优先评估。
+0. **M3 消费方票 #271–#277：已完成**；基线 **0**。推送远端并在 GitHub 留言/关票：`bash scripts/wayfinder/sync-github-after-m3.sh`。
 1. ~~实现 #262（home）~~：**已完成并关闭**。home 的 M1/M2 边已清零。
    - 新增 shared Provider：`libraryComicAgeRestrictionStateProvider`、`libraryScanRunningStateProvider`（`shared/di/library_state_providers.dart`，由 bootstrap 的 `shared_state_overrides.dart` 注入）。
    - `visibleCatalogGridIndexRange` 迁至 `shared/ui/layout/catalog_grid_visible_range.dart`。
@@ -134,11 +131,10 @@ git -c http.version=HTTP/1.1 push origin dev
    - #270（comic_trash）：**已完成并关闭**。历史页布局常量与标题样式下沉为 `shared/ui/layout/page_header_layout.dart`，置顶页头 delegate 下沉为 `shared/ui/layout/page_pinned_header_delegate.dart`，符号去掉 `history` 前缀。comic_trash 的 M1/M2 清零，基线 79 → 75（全部为 M3）。
    - CatalogSelection 事件化（非票，#268 后续决定）：删除 `CatalogSelectionCommandPort`；catalog 多选监听 shared 的 `libraryReorderActiveStateProvider`，reorder 进入时自行退出多选。反向（多选进入退出 reorder）仍经 `libraryReorderModePortProvider`，待后续统一。
    - #278（基础设施，M3 前置）：**已完成（待推送）**。仓储与端口 Provider 声明下沉至 `shared/di/data_providers.dart`（未注入时抛 `UnimplementedError`）；实现类绑定集中在 `features/bootstrap/di/data_overrides.dart` 的 `dataProviderOverrides()`，由 `main.dart` 注入；删除 `features/bootstrap/di/repos.dart` / `ports.dart`，`deps.dart` 改为导出 shared 声明。测试中直接读取真实仓储的用例需显式加入 `...dataProviderOverrides()`。基线 75 → 62。
-   - M3 实施票（待处理，按 feature 拆分）：#271 library_browse（27 条）、#272 home（16 条）、#273 read_session（10 条）、#274 library_admin（7 条）、#275 named_metadata（7 条）、#276 app_settings（5 条）、#277 comic_trash（3 条）。剩余 62 条，基础设施方案已确定（Provider 声明下沉 shared + bootstrap 覆盖，替代 `deps.dart` barrel）。
+   - ~~M3 实施票 #271–#277~~：**已完成**（基线 0）。
 2. **M1/M2 已清零**：comic_trash→home 的 4 条由 #270 处理（布局常量与置顶页头下沉至 `shared/ui/layout/`）。
-3. 消费方票推进时顺手减少本 feature 对 `deps.dart` 的 M3 边。
-4. 全部消费方完成后：实现 R1 扩展，并更新 #260 正文（R6 → M3 ratchet）。
-5. 全部完成后才能关闭 #260 与 #217（基线为空）。
+3. **后续**：实现 Gate R1 扩展；更新 #260 正文（R6 → M3 ratchet）；瘦身 `deps.dart` 总桶（非 ratchet，属清理）；#256 仍延后。
+4. 关闭 #217 / 部分关闭 #260：见同步脚本与 §3。
 
 ### #262 开工前建议盘点
 
