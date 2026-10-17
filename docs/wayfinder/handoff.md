@@ -27,7 +27,7 @@
 
 ## 3. Issue 状态
 
-**已关闭**：#258、#219、#220、#221、#222、#224、#225、#266、**#261**、**#262**、**#263**、**#264**（待确认关闭）。
+**已关闭**：#258、#219、#220、#221、#222、#224、#225、#266、**#261**、**#262**、**#263**、**#264**。
 
 **未关闭**：
 
@@ -126,7 +126,7 @@ git -c http.version=HTTP/1.1 push origin dev
    - `visibleCatalogGridIndexRange` 迁至 `shared/ui/layout/catalog_grid_visible_range.dart`。
    - 涉及 home / 应用壳的测试统一接入 `sharedLibraryStateOverrides()`。
    - 待办：在 #262 留言并关闭；home 仍有 M3（`deps.dart`）边，可随后续票顺手拆。
-   - #264（app_settings）：**已完成（待关闭 issue）**。设置页备份板块改由 bootstrap 经 `shared/di/settings_slot_providers.dart` 的 slot 组装；板块实现迁至 `features/metadata_backup/presentation/views/metadata_backup_settings_detail.dart`；设置原语与布局常量下沉至 `shared/ui/widgets/settings/`；最近备份时间读取迁至 `features/metadata_backup/data/recent_metadata_backup_at.dart`。app_settings 仍有 1 条 M1（`settings_notifier.dart` → read_session `auto_play_mode`），留待 #265 一并处理。
+   - #264（app_settings）：**已完成并关闭**。设置页备份板块改由 bootstrap 经 `shared/di/settings_slot_providers.dart` 的 slot 组装；板块实现迁至 `features/metadata_backup/presentation/views/metadata_backup_settings_detail.dart`；设置原语与布局常量下沉至 `shared/ui/widgets/settings/`；最近备份时间读取迁至 `features/metadata_backup/data/recent_metadata_backup_at.dart`。app_settings 仍有 1 条 M1（`settings_notifier.dart` → read_session `auto_play_mode`），留待 #265 一并处理。
    - #263（comic_trash）：**已完成并关闭**。library_admin 边清零；新增 `libraryMutationBusyStateProvider`、复用 `libraryRevisionSignalPortProvider` / `libraryRevisionStateProvider`。comic_trash 仍对 home 的 `history_layout_constants` / `history_page_header` 有 M1/M2（4 条），属 home 视图共享，可在后续票处理。
 2. 下一步：#265（read_session），并顺带清理 app_settings 的 `auto_play_mode` 边。
 3. 消费方票推进时顺手减少本 feature 对 `deps.dart` 的 M3 边。
