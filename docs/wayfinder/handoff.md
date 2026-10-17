@@ -1,6 +1,6 @@
 # Wayfinder 交接文档（整洁架构迁移）
 
-最后更新：2026-10-17（#271–#277 M3 清零）。分支：`dev`。远端：推送后运行 `scripts/wayfinder/sync-github-after-m3.sh` 同步 Issue。
+最后更新：2026-10-17（#271–#277 M3 清零；#217/#271–#278 已在 GitHub 关票）。分支：`dev`。
 
 ## 1. 当前状态概览
 
@@ -26,13 +26,12 @@
 
 ## 3. Issue 状态
 
-**已关闭（代码已合入，GitHub 待 `sync-github-after-m3.sh`）**：#258、#219–#225、#266、#261–#268、#270、**#271–#277**、**#278**。
+**已关闭**：#217、#258、#219–#225、#266、#261–#268、#270、**#271–#277**、**#278**。
 
 **未关闭 / 待收尾**：
 
-- #217（路线图）：ratchet 基线已空，可关；运行同步脚本后关闭。
 - #256（延后，不实施；见 §9）
-- #260（spec）：M1/M2 与 M3 ratchet DoD 已达成；**R1 扩展**与正文「R6→M3」同步仍待做，建议保留 open 或拆 follow-up。
+- #260（spec）：M1/M2 与 M3 ratchet DoD 已达成；**R1 扩展**与正文「R6→M3」同步仍待做。
 
 ## 4. 已做出的决策（不要重新讨论）
 
@@ -117,7 +116,7 @@ git -c http.version=HTTP/1.1 push origin dev
 
 ## 8. 下一步（下一对话从这里开始）
 
-0. **M3 消费方票 #271–#277：已完成**；基线 **0**。推送远端并在 GitHub 留言/关票：`bash scripts/wayfinder/sync-github-after-m3.sh`。
+0. **M3 消费方票 #271–#277：已完成**；基线 **0**；关联 GitHub 票已关。
 1. ~~实现 #262（home）~~：**已完成并关闭**。home 的 M1/M2 边已清零。
    - 新增 shared Provider：`libraryComicAgeRestrictionStateProvider`、`libraryScanRunningStateProvider`（`shared/di/library_state_providers.dart`，由 bootstrap 的 `shared_state_overrides.dart` 注入）。
    - `visibleCatalogGridIndexRange` 迁至 `shared/ui/layout/catalog_grid_visible_range.dart`。
@@ -134,7 +133,7 @@ git -c http.version=HTTP/1.1 push origin dev
    - ~~M3 实施票 #271–#277~~：**已完成**（基线 0）。
 2. **M1/M2 已清零**：comic_trash→home 的 4 条由 #270 处理（布局常量与置顶页头下沉至 `shared/ui/layout/`）。
 3. **后续**：实现 Gate R1 扩展；更新 #260 正文（R6 → M3 ratchet）；瘦身 `deps.dart` 总桶（非 ratchet，属清理）；#256 仍延后。
-4. 关闭 #217 / 部分关闭 #260：见同步脚本与 §3。
+4. #217 已关；#260 见 §3（R1 扩展与正文同步）。
 
 ### #262 开工前建议盘点
 
