@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_page/widgets/widgets.dart';
 
 class SeriesDetailPage extends ConsumerWidget {
@@ -13,7 +14,7 @@ class SeriesDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AsyncValue<Series?> seriesAsync = ref.watch(
-      seriesByIdProvider(seriesId),
+      seriesByIdStateProvider(seriesId),
     );
     return ColoredBox(
       color: cs.surface,

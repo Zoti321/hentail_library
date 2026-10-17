@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
@@ -99,6 +100,7 @@ void main() {
       characters = _MutableNamedFacetRepository();
       container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),

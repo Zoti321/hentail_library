@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
@@ -164,6 +165,7 @@ void main() {
 
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(revisionEvents),
           ),

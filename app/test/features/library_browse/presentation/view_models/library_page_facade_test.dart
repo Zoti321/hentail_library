@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/library_comic_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
@@ -118,6 +119,7 @@ void main() {
   }) {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
         ...extraOverrides,
         ...idleRevisionThrottleOverrides(),
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),

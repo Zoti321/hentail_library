@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -122,6 +123,7 @@ void main() {
       thumbnails = _ControllableThumbnailEventCoordinator();
       container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),
@@ -238,6 +240,10 @@ void main() {
         await Future<void>.delayed(Duration.zero);
 
         container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
+        container.read(
+          libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+        );
         container.read(libraryRevisionProvider.notifier).notifyExternalChange();
         expect(
           container.read(
@@ -307,6 +313,10 @@ void main() {
         await Future<void>.delayed(Duration.zero);
 
         container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
+        container.read(
+          libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+        );
         container.read(libraryRevisionProvider.notifier).notifyExternalChange();
         expect(
           container.read(
@@ -338,6 +348,10 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+      // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
+      container.read(
+        libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+      );
       container.read(libraryRevisionProvider.notifier).notifyExternalChange();
       expect(
         container.read(

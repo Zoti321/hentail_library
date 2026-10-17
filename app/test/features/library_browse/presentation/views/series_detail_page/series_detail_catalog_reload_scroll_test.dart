@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
@@ -151,6 +152,7 @@ void main() {
       final _DelayedSeriesRepo repo = _DelayedSeriesRepo(comics);
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           libraryRevisionProvider.overrideWith(
             _ControllableLibraryRevision.new,
           ),

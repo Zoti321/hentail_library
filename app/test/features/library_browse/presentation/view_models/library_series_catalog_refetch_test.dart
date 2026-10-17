@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/domain/library_series_projection.dart';
 import 'package:hentai_library/shared/domain/library/library_series_sort_option.dart';
@@ -68,6 +69,7 @@ void main() {
       final _CountingSeriesRepo repo = _CountingSeriesRepo();
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           ...idleRevisionThrottleOverrides(),
           seriesRepoProvider.overrideWith((Ref ref) => repo),
           libraryRevisionProvider.overrideWith(
@@ -95,6 +97,7 @@ void main() {
     final _CountingSeriesRepo repo = _CountingSeriesRepo();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
         ...idleRevisionThrottleOverrides(),
         seriesRepoProvider.overrideWith((Ref ref) => repo),
         libraryRevisionProvider.overrideWith(_ControllableLibraryRevision.new),
@@ -119,6 +122,7 @@ void main() {
     final _CountingSeriesRepo repo = _CountingSeriesRepo();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
         ...idleRevisionThrottleOverrides(),
         seriesRepoProvider.overrideWith((Ref ref) => repo),
         libraryRevisionProvider.overrideWith(_ControllableLibraryRevision.new),

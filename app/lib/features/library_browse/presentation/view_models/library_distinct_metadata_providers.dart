@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_distinct_metadata_providers.g.dart';
@@ -7,7 +7,7 @@ part 'library_distinct_metadata_providers.g.dart';
 @Riverpod(keepAlive: true)
 Future<List<String>> libraryDistinctParodies(Ref ref) async {
   final String? libraryId = ref
-      .watch(currentLibraryProvider)
+      .watch(currentLibraryStateProvider)
       .asData
       ?.value
       .currentId;
@@ -17,7 +17,7 @@ Future<List<String>> libraryDistinctParodies(Ref ref) async {
 @Riverpod(keepAlive: true)
 Future<List<String>> libraryDistinctCharacters(Ref ref) async {
   final String? libraryId = ref
-      .watch(currentLibraryProvider)
+      .watch(currentLibraryStateProvider)
       .asData
       ?.value
       .currentId;

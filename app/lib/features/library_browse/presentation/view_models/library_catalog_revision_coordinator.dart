@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_throttle_busy.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/current_library_state.dart';
+import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_catalog_revision_coordinator.g.dart';
@@ -55,8 +55,8 @@ class LibraryCatalogRevisionCoordinator
       _syncThrottleTimer?.cancel();
     });
 
-    _revisionThrottleBusy = ref.read(libraryRevisionThrottleBusyProvider);
-    ref.listen<bool>(libraryRevisionThrottleBusyProvider, (
+    _revisionThrottleBusy = ref.read(libraryRevisionThrottleBusyStateProvider);
+    ref.listen<bool>(libraryRevisionThrottleBusyStateProvider, (
       bool? previous,
       bool next,
     ) {
@@ -66,7 +66,7 @@ class LibraryCatalogRevisionCoordinator
       }
     });
 
-    ref.listen(libraryRevisionProvider, (
+    ref.listen(libraryRevisionStateProvider, (
       LibraryRevisionState? previous,
       LibraryRevisionState next,
     ) {
@@ -86,7 +86,7 @@ class LibraryCatalogRevisionCoordinator
       _flushInactiveRevision();
     });
 
-    ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryProvider, (
+    ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryStateProvider, (
       AsyncValue<CurrentLibraryState>? previous,
       AsyncValue<CurrentLibraryState> next,
     ) {

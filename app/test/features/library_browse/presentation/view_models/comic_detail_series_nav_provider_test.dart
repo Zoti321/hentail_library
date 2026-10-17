@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
@@ -135,6 +136,7 @@ void main() {
     });
     container = ProviderContainer(
       overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
         comicRepoProvider.overrideWith((Ref ref) => comicRepo),
         seriesRepoProvider.overrideWith(
@@ -178,6 +180,7 @@ void main() {
       container.dispose();
       container = ProviderContainer(
         overrides: <Override>[
+          ...sharedLibraryStateOverrides(),
           libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
           comicRepoProvider.overrideWith((Ref ref) => comicRepo),
           seriesRepoProvider.overrideWith(

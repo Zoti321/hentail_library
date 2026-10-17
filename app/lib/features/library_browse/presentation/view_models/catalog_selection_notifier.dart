@@ -4,8 +4,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 
 class CatalogSelectionState {
   const CatalogSelectionState({
@@ -30,7 +29,7 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
   @override
   CatalogSelectionState build() {
     ref.listen(
-      currentLibraryProvider.select((s) => s.asData?.value.currentId),
+      currentLibraryStateProvider.select((s) => s.asData?.value.currentId),
       (_, _) {
         _reset();
       },
@@ -52,7 +51,7 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
   }
 
   void enter() {
-    ref.read(libraryReorderModeProvider.notifier).exit();
+    ref.read(libraryReorderModePortProvider).exit();
     state = state.copyWith(active: true);
   }
 

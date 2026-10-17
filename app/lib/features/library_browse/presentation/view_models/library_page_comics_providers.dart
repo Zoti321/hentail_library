@@ -4,7 +4,8 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_page_comics_providers.g.dart';
@@ -21,7 +22,7 @@ final Provider<VoidCallback> libraryRefreshActionProvider =
 @Riverpod(keepAlive: true)
 Future<Comic?> libraryComicDetail(Ref ref, String comicId) {
   ref.watch(
-    libraryRevisionProvider.select((LibraryRevisionState s) => s.revision),
+    libraryRevisionStateProvider.select((LibraryRevisionState s) => s.revision),
   );
   return ref.read(comicRepoProvider).findById(comicId);
 }
@@ -29,7 +30,7 @@ Future<Comic?> libraryComicDetail(Ref ref, String comicId) {
 @Riverpod(keepAlive: true)
 Future<List<Comic>> bulkEditComicsByIds(Ref ref, List<String> comicIds) {
   ref.watch(
-    libraryRevisionProvider.select((LibraryRevisionState s) => s.revision),
+    libraryRevisionStateProvider.select((LibraryRevisionState s) => s.revision),
   );
   return ref.read(comicRepoProvider).findByIds(comicIds);
 }

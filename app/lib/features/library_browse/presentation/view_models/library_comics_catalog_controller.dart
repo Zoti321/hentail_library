@@ -12,7 +12,8 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_comics_catalog_controller.g.dart';
@@ -45,7 +46,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     ref.watch(libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics));
 
     final LibraryRevisionState revisionState = ref.read(
-      libraryRevisionProvider,
+      libraryRevisionStateProvider,
     );
     if (revisionState.streamError != null) {
       throw revisionState.streamError!;

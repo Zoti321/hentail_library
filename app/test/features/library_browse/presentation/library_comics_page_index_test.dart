@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_browse/domain/library_comic_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
@@ -84,6 +85,7 @@ void main() {
   ProviderContainer createContainer() {
     return ProviderContainer(
       overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
         ...idleRevisionThrottleOverrides(),
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
         authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),

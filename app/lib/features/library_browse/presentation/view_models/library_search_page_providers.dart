@@ -7,8 +7,9 @@ import 'package:hentai_library/shared/domain/models/value_objects/page_request.d
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/current_library_state.dart';
+import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_search_page_providers.g.dart';
@@ -40,10 +41,10 @@ typedef LibrarySearchComicsPage = ({
 @Riverpod(keepAlive: true)
 Future<LibrarySearchVocabulary> librarySearchVocabulary(Ref ref) async {
   ref.watch(
-    libraryRevisionProvider.select((LibraryRevisionState s) => s.revision),
+    libraryRevisionStateProvider.select((LibraryRevisionState s) => s.revision),
   );
   final String? libraryId = ref
-      .watch(currentLibraryProvider)
+      .watch(currentLibraryStateProvider)
       .asData
       ?.value
       .currentId;
@@ -96,7 +97,7 @@ class LibrarySearchPageComicsController
     }
     // 切库时重搜；不要 watch vocabulary/raw revision（缩略图写库会持续 bump）。
     ref.watch(
-      currentLibraryProvider.select(
+      currentLibraryStateProvider.select(
         (AsyncValue<CurrentLibraryState> asyncValue) =>
             asyncValue.asData?.value.currentId,
       ),

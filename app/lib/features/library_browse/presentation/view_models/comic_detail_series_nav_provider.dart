@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_series_providers.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_detail_series_nav_provider.g.dart';
@@ -143,7 +143,9 @@ Future<ComicDetailSeriesNavSeriesData?> comicDetailSeriesNavForSeries(
   Ref ref,
   String seriesId,
 ) async {
-  final Series? series = await ref.watch(seriesByIdProvider(seriesId).future);
+  final Series? series = await ref.watch(
+    seriesByIdStateProvider(seriesId).future,
+  );
   if (series == null) {
     return null;
   }

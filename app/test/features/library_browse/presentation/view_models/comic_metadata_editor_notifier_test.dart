@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
@@ -116,6 +117,7 @@ void main() {
     seriesRepo = _RecordingSeriesRepository();
     container = ProviderContainer(
       overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
         comicRepoProvider.overrideWithValue(comicRepo),
         seriesRepoProvider.overrideWithValue(seriesRepo),
         libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),

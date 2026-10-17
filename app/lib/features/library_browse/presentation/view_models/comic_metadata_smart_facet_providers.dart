@@ -9,7 +9,8 @@ import 'package:hentai_library/shared/domain/repositories/comic_repository.dart'
 import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/repos.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Scope for Smart facet match on Comic metadata form.
@@ -141,7 +142,7 @@ Future<Map<String, int>> _matchedSourceCountsForKind({
 
 String? _libraryRootForPath(Ref ref, String resourcePath) {
   final CurrentLibraryState? state = ref
-      .watch(currentLibraryProvider)
+      .watch(currentLibraryStateProvider)
       .asData
       ?.value;
   if (state == null) {
