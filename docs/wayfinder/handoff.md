@@ -120,6 +120,7 @@ git -c http.version=HTTP/1.1 push origin dev
 
 ## 8. 下一步（下一对话从这里开始）
 
+0. **优先级调整（2026-10-17）**：先优化深模块设计，再继续迁移。剩余 M3 边（62 条）与 #271–#277 的迁移，按已确定的事件/revision 驱动方向（C 方案）和 shared 声明 + bootstrap 覆盖的基础设施推进，避免每票各自补丁式修改。完成设计收敛后再开 #271 起的实施。CatalogSelection 反向依赖（多选进入退出 reorder）与 `appShellPageNavigationOpener` 的统一注入方式，作为设计阶段的待定项优先评估。
 1. ~~实现 #262（home）~~：**已完成并关闭**。home 的 M1/M2 边已清零。
    - 新增 shared Provider：`libraryComicAgeRestrictionStateProvider`、`libraryScanRunningStateProvider`（`shared/di/library_state_providers.dart`，由 bootstrap 的 `shared_state_overrides.dart` 注入）。
    - `visibleCatalogGridIndexRange` 迁至 `shared/ui/layout/catalog_grid_visible_range.dart`。
