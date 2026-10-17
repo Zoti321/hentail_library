@@ -1,4 +1,7 @@
 import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
+import 'package:hentai_library/shared/domain/library/library_scan_command_port.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
@@ -62,6 +65,21 @@ class _ComicMetadataBulkEditCommandAdapter
       .apply(comicIds: comicIds, patch: patch);
 }
 
+class _LibraryScanCommandAdapter implements LibraryScanCommandPort {
+  _LibraryScanCommandAdapter(this._ref);
+
+  final Ref _ref;
+
+  @override
+  Future<void> start({
+    ScanMode mode = ScanMode.incremental,
+    bool syncAll = false,
+    bool silent = false,
+  }) => _ref
+      .read(scanLibraryControllerProvider.notifier)
+      .start(mode: mode, syncAll: syncAll, silent: silent);
+}
+
 class _LibraryReorderModeAdapter implements LibraryReorderModePort {
   _LibraryReorderModeAdapter(this._ref);
 
@@ -100,3 +118,6 @@ LibraryRevisionSignalPort createLibraryRevisionSignalPort(Ref ref) =>
 ComicMetadataBulkEditCommandPort createComicMetadataBulkEditCommandPort(
   Ref ref,
 ) => _ComicMetadataBulkEditCommandAdapter(ref);
+
+LibraryScanCommandPort createLibraryScanCommandPort(Ref ref) =>
+    _LibraryScanCommandAdapter(ref);

@@ -31,7 +31,7 @@ import 'package:hentai_library/features/library_browse/presentation/views/librar
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_catalog_grid_animation.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/catalog_selectable_comic_card.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
+import 'package:hentai_library/shared/ui/widgets/navigation/library_management_actions.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'animated_library_catalog_grid_sliver.dart';

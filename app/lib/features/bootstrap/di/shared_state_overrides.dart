@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
+import 'package:hentai_library/features/library_browse/di/comic_detail_return_series_ports.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_throttle_busy.dart';
@@ -18,6 +19,10 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   ),
   comicMetadataBulkEditCommandPortProvider.overrideWith(
     createComicMetadataBulkEditCommandPort,
+  ),
+  libraryScanCommandPortProvider.overrideWith(createLibraryScanCommandPort),
+  comicDetailReturnSeriesPortProvider.overrideWith(
+    createComicDetailReturnSeriesPort,
   ),
   currentLibraryStateProvider.overrideWith(
     (Ref ref) => ref.watch(currentLibraryProvider),

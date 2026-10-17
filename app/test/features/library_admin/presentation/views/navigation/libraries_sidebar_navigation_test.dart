@@ -11,6 +11,7 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/shared/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
@@ -365,6 +366,7 @@ Future<void> _pumpLibrariesShell(
         scanLibraryControllerProvider.overrideWith(
           _IdleScanLibraryController.new,
         ),
+        ...sharedLibraryStateOverrides(),
       ],
       child: MaterialApp.router(
         locale: const Locale('zh'),

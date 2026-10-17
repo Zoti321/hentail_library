@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/library/current_library_port.dart';
 import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_edit_command_port.dart';
+import 'package:hentai_library/shared/domain/library/comic_detail_return_series_port.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
+import 'package:hentai_library/shared/domain/library/library_scan_command_port.dart';
 import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
@@ -39,6 +41,20 @@ comicMetadataBulkEditCommandPortProvider =
     Provider<ComicMetadataBulkEditCommandPort>(
       (Ref ref) => throw UnimplementedError(
         'comicMetadataBulkEditCommandPortProvider 未注入，请在 bootstrap 中 override',
+      ),
+    );
+
+final Provider<LibraryScanCommandPort> libraryScanCommandPortProvider =
+    Provider<LibraryScanCommandPort>(
+      (Ref ref) => throw UnimplementedError(
+        'libraryScanCommandPortProvider 未注入，请在 bootstrap 中 override',
+      ),
+    );
+
+final Provider<ComicDetailReturnSeriesPort> comicDetailReturnSeriesPortProvider =
+    Provider<ComicDetailReturnSeriesPort>(
+      (Ref ref) => throw UnimplementedError(
+        'comicDetailReturnSeriesPortProvider 未注入，请在 bootstrap 中 override',
       ),
     );
 

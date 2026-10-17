@@ -8,7 +8,8 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
 import 'package:hentai_library/shared/core/constants/libraries_routes.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/library_form_dialog.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 
 /// Shared Library create / edit / delete / scan actions for sidebar + paths page.
 abstract final class LibraryManagementActions {
@@ -73,9 +74,9 @@ abstract final class LibraryManagementActions {
     final String path = GoRouterState.of(context).uri.path;
     final bool wasViewing =
         LibrariesRoutes.libraryIdFromPath(path) == deletedId ||
-        ref.read(currentLibraryProvider).asData?.value.currentId == deletedId;
+        ref.read(currentLibraryStateProvider).asData?.value.currentId == deletedId;
 
-    await ref.read(currentLibraryProvider.notifier).deleteLibrary(deletedId);
+    await ref.read(currentLibraryPortProvider).deleteLibrary(deletedId);
     if (!context.mounted) {
       return;
     }
@@ -92,7 +93,7 @@ abstract final class LibraryManagementActions {
     BuildContext context,
   ) async {
     final CurrentLibraryState? state = ref
-        .read(currentLibraryProvider)
+        .read(currentLibraryStateProvider)
         .asData
         ?.value;
     final List<LocalLibrary> remaining =
@@ -104,14 +105,14 @@ abstract final class LibraryManagementActions {
     );
     final String? selectId = nav.selectLibraryId;
     if (selectId == null) {
-      await ref.read(currentLibraryProvider.notifier).clear();
+      await ref.read(currentLibraryPortProvider).clear();
       if (!context.mounted) {
         return;
       }
       context.go(nav.goPath);
       return;
     }
-    await ref.read(currentLibraryProvider.notifier).select(selectId);
+    await ref.read(currentLibraryPortProvider).select(selectId);
     if (!context.mounted) {
       return;
     }
@@ -123,23 +124,32 @@ abstract final class LibraryManagementActions {
     BuildContext context,
     String libraryId,
   ) async {
-    ref.read(comicDetailReturnSeriesProvider.notifier).clear();
-    await ref.read(currentLibraryProvider.notifier).select(libraryId);
+    ref.read(comicDetailReturnSeriesPortProvider).clear();
+    await ref.read(currentLibraryPortProvider).select(libraryId);
     if (!context.mounted) {
       return;
     }
     context.go(LibrariesRoutes.library(libraryId));
   }
 
+  /// Best-effort clear of the return-series memory when [context] may sit outside a [ProviderScope].
+  static void _clearComicDetailReturnSeriesFromContext(BuildContext context) {
+    try {
+      ProviderScope.containerOf(
+        context,
+      ).read(comicDetailReturnSeriesPortProvider).clear();
+    } catch (_) {}
+  }
+
   static void goAllLibraries(BuildContext context) {
-    clearComicDetailReturnSeriesFromContext(context);
+    _clearComicDetailReturnSeriesFromContext(context);
     context.go(LibrariesRoutes.all);
   }
 
   static void goCurrentLibraryBrowse(WidgetRef ref, BuildContext context) {
-    ref.read(comicDetailReturnSeriesProvider.notifier).clear();
+    ref.read(comicDetailReturnSeriesPortProvider).clear();
     final String? currentId = ref
-        .read(currentLibraryProvider)
+        .read(currentLibraryStateProvider)
         .asData
         ?.value
         .currentId;
@@ -150,9 +160,9 @@ abstract final class LibraryManagementActions {
   static void goCurrentLibraryBrowseFromContext(BuildContext context) {
     try {
       final ProviderContainer container = ProviderScope.containerOf(context);
-      container.read(comicDetailReturnSeriesProvider.notifier).clear();
+      container.read(comicDetailReturnSeriesPortProvider).clear();
       final String? currentId = container
-          .read(currentLibraryProvider)
+          .read(currentLibraryStateProvider)
           .asData
           ?.value
           .currentId;
@@ -169,7 +179,7 @@ abstract final class LibraryManagementActions {
     ScanMode mode = ScanMode.incremental,
     bool navigate = false,
   }) async {
-    await ref.read(currentLibraryProvider.notifier).select(libraryId);
+    await ref.read(currentLibraryPortProvider).select(libraryId);
     if (!context.mounted) {
       return;
     }
@@ -177,7 +187,7 @@ abstract final class LibraryManagementActions {
       context.go(LibrariesRoutes.library(libraryId));
     }
     await ref
-        .read(scanLibraryControllerProvider.notifier)
+        .read(libraryScanCommandPortProvider)
         .start(mode: mode, silent: true);
   }
 
@@ -186,7 +196,7 @@ abstract final class LibraryManagementActions {
     ScanMode mode = ScanMode.incremental,
   }) async {
     await ref
-        .read(scanLibraryControllerProvider.notifier)
+        .read(libraryScanCommandPortProvider)
         .start(mode: mode, syncAll: true, silent: true);
   }
 }
