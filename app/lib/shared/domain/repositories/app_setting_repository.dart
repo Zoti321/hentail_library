@@ -1,5 +1,6 @@
 import 'package:hentai_library/shared/domain/library/format_group.dart';
-import 'package:hentai_library/shared/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/shared/domain/models/models.dart'
+    show AppSetting;
 
 abstract class AppSettingRepository {
   Future<AppSetting> load();

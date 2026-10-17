@@ -6,9 +6,10 @@ import 'package:hentai_library/shared/core/logging/log_export_flow.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_layout_constants.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_page_primitives.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_page_primitives.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class DiagnosticModeRow extends ConsumerWidget {
@@ -103,9 +104,7 @@ class ClearApplicationDataRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final l10n = context.l10n;
-    final bool syncRunning = ref.watch(
-      scanLibraryControllerProvider.select((state) => state.running),
-    );
+    final bool syncRunning = ref.watch(libraryScanRunningStateProvider);
     return SettingsRow(
       layoutTier: layoutTier,
       isDestructive: true,
@@ -114,7 +113,14 @@ class ClearApplicationDataRow extends ConsumerWidget {
       description: syncRunning
           ? l10n.settingsClearApplicationDataDisabledSyncRunning
           : l10n.settingsClearApplicationDataDescription,
-      onRowTap: syncRunning ? null : () => runAppDataWipeFlow(context),
+      onRowTap: syncRunning
+          ? null
+          : () => runAppDataWipeFlow(
+              context,
+              readRecentMetadataBackupAt: ref.read(
+                recentMetadataBackupAtReaderProvider,
+              ),
+            ),
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,

@@ -9,7 +9,11 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/c
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
+import 'package:hentai_library/features/metadata_backup/data/recent_metadata_backup_at.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/views/metadata_backup_settings_detail.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/di/settings_slot_providers.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -58,6 +62,16 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
         ref.watch(
           comicMetadataBulkPatchControllerProvider.select((s) => s.running),
         ),
+  ),
+  metadataBackupSettingsSectionBuilderProvider.overrideWithValue(
+    (SettingsLayoutTier layoutTier, bool showTitle) =>
+        MetadataBackupSettingsDetail(
+          layoutTier: layoutTier,
+          showTitle: showTitle,
+        ),
+  ),
+  recentMetadataBackupAtReaderProvider.overrideWithValue(
+    readRecentMetadataBackupAt,
   ),
   libraryScanRunningStateProvider.overrideWith(
     (Ref ref) =>

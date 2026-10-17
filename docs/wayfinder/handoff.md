@@ -6,8 +6,8 @@
 
 - `app/lib` 已收敛为 `features/<id>/{presentation,domain,data,di}`、`shared/{core,data,domain,ui,di}`、`src/rust`、`main.dart`。
 - Phase B 布局校验已启用（`kEnforceWayfinderPhaseBLayout = true`），strangler 白名单为空。
-- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **128** 条 = **53** 条 M1/M2（feature↔feature） + **75** 条 M3（product feature→bootstrap）。
-  - 相对 #261 开始前（212 = 135 M1/M2 + 77 M3）减少 **84** 条（其中 #262 home 再减 **12** 条、#263 comic_trash 再减 **10** 条 M1/M2）。
+- Gate 基线：`app/test/gate/import_boundary_baseline.json` 共 **110** 条 = **35** 条 M1/M2（feature↔feature） + **75** 条 M3（product feature→bootstrap）。
+  - 相对 #261 开始前（212 = 135 M1/M2 + 77 M3）减少 **102** 条（其中 #262 home 再减 **12** 条、#263 comic_trash 再减 **10** 条、#264 app_settings 再减 **18** 条 M1/M2）。
 - `dart analyze`：0 error；仍有若干 `unnecessary_import` info，来自 `deps.dart` 总桶，属于迁移遗留，待清理。
 - 全量 `flutter test`（约 937 条）在 #261e 合入后全绿。
 
@@ -27,7 +27,7 @@
 
 ## 3. Issue 状态
 
-**已关闭**：#258、#219、#220、#221、#222、#224、#225、#266、**#261**、**#262**、**#263**。
+**已关闭**：#258、#219、#220、#221、#222、#224、#225、#266、**#261**、**#262**、**#263**、**#264**（待确认关闭）。
 
 **未关闭**：
 
@@ -36,7 +36,7 @@
 - #260（spec：消除 feature↔feature 边）
   - 注意：正文中 "R6 零容忍" 已被留言改为 M3 ratchet，正文尚未同步修改，下次更新时应改正文。
   - 正文中 R1 扩展（禁止 feature domain→本 feature data）**尚未在 Gate 中实现**。
-- #264–#265（app_settings / read_session 消费方票，均依赖 #266 与 #261 打下的端口骨架）
+- #265（read_session 消费方票，依赖 #266 与 #261 打下的端口骨架）
 
 ## 4. 已做出的决策（不要重新讨论）
 
@@ -126,8 +126,9 @@ git -c http.version=HTTP/1.1 push origin dev
    - `visibleCatalogGridIndexRange` 迁至 `shared/ui/layout/catalog_grid_visible_range.dart`。
    - 涉及 home / 应用壳的测试统一接入 `sharedLibraryStateOverrides()`。
    - 待办：在 #262 留言并关闭；home 仍有 M3（`deps.dart`）边，可随后续票顺手拆。
+   - #264（app_settings）：**已完成（待关闭 issue）**。设置页备份板块改由 bootstrap 经 `shared/di/settings_slot_providers.dart` 的 slot 组装；板块实现迁至 `features/metadata_backup/presentation/views/metadata_backup_settings_detail.dart`；设置原语与布局常量下沉至 `shared/ui/widgets/settings/`；最近备份时间读取迁至 `features/metadata_backup/data/recent_metadata_backup_at.dart`。app_settings 仍有 1 条 M1（`settings_notifier.dart` → read_session `auto_play_mode`），留待 #265 一并处理。
    - #263（comic_trash）：**已完成并关闭**。library_admin 边清零；新增 `libraryMutationBusyStateProvider`、复用 `libraryRevisionSignalPortProvider` / `libraryRevisionStateProvider`。comic_trash 仍对 home 的 `history_layout_constants` / `history_page_header` 有 M1/M2（4 条），属 home 视图共享，可在后续票处理。
-2. 依次 #264（app_settings）→ #265（read_session）。
+2. 下一步：#265（read_session），并顺带清理 app_settings 的 `auto_play_mode` 边。
 3. 消费方票推进时顺手减少本 feature 对 `deps.dart` 的 M3 边。
 4. 全部消费方完成后：实现 R1 扩展，并更新 #260 正文（R6 → M3 ratchet）。
 5. 全部完成后才能关闭 #260 与 #217（基线为空）。

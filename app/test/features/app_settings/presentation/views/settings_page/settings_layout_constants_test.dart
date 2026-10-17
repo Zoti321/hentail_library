@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_layout_constants.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 
 void main() {
   group('settingsLayoutTierForWidth', () {

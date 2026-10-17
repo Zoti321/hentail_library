@@ -3,9 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
-import 'package:hentai_library/features/metadata_backup/data/metadata_backup_paths.dart';
 import 'package:hentai_library/shared/data/adapters/app_shutdown_frb_adapter.dart';
+import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/clear_application_data_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:intl/intl.dart';
@@ -25,8 +24,11 @@ Future<void> runAppDataWipeFlow(
   AppDataShutdown? shutdownAppData,
   AppDataDirectoryResolver? resolveAppDataDirectory,
   SharedPreferencesClear? clearPreferences,
+  RecentMetadataBackupAtReader? readRecentMetadataBackupAt,
 }) async {
-  final DateTime? recentBackupAt = await _readRecentMetadataBackupAt();
+  final DateTime? recentBackupAt = readRecentMetadataBackupAt == null
+      ? null
+      : await readRecentMetadataBackupAt();
   final bool confirmed =
       await showDialog<bool>(
         context: context,
@@ -85,19 +87,6 @@ Future<void> runAppDataWipeFlow(
   }
 
   await _exitApp();
-}
-
-Future<DateTime?> _readRecentMetadataBackupAt() async {
-  try {
-    final String backupsDir = await metadataBackupsDirectory();
-    final List<File> files = listMetadataBackupFiles(backupsDir);
-    if (files.isEmpty) {
-      return null;
-    }
-    return files.first.lastModifiedSync();
-  } on Object {
-    return null;
-  }
 }
 
 Future<String> _defaultAppDataDirectory() async {

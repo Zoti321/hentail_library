@@ -7,8 +7,8 @@ import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_layout_constants.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_page_primitives.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_page_primitives.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

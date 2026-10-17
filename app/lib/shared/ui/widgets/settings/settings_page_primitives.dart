@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_layout_constants.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 
 class SettingsGroup extends StatelessWidget {
   const SettingsGroup({super.key, this.title, required this.children});

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -10,6 +11,7 @@ List<Override> settingsViewTestOverrides({
   PackageInfo? packageInfo,
 }) {
   return <Override>[
+    ...sharedLibraryStateOverrides(),
     settingsProvider.overrideWith(
       () => FakeSettingsNotifier(settingBuilder: settingBuilder),
     ),

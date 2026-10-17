@@ -74,7 +74,8 @@ abstract final class LibraryManagementActions {
     final String path = GoRouterState.of(context).uri.path;
     final bool wasViewing =
         LibrariesRoutes.libraryIdFromPath(path) == deletedId ||
-        ref.read(currentLibraryStateProvider).asData?.value.currentId == deletedId;
+        ref.read(currentLibraryStateProvider).asData?.value.currentId ==
+            deletedId;
 
     await ref.read(currentLibraryPortProvider).deleteLibrary(deletedId);
     if (!context.mounted) {

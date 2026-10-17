@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
+import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_about_rows.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_diagnostics_rows.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_metadata_backup_rows.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_layout_constants.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_page_header.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/settings_page_primitives.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_page_primitives.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/locale_preference_row.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/widgets/theme_preference_row.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -328,9 +329,13 @@ class _SettingsDetailPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (category == SettingsCategory.metadataBackup) {
-      return MetadataBackupSettingsDetail(
-        layoutTier: layoutTier,
-        showTitle: showTitle,
+      return Consumer(
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
+          return ref.watch(metadataBackupSettingsSectionBuilderProvider)(
+            layoutTier,
+            showTitle,
+          );
+        },
       );
     }
 
