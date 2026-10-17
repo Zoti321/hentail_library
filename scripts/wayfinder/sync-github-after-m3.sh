@@ -2,7 +2,26 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
-git -c http.version=HTTP/1.1 push origin dev
+gh_retry() {
+  local attempt=1
+  local max=8
+  local delay=6
+  while (( attempt <= max )); do
+    if "$@"; then
+      return 0
+    fi
+    echo "gh 失败，${delay}s 后重试 (${attempt}/${max})…" >&2
+    sleep "$delay"
+    attempt=$((attempt + 1))
+    delay=$((delay + 2))
+  done
+  echo "gh 在 ${max} 次重试后仍失败（常见于代理/TUN 未覆盖终端）。请在外部终端执行本脚本。" >&2
+  return 1
+}
+
+if [[ "${SKIP_PUSH:-}" != "1" ]]; then
+  git -c http.version=HTTP/1.1 push origin dev
+fi
 
 BASELINE_COUNT="$(python -c "import json; print(len(json.load(open('app/test/gate/import_boundary_baseline.json'))))")"
 HEAD_SHA="$(git rev-parse --short HEAD)"
@@ -10,7 +29,7 @@ HEAD_SHA="$(git rev-parse --short HEAD)"
 comment_and_close() {
   local num="$1"
   local body="$2"
-  gh issue close "$num" --comment "$body"
+  gh_retry gh issue close "$num" --comment "$body"
 }
 
 comment_and_close 271 "$(cat <<EOF
@@ -73,7 +92,7 @@ comment_and_close 277 "$(cat <<EOF
 EOF
 )"
 
-if gh issue view 278 --json state --jq .state 2>/dev/null | grep -q OPEN; then
+if gh_retry gh issue view 278 --json state --jq .state 2>/dev/null | grep -q OPEN; then
   comment_and_close 278 "$(cat <<EOF
 ## 交付（\`$HEAD_SHA\`）
 
@@ -83,7 +102,7 @@ EOF
 )"
 fi
 
-gh issue comment 260 --body "$(cat <<EOF
+gh_retry gh issue comment 260 --body "$(cat <<EOF
 ## M3 ratchet 基线已清零（\`$HEAD_SHA\`）
 
 - \`app/test/gate/import_boundary_baseline.json\`：**$BASELINE_COUNT** 条（M1/M2 与 M3 ratchet 均为空）。
@@ -98,7 +117,7 @@ M1/M2 feature↔feature 与 M3 product→bootstrap ratchet 的 DoD 已达成；R
 EOF
 )"
 
-gh issue comment 217 --body "$(cat <<EOF
+gh_retry gh issue comment 217 --body "$(cat <<EOF
 ## 路线图节点：导入边界 ratchet 基线为空（\`$HEAD_SHA\`）
 
 Wayfinder 消费方票 #271–#277 已完成；M3 基线条目 **$BASELINE_COUNT**。
@@ -108,7 +127,7 @@ EOF
 )"
 
 if [[ "$BASELINE_COUNT" == "0" ]]; then
-  gh issue close 217 --comment "DoD「ratchet 基线为空」已达成（\`$HEAD_SHA\`）。R1 扩展等见 #260 留言。"
+  gh_retry gh issue close 217 --comment "DoD「ratchet 基线为空」已达成（\`$HEAD_SHA\`）。R1 扩展等见 #260 留言。"
 fi
 
 echo "Done. Pushed dev; issues updated. #260 left open until R1/body sync if you prefer."
