@@ -16,7 +16,10 @@ import 'package:hentai_library/shared/ui/widgets/navigation/library_management_a
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_sidebar_overflow_actions.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -460,7 +463,6 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
                 enabled: reorderEnabled,
                 onTap: () {
                   controller.hideMenu();
-                  ref.read(catalogSelectionProvider.notifier).exit();
                   ref.read(libraryReorderModeProvider.notifier).enter();
                 },
               ),
