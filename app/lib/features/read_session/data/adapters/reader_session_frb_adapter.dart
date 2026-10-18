@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/read_session/data/adapters/reader_frb_mapper.dart';
+import 'package:hentai_library/shared/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/shared/data/adapters/remote_credentials_frb.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';

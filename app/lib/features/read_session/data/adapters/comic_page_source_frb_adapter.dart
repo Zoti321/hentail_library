@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:hentai_library/features/read_session/data/adapters/reader_frb_mapper.dart';
+import 'package:hentai_library/shared/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/comic_page_source_port.dart';

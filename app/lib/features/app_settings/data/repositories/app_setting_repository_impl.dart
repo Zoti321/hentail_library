@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:hentai_library/shared/core/logging/app_log.dart';
-import 'package:hentai_library/shared/data/repositories/app_setting_storage.dart';
+import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
 import 'package:hentai_library/shared/domain/models/app_setting_migration.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
