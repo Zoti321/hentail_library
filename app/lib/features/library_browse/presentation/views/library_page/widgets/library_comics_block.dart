@@ -137,7 +137,7 @@ class _LibraryComicsGridSliver extends StatelessWidget {
               container
                   .read(appRouterProvider)
                   .pushNamed(
-                    ContentRoutes.comicDetail,
+                    ContentBreadcrumbLabels.comicDetail,
                     pathParameters: <String, String>{'id': manga.comicId},
                   );
             },

@@ -72,6 +72,7 @@ test/features/library_admin/domain/library_scan_scheduler_test.dart
 test/features/library_admin/domain/library_sidebar_layout_test.dart
 test/features/library_admin/presentation/view_models/scan_library_controller_sync_test.dart
 test/features/library_browse/domain/bulk_metadata_edit_session_test.dart
+test/features/library_browse/domain/name_pinyin_assisted_filter_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_controller_revision_test.dart
 test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart

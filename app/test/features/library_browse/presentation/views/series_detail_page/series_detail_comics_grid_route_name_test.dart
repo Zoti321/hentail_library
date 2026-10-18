@@ -40,7 +40,7 @@ void main() {
       reason: 'route name was corrupted (encoding) — must not pushNamed ????',
     );
     expect(
-      text.contains('ContentRoutes.comicDetail') ||
+      text.contains('ContentBreadcrumbLabels.comicDetail') ||
           text.contains("pushNamed(\n                '漫画详情'") ||
           text.contains("pushNamed(\n              '漫画详情'") ||
           RegExp(r"pushNamed\(\s*'漫画详情'").hasMatch(text),

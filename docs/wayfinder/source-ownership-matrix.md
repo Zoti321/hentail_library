@@ -45,12 +45,12 @@
 | `core/constants/**` | `core/constants/**` | `app_settings` 或 `bootstrap` | |
 | `core/errors/**` | `core/errors/**` | `bootstrap` | |
 | `core/image/**` | `core/image/**` | `bootstrap` | `main` 引用 |
-| `core/io/**` | `core/io/**` | `library_admin` | Local root 访问 |
+| `core/io/**` | `features/library_admin/data/local_library_root_access.dart` | `library_admin` | Local root 访问（2026-10-18 迁出 `lib/core`） |
 | `core/l10n/**` | `core/l10n/**` | `bootstrap` | |
 | `core/logging/**` | `core/logging/**` | `bootstrap` | §2.2 FRB：`diagnostic_logging` 需 adapter 化 |
 | `core/metadata/**` | `features/metadata_backup/domain/**` + `features/metadata_backup/data/**` | `metadata_backup` | flow/service 入 feature；paths/bytes 可拆 data |
 | `core/util/**` | `core/util/**` | `bootstrap` | |
-| `core/utils/**` | `core/utils/**` | `library_browse` | 拼音筛选 |
+| `core/utils/**` | `features/library_browse/domain/name_pinyin_assisted_filter.dart` | `library_browse` | 拼音筛选（2026-10-18 迁出 `lib/core`） |
 
 ### 1.3 `domain/` → 主要为 `shared/domain/`
 
