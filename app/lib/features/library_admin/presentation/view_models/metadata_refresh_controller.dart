@@ -1,8 +1,10 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/shared/core/errors/app_exception.dart';
 import 'package:hentai_library/shared/core/logging/app_log.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_port.dart';
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/features/library_admin/di/metadata_refresh.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -30,6 +32,12 @@ class MetadataRefreshController extends _$MetadataRefreshController {
   @override
   MetadataRefreshState build() => const MetadataRefreshState();
 
+  MetadataRefreshPort get _port => ref.read(metadataRefreshPortProvider);
+
+  void _notifyCatalogRevisionIfNeeded() {
+    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+  }
+
   Future<void> refreshComic({
     required String comicId,
     required String title,
@@ -46,7 +54,8 @@ class MetadataRefreshController extends _$MetadataRefreshController {
       targetId: comicId,
     );
     try {
-      await ref.read(metadataRefreshCoordinatorProvider).refreshComic(comicId);
+      await _port.refreshComic(comicId);
+      _notifyCatalogRevisionIfNeeded();
       state = const MetadataRefreshState();
     } catch (e, st) {
       logError(AppLog.ui('metadataRefresh'), '刷新漫画元数据失败', e, st);
@@ -73,9 +82,10 @@ class MetadataRefreshController extends _$MetadataRefreshController {
       targetId: seriesId,
     );
     try {
-      final MetadataRefreshBatchResult batch = await ref
-          .read(metadataRefreshCoordinatorProvider)
-          .refreshSeries(seriesId);
+      final MetadataRefreshBatchResult batch = await _port.refreshSeries(
+        seriesId,
+      );
+      _notifyCatalogRevisionIfNeeded();
       state = MetadataRefreshState(batchResult: batch);
       return batch;
     } catch (e, st) {
@@ -103,9 +113,12 @@ class MetadataRefreshController extends _$MetadataRefreshController {
       targetId: libraryId,
     );
     try {
-      final MetadataRefreshBatchResult result = await ref
-          .read(metadataRefreshCoordinatorProvider)
-          .refreshLibrary(libraryId);
+      final MetadataRefreshBatchResult result = await _port.refreshLibrary(
+        libraryId,
+      );
+      if (!result.skipped) {
+        _notifyCatalogRevisionIfNeeded();
+      }
       state = MetadataRefreshState(batchResult: result);
       return result;
     } catch (e, st) {
@@ -121,7 +134,7 @@ class MetadataRefreshController extends _$MetadataRefreshController {
     if (!state.running) {
       return;
     }
-    ref.read(metadataRefreshCoordinatorProvider).cancelActive();
+    _port.cancelActive();
   }
 
   bool isRefreshingLibrary(String libraryId) {
