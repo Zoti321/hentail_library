@@ -18,6 +18,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'library_comic_filters_notifier.g.dart';
+part 'library_comic_filters_persistence.dart';
+part 'library_comic_filters_catalog_sync.dart';
 
 /// Comics 默认排序（标题升序）。
 final LibraryComicSortOption kLibraryDefaultSortOption =
@@ -166,66 +168,36 @@ Future<void> migrateLegacyLibraryAgeRestriction(SharedPreferences prefs) async {
 
 const LibraryComicProjection _comicProjection = LibraryComicProjection();
 
+/// Comics Tab 筛选偏好的 SharedPreferences 键（#308 持久化侧，供主类与 mixin 共用）。
+const String _ageStorageKey = kLibraryComicsAgeRestrictionStorageKey;
+const String _mediaTypeStorageKey = 'library_media_type_filter_comics';
+const String _tagIncludeStorageKey = 'library_tag_filter_include';
+const String _tagExcludeStorageKey = 'library_tag_filter_exclude';
+const String _tagIncludeModeStorageKey = 'library_tag_filter_include_mode';
+const String _authorIncludeStorageKey = 'library_author_filter_include_ids';
+const String _authorExcludeStorageKey = 'library_author_filter_exclude_ids';
+const String _authorIncludeModeStorageKey =
+    'library_author_filter_include_mode';
+const String _legacyAuthorIncludeStorageKey = 'library_author_filter_include';
+const String _legacyAuthorExcludeStorageKey = 'library_author_filter_exclude';
+const String _sortStorageKey = 'library_sort_comics';
+
 /// Comics Tab 的 Library browse preference（筛选 + 排序）唯一事实来源。
 ///
 /// 持有持久化偏好（年龄、媒体类型、标签、作者、仅待补元数据、按系列展开、排序）
 /// 与会话级 include-set（语言 / parody / character）；命令方法负责写回
 /// SharedPreferences。派生 [libraryComicFilterQueryProvider] 供 Rust 查询消费。
 @Riverpod(keepAlive: true)
-class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier {
-  static const String _ageStorageKey = kLibraryComicsAgeRestrictionStorageKey;
-  static const String _mediaTypeStorageKey = 'library_media_type_filter_comics';
-  static const String _tagIncludeStorageKey = 'library_tag_filter_include';
-  static const String _tagExcludeStorageKey = 'library_tag_filter_exclude';
-  static const String _tagIncludeModeStorageKey =
-      'library_tag_filter_include_mode';
-  static const String _authorIncludeStorageKey =
-      'library_author_filter_include_ids';
-  static const String _authorExcludeStorageKey =
-      'library_author_filter_exclude_ids';
-  static const String _authorIncludeModeStorageKey =
-      'library_author_filter_include_mode';
-  static const String _legacyAuthorIncludeStorageKey =
-      'library_author_filter_include';
-  static const String _legacyAuthorExcludeStorageKey =
-      'library_author_filter_exclude';
-  static const String _sortStorageKey = 'library_sort_comics';
-
+class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
+    with _LibraryComicFiltersCatalogSync {
   @override
   Future<LibraryComicFiltersState> build() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await migrateLegacyLibraryAgeRestriction(prefs);
 
-    final List<Author> authors = await ref.read(authorRepoProvider).listAll();
-    final bool hasAuthorIdKeys =
-        prefs.containsKey(_authorIncludeStorageKey) ||
-        prefs.containsKey(_authorExcludeStorageKey);
-    final LibraryMetadataFilterSelection
-    authorFilter = migrateAuthorFilterPreference(
-      includeIds: hasAuthorIdKeys
-          ? prefs.getStringList(_authorIncludeStorageKey)
-          : null,
-      excludeIds: hasAuthorIdKeys
-          ? prefs.getStringList(_authorExcludeStorageKey)
-          : null,
-      legacyIncludeNames: prefs.getStringList(_legacyAuthorIncludeStorageKey),
-      legacyExcludeNames: prefs.getStringList(_legacyAuthorExcludeStorageKey),
-      includeModeName: prefs.getString(_authorIncludeModeStorageKey),
-      authors: authors,
+    final LibraryMetadataFilterSelection authorFilter = await _loadAuthorFilter(
+      prefs,
     );
-    if (!hasAuthorIdKeys &&
-        (prefs.containsKey(_legacyAuthorIncludeStorageKey) ||
-            prefs.containsKey(_legacyAuthorExcludeStorageKey))) {
-      await _writeMetadataSelection(
-        prefs,
-        authorFilter,
-        includeKey: _authorIncludeStorageKey,
-        excludeKey: _authorExcludeStorageKey,
-        includeModeKey: _authorIncludeModeStorageKey,
-      );
-      await prefs.remove(_legacyAuthorIncludeStorageKey);
-      await prefs.remove(_legacyAuthorExcludeStorageKey);
-    }
 
     return LibraryComicFiltersState(
       ageRestriction: LibraryAgeRestrictionFilter.fromStorage(
@@ -371,37 +343,6 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier {
     );
   }
 
-  Future<void> _writeMetadataSelection(
-    SharedPreferences prefs,
-    LibraryMetadataFilterSelection selection, {
-    required String includeKey,
-    required String excludeKey,
-    required String includeModeKey,
-  }) async {
-    if (!selection.isActive &&
-        selection.includeMode == LibraryMetadataIncludeMode.any) {
-      await prefs.remove(includeKey);
-      await prefs.remove(excludeKey);
-      await prefs.remove(includeModeKey);
-      return;
-    }
-    if (selection.includeNames().isEmpty) {
-      await prefs.remove(includeKey);
-    } else {
-      await prefs.setStringList(includeKey, selection.includeNamesToStorage());
-    }
-    if (selection.excludeNames().isEmpty) {
-      await prefs.remove(excludeKey);
-    } else {
-      await prefs.setStringList(excludeKey, selection.excludeNamesToStorage());
-    }
-    if (selection.includeMode == LibraryMetadataIncludeMode.any) {
-      await prefs.remove(includeModeKey);
-    } else {
-      await prefs.setString(includeModeKey, selection.includeMode.name);
-    }
-  }
-
   Future<void> toggleIncludeSet(LibraryIncludeSetKind kind, String name) async {
     final LibraryComicFiltersState current = await future;
     final Set<String> updated = Set<String>.of(current.includeSetFor(kind));
@@ -481,31 +422,6 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier {
     await prefs.remove(LibraryNeedsMetadataOnly.storageKey);
     await prefs.remove(LibraryExpandBySeries.storageKey);
     _apply(LibraryComicFiltersState.defaults);
-  }
-
-  static bool _isDefaultComicSort(LibraryComicSortOption option) {
-    return option.field == kLibraryDefaultSortOption.field &&
-        option.descending == kLibraryDefaultSortOption.descending;
-  }
-
-  static String _encodeComicSortOption(LibraryComicSortOption option) {
-    return '${option.field.name},${option.descending}';
-  }
-
-  static LibraryComicSortOption _decodeComicSortOption(String? raw) {
-    if (raw == null || raw.isEmpty) {
-      return kLibraryDefaultSortOption;
-    }
-    final List<String> parts = raw.split(',');
-    if (parts.length != 2) {
-      return kLibraryDefaultSortOption;
-    }
-    final LibraryComicSortField? field = LibraryComicSortField.values
-        .asNameMap()[parts[0]];
-    if (field == null) {
-      return kLibraryDefaultSortOption;
-    }
-    return LibraryComicSortOption(field: field, descending: parts[1] == 'true');
   }
 }
 
