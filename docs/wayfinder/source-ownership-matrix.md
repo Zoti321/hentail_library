@@ -92,9 +92,9 @@
 | `library_scan_scheduler.dart` | `library_admin` | `domain` |
 | `comic_trash_service.dart` | `comic_trash` | `domain` |
 | `comic_purge_policy.dart` | `comic_trash` | `domain` |
-| `library_comic_filter.dart` | `library_browse` | `domain` |
+| `library_comic_filter.dart` | `shared/domain/library/` | **已迁**（#297，仓储契约共用） |
 | `library_comic_projection.dart` | `library_browse` | `domain` |
-| `library_series_projection.dart` | `library_browse` | `domain` |
+| `library_series_projection.dart` | `shared/domain/library/` | **已迁**（#298，仓储契约共用） |
 | `library_expand_by_series.dart` | `library_browse` | `domain` |
 | `library_prefer_library_root_series.dart` | `library_browse` | `domain` |
 | `library_needs_metadata_only.dart` | `library_browse` | `domain` |
@@ -102,11 +102,11 @@
 | `smart_facet_match.dart` | `library_browse` | `domain` |
 | `smart_facet_match_preference.dart` | `library_browse` | `domain` |
 | `author_filter_preference_migration.dart` | `library_browse` | `domain` |
-| `library_sidebar_layout.dart` | `library_admin` | `domain` |
+| `library_sidebar_layout.dart` | `shared/domain/library/` | **已迁**（#299，仓储契约共用） |
 | `format_group.dart` | `shared/domain/library/` | l10n 依赖 |
 | `scan_interval.dart` | `shared/domain/library/` | |
 | `library_*_filter.dart` / `library_comic_sort_option.dart` 等枚举筛选 | `shared/domain/library/` | 多 feature + l10n |
-| `library_tri_state_pick.dart` | `library_browse` | `domain` |
+| `library_tri_state_pick.dart` | `shared/domain/library/` | **已迁**（#296，metadata 筛选共用） |
 
 #### `domain/reading/` 拆分
 
@@ -114,11 +114,11 @@
 |----------|----------|--------|
 | `read_session.dart` | `read_session` | `domain` |
 | `read_session_coordinator.dart` | `read_session` | `domain` |
-| `read_session_page.dart` | `read_session` | `domain` |
+| `read_session_page.dart` | `shared/domain/reading/` | **已迁**（#300，端口载荷共用） |
 | `read_session_exceptions.dart` | `read_session` | `domain` |
 | `reader_session_service.dart` | `read_session` | `domain` |
 | `reader_session_snapshot.dart` | `read_session` | `domain` |
-| `reader_page_payload.dart` | `read_session` | `domain` |
+| `reader_page_payload.dart` | `shared/domain/reading/` | **已迁**（#300，端口载荷共用） |
 | `page_image_copy.dart` | `read_session` | `domain` |
 | `auto_play_*.dart` | `read_session` | `domain` |
 | `spread_index.dart` | `read_session` | `domain` |
@@ -183,7 +183,8 @@
 | 现状路径 | 目标路径 |
 |----------|----------|
 | shell navigation + library 管理 VM + shell feedback + `di/*_sync` 等 | `features/library_admin/{presentation,di}/**` | **已迁**（2026-10-17） |
-| §1.3 coordinators / `library_scan_scheduler` / `library_sidebar_layout` | `features/library_admin/domain/` | **已迁** |
+| §1.3 coordinators / `library_scan_scheduler` | `features/library_admin/domain/` | **已迁** |
+| `library_sidebar_layout` | `shared/domain/library/` | **已迁**（#299） |
 
 端口与共用 types（`sync_library_types` 等）仍见 `domain/library/` → 后续 `shared/domain/library`。
 
