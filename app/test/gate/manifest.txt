@@ -35,7 +35,7 @@ test/features/library_browse/presentation/views/widgets/edit_series_dialog_test.
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
 test/shared/ui/interaction/app_motion_test.dart
 test/shared/ui/interaction/interactive_target_test.dart
-test/shared/ui/interaction/reader_input_test.dart
+test/features/read_session/presentation/reader_input_test.dart
 test/shared/ui/theme/hentai_color_scheme_tokens_test.dart
 test/features/library_browse/presentation/stable_page_count_test.dart
 test/features/library_browse/presentation/view_models/catalog_pagination_engine_test.dart
