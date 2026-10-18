@@ -31,7 +31,13 @@ Job id 形如 `{tier}-{domain}-{intent}`（词汇表见 ADR-0018）。
 | `nightly-dart-ui` | `nightly.yml` | `cd app && flutter test test/shared/ui test/features` | 全量 `test/shared/ui` + `test/features`（含慢轨） |
 | `nightly-dart-coverage` | `nightly.yml` | `cargo build --manifest-path core/Cargo.toml -p hentai_flutter && cd app && flutter test --coverage` | **Dart 侧**全量测试行覆盖率趋势：Step Summary + `dart-coverage-lcov` artifact；**不是**门禁 |
 | `nightly-rust-coverage` | `nightly.yml`（与 `nightly-dart-*` 并行；定时仅 main） | `RUST_COVERAGE_HTML=1 ./scripts/run-rust-coverage.sh`（需 `cargo-llvm-cov` + `llvm-tools-preview`） | `hentai-core` 行覆盖率趋势：Summary `LH/LF` + `rust-coverage-lcov` + HTML zip；**不是**门禁；**不可与 Dart % 横向比较** |
-| `watch-platform-android-pdf` | `watch.yml` | 连接 Android 设备/模拟器后 `cd app && flutter test integration_test/pdf_reader_smoke_test.dart` | x86_64 模拟器上真机链路打开 PDF 并读首页；发布时并行跑，失败不挡 `release-publish` |
+| `watch-platform-android-pdf` | `watch.yml` | 连接 Android 设备/模拟器后 `cd app && flutter test integration_test/pdf_reader_smoke_test.dart` | x86_64 模拟器上真机链路打开 PDF 并读首页 |
+| `watch-platform-ios-pdf` | `watch.yml` | Mac + iOS 模拟器：`cd app && flutter build ios --simulator --debug && flutter test integration_test/pdf_reader_smoke_test.dart -d <simulator-id>` | iOS 宿主 + embed pdfium |
+| `watch-platform-windows-pdf` | `watch.yml` | `cd app && flutter test integration_test/pdf_reader_smoke_test.dart -d windows` | Windows 动态库加载 + pdfium |
+| `watch-platform-macos-pdf` | `watch.yml` | `cd app && flutter test integration_test/pdf_reader_smoke_test.dart -d macos` | macOS 动态库加载 + pdfium |
+| `watch-platform-linux-pdf` | `watch.yml` | `cd app && xvfb-run -a flutter test integration_test/pdf_reader_smoke_test.dart -d linux` | Linux 桌面宿主（需 GTK 与 xvfb） |
+
+上述 `watch-platform-*` 在 `release.yml` 中经 `watch-platform-smokes` 一次 `workflow_call` 并行触发；**失败不挡** `release-publish`。手动跑全套：Actions → **Watch** → **Run workflow**。
 | `release-verify` | `release.yml` | `./scripts/run-gate.sh` | 完整 Gate 拓扑（含 codegen 漂移与 FRB 线缝）；`release-build-*` 均 `needs` 它 |
 | `release-build-{windows,macos,linux,android,ios}` | `release.yml` | — | 各平台打包产物 |
 | `release-publish` / `release-manual-summary` | `release.yml` | — | 发布 GitHub Release / 手动构建仅产出 artifact |
@@ -88,7 +94,29 @@ Slice 新增 shim 时同步更新 `strangler_shims.txt` 与 #225 §F；slice 关
 cd app && flutter test         # 全量 Dart（含慢轨 test/shared/ui、test/features）
 ```
 
-Gate **不会**跑全量 `test/shared/ui` + `test/features`（由 `nightly-dart-ui` 覆盖）、不会跑 `integration_test`（由 `watch-platform-android-pdf` 覆盖）、不上 coverage 门禁（`nightly-dart-coverage` / `nightly-rust-coverage` 只出趋势；Rust 行覆盖率 Gate 见 issue #206 PR-B 的 `gate-rust-coverage`）。
+Gate **不会**跑全量 `test/shared/ui` + `test/features`（由 `nightly-dart-ui` 覆盖）、不会跑 `integration_test`（由 `watch-platform-*` 覆盖）、不上 coverage 门禁（`nightly-dart-coverage` / `nightly-rust-coverage` 只出趋势；Rust 行覆盖率 Gate 见 issue #206 PR-B 的 `gate-rust-coverage`）。
+
+### 何时新增 `integration_test`（平台冒烟）
+
+与 ADR-0018 分层对齐；**不要**把业务全流程或 UI Read session 塞进 `integration_test`。
+
+| 你想验证什么 | 放哪里 | 不要放哪里 |
+|--------------|--------|------------|
+| Library sync、DB、Reader 格式逻辑、Path migration | `core/` `cargo test` | Dart `integration_test`、`*_repository_impl` 全流程 |
+| FRB 映射、错误 DTO、薄边 mapper/guard | `app/test/{domain,core,data}/` | `integration_test` |
+| `RustLib.init` + 少量直调 API（宿主 `flutter test`） | `app/test/frb_wire/`（Gate） | 重复同一断言的 `integration_test` |
+| 快轨 UI 契约 | `app/test/gate/manifest.txt` | `integration_test` |
+| **真设备/模拟器/桌面宿主** 加载 cdylib + **原生依赖**（pdfium 等）+ 最小 Reader FRB 契约 | `app/integration_test/*_smoke_test.dart` + `watch-platform-*` | Gate manifest、`nightly-dart-ui` |
+| 全壳 UI、手势、viewport、Library → Read session 导航 | `test/shared/ui`、`test/features`（慢轨 / Nightly） | `integration_test` |
+
+新增平台冒烟检查清单：
+
+1. 文件命名 `*_smoke_test.dart`，**一条原生能力**一个文件（如 PDF 阅读链）。
+2. 断言边界行为：`RustLib.init`、open/list/first-page JPEG magic、`closeReaderFrb`；失败时 `HentaiErrorDto` 的 `code` 应出现在输出（见 `integration_test/support/pdf_reader_smoke_harness.dart`）。
+3. 夹具用合成最小 PDF（`kMinimalOnePagePdf`），不依赖版权 Comic 包。
+4. 在 `watch.yml` 增加 `watch-platform-{platform}-{intent}` job；**不**写入 `app/test/gate/manifest.txt`。
+5. 桌面本地跑前：`cargo build --manifest-path core/Cargo.toml -p hentai_flutter`（Gate / `frb_wire` 同源）；`integration_test` 在嵌入宿主上通常 **无需** `HENTAI_FLUTTER_LIB`。
+6. Library sync、Metadata refresh、WebDAV Remote library：**仅** Rust 集成测，**禁止** Dart `integration_test` 复测。
 
 **Dart 与 Rust 覆盖率不可比**：Dart 为 `app/` 全量测试插桩；Rust 仅为 `hentai-core` 产品 crate（排除 `vendor/` 与 `crates/core/tests/` harness），工具链为 `cargo-llvm-cov`。
 

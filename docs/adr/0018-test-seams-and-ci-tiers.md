@@ -68,11 +68,15 @@ Gate 扩展（issue #206 PR-B，未挡 PR 前仅文档化）：
 └── gate-rust-coverage           与 nightly-rust-coverage 同源脚本 + `--fail-under-lines`（无 HTML artifact）
 
 Watch (watch.yml)                workflow_dispatch / workflow_call
-└── watch-platform-android-pdf   integration_test/pdf_reader_smoke_test.dart（Android 模拟器）
+├── watch-platform-android-pdf   integration_test/pdf_reader_smoke_test.dart（Android 模拟器）
+├── watch-platform-ios-pdf       同上（iOS 模拟器）
+├── watch-platform-windows-pdf   同上（Windows 桌面宿主）
+├── watch-platform-macos-pdf     同上（macOS 桌面宿主）
+└── watch-platform-linux-pdf     同上（Linux 桌面宿主 + xvfb）
 
 Release (release.yml)            tag v* / workflow_dispatch
 ├── release-verify               scripts/run-gate.sh（= 完整 Gate）
-├── watch-platform-android-pdf   调用 watch.yml；并行跑，不挡发布
+├── watch-platform-smokes        调用 watch.yml（全部 watch-platform-*）；并行跑，不挡发布
 ├── release-build-{windows,macos,linux,android,ios}   needs release-verify
 ├── release-publish              needs 全部 release-build-*
 └── release-manual-summary       手动构建且不发布时

@@ -1,4 +1,4 @@
-# Watch：平台级冒烟，不挡 PR。在 Android x86_64 模拟器上跑 PDF 阅读 integration_test。
+# Watch：平台级冒烟，不挡 PR。各平台跑 PDF Reader integration_test（直调 FRB，无全 UI E2E）。
 # 触发：手动 workflow_dispatch；或由 release.yml 以 workflow_call 并行调用（失败不挡发布）。
 name: Watch
 
@@ -9,6 +9,7 @@ on:
 env:
   FLUTTER_VERSION: "3.38.5"
   FRB_CODEGEN_VERSION: "2.12.0"
+  INTEGRATION_TEST: integration_test/pdf_reader_smoke_test.dart
 
 jobs:
   watch-platform-android-pdf:
@@ -56,6 +57,114 @@ jobs:
           working-directory: app
           script: |
             flutter build apk --debug --target-platform android-x64
-            flutter test integration_test/pdf_reader_smoke_test.dart -d emulator-5554 \
+            flutter test ${{ env.INTEGRATION_TEST }} -d emulator-5554 \
               --use-application-binary=build/app/outputs/flutter-apk/app-debug.apk \
               --timeout 10m
+
+  watch-platform-ios-pdf:
+    name: watch · ios pdf smoke
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+          rust-targets: aarch64-apple-ios-sim
+
+      - name: Setup iOS pdfium
+        run: |
+          set -euo pipefail
+          bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --ios
+          test -f "${GITHUB_WORKSPACE}/core/vendor/ios-simulator-arm64/libpdfium.dylib"
+
+      - name: Run iOS PDF smoke test
+        working-directory: app
+        run: |
+          set -euo pipefail
+          SIM_ID="$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          for runtime, devices in data.get('devices', {}).items():
+              if 'iOS' not in runtime:
+                  continue
+              for d in devices:
+                  if d.get('isAvailable') and d.get('name', '').startswith('iPhone'):
+                      print(d['udid'])
+                      sys.exit(0)
+          sys.exit('No available iPhone simulator')
+          ")"
+          xcrun simctl boot "$SIM_ID" 2>/dev/null || true
+          open -a Simulator
+          flutter build ios --simulator --debug
+          flutter test ${{ env.INTEGRATION_TEST }} -d "$SIM_ID" --timeout 10m
+
+  watch-platform-windows-pdf:
+    name: watch · windows pdf smoke
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      - name: Run Windows PDF smoke test
+        working-directory: app
+        run: flutter test ${{ env.INTEGRATION_TEST }} -d windows --timeout 10m
+
+  watch-platform-macos-pdf:
+    name: watch · macos pdf smoke
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      - name: Run macOS PDF smoke test
+        working-directory: app
+        run: flutter test ${{ env.INTEGRATION_TEST }} -d macos --timeout 10m
+
+  watch-platform-linux-pdf:
+    name: watch · linux pdf smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Linux build dependencies
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
+            libstdc++-12-dev libsecret-1-dev xvfb
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      - name: Run Linux PDF smoke test
+        working-directory: app
+        run: xvfb-run -a flutter test ${{ env.INTEGRATION_TEST }} -d linux --timeout 10m
