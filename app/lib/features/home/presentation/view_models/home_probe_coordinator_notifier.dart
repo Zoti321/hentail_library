@@ -177,10 +177,7 @@ class HomeProbeCoordinator extends _$HomeProbeCoordinator {
         ref.read(homeProbeResultsProvider.notifier).upsert(result);
         await ref
             .read(homeAlertDismissStoreProvider.notifier)
-            .clearForLibraryKind(
-              library.libraryId,
-              HomeLibraryAlertKind.pendingResourcesDetected,
-            );
+            .clearPendingDismissAfterProbe(library.libraryId);
       } catch (_) {
         // Probe failures are non-fatal; next idle cycle retries after debounce.
       }

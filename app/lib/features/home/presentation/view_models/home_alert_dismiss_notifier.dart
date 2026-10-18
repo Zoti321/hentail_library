@@ -11,14 +11,6 @@ const String _kHomeAlertDismissedKey = 'home_alert_dismissed';
 typedef HomeAlertDismissEntry = ({int dismissedAtMs, String fingerprint});
 
 @Riverpod(keepAlive: true)
-class HomeAlertDismissRevision extends _$HomeAlertDismissRevision {
-  @override
-  int build() => 0;
-
-  void bump() => state++;
-}
-
-@Riverpod(keepAlive: true)
 class HomeAlertDismissStore extends _$HomeAlertDismissStore {
   @override
   Future<Map<String, HomeAlertDismissEntry>> build() async {
@@ -35,19 +27,30 @@ class HomeAlertDismissStore extends _$HomeAlertDismissStore {
     );
     await _writeMap(prefs, map);
     ref.invalidateSelf();
-    ref.read(homeAlertDismissRevisionProvider.notifier).bump();
   }
 
-  Future<void> clearForLibrary(String libraryId) async {
+  /// Library resource probe 成功后，只清掉该 Library 的待同步 dismiss。
+  Future<void> clearPendingDismissAfterProbe(String libraryId) {
+    return _clearForLibraryKind(
+      libraryId,
+      HomeLibraryAlertKind.pendingResourcesDetected,
+    );
+  }
+
+  /// 从这条 Home library alert 触发 Library sync 之后，清掉该 Library 的全部 dismiss。
+  Future<void> clearDismissAfterAlertSync(String libraryId) {
+    return _clearForLibrary(libraryId);
+  }
+
+  Future<void> _clearForLibrary(String libraryId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final Map<String, HomeAlertDismissEntry> map = _readMap(prefs);
     map.removeWhere((String key, _) => key.startsWith('$libraryId:'));
     await _writeMap(prefs, map);
     ref.invalidateSelf();
-    ref.read(homeAlertDismissRevisionProvider.notifier).bump();
   }
 
-  Future<void> clearForLibraryKind(
+  Future<void> _clearForLibraryKind(
     String libraryId,
     HomeLibraryAlertKind kind,
   ) async {
@@ -56,7 +59,6 @@ class HomeAlertDismissStore extends _$HomeAlertDismissStore {
     map.remove('$libraryId:${kind.name}');
     await _writeMap(prefs, map);
     ref.invalidateSelf();
-    ref.read(homeAlertDismissRevisionProvider.notifier).bump();
   }
 
   Future<void> _writeMap(

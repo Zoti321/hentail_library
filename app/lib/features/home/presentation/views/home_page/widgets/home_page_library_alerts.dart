@@ -171,6 +171,6 @@ class _HomeLibraryAlertCard extends ConsumerWidget {
     );
     await ref
         .read(homeAlertDismissStoreProvider.notifier)
-        .clearForLibrary(alert.libraryId);
+        .clearDismissAfterAlertSync(alert.libraryId);
   }
 }

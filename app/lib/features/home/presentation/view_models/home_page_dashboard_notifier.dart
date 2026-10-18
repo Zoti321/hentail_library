@@ -64,7 +64,6 @@ Stream<List<HomeLibraryAlert>> homeLibraryAlertsStream(Ref ref) {
   final HomePageRepository repository = ref.watch(homePageRepoProvider);
   ref.watch(libraryRevisionThrottleBusyStateProvider);
   ref.watch(homeProbeResultsProvider);
-  ref.watch(homeAlertDismissRevisionProvider);
   final AsyncValue<Map<String, HomeAlertDismissEntry>> dismissedAsync = ref
       .watch(homeAlertDismissStoreProvider);
   final Map<String, LibraryProbeResult> probeResults = ref.watch(
