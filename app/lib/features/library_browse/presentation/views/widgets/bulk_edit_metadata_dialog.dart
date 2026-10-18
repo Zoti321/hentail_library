@@ -20,6 +20,7 @@ import 'package:hentai_library/shared/ui/widgets/form/parody_library_multi_selec
 import 'package:hentai_library/shared/ui/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/dialog_side_tab_bar.dart';
+import 'package:hentai_library/features/library_browse/domain/bulk_metadata_edit_session.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_comics_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,50 +34,21 @@ const double _kBulkEditFieldListWidth = 200;
 
 enum _BulkEditTab { general, authorsAndTags }
 
-enum _BulkFieldKind {
-  description,
-  publishedAt,
-  contentRating,
-  languages,
-  authors,
-  tags,
-  parodies,
-  characters,
-}
-
 extension _BulkEditTabFields on _BulkEditTab {
-  List<_BulkFieldKind> get fields => switch (this) {
-    _BulkEditTab.general => <_BulkFieldKind>[
-      _BulkFieldKind.description,
-      _BulkFieldKind.publishedAt,
-      _BulkFieldKind.contentRating,
-      _BulkFieldKind.languages,
+  List<BulkMetadataEditFieldKind> get fields => switch (this) {
+    _BulkEditTab.general => <BulkMetadataEditFieldKind>[
+      BulkMetadataEditFieldKind.description,
+      BulkMetadataEditFieldKind.publishedAt,
+      BulkMetadataEditFieldKind.contentRating,
+      BulkMetadataEditFieldKind.languages,
     ],
-    _BulkEditTab.authorsAndTags => <_BulkFieldKind>[
-      _BulkFieldKind.authors,
-      _BulkFieldKind.tags,
-      _BulkFieldKind.parodies,
-      _BulkFieldKind.characters,
+    _BulkEditTab.authorsAndTags => <BulkMetadataEditFieldKind>[
+      BulkMetadataEditFieldKind.authors,
+      BulkMetadataEditFieldKind.tags,
+      BulkMetadataEditFieldKind.parodies,
+      BulkMetadataEditFieldKind.characters,
     ],
   };
-}
-
-class _BulkMultiValueFieldState {
-  ComicMetadataBulkMultiValueOp op = ComicMetadataBulkMultiValueOp.add;
-  List<String> values = const <String>[];
-  bool mixedValues = false;
-}
-
-class _BulkScalarFieldState {
-  ComicMetadataBulkScalarOp op = ComicMetadataBulkScalarOp.replace;
-  bool mixedValues = false;
-  String description = '';
-  DateTime? publishedAt;
-}
-
-class _BulkContentRatingFieldState {
-  bool isR18 = false;
-  bool mixedValues = false;
 }
 
 Future<ComicMetadataBulkPatch?> showBulkEditMetadataDialog({
@@ -101,24 +73,9 @@ class BulkEditMetadataDialog extends ConsumerStatefulWidget {
 
 class _BulkEditMetadataDialogState
     extends ConsumerState<BulkEditMetadataDialog> {
-  final Map<_BulkFieldKind, _BulkMultiValueFieldState> _multiFields =
-      <_BulkFieldKind, _BulkMultiValueFieldState>{
-        for (final _BulkFieldKind kind in <_BulkFieldKind>[
-          _BulkFieldKind.tags,
-          _BulkFieldKind.authors,
-          _BulkFieldKind.languages,
-          _BulkFieldKind.parodies,
-          _BulkFieldKind.characters,
-        ])
-          kind: _BulkMultiValueFieldState(),
-      };
-  final _BulkScalarFieldState _descriptionField = _BulkScalarFieldState();
-  final _BulkScalarFieldState _publishedAtField = _BulkScalarFieldState();
-  final _BulkContentRatingFieldState _contentRatingField =
-      _BulkContentRatingFieldState();
+  final BulkMetadataEditSession _session = BulkMetadataEditSession();
   _BulkEditTab _selectedTab = _BulkEditTab.general;
-  _BulkFieldKind? _selectedField;
-  final Set<_BulkFieldKind> _dirtyFields = <_BulkFieldKind>{};
+  BulkMetadataEditFieldKind? _selectedField;
   bool _loading = true;
   ComicMetadataSmartFacetScope? _scope;
 
@@ -137,38 +94,7 @@ class _BulkEditMetadataDialogState
     }
     final Comic? anchor = comics.isNotEmpty ? comics.first : null;
     setState(() {
-      _multiFields[_BulkFieldKind.tags]!.mixedValues = _isMixed(
-        comics.map((Comic c) => c.tags.map((t) => t.name).toList()),
-      );
-      _multiFields[_BulkFieldKind.authors]!.mixedValues = _isMixed(
-        comics.map((Comic c) => c.authors.map((a) => a.name).toList()),
-      );
-      _multiFields[_BulkFieldKind.languages]!.mixedValues = _isMixed(
-        comics.map((Comic c) => List<String>.from(c.languages)),
-      );
-      _multiFields[_BulkFieldKind.parodies]!.mixedValues = _isMixed(
-        comics.map((Comic c) => List<String>.from(c.parodies)),
-      );
-      _multiFields[_BulkFieldKind.characters]!.mixedValues = _isMixed(
-        comics.map((Comic c) => List<String>.from(c.characters)),
-      );
-      _contentRatingField.mixedValues = _isMixed(
-        comics.map(
-          (Comic c) => <String>[
-            c.contentRating == ContentRating.r18 ? 'r18' : 'safe',
-          ],
-        ),
-      );
-      _descriptionField.mixedValues = _isMixed(
-        comics.map((Comic c) => <String>[c.description ?? '']),
-      );
-      _publishedAtField.mixedValues = _isMixed(
-        comics.map(
-          (Comic c) => <String>[
-            c.publishedAt?.millisecondsSinceEpoch.toString() ?? '',
-          ],
-        ),
-      );
+      _session.applyMixedHintsFromComics(comics);
       if (anchor != null) {
         _scope = (
           comicId: anchor.comicId,
@@ -177,47 +103,22 @@ class _BulkEditMetadataDialogState
           seriesId: null,
         );
       }
-      _selectedField = _BulkFieldKind.description;
+      _selectedField = BulkMetadataEditFieldKind.description;
       _loading = false;
     });
   }
 
-  void _markDirty(_BulkFieldKind kind) {
-    if (_dirtyFields.add(kind)) {
+  void _markDirty(BulkMetadataEditFieldKind kind) {
+    if (!_session.isFieldDirty(kind)) {
+      _session.markDirty(kind);
       setState(() {});
     }
   }
 
-  bool _isFieldDirty(_BulkFieldKind kind) => _dirtyFields.contains(kind);
+  bool _isFieldDirty(BulkMetadataEditFieldKind kind) =>
+      _session.isFieldDirty(kind);
 
-  bool _isMixed(Iterable<List<String>> lists) {
-    final Iterator<List<String>> it = lists.iterator;
-    if (!it.moveNext()) {
-      return false;
-    }
-    final List<String> first = List<String>.from(it.current)..sort();
-    while (it.moveNext()) {
-      final List<String> next = List<String>.from(it.current)..sort();
-      if (!_listEquals(first, next)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool _listEquals(List<String> a, List<String> b) {
-    if (a.length != b.length) {
-      return false;
-    }
-    for (int i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  _BulkFieldKind _defaultFieldForTab(_BulkEditTab tab) => tab.fields.first;
+  BulkMetadataEditFieldKind _defaultFieldForTab(_BulkEditTab tab) => tab.fields.first;
 
   void _selectTab(int index) {
     final _BulkEditTab tab = _BulkEditTab.values[index];
@@ -230,117 +131,58 @@ class _BulkEditMetadataDialogState
     });
   }
 
-  void _selectField(_BulkFieldKind kind) {
+  void _selectField(BulkMetadataEditFieldKind kind) {
     if (_selectedField == kind) {
       return;
     }
     setState(() => _selectedField = kind);
   }
 
-  String _fieldLabel(AppLocalizations l10n, _BulkFieldKind kind) {
+  String _fieldLabel(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
     return switch (kind) {
-      _BulkFieldKind.tags => l10n.bulkEditMetadataFieldTags,
-      _BulkFieldKind.authors => l10n.bulkEditMetadataFieldAuthors,
-      _BulkFieldKind.languages => l10n.bulkEditMetadataFieldLanguages,
-      _BulkFieldKind.parodies => l10n.bulkEditMetadataFieldParodies,
-      _BulkFieldKind.characters => l10n.bulkEditMetadataFieldCharacters,
-      _BulkFieldKind.contentRating => l10n.bulkEditMetadataFieldContentRating,
-      _BulkFieldKind.description => l10n.bulkEditMetadataFieldDescription,
-      _BulkFieldKind.publishedAt => l10n.bulkEditMetadataFieldPublishedAt,
+      BulkMetadataEditFieldKind.tags => l10n.bulkEditMetadataFieldTags,
+      BulkMetadataEditFieldKind.authors => l10n.bulkEditMetadataFieldAuthors,
+      BulkMetadataEditFieldKind.languages => l10n.bulkEditMetadataFieldLanguages,
+      BulkMetadataEditFieldKind.parodies => l10n.bulkEditMetadataFieldParodies,
+      BulkMetadataEditFieldKind.characters => l10n.bulkEditMetadataFieldCharacters,
+      BulkMetadataEditFieldKind.contentRating => l10n.bulkEditMetadataFieldContentRating,
+      BulkMetadataEditFieldKind.description => l10n.bulkEditMetadataFieldDescription,
+      BulkMetadataEditFieldKind.publishedAt => l10n.bulkEditMetadataFieldPublishedAt,
     };
   }
 
-  String? _fieldSummary(AppLocalizations l10n, _BulkFieldKind kind) {
+  String? _fieldSummary(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
     if (!_isFieldDirty(kind)) {
       return null;
     }
     return switch (kind) {
-      _BulkFieldKind.languages ||
-      _BulkFieldKind.authors ||
-      _BulkFieldKind.tags ||
-      _BulkFieldKind.parodies ||
-      _BulkFieldKind.characters => () {
-        final _BulkMultiValueFieldState state = _multiFields[kind]!;
+      BulkMetadataEditFieldKind.languages ||
+      BulkMetadataEditFieldKind.authors ||
+      BulkMetadataEditFieldKind.tags ||
+      BulkMetadataEditFieldKind.parodies ||
+      BulkMetadataEditFieldKind.characters => () {
+        final BulkMetadataEditMultiValueFieldState state = _session.multiFields[kind]!;
         return l10n.bulkEditMetadataFieldSummaryCount(
           _multiOpLabels(l10n)[state.op] ?? state.op.name,
           state.values.length,
         );
       }(),
-      _BulkFieldKind.description || _BulkFieldKind.publishedAt => () {
-        final _BulkScalarFieldState state = switch (kind) {
-          _BulkFieldKind.description => _descriptionField,
-          _BulkFieldKind.publishedAt => _publishedAtField,
+      BulkMetadataEditFieldKind.description || BulkMetadataEditFieldKind.publishedAt => () {
+        final BulkMetadataEditScalarFieldState state = switch (kind) {
+          BulkMetadataEditFieldKind.description => _session.descriptionField,
+          BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField,
           _ => throw StateError('$kind'),
         };
         return state.op == ComicMetadataBulkScalarOp.clear
             ? l10n.bulkEditMetadataFieldSummaryClear
             : l10n.bulkEditMetadataFieldSummaryReplace;
       }(),
-      _BulkFieldKind.contentRating =>
-        _contentRatingField.isR18 ? 'R18' : l10n.filterAgeAllAges,
+      BulkMetadataEditFieldKind.contentRating =>
+        _session.contentRatingField.isR18 ? 'R18' : l10n.filterAgeAllAges,
     };
   }
 
-  ComicMetadataBulkPatch? _buildPatch() {
-    final _BulkMultiValueFieldState tags = _multiFields[_BulkFieldKind.tags]!;
-    final _BulkMultiValueFieldState authors =
-        _multiFields[_BulkFieldKind.authors]!;
-    final _BulkMultiValueFieldState languages =
-        _multiFields[_BulkFieldKind.languages]!;
-    final _BulkMultiValueFieldState parodies =
-        _multiFields[_BulkFieldKind.parodies]!;
-    final _BulkMultiValueFieldState characters =
-        _multiFields[_BulkFieldKind.characters]!;
-    if (_dirtyFields.isEmpty) {
-      return null;
-    }
-    return ComicMetadataBulkPatch(
-      tags: _dirtyFields.contains(_BulkFieldKind.tags)
-          ? ComicMetadataBulkMultiValuePatch(op: tags.op, values: tags.values)
-          : null,
-      authors: _dirtyFields.contains(_BulkFieldKind.authors)
-          ? ComicMetadataBulkMultiValuePatch(
-              op: authors.op,
-              values: authors.values,
-            )
-          : null,
-      languages: _dirtyFields.contains(_BulkFieldKind.languages)
-          ? ComicMetadataBulkMultiValuePatch(
-              op: languages.op,
-              values: languages.values,
-            )
-          : null,
-      parodies: _dirtyFields.contains(_BulkFieldKind.parodies)
-          ? ComicMetadataBulkMultiValuePatch(
-              op: parodies.op,
-              values: parodies.values,
-            )
-          : null,
-      characters: _dirtyFields.contains(_BulkFieldKind.characters)
-          ? ComicMetadataBulkMultiValuePatch(
-              op: characters.op,
-              values: characters.values,
-            )
-          : null,
-      contentRating: _dirtyFields.contains(_BulkFieldKind.contentRating)
-          ? (_contentRatingField.isR18 ? 'r18' : 'safe')
-          : null,
-      description: _dirtyFields.contains(_BulkFieldKind.description)
-          ? (_descriptionField.op == ComicMetadataBulkScalarOp.clear
-                ? const ComicMetadataBulkDescriptionPatch.clear()
-                : ComicMetadataBulkDescriptionPatch.replace(
-                    _descriptionField.description,
-                  ))
-          : null,
-      publishedAt: _dirtyFields.contains(_BulkFieldKind.publishedAt)
-          ? (_publishedAtField.op == ComicMetadataBulkScalarOp.clear
-                ? const ComicMetadataBulkPublishedAtPatch.clear()
-                : ComicMetadataBulkPublishedAtPatch.replace(
-                    _publishedAtField.publishedAt?.millisecondsSinceEpoch ?? 0,
-                  ))
-          : null,
-    );
-  }
+  ComicMetadataBulkPatch? _buildPatch() => _session.buildPatch();
 
   Future<void> _onSave() async {
     final AppLocalizations l10n = context.l10n;
@@ -413,10 +255,10 @@ class _BulkEditMetadataDialogState
           child: _BulkEditFieldList(
             fields: _selectedTab.fields,
             selectedField: _selectedField,
-            labelFor: (_BulkFieldKind kind) => _fieldLabel(l10n, kind),
+            labelFor: (BulkMetadataEditFieldKind kind) => _fieldLabel(l10n, kind),
             isDirty: _isFieldDirty,
             isMixed: _isFieldMixed,
-            summaryFor: (_BulkFieldKind kind) => _fieldSummary(l10n, kind),
+            summaryFor: (BulkMetadataEditFieldKind kind) => _fieldSummary(l10n, kind),
             mixedLabel: l10n.bulkEditMetadataMixedValues,
             onSelect: _selectField,
           ),
@@ -442,31 +284,31 @@ class _BulkEditMetadataDialogState
     );
   }
 
-  bool _isFieldMixed(_BulkFieldKind kind) {
+  bool _isFieldMixed(BulkMetadataEditFieldKind kind) {
     return switch (kind) {
-      _BulkFieldKind.description => _descriptionField.mixedValues,
-      _BulkFieldKind.publishedAt => _publishedAtField.mixedValues,
-      _BulkFieldKind.contentRating => _contentRatingField.mixedValues,
-      _BulkFieldKind.languages ||
-      _BulkFieldKind.authors ||
-      _BulkFieldKind.tags ||
-      _BulkFieldKind.parodies ||
-      _BulkFieldKind.characters => _multiFields[kind]!.mixedValues,
+      BulkMetadataEditFieldKind.description => _session.descriptionField.mixedValues,
+      BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField.mixedValues,
+      BulkMetadataEditFieldKind.contentRating => _session.contentRatingField.mixedValues,
+      BulkMetadataEditFieldKind.languages ||
+      BulkMetadataEditFieldKind.authors ||
+      BulkMetadataEditFieldKind.tags ||
+      BulkMetadataEditFieldKind.parodies ||
+      BulkMetadataEditFieldKind.characters => _session.multiFields[kind]!.mixedValues,
     };
   }
 
   Widget _buildFieldEditor(
     AppLocalizations l10n,
     ComicMetadataSmartFacetScope scope,
-    _BulkFieldKind kind,
+    BulkMetadataEditFieldKind kind,
   ) {
     return switch (kind) {
-      _BulkFieldKind.tags ||
-      _BulkFieldKind.authors ||
-      _BulkFieldKind.languages ||
-      _BulkFieldKind.parodies ||
-      _BulkFieldKind.characters => _BulkMultiValueFieldDetail(
-        state: _multiFields[kind]!,
+      BulkMetadataEditFieldKind.tags ||
+      BulkMetadataEditFieldKind.authors ||
+      BulkMetadataEditFieldKind.languages ||
+      BulkMetadataEditFieldKind.parodies ||
+      BulkMetadataEditFieldKind.characters => _BulkMultiValueFieldDetail(
+        state: _session.multiFields[kind]!,
         opLabels: _multiOpLabels(l10n),
         onChanged: () {
           _markDirty(kind);
@@ -474,10 +316,10 @@ class _BulkEditMetadataDialogState
         },
         child: _buildMultiValueInput(l10n, scope, kind),
       ),
-      _BulkFieldKind.description || _BulkFieldKind.publishedAt => () {
-        final _BulkScalarFieldState state = switch (kind) {
-          _BulkFieldKind.description => _descriptionField,
-          _BulkFieldKind.publishedAt => _publishedAtField,
+      BulkMetadataEditFieldKind.description || BulkMetadataEditFieldKind.publishedAt => () {
+        final BulkMetadataEditScalarFieldState state = switch (kind) {
+          BulkMetadataEditFieldKind.description => _session.descriptionField,
+          BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField,
           _ => throw StateError('$kind'),
         };
         return _BulkScalarFieldDetail(
@@ -487,36 +329,36 @@ class _BulkEditMetadataDialogState
             _markDirty(kind);
             setState(() {});
           },
-          child: kind == _BulkFieldKind.description
+          child: kind == BulkMetadataEditFieldKind.description
               ? FluentTextField(
                   labelText: l10n.bulkEditMetadataFieldDescription,
-                  initialValue: _descriptionField.description,
+                  initialValue: _session.descriptionField.description,
                   maxLines: 4,
                   enabled:
-                      _descriptionField.op == ComicMetadataBulkScalarOp.replace,
+                      _session.descriptionField.op == ComicMetadataBulkScalarOp.replace,
                   onChanged: (String value) {
-                    _descriptionField.description = value;
-                    _markDirty(_BulkFieldKind.description);
+                    _session.descriptionField.description = value;
+                    _markDirty(BulkMetadataEditFieldKind.description);
                   },
                 )
               : FluentDatePickerField(
                   labelText: l10n.bulkEditMetadataFieldPublishedAt,
-                  value: _publishedAtField.publishedAt,
+                  value: _session.publishedAtField.publishedAt,
                   enabled:
-                      _publishedAtField.op == ComicMetadataBulkScalarOp.replace,
+                      _session.publishedAtField.op == ComicMetadataBulkScalarOp.replace,
                   onChanged: (DateTime? value) {
-                    _publishedAtField.publishedAt = value;
-                    _markDirty(_BulkFieldKind.publishedAt);
+                    _session.publishedAtField.publishedAt = value;
+                    _markDirty(BulkMetadataEditFieldKind.publishedAt);
                   },
                 ),
         );
       }(),
-      _BulkFieldKind.contentRating => _BulkContentRatingFieldDetail(
+      BulkMetadataEditFieldKind.contentRating => _BulkContentRatingFieldDetail(
         label: l10n.bulkEditMetadataFieldContentRating,
-        state: _contentRatingField,
+        state: _session.contentRatingField,
         allAgesLabel: l10n.filterAgeAllAges,
         onChanged: () {
-          _markDirty(_BulkFieldKind.contentRating);
+          _markDirty(BulkMetadataEditFieldKind.contentRating);
           setState(() {});
         },
       ),
@@ -526,72 +368,72 @@ class _BulkEditMetadataDialogState
   Widget _buildMultiValueInput(
     AppLocalizations l10n,
     ComicMetadataSmartFacetScope scope,
-    _BulkFieldKind kind,
+    BulkMetadataEditFieldKind kind,
   ) {
-    final _BulkMultiValueFieldState state = _multiFields[kind]!;
+    final BulkMetadataEditMultiValueFieldState state = _session.multiFields[kind]!;
     return switch (kind) {
-      _BulkFieldKind.tags => TagLibraryMultiSelectField(
+      BulkMetadataEditFieldKind.tags => TagLibraryMultiSelectField(
         label: l10n.bulkEditMetadataFieldTags,
         icon: LucideIcons.tag,
         selectedNames: state.values,
         scope: scope,
-        onAdd: (String name) => _addMultiValue(_BulkFieldKind.tags, name),
-        onRemove: (String name) => _removeMultiValue(_BulkFieldKind.tags, name),
+        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.tags, name),
+        onRemove: (String name) => _removeMultiValue(BulkMetadataEditFieldKind.tags, name),
       ),
-      _BulkFieldKind.authors => AuthorLibraryMultiSelectField(
+      BulkMetadataEditFieldKind.authors => AuthorLibraryMultiSelectField(
         label: l10n.bulkEditMetadataFieldAuthors,
         icon: LucideIcons.penTool,
         selectedNames: state.values,
         scope: scope,
-        onAdd: (String name) => _addMultiValue(_BulkFieldKind.authors, name),
+        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.authors, name),
         onRemove: (String name) =>
-            _removeMultiValue(_BulkFieldKind.authors, name),
+            _removeMultiValue(BulkMetadataEditFieldKind.authors, name),
       ),
-      _BulkFieldKind.languages => _LanguageChipField(
+      BulkMetadataEditFieldKind.languages => _LanguageChipField(
         l10n: l10n,
         selected: state.values,
-        onAdd: (String name) => _addMultiValue(_BulkFieldKind.languages, name),
+        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.languages, name),
         onRemove: (String name) =>
-            _removeMultiValue(_BulkFieldKind.languages, name),
+            _removeMultiValue(BulkMetadataEditFieldKind.languages, name),
       ),
-      _BulkFieldKind.parodies => ParodyLibraryMultiSelectField(
+      BulkMetadataEditFieldKind.parodies => ParodyLibraryMultiSelectField(
         label: l10n.bulkEditMetadataFieldParodies,
         icon: LucideIcons.bookMarked,
         selectedNames: state.values,
         scope: scope,
-        onAdd: (String name) => _addMultiValue(_BulkFieldKind.parodies, name),
+        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.parodies, name),
         onRemove: (String name) =>
-            _removeMultiValue(_BulkFieldKind.parodies, name),
+            _removeMultiValue(BulkMetadataEditFieldKind.parodies, name),
       ),
-      _BulkFieldKind.characters => CharacterLibraryMultiSelectField(
+      BulkMetadataEditFieldKind.characters => CharacterLibraryMultiSelectField(
         label: l10n.bulkEditMetadataFieldCharacters,
         icon: LucideIcons.userRound,
         selectedNames: state.values,
         scope: scope,
-        onAdd: (String name) => _addMultiValue(_BulkFieldKind.characters, name),
+        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.characters, name),
         onRemove: (String name) =>
-            _removeMultiValue(_BulkFieldKind.characters, name),
+            _removeMultiValue(BulkMetadataEditFieldKind.characters, name),
       ),
       _ => throw StateError('$kind'),
     };
   }
 
-  void _addMultiValue(_BulkFieldKind kind, String name) {
+  void _addMultiValue(BulkMetadataEditFieldKind kind, String name) {
     setState(() {
-      final _BulkMultiValueFieldState field = _multiFields[kind]!;
+      final BulkMetadataEditMultiValueFieldState field = _session.multiFields[kind]!;
       if (!field.values.contains(name)) {
         field.values = <String>[...field.values, name];
       }
-      _dirtyFields.add(kind);
+      _session.dirtyFields.add(kind);
     });
   }
 
-  void _removeMultiValue(_BulkFieldKind kind, String name) {
+  void _removeMultiValue(BulkMetadataEditFieldKind kind, String name) {
     setState(() {
-      _multiFields[kind]!.values = _multiFields[kind]!.values
+      _session.multiFields[kind]!.values = _session.multiFields[kind]!.values
           .where((String v) => v != name)
           .toList();
-      _dirtyFields.add(kind);
+      _session.dirtyFields.add(kind);
     });
   }
 
@@ -657,10 +499,10 @@ class _BulkEditMetadataDialogState
                   child: _BulkEditFieldList(
                     fields: _selectedTab.fields,
                     selectedField: _selectedField,
-                    labelFor: (_BulkFieldKind kind) => _fieldLabel(l10n, kind),
+                    labelFor: (BulkMetadataEditFieldKind kind) => _fieldLabel(l10n, kind),
                     isDirty: _isFieldDirty,
                     isMixed: _isFieldMixed,
-                    summaryFor: (_BulkFieldKind kind) =>
+                    summaryFor: (BulkMetadataEditFieldKind kind) =>
                         _fieldSummary(l10n, kind),
                     mixedLabel: l10n.bulkEditMetadataMixedValues,
                     onSelect: _selectField,
@@ -750,14 +592,14 @@ class _BulkEditFieldList extends StatelessWidget {
     required this.onSelect,
   });
 
-  final List<_BulkFieldKind> fields;
-  final _BulkFieldKind? selectedField;
-  final String Function(_BulkFieldKind kind) labelFor;
-  final bool Function(_BulkFieldKind kind) isDirty;
-  final bool Function(_BulkFieldKind kind) isMixed;
-  final String? Function(_BulkFieldKind kind) summaryFor;
+  final List<BulkMetadataEditFieldKind> fields;
+  final BulkMetadataEditFieldKind? selectedField;
+  final String Function(BulkMetadataEditFieldKind kind) labelFor;
+  final bool Function(BulkMetadataEditFieldKind kind) isDirty;
+  final bool Function(BulkMetadataEditFieldKind kind) isMixed;
+  final String? Function(BulkMetadataEditFieldKind kind) summaryFor;
   final String mixedLabel;
-  final ValueChanged<_BulkFieldKind> onSelect;
+  final ValueChanged<BulkMetadataEditFieldKind> onSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -767,7 +609,7 @@ class _BulkEditFieldList extends StatelessWidget {
       spacing: tokens.spacing.xs,
       children: fields
           .map(
-            (_BulkFieldKind kind) => _BulkEditFieldListRow(
+            (BulkMetadataEditFieldKind kind) => _BulkEditFieldListRow(
               label: labelFor(kind),
               dirty: isDirty(kind),
               selected: selectedField == kind,
@@ -889,7 +731,7 @@ class _BulkEditFieldDetail extends StatelessWidget {
     required this.child,
   });
 
-  final _BulkFieldKind? selectedField;
+  final BulkMetadataEditFieldKind? selectedField;
   final String selectHint;
   final Widget? child;
 
@@ -985,7 +827,7 @@ class _BulkMultiValueFieldDetail extends StatelessWidget {
     required this.onChanged,
   });
 
-  final _BulkMultiValueFieldState state;
+  final BulkMetadataEditMultiValueFieldState state;
   final Map<ComicMetadataBulkMultiValueOp, String> opLabels;
   final Widget child;
   final VoidCallback onChanged;
@@ -1024,7 +866,7 @@ class _BulkScalarFieldDetail extends StatelessWidget {
     required this.onChanged,
   });
 
-  final _BulkScalarFieldState state;
+  final BulkMetadataEditScalarFieldState state;
   final Map<ComicMetadataBulkScalarOp, String> opLabels;
   final Widget child;
   final VoidCallback onChanged;
@@ -1064,7 +906,7 @@ class _BulkContentRatingFieldDetail extends StatelessWidget {
   });
 
   final String label;
-  final _BulkContentRatingFieldState state;
+  final BulkMetadataEditContentRatingFieldState state;
   final String allAgesLabel;
   final VoidCallback onChanged;
 

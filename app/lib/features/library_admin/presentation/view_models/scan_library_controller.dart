@@ -2,9 +2,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/shared/core/io/local_library_root_access.dart';
 import 'package:hentai_library/shared/core/logging/app_log.dart';
 import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
-import 'package:hentai_library/features/library_admin/domain/library_sync_coordinator.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_port.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/di/library_sync.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'scan_library_controller.freezed.dart';
@@ -67,9 +68,7 @@ class ScanLibraryController extends _$ScanLibraryController {
       progress: null,
     );
 
-    final LibrarySyncCoordinator coordinator = ref.read(
-      librarySyncCoordinatorProvider,
-    );
+    final SyncLibraryPort syncAdapter = ref.read(syncLibraryPortProvider);
     _future =
         () async {
               if (promptStorageAccess) {
@@ -78,7 +77,7 @@ class ScanLibraryController extends _$ScanLibraryController {
               if (_cancelled) {
                 return;
               }
-              await coordinator.runSync(
+              await syncAdapter.call(
                 scanMode: mode,
                 syncAll: syncAll,
                 targetLibraryId: targetLibraryId,
@@ -87,6 +86,11 @@ class ScanLibraryController extends _$ScanLibraryController {
                   state = state.copyWith(progress: progress);
                 },
               );
+              if (!_cancelled) {
+                ref
+                    .read(libraryRevisionProvider.notifier)
+                    .notifyExternalChange();
+              }
             }()
             .then((_) {
               state = state.copyWith(running: false);
@@ -106,7 +110,7 @@ class ScanLibraryController extends _$ScanLibraryController {
   void cancel() {
     if (!state.running) return;
     _cancelled = true;
-    ref.read(librarySyncCoordinatorProvider).cancelActive();
+    ref.read(syncLibraryPortProvider).cancelActive();
     state = state.copyWith(running: false, cancelled: true);
   }
 

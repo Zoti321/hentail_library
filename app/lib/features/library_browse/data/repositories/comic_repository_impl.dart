@@ -26,27 +26,6 @@ class ComicRepositoryImpl implements ComicRepository {
   );
 
   @override
-  Future<List<Comic>> getAll() async {
-    final int total = await countAll();
-    if (total <= 0) {
-      return <Comic>[];
-    }
-    final rust.PagedComicResultDto page = await guardFrb(
-      () => rust.fetchComicsPageFrb(
-        request: rust.PageRequestDto(page: 1, pageSize: total),
-        filter: unrestrictedListFilter(),
-        expandBySeries: false,
-        sort: const rust.ComicSortOptionDto(
-          field: rust.ComicSortFieldDto.title,
-          descending: false,
-        ),
-      ),
-      fallbackMessage: '读取漫画列表失败',
-    );
-    return page.items.map(mapRustComic).toList();
-  }
-
-  @override
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
     required LibraryComicFilter filter,

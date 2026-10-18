@@ -10,8 +10,6 @@ import 'package:hentai_library/shared/domain/models/value_objects/paged_result.d
 
 /// 漫画主表与标签的持久化；读写均经 Rust/SeaORM。
 abstract class ComicRepository {
-  Future<List<Comic>> getAll();
-
   Future<int> countAll();
 
   Future<Comic?> findById(String comicId);
