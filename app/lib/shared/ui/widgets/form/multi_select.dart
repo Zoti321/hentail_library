@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_browse/domain/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/shared/ui/widgets/form/fluent_text_field.dart';

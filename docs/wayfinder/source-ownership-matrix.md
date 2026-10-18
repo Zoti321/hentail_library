@@ -50,7 +50,7 @@
 | `core/logging/**` | `core/logging/**` | `bootstrap` | §2.2 FRB：`diagnostic_logging` 需 adapter 化 |
 | `core/metadata/**` | `features/metadata_backup/domain/**` + `features/metadata_backup/data/**` | `metadata_backup` | flow/service 入 feature；paths/bytes 可拆 data |
 | `core/util/**` | `core/util/**` | `bootstrap` | |
-| `core/utils/**` | `features/library_browse/domain/name_pinyin_assisted_filter.dart` | `library_browse` | 拼音筛选（2026-10-18 迁出 `lib/core`） |
+| `core/utils/**` | `shared/util/name_pinyin_assisted_filter.dart` | `library_browse` / `named_metadata` | 拼音筛选（2026-10-18 迁出 `lib/core`） |
 
 ### 1.3 `domain/` → 主要为 `shared/domain/`
 
