@@ -2,20 +2,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
-import 'package:hentai_library/shared/ui/ports/author_detail_port.dart';
 import 'package:hentai_library/shared/ui/ports/library_management_port.dart';
 
 final Provider<LibraryManagementPort> libraryManagementPortProvider =
     Provider<LibraryManagementPort>(
       (Ref ref) => throw UnimplementedError(
         'libraryManagementPortProvider 未注入，请在 bootstrap 中 override',
-      ),
-    );
-
-final Provider<AuthorDetailPort> authorDetailPortProvider =
-    Provider<AuthorDetailPort>(
-      (Ref ref) => throw UnimplementedError(
-        'authorDetailPortProvider 未注入，请在 bootstrap 中 override',
       ),
     );
 

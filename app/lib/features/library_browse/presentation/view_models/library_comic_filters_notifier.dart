@@ -19,7 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'library_comic_filters_notifier.g.dart';
 part 'library_comic_filters_persistence.dart';
-part 'library_comic_filters_catalog_sync.dart';
+part 'library_comic_filters_author_migration.dart';
 
 /// Comics 默认排序（标题升序）。
 final LibraryComicSortOption kLibraryDefaultSortOption =
@@ -189,7 +189,7 @@ const String _sortStorageKey = 'library_sort_comics';
 /// SharedPreferences。派生 [libraryComicFilterQueryProvider] 供 Rust 查询消费。
 @Riverpod(keepAlive: true)
 class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
-    with _LibraryComicFiltersCatalogSync {
+    with _LibraryComicFiltersAuthorMigration {
   @override
   Future<LibraryComicFiltersState> build() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -335,11 +335,7 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
     await _writeMetadataSelection(
       prefs,
       updated,
-      includeKey: tags ? _tagIncludeStorageKey : _authorIncludeStorageKey,
-      excludeKey: tags ? _tagExcludeStorageKey : _authorExcludeStorageKey,
-      includeModeKey: tags
-          ? _tagIncludeModeStorageKey
-          : _authorIncludeModeStorageKey,
+      keys: tags ? _tagStorageKeys : _authorStorageKeys,
     );
   }
 

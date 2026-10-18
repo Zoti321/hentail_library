@@ -24,6 +24,7 @@ import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
+import 'package:hentai_library/shared/di/author_detail_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';

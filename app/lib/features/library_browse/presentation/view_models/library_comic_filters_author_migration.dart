@@ -1,7 +1,7 @@
 part of 'library_comic_filters_notifier.dart';
 
-/// 与 Author 目录同步：读取作者目录并迁移旧版作者筛选偏好（#308 catalog 同步侧）。
-mixin _LibraryComicFiltersCatalogSync on _$LibraryComicFiltersNotifier {
+/// 读取作者目录并迁移旧版作者筛选偏好（名称 → id 键），并写回 SharedPreferences（#308）。
+mixin _LibraryComicFiltersAuthorMigration on _$LibraryComicFiltersNotifier {
   Future<LibraryMetadataFilterSelection> _loadAuthorFilter(
     SharedPreferences prefs,
   ) async {
@@ -28,9 +28,7 @@ mixin _LibraryComicFiltersCatalogSync on _$LibraryComicFiltersNotifier {
       await _writeMetadataSelection(
         prefs,
         authorFilter,
-        includeKey: _authorIncludeStorageKey,
-        excludeKey: _authorExcludeStorageKey,
-        includeModeKey: _authorIncludeModeStorageKey,
+        keys: _authorStorageKeys,
       );
       await prefs.remove(_legacyAuthorIncludeStorageKey);
       await prefs.remove(_legacyAuthorExcludeStorageKey);

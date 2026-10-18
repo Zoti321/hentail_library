@@ -1,34 +1,57 @@
 part of 'library_comic_filters_notifier.dart';
 
+/// 元数据（标签 / 作者）筛选在 SharedPreferences 中的三个键，成组使用。
+class _MetadataStorageKeys {
+  const _MetadataStorageKeys({
+    required this.include,
+    required this.exclude,
+    required this.includeMode,
+  });
+
+  final String include;
+  final String exclude;
+  final String includeMode;
+}
+
+const _MetadataStorageKeys _tagStorageKeys = _MetadataStorageKeys(
+  include: _tagIncludeStorageKey,
+  exclude: _tagExcludeStorageKey,
+  includeMode: _tagIncludeModeStorageKey,
+);
+
+const _MetadataStorageKeys _authorStorageKeys = _MetadataStorageKeys(
+  include: _authorIncludeStorageKey,
+  exclude: _authorExcludeStorageKey,
+  includeMode: _authorIncludeModeStorageKey,
+);
+
 /// 写回元数据（标签 / 作者）筛选选择到 SharedPreferences（#308 持久化侧）。
 Future<void> _writeMetadataSelection(
   SharedPreferences prefs,
   LibraryMetadataFilterSelection selection, {
-  required String includeKey,
-  required String excludeKey,
-  required String includeModeKey,
+  required _MetadataStorageKeys keys,
 }) async {
   if (!selection.isActive &&
       selection.includeMode == LibraryMetadataIncludeMode.any) {
-    await prefs.remove(includeKey);
-    await prefs.remove(excludeKey);
-    await prefs.remove(includeModeKey);
+    await prefs.remove(keys.include);
+    await prefs.remove(keys.exclude);
+    await prefs.remove(keys.includeMode);
     return;
   }
   if (selection.includeNames().isEmpty) {
-    await prefs.remove(includeKey);
+    await prefs.remove(keys.include);
   } else {
-    await prefs.setStringList(includeKey, selection.includeNamesToStorage());
+    await prefs.setStringList(keys.include, selection.includeNamesToStorage());
   }
   if (selection.excludeNames().isEmpty) {
-    await prefs.remove(excludeKey);
+    await prefs.remove(keys.exclude);
   } else {
-    await prefs.setStringList(excludeKey, selection.excludeNamesToStorage());
+    await prefs.setStringList(keys.exclude, selection.excludeNamesToStorage());
   }
   if (selection.includeMode == LibraryMetadataIncludeMode.any) {
-    await prefs.remove(includeModeKey);
+    await prefs.remove(keys.includeMode);
   } else {
-    await prefs.setString(includeModeKey, selection.includeMode.name);
+    await prefs.setString(keys.includeMode, selection.includeMode.name);
   }
 }
 
