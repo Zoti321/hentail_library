@@ -79,7 +79,7 @@ Nightly 的定时触发只在默认分支（`main`）生效；其他分支用 `w
 |------|------|------|
 | L3a | `shared/ui/{widgets,layout,shell,interaction,theme}/**` 不得 `import package:hentai_library/features/` | `test/gate/shared_ui_no_feature_import_test.dart` **零容忍**（`shared_ui_feature_import_allowlist.txt` 仅注释，不扩二期 allowlist） |
 | L3b | `shared/domain/**` → `features/` | `test/gate/shared_domain_no_feature_import_test.dart` + `shared_domain_feature_import_baseline.json` **ratchet**（只减不增） |
-| — | `shared/data/**` 默认 **不** 做整树 ratchet；`shared/data/adapters/**` 与 `shared_feature_import_rules.dart` 中显式路径为 Phase C 故意跨 feature 边 | 规则与文档白名单；勿为「纯洁性」删除 FRB mapper |
+| — | `shared/data/**` 默认 **不** 做整树 ratchet；`shared/data/adapters/**` 与 `shared_feature_import_rules.dart` 显式路径（含 `reader_frb_mapper`、`series_frb_mapper`、`named_facet_form_listing`）为 Phase C / 矩阵列明的故意跨 feature 边 | 规则与文档白名单；勿为「纯洁性」删除 FRB mapper |
 
 本地：
 

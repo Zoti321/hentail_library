@@ -34,7 +34,7 @@ void main() {
       isSharedDataFeatureImportExempt(
         'shared/data/repositories/named_facet_form_listing.dart',
       ),
-      isFalse,
+      isTrue,
     );
   });
 

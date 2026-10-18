@@ -9,18 +9,25 @@ import 'package:path/path.dart' as p;
 const Set<String> kSharedDataExplicitFeatureImportAllowlist = <String>{
   'shared/data/adapters/reader_frb_mapper.dart',
   'shared/data/adapters/series_frb_mapper.dart',
+  // Repositories layer; documented cross-feature seam (#295), not feature-import today.
+  'shared/data/repositories/named_facet_form_listing.dart',
 };
 
-final RegExp _featureImportLineRe = RegExp(
-  r"^import\s+'package:hentai_library/features/([^']+)';",
+final RegExp _featureImportUriRe = RegExp(
+  "package:hentai_library/features/([^'\"]+)",
 );
 
 bool importsFeaturePackageLine(String line) {
-  return _featureImportLineRe.hasMatch(line.trim());
+  final String trimmed = line.trim();
+  return trimmed.startsWith('import ') &&
+      trimmed.contains('package:hentai_library/features/');
 }
 
 String? parseFeatureImportUri(String line) {
-  final Match? match = _featureImportLineRe.matchAsPrefix(line.trim());
+  if (!importsFeaturePackageLine(line)) {
+    return null;
+  }
+  final Match? match = _featureImportUriRe.firstMatch(line);
   if (match == null) {
     return null;
   }
