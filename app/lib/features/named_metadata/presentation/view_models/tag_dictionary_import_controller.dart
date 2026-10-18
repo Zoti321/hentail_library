@@ -5,8 +5,9 @@ import 'package:hentai_library/shared/core/logging/app_log.dart';
 import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/shared/domain/models/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/named_metadata/di/download_providers.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'tag_dictionary_import_controller.g.dart';
@@ -100,7 +101,13 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
       final TagDictionaryImportResult result = await ref
           .read(tagRepoProvider)
           .importTagDictionary(bytes);
-      ref.invalidate(allTagsProvider);
+      await ref
+          .read(
+            namedFacetManagementControllerProvider(
+              ManagedNamedFacetKind.tag,
+            ).notifier,
+          )
+          .refreshAfterTagDictionaryChange();
       state = state.copyWith(running: false, lastResult: result);
       return result;
     } catch (error, stackTrace) {

@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_change_bus.dart';
 
-/// 全部作者列表（用于作者管理页面）；经 FRB stream 监听 Rust 侧作者变化。
+/// 全部作者列表。浏览筛选和已验证作者标记读这份完整字典。
 final allAuthorsProvider = StreamProvider<List<Author>>((ref) {
   ref.watch(
     libraryChangeBusProvider.select(
@@ -12,59 +11,4 @@ final allAuthorsProvider = StreamProvider<List<Author>>((ref) {
     ),
   );
   return ref.watch(authorRepoProvider).watchAll();
-});
-
-/// 作者搜索关键词
-class AuthorFilterNotifier extends Notifier<String> {
-  @override
-  String build() => '';
-
-  void setQuery(String value) {
-    state = value;
-  }
-
-  void clear() {
-    state = '';
-  }
-}
-
-final authorFilterProvider = NotifierProvider<AuthorFilterNotifier, String>(
-  AuthorFilterNotifier.new,
-);
-
-final filteredAuthorsProvider = Provider<List<Author>>((ref) {
-  final AsyncValue<List<Author>> asyncAuthors = ref.watch(allAuthorsProvider);
-  final String query = ref.watch(authorFilterProvider);
-  final List<Author> authors = asyncAuthors.maybeWhen(
-    data: (List<Author> value) => value,
-    orElse: () => const <Author>[],
-  );
-  return authors
-      .where((Author item) => nameMatchesPinyinAssistedFilter(item.name, query))
-      .toList();
-});
-
-/// 作者管理操作封装（新增、删除、重命名）
-class AuthorActions {
-  AuthorActions(this._ref);
-
-  final Ref _ref;
-
-  Future<void> addAuthor(Author author) async {
-    await _ref.read(authorRepoProvider).add(author);
-  }
-
-  Future<void> deleteAuthor(Author author) async {
-    await _ref.read(authorRepoProvider).deleteByNames(<String>[author.name]);
-  }
-
-  Future<void> renameAuthor(Author oldAuthor, String newName) async {
-    final trimmed = newName.trim();
-    if (trimmed.isEmpty || trimmed == oldAuthor.name) return;
-    await _ref.read(authorRepoProvider).rename(oldAuthor.name, trimmed);
-  }
-}
-
-final authorActionsProvider = Provider<AuthorActions>((ref) {
-  return AuthorActions(ref);
 });

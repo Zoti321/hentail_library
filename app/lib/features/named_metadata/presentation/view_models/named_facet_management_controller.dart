@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/shared/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
@@ -195,6 +196,32 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
       <String>[name],
     );
     await refresh();
+  }
+
+  /// 删掉当前 facet 的全部名字，不受搜索过滤影响。
+  /// Tag 会同时让 [allTagsProvider] 重新读取同一份名字。
+  Future<void> deleteAll() async {
+    final List<String> names = await ref
+        .read(namedFacetManagementRepoProvider)
+        .listAll(kind);
+    if (names.isNotEmpty) {
+      await ref
+          .read(namedFacetManagementRepoProvider)
+          .deleteByNames(kind, names);
+    }
+    if (kind == ManagedNamedFacetKind.tag) {
+      await refreshAfterTagDictionaryChange();
+      return;
+    }
+    await refresh();
+  }
+
+  /// 标签字典变了（清空或导入）之后，管理页和 [allTagsProvider] 读同一份名字。
+  Future<void> refreshAfterTagDictionaryChange() async {
+    ref.invalidate(allTagsProvider);
+    if (kind == ManagedNamedFacetKind.tag) {
+      await refresh();
+    }
   }
 
   Future<void> merge({

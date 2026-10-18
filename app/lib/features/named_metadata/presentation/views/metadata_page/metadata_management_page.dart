@@ -327,12 +327,13 @@ class _MetadataManagementPageState
       return;
     }
 
-    await ref.read(tagActionsProvider).deleteAllTags();
     await ref
         .read(
-          namedFacetManagementControllerProvider(metadataTabKind(1)).notifier,
+          namedFacetManagementControllerProvider(
+            ManagedNamedFacetKind.tag,
+          ).notifier,
         )
-        .refresh();
+        .deleteAll();
     if (!context.mounted) {
       return;
     }
