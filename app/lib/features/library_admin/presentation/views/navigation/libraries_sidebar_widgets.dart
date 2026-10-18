@@ -163,7 +163,7 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _PopupMenuItem(
+              PopupMenuTextItem(
                 label: l10n.sidebarAddLocalLibrary,
                 onTap: () {
                   controller.hideMenu();
@@ -172,7 +172,7 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
                       .addLocalLibrary(context);
                 },
               ),
-              _PopupMenuItem(
+              PopupMenuTextItem(
                 label: l10n.sidebarAddRemoteLibrary,
                 onTap: () {
                   controller.hideMenu();
@@ -187,7 +187,7 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
                   color: cs.hentai.borderSubtle,
                 ),
               ...libraries.map(
-                (LocalLibrary library) => _PopupMenuItem(
+                (LocalLibrary library) => PopupMenuTextItem(
                   label: localLibraryDisplayName(library),
                   onTap: () async {
                     controller.hideMenu();

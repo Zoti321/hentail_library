@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/library_admin/di/library_management_port.dart';
+import 'package:hentai_library/features/library_admin/presentation/library_management_port.dart';
 import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
-import 'package:hentai_library/features/library_browse/di/author_detail_ports.dart';
+import 'package:hentai_library/features/library_browse/presentation/author_detail_port.dart';
 import 'package:hentai_library/features/library_browse/di/comic_detail_return_series_ports.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';

@@ -31,7 +31,7 @@ class _SectionAddMenuButton extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _PopupMenuItem(
+              PopupMenuTextItem(
                 label: l10n.sidebarAddLocalLibrary,
                 onTap: () {
                   controller.hideMenu();
@@ -40,7 +40,7 @@ class _SectionAddMenuButton extends HookConsumerWidget {
                       .addLocalLibrary(context);
                 },
               ),
-              _PopupMenuItem(
+              PopupMenuTextItem(
                 label: l10n.sidebarAddRemoteLibrary,
                 onTap: () {
                   controller.hideMenu();
@@ -103,7 +103,7 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _PopupMenuItem(
+              PopupMenuTextItem(
                 label: l10n.sidebarReorderLibraries,
                 enabled: reorderEnabled,
                 onTap: () {
@@ -111,14 +111,14 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
                   ref.read(libraryReorderModeProvider.notifier).enter();
                 },
               ),
-              _PopupMenuItem(
+              PopupMenuTextItem(
                 label: l10n.sidebarScanAllLibraries,
                 onTap: () {
                   controller.hideMenu();
                   ref.read(libraryManagementPortProvider).scanAllLibraries();
                 },
               ),
-              _PopupMenuItem(
+              PopupMenuTextItem(
                 label: l10n.sidebarDeepScanAllLibraries,
                 onTap: () {
                   controller.hideMenu();
@@ -195,7 +195,7 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               for (final LibrarySidebarOverflowAction action in actions)
-                _PopupMenuItem(
+                PopupMenuTextItem(
                   label: _labelFor(
                     l10n,
                     action,
@@ -297,84 +297,5 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
       }
       showErrorToast(context, err);
     }
-  }
-}
-
-class _PopupMenuItem extends HookWidget {
-  const _PopupMenuItem({
-    required this.label,
-    required this.onTap,
-    this.enabled = true,
-    this.isDestructive = false,
-  });
-
-  final String label;
-  final VoidCallback onTap;
-  final bool enabled;
-  final bool isDestructive;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
-    final AppThemeTokens tokens = context.tokens;
-    final HentaiColorScheme h = cs.hentai;
-    final ValueNotifier<bool> hovered = useState(false);
-
-    // Idle must be opaque (panel surface). Lerping from Colors.transparent
-    // goes through muddy greys and looks like a broken color animation.
-    final Color idleBackground = cs.surface;
-    // Light danger wash (not solid red) so hover stays readable.
-    final Color dangerHover = Color.lerp(
-      idleBackground,
-      h.contextMenuDanger,
-      0.2,
-    )!;
-
-    final Color background;
-    final Color foreground;
-    if (!enabled) {
-      background = idleBackground;
-      foreground = h.textTertiary;
-    } else if (hovered.value) {
-      background = isDestructive ? dangerHover : h.contextMenuHover;
-      foreground = isDestructive ? h.contextMenuDanger : h.textPrimary;
-    } else {
-      background = idleBackground;
-      foreground = h.textPrimary;
-    }
-
-    // copyWith keeps ThemeData.fontFamily (MI_Sans_Regular); a bare TextStyle
-    // under AnimatedDefaultTextStyle would fall back to the platform font.
-    final TextStyle labelStyle =
-        (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
-          fontSize: tokens.text.bodySm,
-          color: foreground,
-        );
-
-    return MouseRegion(
-      onEnter: enabled ? (_) => hovered.value = true : null,
-      onExit: enabled ? (_) => hovered.value = false : null,
-      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: GestureDetector(
-        onTap: enabled ? onTap : null,
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          curve: Curves.easeOut,
-          color: background,
-          padding: EdgeInsets.symmetric(
-            horizontal: tokens.spacing.md,
-            vertical: tokens.spacing.sm,
-          ),
-          child: AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 120),
-            curve: Curves.easeOut,
-            style: labelStyle,
-            child: Text(label, textAlign: TextAlign.start),
-          ),
-        ),
-      ),
-    );
   }
 }

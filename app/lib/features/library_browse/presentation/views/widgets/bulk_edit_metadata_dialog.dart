@@ -183,11 +183,7 @@ class _BulkEditMetadataDialogState
       }(),
       BulkMetadataEditFieldKind.description ||
       BulkMetadataEditFieldKind.publishedAt => () {
-        final BulkMetadataEditScalarFieldState state = switch (kind) {
-          BulkMetadataEditFieldKind.description => _session.descriptionField,
-          BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField,
-          _ => throw StateError('$kind'),
-        };
+        final BulkMetadataEditScalarFieldState state = _scalarFieldState(kind);
         return state.op == ComicMetadataBulkScalarOp.clear
             ? l10n.bulkEditMetadataFieldSummaryClear
             : l10n.bulkEditMetadataFieldSummaryReplace;
@@ -301,6 +297,15 @@ class _BulkEditMetadataDialogState
     );
   }
 
+  /// 描述 / 发布日期两个标量字段的状态（原先在两处各写一遍 switch）。
+  BulkMetadataEditScalarFieldState _scalarFieldState(
+    BulkMetadataEditFieldKind kind,
+  ) => switch (kind) {
+    BulkMetadataEditFieldKind.description => _session.descriptionField,
+    BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField,
+    _ => throw StateError('$kind'),
+  };
+
   bool _isFieldMixed(BulkMetadataEditFieldKind kind) {
     return switch (kind) {
       BulkMetadataEditFieldKind.description =>
@@ -338,11 +343,7 @@ class _BulkEditMetadataDialogState
       ),
       BulkMetadataEditFieldKind.description ||
       BulkMetadataEditFieldKind.publishedAt => () {
-        final BulkMetadataEditScalarFieldState state = switch (kind) {
-          BulkMetadataEditFieldKind.description => _session.descriptionField,
-          BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField,
-          _ => throw StateError('$kind'),
-        };
+        final BulkMetadataEditScalarFieldState state = _scalarFieldState(kind);
         return _BulkScalarFieldDetail(
           state: state,
           opLabels: _scalarOpLabels(l10n),
