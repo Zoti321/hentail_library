@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
+import 'shared_feature_import_rules.dart';
+
 List<String> readSharedUiFeatureImportAllowlist() {
   final File manifest = File(
     p.join('test', 'gate', 'shared_ui_feature_import_allowlist.txt'),
@@ -13,12 +15,6 @@ List<String> readSharedUiFeatureImportAllowlist() {
       .where((String line) => line.isNotEmpty && !line.startsWith('#'))
       .map((String line) => p.posix.normalize(line.replaceAll(r'\', '/')))
       .toList();
-}
-
-bool _importsFeature(String line) {
-  final String trimmed = line.trim();
-  return trimmed.startsWith('import ') &&
-      trimmed.contains("package:hentai_library/features/");
 }
 
 List<String> collectSharedUiFeatureImportViolations(Directory libDir) {
@@ -47,7 +43,7 @@ List<String> collectSharedUiFeatureImportViolations(Directory libDir) {
       }
       final List<String> lines = entity.readAsLinesSync();
       for (final String line in lines) {
-        if (_importsFeature(line)) {
+        if (importsFeaturePackageLine(line)) {
           violations.add('$rel: $line');
         }
       }
