@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
-import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_settings_dialog.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
+import '../../../../../support/fakes/settings_test_fakes.dart';
 import '../../../../../support/pump_localized_app.dart';
 
 void main() {
@@ -22,7 +20,7 @@ void main() {
       overrides: <Override>[
         ...sharedLibraryStateOverrides(),
         ...bootstrapCompositionOverrides(),
-        appSettingRepoProvider.overrideWithValue(_MemoryRepo()),
+        appSettingRepoProvider.overrideWithValue(MemoryAppSettingRepository()),
       ],
       home: Builder(
         builder: (BuildContext context) {
@@ -57,25 +55,4 @@ void main() {
     expect(headerMaterial.color, cs.hentai.readerBackground);
     expect(headerMaterial.color, isNot(cs.primary));
   });
-}
-
-class _MemoryRepo implements AppSettingRepository {
-  AppSetting _setting = AppSetting();
-
-  @override
-  Future<AppSetting> load() async => _setting;
-
-  @override
-  Future<void> save(AppSetting setting) async {
-    _setting = setting;
-  }
-
-  @override
-  Future<bool?> peekLegacyAutoScan() async => null;
-
-  @override
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async => null;
-
-  @override
-  Future<void> clearLegacyImportPayload() async {}
 }

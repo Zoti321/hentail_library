@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -11,7 +10,6 @@ import 'package:hentai_library/features/read_session/domain/read_session_page.da
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
@@ -23,6 +21,8 @@ import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
+
+import '../../../support/fakes/settings_test_fakes.dart';
 
 const String _comicId = 'reader-controller-comic';
 const ReaderControllerKey _key = (
@@ -61,29 +61,6 @@ ReaderSessionSnapshot _snapshot({int pageCount = 10, int resumePage = 1}) {
     ),
     resumePageIndex: resumePage,
   );
-}
-
-class _MemoryAppSettingRepository implements AppSettingRepository {
-  _MemoryAppSettingRepository(this._setting);
-
-  AppSetting _setting;
-
-  @override
-  Future<AppSetting> load() async => _setting;
-
-  @override
-  Future<void> save(AppSetting setting) async {
-    _setting = setting;
-  }
-
-  @override
-  Future<bool?> peekLegacyAutoScan() async => null;
-
-  @override
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async => null;
-
-  @override
-  Future<void> clearLegacyImportPayload() async {}
 }
 
 class _RecordingSeriesNavigation extends ReaderSeriesNavigation {
@@ -177,7 +154,7 @@ ProviderContainer _createContainer({
       ...sharedLibraryStateOverrides(),
       ...bootstrapCompositionOverrides(),
       appSettingRepoProvider.overrideWithValue(
-        _MemoryAppSettingRepository(initialSetting),
+        MemoryAppSettingRepository(initial: initialSetting),
       ),
       readerSessionOpenProvider(
         comicId: key.comicId,
@@ -260,8 +237,8 @@ void main() {
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
           appSettingRepoProvider.overrideWithValue(
-            _MemoryAppSettingRepository(
-              AppSetting(readingMode: ReadingMode.paged),
+            MemoryAppSettingRepository(
+              initial: AppSetting(readingMode: ReadingMode.paged),
             ),
           ),
           readerSessionOpenProvider(
@@ -333,8 +310,8 @@ void main() {
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
           appSettingRepoProvider.overrideWithValue(
-            _MemoryAppSettingRepository(
-              AppSetting(readingMode: ReadingMode.paged),
+            MemoryAppSettingRepository(
+              initial: AppSetting(readingMode: ReadingMode.paged),
             ),
           ),
           readerSessionOpenProvider(

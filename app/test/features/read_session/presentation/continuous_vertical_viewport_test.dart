@@ -3,12 +3,10 @@ import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart'
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/module/view/reader_viewport_host.dart';
@@ -22,6 +20,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
+
+import '../../../support/fakes/settings_test_fakes.dart';
 
 const String _testComicId = 'test-comic';
 const ReaderControllerKey _viewKey = (
@@ -117,8 +117,8 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    final _MemoryAppSettingRepository repo = _MemoryAppSettingRepository(
-      AppSetting(webtoonMarginPercent: 20),
+    final MemoryAppSettingRepository repo = MemoryAppSettingRepository(
+      initial: AppSetting(webtoonMarginPercent: 20),
     );
 
     await tester.pumpWidget(
@@ -158,8 +158,8 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
 
-    final _MemoryAppSettingRepository repo = _MemoryAppSettingRepository(
-      AppSetting(
+    final MemoryAppSettingRepository repo = MemoryAppSettingRepository(
+      initial: AppSetting(
         webtoonMarginPercent: 40,
         webtoonZoomMode: WebtoonZoomMode.originalSize,
       ),
@@ -515,27 +515,4 @@ bool _hasHorizontalScrollable(WidgetTester tester) {
             scrollable.axisDirection == AxisDirection.right ||
             scrollable.axisDirection == AxisDirection.left,
       );
-}
-
-class _MemoryAppSettingRepository implements AppSettingRepository {
-  _MemoryAppSettingRepository(this._setting);
-
-  AppSetting _setting;
-
-  @override
-  Future<AppSetting> load() async => _setting;
-
-  @override
-  Future<void> save(AppSetting setting) async {
-    _setting = setting;
-  }
-
-  @override
-  Future<bool?> peekLegacyAutoScan() async => null;
-
-  @override
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async => null;
-
-  @override
-  Future<void> clearLegacyImportPayload() async {}
 }

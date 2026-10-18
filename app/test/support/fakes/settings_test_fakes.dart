@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -38,4 +40,43 @@ class FakeSettingsNotifier extends SettingsNotifier {
 
   @override
   Future<AppSetting> build() async => _settingBuilder?.call() ?? AppSetting();
+}
+
+/// In-memory [AppSettingRepository] for unit/widget tests (load/save + legacy peek).
+class MemoryAppSettingRepository implements AppSettingRepository {
+  MemoryAppSettingRepository({
+    AppSetting? initial,
+    this.legacyAutoScan,
+    this.legacyEnabledFormatGroups,
+    this.roundTripJsonOnSave = false,
+  }) : _setting = initial ?? AppSetting();
+
+  final bool? legacyAutoScan;
+  final List<FormatGroup>? legacyEnabledFormatGroups;
+  final bool roundTripJsonOnSave;
+
+  AppSetting _setting;
+  int clearLegacyImportPayloadCalls = 0;
+
+  @override
+  Future<AppSetting> load() async => _setting;
+
+  @override
+  Future<void> save(AppSetting setting) async {
+    _setting = roundTripJsonOnSave
+        ? AppSetting.fromJson(setting.toJson())
+        : setting;
+  }
+
+  @override
+  Future<bool?> peekLegacyAutoScan() async => legacyAutoScan;
+
+  @override
+  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async =>
+      legacyEnabledFormatGroups;
+
+  @override
+  Future<void> clearLegacyImportPayload() async {
+    clearLegacyImportPayloadCalls++;
+  }
 }

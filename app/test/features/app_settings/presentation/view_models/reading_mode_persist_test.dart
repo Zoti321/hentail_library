@@ -1,16 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
+import '../../../../support/fakes/settings_test_fakes.dart';
+
 void main() {
   test('setReadingMode persists and reloads as webtoon', () async {
-    final _MemoryAppSettingRepository repo = _MemoryAppSettingRepository();
+    final MemoryAppSettingRepository repo = MemoryAppSettingRepository();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
     );
@@ -29,25 +29,4 @@ void main() {
     final AppSetting loaded = await reloaded.read(settingsProvider.future);
     expect(loaded.readingMode, ReadingMode.webtoon);
   });
-}
-
-class _MemoryAppSettingRepository implements AppSettingRepository {
-  AppSetting _setting = AppSetting();
-
-  @override
-  Future<AppSetting> load() async => _setting;
-
-  @override
-  Future<void> save(AppSetting setting) async {
-    _setting = setting;
-  }
-
-  @override
-  Future<bool?> peekLegacyAutoScan() async => null;
-
-  @override
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async => null;
-
-  @override
-  Future<void> clearLegacyImportPayload() async {}
 }

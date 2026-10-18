@@ -118,13 +118,23 @@ Gate **不会**跑全量 `test/shared/ui` + `test/features`（由 `nightly-dart-
 
 慢轨测试**不**写进 manifest；它们由 `nightly-dart-ui` 覆盖。
 
+### 当前基线（2026-10-18，issue #269）
+
+| 指标 | 约数 | 说明 |
+|------|------|------|
+| 全量 Dart 用例 | ~938 | `cd app && flutter test` |
+| Gate manifest | ~105+ 文件 / ~511+ case | `./scripts/run-gate.sh dart-test` |
+| 慢轨（Nightly UI） | ~427 case / ~108 文件 | `test/shared/ui` + `test/features` 中**未**列入 manifest 的部分 |
+
+慢轨约占全量 **46%** 是刻意分层（大壳、responsive、阅读器 viewport 时序），**不等于 legacy 废测**。扩 Gate 仍只改 `manifest.txt` 并过晋升清单；新 Widget 测必须走 `test/support`（`pumpLocalizedApp`、`fakes/settings_test_fakes.dart` 的 `MemoryAppSettingRepository` 等），禁止复制大块 `peekLegacy*` / `MaterialApp` 样板。
+
 ## 共享 harness（强制）
 
 新测 **必须**走共享入口，禁止再复制一套：
 
 | 侧 | 入口 | 用途 |
 |----|------|------|
-| Flutter | `app/test/support/`（如 `pump_localized_app.dart`、`fakes/`） | 本地化 pump、常用 overrides/fakes |
+| Flutter | `app/test/support/`（如 `pump_localized_app.dart`、`fakes/settings_test_fakes.dart`） | 本地化 pump、`MemoryAppSettingRepository`（含 legacy peek/clear）、常用 overrides |
 | Rust | `core/crates/core/tests/common/` | DB init 锁、`create_fixture_db`、fixture SQL |
 
 触及全局 DB 或 `drift_v2.sql` fixture 的 Rust 集成测走 `mod common;`；纯解析 / 纯函数测试不必引入。**schema / 字段表守卫测试**（自建内存库跑迁移 + `PRAGMA table_info`，不碰全局连接，故无需 harness）留在模块内：`core/crates/core/src/metadata_lock/field.rs`、`core/crates/core/src/path_migration/persist.rs`。新 Dart 测试放在 `test/features/<id>/`、`test/shared/ui`、`test/shared/data`、`test/shared/domain` 或 `test/shared/core`。

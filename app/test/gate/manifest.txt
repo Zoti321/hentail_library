@@ -7,6 +7,7 @@ test/gate
 # Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）
 test/shared/domain
 test/shared/core
+test/shared/di
 test/features/app_settings/presentation/app_data_wipe_flow_test.dart
 test/shared/data
 
@@ -71,4 +72,6 @@ test/features/library_admin/domain/library_scan_scheduler_test.dart
 test/features/library_admin/domain/library_sidebar_layout_test.dart
 test/features/library_admin/domain/library_sync_coordinator_test.dart
 test/features/library_admin/domain/metadata_refresh_coordinator_test.dart
+test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart
+test/features/read_session/domain

@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/library/format_group.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../support/fakes/settings_test_fakes.dart';
 
 LocalLibrary _library({required String id}) {
   return (
@@ -81,32 +81,6 @@ class _FakeLibraryRepository implements LibraryRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeAppSettingRepository implements AppSettingRepository {
-  _FakeAppSettingRepository({this.legacyAutoScan, this.legacyFormatGroups});
-
-  final bool? legacyAutoScan;
-  final List<FormatGroup>? legacyFormatGroups;
-  int clearLegacyCalls = 0;
-
-  @override
-  Future<void> clearLegacyImportPayload() async {
-    clearLegacyCalls++;
-  }
-
-  @override
-  Future<AppSetting> load() async => AppSetting();
-
-  @override
-  Future<bool?> peekLegacyAutoScan() async => legacyAutoScan;
-
-  @override
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async =>
-      legacyFormatGroups;
-
-  @override
-  Future<void> save(AppSetting setting) async {}
-}
-
 void main() {
   test(
     'migrates legacy format groups and autoScan to libraries once',
@@ -115,10 +89,10 @@ void main() {
       final _FakeLibraryRepository libraryRepo = _FakeLibraryRepository(
         <LocalLibrary>[_library(id: 'lib-a'), _library(id: 'lib-b')],
       );
-      final _FakeAppSettingRepository appSettingRepo =
-          _FakeAppSettingRepository(
+      final MemoryAppSettingRepository appSettingRepo =
+          MemoryAppSettingRepository(
             legacyAutoScan: true,
-            legacyFormatGroups: <FormatGroup>[FormatGroup.pdf],
+            legacyEnabledFormatGroups: <FormatGroup>[FormatGroup.pdf],
           );
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
@@ -138,7 +112,7 @@ void main() {
       expect(libraryRepo.formatGroupsByLibrary['lib-b'], <FormatGroup>[
         FormatGroup.pdf,
       ]);
-      expect(appSettingRepo.clearLegacyCalls, 1);
+      expect(appSettingRepo.clearLegacyImportPayloadCalls, 1);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       expect(
         prefs.getBool('migrated_enabled_format_groups_to_libraries_v1'),
