@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
+import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -37,8 +37,7 @@ final class LibraryReturnBreadcrumb extends StatelessWidget {
     final Widget libraryLink = Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () =>
-            LibraryManagementActions.goCurrentLibraryBrowseFromContext(context),
+        onTap: () => goCurrentLibraryBrowseFromContext(context),
         borderRadius: BorderRadius.circular(tokens.radius.md),
         hoverColor: cs.primary.withValues(alpha: 0.08),
         splashColor: cs.primary.withValues(alpha: 0.12),

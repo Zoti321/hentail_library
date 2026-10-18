@@ -13,7 +13,7 @@ import 'package:hentai_library/shared/ui/widgets/element/chip/count_digit_chip.d
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/named_facet_context_menu.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/show_author_detail.dart';
+import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/tag_name_editor_dialog.dart';
@@ -292,7 +292,7 @@ class _ManagedNamedFacetChip extends ConsumerWidget {
       onTap: isAuthor
           ? () {
               unawaited(
-                showAuthorDetailByName(context: context, ref: ref, name: name),
+                ref.read(authorDetailPortProvider).showByName(context, name),
               );
             }
           : mergeTarget != null

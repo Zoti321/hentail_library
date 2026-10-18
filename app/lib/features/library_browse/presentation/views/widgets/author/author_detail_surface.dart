@@ -12,7 +12,7 @@ import 'package:hentai_library/shared/ui/widgets/overlays/dialog/adaptive_form_s
 import 'package:hentai_library/features/library_browse/presentation/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/author_image_view.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -67,7 +67,7 @@ void _openSearch(BuildContext context, Iterable<String> names) {
   final String query = formatLibrarySearchAndExactMetaQuery(names);
   final String encoded = Uri.encodeQueryComponent(query);
   Navigator.of(context).maybePop();
-  appRouter.push('/searched?q=$encoded');
+  GoRouter.of(context).push('/searched?q=$encoded');
 }
 
 class _AuthorDetailBody extends StatelessWidget {
@@ -581,9 +581,9 @@ class _AuthorComicCoverCard extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   Navigator.of(context).maybePop();
-                  appRouter.push(
-                    '/comic/${Uri.encodeComponent(comic.comicId)}',
-                  );
+                  GoRouter.of(
+                    context,
+                  ).push('/comic/${Uri.encodeComponent(comic.comicId)}');
                 },
                 child: ComicCoverContent(comicId: comic.comicId),
               ),

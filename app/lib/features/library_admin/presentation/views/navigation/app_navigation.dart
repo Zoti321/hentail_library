@@ -5,7 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/dto/nav_item_data.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
+import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 abstract final class AppNavigation {
@@ -73,7 +73,9 @@ abstract final class AppNavigation {
         break;
       case navIdLibrary:
         if (ref != null) {
-          LibraryManagementActions.goCurrentLibraryBrowse(ref, context);
+          ref
+              .read(libraryManagementPortProvider)
+              .goCurrentLibraryBrowse(context);
         } else {
           context.go(LibrariesRoutes.all);
         }

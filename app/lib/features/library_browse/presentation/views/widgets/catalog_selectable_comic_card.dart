@@ -30,7 +30,7 @@ class CatalogSelectableComicCard extends ConsumerWidget {
         gridIndex: gridIndex,
         onEditMetadata: onEditMetadata,
         onTap: onOpenDetail,
-        onReadComic: () => ComicCardHost.openReader(comic.comicId),
+        onReadComic: () => ComicCardHost.openReader(ref, comic.comicId),
         onTrashComic: () => ComicCardHost.confirmTrash(context, ref, comic),
         catalogCoverViewport: libraryCatalogCoverViewportProvider,
       );
@@ -49,9 +49,8 @@ class CatalogSelectableComicCard extends ConsumerWidget {
           onEditMetadata: onEditMetadata,
           onTap: () =>
               ref.read(catalogSelectionProvider.notifier).toggle(comic.comicId),
-          onReadComic: () => ComicCardHost.openReader(comic.comicId),
-          onTrashComic: () =>
-              ComicCardHost.confirmTrash(context, ref, comic),
+          onReadComic: () => ComicCardHost.openReader(ref, comic.comicId),
+          onTrashComic: () => ComicCardHost.confirmTrash(context, ref, comic),
           catalogCoverViewport: libraryCatalogCoverViewportProvider,
           selectionMode: true,
         ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
+import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
@@ -56,10 +56,7 @@ class RouteNotFoundPage extends StatelessWidget {
                 GhostButton.iconText(
                   icon: LucideIcons.library,
                   text: l10n.notFoundGoLibrary,
-                  onPressed: () =>
-                      LibraryManagementActions.goCurrentLibraryBrowseFromContext(
-                        context,
-                      ),
+                  onPressed: () => goCurrentLibraryBrowseFromContext(context),
                 ),
               ],
             ),

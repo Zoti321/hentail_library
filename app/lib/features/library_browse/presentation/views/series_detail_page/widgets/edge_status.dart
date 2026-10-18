@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
+import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
@@ -96,10 +96,7 @@ class SeriesNotFound extends StatelessWidget {
             ),
             label: l10n.seriesDetailNotFound(_displayLabel(l10n)),
             action: TextButton.icon(
-              onPressed: () =>
-                  LibraryManagementActions.goCurrentLibraryBrowseFromContext(
-                    context,
-                  ),
+              onPressed: () => goCurrentLibraryBrowseFromContext(context),
               icon: const Icon(LucideIcons.library, size: 16),
               label: Text(l10n.comicDetailGoToLibrary),
             ),

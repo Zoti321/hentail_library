@@ -98,14 +98,16 @@ class _LibraryCatalogEmptySliver extends ConsumerWidget {
                 emptyAction(
                   actionIcon: LucideIcons.folderPlus,
                   label: context.l10n.sidebarAddLocalLibrary,
-                  onPressed: () =>
-                      LibraryManagementActions.addLocalLibrary(ref, context),
+                  onPressed: () => ref
+                      .read(libraryManagementPortProvider)
+                      .addLocalLibrary(context),
                 ),
                 emptyAction(
                   actionIcon: LucideIcons.cloudUpload,
                   label: context.l10n.sidebarAddRemoteLibrary,
-                  onPressed: () =>
-                      LibraryManagementActions.addRemoteLibrary(ref, context),
+                  onPressed: () => ref
+                      .read(libraryManagementPortProvider)
+                      .addRemoteLibrary(context),
                 ),
               ],
               if (content.showClearFilters)

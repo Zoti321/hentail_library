@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/library_admin/di/library_management_port.dart';
 import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
+import 'package:hentai_library/features/library_browse/di/author_detail_ports.dart';
 import 'package:hentai_library/features/library_browse/di/comic_detail_return_series_ports.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
@@ -21,6 +23,7 @@ import 'package:hentai_library/features/named_metadata/presentation/view_models/
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
+import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_layout_constants.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
@@ -48,6 +51,8 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   comicDetailReturnSeriesPortProvider.overrideWith(
     createComicDetailReturnSeriesPort,
   ),
+  libraryManagementPortProvider.overrideWith(createLibraryManagementPort),
+  authorDetailPortProvider.overrideWith(createAuthorDetailPort),
   currentLibraryStateProvider.overrideWith(
     (Ref ref) => ref.watch(currentLibraryProvider),
   ),

@@ -104,11 +104,9 @@ class _LibrarySidebarRow extends ConsumerWidget {
       indentWithoutIcon: true,
       extraLeftIndent: nestedUnderMore ? _kLibrariesMoreChildIndent : 0,
       onTap: () async {
-        await LibraryManagementActions.openLibrary(
-          ref,
-          context,
-          library.libraryId,
-        );
+        await ref
+            .read(libraryManagementPortProvider)
+            .openLibrary(context, library.libraryId);
         onNavigate?.call();
       },
       trailing: _LibraryOverflowMenuButton(library: library),
@@ -169,14 +167,18 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
                 label: l10n.sidebarAddLocalLibrary,
                 onTap: () {
                   controller.hideMenu();
-                  LibraryManagementActions.addLocalLibrary(ref, context);
+                  ref
+                      .read(libraryManagementPortProvider)
+                      .addLocalLibrary(context);
                 },
               ),
               _PopupMenuItem(
                 label: l10n.sidebarAddRemoteLibrary,
                 onTap: () {
                   controller.hideMenu();
-                  LibraryManagementActions.addRemoteLibrary(ref, context);
+                  ref
+                      .read(libraryManagementPortProvider)
+                      .addRemoteLibrary(context);
                 },
               ),
               if (libraries.isNotEmpty)
@@ -189,11 +191,9 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
                   label: localLibraryDisplayName(library),
                   onTap: () async {
                     controller.hideMenu();
-                    await LibraryManagementActions.openLibrary(
-                      ref,
-                      context,
-                      library.libraryId,
-                    );
+                    await ref
+                        .read(libraryManagementPortProvider)
+                        .openLibrary(context, library.libraryId);
                     onNavigate?.call();
                   },
                 ),
@@ -248,14 +248,18 @@ class _SectionAddMenuButton extends HookConsumerWidget {
                 label: l10n.sidebarAddLocalLibrary,
                 onTap: () {
                   controller.hideMenu();
-                  LibraryManagementActions.addLocalLibrary(ref, context);
+                  ref
+                      .read(libraryManagementPortProvider)
+                      .addLocalLibrary(context);
                 },
               ),
               _PopupMenuItem(
                 label: l10n.sidebarAddRemoteLibrary,
                 onTap: () {
                   controller.hideMenu();
-                  LibraryManagementActions.addRemoteLibrary(ref, context);
+                  ref
+                      .read(libraryManagementPortProvider)
+                      .addRemoteLibrary(context);
                 },
               ),
             ],
@@ -324,17 +328,16 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
                 label: l10n.sidebarScanAllLibraries,
                 onTap: () {
                   controller.hideMenu();
-                  LibraryManagementActions.scanAllLibraries(ref);
+                  ref.read(libraryManagementPortProvider).scanAllLibraries();
                 },
               ),
               _PopupMenuItem(
                 label: l10n.sidebarDeepScanAllLibraries,
                 onTap: () {
                   controller.hideMenu();
-                  LibraryManagementActions.scanAllLibraries(
-                    ref,
-                    mode: ScanMode.full,
-                  );
+                  ref
+                      .read(libraryManagementPortProvider)
+                      .scanAllLibraries(mode: ScanMode.full);
                 },
               ),
             ],
@@ -464,14 +467,13 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
   ) {
     switch (action) {
       case LibrarySidebarOverflowAction.scan:
-        LibraryManagementActions.scanLibrary(ref, context, library.libraryId);
+        ref
+            .read(libraryManagementPortProvider)
+            .scanLibrary(context, library.libraryId);
       case LibrarySidebarOverflowAction.deepScan:
-        LibraryManagementActions.scanLibrary(
-          ref,
-          context,
-          library.libraryId,
-          mode: ScanMode.full,
-        );
+        ref
+            .read(libraryManagementPortProvider)
+            .scanLibrary(context, library.libraryId, mode: ScanMode.full);
       case LibrarySidebarOverflowAction.refreshMetadata:
         if (refreshingThis) {
           ref.read(metadataRefreshControllerProvider.notifier).cancel();
@@ -479,9 +481,11 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
         }
         _refreshLibraryMetadata(ref, context);
       case LibrarySidebarOverflowAction.edit:
-        LibraryManagementActions.editLibrarySettings(ref, context, library);
+        ref
+            .read(libraryManagementPortProvider)
+            .editLibrarySettings(context, library);
       case LibrarySidebarOverflowAction.delete:
-        LibraryManagementActions.deleteLibrary(ref, context, library);
+        ref.read(libraryManagementPortProvider).deleteLibrary(context, library);
     }
   }
 
