@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
 import 'package:hentai_library/features/metadata_backup/data/metadata_backup_paths.dart';
-import 'package:hentai_library/shared/data/adapters/metadata_backup_frb_types.dart';
+import 'package:hentai_library/features/metadata_backup/data/adapters/metadata_backup_frb_types.dart';
 import 'package:path/path.dart' as p;
 
 typedef MetadataAutoBackupExportInvoker =
