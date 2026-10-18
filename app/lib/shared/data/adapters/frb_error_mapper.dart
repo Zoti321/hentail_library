@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/core/errors/app_exception.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
 /// 将 Rust FRB 结构化错误映射为 Dart [AppException]。

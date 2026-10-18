@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/core/errors/app_exception.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
 
 /// Read session / Resource access 失败的用户可见分类（映射自 core error kinds）。
 enum ReadSessionFailureKind {

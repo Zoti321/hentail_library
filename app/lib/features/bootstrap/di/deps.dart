@@ -12,12 +12,12 @@ export 'package:hentai_library/features/bootstrap/presentation/view_models/aggre
 export 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
 export 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 export 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
-export 'package:hentai_library/shared/core/util/debouncer.dart';
+export 'package:hentai_library/core/util/debouncer.dart';
 export 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_controller.dart';
 export 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
 export 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 export 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
-export 'package:hentai_library/shared/core/util/stream_throttle.dart';
+export 'package:hentai_library/core/util/stream_throttle.dart';
 export 'package:hentai_library/shared/di/comic_cover_providers.dart';
 export 'package:hentai_library/shared/di/library_state_providers.dart';
 export 'package:hentai_library/shared/di/series_cover_providers.dart';

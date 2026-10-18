@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/core/image/image_decode_cache_size.dart';
+import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/shared/ui/interaction/app_motion.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';

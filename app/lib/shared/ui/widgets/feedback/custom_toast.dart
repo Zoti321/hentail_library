@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/core/errors/app_exception.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kToastStandardMaxWidth = 380;

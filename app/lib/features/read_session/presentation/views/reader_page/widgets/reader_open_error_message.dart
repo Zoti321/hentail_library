@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
 
 /// 将 Read session 打开失败映射为本地化分类文案。

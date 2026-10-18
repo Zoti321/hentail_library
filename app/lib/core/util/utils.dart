@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:hentai_library/shared/core/errors/app_exception.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
 
 // 判断是否为桌面平台
 bool get isDesktop {

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/core/logging/log_redactor.dart';
+import 'package:hentai_library/core/logging/log_redactor.dart';
 import 'package:test/test.dart';
 
 void main() {

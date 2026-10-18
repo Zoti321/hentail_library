@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/features/library_browse/domain/library_tri_state_pick.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';

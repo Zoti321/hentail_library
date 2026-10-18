@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/core/errors/app_exception.dart';
-import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/core/util/utils.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/card/catalog_cover_card_shell.dart';

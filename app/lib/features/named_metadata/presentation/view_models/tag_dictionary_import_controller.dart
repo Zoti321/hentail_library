@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:hentai_library/shared/core/logging/app_log.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/shared/domain/models/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/named_metadata/di/download_providers.dart';

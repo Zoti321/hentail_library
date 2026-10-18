@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/core/util/semver_utils.dart';
+import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/features/app_settings/data/services/app_update/app_update_service.dart';
 import 'package:hentai_library/shared/domain/models/app_release_info.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/app_update_dialog.dart';

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
-import 'package:hentai_library/shared/core/utils/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';

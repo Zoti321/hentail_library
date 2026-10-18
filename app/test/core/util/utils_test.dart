@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/core/util/utils.dart';
+import 'package:hentai_library/core/util/utils.dart';
 import 'package:test/test.dart';
 
 void main() {

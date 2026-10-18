@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/core/constants/libraries_routes.dart';
+import 'package:hentai_library/core/constants/libraries_routes.dart';
 
 void main() {
   group('LibrariesRoutes.redirectPath', () {

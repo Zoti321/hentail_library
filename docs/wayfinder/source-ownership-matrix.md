@@ -19,7 +19,7 @@
 - `features/<id>/presentation/<legacy-subpath>` ← `ui/features/...` 下 `views/`、`view_models/`、`widgets/` 等
 - `shared/domain/...` ← 今日 `domain/models`、`domain/repositories`、`domain/ports` 等
 - `shared/data/...` ← 今日 `data/**` 整树
-- `shared/core/...` ← 今日 `core/**` 整树
+- `core/...` ← 应用横切内核（l10n、logging、util 等；2026-10-18 自 `shared/core` 回迁 `lib/core`）
 - `shared/ui/...` ← 今日 `ui/core/**` 整树
 
 生成代码（`*.g.dart`、`*.freezed.dart`）与源文件同批移动；`src/rust/**` 不动。
@@ -37,20 +37,20 @@
 | `data/services/app_update/**` | `features/app_settings/data/services/app_update/**` | `app_settings` | #221：单 feature 服务 |
 | `data/services/tag_dictionary/**` | `features/named_metadata/data/services/tag_dictionary/**` | `named_metadata` | |
 
-### 1.2 `core/` → `shared/core/`
+### 1.2 应用 `core/`（`lib/core`，非 Rust `core/`）
 
 | 现状路径 | 目标路径 | Slice | 备注 |
 |----------|----------|-------|------|
 | `core/app_data/app_data_wipe_flow.dart` | `features/app_settings/presentation/app_data_wipe_flow.dart` | `app_settings` | UI 编排（#220 R1：避免 feature `domain`→`data`）；矩阵原写 `domain/` |
-| `core/constants/**` | `shared/core/constants/**` | `app_settings` 或 `bootstrap` | |
-| `core/errors/**` | `shared/core/errors/**` | `bootstrap` | |
-| `core/image/**` | `shared/core/image/**` | `bootstrap` | `main` 引用 |
-| `core/io/**` | `shared/core/io/**` | `library_admin` | Local root 访问 |
-| `core/l10n/**` | `shared/core/l10n/**` | `bootstrap` | |
-| `core/logging/**` | `shared/core/logging/**` | `bootstrap` | §2.2 FRB：`diagnostic_logging` 需 adapter 化 |
+| `core/constants/**` | `core/constants/**` | `app_settings` 或 `bootstrap` | |
+| `core/errors/**` | `core/errors/**` | `bootstrap` | |
+| `core/image/**` | `core/image/**` | `bootstrap` | `main` 引用 |
+| `core/io/**` | `core/io/**` | `library_admin` | Local root 访问 |
+| `core/l10n/**` | `core/l10n/**` | `bootstrap` | |
+| `core/logging/**` | `core/logging/**` | `bootstrap` | §2.2 FRB：`diagnostic_logging` 需 adapter 化 |
 | `core/metadata/**` | `features/metadata_backup/domain/**` + `features/metadata_backup/data/**` | `metadata_backup` | flow/service 入 feature；paths/bytes 可拆 data |
-| `core/util/**` | `shared/core/util/**` | `bootstrap` | |
-| `core/utils/**` | `shared/core/utils/**` | `library_browse` | 拼音筛选 |
+| `core/util/**` | `core/util/**` | `bootstrap` | |
+| `core/utils/**` | `core/utils/**` | `library_browse` | 拼音筛选 |
 
 ### 1.3 `domain/` → 主要为 `shared/domain/`
 
@@ -159,7 +159,7 @@
 | 现状路径 | 目标路径 | 备注 |
 |----------|----------|------|
 | shell `app` / `routing` / `responsive_app_shell` / startup VM | `features/bootstrap/presentation/**` | **已迁**（2026-10-17） |
-| `debouncer` / `stream_throttle` | `shared/core/util/` | **已迁** |
+| `debouncer` / `stream_throttle` | `core/util/` | **已迁** |
 | `deps` + `repos` / `ports` / `services` | `features/bootstrap/di/` | **已迁**；`shared/di` 见 #258 bootstrap-final |
 | `shell.dart` | 删除 | **已删** |
 
@@ -305,5 +305,5 @@
 | 2026-10-17 | `comic_trash` slice：trash UI/VM/di + domain + `trashed_comic` → shared |
 | 2026-10-17 | `home` slice：home/history presentation + `home_page_read_models` → shared |
 | 2026-10-17 | `library_admin` slice：navigation/VM/di + domain coordinators |
-| 2026-10-17 | `bootstrap` slice（presentation）：shell 残余 → `features/bootstrap` + util → `shared/core` |
+| 2026-10-17 | `bootstrap` slice（presentation）：shell 残余 → `features/bootstrap` + util → `shared/core`（后于 2026-10-18 回迁 `lib/core`） |
 | 2026-10-17 | `bootstrap-final`（#258）：`core/data/domain/ui` 整树 → `shared/*`；`ui/providers` → `shared/di`；删除 `ui/providers.dart`；Phase B 启用；Gate 基线 135 条 feature↔feature 边保留（follow-up 解耦） |

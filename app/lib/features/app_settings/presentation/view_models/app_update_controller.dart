@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:hentai_library/shared/core/constants/app_update_constants.dart';
-import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/core/logging/app_log.dart';
-import 'package:hentai_library/shared/core/util/app_root_navigator.dart';
-import 'package:hentai_library/shared/core/util/semver_utils.dart';
+import 'package:hentai_library/core/constants/app_update_constants.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/core/util/app_root_navigator.dart';
+import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/shared/domain/models/app_release_info.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;

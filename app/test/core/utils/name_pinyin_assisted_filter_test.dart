@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/core/utils/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:test/test.dart';
 
 void main() {

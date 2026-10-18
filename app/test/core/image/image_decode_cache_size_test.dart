@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/core/image/image_decode_cache_size.dart';
+import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 
 void main() {
   test('decodeCacheSizeForLogicalSize scales by device pixel ratio', () {

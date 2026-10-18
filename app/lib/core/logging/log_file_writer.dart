@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:hentai_library/shared/core/logging/app_log.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';

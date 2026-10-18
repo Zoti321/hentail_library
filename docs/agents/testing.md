@@ -165,7 +165,7 @@ Gate **不会**跑全量 `test/shared/ui` + `test/features`（由 `nightly-dart-
 | Flutter | `app/test/support/`（如 `pump_localized_app.dart`、`fakes/settings_test_fakes.dart`） | 本地化 pump、`MemoryAppSettingRepository`（含 legacy peek/clear）、常用 overrides |
 | Rust | `core/crates/core/tests/common/` | DB init 锁、`create_fixture_db`、fixture SQL |
 
-触及全局 DB 或 `drift_v2.sql` fixture 的 Rust 集成测走 `mod common;`；纯解析 / 纯函数测试不必引入。**schema / 字段表守卫测试**（自建内存库跑迁移 + `PRAGMA table_info`，不碰全局连接，故无需 harness）留在模块内：`core/crates/core/src/metadata_lock/field.rs`、`core/crates/core/src/path_migration/persist.rs`。新 Dart 测试放在 `test/features/<id>/`、`test/shared/ui`、`test/shared/data`、`test/shared/domain` 或 `test/shared/core`。
+触及全局 DB 或 `drift_v2.sql` fixture 的 Rust 集成测走 `mod common;`；纯解析 / 纯函数测试不必引入。**schema / 字段表守卫测试**（自建内存库跑迁移 + `PRAGMA table_info`，不碰全局连接，故无需 harness）留在模块内：`core/crates/core/src/metadata_lock/field.rs`、`core/crates/core/src/path_migration/persist.rs`。新 Dart 测试放在 `test/features/<id>/`、`test/shared/ui`、`test/shared/data`、`test/shared/domain` 或 `test/core`。
 
 ### Flutter 示例
 

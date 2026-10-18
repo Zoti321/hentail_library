@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:hentai_library/shared/core/logging/log_file_writer.dart';
+import 'package:hentai_library/core/logging/log_file_writer.dart';
 import 'package:logging/logging.dart';
 
 LogFileWriter? _appLogFileWriter;

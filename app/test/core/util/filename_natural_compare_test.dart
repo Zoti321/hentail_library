@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/core/util/filename_natural_compare.dart';
+import 'package:hentai_library/core/util/filename_natural_compare.dart';
 import 'package:test/test.dart';
 
 void main() {

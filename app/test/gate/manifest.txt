@@ -6,7 +6,7 @@ test/gate
 
 # Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）
 test/shared/domain
-test/shared/core
+test/core
 test/shared/di
 test/features/app_settings/presentation/app_data_wipe_flow_test.dart
 test/shared/data

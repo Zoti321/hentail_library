@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/core/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/library_empty_state.dart';
 import 'package:test/test.dart';

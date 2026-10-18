@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
-import 'package:hentai_library/shared/core/logging/log_export_manifest.dart';
-import 'package:hentai_library/shared/core/logging/log_redactor.dart';
+import 'package:hentai_library/core/logging/log_export_manifest.dart';
+import 'package:hentai_library/core/logging/log_redactor.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 

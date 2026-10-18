@@ -35,7 +35,7 @@ void main() {
         readGateManifestEntries(),
         containsAll(<String>[
           'test/shared/domain',
-          'test/shared/core',
+          'test/core',
           'test/shared/data',
           'test/frb_wire',
           'test/project_layout_test.dart',

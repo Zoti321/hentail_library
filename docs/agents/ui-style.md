@@ -18,7 +18,7 @@ Shell / theme entry points:
 - `app/lib/features/bootstrap/presentation/views/app.dart` — `buildAppTheme` (light/dark)
 - `app/lib/features/bootstrap/presentation/views/routing/app_router.dart` — single `appRouter` + `ResponsiveAppShell`
 - `app/lib/shared/ui/layout/app_layout_breakpoints.dart` — compact / medium / expanded
-- `app/lib/shared/core/util/utils.dart` — `isDesktop` for **window chrome only** (Windows / macOS / Linux; not web); do not fork page trees on it
+- `app/lib/core/util/utils.dart` — `isDesktop` for **window chrome only** (Windows / macOS / Linux; not web); do not fork page trees on it
 
 ---
 

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/core/util/utils.dart';
+import 'package:hentai_library/core/util/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:window_manager/window_manager.dart';
 

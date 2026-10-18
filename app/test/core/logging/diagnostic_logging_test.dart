@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:hentai_library/shared/core/logging/diagnostic_logging.dart';
+import 'package:hentai_library/core/logging/diagnostic_logging.dart';
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
 
