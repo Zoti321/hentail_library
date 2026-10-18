@@ -23,6 +23,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'named_facet_management_states.dart';
 part 'named_facet_list_widgets.dart';
+part 'named_facet_merge_selection.dart';
 
 class NamedFacetManagementSliverGroup extends ConsumerWidget {
   const NamedFacetManagementSliverGroup({

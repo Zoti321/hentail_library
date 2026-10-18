@@ -123,21 +123,16 @@ class _ManagedNamedFacetChip extends ConsumerWidget {
     final bool desktop = _isDesktop(context);
     final bool isMergeTarget = mergeTarget == name;
     final ColorScheme colors = Theme.of(context).colorScheme;
-    final Color? selectionFill = isMergeTarget
-        ? colors.hentai.success.withValues(alpha: 0.22)
-        : isMergeSource
-        ? colors.error.withValues(alpha: 0.22)
-        : null;
-    final Color? selectionBorder = isMergeTarget
-        ? colors.hentai.success
-        : isMergeSource
-        ? colors.error
-        : null;
+    final ({Color? fill, Color? border}) selection = _mergeSelectionColors(
+      colors,
+      isMergeTarget: isMergeTarget,
+      isMergeSource: isMergeSource,
+    );
     return OutlinedMetaChip(
       text: name,
       compact: true,
-      backgroundColor: selectionFill,
-      borderColor: selectionBorder,
+      backgroundColor: selection.fill,
+      borderColor: selection.border,
       count: isAuthor ? null : attachmentCount,
       verified:
           isAuthor &&
@@ -156,13 +151,12 @@ class _ManagedNamedFacetChip extends ConsumerWidget {
               );
             }
           : mergeTarget != null
-          ? () {
-              if (isMergeTarget) {
-                onMergeSelectionExited?.call();
-              } else {
-                onMergeSourceSelected?.call(name);
-              }
-            }
+          ? () => _onMergeChipTap(
+              name: name,
+              isMergeTarget: isMergeTarget,
+              onExit: onMergeSelectionExited,
+              onSource: onMergeSourceSelected,
+            )
           : null,
       onLongPress: isAuthor || desktop || mergeTarget != null
           ? null
