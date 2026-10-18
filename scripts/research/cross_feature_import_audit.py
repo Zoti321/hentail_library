@@ -79,6 +79,7 @@ def main() -> None:
     ]
 
     domain_to_data: list[str] = []
+    shared_domain_to_features: list[str] = []
     non_data_to_frb: list[str] = []
     browse_to_reading: list[str] = []
     edge_counts: dict[tuple[str, str], int] = defaultdict(int)
@@ -97,6 +98,8 @@ def main() -> None:
 
             if rel.startswith("shared/domain/") and imp.startswith("shared/data/"):
                 domain_to_data.append(f"{rel} -> {imp}")
+            if rel.startswith("shared/domain/") and imp.startswith("features/"):
+                shared_domain_to_features.append(f"{rel} -> {imp}")
             if (
                 "/domain/" in rel
                 and rel.startswith("features/")
@@ -132,6 +135,7 @@ def main() -> None:
 
     out = {
         "domain_to_data": sorted(set(domain_to_data)),
+        "shared_domain_to_features": sorted(set(shared_domain_to_features)),
         "non_data_to_frb": sorted(set(non_data_to_frb)),
         "library_browse_to_reading_domain": sorted(set(browse_to_reading)),
         "module_edge_counts": {
