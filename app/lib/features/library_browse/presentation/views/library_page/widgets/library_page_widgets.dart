@@ -42,6 +42,8 @@ part 'library_grid_delegate.dart';
 part 'library_page_header.dart';
 part 'library_pagination_bar_sliver.dart';
 part 'library_search_toolbar.dart';
+part 'library_search_field.dart';
+part 'library_display_target_tabs.dart';
 part 'library_toolbar_overflow_menus.dart';
 part 'library_series_block.dart';
 part 'library_comic_empty_slivers.dart';
