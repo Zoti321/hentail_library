@@ -3,7 +3,6 @@ import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_t
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:test/test.dart';
 
 Comic _comic({

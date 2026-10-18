@@ -1,7 +1,6 @@
 //! Library CRUD, sidebar layout, and current-library preferences.
 
-use std::collections::{HashMap, HashSet};
-use std::path::Path;
+use std::collections::HashSet;
 
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter, QueryOrder, Set,
@@ -9,11 +8,9 @@ use sea_orm::{
 };
 
 use crate::comic::{now_ms};
-use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::entity::{app_prefs, libraries, prelude::*};
 use crate::error::HentaiError;
-use crate::resource::{local_access, ResourceAccess};
 use crate::sync::format_group::FormatGroup;
 use crate::sync::writer::delete_comics_side_effects;
 

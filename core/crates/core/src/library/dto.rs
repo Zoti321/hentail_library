@@ -5,7 +5,6 @@ use std::path::Path;
 use sha1::{Digest, Sha1};
 
 use crate::comic_id::normalize_path_for_key;
-use crate::db::{connection, map_db_err};
 use crate::entity::libraries;
 use crate::error::HentaiError;
 use crate::sync::format_group::FormatGroup;

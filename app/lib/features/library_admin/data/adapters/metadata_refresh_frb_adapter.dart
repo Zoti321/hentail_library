@@ -15,6 +15,7 @@ class MetadataRefreshFrbAdapter implements MetadataRefreshPort {
   final LibraryRepository _libraryRepository;
   sync_rust.SyncHandleDto? _activeHandle;
 
+  @override
   Future<void> refreshComic(String comicId) async {
     await pushRemoteLibraryCredentials(_libraryRepository);
     return guardFrb(
@@ -23,6 +24,7 @@ class MetadataRefreshFrbAdapter implements MetadataRefreshPort {
     );
   }
 
+  @override
   Future<MetadataRefreshBatchResult> refreshSeries(String seriesId) async {
     await pushRemoteLibraryCredentials(_libraryRepository);
     final sync_rust.SyncHandleDto handle = sync_rust.createSyncHandleFrb();
@@ -47,6 +49,7 @@ class MetadataRefreshFrbAdapter implements MetadataRefreshPort {
     }
   }
 
+  @override
   Future<MetadataRefreshBatchResult> refreshLibrary(String libraryId) async {
     await pushRemoteLibraryCredentials(_libraryRepository);
     final sync_rust.SyncHandleDto handle = sync_rust.createSyncHandleFrb();
@@ -71,6 +74,7 @@ class MetadataRefreshFrbAdapter implements MetadataRefreshPort {
     }
   }
 
+  @override
   void cancelActive() {
     final sync_rust.SyncHandleDto? handle = _activeHandle;
     if (handle != null) {

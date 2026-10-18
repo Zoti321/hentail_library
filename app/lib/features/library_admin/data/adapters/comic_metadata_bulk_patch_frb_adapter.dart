@@ -14,6 +14,7 @@ class ComicMetadataBulkPatchFrbAdapter implements ComicMetadataBulkPatchPort {
   final LibraryRepository _libraryRepository;
   sync_rust.SyncHandleDto? _activeHandle;
 
+  @override
   Future<ComicMetadataBulkPatchResult> apply({
     required List<String> comicIds,
     required ComicMetadataBulkPatch patch,
@@ -42,6 +43,7 @@ class ComicMetadataBulkPatchFrbAdapter implements ComicMetadataBulkPatchPort {
     }
   }
 
+  @override
   void cancelActive() {
     final sync_rust.SyncHandleDto? handle = _activeHandle;
     if (handle != null) {

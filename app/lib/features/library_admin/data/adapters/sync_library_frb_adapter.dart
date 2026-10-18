@@ -17,6 +17,7 @@ class SyncLibraryFrbAdapter implements SyncLibraryPort {
 
   rust.SyncHandleDto? _activeHandle;
 
+  @override
   Future<void> call({
     ScanMode scanMode = ScanMode.incremental,
     bool syncAll = false,
@@ -65,6 +66,7 @@ class SyncLibraryFrbAdapter implements SyncLibraryPort {
     }
   }
 
+  @override
   void cancelActive() {
     final handle = _activeHandle;
     if (handle != null) {

@@ -15,13 +15,10 @@ import 'package:test/test.dart';
 class _ScriptedRefreshAdapter implements MetadataRefreshPort {
   _ScriptedRefreshAdapter({
     this.onRefreshComic,
-    this.onRefreshSeries,
     this.onRefreshLibrary,
   });
 
   final Future<void> Function(String comicId)? onRefreshComic;
-  final Future<MetadataRefreshBatchResult> Function(String seriesId)?
-  onRefreshSeries;
   final Future<MetadataRefreshBatchResult> Function(String libraryId)?
   onRefreshLibrary;
 
@@ -32,14 +29,13 @@ class _ScriptedRefreshAdapter implements MetadataRefreshPort {
 
   @override
   Future<MetadataRefreshBatchResult> refreshSeries(String seriesId) {
-    return onRefreshSeries?.call(seriesId) ??
-        Future<MetadataRefreshBatchResult>.value((
-          succeeded: 0,
-          failed: 0,
-          cancelled: false,
-          skipped: false,
-          skipMessage: null,
-        ));
+    return Future<MetadataRefreshBatchResult>.value((
+      succeeded: 0,
+      failed: 0,
+      cancelled: false,
+      skipped: false,
+      skipMessage: null,
+    ));
   }
 
   @override

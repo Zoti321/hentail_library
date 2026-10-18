@@ -5,7 +5,6 @@ import 'package:hentai_library/shared/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
