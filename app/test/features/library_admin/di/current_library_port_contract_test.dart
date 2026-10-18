@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
@@ -108,7 +108,7 @@ void main() {
       overrides: <Override>[
         libraryRepoProvider.overrideWithValue(repo),
         libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
-        currentLibraryPortProvider.overrideWith(createCurrentLibraryPort),
+        ...sharedLibraryStateOverrides(),
       ],
     );
   });

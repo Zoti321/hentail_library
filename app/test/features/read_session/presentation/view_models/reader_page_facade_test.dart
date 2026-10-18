@@ -3,6 +3,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
@@ -49,6 +50,9 @@ ProviderContainer _container({String title = 'Facade'}) {
       readSessionContextForReaderProvider(
         comicId: _comicId,
       ).overrideWith((Ref ref) async => _sessionContext()),
+      readerFullscreenControllerProvider.overrideWith(
+        _FakeReaderFullscreenController.new,
+      ),
     ],
   );
 }
@@ -135,6 +139,40 @@ void main() {
       'Renamed',
     );
   });
+  test(
+    'fullscreen and series boundary prompt flow through the facade',
+    () async {
+      final ProviderContainer container = _container();
+      addTearDown(container.dispose);
+      await container.read(readerControllerProvider(_viewKey).future);
+      await container.read(
+        readSessionContextForReaderProvider(comicId: _comicId).future,
+      );
+
+      int notifications = 0;
+      container.listen(readerPageFacadeProvider(comicId: _comicId), (
+        ReaderPageFacadeState? previous,
+        ReaderPageFacadeState next,
+      ) {
+        notifications++;
+      });
+
+      (container.read(readerFullscreenControllerProvider.notifier)
+              as _FakeReaderFullscreenController)
+          .set(true);
+      (container.read(readerControllerProvider(_viewKey).notifier)
+              as _StubReaderController)
+          .setSeriesBoundaryPrompt(SeriesBoundaryPrompt.advance);
+      await Future<void>.delayed(Duration.zero);
+
+      final ReaderPageFacadeState facade = container.read(
+        readerPageFacadeProvider(comicId: _comicId),
+      );
+      expect(facade.readerFullscreen, isTrue);
+      expect(facade.seriesBoundaryPrompt, SeriesBoundaryPrompt.advance);
+      expect(notifications, greaterThan(0));
+    },
+  );
 }
 
 class _StubReaderController extends ReaderController {
@@ -156,7 +194,20 @@ class _StubReaderController extends ReaderController {
     state = AsyncData(state.requireValue.copyWith(currentIndex: index));
   }
 
+  void setSeriesBoundaryPrompt(SeriesBoundaryPrompt prompt) {
+    state = AsyncData(
+      state.requireValue.copyWith(seriesBoundaryPrompt: prompt),
+    );
+  }
+
   void replaceComicTitle(String title) {
     state = AsyncData(state.requireValue.copyWith(comic: _comic(title: title)));
   }
+}
+
+class _FakeReaderFullscreenController extends ReaderFullscreenController {
+  @override
+  bool build() => false;
+
+  void set(bool value) => state = value;
 }
