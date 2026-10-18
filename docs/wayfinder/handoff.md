@@ -1,6 +1,6 @@
 # Wayfinder 交接文档（整洁架构迁移）
 
-最后更新：2026-10-17（#217 / #271–#278 已关；**下一主线 #256**）。分支：`dev`。
+最后更新：2026-10-18（**Phase C #279 / #280–#289** 在分支 `wayfinder/256-phase-c-data` 实施完成）。合并前基线分支：`dev`。
 
 ## 1. 当前状态概览
 
@@ -27,8 +27,13 @@
 
 | Issue | 角色 |
 |-------|------|
-| **#256** | **下一主线**：`shared/data` 按 feature owner 回迁（见 §8、§9） |
+| **#256 / #279** | Phase C spec + 子票 #280–#289；实现见 `wayfinder/256-phase-c-data` |
 | #260 | spec 收尾：**已完成**（R1 扩展 + 正文 M3 ratchet 表述） |
+
+### `shared/data` 最小内核（Phase C9 后保留）
+
+- **adapters**：`frb_call_guard`、`frb_error_mapper`、`frb_zone_guard`、`reader_frb_mapper`（跨 browse/read）、`remote_credentials_frb`、`series_frb_mapper`、`author_frb_mapper`、`history_frb_mapper`、`thumbnail_frb_mapper`、基础设施（shutdown、diagnostic、clipboard 等）
+- **repositories**：`comic_thumbnail_repository_impl`、`named_facet_form_listing`（library_browse 批量编辑消费）
 
 ## 4. 已做出的决策（不要重新讨论）
 
@@ -60,7 +65,7 @@
 
 ## 6. 已知风险与待办
 
-- **R1 扩展**未落地（#260 剩余）。
+- **R2 Phase C**：`features/<id>/data/**` 可 import FRB（#280）；`reader_frb_mapper` / `named_facet_form_listing` 故意留在 shared 以避免 R5/M1。
 - `features/bootstrap/di/deps.dart` 仍为**便利 export 桶**（非 Gate 违规）；可随 #256 slice 顺手删未使用 export，非必须一次清完。
 - `CurrentLibraryPort` 等适配器缺少独立单测。
 - 历史 ADR / `docs/wayfinder/source-ownership-matrix.md` 中旧路径有意保留，slice 完成后再改矩阵对应行。
