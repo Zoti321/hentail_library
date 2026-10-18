@@ -35,7 +35,7 @@ class SeriesDetailPage extends ConsumerWidget {
         },
         loading: () => const DetailLoadingStatus(),
         error: (Object error, StackTrace _) => DetailErrorStatus(
-          label: context.l10n.searchLoadFailed(error.toString()),
+          label: context.l10n.seriesDetailLoadFailed(error.toString()),
         ),
         skipLoadingOnReload: true,
         skipLoadingOnRefresh: true,

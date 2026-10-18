@@ -13,7 +13,7 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/anchored_overlay_menu.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic_delete_flow.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_back_header.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_series_nav.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -59,8 +59,7 @@ class ComicDetailHeader extends ConsumerWidget {
                   foregroundColor: cs.hentai.iconDefault,
                   hoverColor: theme.hoverColor,
                   overlayColor: theme.hoverColor,
-                  onPressed: () =>
-                      ComicDetailBackHeader.popOrGoLibrary(context),
+                  onPressed: () => DetailBackHeader.popOrGoLibrary(context),
                 ),
                 const SizedBox(width: 4),
                 _ComicDetailOverflowMenuButton(comic: comic),

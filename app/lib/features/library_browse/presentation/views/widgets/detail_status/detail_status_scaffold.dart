@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_back_header.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -27,7 +27,7 @@ class DetailStatusScaffold extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        const ComicDetailBackHeader(),
+        const DetailBackHeader(),
         Expanded(
           child: Center(
             child: Padding(

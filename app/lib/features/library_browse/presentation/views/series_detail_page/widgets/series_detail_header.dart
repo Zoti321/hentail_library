@@ -16,7 +16,7 @@ import 'package:hentai_library/features/library_browse/presentation/views/widget
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_series_dialog.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_back_header.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
 import 'package:hentai_library/shared/domain/library/library_metadata_refresh_command_port.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
@@ -110,7 +110,7 @@ class _SeriesDetailDefaultHeaderRow extends ConsumerWidget {
             foregroundColor: cs.hentai.iconDefault,
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
-            onPressed: () => ComicDetailBackHeader.popOrGoLibrary(context),
+            onPressed: () => DetailBackHeader.popOrGoLibrary(context),
           ),
           const SizedBox(width: 4),
           _SeriesDetailOverflowMenuButton(series: series),

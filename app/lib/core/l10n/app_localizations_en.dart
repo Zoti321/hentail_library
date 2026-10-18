@@ -1203,6 +1203,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get seriesDetailComicsLoadFailed => 'Failed to load comic list';
 
   @override
+  String seriesDetailLoadFailed(String error) {
+    return 'Failed to load: $error';
+  }
+
+  @override
   String get seriesDetailUnknown => 'Unknown series';
 
   @override

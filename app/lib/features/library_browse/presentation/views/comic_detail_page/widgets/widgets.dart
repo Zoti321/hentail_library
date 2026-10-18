@@ -1,4 +1,4 @@
-export 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_back_header.dart';
+export 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 export 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_cover.dart';
 export 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_header.dart';
 export 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_info_sections.dart';

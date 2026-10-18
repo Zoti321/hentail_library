@@ -1156,6 +1156,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get seriesDetailComicsLoadFailed => '漫画列表加载失败';
 
   @override
+  String seriesDetailLoadFailed(String error) {
+    return '加载失败：$error';
+  }
+
+  @override
   String get seriesDetailUnknown => '未知系列';
 
   @override

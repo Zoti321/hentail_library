@@ -26,7 +26,7 @@ class ComicDetailPage extends ConsumerWidget {
         if (didPop) {
           return;
         }
-        ComicDetailBackHeader.popOrGoLibrary(context);
+        DetailBackHeader.popOrGoLibrary(context);
       },
       child: ColoredBox(
         color: cs.surface,

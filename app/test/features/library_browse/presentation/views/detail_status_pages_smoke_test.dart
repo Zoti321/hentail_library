@@ -87,7 +87,10 @@ void main() {
     final AppLocalizations l10n = AppLocalizations.of(
       tester.element(find.byType(SeriesDetailPage)),
     );
-    expect(find.textContaining(l10n.searchLoadFailed('')), findsOneWidget);
+    expect(
+      find.textContaining(l10n.seriesDetailLoadFailed('')),
+      findsOneWidget,
+    );
     expect(find.byType(TextButton), findsNothing);
   });
 

@@ -564,6 +564,14 @@
   "formSeriesItemSortOrderInvalid": "请输入有效数字",
   "seriesDetailNoComics": "系列内暂无漫画",
   "seriesDetailComicsLoadFailed": "漫画列表加载失败",
+  "seriesDetailLoadFailed": "加载失败：{error}",
+  "@seriesDetailLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "seriesDetailUnknown": "未知系列",
   "seriesDetailNotFound": "未找到系列「{name}」",
   "@seriesDetailNotFound": {
