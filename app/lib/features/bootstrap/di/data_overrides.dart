@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/read_session/data/adapters/comic_page_source_frb_adapter.dart';
 import 'package:hentai_library/features/read_session/data/adapters/reader_session_frb_adapter.dart';
-import 'package:hentai_library/shared/data/adapters/library_revision_frb_adapter.dart';
+import 'package:hentai_library/features/library_admin/data/adapters/library_revision_frb_adapter.dart';
 import 'package:hentai_library/shared/data/repositories/app_setting_repository_impl.dart';
 import 'package:hentai_library/shared/data/repositories/author_repository_impl.dart';
 import 'package:hentai_library/shared/data/repositories/comic_repository_impl.dart';
 import 'package:hentai_library/shared/data/repositories/comic_thumbnail_repository_impl.dart';
 import 'package:hentai_library/shared/data/repositories/home_page_repository_impl.dart';
-import 'package:hentai_library/shared/data/repositories/library_repository_impl.dart';
+import 'package:hentai_library/features/library_admin/data/repositories/library_repository_impl.dart';
 import 'package:hentai_library/shared/data/repositories/named_facet_dictionary_repository_impl.dart';
 import 'package:hentai_library/shared/data/repositories/named_facet_management_repository_impl.dart';
 import 'package:hentai_library/shared/data/repositories/reading_history_repository_impl.dart';
