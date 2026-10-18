@@ -295,6 +295,16 @@
 - 模块边对照：`python scripts/research/cross_feature_import_audit.py`
 - 矩阵变更：PR 须更新本文件版本表与 #225 slice checklist
 
+### Gate 保护（与代码同步）
+
+| 矩阵目标 | Gate / 文档 |
+|----------|-------------|
+| `shared/ui/**`（含 `theme/`）不得依赖 `features/` | L3a：`shared_ui_no_feature_import_test.dart`（ADR-0027） |
+| `shared/domain/**` 不得新增对 `features/` 的 import 边 | L3b：`shared_domain_no_feature_import_test.dart` + baseline ratchet（#295） |
+| `shared/data/adapters/**` 允许故意 import feature（FRB 薄边） | `shared_feature_import_rules.dart` 白名单；**不**对整棵 `shared/data` ratchet |
+| product feature↔feature 图 | L2：`import_boundary_baseline.json`（#220） |
+| `shared/domain` / feature `domain/` 不得 import `shared/data` | L1 R1：`import_boundary_test.dart` |
+
 | 版本 | 说明 |
 |------|------|
 | 2026-10-16 | 初版（#224） |
@@ -308,3 +318,4 @@
 | 2026-10-17 | `library_admin` slice：navigation/VM/di + domain coordinators |
 | 2026-10-17 | `bootstrap` slice（presentation）：shell 残余 → `features/bootstrap` + util → `shared/core`（后于 2026-10-18 回迁 `lib/core`） |
 | 2026-10-17 | `bootstrap-final`（#258）：`core/data/domain/ui` 整树 → `shared/*`；`ui/providers` → `shared/di`；删除 `ui/providers.dart`；Phase B 启用；Gate 基线 135 条 feature↔feature 边保留（follow-up 解耦） |
+| 2026-10-18 | #295 P3：`shared/ui/theme` 纳入 L3a；`shared/domain`→`features` L3b ratchet；`shared/data` adapter 白名单文档化（见 §13 Gate 保护） |

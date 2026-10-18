@@ -1,7 +1,7 @@
 # Gate tier: gate-dart-test 硬门禁清单（路径相对 app/，文件或目录均可）。
 # 扩硬门禁只改本文件 + 在 PR 说明中列出新增路径；规则见 docs/agents/testing.md。
 
-# Gate 自检（含 import_boundary_test.dart、strangler_shims_test.dart）
+# Gate 自检（import_boundary、shared_ui/domain feature-import L3、strangler_shims）
 test/gate
 
 # Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）

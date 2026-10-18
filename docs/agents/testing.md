@@ -73,6 +73,29 @@ Nightly 的定时触发只在默认分支（`main`）生效；其他分支用 `w
 
 本地：`cd app && flutter test test/gate/import_boundary_test.dart`。修复跨模块耦合后须在同一 PR 缩减 baseline（`dart run tool/generate_import_boundary_baseline.dart` 在 L1 已绿时重写条目）。分类表与 `scripts/research/cross_feature_import_audit.py` 应对齐。
 
+### Shared 层 feature-import 缝（ADR-0027 · #295 L3）
+
+| 层级 | 规则 | 机制 |
+|------|------|------|
+| L3a | `shared/ui/{widgets,layout,shell,interaction,theme}/**` 不得 `import package:hentai_library/features/` | `test/gate/shared_ui_no_feature_import_test.dart` **零容忍**（`shared_ui_feature_import_allowlist.txt` 仅注释，不扩二期 allowlist） |
+| L3b | `shared/domain/**` → `features/` | `test/gate/shared_domain_no_feature_import_test.dart` + `shared_domain_feature_import_baseline.json` **ratchet**（只减不增） |
+| — | `shared/data/**` 默认 **不** 做整树 ratchet；`shared/data/adapters/**` 与 `shared_feature_import_rules.dart` 中显式路径为 Phase C 故意跨 feature 边 | 规则与文档白名单；勿为「纯洁性」删除 FRB mapper |
+
+本地：
+
+```bash
+cd app && flutter test test/gate/shared_ui_no_feature_import_test.dart
+cd app && flutter test test/gate/shared_domain_no_feature_import_test.dart
+```
+
+**重写 baseline**（仅在 L1/L3a 已绿、且你**主动缩减** `shared/domain`→`features` 边之后）：
+
+```bash
+cd app && dart run tool/generate_shared_domain_feature_import_baseline.dart
+```
+
+L2 product 图 baseline 仍用 `dart run tool/generate_import_boundary_baseline.dart`（须 structural 零容忍）。两套 baseline 文件勿混用。
+
 ### Wayfinder 布局缝（#219）
 
 | 断言 | 机制 |
