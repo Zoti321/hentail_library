@@ -1,6 +1,6 @@
 part of 'reader_controller.dart';
 
-/// 系列边界提示与自动播放、翻页命令（#307）：由 [ReaderController] 以 mixin 组合。
+/// 系列边界提示与翻页命令（#307）：由 [ReaderController] 以 mixin 组合。（自动播放见 reader_controller_auto_play.dart）
 mixin _ReaderControllerNavigation on _$ReaderController {
   void _notifyPageChanged(int pageIndex) {
     final ReaderControllerKey key = ref.$arg as ReaderControllerKey;
@@ -46,66 +46,6 @@ mixin _ReaderControllerNavigation on _$ReaderController {
           return next;
         }
         return next.copyWith(seriesBoundaryPrompt: SeriesBoundaryPrompt.none);
-    }
-  }
-
-  void setAutoPlayEnabled(bool value) {
-    _updateDataState((ReaderState s) => s.copyWith(autoPlayEnabled: value));
-  }
-
-  /// 自动播放的一拍到了。定时器留在页面。
-  ///
-  /// 返回 false 时页面应取消定时器：自动播放已停止，或已开始切卷。
-  Future<bool> advanceAutoPlay({
-    required ReaderNavContextData? navContext,
-    required ReadSessionRouteParams session,
-    required GoRouter router,
-  }) async {
-    final ReaderState? current = state.asData?.value;
-    if (current == null || !current.autoPlayEnabled) {
-      return false;
-    }
-    if (!current.readingMode.supportsAutoPlay || current.totalPages <= 0) {
-      return false;
-    }
-    final bool onLastSpread = SpreadIndex.isOnLastSpread(
-      mode: current.readingMode,
-      totalPages: current.totalPages,
-      currentPageIndex: current.currentIndex,
-    );
-    if (!onLastSpread) {
-      nextPage();
-      return true;
-    }
-    final AutoPlayMode mode =
-        ref.read(appSettingsStateProvider).asData?.value.autoPlayMode ??
-        kDefaultAutoPlayMode;
-    final List<ReaderComicListItem>? items = navContext?.items;
-    final String? firstComicId = items != null && items.isNotEmpty
-        ? items.first.comicId
-        : null;
-    final AutoPlayBoundaryDecision decision = resolveAutoPlayBoundary(
-      mode: mode,
-      currentComicId: session.comicId,
-      nextComicId: navContext?.nextItem?.comicId,
-      firstComicId: firstComicId,
-    );
-    switch (decision) {
-      case AutoPlayBoundaryStop():
-        setAutoPlayEnabled(false);
-        return false;
-      case AutoPlayBoundaryJumpToFirstPage():
-        setIndex(1);
-        return true;
-      case AutoPlayBoundarySwitchComic(:final String comicId):
-        await ref
-            .read(readerSeriesNavigationProvider.notifier)
-            .switchComic(
-              router: router,
-              currentSession: session,
-              targetComicId: comicId,
-            );
-        return false;
     }
   }
 

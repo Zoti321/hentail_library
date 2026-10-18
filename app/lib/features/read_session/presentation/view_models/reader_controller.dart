@@ -27,6 +27,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'reader_controller.freezed.dart';
 part 'reader_controller.g.dart';
 part 'reader_controller_navigation.dart';
+part 'reader_controller_auto_play.dart';
 
 /// 翻页越界切卷的二次确认方向（末页→下一卷 / 首页→上一卷）。
 enum SeriesBoundaryPrompt { none, advance, retreat }
@@ -124,7 +125,7 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
 
 @riverpod
 class ReaderController extends _$ReaderController
-    with _ReaderControllerNavigation {
+    with _ReaderControllerNavigation, _ReaderControllerAutoPlay {
   @override
   Future<ReaderState> build(ReaderControllerKey key) async {
     final String id = key.comicId;
