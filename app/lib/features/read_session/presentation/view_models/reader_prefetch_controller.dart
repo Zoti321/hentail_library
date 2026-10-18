@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
+import 'package:hentai_library/shared/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_logic.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_image_cache.dart';

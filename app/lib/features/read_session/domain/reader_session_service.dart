@@ -8,8 +8,8 @@ import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
-import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
+import 'package:hentai_library/shared/domain/reading/read_session_page.dart';
+import 'package:hentai_library/shared/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 
 /// 阅读 I/O 编排：显式 open/close、页码约定与 session snapshot。

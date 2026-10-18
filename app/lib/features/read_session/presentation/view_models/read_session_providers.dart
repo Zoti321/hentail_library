@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:hentai_library/shared/domain/models/entity/reading_history.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
+import 'package:hentai_library/shared/domain/reading/read_session_page.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
+import 'package:hentai_library/shared/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 import 'package:hentai_library/features/read_session/di/session_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
