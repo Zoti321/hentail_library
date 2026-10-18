@@ -5,14 +5,18 @@ import 'package:path/path.dart' as p;
 /// Phase B (end-state): enabled at bootstrap-final (#258 / #219).
 const bool kEnforceWayfinderPhaseBLayout = true;
 
-/// Phase A allow-list; legacy `core/` `data/` `domain/` `ui/` roots were removed in #258.
+/// Phase A allow-list; legacy `data/` `domain/` `ui/` roots were removed in #258.
+/// `core/` is the app cross-cutting kernel (l10n, logging, util), moved back to
+/// `lib/core` on 2026-10-18 (see docs/wayfinder/source-ownership-matrix.md).
 const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
+  'core',
   'features',
   'shared',
   'src',
 };
 
 const Set<String> kWayfinderPhaseBTopLevelLibDirs = <String>{
+  'core',
   'features',
   'shared',
   'src',
