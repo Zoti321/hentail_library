@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/library_prefer_library_root_series.dart';
-import 'package:hentai_library/features/library_browse/domain/library_series_projection.dart';
+import 'package:hentai_library/shared/domain/library/library_series_projection.dart';
 import 'package:hentai_library/shared/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/library/library_serialization_status_filter.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
