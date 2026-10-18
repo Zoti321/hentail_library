@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/shared/data/adapters/reader_frb_mapper.dart';
+import 'package:hentai_library/features/read_session/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
