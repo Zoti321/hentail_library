@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
-import 'package:hentai_library/features/library_browse/domain/library_tri_state_pick.dart';
+import 'package:hentai_library/shared/domain/library/library_tri_state_pick.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_filter_accordion.dart';

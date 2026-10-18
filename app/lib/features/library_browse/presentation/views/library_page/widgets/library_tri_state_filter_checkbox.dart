@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/library_browse/domain/library_tri_state_pick.dart';
+import 'package:hentai_library/shared/domain/library/library_tri_state_pick.dart';
 
 class LibraryTriStateFilterCheckbox extends StatelessWidget {
   const LibraryTriStateFilterCheckbox({
