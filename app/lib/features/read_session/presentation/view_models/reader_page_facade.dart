@@ -9,6 +9,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'reader_page_facade.freezed.dart';
 part 'reader_page_facade.g.dart';
 
+/// 控制器状态投影：外壳仅依赖漫画与总页数（翻页索引不在此列）。
+typedef _ReaderPageViewShell = ({Comic comic, int totalPages});
+
 /// 阅读页外壳的稳定打开态字段（不含翻页索引 / chrome / 阅读模式）。
 typedef ReaderPageShellData = ({
   Comic comic,
@@ -46,21 +49,21 @@ ReaderPageFacadeState readerPageFacade(
     startFromFirstPage: startFromFirstPage,
   );
   // 外壳只关心 comic + totalPages：翻页不得重建页面根。
-  final AsyncValue<({Comic comic, int totalPages})> viewShellAsync = ref.watch(
+  final AsyncValue<_ReaderPageViewShell> viewShellAsync = ref.watch(
     readerControllerProvider(viewKey).select((
       AsyncValue<ReaderState> asyncState,
     ) {
       if (asyncState.hasError) {
-        return AsyncError<({Comic comic, int totalPages})>(
+        return AsyncError<_ReaderPageViewShell>(
           asyncState.error!,
           asyncState.stackTrace!,
         );
       }
       final ReaderState? state = asyncState.asData?.value;
       if (state == null) {
-        return const AsyncLoading<({Comic comic, int totalPages})>();
+        return const AsyncLoading<_ReaderPageViewShell>();
       }
-      return AsyncData<({Comic comic, int totalPages})>((
+      return AsyncData<_ReaderPageViewShell>((
         comic: state.comic,
         totalPages: state.totalPages,
       ));
@@ -91,7 +94,7 @@ ReaderPageFacadeState readerPageFacade(
 }
 
 AsyncValue<ReaderPageShellData> _combineReaderShell(
-  AsyncValue<({Comic comic, int totalPages})> viewShell,
+  AsyncValue<_ReaderPageViewShell> viewShell,
   AsyncValue<ReadSessionContextData> session,
 ) {
   if (viewShell.hasError) {
@@ -100,7 +103,7 @@ AsyncValue<ReaderPageShellData> _combineReaderShell(
   if (session.hasError) {
     return AsyncError(session.error!, session.stackTrace!);
   }
-  final ({Comic comic, int totalPages})? view = viewShell.asData?.value;
+  final _ReaderPageViewShell? view = viewShell.asData?.value;
   final ReadSessionContextData? sessionData = session.asData?.value;
   if (view == null || sessionData == null) {
     return const AsyncLoading<ReaderPageShellData>();

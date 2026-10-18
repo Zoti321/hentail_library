@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_back_header.dart';
@@ -126,30 +127,24 @@ class DetailErrorStatus extends StatelessWidget {
   }
 }
 
-class _DetailRetryButton extends StatefulWidget {
+class _DetailRetryButton extends HookWidget {
   const _DetailRetryButton({required this.onRetry});
 
   final VoidCallback onRetry;
 
   @override
-  State<_DetailRetryButton> createState() => _DetailRetryButtonState();
-}
-
-class _DetailRetryButtonState extends State<_DetailRetryButton> {
-  bool retrying = false;
-
-  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final AppLocalizations l10n = context.l10n;
+    final ValueNotifier<bool> retrying = useState<bool>(false);
     return TextButton.icon(
-      onPressed: retrying
+      onPressed: retrying.value
           ? null
           : () {
-              setState(() => retrying = true);
-              widget.onRetry();
+              retrying.value = true;
+              onRetry();
             },
-      icon: retrying
+      icon: retrying.value
           ? SizedBox(
               width: 16,
               height: 16,
@@ -159,7 +154,7 @@ class _DetailRetryButtonState extends State<_DetailRetryButton> {
               ),
             )
           : const Icon(LucideIcons.refreshCw, size: 16),
-      label: Text(retrying ? l10n.shellRetrying : l10n.shellRetry),
+      label: Text(retrying.value ? l10n.shellRetrying : l10n.shellRetry),
     );
   }
 }

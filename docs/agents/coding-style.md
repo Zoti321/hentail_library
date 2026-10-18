@@ -76,7 +76,7 @@ Presentation layer follows **MVVM with Riverpod** (ADR-0017). State management i
 | Suffix | Use |
 |--------|-----|
 | `{Noun}Notifier` | Mutable UI state (`SettingsNotifier`) |
-| `{noun}ViewModel` provider | Read-only aggregate (`readerPageViewModel`) |
+| `{noun}ViewModel` provider | Read-only aggregate（页面根聚合用 Facade Provider，如 `readerPageFacadeProvider`，见上文 Complex pages） |
 | `{Noun}Controller` | Pagination catalog or long-running orchestration only (`ScanLibraryController`, `LibraryComicsCatalogController`) |
 
 ## Widget state
