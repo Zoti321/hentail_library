@@ -3,7 +3,14 @@ import 'dart:typed_data';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_image_cache.dart';
+/// Builds a reader-scoped [ImageProvider] (injected from read_session).
+typedef ReaderComicImageProviderBuilder =
+    ImageProvider<Object>? Function({
+      String? filePath,
+      Uint8List? memoryBytes,
+      int? cacheWidth,
+      int? cacheHeight,
+    });
 
 class AppComicImage extends StatelessWidget {
   const AppComicImage({
@@ -19,6 +26,7 @@ class AppComicImage extends StatelessWidget {
     this.errorPlaceholder,
     this.filterQuality = FilterQuality.medium,
     this.useReaderImageCache = false,
+    this.readerImageProviderBuilder,
     this.onDecodeError,
   });
 
@@ -37,17 +45,22 @@ class AppComicImage extends StatelessWidget {
   final Widget? errorPlaceholder;
   final FilterQuality filterQuality;
   final bool useReaderImageCache;
+  final ReaderComicImageProviderBuilder? readerImageProviderBuilder;
   final VoidCallback? onDecodeError;
 
   @override
   Widget build(BuildContext context) {
     if (useReaderImageCache) {
-      final ImageProvider<Object>? provider = buildReaderImageProvider(
-        filePath: filePath,
-        memoryBytes: memoryBytes,
-        cacheWidth: cacheWidth,
-        cacheHeight: cacheHeight,
-      );
+      final ReaderComicImageProviderBuilder? buildProvider =
+          readerImageProviderBuilder;
+      final ImageProvider<Object>? provider = buildProvider == null
+          ? null
+          : buildProvider(
+              filePath: filePath,
+              memoryBytes: memoryBytes,
+              cacheWidth: cacheWidth,
+              cacheHeight: cacheHeight,
+            );
       if (provider == null) {
         return _buildErrorPlaceholder();
       }

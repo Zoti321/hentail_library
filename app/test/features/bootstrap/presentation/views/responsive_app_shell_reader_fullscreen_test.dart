@@ -8,7 +8,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/chrome/app_title_bar.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_fullscreen_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';

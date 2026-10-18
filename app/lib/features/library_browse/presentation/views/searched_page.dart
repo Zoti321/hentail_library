@@ -9,7 +9,7 @@ import 'package:hentai_library/features/library_browse/presentation/comic_card_h
 import 'package:hentai_library/shared/ui/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page/widgets/searched_page_header.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/library_management_actions.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/features/library_browse/presentation/content_breadcrumb_labels.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_return_series_notifier.dart';

@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/widgets/chrome/app_title_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/chrome/diagnostic_mode_banner.dart';
 import 'package:hentai_library/shared/ui/shell/app_shell_sidebar_slot.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
 
@@ -131,7 +130,6 @@ class ResponsiveAppShell extends StatelessWidget {
                   isReaderRoute: isReaderRoute,
                   isReaderFullscreen: isReaderFullscreen,
                 ),
-              if (showShellChrome) const DiagnosticModeBanner(),
               if (showShellChrome)
                 ...shellFeedbackBelowTitleBar,
               Expanded(

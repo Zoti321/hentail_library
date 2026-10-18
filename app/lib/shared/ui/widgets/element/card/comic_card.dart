@@ -8,6 +8,7 @@ import 'package:hentai_library/shared/ui/widgets/element/card/catalog_cover_card
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/comic_context_menu.dart';
+import 'package:riverpod/misc.dart' show ProviderListenable;
 
 class ComicCard extends StatelessWidget {
   const ComicCard({
@@ -18,6 +19,7 @@ class ComicCard extends StatelessWidget {
     required this.onReadComic,
     required this.onTrashComic,
     this.gridIndex,
+    this.catalogCoverViewport,
     this.selectionMode = false,
   });
 
@@ -27,6 +29,7 @@ class ComicCard extends StatelessWidget {
   final VoidCallback onReadComic;
   final VoidCallback onTrashComic;
   final int? gridIndex;
+  final ProviderListenable<Set<int>>? catalogCoverViewport;
   final bool selectionMode;
 
   @override
@@ -44,7 +47,11 @@ class ComicCard extends StatelessWidget {
           : (LongPressStartDetails details) {
               _showContextMenu(context, details.globalPosition);
             },
-      cover: ComicCoverContent(comicId: comic.comicId, gridIndex: gridIndex),
+      cover: ComicCoverContent(
+        comicId: comic.comicId,
+        gridIndex: gridIndex,
+        coverViewport: catalogCoverViewport,
+      ),
       info: (bool isHover) => _ComicCardInfo(
         title: comic.title,
         pageCount: comic.pageCount,

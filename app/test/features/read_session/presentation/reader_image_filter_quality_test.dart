@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
-import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_image_filter_quality.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_image_filter_quality.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

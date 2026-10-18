@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/domain/models/value_objects/form/library_f
 import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/library_form_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/dialogs/library_form_dialog.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';

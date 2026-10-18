@@ -9,10 +9,10 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/common.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_image_cache.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_image_cache.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/page_image_copy_provider.dart';
-import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_image_filter_quality.dart';
-import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_page_fade_in.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_image_filter_quality.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_page_fade_in.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -79,6 +79,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
               fit: widget.fit,
               filterQuality: filterQuality,
               useReaderImageCache: true,
+              readerImageProviderBuilder: buildReaderImageProvider,
               cacheWidth: cacheWidth,
               loadingPlaceholder: loadingSurface,
               errorPlaceholder: errorPlaceholder,
@@ -120,6 +121,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
                 fit: widget.fit,
                 filterQuality: filterQuality,
                 useReaderImageCache: true,
+              readerImageProviderBuilder: buildReaderImageProvider,
                 cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,
                 errorPlaceholder: errorPlaceholder,
@@ -179,6 +181,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           fit: widget.fit,
           filterQuality: filterQuality,
           useReaderImageCache: true,
+          readerImageProviderBuilder: buildReaderImageProvider,
           cacheWidth: cacheWidth,
           loadingPlaceholder: loadingSurface,
           errorPlaceholder: errorPlaceholder,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/destructive_filled_button.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/clear_application_data_confirm_dialog.dart';
+import 'package:hentai_library/features/app_settings/presentation/views/dialogs/clear_application_data_confirm_dialog.dart';
 
 import '../../../../../../support/pump_localized_app.dart';
 

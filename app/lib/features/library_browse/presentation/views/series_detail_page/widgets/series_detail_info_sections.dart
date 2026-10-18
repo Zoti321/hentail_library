@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_info_sections.dart';
-import 'package:hentai_library/shared/ui/widgets/author/show_author_detail.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/show_author_detail.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 休刊状态 chip 描边/文字色（仅系列详情页使用）。

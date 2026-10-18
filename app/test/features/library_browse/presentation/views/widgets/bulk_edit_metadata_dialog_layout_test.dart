@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/shared/ui/widgets/form/tag_library_multi_select_field.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/bulk_edit_metadata_dialog.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';

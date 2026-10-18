@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/app_settings/presentation/views/widgets/diagnostic_mode_banner.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/comic_metadata_bulk_patch_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_scan_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
@@ -47,6 +48,7 @@ class ApplicationShell extends ConsumerWidget {
       },
       isReaderFullscreen: readerFullscreen,
       shellFeedbackBelowTitleBar: const <Widget>[
+        DiagnosticModeBanner(),
         LibraryScanShellFeedback(),
         ComicMetadataBulkPatchShellFeedback(),
       ],

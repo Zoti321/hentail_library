@@ -1,0 +1,63 @@
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
+import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
+
+void main() {
+  group('resolveReaderTapZone', () {
+    test('maps left and right thirds', () {
+      expect(
+        resolveReaderTapZone(globalX: 100, width: 1000),
+        ReaderTapZone.left,
+      );
+      expect(
+        resolveReaderTapZone(globalX: 500, width: 1000),
+        ReaderTapZone.center,
+      );
+      expect(
+        resolveReaderTapZone(globalX: 800, width: 1000),
+        ReaderTapZone.right,
+      );
+    });
+  });
+
+  group('readerKeyboardCommandFor', () {
+    test('arrows turn pages and space toggles auto-play', () {
+      expect(
+        readerKeyboardCommandFor(
+          LogicalKeyboardKey.arrowLeft,
+          showControls: false,
+        ),
+        ReaderKeyboardCommand.prevPage,
+      );
+      expect(
+        readerKeyboardCommandFor(
+          LogicalKeyboardKey.arrowRight,
+          showControls: false,
+        ),
+        ReaderKeyboardCommand.nextPage,
+      );
+      expect(
+        readerKeyboardCommandFor(LogicalKeyboardKey.space, showControls: false),
+        ReaderKeyboardCommand.toggleAutoPlay,
+      );
+    });
+
+    test('escape hides controls when they are visible', () {
+      expect(
+        readerKeyboardCommandFor(LogicalKeyboardKey.escape, showControls: true),
+        ReaderKeyboardCommand.hideControls,
+      );
+    });
+
+    test('escape exits when controls are hidden', () {
+      expect(
+        readerKeyboardCommandFor(
+          LogicalKeyboardKey.escape,
+          showControls: false,
+        ),
+        ReaderKeyboardCommand.exit,
+      );
+    });
+  });
+}

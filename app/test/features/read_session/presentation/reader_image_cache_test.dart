@@ -4,8 +4,8 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/image/image_cache_config.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_image_cache.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_prefetch_logic.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_image_cache.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_logic.dart';
 
 void main() {
   tearDown(clearReaderImageCache);

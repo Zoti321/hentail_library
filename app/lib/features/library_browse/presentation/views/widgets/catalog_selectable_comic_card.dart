@@ -3,6 +3,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic_card_host.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/shared/ui/widgets/element/card/comic_card.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -31,6 +32,7 @@ class CatalogSelectableComicCard extends ConsumerWidget {
         onTap: onOpenDetail,
         onReadComic: () => ComicCardHost.openReader(comic.comicId),
         onTrashComic: () => ComicCardHost.confirmTrash(context, ref, comic),
+        catalogCoverViewport: libraryCatalogCoverViewportProvider,
       );
     }
 
@@ -50,6 +52,7 @@ class CatalogSelectableComicCard extends ConsumerWidget {
           onReadComic: () => ComicCardHost.openReader(comic.comicId),
           onTrashComic: () =>
               ComicCardHost.confirmTrash(context, ref, comic),
+          catalogCoverViewport: libraryCatalogCoverViewportProvider,
           selectionMode: true,
         ),
         Positioned(

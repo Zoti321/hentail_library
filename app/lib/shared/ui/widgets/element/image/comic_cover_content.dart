@@ -3,7 +3,6 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
@@ -87,8 +86,10 @@ class ComicCoverContent extends ConsumerWidget {
       return priority;
     }
     // Per-index select: only rebuild when this cell enters/leaves the viewport.
-    final ProviderListenable<Set<int>> viewport =
-        coverViewport ?? libraryCatalogCoverViewportProvider;
+    final ProviderListenable<Set<int>>? viewport = coverViewport;
+    if (viewport == null) {
+      return ThumbnailPriority.high;
+    }
     final bool inViewport = ref.watch(
       viewport.select((Set<int> indices) => indices.contains(index)),
     );

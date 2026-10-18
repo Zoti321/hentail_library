@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
-import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/reader_viewport_pages.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_pages.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 
 void main() {

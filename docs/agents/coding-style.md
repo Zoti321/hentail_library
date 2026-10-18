@@ -17,10 +17,43 @@ Monorepo (`app/` Flutter, `core/` Rust): see `docs/agents/rust-core.md`. Dart la
 | `data/repositories/` | Thin FRB adapters. No Drift. |
 | `data/adapters/` | Mapper / guard / FRB call adapters. |
 | `data/services/` | Dart-only services (app update, tag dictionary download). |
-| `ui/` | Shared widgets/theme and feature modules (`features/*/view_models/`, `features/shell/di/`). |
+| `shared/` | Cross-feature Dart: `domain/`, `di/`, `ui/`, `util/` (not under `features/`). |
+| `features/*/` | Vertical slices: `data/`, `domain/`, `di/`, `presentation/` (`views/`, `view_models/`, feature-only `widgets/`). |
+| `features/bootstrap/` | App entry, routing, **composition root** (`ApplicationShell` injects shell slots). |
 | `src/rust/` | FRB generated — do not hand-edit. |
 
-Import canonical paths from `app/lib/`. Do not add Flutter sources at the repo root or under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`).
+Import canonical paths from `app/lib/`. Do not add Flutter sources at the repo root or under removed legacy roots (`presentation/` at repo root, `model/`, `repository/`, `services/`, `usecases/`, `database/`).
+
+### Shared UI layers (ADR-0027)
+
+Presentation MVVM (below) coexists with a **four-layer shared UI model**. Physical roots:
+
+| Layer | Path | May import `features/`? |
+|-------|------|-------------------------|
+| **Shell** | `shared/ui/shell/` | **No** — layout chrome only; feature chrome via bootstrap slots |
+| **Layout** | `shared/ui/layout/` | **No** — breakpoints, catalog/detail templates, sliver math |
+| **Component** | `shared/ui/widgets/` | **No** — primitives, dialog **shells**, form controls without feature ViewModels |
+| **Interaction** | `shared/ui/interaction/` | **No** — input mapping helpers that must not depend on a single feature |
+| **Theme** | `shared/ui/theme/` | **No** |
+
+**Feature composition** (`features/*/presentation/`) owns pages, domain dialogs (update, library form, metadata editor), `*Host` wrappers, and anything that `ref.watch`es a feature Notifier.
+
+**Composition root** (`ApplicationShell` in bootstrap) wires shell feedback (e.g. diagnostic banner), sidebar builders (`LibrariesAppSidebar` via `AppShellSidebarSlot`), and other cross-feature chrome — not `ResponsiveAppShell` itself.
+
+**Dependency gate:** `test/gate/shared_ui_no_feature_import_test.dart` scans `shared/ui/widgets`, `layout`, and `shell` for `package:.../features/` imports. Allowlist file must stay **empty** in steady state; fix violations by moving code or injecting callbacks — do not grow the allowlist for convenience.
+
+**Placement rules when adding UI**
+
+- Shared component needs feature data → **constructor callbacks** or a feature `*Host` widget; never import feature providers inside `shared/ui/**`.
+- Dialog shows feature-specific copy or orchestration → `features/<feature>/presentation/views/dialogs/` (may still use `HentaiDialog` / `AdaptiveFormSurface` from shared).
+- Catalog toolbar, facet multi-select, author surfaces → `library_browse` (or the owning feature), not `shared/ui/widgets/`.
+- Cover decode priority / reader image provider → pass `ProviderListenable` or builder from feature into shared `ComicCoverContent` / `AppComicImage`.
+
+**Large widgets**
+
+- Prefer **one public type per file** under `shared/ui/widgets/**` (strict name match).
+- When a control grows past ~400–500 lines, split with **`part` / `part of`** in the same library (keep a single import path for callers). Example pattern: main file exports public API; `*_state.dart` / `*_menu.dart` or tab `part` files hold private types.
+- Do not split solely to satisfy line count if it fragments cohesive behavior without improving navigation — split at natural seams (menu overlay vs field state vs tab pane).
 
 ## UI architecture (MVVM)
 
@@ -28,7 +61,7 @@ Presentation layer follows **MVVM with Riverpod** (ADR-0017). State management i
 
 | Layer | Path | Role |
 |-------|------|------|
-| View | `features/*/presentation/views/**`, `shared/ui/widgets/` | Render; `ref.watch` ViewModel/Facade; fire commands via Notifier or callbacks |
+| View | `features/*/presentation/views/**`, `shared/ui/{widgets,layout,shell}/` | Render; `ref.watch` ViewModel/Facade; fire commands via Notifier or callbacks |
 | ViewModel | `features/*/presentation/view_models/` | UI state, Repository/Service orchestration, command API |
 | Model | `domain/models/`, `domain/repositories/` | Entities and repository interfaces |
 

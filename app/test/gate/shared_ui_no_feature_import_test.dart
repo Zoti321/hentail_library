@@ -26,6 +26,7 @@ List<String> collectSharedUiFeatureImportViolations(Directory libDir) {
     'shared/ui/widgets',
     'shared/ui/layout',
     'shared/ui/shell',
+    'shared/ui/interaction',
   ];
   final List<String> violations = <String>[];
   for (final String root in roots) {

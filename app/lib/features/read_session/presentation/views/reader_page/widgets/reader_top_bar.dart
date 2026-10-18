@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/ui/interaction/app_motion.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/features/read_session/presentation/module/controller/reader_series_navigation.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_series_navigation.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_floating_panel.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_overflow_menu.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';

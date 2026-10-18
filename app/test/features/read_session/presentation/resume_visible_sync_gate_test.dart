@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/read_session/presentation/module/widgets/viewport/resume_visible_sync_gate.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/viewport/resume_visible_sync_gate.dart';
 
 void main() {
   group('ResumeVisibleSyncGate', () {

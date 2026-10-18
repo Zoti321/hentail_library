@@ -16,7 +16,7 @@ import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/features/library_browse/presentation/library.dart';
 import 'package:hentai_library/shared/domain/library/library_scan_activity_state.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/filter_popup_button.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/filter_popup_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/sort_popup_button.dart';
@@ -34,7 +34,7 @@ import 'package:hentai_library/features/library_browse/presentation/views/librar
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_catalog_grid_animation.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/catalog_selectable_comic_card.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/library_management_actions.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_management_actions.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'animated_library_catalog_grid_sliver.dart';

@@ -1,0 +1,55 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/widgets/form/multi_select.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/form/named_facet_multi_select_field.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_smart_facet_providers.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// 全库作者多选：字段内 chip + 内联输入；浮层列出未选字典项。
+class AuthorLibraryMultiSelectField extends ConsumerWidget {
+  const AuthorLibraryMultiSelectField({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.selectedNames,
+    required this.onAdd,
+    required this.onRemove,
+    required this.scope,
+    this.labelTrailing,
+    this.compactTrigger = false,
+  });
+
+  final String label;
+  final Widget? labelTrailing;
+  final IconData icon;
+  final List<String> selectedNames;
+  final ValueChanged<String> onAdd;
+  final ValueChanged<String> onRemove;
+  final ComicMetadataSmartFacetScope scope;
+
+  /// When true, shortens the field chrome (e.g. metadata dialog).
+  final bool compactTrigger;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    return NamedFacetMultiSelectField(
+      label: label,
+      labelTrailing: labelTrailing,
+      icon: icon,
+      selectedNames: selectedNames,
+      onAdd: onAdd,
+      onRemove: onRemove,
+      compactTrigger: compactTrigger,
+      itemsProvider: authorsSmartForComicMetadataFormProvider(scope),
+      onRetry: () =>
+          ref.invalidate(authorsSmartForComicMetadataFormProvider(scope)),
+      copy: MultiSelectCopy(
+        inputPlaceholder: l10n.formAuthorSelectPlaceholder,
+        listLoadFailed: l10n.formAuthorListLoadFailed,
+        emptyCatalog: l10n.formAuthorEmptyCatalog,
+        emptyRemaining: l10n.formAuthorEmptyRemaining,
+      ),
+    );
+  }
+}
