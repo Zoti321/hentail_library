@@ -20,7 +20,6 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_series_navigation.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -64,63 +63,6 @@ abstract class ReaderState with _$ReaderState {
   ReaderState._();
 
   int get totalPages => totalPagesOverride ?? 0;
-}
-
-class ReaderPageViewModel {
-  const ReaderPageViewModel({
-    required this.viewState,
-    required this.sessionContext,
-  });
-  final ReaderState viewState;
-  final ReadSessionContextData sessionContext;
-
-  ReaderNavContextData get navContext => sessionContext.navContext;
-  int? get preferredPageIndex => sessionContext.preferredPageIndex;
-  bool get hasSeriesContext => sessionContext.hasSeriesContext;
-  String? get seriesId => sessionContext.seriesId;
-}
-
-@riverpod
-AsyncValue<ReaderPageViewModel> readerPageViewModel(
-  Ref ref, {
-  required String comicId,
-  bool incognito = false,
-  bool startFromFirstPage = false,
-}) {
-  final AsyncValue<ReaderState> viewAsync = ref.watch(
-    readerControllerProvider(
-      readerControllerKey(
-        comicId,
-        incognito: incognito,
-        startFromFirstPage: startFromFirstPage,
-      ),
-    ),
-  );
-  final AsyncValue<ReadSessionContextData> sessionContextAsync = ref.watch(
-    readSessionContextForReaderProvider(
-      comicId: comicId,
-      incognito: incognito,
-      startFromFirstPage: startFromFirstPage,
-    ),
-  );
-  if (viewAsync.hasError) {
-    return AsyncError(viewAsync.error!, viewAsync.stackTrace!);
-  }
-  if (sessionContextAsync.hasError) {
-    return AsyncError(
-      sessionContextAsync.error!,
-      sessionContextAsync.stackTrace!,
-    );
-  }
-  final ReaderState? viewState = viewAsync.asData?.value;
-  final ReadSessionContextData? sessionContext =
-      sessionContextAsync.asData?.value;
-  if (viewState == null || sessionContext == null) {
-    return const AsyncLoading();
-  }
-  return AsyncData(
-    ReaderPageViewModel(viewState: viewState, sessionContext: sessionContext),
-  );
 }
 
 @riverpod

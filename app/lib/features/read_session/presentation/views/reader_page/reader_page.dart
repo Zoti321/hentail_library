@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
@@ -23,20 +22,12 @@ import 'package:hentai_library/features/read_session/presentation/views/reader_p
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_top_bar.dart';
 import 'package:hentai_library/features/read_session/di/session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 
 part 'reader_page_slots.dart';
-
-/// Stable open-session fields for [ReaderPage] shell (excludes index/chrome/mode).
-typedef ReaderPageShellData = ({
-  Comic comic,
-  int totalPages,
-  ReadSessionContextData sessionContext,
-});
 
 class ReaderPage extends HookConsumerWidget {
   const ReaderPage({
@@ -59,11 +50,6 @@ class ReaderPage extends HookConsumerWidget {
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
     );
-    final ReaderControllerKey viewKey = readerControllerKey(
-      routeContext.comicId,
-      incognito: routeContext.incognito,
-      startFromFirstPage: routeContext.startFromFirstPage,
-    );
 
     if (routeContext.comicId.isEmpty) {
       return Theme(
@@ -76,39 +62,19 @@ class ReaderPage extends HookConsumerWidget {
 
     final ThemeData theme = buildAppTheme(Brightness.dark);
 
-    // Shell watch: comic + totalPages only — page turns must not rebuild chrome tree.
-    final AsyncValue<({Comic comic, int totalPages})> viewShellAsync = ref
-        .watch(
-          readerControllerProvider(viewKey).select((
-            AsyncValue<ReaderState> asyncState,
-          ) {
-            if (asyncState.hasError) {
-              return AsyncError<({Comic comic, int totalPages})>(
-                asyncState.error!,
-                asyncState.stackTrace!,
-              );
-            }
-            final ReaderState? state = asyncState.asData?.value;
-            if (state == null) {
-              return const AsyncLoading<({Comic comic, int totalPages})>();
-            }
-            return AsyncData<({Comic comic, int totalPages})>((
-              comic: state.comic,
-              totalPages: state.totalPages,
-            ));
-          }),
-        );
-    final AsyncValue<ReadSessionContextData> sessionAsync = ref.watch(
-      readSessionContextForReaderProvider(
+    // 根节点唯一 watch：外壳 / 全屏 / 切卷提示均由 Facade 聚合（ADR-0017）。
+    final ReaderPageFacadeState facade = ref.watch(
+      readerPageFacadeProvider(
         comicId: routeContext.comicId,
         incognito: routeContext.incognito,
         startFromFirstPage: routeContext.startFromFirstPage,
       ),
     );
-    final AsyncValue<ReaderPageShellData> shellAsync = _combineReaderShell(
-      viewShellAsync,
-      sessionAsync,
-    );
+    final ReaderControllerKey viewKey = facade.viewKey;
+    final AsyncValue<ReaderPageShellData> shellAsync = facade.shellAsync;
+    final bool readerFullscreen = facade.readerFullscreen;
+    final SeriesBoundaryPrompt seriesBoundaryPrompt =
+        facade.seriesBoundaryPrompt;
 
     final bool readerReady = shellAsync.hasValue;
     final ReaderPageShellData? loadedShell = shellAsync.asData?.value;
@@ -166,14 +132,6 @@ class ReaderPage extends HookConsumerWidget {
       readerControllerProvider(viewKey).notifier,
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
-    final bool readerFullscreen = ref.watch(readerFullscreenControllerProvider);
-    final SeriesBoundaryPrompt seriesBoundaryPrompt = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> asyncState) =>
-            asyncState.asData?.value.seriesBoundaryPrompt ??
-            SeriesBoundaryPrompt.none,
-      ),
-    );
     final GlobalKey<ScaffoldState> scaffoldKey = useMemoized(
       GlobalKey<ScaffoldState>.new,
       <Object?>[],
@@ -387,26 +345,4 @@ class ReaderPage extends HookConsumerWidget {
       ),
     );
   }
-}
-
-AsyncValue<ReaderPageShellData> _combineReaderShell(
-  AsyncValue<({Comic comic, int totalPages})> viewShell,
-  AsyncValue<ReadSessionContextData> session,
-) {
-  if (viewShell.hasError) {
-    return AsyncError(viewShell.error!, viewShell.stackTrace!);
-  }
-  if (session.hasError) {
-    return AsyncError(session.error!, session.stackTrace!);
-  }
-  final ({Comic comic, int totalPages})? view = viewShell.asData?.value;
-  final ReadSessionContextData? sessionData = session.asData?.value;
-  if (view == null || sessionData == null) {
-    return const AsyncLoading<ReaderPageShellData>();
-  }
-  return AsyncData<ReaderPageShellData>((
-    comic: view.comic,
-    totalPages: view.totalPages,
-    sessionContext: sessionData,
-  ));
 }
