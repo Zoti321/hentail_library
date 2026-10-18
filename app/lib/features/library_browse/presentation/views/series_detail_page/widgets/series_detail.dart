@@ -7,7 +7,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/library_pagination_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/responsive_layout/detail_primary_row_layout.dart';
+import 'package:hentai_library/shared/ui/layout/detail_primary_row_layout.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_comics_catalog_state.dart';

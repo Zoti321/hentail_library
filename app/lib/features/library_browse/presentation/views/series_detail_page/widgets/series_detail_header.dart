@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/page_size_menu.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/page_size_menu_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/anchored_overlay_menu.dart';

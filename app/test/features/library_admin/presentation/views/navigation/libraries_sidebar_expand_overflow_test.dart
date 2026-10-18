@@ -32,7 +32,7 @@ void main() {
         routes: <RouteBase>[
           ShellRoute(
             builder: (BuildContext context, GoRouterState state, Widget child) {
-              return ResponsiveAppShell(routeChild: child);
+              return ApplicationShell(routeChild: child);
             },
             routes: <RouteBase>[
               GoRoute(

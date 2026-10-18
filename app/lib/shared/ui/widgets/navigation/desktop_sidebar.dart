@@ -4,9 +4,6 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/dto/nav_item_data.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Builds the Libraries section inserted after Home in [DesktopSidebar].
@@ -17,7 +14,7 @@ typedef DesktopSidebarLibrariesSectionBuilder =
       required bool showCollapsedTooltip,
     });
 
-class DesktopSidebar extends HookConsumerWidget {
+class DesktopSidebar extends HookWidget {
   static const double expandedWidth = 256;
   static const double collapsedWidth = 72;
 
@@ -53,6 +50,14 @@ class DesktopSidebar extends HookConsumerWidget {
   /// Compact / collapsed rail cannot enter Library reorder mode.
   final bool allowLibraryReorder;
 
+  final List<NavItemData> mainNavItems;
+  final List<NavItemData> systemNavItems;
+
+  /// [librariesSectionBuilder] is inserted after the nav item with this id.
+  final String librariesAnchorNavId;
+
+  final bool reorderMode;
+
   const DesktopSidebar({
     super.key,
     required this.activeId,
@@ -64,10 +69,14 @@ class DesktopSidebar extends HookConsumerWidget {
     this.librariesSectionBuilder,
     this.librariesReorderPaneBuilder,
     this.allowLibraryReorder = true,
+    required this.mainNavItems,
+    required this.systemNavItems,
+    required this.librariesAnchorNavId,
+    required this.reorderMode,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
@@ -91,21 +100,9 @@ class DesktopSidebar extends HookConsumerWidget {
       return null;
     }, <Object?>[isExpanded]);
 
-    useEffect(() {
-      if (!isExpanded || !allowLibraryReorder) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ref.read(libraryReorderModeProvider.notifier).exit();
-        });
-      }
-      return null;
-    }, <Object?>[isExpanded, allowLibraryReorder]);
-
     final l10n = context.l10n;
-    final bool reorderMode = ref.watch(libraryReorderModeProvider);
-    final List<NavItemData> menuItems = AppNavigation.desktopMainNavItems(l10n);
-    final List<NavItemData> systemItems = AppNavigation.desktopSystemNavItems(
-      l10n,
-    );
+    final List<NavItemData> menuItems = mainNavItems;
+    final List<NavItemData> systemItems = systemNavItems;
 
     return AnimatedBuilder(
       animation: expandController,
@@ -135,7 +132,7 @@ class DesktopSidebar extends HookConsumerWidget {
               onTap: () => onDestinationSelected(item.id),
             ),
           );
-          if (item.id == AppNavigation.navIdHome) {
+          if (item.id == librariesAnchorNavId) {
             final DesktopSidebarLibrariesSectionBuilder? builder =
                 librariesSectionBuilder;
             if (builder != null) {

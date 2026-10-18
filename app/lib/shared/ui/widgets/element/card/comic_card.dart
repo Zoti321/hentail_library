@@ -8,43 +8,41 @@ import 'package:hentai_library/shared/ui/widgets/element/card/catalog_cover_card
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/comic_context_menu.dart';
-import 'package:hentai_library/features/library_browse/presentation/comic_delete_flow.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ComicCard extends ConsumerWidget {
+class ComicCard extends StatelessWidget {
   const ComicCard({
     super.key,
     required this.comic,
     required this.onTap,
     required this.onEditMetadata,
+    required this.onReadComic,
+    required this.onTrashComic,
     this.gridIndex,
     this.selectionMode = false,
   });
 
   final Comic comic;
   final VoidCallback onTap;
-
-  /// 由 feature 打开元数据编辑表面并负责持久化。
   final VoidCallback onEditMetadata;
+  final VoidCallback onReadComic;
+  final VoidCallback onTrashComic;
   final int? gridIndex;
   final bool selectionMode;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return CatalogCoverCardShell(
       semanticLabel: comic.title,
       onTap: onTap,
       onSecondaryTapUp: selectionMode
           ? (_) => onTap()
           : (TapUpDetails details) {
-              _showContextMenu(context, ref, details.globalPosition);
+              _showContextMenu(context, details.globalPosition);
             },
       onLongPressStart: selectionMode
           ? (_) => onTap()
           : (LongPressStartDetails details) {
-              _showContextMenu(context, ref, details.globalPosition);
+              _showContextMenu(context, details.globalPosition);
             },
       cover: ComicCoverContent(comicId: comic.comicId, gridIndex: gridIndex),
       info: (bool isHover) => _ComicCardInfo(
@@ -55,11 +53,7 @@ class ComicCard extends ConsumerWidget {
     );
   }
 
-  void _showContextMenu(
-    BuildContext context,
-    WidgetRef ref,
-    Offset globalPosition,
-  ) {
+  void _showContextMenu(BuildContext context, Offset globalPosition) {
     ComicContextMenu.show(
       context,
       position: globalPosition,
@@ -68,12 +62,7 @@ class ComicCard extends ConsumerWidget {
         final l10n = context.l10n;
         switch (action) {
           case ComicContextAction.read:
-            appRouter.pushNamed(
-              ReaderRouteArgs.readerRouteName,
-              queryParameters: ReaderRouteArgs(
-                comicId: comic.comicId,
-              ).toQueryParameters(),
-            );
+            onReadComic();
           case ComicContextAction.edit:
             onEditMetadata();
           case ComicContextAction.showInExplorer:
@@ -101,7 +90,7 @@ class ComicCard extends ConsumerWidget {
               );
             });
           case ComicContextAction.delete:
-            confirmAndTrashComic(context, ref, comic);
+            onTrashComic();
         }
       },
     );

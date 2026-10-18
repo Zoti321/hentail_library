@@ -10,7 +10,7 @@ import 'package:hentai_library/features/bootstrap/presentation/views/all_librari
 import 'package:hentai_library/features/home/presentation/views/home_page/home_page.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
+import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_page/trash_page.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
@@ -33,7 +33,7 @@ final GoRouter appRouter = GoRouter(
   routes: <RouteBase>[
     ShellRoute(
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        return ResponsiveAppShell(routeChild: child);
+        return ApplicationShell(routeChild: child);
       },
       routes: <RouteBase>[
         GoRoute(

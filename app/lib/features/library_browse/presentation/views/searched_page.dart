@@ -5,6 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic_card_host.dart';
 import 'package:hentai_library/shared/ui/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page/widgets/searched_page_header.dart';
@@ -236,6 +237,13 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                         onEditMetadata: () => showEditMetadataDialog(
                           context: context,
                           comic: comic,
+                        ),
+                        onReadComic: () =>
+                            ComicCardHost.openReader(comic.comicId),
+                        onTrashComic: () => ComicCardHost.confirmTrash(
+                          context,
+                          ref,
+                          comic,
                         ),
                         onTap: () {
                           ref

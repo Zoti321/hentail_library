@@ -19,7 +19,7 @@ import 'package:hentai_library/shared/domain/library/library_scan_activity_state
 import 'package:hentai_library/shared/ui/widgets/actions/filter_popup_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_panel_shell.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/sort_popup_button.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/sort_popup_button.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/shared/ui/widgets/chrome/content_switcher_bottom_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/count_digit_chip.dart';

@@ -16,7 +16,9 @@ How agents should build UI in this project: reuse custom components, follow the 
 Shell / theme entry points:
 
 - `app/lib/features/bootstrap/presentation/views/app.dart` — `buildAppTheme` (light/dark)
-- `app/lib/features/bootstrap/presentation/views/routing/app_router.dart` — single `appRouter` + `ResponsiveAppShell`
+- `app/lib/features/bootstrap/presentation/views/routing/app_router.dart` — single `appRouter` + `ApplicationShell`（组合根，`application_shell.dart`）
+- `app/lib/shared/ui/shell/responsive_app_shell.dart` — `ResponsiveAppShell`（布局壳；通过 `AppShellSidebarSlot` / `AppShellSidebarBuilder` 注入侧栏）
+- `app/lib/features/library_admin/.../libraries_app_sidebar.dart` — `LibrariesAppSidebar`（Libraries 分区 + 主导航的具体实现）
 - `app/lib/shared/ui/layout/app_layout_breakpoints.dart` — compact / medium / expanded
 - `app/lib/core/util/utils.dart` — `isDesktop` for **window chrome only** (Windows / macOS / Linux; not web); do not fork page trees on it
 
@@ -150,7 +152,7 @@ Reuse widgets under `app/lib/shared/ui/widgets/` before adding a new primitive. 
 | Navigation | `navigation/` |
 | Overlays | `overlays/dialog/`, `overlays/context_menu/` |
 | Pagination | `pagination/` |
-| Layout | `responsive_layout/` |
+| Layout（含页面模板） | `app/lib/shared/ui/layout/`（如 `DetailPrimaryRowLayout`、`LibraryBlocksSliverGroup`） |
 
 Feature-only editors (`EditMetadataDialog`, `EditSeriesDialog`) live under `features/library_browse/presentation/views/**/widgets/`, not the shared overlay catalog.
 
@@ -166,9 +168,9 @@ Theme entry points:
 ### Existing helpers
 
 - **`AppLayoutBreakpoints`** — canonical widths: compact `< 600`, medium `600–1024`, expanded `≥ 1024` (`app/lib/shared/ui/layout/app_layout_breakpoints.dart`).
-- **`ResponsiveAppShell`** — compact drawer / medium collapsed sidebar / expanded sidebar; wraps all app routes.
-- **`DetailPrimaryRowLayout`** — comic/series detail cover + info: single column on compact, row on wider widths.
-- **`LibraryBlocksSliverGroup`** — standard library page sliver composition (series block + comics block).
+- **`ResponsiveAppShell`**（`shared/ui/shell/`）— compact drawer / medium collapsed sidebar / expanded sidebar; wraps all app routes; 侧栏由 `ApplicationShell` 注入 `LibrariesAppSidebar`。
+- **`DetailPrimaryRowLayout`**（`shared/ui/layout/`）— comic/series detail cover + info: single column on compact, row on wider widths.
+- **`LibraryBlocksSliverGroup`**（`shared/ui/layout/`）— standard library page sliver composition (series block + comics block).
 - **Settings list–detail** — settings hide the app sidebar and use a responsive master/detail (see **Settings list–detail** in `CONTEXT.md`).
 - **`LayoutBuilder` + `MediaQuery`** — prefer for local density; do not add new `isDesktop` page forks.
 
@@ -208,7 +210,8 @@ When narrowing: keep **desktop visual style** (colors, borders, GhostButton, cus
 ```
 app/lib/features/<feature>/presentation/views/   # feature screens (no desktop/ vs mobile/ split)
 app/lib/shared/ui/widgets/                       # shared custom components — extend here first
-app/lib/shared/ui/layout/                        # breakpoints / layout primitives
+app/lib/shared/ui/shell/                           # App shell（chrome 槽位、drawer、body）
+app/lib/shared/ui/layout/                        # breakpoints / layout primitives / page templates
 ```
 
 New shared screens: place widgets in `core/widgets` if cross-feature; keep feature-specific composition under `views/` without a `desktop/` / `mobile/` split.

@@ -80,7 +80,7 @@ Future<void> _pumpShellHome(WidgetTester tester, Size viewportSize) async {
             ShellRoute(
               builder:
                   (BuildContext context, GoRouterState state, Widget child) {
-                    return ResponsiveAppShell(routeChild: child);
+                    return ApplicationShell(routeChild: child);
                   },
               routes: <RouteBase>[
                 GoRoute(
