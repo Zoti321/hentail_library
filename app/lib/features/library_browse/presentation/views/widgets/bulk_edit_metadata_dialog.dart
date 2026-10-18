@@ -116,10 +116,17 @@ class _BulkEditMetadataDialogState
     }
   }
 
+  /// 字段被编辑后：先登记脏标记，再强制重建（与原 onChanged 中的组合行为一致）。
+  void _onFieldEdited(BulkMetadataEditFieldKind kind) {
+    _markDirty(kind);
+    setState(() {});
+  }
+
   bool _isFieldDirty(BulkMetadataEditFieldKind kind) =>
       _session.isFieldDirty(kind);
 
-  BulkMetadataEditFieldKind _defaultFieldForTab(_BulkEditTab tab) => tab.fields.first;
+  BulkMetadataEditFieldKind _defaultFieldForTab(_BulkEditTab tab) =>
+      tab.fields.first;
 
   void _selectTab(int index) {
     final _BulkEditTab tab = _BulkEditTab.values[index];
@@ -143,12 +150,17 @@ class _BulkEditMetadataDialogState
     return switch (kind) {
       BulkMetadataEditFieldKind.tags => l10n.bulkEditMetadataFieldTags,
       BulkMetadataEditFieldKind.authors => l10n.bulkEditMetadataFieldAuthors,
-      BulkMetadataEditFieldKind.languages => l10n.bulkEditMetadataFieldLanguages,
+      BulkMetadataEditFieldKind.languages =>
+        l10n.bulkEditMetadataFieldLanguages,
       BulkMetadataEditFieldKind.parodies => l10n.bulkEditMetadataFieldParodies,
-      BulkMetadataEditFieldKind.characters => l10n.bulkEditMetadataFieldCharacters,
-      BulkMetadataEditFieldKind.contentRating => l10n.bulkEditMetadataFieldContentRating,
-      BulkMetadataEditFieldKind.description => l10n.bulkEditMetadataFieldDescription,
-      BulkMetadataEditFieldKind.publishedAt => l10n.bulkEditMetadataFieldPublishedAt,
+      BulkMetadataEditFieldKind.characters =>
+        l10n.bulkEditMetadataFieldCharacters,
+      BulkMetadataEditFieldKind.contentRating =>
+        l10n.bulkEditMetadataFieldContentRating,
+      BulkMetadataEditFieldKind.description =>
+        l10n.bulkEditMetadataFieldDescription,
+      BulkMetadataEditFieldKind.publishedAt =>
+        l10n.bulkEditMetadataFieldPublishedAt,
     };
   }
 
@@ -162,13 +174,15 @@ class _BulkEditMetadataDialogState
       BulkMetadataEditFieldKind.tags ||
       BulkMetadataEditFieldKind.parodies ||
       BulkMetadataEditFieldKind.characters => () {
-        final BulkMetadataEditMultiValueFieldState state = _session.multiFields[kind]!;
+        final BulkMetadataEditMultiValueFieldState state =
+            _session.multiFields[kind]!;
         return l10n.bulkEditMetadataFieldSummaryCount(
           _multiOpLabels(l10n)[state.op] ?? state.op.name,
           state.values.length,
         );
       }(),
-      BulkMetadataEditFieldKind.description || BulkMetadataEditFieldKind.publishedAt => () {
+      BulkMetadataEditFieldKind.description ||
+      BulkMetadataEditFieldKind.publishedAt => () {
         final BulkMetadataEditScalarFieldState state = switch (kind) {
           BulkMetadataEditFieldKind.description => _session.descriptionField,
           BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField,
@@ -256,10 +270,12 @@ class _BulkEditMetadataDialogState
           child: _BulkEditFieldList(
             fields: _selectedTab.fields,
             selectedField: _selectedField,
-            labelFor: (BulkMetadataEditFieldKind kind) => _fieldLabel(l10n, kind),
+            labelFor: (BulkMetadataEditFieldKind kind) =>
+                _fieldLabel(l10n, kind),
             isDirty: _isFieldDirty,
             isMixed: _isFieldMixed,
-            summaryFor: (BulkMetadataEditFieldKind kind) => _fieldSummary(l10n, kind),
+            summaryFor: (BulkMetadataEditFieldKind kind) =>
+                _fieldSummary(l10n, kind),
             mixedLabel: l10n.bulkEditMetadataMixedValues,
             onSelect: _selectField,
           ),
@@ -287,14 +303,18 @@ class _BulkEditMetadataDialogState
 
   bool _isFieldMixed(BulkMetadataEditFieldKind kind) {
     return switch (kind) {
-      BulkMetadataEditFieldKind.description => _session.descriptionField.mixedValues,
-      BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField.mixedValues,
-      BulkMetadataEditFieldKind.contentRating => _session.contentRatingField.mixedValues,
+      BulkMetadataEditFieldKind.description =>
+        _session.descriptionField.mixedValues,
+      BulkMetadataEditFieldKind.publishedAt =>
+        _session.publishedAtField.mixedValues,
+      BulkMetadataEditFieldKind.contentRating =>
+        _session.contentRatingField.mixedValues,
       BulkMetadataEditFieldKind.languages ||
       BulkMetadataEditFieldKind.authors ||
       BulkMetadataEditFieldKind.tags ||
       BulkMetadataEditFieldKind.parodies ||
-      BulkMetadataEditFieldKind.characters => _session.multiFields[kind]!.mixedValues,
+      BulkMetadataEditFieldKind.characters =>
+        _session.multiFields[kind]!.mixedValues,
     };
   }
 
@@ -312,12 +332,12 @@ class _BulkEditMetadataDialogState
         state: _session.multiFields[kind]!,
         opLabels: _multiOpLabels(l10n),
         onChanged: () {
-          _markDirty(kind);
-          setState(() {});
+          _onFieldEdited(kind);
         },
         child: _buildMultiValueInput(l10n, scope, kind),
       ),
-      BulkMetadataEditFieldKind.description || BulkMetadataEditFieldKind.publishedAt => () {
+      BulkMetadataEditFieldKind.description ||
+      BulkMetadataEditFieldKind.publishedAt => () {
         final BulkMetadataEditScalarFieldState state = switch (kind) {
           BulkMetadataEditFieldKind.description => _session.descriptionField,
           BulkMetadataEditFieldKind.publishedAt => _session.publishedAtField,
@@ -327,8 +347,7 @@ class _BulkEditMetadataDialogState
           state: state,
           opLabels: _scalarOpLabels(l10n),
           onChanged: () {
-            _markDirty(kind);
-            setState(() {});
+            _onFieldEdited(kind);
           },
           child: kind == BulkMetadataEditFieldKind.description
               ? FluentTextField(
@@ -336,7 +355,8 @@ class _BulkEditMetadataDialogState
                   initialValue: _session.descriptionField.description,
                   maxLines: 4,
                   enabled:
-                      _session.descriptionField.op == ComicMetadataBulkScalarOp.replace,
+                      _session.descriptionField.op ==
+                      ComicMetadataBulkScalarOp.replace,
                   onChanged: (String value) {
                     _session.descriptionField.description = value;
                     _markDirty(BulkMetadataEditFieldKind.description);
@@ -346,7 +366,8 @@ class _BulkEditMetadataDialogState
                   labelText: l10n.bulkEditMetadataFieldPublishedAt,
                   value: _session.publishedAtField.publishedAt,
                   enabled:
-                      _session.publishedAtField.op == ComicMetadataBulkScalarOp.replace,
+                      _session.publishedAtField.op ==
+                      ComicMetadataBulkScalarOp.replace,
                   onChanged: (DateTime? value) {
                     _session.publishedAtField.publishedAt = value;
                     _markDirty(BulkMetadataEditFieldKind.publishedAt);
@@ -359,8 +380,7 @@ class _BulkEditMetadataDialogState
         state: _session.contentRatingField,
         allAgesLabel: l10n.filterAgeAllAges,
         onChanged: () {
-          _markDirty(BulkMetadataEditFieldKind.contentRating);
-          setState(() {});
+          _onFieldEdited(BulkMetadataEditFieldKind.contentRating);
         },
       ),
     };
@@ -371,29 +391,34 @@ class _BulkEditMetadataDialogState
     ComicMetadataSmartFacetScope scope,
     BulkMetadataEditFieldKind kind,
   ) {
-    final BulkMetadataEditMultiValueFieldState state = _session.multiFields[kind]!;
+    final BulkMetadataEditMultiValueFieldState state =
+        _session.multiFields[kind]!;
     return switch (kind) {
       BulkMetadataEditFieldKind.tags => TagLibraryMultiSelectField(
         label: l10n.bulkEditMetadataFieldTags,
         icon: LucideIcons.tag,
         selectedNames: state.values,
         scope: scope,
-        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.tags, name),
-        onRemove: (String name) => _removeMultiValue(BulkMetadataEditFieldKind.tags, name),
+        onAdd: (String name) =>
+            _addMultiValue(BulkMetadataEditFieldKind.tags, name),
+        onRemove: (String name) =>
+            _removeMultiValue(BulkMetadataEditFieldKind.tags, name),
       ),
       BulkMetadataEditFieldKind.authors => AuthorLibraryMultiSelectField(
         label: l10n.bulkEditMetadataFieldAuthors,
         icon: LucideIcons.penTool,
         selectedNames: state.values,
         scope: scope,
-        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.authors, name),
+        onAdd: (String name) =>
+            _addMultiValue(BulkMetadataEditFieldKind.authors, name),
         onRemove: (String name) =>
             _removeMultiValue(BulkMetadataEditFieldKind.authors, name),
       ),
       BulkMetadataEditFieldKind.languages => _LanguageChipField(
         l10n: l10n,
         selected: state.values,
-        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.languages, name),
+        onAdd: (String name) =>
+            _addMultiValue(BulkMetadataEditFieldKind.languages, name),
         onRemove: (String name) =>
             _removeMultiValue(BulkMetadataEditFieldKind.languages, name),
       ),
@@ -402,7 +427,8 @@ class _BulkEditMetadataDialogState
         icon: LucideIcons.bookMarked,
         selectedNames: state.values,
         scope: scope,
-        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.parodies, name),
+        onAdd: (String name) =>
+            _addMultiValue(BulkMetadataEditFieldKind.parodies, name),
         onRemove: (String name) =>
             _removeMultiValue(BulkMetadataEditFieldKind.parodies, name),
       ),
@@ -411,7 +437,8 @@ class _BulkEditMetadataDialogState
         icon: LucideIcons.userRound,
         selectedNames: state.values,
         scope: scope,
-        onAdd: (String name) => _addMultiValue(BulkMetadataEditFieldKind.characters, name),
+        onAdd: (String name) =>
+            _addMultiValue(BulkMetadataEditFieldKind.characters, name),
         onRemove: (String name) =>
             _removeMultiValue(BulkMetadataEditFieldKind.characters, name),
       ),
@@ -421,7 +448,8 @@ class _BulkEditMetadataDialogState
 
   void _addMultiValue(BulkMetadataEditFieldKind kind, String name) {
     setState(() {
-      final BulkMetadataEditMultiValueFieldState field = _session.multiFields[kind]!;
+      final BulkMetadataEditMultiValueFieldState field =
+          _session.multiFields[kind]!;
       if (!field.values.contains(name)) {
         field.values = <String>[...field.values, name];
       }
@@ -500,7 +528,8 @@ class _BulkEditMetadataDialogState
                   child: _BulkEditFieldList(
                     fields: _selectedTab.fields,
                     selectedField: _selectedField,
-                    labelFor: (BulkMetadataEditFieldKind kind) => _fieldLabel(l10n, kind),
+                    labelFor: (BulkMetadataEditFieldKind kind) =>
+                        _fieldLabel(l10n, kind),
                     isDirty: _isFieldDirty,
                     isMixed: _isFieldMixed,
                     summaryFor: (BulkMetadataEditFieldKind kind) =>
