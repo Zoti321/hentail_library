@@ -17,6 +17,23 @@ void main() {
     );
   });
 
+  test('FRB import whitelist: feature data/ layer (Phase C #280)', () {
+    expect(
+      isFrbImportAllowedSource(
+        'features/library_admin/data/adapters/sync_library_frb_adapter.dart',
+      ),
+      isTrue,
+    );
+    expect(
+      isFrbImportAllowedSource('features/library_admin/domain/foo.dart'),
+      isFalse,
+    );
+    expect(
+      isFrbImportAllowedSource('shared/data/adapters/foo.dart'),
+      isTrue,
+    );
+  });
+
   test('import boundaries: L1 structural rules are zero-tolerance', () {
     final List<ImportViolation> all = collectImportViolations(libDir);
     final List<ImportViolation> structural = structuralViolations(all);

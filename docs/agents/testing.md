@@ -62,7 +62,7 @@ Nightly 的定时触发只在默认分支（`main`）生效；其他分支用 `w
 
 | 层级 | 规则 | 机制 |
 |------|------|------|
-| L1 | R1–R5（`shared/domain` 与 feature `domain/` 不得 import `shared/data` 或本 feature `data/`；FRB 白名单、library_browse↔reading 等） | `test/gate/import_boundary_test.dart` **零容忍** |
+| L1 | R1–R5（`shared/domain` 与 feature `domain/` 不得 import `shared/data` 或本 feature `data/`；FRB 仅允许 `main.dart`、`shared/data/**`、**`features/<id>/data/**`**（Phase C #256）；library_browse↔reading 等） | `test/gate/import_boundary_test.dart` **零容忍** |
 | L2 | M1/M2/M3（product↔product 模块边；product→bootstrap） | 同上 + `test/gate/import_boundary_baseline.json` **ratchet**（只减不增） |
 
 本地：`cd app && flutter test test/gate/import_boundary_test.dart`。修复跨模块耦合后须在同一 PR 缩减 baseline（`dart run tool/generate_import_boundary_baseline.dart` 在 L1 已绿时重写条目）。分类表与 `scripts/research/cross_feature_import_audit.py` 应对齐。

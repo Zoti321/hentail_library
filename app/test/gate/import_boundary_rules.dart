@@ -133,6 +133,10 @@ bool isFrbImportAllowedSource(String libRelativePosix) {
   if (path.startsWith('shared/data/')) {
     return true;
   }
+  // Wayfinder Phase C (#256 / #280): FRB thin edge lives in owner feature data/.
+  if (path.startsWith('features/') && path.contains('/data/')) {
+    return true;
+  }
   return false;
 }
 
