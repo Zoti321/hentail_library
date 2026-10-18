@@ -70,7 +70,11 @@ class LibraryCatalogRevisionCoordinator
       LibraryRevisionState? previous,
       LibraryRevisionState next,
     ) {
-      if (previous?.revision == next.revision) {
+      // Initial subscription fires during build; state is seeded below.
+      if (previous == null) {
+        return;
+      }
+      if (previous.revision == next.revision) {
         return;
       }
       _onRevisionBumped(next.revision);
@@ -98,8 +102,9 @@ class LibraryCatalogRevisionCoordinator
       _flushInactiveRevision();
     });
 
-    return const LibraryCatalogRevisionSnapshot(
-      activeRevision: 0,
+    final int revision = ref.read(libraryRevisionStateProvider).revision;
+    return LibraryCatalogRevisionSnapshot(
+      activeRevision: revision,
       inactiveRevision: 0,
     );
   }
