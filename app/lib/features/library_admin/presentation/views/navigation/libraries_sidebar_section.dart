@@ -24,6 +24,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'libraries_sidebar_widgets.dart';
+part 'libraries_sidebar_menus.dart';
 
 /// Trailing action slot width — matches [GhostButton.icon] `size` on library rows.
 const double _kSidebarRowTrailingSlotSize = 28;
