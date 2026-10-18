@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/data/adapters/sync_library_frb_adapter.dart';
+import 'package:hentai_library/features/library_admin/data/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sync_coordinator.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
