@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_image_cache.dart';
@@ -40,6 +41,19 @@ void main() {
 
     expect(buildReaderImageProvider(filePath: '   '), isNull);
     expect(buildReaderImageProvider(), isNull);
+  });
+
+  testWidgets('precacheReaderFilePath no-ops for missing cache file', (
+    WidgetTester tester,
+  ) async {
+    ensureReaderImageCacheConfigured();
+    await tester.pumpWidget(const SizedBox.shrink());
+    final BuildContext context = tester.element(find.byType(SizedBox));
+    await precacheReaderFilePath(
+      context: context,
+      filePath:
+          '${Directory.systemTemp.path}/reader_precache_missing_${DateTime.now().microsecondsSinceEpoch}.jpg',
+    );
   });
 
   test('isUsableReaderCacheFile rejects missing and empty files', () async {

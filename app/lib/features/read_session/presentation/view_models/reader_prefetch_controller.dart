@@ -85,17 +85,15 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
           )
           .then<void>((_) {}, onError: (_, StackTrace _) {}),
     );
-    unawaited(
-      ref
-          .read(readerSessionServiceProvider)
-          .prefetchPages(
-            comicId: comicId,
-            archivePageIndexes: targets
-                .map((int pageOneBased) => pageOneBased - 1)
-                .toList(growable: false),
-            generation: generation,
-          ),
-    );
+    await ref
+        .read(readerSessionServiceProvider)
+        .prefetchPages(
+          comicId: comicId,
+          archivePageIndexes: targets
+              .map((int pageOneBased) => pageOneBased - 1)
+              .toList(growable: false),
+          generation: generation,
+        );
   }
 
   Future<void> precacheWindow({
@@ -111,44 +109,57 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     final int generation = state[comicId] ?? 0;
     ensureReaderImageCacheConfigured();
     for (final int pageOneBased in pageIndexesOneBased) {
-      if ((state[comicId] ?? 0) != generation || !context.mounted) {
+      if (!_isPrecacheStillValid(
+            comicId: comicId,
+            generation: generation,
+            pageOneBased: pageOneBased,
+          ) ||
+          !context.mounted) {
         return;
       }
       if (pageOneBased < 1 || pageOneBased > imageList.length) {
         continue;
       }
       final ReaderPageImageData imageData = imageList[pageOneBased - 1];
-      final ImageProvider<Object>? provider = await _resolveReaderImageProvider(
+      await _precachePage(
+        context: context,
+        comicId: comicId,
+        generation: generation,
         imageData: imageData,
         cacheWidth: cacheWidth,
       );
-      if (provider == null) {
-        continue;
-      }
-      if ((state[comicId] ?? 0) != generation || !context.mounted) {
-        return;
-      }
-      try {
-        await precacheReaderImage(context: context, provider: provider);
-      } on Object {
-        // 单页预热失败不阻断窗口内其余页。
-      }
     }
   }
 
-  Future<ImageProvider<Object>?> _resolveReaderImageProvider({
+  bool _isPrecacheStillValid({
+    required String comicId,
+    required int generation,
+    required int pageOneBased,
+  }) {
+    if ((state[comicId] ?? 0) != generation) {
+      return false;
+    }
+    final Set<int>? window = _lastWarmWindows[comicId];
+    return window != null && window.contains(pageOneBased);
+  }
+
+  Future<void> _precachePage({
+    required BuildContext context,
+    required String comicId,
+    required int generation,
     required ReaderPageImageData imageData,
     int? cacheWidth,
   }) async {
     if (imageData is ReaderDirPageImageData) {
-      final String path = imageData.file.path;
-      if (!isUsableReaderCacheFile(path)) {
-        return null;
-      }
-      return buildReaderImageProvider(filePath: path, cacheWidth: cacheWidth);
+      await precacheReaderFilePath(
+        context: context,
+        filePath: imageData.file.path,
+        cacheWidth: cacheWidth,
+      );
+      return;
     }
     if (imageData is! ReaderArchivePageImageData) {
-      return null;
+      return;
     }
     final ReaderPagePayload page = await ref.read(
       comicReaderPageProvider(
@@ -156,16 +167,35 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
         pageIndex: imageData.pageIndex,
       ).future,
     );
-    return switch (page) {
-      ReaderPageFilePath(:final String path) =>
-        isUsableReaderCacheFile(path)
-            ? buildReaderImageProvider(filePath: path, cacheWidth: cacheWidth)
-            : null,
-      ReaderPageBytes(:final Uint8List data) => buildReaderImageProvider(
-        memoryBytes: data,
-        cacheWidth: cacheWidth,
-      ),
-    };
+    if (!_isPrecacheStillValid(
+          comicId: comicId,
+          generation: generation,
+          pageOneBased: imageData.pageIndex + 1,
+        ) ||
+        !context.mounted) {
+      return;
+    }
+    switch (page) {
+      case ReaderPageFilePath(:final String path):
+        await precacheReaderFilePath(
+          context: context,
+          filePath: path,
+          cacheWidth: cacheWidth,
+        );
+      case ReaderPageBytes(:final Uint8List data):
+        final ImageProvider<Object>? provider = buildReaderImageProvider(
+          memoryBytes: data,
+          cacheWidth: cacheWidth,
+        );
+        if (provider == null) {
+          return;
+        }
+        try {
+          await precacheReaderImage(context: context, provider: provider);
+        } on Object {
+          // 单页预热失败不阻断窗口内其余页。
+        }
+    }
   }
 
   Future<void> warmOpenComic({

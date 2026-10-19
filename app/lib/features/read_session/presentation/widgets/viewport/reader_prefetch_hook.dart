@@ -44,23 +44,24 @@ void useReaderPrefetchWindow({
         if (!context.mounted) {
           return;
         }
-        unawaited(
-          controller.warmWindow(
+        unawaited(() async {
+          await controller.warmWindow(
             comicId: comicId,
             centerPageOneBased: centerPageOneBased,
             totalPages: totalPages,
             extraPageIndexesOneBased: extraPageIndexesOneBased,
-          ),
-        );
-        unawaited(
-          controller.precacheWindow(
+          );
+          if (!context.mounted) {
+            return;
+          }
+          await controller.precacheWindow(
             context: context,
             comicId: comicId,
             pageIndexesOneBased: targets,
             imageList: imageList,
             cacheWidth: cacheWidth,
-          ),
-        );
+          );
+        }());
       });
       return null;
     },

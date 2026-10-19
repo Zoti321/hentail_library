@@ -73,3 +73,34 @@ Future<void> precacheReaderImage({
 }) {
   return precacheImage(provider, context);
 }
+
+/// 磁盘页预热：读入内存再 precache，避免 [ExtendedFileImageProvider] 在
+/// Rust `evict_outside_pages` 与异步解码之间的竞态下打 PathNotFound 日志。
+Future<void> precacheReaderFilePath({
+  required BuildContext context,
+  required String filePath,
+  int? cacheWidth,
+  int? cacheHeight,
+}) async {
+  final String trimmed = filePath.trim();
+  if (!isUsableReaderCacheFile(trimmed)) {
+    return;
+  }
+  try {
+    final Uint8List bytes = await File(trimmed).readAsBytes();
+    if (bytes.isEmpty) {
+      return;
+    }
+    final ImageProvider<Object>? provider = buildReaderImageProvider(
+      memoryBytes: bytes,
+      cacheWidth: cacheWidth,
+      cacheHeight: cacheHeight,
+    );
+    if (provider == null) {
+      return;
+    }
+    await precacheReaderImage(context: context, provider: provider);
+  } on FileSystemException {
+    // 预取窗口已滑走、磁盘缓存被驱逐。
+  }
+}
