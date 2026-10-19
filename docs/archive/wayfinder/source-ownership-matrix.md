@@ -1,5 +1,7 @@
 # Wayfinder 源码 ownership 矩阵（现状 → 目标）
 
+> **已归档**：#258 后目录已落位；维护 import/布局请改 Gate 与 `docs/agents/testing.md`，勿再更新本矩阵路径表。
+
 **版本**：2026-10-16  
 **依据**：#218 模块清单、#219 拓扑、#221 shared/domain 切分、#222 DI/`shared/ui`、#223 import 盘点  
 **用途**：各 migration slice 搬迁清单；**非**单 PR 范围。目标 URI 前缀均为 `package:hentai_library/` 下 `app/lib/` 相对路径。

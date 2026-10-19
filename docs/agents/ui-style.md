@@ -2,16 +2,11 @@
 
 How agents should build UI in this project: reuse custom components, follow the desktop design language, and keep a **single responsive** layout (viewport width), not platform-specific page trees.
 
-## Current state vs target
+## Steady state
 
-| Aspect | Today | Remaining target |
-|--------|-------|------------------|
-| Layout | **One** responsive shell (`ResponsiveAppShell`) via `AppLayoutBreakpoints` | Compact density / placement polish where still awkward |
-| Theme | `buildAppTheme` everywhere (`app.dart`) | Keep desktop Fluent-inspired look on all widths |
-| Routing | Single `appRouter` | — |
-| Pages | Shared views under `views/` (no `desktop/` / `mobile/` trees) | Replace residual stock Material controls when touching a screen |
+单一响应式壳（`ResponsiveAppShell` + `AppLayoutBreakpoints`）、全局 `buildAppTheme`、单 `appRouter`；页面在 `features/*/presentation/views/`，**禁止** `desktop/` / `mobile/` 分树。
 
-**Rule for new work:** Do not add new mobile-only Material pages or resurrect `views/mobile/`. Build with desktop custom components and responsive layout. When editing a screen, prefer converging leftover Material widgets toward the catalog below.
+**新改动：** 用下文组件表与 Fluent 风格；触屏只做密度/摆放，不 fork 整页。残留 Material 控件在改屏时逐步替换即可。
 
 Shell / theme entry points:
 

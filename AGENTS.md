@@ -1,5 +1,7 @@
 ## Agent skills
 
+维护与写作约定：`docs/agents/README.md`。
+
 ### Architecture
 
 Rust core / FRB / monorepo (`app/` Flutter, `core/` Rust): **`docs/agents/rust-core.md`**; read `docs/adr/` entries that touch the area (background: ADR-0002).

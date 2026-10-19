@@ -4,23 +4,21 @@ Project-specific conventions for UI widgets and lightweight data shapes. Agents 
 
 ## Project layout
 
-Monorepo (`app/` Flutter, `core/` Rust): see `docs/agents/rust-core.md`. Dart layers under `app/lib/`:
+Monorepo (`app/` Flutter, `core/` Rust): see `docs/agents/rust-core.md`. Dart layers under `app/lib/`（Wayfinder 迁移已收尾；历史矩阵见 `docs/archive/wayfinder/`）：
 
 | Path | Role |
 |------|------|
-| `core/` | Cross-cutting utilities (`logging` + `AppLog`, l10n, path/format helpers). |
-| `domain/models/` | Entities and value objects. |
-| `domain/repositories/` | Repository interfaces. |
-| `domain/library/` | Filter / projection plus sync / refresh / deletion coordinators (FRB orchestration, not a second business core). |
-| `domain/reading/` | Read session types and coordinators. |
-| `domain/ports/` | UI-facing ports (clipboard, page source). |
-| `data/repositories/` | Thin FRB adapters. No Drift. |
-| `data/adapters/` | Mapper / guard / FRB call adapters. |
-| `data/services/` | Dart-only services (app update, tag dictionary download). |
-| `shared/` | Cross-feature Dart: `domain/`, `di/`, `ui/`, `util/` (not under `features/`). |
-| `features/*/` | Vertical slices: `data/`, `domain/`, `di/`, `presentation/` (`views/`, `view_models/`, feature-only `widgets/`). |
-| `features/bootstrap/` | App entry, routing, **composition root** (`ApplicationShell` injects shell slots). |
-| `src/rust/` | FRB generated — do not hand-edit. |
+| `core/` | 应用横切：`l10n`、`logging`、`errors`、`image` 等（非 Rust `core/`）。 |
+| `shared/domain/` | 跨 feature 实体、仓储接口、ports、thumbnail 等。 |
+| `shared/data/` | FRB 薄边：`repositories/`、`adapters/`（无 Drift）。 |
+| `shared/di/` | 全局 Provider 组装。 |
+| `shared/ui/` | 四层共享 UI（shell / layout / widgets / theme）；见下文 ADR-0027。 |
+| `shared/util/` | 跨 feature 纯 Dart 工具。 |
+| `features/*/` | 垂直切片：`data/`、`domain/`、`di/`、`presentation/`（`views/`、`view_models/`、feature `widgets/`）。 |
+| `features/bootstrap/` | 入口、路由、**composition root**（`ApplicationShell` 注入 shell slots）。 |
+| `features/library_admin/domain/` | Library sync / metadata refresh / bulk patch 等 coordinator（FRB 编排，非第二业务核）。 |
+| `features/read_session/domain/` | Read session 类型与编排。 |
+| `src/rust/` | FRB 生成代码 — 勿手改。 |
 
 Import canonical paths from `app/lib/`. Do not add Flutter sources at the repo root or under removed legacy roots (`presentation/` at repo root, `model/`, `repository/`, `services/`, `usecases/`, `database/`).
 
@@ -63,7 +61,7 @@ Presentation layer follows **MVVM with Riverpod** (ADR-0017). State management i
 |-------|------|------|
 | View | `features/*/presentation/views/**`, `shared/ui/{widgets,layout,shell}/` | Render; `ref.watch` ViewModel/Facade; fire commands via Notifier or callbacks |
 | ViewModel | `features/*/presentation/view_models/` | UI state, Repository/Service orchestration, command API |
-| Model | `domain/models/`, `domain/repositories/` | Entities and repository interfaces |
+| Model | `shared/domain/**`, `features/*/domain/**` | Entities and repository interfaces |
 
 **Hard rules**
 

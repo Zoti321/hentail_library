@@ -2,7 +2,7 @@
 
 > **快照，不代表 HEAD。** 首次调研：2026-09-13 ｜ **最近复核：2026-09-16**（对照当时 `HEAD = 8ec741c7`）｜ FRB sync/async 计数与 P0-B2·P1-A3 于 2026-09-16 晚间按第二刀（#129）回写。现行架构见 `docs/agents/rust-core.md`，测试门禁见 `docs/agents/testing.md`。
 > 范围：`e:\projects\hentai_library` 产品/架构债、性能、代码质量、测试/CI、DX、产品缺口
-> 落盘约定：本仓库 research 约定目录为 `docs/research/`
+> **已归档**至 `docs/archive/research/`；勿按本文排期。开放项查 GitHub Issues 与 HEAD。
 > 性质：**只读调研**；结论按「已落地 / 部分落地 / 仍开放 / 不建议现在做」标注
 > 方法：Glob / Grep / Read 对照 `GLOSSARY.md`、`docs/adr/*`、`docs/agents/*`、源码与 `.github/workflows/ci.yml`；引用 `GLOSSARY.md` 用**词条名**，不用行号；本次复核**已**执行 `gh issue list` 核实 issue 状态（首版未核实）
 

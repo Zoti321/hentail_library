@@ -71,7 +71,7 @@ Nightly 的定时触发只在默认分支（`main`）生效；其他分支用 `w
 | L1 | R1–R5（`shared/domain` 与 feature `domain/` 不得 import `shared/data` 或本 feature `data/`；FRB 仅允许 `main.dart`、`shared/data/**`、**`features/<id>/data/**`**（Phase C #256）；library_browse↔reading 等） | `test/gate/import_boundary_test.dart` **零容忍** |
 | L2 | M1/M2/M3（product↔product 模块边；product→bootstrap） | 同上 + `test/gate/import_boundary_baseline.json` **ratchet**（只减不增） |
 
-本地：`cd app && flutter test test/gate/import_boundary_test.dart`。修复跨模块耦合后须在同一 PR 缩减 baseline（`dart run tool/generate_import_boundary_baseline.dart` 在 L1 已绿时重写条目）。分类表与 `scripts/research/cross_feature_import_audit.py` 应对齐。
+本地：`cd app && flutter test test/gate/import_boundary_test.dart`。修复跨模块耦合后须在同一 PR 缩减 baseline（`dart run tool/generate_import_boundary_baseline.dart` 在 L1 已绿时重写条目）。启发式模块边对照：`python scripts/research/cross_feature_import_audit.py`（非门禁；2026-10 盘点快照见 `docs/archive/research/cross-feature-import-audit-2026-10-16.md`）。
 
 ### Shared 层 feature-import 缝（ADR-0027 · #295 L3）
 
@@ -96,7 +96,7 @@ cd app && dart run tool/generate_shared_domain_feature_import_baseline.dart
 
 L2 product 图 baseline 仍用 `dart run tool/generate_import_boundary_baseline.dart`（须 structural 零容忍）。两套 baseline 文件勿混用。
 
-### Wayfinder 布局缝（#219）
+### App lib 顶层布局（#219 / #258）
 
 | 断言 | 机制 |
 |------|------|
@@ -106,7 +106,7 @@ L2 product 图 baseline 仍用 `dart run tool/generate_import_boundary_baseline.
 | Phase B（仅 `features`/`shared`/`src`） | `wayfinder_layout_helpers.dart` 中 `kEnforceWayfinderPhaseBLayout`，bootstrap 收尾 slice 启用 |
 | Feature 有向图 import（R1 以外） | `import_boundary_test.dart`（#220） |
 
-Slice 新增 shim 时同步更新 `strangler_shims.txt` 与 #225 §F；slice 关闭前删尽 shim 并清空白名单行。
+新增 shim 时同步更新 `strangler_shims.txt`；无消费者后删 shim 并清空白名单行。
 
 ## 本地全量
 

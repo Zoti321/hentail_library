@@ -1,5 +1,7 @@
 # 跨 feature import 现状盘点（#223）
 
+> **已归档**（2026-10-16 快照）。现行边界以 `app/test/gate/import_boundary_test.dart` 与 `docs/agents/testing.md` 为准。
+
 **日期**：2026-10-16  
 **依据**：Wayfinder [#218](https://github.com/Zoti321/hentail_library/issues/218) 已对齐的目标模块与依赖规则；源码 Primary source 为 `app/lib/**/*.dart`（排除 `*.g.dart` / `*.freezed.dart`）。  
 **复现**：`python scripts/research/cross_feature_import_audit.py`（路径→目标模块的启发式分类，见脚本内 `classify()`）。
