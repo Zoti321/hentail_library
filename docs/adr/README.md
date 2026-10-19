@@ -83,3 +83,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0026](./0026-library-write-seam.md) | Library-level write seam（库级写的锁与事务边界） | Accepted |
 | [0027](./0027-flutter-ui-shell-layout-component-layers.md) | Flutter UI Shell / Layout / Component 四层与 shared 依赖边界 | Accepted |
 | [0028](./0028-design-system-theme-extensions.md) | 设计系统主骨架（ThemeExtension + theme_tailor + Widgetbook dev） | Accepted |
+| [0029](./0029-design-system-documentation-charter.md) | design-system 目录章程（规划文档、Agent 规范、ui-ux-pro-max 输出） | Accepted |

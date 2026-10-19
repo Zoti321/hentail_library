@@ -33,6 +33,26 @@ void main() {
       expect(Directory(p.join(repoRoot.path, '.github')).existsSync(), isTrue);
     });
 
+    test('design-system MASTER declares directory charter (ADR-0029)', () {
+      final File master = File(
+        p.join(
+          repoRoot.path,
+          'design-system',
+          'hentai-library',
+          'MASTER.md',
+        ),
+      );
+      expect(master.existsSync(), isTrue);
+      final String content = master.readAsStringSync();
+      expect(content, contains('## Directory charter'));
+      expect(content, contains('pages/[page-name].md'));
+      expect(
+        Directory(p.join(repoRoot.path, 'design-system', 'hentai-library', 'pages'))
+            .existsSync(),
+        isTrue,
+      );
+    });
+
     test('core/ Rust workspace exists', () {
       expect(Directory(p.join(repoRoot.path, 'core')).existsSync(), isTrue);
       expect(

@@ -6,6 +6,20 @@
 
 ---
 
+## Directory charter
+
+本目录树（`design-system/hentai-library/`）的约定角色：
+
+| 角色 | 说明 |
+|------|------|
+| **规划文档** | 记录 Fluent 向、跨平台单壳下的 UI/UX 方向、页面模式与改版阶段；可链接 Figma/Penpot 等外部稿（稿为参考，冲突时以本目录 + 代码真值为准）。 |
+| **Agent UI 规范** | `AGENTS.md` 入口；实现某路由前先读 `pages/<page>.md`，再读本 MASTER。 |
+| **ui-ux-pro-max 输出** | `search.py --design-system --persist` 写入同结构的 `MASTER.md` / `pages/`；**勿对已有 MASTER 使用 `--force`**，除非明确整包换肤且经 review。 |
+
+**真源分层**（ADR-0029）：语义与页面规则 → 本目录；**token 数值与 Widget 行为** → `app/lib/shared/ui/theme/`、`app/lib/shared/ui/widgets/`；架构取舍 → `docs/adr/`（尤其 ADR-0027、ADR-0028）。Skill 或 Agent 产出合并前须符合下文 Anti-Patterns 与产品语境。
+
+---
+
 **Project:** Hentai Library  
 **Stack:** Flutter (responsive desktop-style shell)  
 **Agent UI spec:** this file + `pages/*`; token 数值以 `app/lib/shared/ui/theme/` 代码为准。
