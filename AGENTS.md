@@ -2,15 +2,15 @@
 
 ### Architecture
 
-Rust core / FRB / monorepo (`app/` Flutter, `core/` Rust): **`docs/agents/rust-core.md`** and ADR-0002.
+Rust core / FRB / monorepo (`app/` Flutter, `core/` Rust): **`docs/agents/rust-core.md`**; read `docs/adr/` entries that touch the area (background: ADR-0002).
 
 ### Product
 
-Personal comic library (local roots and user-hosted WebDAV). Scope, formats, out-of-scope: `docs/agents/product-positioning.md`. Read session pages follow **Page image fidelity** in `GLOSSARY.md`.
+Personal comic library (local roots and user-hosted WebDAV). Scope, formats, out-of-scope: `docs/agents/product-positioning.md`.
 
 ### Vocabulary
 
-Name domain concepts as defined in **`GLOSSARY.md`**. Read `docs/adr/` entries that touch the area. If output contradicts an ADR, say so explicitly.
+**Glossary:** name domain concepts, discuss terminology, or edit an ADR → read **`GLOSSARY.md`** (definitions) and `docs/adr/` for decisions in that area. If output contradicts an ADR, say so explicitly. Read session page rendering → **`GLOSSARY.md`** **Page image fidelity** only (no duplicate rules elsewhere).
 
 ### Issues
 

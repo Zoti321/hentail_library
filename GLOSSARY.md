@@ -1,6 +1,6 @@
-# Hentai Library
+# Glossary
 
-个人漫画库：用户可维护一个或多个 Library（本地磁盘根或 WebDAV 远程根），扫描 Resource、管理元数据、按系列组织，并阅读（本地可离线；远程为在线流式）。
+领域术语与 _Avoid_ 别名。产品范围与格式支持见 `docs/agents/product-positioning.md`；人类向概述见根目录 `README.md`。
 
 ## Language
 

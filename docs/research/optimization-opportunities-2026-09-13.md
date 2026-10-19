@@ -4,7 +4,7 @@
 > 范围：`e:\projects\hentai_library` 产品/架构债、性能、代码质量、测试/CI、DX、产品缺口
 > 落盘约定：本仓库 research 约定目录为 `docs/research/`
 > 性质：**只读调研**；结论按「已落地 / 部分落地 / 仍开放 / 不建议现在做」标注
-> 方法：Glob / Grep / Read 对照 `GLOSSARY.md`、`docs/adr/*`、`docs/agents/*`、源码与 `.github/workflows/ci.yml`；本次复核**已**执行 `gh issue list` 核实 issue 状态（首版未核实）
+> 方法：Glob / Grep / Read 对照 `GLOSSARY.md`、`docs/adr/*`、`docs/agents/*`、源码与 `.github/workflows/ci.yml`；引用 `GLOSSARY.md` 用**词条名**，不用行号；本次复核**已**执行 `gh issue list` 核实 issue 状态（首版未核实）
 
 ---
 
@@ -307,7 +307,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 
 #### P0-F1 — All libraries browse：仅占位 — **未变**
 
-- **现状证据**：`GLOSSARY.md` L24：`/libraries/all`「本阶段仅占位提示，不实现聚合目录」；`all_libraries_browse_page.dart` L8 注释「Placeholder」，页面只有标题栏 + 提示文案；侧栏仍可导航进入（`LibraryManagementActions.goAllLibraries`）。
+- **现状证据**：`GLOSSARY.md` 词条 **All libraries browse**（路由 `/libraries/all`，本阶段仅占位提示、不实现聚合目录）；`all_libraries_browse_page.dart` L8 注释「Placeholder」，页面只有标题栏 + 提示文案；侧栏仍可导航进入（`LibraryManagementActions.goAllLibraries`）。
 - **问题/机会**：多库用户期望「全部库」目录，当前是死胡同页。
 - **建议方向**：排期跨库聚合 catalog，或先弱化/隐藏入口直至实现。
 - **风险/代价**：高（查询模型、筛选、性能）；**明确产品增量**。
