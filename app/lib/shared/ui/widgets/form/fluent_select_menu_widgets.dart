@@ -176,7 +176,7 @@ class _FluentSelectMenuItem extends StatelessWidget {
             style: TextStyle(
               fontSize: fontSize,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              color: isSelected ? cs.primary : cs.hentai.textPrimary,
+              color: isSelected ? cs.primary : context.hentai.textPrimary,
               height: 1.4,
             ),
             maxLines: 1,

@@ -20,48 +20,48 @@ class ComicCoverPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
+    final HentaiColorScheme semantic = context.hentai;
     return switch (variant) {
-      ComicCoverPlaceholderVariant.card => _buildCard(cs),
-      ComicCoverPlaceholderVariant.detail => _buildDetail(cs),
+      ComicCoverPlaceholderVariant.card => _buildCard(semantic),
+      ComicCoverPlaceholderVariant.detail => _buildDetail(semantic),
     };
   }
 
-  Widget _buildCard(ColorScheme cs) {
+  Widget _buildCard(HentaiColorScheme semantic) {
     return switch (kind) {
       ComicCoverPlaceholderKind.loading => ColoredBox(
-        color: cs.hentai.imagePlaceholder,
+        color: semantic.imagePlaceholder,
       ),
       ComicCoverPlaceholderKind.noCover => ColoredBox(
-        color: cs.hentai.imageFallback,
+        color: semantic.imageFallback,
         child: Center(
-          child: Icon(LucideIcons.imageOff, color: cs.hentai.iconSecondary),
+          child: Icon(LucideIcons.imageOff, color: semantic.iconSecondary),
         ),
       ),
       ComicCoverPlaceholderKind.error => ColoredBox(
-        color: cs.hentai.imageFallback,
+        color: semantic.imageFallback,
         child: Center(
-          child: Icon(LucideIcons.circleAlert, color: cs.hentai.textTertiary),
+          child: Icon(LucideIcons.circleAlert, color: semantic.textTertiary),
         ),
       ),
     };
   }
 
-  Widget _buildDetail(ColorScheme cs) {
+  Widget _buildDetail(HentaiColorScheme semantic) {
     final double resolvedIconSize = iconSize ?? 40;
     return switch (kind) {
       ComicCoverPlaceholderKind.loading => const SizedBox.expand(),
       ComicCoverPlaceholderKind.noCover => Center(
         child: Icon(
           LucideIcons.imageOff,
-          color: cs.hentai.iconSecondary,
+          color: semantic.iconSecondary,
           size: resolvedIconSize,
         ),
       ),
       ComicCoverPlaceholderKind.error => Center(
         child: Icon(
           LucideIcons.circleAlert,
-          color: cs.hentai.textTertiary,
+          color: semantic.textTertiary,
           size: resolvedIconSize,
         ),
       ),

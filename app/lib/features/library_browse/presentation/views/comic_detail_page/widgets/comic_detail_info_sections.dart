@@ -57,7 +57,7 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
           pageLabel,
           style: TextStyle(
             fontSize: tokens.text.bodySm,
-            color: cs.hentai.textSecondary,
+            color: context.hentai.textSecondary,
           ),
         ),
       );
@@ -68,7 +68,7 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
           publishedLabel,
           style: TextStyle(
             fontSize: tokens.text.bodySm,
-            color: cs.hentai.textSecondary,
+            color: context.hentai.textSecondary,
           ),
         ),
       );
@@ -118,7 +118,7 @@ class ComicLanguageSegments extends StatelessWidget {
             '|',
             style: TextStyle(
               fontSize: tokens.text.bodySm,
-              color: cs.hentai.textSecondary,
+              color: context.hentai.textSecondary,
             ),
           ),
         );
@@ -155,7 +155,7 @@ class _ComicLanguageSegmentLink extends HookWidget {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ValueNotifier<bool> hovered = useState(false);
-    final Color color = hovered.value ? cs.primary : cs.hentai.textSecondary;
+    final Color color = hovered.value ? cs.primary : context.hentai.textSecondary;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => hovered.value = true,
@@ -198,7 +198,7 @@ class ComicDetailDescription extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontSize: tokens.text.bodySm,
-        color: cs.hentai.textSecondary,
+        color: context.hentai.textSecondary,
         height: 1.45,
       ),
     );
@@ -362,7 +362,7 @@ class LabeledMetaChipRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: tokens.text.bodySm,
-              color: cs.hentai.textPrimary,
+              color: context.hentai.textPrimary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -421,7 +421,7 @@ class ComicDetailInfoRow extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontSize: tokens.text.bodySm,
-        color: cs.hentai.textSecondary,
+        color: context.hentai.textSecondary,
       ),
     );
     final String? tip = tooltip ?? (value.length > 48 ? value : null);
@@ -441,7 +441,7 @@ class ComicDetailInfoRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: tokens.text.bodySm,
-              color: cs.hentai.textPrimary,
+              color: context.hentai.textPrimary,
               fontWeight: FontWeight.w500,
             ),
           ),

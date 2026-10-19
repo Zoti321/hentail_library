@@ -248,7 +248,7 @@ class _FluentSelectFieldState<T> extends State<FluentSelectField<T>> {
             key: _triggerBoxKey,
             duration: const Duration(milliseconds: 150),
             decoration: BoxDecoration(
-              color: cs.hentai.inputBackground,
+              color: context.hentai.inputBackground,
               borderRadius: BorderRadius.circular(tokens.radius.md),
               border: Border.all(color: borderColor, width: 1),
               boxShadow: showActiveBorder
@@ -285,7 +285,7 @@ class _FluentSelectFieldState<T> extends State<FluentSelectField<T>> {
                     size: 16,
                     color: widget.enabled
                         ? cs.onSurfaceVariant
-                        : cs.hentai.textTertiary,
+                        : context.hentai.textTertiary,
                   ),
                 ],
               ),
@@ -298,8 +298,8 @@ class _FluentSelectFieldState<T> extends State<FluentSelectField<T>> {
 
   Widget _buildInlineLabel(AppThemeTokens tokens, ColorScheme cs) {
     final Color labelColor = widget.enabled
-        ? cs.hentai.textSecondary
-        : cs.hentai.textSecondary.withValues(alpha: 0.45);
+        ? context.hentai.textSecondary
+        : context.hentai.textSecondary.withValues(alpha: 0.45);
     return Text(
       widget.labelText!,
       style: TextStyle(
@@ -322,11 +322,11 @@ class _FluentSelectFieldState<T> extends State<FluentSelectField<T>> {
     final Color borderColor = hasError
         ? cs.error
         : showActiveBorder
-        ? cs.hentai.inputBorderActive
-        : cs.hentai.inputBorder;
+        ? context.hentai.inputBorderActive
+        : context.hentai.inputBorder;
     final Color textColor = widget.enabled
-        ? cs.hentai.textPrimary
-        : cs.hentai.textSecondary;
+        ? context.hentai.textPrimary
+        : context.hentai.textSecondary;
 
     final Widget trigger = _buildTrigger(
       tokens: tokens,

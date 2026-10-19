@@ -64,10 +64,10 @@ class _EmptyLibraryHero extends StatelessWidget {
     final l10n = context.l10n;
     final Color accent = colorScheme.primary;
     final BorderSide actionBorderSide = BorderSide(
-      color: colorScheme.hentai.borderSubtle,
+      color: context.hentai.borderSubtle,
     );
     final ButtonStyle outlinedActionStyle = OutlinedButton.styleFrom(
-      foregroundColor: colorScheme.hentai.textPrimary,
+      foregroundColor: context.hentai.textPrimary,
       side: actionBorderSide,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -103,7 +103,7 @@ class _EmptyLibraryHero extends StatelessWidget {
             fontSize: tokens.text.titleMd,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.3,
-            color: colorScheme.hentai.textPrimary,
+            color: context.hentai.textPrimary,
           ),
         ),
         SizedBox(height: tokens.spacing.sm),
@@ -111,7 +111,7 @@ class _EmptyLibraryHero extends StatelessWidget {
           l10n.homeEmptyHint,
           style: TextStyle(
             fontSize: tokens.text.bodySm,
-            color: colorScheme.hentai.textSecondary,
+            color: context.hentai.textSecondary,
             height: 1.5,
           ),
         ),
@@ -151,7 +151,7 @@ class _EmptyLibraryHero extends StatelessWidget {
         border: Border.all(
           color: Color.alphaBlend(
             accent.withAlpha(50),
-            colorScheme.hentai.borderSubtle,
+            context.hentai.borderSubtle,
           ),
         ),
         boxShadow: <BoxShadow>[
@@ -527,7 +527,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
         border: Border.all(
           color: Color.alphaBlend(
             accent.withAlpha(52),
-            colorScheme.hentai.borderSubtle,
+            context.hentai.borderSubtle,
           ),
         ),
         boxShadow: <BoxShadow>[
@@ -574,7 +574,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
                             letterSpacing: 0.8,
                             color: Color.alphaBlend(
                               accent.withAlpha(200),
-                              colorScheme.hentai.textTertiary,
+                              context.hentai.textTertiary,
                             ),
                           ),
                         ),
@@ -586,7 +586,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.8,
                             height: 1.05,
-                            color: colorScheme.hentai.textPrimary,
+                            color: context.hentai.textPrimary,
                           ),
                         ),
                         SizedBox(height: tokens.spacing.sm - 1),
@@ -594,7 +594,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
                           widget.caption,
                           style: TextStyle(
                             fontSize: tokens.text.bodySm,
-                            color: colorScheme.hentai.textSecondary,
+                            color: context.hentai.textSecondary,
                             height: 1.35,
                           ),
                         ),

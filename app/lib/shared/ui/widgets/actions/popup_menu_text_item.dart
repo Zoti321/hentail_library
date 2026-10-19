@@ -22,7 +22,7 @@ class PopupMenuTextItem extends HookWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final HentaiColorScheme h = cs.hentai;
+    final HentaiColorScheme h = context.hentai;
     final ValueNotifier<bool> hovered = useState(false);
 
     // Idle must be opaque (panel surface). Lerping from Colors.transparent

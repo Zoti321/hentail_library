@@ -84,7 +84,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                   fontFamily: 'RobotoMono',
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: cs.hentai.readerTextIconPrimary,
+                  color: context.hentai.readerTextIconPrimary,
                 ),
               ),
               Expanded(
@@ -94,13 +94,13 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                     data: SliderThemeData(
                       trackHeight: 3,
                       activeTrackColor: cs.primary,
-                      inactiveTrackColor: cs.hentai.sliderInactive,
+                      inactiveTrackColor: context.hentai.sliderInactive,
                       thumbColor: cs.primary,
                       thumbShape: const RoundSliderThumbShape(
                         enabledThumbRadius: 7,
                         elevation: 3,
                       ),
-                      overlayColor: cs.hentai.readerSliderOverlay,
+                      overlayColor: context.hentai.readerSliderOverlay,
                       overlayShape: const RoundSliderOverlayShape(
                         overlayRadius: 14,
                       ),
@@ -142,7 +142,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                   fontFamily: 'RobotoMono',
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: cs.hentai.readerTextIconPrimary,
+                  color: context.hentai.readerTextIconPrimary,
                 ),
               ),
             ],
@@ -178,7 +178,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
-        color: cs.hentai.readerPanelSubtle,
+        color: context.hentai.readerPanelSubtle,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
@@ -191,9 +191,9 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
             iconSize: 16,
             size: 28,
             borderRadius: 999,
-            foregroundColor: cs.hentai.readerTextIconPrimary,
-            hoverColor: cs.hentai.readerPanelSubtle,
-            overlayColor: cs.hentai.readerPanelSubtle,
+            foregroundColor: context.hentai.readerTextIconPrimary,
+            hoverColor: context.hentai.readerPanelSubtle,
+            overlayColor: context.hentai.readerPanelSubtle,
             onPressed: widget.onPrevPage,
           ),
           if (widget.showAutoPlayControls)
@@ -212,9 +212,9 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
               borderRadius: 999,
               foregroundColor: widget.readerAutoPlayEnabled
                   ? cs.primary
-                  : cs.hentai.readerTextIconPrimary,
-              hoverColor: cs.hentai.readerPanelSubtle,
-              overlayColor: cs.hentai.readerPanelSubtle,
+                  : context.hentai.readerTextIconPrimary,
+              hoverColor: context.hentai.readerPanelSubtle,
+              overlayColor: context.hentai.readerPanelSubtle,
               onPressed: () {
                 widget.onReaderAutoPlayEnabledChanged(
                   !widget.readerAutoPlayEnabled,
@@ -228,9 +228,9 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
             iconSize: 16,
             size: 28,
             borderRadius: 999,
-            foregroundColor: cs.hentai.readerTextIconPrimary,
-            hoverColor: cs.hentai.readerPanelSubtle,
-            overlayColor: cs.hentai.readerPanelSubtle,
+            foregroundColor: context.hentai.readerTextIconPrimary,
+            hoverColor: context.hentai.readerPanelSubtle,
+            overlayColor: context.hentai.readerPanelSubtle,
             onPressed: widget.onNextPage,
           ),
         ],

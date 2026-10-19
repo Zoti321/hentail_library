@@ -41,7 +41,7 @@ class ComicConfirmPurgeDialog extends HookWidget {
         children: <Widget>[
           Text(
             _message(l10n),
-            style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
+            style: TextStyle(fontSize: 14, color: context.hentai.textSecondary),
           ),
           if (needsAcknowledgement) ...<Widget>[
             const SizedBox(height: 12),
@@ -55,7 +55,7 @@ class ComicConfirmPurgeDialog extends HookWidget {
                 counts.local > 0
                     ? l10n.comicDetailDeleteLocalAcknowledge
                     : l10n.comicPurgeRemoteAcknowledge,
-                style: TextStyle(fontSize: 14, color: cs.hentai.textPrimary),
+                style: TextStyle(fontSize: 14, color: context.hentai.textPrimary),
               ),
             ),
           ],

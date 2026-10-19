@@ -27,7 +27,7 @@ class DiagnosticModeRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.bug,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsDiagnosticModeLabel,
       description: enabled
@@ -80,7 +80,7 @@ class ExportLogsRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.fileArchive,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsExportLogsLabel,
       description: l10n.settingsExportLogsDescription,
@@ -89,7 +89,7 @@ class ExportLogsRow extends ConsumerWidget {
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,
-        color: theme.colorScheme.hentai.iconSecondary,
+        color: theme.hentai.iconSecondary,
       ),
     );
   }
@@ -124,7 +124,7 @@ class ClearApplicationDataRow extends ConsumerWidget {
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,
-        color: theme.colorScheme.hentai.iconSecondary,
+        color: theme.hentai.iconSecondary,
       ),
     );
   }
@@ -144,7 +144,7 @@ class UninstallDataInfoRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.info,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsUninstallDataInfoLabel,
       description: l10n.settingsUninstallDataInfoDescription,

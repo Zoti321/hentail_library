@@ -89,9 +89,9 @@ class FluentDatePickerField extends StatelessWidget {
             borderRadius: BorderRadius.circular(tokens.radius.md),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: cs.hentai.inputBackground,
+                color: context.hentai.inputBackground,
                 borderRadius: BorderRadius.circular(tokens.radius.md),
-                border: Border.all(color: cs.hentai.inputBorder, width: 1),
+                border: Border.all(color: context.hentai.inputBorder, width: 1),
               ),
               child: Padding(
                 padding: EdgeInsets.symmetric(
@@ -112,8 +112,8 @@ class FluentDatePickerField extends StatelessWidget {
                         style: TextStyle(
                           fontSize: tokens.text.bodyMd,
                           color: displayText == null
-                              ? cs.hentai.textPlaceholder
-                              : cs.hentai.textPrimary,
+                              ? context.hentai.textPlaceholder
+                              : context.hentai.textPrimary,
                           height: 1.4,
                         ),
                       ),

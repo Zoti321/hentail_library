@@ -13,12 +13,12 @@ class TagChip extends StatelessWidget {
     final BorderRadius radius = BorderRadius.circular(tokens.radius.pill);
     final Color chipBackground = cs.brightness == Brightness.light
         ? Colors.white
-        : cs.hentai.subtleTagBackground;
+        : context.hentai.subtleTagBackground;
     final TextStyle textStyle = TextStyle(
       fontSize: tokens.text.labelXs,
       height: 1.2,
       letterSpacing: 0.1,
-      color: cs.hentai.textSecondary,
+      color: context.hentai.textSecondary,
       fontWeight: FontWeight.w600,
     );
 
@@ -30,7 +30,7 @@ class TagChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: chipBackground,
           borderRadius: radius,
-          border: Border.all(color: cs.hentai.borderSubtle, width: 1),
+          border: Border.all(color: context.hentai.borderSubtle, width: 1),
           boxShadow: <BoxShadow>[
             BoxShadow(
               color: context.shadows.catalogCardRest,

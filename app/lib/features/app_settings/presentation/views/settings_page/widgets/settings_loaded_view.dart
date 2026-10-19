@@ -296,7 +296,7 @@ class _SettingsMasterCategoryRow extends StatelessWidget {
       icon: Icon(
         icon,
         size: 20,
-        color: selected ? cs.primary : cs.hentai.iconDefault,
+        color: selected ? cs.primary : context.hentai.iconDefault,
       ),
       label: label,
       onRowTap: onTap,
@@ -304,7 +304,7 @@ class _SettingsMasterCategoryRow extends StatelessWidget {
           ? Icon(
               LucideIcons.chevronRight,
               size: 16,
-              color: cs.hentai.iconDefault,
+              color: context.hentai.iconDefault,
             )
           : null,
     );
@@ -363,7 +363,7 @@ class _SettingsDetailPane extends StatelessWidget {
             fontSize: settingsPageTitleFontSize(layoutTier),
             fontWeight: FontWeight.w600,
             letterSpacing: -0.4,
-            color: cs.hentai.textPrimary,
+            color: context.hentai.textPrimary,
           ),
         ),
         group,

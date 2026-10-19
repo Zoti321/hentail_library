@@ -60,7 +60,7 @@ class _LocalePreferenceRowState extends ConsumerState<LocalePreferenceRow> {
         ? Icon(
             LucideIcons.chevronRight,
             size: 16,
-            color: colorScheme.hentai.iconSecondary,
+            color: context.hentai.iconSecondary,
           )
         : GhostButton.iconText(
             icon: LucideIcons.chevronsUpDown,
@@ -70,8 +70,8 @@ class _LocalePreferenceRowState extends ConsumerState<LocalePreferenceRow> {
             iconSize: 14,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             borderRadius: tokens.radius.md,
-            foregroundColor: colorScheme.hentai.textSecondary,
-            hoverColor: colorScheme.hentai.hoverBackground,
+            foregroundColor: context.hentai.textSecondary,
+            hoverColor: context.hentai.hoverBackground,
             overlayColor: colorScheme.primary.withAlpha(14),
             delayTooltipThreeSeconds: false,
             onPressed: () => menuController.toggleMenu(),
@@ -82,7 +82,7 @@ class _LocalePreferenceRowState extends ConsumerState<LocalePreferenceRow> {
       icon: Icon(
         LucideIcons.languages,
         size: 20,
-        color: colorScheme.hentai.iconDefault,
+        color: context.hentai.iconDefault,
       ),
       label: l10n.settingsLanguageLabel,
       onRowTap: () => menuController.showMenu(),
@@ -125,7 +125,7 @@ class AppLocalePreferenceMenuPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: colorScheme.hentai.borderSubtle),
+        border: Border.all(color: context.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: context.shadows.catalogCardHover,
@@ -145,7 +145,7 @@ class AppLocalePreferenceMenuPanel extends StatelessWidget {
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest,
                 border: Border(
-                  bottom: BorderSide(color: colorScheme.hentai.borderSubtle),
+                  bottom: BorderSide(color: context.hentai.borderSubtle),
                 ),
               ),
               child: Text(
@@ -153,7 +153,7 @@ class AppLocalePreferenceMenuPanel extends StatelessWidget {
                 style: TextStyle(
                   fontSize: tokens.text.bodySm,
                   fontWeight: FontWeight.w600,
-                  color: colorScheme.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
               ),
             ),
@@ -187,7 +187,7 @@ class AppLocalePreferenceMenuPanel extends StatelessWidget {
                                 size: 18,
                                 color: isSelected
                                     ? colorScheme.primary
-                                    : colorScheme.hentai.textTertiary,
+                                    : context.hentai.textTertiary,
                               ),
                               SizedBox(width: tokens.spacing.sm),
                               Expanded(
@@ -196,7 +196,7 @@ class AppLocalePreferenceMenuPanel extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
-                                    color: colorScheme.hentai.textPrimary,
+                                    color: context.hentai.textPrimary,
                                   ),
                                 ),
                               ),

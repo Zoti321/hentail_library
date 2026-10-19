@@ -15,7 +15,7 @@ class DisableAllFormatGroupsConfirmDialog extends StatelessWidget {
       title: l10n.settingsDisableAllFormatsConfirmTitle,
       content: Text(
         l10n.settingsDisableAllFormatsConfirmContent,
-        style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
+        style: TextStyle(fontSize: 14, color: context.hentai.textSecondary),
       ),
       actions: [
         TextButton(

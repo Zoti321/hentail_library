@@ -55,7 +55,7 @@ void main() {
   ) async {
     final ThemeData theme = buildAppTheme(Brightness.light);
     final ColorScheme cs = theme.colorScheme;
-    final HentaiColorScheme h = cs.hentai;
+    final HentaiColorScheme h = theme.hentai;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -93,7 +93,7 @@ void main() {
   ) async {
     final ThemeData theme = buildAppTheme(Brightness.light);
     final ColorScheme cs = theme.colorScheme;
-    final HentaiColorScheme h = cs.hentai;
+    final HentaiColorScheme h = theme.hentai;
 
     await tester.pumpWidget(
       MaterialApp(

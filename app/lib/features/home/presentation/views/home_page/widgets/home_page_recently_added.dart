@@ -66,7 +66,7 @@ class _HomeRecentlyAddedSectionState
               style: TextStyle(
                 fontSize: tokens.text.titleSm,
                 fontWeight: FontWeight.w600,
-                color: colorScheme.hentai.textPrimary,
+                color: context.hentai.textPrimary,
               ),
             ),
             SizedBox(height: tokens.spacing.sm),
@@ -122,7 +122,7 @@ class _RecentlyAddedCard extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(tokens.radius.xs),
-            border: Border.all(color: cs.hentai.borderSubtle),
+            border: Border.all(color: context.hentai.borderSubtle),
           ),
           child: Row(
             children: <Widget>[
@@ -154,7 +154,7 @@ class _RecentlyAddedCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: tokens.text.bodySm,
                           fontWeight: FontWeight.w600,
-                          color: cs.hentai.textPrimary,
+                          color: context.hentai.textPrimary,
                         ),
                       ),
                       SizedBox(height: tokens.spacing.xs),
@@ -164,7 +164,7 @@ class _RecentlyAddedCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: tokens.text.labelXs,
-                          color: cs.hentai.textSecondary,
+                          color: context.hentai.textSecondary,
                         ),
                       ),
                     ],

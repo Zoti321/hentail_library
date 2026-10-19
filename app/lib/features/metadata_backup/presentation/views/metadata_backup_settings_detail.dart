@@ -92,7 +92,7 @@ class MetadataBackupSettingsDetail extends ConsumerWidget {
                 fontSize: settingsPageTitleFontSize(layoutTier),
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.4,
-                color: cs.hentai.textPrimary,
+                color: context.hentai.textPrimary,
               ),
             ),
             content,
@@ -120,7 +120,7 @@ class MetadataAutoBackupToggleRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.hardDrive,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsMetadataBackupAutoToggleLabel,
       description: l10n.settingsMetadataBackupAutoToggleDescription,
@@ -152,7 +152,7 @@ class MetadataBackupStoragePathRow extends StatelessWidget {
       icon: Icon(
         LucideIcons.folder,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsMetadataBackupStoragePathLabel,
       description: storagePath,
@@ -184,7 +184,7 @@ class MetadataBackupLastBackupRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.clock,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsMetadataBackupLastBackupLabel,
       description: description,
@@ -206,7 +206,7 @@ class MetadataBackupNowRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.save,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsMetadataBackupNowLabel,
       description: l10n.settingsMetadataBackupNowDescription,
@@ -221,7 +221,7 @@ class MetadataBackupNowRow extends ConsumerWidget {
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,
-        color: theme.colorScheme.hentai.iconSecondary,
+        color: theme.hentai.iconSecondary,
       ),
     );
   }
@@ -246,7 +246,7 @@ class MetadataBackupOpenFolderRow extends StatelessWidget {
       icon: Icon(
         LucideIcons.folderOpen,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsMetadataBackupOpenFolderLabel,
       description: l10n.settingsMetadataBackupOpenFolderDescription,
@@ -262,7 +262,7 @@ class MetadataBackupOpenFolderRow extends StatelessWidget {
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,
-        color: theme.colorScheme.hentai.iconSecondary,
+        color: theme.hentai.iconSecondary,
       ),
     );
   }
@@ -287,7 +287,7 @@ class MetadataExportRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.upload,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsMetadataBackupExportLabel,
       description: l10n.settingsMetadataBackupExportDescription,
@@ -298,7 +298,7 @@ class MetadataExportRow extends ConsumerWidget {
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,
-        color: theme.colorScheme.hentai.iconSecondary,
+        color: theme.hentai.iconSecondary,
       ),
     );
   }
@@ -318,7 +318,7 @@ class MetadataImportRow extends StatelessWidget {
       icon: Icon(
         LucideIcons.download,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsMetadataBackupImportLabel,
       description: l10n.settingsMetadataBackupImportDescription,
@@ -326,7 +326,7 @@ class MetadataImportRow extends StatelessWidget {
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,
-        color: theme.colorScheme.hentai.iconSecondary,
+        color: theme.hentai.iconSecondary,
       ),
     );
   }

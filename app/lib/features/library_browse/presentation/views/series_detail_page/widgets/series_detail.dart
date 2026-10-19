@@ -135,7 +135,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
                                 height: 1,
                                 thickness:
                                     1 / MediaQuery.devicePixelRatioOf(context),
-                                color: cs.hentai.borderSubtle,
+                                color: context.hentai.borderSubtle,
                               ),
                               SizedBox(height: tokens.spacing.lg),
                             ],
@@ -187,7 +187,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.4,
-                color: cs.hentai.textPrimary,
+                color: context.hentai.textPrimary,
                 height: 1.25,
               ),
             ),
@@ -277,7 +277,7 @@ class _SeriesDetailComicsError extends StatelessWidget {
             l10n.seriesDetailComicsLoadFailed,
             style: TextStyle(
               fontSize: tokens.text.bodySm,
-              color: cs.hentai.textSecondary,
+              color: context.hentai.textSecondary,
             ),
           ),
           TextButton(onPressed: onRetry, child: Text(l10n.shellRetry)),

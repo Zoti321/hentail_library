@@ -61,7 +61,7 @@ class LibraryScanShellFeedback extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: colorScheme.hentai.borderSubtle),
+            bottom: BorderSide(color: context.hentai.borderSubtle),
           ),
         ),
         child: Row(
@@ -74,7 +74,7 @@ class LibraryScanShellFeedback extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: colorScheme.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

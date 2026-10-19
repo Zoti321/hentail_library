@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
+import 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
 import 'package:theme_tailor_annotation/theme_tailor_annotation.dart';
 
 part 'app_shadow_tokens.tailor.dart';
@@ -26,15 +26,15 @@ class AppShadowTokens extends ThemeExtension<AppShadowTokens>
   final Color toastSecondary;
   final Color contextMenu;
 
-  factory AppShadowTokens.fromSemantic(HentaiColorScheme semantic) {
+  factory AppShadowTokens.fromPalette(AppShadowPalette palette) {
     return AppShadowTokens(
-      catalogCardRest: semantic.cardShadow,
-      catalogCardHover: semantic.cardShadowHover,
-      dialogPrimary: semantic.cardShadowHover,
-      dialogSecondary: semantic.cardShadow,
-      toastPrimary: semantic.cardShadowHover,
-      toastSecondary: semantic.cardShadow,
-      contextMenu: semantic.contextMenuShadow,
+      catalogCardRest: palette.catalogCardRest,
+      catalogCardHover: palette.catalogCardHover,
+      dialogPrimary: palette.catalogCardHover,
+      dialogSecondary: palette.catalogCardRest,
+      toastPrimary: palette.catalogCardHover,
+      toastSecondary: palette.catalogCardRest,
+      contextMenu: palette.contextMenu,
     );
   }
 

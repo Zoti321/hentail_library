@@ -52,7 +52,7 @@ void main() {
           .ancestor(of: find.text('阅读设置'), matching: find.byType(Material))
           .first,
     );
-    expect(headerMaterial.color, cs.hentai.readerBackground);
+    expect(headerMaterial.color, headerTheme.hentai.readerBackground);
     expect(headerMaterial.color, isNot(cs.primary));
   });
 }

@@ -54,7 +54,7 @@ class SeriesDetailComicsGridSliver extends ConsumerWidget {
               l10n.seriesDetailNoComics,
               style: TextStyle(
                 fontSize: tokens.text.bodySm,
-                color: cs.hentai.textTertiary,
+                color: context.hentai.textTertiary,
               ),
             ),
           ),

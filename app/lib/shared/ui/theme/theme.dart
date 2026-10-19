@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/shared/ui/interaction/desktop_page_transition.dart';
 import 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
+import 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
 import 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_motion_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_shadow_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
 
 export 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
+export 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
 export 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
 export 'package:hentai_library/shared/ui/theme/extensions/theme_context_extensions.dart';
 export 'package:hentai_library/shared/ui/theme/tokens/app_layout_tokens.dart';
@@ -41,7 +43,9 @@ ThemeData buildAppTheme(Brightness brightness) {
   final AppThemeTokens tokens = brightness == Brightness.dark
       ? AppThemeTokens.dark()
       : AppThemeTokens.light();
-  final AppShadowTokens shadows = AppShadowTokens.fromSemantic(semantic);
+  final AppShadowTokens shadows = AppShadowTokens.fromPalette(
+    AppShadowPalette.forBrightness(brightness),
+  );
   final AppMotionTokens motion = brightness == Brightness.dark
       ? AppMotionTokens.dark()
       : AppMotionTokens.light();

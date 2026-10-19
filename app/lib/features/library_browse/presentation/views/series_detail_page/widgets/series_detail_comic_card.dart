@@ -96,7 +96,7 @@ class SeriesDetailComicCard extends HookConsumerWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(tokens.radius.xs),
               side: BorderSide(
-                color: selected ? cs.primary : cs.hentai.borderSubtle,
+                color: selected ? cs.primary : context.hentai.borderSubtle,
               ),
             ),
             child: InkWell(
@@ -238,7 +238,7 @@ class _CoverEditButton extends StatelessWidget {
               child: Icon(
                 LucideIcons.pencil,
                 size: 14,
-                color: cs.hentai.iconDefault,
+                color: context.hentai.iconDefault,
               ),
             ),
           ),
@@ -275,7 +275,7 @@ class _SeriesDetailComicCardInfo extends StatelessWidget {
             fontWeight: FontWeight.w600,
             fontFamily: 'MI_Sans_Regular',
             height: 1.25,
-            color: isHover ? cs.primary : cs.hentai.textPrimary,
+            color: isHover ? cs.primary : context.hentai.textPrimary,
           ),
           child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
         ),
@@ -283,7 +283,7 @@ class _SeriesDetailComicCardInfo extends StatelessWidget {
           l10n.comicDetailPageCount(pageCount),
           style: TextStyle(
             fontSize: tokens.text.labelXs - 1,
-            color: cs.hentai.textTertiary,
+            color: context.hentai.textTertiary,
           ),
         ),
       ],

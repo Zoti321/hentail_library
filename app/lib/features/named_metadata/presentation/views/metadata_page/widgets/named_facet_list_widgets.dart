@@ -202,7 +202,7 @@ class _NamedFacetListHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: tokens.text.bodySm,
                   fontWeight: FontWeight.w600,
-                  color: cs.hentai.textSecondary,
+                  color: context.hentai.textSecondary,
                 ),
               ),
             ),
@@ -214,7 +214,7 @@ class _NamedFacetListHeader extends StatelessWidget {
           ],
         ),
         SizedBox(height: tokens.spacing.sm),
-        Divider(height: 1, thickness: 1, color: cs.hentai.borderSubtle),
+        Divider(height: 1, thickness: 1, color: context.hentai.borderSubtle),
       ],
     );
   }
@@ -233,7 +233,7 @@ class _NamedFacetListFooter extends ConsumerWidget {
     final l10n = context.l10n;
     final TextStyle footerStyle = TextStyle(
       fontSize: tokens.text.labelXs,
-      color: cs.hentai.textTertiary,
+      color: context.hentai.textTertiary,
     );
 
     if (state.hasSearchQuery) {

@@ -19,10 +19,10 @@ class MetadataLockButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final Color color = !enabled
-        ? cs.hentai.textTertiary
+        ? context.hentai.textTertiary
         : locked
         ? cs.primary
-        : cs.hentai.textTertiary;
+        : context.hentai.textTertiary;
     return IconButton(
       visualDensity: VisualDensity.compact,
       padding: EdgeInsets.zero,

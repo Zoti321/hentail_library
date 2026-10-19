@@ -58,7 +58,7 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: cs.hentai.textSecondary,
+                          color: context.hentai.textSecondary,
                         ),
                       ),
                     ),
@@ -100,7 +100,7 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: cs.hentai.textSecondary,
+                    color: context.hentai.textSecondary,
                   ),
                 ),
               ),

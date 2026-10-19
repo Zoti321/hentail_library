@@ -39,7 +39,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
             style: TextStyle(
               fontSize: tokens.text.titleSm,
               fontWeight: FontWeight.w600,
-              color: colorScheme.hentai.textPrimary,
+              color: context.hentai.textPrimary,
             ),
           ),
           SizedBox(height: tokens.spacing.sm),
@@ -78,7 +78,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: tokens.text.titleSm,
                   fontWeight: FontWeight.w600,
-                  color: colorScheme.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
               ),
             ),
@@ -153,7 +153,7 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
           l10n.shellLoadFailed,
           style: TextStyle(
             fontSize: widget.tokens.text.bodySm,
-            color: widget.colorScheme.hentai.textSecondary,
+            color: context.hentai.textSecondary,
           ),
         ),
       );
@@ -166,14 +166,14 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
             Icon(
               LucideIcons.bookOpen,
               size: 20,
-              color: widget.colorScheme.hentai.textTertiary,
+              color: context.hentai.textTertiary,
             ),
             SizedBox(width: widget.tokens.spacing.sm),
             Text(
               l10n.homeNoReadingHistory,
               style: TextStyle(
                 fontSize: widget.tokens.text.bodySm,
-                color: widget.colorScheme.hentai.textSecondary,
+                color: context.hentai.textSecondary,
               ),
             ),
             TextButton(
@@ -225,7 +225,7 @@ class _ContinueReadingSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final Color bar = cs.hentai.imagePlaceholder;
+    final Color bar = context.hentai.imagePlaceholder;
     return ExcludeSemantics(
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
@@ -238,7 +238,7 @@ class _ContinueReadingSkeleton extends StatelessWidget {
             decoration: BoxDecoration(
               color: cs.surface,
               borderRadius: BorderRadius.circular(tokens.radius.xs),
-              border: Border.all(color: cs.hentai.borderSubtle),
+              border: Border.all(color: context.hentai.borderSubtle),
             ),
             child: SizedBox(
               width: continueReadingItemWidthCompact,

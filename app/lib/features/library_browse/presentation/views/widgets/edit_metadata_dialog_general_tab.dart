@@ -153,7 +153,7 @@ class _EditMetadataGeneralTab extends StatelessWidget {
                     l10n.formLanguagesLabel,
                     style: TextStyle(
                       fontSize: tokens.text.bodySm,
-                      color: cs.hentai.textPrimary,
+                      color: context.hentai.textPrimary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

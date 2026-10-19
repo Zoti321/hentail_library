@@ -38,7 +38,7 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
         iconSize: 16,
         size: 28,
         borderRadius: 6,
-        foregroundColor: cs.hentai.iconDefault,
+        foregroundColor: context.hentai.iconDefault,
         hoverColor: Theme.of(context).hoverColor,
         overlayColor: Theme.of(context).hoverColor,
         delayTooltipThreeSeconds: true,
@@ -84,7 +84,7 @@ class _FilterMenu extends ConsumerWidget {
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHighest,
               border: Border(
-                bottom: BorderSide(color: colorScheme.hentai.borderSubtle),
+                bottom: BorderSide(color: context.hentai.borderSubtle),
               ),
             ),
             child: Text(
@@ -92,7 +92,7 @@ class _FilterMenu extends ConsumerWidget {
               style: TextStyle(
                 fontSize: context.tokens.text.bodySm,
                 fontWeight: FontWeight.w600,
-                color: colorScheme.hentai.textPrimary,
+                color: context.hentai.textPrimary,
               ),
             ),
           ),
@@ -104,7 +104,7 @@ class _FilterMenu extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: colorScheme.hentai.textSecondary,
+                color: context.hentai.textSecondary,
               ),
             ),
           ),

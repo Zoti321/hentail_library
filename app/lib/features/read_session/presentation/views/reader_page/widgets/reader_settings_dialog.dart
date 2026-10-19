@@ -79,8 +79,8 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
     final ThemeData darkTheme = Theme.of(context).brightness == Brightness.dark
         ? Theme.of(context)
         : buildAppTheme(Brightness.dark);
-    final ColorScheme darkCs = darkTheme.colorScheme;
-    final AppThemeTokens darkTokens = darkTheme.extension<AppThemeTokens>()!;
+    final HentaiColorScheme darkSemantic = darkTheme.hentai;
+    final AppThemeTokens darkTokens = darkTheme.tokens;
 
     return Theme(
       data: darkTheme,
@@ -102,7 +102,7 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                 ),
                 Flexible(
                   child: Material(
-                    color: darkCs.hentai.readerBackground,
+                    color: darkSemantic.readerBackground,
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                       child: Column(
@@ -272,7 +272,7 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return Material(
-      color: cs.hentai.readerBackground,
+      color: context.hentai.readerBackground,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -291,7 +291,7 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
                   icon: Icon(
                     LucideIcons.x,
                     size: 18,
-                    color: cs.hentai.readerTextIconPrimary,
+                    color: context.hentai.readerTextIconPrimary,
                   ),
                 ),
                 Expanded(
@@ -300,14 +300,14 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
                     style: TextStyle(
                       fontSize: tokens.text.bodyMd,
                       fontWeight: FontWeight.w600,
-                      color: cs.hentai.readerTextIconPrimary,
+                      color: context.hentai.readerTextIconPrimary,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          Divider(height: 1, thickness: 1, color: cs.hentai.borderSubtle),
+          Divider(height: 1, thickness: 1, color: context.hentai.borderSubtle),
         ],
       ),
     );
@@ -332,7 +332,7 @@ class _ReaderSettingsSection extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: cs.hentai.readerTextIconPrimary,
+            color: context.hentai.readerTextIconPrimary,
           ),
         ),
         ...children,
@@ -364,7 +364,7 @@ class _ReaderSettingsNumberRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 13,
-              color: cs.hentai.readerTextSecondary,
+              color: context.hentai.readerTextSecondary,
             ),
           ),
         ),
@@ -379,16 +379,16 @@ class _ReaderSettingsNumberRow extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              color: cs.hentai.readerTextIconPrimary,
+              color: context.hentai.readerTextIconPrimary,
             ),
             decoration: InputDecoration(
               isDense: true,
               filled: true,
-              fillColor: cs.hentai.inputBackground,
+              fillColor: context.hentai.inputBackground,
               suffixText: suffix,
               suffixStyle: TextStyle(
                 fontSize: 12,
-                color: cs.hentai.readerTextSecondary,
+                color: context.hentai.readerTextSecondary,
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 10,

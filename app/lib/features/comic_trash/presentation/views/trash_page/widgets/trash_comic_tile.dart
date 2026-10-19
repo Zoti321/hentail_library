@@ -68,7 +68,7 @@ class TrashComicTile extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(tokens.radius.xs),
                         side: BorderSide(
-                          color: selected ? cs.primary : cs.hentai.borderSubtle,
+                          color: selected ? cs.primary : context.hentai.borderSubtle,
                         ),
                       ),
                       child: InkWell(
@@ -103,7 +103,7 @@ class TrashComicTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: cs.hentai.textPrimary,
+                        color: context.hentai.textPrimary,
                       ),
                     ),
                     Row(
@@ -122,7 +122,7 @@ class TrashComicTile extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
-                              color: cs.hentai.textSecondary,
+                              color: context.hentai.textSecondary,
                             ),
                           ),
                         ),
@@ -132,7 +132,7 @@ class TrashComicTile extends StatelessWidget {
                       l10n.trashDeletedAt(deletedAt),
                       style: TextStyle(
                         fontSize: 12,
-                        color: cs.hentai.textTertiary,
+                        color: context.hentai.textTertiary,
                       ),
                     ),
                   ],

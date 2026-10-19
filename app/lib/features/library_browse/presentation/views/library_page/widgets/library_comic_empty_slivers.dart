@@ -77,20 +77,20 @@ class _LibraryCatalogEmptySliver extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: tokens.spacing.md,
             children: <Widget>[
-              Icon(icon, size: 56, color: cs.hentai.textTertiary),
+              Icon(icon, size: 56, color: context.hentai.textTertiary),
               Text(
                 content.title,
                 style: TextStyle(
                   fontSize: tokens.text.titleSm,
                   fontWeight: FontWeight.w600,
-                  color: cs.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
               ),
               Text(
                 content.hint,
                 style: TextStyle(
                   fontSize: tokens.text.bodySm,
-                  color: cs.hentai.textSecondary,
+                  color: context.hentai.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),

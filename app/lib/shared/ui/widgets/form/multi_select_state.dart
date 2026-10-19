@@ -300,7 +300,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(widget.icon, size: 14, color: cs.hentai.textTertiary),
+            Icon(widget.icon, size: 14, color: context.hentai.textTertiary),
             SizedBox(width: tokens.spacing.sm),
             Expanded(
               child: FormLabel(widget.label, trailing: widget.labelTrailing),
@@ -386,7 +386,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                         color: cs.surface,
                         borderRadius: BorderRadius.circular(tokens.radius.md),
                         border: Border.all(
-                          color: cs.hentai.borderSubtle,
+                          color: context.hentai.borderSubtle,
                           width: 1.5,
                         ),
                         boxShadow: [
@@ -424,7 +424,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                                       style: TextStyle(
                                         fontSize: tokens.text.bodySm,
                                         height: 1.35,
-                                        color: cs.hentai.textPrimary,
+                                        color: context.hentai.textPrimary,
                                       ),
                                       decoration: InputDecoration(
                                         isDense: true,
@@ -435,7 +435,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                                         hintStyle: TextStyle(
                                           fontSize: tokens.text.bodySm,
                                           height: 1.35,
-                                          color: cs.hentai.textPlaceholder,
+                                          color: context.hentai.textPlaceholder,
                                         ),
                                         contentPadding: EdgeInsets.zero,
                                       ),
@@ -463,7 +463,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                               child: Icon(
                                 LucideIcons.chevronsUpDown,
                                 size: 15,
-                                color: cs.hentai.iconSecondary,
+                                color: context.hentai.iconSecondary,
                               ),
                             ),
                         ],
@@ -480,13 +480,13 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
             padding: EdgeInsets.only(top: tokens.spacing.sm),
             child: Row(
               children: [
-                Icon(LucideIcons.circleAlert, size: 14, color: cs.hentai.error),
+                Icon(LucideIcons.circleAlert, size: 14, color: context.hentai.error),
                 SizedBox(width: tokens.spacing.sm),
                 Text(
                   widget.copy.listLoadFailed,
                   style: TextStyle(
                     fontSize: tokens.text.labelXs,
-                    color: cs.hentai.textSecondary,
+                    color: context.hentai.textSecondary,
                   ),
                 ),
                 TextButton(

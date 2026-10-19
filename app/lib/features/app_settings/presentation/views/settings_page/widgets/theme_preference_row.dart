@@ -59,7 +59,7 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
         ? Icon(
             LucideIcons.chevronRight,
             size: 16,
-            color: colorScheme.hentai.iconSecondary,
+            color: context.hentai.iconSecondary,
           )
         : GhostButton.iconText(
             icon: LucideIcons.chevronsUpDown,
@@ -69,8 +69,8 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
             iconSize: 14,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             borderRadius: tokens.radius.md,
-            foregroundColor: colorScheme.hentai.textSecondary,
-            hoverColor: colorScheme.hentai.hoverBackground,
+            foregroundColor: context.hentai.textSecondary,
+            hoverColor: context.hentai.hoverBackground,
             overlayColor: colorScheme.primary.withAlpha(14),
             delayTooltipThreeSeconds: false,
             onPressed: () => menuController.toggleMenu(),
@@ -81,7 +81,7 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
       icon: Icon(
         LucideIcons.palette,
         size: 20,
-        color: colorScheme.hentai.iconDefault,
+        color: context.hentai.iconDefault,
       ),
       label: l10n.settingsThemeLabel,
       onRowTap: () => menuController.showMenu(),
@@ -124,7 +124,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: colorScheme.hentai.borderSubtle),
+        border: Border.all(color: context.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: context.shadows.catalogCardHover,
@@ -144,7 +144,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHighest,
                 border: Border(
-                  bottom: BorderSide(color: colorScheme.hentai.borderSubtle),
+                  bottom: BorderSide(color: context.hentai.borderSubtle),
                 ),
               ),
               child: Text(
@@ -152,7 +152,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
                 style: TextStyle(
                   fontSize: tokens.text.bodySm,
                   fontWeight: FontWeight.w600,
-                  color: colorScheme.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
               ),
             ),
@@ -186,7 +186,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
                                 size: 18,
                                 color: isSelected
                                     ? colorScheme.primary
-                                    : colorScheme.hentai.textTertiary,
+                                    : context.hentai.textTertiary,
                               ),
                               SizedBox(width: tokens.spacing.sm),
                               Expanded(
@@ -195,7 +195,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
-                                    color: colorScheme.hentai.textPrimary,
+                                    color: context.hentai.textPrimary,
                                   ),
                                 ),
                               ),

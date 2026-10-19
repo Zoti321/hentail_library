@@ -27,11 +27,11 @@ class _ToggleSwitchState extends State<ToggleSwitch> {
           decoration: BoxDecoration(
             color: widget.checked
                 ? theme.colorScheme.primary
-                : theme.colorScheme.hentai.borderSubtle,
+                : theme.hentai.borderSubtle,
             border: Border.all(
               color: widget.checked
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.hentai.borderMedium,
+                  : theme.hentai.borderMedium,
               width: 1,
             ),
             borderRadius: BorderRadius.circular(20),

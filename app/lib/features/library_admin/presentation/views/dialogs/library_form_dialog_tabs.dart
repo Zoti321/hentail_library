@@ -227,7 +227,7 @@ class _LibraryFormScannerTab extends StatelessWidget {
               l10n.settingsSupportedFormatsDescription,
               style: TextStyle(
                 fontSize: tokens.text.bodySm,
-                color: cs.hentai.textSecondary,
+                color: context.hentai.textSecondary,
               ),
             ),
             SizedBox(height: tokens.spacing.sm),

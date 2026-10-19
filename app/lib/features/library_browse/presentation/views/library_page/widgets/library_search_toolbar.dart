@@ -45,7 +45,7 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                           borderRadius: 8,
                           foregroundColor: Theme.of(
                             context,
-                          ).colorScheme.hentai.iconDefault,
+                          ).hentai.iconDefault,
                           hoverColor: Theme.of(context).hoverColor,
                           overlayColor: Theme.of(context).hoverColor,
                           onPressed: onOpenNavigation,
@@ -142,7 +142,7 @@ class _LibraryCompactToolbar extends ConsumerWidget {
           iconSize: 16,
           size: 32,
           borderRadius: 8,
-          foregroundColor: isCustomized ? cs.primary : cs.hentai.iconDefault,
+          foregroundColor: isCustomized ? cs.primary : context.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
           delayTooltipThreeSeconds: true,
@@ -168,7 +168,7 @@ class _LegacyLibraryToolbar extends ConsumerWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.hentai.borderSubtle),
+        border: Border.all(color: context.hentai.borderSubtle),
       ),
       padding: const EdgeInsets.all(3),
       child: Row(
@@ -181,7 +181,7 @@ class _LegacyLibraryToolbar extends ConsumerWidget {
             iconSize: 16,
             size: 28,
             borderRadius: 6,
-            foregroundColor: cs.hentai.iconDefault,
+            foregroundColor: context.hentai.iconDefault,
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
             delayTooltipThreeSeconds: true,

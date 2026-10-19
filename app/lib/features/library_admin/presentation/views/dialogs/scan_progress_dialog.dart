@@ -126,7 +126,7 @@ class ScanProgressDialog extends ConsumerWidget {
           child: progress == null
               ? Text(
                   l10n.scanPreparing,
-                  style: TextStyle(fontSize: 14, color: cs.hentai.textPrimary),
+                  style: TextStyle(fontSize: 14, color: context.hentai.textPrimary),
                 )
               : _buildRunningContent(context, progress),
         ),
@@ -142,15 +142,15 @@ class ScanProgressDialog extends ConsumerWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final TextStyle primaryStyle = TextStyle(
       fontSize: 14,
-      color: cs.hentai.textPrimary,
+      color: context.hentai.textPrimary,
     );
     final TextStyle secondaryStyle = TextStyle(
       fontSize: 13,
-      color: cs.hentai.textSecondary,
+      color: context.hentai.textSecondary,
     );
     final TextStyle tertiaryStyle = TextStyle(
       fontSize: 13,
-      color: cs.hentai.textTertiary,
+      color: context.hentai.textTertiary,
     );
 
     if (progress.route == SyncLibraryRoute.withRoots &&
@@ -250,11 +250,11 @@ class ScanProgressDialog extends ConsumerWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final TextStyle bodyStyle = TextStyle(
       fontSize: 14,
-      color: cs.hentai.textSecondary,
+      color: context.hentai.textSecondary,
     );
     final TextStyle tertiaryStyle = TextStyle(
       fontSize: 13,
-      color: cs.hentai.textTertiary,
+      color: context.hentai.textTertiary,
     );
 
     if (cancelled) {
@@ -300,7 +300,7 @@ class ScanProgressDialog extends ConsumerWidget {
         Expanded(
           child: Text(
             error,
-            style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
+            style: TextStyle(fontSize: 13, color: context.hentai.textSecondary),
           ),
         ),
       ],

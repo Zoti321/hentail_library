@@ -80,9 +80,9 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
         iconSize: 16,
         size: kReaderTopBarActionSize,
         borderRadius: 8,
-        foregroundColor: cs.hentai.readerTextIconPrimary,
-        hoverColor: cs.hentai.readerPanelSubtle,
-        overlayColor: cs.hentai.readerPanelSubtle,
+        foregroundColor: context.hentai.readerTextIconPrimary,
+        hoverColor: context.hentai.readerPanelSubtle,
+        overlayColor: context.hentai.readerPanelSubtle,
         onPressed: () => menuController.toggleMenu(),
       ),
     );
@@ -196,13 +196,13 @@ class _ReaderOverflowMenuItem extends StatelessWidget {
           child: Row(
             spacing: 10,
             children: <Widget>[
-              Icon(icon, size: 16, color: cs.hentai.readerTextIconPrimary),
+              Icon(icon, size: 16, color: context.hentai.readerTextIconPrimary),
               Expanded(
                 child: Text(
                   label,
                   style: TextStyle(
                     fontSize: 13,
-                    color: cs.hentai.readerTextIconPrimary,
+                    color: context.hentai.readerTextIconPrimary,
                   ),
                 ),
               ),

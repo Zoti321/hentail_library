@@ -73,7 +73,7 @@ class _ReaderSeriesMenuItem extends StatelessWidget {
     final TextStyle textStyle = TextStyle(
       fontSize: tokens.text.bodySm,
       fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
-      color: isCurrent ? cs.primary : cs.hentai.readerTextIconPrimary,
+      color: isCurrent ? cs.primary : context.hentai.readerTextIconPrimary,
       height: 1.35,
     );
     return Material(

@@ -31,7 +31,7 @@ class AutoUpdateRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.download,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsAutoUpdateLabel,
       action: ToggleSwitch(
@@ -64,7 +64,7 @@ class AboutVersionRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.info,
         size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
+        color: theme.hentai.iconDefault,
       ),
       label: l10n.settingsCheckForUpdatesLabel,
       onRowTap: packageInfoAsync.isLoading
@@ -78,7 +78,7 @@ class AboutVersionRow extends ConsumerWidget {
           versionActionLabel,
           style: TextStyle(
             fontSize: 12,
-            color: theme.colorScheme.hentai.textTertiary,
+            color: theme.hentai.textTertiary,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

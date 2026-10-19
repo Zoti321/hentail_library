@@ -46,7 +46,7 @@ class DetailBackHeader extends StatelessWidget {
                 iconSize: 16,
                 size: 32,
                 borderRadius: 8,
-                foregroundColor: cs.hentai.iconDefault,
+                foregroundColor: context.hentai.iconDefault,
                 hoverColor: theme.hoverColor,
                 overlayColor: theme.hoverColor,
                 onPressed: () => DetailBackHeader.popOrGoLibrary(context),

@@ -68,7 +68,7 @@ class _MetadataTagsOverflowMenuButtonState
           iconSize: 16,
           size: 32,
           borderRadius: 8,
-          foregroundColor: cs.hentai.iconDefault,
+          foregroundColor: context.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
           onPressed: enabled ? () => _controller.toggleMenu() : null,

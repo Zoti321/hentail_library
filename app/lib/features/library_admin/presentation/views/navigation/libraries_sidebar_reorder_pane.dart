@@ -96,7 +96,7 @@ class LibrariesSidebarReorderPane extends HookConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: cs.hentai.textPrimary,
+                    color: context.hentai.textPrimary,
                     fontSize: tokens.text.bodyMd,
                     fontWeight: FontWeight.w600,
                   ),
@@ -109,9 +109,9 @@ class LibrariesSidebarReorderPane extends HookConsumerWidget {
                 iconSize: 16,
                 size: 28,
                 borderRadius: tokens.radius.sm,
-                foregroundColor: cs.hentai.textSecondary,
-                hoverColor: cs.hentai.sidebarItemHoverBackground,
-                overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(
+                foregroundColor: context.hentai.textSecondary,
+                hoverColor: context.hentai.sidebarItemHoverBackground,
+                overlayColor: context.hentai.sidebarItemHoverBackground.withAlpha(
                   110,
                 ),
                 delayTooltipThreeSeconds: true,
@@ -186,7 +186,7 @@ class _ReorderSectionTitle extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: theme.textTheme.labelSmall?.copyWith(
-            color: cs.hentai.textTertiary,
+            color: context.hentai.textTertiary,
             fontSize: tokens.text.labelXs,
             fontWeight: FontWeight.w600,
           ),
@@ -228,7 +228,7 @@ class _ReorderLibraryRow extends StatelessWidget {
               Icon(
                 LucideIcons.gripVertical,
                 size: 16,
-                color: cs.hentai.textTertiary,
+                color: context.hentai.textTertiary,
               ),
               SizedBox(width: tokens.spacing.sm),
               Expanded(
@@ -237,7 +237,7 @@ class _ReorderLibraryRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: cs.hentai.textSecondary,
+                    color: context.hentai.textSecondary,
                     fontSize: tokens.text.bodyMd,
                   ),
                 ),

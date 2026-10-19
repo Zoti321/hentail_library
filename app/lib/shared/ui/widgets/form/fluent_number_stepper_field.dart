@@ -80,8 +80,8 @@ class FluentNumberStepperField extends HookWidget {
     final Color borderColor = hasError
         ? cs.error
         : showActiveBorder
-        ? cs.hentai.inputBorderActive
-        : cs.hentai.inputBorder;
+        ? context.hentai.inputBorderActive
+        : context.hentai.inputBorder;
     final bool useDense = isDense;
     final bool showStepper = enabled && fieldActive;
 
@@ -149,7 +149,7 @@ class FluentNumberStepperField extends HookWidget {
             vertical: useDense ? 0 : tokens.spacing.xs,
           ),
           decoration: BoxDecoration(
-            color: cs.hentai.inputBackground,
+            color: context.hentai.inputBackground,
             borderRadius: BorderRadius.circular(tokens.radius.md),
             border: Border.all(color: borderColor, width: 1),
             boxShadow: showActiveBorder
@@ -180,14 +180,14 @@ class FluentNumberStepperField extends HookWidget {
                   style: TextStyle(
                     fontSize: tokens.text.bodyMd,
                     color: enabled
-                        ? cs.hentai.textPrimary
-                        : cs.hentai.textSecondary,
+                        ? context.hentai.textPrimary
+                        : context.hentai.textSecondary,
                     height: 1.4,
                   ),
                   decoration: InputDecoration(
                     hintText: hintText,
                     hintStyle: TextStyle(
-                      color: cs.hentai.textPlaceholder,
+                      color: context.hentai.textPlaceholder,
                       fontSize: tokens.text.bodyMd,
                     ),
                     contentPadding: EdgeInsets.symmetric(
@@ -277,7 +277,7 @@ class _StepperButton extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           borderRadius: radius,
-          child: Icon(icon, size: 16, color: cs.hentai.iconDefault),
+          child: Icon(icon, size: 16, color: context.hentai.iconDefault),
         ),
       ),
     );

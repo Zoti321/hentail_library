@@ -67,11 +67,11 @@ class FluentTextFieldState extends State<FluentTextField> {
     final Color borderColor = hasError
         ? cs.error
         : showActiveBorder
-        ? cs.hentai.inputBorderActive
-        : cs.hentai.inputBorder;
+        ? context.hentai.inputBorderActive
+        : context.hentai.inputBorder;
     final Color textColor = widget.enabled
-        ? cs.hentai.textPrimary
-        : cs.hentai.textSecondary;
+        ? context.hentai.textPrimary
+        : context.hentai.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +91,7 @@ class FluentTextFieldState extends State<FluentTextField> {
               vertical: useDense ? 0 : tokens.spacing.xs,
             ),
             decoration: BoxDecoration(
-              color: cs.hentai.inputBackground,
+              color: context.hentai.inputBackground,
               borderRadius: BorderRadius.circular(tokens.radius.md),
               border: Border.all(color: borderColor, width: 1),
               boxShadow: showActiveBorder
@@ -124,7 +124,7 @@ class FluentTextFieldState extends State<FluentTextField> {
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
-                  color: cs.hentai.textPlaceholder,
+                  color: context.hentai.textPlaceholder,
                   fontSize: tokens.text.bodyMd,
                 ),
                 contentPadding: isTextarea
@@ -177,7 +177,7 @@ class FormLabel extends StatelessWidget {
       style: TextStyle(
         fontSize: tokens.text.labelXs,
         fontWeight: FontWeight.w700,
-        color: Theme.of(context).colorScheme.hentai.textTertiary,
+        color: context.hentai.textTertiary,
       ),
     );
     if (trailing == null) {

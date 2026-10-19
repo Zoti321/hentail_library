@@ -172,7 +172,7 @@ class _AuthorHeader extends StatelessWidget {
                       child: Icon(
                         LucideIcons.user,
                         size: 36,
-                        color: cs.hentai.iconSecondary,
+                        color: context.hentai.iconSecondary,
                       ),
                     ),
             ),
@@ -201,7 +201,7 @@ class _AuthorNameRow extends HookConsumerWidget {
     final TextStyle nameStyle = TextStyle(
       fontSize: tokens.text.titleLg,
       fontWeight: FontWeight.w700,
-      color: cs.hentai.textPrimary,
+      color: context.hentai.textPrimary,
     );
 
     Future<void> submit() async {
@@ -297,7 +297,7 @@ class _AuthorNameRow extends HookConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: tokens.text.bodySm,
-                    color: cs.hentai.textSecondary,
+                    color: context.hentai.textSecondary,
                   ),
                 ),
             ],
@@ -308,7 +308,7 @@ class _AuthorNameRow extends HookConsumerWidget {
           tooltip: l10n.authorDetailRename,
           visualDensity: VisualDensity.compact,
           iconSize: 16,
-          color: cs.hentai.iconSecondary,
+          color: context.hentai.iconSecondary,
           onPressed: () {
             controller.text = detail.name;
             controller.selection = TextSelection(
@@ -506,7 +506,7 @@ class _AuthorComicsSection extends StatelessWidget {
                 style: TextStyle(
                   fontSize: tokens.text.titleSm,
                   fontWeight: FontWeight.w600,
-                  color: cs.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
               ),
             ),
@@ -539,7 +539,7 @@ class _AuthorComicsSection extends StatelessWidget {
             l10n.authorDetailComicsEmpty,
             style: TextStyle(
               fontSize: tokens.text.bodySm,
-              color: cs.hentai.textSecondary,
+              color: context.hentai.textSecondary,
             ),
           )
         else

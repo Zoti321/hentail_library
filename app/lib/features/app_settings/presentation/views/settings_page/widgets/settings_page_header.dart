@@ -87,7 +87,7 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
                     iconSize: 16,
                     size: 32,
                     borderRadius: 8,
-                    foregroundColor: cs.hentai.iconDefault,
+                    foregroundColor: context.hentai.iconDefault,
                     hoverColor: theme.hoverColor,
                     overlayColor: theme.hoverColor,
                     onPressed: onBack,
@@ -117,7 +117,7 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
                     child: Text(
                       resolvedTitle,
                       key: ValueKey<String>(resolvedTitle),
-                      style: buildSettingsPageTitleStyle(cs, layoutTier),
+                      style: buildSettingsPageTitleStyle(context.hentai, layoutTier),
                     ),
                   ),
                 ],

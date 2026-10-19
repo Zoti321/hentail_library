@@ -68,7 +68,7 @@ class _LibrariesMoreRow extends StatelessWidget {
           child: Icon(
             expanded ? LucideIcons.chevronDown : LucideIcons.chevronRight,
             size: 16,
-            color: cs.hentai.textSecondary,
+            color: context.hentai.textSecondary,
           ),
         ),
       ),
@@ -184,7 +184,7 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
               if (libraries.isNotEmpty)
                 Divider(
                   height: tokens.spacing.sm,
-                  color: cs.hentai.borderSubtle,
+                  color: context.hentai.borderSubtle,
                 ),
               ...libraries.map(
                 (LocalLibrary library) => PopupMenuTextItem(
@@ -232,10 +232,10 @@ class _SidebarIconOnlyButton extends HookWidget {
     final AppThemeTokens tokens = context.tokens;
     final ValueNotifier<bool> hovered = useState(false);
     final Color background = isActive
-        ? cs.hentai.sidebarItemActiveBackground
+        ? context.hentai.sidebarItemActiveBackground
         : (hovered.value
-              ? cs.hentai.sidebarItemHoverBackground
-              : cs.hentai.sidebarBackground);
+              ? context.hentai.sidebarItemHoverBackground
+              : context.hentai.sidebarBackground);
 
     return Container(
       margin: EdgeInsets.symmetric(
@@ -261,16 +261,16 @@ class _SidebarIconOnlyButton extends HookWidget {
                   border: Border.all(
                     width: 1,
                     color: isActive
-                        ? cs.hentai.sidebarItemActiveBorder
-                        : cs.hentai.sidebarBackground,
+                        ? context.hentai.sidebarItemActiveBorder
+                        : context.hentai.sidebarBackground,
                   ),
                 ),
                 child: Icon(
                   icon,
                   size: DesktopSidebar.navItemIconSize,
                   color: isActive || hovered.value
-                      ? cs.hentai.textPrimary
-                      : cs.hentai.textSecondary,
+                      ? context.hentai.textPrimary
+                      : context.hentai.textSecondary,
                 ),
               ),
             ),
@@ -308,7 +308,7 @@ class _SidebarChromeRow extends HookWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final HentaiColorScheme h = cs.hentai;
+    final HentaiColorScheme h = context.hentai;
     final AppThemeTokens tokens = context.tokens;
     final ValueNotifier<bool> hovered = useState(false);
     final double t = expandProgress.clamp(0.0, 1.0);

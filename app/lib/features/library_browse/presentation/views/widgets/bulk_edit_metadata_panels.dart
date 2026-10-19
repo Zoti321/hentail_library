@@ -70,7 +70,7 @@ class _BulkEditFieldListRow extends StatelessWidget {
     final Color? background = selected
         ? cs.primary.withAlpha(20)
         : dirty
-        ? cs.hentai.hoverBackground.withAlpha(80)
+        ? context.hentai.hoverBackground.withAlpha(80)
         : null;
 
     return Material(
@@ -105,7 +105,7 @@ class _BulkEditFieldListRow extends StatelessWidget {
                   style: TextStyle(
                     fontSize: tokens.text.bodySm,
                     fontWeight: FontWeight.w600,
-                    color: cs.hentai.textPrimary,
+                    color: context.hentai.textPrimary,
                   ),
                 ),
                 if (summary != null || mixed)
@@ -119,7 +119,7 @@ class _BulkEditFieldListRow extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: tokens.text.labelXs,
-                              color: cs.hentai.textSecondary,
+                              color: context.hentai.textSecondary,
                             ),
                           ),
                         ),
@@ -129,7 +129,7 @@ class _BulkEditFieldListRow extends StatelessWidget {
                           mixedLabel,
                           style: TextStyle(
                             fontSize: tokens.text.labelXs,
-                            color: cs.hentai.textTertiary,
+                            color: context.hentai.textTertiary,
                           ),
                         ),
                       ],
@@ -185,7 +185,7 @@ class _BulkEditDetailPlaceholder extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: tokens.text.bodySm,
-            color: cs.hentai.textTertiary,
+            color: context.hentai.textTertiary,
           ),
         ),
       ),
@@ -371,7 +371,7 @@ class _BulkEditOperationSelector extends StatelessWidget {
           style: TextStyle(
             fontSize: tokens.text.bodySm,
             fontWeight: FontWeight.w500,
-            color: cs.hentai.textPrimary,
+            color: context.hentai.textPrimary,
           ),
         ),
         Align(

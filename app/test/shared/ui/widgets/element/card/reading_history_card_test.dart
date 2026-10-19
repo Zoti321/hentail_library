@@ -16,7 +16,7 @@ void main() {
     'hover keeps border subtle and animates card shadow like catalog cards',
     (WidgetTester tester) async {
       final ThemeData theme = buildAppTheme(Brightness.light);
-      final HentaiColorScheme h = theme.colorScheme.hentai;
+      final HentaiColorScheme h = theme.hentai;
 
       await tester.pumpWidget(
         ProviderScope(
@@ -79,7 +79,7 @@ void main() {
     });
 
     final ThemeData theme = buildAppTheme(Brightness.light);
-    final HentaiColorScheme h = theme.colorScheme.hentai;
+    final HentaiColorScheme h = theme.hentai;
 
     await tester.pumpWidget(
       ProviderScope(

@@ -16,7 +16,7 @@ class MetaChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: theme.colorScheme.hentai.borderSubtle),
+        border: Border.all(color: theme.hentai.borderSubtle),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -28,7 +28,7 @@ class MetaChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.hentai.textSecondary,
+              color: theme.hentai.textSecondary,
             ),
           ),
         ],

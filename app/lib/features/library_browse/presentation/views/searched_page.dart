@@ -282,12 +282,12 @@ class _SearchResultsEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: tokens.spacing.md,
           children: <Widget>[
-            Icon(LucideIcons.searchX, size: 40, color: cs.hentai.textTertiary),
+            Icon(LucideIcons.searchX, size: 40, color: context.hentai.textTertiary),
             Text(
               l10n.libraryNoMatchTitle,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
-                color: cs.hentai.textSecondary,
+                color: context.hentai.textSecondary,
               ),
             ),
             TextButton.icon(

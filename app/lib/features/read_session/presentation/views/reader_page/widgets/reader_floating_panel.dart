@@ -93,7 +93,7 @@ class ReaderFloatingPanel extends StatelessWidget {
           constraints: constraints,
           padding: padding,
           decoration: BoxDecoration(
-            color: cs.hentai.readerPanelBackground,
+            color: context.hentai.readerPanelBackground,
             borderRadius: BorderRadius.circular(radius),
           ),
           child: child,

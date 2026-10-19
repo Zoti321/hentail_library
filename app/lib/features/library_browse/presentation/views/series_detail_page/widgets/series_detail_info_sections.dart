@@ -14,14 +14,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 休刊状态 chip 描边/文字色（仅系列详情页使用）。
 Color _serializationChipAccentColor(
-  ColorScheme cs,
+  HentaiColorScheme semantic,
   SerializationStatus status,
 ) {
   return switch (status) {
-    SerializationStatus.ongoing => cs.hentai.success,
-    SerializationStatus.ended => cs.hentai.textTertiary,
-    SerializationStatus.hiatus => cs.hentai.serializationHiatus,
-    SerializationStatus.unknown => cs.hentai.textSecondary,
+    SerializationStatus.ongoing => semantic.success,
+    SerializationStatus.ended => semantic.textTertiary,
+    SerializationStatus.hiatus => semantic.serializationHiatus,
+    SerializationStatus.unknown => semantic.textSecondary,
   };
 }
 
@@ -36,8 +36,10 @@ class SeriesSerializationChip extends StatelessWidget {
     if (status == SerializationStatus.unknown) {
       return const SizedBox.shrink();
     }
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final Color accentColor = _serializationChipAccentColor(cs, status);
+    final Color accentColor = _serializationChipAccentColor(
+      context.hentai,
+      status,
+    );
     return OutlinedMetaChip(
       text: context.l10n.serializationStatusLabel(status),
       borderColor: accentColor,
@@ -99,7 +101,7 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
               l10n.seriesVolumeCountLabel(series.items.length),
           style: TextStyle(
             fontSize: tokens.text.bodySm,
-            color: cs.hentai.textSecondary,
+            color: context.hentai.textSecondary,
           ),
         ),
       ],

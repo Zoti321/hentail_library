@@ -428,7 +428,7 @@ class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
         children: <Widget>[
           Text(
             '将 ${widget.sources.length} 个 tag 合并到「${widget.target}」？源 tag 的 Comic 附着会转移到目标，源 tag 将被删除。',
-            style: TextStyle(color: cs.hentai.textSecondary),
+            style: TextStyle(color: context.hentai.textSecondary),
           ),
           CheckboxListTile(
             value: skip,

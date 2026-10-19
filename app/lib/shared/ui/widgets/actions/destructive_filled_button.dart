@@ -21,7 +21,7 @@ class DestructiveFilledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HentaiColorScheme h = Theme.of(context).colorScheme.hentai;
+    final HentaiColorScheme h = context.hentai;
     return FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(

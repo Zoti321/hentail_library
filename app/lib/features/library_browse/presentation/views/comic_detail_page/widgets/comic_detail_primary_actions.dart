@@ -33,7 +33,7 @@ ButtonStyle comicDetailIncognitoReadStyle(
   final ColorScheme cs = theme.colorScheme;
   return ElevatedButton.styleFrom(
     backgroundColor: cs.surfaceContainerHigh,
-    foregroundColor: cs.hentai.textPrimary,
+    foregroundColor: theme.hentai.textPrimary,
     elevation: 1,
     shadowColor: theme.extension<AppShadowTokens>()!.catalogCardRest,
     padding: EdgeInsets.symmetric(
@@ -42,7 +42,7 @@ ButtonStyle comicDetailIncognitoReadStyle(
     ),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(tokens.radius.xs),
-      side: BorderSide(color: cs.hentai.borderSubtle),
+      side: BorderSide(color: theme.hentai.borderSubtle),
     ),
   );
 }

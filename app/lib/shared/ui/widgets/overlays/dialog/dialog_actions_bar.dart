@@ -44,7 +44,7 @@ class DialogActionsBar extends StatelessWidget {
         border: showDivider
             ? Border(
                 top: BorderSide(
-                  color: theme.colorScheme.hentai.borderSubtle,
+                  color: theme.hentai.borderSubtle,
                   width: 1,
                 ),
               )

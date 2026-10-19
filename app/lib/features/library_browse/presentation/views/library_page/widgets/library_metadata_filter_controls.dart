@@ -89,7 +89,7 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                       style: TextStyle(
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w500,
-                        color: cs.hentai.textPrimary,
+                        color: context.hentai.textPrimary,
                       ),
                     ),
                   ),
@@ -133,16 +133,16 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                               searchQuery.value = value,
                           style: TextStyle(
                             fontSize: 13,
-                            color: cs.hentai.textPrimary,
+                            color: context.hentai.textPrimary,
                           ),
                           decoration: InputDecoration(
                             isDense: true,
                             hintText: l10n.libraryMetadataFilterSearchHint,
-                            hintStyle: TextStyle(color: cs.hentai.textTertiary),
+                            hintStyle: TextStyle(color: context.hentai.textTertiary),
                             prefixIcon: Icon(
                               LucideIcons.search,
                               size: 16,
-                              color: cs.hentai.iconSecondary,
+                              color: context.hentai.iconSecondary,
                             ),
                             prefixIconConstraints: const BoxConstraints(
                               minWidth: 36,
@@ -198,7 +198,7 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                     l10n.libraryMetadataFilterEmpty,
                     style: TextStyle(
                       fontSize: 12,
-                      color: cs.hentai.textTertiary,
+                      color: context.hentai.textTertiary,
                     ),
                   ),
                 )
@@ -253,7 +253,7 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                                     labelFor?.call(name) ?? name,
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: cs.hentai.textPrimary,
+                                      color: context.hentai.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -295,7 +295,7 @@ class _IncludeModeIconButton extends StatelessWidget {
       iconSize: 16,
       size: 32,
       borderRadius: 8,
-      foregroundColor: isAll ? cs.primary : cs.hentai.iconSecondary,
+      foregroundColor: isAll ? cs.primary : context.hentai.iconSecondary,
       hoverColor: theme.hoverColor,
       overlayColor: theme.hoverColor,
       onPressed: () => onChanged(

@@ -59,7 +59,7 @@ class _SeriesCardInfo extends StatelessWidget {
             fontWeight: FontWeight.w600,
             fontFamily: 'MI_Sans_Regular',
             height: 1.25,
-            color: isHover ? cs.primary : cs.hentai.textPrimary,
+            color: isHover ? cs.primary : context.hentai.textPrimary,
           ),
           child: Text(
             series.name,
@@ -71,7 +71,7 @@ class _SeriesCardInfo extends StatelessWidget {
           l10n.seriesVolumeCountLabel(series.items.length),
           style: TextStyle(
             fontSize: tokens.text.labelXs - 1,
-            color: cs.hentai.textTertiary,
+            color: context.hentai.textTertiary,
           ),
         ),
       ],

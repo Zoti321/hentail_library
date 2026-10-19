@@ -82,7 +82,7 @@ class TagDictionaryImportDialog extends HookConsumerWidget {
         children: <Widget>[
           Text(
             l10n.metadataImportTagDictionaryDialogBody,
-            style: TextStyle(color: colorScheme.hentai.textSecondary),
+            style: TextStyle(color: context.hentai.textSecondary),
           ),
           const SizedBox(height: 16),
           LinearProgressIndicator(

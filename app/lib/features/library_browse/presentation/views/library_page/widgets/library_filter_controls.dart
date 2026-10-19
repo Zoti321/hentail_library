@@ -64,7 +64,7 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                       style: TextStyle(
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w500,
-                        color: cs.hentai.textPrimary,
+                        color: context.hentai.textPrimary,
                       ),
                     ),
                   ),
@@ -163,7 +163,7 @@ class _LibraryMediaTypeFilterControlsState
                       style: TextStyle(
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w500,
-                        color: cs.hentai.textPrimary,
+                        color: context.hentai.textPrimary,
                       ),
                     ),
                   ),
@@ -251,7 +251,7 @@ class _LibrarySerializationStatusFilterControlsState
                       style: TextStyle(
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w500,
-                        color: cs.hentai.textPrimary,
+                        color: context.hentai.textPrimary,
                       ),
                     ),
                   ),
@@ -336,7 +336,7 @@ class LibraryOrganizeFilterControls extends HookConsumerWidget {
                       style: TextStyle(
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w500,
-                        color: cs.hentai.textPrimary,
+                        color: context.hentai.textPrimary,
                       ),
                     ),
                   ),
@@ -407,7 +407,7 @@ class _FilterCheckboxOptionRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(fontSize: 13, color: cs.hentai.textPrimary),
+                  style: TextStyle(fontSize: 13, color: context.hentai.textPrimary),
                 ),
               ),
             ],

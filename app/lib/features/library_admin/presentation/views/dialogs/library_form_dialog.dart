@@ -226,7 +226,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
               title: l10n.formLibraryRootChangeConfirmTitle,
               content: Text(
                 l10n.formLibraryRootChangeConfirmBody,
-                style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
+                style: TextStyle(fontSize: 14, color: context.hentai.textSecondary),
               ),
               actions: <Widget>[
                 TextButton(

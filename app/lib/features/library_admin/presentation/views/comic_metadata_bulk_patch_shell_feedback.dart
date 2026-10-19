@@ -32,7 +32,7 @@ class ComicMetadataBulkPatchShellFeedback extends ConsumerWidget {
         height: 30,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
+          border: Border(bottom: BorderSide(color: context.hentai.borderSubtle)),
         ),
         child: Row(
           children: <Widget>[
@@ -44,7 +44,7 @@ class ComicMetadataBulkPatchShellFeedback extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: cs.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

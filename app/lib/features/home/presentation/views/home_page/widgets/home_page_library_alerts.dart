@@ -60,7 +60,7 @@ class _HomeLibraryAlertCard extends ConsumerWidget {
     final bool isError =
         alert.kind == HomeLibraryAlertKind.remoteUnreachable ||
         alert.kind == HomeLibraryAlertKind.syncFailed;
-    final Color accent = isError ? cs.hentai.error : cs.hentai.warning;
+    final Color accent = isError ? context.hentai.error : context.hentai.warning;
     final IconData icon = switch (alert.kind) {
       HomeLibraryAlertKind.remoteUnreachable => LucideIcons.cloudOff,
       HomeLibraryAlertKind.syncFailed => LucideIcons.circleAlert,
@@ -105,7 +105,7 @@ class _HomeLibraryAlertCard extends ConsumerWidget {
                   Text(
                     message,
                     style: TextStyle(
-                      color: cs.hentai.textPrimary,
+                      color: context.hentai.textPrimary,
                       fontSize: tokens.text.bodySm,
                       height: 1.4,
                     ),
@@ -118,7 +118,7 @@ class _HomeLibraryAlertCard extends ConsumerWidget {
                       child: Text(
                         detail,
                         style: TextStyle(
-                          color: cs.hentai.textSecondary,
+                          color: context.hentai.textSecondary,
                           fontSize: tokens.text.labelXs,
                         ),
                         maxLines: 2,

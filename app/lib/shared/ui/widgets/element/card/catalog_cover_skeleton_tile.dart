@@ -10,7 +10,7 @@ class CatalogCoverSkeletonTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final Color bar = cs.hentai.imagePlaceholder;
+    final Color bar = context.hentai.imagePlaceholder;
     return ExcludeSemantics(
       child: CatalogCoverCardShell(
         cover: ColoredBox(color: bar),

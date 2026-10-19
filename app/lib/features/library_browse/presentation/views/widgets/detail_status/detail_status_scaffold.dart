@@ -43,7 +43,7 @@ class DetailStatusScaffold extends StatelessWidget {
                     label,
                     style: TextStyle(
                       fontSize: tokens.text.bodyMd,
-                      color: cs.hentai.textSecondary,
+                      color: context.hentai.textSecondary,
                     ),
                   ),
                   if (action != null) action!,
@@ -92,7 +92,7 @@ class DetailNotFoundStatus extends StatelessWidget {
       leading: Icon(
         icon,
         size: 48,
-        color: Theme.of(context).colorScheme.hentai.textTertiary,
+        color: context.hentai.textTertiary,
       ),
       label: label,
       action: TextButton.icon(
@@ -119,7 +119,7 @@ class DetailErrorStatus extends StatelessWidget {
       leading: Icon(
         LucideIcons.circleAlert,
         size: 48,
-        color: theme.colorScheme.hentai.textTertiary,
+        color: theme.hentai.textTertiary,
       ),
       label: label,
       action: retry == null ? null : _DetailRetryButton(onRetry: retry),

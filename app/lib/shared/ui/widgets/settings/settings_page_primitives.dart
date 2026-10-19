@@ -24,7 +24,7 @@ class SettingsGroup extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.hentai.textTertiary,
+                color: theme.hentai.textTertiary,
                 letterSpacing: 1.0,
               ),
             ),
@@ -49,7 +49,7 @@ class SettingsGroup extends StatelessWidget {
                           height: 1,
                           thickness: 1,
                           color:
-                              theme.colorScheme.hentai.inputBackgroundDisabled,
+                              theme.hentai.inputBackgroundDisabled,
                         ),
                     ],
                   ),
@@ -105,7 +105,7 @@ class _SettingsRowState extends State<SettingsRow> {
           duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(
             color: isHovered
-                ? colorScheme.hentai.hoverBackground
+                ? context.hentai.hoverBackground
                 : colorScheme.surface,
           ),
           child: Padding(
@@ -125,7 +125,7 @@ class _SettingsRowState extends State<SettingsRow> {
                           fontWeight: FontWeight.w500,
                           color: widget.isDestructive
                               ? colorScheme.error
-                              : colorScheme.hentai.textPrimary,
+                              : context.hentai.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -136,7 +136,7 @@ class _SettingsRowState extends State<SettingsRow> {
                           widget.description!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: colorScheme.hentai.textTertiary,
+                            color: context.hentai.textTertiary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

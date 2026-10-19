@@ -92,7 +92,7 @@ class _UnderlineTab extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? cs.primary : cs.hentai.textSecondary,
+                color: isSelected ? cs.primary : context.hentai.textSecondary,
               ),
             ),
             const SizedBox(height: 6),

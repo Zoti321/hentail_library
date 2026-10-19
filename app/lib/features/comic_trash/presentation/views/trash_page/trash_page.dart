@@ -116,7 +116,7 @@ class _TrashHeader extends ConsumerWidget {
       if (hasSelection)
         Text(
           l10n.trashSelectedCount(selectedCount),
-          style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
+          style: TextStyle(fontSize: 13, color: context.hentai.textSecondary),
         ),
       if (hasSelection) SizedBox(width: tokens.spacing.sm),
       _TrashHeaderAction(
@@ -139,9 +139,9 @@ class _TrashHeader extends ConsumerWidget {
         layoutTier: layoutTier,
         icon: LucideIcons.trash2,
         text: hasSelection ? l10n.trashPurgeSelected : l10n.trashPurgeAll,
-        foregroundColor: cs.hentai.contextMenuDanger,
-        hoverColor: cs.hentai.contextMenuDanger.withAlpha(24),
-        overlayColor: cs.hentai.contextMenuDanger.withAlpha(20),
+        foregroundColor: context.hentai.contextMenuDanger,
+        hoverColor: context.hentai.contextMenuDanger.withAlpha(24),
+        overlayColor: context.hentai.contextMenuDanger.withAlpha(20),
         onPressed: hasItems
             ? hasSelection
                   ? () => purgeTrashedComics(context, ref, state.selectedItems)
@@ -170,7 +170,7 @@ class _TrashHeader extends ConsumerWidget {
                       icon: LucideIcons.menu,
                       semanticLabel: l10n.shellOpenNavMenu,
                       tooltip: '',
-                      foregroundColor: cs.hentai.iconDefault,
+                      foregroundColor: context.hentai.iconDefault,
                       hoverColor: theme.hoverColor,
                       overlayColor: theme.hoverColor,
                       onPressed: onOpenNavigation,
@@ -179,7 +179,7 @@ class _TrashHeader extends ConsumerWidget {
                   ],
                   Text(
                     l10n.navTrash,
-                    style: pageHeaderTitleStyle(cs, layoutTier),
+                    style: pageHeaderTitleStyle(context.hentai, layoutTier),
                   ),
                 ],
               ),
@@ -258,7 +258,7 @@ class _TrashBody extends ConsumerWidget {
             l10n.shellLoadFailed,
             style: TextStyle(
               fontSize: 14,
-              color: theme.colorScheme.hentai.textSecondary,
+              color: theme.hentai.textSecondary,
             ),
           ),
         ),
@@ -277,7 +277,7 @@ class _TrashBody extends ConsumerWidget {
               l10n.trashPageSummary(state.totalCount),
               style: TextStyle(
                 fontSize: tokens.text.bodySm,
-                color: theme.colorScheme.hentai.textTertiary,
+                color: theme.hentai.textTertiary,
               ),
             ),
             const SizedBox(height: kPageHeaderSearchToListSpacing),
@@ -315,15 +315,15 @@ class _TrashEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: 8,
           children: <Widget>[
-            Icon(LucideIcons.trash2, size: 48, color: cs.hentai.textTertiary),
+            Icon(LucideIcons.trash2, size: 48, color: context.hentai.textTertiary),
             Text(
               l10n.trashEmptyTitle,
-              style: TextStyle(fontSize: 15, color: cs.hentai.textPrimary),
+              style: TextStyle(fontSize: 15, color: context.hentai.textPrimary),
             ),
             Text(
               l10n.trashEmptyDescription,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
+              style: TextStyle(fontSize: 13, color: context.hentai.textSecondary),
             ),
           ],
         ),

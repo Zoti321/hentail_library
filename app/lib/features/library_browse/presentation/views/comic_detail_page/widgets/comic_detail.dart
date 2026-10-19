@@ -55,7 +55,7 @@ class ComicDetail extends ConsumerWidget {
                                     fontSize: 22,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: -0.4,
-                                    color: cs.hentai.textPrimary,
+                                    color: context.hentai.textPrimary,
                                     height: 1.25,
                                   ),
                                 ),

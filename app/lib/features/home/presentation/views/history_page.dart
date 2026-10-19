@@ -232,7 +232,7 @@ class _HistoryBodyLeading extends ConsumerWidget {
           style: TextStyle(
             fontSize: tokens.text.bodySm,
             fontWeight: FontWeight.w400,
-            color: theme.colorScheme.hentai.textTertiary,
+            color: theme.hentai.textTertiary,
           ),
         ),
         const SizedBox(height: kPageHeaderSubtitleToSearchSpacing),
@@ -290,7 +290,7 @@ class _HistoryListSliver extends ConsumerWidget {
               l10n.shellLoadFailed,
               style: TextStyle(
                 fontSize: 14,
-                color: theme.colorScheme.hentai.textSecondary,
+                color: theme.hentai.textSecondary,
               ),
             ),
           ),
@@ -309,7 +309,7 @@ class _HistoryListSliver extends ConsumerWidget {
                     Icon(
                       LucideIcons.bookOpen,
                       size: 48,
-                      color: theme.colorScheme.hentai.textTertiary,
+                      color: theme.hentai.textTertiary,
                     ),
                     Text(
                       feed.keyword.isEmpty
@@ -317,7 +317,7 @@ class _HistoryListSliver extends ConsumerWidget {
                           : l10n.historyNoMatch,
                       style: TextStyle(
                         fontSize: 14,
-                        color: theme.colorScheme.hentai.textSecondary,
+                        color: theme.hentai.textSecondary,
                       ),
                     ),
                   ],

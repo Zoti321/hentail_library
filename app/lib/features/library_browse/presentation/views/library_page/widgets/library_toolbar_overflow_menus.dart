@@ -55,7 +55,7 @@ class _LibraryPageSizeMenuButtonState
         iconSize: 16,
         size: 32,
         borderRadius: 8,
-        foregroundColor: cs.hentai.iconDefault,
+        foregroundColor: context.hentai.iconDefault,
         hoverColor: theme.hoverColor,
         overlayColor: theme.hoverColor,
         delayTooltipThreeSeconds: true,
@@ -131,7 +131,7 @@ class _LibraryPageSizeMenuItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              color: isSelected ? cs.primary : cs.hentai.textPrimary,
+              color: isSelected ? cs.primary : context.hentai.textPrimary,
             ),
           ),
         ),
@@ -217,7 +217,7 @@ class _LibraryOverflowMenuButtonState
                       child: Center(
                         child: TerminalSpinner(
                           size: 16,
-                          color: cs.hentai.iconDefault,
+                          color: context.hentai.iconDefault,
                         ),
                       ),
                     ),
@@ -232,7 +232,7 @@ class _LibraryOverflowMenuButtonState
               iconSize: 16,
               size: 32,
               borderRadius: 8,
-              foregroundColor: cs.hentai.iconDefault,
+              foregroundColor: context.hentai.iconDefault,
               hoverColor: theme.hoverColor,
               overlayColor: theme.hoverColor,
               delayTooltipThreeSeconds: true,
@@ -363,14 +363,14 @@ class _LibraryOverflowMenuItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: <Widget>[
-              Icon(icon, size: 16, color: cs.hentai.iconDefault),
+              Icon(icon, size: 16, color: context.hentai.iconDefault),
               const SizedBox(width: 10),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: cs.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
               ),
             ],

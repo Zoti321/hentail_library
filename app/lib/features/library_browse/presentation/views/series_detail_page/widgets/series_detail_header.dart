@@ -107,7 +107,7 @@ class _SeriesDetailDefaultHeaderRow extends ConsumerWidget {
             iconSize: 16,
             size: 32,
             borderRadius: 8,
-            foregroundColor: cs.hentai.iconDefault,
+            foregroundColor: context.hentai.iconDefault,
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
             onPressed: () => DetailBackHeader.popOrGoLibrary(context),
@@ -122,7 +122,7 @@ class _SeriesDetailDefaultHeaderRow extends ConsumerWidget {
             iconSize: 16,
             size: 32,
             borderRadius: 8,
-            foregroundColor: cs.hentai.iconDefault,
+            foregroundColor: context.hentai.iconDefault,
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
             onPressed: () {
@@ -259,7 +259,7 @@ class _SeriesDetailOverflowMenuButtonState
         iconSize: 16,
         size: 32,
         borderRadius: 8,
-        foregroundColor: cs.hentai.iconDefault,
+        foregroundColor: context.hentai.iconDefault,
         hoverColor: theme.hoverColor,
         overlayColor: theme.hoverColor,
         onPressed: () => _controller.toggleMenu(),
@@ -301,11 +301,11 @@ class _SeriesDetailOverflowMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final Color fg = enabled
-        ? cs.hentai.iconDefault
-        : cs.hentai.iconDefault.withValues(alpha: 0.38);
+        ? context.hentai.iconDefault
+        : context.hentai.iconDefault.withValues(alpha: 0.38);
     final Color text = enabled
-        ? cs.hentai.textPrimary
-        : cs.hentai.textPrimary.withValues(alpha: 0.38);
+        ? context.hentai.textPrimary
+        : context.hentai.textPrimary.withValues(alpha: 0.38);
     return Material(
       color: Colors.transparent,
       child: InkWell(

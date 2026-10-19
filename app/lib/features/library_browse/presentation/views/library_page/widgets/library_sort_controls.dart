@@ -88,7 +88,7 @@ class _ComicSortListRow extends ConsumerWidget {
     final TextStyle labelStyle = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w400,
-      color: isEnabled ? cs.hentai.textSecondary : cs.hentai.textTertiary,
+      color: isEnabled ? context.hentai.textSecondary : context.hentai.textTertiary,
     );
 
     return Material(
@@ -120,7 +120,7 @@ class _ComicSortListRow extends ConsumerWidget {
                             ? LucideIcons.chevronUp
                             : LucideIcons.chevronDown,
                         size: 14,
-                        color: isEnabled ? cs.primary : cs.hentai.textTertiary,
+                        color: isEnabled ? cs.primary : context.hentai.textTertiary,
                       )
                     : null,
               ),
@@ -134,7 +134,7 @@ class _ComicSortListRow extends ConsumerWidget {
               if (!isImplemented)
                 Text(
                   l10n.libraryComingSoon,
-                  style: TextStyle(fontSize: 11, color: cs.hentai.textTertiary),
+                  style: TextStyle(fontSize: 11, color: context.hentai.textTertiary),
                 ),
             ],
           ),
@@ -163,7 +163,7 @@ class _SeriesSortListRow extends ConsumerWidget {
     final TextStyle labelStyle = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w400,
-      color: isImplemented ? cs.hentai.textSecondary : cs.hentai.textTertiary,
+      color: isImplemented ? context.hentai.textSecondary : context.hentai.textTertiary,
     );
 
     return Material(
@@ -209,7 +209,7 @@ class _SeriesSortListRow extends ConsumerWidget {
               if (!isImplemented)
                 Text(
                   l10n.libraryComingSoon,
-                  style: TextStyle(fontSize: 11, color: cs.hentai.textTertiary),
+                  style: TextStyle(fontSize: 11, color: context.hentai.textTertiary),
                 ),
             ],
           ),

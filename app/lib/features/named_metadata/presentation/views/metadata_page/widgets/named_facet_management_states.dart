@@ -42,14 +42,14 @@ class _NamedFacetManagementErrorState extends StatelessWidget {
             Icon(
               LucideIcons.circleAlert,
               size: 32,
-              color: cs.hentai.textTertiary,
+              color: context.hentai.textTertiary,
             ),
             SizedBox(height: tokens.spacing.md),
             Text(
               '$error',
               style: TextStyle(
                 fontSize: tokens.text.bodySm,
-                color: cs.hentai.textTertiary,
+                color: context.hentai.textTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -90,7 +90,7 @@ class _NamedFacetManagementEmptyState extends StatelessWidget {
             Icon(
               hasSearchQuery ? LucideIcons.searchX : _iconForKind(kind),
               size: 32,
-              color: cs.hentai.textTertiary,
+              color: context.hentai.textTertiary,
             ),
             SizedBox(height: tokens.spacing.md),
             Text(
@@ -100,7 +100,7 @@ class _NamedFacetManagementEmptyState extends StatelessWidget {
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
                 fontWeight: FontWeight.w600,
-                color: cs.hentai.textPrimary,
+                color: context.hentai.textPrimary,
               ),
             ),
             SizedBox(height: tokens.spacing.xs),
@@ -110,7 +110,7 @@ class _NamedFacetManagementEmptyState extends StatelessWidget {
                   : l10n.metadataEmptyHint(kind),
               style: TextStyle(
                 fontSize: tokens.text.bodySm,
-                color: cs.hentai.textSecondary,
+                color: context.hentai.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),

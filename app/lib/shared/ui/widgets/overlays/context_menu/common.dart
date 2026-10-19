@@ -97,7 +97,7 @@ class ContextMenuContainer extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: cs.hentai.textPrimary,
+                  color: context.hentai.textPrimary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -129,7 +129,7 @@ class ContextMenuActionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final HentaiColorScheme palette = cs.hentai;
+    final HentaiColorScheme palette = context.hentai;
     final Color hoverColor = isDestructive
         ? palette.contextMenuDanger.withAlpha(26)
         : cs.primary.withAlpha(10);

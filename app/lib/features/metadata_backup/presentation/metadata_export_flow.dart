@@ -129,7 +129,7 @@ class _MetadataExportOptionsDialogState
             l10n.settingsMetadataBackupExportDescription,
             style: TextStyle(
               fontSize: tokens.text.bodyMd,
-              color: cs.hentai.textSecondary,
+              color: context.hentai.textSecondary,
               height: 1.45,
             ),
           ),

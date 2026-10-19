@@ -43,7 +43,7 @@ class LibraryFilterAccordionChevron extends StatelessWidget {
       child: Icon(
         LucideIcons.chevronDown,
         size: 16,
-        color: cs.hentai.iconSecondary,
+        color: context.hentai.iconSecondary,
       ),
     );
   }

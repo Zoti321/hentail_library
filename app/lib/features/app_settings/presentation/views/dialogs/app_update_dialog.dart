@@ -46,7 +46,7 @@ class AppUpdateDialog extends ConsumerWidget {
             l10n.updatePublishedOn(publishedLabel),
             style: TextStyle(
               fontSize: 12,
-              color: colorScheme.hentai.textTertiary,
+              color: context.hentai.textTertiary,
             ),
           ),
           if (release.releaseNotes.isNotEmpty) ...<Widget>[
@@ -59,7 +59,7 @@ class AppUpdateDialog extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
-                    color: colorScheme.hentai.textSecondary,
+                    color: context.hentai.textSecondary,
                   ),
                 ),
               ),

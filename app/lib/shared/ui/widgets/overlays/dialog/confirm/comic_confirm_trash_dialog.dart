@@ -17,7 +17,7 @@ class ComicConfirmTrashDialog extends StatelessWidget {
       title: l10n.comicDetailDeleteTitle,
       content: Text(
         l10n.comicTrashConfirmContent(title),
-        style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
+        style: TextStyle(fontSize: 14, color: context.hentai.textSecondary),
       ),
       actions: <Widget>[
         TextButton(

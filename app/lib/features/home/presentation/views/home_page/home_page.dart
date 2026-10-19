@@ -152,7 +152,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     children: <Widget>[
                       Text(
                         greetingText,
-                        style: homePageSubtitleStyle(colorScheme),
+                        style: homePageSubtitleStyle(context.hentai),
                       ),
                       SizedBox(height: tokens.spacing.lg),
                       HomeLibraryAlertStack(enabled: deferredSectionsReady),

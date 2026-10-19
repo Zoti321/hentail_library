@@ -74,7 +74,7 @@ class _EditMetadataAuthorsTagsTab extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w500,
-                        color: cs.hentai.textPrimary,
+                        color: context.hentai.textPrimary,
                       ),
                     ),
                     SizedBox(width: tokens.spacing.sm),

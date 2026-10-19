@@ -66,11 +66,11 @@ PageHeaderGridMetrics pageHeaderGridMetrics(
 }
 
 TextStyle pageHeaderTitleStyle(
-  ColorScheme colorScheme,
+  HentaiColorScheme semantic,
   PageHeaderLayoutTier layoutTier,
 ) {
   return TextStyle(
-    color: colorScheme.hentai.textPrimary,
+    color: semantic.textPrimary,
     fontSize: pageHeaderTitleFontSize(layoutTier),
     fontWeight: FontWeight.w600,
     letterSpacing: -0.4,

@@ -96,7 +96,7 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
           iconSize: 16,
           size: 32,
           borderRadius: 8,
-          foregroundColor: cs.hentai.iconDefault,
+          foregroundColor: context.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
           onPressed: previous == null
@@ -126,7 +126,7 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
             iconSize: 16,
             size: 32,
             borderRadius: 8,
-            foregroundColor: cs.hentai.iconDefault,
+            foregroundColor: context.hentai.iconDefault,
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
             onPressed: () => menuController.toggleMenu(),
@@ -139,7 +139,7 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
           iconSize: 16,
           size: 32,
           borderRadius: 8,
-          foregroundColor: cs.hentai.iconDefault,
+          foregroundColor: context.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
           onPressed: next == null
@@ -209,7 +209,7 @@ class _ComicDetailSeriesMenuItem extends StatelessWidget {
     final TextStyle textStyle = TextStyle(
       fontSize: tokens.text.bodySm,
       fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
-      color: isCurrent ? cs.primary : cs.hentai.textPrimary,
+      color: isCurrent ? cs.primary : context.hentai.textPrimary,
       height: 1.35,
     );
     final Widget label = Text(

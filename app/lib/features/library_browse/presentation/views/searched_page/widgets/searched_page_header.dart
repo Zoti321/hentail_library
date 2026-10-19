@@ -53,7 +53,7 @@ class SearchedPageHeaderSection extends StatelessWidget {
             iconSize: 16,
             size: 32,
             borderRadius: 8,
-            foregroundColor: cs.hentai.iconDefault,
+            foregroundColor: context.hentai.iconDefault,
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
             onPressed: () => popOrGoLibrary(context),
@@ -62,7 +62,7 @@ class SearchedPageHeaderSection extends StatelessWidget {
           Flexible(
             child: Text(
               title,
-              style: libraryPageTitleStyle(cs, layoutTier),
+              style: libraryPageTitleStyle(context.hentai, layoutTier),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

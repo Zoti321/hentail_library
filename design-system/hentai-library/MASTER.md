@@ -71,7 +71,7 @@ Cross-platform **comic library** app: scan/sync local or WebDAV roots, browse ca
 
 ### Color Palette
 
-Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`context.hentai`** (`HentaiColorScheme` on `ThemeData.extensions`). Prefer **`context.tokens`** / **`context.shadows`** / **`context.motion`**. Never hard-code hex in widgets. (`colorScheme.hentai` is deprecated.)
+Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`context.hentai`** / **`Theme.of(context).hentai`** (`HentaiColorScheme` on `ThemeData.extensions`). Prefer **`context.tokens`** / **`context.shadows`** / **`context.motion`**. Never hard-code hex in widgets. (`ColorScheme.hentai` is deprecated.)
 
 | Role | Light | Dark | Flutter access |
 |------|-------|------|----------------|

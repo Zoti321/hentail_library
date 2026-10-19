@@ -22,7 +22,7 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
         children: [
           Text(
             l10n.confirmRemovePathContent,
-            style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
+            style: TextStyle(fontSize: 14, color: context.hentai.textSecondary),
           ),
           const SizedBox(height: 10),
           Text(
@@ -32,7 +32,7 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: cs.hentai.textPrimary,
+              color: context.hentai.textPrimary,
             ),
           ),
         ],

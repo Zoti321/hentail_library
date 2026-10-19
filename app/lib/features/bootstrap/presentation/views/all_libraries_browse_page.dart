@@ -18,7 +18,7 @@ class AllLibrariesBrowsePage extends StatelessWidget {
     final VoidCallback? openNav = appShellPageNavigationOpener(context);
 
     return ColoredBox(
-      color: cs.hentai.winBackground,
+      color: context.hentai.winBackground,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -39,9 +39,9 @@ class AllLibrariesBrowsePage extends StatelessWidget {
                     iconSize: 18,
                     size: 36,
                     borderRadius: tokens.radius.md,
-                    foregroundColor: cs.hentai.textSecondary,
-                    hoverColor: cs.hentai.sidebarItemHoverBackground,
-                    overlayColor: cs.hentai.sidebarItemHoverBackground
+                    foregroundColor: context.hentai.textSecondary,
+                    hoverColor: context.hentai.sidebarItemHoverBackground,
+                    overlayColor: context.hentai.sidebarItemHoverBackground
                         .withAlpha(110),
                     onPressed: openNav,
                   ),
@@ -50,7 +50,7 @@ class AllLibrariesBrowsePage extends StatelessWidget {
                     l10n.libraryTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: cs.hentai.textPrimary,
+                      color: context.hentai.textPrimary,
                     ),
                   ),
                 ),
@@ -69,7 +69,7 @@ class AllLibrariesBrowsePage extends StatelessWidget {
                       Icon(
                         LucideIcons.library,
                         size: 40,
-                        color: cs.hentai.textTertiary,
+                        color: context.hentai.textTertiary,
                       ),
                       SizedBox(height: tokens.spacing.md),
                       Text(
@@ -77,7 +77,7 @@ class AllLibrariesBrowsePage extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: cs.hentai.textPrimary,
+                          color: context.hentai.textPrimary,
                         ),
                       ),
                       SizedBox(height: tokens.spacing.sm),
@@ -85,7 +85,7 @@ class AllLibrariesBrowsePage extends StatelessWidget {
                         l10n.allLibrariesBrowsePlaceholderBody,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: cs.hentai.textSecondary,
+                          color: context.hentai.textSecondary,
                         ),
                       ),
                     ],

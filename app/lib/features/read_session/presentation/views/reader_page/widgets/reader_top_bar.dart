@@ -61,9 +61,9 @@ class ReaderTopBar extends StatelessWidget {
             iconSize: 16,
             size: kReaderTopBarActionSize,
             borderRadius: 8,
-            foregroundColor: cs.hentai.readerTextIconPrimary,
-            hoverColor: cs.hentai.readerPanelSubtle,
-            overlayColor: cs.hentai.readerPanelSubtle,
+            foregroundColor: context.hentai.readerTextIconPrimary,
+            hoverColor: context.hentai.readerPanelSubtle,
+            overlayColor: context.hentai.readerPanelSubtle,
             onPressed: () async {
               await onExit();
             },
@@ -74,7 +74,7 @@ class ReaderTopBar extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
-                color: cs.hentai.readerTextIconPrimary,
+                color: context.hentai.readerTextIconPrimary,
                 letterSpacing: 0.6,
               ),
             ),
@@ -92,9 +92,9 @@ class ReaderTopBar extends StatelessWidget {
             iconSize: 16,
             size: kReaderTopBarActionSize,
             borderRadius: 8,
-            foregroundColor: cs.hentai.readerTextIconPrimary,
-            hoverColor: cs.hentai.readerPanelSubtle,
-            overlayColor: cs.hentai.readerPanelSubtle,
+            foregroundColor: context.hentai.readerTextIconPrimary,
+            hoverColor: context.hentai.readerPanelSubtle,
+            overlayColor: context.hentai.readerPanelSubtle,
             onPressed: () async {
               await onToggleFullscreen();
             },
@@ -108,9 +108,9 @@ class ReaderTopBar extends StatelessWidget {
             iconSize: 16,
             size: kReaderTopBarActionSize,
             borderRadius: 8,
-            foregroundColor: cs.hentai.readerTextIconPrimary,
-            hoverColor: cs.hentai.readerPanelSubtle,
-            overlayColor: cs.hentai.readerPanelSubtle,
+            foregroundColor: context.hentai.readerTextIconPrimary,
+            hoverColor: context.hentai.readerPanelSubtle,
+            overlayColor: context.hentai.readerPanelSubtle,
             onPressed: () {
               showReaderSettingsDialog(context);
             },
@@ -247,9 +247,9 @@ class _ReaderSeriesMenuButtonState
         iconSize: 16,
         size: kReaderTopBarActionSize,
         borderRadius: 8,
-        foregroundColor: cs.hentai.readerTextIconPrimary,
-        hoverColor: cs.hentai.readerPanelSubtle,
-        overlayColor: cs.hentai.readerPanelSubtle,
+        foregroundColor: context.hentai.readerTextIconPrimary,
+        hoverColor: context.hentai.readerPanelSubtle,
+        overlayColor: context.hentai.readerPanelSubtle,
         onPressed: () => _menuController.toggleMenu(),
       ),
     );

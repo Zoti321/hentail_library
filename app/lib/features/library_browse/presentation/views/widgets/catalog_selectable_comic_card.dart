@@ -62,7 +62,7 @@ class CatalogSelectableComicCard extends ConsumerWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(tokens.radius.xs),
               side: BorderSide(
-                color: selected ? cs.primary : cs.hentai.borderSubtle,
+                color: selected ? cs.primary : context.hentai.borderSubtle,
               ),
             ),
             child: InkWell(

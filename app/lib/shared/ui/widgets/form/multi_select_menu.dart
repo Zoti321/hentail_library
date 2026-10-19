@@ -76,7 +76,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
                 Text(
                   l10n.commonLoadFailed,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.hentai.textPrimary,
+                    color: context.hentai.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -145,7 +145,7 @@ class _MultiSelectMenuSizedShell extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(tokens.radius.xs),
-        border: Border.all(color: cs.hentai.borderSubtle),
+        border: Border.all(color: context.hentai.borderSubtle),
         boxShadow: context.shadows.raisedPanel(),
       ),
       child: ClipRRect(
@@ -209,7 +209,7 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: tokens.text.bodySm,
-                    color: cs.hentai.textTertiary,
+                    color: context.hentai.textTertiary,
                   ),
                 ),
               ),
@@ -281,7 +281,7 @@ class _MultiSelectDropdownRow extends StatelessWidget {
       style: TextStyle(
         fontSize: 14,
         fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w500,
-        color: isHighlighted ? cs.primary : cs.hentai.textPrimary,
+        color: isHighlighted ? cs.primary : context.hentai.textPrimary,
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
@@ -293,7 +293,7 @@ class _MultiSelectDropdownRow extends StatelessWidget {
         LucideIcons.sparkles,
         key: MultiSelect.smartMatchedHintKey,
         size: 14,
-        color: cs.hentai.textTertiary,
+        color: context.hentai.textTertiary,
       );
       final String? tip = smartMatchedTooltip;
       rowChild = Row(

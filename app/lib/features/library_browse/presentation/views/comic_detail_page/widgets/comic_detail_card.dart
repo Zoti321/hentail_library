@@ -22,7 +22,7 @@ class ComicDetailCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: radius,
-        border: Border.all(color: cs.hentai.borderSubtle),
+        border: Border.all(color: context.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: context.shadows.catalogCardRest,

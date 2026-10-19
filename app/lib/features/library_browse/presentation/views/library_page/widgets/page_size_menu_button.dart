@@ -53,7 +53,7 @@ class _PageSizeMenuButtonState extends State<PageSizeMenuButton> {
         iconSize: 16,
         size: 32,
         borderRadius: 8,
-        foregroundColor: cs.hentai.iconDefault,
+        foregroundColor: context.hentai.iconDefault,
         hoverColor: theme.hoverColor,
         overlayColor: theme.hoverColor,
         delayTooltipThreeSeconds: true,
@@ -129,7 +129,7 @@ class _PageSizeMenuItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              color: isSelected ? cs.primary : cs.hentai.textPrimary,
+              color: isSelected ? cs.primary : context.hentai.textPrimary,
             ),
           ),
         ),

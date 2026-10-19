@@ -31,7 +31,7 @@ final class LibraryReturnBreadcrumb extends StatelessWidget {
     final TextStyle trailStyle = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w500,
-      color: cs.hentai.textSecondary,
+      color: context.hentai.textSecondary,
       letterSpacing: -0.1,
     );
     final Widget libraryLink = Material(
@@ -81,7 +81,7 @@ final class LibraryReturnBreadcrumb extends StatelessWidget {
             child: Icon(
               LucideIcons.chevronRight,
               size: 14,
-              color: cs.hentai.textTertiary,
+              color: context.hentai.textTertiary,
             ),
           ),
           Expanded(
@@ -150,7 +150,7 @@ class _BreadcrumbTrailingTitle extends StatelessWidget {
                 child: Icon(
                   LucideIcons.info,
                   size: 14,
-                  color: cs.hentai.textTertiary,
+                  color: context.hentai.textTertiary,
                 ),
               ),
             ),

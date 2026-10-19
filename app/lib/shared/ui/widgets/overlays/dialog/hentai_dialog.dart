@@ -88,7 +88,7 @@ class HentaiDialog extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: cs.hentai.textPrimary,
+                    color: context.hentai.textPrimary,
                   ),
                 ),
               ),

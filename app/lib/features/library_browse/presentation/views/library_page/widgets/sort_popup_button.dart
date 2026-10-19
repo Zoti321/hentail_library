@@ -38,7 +38,7 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
         iconSize: 16,
         size: 28,
         borderRadius: tokens.radius.sm,
-        foregroundColor: theme.colorScheme.hentai.iconDefault,
+        foregroundColor: theme.hentai.iconDefault,
         hoverColor: theme.hoverColor,
         overlayColor: theme.hoverColor,
         delayTooltipThreeSeconds: true,
@@ -71,7 +71,7 @@ class _SortMenu extends StatelessWidget {
               color: theme.colorScheme.surfaceContainerHighest,
               border: Border(
                 bottom: BorderSide(
-                  color: theme.colorScheme.hentai.borderSubtle,
+                  color: theme.hentai.borderSubtle,
                 ),
               ),
             ),
@@ -88,7 +88,7 @@ class _SortMenu extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.hentai.textPrimary,
+                    color: theme.hentai.textPrimary,
                   ),
                 ),
               ],

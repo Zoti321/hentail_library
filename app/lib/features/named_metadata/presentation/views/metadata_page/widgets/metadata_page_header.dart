@@ -14,13 +14,13 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 TextStyle metadataPageTitleStyle(
-  ColorScheme colorScheme,
+  HentaiColorScheme semantic,
   MetadataLayoutTier layoutTier,
 ) {
   return TextStyle(
     fontSize: metadataPageTitleFontSize(layoutTier),
     fontWeight: FontWeight.w600,
-    color: colorScheme.hentai.textPrimary,
+    color: semantic.textPrimary,
     letterSpacing: -0.4,
   );
 }
@@ -122,7 +122,7 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
               iconSize: 16,
               size: 32,
               borderRadius: 8,
-              foregroundColor: cs.hentai.iconDefault,
+              foregroundColor: context.hentai.iconDefault,
               hoverColor: Theme.of(context).hoverColor,
               overlayColor: Theme.of(context).hoverColor,
               onPressed: onExitMergeSelection,
@@ -165,7 +165,7 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
                           iconSize: 16,
                           size: 32,
                           borderRadius: 8,
-                          foregroundColor: cs.hentai.iconDefault,
+                          foregroundColor: context.hentai.iconDefault,
                           hoverColor: Theme.of(context).hoverColor,
                           overlayColor: Theme.of(context).hoverColor,
                           onPressed: onOpenNavigation,
@@ -174,7 +174,7 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
                       ],
                       Text(
                         l10n.navMetadata,
-                        style: metadataPageTitleStyle(cs, layoutTier),
+                        style: metadataPageTitleStyle(context.hentai, layoutTier),
                       ),
                       if (showCountChip) ...<Widget>[
                         const SizedBox(width: 12),
@@ -197,7 +197,7 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
                 iconSize: 16,
                 size: 32,
                 borderRadius: 8,
-                foregroundColor: cs.hentai.iconDefault,
+                foregroundColor: context.hentai.iconDefault,
                 hoverColor: Theme.of(context).hoverColor,
                 overlayColor: Theme.of(context).hoverColor,
                 delayTooltipThreeSeconds: true,

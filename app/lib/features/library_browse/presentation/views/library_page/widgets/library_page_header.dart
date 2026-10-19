@@ -5,13 +5,13 @@ const double kLibrarySearchToGridSpacing = 16;
 const double kLibraryHeaderVerticalPadding = 10;
 
 TextStyle libraryPageTitleStyle(
-  ColorScheme colorScheme,
+  HentaiColorScheme semantic,
   LibraryLayoutTier layoutTier,
 ) {
   return TextStyle(
     fontSize: libraryPageTitleFontSize(layoutTier),
     fontWeight: FontWeight.w600,
-    color: colorScheme.hentai.textPrimary,
+    color: semantic.textPrimary,
     letterSpacing: -0.4,
   );
 }
@@ -91,7 +91,7 @@ class LibraryPageHeader extends ConsumerWidget {
       children: <Widget>[
         Text(
           l10n.libraryTitle,
-          style: libraryPageTitleStyle(theme.colorScheme, layoutTier),
+          style: libraryPageTitleStyle(context.hentai, layoutTier),
         ),
         if (countChips.isNotEmpty) ...<Widget>[
           const SizedBox(width: 12),

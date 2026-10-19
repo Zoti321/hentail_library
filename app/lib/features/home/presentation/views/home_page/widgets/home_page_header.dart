@@ -10,19 +10,19 @@ const double kHomeHeaderVerticalPadding = 6;
 const double kHomeHeaderShadowGradientHeight = 6;
 
 TextStyle homePageTitleStyle(
-  ColorScheme colorScheme,
+  HentaiColorScheme semantic,
   HomePageLayoutTier layoutTier,
 ) {
   return TextStyle(
-    color: colorScheme.hentai.textPrimary,
+    color: semantic.textPrimary,
     fontSize: homePageTitleFontSize(layoutTier),
     fontWeight: FontWeight.w600,
     letterSpacing: -0.4,
   );
 }
 
-TextStyle homePageSubtitleStyle(ColorScheme colorScheme) {
-  return TextStyle(color: colorScheme.hentai.textTertiary, fontSize: 13);
+TextStyle homePageSubtitleStyle(HentaiColorScheme semantic) {
+  return TextStyle(color: semantic.textTertiary, fontSize: 13);
 }
 
 /// 粘连 header：左汉堡(仅 compact)+标题；无扫描按钮。
@@ -87,7 +87,7 @@ class HomePageHeaderToolbar extends StatelessWidget {
               iconSize: 16,
               size: 32,
               borderRadius: 8,
-              foregroundColor: colorScheme.hentai.iconDefault,
+              foregroundColor: context.hentai.iconDefault,
               hoverColor: theme.hoverColor,
               overlayColor: theme.hoverColor,
               onPressed: onOpenNavigation,
@@ -96,7 +96,7 @@ class HomePageHeaderToolbar extends StatelessWidget {
           ],
           Text(
             l10n.homeTitle,
-            style: homePageTitleStyle(colorScheme, layoutTier),
+            style: homePageTitleStyle(context.hentai, layoutTier),
           ),
         ],
       ),
