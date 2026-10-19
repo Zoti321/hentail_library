@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -62,7 +63,7 @@ class LibraryCatalogRevisionCoordinator
     ) {
       _revisionThrottleBusy = next;
       if ((previous ?? false) && !next) {
-        _flushPendingActiveRevision();
+        _runAfterBuild(_flushPendingActiveRevision);
       }
     });
 
@@ -77,7 +78,8 @@ class LibraryCatalogRevisionCoordinator
       if (previous.revision == next.revision) {
         return;
       }
-      _onRevisionBumped(next.revision);
+      final int revision = next.revision;
+      _runAfterBuild(() => _onRevisionBumped(revision));
     });
 
     ref.listen(libraryDisplayTargetProvider, (
@@ -87,7 +89,7 @@ class LibraryCatalogRevisionCoordinator
       if (previous == null || previous == next) {
         return;
       }
-      _flushInactiveRevision();
+      _runAfterBuild(_flushInactiveRevision);
     });
 
     ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryStateProvider, (
@@ -99,7 +101,7 @@ class LibraryCatalogRevisionCoordinator
       if (previousId == null || previousId == nextId) {
         return;
       }
-      _flushInactiveRevision();
+      _runAfterBuild(_flushInactiveRevision);
     });
 
     final int revision = ref.read(libraryRevisionStateProvider).revision;
@@ -107,6 +109,20 @@ class LibraryCatalogRevisionCoordinator
       activeRevision: revision,
       inactiveRevision: 0,
     );
+  }
+
+  /// `ref.listen` may run while a widget is building; defer notifier writes.
+  void _runAfterBuild(void Function() action) {
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle) {
+      action();
+      return;
+    }
+    Future<void>.microtask(() {
+      if (!ref.mounted) {
+        return;
+      }
+      action();
+    });
   }
 
   void _onRevisionBumped(int revision) {
