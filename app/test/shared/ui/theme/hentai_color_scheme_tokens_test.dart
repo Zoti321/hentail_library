@@ -64,7 +64,8 @@ void main() {
       final AppShadowTokens shadows = theme.extension<AppShadowTokens>()!;
       final AppMotionTokens motion = theme.extension<AppMotionTokens>()!;
       expect(shadows.catalogCard(highlighted: false), isNotEmpty);
-      expect(shadows.dialog(), isNotEmpty);
+      expect(shadows.elevatedSurface(isDark: false), isNotEmpty);
+      expect(shadows.raisedPanel(), isNotEmpty);
       expect(motion.durationFast, const Duration(milliseconds: 180));
       expect(motion.durationMedium, const Duration(milliseconds: 200));
       expect(AppMotionTokens.standardCurve, Curves.easeOutCubic);

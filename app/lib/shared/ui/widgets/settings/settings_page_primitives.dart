@@ -33,14 +33,8 @@ class SettingsGroup extends StatelessWidget {
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.colorScheme.hentai.borderSubtle),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: theme.colorScheme.hentai.cardShadow,
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            border: Border.all(color: context.hentai.borderSubtle),
+            boxShadow: context.shadows.subtleRest(),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),

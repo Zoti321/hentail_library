@@ -155,34 +155,10 @@ class CustomToast extends StatelessWidget {
       AppToastType.error => cs.error,
       AppToastType.info => cs.primary,
     };
-    final Color foregroundColor = cs.hentai.textPrimary;
-    final Color ambient = isDark
-        ? Colors.black.withAlpha(52)
-        : Colors.black.withAlpha(14);
-    final Color contact = isDark
-        ? Colors.black.withAlpha(72)
-        : Colors.black.withAlpha(22);
-    final List<BoxShadow> elevationShadows = <BoxShadow>[
-      BoxShadow(color: ambient, blurRadius: 32, offset: const Offset(0, 14)),
-      BoxShadow(
-        color: cs.hentai.cardShadowHover,
-        blurRadius: 24,
-        spreadRadius: 0,
-        offset: const Offset(0, 8),
-      ),
-      BoxShadow(
-        color: cs.hentai.cardShadow,
-        blurRadius: 8,
-        spreadRadius: 0,
-        offset: const Offset(0, 2),
-      ),
-      BoxShadow(
-        color: contact,
-        blurRadius: 4,
-        spreadRadius: 0,
-        offset: const Offset(0, 1),
-      ),
-    ];
+    final Color foregroundColor = context.hentai.textPrimary;
+    final List<BoxShadow> elevationShadows = context.shadows.toast(
+      isDark: isDark,
+    );
     return Material(
       color: Colors.transparent,
       child: DecoratedBox(

@@ -33,7 +33,7 @@ class CapsuleTabBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(_radius),
-        border: Border.all(color: cs.hentai.borderSubtle),
+        border: Border.all(color: context.hentai.borderSubtle),
       ),
       child: Padding(
         padding: _padding,
@@ -51,8 +51,8 @@ class CapsuleTabBar extends StatelessWidget {
                   onTap: () => onSelected(i),
                   hoverColor: cs.primary.withAlpha(20),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    curve: Curves.easeOutCubic,
+                    duration: context.motion.durationFast,
+                    curve: AppMotionTokens.standardCurve,
                     height: _height - 8,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(

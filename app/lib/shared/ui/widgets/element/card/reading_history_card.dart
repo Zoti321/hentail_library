@@ -53,21 +53,9 @@ class ReadingHistoryCard extends HookConsumerWidget {
     final Color cardBackground = (isHovered.value || isFocused.value)
         ? cs.surfaceContainer
         : cs.surface;
-    final List<BoxShadow> cardShadows = (isHovered.value || isFocused.value)
-        ? <BoxShadow>[
-            BoxShadow(
-              color: cs.hentai.cardShadowHover,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ]
-        : <BoxShadow>[
-            BoxShadow(
-              color: cs.hentai.cardShadow,
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ];
+    final List<BoxShadow> cardShadows = context.shadows.catalogCard(
+      highlighted: isHovered.value || isFocused.value,
+    );
 
     final String progressLabel = _progressLabel(context, pageIndex);
 
@@ -98,9 +86,9 @@ class ReadingHistoryCard extends HookConsumerWidget {
               child: AnimatedContainer(
                 duration: motionDurationOf(
                   context,
-                  const Duration(milliseconds: 200),
+                  context.motion.durationMedium,
                 ),
-                curve: Curves.easeOutCubic,
+                curve: AppMotionTokens.standardCurve,
                 decoration: BoxDecoration(
                   color: cardBackground,
                   borderRadius: cardRadius,

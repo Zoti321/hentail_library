@@ -77,13 +77,12 @@ class AdaptiveComicCover extends StatelessWidget {
     if (!showShadow) {
       return result;
     }
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: borderRadius,
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: cs.hentai.cardShadow,
+            color: context.shadows.catalogCardRest,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

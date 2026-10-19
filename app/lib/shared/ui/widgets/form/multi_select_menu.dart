@@ -146,13 +146,7 @@ class _MultiSelectMenuSizedShell extends StatelessWidget {
         color: cs.surface,
         borderRadius: BorderRadius.circular(tokens.radius.xs),
         border: Border.all(color: cs.hentai.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: cs.hentai.cardShadowHover,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: context.shadows.raisedPanel(),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(tokens.radius.xs),

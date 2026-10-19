@@ -105,13 +105,7 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
               color: cs.surface,
               borderRadius: BorderRadius.circular(tokens.radius.md),
               border: Border.all(color: cs.hentai.borderSubtle),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: cs.hentai.cardShadowHover,
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: context.shadows.raisedPanel(),
             ),
             child: GhostButton.icon(
               icon: LucideIcons.arrowUp,

@@ -57,32 +57,71 @@ class AppShadowTokens extends ThemeExtension<AppShadowTokens>
     ];
   }
 
-  List<BoxShadow> dialog({double opacity = 1}) {
-    return [
+  /// Four-layer stack for dialogs, toasts, and adaptive form surfaces.
+  List<BoxShadow> elevatedSurface({
+    required bool isDark,
+    double opacity = 1,
+  }) {
+    final Color ambient = isDark
+        ? Colors.black.withAlpha(52)
+        : Colors.black.withAlpha(14);
+    final Color contact = isDark
+        ? Colors.black.withAlpha(72)
+        : Colors.black.withAlpha(22);
+    Color scaled(Color color) =>
+        color.withValues(alpha: color.a * opacity.clamp(0.0, 1.0));
+
+    return <BoxShadow>[
       BoxShadow(
-        color: dialogPrimary.withValues(alpha: dialogPrimary.a * opacity),
-        blurRadius: 16,
+        color: scaled(ambient),
+        blurRadius: 32,
+        spreadRadius: -4,
+        offset: const Offset(0, 14),
+      ),
+      BoxShadow(
+        color: scaled(dialogPrimary),
+        blurRadius: 24,
         offset: const Offset(0, 8),
       ),
       BoxShadow(
-        color: dialogSecondary.withValues(alpha: dialogSecondary.a * opacity),
-        blurRadius: 4,
+        color: scaled(dialogSecondary),
+        blurRadius: 8,
         offset: const Offset(0, 2),
+      ),
+      BoxShadow(
+        color: scaled(contact),
+        blurRadius: 4,
+        offset: const Offset(0, 1),
       ),
     ];
   }
 
-  List<BoxShadow> toast() {
-    return [
+  List<BoxShadow> dialog({double opacity = 1, required bool isDark}) =>
+      elevatedSurface(isDark: isDark, opacity: opacity);
+
+  List<BoxShadow> toast({required bool isDark}) =>
+      elevatedSurface(isDark: isDark);
+
+  /// Dropdown / popup panel (menus, multi-select).
+  List<BoxShadow> raisedPanel({
+    double blurRadius = 8,
+    Offset offset = const Offset(0, 4),
+  }) {
+    return <BoxShadow>[
       BoxShadow(
-        color: toastPrimary,
-        blurRadius: 16,
-        offset: const Offset(0, 8),
+        color: catalogCardHover,
+        blurRadius: blurRadius,
+        offset: offset,
       ),
+    ];
+  }
+
+  List<BoxShadow> subtleRest() {
+    return <BoxShadow>[
       BoxShadow(
-        color: toastSecondary,
-        blurRadius: 4,
-        offset: const Offset(0, 2),
+        color: catalogCardRest,
+        blurRadius: 2,
+        offset: const Offset(0, 1),
       ),
     ];
   }

@@ -21,6 +21,7 @@ class PagePinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final Color headerShadowTint = context.shadows.catalogCardRest;
     return ColoredBox(
       color: cs.surface,
       child: Stack(
@@ -39,9 +40,9 @@ class PagePinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: <Color>[
-                      cs.hentai.cardShadow.withValues(alpha: 0),
-                      cs.hentai.cardShadow.withValues(alpha: 0.025),
-                      cs.hentai.cardShadow.withValues(alpha: 0.05),
+                      headerShadowTint.withValues(alpha: 0),
+                      headerShadowTint.withValues(alpha: 0.025),
+                      headerShadowTint.withValues(alpha: 0.05),
                     ],
                     stops: const <double>[0, 0.75, 1],
                   ),

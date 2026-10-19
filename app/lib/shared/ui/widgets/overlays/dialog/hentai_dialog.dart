@@ -51,22 +51,16 @@ class HentaiDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final HentaiColorScheme semantic = context.hentai;
+    final AppShadowTokens shadows = context.shadows;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     final double effectiveWidth = math.min(
       width,
       viewportWidth - _dialogInsetPadding * 2,
     );
     final double maxDialogHeight = MediaQuery.sizeOf(context).height - 48;
-    // 三层阴影：环境光（与页面分离）+ 主抬升 + 贴边接触阴影，浅色下尤其增强层次感
-    final ambient = isDark
-        ? Colors.black.withAlpha(52)
-        : Colors.black.withAlpha(14);
-    final contact = isDark
-        ? Colors.black.withAlpha(72)
-        : Colors.black.withAlpha(22);
-
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -78,35 +72,10 @@ class HentaiDialog extends StatelessWidget {
           width: effectiveWidth,
           constraints: BoxConstraints(maxHeight: maxDialogHeight),
           decoration: BoxDecoration(
-            color: backgroundColor ?? cs.hentai.cardHover,
+            color: backgroundColor ?? semantic.cardHover,
             borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: cs.hentai.borderSubtle, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: ambient,
-                blurRadius: 32,
-                spreadRadius: -4,
-                offset: const Offset(0, 14),
-              ),
-              BoxShadow(
-                color: cs.hentai.cardShadowHover,
-                blurRadius: 24,
-                spreadRadius: 0,
-                offset: const Offset(0, 8),
-              ),
-              BoxShadow(
-                color: cs.hentai.cardShadow,
-                blurRadius: 8,
-                spreadRadius: 0,
-                offset: const Offset(0, 2),
-              ),
-              BoxShadow(
-                color: contact,
-                blurRadius: 4,
-                spreadRadius: 0,
-                offset: const Offset(0, 1),
-              ),
-            ],
+            border: Border.all(color: semantic.borderSubtle, width: 1),
+            boxShadow: shadows.elevatedSurface(isDark: isDark),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

@@ -221,12 +221,7 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
     final double minHeight = lerpDouble(0, maxHeight, t)!;
     final bool pageMode = t >= 0.5;
 
-    final Color ambient = isDark
-        ? Colors.black.withAlpha(52)
-        : Colors.black.withAlpha(14);
-    final Color contact = isDark
-        ? Colors.black.withAlpha(72)
-        : Colors.black.withAlpha(22);
+    final AppShadowTokens shadows = context.shadows;
     final double shadowOpacity = (1 - t).clamp(0.0, 1.0);
 
     final Widget paddedBody = scrollableBody
@@ -282,37 +277,10 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                 ),
                 boxShadow: shadowOpacity <= 0
                     ? null
-                    : <BoxShadow>[
-                        BoxShadow(
-                          color: ambient.withValues(
-                            alpha: ambient.a * shadowOpacity,
-                          ),
-                          blurRadius: 32,
-                          spreadRadius: -4,
-                          offset: const Offset(0, 14),
-                        ),
-                        BoxShadow(
-                          color: cs.hentai.cardShadowHover.withValues(
-                            alpha: cs.hentai.cardShadowHover.a * shadowOpacity,
-                          ),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
-                        ),
-                        BoxShadow(
-                          color: cs.hentai.cardShadow.withValues(
-                            alpha: cs.hentai.cardShadow.a * shadowOpacity,
-                          ),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                        BoxShadow(
-                          color: contact.withValues(
-                            alpha: contact.a * shadowOpacity,
-                          ),
-                          blurRadius: 4,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
+                    : shadows.elevatedSurface(
+                        isDark: isDark,
+                        opacity: shadowOpacity,
+                      ),
               ),
               child: Material(
                 color: Colors.transparent,

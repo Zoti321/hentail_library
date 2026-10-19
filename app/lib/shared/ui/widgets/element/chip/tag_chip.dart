@@ -33,7 +33,7 @@ class TagChip extends StatelessWidget {
           border: Border.all(color: cs.hentai.borderSubtle, width: 1),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: cs.hentai.cardShadow,
+              color: context.shadows.catalogCardRest,
               blurRadius: 3,
               offset: const Offset(0, 1),
             ),
