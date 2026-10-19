@@ -62,5 +62,5 @@ Komga 等同类产品的常见做法是：用户编辑排序值后，将该条�
 
 ## References
 
-- `CONTEXT.md` — Series / Folder series
+- `GLOSSARY.md` — Series / Folder series
 - ADR-0005 — Series reading context（卷序仍按 order 排序后的 comicId 列表派生）

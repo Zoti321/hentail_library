@@ -18,7 +18,7 @@ ADR-0012 规定用户 Comic deletion 立即永久删除 Local Resource，且「�
 
 ### 两段式
 
-- 用户主动删除 Comic 改为 **Comic trash**（见 `CONTEXT.md`）：仅标记删除时间，库记录、用户元数据、Metadata field lock、阅读历史、Resource 原样保留。Local 与 Remote library 一致。
+- 用户主动删除 Comic 改为 **Comic trash**（见 `GLOSSARY.md`）：仅标记删除时间，库记录、用户元数据、Metadata field lock、阅读历史、Resource 原样保留。Local 与 Remote library 一致。
 - **Comic restore** 清除标记，恢复全部可见性。
 - **Comic purge** 仅作用于已 trash 的 Comic，沿用 ADR-0012 的删盘语义（Local 路径校验后删 Resource；Remote 仅清库）。批量 purge **逐本**处理：成功者清库，删盘失败者保留在 trash，汇总结果返回。
 - **不**做自动 purge（按天数等），只能用户手动触发。
@@ -64,7 +64,7 @@ ADR-0012 规定用户 Comic deletion 立即永久删除 Local Resource，且「�
 
 ## References
 
-- `CONTEXT.md` — Comic trash / Comic restore / Comic purge / Comic deletion
+- `GLOSSARY.md` — Comic trash / Comic restore / Comic purge / Comic deletion
 - ADR-0012 — 删盘语义与路径安全（被本 ADR 部分取代）
 - ADR-0013 — Path migration
 - ADR-0018 — 测试三层缝

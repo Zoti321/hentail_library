@@ -20,7 +20,7 @@ pub struct ComicFilterDto {
     pub parodies: Vec<String>,
     /// Character names to include (OR semantics); empty = no filter.
     pub characters: Vec<String>,
-    /// Keep only Comics in **Needs metadata** state (see `CONTEXT.md`).
+    /// Keep only Comics in **Needs metadata** state (see `GLOSSARY.md`).
     #[serde(default)]
     pub needs_metadata_only: bool,
     /// When `None`, browse APIs resolve to Current library.

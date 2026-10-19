@@ -18,7 +18,7 @@ App preferences: theme, locale, metadata backup, diagnostics, about. **List–de
 
 - Constants: `settings_layout_constants.dart` — use `settingsLayoutTierForWidth`, `settingsContentHorizontalPadding`
 - Pinned header: `SettingsPageHeader` with measure key
-- Shell: settings route hides sidebar (see `CONTEXT.md` Settings list–detail)
+- Shell: settings route hides sidebar (see `GLOSSARY.md` Settings list–detail)
 
 ## Components
 

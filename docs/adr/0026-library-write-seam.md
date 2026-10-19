@@ -69,7 +69,7 @@ Accepted
 
 ## References
 
-- `CONTEXT.md` — Library、Comic、Library sync、Metadata field lock
+- `GLOSSARY.md` — Library、Comic、Library sync、Metadata field lock
 - ADR-0007 — Metadata field locks
 - ADR-0013 — Path migration
 - ADR-0018 — 测试三层缝

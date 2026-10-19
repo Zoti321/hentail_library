@@ -171,7 +171,7 @@ Theme entry points:
 - **`ResponsiveAppShell`**（`shared/ui/shell/`）— compact drawer / medium collapsed sidebar / expanded sidebar; wraps all app routes; 侧栏由 `ApplicationShell` 注入 `LibrariesAppSidebar`。
 - **`DetailPrimaryRowLayout`**（`shared/ui/layout/`）— comic/series detail cover + info: single column on compact, row on wider widths.
 - **`LibraryBlocksSliverGroup`**（`shared/ui/layout/`）— standard library page sliver composition (series block + comics block).
-- **Settings list–detail** — settings hide the app sidebar and use a responsive master/detail (see **Settings list–detail** in `CONTEXT.md`).
+- **Settings list–detail** — settings hide the app sidebar and use a responsive master/detail (see **Settings list–detail** in `GLOSSARY.md`).
 - **`LayoutBuilder` + `MediaQuery`** — prefer for local density; do not add new `isDesktop` page forks.
 
 ### Breakpoints (codified)

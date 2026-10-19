@@ -4,7 +4,7 @@
 > 范围：`e:\projects\hentai_library` 产品/架构债、性能、代码质量、测试/CI、DX、产品缺口
 > 落盘约定：本仓库 research 约定目录为 `docs/research/`
 > 性质：**只读调研**；结论按「已落地 / 部分落地 / 仍开放 / 不建议现在做」标注
-> 方法：Glob / Grep / Read 对照 `CONTEXT.md`、`docs/adr/*`、`docs/agents/*`、源码与 `.github/workflows/ci.yml`；本次复核**已**执行 `gh issue list` 核实 issue 状态（首版未核实）
+> 方法：Glob / Grep / Read 对照 `GLOSSARY.md`、`docs/adr/*`、`docs/agents/*`、源码与 `.github/workflows/ci.yml`；本次复核**已**执行 `gh issue list` 核实 issue 状态（首版未核实）
 
 ---
 
@@ -38,7 +38,7 @@
 
 | 区域 | 覆盖 |
 |------|------|
-| A 产品与架构债 | `CONTEXT.md`、`AGENTS.md`、`docs/adr/*`、`docs/agents/rust-core.md`、monorepo `app/` / `core/`、FRB 边界、ADR 与实现抽样对照 |
+| A 产品与架构债 | `GLOSSARY.md`、`AGENTS.md`、`docs/adr/*`、`docs/agents/rust-core.md`、monorepo `app/` / `core/`、FRB 边界、ADR 与实现抽样对照 |
 | B 性能与阅读体验 | 阅读会话、缩略图、revision 流、扫描订阅；对照已删除的 `ui-performance-tuning.md` 结论 |
 | C 代码质量 | `app/lib` 分层、StatefulWidget、sync FRB / `guardFrbSync`、过宽 catch、文档/注释漂移 |
 | D 测试与 CI | `docs/agents/testing.md` vs `.github/workflows/ci.yml`、Rust/Dart 测布局 |
@@ -105,7 +105,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 | **P1-4** 阅读器缓存过小 | **部分落地** | `kReaderImageCacheMaxEntries = 24`（原 ≈7） |
 | **P1-5** 扫描进度订阅过宽 | **部分落地** | 侧栏/Home 已 `.select`；toolbar 路径仍需个案复核 |
 | **P1-10** pageSize 500 | **已收紧** | `kLibraryPageSizeOptions = [20,50,100,200]` |
-| **P2-1** FilterQuality.high | **已否决且固化** | `CONTEXT.md` Page image fidelity；`kReaderPageFilterQuality = FilterQuality.medium` |
+| **P2-1** FilterQuality.high | **已否决且固化** | `GLOSSARY.md` Page image fidelity；`kReaderPageFilterQuality = FilterQuality.medium` |
 
 ---
 
@@ -307,7 +307,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 
 #### P0-F1 — All libraries browse：仅占位 — **未变**
 
-- **现状证据**：`CONTEXT.md` L24：`/libraries/all`「本阶段仅占位提示，不实现聚合目录」；`all_libraries_browse_page.dart` L8 注释「Placeholder」，页面只有标题栏 + 提示文案；侧栏仍可导航进入（`LibraryManagementActions.goAllLibraries`）。
+- **现状证据**：`GLOSSARY.md` L24：`/libraries/all`「本阶段仅占位提示，不实现聚合目录」；`all_libraries_browse_page.dart` L8 注释「Placeholder」，页面只有标题栏 + 提示文案；侧栏仍可导航进入（`LibraryManagementActions.goAllLibraries`）。
 - **问题/机会**：多库用户期望「全部库」目录，当前是死胡同页。
 - **建议方向**：排期跨库聚合 catalog，或先弱化/隐藏入口直至实现。
 - **风险/代价**：高（查询模型、筛选、性能）；**明确产品增量**。
@@ -324,7 +324,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 
 #### P1-F4 — Remote library 产品边界
 
-- **现状证据**：ADR-0008 / CONTEXT：远程不含 `folder`；不整本落盘；根不可达跳过不删库；Remote 改 WebDAV 根无前缀 remapping（ADR-0013 明确不在决策内）；WebDAV 备份设置/DB 非当前工作。
+- **现状证据**：ADR-0008 / `GLOSSARY.md`：远程不含 `folder`；不整本落盘；根不可达跳过不删库；Remote 改 WebDAV 根无前缀 remapping（ADR-0013 明确不在决策内）；WebDAV 备份设置/DB 非当前工作。
 - **建议方向**：README/设置文案写清边界；改根 remapping 需新 ADR。
 - **标注**：远程 folder / Digest 认证 / 备份 — **不建议现在做**。
 
@@ -338,7 +338,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 
 | 项 | 理由（含来源） |
 |----|----------------|
-| 阅读器页图 `FilterQuality` 滚动降档 / 静止升 `high` | `CONTEXT.md` Page image fidelity；产品定位 supersede 旧 P2-1 |
+| 阅读器页图 `FilterQuality` 滚动降档 / 静止升 `high` | `GLOSSARY.md` Page image fidelity；产品定位 supersede 旧 P2-1 |
 | 为流畅度优化扫描/缩略图**生成算法**吞吐 | 旧 research 边界；缺瓶颈证据 |
 | 真 FRB / `*_repository_impl` Dart 集成测 | `docs/agents/testing.md` 明确本波不做 |
 | 远程 image folder、WebDAV 备份 DB、Digest/客户端证书 | ADR-0008 范围外 |
@@ -367,7 +367,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 
 ## 附录：一手来源索引（抽样）
 
-- 领域与产品：`CONTEXT.md`；`docs/agents/{product-positioning,rust-core,testing,coding-style,ui-style,issue-tracker}.md`；`docs/agents/operations/{log-support,tag-dictionary-import}.md`
+- 领域与产品：`GLOSSARY.md`；`docs/agents/{product-positioning,rust-core,testing,coding-style,ui-style,issue-tracker}.md`；`docs/agents/operations/{log-support,tag-dictionary-import}.md`
 - ADR：`docs/adr/0002`–`0015`、`docs/adr/README.md`
 - CI：`.github/workflows/ci.yml`（`test-unit` 白名单、`test-widget` soft）
 - FRB API：`core/crates/flutter/src/api/{comic,reader,thumbnail,history,series,library,named_facet,path}.rs`

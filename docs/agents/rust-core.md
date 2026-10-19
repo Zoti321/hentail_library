@@ -8,7 +8,7 @@
 |------|------|
 | `app/` | Flutter：`lib/ui`、`lib/domain`、`lib/data`（调 FRB） |
 | `core/` | Rust workspace：`crates/core`（业务）、`crates/flutter`（FRB cdylib） |
-| 根目录 | `README.md`、`AGENTS.md`、`CONTEXT.md`、`docs/`、`.github/` |
+| 根目录 | `README.md`、`AGENTS.md`、`GLOSSARY.md`、`docs/`、`.github/` |
 
 开发初始化见仓库根 `README.md` 与 `./scripts/setup-dev.sh`（创建 `app/rust_builder/rust` → `core/crates/flutter` 链接并拉取 pdfium）。
 
@@ -42,4 +42,4 @@
 
 ## 词汇
 
-继续使用 `CONTEXT.md`：Comic、Resource、Library、Library root、Library sync、Series inference、Named metadata facet 等。
+继续使用 `GLOSSARY.md`：Comic、Resource、Library、Library root、Library sync、Series inference、Named metadata facet 等。

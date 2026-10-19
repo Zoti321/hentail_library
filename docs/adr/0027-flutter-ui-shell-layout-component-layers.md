@@ -8,7 +8,7 @@ Accepted
 
 Flutter 侧已有单响应式 App shell、Fluent 风格设计系统（`shared/ui/widgets`）与 MVVM（ADR-0017）。实践中 Shell 编排、Layout 辅助与 feature 侧栏逻辑分散在 bootstrap、shared navigation 与 library_admin；部分 shared 组件反向 import feature（导航表、库排序控件、卡片删除流等），导致设计系统无法独立门禁测试，且 Agent 难以判断新 UI 应落在哪一层。
 
-产品术语在 CONTEXT 中区分 **App sidebar**（含 Libraries 分区）与 **Settings list–detail**（非应用侧栏）。ADR-0020 将 Library sync 与库健康收敛到侧栏 Libraries 分区与 **shell 级**调度。
+产品术语在 `GLOSSARY.md` 中区分 **App sidebar**（含 Libraries 分区）与 **Settings list–detail**（非应用侧栏）。ADR-0020 将 Library sync 与库健康收敛到侧栏 Libraries 分区与 **shell 级**调度。
 
 ## Decision
 
@@ -45,7 +45,7 @@ Settings list–detail 与 Reader 路由仍隐藏 App sidebar/drawer（现有行
 ### Positive
 
 - Shell/Layout/Component 边界可文档化、可门禁，利于 Agent 与人类维护。
-- Libraries 域 UI 与 CONTEXT/ADR-0009、ADR-0020 一致。
+- Libraries 域 UI 与 `GLOSSARY.md` / ADR-0009、ADR-0020 一致。
 
 ### Negative
 

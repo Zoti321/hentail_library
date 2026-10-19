@@ -18,7 +18,7 @@ Accepted
 
 ### 领域对象
 
-- 新增 **Comic metadata bulk patch**（见 `CONTEXT.md`）：对同一 Library 内 Comic 集合的稀疏用户元数据变更；仅启用字段参与；未启用字段不写值、不改锁。
+- 新增 **Comic metadata bulk patch**（见 `GLOSSARY.md`）：对同一 Library 内 Comic 集合的稀疏用户元数据变更；仅启用字段参与；未启用字段不写值、不改锁。
 
 ### Core API
 
@@ -81,7 +81,7 @@ MVP 无 core plan/dry-run API；确认 dialog 仅静态「N 本 · M 字段」�
 
 ## References
 
-- `CONTEXT.md` — Comic metadata bulk patch / Comic metadata form / Metadata field lock
+- `GLOSSARY.md` — Comic metadata bulk patch / Comic metadata form / Metadata field lock
 - ADR-0007 — Metadata field locks
 - ADR-0006 — Series item sort order lock（reorder mode 互斥）
 - ADR-0018 — 测试三层缝（Rust 真值缝优先）

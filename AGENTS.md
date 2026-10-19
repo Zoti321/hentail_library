@@ -6,11 +6,11 @@ Rust core / FRB / monorepo (`app/` Flutter, `core/` Rust): **`docs/agents/rust-c
 
 ### Product
 
-Personal comic library (local roots and user-hosted WebDAV). Scope, formats, out-of-scope: `docs/agents/product-positioning.md`. Read session pages follow **Page image fidelity** in `CONTEXT.md`.
+Personal comic library (local roots and user-hosted WebDAV). Scope, formats, out-of-scope: `docs/agents/product-positioning.md`. Read session pages follow **Page image fidelity** in `GLOSSARY.md`.
 
 ### Vocabulary
 
-Name domain concepts as defined in **`CONTEXT.md`**. Read `docs/adr/` entries that touch the area. If output contradicts an ADR, say so explicitly.
+Name domain concepts as defined in **`GLOSSARY.md`**. Read `docs/adr/` entries that touch the area. If output contradicts an ADR, say so explicitly.
 
 ### Issues
 

@@ -28,7 +28,7 @@ void main() {
     });
 
     test('repo root keeps collaboration docs', () {
-      expect(File(p.join(repoRoot.path, 'CONTEXT.md')).existsSync(), isTrue);
+      expect(File(p.join(repoRoot.path, 'GLOSSARY.md')).existsSync(), isTrue);
       expect(Directory(p.join(repoRoot.path, 'docs')).existsSync(), isTrue);
       expect(Directory(p.join(repoRoot.path, '.github')).existsSync(), isTrue);
     });

@@ -156,7 +156,7 @@ Reuse widgets under `app/lib/shared/ui/widgets/` before creating primitives.
 
 - Background: `cs.hentai.readerBackground`
 - Floating UI: `floatingUiBackground`
-- **Page image fidelity:** follow `CONTEXT.md` — no unauthorized scaling/filtering
+- **Page image fidelity:** follow `GLOSSARY.md` — no unauthorized scaling/filtering
 
 ---
 

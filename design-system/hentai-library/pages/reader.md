@@ -7,7 +7,7 @@
 
 ## Purpose
 
-Immersive comic reading: paged/scroll modes, chrome overlay, series nav, settings, auto-play. **Page image fidelity** per `CONTEXT.md` is mandatory.
+Immersive comic reading: paged/scroll modes, chrome overlay, series nav, settings, auto-play. **Page image fidelity** per `GLOSSARY.md` is mandatory.
 
 ## Layout
 

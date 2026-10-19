@@ -20,7 +20,7 @@ What this app is, what it is not, and which comic resource formats are in scope.
 | WebDAV backup of settings/DB (separate future issue) | Not in current WebDAV library-source work |
 | General-purpose ebook library (novels, textbooks) | No — comic-first |
 
-Domain vocabulary (Library, Library root, Comic, Library sync, …) lives in **`CONTEXT.md`**. This file covers product scope and format support only.
+Domain vocabulary (Library, Library root, Comic, Library sync, …) lives in **`GLOSSARY.md`**. This file covers product scope and format support only.
 
 ## Platforms
 
@@ -77,12 +77,12 @@ Multi-Library and WebDAV remote libraries are in scope and implemented (ADR-0008
 
 ## Reading fidelity
 
-In-app **Read session** page images follow **Page image fidelity** in `CONTEXT.md`: show source page bitmaps faithfully. Do **not** trade page sampling quality for scroll FPS (no scroll-time `FilterQuality` downgrade / idle “upgrade”). Layout-constrained decode (`cacheWidth`) is allowed; dynamic or `FilterQuality.high` page sampling is not. This product rule **outranks** reader UI performance tweaks. Covers / library thumbnails are out of scope.
+In-app **Read session** page images follow **Page image fidelity** in `GLOSSARY.md`: show source page bitmaps faithfully. Do **not** trade page sampling quality for scroll FPS (no scroll-time `FilterQuality` downgrade / idle “upgrade”). Layout-constrained decode (`cacheWidth`) is allowed; dynamic or `FilterQuality.high` page sampling is not. This product rule **outranks** reader UI performance tweaks. Covers / library thumbnails are out of scope.
 
 ## Agent guidance
 
 - Describe the product as a **personal comic library** with optional **user-hosted WebDAV** roots — not a generic file manager, ebook app, or SaaS cloud reader.
-- Use **Library** / **Library root** / **Current library** / **Local library** / **Remote library** from `CONTEXT.md`; treat **Saved path** as the legacy name for a local root — its UI and FRB surface was retired in ADR-0014, so it now only survives in the `saved_paths` table and migrations.
+- Use **Library** / **Library root** / **Current library** / **Local library** / **Remote library** from `GLOSSARY.md`; treat **Saved path** as the legacy name for a local root — its UI and FRB surface was retired in ADR-0014, so it now only survives in the `saved_paths` table and migrations.
 - Prefer **Comic** / **Resource** / **Library sync** / **Resource access** in issues and PRs.
 - New reader or scan features should extend Resource access → Comic → Reader rather than Flutter-only protocol forks (e.g. do not put WebDAV page I/O primarily in `cached_network_image`).
 - Reader page rendering: honor **Page image fidelity** before applying performance tuning suggestions.

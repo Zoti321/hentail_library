@@ -1,4 +1,4 @@
-/// Comic Language（文本语言）规范英文名；空列表表示未设。见 `CONTEXT.md`。
+/// Comic Language（文本语言）规范英文名；空列表表示未设。见 `GLOSSARY.md`。
 abstract final class ComicLanguageNames {
   ComicLanguageNames._();
 
