@@ -5,7 +5,7 @@ import 'package:path/path.dart' as p;
 /// `shared/data` paths that may import `features/` outside the adapters tree.
 ///
 /// Phase C (#256): FRB thin edges; keep in sync with
-/// [docs/agents/testing.md] and `import_boundary_rules.dart` FRB allowlist.
+/// [docs/engineering/gate.md] and `import_boundary_rules.dart` FRB allowlist.
 const Set<String> kSharedDataExplicitFeatureImportAllowlist = <String>{
   'shared/data/adapters/reader_frb_mapper.dart',
   'shared/data/adapters/series_frb_mapper.dart',

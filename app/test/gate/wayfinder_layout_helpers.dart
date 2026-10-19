@@ -7,7 +7,7 @@ const bool kEnforceWayfinderPhaseBLayout = true;
 
 /// Phase A allow-list; legacy `data/` `domain/` `ui/` roots were removed in #258.
 /// `core/` is the app cross-cutting kernel (l10n, logging, util), moved back to
-/// `lib/core` on 2026-10-18 (layout rules: `docs/agents/testing.md` § App lib 顶层布局).
+/// `lib/core` on 2026-10-18 (layout rules: `docs/engineering/gate.md` § App lib 顶层布局).
 const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
   'core',
   'features',

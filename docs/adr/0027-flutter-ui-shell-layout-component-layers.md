@@ -57,4 +57,4 @@ Settings list–detail 与 Reader 路由仍隐藏 App sidebar/drawer（现有行
 - ADR-0017 — MVVM 与 View/Repository 边界
 - ADR-0018 — Gate 测试缝
 - ADR-0020 — shell 级调度与侧栏 Libraries
-- `docs/agents/ui-style.md`
+- `design-system/hentai-library/MASTER.md`

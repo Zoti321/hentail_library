@@ -90,7 +90,7 @@ Manual build（非 tier；仅 workflow_dispatch）
 
 - `app/test/gate/manifest.txt` 是 `gate-dart-test` 的唯一路径来源；扩硬门禁只改 manifest 并在 PR 中列出。
 - 每个 `gate-*` job 只调用 `scripts/run-gate.sh <子命令>`；`release-verify` 复用同一脚本，保证发布前与 PR 门禁拓扑一致。
-- 操作细则（晋升检查清单、harness 用法、本地全量命令）写在 `docs/agents/testing.md`，本 ADR 只记录决策。
+- 操作细则（晋升检查清单、harness 用法、本地全量命令）写在 `docs/engineering/gate.md`，本 ADR 只记录决策。
 
 ## Consequences
 
@@ -109,4 +109,4 @@ Manual build（非 tier；仅 workflow_dispatch）
 ## References
 
 - ADR-0002 — Rust core via FRB（业务在 Rust，Dart 测 UI + 薄边）
-- `docs/agents/testing.md` — Gate tier 操作手册、UI 双轨晋升清单、共享 harness
+- `docs/engineering/gate.md` — Gate tier 操作手册、UI 双轨晋升清单、共享 harness

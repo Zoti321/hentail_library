@@ -72,4 +72,4 @@ Phase 1 目标为**开发可观测性**。用户侧日志导出、设置页诊�
 ## Related
 
 - [ADR-0002](./0002-rust-core-via-frb.md) — Rust 核心经 FRB 接管；日志需覆盖 `core/` 迁入模块。
-- `docs/agents/coding-style.md` — `app/lib/core/` 为横切工具层，日志初始化归属此处。
+- `app/lib/core/` 为横切工具层，日志初始化归属此处。

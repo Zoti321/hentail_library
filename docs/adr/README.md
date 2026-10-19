@@ -2,6 +2,8 @@
 
 本目录存放 **架构决策记录（ADR）**：记录「为什么」做出某个技术或结构选择，供后续开发与 Agent 技能参考。
 
+协作文档地图：`CONTRIBUTING.md`、`AGENTS.md`。操作步骤（Gate、`gh`）在 `docs/engineering/`；**能测的不写长文**。
+
 ## 何时写 ADR
 
 满足以下三点时再新增 ADR：

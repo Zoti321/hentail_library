@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Canonical hentai-core line coverage via cargo-llvm-cov (Nightly + Gate + local rust-coverage).
-# Same package scope and ignore rules as gate-rust-test product code; see docs/agents/testing.md.
+# Same package scope and ignore rules as gate-rust-test product code; see docs/engineering/gate.md.
 # cargo-llvm-cov 0.9+ cannot pass --lcov and --html on the same invocation; use report subcommands.
 set -euo pipefail
 

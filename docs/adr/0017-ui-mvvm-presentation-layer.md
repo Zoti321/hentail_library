@@ -75,5 +75,5 @@ Flutter UI 已以 Riverpod Notifier/Provider 为主干，但存在以下漂移�
 
 ## References
 
-- `docs/agents/coding-style.md` — Widget 与 Riverpod 命名（随 ADR 同步补充 ViewModel 规则）
-- `docs/agents/testing.md` — ViewModel 层 mock Repo 测试为首选接缝
+- ADR-0017、ADR-0027；`app/test/gate/` 强制执行分层与 import
+- `docs/engineering/gate.md` — ViewModel 层 mock Repo 测试为首选接缝

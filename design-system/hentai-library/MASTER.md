@@ -8,8 +8,7 @@
 
 **Project:** Hentai Library  
 **Stack:** Flutter (responsive desktop-style shell)  
-**Initialized:** 2026-09-25 via ui-ux-pro-max  
-**Authoritative source:** `docs/agents/ui-style.md` — this file summarizes agent-facing rules; when in doubt, read the doc and theme code.
+**Agent UI spec:** this file + `pages/*`; token 数值以 `app/lib/shared/ui/theme/` 代码为准。
 
 ### Page Overrides Index
 
@@ -43,6 +42,17 @@ Cross-platform **comic library** app: scan/sync local or WebDAV roots, browse ca
 | Breakpoints | compact `<600` · medium `600–1023` · expanded `≥1024` |
 | Window chrome | `isDesktop` (Windows/macOS/Linux only) — **not** for forking page trees |
 | Icons | **Lucide** (`lucide_icons_flutter`) — avoid Material `Icons.*` in new UI |
+
+**Shell / routing entry points**
+
+- `features/bootstrap/presentation/views/app.dart` — `buildAppTheme`
+- `features/bootstrap/presentation/views/routing/app_router.dart` — `appRouter`, `ApplicationShell`
+- `shared/ui/shell/responsive_app_shell.dart` — `ResponsiveAppShell` + sidebar slots
+- `features/library_admin/.../libraries_app_sidebar.dart` — Libraries 分区
+- `shared/ui/layout/app_layout_breakpoints.dart` — breakpoints
+- `core/util/utils.dart` — `isDesktop` **仅**窗口 chrome，不分叉页面树
+
+**Shared UI layers (ADR-0027)** — `shared/ui/{shell,layout,widgets,interaction,theme}/` **不得** import `features/`；feature 组合在 `features/*/presentation/`。依赖边界由 `app/test/gate/shared_ui_no_feature_import_test.dart` 等强制执行。
 
 ---
 
@@ -113,6 +123,10 @@ Content area: `tokens.layout.contentAreaPadding` (48h / 16v).
 
 Use semantic tokens — `cs.hentai.cardShadow`, `cardShadowHover` on catalog cards; multi-layer shadow on `HentaiDialog`. Do not copy generic CSS shadow tables from web stacks.
 
+### Animating fills
+
+`Color.lerp` from `Colors.transparent`（透明黑）会在过渡到浅色 hover 时闪灰。静止态用**目标色 alpha 0**（如 `hoverFill.withAlpha(0)`），勿从 `Colors.transparent` 起播。渐变透明 stop 须与相邻 stop 同色 RGB。范例：`OutlinedMetaChip` borderless hover。
+
 ---
 
 ## Component Specs
@@ -165,10 +179,14 @@ Reuse widgets under `app/lib/shared/ui/widgets/` before creating primitives.
 | Pattern | Guidance |
 |---------|----------|
 | Responsive | `LayoutBuilder` / breakpoint helpers — no fixed viewport widths |
-| Catalog | Grid of `ComicCard` / `SeriesCard`; filters in sidebar or toolbar |
+| Catalog | Grid of `ComicCard` / `SeriesCard`; `LibraryBlocksSliverGroup` |
+| Detail | `DetailPrimaryRowLayout` — compact 单列，宽屏横排 |
+| Settings | **Settings list–detail**（`GLOSSARY.md`）— 隐藏 app sidebar |
 | Reader | Immersive; minimal chrome; respect safe areas on mobile |
 | Sidebar | Expanded 256px / collapsed 72px (`DesktopSidebar`) |
 | Compact nav | Drawer, not a separate Material mobile tree |
+
+**Paths:** `features/<feature>/presentation/views/` · 共享组件 `shared/ui/widgets/` · 布局 `shared/ui/layout/` · **禁止** `views/mobile/` 分树。
 
 ---
 
@@ -193,6 +211,8 @@ Reuse widgets under `app/lib/shared/ui/widgets/` before creating primitives.
 - ❌ Layout-shifting hover transforms on cards (shadow change only)
 - ❌ Hard-coded spacing/font sizes outside `context.tokens`
 - ❌ Forking UI on `isDesktop` for page structure (window chrome only)
+- ❌ `AnimatedContainer` / `BoxDecoration` from `Colors.transparent` — see **Animating fills**
+- ❌ Stock `AlertDialog` — use `HentaiDialog` or `overlays/dialog/confirm/`
 
 ---
 
