@@ -1,0 +1,71 @@
+import 'package:hentai_library/shared/domain/library/library_series_projection.dart';
+import 'package:hentai_library/shared/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
+import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
+
+/// Series 仓储：文件夹 sync 自动生成；用户可编辑连载状态与计划总卷数。
+abstract class SeriesRepository {
+  Future<int> countAll();
+
+  Future<PagedResult<Series>> fetchPage({
+    required PageRequest request,
+    required LibrarySeriesFilter filter,
+    required LibrarySeriesSortOption sortOption,
+  });
+
+  Future<Series?> findById(String seriesId);
+
+  /// 按 comicId 反查成员归属（所属 series + 排序值与锁）；无归属返回 null。
+  Future<SeriesItemMembership?> findMembershipByComicId(String comicId);
+
+  /// 按 comicId 派生 Series reading context；无归属返回 null。
+  Future<SeriesReadingContext?> getReadingContextByComicId(String comicId);
+
+  Future<PagedResult<SeriesComicPageItem>> fetchComicsPage({
+    required String seriesId,
+    required PageRequest request,
+  });
+
+  Future<void> updateSeriesItemSortOrder({
+    required String seriesId,
+    required String comicId,
+    required double sortOrder,
+  });
+
+  Future<void> setSeriesItemSortOrderLocked({
+    required String seriesId,
+    required String comicId,
+    required bool locked,
+  });
+
+  Future<SeriesComicsMetadata> fetchComicsMetadata(String seriesId);
+
+  Future<void> updateUserMeta({
+    required String seriesId,
+    String? name,
+    SerializationStatus? serializationStatus,
+    int? totalCount,
+    bool clearTotalCount = false,
+  });
+
+  Future<void> setMetaLocks({
+    required String seriesId,
+    bool? name,
+    bool? serializationStatus,
+    bool? totalCount,
+  });
+
+  Future<List<Series>> searchByKeyword(String keyword);
+
+  Future<List<Series>> searchByMetadataExpression({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+  });
+}

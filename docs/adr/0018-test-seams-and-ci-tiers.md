@@ -68,11 +68,15 @@ Gate 扩展（issue #206 PR-B，未挡 PR 前仅文档化）：
 └── gate-rust-coverage           与 nightly-rust-coverage 同源脚本 + `--fail-under-lines`（无 HTML artifact）
 
 Watch (watch.yml)                workflow_dispatch / workflow_call
-└── watch-platform-android-pdf   integration_test/pdf_reader_smoke_test.dart（Android 模拟器）
+├── watch-platform-android-pdf   integration_test/pdf_reader_smoke_test.dart（Android 模拟器）
+├── watch-platform-ios-pdf       同上（iOS 模拟器）
+├── watch-platform-windows-pdf   同上（Windows 桌面宿主）
+├── watch-platform-macos-pdf     同上（macOS 桌面宿主）
+└── watch-platform-linux-pdf     同上（Linux 桌面宿主 + xvfb）
 
 Release (release.yml)            tag v* / workflow_dispatch
 ├── release-verify               scripts/run-gate.sh（= 完整 Gate）
-├── watch-platform-android-pdf   调用 watch.yml；并行跑，不挡发布
+├── watch-platform-smokes        调用 watch.yml（全部 watch-platform-*）；并行跑，不挡发布
 ├── release-build-{windows,macos,linux,android,ios}   needs release-verify
 ├── release-publish              needs 全部 release-build-*
 └── release-manual-summary       手动构建且不发布时
@@ -86,7 +90,7 @@ Manual build（非 tier；仅 workflow_dispatch）
 
 - `app/test/gate/manifest.txt` 是 `gate-dart-test` 的唯一路径来源；扩硬门禁只改 manifest 并在 PR 中列出。
 - 每个 `gate-*` job 只调用 `scripts/run-gate.sh <子命令>`；`release-verify` 复用同一脚本，保证发布前与 PR 门禁拓扑一致。
-- 操作细则（晋升检查清单、harness 用法、本地全量命令）写在 `docs/agents/testing.md`，本 ADR 只记录决策。
+- 操作细则（晋升检查清单、harness 用法、本地全量命令）写在 `docs/engineering/gate.md`，本 ADR 只记录决策。
 
 ## Consequences
 
@@ -105,4 +109,4 @@ Manual build（非 tier；仅 workflow_dispatch）
 ## References
 
 - ADR-0002 — Rust core via FRB（业务在 Rust，Dart 测 UI + 薄边）
-- `docs/agents/testing.md` — Gate tier 操作手册、UI 双轨晋升清单、共享 harness
+- `docs/engineering/gate.md` — Gate tier 操作手册、UI 双轨晋升清单、共享 harness

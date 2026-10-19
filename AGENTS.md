@@ -1,37 +1,21 @@
-## Agent skills
+# Hentai Library
 
-### Architecture
+Monorepo: **`app/`** Flutter · **`core/`** Rust (FRB).  
+Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onboarding: `README.md` · Contributor map: `CONTRIBUTING.md`.
 
-Rust core / FRB / monorepo (`app/` Flutter, `core/` Rust): **`docs/agents/rust-core.md`** and ADR-0002.
+**Glossary** — domain terms, terminology, edit ADR → `GLOSSARY.md` + `docs/adr/`.  
+**Read session pages** → `GLOSSARY.md` **Page image fidelity** only.
 
-### Product
+**Product scope** (capabilities, platforms) → `README.md` § 核心功能 / 支持平台.
 
-Personal comic library (local roots and user-hosted WebDAV). Scope, formats, out-of-scope: `docs/agents/product-positioning.md`. Read session pages follow **Page image fidelity** in `CONTEXT.md`.
+**Flutter UI** (shell, tokens, components) → `design-system/hentai-library/MASTER.md` (+ `pages/*` per route).
 
-### Vocabulary
+**Dart layout & imports** (features/shared/core, MVVM) → ADR-0017, ADR-0027; enforced by `app/test/gate/` + `project_layout_test.dart`.
 
-Name domain concepts as defined in **`CONTEXT.md`**. Read `docs/adr/` entries that touch the area. If output contradicts an ADR, say so explicitly.
+**Rust** (sync, read, DB) → `core/`; see `docs/adr/README.md` (ADR-0002 and related).
 
-### Issues
+**Tests & CI** → `docs/engineering/gate.md`; tier names ADR-0018; workflows `.github/workflows/gate.yml`.
 
-GitHub Issues (`Zoti321/hentail_library`); use `gh`. Commands and triage labels: `docs/agents/issue-tracker.md`.
+**Issues** · **logs export** · **tag dictionary JSON** → `docs/engineering/maintainer.md`.
 
-### Coding
-
-Dart layers, widget state, Riverpod / MVVM: `docs/agents/coding-style.md`. Scan / sync / read / DB lives in Rust `core/`.
-
-### UI
-
-Single responsive shell, desktop Fluent-inspired, reuse `app/lib/ui/core/widgets/`: `docs/agents/ui-style.md`.
-
-### Testing
-
-PR Gate vs local full suite, FRB thin-edge, UI dual-track: `docs/agents/testing.md`.
-
-### Diagnostics
-
-Collecting or exporting user logs, verbose diagnostics: `docs/agents/operations/log-support.md`.
-
-### Tag dictionary
-
-Importing curated tag JSON (not EhTag): `docs/agents/operations/tag-dictionary-import.md`.
+Do not use `docs/archive/` as current spec.

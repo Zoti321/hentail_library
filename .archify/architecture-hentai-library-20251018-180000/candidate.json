@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Hentai Library 系统架构",
+    "locale": "zh-CN",
+    "output": ".archify/architecture-hentai-library-20251018-180000/hentai-library.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/Zoti321/hentail_library.git",
+      "provider": "github",
+      "revision": "a62c3d1293f91ec392bc0555bd089e1bd6314f87"
+    }
+  },
+  "components": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "用户",
+      "sublabel": "桌面 / 移动",
+      "pos": [40, 200],
+      "size": [120, 60]
+    },
+    {
+      "id": "flutter-ui",
+      "type": "frontend",
+      "label": "Flutter UI",
+      "sublabel": "features + 路由",
+      "pos": [200, 120],
+      "size": [140, 64],
+      "sources": [
+        { "path": "app/lib/main.dart", "line": 25, "end_line": 64 },
+        { "path": "app/lib/features/bootstrap/presentation/views/app.dart", "line": 18, "end_line": 40 }
+      ]
+    },
+    {
+      "id": "dart-repos",
+      "type": "frontend",
+      "label": "Repository 层",
+      "sublabel": "Riverpod 编排",
+      "pos": [390, 120],
+      "size": [150, 64],
+      "sources": [
+        { "path": "app/lib/features/library_browse/data/repositories/comic_repository_impl.dart", "line": 18, "end_line": 44 }
+      ]
+    },
+    {
+      "id": "frb-bridge",
+      "type": "backend",
+      "label": "FRB 桥接",
+      "sublabel": "core/crates/flutter",
+      "pos": [590, 120],
+      "size": [140, 64],
+      "sources": [
+        { "path": "app/flutter_rust_bridge.yaml", "line": 1, "end_line": 4 },
+        { "path": "core/crates/flutter/src/api/sync.rs", "line": 1, "end_line": 8 }
+      ]
+    },
+    {
+      "id": "hentai-core",
+      "type": "backend",
+      "label": "hentai_core",
+      "sublabel": "扫描 / 同步 / 阅读 I/O",
+      "pos": [780, 120],
+      "size": [150, 64],
+      "sources": [
+        { "path": "core/crates/core/src/lib.rs", "line": 1, "end_line": 31 },
+        { "path": "core/crates/core/src/sync/mod.rs", "line": 1, "end_line": 8 }
+      ]
+    },
+    {
+      "id": "sqlite",
+      "type": "database",
+      "label": "SQLite",
+      "sublabel": "SeaORM 持久化",
+      "pos": [780, 280],
+      "size": [150, 60],
+      "sources": [
+        { "path": "core/crates/core/src/db.rs", "line": 33, "end_line": 35 }
+      ]
+    },
+    {
+      "id": "shared-prefs",
+      "type": "database",
+      "label": "SharedPreferences",
+      "sublabel": "App / 浏览偏好",
+      "pos": [200, 280],
+      "size": [150, 60],
+      "sources": [
+        { "path": "docs/agents/rust-core.md", "line": 25, "end_line": 25 }
+      ]
+    },
+    {
+      "id": "local-root",
+      "type": "external",
+      "label": "本地 Library root",
+      "sublabel": "磁盘 Resource",
+      "pos": [40, 360],
+      "size": [150, 60],
+      "sources": [
+        { "path": "GLOSSARY.md", "line": 51, "end_line": 53 }
+      ]
+    },
+    {
+      "id": "webdav-root",
+      "type": "external",
+      "label": "WebDAV Library root",
+      "sublabel": "远程 Resource",
+      "pos": [40, 480],
+      "size": [150, 60],
+      "sources": [
+        { "path": "GLOSSARY.md", "line": 55, "end_line": 57 }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Flutter 客户端 (app/)",
+      "wraps": ["flutter-ui", "dart-repos", "shared-prefs"]
+    },
+    {
+      "kind": "region",
+      "label": "Rust Core + FRB cdylib",
+      "wraps": ["frb-bridge", "hentai-core", "sqlite"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "user-to-ui",
+      "from": "user",
+      "to": "flutter-ui",
+      "label": "浏览 / 阅读",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ui-to-repos",
+      "from": "flutter-ui",
+      "to": "dart-repos",
+      "label": "Provider 调用"
+    },
+    {
+      "id": "repos-to-frb",
+      "from": "dart-repos",
+      "to": "frb-bridge",
+      "label": "guardFrb API",
+      "variant": "emphasis"
+    },
+    {
+      "id": "frb-to-core",
+      "from": "frb-bridge",
+      "to": "hentai-core",
+      "label": "业务入口"
+    },
+    {
+      "id": "core-to-db",
+      "from": "hentai-core",
+      "to": "sqlite",
+      "label": "读写 Comic / Library"
+    },
+    {
+      "id": "ui-to-prefs",
+      "from": "flutter-ui",
+      "to": "shared-prefs",
+      "label": "轻量设置",
+      "variant": "dashed"
+    },
+    {
+      "id": "core-sync-local",
+      "from": "hentai-core",
+      "to": "local-root",
+      "label": "Library sync / 解码"
+    },
+    {
+      "id": "core-read-remote",
+      "from": "hentai-core",
+      "to": "webdav-root",
+      "label": "流式读取",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "主路径",
+      "items": [
+        "启动时 RustLib.init → initDbFrb 打开应用数据目录下的 SQLite",
+        "业务逻辑集中在 hentai_core；Dart 不复制 sync / 筛选等规则"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Library sync",
+      "items": [
+        "sync_library_frb 经库级写锁编排扫描、写库与缩略图",
+        "同步结束后在 Rust 内清理 Reader session；Flutter 不重复失效化"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "阅读",
+      "items": [
+        "open_reader_frb / load_page_* 在 Rust 解码页图像",
+        "本地可走文件路径；远程经 WebDAV 在线流式"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,216 @@
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/domain/reading/reader_page_payload.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_logic.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_image_cache.dart';
+import 'package:hentai_library/features/read_session/di/session_providers.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'reader_prefetch_controller.g.dart';
+
+@Riverpod(keepAlive: true)
+class ReaderPrefetchController extends _$ReaderPrefetchController {
+  final Map<String, Set<int>> _lastWarmWindows = <String, Set<int>>{};
+
+  @override
+  Map<String, int> build() => <String, int>{};
+
+  int bumpGeneration(String comicId) {
+    final int next = (state[comicId] ?? 0) + 1;
+    state = <String, int>{...state, comicId: next};
+    return next;
+  }
+
+  void clearComic(String comicId) {
+    // Invalidate Flutter-side prefetch generation before disk clear.
+    bumpGeneration(comicId);
+    _lastWarmWindows.remove(comicId);
+    if (state.containsKey(comicId)) {
+      state = Map<String, int>.from(state)..remove(comicId);
+    }
+    clearReaderImageCache();
+    // Fire-and-forget: async FRB must not block exit navigation (P2-4).
+    unawaited(
+      ref.read(readerSessionServiceProvider).clearPageCache(comicId: comicId),
+    );
+    ref.invalidate(comicReaderPageProvider);
+  }
+
+  Future<void> warmWindow({
+    required String comicId,
+    required int centerPageOneBased,
+    required int totalPages,
+    Iterable<int> extraPageIndexesOneBased = const <int>[],
+  }) async {
+    if (totalPages <= 0) {
+      return;
+    }
+    final Set<int> targets = computePrefetchWindow(
+      centerPageOneBased: centerPageOneBased,
+      totalPages: totalPages,
+      neighborCount: kReaderPrefetchNeighborCount,
+      extraPageIndexesOneBased: extraPageIndexesOneBased,
+    );
+    final Set<int>? previous = _lastWarmWindows[comicId];
+    if (!shouldBumpPrefetchGeneration(
+      previousWindow: previous,
+      nextWindow: targets,
+    )) {
+      return;
+    }
+    // Drop keepAlive FilePaths for pages Rust is about to evict from disk cache.
+    for (final int pageOneBased in pagesLeavingPrefetchWindow(
+      previousWindow: previous,
+      nextWindow: targets,
+    )) {
+      ref.invalidate(
+        comicReaderPageProvider(comicId: comicId, pageIndex: pageOneBased - 1),
+      );
+    }
+    _lastWarmWindows[comicId] = Set<int>.from(targets);
+    final int generation = bumpGeneration(comicId);
+    // Kick the landing/center page before neighbor prefetch contends on the archive.
+    final int centerZeroBased = centerPageOneBased.clamp(1, totalPages) - 1;
+    unawaited(
+      ref
+          .read(
+            comicReaderPageProvider(
+              comicId: comicId,
+              pageIndex: centerZeroBased,
+            ).future,
+          )
+          .then<void>((_) {}, onError: (_, StackTrace _) {}),
+    );
+    await ref
+        .read(readerSessionServiceProvider)
+        .prefetchPages(
+          comicId: comicId,
+          archivePageIndexes: targets
+              .map((int pageOneBased) => pageOneBased - 1)
+              .toList(growable: false),
+          generation: generation,
+        );
+  }
+
+  Future<void> precacheWindow({
+    required BuildContext context,
+    required String comicId,
+    required Set<int> pageIndexesOneBased,
+    required List<ReaderPageImageData> imageList,
+    int? cacheWidth,
+  }) async {
+    if (pageIndexesOneBased.isEmpty || imageList.isEmpty) {
+      return;
+    }
+    final int generation = state[comicId] ?? 0;
+    ensureReaderImageCacheConfigured();
+    for (final int pageOneBased in pageIndexesOneBased) {
+      if (!_isPrecacheStillValid(
+            comicId: comicId,
+            generation: generation,
+            pageOneBased: pageOneBased,
+          ) ||
+          !context.mounted) {
+        return;
+      }
+      if (pageOneBased < 1 || pageOneBased > imageList.length) {
+        continue;
+      }
+      final ReaderPageImageData imageData = imageList[pageOneBased - 1];
+      await _precachePage(
+        context: context,
+        comicId: comicId,
+        generation: generation,
+        imageData: imageData,
+        cacheWidth: cacheWidth,
+      );
+    }
+  }
+
+  bool _isPrecacheStillValid({
+    required String comicId,
+    required int generation,
+    required int pageOneBased,
+  }) {
+    if ((state[comicId] ?? 0) != generation) {
+      return false;
+    }
+    final Set<int>? window = _lastWarmWindows[comicId];
+    return window != null && window.contains(pageOneBased);
+  }
+
+  Future<void> _precachePage({
+    required BuildContext context,
+    required String comicId,
+    required int generation,
+    required ReaderPageImageData imageData,
+    int? cacheWidth,
+  }) async {
+    if (imageData is ReaderDirPageImageData) {
+      await precacheReaderFilePath(
+        context: context,
+        filePath: imageData.file.path,
+        cacheWidth: cacheWidth,
+      );
+      return;
+    }
+    if (imageData is! ReaderArchivePageImageData) {
+      return;
+    }
+    final ReaderPagePayload page = await ref.read(
+      comicReaderPageProvider(
+        comicId: imageData.comicId,
+        pageIndex: imageData.pageIndex,
+      ).future,
+    );
+    if (!_isPrecacheStillValid(
+          comicId: comicId,
+          generation: generation,
+          pageOneBased: imageData.pageIndex + 1,
+        ) ||
+        !context.mounted) {
+      return;
+    }
+    switch (page) {
+      case ReaderPageFilePath(:final String path):
+        await precacheReaderFilePath(
+          context: context,
+          filePath: path,
+          cacheWidth: cacheWidth,
+        );
+      case ReaderPageBytes(:final Uint8List data):
+        final ImageProvider<Object>? provider = buildReaderImageProvider(
+          memoryBytes: data,
+          cacheWidth: cacheWidth,
+        );
+        if (provider == null) {
+          return;
+        }
+        try {
+          await precacheReaderImage(context: context, provider: provider);
+        } on Object {
+          // 单页预热失败不阻断窗口内其余页。
+        }
+    }
+  }
+
+  Future<void> warmOpenComic({
+    required String comicId,
+    int? resumePageOneBased,
+  }) async {
+    final snapshot = await ref.read(
+      readerSessionOpenProvider(comicId: comicId).future,
+    );
+    final int center = resumePageOneBased ?? snapshot.resumePageIndex;
+    await ref.read(comicImagesProvider(comicId: comicId).future);
+    await warmWindow(
+      comicId: comicId,
+      centerPageOneBased: center,
+      totalPages: snapshot.totalPages,
+    );
+  }
+}

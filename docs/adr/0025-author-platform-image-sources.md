@@ -116,4 +116,4 @@ Patreon 适配器仅接受 Creator 资料页形状：`/c/{vanity}`、`/user?u={i
 - Issue #204 — Author image 高清显示与统一取图接口
 - ADR-0002 — Rust 核心层经 FRB 接管数据与 I/O
 - ADR-0024 — Author 稳定身份与创作平台外链
-- `CONTEXT.md` — Author image / Author alias / Creative platform / Author link
+- `GLOSSARY.md` — Author image / Author alias / Creative platform / Author link

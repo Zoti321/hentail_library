@@ -1,0 +1,241 @@
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
+import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
+import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
+import 'package:hentai_library/shared/di/comic_cover_load_gate.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'comic_cover_providers.g.dart';
+
+class ThumbnailBackgroundProgress {
+  const ThumbnailBackgroundProgress({
+    this.done = 0,
+    this.total = 0,
+    this.failed = 0,
+  });
+
+  final int done;
+  final int total;
+  final int failed;
+
+  bool get isActive => total > 0 && done < total;
+}
+
+/// 漫画封面缓存管理（删除漫画后清理缓存）。
+@Riverpod(keepAlive: true)
+class ComicCoverCacheManager extends _$ComicCoverCacheManager {
+  @override
+  void build() {}
+
+  void clearForComics(Iterable<String> comicIds) {
+    for (final String comicId in comicIds) {
+      ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).clear();
+      ref.invalidate(comicCoverProvider(comicId));
+    }
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ComicCoverThumbnailCache extends _$ComicCoverThumbnailCache {
+  @override
+  Uint8List? build(String comicId) => null;
+
+  void set(Uint8List bytes) {
+    state = bytes;
+  }
+
+  void clear() {
+    state = null;
+  }
+}
+
+@Riverpod()
+class ComicCover extends _$ComicCover {
+  String? _comicId;
+  bool _loadInFlight = false;
+  ThumbnailPriority _priority = ThumbnailPriority.high;
+
+  @override
+  ComicCoverState build(String comicId) {
+    _comicId = comicId;
+    final Uint8List? cached = ref.watch(
+      comicCoverThumbnailCacheProvider(comicId),
+    );
+    if (cached != null && cached.isNotEmpty) {
+      return ComicCoverReady(ComicCoverImage.bytes(cached));
+    }
+    Future.microtask(() => ensureLoaded());
+    return const ComicCoverLoading();
+  }
+
+  void bumpPriority(ThumbnailPriority priority) {
+    if (priority.index < _priority.index) {
+      _priority = priority;
+    }
+  }
+
+  void ensureLoaded({ThumbnailPriority priority = ThumbnailPriority.high}) {
+    bumpPriority(priority);
+    if (state is ComicCoverReady) {
+      return;
+    }
+    unawaited(_load());
+  }
+
+  void setReady(Uint8List bytes) {
+    final String? comicId = _comicId;
+    if (comicId == null) {
+      return;
+    }
+    ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
+    state = ComicCoverReady(ComicCoverImage.bytes(bytes));
+  }
+
+  void markDecodeError() {
+    final String? comicId = _comicId;
+    if (comicId == null) {
+      return;
+    }
+    ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).clear();
+    state = const ComicCoverError();
+  }
+
+  Future<void> _load() async {
+    if (_loadInFlight) {
+      return;
+    }
+    final String? comicId = _comicId;
+    if (comicId == null) {
+      return;
+    }
+    if (state is ComicCoverReady) {
+      return;
+    }
+
+    final ComicCoverImage? previous = switch (state) {
+      ComicCoverLoading(:final previous) => previous,
+      ComicCoverReady(:final data) => data,
+      _ => null,
+    };
+    state = ComicCoverLoading(previous: previous);
+    _loadInFlight = true;
+    try {
+      if (!ref.mounted) {
+        return;
+      }
+      // Capture deps before the gate wait — provider may dispose while queued.
+      final comicRepo = ref.read(comicRepoProvider);
+      final thumbRepo = ref.read(comicThumbnailRepoProvider);
+
+      await ComicCoverLoadGate.run(() async {
+        if (!ref.mounted) {
+          return;
+        }
+        final Comic? comic = await comicRepo.findById(comicId);
+        if (!ref.mounted) {
+          return;
+        }
+        if (comic == null) {
+          state = const ComicCoverNoCover();
+          return;
+        }
+
+        Uint8List? bytes = (await thumbRepo.findByComicId(comicId))?.thumbnail;
+        if (!ref.mounted) {
+          return;
+        }
+        if (bytes == null || bytes.isEmpty) {
+          final ensured = await thumbRepo.ensureByComicId(
+            comicId: comicId,
+            priority: _priority,
+          );
+          bytes = ensured?.thumbnail;
+        }
+        if (!ref.mounted) {
+          return;
+        }
+        if (bytes == null || bytes.isEmpty) {
+          state = const ComicCoverNoCover();
+          return;
+        }
+        ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
+        state = ComicCoverReady(ComicCoverImage.bytes(bytes));
+      });
+    } on Object catch (error, stackTrace) {
+      if (!ref.mounted) {
+        return;
+      }
+      logError(
+        AppLog.ui('comic_cover'),
+        '加载漫画封面失败: comicId=$comicId',
+        error,
+        stackTrace,
+      );
+      state = ComicCoverError(cause: error);
+    } finally {
+      _loadInFlight = false;
+    }
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
+  StreamSubscription<ThumbnailEvent>? _subscription;
+
+  @override
+  ThumbnailBackgroundProgress build() {
+    ref.onDispose(() {
+      unawaited(_subscription?.cancel());
+      _subscription = null;
+    });
+    _subscription ??= ref
+        .read(comicThumbnailRepoProvider)
+        .watchEvents()
+        .listen(_onEvent);
+    return const ThumbnailBackgroundProgress();
+  }
+
+  void _onEvent(ThumbnailEvent event) {
+    switch (event) {
+      case ThumbnailReady(:final String comicId):
+        unawaited(_onThumbnailReady(comicId));
+      case ThumbnailProgress(
+        :final int done,
+        :final int total,
+        :final int failed,
+      ):
+        state = ThumbnailBackgroundProgress(
+          done: done,
+          total: total,
+          failed: failed,
+        );
+    }
+  }
+
+  Future<void> _onThumbnailReady(String comicId) async {
+    try {
+      final record = await ref
+          .read(comicThumbnailRepoProvider)
+          .findByComicId(comicId);
+      final Uint8List? bytes = record?.thumbnail;
+      if (bytes == null || bytes.isEmpty || !ref.mounted) {
+        return;
+      }
+      ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
+      ref.read(comicCoverProvider(comicId).notifier).setReady(bytes);
+    } on Object catch (error, stackTrace) {
+      logError(
+        AppLog.ui('comic_cover'),
+        '缩略图就绪后刷新封面失败: comicId=$comicId',
+        error,
+        stackTrace,
+      );
+    }
+  }
+}

@@ -1,0 +1,369 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/layout/page_content_width_layout.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/shared/ui/widgets/chrome/capsule_tab_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/chrome/content_switcher_bottom_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/element/chip/count_digit_chip.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_page/widgets/metadata_tags_overflow_menu.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+TextStyle metadataPageTitleStyle(
+  HentaiColorScheme semantic,
+  MetadataLayoutTier layoutTier,
+) {
+  return TextStyle(
+    fontSize: metadataPageTitleFontSize(layoutTier),
+    fontWeight: FontWeight.w600,
+    color: semantic.textPrimary,
+    letterSpacing: -0.4,
+  );
+}
+
+class MetadataPageHeaderSection extends StatelessWidget {
+  const MetadataPageHeaderSection({
+    required this.layoutTier,
+    required this.horizontalPadding,
+    required this.contentMaxWidth,
+    required this.selectedTabIndex,
+    required this.onTabSelected,
+    required this.onAdd,
+    this.onDeleteAllTags,
+    this.onOpenNavigation,
+    this.mergeSelectionCount = 0,
+    this.onExitMergeSelection,
+    this.onMergeSelection,
+    super.key,
+  });
+
+  final MetadataLayoutTier layoutTier;
+  final double horizontalPadding;
+  final double contentMaxWidth;
+  final int selectedTabIndex;
+  final ValueChanged<int> onTabSelected;
+  final VoidCallback onAdd;
+  final VoidCallback? onDeleteAllTags;
+  final VoidCallback? onOpenNavigation;
+  final int mergeSelectionCount;
+  final VoidCallback? onExitMergeSelection;
+  final VoidCallback? onMergeSelection;
+
+  @override
+  Widget build(BuildContext context) {
+    return PageContentWidthAlign(
+      horizontalPadding: horizontalPadding,
+      maxWidth: contentMaxWidth,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: kMetadataHeaderVerticalPadding,
+        ),
+        child: MetadataPageHeaderToolbar(
+          layoutTier: layoutTier,
+          selectedTabIndex: selectedTabIndex,
+          onTabSelected: onTabSelected,
+          onAdd: onAdd,
+          onDeleteAllTags: onDeleteAllTags,
+          onOpenNavigation: onOpenNavigation,
+          mergeSelectionCount: mergeSelectionCount,
+          onExitMergeSelection: onExitMergeSelection,
+          onMergeSelection: onMergeSelection,
+        ),
+      ),
+    );
+  }
+}
+
+class MetadataPageHeaderToolbar extends ConsumerWidget {
+  const MetadataPageHeaderToolbar({
+    required this.layoutTier,
+    required this.selectedTabIndex,
+    required this.onTabSelected,
+    required this.onAdd,
+    this.onDeleteAllTags,
+    this.onOpenNavigation,
+    this.mergeSelectionCount = 0,
+    this.onExitMergeSelection,
+    this.onMergeSelection,
+    super.key,
+  });
+
+  final MetadataLayoutTier layoutTier;
+  final int selectedTabIndex;
+  final ValueChanged<int> onTabSelected;
+  final VoidCallback onAdd;
+  final VoidCallback? onDeleteAllTags;
+  final VoidCallback? onOpenNavigation;
+  final int mergeSelectionCount;
+  final VoidCallback? onExitMergeSelection;
+  final VoidCallback? onMergeSelection;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final String addTooltip = l10n.metadataAddEntityTooltip(selectedTabIndex);
+    final bool showEntityTabs = metadataHeaderShowsEntityTabs(layoutTier);
+    final bool showCountChip = metadataHeaderShowsCountChip(layoutTier);
+    final bool mergeSelectionMode = onExitMergeSelection != null;
+    if (mergeSelectionMode) {
+      return SizedBox(
+        height: 44,
+        child: Row(
+          children: <Widget>[
+            GhostButton.icon(
+              icon: LucideIcons.x,
+              tooltip: l10n.commonCancel,
+              semanticLabel: l10n.commonCancel,
+              iconSize: 16,
+              size: 32,
+              borderRadius: 8,
+              foregroundColor: context.hentai.iconDefault,
+              hoverColor: Theme.of(context).hoverColor,
+              overlayColor: Theme.of(context).hoverColor,
+              onPressed: onExitMergeSelection,
+            ),
+            const Spacer(),
+            FilledButton.icon(
+              icon: const Icon(LucideIcons.merge, size: 16),
+              label: Text('${l10n.metadataMerge} $mergeSelectionCount tags'),
+              onPressed: mergeSelectionCount > 1 ? onMergeSelection : null,
+              style: FilledButton.styleFrom(
+                backgroundColor: cs.primary,
+                foregroundColor: cs.onPrimary,
+                disabledBackgroundColor: cs.primary.withAlpha(102),
+                disabledForegroundColor: cs.onPrimary.withAlpha(153),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return SizedBox(
+      height: 44,
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (onOpenNavigation != null) ...<Widget>[
+                        GhostButton.icon(
+                          icon: LucideIcons.menu,
+                          semanticLabel: l10n.shellOpenNavMenu,
+                          tooltip: '',
+                          iconSize: 16,
+                          size: 32,
+                          borderRadius: 8,
+                          foregroundColor: context.hentai.iconDefault,
+                          hoverColor: Theme.of(context).hoverColor,
+                          overlayColor: Theme.of(context).hoverColor,
+                          onPressed: onOpenNavigation,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Text(
+                        l10n.navMetadata,
+                        style: metadataPageTitleStyle(
+                          context.hentai,
+                          layoutTier,
+                        ),
+                      ),
+                      if (showCountChip) ...<Widget>[
+                        const SizedBox(width: 12),
+                        _MetadataActiveCountChip(
+                          selectedTabIndex: selectedTabIndex,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              if (selectedTabIndex == 1 && onDeleteAllTags != null)
+                MetadataTagsOverflowMenuButton(
+                  onDeleteAllTags: onDeleteAllTags!,
+                ),
+              GhostButton.icon(
+                icon: LucideIcons.plus,
+                tooltip: addTooltip,
+                semanticLabel: addTooltip,
+                iconSize: 16,
+                size: 32,
+                borderRadius: 8,
+                foregroundColor: context.hentai.iconDefault,
+                hoverColor: Theme.of(context).hoverColor,
+                overlayColor: Theme.of(context).hoverColor,
+                delayTooltipThreeSeconds: true,
+                onPressed: onAdd,
+              ),
+            ],
+          ),
+          if (showEntityTabs)
+            MetadataEntityTabs(
+              selectedTabIndex: selectedTabIndex,
+              onTabSelected: onTabSelected,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetadataActiveCountChip extends ConsumerWidget {
+  const _MetadataActiveCountChip({required this.selectedTabIndex});
+
+  final int selectedTabIndex;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final ManagedNamedFacetKind kind = metadataTabKind(selectedTabIndex);
+    final state = ref.watch(namedFacetManagementControllerProvider(kind));
+    final int count = state.hasSearchQuery
+        ? state.items.length
+        : state.totalCount;
+    return CountDigitChip(
+      count: count,
+      semanticLabel: l10n.metadataTotalCount(count),
+    );
+  }
+}
+
+class MetadataEntityTabs extends StatelessWidget {
+  const MetadataEntityTabs({
+    required this.selectedTabIndex,
+    required this.onTabSelected,
+    super.key,
+  });
+
+  final int selectedTabIndex;
+  final ValueChanged<int> onTabSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return CapsuleTabBar(
+      items: <CapsuleTabItem>[
+        CapsuleTabItem(
+          label: l10n.metadataTabAuthors,
+          icon: LucideIcons.penLine,
+        ),
+        CapsuleTabItem(label: l10n.metadataTabTags, icon: LucideIcons.tags),
+        CapsuleTabItem(
+          label: l10n.metadataTabParodies,
+          icon: LucideIcons.clapperboard,
+        ),
+        CapsuleTabItem(
+          label: l10n.metadataTabCharacters,
+          icon: LucideIcons.userRound,
+        ),
+      ],
+      selectedIndex: selectedTabIndex,
+      onSelected: onTabSelected,
+    );
+  }
+}
+
+class MetadataEntityBottomBar extends StatelessWidget {
+  const MetadataEntityBottomBar({
+    required this.selectedTabIndex,
+    required this.onTabSelected,
+    super.key,
+  });
+
+  final int selectedTabIndex;
+  final ValueChanged<int> onTabSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return ContentSwitcherBottomBar(
+      items: <ContentSwitcherBottomBarItem>[
+        (icon: LucideIcons.penLine, label: l10n.metadataTabAuthors),
+        (icon: LucideIcons.tags, label: l10n.metadataTabTags),
+        (icon: LucideIcons.clapperboard, label: l10n.metadataTabParodies),
+        (icon: LucideIcons.userRound, label: l10n.metadataTabCharacters),
+      ],
+      selectedIndex: selectedTabIndex,
+      onSelected: onTabSelected,
+    );
+  }
+}
+
+const double kMetadataHeaderShadowGradientHeight = 6;
+
+class MetadataPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
+  MetadataPinnedHeaderDelegate({required this.extent, required this.child});
+
+  final double extent;
+  final Widget child;
+
+  @override
+  double get minExtent => extent;
+
+  @override
+  double get maxExtent => extent;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: cs.surface,
+      child: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          Align(alignment: Alignment.topCenter, child: child),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: kMetadataHeaderShadowGradientHeight,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      ...context.shadows.pinnedHeaderShadowGradient(),
+                    ],
+                    stops: const <double>[0, 0.75, 1],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant MetadataPinnedHeaderDelegate oldDelegate) {
+    return oldDelegate.extent != extent || oldDelegate.child != child;
+  }
+}
+
+ManagedNamedFacetKind metadataTabKind(int index) {
+  return switch (index) {
+    0 => ManagedNamedFacetKind.author,
+    1 => ManagedNamedFacetKind.tag,
+    2 => ManagedNamedFacetKind.parody,
+    3 => ManagedNamedFacetKind.character,
+    _ => ManagedNamedFacetKind.tag,
+  };
+}

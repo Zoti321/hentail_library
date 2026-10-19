@@ -8,8 +8,7 @@
 
 **Project:** Hentai Library  
 **Stack:** Flutter (responsive desktop-style shell)  
-**Initialized:** 2026-09-25 via ui-ux-pro-max  
-**Authoritative source:** `docs/agents/ui-style.md` — this file summarizes agent-facing rules; when in doubt, read the doc and theme code.
+**Agent UI spec:** this file + `pages/*`; token 数值以 `app/lib/shared/ui/theme/` 代码为准。
 
 ### Page Overrides Index
 
@@ -39,10 +38,21 @@ Cross-platform **comic library** app: scan/sync local or WebDAV roots, browse ca
 | Aspect | Rule |
 |--------|------|
 | Layout | `ResponsiveAppShell` + `AppLayoutBreakpoints` |
-| Theme | `buildAppTheme` in `app/lib/ui/features/shell/views/app.dart` |
+| Theme | `buildAppTheme` in `app/lib/features/bootstrap/presentation/views/app.dart` |
 | Breakpoints | compact `<600` · medium `600–1023` · expanded `≥1024` |
 | Window chrome | `isDesktop` (Windows/macOS/Linux only) — **not** for forking page trees |
 | Icons | **Lucide** (`lucide_icons_flutter`) — avoid Material `Icons.*` in new UI |
+
+**Shell / routing entry points**
+
+- `features/bootstrap/presentation/views/app.dart` — `buildAppTheme`
+- `features/bootstrap/presentation/views/routing/app_router.dart` — `appRouter`, `ApplicationShell`
+- `shared/ui/shell/responsive_app_shell.dart` — `ResponsiveAppShell` + sidebar slots
+- `features/library_admin/.../libraries_app_sidebar.dart` — Libraries 分区
+- `shared/ui/layout/app_layout_breakpoints.dart` — breakpoints
+- `core/util/utils.dart` — `isDesktop` **仅**窗口 chrome，不分叉页面树
+
+**Shared UI layers (ADR-0027)** — `shared/ui/{shell,layout,widgets,interaction,theme}/` **不得** import `features/`；feature 组合在 `features/*/presentation/`。依赖边界由 `app/test/gate/shared_ui_no_feature_import_test.dart` 等强制执行。
 
 ---
 
@@ -55,13 +65,13 @@ Cross-platform **comic library** app: scan/sync local or WebDAV roots, browse ca
 | Property | Value |
 |----------|-------|
 | Style | Minimal, content-first, geometric grid |
-| Motion | `easeOutCubic`, **180–220 ms** (sidebar, tabs, hover) |
+| Motion | `context.motion.durationFast` / `durationMedium` + `AppMotionTokens.standardCurve` (**180–220 ms**, easeOutCubic) |
 | Elevation | Prefer borders + layered shadow over heavy Material elevation |
 | Density | Catalog grids medium-dense; reader chrome minimal |
 
 ### Color Palette
 
-Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`colorScheme.hentai`** (`HentaiColorScheme`). Never hard-code hex in widgets.
+Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`context.hentai`** / **`Theme.of(context).hentai`** (`HentaiColorScheme` on `ThemeData.extensions`). Prefer **`context.tokens`** / **`context.shadows`** / **`context.motion`**. Never hard-code hex in widgets. (`ColorScheme.hentai` is deprecated.)
 
 | Role | Light | Dark | Flutter access |
 |------|-------|------|----------------|
@@ -76,7 +86,9 @@ Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`colorScheme.hentai
 | Status | — | — | `success`, `warning`, `error` |
 | Reader chrome | — | — | `readerBackground`, `floatingUiBackground` |
 
-**Theme entry:** `app/lib/ui/core/theme/theme_visual_tokens.dart` → `HentaiColorScheme`
+**Theme entry:** `app/lib/shared/ui/theme/theme.dart` → `buildAppTheme`；语义色 `color/hentai_color_scheme.dart`；M3 底层 `color/app_color_scheme.dart`
+
+**Dev catalog (Widgetbook):** `flutter run -t widgetbook/main.dart`（非 Gate、非生产路由）
 
 ### Typography
 
@@ -111,13 +123,17 @@ Content area: `tokens.layout.contentAreaPadding` (48h / 16v).
 
 ### Shadows
 
-Use semantic tokens — `cs.hentai.cardShadow`, `cardShadowHover` on catalog cards; multi-layer shadow on `HentaiDialog`. Do not copy generic CSS shadow tables from web stacks.
+Use **`context.shadows`** presets — `catalogCard`, `dialog`, `toast`, `contextMenuPanel`. Legacy shadow tints remain on `HentaiColorScheme` during migration. Do not copy generic CSS shadow tables from web stacks.
+
+### Animating fills
+
+`Color.lerp` from `Colors.transparent`（透明黑）会在过渡到浅色 hover 时闪灰。静止态用**目标色 alpha 0**（如 `hoverFill.withAlpha(0)`），勿从 `Colors.transparent` 起播。渐变透明 stop 须与相邻 stop 同色 RGB。范例：`OutlinedMetaChip` borderless hover。
 
 ---
 
 ## Component Specs
 
-Reuse widgets under `app/lib/ui/core/widgets/` before creating primitives.
+Reuse widgets under `app/lib/shared/ui/widgets/` before creating primitives.
 
 | Category | Path |
 |----------|------|
@@ -139,7 +155,7 @@ Reuse widgets under `app/lib/ui/core/widgets/` before creating primitives.
 `CatalogCoverCardShell` → `ComicCard` / `SeriesCard`:
 
 - Border: `borderSubtle` 1px · radius: `tokens.radius.xs` (4)
-- Background: `cs.surface` · rest: `cardShadow` · hover: `cardShadowHover`
+- Background: `cs.surface` · rest/hover shadow tint: `context.shadows.catalogCardRest` / `catalogCardHover` (via `catalogCard(highlighted: …)`)
 - Cover: 2:3 aspect, flush top/sides, no hover scale
 - Info padding: sm L/R/bottom, `spacing.md` gap from cover
 
@@ -156,7 +172,7 @@ Reuse widgets under `app/lib/ui/core/widgets/` before creating primitives.
 
 - Background: `cs.hentai.readerBackground`
 - Floating UI: `floatingUiBackground`
-- **Page image fidelity:** follow `CONTEXT.md` — no unauthorized scaling/filtering
+- **Page image fidelity:** `GLOSSARY.md` → **Page image fidelity**
 
 ---
 
@@ -165,10 +181,14 @@ Reuse widgets under `app/lib/ui/core/widgets/` before creating primitives.
 | Pattern | Guidance |
 |---------|----------|
 | Responsive | `LayoutBuilder` / breakpoint helpers — no fixed viewport widths |
-| Catalog | Grid of `ComicCard` / `SeriesCard`; filters in sidebar or toolbar |
+| Catalog | Grid of `ComicCard` / `SeriesCard`; `LibraryBlocksSliverGroup` |
+| Detail | `DetailPrimaryRowLayout` — compact 单列，宽屏横排 |
+| Settings | **Settings list–detail**（`GLOSSARY.md`）— 隐藏 app sidebar |
 | Reader | Immersive; minimal chrome; respect safe areas on mobile |
 | Sidebar | Expanded 256px / collapsed 72px (`DesktopSidebar`) |
 | Compact nav | Drawer, not a separate Material mobile tree |
+
+**Paths:** `features/<feature>/presentation/views/` · 共享组件 `shared/ui/widgets/` · 布局 `shared/ui/layout/` · **禁止** `views/mobile/` 分树。
 
 ---
 
@@ -193,12 +213,14 @@ Reuse widgets under `app/lib/ui/core/widgets/` before creating primitives.
 - ❌ Layout-shifting hover transforms on cards (shadow change only)
 - ❌ Hard-coded spacing/font sizes outside `context.tokens`
 - ❌ Forking UI on `isDesktop` for page structure (window chrome only)
+- ❌ `AnimatedContainer` / `BoxDecoration` from `Colors.transparent` — see **Animating fills**
+- ❌ Stock `AlertDialog` — use `HentaiDialog` or `overlays/dialog/confirm/`
 
 ---
 
 ## Pre-Delivery Checklist
 
-- [ ] Reused existing widget from `ui/core/widgets/` where applicable
+- [ ] Reused existing widget from `shared/ui/widgets/` where applicable
 - [ ] Tokens from `context.tokens` and `cs.hentai` — no ad-hoc hex/spacing
 - [ ] Lucide icons; consistent 14/24px sizing per context
 - [ ] Hover/transition ~180–220 ms `easeOutCubic`; respect reduced motion

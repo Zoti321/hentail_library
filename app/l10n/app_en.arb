@@ -564,6 +564,14 @@
   "formSeriesItemSortOrderInvalid": "Enter a valid number",
   "seriesDetailNoComics": "No comics in this series",
   "seriesDetailComicsLoadFailed": "Failed to load comic list",
+  "seriesDetailLoadFailed": "Failed to load: {error}",
+  "@seriesDetailLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "seriesDetailUnknown": "Unknown series",
   "seriesDetailNotFound": "Series not found: \"{name}\"",
   "@seriesDetailNotFound": {

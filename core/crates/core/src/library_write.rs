@@ -5,6 +5,14 @@
 //! - Cross-comic bulk library writes hold the lock: library sync, metadata refresh,
 //!   trash / restore / purge, metadata-backup import, and the bulk dictionary /
 //!   facet / reading-history operations.
+//!
+//! Held-lock entry points (keep in sync with ADR-0026):
+//! `sync_library`, `refresh_comic_metadata`, `refresh_series_metadata`,
+//! `refresh_library_metadata`, `apply_comic_metadata_bulk_patch`, `trash_comics`,
+//! `restore_comics`, `purge_comics`, `update_local_library_root`,
+//! `import_comic_metadata`, `rename_tag`, `delete_tags_by_names`, `rename_author`,
+//! `delete_authors_by_names`, `rename_named_facet_name`, `delete_named_facet_by_names`,
+//! `merge_named_facet_name`, `clear_all_reading`.
 //! - Single-comic user writes do not take the lock, so one comic stays editable
 //!   while a library sync runs.
 //! - Single-flight and fail-fast: a second acquisition fails with

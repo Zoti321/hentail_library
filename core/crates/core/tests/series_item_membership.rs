@@ -85,7 +85,7 @@ fn membership_for_member_comic_returns_series_id_and_sort_state() {
 }
 
 /// 锁住 `find_series_item_by_comic_id` / reading context 的 `.one()` 前提：
-/// 一本 Comic 至多属于一个 Series（`CONTEXT.md` 的 Folder series 语义，
+/// 一本 Comic 至多属于一个 Series（`GLOSSARY.md` 的 Folder series 语义，
 /// 由 `series_items` 的 `UNIQUE (comic_id)` 保证）。
 #[test]
 fn series_items_rejects_same_comic_in_two_series() {

@@ -38,5 +38,5 @@ Accepted
 
 ## 参考
 
-- `docs/agents/operations/tag-dictionary-import.md` — JSON 格式与接入步骤
-- `CONTEXT.md` — **Tag dictionary import** 术语
+- `docs/engineering/maintainer.md` — JSON 格式与接入步骤
+- `GLOSSARY.md` — **Tag dictionary import** 术语

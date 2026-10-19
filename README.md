@@ -42,6 +42,8 @@
 
 本仓库为 **Monorepo**：Flutter 应用在 `app/`，Rust 核心位于 `core/`。
 
+贡献者与 Agent 的领域用语以根目录 **`GLOSSARY.md`** 为准（下文「书架」等为用户向口语，不用于 issue/PR/代码注释中的领域概念）。文档地图见 **`CONTRIBUTING.md`**。
+
 ### 首次 / clone 后初始化
 
 Cargokit 通过 `app/rust_builder/rust` 链接到 `core/crates/flutter` 来编译 Rust；该链接不会提交到 Git，需本地创建一次：
@@ -70,7 +72,7 @@ flutter test
 flutter run -d windows   # 或其他平台
 ```
 
-- PR 硬门禁与本地 Gate：仓库根执行 `./scripts/run-gate.sh`（见 `docs/agents/testing.md`）
+- PR 硬门禁与本地 Gate：仓库根执行 `./scripts/run-gate.sh`（见 `docs/engineering/gate.md`）
 - 合并前若改了 UI 或怀疑 widget 回归，再跑全量：`cd app && flutter test`
 - 新增/改动需代码生成的 Dart 模型或 Provider 后，同步跑 `build_runner`（业务持久化在 Rust/SeaORM，无 Drift DAO）
-- PR 说明建议包含：改动背景、核心改动点、测试方式、截图（UI 改动）
+- PR 说明使用仓库 [PR 模板](.github/pull_request_template.md)（Summary / Evidence / Merge danger）

@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-- 产品定位：Home dashboard 是启动后第一屏，但 **Reading history 跨 Library 全局**；浏览与搜索默认作用于 **Current library**（`CONTEXT.md`）。
+- 产品定位：Home dashboard 是启动后第一屏，但 **Reading history 跨 Library 全局**；浏览与搜索默认作用于 **Current library**（`GLOSSARY.md`）。
 - ADR-0014 将空库 onboarding 放在 Home hero，主行动含扫描；多库后 onboarding 应引导 **建库**，扫描下沉到 Library 上下文。
 - 用户期望首页承担：**继续阅读**、**全库态势摘要**（含「某库可能有新 Resource，建议 Library sync」），而非 Current library 语境与常驻扫描。
 

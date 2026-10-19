@@ -1,0 +1,334 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/page_size_menu_button.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_panel_shell.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/anchored_overlay_menu.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/catalog_selection_header_section.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_series_dialog.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
+import 'package:hentai_library/shared/domain/library/library_metadata_refresh_command_port.dart';
+import 'package:hentai_library/shared/di/library_command_providers.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class SeriesDetailHeader extends ConsumerWidget {
+  const SeriesDetailHeader({
+    super.key,
+    required this.series,
+    required this.pageComicIds,
+  });
+
+  final Series series;
+  final List<String> pageComicIds;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final bool selectionActive = ref.watch(
+      catalogSelectionProvider.select((CatalogSelectionState s) => s.active),
+    );
+    final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
+      MediaQuery.sizeOf(context).width,
+    );
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: context.shadows.catalogCardRest,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: SizedBox(
+          height: 48,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            child: selectionActive
+                ? Padding(
+                    key: const ValueKey<String>(
+                      'series-detail-selection-header',
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: CatalogSelectionHeaderToolbar(
+                      layoutTier: layoutTier,
+                      pageComicIds: pageComicIds,
+                    ),
+                  )
+                : _SeriesDetailDefaultHeaderRow(
+                    key: const ValueKey<String>('series-detail-default-header'),
+                    series: series,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SeriesDetailDefaultHeaderRow extends ConsumerWidget {
+  const _SeriesDetailDefaultHeaderRow({super.key, required this.series});
+
+  final Series series;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    final int activePageSize = ref.watch(seriesDetailActivePageSizeProvider);
+    final AppLocalizations l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        children: <Widget>[
+          GhostButton.icon(
+            icon: LucideIcons.arrowLeft,
+            tooltip: l10n.shellBack,
+            semanticLabel: l10n.shellBack,
+            iconSize: 16,
+            size: 32,
+            borderRadius: 8,
+            foregroundColor: context.hentai.iconDefault,
+            hoverColor: theme.hoverColor,
+            overlayColor: theme.hoverColor,
+            onPressed: () => DetailBackHeader.popOrGoLibrary(context),
+          ),
+          const SizedBox(width: 4),
+          _SeriesDetailOverflowMenuButton(series: series),
+          const SizedBox(width: 4),
+          GhostButton.icon(
+            icon: LucideIcons.pencil,
+            tooltip: l10n.seriesDetailEdit,
+            semanticLabel: l10n.seriesDetailEdit,
+            iconSize: 16,
+            size: 32,
+            borderRadius: 8,
+            foregroundColor: context.hentai.iconDefault,
+            hoverColor: theme.hoverColor,
+            overlayColor: theme.hoverColor,
+            onPressed: () {
+              showEditSeriesDialog(context: context, series: series);
+            },
+          ),
+          const Spacer(),
+          PageSizeMenuButton(
+            activePageSize: activePageSize,
+            onSelected: (int pageSize) {
+              ref
+                  .read(seriesDetailPageSizeProvider.notifier)
+                  .setPageSize(pageSize);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeriesDetailOverflowMenuButton extends ConsumerStatefulWidget {
+  const _SeriesDetailOverflowMenuButton({required this.series});
+
+  final Series series;
+
+  @override
+  ConsumerState<_SeriesDetailOverflowMenuButton> createState() =>
+      _SeriesDetailOverflowMenuButtonState();
+}
+
+class _SeriesDetailOverflowMenuButtonState
+    extends ConsumerState<_SeriesDetailOverflowMenuButton> {
+  final AnchoredOverlayMenuController _controller =
+      AnchoredOverlayMenuController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
+    final LibraryMetadataRefreshCommandPort metadataRefresh = ref.read(
+      libraryMetadataRefreshCommandPortProvider,
+    );
+    final bool scanning = ref.watch(libraryScanRunningStateProvider);
+    final bool refreshingThis = metadataRefresh.isRefreshingSeries(
+      widget.series.id,
+    );
+    final bool otherWriteBusy =
+        scanning ||
+        (ref.watch(libraryMetadataRefreshRunningStateProvider) &&
+            !refreshingThis);
+    return AnchoredOverlayMenu(
+      controller: _controller,
+      barrierColor: Colors.transparent,
+      position: AnchoredOverlayMenuPosition.under,
+      menuBuilder: (VoidCallback hideMenu) => PopupMenuPanelShell(
+        width: 200,
+        blurRadius: 6,
+        shadowOffset: const Offset(0, 4),
+        borderRadius: tokens.radius.xs,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _SeriesDetailOverflowMenuItem(
+                icon: LucideIcons.refreshCw,
+                label: refreshingThis
+                    ? l10n.cancelRefreshMetadata
+                    : l10n.refreshMetadata,
+                enabled: !otherWriteBusy,
+                onTap: () {
+                  hideMenu();
+                  if (refreshingThis) {
+                    metadataRefresh.cancel();
+                    return;
+                  }
+                  _refreshMetadata(context);
+                },
+              ),
+              _SeriesDetailOverflowMenuItem(
+                icon: LucideIcons.squareCheck,
+                label: l10n.catalogSelectionEnter,
+                enabled: !otherWriteBusy && widget.series.items.isNotEmpty,
+                onTap: () {
+                  hideMenu();
+                  ref.read(catalogSelectionProvider.notifier).enter();
+                },
+              ),
+              _SeriesDetailOverflowMenuItem(
+                icon: LucideIcons.folderOpen,
+                label: l10n.comicDetailShowInExplorer,
+                onTap: () {
+                  hideMenu();
+                  showInFileExplorer(widget.series.folderPath).catchError((
+                    Object error,
+                    StackTrace stackTrace,
+                  ) {
+                    if (!context.mounted) {
+                      return;
+                    }
+                    if (error is AppException) {
+                      showErrorToast(context, error);
+                      return;
+                    }
+                    showErrorToast(
+                      context,
+                      AppException(
+                        l10n.comicDetailShowInExplorerFailed,
+                        cause: error,
+                        stackTrace: stackTrace,
+                      ),
+                    );
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      child: GhostButton.icon(
+        icon: LucideIcons.ellipsisVertical,
+        tooltip: l10n.libraryMoreActions,
+        semanticLabel: l10n.libraryMoreActionsSemantic,
+        iconSize: 16,
+        size: 32,
+        borderRadius: 8,
+        foregroundColor: context.hentai.iconDefault,
+        hoverColor: theme.hoverColor,
+        overlayColor: theme.hoverColor,
+        onPressed: () => _controller.toggleMenu(),
+      ),
+    );
+  }
+
+  Future<void> _refreshMetadata(BuildContext context) async {
+    try {
+      final MetadataRefreshBatchResult result = await ref
+          .read(libraryMetadataRefreshCommandPortProvider)
+          .refreshSeries(seriesId: widget.series.id, name: widget.series.name);
+      if (!context.mounted) {
+        return;
+      }
+      showMetadataRefreshBatchToast(context, result);
+    } catch (err) {
+      if (context.mounted) {
+        showErrorToast(context, err);
+      }
+    }
+  }
+}
+
+class _SeriesDetailOverflowMenuItem extends StatelessWidget {
+  const _SeriesDetailOverflowMenuItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.enabled = true,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final Color fg = enabled
+        ? context.hentai.iconDefault
+        : context.hentai.iconDefault.withValues(alpha: 0.38);
+    final Color text = enabled
+        ? context.hentai.textPrimary
+        : context.hentai.textPrimary.withValues(alpha: 0.38);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        hoverColor: cs.primary.withAlpha(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: <Widget>[
+              Icon(icon, size: 16, color: fg),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: text,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

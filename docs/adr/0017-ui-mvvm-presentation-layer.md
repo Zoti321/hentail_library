@@ -39,7 +39,7 @@ Flutter UI 已以 Riverpod Notifier/Provider 为主干，但存在以下漂移�
 
 - 各 feature 下 **`state/` 迁入 `view_models/`**，删除空 `state/` 目录。
 - **可变 UI 状态**：类名 `{Noun}Notifier`（如 `SettingsNotifier`），状态类型 `{Noun}State`。
-- **只读聚合 / 组合输出**：函数或类 provider，命名 `{noun}ViewModel` → `{noun}ViewModelProvider`（如现有 `readerPageViewModel`）。
+- **只读聚合 / 组合输出**：函数或类 provider，命名 `{noun}ViewModel` → `{noun}ViewModelProvider`（页面根聚合另见 Facade Provider，如 `readerPageFacadeProvider`）。
 - **分页目录与长任务编排**（Library catalog 分页、Library sync、Metadata refresh）：可保留 `{Noun}Controller` 后缀，表示 orchestration/pagination engine，但须位于 `view_models/`。
 
 **阶段二**
@@ -75,5 +75,5 @@ Flutter UI 已以 Riverpod Notifier/Provider 为主干，但存在以下漂移�
 
 ## References
 
-- `docs/agents/coding-style.md` — Widget 与 Riverpod 命名（随 ADR 同步补充 ViewModel 规则）
-- `docs/agents/testing.md` — ViewModel 层 mock Repo 测试为首选接缝
+- ADR-0017、ADR-0027；`app/test/gate/` 强制执行分层与 import
+- `docs/engineering/gate.md` — ViewModel 层 mock Repo 测试为首选接缝

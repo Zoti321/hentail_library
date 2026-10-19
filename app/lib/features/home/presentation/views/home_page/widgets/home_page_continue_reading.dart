@@ -1,0 +1,288 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hentai_library/shared/di/library_management_providers.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
+import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
+import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
+import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_constants.dart';
+import 'package:hentai_library/shared/ui/widgets/element/card/reading_history_card.dart';
+import 'package:hentai_library/shared/ui/widgets/foundation/horizontal_wheel_scroll_listener.dart';
+
+import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class HomePageContinueReadingSection extends ConsumerWidget {
+  const HomePageContinueReadingSection({
+    super.key,
+    required this.layoutTier,
+    required this.enabled,
+  });
+
+  final HomePageLayoutTier layoutTier;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
+    if (!enabled) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            l10n.homeContinueReading,
+            style: TextStyle(
+              fontSize: tokens.text.titleSm,
+              fontWeight: FontWeight.w600,
+              color: context.hentai.textPrimary,
+            ),
+          ),
+          SizedBox(height: tokens.spacing.sm),
+          SizedBox(
+            height: continueReadingStripHeight + 8,
+            child: const _ContinueReadingSkeleton(),
+          ),
+        ],
+      );
+    }
+    final bool loading = ref.watch(
+      homeContinueReadingTop5StreamProvider.select((
+        AsyncValue<List<HomeContinueReadingEntry>> value,
+      ) {
+        return value.isLoading;
+      }),
+    );
+    final bool hasError = ref.watch(
+      homeContinueReadingTop5StreamProvider.select((
+        AsyncValue<List<HomeContinueReadingEntry>> value,
+      ) {
+        return value.hasError;
+      }),
+    );
+    final List<HistoryGridItem> visible = ref.watch(
+      homeContinueReadingTop5GridItemsProvider,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                l10n.homeContinueReading,
+                style: TextStyle(
+                  fontSize: tokens.text.titleSm,
+                  fontWeight: FontWeight.w600,
+                  color: context.hentai.textPrimary,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => context.go('/history'),
+              child: Text('${l10n.homeViewAllHistory} →'),
+            ),
+          ],
+        ),
+        SizedBox(height: tokens.spacing.sm),
+        SizedBox(
+          height: continueReadingStripHeight + 8,
+          child: _ContinueReadingBody(
+            layoutTier: layoutTier,
+            loading: loading,
+            hasError: hasError,
+            visible: visible,
+            tokens: tokens,
+            colorScheme: colorScheme,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ContinueReadingBody extends StatefulWidget {
+  const _ContinueReadingBody({
+    required this.layoutTier,
+    required this.loading,
+    required this.hasError,
+    required this.visible,
+    required this.tokens,
+    required this.colorScheme,
+  });
+
+  final HomePageLayoutTier layoutTier;
+  final bool loading;
+  final bool hasError;
+  final List<HistoryGridItem> visible;
+  final AppThemeTokens tokens;
+  final ColorScheme colorScheme;
+
+  @override
+  State<_ContinueReadingBody> createState() => _ContinueReadingBodyState();
+}
+
+class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
+  late final ScrollController continueReadingScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    continueReadingScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    continueReadingScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    if (widget.loading) {
+      return const _ContinueReadingSkeleton();
+    }
+    if (widget.hasError) {
+      return Center(
+        child: Text(
+          l10n.shellLoadFailed,
+          style: TextStyle(
+            fontSize: widget.tokens.text.bodySm,
+            color: context.hentai.textSecondary,
+          ),
+        ),
+      );
+    }
+    if (widget.visible.isEmpty) {
+      return Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              LucideIcons.bookOpen,
+              size: 20,
+              color: context.hentai.textTertiary,
+            ),
+            SizedBox(width: widget.tokens.spacing.sm),
+            Text(
+              l10n.homeNoReadingHistory,
+              style: TextStyle(
+                fontSize: widget.tokens.text.bodySm,
+                color: context.hentai.textSecondary,
+              ),
+            ),
+            TextButton(
+              onPressed: () => goCurrentLibraryBrowseFromContext(context),
+              style: TextButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(l10n.homeGoToLibrary),
+            ),
+          ],
+        ),
+      );
+    }
+    return HorizontalWheelScrollListener(
+      controller: continueReadingScrollController,
+      child: ListView.separated(
+        controller: continueReadingScrollController,
+        scrollDirection: Axis.horizontal,
+        itemCount: widget.visible.length,
+        separatorBuilder: (BuildContext context, int index) =>
+            SizedBox(width: widget.tokens.spacing.md),
+        itemBuilder: (BuildContext context, int index) {
+          final HistoryGridItem item = widget.visible[index];
+          return SizedBox(
+            width: continueReadingItemWidthFor(widget.layoutTier),
+            height: continueReadingStripHeight,
+            child: ReadingHistoryCard(
+              comicId: item.comicId,
+              title: item.title,
+              lastReadTime: item.lastReadTime,
+              pageIndex: item.pageIndex,
+              onTap: () => ProviderScope.containerOf(context)
+                  .read(readSessionLaunchPortProvider)
+                  .openComic(comicId: item.comicId),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ContinueReadingSkeleton extends StatelessWidget {
+  const _ContinueReadingSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final Color bar = context.hentai.imagePlaceholder;
+    return ExcludeSemantics(
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 3,
+        separatorBuilder: (BuildContext context, int index) =>
+            SizedBox(width: tokens.spacing.md),
+        itemBuilder: (BuildContext context, int index) {
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: cs.surface,
+              borderRadius: BorderRadius.circular(tokens.radius.xs),
+              border: Border.all(color: context.hentai.borderSubtle),
+            ),
+            child: SizedBox(
+              width: continueReadingItemWidthCompact,
+              height: continueReadingStripHeight,
+              child: Row(
+                children: <Widget>[
+                  ColoredBox(
+                    color: bar,
+                    child: SizedBox(
+                      width: continueReadingStripHeight * 2 / 3,
+                      height: double.infinity,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(tokens.spacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ColoredBox(
+                            color: bar,
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: tokens.text.bodyMd,
+                            ),
+                          ),
+                          SizedBox(height: tokens.spacing.md),
+                          ColoredBox(
+                            color: bar,
+                            child: SizedBox(
+                              width: 96,
+                              height: tokens.text.labelXs,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

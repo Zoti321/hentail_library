@@ -34,7 +34,7 @@ Primary catalog for the **Current library**: series block + comics grid, search 
 ## Interactions
 
 - Filter/sort: end drawer (compact) — do not add bottom sheet Material pattern on desktop widths
-- Card hover: shadow lift only (`cardShadowHover`), no scale
+- Card hover: shadow lift only (`context.shadows.catalogCardHover` / `catalogCard(highlighted: true)`), no scale
 - Right-click → existing `*ContextMenu.show`
 
 ## Anti-Patterns (This Page)

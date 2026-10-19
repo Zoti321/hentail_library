@@ -1,0 +1,111 @@
+import 'dart:math' as math;
+
+import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
+
+enum LibraryLayoutTier { compact, medium, expanded }
+
+/// 库页常规顶栏 ↔ 选择模式顶栏切换时长（对齐桌面短动效）。
+const Duration kLibraryHeaderModeTransitionDuration = Duration(
+  milliseconds: 180,
+);
+
+LibraryLayoutTier libraryLayoutTierForWidth(double width) {
+  if (AppLayoutBreakpoints.isCompact(width)) {
+    return LibraryLayoutTier.compact;
+  }
+  if (AppLayoutBreakpoints.isMedium(width)) {
+    return LibraryLayoutTier.medium;
+  }
+  return LibraryLayoutTier.expanded;
+}
+
+double libraryContentHorizontalPadding(LibraryLayoutTier tier) {
+  return switch (tier) {
+    LibraryLayoutTier.compact => 16,
+    LibraryLayoutTier.medium => 28,
+    LibraryLayoutTier.expanded => 48,
+  };
+}
+
+double libraryPageTitleFontSize(LibraryLayoutTier tier) {
+  return switch (tier) {
+    LibraryLayoutTier.compact => 18,
+    LibraryLayoutTier.medium => 22,
+    LibraryLayoutTier.expanded => 26,
+  };
+}
+
+double libraryToolbarActionSpacing(LibraryLayoutTier tier) {
+  return switch (tier) {
+    LibraryLayoutTier.compact => 4,
+    LibraryLayoutTier.medium => 6,
+    LibraryLayoutTier.expanded => 8,
+  };
+}
+
+bool libraryHeaderShowsCountChips(LibraryLayoutTier tier) {
+  return true;
+}
+
+bool libraryHeaderShowsActiveCountChipOnly(LibraryLayoutTier tier) {
+  return tier == LibraryLayoutTier.compact;
+}
+
+bool libraryHeaderShowsDisplayTargetTabs(LibraryLayoutTier tier) {
+  return tier != LibraryLayoutTier.compact;
+}
+
+bool libraryUsesContentSwitcherBottomBar(LibraryLayoutTier tier) {
+  return tier == LibraryLayoutTier.compact;
+}
+
+double libraryGridMaxCrossAxisExtent(LibraryLayoutTier tier) {
+  return switch (tier) {
+    LibraryLayoutTier.compact => 168,
+    LibraryLayoutTier.medium => 188,
+    LibraryLayoutTier.expanded => 200,
+  };
+}
+
+double libraryGridSpacing(LibraryLayoutTier tier) {
+  return switch (tier) {
+    LibraryLayoutTier.compact => 12,
+    LibraryLayoutTier.medium => 14,
+    LibraryLayoutTier.expanded => 16,
+  };
+}
+
+double libraryPageSizeMenuWidth(LibraryLayoutTier tier, double viewportWidth) {
+  return switch (tier) {
+    LibraryLayoutTier.compact => math.min(viewportWidth - 32, 160),
+    LibraryLayoutTier.medium || LibraryLayoutTier.expanded => 120,
+  };
+}
+
+double libraryOverflowMenuWidth(LibraryLayoutTier tier, double viewportWidth) {
+  return switch (tier) {
+    LibraryLayoutTier.compact => math.min(viewportWidth - 32, 240),
+    LibraryLayoutTier.medium || LibraryLayoutTier.expanded => 200,
+  };
+}
+
+double libraryFilterSortDrawerWidth(
+  LibraryLayoutTier tier,
+  double viewportWidth,
+) {
+  return switch (tier) {
+    LibraryLayoutTier.compact => math.min(
+      math.max(viewportWidth * 0.55, 200),
+      math.min(viewportWidth - 16, 400),
+    ),
+    LibraryLayoutTier.medium => math.min(360, viewportWidth * 0.35),
+    LibraryLayoutTier.expanded => math.min(360, viewportWidth * 0.30),
+  };
+}
+
+double libraryFilterSortDrawerWidthForViewport(double viewportWidth) {
+  return libraryFilterSortDrawerWidth(
+    libraryLayoutTierForWidth(viewportWidth),
+    viewportWidth,
+  );
+}

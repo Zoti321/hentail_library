@@ -36,70 +36,12 @@ def classify(relative: str) -> str:
     p = relative.replace("\\", "/")
     if p.startswith("src/rust/"):
         return "frb_generated"
-    if p.startswith("data/"):
+    if p.startswith("features/"):
+        parts = p.split("/")
+        if len(parts) >= 2:
+            return parts[1]
+    if p.startswith("shared/"):
         return "shared"
-    if p.startswith("domain/"):
-        return "shared"
-    if p.startswith("core/metadata/"):
-        return "metadata_backup"
-    if p.startswith("core/app_data/"):
-        return "app_settings"
-    if p.startswith("core/"):
-        return "shared"
-    if p.startswith("ui/core/"):
-        return "shared"
-    if p == "ui/providers.dart" or p.startswith("ui/providers/"):
-        return "bootstrap"
-    if p.startswith("ui/features/settings/"):
-        return "app_settings"
-    if p.startswith("ui/features/metadata/"):
-        return "named_metadata"
-    if p.startswith("ui/features/library/"):
-        return "library_browse"
-    if p.startswith("ui/features/reader/"):
-        return "read_session"
-    if p.startswith("ui/features/shell/views/home_page/"):
-        return "home"
-    if p.startswith("ui/features/shell/views/history_page"):
-        return "home"
-    if p.startswith("ui/features/shell/view_models/home_"):
-        return "home"
-    if p.startswith("ui/features/shell/view_models/history_"):
-        return "home"
-    if "trash" in p and p.startswith("ui/features/shell/"):
-        return "comic_trash"
-    if p.startswith("ui/features/shell/di/comic_trash"):
-        return "comic_trash"
-    if p.startswith("ui/features/shell/view_models/scan_library_controller"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/metadata_refresh"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/library_scan"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/library_revision"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/library_series_providers"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/current_library_notifier"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/library_reorder_mode"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/view_models/comic_metadata_bulk_patch"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/views/navigation/"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/views/library_scan"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/views/comic_metadata_bulk_patch"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/di/library_sync"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/di/metadata_refresh"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/di/comic_metadata_bulk_patch"):
-        return "library_admin"
-    if p.startswith("ui/features/shell/"):
-        return "bootstrap"
     if p == "main.dart":
         return "bootstrap"
     return "shared"
@@ -126,7 +68,7 @@ def resolve_module(import_path: str) -> str | None:
 
 
 def is_ui_layer(path: str) -> bool:
-    return path.startswith("ui/features/") or path.startswith("ui/core/")
+    return (path.startswith("features/") and "/presentation/" in path) or path.startswith("shared/ui/")
 
 
 def main() -> None:
@@ -137,6 +79,7 @@ def main() -> None:
     ]
 
     domain_to_data: list[str] = []
+    shared_domain_to_features: list[str] = []
     non_data_to_frb: list[str] = []
     browse_to_reading: list[str] = []
     edge_counts: dict[tuple[str, str], int] = defaultdict(int)
@@ -153,13 +96,23 @@ def main() -> None:
             if target is None:
                 continue
 
-            if rel.startswith("domain/") and imp.startswith("data/"):
+            if rel.startswith("shared/domain/") and imp.startswith("shared/data/"):
+                domain_to_data.append(f"{rel} -> {imp}")
+            if rel.startswith("shared/domain/") and imp.startswith("features/"):
+                shared_domain_to_features.append(f"{rel} -> {imp}")
+            if (
+                "/domain/" in rel
+                and rel.startswith("features/")
+                and mod in MODULES
+                and mod not in ("shared", "bootstrap", "frb_generated")
+                and imp.startswith(f"features/{mod}/data/")
+            ):
                 domain_to_data.append(f"{rel} -> {imp}")
 
-            if target == "frb_generated" and not rel.startswith("data/"):
+            if target == "frb_generated" and not rel.startswith("shared/data/"):
                 non_data_to_frb.append(rel)
 
-            if mod == "library_browse" and imp.startswith("domain/reading/"):
+            if mod == "library_browse" and imp.startswith("features/read_session/"):
                 browse_to_reading.append(f"{rel} -> {imp}")
 
             if mod != target and mod in MODULES and target in MODULES:
@@ -182,6 +135,7 @@ def main() -> None:
 
     out = {
         "domain_to_data": sorted(set(domain_to_data)),
+        "shared_domain_to_features": sorted(set(shared_domain_to_features)),
         "non_data_to_frb": sorted(set(non_data_to_frb)),
         "library_browse_to_reading_domain": sorted(set(browse_to_reading)),
         "module_edge_counts": {

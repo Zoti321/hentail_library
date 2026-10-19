@@ -59,7 +59,8 @@ jobs:
       - name: Run full gate
         run: bash scripts/run-gate.sh
 
-  watch-platform-android-pdf:
+  watch-platform-smokes:
+    name: watch · platform smokes
     uses: ./.github/workflows/watch.yml
 
   release-build-windows:

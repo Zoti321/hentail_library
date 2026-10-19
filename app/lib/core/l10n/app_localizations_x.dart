@@ -2,33 +2,33 @@ import 'package:flutter/widgets.dart';
 
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
-import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/format_group.dart';
 
-import 'package:hentai_library/domain/library/scan_interval.dart';
+import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 
-import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 
-import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
 
-import 'package:hentai_library/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 
-import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/shared/domain/library/library_series_sort_option.dart';
 
-import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_serialization_status_filter.dart';
 
-import 'package:hentai_library/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 
-import 'package:hentai_library/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
 
-import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 
-import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 
-import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 
-import 'package:hentai_library/domain/reading/auto_play_mode.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 
-import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 
 import 'package:intl/intl.dart';
 

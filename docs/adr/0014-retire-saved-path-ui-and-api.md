@@ -1,6 +1,6 @@
 # 退役 Saved path / Selected Paths UI 与 Path API
 
-多 Library（ADR-0008）落地后，运行时 Path 已是 `libraries` 表上的薄封装，但 Flutter 仍保留 `/paths`（Selected Paths）与侧栏 Library form 双入口，且 `PathRepository.add` 可绕过 Library form 裸建 Local library。产品叙事与 `CONTEXT` 已只认 Library；继续保留路径页会分裂心智并扩大测试面。
+多 Library（ADR-0008）落地后，运行时 Path 已是 `libraries` 表上的薄封装，但 Flutter 仍保留 `/paths`（Selected Paths）与侧栏 Library form 双入口，且 `PathRepository.add` 可绕过 Library form 裸建 Local library。产品叙事与 `GLOSSARY.md` 已只认 Library；继续保留路径页会分裂心智并扩大测试面。
 
 ## Status
 

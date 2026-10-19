@@ -2162,6 +2162,12 @@ abstract class AppLocalizations {
   /// **'漫画列表加载失败'**
   String get seriesDetailComicsLoadFailed;
 
+  /// No description provided for @seriesDetailLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载失败：{error}'**
+  String seriesDetailLoadFailed(String error);
+
   /// No description provided for @seriesDetailUnknown.
   ///
   /// In zh, this message translates to:

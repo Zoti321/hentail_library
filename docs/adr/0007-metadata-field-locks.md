@@ -81,7 +81,7 @@ Komga 的模型是：字段级锁；编辑自动上锁；未锁定且刷新源�
 
 ## References
 
-- `CONTEXT.md` — Comic metadata form / Series metadata form / Library sync
+- `GLOSSARY.md` — Comic metadata form / Series metadata form / Library sync
 - ADR-0006 — Series item sort order lock
 - ADR-0022 — Comic metadata bulk patch（多值 add / remove / replace 语义现由 `metadata_lock::multi_value` 提供）
 - Komga Edit Metadata — field locks

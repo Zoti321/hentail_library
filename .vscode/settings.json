@@ -1,4 +1,6 @@
 {
+  "dart.projectSearchPaths": ["app"],
+  "rust-analyzer.linkedProjects": ["core/Cargo.toml"],
   "sqltools.connections": [
     {
       "previewLimit": 50,

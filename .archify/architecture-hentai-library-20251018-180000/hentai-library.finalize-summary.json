@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\candidate.json",
+    "sha256": "0059ad52d2ce894c8a6bab9814977138963abbdf95934333d7eaef1731273b3c",
+    "bytes": 5653
+  },
+  "artifact": {
+    "path": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
+    "sha256": "7242d3e6ce7a99ffdecc46c38ddb6cb37c3ee50255f1f666388c5f841e18807e",
+    "bytes": 826166
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.finalize.json",
+    "summaryReceipt": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.finalize-summary.json",
+    "browserCheckReceipt": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.1.0",
+    "availableVersion": "3.1.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-18T10:01:35.680Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 10741,
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "routesOverSuggestedBends": 2
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [],
+      "detours": [
+        {
+          "relationship": {
+            "id": "core-sync-local",
+            "from": "hentai-core",
+            "to": "local-root",
+            "label": "Library sync / 解码",
+            "collectionIndex": 6,
+            "artifactIndex": 7
+          },
+          "bends": 4,
+          "stretch": 1
+        },
+        {
+          "relationship": {
+            "id": "core-read-remote",
+            "from": "hentai-core",
+            "to": "webdav-root",
+            "label": "流式读取",
+            "collectionIndex": 7,
+            "artifactIndex": 8
+          },
+          "bends": 3,
+          "stretch": 1.08
+        }
+      ],
+      "truncated": false
+    },
+    "hints": [
+      "hentai-core → local-root needs 4 bends: move node hentai-core or local-root so they share a row or column with matching centers, or sit diagonally with a clear corner.",
+      "hentai-core → webdav-root needs 3 bends: move node hentai-core or webdav-root so they share a row or column with matching centers, or sit diagonally with a clear corner."
+    ],
+    "repair": "Trace these relationships at the desktop viewport. For Architecture, use references/architecture-layout-repair.md: reflow a blocked main path or tangled connected scene, and repair an isolated defect locally only when the surrounding composition is accepted. Preserve all semantic content and user-fixed geometry. Rerun finalize once after the edit."
+  }
+}

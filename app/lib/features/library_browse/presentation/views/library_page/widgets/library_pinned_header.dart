@@ -1,0 +1,96 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/widgets.dart';
+
+/// 库页可粘连 header：标题、数量 chip、Tab 切换与操作按钮（单行三栏）。
+class LibraryPageHeaderSection extends StatelessWidget {
+  const LibraryPageHeaderSection({
+    super.key,
+    required this.layoutTier,
+    required this.horizontalPadding,
+    this.onOpenFilterSort,
+    this.onOpenNavigation,
+  });
+
+  final LibraryLayoutTier layoutTier;
+  final double horizontalPadding;
+  final VoidCallback? onOpenFilterSort;
+  final VoidCallback? onOpenNavigation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        kLibraryHeaderVerticalPadding,
+        horizontalPadding,
+        kLibraryHeaderVerticalPadding,
+      ),
+      child: LibraryPageHeaderToolbar(
+        layoutTier: layoutTier,
+        onOpenFilterSort: onOpenFilterSort,
+        onOpenNavigation: onOpenNavigation,
+      ),
+    );
+  }
+}
+
+/// Header 底部阴影渐变高度。须画在 delegate 边界内——[SliverPersistentHeader] 会裁掉
+/// 落在 extent 外的 [BoxDecoration.boxShadow]。
+const double kLibraryHeaderShadowGradientHeight = 6;
+
+class LibraryPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
+  LibraryPinnedHeaderDelegate({required this.extent, required this.child});
+
+  final double extent;
+  final Widget child;
+
+  @override
+  double get minExtent => extent;
+
+  @override
+  double get maxExtent => extent;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: cs.surface,
+      child: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          Align(alignment: Alignment.topCenter, child: child),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: kLibraryHeaderShadowGradientHeight,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      ...context.shadows.pinnedHeaderShadowGradient(),
+                    ],
+                    stops: const <double>[0, 0.75, 1],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant LibraryPinnedHeaderDelegate oldDelegate) {
+    return oldDelegate.extent != extent || oldDelegate.child != child;
+  }
+}

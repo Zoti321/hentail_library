@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "11d4b6ba-131f-404c-b3e2-186cc6790d40",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\candidate.json",
+  "output": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
+  "specification": {
+    "sha256": "0059ad52d2ce894c8a6bab9814977138963abbdf95934333d7eaef1731273b3c",
+    "bytes": 5653
+  },
+  "artifact": {
+    "sha256": "7242d3e6ce7a99ffdecc46c38ddb6cb37c3ee50255f1f666388c5f841e18807e",
+    "bytes": 826166
+  }
+}

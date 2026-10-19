@@ -1,0 +1,74 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class DiagnosticModeBanner extends ConsumerWidget {
+  const DiagnosticModeBanner({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool enabled = ref.watch(diagnosticModeProvider);
+    if (!enabled) {
+      return const SizedBox.shrink();
+    }
+
+    final l10n = context.l10n;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Material(
+      color: colorScheme.primary.withValues(alpha: 0.1),
+      child: Container(
+        width: double.infinity,
+        height: 30,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: context.hentai.borderSubtle),
+          ),
+        ),
+        child: Row(
+          children: <Widget>[
+            Icon(LucideIcons.bug, size: 14, color: colorScheme.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.diagnosticModeBannerMessage,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: context.hentai.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            TextButton(
+              onPressed: () =>
+                  ref.read(diagnosticModeProvider.notifier).disable(),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
+              child: Text(l10n.diagnosticModeDisable),
+            ),
+            TextButton(
+              onPressed: () => context.go('/settings'),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
+              child: Text(l10n.navSettings),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

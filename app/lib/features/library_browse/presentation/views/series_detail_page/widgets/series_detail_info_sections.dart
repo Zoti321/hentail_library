@@ -1,0 +1,187 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/ui/layout/detail_meta_chip_band_layout.dart';
+import 'package:hentai_library/shared/ui/layout/detail_meta_chip_row_layout.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
+import 'package:hentai_library/shared/ui/widgets/element/chip/r18_rating_chip.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_info_sections.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/show_author_detail.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// 休刊状态 chip 描边/文字色（仅系列详情页使用）。
+Color _serializationChipAccentColor(
+  HentaiColorScheme semantic,
+  SerializationStatus status,
+) {
+  return switch (status) {
+    SerializationStatus.ongoing => semantic.success,
+    SerializationStatus.ended => semantic.textTertiary,
+    SerializationStatus.hiatus => semantic.serializationHiatus,
+    SerializationStatus.unknown => semantic.textSecondary,
+  };
+}
+
+/// 连载状态 chip；[status] 为 [SerializationStatus.unknown] 时不渲染。
+class SeriesSerializationChip extends StatelessWidget {
+  const SeriesSerializationChip({super.key, required this.status});
+
+  final SerializationStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    if (status == SerializationStatus.unknown) {
+      return const SizedBox.shrink();
+    }
+    final Color accentColor = _serializationChipAccentColor(
+      context.hentai,
+      status,
+    );
+    return OutlinedMetaChip(
+      text: context.l10n.serializationStatusLabel(status),
+      borderColor: accentColor,
+      textColor: accentColor,
+      compact: true,
+    );
+  }
+}
+
+class SeriesDetailSummaryMetaRow extends StatelessWidget {
+  const SeriesDetailSummaryMetaRow({
+    super.key,
+    required this.series,
+    this.hasR18 = false,
+    this.languages = const <String>[],
+  });
+
+  final Series series;
+  final bool hasR18;
+  final List<String> languages;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
+    final bool showSerialization =
+        series.serializationStatus != SerializationStatus.unknown;
+    final bool hasLanguages = languages.isNotEmpty;
+    final List<Widget> chipRowChildren = <Widget>[
+      if (showSerialization)
+        SeriesSerializationChip(status: series.serializationStatus),
+      if (hasR18) const R18RatingChip(),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.spacing.xs,
+      children: <Widget>[
+        // Align with Comic cover-right: Language → status chips → volume.
+        if (hasLanguages) ComicLanguageSegments(languages: languages),
+        SizedBox(
+          height: kSeriesDetailMetaChipRowHeight,
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: tokens.spacing.sm,
+              children: chipRowChildren,
+            ),
+          ),
+        ),
+        Text(
+          l10n.seriesVolumeProgressLabel(
+                current: series.items.length,
+                total: series.totalCount,
+              ) ??
+              l10n.seriesVolumeCountLabel(series.items.length),
+          style: TextStyle(
+            fontSize: tokens.text.bodySm,
+            color: context.hentai.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class SeriesDetailMetadataBlock extends ConsumerWidget {
+  const SeriesDetailMetadataBlock({
+    super.key,
+    required this.authors,
+    required this.tags,
+    this.parodies = const <String>[],
+    this.characters = const <String>[],
+  });
+
+  final List<String> authors;
+  final List<String> tags;
+  final List<String> parodies;
+  final List<String> characters;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
+    final List<Widget> rows = <Widget>[];
+    // Order: Parody → Author → Character → Tag（与 Comic 一致）。
+    if (parodies.isNotEmpty) {
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailParodies,
+          items: parodies,
+          maxRows: kDetailMetaChipBandMaxRowsSingle,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
+        ),
+      );
+    }
+    if (authors.isNotEmpty) {
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailAuthors,
+          items: authors,
+          maxRows: kDetailMetaChipBandMaxRowsSingle,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
+          onItemTap: (String name) {
+            showAuthorDetailByName(context: context, ref: ref, name: name);
+          },
+        ),
+      );
+    }
+    if (characters.isNotEmpty) {
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailCharacters,
+          items: characters,
+          maxRows: kDetailMetaChipBandMaxRowsCharacter,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
+        ),
+      );
+    }
+    if (tags.isNotEmpty) {
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailTags,
+          items: tags,
+          maxRows: kDetailMetaChipBandMaxRowsTag,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
+        ),
+      );
+    }
+    if (rows.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: tokens.spacing.md,
+      children: rows,
+    );
+  }
+}

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
+import 'package:hentai_library/shared/domain/models/app_setting.dart';
 
 /// Maps persisted language preference to [MaterialApp.locale].
 ///

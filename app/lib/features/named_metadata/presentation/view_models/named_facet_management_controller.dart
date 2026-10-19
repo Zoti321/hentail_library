@@ -1,0 +1,263 @@
+import 'dart:async';
+
+import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'named_facet_management_controller.g.dart';
+
+const int kNamedFacetManagementPageSize = 80;
+
+class NamedFacetManagementState {
+  const NamedFacetManagementState({
+    required this.query,
+    required this.items,
+    required this.totalCount,
+    required this.isLoading,
+    required this.isLoadingMore,
+    required this.hasMore,
+    this.attachmentCounts = const <String, int>{},
+    this.error,
+  });
+
+  factory NamedFacetManagementState.initial() =>
+      const NamedFacetManagementState(
+        query: '',
+        items: <String>[],
+        totalCount: 0,
+        isLoading: true,
+        isLoadingMore: false,
+        hasMore: false,
+      );
+
+  final String query;
+  final List<String> items;
+  final int totalCount;
+  final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final Map<String, int> attachmentCounts;
+  final Object? error;
+
+  bool get hasSearchQuery => query.trim().isNotEmpty;
+  bool get isEmpty => !isLoading && items.isEmpty;
+
+  NamedFacetManagementState copyWith({
+    String? query,
+    List<String>? items,
+    int? totalCount,
+    bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMore,
+    Map<String, int>? attachmentCounts,
+    Object? error = _sentinel,
+  }) {
+    return NamedFacetManagementState(
+      query: query ?? this.query,
+      items: items ?? this.items,
+      totalCount: totalCount ?? this.totalCount,
+      isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
+      attachmentCounts: attachmentCounts ?? this.attachmentCounts,
+      error: identical(error, _sentinel) ? this.error : error,
+    );
+  }
+}
+
+const Object _sentinel = Object();
+
+@Riverpod(keepAlive: true)
+class NamedFacetManagementController extends _$NamedFacetManagementController {
+  int _page = 1;
+
+  @override
+  NamedFacetManagementState build(ManagedNamedFacetKind kind) {
+    Future<void>.microtask(refresh);
+    return NamedFacetManagementState.initial();
+  }
+
+  Future<void> refresh() async {
+    state = state.copyWith(isLoading: true, isLoadingMore: false, error: null);
+    try {
+      if (state.hasSearchQuery) {
+        final List<String> all = await ref
+            .read(namedFacetManagementRepoProvider)
+            .listAll(kind);
+        final List<String> filtered = all
+            .where(
+              (String item) =>
+                  nameMatchesPinyinAssistedFilter(item, state.query),
+            )
+            .toList();
+        state = state.copyWith(
+          items: filtered,
+          totalCount: filtered.length,
+          isLoading: false,
+          isLoadingMore: false,
+          hasMore: false,
+          error: null,
+        );
+        unawaited(_prefetchAttachmentCounts(filtered));
+        return;
+      }
+
+      _page = 1;
+      final result = await ref
+          .read(namedFacetManagementRepoProvider)
+          .fetchPage(
+            kind,
+            pageRequest(page: _page, pageSize: kNamedFacetManagementPageSize),
+          );
+      state = state.copyWith(
+        items: result.items,
+        totalCount: result.totalCount,
+        isLoading: false,
+        isLoadingMore: false,
+        hasMore: result.items.length < result.totalCount,
+        error: null,
+      );
+      unawaited(_prefetchAttachmentCounts(result.items));
+    } catch (error) {
+      state = state.copyWith(
+        isLoading: false,
+        isLoadingMore: false,
+        hasMore: false,
+        error: error,
+      );
+    }
+  }
+
+  Future<void> setQuery(String value) async {
+    final String next = value.trim();
+    if (next == state.query) {
+      return;
+    }
+    state = state.copyWith(query: next);
+    await refresh();
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoading ||
+        state.isLoadingMore ||
+        state.hasSearchQuery ||
+        !state.hasMore) {
+      return;
+    }
+    state = state.copyWith(isLoadingMore: true, error: null);
+    try {
+      final int nextPage = _page + 1;
+      final result = await ref
+          .read(namedFacetManagementRepoProvider)
+          .fetchPage(
+            kind,
+            pageRequest(
+              page: nextPage,
+              pageSize: kNamedFacetManagementPageSize,
+            ),
+          );
+      _page = result.page;
+      final List<String> merged = <String>[...state.items, ...result.items];
+      state = state.copyWith(
+        items: merged,
+        totalCount: result.totalCount,
+        isLoadingMore: false,
+        hasMore: merged.length < result.totalCount,
+        error: null,
+      );
+      unawaited(_prefetchAttachmentCounts(result.items));
+    } catch (error) {
+      state = state.copyWith(isLoadingMore: false, error: error);
+    }
+  }
+
+  Future<void> add(String name) async {
+    await ref.read(namedFacetManagementRepoProvider).add(kind, name);
+    await refresh();
+  }
+
+  Future<void> rename(String oldName, String newName) async {
+    final String trimmed = newName.trim();
+    if (trimmed.isEmpty || trimmed == oldName) {
+      return;
+    }
+    await ref
+        .read(namedFacetManagementRepoProvider)
+        .rename(kind, oldName, trimmed);
+    await refresh();
+  }
+
+  Future<void> delete(String name) async {
+    await ref.read(namedFacetManagementRepoProvider).deleteByNames(
+      kind,
+      <String>[name],
+    );
+    await refresh();
+  }
+
+  /// 删掉当前 facet 的全部名字，不受搜索过滤影响。
+  /// Tag 会同时让 [allTagsProvider] 重新读取同一份名字。
+  Future<void> deleteAll() async {
+    final List<String> names = await ref
+        .read(namedFacetManagementRepoProvider)
+        .listAll(kind);
+    if (names.isNotEmpty) {
+      await ref
+          .read(namedFacetManagementRepoProvider)
+          .deleteByNames(kind, names);
+    }
+    if (kind == ManagedNamedFacetKind.tag) {
+      await refreshAfterTagDictionaryChange();
+      return;
+    }
+    await refresh();
+  }
+
+  /// 标签字典变了（清空或导入）之后，管理页和 [allTagsProvider] 读同一份名字。
+  Future<void> refreshAfterTagDictionaryChange() async {
+    ref.invalidate(allTagsProvider);
+    if (kind == ManagedNamedFacetKind.tag) {
+      await refresh();
+    }
+  }
+
+  Future<void> merge({
+    required String targetName,
+    required List<String> sourceNames,
+  }) async {
+    final repo = ref.read(namedFacetManagementRepoProvider);
+    for (final String sourceName in sourceNames) {
+      await repo.merge(kind, sourceName, targetName);
+    }
+    await refresh();
+  }
+
+  Future<int> countAttachments(String name) {
+    return ref
+        .read(namedFacetManagementRepoProvider)
+        .countAttachments(kind, name);
+  }
+
+  Future<void> _prefetchAttachmentCounts(List<String> names) async {
+    if (kind == ManagedNamedFacetKind.author || names.isEmpty) {
+      return;
+    }
+    final Map<String, int> next = Map<String, int>.of(state.attachmentCounts);
+    await Future.wait(
+      names.map((String name) async {
+        try {
+          next[name] = await ref
+              .read(namedFacetManagementRepoProvider)
+              .countAttachments(kind, name);
+        } catch (_) {}
+      }),
+    );
+    if (!ref.mounted) {
+      return;
+    }
+    state = state.copyWith(attachmentCounts: next);
+  }
+}

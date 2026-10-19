@@ -8,13 +8,17 @@ import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/logging/app_logging.dart';
 import 'package:hentai_library/core/util/app_window_title.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/data/adapters/frb_zone_guard.dart';
+import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/adapters/frb_zone_guard.dart';
 import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/api/logging.dart';
 import 'package:hentai_library/src/rust/frb_generated.dart';
-import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/ui/features/shell/views/app.dart';
+import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
+import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -43,19 +47,21 @@ Future<void> _prepareApp() async {
 
   await RustLib.init();
 
+  final appDataDir = await getApplicationSupportDirectory();
+  // Log file setup must not gate the database. A denied log path used to skip
+  // init_db, and every later call then failed with "init_db 尚未调用".
   try {
-    final appDataDir = await getApplicationSupportDirectory();
     guardFrbSync(
       () => configureRustLogFrb(appDataDir: appDataDir.path),
       fallbackMessage: 'Rust 日志初始化失败',
     );
-    guardFrbSync(
-      () => initDbFrb(appDataDir: appDataDir.path, dbFileName: 'my_database'),
-      fallbackMessage: '数据库初始化失败',
-    );
   } catch (e, st) {
-    logError(AppLog.dataFrb(), 'Rust 初始化失败', e, st);
+    logError(AppLog.dataFrb(), 'Rust 日志初始化失败', e, st);
   }
+  guardFrbSync(
+    () => initDbFrb(appDataDir: appDataDir.path, dbFileName: 'my_database'),
+    fallbackMessage: '数据库初始化失败',
+  );
 
   configureGlobalImageCache();
 }
@@ -104,7 +110,13 @@ class _BootstrapApp extends StatelessWidget {
             ),
           );
         }
-        return const MyApp();
+        return MyApp(
+          overrides: <Override>[
+            ...dataProviderOverrides(),
+            ...sharedLibraryStateOverrides(),
+            ...bootstrapCompositionOverrides(),
+          ],
+        );
       },
     );
   }

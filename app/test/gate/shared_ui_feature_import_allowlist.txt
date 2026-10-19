@@ -1,0 +1,1 @@
+# Paths relative to app/lib. Empty allowlist: shared UI must not import features (ADR-0027 phase 2).

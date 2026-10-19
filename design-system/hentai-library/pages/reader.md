@@ -7,7 +7,7 @@
 
 ## Purpose
 
-Immersive comic reading: paged/scroll modes, chrome overlay, series nav, settings, auto-play. **Page image fidelity** per `CONTEXT.md` is mandatory.
+Immersive comic reading: paged/scroll modes, chrome overlay, series nav, settings, auto-play. Mandatory: `GLOSSARY.md` → **Page image fidelity**.
 
 ## Layout
 
@@ -15,7 +15,7 @@ Immersive comic reading: paged/scroll modes, chrome overlay, series nav, setting
 - Background: `cs.hentai.readerBackground` (`#09090B`)
 - Full-screen scaffold; shell sidebar hidden
 - Chrome: `ReaderTopBar`, `ReaderBottomBar`, `ReaderFloatingPanel` — toggle visibility; `keepControlsOpen` route arg
-- Content: `ReaderContent` + `ReaderImageItem` — no unauthorized scaling/filtering
+- Content: `ReaderContent` + `ReaderImageItem` (see **Page image fidelity** in `GLOSSARY.md`)
 
 ## Components
 
