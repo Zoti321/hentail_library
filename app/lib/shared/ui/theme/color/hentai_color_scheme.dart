@@ -26,8 +26,6 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
     required this.borderStrong,
     required this.inputBorder,
     required this.inputBorderActive,
-    required this.cardShadow,
-    required this.cardShadowHover,
     required this.imagePlaceholder,
     required this.imageFallback,
     required this.success,
@@ -64,7 +62,6 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
     required this.contextMenuMutedText,
     required this.contextMenuHover,
     required this.contextMenuDanger,
-    required this.contextMenuShadow,
   });
 
   final Color hoverBackground;
@@ -85,13 +82,6 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
   final Color borderStrong;
   final Color inputBorder;
   final Color inputBorderActive;
-
-  /// Shadow tint for catalog cards (rest). Prefer [AppShadowTokens.catalogCard].
-  final Color cardShadow;
-
-  /// Shadow tint for catalog cards (hover). Prefer [AppShadowTokens.catalogCard].
-  final Color cardShadowHover;
-
   final Color imagePlaceholder;
   final Color imageFallback;
   final Color success;
@@ -130,7 +120,6 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
   final Color contextMenuMutedText;
   final Color contextMenuHover;
   final Color contextMenuDanger;
-  final Color contextMenuShadow;
 
   static const HentaiColorScheme light = HentaiColorScheme(
     hoverBackground: Color(0xFFFCFCFD),
@@ -151,8 +140,6 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
     borderStrong: Color(0xFFA8ADB4),
     inputBorder: Color(0xFFEDEFF2),
     inputBorderActive: Color(0xFF005FB8),
-    cardShadow: Color(0x0F000000),
-    cardShadowHover: Color(0x20000000),
     imagePlaceholder: Color(0xFFECEEF1),
     imageFallback: Color(0xFFDDE1E6),
     success: Color(0xFF4CAF50),
@@ -189,7 +176,6 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
     contextMenuMutedText: Color(0xFF57606A),
     contextMenuHover: Color(0xFFEAEFF4),
     contextMenuDanger: Color(0xFFCF222E),
-    contextMenuShadow: Color(0x29000000),
   );
 
   static const HentaiColorScheme dark = HentaiColorScheme(
@@ -211,8 +197,6 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
     borderStrong: Color(0xFF707070),
     inputBorder: Color(0xFF404040),
     inputBorderActive: Color(0xFF6EB3FF),
-    cardShadow: Color(0x99000000),
-    cardShadowHover: Color(0xE6000000),
     imagePlaceholder: Color(0xFF3A3A3A),
     imageFallback: Color(0xFF4A4A4A),
     success: Color(0xFF4CAF50),
@@ -249,7 +233,6 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
     contextMenuMutedText: Color(0xFF768390),
     contextMenuHover: Color(0xFF3D444D),
     contextMenuDanger: Color(0xFFF47067),
-    contextMenuShadow: Color(0x7A010409),
   );
 
   static HentaiColorScheme forBrightness(Brightness brightness) =>

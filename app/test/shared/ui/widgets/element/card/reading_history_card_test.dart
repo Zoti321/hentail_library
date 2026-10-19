@@ -17,6 +17,7 @@ void main() {
     (WidgetTester tester) async {
       final ThemeData theme = buildAppTheme(Brightness.light);
       final HentaiColorScheme h = theme.hentai;
+      final AppShadowTokens shadows = theme.shadows;
 
       await tester.pumpWidget(
         ProviderScope(
@@ -49,7 +50,7 @@ void main() {
 
       BoxDecoration decoration = _cardDecoration(tester);
       expect(_borderColor(decoration), h.borderSubtle);
-      expect(decoration.boxShadow!.single.color, h.cardShadow);
+      expect(decoration.boxShadow!.single.color, shadows.catalogCardRest);
       expect(decoration.boxShadow!.single.blurRadius, 2);
 
       final TestGesture mouse = await tester.createGesture(
@@ -63,7 +64,7 @@ void main() {
 
       decoration = _cardDecoration(tester);
       expect(_borderColor(decoration), h.borderSubtle);
-      expect(decoration.boxShadow!.single.color, h.cardShadowHover);
+      expect(decoration.boxShadow!.single.color, shadows.catalogCardHover);
       expect(decoration.boxShadow!.single.blurRadius, 4);
     },
   );
@@ -80,6 +81,7 @@ void main() {
 
     final ThemeData theme = buildAppTheme(Brightness.light);
     final HentaiColorScheme h = theme.hentai;
+    final AppShadowTokens shadows = theme.shadows;
 
     await tester.pumpWidget(
       ProviderScope(
@@ -112,7 +114,7 @@ void main() {
 
     BoxDecoration decoration = _cardDecoration(tester);
     expect(decoration.color, theme.colorScheme.surface);
-    expect(decoration.boxShadow!.single.color, h.cardShadow);
+    expect(decoration.boxShadow!.single.color, shadows.catalogCardRest);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.pump();
@@ -120,7 +122,7 @@ void main() {
 
     decoration = _cardDecoration(tester);
     expect(decoration.color, theme.colorScheme.surfaceContainer);
-    expect(decoration.boxShadow!.single.color, h.cardShadowHover);
+    expect(decoration.boxShadow!.single.color, shadows.catalogCardHover);
 
     await tester.tap(find.byType(ReadingHistoryCard));
     await tester.pump();
@@ -133,7 +135,7 @@ void main() {
     );
     decoration = _cardDecoration(tester);
     expect(decoration.color, theme.colorScheme.surface);
-    expect(decoration.boxShadow!.single.color, h.cardShadow);
+    expect(decoration.boxShadow!.single.color, shadows.catalogCardRest);
   });
 
   testWidgets('wraps card chrome in a RepaintBoundary', (

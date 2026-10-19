@@ -155,7 +155,7 @@ Reuse widgets under `app/lib/shared/ui/widgets/` before creating primitives.
 `CatalogCoverCardShell` → `ComicCard` / `SeriesCard`:
 
 - Border: `borderSubtle` 1px · radius: `tokens.radius.xs` (4)
-- Background: `cs.surface` · rest: `cardShadow` · hover: `cardShadowHover`
+- Background: `cs.surface` · rest/hover shadow tint: `context.shadows.catalogCardRest` / `catalogCardHover` (via `catalogCard(highlighted: …)`)
 - Cover: 2:3 aspect, flush top/sides, no hover scale
 - Info padding: sm L/R/bottom, `spacing.md` gap from cover
 

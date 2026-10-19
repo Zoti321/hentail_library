@@ -28,8 +28,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
   Color get borderStrong;
   Color get inputBorder;
   Color get inputBorderActive;
-  Color get cardShadow;
-  Color get cardShadowHover;
   Color get imagePlaceholder;
   Color get imageFallback;
   Color get success;
@@ -66,7 +64,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
   Color get contextMenuMutedText;
   Color get contextMenuHover;
   Color get contextMenuDanger;
-  Color get contextMenuShadow;
 
   @override
   HentaiColorScheme copyWith({
@@ -88,8 +85,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
     Color? borderStrong,
     Color? inputBorder,
     Color? inputBorderActive,
-    Color? cardShadow,
-    Color? cardShadowHover,
     Color? imagePlaceholder,
     Color? imageFallback,
     Color? success,
@@ -126,7 +121,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
     Color? contextMenuMutedText,
     Color? contextMenuHover,
     Color? contextMenuDanger,
-    Color? contextMenuShadow,
   }) {
     return HentaiColorScheme(
       hoverBackground: hoverBackground ?? this.hoverBackground,
@@ -148,8 +142,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
       borderStrong: borderStrong ?? this.borderStrong,
       inputBorder: inputBorder ?? this.inputBorder,
       inputBorderActive: inputBorderActive ?? this.inputBorderActive,
-      cardShadow: cardShadow ?? this.cardShadow,
-      cardShadowHover: cardShadowHover ?? this.cardShadowHover,
       imagePlaceholder: imagePlaceholder ?? this.imagePlaceholder,
       imageFallback: imageFallback ?? this.imageFallback,
       success: success ?? this.success,
@@ -194,7 +186,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
       contextMenuMutedText: contextMenuMutedText ?? this.contextMenuMutedText,
       contextMenuHover: contextMenuHover ?? this.contextMenuHover,
       contextMenuDanger: contextMenuDanger ?? this.contextMenuDanger,
-      contextMenuShadow: contextMenuShadow ?? this.contextMenuShadow,
     );
   }
 
@@ -235,8 +226,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
         other.inputBorderActive,
         t,
       )!,
-      cardShadow: Color.lerp(cardShadow, other.cardShadow, t)!,
-      cardShadowHover: Color.lerp(cardShadowHover, other.cardShadowHover, t)!,
       imagePlaceholder: Color.lerp(
         imagePlaceholder,
         other.imagePlaceholder,
@@ -365,11 +354,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
         other.contextMenuDanger,
         t,
       )!,
-      contextMenuShadow: Color.lerp(
-        contextMenuShadow,
-        other.contextMenuShadow,
-        t,
-      )!,
     );
   }
 
@@ -446,14 +430,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
             const DeepCollectionEquality().equals(
               inputBorderActive,
               other.inputBorderActive,
-            ) &&
-            const DeepCollectionEquality().equals(
-              cardShadow,
-              other.cardShadow,
-            ) &&
-            const DeepCollectionEquality().equals(
-              cardShadowHover,
-              other.cardShadowHover,
             ) &&
             const DeepCollectionEquality().equals(
               imagePlaceholder,
@@ -589,10 +565,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
             const DeepCollectionEquality().equals(
               contextMenuDanger,
               other.contextMenuDanger,
-            ) &&
-            const DeepCollectionEquality().equals(
-              contextMenuShadow,
-              other.contextMenuShadow,
             ));
   }
 
@@ -618,8 +590,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
       const DeepCollectionEquality().hash(borderStrong),
       const DeepCollectionEquality().hash(inputBorder),
       const DeepCollectionEquality().hash(inputBorderActive),
-      const DeepCollectionEquality().hash(cardShadow),
-      const DeepCollectionEquality().hash(cardShadowHover),
       const DeepCollectionEquality().hash(imagePlaceholder),
       const DeepCollectionEquality().hash(imageFallback),
       const DeepCollectionEquality().hash(success),
@@ -656,7 +626,6 @@ mixin _$HentaiColorSchemeTailorMixin on ThemeExtension<HentaiColorScheme> {
       const DeepCollectionEquality().hash(contextMenuMutedText),
       const DeepCollectionEquality().hash(contextMenuHover),
       const DeepCollectionEquality().hash(contextMenuDanger),
-      const DeepCollectionEquality().hash(contextMenuShadow),
     ]);
   }
 }

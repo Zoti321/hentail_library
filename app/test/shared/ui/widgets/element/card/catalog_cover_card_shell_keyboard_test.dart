@@ -56,6 +56,7 @@ void main() {
     final ThemeData theme = buildAppTheme(Brightness.light);
     final ColorScheme cs = theme.colorScheme;
     final HentaiColorScheme h = theme.hentai;
+    final AppShadowTokens shadows = theme.shadows;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -77,7 +78,7 @@ void main() {
 
     BoxDecoration idle = _cardDecoration(tester);
     expect(_borderColor(idle), h.borderSubtle);
-    expect(idle.boxShadow!.single.color, h.cardShadow);
+    expect(idle.boxShadow!.single.color, shadows.catalogCardRest);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.pump();
@@ -85,7 +86,7 @@ void main() {
 
     final BoxDecoration focused = _cardDecoration(tester);
     expect(_borderColor(focused), cs.primary);
-    expect(focused.boxShadow!.single.color, h.cardShadowHover);
+    expect(focused.boxShadow!.single.color, shadows.catalogCardHover);
   });
 
   testWidgets('pointer tap unfocuses and restores idle chrome', (
@@ -94,6 +95,7 @@ void main() {
     final ThemeData theme = buildAppTheme(Brightness.light);
     final ColorScheme cs = theme.colorScheme;
     final HentaiColorScheme h = theme.hentai;
+    final AppShadowTokens shadows = theme.shadows;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -134,7 +136,7 @@ void main() {
     );
     final BoxDecoration idle = _cardDecoration(tester);
     expect(_borderColor(idle), h.borderSubtle);
-    expect(idle.boxShadow!.single.color, h.cardShadow);
+    expect(idle.boxShadow!.single.color, shadows.catalogCardRest);
   });
 }
 
