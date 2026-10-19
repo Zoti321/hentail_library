@@ -212,4 +212,3 @@ String _formatSortOrder(double value) {
   }
   return value.toString();
 }
-

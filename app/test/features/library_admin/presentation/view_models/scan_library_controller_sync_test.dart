@@ -59,8 +59,7 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final int revisionBefore =
-        container.read(libraryRevisionProvider).revision;
+    final int revisionBefore = container.read(libraryRevisionProvider).revision;
     await container
         .read(scanLibraryControllerProvider.notifier)
         .start(promptStorageAccess: false);
@@ -87,8 +86,7 @@ void main() {
     addTearDown(container.dispose);
     controller = container.read(scanLibraryControllerProvider.notifier);
 
-    final int revisionBefore =
-        container.read(libraryRevisionProvider).revision;
+    final int revisionBefore = container.read(libraryRevisionProvider).revision;
     await controller.start(promptStorageAccess: false);
     final int revisionAfter = container.read(libraryRevisionProvider).revision;
 

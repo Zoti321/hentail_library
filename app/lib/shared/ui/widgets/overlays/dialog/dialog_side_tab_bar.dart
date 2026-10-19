@@ -39,7 +39,10 @@ class DialogSideTabBar extends StatelessWidget {
         decoration: showDivider
             ? BoxDecoration(
                 border: Border(
-                  right: BorderSide(color: context.hentai.borderSubtle, width: 1),
+                  right: BorderSide(
+                    color: context.hentai.borderSubtle,
+                    width: 1,
+                  ),
                 ),
               )
             : const BoxDecoration(),

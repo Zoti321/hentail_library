@@ -12,7 +12,9 @@ void main() {
   final List<ImportViolation> all = collectImportViolations(libDir);
   final List<String> keys = violationKeySet(ratchetViolations(all)).toList()
     ..sort();
-  final File out = File(p.join('test', 'gate', 'import_boundary_baseline.json'));
+  final File out = File(
+    p.join('test', 'gate', 'import_boundary_baseline.json'),
+  );
   out.writeAsStringSync(const JsonEncoder.withIndent('  ').convert(keys));
   print('Wrote ${keys.length} baseline entries to ${out.path}');
   final int structural = structuralViolations(all).length;

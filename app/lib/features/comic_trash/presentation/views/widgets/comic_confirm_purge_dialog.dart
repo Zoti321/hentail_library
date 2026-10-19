@@ -55,7 +55,10 @@ class ComicConfirmPurgeDialog extends HookWidget {
                 counts.local > 0
                     ? l10n.comicDetailDeleteLocalAcknowledge
                     : l10n.comicPurgeRemoteAcknowledge,
-                style: TextStyle(fontSize: 14, color: context.hentai.textPrimary),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: context.hentai.textPrimary,
+                ),
               ),
             ),
           ],

@@ -153,7 +153,9 @@ class DesktopSidebar extends HookWidget {
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: context.hentai.sidebarBackground,
-            border: Border(right: BorderSide(color: context.hentai.borderSubtle)),
+            border: Border(
+              right: BorderSide(color: context.hentai.borderSubtle),
+            ),
           ),
           padding: EdgeInsets.fromLTRB(
             tokens.spacing.sm,
@@ -253,15 +255,21 @@ class _SidebarButtonState extends State<_SidebarButton> {
     final Color idleBackground = context.hentai.sidebarBackground;
     final Color backgroundColor = widget.isActive
         ? context.hentai.sidebarItemActiveBackground
-        : (_isHovered ? context.hentai.sidebarItemHoverBackground : idleBackground);
+        : (_isHovered
+              ? context.hentai.sidebarItemHoverBackground
+              : idleBackground);
 
     final Color textColor = widget.isActive
         ? context.hentai.textPrimary
-        : (_isHovered ? context.hentai.textPrimary : context.hentai.textSecondary);
+        : (_isHovered
+              ? context.hentai.textPrimary
+              : context.hentai.textSecondary);
 
     final Color iconColor = widget.isActive
         ? context.hentai.textPrimary
-        : (_isHovered ? context.hentai.textPrimary : context.hentai.textSecondary);
+        : (_isHovered
+              ? context.hentai.textPrimary
+              : context.hentai.textSecondary);
 
     final Widget actionable = Semantics(
       button: true,
@@ -302,7 +310,8 @@ class _SidebarButtonState extends State<_SidebarButton> {
                     boxShadow: widget.isActive
                         ? <BoxShadow>[
                             BoxShadow(
-                              color: context.hentai.sidebarItemActiveShadowColor,
+                              color:
+                                  context.hentai.sidebarItemActiveShadowColor,
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),

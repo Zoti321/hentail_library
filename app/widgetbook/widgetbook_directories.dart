@@ -67,15 +67,9 @@ List<WidgetbookNode> buildWidgetbookDirectories() {
                   title: '示例对话框',
                   content: const Text('用于预览 token 与阴影分层。'),
                   actions: <Widget>[
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('取消'),
-                    ),
+                    TextButton(onPressed: () {}, child: const Text('取消')),
                     const SizedBox(width: 8),
-                    FilledButton(
-                      onPressed: () {},
-                      child: const Text('确定'),
-                    ),
+                    FilledButton(onPressed: () {}, child: const Text('确定')),
                   ],
                 ),
               ),
@@ -90,9 +84,7 @@ List<WidgetbookNode> buildWidgetbookDirectories() {
               builder: (BuildContext context) => SizedBox(
                 width: 160,
                 child: CatalogCoverCardShell(
-                  cover: ColoredBox(
-                    color: context.hentai.imagePlaceholder,
-                  ),
+                  cover: ColoredBox(color: context.hentai.imagePlaceholder),
                   info: (bool _) => Text(
                     '示例标题',
                     style: TextStyle(

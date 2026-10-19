@@ -149,11 +149,7 @@ class MetadataBackupStoragePathRow extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     return SettingsRow(
       layoutTier: layoutTier,
-      icon: Icon(
-        LucideIcons.folder,
-        size: 20,
-        color: theme.hentai.iconDefault,
-      ),
+      icon: Icon(LucideIcons.folder, size: 20, color: theme.hentai.iconDefault),
       label: l10n.settingsMetadataBackupStoragePathLabel,
       description: storagePath,
     );
@@ -181,11 +177,7 @@ class MetadataBackupLastBackupRow extends ConsumerWidget {
 
     return SettingsRow(
       layoutTier: layoutTier,
-      icon: Icon(
-        LucideIcons.clock,
-        size: 20,
-        color: theme.hentai.iconDefault,
-      ),
+      icon: Icon(LucideIcons.clock, size: 20, color: theme.hentai.iconDefault),
       label: l10n.settingsMetadataBackupLastBackupLabel,
       description: description,
     );
@@ -203,11 +195,7 @@ class MetadataBackupNowRow extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     return SettingsRow(
       layoutTier: layoutTier,
-      icon: Icon(
-        LucideIcons.save,
-        size: 20,
-        color: theme.hentai.iconDefault,
-      ),
+      icon: Icon(LucideIcons.save, size: 20, color: theme.hentai.iconDefault),
       label: l10n.settingsMetadataBackupNowLabel,
       description: l10n.settingsMetadataBackupNowDescription,
       onRowTap: () async {
@@ -284,11 +272,7 @@ class MetadataExportRow extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     return SettingsRow(
       layoutTier: layoutTier,
-      icon: Icon(
-        LucideIcons.upload,
-        size: 20,
-        color: theme.hentai.iconDefault,
-      ),
+      icon: Icon(LucideIcons.upload, size: 20, color: theme.hentai.iconDefault),
       label: l10n.settingsMetadataBackupExportLabel,
       description: l10n.settingsMetadataBackupExportDescription,
       onRowTap: () => runMetadataExportFlow(

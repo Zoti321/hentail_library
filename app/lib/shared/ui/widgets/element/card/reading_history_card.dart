@@ -92,7 +92,10 @@ class ReadingHistoryCard extends HookConsumerWidget {
                 decoration: BoxDecoration(
                   color: cardBackground,
                   borderRadius: cardRadius,
-                  border: Border.all(color: context.hentai.borderSubtle, width: 1),
+                  border: Border.all(
+                    color: context.hentai.borderSubtle,
+                    width: 1,
+                  ),
                   boxShadow: cardShadows,
                 ),
                 child: ClipRRect(

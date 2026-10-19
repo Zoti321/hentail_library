@@ -13,10 +13,7 @@ import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 
 class _ScriptedRefreshAdapter implements MetadataRefreshPort {
-  _ScriptedRefreshAdapter({
-    this.onRefreshComic,
-    this.onRefreshLibrary,
-  });
+  _ScriptedRefreshAdapter({this.onRefreshComic, this.onRefreshLibrary});
 
   final Future<void> Function(String comicId)? onRefreshComic;
   final Future<MetadataRefreshBatchResult> Function(String libraryId)?
@@ -83,7 +80,9 @@ void main() {
         libraryRevisionPortProvider.overrideWithValue(
           _FakeLibraryRevisionPort(events),
         ),
-        scanLibraryControllerProvider.overrideWith(_IdleScanLibraryController.new),
+        scanLibraryControllerProvider.overrideWith(
+          _IdleScanLibraryController.new,
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -117,7 +116,9 @@ void main() {
         libraryRevisionPortProvider.overrideWithValue(
           _FakeLibraryRevisionPort(events),
         ),
-        scanLibraryControllerProvider.overrideWith(_IdleScanLibraryController.new),
+        scanLibraryControllerProvider.overrideWith(
+          _IdleScanLibraryController.new,
+        ),
       ],
     );
     addTearDown(container.dispose);

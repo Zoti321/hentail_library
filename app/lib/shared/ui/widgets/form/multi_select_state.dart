@@ -480,7 +480,11 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
             padding: EdgeInsets.only(top: tokens.spacing.sm),
             child: Row(
               children: [
-                Icon(LucideIcons.circleAlert, size: 14, color: context.hentai.error),
+                Icon(
+                  LucideIcons.circleAlert,
+                  size: 14,
+                  color: context.hentai.error,
+                ),
                 SizedBox(width: tokens.spacing.sm),
                 Text(
                   widget.copy.listLoadFailed,
@@ -507,4 +511,3 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
     );
   }
 }
-

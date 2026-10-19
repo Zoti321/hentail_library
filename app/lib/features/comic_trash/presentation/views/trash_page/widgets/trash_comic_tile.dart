@@ -68,7 +68,9 @@ class TrashComicTile extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(tokens.radius.xs),
                         side: BorderSide(
-                          color: selected ? cs.primary : context.hentai.borderSubtle,
+                          color: selected
+                              ? cs.primary
+                              : context.hentai.borderSubtle,
                         ),
                       ),
                       child: InkWell(

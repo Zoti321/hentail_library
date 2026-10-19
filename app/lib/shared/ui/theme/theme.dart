@@ -82,12 +82,7 @@ ThemeData buildAppTheme(Brightness brightness) {
         TargetPlatform.windows: DesktopFadeThroughPageTransitionsBuilder(),
       },
     ),
-    extensions: <ThemeExtension<dynamic>>[
-      tokens,
-      semantic,
-      shadows,
-      motion,
-    ],
+    extensions: <ThemeExtension<dynamic>>[tokens, semantic, shadows, motion],
   );
 }
 

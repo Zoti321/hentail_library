@@ -7,7 +7,7 @@ use sea_orm::{
     Statement, TransactionTrait,
 };
 
-use crate::comic::{now_ms};
+use crate::comic::now_ms;
 use crate::db::{connection, map_db_err};
 use crate::entity::{app_prefs, libraries, prelude::*};
 use crate::error::HentaiError;
@@ -16,9 +16,9 @@ use crate::sync::writer::delete_comics_side_effects;
 
 use super::dto::{
     library_id_from_root, library_name_from_root, library_name_from_webdav_root, model_to_dto,
-    serialize_format_groups, DEFAULT_FORMAT_GROUPS, KIND_LOCAL, KIND_REMOTE,
-    PREF_CURRENT_LIBRARY_ID, REMOTE_DEFAULT_FORMAT_GROUPS, LibraryDto, LibrarySidebarPlacement,
-    ScanInterval,
+    serialize_format_groups, LibraryDto, LibrarySidebarPlacement, ScanInterval,
+    DEFAULT_FORMAT_GROUPS, KIND_LOCAL, KIND_REMOTE, PREF_CURRENT_LIBRARY_ID,
+    REMOTE_DEFAULT_FORMAT_GROUPS,
 };
 use super::local_root_update::ensure_local_root_not_nested;
 use super::webdav_root::{library_id_from_webdav_root, normalize_webdav_root};
@@ -280,7 +280,6 @@ pub async fn update_remote_library(
 
     update_existing_remote(model, &root, &user, allow_http).await
 }
-
 
 pub(crate) async fn update_existing_remote(
     model: libraries::Model,

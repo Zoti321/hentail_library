@@ -117,7 +117,10 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
                     child: Text(
                       resolvedTitle,
                       key: ValueKey<String>(resolvedTitle),
-                      style: buildSettingsPageTitleStyle(context.hentai, layoutTier),
+                      style: buildSettingsPageTitleStyle(
+                        context.hentai,
+                        layoutTier,
+                      ),
                     ),
                   ),
                 ],

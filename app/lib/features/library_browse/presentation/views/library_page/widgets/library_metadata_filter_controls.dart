@@ -138,7 +138,9 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                           decoration: InputDecoration(
                             isDense: true,
                             hintText: l10n.libraryMetadataFilterSearchHint,
-                            hintStyle: TextStyle(color: context.hentai.textTertiary),
+                            hintStyle: TextStyle(
+                              color: context.hentai.textTertiary,
+                            ),
                             prefixIcon: Icon(
                               LucideIcons.search,
                               size: 16,

@@ -125,7 +125,9 @@ final ColorScheme _baseDarkColorScheme = buildAppColorScheme(
 );
 
 ColorScheme buildBaseColorScheme(Brightness brightness) =>
-    brightness == Brightness.dark ? _baseDarkColorScheme : _baseLightColorScheme;
+    brightness == Brightness.dark
+    ? _baseDarkColorScheme
+    : _baseLightColorScheme;
 
 ColorScheme buildAppColorScheme({
   required Brightness brightness,

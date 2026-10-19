@@ -111,9 +111,8 @@ class LibrariesSidebarReorderPane extends HookConsumerWidget {
                 borderRadius: tokens.radius.sm,
                 foregroundColor: context.hentai.textSecondary,
                 hoverColor: context.hentai.sidebarItemHoverBackground,
-                overlayColor: context.hentai.sidebarItemHoverBackground.withAlpha(
-                  110,
-                ),
+                overlayColor: context.hentai.sidebarItemHoverBackground
+                    .withAlpha(110),
                 delayTooltipThreeSeconds: true,
                 onPressed: () =>
                     ref.read(libraryReorderModeProvider.notifier).exit(),

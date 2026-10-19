@@ -174,7 +174,10 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
                       ],
                       Text(
                         l10n.navMetadata,
-                        style: metadataPageTitleStyle(context.hentai, layoutTier),
+                        style: metadataPageTitleStyle(
+                          context.hentai,
+                          layoutTier,
+                        ),
                       ),
                       if (showCountChip) ...<Widget>[
                         const SizedBox(width: 12),

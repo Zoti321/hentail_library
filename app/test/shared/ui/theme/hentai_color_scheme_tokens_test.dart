@@ -30,7 +30,7 @@ void main() {
       expect(light.destructive, light.contextMenuDanger);
       expect(dark.destructive, dark.contextMenuDanger);
       expect(light.onDestructive, isNot(light.destructive));
-      expect(dark.onDestructive, isNot(dark.onDestructive));
+      expect(dark.onDestructive, isNot(dark.destructive));
     });
   });
 

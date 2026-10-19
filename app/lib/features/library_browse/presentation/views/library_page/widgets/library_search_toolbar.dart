@@ -43,9 +43,7 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                           iconSize: 16,
                           size: 32,
                           borderRadius: 8,
-                          foregroundColor: Theme.of(
-                            context,
-                          ).hentai.iconDefault,
+                          foregroundColor: Theme.of(context).hentai.iconDefault,
                           hoverColor: Theme.of(context).hoverColor,
                           overlayColor: Theme.of(context).hoverColor,
                           onPressed: onOpenNavigation,
@@ -142,7 +140,9 @@ class _LibraryCompactToolbar extends ConsumerWidget {
           iconSize: 16,
           size: 32,
           borderRadius: 8,
-          foregroundColor: isCustomized ? cs.primary : context.hentai.iconDefault,
+          foregroundColor: isCustomized
+              ? cs.primary
+              : context.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
           delayTooltipThreeSeconds: true,

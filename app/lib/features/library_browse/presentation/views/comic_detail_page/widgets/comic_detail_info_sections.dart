@@ -155,7 +155,9 @@ class _ComicLanguageSegmentLink extends HookWidget {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ValueNotifier<bool> hovered = useState(false);
-    final Color color = hovered.value ? cs.primary : context.hentai.textSecondary;
+    final Color color = hovered.value
+        ? cs.primary
+        : context.hentai.textSecondary;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => hovered.value = true,

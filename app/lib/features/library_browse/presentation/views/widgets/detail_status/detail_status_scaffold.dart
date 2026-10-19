@@ -89,11 +89,7 @@ class DetailNotFoundStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DetailStatusScaffold(
-      leading: Icon(
-        icon,
-        size: 48,
-        color: context.hentai.textTertiary,
-      ),
+      leading: Icon(icon, size: 48, color: context.hentai.textTertiary),
       label: label,
       action: TextButton.icon(
         onPressed: () => goCurrentLibraryBrowseFromContext(context),

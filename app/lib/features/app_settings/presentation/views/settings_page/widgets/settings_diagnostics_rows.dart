@@ -24,11 +24,7 @@ class DiagnosticModeRow extends ConsumerWidget {
     final l10n = context.l10n;
     return SettingsRow(
       layoutTier: layoutTier,
-      icon: Icon(
-        LucideIcons.bug,
-        size: 20,
-        color: theme.hentai.iconDefault,
-      ),
+      icon: Icon(LucideIcons.bug, size: 20, color: theme.hentai.iconDefault),
       label: l10n.settingsDiagnosticModeLabel,
       description: enabled
           ? l10n.settingsDiagnosticModeDescriptionEnabled
@@ -141,11 +137,7 @@ class UninstallDataInfoRow extends ConsumerWidget {
     final l10n = context.l10n;
     return SettingsRow(
       layoutTier: layoutTier,
-      icon: Icon(
-        LucideIcons.info,
-        size: 20,
-        color: theme.hentai.iconDefault,
-      ),
+      icon: Icon(LucideIcons.info, size: 20, color: theme.hentai.iconDefault),
       label: l10n.settingsUninstallDataInfoLabel,
       description: l10n.settingsUninstallDataInfoDescription,
     );

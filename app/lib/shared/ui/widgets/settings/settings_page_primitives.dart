@@ -48,8 +48,7 @@ class SettingsGroup extends StatelessWidget {
                         Divider(
                           height: 1,
                           thickness: 1,
-                          color:
-                              theme.hentai.inputBackgroundDisabled,
+                          color: theme.hentai.inputBackgroundDisabled,
                         ),
                     ],
                   ),

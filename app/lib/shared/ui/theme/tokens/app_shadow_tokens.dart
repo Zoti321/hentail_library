@@ -58,10 +58,7 @@ class AppShadowTokens extends ThemeExtension<AppShadowTokens>
   }
 
   /// Four-layer stack for dialogs, toasts, and adaptive form surfaces.
-  List<BoxShadow> elevatedSurface({
-    required bool isDark,
-    double opacity = 1,
-  }) {
+  List<BoxShadow> elevatedSurface({required bool isDark, double opacity = 1}) {
     final Color ambient = isDark
         ? Colors.black.withAlpha(52)
         : Colors.black.withAlpha(14);
@@ -137,11 +134,7 @@ class AppShadowTokens extends ThemeExtension<AppShadowTokens>
 
   List<BoxShadow> contextMenuPanel() {
     return [
-      BoxShadow(
-        color: contextMenu,
-        blurRadius: 12,
-        offset: const Offset(0, 4),
-      ),
+      BoxShadow(color: contextMenu, blurRadius: 12, offset: const Offset(0, 4)),
     ];
   }
 }

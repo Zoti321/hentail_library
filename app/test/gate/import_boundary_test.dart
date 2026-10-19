@@ -28,10 +28,7 @@ void main() {
       isFrbImportAllowedSource('features/library_admin/domain/foo.dart'),
       isFalse,
     );
-    expect(
-      isFrbImportAllowedSource('shared/data/adapters/foo.dart'),
-      isTrue,
-    );
+    expect(isFrbImportAllowedSource('shared/data/adapters/foo.dart'), isTrue);
   });
 
   test('import boundaries: L1 structural rules are zero-tolerance', () {

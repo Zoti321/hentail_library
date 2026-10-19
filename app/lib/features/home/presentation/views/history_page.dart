@@ -288,10 +288,7 @@ class _HistoryListSliver extends ConsumerWidget {
           child: Center(
             child: Text(
               l10n.shellLoadFailed,
-              style: TextStyle(
-                fontSize: 14,
-                color: theme.hentai.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: theme.hentai.textSecondary),
             ),
           ),
         ),

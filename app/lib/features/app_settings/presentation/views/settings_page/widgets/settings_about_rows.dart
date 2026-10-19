@@ -61,11 +61,7 @@ class AboutVersionRow extends ConsumerWidget {
     );
     return SettingsRow(
       layoutTier: layoutTier,
-      icon: Icon(
-        LucideIcons.info,
-        size: 20,
-        color: theme.hentai.iconDefault,
-      ),
+      icon: Icon(LucideIcons.info, size: 20, color: theme.hentai.iconDefault),
       label: l10n.settingsCheckForUpdatesLabel,
       onRowTap: packageInfoAsync.isLoading
           ? null
@@ -76,10 +72,7 @@ class AboutVersionRow extends ConsumerWidget {
         constraints: const BoxConstraints(maxWidth: 180),
         child: Text(
           versionActionLabel,
-          style: TextStyle(
-            fontSize: 12,
-            color: theme.hentai.textTertiary,
-          ),
+          style: TextStyle(fontSize: 12, color: theme.hentai.textTertiary),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.end,

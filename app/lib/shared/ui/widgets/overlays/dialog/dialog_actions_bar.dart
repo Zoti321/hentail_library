@@ -43,10 +43,7 @@ class DialogActionsBar extends StatelessWidget {
       decoration: BoxDecoration(
         border: showDivider
             ? Border(
-                top: BorderSide(
-                  color: theme.hentai.borderSubtle,
-                  width: 1,
-                ),
+                top: BorderSide(color: theme.hentai.borderSubtle, width: 1),
               )
             : null,
       ),

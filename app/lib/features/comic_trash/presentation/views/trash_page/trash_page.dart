@@ -256,10 +256,7 @@ class _TrashBody extends ConsumerWidget {
         child: Center(
           child: Text(
             l10n.shellLoadFailed,
-            style: TextStyle(
-              fontSize: 14,
-              color: theme.hentai.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14, color: theme.hentai.textSecondary),
           ),
         ),
       ),
@@ -315,7 +312,11 @@ class _TrashEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: 8,
           children: <Widget>[
-            Icon(LucideIcons.trash2, size: 48, color: context.hentai.textTertiary),
+            Icon(
+              LucideIcons.trash2,
+              size: 48,
+              color: context.hentai.textTertiary,
+            ),
             Text(
               l10n.trashEmptyTitle,
               style: TextStyle(fontSize: 15, color: context.hentai.textPrimary),
@@ -323,7 +324,10 @@ class _TrashEmptyState extends StatelessWidget {
             Text(
               l10n.trashEmptyDescription,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: context.hentai.textSecondary),
+              style: TextStyle(
+                fontSize: 13,
+                color: context.hentai.textSecondary,
+              ),
             ),
           ],
         ),

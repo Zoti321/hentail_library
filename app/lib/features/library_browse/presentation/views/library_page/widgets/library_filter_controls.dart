@@ -407,7 +407,10 @@ class _FilterCheckboxOptionRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(fontSize: 13, color: context.hentai.textPrimary),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: context.hentai.textPrimary,
+                  ),
                 ),
               ),
             ],

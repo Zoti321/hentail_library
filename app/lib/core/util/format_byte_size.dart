@@ -6,14 +6,7 @@ String formatByteSizeBin1024(int bytes) {
     return '0 B';
   }
 
-  const List<String> suffixes = <String>[
-    'B',
-    'KB',
-    'MB',
-    'GB',
-    'TB',
-    'PB',
-  ];
+  const List<String> suffixes = <String>['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
   final int unitIndex = (log(bytes) / log(1024)).floor().clamp(
     0,
     suffixes.length - 1,

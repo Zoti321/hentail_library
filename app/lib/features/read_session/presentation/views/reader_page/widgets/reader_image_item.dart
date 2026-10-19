@@ -121,7 +121,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
                 fit: widget.fit,
                 filterQuality: filterQuality,
                 useReaderImageCache: true,
-              readerImageProviderBuilder: buildReaderImageProvider,
+                readerImageProviderBuilder: buildReaderImageProvider,
                 cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,
                 errorPlaceholder: errorPlaceholder,
@@ -220,9 +220,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
   }
 
   Widget _buildReaderLoadingSurface(BuildContext context) {
-    return ColoredBox(
-      color: context.hentai.readerBackground,
-    );
+    return ColoredBox(color: context.hentai.readerBackground);
   }
 
   Widget _buildReaderImageErrorPlaceholder(BuildContext context) {

@@ -21,8 +21,8 @@ class PagePinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final List<Color> headerShadowGradient =
-        context.shadows.pinnedHeaderShadowGradient();
+    final List<Color> headerShadowGradient = context.shadows
+        .pinnedHeaderShadowGradient();
     return ColoredBox(
       color: cs.surface,
       child: Stack(

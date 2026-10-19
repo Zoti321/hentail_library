@@ -37,7 +37,8 @@ class ResponsiveAppShell extends StatelessWidget {
   final Widget routeChild;
   final String Function(String path) activeNavIdForPath;
   final AppShellSidebarBuilder sidebarBuilder;
-  final void Function(BuildContext context, String navId) onNavDestinationSelected;
+  final void Function(BuildContext context, String navId)
+  onNavDestinationSelected;
   final bool isDesktopSidebarExpanded;
   final VoidCallback onToggleDesktopSidebarExpanded;
   final bool isReaderFullscreen;
@@ -130,8 +131,7 @@ class ResponsiveAppShell extends StatelessWidget {
                   isReaderRoute: isReaderRoute,
                   isReaderFullscreen: isReaderFullscreen,
                 ),
-              if (showShellChrome)
-                ...shellFeedbackBelowTitleBar,
+              if (showShellChrome) ...shellFeedbackBelowTitleBar,
               Expanded(
                 child: hideAppSidebar
                     ? routeChild
@@ -163,7 +163,6 @@ class ResponsiveAppShell extends StatelessWidget {
       },
     );
   }
-
 }
 
 bool _isSettingsRoute(String path) => path == '/settings';

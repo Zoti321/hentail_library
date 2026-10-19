@@ -36,16 +36,18 @@ class BulkMetadataEditSession {
   BulkMetadataEditSession();
 
   final Map<BulkMetadataEditFieldKind, BulkMetadataEditMultiValueFieldState>
-  multiFields = <BulkMetadataEditFieldKind, BulkMetadataEditMultiValueFieldState>{
-    for (final BulkMetadataEditFieldKind kind in <BulkMetadataEditFieldKind>[
-      BulkMetadataEditFieldKind.tags,
-      BulkMetadataEditFieldKind.authors,
-      BulkMetadataEditFieldKind.languages,
-      BulkMetadataEditFieldKind.parodies,
-      BulkMetadataEditFieldKind.characters,
-    ])
-      kind: BulkMetadataEditMultiValueFieldState(),
-  };
+  multiFields =
+      <BulkMetadataEditFieldKind, BulkMetadataEditMultiValueFieldState>{
+        for (final BulkMetadataEditFieldKind kind
+            in <BulkMetadataEditFieldKind>[
+              BulkMetadataEditFieldKind.tags,
+              BulkMetadataEditFieldKind.authors,
+              BulkMetadataEditFieldKind.languages,
+              BulkMetadataEditFieldKind.parodies,
+              BulkMetadataEditFieldKind.characters,
+            ])
+          kind: BulkMetadataEditMultiValueFieldState(),
+      };
 
   final BulkMetadataEditScalarFieldState descriptionField =
       BulkMetadataEditScalarFieldState();
@@ -96,7 +98,8 @@ class BulkMetadataEditSession {
     dirtyFields.add(kind);
   }
 
-  bool isFieldDirty(BulkMetadataEditFieldKind kind) => dirtyFields.contains(kind);
+  bool isFieldDirty(BulkMetadataEditFieldKind kind) =>
+      dirtyFields.contains(kind);
 
   ComicMetadataBulkPatch? buildPatch() {
     if (dirtyFields.isEmpty) {
@@ -141,7 +144,8 @@ class BulkMetadataEditSession {
               values: characters.values,
             )
           : null,
-      contentRating: dirtyFields.contains(BulkMetadataEditFieldKind.contentRating)
+      contentRating:
+          dirtyFields.contains(BulkMetadataEditFieldKind.contentRating)
           ? (contentRatingField.isR18 ? 'r18' : 'safe')
           : null,
       description: dirtyFields.contains(BulkMetadataEditFieldKind.description)

@@ -126,7 +126,10 @@ class ScanProgressDialog extends ConsumerWidget {
           child: progress == null
               ? Text(
                   l10n.scanPreparing,
-                  style: TextStyle(fontSize: 14, color: context.hentai.textPrimary),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: context.hentai.textPrimary,
+                  ),
                 )
               : _buildRunningContent(context, progress),
         ),

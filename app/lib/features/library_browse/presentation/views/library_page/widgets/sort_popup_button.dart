@@ -70,9 +70,7 @@ class _SortMenu extends StatelessWidget {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest,
               border: Border(
-                bottom: BorderSide(
-                  color: theme.hentai.borderSubtle,
-                ),
+                bottom: BorderSide(color: theme.hentai.borderSubtle),
               ),
             ),
             child: Row(

@@ -1,3 +1,5 @@
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 import 'package:theme_tailor_annotation/theme_tailor_annotation.dart';
 
@@ -27,4 +29,19 @@ class AppSpacingTokens extends ThemeExtension<AppSpacingTokens>
     lg: 16,
     xl: 20,
   );
+
+  @override
+  AppSpacingTokens lerp(
+    covariant ThemeExtension<AppSpacingTokens>? other,
+    double t,
+  ) {
+    if (other is! AppSpacingTokens) return this;
+    return AppSpacingTokens(
+      xs: lerpDouble(xs, other.xs, t)!,
+      sm: lerpDouble(sm, other.sm, t)!,
+      md: lerpDouble(md, other.md, t)!,
+      lg: lerpDouble(lg, other.lg, t)!,
+      xl: lerpDouble(xl, other.xl, t)!,
+    );
+  }
 }

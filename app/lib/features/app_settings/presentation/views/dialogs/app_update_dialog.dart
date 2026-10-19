@@ -44,10 +44,7 @@ class AppUpdateDialog extends ConsumerWidget {
         children: <Widget>[
           Text(
             l10n.updatePublishedOn(publishedLabel),
-            style: TextStyle(
-              fontSize: 12,
-              color: context.hentai.textTertiary,
-            ),
+            style: TextStyle(fontSize: 12, color: context.hentai.textTertiary),
           ),
           if (release.releaseNotes.isNotEmpty) ...<Widget>[
             const SizedBox(height: 12),

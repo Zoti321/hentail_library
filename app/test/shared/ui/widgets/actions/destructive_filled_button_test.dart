@@ -20,9 +20,7 @@ void main() {
         ),
       );
 
-      final HentaiColorScheme h = buildAppTheme(
-        Brightness.light,
-      ).hentai;
+      final HentaiColorScheme h = buildAppTheme(Brightness.light).hentai;
       final FilledButton button = tester.widget(find.byType(FilledButton));
       final Set<WidgetState> enabled = <WidgetState>{};
 
@@ -40,9 +38,7 @@ void main() {
         ),
       );
 
-      final HentaiColorScheme h = buildAppTheme(
-        Brightness.light,
-      ).hentai;
+      final HentaiColorScheme h = buildAppTheme(Brightness.light).hentai;
       final ColorScheme cs = buildAppTheme(Brightness.light).colorScheme;
       final FilledButton button = tester.widget(find.byType(FilledButton));
       const Set<WidgetState> disabled = <WidgetState>{WidgetState.disabled};

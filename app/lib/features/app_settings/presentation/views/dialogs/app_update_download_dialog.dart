@@ -102,10 +102,7 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
         children: <Widget>[
           Text(
             asset.name,
-            style: TextStyle(
-              fontSize: 13,
-              color: context.hentai.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: context.hentai.textSecondary),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -118,10 +115,7 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
           const SizedBox(height: 8),
           Text(
             hasFailed.value ? l10n.updateDownloadFailed : progressLabel,
-            style: TextStyle(
-              fontSize: 12,
-              color: context.hentai.textTertiary,
-            ),
+            style: TextStyle(fontSize: 12, color: context.hentai.textTertiary),
           ),
         ],
       ),
