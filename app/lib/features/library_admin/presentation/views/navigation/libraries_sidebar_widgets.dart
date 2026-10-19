@@ -52,7 +52,6 @@ class _LibrariesMoreRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return _SidebarChromeRow(
       isActive: false,
       expandProgress: expandProgress,
@@ -131,7 +130,6 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final CustomPopupMenuController controller = useMemoized(
@@ -228,7 +226,6 @@ class _SidebarIconOnlyButton extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final ValueNotifier<bool> hovered = useState(false);
     final Color background = isActive
@@ -307,7 +304,6 @@ class _SidebarChromeRow extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final HentaiColorScheme h = context.hentai;
     final AppThemeTokens tokens = context.tokens;
     final ValueNotifier<bool> hovered = useState(false);

@@ -122,9 +122,8 @@ class _ManagedNamedFacetChip extends ConsumerWidget {
     final bool isAuthor = kind == ManagedNamedFacetKind.author;
     final bool desktop = _isDesktop(context);
     final bool isMergeTarget = mergeTarget == name;
-    final ColorScheme colors = Theme.of(context).colorScheme;
     final ({Color? fill, Color? border}) selection = _mergeSelectionColors(
-      colors,
+      context.hentai,
       isMergeTarget: isMergeTarget,
       isMergeSource: isMergeSource,
     );
@@ -228,7 +227,6 @@ class _NamedFacetListFooter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final TextStyle footerStyle = TextStyle(

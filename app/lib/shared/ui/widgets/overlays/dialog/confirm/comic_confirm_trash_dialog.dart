@@ -12,7 +12,6 @@ class ComicConfirmTrashDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return HentaiDialog(
       title: l10n.comicDetailDeleteTitle,
       content: Text(

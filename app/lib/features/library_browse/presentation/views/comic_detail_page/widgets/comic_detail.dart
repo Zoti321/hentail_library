@@ -17,7 +17,6 @@ class ComicDetail extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final double horizontalPadding = detailContentHorizontalPadding(context);
 
     return Column(

@@ -419,7 +419,6 @@ class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return HentaiDialog(
       title: '确认合并',
       content: Column(

@@ -22,7 +22,6 @@ class DetailStatusScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

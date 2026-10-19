@@ -51,7 +51,6 @@ class HentaiDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final HentaiColorScheme semantic = context.hentai;
     final AppShadowTokens shadows = context.shadows;
     final bool isDark = Theme.of(context).brightness == Brightness.dark;

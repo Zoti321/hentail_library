@@ -43,9 +43,7 @@ class _HomeRecentlyAddedSectionState
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme colorScheme = theme.colorScheme;
     final l10n = context.l10n;
     if (!widget.enabled) {
       return const SizedBox.shrink();

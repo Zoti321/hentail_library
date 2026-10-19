@@ -403,7 +403,6 @@ class _MetadataImportDetailsAccordion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
 
     return Column(

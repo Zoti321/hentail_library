@@ -8,7 +8,6 @@ class _SectionAddMenuButton extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final CustomPopupMenuController controller = useMemoized(
       CustomPopupMenuController.new,
@@ -82,7 +81,6 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final CustomPopupMenuController controller = useMemoized(
       CustomPopupMenuController.new,
@@ -162,7 +160,6 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final CustomPopupMenuController controller = useMemoized(
       CustomPopupMenuController.new,

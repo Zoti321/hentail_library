@@ -77,7 +77,6 @@ class ContextMenuContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final String? title = this.title;
     return PopupMenuPanelShell(

@@ -30,7 +30,6 @@ class LibraryPageHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ThemeData theme = Theme.of(context);
     final AppLocalizations l10n = context.l10n;
     final int comicCount = ref.watch(libraryDisplayedComicCountProvider);
     final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);

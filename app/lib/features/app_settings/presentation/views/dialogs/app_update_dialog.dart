@@ -31,7 +31,6 @@ class AppUpdateDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final String publishedLabel = DateFormat(
       'yyyy-MM-dd',
     ).format(release.publishedAt.toLocal());

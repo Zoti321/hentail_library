@@ -16,12 +16,19 @@ class AppTextTokens extends ThemeExtension<AppTextTokens>
     required this.titleLg,
   });
 
+  @override
   final double labelXs;
+  @override
   final double bodySm;
+  @override
   final double bodyMd;
+  @override
   final double bodyLg;
+  @override
   final double titleSm;
+  @override
   final double titleMd;
+  @override
   final double titleLg;
 
   static const AppTextTokens shared = AppTextTokens(

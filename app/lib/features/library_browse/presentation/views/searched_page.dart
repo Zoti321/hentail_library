@@ -272,7 +272,6 @@ class _SearchResultsEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
     return Padding(

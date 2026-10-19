@@ -187,7 +187,6 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final double panelMaxHeight = math.min(
       _kMultiSelectMenuMaxHeight,

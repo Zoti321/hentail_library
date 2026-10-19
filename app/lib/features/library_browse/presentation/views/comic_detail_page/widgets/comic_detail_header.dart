@@ -114,7 +114,6 @@ class _ComicDetailOverflowMenuButtonState
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;

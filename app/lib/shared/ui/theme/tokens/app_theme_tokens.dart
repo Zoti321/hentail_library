@@ -17,9 +17,13 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens>
     required this.layout,
   });
 
+  @override
   final AppTextTokens text;
+  @override
   final AppRadiusTokens radius;
+  @override
   final AppSpacingTokens spacing;
+  @override
   final AppLayoutTokens layout;
 
   static const AppThemeTokens shared = AppThemeTokens(

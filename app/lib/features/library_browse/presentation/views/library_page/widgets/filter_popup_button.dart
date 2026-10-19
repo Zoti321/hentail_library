@@ -22,7 +22,6 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final cs = Theme.of(context).colorScheme;
 
     return CustomPopupMenu(
       controller: controller,

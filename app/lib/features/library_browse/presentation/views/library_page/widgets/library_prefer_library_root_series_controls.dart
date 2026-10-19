@@ -24,7 +24,6 @@ class LibraryPreferLibraryRootSeriesControls extends ConsumerWidget {
     }
 
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
     final bool enabled = ref.watch(

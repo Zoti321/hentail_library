@@ -266,7 +266,6 @@ class _StepperButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final BorderRadius radius = BorderRadius.circular(tokens.radius.xs);
     return SizedBox(
       width: 28,

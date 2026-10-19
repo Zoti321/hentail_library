@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_image_cache.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_constants.dart';

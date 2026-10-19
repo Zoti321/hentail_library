@@ -42,7 +42,6 @@ class ReaderTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final MediaQueryData media = MediaQuery.of(context);
     final double topPadding = media.padding.top + kReaderChromeEdgeGap;
     final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
@@ -226,7 +225,6 @@ class _ReaderSeriesMenuButtonState
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return CustomPopupMenu(
       controller: _menuController,
       barrierColor: Colors.transparent,

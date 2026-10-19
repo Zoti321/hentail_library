@@ -29,7 +29,6 @@ class SeriesDetailComicsGridSliver extends ConsumerWidget {
       MediaQuery.sizeOf(context).width,
     );
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final SliverGridDelegate gridDelegate = libraryGridDelegateForTokens(
       tokens,
       layoutTier,

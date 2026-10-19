@@ -64,61 +64,115 @@ class HentaiColorScheme extends ThemeExtension<HentaiColorScheme>
     required this.contextMenuDanger,
   });
 
+  @override
   final Color hoverBackground;
+  @override
   final Color cardHover;
+  @override
   final Color overlayScrim;
+  @override
   final Color inputBackground;
+  @override
   final Color inputBackgroundDisabled;
+  @override
   final Color subtleTagBackground;
+  @override
   final Color textPrimary;
+  @override
   final Color textSecondary;
+  @override
   final Color textTertiary;
+  @override
   final Color textPlaceholder;
+  @override
   final Color textDisabled;
+  @override
   final Color iconDefault;
+  @override
   final Color iconSecondary;
+  @override
   final Color borderSubtle;
+  @override
   final Color borderMedium;
+  @override
   final Color borderStrong;
+  @override
   final Color inputBorder;
+  @override
   final Color inputBorderActive;
+  @override
   final Color imagePlaceholder;
+  @override
   final Color imageFallback;
+  @override
   final Color success;
+  @override
   final Color warning;
+  @override
   final Color error;
 
   /// Destructive action fill (delete / remove / clear confirms).
+  @override
   final Color destructive;
+  @override
   final Color onDestructive;
+  @override
   final Color serializationHiatus;
+  @override
   final Color winBackground;
+  @override
   final Color winSurface;
+  @override
   final Color sidebarBackground;
+  @override
   final Color sidebarItemHoverBackground;
+  @override
   final Color sidebarItemActiveBackground;
+  @override
   final Color sidebarItemActiveBorder;
+  @override
   final Color sidebarItemActiveShadowColor;
+  @override
   final Color readerBackground;
+  @override
   final Color floatingUiBackground;
+  @override
   final Color activeButtonBg;
+  @override
   final Color sliderActive;
+  @override
   final Color sliderInactive;
+  @override
   final Color readerTextMuted;
+  @override
   final Color readerTextIconPrimary;
+  @override
   final Color readerTextSecondary;
+  @override
   final Color readerTextOnWhite;
+  @override
   final Color readerPanelBackground;
+  @override
   final Color readerPanelBorder;
+  @override
   final Color readerPanelSubtle;
+  @override
   final Color readerPanelSubtleBorder;
+  @override
   final Color readerSliderOverlay;
+  @override
   final Color contextMenuBackground;
+  @override
   final Color contextMenuBorder;
+  @override
   final Color contextMenuSeparator;
+  @override
   final Color contextMenuText;
+  @override
   final Color contextMenuMutedText;
+  @override
   final Color contextMenuHover;
+  @override
   final Color contextMenuDanger;
 
   static const HentaiColorScheme light = HentaiColorScheme(

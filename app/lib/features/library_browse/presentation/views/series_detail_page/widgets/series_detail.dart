@@ -266,7 +266,6 @@ class _SeriesDetailComicsError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),

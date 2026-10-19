@@ -142,7 +142,6 @@ class ScanProgressDialog extends ConsumerWidget {
     SyncLibraryProgress progress,
   ) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final TextStyle primaryStyle = TextStyle(
       fontSize: 14,
       color: context.hentai.textPrimary,
@@ -250,7 +249,6 @@ class ScanProgressDialog extends ConsumerWidget {
     ThumbnailBackgroundProgress thumbnailProgress,
   ) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final TextStyle bodyStyle = TextStyle(
       fontSize: 14,
       color: context.hentai.textSecondary,

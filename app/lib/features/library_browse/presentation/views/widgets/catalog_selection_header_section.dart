@@ -57,7 +57,6 @@ class CatalogSelectionHeaderToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final bool showClear = selection.selectedIds.isNotEmpty;

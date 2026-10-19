@@ -269,7 +269,6 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return Material(
       color: context.hentai.readerBackground,
@@ -322,7 +321,6 @@ class _ReaderSettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 8,
@@ -356,7 +354,6 @@ class _ReaderSettingsNumberRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return Row(
       children: <Widget>[
         Expanded(

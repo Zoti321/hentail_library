@@ -32,7 +32,6 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
     final CustomPopupMenuController menuController = useMemoized(
       CustomPopupMenuController.new,
     );
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final bool isSeriesRead = seriesId != null && seriesId!.trim().isNotEmpty;
 
     return CustomPopupMenu(
@@ -186,7 +185,6 @@ class _ReaderOverflowMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(

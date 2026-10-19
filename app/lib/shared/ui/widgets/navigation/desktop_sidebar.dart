@@ -77,8 +77,6 @@ class DesktopSidebar extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final double topPadding = applyDrawerTopInset
         ? MediaQuery.viewPaddingOf(context).top + tokens.spacing.lg
@@ -249,7 +247,6 @@ class _SidebarButtonState extends State<_SidebarButton> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final double t = widget.expandProgress.clamp(0.0, 1.0);
 
     final Color idleBackground = context.hentai.sidebarBackground;

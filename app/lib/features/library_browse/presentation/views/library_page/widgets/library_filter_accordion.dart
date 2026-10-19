@@ -35,7 +35,6 @@ class LibraryFilterAccordionChevron extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return AnimatedRotation(
       turns: expanded ? 0.5 : 0,
       duration: kLibraryFilterAccordionDuration,

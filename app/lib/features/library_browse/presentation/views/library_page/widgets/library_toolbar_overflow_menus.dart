@@ -30,7 +30,6 @@ class _LibraryPageSizeMenuButtonState
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final int activePageSize = ref.watch(libraryActivePageSizeProvider);
     final AppLocalizations l10n = context.l10n;
@@ -146,7 +145,6 @@ class _LibraryOverflowMenuButtonState
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final LibraryScanActivityState scanLeaf = ref.watch(
       libraryScanActivityStateProvider,

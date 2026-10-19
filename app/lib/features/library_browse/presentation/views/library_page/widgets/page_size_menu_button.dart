@@ -30,7 +30,6 @@ class _PageSizeMenuButtonState extends State<PageSizeMenuButton> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     return CustomPopupMenu(
       controller: _controller,

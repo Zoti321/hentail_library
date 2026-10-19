@@ -82,7 +82,6 @@ class ReaderFloatingPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final double radius = context.tokens.radius.xs;
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),

@@ -4,18 +4,15 @@ part of 'named_facet_management_panel.dart';
 
 /// 合并选择对 chip 样式的影响：目标为成功色，来源为错误色，其余不着色。
 ({Color? fill, Color? border}) _mergeSelectionColors(
-  ColorScheme colors, {
+  HentaiColorScheme h, {
   required bool isMergeTarget,
   required bool isMergeSource,
 }) {
   if (isMergeTarget) {
-    return (
-      fill: colors.hentai.success.withValues(alpha: 0.22),
-      border: colors.hentai.success,
-    );
+    return (fill: h.success.withValues(alpha: 0.22), border: h.success);
   }
   if (isMergeSource) {
-    return (fill: colors.error.withValues(alpha: 0.22), border: colors.error);
+    return (fill: h.error.withValues(alpha: 0.22), border: h.error);
   }
   return (fill: null, border: null);
 }

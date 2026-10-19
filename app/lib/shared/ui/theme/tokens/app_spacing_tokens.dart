@@ -16,10 +16,15 @@ class AppSpacingTokens extends ThemeExtension<AppSpacingTokens>
     required this.xl,
   });
 
+  @override
   final double xs;
+  @override
   final double sm;
+  @override
   final double md;
+  @override
   final double lg;
+  @override
   final double xl;
 
   static const AppSpacingTokens shared = AppSpacingTokens(

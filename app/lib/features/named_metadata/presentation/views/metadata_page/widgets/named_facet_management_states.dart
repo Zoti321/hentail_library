@@ -31,7 +31,6 @@ class _NamedFacetManagementErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl * 2),
@@ -78,7 +77,6 @@ class _NamedFacetManagementEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     return Padding(

@@ -29,7 +29,6 @@ class FluentToggleField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final String displayText = value ? checkedLabel : uncheckedLabel;
 
     return Column(

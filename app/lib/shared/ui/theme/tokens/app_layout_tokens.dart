@@ -11,7 +11,9 @@ class AppLayoutTokens extends ThemeExtension<AppLayoutTokens>
     required this.contentVerticalPadding,
   });
 
+  @override
   final double contentHorizontalPadding;
+  @override
   final double contentVerticalPadding;
 
   static const AppLayoutTokens shared = AppLayoutTokens(
@@ -19,6 +21,7 @@ class AppLayoutTokens extends ThemeExtension<AppLayoutTokens>
     contentVerticalPadding: 16,
   );
 
+  @override
   EdgeInsets get contentAreaPadding => EdgeInsets.symmetric(
     horizontal: contentHorizontalPadding,
     vertical: contentVerticalPadding,

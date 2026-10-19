@@ -14,10 +14,15 @@ class AppRadiusTokens extends ThemeExtension<AppRadiusTokens>
     required this.pill,
   });
 
+  @override
   final double xs;
+  @override
   final double sm;
+  @override
   final double md;
+  @override
   final double lg;
+  @override
   final double pill;
 
   static const AppRadiusTokens shared = AppRadiusTokens(

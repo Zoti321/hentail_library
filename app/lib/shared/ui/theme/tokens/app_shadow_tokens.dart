@@ -18,12 +18,19 @@ class AppShadowTokens extends ThemeExtension<AppShadowTokens>
     required this.contextMenu,
   });
 
+  @override
   final Color catalogCardRest;
+  @override
   final Color catalogCardHover;
+  @override
   final Color dialogPrimary;
+  @override
   final Color dialogSecondary;
+  @override
   final Color toastPrimary;
+  @override
   final Color toastSecondary;
+  @override
   final Color contextMenu;
 
   factory AppShadowTokens.fromPalette(AppShadowPalette palette) {

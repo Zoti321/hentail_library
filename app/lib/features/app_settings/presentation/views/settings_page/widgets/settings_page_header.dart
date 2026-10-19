@@ -65,7 +65,6 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final l10n = context.l10n;
     final String resolvedTitle = title ?? l10n.navSettings;
 

@@ -8,7 +8,6 @@ class CatalogCoverSkeletonTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final Color bar = context.hentai.imagePlaceholder;
     return ExcludeSemantics(

@@ -102,7 +102,6 @@ class _TrashHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final TrashPageState? state = ref
@@ -303,7 +302,6 @@ class _TrashEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.only(top: 48),

@@ -19,7 +19,6 @@ class LibrariesSidebarReorderPane extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final List<LocalLibrary> libraries =
         ref.watch(currentLibraryProvider).asData?.value.libraries ??
@@ -170,7 +169,6 @@ class _ReorderSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return IgnorePointer(
       child: Padding(
@@ -208,7 +206,6 @@ class _ReorderLibraryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final String name = localLibraryDisplayName(library);
 

@@ -41,7 +41,6 @@ class _EditMetadataAuthorsTagsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final bool smartMatchEnabled =
         ref.watch(smartFacetMatchPreferenceProvider).asData?.value ??
         SmartFacetMatchPreference.defaultValue;

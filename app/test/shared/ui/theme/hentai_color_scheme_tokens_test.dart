@@ -82,7 +82,7 @@ void main() {
         lg: 32,
         xl: 40,
       );
-      final AppSpacingTokens mid = a.lerp(b, 0.5) as AppSpacingTokens;
+      final AppSpacingTokens mid = a.lerp(b, 0.5);
       expect(mid.md, 18);
       expect(mid.xs, 6);
     });

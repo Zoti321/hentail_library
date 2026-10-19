@@ -340,7 +340,6 @@ class _SettingsDetailPane extends StatelessWidget {
     }
 
     final AppLocalizations l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final Widget group = SettingsGroup(
       children: _detailRows(

@@ -64,7 +64,6 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
     final bool showSerialization =
         series.serializationStatus != SerializationStatus.unknown;

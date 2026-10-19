@@ -116,7 +116,6 @@ class _MetadataExportOptionsDialogState
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
 
     return HentaiDialog(
       title: l10n.settingsMetadataBackupExportDialogTitle,

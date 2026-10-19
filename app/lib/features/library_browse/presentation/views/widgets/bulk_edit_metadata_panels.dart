@@ -176,7 +176,6 @@ class _BulkEditDetailPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: EdgeInsets.all(tokens.spacing.xl),
@@ -361,7 +360,6 @@ class _BulkEditOperationSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.xs,

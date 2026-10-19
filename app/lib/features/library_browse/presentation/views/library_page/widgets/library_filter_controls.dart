@@ -30,7 +30,6 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final LibraryDisplayTarget displayTarget = ref.watch(
       libraryDisplayTargetProvider,
@@ -128,7 +127,6 @@ class _LibraryMediaTypeFilterControlsState
     }
 
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final LibraryMediaTypeFilterSelection selected = ref.watch(
       libraryComicFiltersProvider.select(
@@ -220,7 +218,6 @@ class _LibrarySerializationStatusFilterControlsState
     }
 
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final LibrarySerializationStatusFilter selected = ref.watch(
       librarySeriesTabSerializationStatusFilterProvider,
@@ -302,7 +299,6 @@ class LibraryOrganizeFilterControls extends HookConsumerWidget {
     }
 
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final bool needsMetadataOnly = ref.watch(
       libraryComicFiltersProvider.select(
@@ -377,7 +373,6 @@ class _FilterCheckboxOptionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     return Material(
       color: Colors.transparent,
       child: InkWell(

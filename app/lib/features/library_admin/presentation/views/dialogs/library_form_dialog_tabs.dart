@@ -192,7 +192,6 @@ class _LibraryFormScannerTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: tokens.spacing.lg,

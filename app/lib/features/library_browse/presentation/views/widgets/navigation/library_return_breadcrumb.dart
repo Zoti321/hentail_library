@@ -113,7 +113,6 @@ class _BreadcrumbTrailingTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final TextPainter probe = TextPainter(

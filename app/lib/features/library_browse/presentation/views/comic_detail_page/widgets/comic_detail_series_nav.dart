@@ -80,7 +80,6 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final ComicDetailSeriesNavItem? previous = data.previousItem;
     final ComicDetailSeriesNavItem? next = data.nextItem;

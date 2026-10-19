@@ -29,7 +29,6 @@ class SearchedPageHeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final String displayQuery =
         unwrapFullyQuotedLibrarySearchQuery(query) ?? query;
     final AppLocalizations l10n = context.l10n;

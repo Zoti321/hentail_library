@@ -43,7 +43,6 @@ class TagDictionaryImportDialog extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final ValueNotifier<double?> progress = useState<double?>(null);
     final ValueNotifier<bool> started = useState<bool>(false);
 

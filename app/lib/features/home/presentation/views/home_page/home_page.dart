@@ -80,7 +80,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final ({int comicCount, int libraryCount, bool showEmptyOnboarding})
     homeCountsLeaf = ref.watch(
       homePageCountsStreamProvider.select((AsyncValue<HomePageCounts> async) {

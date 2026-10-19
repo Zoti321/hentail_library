@@ -12,7 +12,9 @@ class AppMotionTokens extends ThemeExtension<AppMotionTokens>
     required this.durationMedium,
   });
 
+  @override
   final Duration durationFast;
+  @override
   final Duration durationMedium;
 
   static const Curve standardCurve = Curves.easeOutCubic;

@@ -489,7 +489,6 @@ class _AuthorComicsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final List<AuthorFacetCount> facets = <AuthorFacetCount>[
       ...detail.parodies,
       ...detail.characters,

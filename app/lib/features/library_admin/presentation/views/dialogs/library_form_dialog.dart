@@ -221,7 +221,6 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
           context: context,
           builder: (BuildContext dialogContext) {
             final l10n = dialogContext.l10n;
-            final ColorScheme cs = Theme.of(dialogContext).colorScheme;
             return HentaiDialog(
               title: l10n.formLibraryRootChangeConfirmTitle,
               content: Text(

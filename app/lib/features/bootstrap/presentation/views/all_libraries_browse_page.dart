@@ -12,7 +12,6 @@ class AllLibrariesBrowsePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final VoidCallback? openNav = appShellPageNavigationOpener(context);

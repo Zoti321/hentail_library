@@ -19,7 +19,6 @@ class ReaderOpenErrorPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final String message = readSessionOpenFailureMessage(context, error);
     return Center(

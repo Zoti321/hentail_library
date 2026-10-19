@@ -36,7 +36,6 @@ class _MetadataTagsOverflowMenuButtonState
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final int tagCount = ref
         .watch(allTagsProvider)

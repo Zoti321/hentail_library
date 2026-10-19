@@ -28,7 +28,6 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
     final int? pageCount = ref
         .watch(comicResolvedPageCountProvider(comic.comicId))
@@ -108,7 +107,6 @@ class ComicLanguageSegments extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
     final List<Widget> children = <Widget>[];
     for (int i = 0; i < languages.length; i++) {
@@ -192,7 +190,6 @@ class ComicDetailDescription extends StatelessWidget {
     if (text == null || text.isEmpty) {
       return const SizedBox.shrink();
     }
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return Text(
       text,
@@ -353,7 +350,6 @@ class LabeledMetaChipRow extends StatelessWidget {
     if (items.isEmpty) {
       return const SizedBox.shrink();
     }
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -415,7 +411,6 @@ class ComicDetailInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     Widget valueWidget = Text(
       value,

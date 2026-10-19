@@ -33,7 +33,6 @@ class MetadataBackupSettingsDetail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
 
     return FutureBuilder<String>(
       future: metadataBackupsDirectory(),

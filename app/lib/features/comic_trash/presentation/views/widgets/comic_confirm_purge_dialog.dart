@@ -29,7 +29,6 @@ class ComicConfirmPurgeDialog extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final acknowledgement = useState(false);
     final bool needsAcknowledgement = purgeRequiresAcknowledgement(counts);
     final bool canConfirm = !needsAcknowledgement || acknowledgement.value;

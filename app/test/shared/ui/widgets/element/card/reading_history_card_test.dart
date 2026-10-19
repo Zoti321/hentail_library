@@ -80,7 +80,6 @@ void main() {
     });
 
     final ThemeData theme = buildAppTheme(Brightness.light);
-    final HentaiColorScheme h = theme.hentai;
     final AppShadowTokens shadows = theme.shadows;
 
     await tester.pumpWidget(
