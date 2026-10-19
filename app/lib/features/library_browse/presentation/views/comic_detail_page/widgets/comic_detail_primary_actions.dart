@@ -35,7 +35,7 @@ ButtonStyle comicDetailIncognitoReadStyle(
     backgroundColor: cs.surfaceContainerHigh,
     foregroundColor: cs.hentai.textPrimary,
     elevation: 1,
-    shadowColor: cs.hentai.cardShadow,
+    shadowColor: theme.extension<AppShadowTokens>()!.catalogCardRest,
     padding: EdgeInsets.symmetric(
       horizontal: tokens.spacing.xl,
       vertical: tokens.spacing.sm + 6,

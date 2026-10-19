@@ -128,7 +128,7 @@ class AppLocalePreferenceMenuPanel extends StatelessWidget {
         border: Border.all(color: colorScheme.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: colorScheme.hentai.cardShadowHover,
+            color: context.shadows.catalogCardHover,
             blurRadius: 6,
             offset: const Offset(0, 4),
           ),

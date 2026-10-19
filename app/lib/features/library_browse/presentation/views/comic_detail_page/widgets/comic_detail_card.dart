@@ -25,7 +25,7 @@ class ComicDetailCard extends StatelessWidget {
         border: Border.all(color: cs.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: cs.hentai.cardShadow,
+            color: context.shadows.catalogCardRest,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

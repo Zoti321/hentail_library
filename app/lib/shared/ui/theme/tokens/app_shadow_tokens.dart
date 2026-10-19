@@ -126,6 +126,15 @@ class AppShadowTokens extends ThemeExtension<AppShadowTokens>
     ];
   }
 
+  /// Bottom fade on pinned page headers ([PagePinnedHeaderDelegate]).
+  List<Color> pinnedHeaderShadowGradient() {
+    return <Color>[
+      catalogCardRest.withValues(alpha: 0),
+      catalogCardRest.withValues(alpha: 0.025),
+      catalogCardRest.withValues(alpha: 0.05),
+    ];
+  }
+
   List<BoxShadow> contextMenuPanel() {
     return [
       BoxShadow(

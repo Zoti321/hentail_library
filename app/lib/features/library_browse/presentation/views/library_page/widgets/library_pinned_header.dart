@@ -76,9 +76,7 @@ class LibraryPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: <Color>[
-                      cs.hentai.cardShadow.withValues(alpha: 0),
-                      cs.hentai.cardShadow.withValues(alpha: 0.025),
-                      cs.hentai.cardShadow.withValues(alpha: 0.05),
+                      ...context.shadows.pinnedHeaderShadowGradient(),
                     ],
                     stops: const <double>[0, 0.75, 1],
                   ),
