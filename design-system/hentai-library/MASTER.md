@@ -65,13 +65,13 @@ Cross-platform **comic library** app: scan/sync local or WebDAV roots, browse ca
 | Property | Value |
 |----------|-------|
 | Style | Minimal, content-first, geometric grid |
-| Motion | `easeOutCubic`, **180–220 ms** (sidebar, tabs, hover) |
+| Motion | `context.motion.durationFast` / `durationMedium` + `AppMotionTokens.standardCurve` (**180–220 ms**, easeOutCubic) |
 | Elevation | Prefer borders + layered shadow over heavy Material elevation |
 | Density | Catalog grids medium-dense; reader chrome minimal |
 
 ### Color Palette
 
-Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`colorScheme.hentai`** (`HentaiColorScheme`). Never hard-code hex in widgets.
+Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`context.hentai`** (`HentaiColorScheme` on `ThemeData.extensions`). Prefer **`context.tokens`** / **`context.shadows`** / **`context.motion`**. Never hard-code hex in widgets. (`colorScheme.hentai` is deprecated.)
 
 | Role | Light | Dark | Flutter access |
 |------|-------|------|----------------|
@@ -86,7 +86,9 @@ Use **`Theme.of(context).colorScheme`** (M3 roles) **and** **`colorScheme.hentai
 | Status | — | — | `success`, `warning`, `error` |
 | Reader chrome | — | — | `readerBackground`, `floatingUiBackground` |
 
-**Theme entry:** `app/lib/shared/ui/theme/theme_visual_tokens.dart` → `HentaiColorScheme`
+**Theme entry:** `app/lib/shared/ui/theme/theme.dart` → `buildAppTheme`；语义色 `color/hentai_color_scheme.dart`；M3 底层 `color/app_color_scheme.dart`
+
+**Dev catalog (Widgetbook):** `flutter run -t widgetbook/main.dart`（非 Gate、非生产路由）
 
 ### Typography
 
@@ -121,7 +123,7 @@ Content area: `tokens.layout.contentAreaPadding` (48h / 16v).
 
 ### Shadows
 
-Use semantic tokens — `cs.hentai.cardShadow`, `cardShadowHover` on catalog cards; multi-layer shadow on `HentaiDialog`. Do not copy generic CSS shadow tables from web stacks.
+Use **`context.shadows`** presets — `catalogCard`, `dialog`, `toast`, `contextMenuPanel`. Legacy shadow tints remain on `HentaiColorScheme` during migration. Do not copy generic CSS shadow tables from web stacks.
 
 ### Animating fills
 

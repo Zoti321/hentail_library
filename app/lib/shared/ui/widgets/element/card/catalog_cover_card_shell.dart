@@ -36,7 +36,7 @@ class CatalogCoverCardShell extends HookWidget {
     final bool highlighted = isHover.value || isFocused.value;
     final Duration motion = motionDurationOf(
       context,
-      const Duration(milliseconds: 200),
+      context.motion.durationMedium,
     );
 
     void invokeTap({required bool fromPointer}) {
@@ -58,21 +58,7 @@ class CatalogCoverCardShell extends HookWidget {
           border: Border.all(
             color: isFocused.value ? cs.primary : cs.hentai.borderSubtle,
           ),
-          boxShadow: highlighted
-              ? <BoxShadow>[
-                  BoxShadow(
-                    color: cs.hentai.cardShadowHover,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : <BoxShadow>[
-                  BoxShadow(
-                    color: cs.hentai.cardShadow,
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+          boxShadow: context.shadows.catalogCard(highlighted: highlighted),
         ),
         child: ClipRRect(
           borderRadius: cardRadius,

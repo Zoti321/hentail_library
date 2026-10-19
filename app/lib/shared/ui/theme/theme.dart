@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/shared/ui/interaction/desktop_page_transition.dart';
+import 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
+import 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
+import 'package:hentai_library/shared/ui/theme/tokens/app_motion_tokens.dart';
+import 'package:hentai_library/shared/ui/theme/tokens/app_shadow_tokens.dart';
+import 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
 
-part 'theme_layout_tokens.dart';
-part 'theme_typography_tokens.dart';
-part 'theme_visual_tokens.dart';
+export 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
+export 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
+export 'package:hentai_library/shared/ui/theme/extensions/theme_context_extensions.dart';
+export 'package:hentai_library/shared/ui/theme/tokens/app_layout_tokens.dart';
+export 'package:hentai_library/shared/ui/theme/tokens/app_motion_tokens.dart';
+export 'package:hentai_library/shared/ui/theme/tokens/app_radius_tokens.dart';
+export 'package:hentai_library/shared/ui/theme/tokens/app_shadow_tokens.dart';
+export 'package:hentai_library/shared/ui/theme/tokens/app_spacing_tokens.dart';
+export 'package:hentai_library/shared/ui/theme/tokens/app_text_tokens.dart';
+export 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
 
 /// Shell / theme-boundary system bar style for everyday browsing chrome.
-///
-/// Keeps edge-to-edge (transparent system bars). Icon contrast follows
-/// [ColorScheme.brightness]; navigation bar color uses [ColorScheme.surface]
-/// on platforms that still honor it (ignored under forced edge-to-edge where
-/// the app paints behind the bars instead).
 SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
   final bool isDark = colorScheme.brightness == Brightness.dark;
   final Brightness iconBrightness = isDark ? Brightness.light : Brightness.dark;
@@ -25,16 +32,24 @@ SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
   );
 }
 
+/// Single assembly entry for app [ThemeData] (light/dark).
 ThemeData buildAppTheme(Brightness brightness) {
-  final colorScheme = HentaiColorScheme.buildBaseColorScheme(brightness);
-  final tokens = brightness == Brightness.dark
+  final ColorScheme colorScheme = buildBaseColorScheme(brightness);
+  final HentaiColorScheme semantic = HentaiColorScheme.forBrightness(
+    brightness,
+  );
+  final AppThemeTokens tokens = brightness == Brightness.dark
       ? AppThemeTokens.dark()
       : AppThemeTokens.light();
+  final AppShadowTokens shadows = AppShadowTokens.fromSemantic(semantic);
+  final AppMotionTokens motion = brightness == Brightness.dark
+      ? AppMotionTokens.dark()
+      : AppMotionTokens.light();
   final RoundedRectangleBorder buttonShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(tokens.radius.md),
   );
 
-  var themeData = ThemeData(
+  return ThemeData(
     useMaterial3: true,
     colorScheme: colorScheme,
     scaffoldBackgroundColor: colorScheme.surface,
@@ -63,9 +78,13 @@ ThemeData buildAppTheme(Brightness brightness) {
         TargetPlatform.windows: DesktopFadeThroughPageTransitionsBuilder(),
       },
     ),
-    extensions: [tokens],
+    extensions: <ThemeExtension<dynamic>>[
+      tokens,
+      semantic,
+      shadows,
+      motion,
+    ],
   );
-  return themeData;
 }
 
 ScrollbarThemeData _buildScrollbarTheme(ColorScheme colorScheme) {
