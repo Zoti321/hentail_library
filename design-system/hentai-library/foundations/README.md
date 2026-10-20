@@ -21,6 +21,20 @@
 | 对比度 / 焦点 / 减动效 | [accessibility.md](./accessibility.md) |
 | 图标（Lucide） | [iconography.md](./iconography.md) |
 
+## 采纳分层（Tier A/B/C）
+
+决策：[#327 决策 Fluent 维度采纳分层](https://github.com/Zoti321/hentail_library/issues/327)。
+
+| Tier | 含义 |
+|------|------|
+| **A** | 跨平台必须：solid 色与 stroke/shadow/token 基线、MI Sans、Lucide、无 ripple、Toast、a11y 对比度；断点 600/1024 |
+| **B** | 可选：局部 Acrylic、路由 fade-through、focus ring、stagger、扩展 spacing/shadow 方程 |
+| **C** | 不承诺：真 Mica、Windows 变亮 hover、Fluent 组件库 parity、Copilot、Material Icons、mobile 分树、全套 HC 主题 |
+
+**Material：** Solid/Smoke → A；Acrylic → B；Mica → C。
+
+P0 角色表请填写 **Tier** 列（A/B/C）。
+
 ## 共用：明暗对照表模板
 
 P0 各专题的「角色表」统一列（**禁止在 Widget 中写裸 hex**；明暗列写语义与用法，具体色值指向代码测试/Widgetbook）：
@@ -30,7 +44,7 @@ P0 各专题的「角色表」统一列（**禁止在 Widget 中写裸 hex**；�
 | _例：内容表面_ | Surface | 主内容区背景 | 同上 | `colorScheme.surface` |
 | _例：细边框_ | Stroke subtle | 1px 分隔 | 同上 | `context.hentai.borderSubtle` |
 
-可选附加列（按需）：**Tier**（A/B/C，待 [#327](https://github.com/Zoti321/hentail_library/issues/327)）、**Anti-Pattern**、**典型 Widget**。
+可选附加列（按需）：**Tier**（A/B/C，见上节）、**Anti-Pattern**、**典型 Widget**。
 
 ## 共用：单文件章节骨架
 
