@@ -49,3 +49,15 @@ Shell（sidebar、title bar）不纳入上表；另立 **P3-Shell** spec。
 ## 外链与稿面
 
 裁决顺序与 R0/R1/R2：[#323](https://github.com/Zoti321/hentail_library/issues/323) → 落盘 `references.md`（P0 spec）。
+
+## ui-ux-pro-max 合并（[#326](https://github.com/Zoti321/hentail_library/issues/326)）
+
+| 规则 | 说明 |
+|------|------|
+| **可 persist** | 仅 `MASTER.md`、`pages/*.md` |
+| **不可 persist / force** | `foundations/`、`ROADMAP.md`、`references.md`、`research/` |
+| **`--force`** | 默认禁止；整包换肤须维护者确认 + 单独 PR review |
+| **审查** | Anti-Patterns、产品单壳语境、Tier/#323 一致、无稿面 hex；`pages/*` 覆盖 MASTER |
+| **Agent** | 先读 MASTER + 目标 page + Tier；优先 diff 建议；persist 走 dev PR 并注明来源 |
+
+Wayfinder 地图 [#319](https://github.com/Zoti321/hentail_library/issues/319) 决策已齐；实现用 `/to-spec` → `ready-for-agent`。
