@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
-import 'package:hentai_library/shared/ui/ports/library_management_port.dart';
+import 'package:hentai_library/shared/application/ports/library_management_port.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomeLibraryAlertStack extends ConsumerWidget {
