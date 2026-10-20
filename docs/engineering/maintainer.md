@@ -2,7 +2,7 @@
 
 ## GitHub Issues（`gh`）
 
-仓库内用 `gh`（从 `git remote` 推断 repo）。
+仓库内用 `gh`（从 `git remote` 推断 repo）。**Agent 技能**（`to-tickets`、`implement-spec` 等）的 tracker 约定见 `docs/agents/issue-tracker.md`。
 
 | 操作 | 命令 |
 |------|------|
@@ -13,7 +13,7 @@
 | 标签 | `gh issue edit <n> --add-label "..."` / `--remove-label "..."` |
 | 关闭 | `gh issue close <n> --comment "..."` |
 
-Triage：**恰好一个**标签——`needs-triage` · `needs-info` · `ready-for-agent` · `ready-for-human` · `wontfix`。
+Triage：**恰好一个** state 标签——`needs-triage` · `needs-info` · `ready-for-agent` · `ready-for-human` · `wontfix`（与 `docs/agents/triage-labels.md` 一致）。分类常用 `bug` / `enhancement`。Agent 分拣：`/triage` 技能。
 
 ## 用户日志与支持
 

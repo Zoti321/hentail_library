@@ -17,3 +17,17 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 **Tests & CI** → `docs/engineering/gate.md`; tier names ADR-0018; workflows `.github/workflows/gate.yml`.
 
 **Issues** · **logs export** · **tag dictionary JSON** → `docs/engineering/maintainer.md`.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues via `gh` (default); local `.scratch/<feature>/issues/` only when `gh` cannot reach GitHub. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical state + category roles; label strings match GitHub. See `docs/agents/triage-labels.md`. Maintainer workflow: `/triage` skill.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` + `docs/adr/`. See `docs/agents/domain.md`.
