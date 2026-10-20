@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/ui/dto/nav_item_data.dart';
+import 'package:hentai_library/shared/ui/shell/shell_nav_item.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
@@ -17,16 +17,16 @@ abstract final class AppNavigation {
   static const String navIdSettings = 'settings';
 
   /// Flat main items (Libraries section is rendered separately after Home).
-  static List<NavItemData> desktopMainNavItems(AppLocalizations l10n) =>
-      <NavItemData>[
+  static List<ShellNavItem> desktopMainNavItems(AppLocalizations l10n) =>
+      <ShellNavItem>[
         (id: navIdHome, label: l10n.navHome, icon: LucideIcons.house),
         (id: navIdMetadata, label: l10n.navMetadata, icon: LucideIcons.layers),
         (id: navIdHistory, label: l10n.navHistory, icon: LucideIcons.history),
       ];
 
-  static List<NavItemData> desktopSystemNavItems(
+  static List<ShellNavItem> desktopSystemNavItems(
     AppLocalizations l10n,
-  ) => <NavItemData>[
+  ) => <ShellNavItem>[
     (id: navIdTrash, label: l10n.navTrash, icon: LucideIcons.trash2),
     (id: navIdSettings, label: l10n.navSettings, icon: LucideIcons.settings),
   ];

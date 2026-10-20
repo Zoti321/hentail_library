@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
@@ -24,7 +24,7 @@ class ComicDetailCover extends ConsumerWidget {
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
     return AdaptiveComicCover(
-      coverDisplay: comicCoverImageOrPrevious(state),
+      coverDisplay: comicCoverSourceOrPrevious(state),
       containerAspectRatio: containerAspectRatio,
       backgroundColor: Colors.white,
       showShadow: true,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
 
@@ -20,7 +20,7 @@ class AdaptiveComicCover extends StatelessWidget {
     this.onDecodeError,
   });
 
-  final ComicCoverImage? coverDisplay;
+  final ComicCoverSource? coverDisplay;
   final double containerAspectRatio;
   final double fallbackAspectRatio;
   final BoxFit fit;

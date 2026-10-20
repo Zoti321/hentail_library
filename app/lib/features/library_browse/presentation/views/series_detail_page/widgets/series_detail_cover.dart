@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
@@ -35,7 +35,7 @@ class SeriesDetailCover extends ConsumerWidget {
       ),
       data: (SeriesCoverSource source) => switch (source) {
         SeriesCoverCustomThumbnail(:final thumbnail) => _buildAdaptive(
-          coverDisplay: ComicCoverImage.bytes(thumbnail),
+          coverDisplay: ComicCoverSource.bytes(thumbnail),
           placeholderKind: ComicCoverPlaceholderKind.loading,
         ),
         SeriesCoverFallbackComic(:final comicId) => _buildFallbackComicCover(
@@ -57,7 +57,7 @@ class SeriesDetailCover extends ConsumerWidget {
     final ComicCoverState state = ref.watch(comicCoverProvider(coverComicId));
 
     return AdaptiveComicCover(
-      coverDisplay: comicCoverImageOrPrevious(state),
+      coverDisplay: comicCoverSourceOrPrevious(state),
       containerAspectRatio: containerAspectRatio,
       backgroundColor: Colors.white,
       showShadow: true,
@@ -71,7 +71,7 @@ class SeriesDetailCover extends ConsumerWidget {
   }
 
   Widget _buildAdaptive({
-    required ComicCoverImage? coverDisplay,
+    required ComicCoverSource? coverDisplay,
     required ComicCoverPlaceholderKind placeholderKind,
   }) {
     return AdaptiveComicCover(

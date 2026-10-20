@@ -19,7 +19,7 @@ import 'package:hentai_library/shared/domain/repositories/author_repository.dart
 import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/tag_repository.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/meta_chip.dart';

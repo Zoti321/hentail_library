@@ -1,5 +1,5 @@
 /// 阅读历史网格项（首页/历史页卡片传值）。
-typedef HistoryGridItem = ({
+typedef HistoryCardItem = ({
   String id,
   String title,
   DateTime lastReadTime,
@@ -8,7 +8,7 @@ typedef HistoryGridItem = ({
   int? pageIndex,
 });
 
-HistoryGridItem historyGridItem({
+HistoryCardItem historyCardItem({
   required String id,
   required String title,
   required DateTime lastReadTime,

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 
 /// 漫画封面展示状态（Provider 层消费）。
 sealed class ComicCoverState {
@@ -9,13 +9,13 @@ sealed class ComicCoverState {
 final class ComicCoverLoading extends ComicCoverState {
   const ComicCoverLoading({this.previous});
 
-  final ComicCoverImage? previous;
+  final ComicCoverSource? previous;
 }
 
 final class ComicCoverReady extends ComicCoverState {
   const ComicCoverReady(this.data);
 
-  final ComicCoverImage data;
+  final ComicCoverSource data;
 }
 
 /// 无可用封面（含缩略图生成中）。
@@ -31,7 +31,7 @@ final class ComicCoverError extends ComicCoverState {
 }
 
 /// 从 [ComicCoverState] 提取可渲染的封面图像（ready 或 loading 的 previous）。
-ComicCoverImage? comicCoverImageOrPrevious(ComicCoverState state) {
+ComicCoverSource? comicCoverSourceOrPrevious(ComicCoverState state) {
   return switch (state) {
     ComicCoverReady(:final data) => data,
     ComicCoverLoading(:final previous) => previous,

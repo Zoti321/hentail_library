@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/interaction/app_motion.dart';
-import 'package:hentai_library/shared/ui/interaction/interactive_target.dart';
+import 'package:hentai_library/shared/ui/motion/app_motion.dart';
+import 'package:hentai_library/shared/ui/widgets/foundation/pointer_target.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';

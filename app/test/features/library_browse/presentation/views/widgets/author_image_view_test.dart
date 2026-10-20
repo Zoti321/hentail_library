@@ -4,8 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/author_image_view.dart';
@@ -41,7 +41,7 @@ Future<void> _pump(
     tester,
     overrides: <Override>[
       comicCoverProvider('comic-1').overrideWith(
-        () => FixedComicCover(ComicCoverReady(ComicCoverImage.bytes(_png))),
+        () => FixedComicCover(ComicCoverReady(ComicCoverSource.bytes(_png))),
       ),
       authorImageProvider(_request).overrideWith((Ref ref) => hd()),
     ],

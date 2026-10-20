@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 
@@ -17,7 +17,7 @@ void main() {
             width: 120,
             height: 180,
             child: CardLetterboxedCoverImage(
-              cover: ComicCoverImage.bytes(Uint8List.fromList(<int>[1, 2, 3])),
+              cover: ComicCoverSource.bytes(Uint8List.fromList(<int>[1, 2, 3])),
             ),
           ),
         ),

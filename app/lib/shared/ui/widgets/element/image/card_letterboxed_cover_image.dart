@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/image/image_decode_cache_size.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
 
@@ -16,7 +16,7 @@ class CardLetterboxedCoverImage extends StatelessWidget {
     this.alignment = Alignment.center,
   });
 
-  final ComicCoverImage cover;
+  final ComicCoverSource cover;
   final VoidCallback? onDecodeError;
   final BoxFit fit;
   final AlignmentGeometry alignment;

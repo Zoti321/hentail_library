@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
-import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
+import 'package:hentai_library/features/home/presentation/models/history_card_item.dart';
 import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_constants.dart';
 import 'package:hentai_library/shared/ui/widgets/element/card/reading_history_card.dart';
@@ -64,7 +64,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
         return value.hasError;
       }),
     );
-    final List<HistoryGridItem> visible = ref.watch(
+    final List<HistoryCardItem> visible = ref.watch(
       homeContinueReadingTop5GridItemsProvider,
     );
     return Column(
@@ -118,7 +118,7 @@ class _ContinueReadingBody extends StatefulWidget {
   final HomePageLayoutTier layoutTier;
   final bool loading;
   final bool hasError;
-  final List<HistoryGridItem> visible;
+  final List<HistoryCardItem> visible;
   final AppThemeTokens tokens;
   final ColorScheme colorScheme;
 
@@ -198,7 +198,7 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
         separatorBuilder: (BuildContext context, int index) =>
             SizedBox(width: widget.tokens.spacing.md),
         itemBuilder: (BuildContext context, int index) {
-          final HistoryGridItem item = widget.visible[index];
+          final HistoryCardItem item = widget.visible[index];
           return SizedBox(
             width: continueReadingItemWidthFor(widget.layoutTier),
             height: continueReadingStripHeight,
