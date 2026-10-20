@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/shared/ui/interaction/desktop_page_transition.dart';
+import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/library_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page.dart';

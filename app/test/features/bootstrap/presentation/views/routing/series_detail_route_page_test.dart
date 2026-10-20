@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/shared/ui/interaction/desktop_page_transition.dart';
+import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 
 class _FakeGoRouterState extends Fake implements GoRouterState {
   @override

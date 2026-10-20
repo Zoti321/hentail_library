@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hentai_library/shared/ui/interaction/desktop_page_transition.dart';
+import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
 import 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
 import 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';

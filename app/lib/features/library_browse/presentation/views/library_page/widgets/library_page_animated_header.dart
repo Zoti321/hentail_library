@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/interaction/app_motion.dart';
+import 'package:hentai_library/shared/ui/motion/app_motion.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_pinned_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/catalog_selection_header_section.dart';

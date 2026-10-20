@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/interaction/interactive_target.dart';
+import 'package:hentai_library/shared/ui/widgets/foundation/pointer_target.dart';
 
 void main() {
   group('minInteractiveSize', () {

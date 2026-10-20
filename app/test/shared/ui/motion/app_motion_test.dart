@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/interaction/app_motion.dart';
+import 'package:hentai_library/shared/ui/motion/app_motion.dart';
 
 void main() {
   group('motionDuration', () {

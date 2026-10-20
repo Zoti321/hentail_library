@@ -5,7 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_return_series_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/comic_detail_back_location.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
-import 'package:hentai_library/shared/ui/interaction/desktop_page_transition.dart';
+import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
