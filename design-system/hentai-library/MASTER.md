@@ -66,7 +66,7 @@ Cross-platform **comic library** app: scan/sync local or WebDAV roots, browse ca
 - `shared/ui/layout/app_layout_breakpoints.dart` — breakpoints
 - `core/util/utils.dart` — `isDesktop` **仅**窗口 chrome，不分叉页面树
 
-**Shared UI layers (ADR-0027)** — `shared/ui/{shell,layout,widgets,interaction,theme}/` **不得** import `features/`；feature 组合在 `features/*/presentation/`。依赖边界由 `app/test/gate/shared_ui_no_feature_import_test.dart` 等强制执行。
+**Shared UI layers (ADR-0027)** — `shared/ui/{shell,layout,models,motion,widgets,theme}/` **不得** import `features/`；**Application UI ports** 在 `shared/application/ports/`。**Motion token**（`AppMotionTokens`、`context.motion`）在 `theme/tokens`；**motion/** 为过渡与 reduced-motion 实现；指针/命中区工具在 `widgets/foundation/`。feature 组合在 `features/*/presentation/`。依赖边界由 `app/test/gate/shared_ui_no_feature_import_test.dart` 等强制执行。
 
 ---
 
