@@ -107,4 +107,4 @@ Fluent 2 站点与「Design language」Figma 层按**多专题**组织。下列�
 
 ---
 
-*本文件随 research 分支 `research/wayfinder-320-fluent2-flutter-feasibility` 提交；合并前以 issue #320 resolution 为准。*
+*备忘路径：`design-system/hentai-library/research/`（在 **`dev`** 维护；规范落盘见 wayfinder [#319](https://github.com/Zoti321/hentail_library/issues/319)）。*
