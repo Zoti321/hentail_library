@@ -36,7 +36,7 @@ Accepted
 ### 4. 不在此目录承载的内容
 
 - Gate 细则、CI tier、Rust/FRB 契约 → `docs/engineering/`
-- 过期 backlog → 非 `docs/archive/` 现行规范
+- 过期 backlog → GitHub Issues 与 Accepted ADR，勿依赖已删除的归档文档树
 - 大段可复制进仓库的 Dart 实现
 
 ## Consequences

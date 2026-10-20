@@ -10,12 +10,10 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **Flutter UI** (shell, tokens, components) → `design-system/hentai-library/MASTER.md` (+ `pages/*` per route). Same tree: design planning, Agent UI spec, ui-ux-pro-max `--persist` output (ADR-0029); token **values** live in `app/lib/shared/ui/theme/`.
 
-**Dart layout & imports** (features/shared/core, MVVM) → ADR-0017, ADR-0027; enforced by `app/test/gate/` + `project_layout_test.dart`.
+**Dart layout & imports** (features/shared/core, MVVM) → ADR-0017, ADR-0027; Wayfinder 终态以 `app/test/gate/` + ADR-0027 为准，并由 `project_layout_test.dart` 等门禁强制执行。
 
 **Rust** (sync, read, DB) → `core/`; see `docs/adr/README.md` (ADR-0002 and related).
 
 **Tests & CI** → `docs/engineering/gate.md`; tier names ADR-0018; workflows `.github/workflows/gate.yml`.
 
 **Issues** · **logs export** · **tag dictionary JSON** → `docs/engineering/maintainer.md`.
-
-Do not use `docs/archive/` as current spec.

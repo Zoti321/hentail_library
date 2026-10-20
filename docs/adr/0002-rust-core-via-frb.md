@@ -10,7 +10,7 @@ Dart 在压缩包、EPUB、PDF 等格式上库支持弱；全库扫描与全量�
 
 ## Decision
 
-将扫描、Library sync、阅读 I/O、缩略图、SQLite 持久化迁入 Rust（`flutter_rust_bridge`），Monorepo 布局：`app/`（Flutter UI + Repository 薄层）、`core/`（`hentai-core` + `hentai-flutter`）。SeaORM 原地接管 `my_database.sqlite`；comicId 仍按 ADR-0001。`settings.json`、应用更新、打开文件管理器留 Dart。移除 R18 路径自动检测功能。
+将扫描、Library sync、阅读 I/O、缩略图、SQLite 持久化迁入 Rust（`flutter_rust_bridge`），Monorepo 布局：`app/`（Flutter UI + Repository 薄层）、`core/`（`hentai-core` + `hentai-flutter`）。SeaORM 原地接管 `my_database.sqlite`；comicId 仍按 ADR-0001。App preference 与 Library browse preference 留 Dart（SharedPreferences），见 ADR-0016；应用更新、打开文件管理器留 Dart UI。移除 R18 路径自动检测功能。
 
 ## Consequences
 
