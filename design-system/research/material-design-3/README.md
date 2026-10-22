@@ -1,7 +1,7 @@
 # Material 3 设计系统调研（索引与决策清单）
 
 > 本目录是 **设计系统重写的调研底稿**，不是最终规范。旧 Fluent 设计系统文档（`design-system/hentai-library/` 24 个文件）已整体删除（`git rm` 暂存），目录保留，历史可从 HEAD 取回。
-> 当前阶段：**Figma 建库中**（D1–D8 全部拍板；颜色 A 亮/暗、44 Number token、30 Text Style、6 Effect + 5 Grid Style、01–04 文档页、05 三个打样组件已建；完整组件集、模板待建），代码未动。设计稿在 Figma 完成并经确认后，才进入实现。
+> 当前阶段：**Figma 建库中**（D1–D8 全部拍板；颜色 A 亮/暗、44 Number token、30 Text Style、6 Effect + 5 Grid Style、01–04 文档页、05 三个打样组件 + Button 8 变体集 + NavigationBar 4 变体 + NavigationRail 8 变体、07 首个 Large 1440×900 书库模板已建），代码未动。设计稿在 Figma 完成并经确认后，才进入实现。
 > 证据分级：**A** = 官方规范页/设计文档原文；**B** = 官方源码/实现（Compose `*Tokens.kt`、material-web `tokens/v0_192`、Flutter SDK 源码）——数值可信但非规范页；**C** = 未核实/工程推断。各文档正文逐条标注。
 
 ## 文档索引
@@ -13,6 +13,7 @@
 | `03-flutter-implementation.md` | 425 | 42 | Flutter M3 实现现状、规范差距、本仓库 theme/ADR 盘点、失效引用、迁移要点（附录性质） | 项目解析到 Flutter `>=3.38.0`；Expressive 无官方路径（#168813 Open）；主题装配点分散且有裸 `MaterialApp` |
 | `04-figma-design-workflow.md` | 391 | 31 | 官方 Figma 资源核实、Variables vs Styles、文件/组件集结构、桌面 frame、Plugin API 与 figwright 映射、交接清单 | M3 Design Kit v1.20 起已并入 Expressive → **必须自建 Figma 库**；只借 Material Theme Builder 的色板；插件 API 无 `setVariableValue`，是 `setValueForMode` |
 | `05-color-directions.md` | 117 | 0 | 粉色 A/B/C 取色、Figma 预览与切换方式、对比度、字体落地 | 免费版 1 collection 只能 1 mode → 建 6 个 collection，用三个 frame + 原型跳转切换；**已选定 A 柔和玫瑰**，亮/暗 frame 均已建；B/C 已移到 `12 Archive & Scratch` 作备选皮肤 |
+| `06-adaptive-desktop.md` | 281 | 7 | 五档断点、分栏/导航矩阵、canonical layouts（list-detail / supporting pane / feed）、栅格与间距、连续性、桌面输入、页面映射、模板矩阵 | Compact 1 栏 / Medium 1（推荐）或 2 / Expanded 起 2 栏；导航 compact=bar、medium/expanded=collapsed rail、large/XL=expanded rail；supporting pane expanded 固定 360dp；官方 spacing 页无数值，项目用 4/8 体系 |
 
 行数与 URL 数按本地文件统计；各文档开头的「检索说明」记录了抓取失败与降级路径，引用前先看该节。
 
@@ -21,7 +22,7 @@
 - `m3.material.io` 大量页面是 JS 交互式 token 浏览器，抓取返回空正文；Firecrawl 多次 429；`web_fetch` 报 non-public IP；shell 直连 TLS 失败。
 - 因此 **M3 规范页的原始 dp/字号/透明度数值大多没拿到**；文档中的数值主要来自官方实现源码（B 级），并与规范页可抓到的文字交叉验证。
 - 设计稿阶段可以接受 B 级数值（最终落点是 Flutter），但凡是「规范值 vs 实现值」不一致处，文档已并列记录（如 type scale 的 3 处 tracking、rail destinations 3–7 vs 3–5）。
-- 未能从官方文档确认的项：drawer modal/standard 判定、dialog vs full-screen、snackbar/badge/tooltip 取舍、chips/cards/carousel 官方分类、Switch/Radio 尺寸、M3 桌面快捷键、spacing/density/canonical layouts 的具体 dp、图标推荐尺寸 20/24dp 等。详见各文档「证据薄弱」节与 `04` §7。
+- 未能从官方文档确认的项：drawer modal/standard 判定、dialog vs full-screen、snackbar/badge/tooltip 取舍、chips/cards/carousel 官方分类、Switch/Radio 尺寸、M3 桌面快捷键、spacing 数值、grid margin/gutter 数值、navigation bar/rail 的精确 dp、图标推荐尺寸 20/24dp 等。详见各文档「证据薄弱」节与 `04` §7。
 
 ## 合并后的核心结论
 
@@ -35,6 +36,7 @@
 8. **桌面实现细节与规范有落差**：`adaptivePlatformDensity` 在 Windows/macOS/Linux 返回 compact（`theme_data.dart:3233-3250`）；Tooltip 桌面最小高 24；modal bottom sheet maxWidth 640 / 圆角 28；桌面纵向滚动自动加 Scrollbar 且默认不支持鼠标拖拽。
 9. **Figma 必须自建库**：官方 kit 只能当「baseline 语义参考图」，色板走 Material Theme Builder；Expressive-only 内容排除；字阶落 Text Style（Figma 无复合排版变量）；组件状态用 variant（Button 225 变体为上限）。
 10. **figwright 已连接**（server/plugin 0.6.0，文件 `Hentai Library UI  (Material Design) v2`）。免费版每个 collection 只能 1 mode，颜色主题按「一主题一 collection」建；A/B/C 切换用三个 frame + Prototype 跳转，明细见 `05-color-directions.md`。
+11. **自适应布局已有官方依据**：五档断点之外，分栏与导航要按 breakpoint 置换（compact bar → collapsed rail → expanded rail）；list-detail 在 compact 单栏、expanded 起双栏；supporting pane 在 expanded 固定 360dp；feed 随断点加列。代码迁移时不要缓存窗口尺寸，单/双栏切换只改布局不动路由栈。
 
 ## 设计决策（D1–D8 已全部拍板）
 
@@ -62,12 +64,12 @@ D1–D8 已全部拍板。D4 的 splash 平台策略只进了设计文档，代�
 1. 已定：D1 五档、D2 MiSans、D3 A 柔和玫瑰、D4 state layer + 平台 splash、D5 排除 Expressive、D6 混合建库、D7 首批稿顺序、D8 Material Symbols。
 2. `design-system/hentai-library/MASTER.md` 已建立（目录章程、颜色/字阶、断点、Figma 页面图、组件清单、代码映射）。
 3. Figma：变量 6 集合 + Number 44 项、30 Text Style、6 Effect + 5 Grid Style、A 亮/暗预览、01–04 文档页已完成。
-4. 05 Components 已完成 Button / Icon Button / Text Field 三个打样组件；下一步扩 variant 矩阵（默认/hover/pressed/disabled/selected） → 06 Patterns → 07 Templates × 五档 → 08 Screens（按 D7 主壳 + 首页 + 书库 + 阅读器）→ 09 States → 10 Motion → 11 Handoff。
+4. 05 Components 已完成 Button / Icon Button / Text Field 打样；Button 8 变体、NavigationBar 4 变体、NavigationRail 8 变体（Type × Selected）已建。07 已建 `Template/Library · Large 1440`（`41:1578`：expanded rail + 列表-详情）。下一步：FAB、List Item、Card、Chip、Dialog（P0）→ 06 Patterns → 07 其余断点模板（1024×768 / 600×800 / 390×844 / 1920×1080）→ 08 Screens（主壳 + 首页 + 书库 + 阅读器）→ 09 States → 10 Motion → 11 Handoff。
 5. 组件状态矩阵（每组件出几态）在进入 05 前定；插画/占位图来源仍缺。
 6. 设计稿定稿并评审通过后，才进入 Flutter 主题与页面改造（`03` 的清单可作为迁移附录）。
 
 ## 复现与更新
 
-- 四份文档由并行的后台调研代理生成，硬性要求：只引一手来源、逐条 URL、区分规范/实现/Expressive、中文、只写各自文件。
+- 01–05 由并行的后台调研代理生成，06 由主代理按用户给定的 4 个官方入口补抓 canonical examples 后写成；硬性要求：只引一手来源、逐条 URL、区分规范/实现/Expressive、中文、只写各自文件。
 - 更新某一份时，请同步改本索引的行数/结论，并在对应文档的「检索说明」里记录新抓取通道与失败原因。
 - 引用规范数值到 MASTER/页面文档时，标注来源小节与证据级别（A/B），不要只写「M3 规定」。

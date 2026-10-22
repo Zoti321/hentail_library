@@ -1,8 +1,8 @@
 # Hentai Library · Material 3 设计系统（MASTER）
 
-> 状态：**Figma 建库中**。本文件是设计系统的唯一规划入口；颜色方向 A 已定（亮/暗预览）、44 个 Number token、30 个 Text Style、6 个 Effect Style、5 个 Grid Style 与 01–04 文档页已建。组件集 / 模板尚未开始。
+> 状态：**Figma 建库中**。本文件是设计系统的唯一规划入口；颜色方向 A 已定（亮/暗预览）、44 个 Number token、30 个 Text Style、6 个 Effect Style、5 个 Grid Style、01–04 文档页已建；05 已有三个打样组件与 Button 8 变体集。桌面/大屏规则已入 §5，导航组件、模板与页面尚未开始。
 > 代码未迁移：`app/` 仍是旧 Fluent 取向的主题与页面。设计稿评审通过后才改代码（见 §8）。
-> 证据底稿：`design-system/research/material-design-3/`（01 基础、02 组件、03 Flutter 实现、04 Figma 工作流、05 粉色方向）。规范数值若与本文件冲突，先查底稿的证据级别（A 官方规范 / B 官方实现源码 / C 推断）。
+> 证据底稿：`design-system/research/material-design-3/`（01 基础、02 组件、03 Flutter 实现、04 Figma 工作流、05 粉色方向、06 自适应布局）。规范数值若与本文件冲突，先查底稿的证据级别（A 官方规范 / B 官方实现源码 / C 推断）。
 
 ## Directory charter
 
@@ -204,17 +204,60 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 ## 5. 布局与断点
 
-| class | 宽度 (dp) | 代表 frame | 壳层 |
-|---|---:|---|---|
-| compact | < 600 | 390×844 | 底部导航；单列 |
-| medium | 600–839 | 800×1280 | 抽屉或 rail（按页面）；两列内容 |
-| expanded | 840–1199 | 1024×768 | 常驻 navigation rail；列表-详情可并排 |
-| large | 1200–1599 | 1440×900 | rail + 内容最大宽；三列网格 |
-| extra-large | ≥ 1600 | 1920×1080 | 同上，内容居中限宽，避免无限拉伸 |
+### 5.1 五档断点
 
+| class | 宽度 (dp) | 代表 frame | 壳层 | 分栏 | 栅格 |
+|---|---:|---|---|---|---|
+| compact | < 600 | 390×844 | Navigation bar（高 80） | 1 | 4 列 / margin 16 / gutter 16 |
+| medium | 600–839 | 800×1280 | Collapsed navigation rail（宽 80） | 1（推荐）或 2 | 8 列 / margin 24 / gutter 24 |
+| expanded | 840–1199 | 1024×768 | Collapsed rail（可换 standard expanded） | 1 或 2（推荐 2） | 12 列 / margin 24 / gutter 24 |
+| large | 1200–1599 | 1440×900 | Expanded rail（宽 256，显示文字标签） | 1 或 2（推荐 2） | 12 列 / margin 24 / gutter 24 |
+| extra-large | ≥ 1600 | 1920×1080 | Expanded rail（宽 256） | 1–3（推荐 3） | 12 列 / margin 24 / gutter 32 |
+
+- 断点按**应用可用窗口**判断，不用设备类型；横竖屏、多窗口、折叠展开都会换档。
 - 接缝测试：599/600、839/840、1199/1200、1599/1600 各出一张对照。
-- 断点按**应用可用窗口**判断，不用设备类型。
+- 内容最大宽：large/XL 的正文区约 1200dp 居中，避免 1920 拉满；正文保持 40–60 字符/行。
 - 代码现状 `app/lib/shared/ui/layout/app_layout_breakpoints.dart:10,13` 是 600/1024；迁移时改五档。
+
+### 5.2 官方分栏与导航矩阵
+
+| Breakpoint | Panes | Navigation | Communication | Action |
+|---|---|---|---|---|
+| Compact | 1 | Navigation bar；modal expanded rail | Simple / full-screen dialog | Bottom sheet |
+| Medium | 1（推荐）或 2 | Navigation bar；modal expanded rail | Simple dialog | Menu |
+| Expanded | 1 或 2（推荐 2） | Modal 或 standard expanded rail | Simple dialog | Menu |
+| Large | 1 或 2（推荐 2） | Modal 或 standard expanded rail | Simple dialog | Menu |
+| Extra-large | 1–3（推荐 3） | Modal 或 standard expanded rail | Simple dialog | Menu |
+
+跨断点只做五件事：**reveal / divide / resize / reposition / swap**。不换功能不等价的组件（button↔chip、list item↔card 要谨慎）。Medium 两栏只用于低密度内容 + 清晰动作。
+
+### 5.3 Canonical layouts
+
+**List-detail**（书库、历史、设置）：compact 1 栏；medium 1（推荐）或 2（双栏时用 bottom nav 省横向空间）；expanded 起 2 栏。单栏时 detail 才有 back；双栏时 selected 只在 list；无选中时 detail 显示占位；单/双栏切换保持最近使用的 pane。
+
+**Supporting pane**（详情页元数据、阅读器设置）：compact/medium 放 primary 下方（compact 可用 bottom sheet）；expanded 起放 leading/trailing 固定 **360dp**。父子关系改用 list-detail。
+
+**Feed**（首页、搜索、历史列表）：网格卡片；compact 单列铺满，medium 起加列，expanded/large/XL 列数继续增加；用大小与位置表达层级，重排保持顺序。
+
+### 5.4 页面 → 布局映射
+
+| 页面 | Compact | Medium | Expanded | Large / XL |
+|---|---|---|---|---|
+| 首页 Home | feed 单列 | feed 2 列 | feed 3 列 | feed 4–5 列，内容限宽 |
+| 书库 All libraries | 列表→详情路由 | feed 或双栏 | list-detail 双栏 | 双栏 + 更宽 list |
+| 单本详情 Library | 单栏 detail | 单栏 | supporting pane（trailing 360） | 同 expanded |
+| 阅读器 Reader | 全屏单栏 | 全屏单栏 | 单栏 + 可选 trailing 360 | 同 expanded，阅读区限宽 |
+| 历史 History | feed 单列 | 2 列 | 2 列 + 详情 | 双栏 |
+| 搜索 Search | 单列结果 | 2 列 | 2 列 | 3 列，筛选常驻 |
+| 设置 Settings | 单栏 | 1 或 2（低密度） | 双栏：分类 + 内容 | 双栏 + 展开 rail |
+
+### 5.5 连续性与输入
+
+- 不缓存/硬编码窗口尺寸与方向；用 `MediaQuery.sizeOf` / `LayoutBuilder` 取当前约束。
+- 鼠标 hover / 键盘 focus / 触摸 pressed 都要有可见反馈；焦点环 2px + 12% state layer；hover 不能是唯一入口。
+- 交互目标 ≥ 48×48；桌面可收紧视觉密度，但不能缩点击区。
+- 官方没有 spacing 数值表；项目用 4/8 体系（§4.1），桌面可放宽到 space/5–6。
+- 详细依据与证据级别见 `research/material-design-3/06-adaptive-desktop.md`。
 
 ## 6. Figma 库结构
 
@@ -227,9 +270,9 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 02 Styles | `9:10` | 30 Text Style + 样张；6 Effect + 5 Grid Style 与卡片 | 完成（`25:1234`） |
 | 03 Foundations | `9:11` | 角色用法、字阶、形状、elevation、motion、state、a11y 规则页 | 完成（`25:1314`） |
 | 04 Icons & Assets | `9:12` | Material Symbols 24px 样本、尺寸 20/24/40、filled 态 | 完成（`25:1374`）；插画/占位图待补 |
-| 05 Components | `9:13` | 无业务语义的原子组件 | 三个组件打样完成（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）；variant 矩阵待扩 |
+| 05 Components | `9:13` | 无业务语义的原子组件 | 三个打样（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）+ **Button 变体集 `39:1481`**（Filled/Tonal/Outlined/Text × Default/Disabled，8 变体）+ **NavigationBar 变体集 `41:1539`**（Selected=home/library-books/history/settings，4 变体）+ **NavigationRail 变体集 `41:1577`**（Type=Collapsed/Expanded × Selected=home/library-books/history/settings，8 变体）；FAB/List/Card/Chip/Dialog 待建 |
 | 06 Patterns | `9:14` | 有业务语义的组合（导航、列表-详情、搜索、阅读器） | 待建 |
-| 07 Templates | `9:15` | 五档壳层模板 | 待建 |
+| 07 Templates | `9:15` | 五档壳层模板 | Large 1440×900 书库 list-detail 模板 `41:1578`（expanded rail + 左列表 400 + 右详情）；1024×768 / 600×800 / 390×844 / 1920×1080 待建 |
 | 08 Screens | `9:16` | 带真实内容的页面实例 | 待建 |
 | 09 States & Content Lab | `9:17` | loading/empty/error/offline、长文本、CJK、大图 | 待建 |
 | 10 Motion | `9:18` | 转场与时长标注 | 待建 |
@@ -240,7 +283,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 ## 7. 组件清单（规划）
 
-P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已在 05 页打样，其余待建。
+P0 = 首批页面必需；P1 = 第二批。Button（含 4 风格 × 2 状态的变体集）/ Icon Button / Text Field / NavigationBar / NavigationRail 已在 05 页建，其余待建。导航壳层按 §5 的五档矩阵建：compact 用 Navigation bar，medium/expanded 用 collapsed rail，large/XL 用 expanded rail。
 
 | 组件 | 优先级 | 关键 variant | Flutter 对照 / 风险 |
 |---|---|---|---|
@@ -249,7 +292,7 @@ P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已
 | Icon Button | P0 | standard/filled/tonal/outlined × toggle | 已打样 standard 40×40 + 24 图标；最小点击区 48 |
 | FAB | P0 | size (56/80/96) × color × extended | Flutter 只有 56，80/96 需自绘 |
 | Text Field / Search Bar | P0 | filled/outlined × focus/error | 已打样 filled 320×56；桌面 hover/focus state layer |
-| Navigation Bar / Rail | P0 | destinations 3–5 × selected | 大屏 rail 与 bottom bar 的切换策略 |
+| Navigation Bar / Rail | P0 | destinations 3–5 × selected | 已建：NavigationBar `41:1539`（390×80，4 变体）；NavigationRail `41:1577`（Collapsed 80 / Expanded 256，各 4 个 Selected 变体）。切换策略见 §5.2 |
 | List Item | P0 | 1/2/3 line × leading/trailing | 高度 56/72/88；封面图用 2:3 缩略图 |
 | Card | P0 | elevated/filled/outlined | 与列表容器区分，不叠阴影 |
 | Chip | P0 | assist/filter/input/suggestion | 选中态用 secondaryContainer |
@@ -270,7 +313,7 @@ P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已
 
 - 状态 variant 控制在 5 个以内，避免 Button 类组件的组合爆炸（官方 kit 的 225 变体上限是反例）。
 - 尺寸、图标有无、标签用 **component properties**（VARIANT / BOOLEAN / TEXT / INSTANCE_SWAP），不要用更多 state variant 表达。
-- disabled：内容 38% / 容器 12%，不改变形状与位置。
+- disabled：用**实色混合**表达 38% 内容 / 12% 容器，不要用 paint opacity（导出到透明底会发黑）。当前值：容器 `#E4DDDC`（surface + onSurface 12%）、容器上的文字 `#9B9393`（再叠 38%）、surface 上的文字 `#ABA3A3`（surface + onSurface 38%）。不改变形状与位置。
 
 ## 8. 代码映射（迁移前只读）
 
@@ -279,6 +322,7 @@ P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已
 | 颜色 46 角色 | `app/lib/shared/ui/theme/color/app_color_scheme.dart`（26 字段手工枚举，primary `#005FB8`） | 改为 `ColorScheme.fromSeed(seedColor: #E91E63, dynamicSchemeVariant: tonalSpot)` 或直接生成 46 角色；保留 `HentaiColorScheme` 扩展 |
 | Text Style 30 | `tokens/app_text_tokens.dart`、`buildAppTheme` 的 `fontFamily: 'MI_Sans_Regular'` | 换 MiSans 四档资产；`TextTheme` 按 §3.1 重建 |
 | 断点五档 | `layout/app_layout_breakpoints.dart`（600/1024） | 改 600/840/1200/1600；`isCompact/isMedium/isExpanded` 扩展为五档 |
+| 自适应壳层 | 现有底部导航 / 桌面侧栏分散在各页面 | 按 §5.2 收口：compact NavigationBar，medium/expanded collapsed rail，large/XL expanded rail；书库/历史/设置用 list-detail，首页/搜索用 feed，详情/阅读器用 supporting pane |
 | shape/elevation/motion | `tokens/app_radius_tokens.dart`、`app_shadow_tokens.dart`、`app_motion_tokens.dart` | 按 Figma 定稿值替换 |
 | 组件状态 / splash | `theme.dart:62-64` 现为 NoSplash + transparent highlight + 桌面 compact density | 按 D4：**移动端保留平台 splash，桌面 `NoSplash` + state layer**；恢复 hover 8% / focus 12% / pressed 12% / dragged 16%；触达尺寸不得低于 48 |
 | 图标 | `lucide_icons_flutter ^3.1.9`（全库使用） | 换 Material Symbols（outlined 默认 / filled 选中）；先替换导航、播放器、列表动作等 P0 图标 |
@@ -288,7 +332,8 @@ P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已
 ## 9. 未决事项
 
 1. **插图与占位图**：04 页目前只有图标；封面、占位构图、空态插图未定来源（自绘 / 授权素材）。
-2. **Grid margin**：Figma Grid Style 无 margin 参数，03 页展示的 16/24 是项目取值；M3 官方 margin 页抓取失败（C 级），待复核。
+2. **Grid margin**：Figma Grid Style 无 margin 参数；项目取 compact 16 / ≥medium 24（§5.1）。M3 官方 margin 表抓取失败，仍为 C 级，模板出图后再复核。
+3. **导航组件精确 dp**：Navigation bar 高 80、rail 宽 80/256、indicator 56×32 来自实现值（B）；官方 specs 页抓取失败。已按实现值建出 `41:1539` / `41:1577` 并在 `41:1578` 模板验证；若后续拿到官方数值，改组件集而非模板。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -307,3 +352,7 @@ P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已
 | 05 打样 | Button/Filled、IconButton/Standard、TextField/Filled 三个 COMPONENT 建成并完成变量绑定；证明 token 可落地，variant 矩阵未展开 |
 | 组件状态矩阵 | 定 P0 五态（default/hover/pressed/disabled/selected）、P1 两态；focus 用焦点层，不进 variant；其余组合交给 component properties |
 | 叠字修复 | 01 Tokens 初版分批坐标复用导致重叠，整块重建为 147 文本 + 92 色卡 |
+| 桌面/大屏 | 调研官方 breakpoints / spacing / canonical examples / 5-steps，写成 `06-adaptive-desktop.md`；§5 扩为五档壳层、分栏矩阵、canonical layouts、页面映射与连续性规则 |
+| Button 变体集 | Figma `39:1481`：Filled/Tonal/Outlined/Text × Default/Disabled，8 变体；disabled 改实色混合避免透明底发黑 |
+| 导航组件 | `41:1539` NavigationBar（390×80，Selected 4 变体）；`41:1577` NavigationRail（Collapsed 80 / Expanded 256，Type × Selected 8 变体）；indicator 需置底，否则盖住图标 |
+| 桌面模板 | `41:1578` `Template/Library · Large 1440`：expanded rail 256 + 左侧列表 400 + 右侧详情；官方 large 分栏规则落地验证 |
