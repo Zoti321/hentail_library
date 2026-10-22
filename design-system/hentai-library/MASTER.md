@@ -1,6 +1,6 @@
 # Hentai Library · Material 3 设计系统（MASTER）
 
-> 状态：**Figma 建库中**。本文件是设计系统的唯一规划入口；颜色方向 A 已定（亮/暗预览）、44 个 Number token、30 个 Text Style、6 个 Effect Style、5 个 Grid Style、01–04 文档页已建；05 已有三个打样组件与 Button 8 变体集。桌面/大屏规则已入 §5，导航组件、模板与页面尚未开始。
+> 状态：**Figma 首批稿完成**。本文件是设计系统的唯一规划入口；颜色方向 A 已定（亮/暗预览）、44 个 Number token、30 个 Text Style、6 个 Effect Style、5 个 Grid Style、01–04 文档页已建；05 已建齐 P0 原子组件集，06 有 BookListItem / ComicCard / ChapterRow 三个业务组件，07 五档模板齐全，08 首页与阅读器在 compact/medium/expanded/large 出图。代码未迁移。
 > 代码未迁移：`app/` 仍是旧 Fluent 取向的主题与页面。设计稿评审通过后才改代码（见 §8）。
 > 证据底稿：`design-system/research/material-design-3/`（01 基础、02 组件、03 Flutter 实现、04 Figma 工作流、05 粉色方向、06 自适应布局）。规范数值若与本文件冲突，先查底稿的证据级别（A 官方规范 / B 官方实现源码 / C 推断）。
 
@@ -218,7 +218,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 接缝测试：599/600、839/840、1199/1200、1599/1600 各出一张对照。
 - 内容最大宽：large/XL 的正文区约 1200dp 居中，避免 1920 拉满；正文保持 40–60 字符/行。
 - 代码现状 `app/lib/shared/ui/layout/app_layout_breakpoints.dart:10,13` 是 600/1024；迁移时改五档。
-- 模板进度：Large 1440×900 `41:1578`、Expanded 1024×768 `41:1774`、Medium 600×800 `41:1824`；compact 390×844 与 XL 1920×1080 待建。
+- 模板进度（五档齐全）：Compact 390×844 `41:1975`、Medium 600×800 `41:1824`、Expanded 1024×768 `41:1774`、Large 1440×900 `41:1578`、XL 1920×1080 `41:2384`。XL 用三栏（expanded rail 256 + 列表 504 + 详情/章节 + 阅读进度 360），验证官方 XL 1–3 pane 上限。
 
 ### 5.2 官方分栏与导航矩阵
 
@@ -272,9 +272,9 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 03 Foundations | `9:11` | 角色用法、字阶、形状、elevation、motion、state、a11y 规则页 | 完成（`25:1314`） |
 | 04 Icons & Assets | `9:12` | Material Symbols 24px 样本、尺寸 20/24/40、filled 态 | 完成（`25:1374`）；插画/占位图待补 |
 | 05 Components | `9:13` | 无业务语义的原子组件 | 三个打样（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）+ **Button 变体集 `39:1481`**（Filled/Tonal/Outlined/Text × Default/Disabled，8 变体）+ **NavigationBar 变体集 `41:1539`**（Selected=home/library-books/history/settings，4 变体）+ **NavigationRail 变体集 `41:1577`**（Type=Collapsed/Expanded × Selected=home/library-books/history/settings，8 变体）；**FAB `41:1886`**（Regular 56 / Medium 80 / Large 96 / Extended 136×56）、**FilterChip `41:1895`**（Unselected / Selected）、**ListItem `41:1920`**（Lines 1/2/3，56/72/88）、**Card `41:1933`**（Filled / Elevated / Outlined）、**Dialog/Basic `41:1939`**（320×220）|
-| 06 Patterns | `9:14` | 有业务语义的组合（导航、列表-详情、搜索、阅读器） | 待建 |
-| 07 Templates | `9:15` | 五档壳层模板 | Large 1440×900 `41:1578`（expanded rail 256 + 列表 400 + 详情）；Expanded 1024×768 `41:1774`（collapsed rail 80 + 列表 304 + 详情）；Medium 600×800 `41:1824`（collapsed rail 80 + 单栏列表 + FAB）；compact 390×844 与 XL 1920×1080 待建 |
-| 08 Screens | `9:16` | 带真实内容的页面实例 | 待建 |
+| 06 Patterns | `9:14` | 有业务语义的组合（书籍行、漫画卡、章节行） | 已建：`BookListItem` `41:1946`（368×80，封面 48×64 + 标题 16 + meta 12 + 进度条）、`ComicCard` `41:1951`（160×276，封面 160×220）、`ChapterRow` `41:1955`（360×48）；证明 frame `41:1956`。阅读器 overlay、设置分区待补 |
+| 07 Templates | `9:15` | 五档壳层模板 | **五档齐全**：Compact 390×844 `41:1975`（导航栏 80 + 单栏列表 + FAB）、Medium 600×800 `41:1824`（collapsed rail 80）、Expanded 1024×768 `41:1774`（collapsed rail 80 + 列表 304 + 详情）、Large 1440×900 `41:1578`（expanded rail 256 + 列表 400 + 详情）、XL 1920×1080 `41:2384`（三栏：rail 256 + 列表 504 + 详情 + 阅读进度 360） |
+| 08 Screens | `9:16` | 带真实内容的页面实例 | Home：1440 `41:2026` / 1024 `41:2209` / 600 `41:2160` / 390 `41:2314`；Reader：1440 `41:2097` / 1024 `41:2275` / 600 `41:2139` / 390 `41:2363`。书库的页面实例在 07 模板（正文与数据已灌入） |
 | 09 States & Content Lab | `9:17` | loading/empty/error/offline、长文本、CJK、大图 | 待建 |
 | 10 Motion | `9:18` | 转场与时长标注 | 待建 |
 | 11 Handoff & A11y | `9:19` | token 映射、组件 API、do/don't、覆盖看板 | 待建 |
@@ -282,9 +282,23 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 建库顺序：variables → text/effect/grid styles → primitives → patterns → templates × 断点 → screens → states/content → docs。
 
+### 6.1 首批页面
+
+首页与阅读器的四档出图（完整五档见 07 模板）：
+
+![首页 1440](../research/material-design-3/assets/screen-home-large-1440.png)
+
+![首页 600](../research/material-design-3/assets/screen-home-medium-600.png)
+
+![阅读器 1440](../research/material-design-3/assets/screen-reader-large-1440.png)
+
+![阅读器 390](../research/material-design-3/assets/screen-reader-compact-390.png)
+
+![书库 XL 三栏](../research/material-design-3/assets/template-library-extra-large-1920.png)
+
 ## 7. 组件清单（规划）
 
-P0 = 首批页面必需；P1 = 第二批。Button（含 4 风格 × 2 状态的变体集）/ Icon Button / Text Field / NavigationBar / NavigationRail 已在 05 页建，其余待建。导航壳层按 §5 的五档矩阵建：compact 用 Navigation bar，medium/expanded 用 collapsed rail，large/XL 用 expanded rail。
+P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（Button / Icon Button / Text Field / NavigationBar / NavigationRail / FAB / FilterChip / ListItem / Card / Dialog）；业务组合在 06（BookListItem / ComicCard / ChapterRow）。导航壳层按 §5 的五档矩阵落地：compact 用 Navigation bar，medium/expanded 用 collapsed rail，large/XL 用 expanded rail。
 
 | 组件 | 优先级 | 关键 variant | Flutter 对照 / 风险 |
 |---|---|---|---|
@@ -303,7 +317,7 @@ P0 = 首批页面必需；P1 = 第二批。Button（含 4 风格 × 2 状态的�
 | Tabs / Menu / Tooltip / Divider / Badge | P1 | — | Tooltip 桌面最小高 24 |
 | Segmented Button | 暂缓 | — | 官方 2025-05 起不再推荐，改用 connected button group |
 
-业务组件（Comic Card、Reader Overlay、Library Grid、History Row、Metadata Panel、Settings Section）放 `06 Patterns`，不混进 `05 Components`。
+业务组件放 `06 Patterns`，不混进 `05 Components`。已建 BookListItem / ComicCard / ChapterRow；待补 Reader Overlay（顶栏 + 底栏 + 页码滑杆）、Settings Section、History Row、Metadata Panel。
 
 ### 7.1 组件状态矩阵（已定）
 
@@ -359,3 +373,6 @@ P0 = 首批页面必需；P1 = 第二批。Button（含 4 风格 × 2 状态的�
 | 桌面模板 | `41:1578` `Template/Library · Large 1440`：expanded rail 256 + 左侧列表 400 + 右侧详情；官方 large 分栏规则落地验证 |
 | 多断点模板 | `41:1774` Expanded 1024×768（collapsed rail 80 + 列表 304 + 详情）；`41:1824` Medium 600×800（collapsed rail 80 + 单栏列表 + 筛选 chips + FAB） |
 | P0 组件补齐 | `41:1886` FAB 4 尺寸；`41:1895` FilterChip 2 态；`41:1920` ListItem 3 行数；`41:1933` Card 3 风格；`41:1939` Dialog/Basic；全部绑定 A-Light 变量 |
+| 业务 Patterns | `41:1946` BookListItem、`41:1951` ComicCard、`41:1955` ChapterRow；证明 frame `41:1956`。业务语义不下沉到 05 |
+| 五档模板 | 补 Compact 390×844 `41:1975` 与 XL 1920×1080 `41:2384`（三栏，官方 XL 3-pane 上限）；至此 compact/medium/expanded/large/XL 齐全 |
+| 首批 Screens | 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)；阅读器 `41:2097`(1440)/`41:2275`(1024)/`41:2139`(600)/`41:2363`(390)；均用实例 + 真实文案，验证 supporting pane 与 feed |
