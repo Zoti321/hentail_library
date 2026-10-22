@@ -1,7 +1,7 @@
 # Material 3 设计系统调研（索引与决策清单）
 
 > 本目录是 **设计系统重写的调研底稿**，不是最终规范。旧 Fluent 设计系统文档（`design-system/hentai-library/` 24 个文件）已整体删除（`git rm` 暂存），目录保留，历史可从 HEAD 取回。
-> 当前阶段：**Figma 建库中**（D1–D8 全部拍板；颜色 A 亮/暗、44 Number token、30 Text Style、6 Effect + 5 Grid Style、01–04 文档页、05 三个打样组件 + Button 8 变体集 + NavigationBar 4 变体 + NavigationRail 8 变体、07 Large 1440×900 / Expanded 1024×768 / Medium 600×800 三个书库模板已建），代码未动。设计稿在 Figma 完成并经确认后，才进入实现。
+> 当前阶段：**Figma 建库中**（D1–D8 全部拍板；颜色 A 亮/暗、44 Number token、30 Text Style、6 Effect + 5 Grid Style、01–04 文档页、05 三个打样组件 + Button 8 变体集 + NavigationBar 4 变体 + NavigationRail 8 变体、07 Large 1440×900 / Expanded 1024×768 / Medium 600×800 三个书库模板、05 的 FAB/FilterChip/ListItem/Card/Dialog P0 组件已建），代码未动。设计稿在 Figma 完成并经确认后，才进入实现。
 > 证据分级：**A** = 官方规范页/设计文档原文；**B** = 官方源码/实现（Compose `*Tokens.kt`、material-web `tokens/v0_192`、Flutter SDK 源码）——数值可信但非规范页；**C** = 未核实/工程推断。各文档正文逐条标注。
 
 ## 文档索引
@@ -64,7 +64,7 @@ D1–D8 已全部拍板。D4 的 splash 平台策略只进了设计文档，代�
 1. 已定：D1 五档、D2 MiSans、D3 A 柔和玫瑰、D4 state layer + 平台 splash、D5 排除 Expressive、D6 混合建库、D7 首批稿顺序、D8 Material Symbols。
 2. `design-system/hentai-library/MASTER.md` 已建立（目录章程、颜色/字阶、断点、Figma 页面图、组件清单、代码映射）。
 3. Figma：变量 6 集合 + Number 44 项、30 Text Style、6 Effect + 5 Grid Style、A 亮/暗预览、01–04 文档页已完成。
-4. 05 Components 已完成 Button / Icon Button / Text Field 打样；Button 8 变体、NavigationBar 4 变体、NavigationRail 8 变体（Type × Selected）已建。07 已建 Large 1440×900 `41:1578`（expanded rail + 列表-详情）、Expanded 1024×768 `41:1774`（collapsed rail + 双栏）、Medium 600×800 `41:1824`（collapsed rail + 单栏 + FAB）。下一步：FAB、List Item、Card、Chip、Dialog（P0）→ 06 Patterns → 07 compact 390×844 / XL 1920×1080 → 08 Screens（主壳 + 首页 + 书库 + 阅读器）→ 09 States → 10 Motion → 11 Handoff。
+4. 05 Components 已完成 P0 主体：Button 8 变体、IconButton、TextField、NavigationBar 4 变体、NavigationRail 8 变体、FAB 4 尺寸、FilterChip 2 态、ListItem 3 行数、Card 3 风格、Dialog/Basic。07 已建 Large 1440×900 `41:1578`、Expanded 1024×768 `41:1774`、Medium 600×800 `41:1824`。下一步：06 Patterns（BookListItem / ComicCard / ChapterRow / ReaderToolbar / SettingsSection）→ 07 compact 390×844 / XL 1920×1080 → 08 Screens（主壳 + 首页 + 书库 + 阅读器）→ 09 States → 10 Motion → 11 Handoff。
 5. 组件状态矩阵（每组件出几态）在进入 05 前定；插画/占位图来源仍缺。
 6. 设计稿定稿并评审通过后，才进入 Flutter 主题与页面改造（`03` 的清单可作为迁移附录）。
 
