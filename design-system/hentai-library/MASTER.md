@@ -261,6 +261,17 @@ P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已
 
 业务组件（Comic Card、Reader Overlay、Library Grid、History Row、Metadata Panel、Settings Section）放 `06 Patterns`，不混进 `05 Components`。
 
+### 7.1 组件状态矩阵（已定）
+
+| 优先级 | Figma variant 状态 | 说明 |
+|---|---|---|
+| P0 | default / hover / pressed / disabled / selected | selected 只给可切换组件（Icon Button toggle、Chip、Navigation item）；focus 不单独出 variant，用 2px outline 焦点层 + 12% state layer，布尔属性控制显隐 |
+| P1 | default / selected | 其余交互态由代码按 §4.4 生成，不出设计稿 |
+
+- 状态 variant 控制在 5 个以内，避免 Button 类组件的组合爆炸（官方 kit 的 225 变体上限是反例）。
+- 尺寸、图标有无、标签用 **component properties**（VARIANT / BOOLEAN / TEXT / INSTANCE_SWAP），不要用更多 state variant 表达。
+- disabled：内容 38% / 容器 12%，不改变形状与位置。
+
 ## 8. 代码映射（迁移前只读）
 
 | 设计侧 | 代码侧（现状） | 迁移动作 |
@@ -276,9 +287,8 @@ P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已
 
 ## 9. 未决事项
 
-1. **组件状态矩阵**：每个组件的 hover/focus/pressed/disabled/selected 是否都出 variant，还是只出关键态（建议：P0 组件出默认/hover/pressed/disabled/selected 五态，其余只出默认 + selected）。进入 05 Components 前定。
-2. **插图与占位图**：04 页目前只有图标；封面、占位构图、空态插图未定来源（自绘 / 授权素材）。
-3. **Grid margin**：Figma Grid Style 无 margin 参数，03 页展示的 16/24 是项目取值；M3 官方 margin 页抓取失败（C 级），待复核。
+1. **插图与占位图**：04 页目前只有图标；封面、占位构图、空态插图未定来源（自绘 / 授权素材）。
+2. **Grid margin**：Figma Grid Style 无 margin 参数，03 页展示的 16/24 是项目取值；M3 官方 margin 页抓取失败（C 级），待复核。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -295,4 +305,5 @@ P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已
 | Styles | 6 个 Effect Style（elevation/level0–5）与 5 个 Grid Style（四档栅格 + 8pt baseline）建成；02 页出对照卡 |
 | 01–04 文档页 | Tokens 总览、Effect/Grid、Foundations 规则、Material Symbols 图标页建成并截图 |
 | 05 打样 | Button/Filled、IconButton/Standard、TextField/Filled 三个 COMPONENT 建成并完成变量绑定；证明 token 可落地，variant 矩阵未展开 |
+| 组件状态矩阵 | 定 P0 五态（default/hover/pressed/disabled/selected）、P1 两态；focus 用焦点层，不进 variant；其余组合交给 component properties |
 | 叠字修复 | 01 Tokens 初版分批坐标复用导致重叠，整块重建为 147 文本 + 92 色卡 |
