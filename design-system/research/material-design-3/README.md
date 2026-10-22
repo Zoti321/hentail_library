@@ -65,7 +65,7 @@ D1–D8 已全部拍板。D4 的 splash 平台策略只进了设计文档，代�
 1. 已定：D1 五档、D2 MiSans、D3 A 柔和玫瑰、D4 state layer + 平台 splash、D5 排除 Expressive、D6 混合建库、D7 首批稿顺序、D8 Material Symbols。
 2. `design-system/hentai-library/MASTER.md` 已建立（目录章程、颜色/字阶、断点、Figma 页面图、组件清单、代码映射）。
 3. Figma：变量 6 集合 + Number 44 项、30 Text Style、6 Effect + 5 Grid Style、A 亮/暗预览、01–04 文档页已完成。
-4. 05 已完成 P0 主体：Button 8 变体、IconButton、TextField、NavigationBar 4 变体、NavigationRail 8 变体、FAB 4 尺寸、FilterChip 2 态、ListItem 3 行数、Card 3 风格、Dialog/Basic。06 已建 BookListItem `41:1946`、ComicCard `41:1951`、ChapterRow `41:1955`。07 五档齐全：Compact 390 `41:1975`、Medium 600 `41:1824`、Expanded 1024 `41:1774`、Large 1440 `41:1578`、XL 1920 `41:2384`（三栏）。08 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)、阅读器 `41:2097`/`41:2275`/`41:2139`/`41:2363`。下一步：补 06 剩余业务组件（Reader Overlay / Settings Section / History Row / Metadata Panel）→ 09 States & Content Lab → 10 Motion → 11 Handoff & A11y。
+4. 05 已完成 P0 主体：Button 8 变体、IconButton、TextField、NavigationBar 4 变体、NavigationRail 8 变体、FAB 4 尺寸、FilterChip 2 态、ListItem 3 行数、Card 3 风格、Dialog/Basic。06 已建 BookListItem `41:1946`、ComicCard `41:1951`、ChapterRow `41:1955`、HistoryRow `41:2498`、SettingsSection `41:2496`、MetadataPanel `41:2497`、ReaderToolbar `41:2516`、ReaderBottomBar `41:2517`。07 五档齐全：Compact 390 `41:1975`、Medium 600 `41:1824`、Expanded 1024 `41:1774`、Large 1440 `41:1578`、XL 1920 `41:2384`（三栏）。08 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)、阅读器 `41:2097`/`41:2275`/`41:2139`/`41:2363`。下一步：09 States & Content Lab（loading/empty/error/offline、长文本/CJK、大图、密度）→ 10 Motion → 11 Handoff & A11y。
 5. 组件状态矩阵（每组件出几态）在进入 05 前定；插画/占位图来源仍缺。
 6. 设计稿定稿并评审通过后，才进入 Flutter 主题与页面改造（`03` 的清单可作为迁移附录）。
 

@@ -272,7 +272,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 03 Foundations | `9:11` | 角色用法、字阶、形状、elevation、motion、state、a11y 规则页 | 完成（`25:1314`） |
 | 04 Icons & Assets | `9:12` | Material Symbols 24px 样本、尺寸 20/24/40、filled 态 | 完成（`25:1374`）；插画/占位图待补 |
 | 05 Components | `9:13` | 无业务语义的原子组件 | 三个打样（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）+ **Button 变体集 `39:1481`**（Filled/Tonal/Outlined/Text × Default/Disabled，8 变体）+ **NavigationBar 变体集 `41:1539`**（Selected=home/library-books/history/settings，4 变体）+ **NavigationRail 变体集 `41:1577`**（Type=Collapsed/Expanded × Selected=home/library-books/history/settings，8 变体）；**FAB `41:1886`**（Regular 56 / Medium 80 / Large 96 / Extended 136×56）、**FilterChip `41:1895`**（Unselected / Selected）、**ListItem `41:1920`**（Lines 1/2/3，56/72/88）、**Card `41:1933`**（Filled / Elevated / Outlined）、**Dialog/Basic `41:1939`**（320×220）|
-| 06 Patterns | `9:14` | 有业务语义的组合（书籍行、漫画卡、章节行） | 已建：`BookListItem` `41:1946`（368×80，封面 48×64 + 标题 16 + meta 12 + 进度条）、`ComicCard` `41:1951`（160×276，封面 160×220）、`ChapterRow` `41:1955`（360×48）；证明 frame `41:1956`。阅读器 overlay、设置分区待补 |
+| 06 Patterns | `9:14` | 有业务语义的组合（书籍行、漫画卡、章节行） | 已建：`BookListItem` `41:1946`（368×80，封面 48×64 + 标题 16 + meta 12 + 进度条）、`ComicCard` `41:1951`（160×276，封面 160×220）、`ChapterRow` `41:1955`（360×48）、`HistoryRow` `41:2498`（360×72）、`SettingsSection` `41:2496`（360×300，4 行 label/value）、`MetadataPanel` `41:2497`（320×240，5 组键值）、`ReaderToolbar` `41:2516`（1080×64）、`ReaderBottomBar` `41:2517`（1080×80，含 320 进度条）；证明 frame `41:1956` |
 | 07 Templates | `9:15` | 五档壳层模板 | **五档齐全**：Compact 390×844 `41:1975`（导航栏 80 + 单栏列表 + FAB）、Medium 600×800 `41:1824`（collapsed rail 80）、Expanded 1024×768 `41:1774`（collapsed rail 80 + 列表 304 + 详情）、Large 1440×900 `41:1578`（expanded rail 256 + 列表 400 + 详情）、XL 1920×1080 `41:2384`（三栏：rail 256 + 列表 504 + 详情 + 阅读进度 360） |
 | 08 Screens | `9:16` | 带真实内容的页面实例 | Home：1440 `41:2026` / 1024 `41:2209` / 600 `41:2160` / 390 `41:2314`；Reader：1440 `41:2097` / 1024 `41:2275` / 600 `41:2139` / 390 `41:2363`。书库的页面实例在 07 模板（正文与数据已灌入） |
 | 09 States & Content Lab | `9:17` | loading/empty/error/offline、长文本、CJK、大图 | 待建 |
@@ -317,7 +317,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | Tabs / Menu / Tooltip / Divider / Badge | P1 | — | Tooltip 桌面最小高 24 |
 | Segmented Button | 暂缓 | — | 官方 2025-05 起不再推荐，改用 connected button group |
 
-业务组件放 `06 Patterns`，不混进 `05 Components`。已建 BookListItem / ComicCard / ChapterRow；待补 Reader Overlay（顶栏 + 底栏 + 页码滑杆）、Settings Section、History Row、Metadata Panel。
+业务组件放 `06 Patterns`，不混进 `05 Components`。已建 BookListItem / ComicCard / ChapterRow / HistoryRow / SettingsSection / MetadataPanel / ReaderToolbar / ReaderBottomBar；阅读器 overlay 由 toolbar + bottom bar 组合，不再做整屏组件（整屏属 08 Screens）。
 
 ### 7.1 组件状态矩阵（已定）
 
@@ -376,3 +376,4 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 业务 Patterns | `41:1946` BookListItem、`41:1951` ComicCard、`41:1955` ChapterRow；证明 frame `41:1956`。业务语义不下沉到 05 |
 | 五档模板 | 补 Compact 390×844 `41:1975` 与 XL 1920×1080 `41:2384`（三栏，官方 XL 3-pane 上限）；至此 compact/medium/expanded/large/XL 齐全 |
 | 首批 Screens | 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)；阅读器 `41:2097`(1440)/`41:2275`(1024)/`41:2139`(600)/`41:2363`(390)；均用实例 + 真实文案，验证 supporting pane 与 feed |
+| 06 业务组件补齐 | `41:2498` HistoryRow、`41:2496` SettingsSection、`41:2497` MetadataPanel、`41:2516` ReaderToolbar、`41:2517` ReaderBottomBar；阅读器 overlay 改为组合而非整屏组件 |
