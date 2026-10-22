@@ -227,7 +227,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 02 Styles | `9:10` | 30 Text Style + 样张；6 Effect + 5 Grid Style 与卡片 | 完成（`25:1234`） |
 | 03 Foundations | `9:11` | 角色用法、字阶、形状、elevation、motion、state、a11y 规则页 | 完成（`25:1314`） |
 | 04 Icons & Assets | `9:12` | Material Symbols 24px 样本、尺寸 20/24/40、filled 态 | 完成（`25:1374`）；插画/占位图待补 |
-| 05 Components | `9:13` | 无业务语义的原子组件 | 待建（下一步：Button / Icon Button / Text Field 打样） |
+| 05 Components | `9:13` | 无业务语义的原子组件 | 三个组件打样完成（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）；variant 矩阵待扩 |
 | 06 Patterns | `9:14` | 有业务语义的组合（导航、列表-详情、搜索、阅读器） | 待建 |
 | 07 Templates | `9:15` | 五档壳层模板 | 待建 |
 | 08 Screens | `9:16` | 带真实内容的页面实例 | 待建 |
@@ -240,15 +240,15 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 ## 7. 组件清单（规划）
 
-P0 = 首批页面必需；P1 = 第二批。状态均为「待建」。
+P0 = 首批页面必需；P1 = 第二批。Button / Icon Button / Text Field 已在 05 页打样，其余待建。
 
 | 组件 | 优先级 | 关键 variant | Flutter 对照 / 风险 |
 |---|---|---|---|
 | Icon（Material Symbols） | P0 | outlined / filled × 20 / 24 / 40 | 自托管 SVG 或图标包；迁移时替换 `lucide_icons_flutter`；filled 只用于 selected/激活 |
-| Button（filled/tonal/outlined/text/elevated） | P0 | emphasis × size × icon × state | `FilledButton` 等；需统一高度 40、圆角 full |
-| Icon Button | P0 | standard/filled/tonal/outlined × toggle | 最小点击区 48 |
+| Button（filled/tonal/outlined/text/elevated） | P0 | emphasis × size × icon × state | `FilledButton` 等；已打样 filled 120×40 / radius full；需统一高度 40、圆角 full |
+| Icon Button | P0 | standard/filled/tonal/outlined × toggle | 已打样 standard 40×40 + 24 图标；最小点击区 48 |
 | FAB | P0 | size (56/80/96) × color × extended | Flutter 只有 56，80/96 需自绘 |
-| Text Field / Search Bar | P0 | filled/outlined × focus/error | 桌面 hover/focus state layer |
+| Text Field / Search Bar | P0 | filled/outlined × focus/error | 已打样 filled 320×56；桌面 hover/focus state layer |
 | Navigation Bar / Rail | P0 | destinations 3–5 × selected | 大屏 rail 与 bottom bar 的切换策略 |
 | List Item | P0 | 1/2/3 line × leading/trailing | 高度 56/72/88；封面图用 2:3 缩略图 |
 | Card | P0 | elevated/filled/outlined | 与列表容器区分，不叠阴影 |
@@ -294,4 +294,5 @@ P0 = 首批页面必需；P1 = 第二批。状态均为「待建」。
 | 数值 token | `Number` 集合 44 项（spacing/radius/size/state/breakpoint/icon/elevation）建成；spacing 4/8 体系获用户批准 |
 | Styles | 6 个 Effect Style（elevation/level0–5）与 5 个 Grid Style（四档栅格 + 8pt baseline）建成；02 页出对照卡 |
 | 01–04 文档页 | Tokens 总览、Effect/Grid、Foundations 规则、Material Symbols 图标页建成并截图 |
+| 05 打样 | Button/Filled、IconButton/Standard、TextField/Filled 三个 COMPONENT 建成并完成变量绑定；证明 token 可落地，variant 矩阵未展开 |
 | 叠字修复 | 01 Tokens 初版分批坐标复用导致重叠，整块重建为 147 文本 + 92 色卡 |
