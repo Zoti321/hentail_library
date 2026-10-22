@@ -1,6 +1,6 @@
 # Hentai Library · Material 3 设计系统（MASTER）
 
-> 状态：**Figma 建库中**。本文件是设计系统的唯一规划入口；颜色方向 A 已定（亮/暗预览均已建），30 个 Text Style 已建，组件集 / 模板尚未完成。
+> 状态：**Figma 建库中**。本文件是设计系统的唯一规划入口；颜色方向 A 已定（亮/暗预览）、44 个 Number token、30 个 Text Style、6 个 Effect Style、5 个 Grid Style 与 01–04 文档页已建。组件集 / 模板尚未开始。
 > 代码未迁移：`app/` 仍是旧 Fluent 取向的主题与页面。设计稿评审通过后才改代码（见 §8）。
 > 证据底稿：`design-system/research/material-design-3/`（01 基础、02 组件、03 Flutter 实现、04 Figma 工作流、05 粉色方向）。规范数值若与本文件冲突，先查底稿的证据级别（A 官方规范 / B 官方实现源码 / C 推断）。
 
@@ -29,7 +29,7 @@
 |---|---|---|---|
 | D1 | 断点 | **M3 五档 600 / 840 / 1200 / 1600** | 设计稿按五档出；代码 `app_layout_breakpoints.dart` 仍是 600/1024，迁移时改 |
 | D2 | 字体 | **MiSans**，Regular / Medium / Semibold / Bold | Figma 字族 `MiSans`；style `Semibold` 无空格。应用目前只打包 Regular，迁移时补资产 |
-| D3 | 品牌色 | **A · 柔和玫瑰**：`#E91E63` + `tonalSpot` | 46 角色见 §2；B/C 变量与预览保留在 `01 Tokens` 作备选 |
+| D3 | 品牌色 | **A · 柔和玫瑰**：`#E91E63` + `tonalSpot` | 46 角色见 §2；B/C 变量与预览移至 `12 Archive & Scratch` 作备选 |
 | D4 | 状态反馈 | **恢复 M3 state layer；splash 按平台**：移动端开启，桌面端关闭 | hover 8% / focus 12% / pressed 12% / dragged 16%；桌面用 state layer 代替 splash。细节见 §4.4；代码暂不动 |
 | D7 | 首批设计稿 | **主壳 + 首页 + 书库 + 阅读器** | 1440×900 主稿，1024×768 验接缝，600×800 验紧凑；按此顺序评审 |
 | D8 | 图标集 | **Material Symbols** | outlined 为默认，selected/激活用 filled；`04 Icons & Assets` 按此建，代码迁移时替换 `lucide_icons_flutter` |
@@ -144,15 +144,47 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 应用侧 `app/pubspec.yaml` 目前只有 `assets/fonts/MiSans-Regular.ttf`，迁移时必须补 Medium/Bold 资产并注册 `fontWeight`，否则层级会塌。
 - CJK 行高：M3 2026 起会按 script 调整；本项目先按表中固定行高，等官方 Flutter 实现再对齐。
 
-## 4. 形状 / 高度 / 动效（未完成）
+## 4. 形状 / 高度 / 动效 / 数值 token
 
-| 维度 | 计划 | 状态 |
+### 4.1 Number tokens（Figma collection `Number`）
+
+| 组 | 值 | 用法 |
 |---|---|---|
-| shape | M3 scale：none 0 / xs 4 / sm 8 / md 12 / lg 16 / xl 28 / full | Figma 变量与代码 `AppRadiusTokens` 待建 |
-| elevation | level 0–5，阴影 + 可选 tonal overlay；surface 不再随高度变色 | Figma Effect Styles 待建；代码 `AppShadowTokens` 待替换 |
-| motion | duration short/medium/long + standard/emphasized easing；桌面保留 fade-through | Figma Motion 页待建；代码 `AppMotionTokens` 待对齐 |
+| spacing | 0 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 | 4/8 体系；M3 未规定 spacing scale，属项目决策 |
+| radius | none 0 / xs 4 / sm 8 / md 12 / lg 16 / xl 28 / full 999 | 卡片 12、对话框 28、FAB 16、按钮与 chip = full |
+| size | control 40 / touch 48 / list 56·72·88 / fab 56·80·96 / extended-fab 56 | 视觉高度可 40，触达不得小于 48 |
+| state | hover 8% / focus 12% / pressed 12% / dragged 16% / disabled 38%·12% | 见 §4.4 |
+| breakpoint | 600 / 840 / 1200 / 1600 | 见 §5 |
+| icon | 20 / 24 / 40 | 默认 24 |
+| elevation | 0 / 1 / 3 / 6 / 8 / 12 | 对应 level 0–5，见 §4.2 |
 
-> 这三项在 `01-foundations.md` 有 B 级数值；建 effect/grid style 时再逐项核实，不在本文件提前写死。
+### 4.2 Elevation（Figma Effect Styles `elevation/level0–5`）
+
+| level | dp | 阴影 | 表面角色 | 用途 |
+|---|---:|---|---|---|
+| 0 | 0 | 无 | surface | 静止背景 |
+| 1 | 1 | 3 层 | surfaceContainerLow | 卡片 / hover |
+| 2 | 3 | 3 层 | surfaceContainer | 菜单 / 拖拽 |
+| 3 | 6 | 3 层 | surfaceContainerHigh | FAB / 对话框 |
+| 4 | 8 | 3 层 | surfaceContainerHighest | hover 提升（仅交互中） |
+| 5 | 12 | 3 层 | surfaceContainerHighest | dragged / 模态（仅交互中） |
+
+- 阴影 dp 与 3 层黑色透明度（0.20 / 0.14 / 0.12）取自 Flutter `kElevationToShadow`（B 级官方实现）。
+- **M3 的 elevation token 不含阴影**：高度主要靠 `surfaceContainer*` 色调表达；阴影是平台选择。桌面保留轻阴影，移动端可只留色调。
+- Figma 中 Effect Style 只存阴影，色调必须在组件填充里绑对应 surface 角色。
+
+### 4.3 Motion
+
+| 场景 | 时长 | 曲线 |
+|---|---:|---|
+| enter（元素出现） | 400ms | Emphasized decelerate |
+| exit（元素消失） | 200ms | Emphasized accelerate |
+| 屏内状态变化 | 500ms | Emphasized |
+| 通用过渡 | 300ms | Standard |
+| 主曲线控制点 | — | 0.2, 0, 0, 1 |
+
+- 桌面页面转场保留 fade-through（现有 `DesktopFadeThroughPageTransitionsBuilder`）。
+- 所有位移/缩放必须受 reduce-motion 开关约束：开启时只保留淡入淡出。
 
 ### 4.4 状态反馈与 splash（D4 已定）
 
@@ -165,9 +197,10 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 - **移动端（Android / iOS）**：保留平台默认 splash（ink ripple/sparkle）作为按压反馈；state layer 主要用于 selected/focus 等非瞬时态。
 - **桌面端（Windows / macOS / Linux）**：关闭 splash（`NoSplash.splashFactory`），hover/pressed 全部由 state layer 提供；否则鼠标点击会出现与桌面习惯不符的扩散动画。
+- 代码落点 `app/lib/shared/ui/theme/theme.dart:62-64`（现为 NoSplash + transparent highlight + `adaptivePlatformDensity`）；迁移时按 `Platform` 分支处理，并恢复 `visualDensity` 的触达最小值。
 - 组件实现：`ButtonStyle.overlayColor` / `InkWell.hoverColor` / `MaterialStateProperty` 按上表取值；不要在组件里写死颜色，叠 `onSurface` 的 alpha。
 - 触达尺寸：视觉高度可以 40，但可点击区不得小于 48×48（桌面与移动一致）。
-- 代码落点（迁移时）：`app/lib/shared/ui/theme/theme.dart:62-64` 现在是 `NoSplash` + 透明 highlight + `adaptivePlatformDensity`，要改成**按平台条件**：`splashFactory = 移动端 ? 平台默认 : NoSplash`，并恢复 overlay/hover 的 state layer。**本轮只写文档，不改代码。**
+
 
 ## 5. 布局与断点
 
@@ -190,18 +223,18 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 页面 | id | 内容 | 状态 |
 |---|---|---|---|
 | 00 Cover · Changelog · Status | `0:1` | 封面、变更记录、建库进度 | 待补 |
-| 01 Tokens | `9:9` | 6 个颜色集合、A/B/C 方向预览 | 颜色完成；shape/spacing 变量待建 |
-| 02 Styles | `9:10` | 30 Text Style + 样张 | 完成；effect/grid 待建 |
-| 03 Foundations | `9:11` | 角色用法、字阶、层级、a11y 规范页 | 待建 |
-| 04 Icons & Assets | `9:12` | 图标、插画、占位图 | 待建；D8 已定 Material Symbols（outlined 默认 / filled 选中） |
-| 05 Components | `9:13` | 无业务语义的原子组件 | 待建 |
+| 01 Tokens | `9:9` | 6 个颜色集合 + A 亮/暗预览 + 44 Number token 总览 | 完成（`25:689`） |
+| 02 Styles | `9:10` | 30 Text Style + 样张；6 Effect + 5 Grid Style 与卡片 | 完成（`25:1234`） |
+| 03 Foundations | `9:11` | 角色用法、字阶、形状、elevation、motion、state、a11y 规则页 | 完成（`25:1314`） |
+| 04 Icons & Assets | `9:12` | Material Symbols 24px 样本、尺寸 20/24/40、filled 态 | 完成（`25:1374`）；插画/占位图待补 |
+| 05 Components | `9:13` | 无业务语义的原子组件 | 待建（下一步：Button / Icon Button / Text Field 打样） |
 | 06 Patterns | `9:14` | 有业务语义的组合（导航、列表-详情、搜索、阅读器） | 待建 |
 | 07 Templates | `9:15` | 五档壳层模板 | 待建 |
 | 08 Screens | `9:16` | 带真实内容的页面实例 | 待建 |
 | 09 States & Content Lab | `9:17` | loading/empty/error/offline、长文本、CJK、大图 | 待建 |
 | 10 Motion | `9:18` | 转场与时长标注 | 待建 |
 | 11 Handoff & A11y | `9:19` | token 映射、组件 API、do/don't、覆盖看板 | 待建 |
-| 12 Archive & Scratch | `9:20` | 废弃方向、Expressive 实验 | 待建 |
+| 12 Archive & Scratch | `9:20` | B/C 方向、Expressive 实验 | B/C 已移入 |
 
 建库顺序：variables → text/effect/grid styles → primitives → patterns → templates × 断点 → screens → states/content → docs。
 
@@ -243,10 +276,9 @@ P0 = 首批页面必需；P1 = 第二批。状态均为「待建」。
 
 ## 9. 未决事项
 
-1. **组件状态矩阵**：每个组件的 hover/focus/pressed/disabled/selected 是否都出 variant，还是只出关键态（建议：P0 组件出默认/hover/pressed/disabled/selected 五态，其余只出默认 + selected）。
-2. **effect / grid style 取值**：P0 的 3 个层级与 grid 断点尚未在 Figma 建 style，建时按 `01-foundations.md` 的 B 级数值复核。
-3. **图标光学尺寸**：Material Symbols 的 20 / 24 / 40 与 weight/fill 轴需要逐处标注，`04 Icons & Assets` 建页时确定。
-
+1. **组件状态矩阵**：每个组件的 hover/focus/pressed/disabled/selected 是否都出 variant，还是只出关键态（建议：P0 组件出默认/hover/pressed/disabled/selected 五态，其余只出默认 + selected）。进入 05 Components 前定。
+2. **插图与占位图**：04 页目前只有图标；封面、占位构图、空态插图未定来源（自绘 / 授权素材）。
+3. **Grid margin**：Figma Grid Style 无 margin 参数，03 页展示的 16/24 是项目取值；M3 官方 margin 页抓取失败（C 级），待复核。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -259,3 +291,7 @@ P0 = 首批页面必需；P1 = 第二批。状态均为「待建」。
 | D4 状态反馈 | 恢复 M3 state layer；splash 按平台（移动端开启 / 桌面关闭），只入文档，代码未动 |
 | D7 首批稿 | 主壳 + 首页 + 书库 + 阅读器；1440×900 主稿、1024×768 接缝、600×800 紧凑 |
 | D8 图标 | Material Symbols，outlined 默认 / filled 选中；代码迁移时替换 Lucide |
+| 数值 token | `Number` 集合 44 项（spacing/radius/size/state/breakpoint/icon/elevation）建成；spacing 4/8 体系获用户批准 |
+| Styles | 6 个 Effect Style（elevation/level0–5）与 5 个 Grid Style（四档栅格 + 8pt baseline）建成；02 页出对照卡 |
+| 01–04 文档页 | Tokens 总览、Effect/Grid、Foundations 规则、Material Symbols 图标页建成并截图 |
+| 叠字修复 | 01 Tokens 初版分批坐标复用导致重叠，整块重建为 147 文本 + 92 色卡 |

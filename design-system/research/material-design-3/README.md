@@ -1,7 +1,7 @@
 # Material 3 设计系统调研（索引与决策清单）
 
 > 本目录是 **设计系统重写的调研底稿**，不是最终规范。旧 Fluent 设计系统文档（`design-system/hentai-library/` 24 个文件）已整体删除（`git rm` 暂存），目录保留，历史可从 HEAD 取回。
-> 当前阶段：**Figma 建库中**（D1–D8 全部拍板；颜色 A 亮/暗、30 个 Text Style、A/B/C 切换已建；effect/grid styles、组件集、模板待建），代码未动。设计稿在 Figma 完成并经确认后，才进入实现。
+> 当前阶段：**Figma 建库中**（D1–D8 全部拍板；颜色 A 亮/暗、44 Number token、30 Text Style、6 Effect + 5 Grid Style、01–04 文档页已建；组件集、模板待建），代码未动。设计稿在 Figma 完成并经确认后，才进入实现。
 > 证据分级：**A** = 官方规范页/设计文档原文；**B** = 官方源码/实现（Compose `*Tokens.kt`、material-web `tokens/v0_192`、Flutter SDK 源码）——数值可信但非规范页；**C** = 未核实/工程推断。各文档正文逐条标注。
 
 ## 文档索引
@@ -12,7 +12,7 @@
 | `02-components-patterns.md` | 488 | 27 | 组件目录与逐项规格、导航/选择模式、大屏与桌面、Expressive 组件状态、组件级 a11y、state layer 落地 | Expressive 是**逐平台逐组件**可选，不是全局升级；SegmentedButton 自 2025-05 起官方不再推荐；Flutter 普遍停在 Expressive 之前 |
 | `03-flutter-implementation.md` | 425 | 42 | Flutter M3 实现现状、规范差距、本仓库 theme/ADR 盘点、失效引用、迁移要点（附录性质） | 项目解析到 Flutter `>=3.38.0`；Expressive 无官方路径（#168813 Open）；主题装配点分散且有裸 `MaterialApp` |
 | `04-figma-design-workflow.md` | 391 | 31 | 官方 Figma 资源核实、Variables vs Styles、文件/组件集结构、桌面 frame、Plugin API 与 figwright 映射、交接清单 | M3 Design Kit v1.20 起已并入 Expressive → **必须自建 Figma 库**；只借 Material Theme Builder 的色板；插件 API 无 `setVariableValue`，是 `setValueForMode` |
-| `05-color-directions.md` | 117 | 0 | 粉色 A/B/C 取色、Figma 预览与切换方式、对比度、字体落地 | 免费版 1 collection 只能 1 mode → 建 6 个 collection，用三个 frame + 原型跳转切换；**已选定 A 柔和玫瑰**，亮/暗 frame 均已建；B/C 留作备选皮肤 |
+| `05-color-directions.md` | 117 | 0 | 粉色 A/B/C 取色、Figma 预览与切换方式、对比度、字体落地 | 免费版 1 collection 只能 1 mode → 建 6 个 collection，用三个 frame + 原型跳转切换；**已选定 A 柔和玫瑰**，亮/暗 frame 均已建；B/C 已移到 `12 Archive & Scratch` 作备选皮肤 |
 
 行数与 URL 数按本地文件统计；各文档开头的「检索说明」记录了抓取失败与降级路径，引用前先看该节。
 
@@ -42,7 +42,7 @@
 |---|---|---|---|---|
 | D1 | 断点体系 | A 沿用仓库 600/1024；B 采用 M3 五档 600/840/1200/1600；C 设计用 M3、代码暂留旧值 | **已定 B**（M3 官方五档 600/840/1200/1600，设计稿按五档出；代码后续改 `AppLayoutBreakpoints`） | 决定设计稿要出几个重排态、什么时候侧栏展开 |
 | D2 | 正文字体 | A 继续 MiSans（补 400/500/700 字重）；B Roboto + Noto Sans SC；C Inter + Noto Sans SC | **已定 A**：本机已装 MiSans Regular/Medium/Semibold/Bold；Figma 字族 `MiSans`，style `Semibold` 无空格 | 字阶、行高、Figma Text Style 全依赖它 |
-| D3 | 品牌色 | A 柔和玫瑰（#E91E63 tonalSpot）；B 品牌玫红（#E91E63 fidelity）；C 樱花粉（#F06C9B fidelity） | **已定 A · 柔和玫瑰**；B/C 变量与预览保留，取色与对比度见 `05-color-directions.md` | 整个色板、暗色、对比度 |
+| D3 | 品牌色 | A 柔和玫瑰（#E91E63 tonalSpot）；B 品牌玫红（#E91E63 fidelity）；C 樱花粉（#F06C9B fidelity） | **已定 A · 柔和玫瑰**；B/C 变量与预览移到 `12 Archive & Scratch`，取色与对比度见 `05-color-directions.md` | 整个色板、暗色、对比度 |
 | D4 | 状态反馈 | A 恢复 M3 state layer（hover/pressed/focus 蒙层），splash 可保留关闭；B 保持现状无反馈；C 自定义 hover 但不做 pressed | **已定 A + 平台策略**：恢复 state layer；**移动端开启 splash，桌面端关闭**（只写文档，代码未动） | 桌面可用性、a11y、组件状态矩阵 |
 | D5 | Expressive | A 排除；B 局部引入 | **已按调研锁定 A**（Flutter 无官方支持；用户未反对） | 决定 Figma 组件集范围 |
 | D6 | Figma 建库方式 | A 手工建库；B figwright 脚本建库（需先打开插件）；C 混合（手工骨架 + 脚本批量） | **采用 C**（本会话即此方式：手工定结构，figwright 批量写节点） | 建库速度与可重复性 |
@@ -55,14 +55,16 @@ D1–D8 已全部拍板。D4 的 splash 平台策略只进了设计文档，代�
 
 - M3 规范页数值（type scale tracking、state layer 透明度、spacing/density、canonical layouts 的 pane 宽）——需人工在浏览器读 `m3.material.io` 的 token 浏览器，或另找官方 token 导出（`material-foundation/material-tokens` 的 DSP/JSON）。
 - Figma 变量 mode 的套餐限额（help 文档 10/20/unlimited 三方冲突）、kit 发布者字段、`VariableAlias` 字段、MiSans 在 Figma 的可用性——`04` §7 列了 12 条，建库前需逐条核实。
-- 本仓库 `app/test/project_layout_test.dart:36-54` 仍断言 `design-system/hentai-library/MASTER.md` 存在，该文件已删除，此测试当前必失败；按「设计稿完成后再改代码」的约定，暂不修。
+- 本仓库 `app/test/project_layout_test.dart:36-54` 仍断言 `design-system/hentai-library/MASTER.md` 存在，MASTER 已重建且含 `## Directory charter`，但 `pages/` 目录尚未重建，该测试仍必失败；按「设计稿完成后再改代码」的约定，暂不修。
 
 ## 下一步（按序）
 
 1. 已定：D1 五档、D2 MiSans、D3 A 柔和玫瑰、D4 state layer + 平台 splash、D5 排除 Expressive、D6 混合建库、D7 首批稿顺序、D8 Material Symbols。
 2. `design-system/hentai-library/MASTER.md` 已建立（目录章程、颜色/字阶、断点、Figma 页面图、组件清单、代码映射）。
-3. Figma：变量 6 集合、30 Text Style、A 亮/暗预览、A/B/C 切换已完成；下一步 effect/grid styles → 组件集 → 模板/页面（按 D7 主壳 + 首页 + 书库 + 阅读器）。
-4. 设计稿定稿并评审通过后，才进入 Flutter 主题与页面改造（`03` 的清单可作为迁移附录）。
+3. Figma：变量 6 集合 + Number 44 项、30 Text Style、6 Effect + 5 Grid Style、A 亮/暗预览、01–04 文档页已完成。
+4. 下一步 05 Components：先做 Button / Icon Button / Text Field 三个打样组件验证 token，再批量组件集 → 06 Patterns → 07 Templates × 五档 → 08 Screens（按 D7 主壳 + 首页 + 书库 + 阅读器）→ 09 States → 10 Motion → 11 Handoff。
+5. 组件状态矩阵（每组件出几态）在进入 05 前定；插画/占位图来源仍缺。
+6. 设计稿定稿并评审通过后，才进入 Flutter 主题与页面改造（`03` 的清单可作为迁移附录）。
 
 ## 复现与更新
 
