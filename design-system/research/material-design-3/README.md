@@ -1,7 +1,7 @@
 # Material 3 设计系统调研（索引与决策清单）
 
 > 本目录是 **设计系统重写的调研底稿**，不是最终规范。旧 Fluent 设计系统文档（`design-system/hentai-library/` 24 个文件）已整体删除（`git rm` 暂存），目录保留，历史可从 HEAD 取回。
-> 当前阶段：**Figma 首批稿完成**（D1–D8 全部拍板；颜色 A 亮/暗、44 Number token、30 Text Style、6 Effect + 5 Grid Style、01–04 文档页；05 十个 P0 原子组件集；06 BookListItem / ComicCard / ChapterRow；07 五档模板 compact 390 / medium 600 / expanded 1024 / large 1440 / XL 1920；08 首页 + 阅读器四档出图），代码未动。设计稿在 Figma 完成并经确认后，才进入实现。
+> 当前阶段：**Figma 设计稿阶段完成，待评审**（D1–D8 全部拍板；颜色 A 亮/暗、44 Number token、30 Text Style、6 Effect + 5 Grid Style、01–04 文档页；05 十个 P0 原子组件集；06 八个业务组件；07 五档模板 compact 390 / medium 600 / expanded 1024 / large 1440 / XL 1920；08 首页 + 阅读器四档出图；09 States & Content Lab；10 Motion；11 Handoff & A11y），代码未动。设计稿评审通过后才进入实现。
 > 证据分级：**A** = 官方规范页/设计文档原文；**B** = 官方源码/实现（Compose `*Tokens.kt`、material-web `tokens/v0_192`、Flutter SDK 源码）——数值可信但非规范页；**C** = 未核实/工程推断。各文档正文逐条标注。
 
 ## 文档索引
@@ -58,14 +58,14 @@ D1–D8 已全部拍板。D4 的 splash 平台策略只进了设计文档，代�
 - M3 规范页数值（type scale tracking、state layer 透明度、spacing/density、canonical layouts 的 pane 宽）——需人工在浏览器读 `m3.material.io` 的 token 浏览器，或另找官方 token 导出（`material-foundation/material-tokens` 的 DSP/JSON）。
 - Figma 变量 mode 的套餐限额（help 文档 10/20/unlimited 三方冲突）、kit 发布者字段、`VariableAlias` 字段、MiSans 在 Figma 的可用性——`04` §7 列了 12 条，建库前需逐条核实。
 - 本仓库 `app/test/project_layout_test.dart:36-54` 仍断言 `design-system/hentai-library/MASTER.md` 存在，MASTER 已重建且含 `## Directory charter`，但 `pages/` 目录尚未重建，该测试仍必失败；按「设计稿完成后再改代码」的约定，暂不修。
-- 06 还未覆盖阅读器 overlay、设置分区、历史行、元数据面板；09 States（loading/empty/error/offline、长文本/CJK、大图、密度）尚未开始。
+- 06 已补齐 HistoryRow / SettingsSection / MetadataPanel / ReaderToolbar / ReaderBottomBar，阅读器 overlay 由 toolbar + bottom bar 组合；09 States 覆盖 loading 骨架 / empty / error / offline 缓存 / 长文本两行·三行截断 / 大图 16:9 / density 40·56 对照。
 
 ## 下一步（按序）
 
 1. 已定：D1 五档、D2 MiSans、D3 A 柔和玫瑰、D4 state layer + 平台 splash、D5 排除 Expressive、D6 混合建库、D7 首批稿顺序、D8 Material Symbols。
 2. `design-system/hentai-library/MASTER.md` 已建立（目录章程、颜色/字阶、断点、Figma 页面图、组件清单、代码映射）。
 3. Figma：变量 6 集合 + Number 44 项、30 Text Style、6 Effect + 5 Grid Style、A 亮/暗预览、01–04 文档页已完成。
-4. 05 已完成 P0 主体：Button 8 变体、IconButton、TextField、NavigationBar 4 变体、NavigationRail 8 变体、FAB 4 尺寸、FilterChip 2 态、ListItem 3 行数、Card 3 风格、Dialog/Basic。06 已建 BookListItem `41:1946`、ComicCard `41:1951`、ChapterRow `41:1955`、HistoryRow `41:2498`、SettingsSection `41:2496`、MetadataPanel `41:2497`、ReaderToolbar `41:2516`、ReaderBottomBar `41:2517`。07 五档齐全：Compact 390 `41:1975`、Medium 600 `41:1824`、Expanded 1024 `41:1774`、Large 1440 `41:1578`、XL 1920 `41:2384`（三栏）。08 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)、阅读器 `41:2097`/`41:2275`/`41:2139`/`41:2363`。下一步：09 States & Content Lab（loading/empty/error/offline、长文本/CJK、大图、密度）→ 10 Motion → 11 Handoff & A11y。
+4. 05 已完成 P0 主体：Button 8 变体、IconButton、TextField、NavigationBar 4 变体、NavigationRail 8 变体、FAB 4 尺寸、FilterChip 2 态、ListItem 3 行数、Card 3 风格、Dialog/Basic。06 已建 BookListItem `41:1946`、ComicCard `41:1951`、ChapterRow `41:1955`、HistoryRow `41:2498`、SettingsSection `41:2496`、MetadataPanel `41:2497`、ReaderToolbar `41:2516`、ReaderBottomBar `41:2517`。07 五档齐全：Compact 390 `41:1975`、Medium 600 `41:1824`、Expanded 1024 `41:1774`、Large 1440 `41:1578`、XL 1920 `41:2384`（三栏）。08 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)、阅读器 `41:2097`/`41:2275`/`41:2139`/`41:2363`。09 `41:2520` 七块状态与内容实验；10 `48:2574` 四个时长卡 + reduce-motion；11 `48:2610` token/组件/a11y 三列交接。**下一步：设计稿评审 → Flutter 迁移**（①theme ②shell/断点 ③组件 ④页面）。
 5. 组件状态矩阵（每组件出几态）在进入 05 前定；插画/占位图来源仍缺。
 6. 设计稿定稿并评审通过后，才进入 Flutter 主题与页面改造（`03` 的清单可作为迁移附录）。
 
