@@ -218,6 +218,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 接缝测试：599/600、839/840、1199/1200、1599/1600 各出一张对照。
 - 内容最大宽：large/XL 的正文区约 1200dp 居中，避免 1920 拉满；正文保持 40–60 字符/行。
 - 代码现状 `app/lib/shared/ui/layout/app_layout_breakpoints.dart:10,13` 是 600/1024；迁移时改五档。
+- 模板进度：Large 1440×900 `41:1578`、Expanded 1024×768 `41:1774`、Medium 600×800 `41:1824`；compact 390×844 与 XL 1920×1080 待建。
 
 ### 5.2 官方分栏与导航矩阵
 
@@ -272,7 +273,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 04 Icons & Assets | `9:12` | Material Symbols 24px 样本、尺寸 20/24/40、filled 态 | 完成（`25:1374`）；插画/占位图待补 |
 | 05 Components | `9:13` | 无业务语义的原子组件 | 三个打样（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）+ **Button 变体集 `39:1481`**（Filled/Tonal/Outlined/Text × Default/Disabled，8 变体）+ **NavigationBar 变体集 `41:1539`**（Selected=home/library-books/history/settings，4 变体）+ **NavigationRail 变体集 `41:1577`**（Type=Collapsed/Expanded × Selected=home/library-books/history/settings，8 变体）；FAB/List/Card/Chip/Dialog 待建 |
 | 06 Patterns | `9:14` | 有业务语义的组合（导航、列表-详情、搜索、阅读器） | 待建 |
-| 07 Templates | `9:15` | 五档壳层模板 | Large 1440×900 书库 list-detail 模板 `41:1578`（expanded rail + 左列表 400 + 右详情）；1024×768 / 600×800 / 390×844 / 1920×1080 待建 |
+| 07 Templates | `9:15` | 五档壳层模板 | Large 1440×900 `41:1578`（expanded rail 256 + 列表 400 + 详情）；Expanded 1024×768 `41:1774`（collapsed rail 80 + 列表 304 + 详情）；Medium 600×800 `41:1824`（collapsed rail 80 + 单栏列表 + FAB）；compact 390×844 与 XL 1920×1080 待建 |
 | 08 Screens | `9:16` | 带真实内容的页面实例 | 待建 |
 | 09 States & Content Lab | `9:17` | loading/empty/error/offline、长文本、CJK、大图 | 待建 |
 | 10 Motion | `9:18` | 转场与时长标注 | 待建 |
@@ -356,3 +357,4 @@ P0 = 首批页面必需；P1 = 第二批。Button（含 4 风格 × 2 状态的�
 | Button 变体集 | Figma `39:1481`：Filled/Tonal/Outlined/Text × Default/Disabled，8 变体；disabled 改实色混合避免透明底发黑 |
 | 导航组件 | `41:1539` NavigationBar（390×80，Selected 4 变体）；`41:1577` NavigationRail（Collapsed 80 / Expanded 256，Type × Selected 8 变体）；indicator 需置底，否则盖住图标 |
 | 桌面模板 | `41:1578` `Template/Library · Large 1440`：expanded rail 256 + 左侧列表 400 + 右侧详情；官方 large 分栏规则落地验证 |
+| 多断点模板 | `41:1774` Expanded 1024×768（collapsed rail 80 + 列表 304 + 详情）；`41:1824` Medium 600×800（collapsed rail 80 + 单栏列表 + 筛选 chips + FAB） |
