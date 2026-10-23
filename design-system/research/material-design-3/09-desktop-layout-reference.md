@@ -711,39 +711,63 @@ get_node(frameId) 返回整帧递归树（characters / fontSize / x / y / width 
 - 左列宽 260（x=0）：页标题 20 Semibold、副标题 13 Regular、7 个行名 16 Semibold；每个组件下方 13 Regular caption（组件名 · 变体/尺寸），全部绑 `color/onSurface`（`10:52`）或 `color/onSurfaceVariant`（`10:60`），只有画布语义、不进产品。
 - 复核：40 个顶层节点两两求交 **overlap 0**（第一版 Filter 说明 320 宽压到 Assist 说明，已收窄到 260 并换行）。
 - 组件本身就是整高元素（rail 变体分别 80/256 宽、与画布同高），所以导航行下半部是大片空白，属预期。
-## 12. SearchBar 焦点态变体（2026-10-23）
+## 12. SearchBar 焦点态变体（2026-10-23，**按官方 M3 重做，Gmail 版作废**）
 
-用户给 Gmail 顶部搜索框的两张截图（focus / rest）后要求「参考图一给 Components SearchBar 设计焦点态变体，尾部的按钮不必参考」。
+### 12.0 口径变更
 
-### 12.1 截图实测（B，Pillow 取样）
+第一版按用户提供的 Gmail 顶部搜索框截图做（常态灰底、焦点白底 + 1dp 细边）。用户随后改口径（m02526 原话）：「算了，还是不参考Gmail了 根据官方文档来设计 https://m3.material.io/components/search」。Gmail 版（`State=Rest` = `surfaceContainer` / `State=Focused` = `surfaceContainerLowest` + 1dp `outlineVariant`）**已作废**，组件按官方重做。
 
-| 帧 | 页面底 | 容器填充 | 边界 | 说明 |
+### 12.1 官方取证（A，`read_page` 抓到正文）
+
+| 页面 | 结果 | 关键原文 |
+|---|---|---|
+| `/components/search`（overview） | 8931 字符，完整 | `Search lets people enter a keyword or phrase`；`A search bar can include a leading search icon, hinted search text, and optional trailing icons`；**`Elevation: Lower elevation and no shadow by default`**；`M3 search bars are rounded, use tonal surface` |
+| `/components/search/guidelines` | 21252 字符，完整 | 见下 |
+| `/components/search/specs` | **只回 169 字符**（标签页壳） | 抓不到数值，未引该页任何数字 |
+
+guidelines 里对本组件有用的原文（逐条）：
+
+- Anatomy 6 元素：container / leading icon / supporting text / avatar 或 trailing icon（可选）/ input text / suggestions-or-results container。
+- **`Search bars use the surface container high color role`**；并警告 `Avoid using a surface container high color on a surface container background`（角色要差超过一档）。
+- **`In the contained style, the search bar container remains the same shape in both the unfocused and focused states`**。
+- 容器外边距：unfocused **24dp**、focused **12dp**。
+- leading icon 两种语义：导航图标（menu / back）或非功能性搜索图标。
+- trailing 1–2 个图标（语音 / 位置 / 溢出 / 装饰），focused 可加 clear ✕。
+- Behaviour：**back 图标释放焦点、收起建议，把搜索栏还原**。
+- Adaptive：搜索栏留**在自己所属的 pane 内**随宽度缩放，内部元素左右锚定。
+- Focused 布局：**docked** 用于 medium（600–839）与 expanded（840–1199/桌面）；**full-screen** 是 compact（<600）默认。
+- 结果/建议列表显示在 bar 下方，**输入文本保持可见**。
+
+### 12.2 落进组件（已执行，B）
+
+`SearchBar` 组件集 **`79:1980`**（05 页 (320,440)，744×56，两变体并排 x=0 / 384）：
+
+| 变体 | id | 容器 | 描边/阴影 | 结构 |
 |---|---|---|---|---|
-| 常态（图二） | `#F8FAFD` (248,250,253) | `#E9EEF6` (233,238,246) | 无描边 | 填充即容器边界 |
-| 焦点（图一） | `#F8FAFD` | `#FFFFFF` 白 | 约 `#DADCE0`≈1–2px + 上缘浅投影 | 由「灰底」转「白底 + 细边」 |
+| `State=Unfocused` | `48:2651` | 360×56 r28，**`surfaceContainerHigh`**（`10:58`，#F5E4E5，L\*91.9） | 无 / 无 | 24dp 搜索图标 `48:2649` @16,16 + hint 14 @56,18 |
+| `State=Focused` | `79:1976` | 同上，**完全同色同形** | 无 / 无 | leading 换 back 箭头 `80:1981`（24dp @16,16，vector `80:1982` 绑 `onSurfaceVariant` `10:60`）+ 同 hint + trailing clear ✕ `80:1983`（vector `80:1984` 同色 @320,16） |
 
-- 尾部筛选图标是 Gmail 自有功能，按用户要求**不做**。
-- 边界对比度：`#DADCE0` 对白 **1.37:1** —— 远低于本项目 `outline`（**4.48:1**），接近 `outlineVariant`（对白 **1.70:1** / 对 surface **1.62:1**）。
+- 两态**只差图标**（搜索 → back / 无 → clear），容器色、尺寸、圆角、文字位置一律不动 —— 这是官方 contained 样式的硬要求（A）。
+- 容器色由 `surfaceContainer`（94.0）改为 **`surfaceContainerHigh`（91.9）**：官方明写用 `surface container high`。放到本项目 pane（`surface` 98.1）上，与背景差 **6.2 L\***，满足官方「不要在 surface container 背景上再用 container high」的告警（此处背景是 surface，跨了 3 档）。
+- **不加描边、不加阴影**：官方 overview 明写 `Lower elevation and no shadow by default`（A），与桌面区域规则无关，是 search 自身的 spec。
+- unfocused 24dp / focused 12dp 是**容器外边距**（组件与 pane 边缘的距离），落地在页面布局层，组件本身不内建。
+- focused 的 docked / full-screen 是**布局行为**：本项目 medium/expanded/large/XL 全走 docked（在 pane 内原地展开，建议列表挂在 bar 下方），compact 走 full-screen；这条在迁移时由路由/overlay 决定，组件集只负责两态外观。
 
-### 12.2 落进组件（已执行）
+### 12.3 与「区域级纯 tone」规则的关系（口径收敛）
 
-`SearchBar` 由 COMPONENT 升级为 COMPONENT_SET `79:1980`（744×56，位于 05 页 (320,440)）：
+上一版这里写过「本项目桌面规则是『纯 tone 分隔、容器不加阴影』，所以不给 SearchBar 加投影」。这句要收回并限定：
 
-| 变体 | id | 容器填充 | 描边 | 结构 |
-|---|---|---|---|---|
-| `State=Rest` | `48:2651` | `surfaceContainer`（`10:57`，L\*94.0） | 无 | 24 搜索图标 @16,16 + 占位文本 14 @56,18 |
-| `State=Focused` | `79:1976` | `surfaceContainerLowest`（`10:55`，#FFFFFF） | 1dp `outlineVariant`（`10:62`）INSIDE | 同结构，文字/图标不变 |
+- 用户的原意是「**pane / NavigationRail 这些区域用背景色区分，而不是边框**」——这是**区域级**规则（窗口底 / rail / 导航列表 / pane / 详情列之间用角色级差 + 24dp 画布缝，不加 1dp 线也不加投影）。
+- 官方只对「区域」和「默认 elevation」这么说：tone-based 博文讲容器角色替代 elevation 分区（A），elevation overview 讲 `Tokens have no shadows or color`（A）。**没有任何官方页面说「所有容器一律无阴影」**。
+- 组件按各自 specs：search bar 无阴影是**官方 A**；FAB / Dialog / Menu / Snackbar 一类浮层按官方 elevation token **允许阴影**。
+- 因此本节的正确表述是「SearchBar 不加阴影是官方 spec 决定的」，而不是「因为桌面禁用阴影」。该口径已同步到 `MASTER` §2.3（新增「适用范围」bullet）与 `README` 结论 14。
 
-- 两变体各 360×56、圆角 28，并排 x=0 / 384（gap 24）。
-- **为什么用 `outlineVariant` 而不是 `outline`**：参考图的边界只有 1.37:1，`outline` 的 4.48:1 会明显重于参考；`outlineVariant` 1.70:1 与参考同量级又略强，在白底上仍能看出边缘。若评审认为不够清晰，切 `outline` 即可（值不变，只换绑定）。
-- 未加投影：本项目桌面规则是「纯 tone 分隔、容器不加阴影」，Gmail 焦点态上缘的浅投影属于其自身 elevation 体系。
-- 与 chip 的关系：`Chip/Filter` 用的是 `outline`（交互边界 ≥3:1），SearchBar 是「填充转白 + 细边」，两者都成立但语义不同，迁移时不要共用同一个 outline 常量。
+### 12.4 未决
 
-### 12.3 未决
-
-1. `outlineVariant` 1.70:1 在低端屏/高环境光下是否够辨识（与 08 §6 的同类未决合并）。
-2. 焦点态是否需要在键盘导航时再加 2dp `primary` 环（Gmail 无，M3 状态层有）；MVP 先不加。
-3. 深色主题的焦点态未出样张（应为 `surfaceContainerLowest` 暗值 `10:102` + `outlineVariant` 暗值 `10:122` 一类，待补）。
+1. focused 状态下建议/结果列表的容器（官方 anatomy 第 6 元素）未出样张；它属于 pattern 层，MVP 先按「bar 下方直接接列表」处理。
+2. 键盘导航的 2dp `primary` 焦点环：官方有 focus state layer，组件样张里没有单独画；迁移时按 M3 状态层实现（12% + 2dp 环）。
+3. 深色主题两态未出样张（应为 `surfaceContainerHigh` 暗值 `10:105` 一类）。
+4. 各页面里的搜索框仍是手绘 rect + text，**没有替换成 `79:1980` 实例**；迁移到 Flutter 时以组件集为准，Figma 侧是否回灌待评审。
 
 
 
