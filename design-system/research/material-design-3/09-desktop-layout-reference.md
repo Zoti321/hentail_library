@@ -444,4 +444,64 @@
 | History 600 | `75:1613` | 600×800 | rail 80 + pane 488×736；单列 `HistoryRow` 440×72，三组各两行：y=144/224、344/424、544/624 |
 
 **（4）D 组对照帧删除**：`69:813`（卡组版 B）按用户要求删除；07 现九帧。08 补齐后 16 帧、四行四列满格，两页重叠数均为 0。
+## 11.11 2026-10-23 追加：rail 档位改 `surfaceContainer` 与分隔线归零
+
+用户两条：「Screens 里有的 NavigationRail 还保留右边框」「不满意 NavigationRail 背景色，太暗，重新对照 tone-based surface colors，也考虑透明度的影响，不行还要调整灰阶调色板」。
+
+### 11.11.1 官方取证失败，降级到官方实现（B）
+
+- `https://m3.material.io/components/navigation-rail/specs` 用 `read_page` 只回 109 字符（`Hide previews / Switch to grid view / Navigation rail (baseline) ... Nav rail - Common`），**拿不到 container color 正文**，本小节不引用该页任何数值（A 级缺口如实记录）。
+- 降级到本机 Flutter SDK 源码（B）：`E:/flutter sdk/flutter/packages/flutter/lib/src/material/navigation_rail.dart:1230` —
+
+  ```dart
+  Color? get backgroundColor => _colors.surface;
+  ```
+
+  同文件 `:1218-1223` 给出 `elevation 0.0` / `minWidth 80.0` / `minExtendedWidth 256`；`:1254` `indicatorColor => _colors.secondaryContainer`；`:1256` `indicatorShape => StadiumBorder()`。即**官方实现的 rail 默认就是最亮的 `surface`**，不额外压暗。
+
+### 11.11.2 透明度不是独立变量（C，自算）
+
+`surface` `#FFF8F7`（L\* 98.08）叠在本项目窗口底 `#E7D6D7`（L\* 86.99）上的等效亮度：
+
+| α | 合成色 | 等效 L\* | 落在哪个既有角色附近 |
+|---:|---|---:|---|
+| 0.3 | `#EEE0E1` | 90.29 | 介于 surfaceDim(87.0) 与 containerHigh(91.9) 之间 |
+| 0.4 | `#F1E4E4` | 91.59 | ≈ `surfaceContainerHigh` 91.93 |
+| 0.5 | `#F3E7E7` | 92.56 | containerHigh 与 container 之间 |
+| 0.6 | `#F5EAEA` | 93.54 | ≈ `surfaceContainer` 94.04 |
+| 0.7 | `#F8EEED` | 94.83 | ≈ `surfaceContainerLow` 95.97 |
+
+结论：**透明度只是在相邻两档 tone 之间插值**，任何 α 都等于某个既有角色，所以不必引入半透层——直接用不透明 token 选档更可控，也顺带满足官方「同一 region 跨断点用同一角色」（A，`08` §1.6 引）。这个结论也适用于「用叠加色做分区」的所有尝试。
+
+### 11.11.3 最终档位与理由
+
+| 区域 | 旧 | 新 | 对 pane(98.1) | 对窗口底(87.0) |
+|---|---|---|---:|---:|
+| rail（亮） | `surfaceDim` 87.0（= 与窗口底同色，只剩一条 24dp 缝） | **`surfaceContainer` 94.0**（`#FBEAEB`） | **4.0** | **7.0** |
+| rail（暗） | `surfaceContainerLowest` 4.0 | **`surfaceContainerHigh` 17.1**（`#312829`） | 5.2 | 13.1 |
+
+规则：**rail 取「比内容 pane 低一档、比窗口底高一档」**——两端都有 4.0 以上的边界，不再依赖 1dp 线；暗色方向相反（暗色没有更暗的 chrome，`surfaceDim` 在暗色等于 `surface`，所以往亮的 `surfaceContainerHigh` 走）。
+
+### 11.11.4 右分割线的根因与处理
+
+rail **组件**里有一个 1dp 子矩形 `divider`（宽 1、x=79、fill `outlineVariant` = `VariableID:10:62`），8 个变体各一个：
+
+`41:1541`（父 `41:1557`）/ `41:1559`（`41:1576`）/ `41:1652`（`41:1651`）/ `41:1669`（`41:1668`）/ `41:1686`（`41:1685`）/ `41:1703`（`41:1702`）/ `41:1721`（`41:1720`）/ `41:1739`（`41:1738`）。
+
+已在**组件源**逐个 `set_visible(false)`（实例继承，不需要逐实例改）；复查 9:15 / 9:16 全部 rail 实例的对应子节点（id 形如 `I41:2027;41:1559`）均为隐藏。另隐藏 07 里两条残留的列间 1dp 线 `41:1616`（x=688，父 `41:1578`）与 `41:1795`（x=432，父 `41:1774`）——它们是 pane 铺开前的旧分隔线，与「纯 tone 分区」冲突。9:16 现在仅存的 1dp 描边是 4 个 1440 桌面帧自身的窗口 chrome 与 Chip 描边，属产品层内容。
+
+### 11.11.5 变量与影响面
+
+| 变量 | Light | Dark |
+|---|---|---|
+| `color/desktop/rail` | `75:1683` → `color/surfaceContainer`（`10:57`） | `75:1684` → `surfaceContainerHigh`（`10:105`） |
+
+改动绑定：实例 `41:1756` / `41:1775` / `41:1825` / `67:510` / `72:901` / `72:962` / `72:1084`（07）+ `41:2027` / `41:2161` / `41:2210` / `48:2664` / `48:2750` / `72:1161` / `72:1206` / `72:1251` / `75:1418` / `75:1481` / `75:1544` / `75:1614`（08）；组件变体 `41:1557` / `41:1576` / `41:1651` / `41:1668` / `41:1685` / `41:1702` / `41:1720` / `41:1738`。帧底仍是 `desktop/window`（= `surfaceDim` 87.0）不变。
+
+对照条（不参与评审页）：`75:1685`「Tone/rail candidates · Light」放在 `12 Archive`（`9:20`），四组 rail 分别绑 87.0 / 91.9 / 94.0 / 96.0，pane 全部绑 `surface`，供以后换调色板时复看。
+
+### 11.11.6 与参考图的关系
+
+`example.png` 里 rail 与窗口底是**同一面**（同为 L\* 87.0，靠 24dp 缝区分），本项目的窗口底仍是 87.0，但 rail 抬到 94.0 —— 这是有意的偏离：参考图的 rail 是带标签的宽轨（296dp 级），整片深色不压内容；本项目 80dp collapsed rail 在 1440 上占宽小，整片 87.0 会显得窗口「四周一圈脏」。因此**保留参考图的窗口底深度，把 rail 提一档**（用户偏好优先于逐像素还原）。
+
 
