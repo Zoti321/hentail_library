@@ -312,6 +312,12 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 设置 | `48:2663` | — | — | `48:2710` |
 | 历史 | `48:2749` | — | — | `48:2803` |
 
+**画布矩阵（2026-10-23 修复重叠后）**：08 / 07 两页统一按「行 = 页面、列 = 断点」排布，避免帧互相压叠。
+
+- 列 x = `0` / `1500` / `2600` / `3300` ↔ Large 1440 / Expanded 1024 / Medium 600 / Compact 390（列间留 60–100px 空隙）。
+- 行 y = `0` / `1000` / `2000` / `3000` ↔ Home（首页）/ Reader（阅读器）/ Settings（设置）/ History（历史）。
+- 07 Templates 沿用同一组列 x：第一行放四档断点模板，XL 1920 宽 1920 放不进 1500 列距，单独放第二行 `(0, 1100)`。
+
 四个 P0 文档页的样张同样只在 Figma：Tokens 总览 `25:689`、Effect/Grid `25:1234`、Foundations `25:1314`、Material Symbols `25:1374`、Components Proof `25:1428`、Patterns Proof `41:1956`、States & Content Lab `41:2520`、Motion `48:2574`、Handoff & A11y `48:2610`。
 
 ## 7. 组件清单（规划）
@@ -412,3 +418,4 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | Rail 官方规范改版 | 按 2025-05 官方 rail 文档（替代 baseline rail / drawer）：8 个变体补顶部 menu 切换图标（collapsed 用 `menu` 居中、expanded 用 `menu_open` 并与 destination 图标同 x=32）；选中图标改 filled（home/library_books/history/settings 的 `_fill1_24px`）；collapsed 选中 label 改 secondary（`text.secondary`）、全部 label 用 Label Medium；expanded indicator 由 101×32 改 101×56 并提到行顶、行距 64→68；collapsed 行距 64、顶部 52 起。NavigationBar 4 变体同步改 filled 选中图标 |
 | Rail menu 对齐 | expanded 的 menu 从 `(16,16)` 移到 `(32,16)`，与 destination 图标列对齐；图标换成 `menu_open`（收起语义），collapsed 仍是 `menu`。4 个 expanded 变体与所有模板/页面实例同步 |
 | 文字缩放样例 | 09 页新增 `57:532` Text scale 卡：100% / 150% / 200% 三档导航项，行高随字号增长、保留 padding、不截断 |
+| 画布矩阵修复 | 08 Screens 12 帧改「行 = 页面、列 = 断点」矩阵（列 x 0/1500/2600/3300，行 y 0/1000/2000/3000），消除 4 处重叠并修掉 Reader 1024 `41:2275` 的 y=−346；07 Templates 5 帧同列同规则重排（`41:1774`→1500、`41:1824`→2600、`41:1975`→3300、XL `41:2384`→(0,1100)），消除 `41:1824`∩`41:2384` 的 100×80 重叠。两页现均 0 重叠，截图仅在 Figma 内查看 |
