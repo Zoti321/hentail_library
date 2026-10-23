@@ -104,6 +104,8 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 ### 2.6 桌面级差对照表（large / XL，供评审与 Figma 重上色）
 
+> 前提别读反：tone-based surface **本来就是为大屏新增**的模型（官方博文副标题 `New surface color roles offer more flexibility for large screens`，A），它正是为了让大屏不必再靠 elevation 叠色分区。本节的结论是「**同一个梯级**铺到并列大区时级差不足」，正解是动用官方为大窗口开的 **区域级 add-on surface colors**（也就是用**更多** tone 角色），而不是退回阴影。完整推理见 `research/material-design-3/08-tone-based-surfaces.md` §0.5。
+
 | 区域 | 亮色角色 | L\* | 暗色角色 | L\* | 相邻级差（亮 / 暗） |
 |---|---|---:|---|---:|---|
 | 导航 rail | `surfaceDim` `#E7D6D7` | 87.0 | `surfaceContainerHighest` `#3C3233` | 21.9 | rail→面板 **7.0 / 10.0** |

@@ -1,4 +1,4 @@
-# 08 · Tone-based surface 在桌面端：机理、根因与修正方案
+# 08 · Tone-based surface 与桌面端：它为大屏而生，为什么默认梯级仍然不够
 
 > **状态**：调研 + 可落地方案。本轮**不改** Flutter 代码、**不改** Figma，也**不改**任何 hex 值（`MASTER.md §2.2` 的 46 个值原样保留）。
 > **决策前提**：不推翻 `MASTER.md §1` 的 D3「A · 柔和玫瑰」（seed `#E91E63` / tonalSpot / primary chroma 36 / neutral chroma 6）。本文所有方案都保留主色与整体粉调。
@@ -11,11 +11,30 @@
 
 ## 0. TL;DR
 
+- **先说结论，避免误读：tone-based surface 本来就是为大屏设计的**（A：官方博文副标题 `New surface color roles offer more flexibility for large screens and rich color features`）。本文**不是**说它「只适合移动端」——恰恰相反，桌面端该做的是**把它的能力用满**（区域级 add-on surface colors，官方专门为大窗口类开的），而不是退回被弃用的 elevation 叠色。三个命题的区别见 **§0.5**。
 - **模型本身没坏**：tone-based surface 把「层级」编码成 `surface → surfaceContainer*` 的**明度差**，官方明确说这套角色「不再与 elevation 绑定」，且**本来就是为更大的屏**准备的（A，官方博文副标题 + roles 页原文）。
 - **根因是「只有一个编码通道，而且通道太窄」**：A · 柔和玫瑰的亮色阶梯每级只有 **ΔL∗ 1.93–2.11**（对 surface 的 WCAG 对比度仅 **1.05–1.23**，ΔE76 2.07–2.11），整条 `surfaceBright → surfaceContainerHighest` 只有 **8.15** 个 L∗。这个级差放在 48dp 卡片上够看，铺在 1440×900 的**并列大分区**上就消失：桌面没有移动端那套「小视口 + 挤在一起共边比较 + splash/按压反馈 + 圆角」的辅助线索，层级只剩一条 2 个 L∗ 的通道。
 - **官方配套手段是有的，但我们的规范里全关掉了**：`MASTER §2.3` 写了「不要再拿 elevation 阴影表达层级」、`§4.2` 把阴影当「可选」、stroke 宽度连 token 都没有。官方原文给的是「tone 为默认 + 需要时用 hairline / 阴影 / scrim 补」（A）。
 - **推荐（本文最终合并口径）**：**主通道 = 区域级 add-on surface 映射**——桌面档 rail 用 `surfaceDim`、导航列表与 supporting pane 用 `surfaceContainer`、主内容用 `surface`，亮色级差 **7.0 / 4.0**、暗色 **10.0 / 6.0**，**46 个 hex 一个不改**（官方明文允许「在大窗口类增加 add-on surface colors」，A，§1.6）；**第二通道 = 1dp `outlineVariant` hairline**（级差不足、高环境光、低端屏时按需叠加；可交互边界换 `outline`）；**浮层 = level2–5 真阴影 + tint 全关**（§3.3 限域版）。**不采纳 b2「把整条梯级压暗」**（会动移动端观感 + 需要第二个 mode）。
 - **对 46 角色的增量**：**颜色值 0 变更、角色 0 新增**；新增 **2 个数值 token**（`stroke/hairline` 1dp、`stroke/focus` 2dp），**扩用 2 个既有颜色角色**（`outlineVariant` / `outline`），**1 条规则变更**（阴影使用范围）。
+
+### 0.5 先消歧义：「为大屏设计」与「默认梯级在大屏上不够用」是两件事
+
+这三个命题经常被混成一个，混了就会得出错误结论（「tone-based 不适合桌面」或「那就回去加阴影」）：
+
+| # | 命题 | 依据 | 判定 |
+|---|---|---|---|
+| **P1** | tone-based surface 是**专为大屏新增**的模型 | **A**：官方博文副标题 `New surface color roles offer more flexibility for large screens and rich color features`；正文 `now have more layout flexibility for larger screens`；roles 页 `especially helpful for creating hierarchy and nested containers in layouts for expanded screens` | **成立**。它就是为了让大屏**不必再靠 elevation 叠色**去分区 |
+| **P2** | baseline M3 的**相邻档差**（亮色约 2 个 L∗、对比度 1.05–1.23）不足以单独承担「同屏并列、无边界、大尺度」分区的分隔 | **B**：本仓库 46 个 hex 实测（§2.1 / §2.2）+ 真实桌面产品反证（§2.5） | **成立**，但对象是「**单一梯级 + 关掉第二通道**」这种用法，**不是 tone-based 整体** |
+| **P3** | 桌面端对 tone-based 该做的是「**用满**它」，不是退回阴影 | **A**：roles 页 `you can use add-on surface colors in larger window class sizes as long as colors are consistently applied` | **成立**；这正是 §4.1 区域级映射的官方依据 |
+
+**这三条不冲突**，关系是：
+
+- P1 说的是**模型定位**：用 tone 取代 elevation 表达层级，大屏收益最大。
+- P2 说的是**默认取值的密度**：`surface` 98 / `container*` 96·94·92·90 这套数字是为「小面积 + 卡片 containment + splash + 可选阴影」调的；把它**同一个梯级**去铺 3–4 个并列大区，等于**面积放大了、密度没换**。
+- P3 给出正解：**按区域换角色**（rail → `surfaceDim`、面板 → `surfaceContainer`、内容 → `surface`），把桌面需要的级差从 2 拉到 **7.0 / 4.0**（亮）与 **10.0 / 6.0**（暗）——**用的仍是 tone-based，只是从「一条梯级」变成「一张区域映射表」**；官方允许的 **hairline** 作为第二通道按需叠加。**没有任何一步回到被弃用的 elevation-tint 模型**（§1.6 原文：tone 是默认，阴影 / scrim / hairline 是补充手段）。
+
+> 换句话说：**「桌面端需要比移动端更大的级差」与「tone-based 更适合桌面端」是同一件事的两面**——正因为桌面要靠 tone（而不是靠阴影）表达层级，才需要动用官方为大屏开的区域级 add-on 能力把级差拉开。
 
 ---
 
@@ -253,7 +272,7 @@ Dark，`alphaBlend(primary #FFB2BE, surface #191112, a)`：
 
 **读法（这是全文最有实践价值的一条）**：真实产品并没有把 5 档当梯级顺序用，而是「**87 / 94 / 98 三个 zone，配大级差 7 和 4**」，zone 内部（卡片）才用「1.7–2.1 + 圆角 + 阴影」。也就是说：**小级差可以用，但只能用在有几何线索（圆角/内距/阴影）的容器上；无边界的大面积并列分区必须 ≥4 ΔL∗（最好 ≥7）或另加一条可见边界。**（B：本仓库实测；本文未写入任何位图工件。）
 
-### 2.6 机理合并：为什么移动端够、桌面不够
+### 2.6 机理合并：为什么同一个梯级在移动端够、搬到桌面并列大区就不够
 
 1. **编码通道只有一个，且通道宽度只有 2 个 L∗**（§2.1）。移动端靠「小视口 + 容器小（48–88dp）+ 两块几乎总是共边/同屏 + 圆角 + splash/按压 + 有时还有系统阴影」这一堆**几何与动效线索**把这个 2 补上；桌面把面积放大一个数量级、把 splash 关掉（`MASTER §4.4`）、把阴影禁用（`MASTER §2.3`），**只剩那 2 个 L∗**。
 2. **对比度的物理下限**：2 个 L∗ 在 sRGB 上对应对比度 1.05，而官方对边界的要求是可访问级（3:1）。**明度差到不了 3:1，意味着「靠色差当边界」在这套色板里本质上不可能达标**——必须引入第二种编码（描边/阴影/间距），这是几何问题不是调色问题。
@@ -261,7 +280,7 @@ Dark，`alphaBlend(primary #FFB2BE, surface #191112, a)`：
 4. **「脏」是 chroma 的后果，不是错觉**：容器区 C∗ 5.4–6.6、色相 10–15°（玫偏红），大面积平涂时低 chroma 的偏色最容易被读成「脏」（C 级视觉判断，数字是 B）。
 5. **桌面真正的层级载体是 chrome 分区**，而我们的组件映射把它们压在同一档：`§4.2` 里 level1–2 用 containerLow/container，物理上就是相邻 2 个 L∗ 的两块（B，`MASTER §4.2`）。
 
-一句话根因：**tone-based surface 用「2 个 L∗ 的明度差」编码层级，在移动端有一整套几何/动效线索兜底时够用；桌面把这些兜底全去掉、又把同一套差分铺到大面积并列分区上，编码宽度不足的问题就暴露了——问题不在色值，而在「只有一个编码通道」。**
+一句话根因（注意措辞，别读成「tone 不适合桌面」）：**tone-based surface 用「2 个 L∗ 的明度差」编码层级；小面积、两块总是共边、还有 splash/圆角兜底时够用；桌面把这些兜底全去掉、又把**同一个梯级**铺到 3–4 个大面积并列分区上，编码宽度不足就暴露了——问题不在「用 tone」，而在「只用一条梯级、只开一个通道」。官方为大屏准备的正解正是 §4.1 的区域级 add-on 映射（把级差从 2 拉到 7/4），仍属 tone-based。**
 
 ---
 
