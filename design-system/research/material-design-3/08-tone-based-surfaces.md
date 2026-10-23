@@ -26,7 +26,9 @@
 
 | 编号 | 口径 | 判定方式 |
 |---|---|---|
-| **T1 结构** | 任何 **≥1200dp** 的并列 pane，必须显式声明各自的区域角色：**rail → `surfaceDim`**、**导航列表 / supporting pane → `surfaceContainer`**、**主内容 → `surface`**；面板内卡片再降一档（`surfaceContainerLow`），浮起卡片用 `surfaceContainerLowest`。代码以「区域」为参数，不以组件为参数（同一个 `Card` 在内容区与面板内取不同角色）。 | 看实现里取色是否由「区域上下文」决定，是否有区域→角色的单一映射表 |
+| **T1 结构** | 任何 **≥1024dp（expanded 起算桌面）** 的并列 pane，必须显式声明各自的区域角色：**rail → `surfaceDim`**、**导航列表 / supporting pane → `surfaceContainer`**、**主内容 → `surface`**；面板内卡片再降一档（`surfaceContainerLow`），浮起卡片用 `surfaceContainerLowest`。代码以「区域」为参数，不以组件为参数（同一个 `Card` 在内容区与面板内取不同角色）。 | 看实现里取色是否由「区域上下文」决定，是否有区域→角色的单一映射表 |
+
+> **2026-10-23 口径更新**：桌面归属从「→ large 1200 起」下调为「**expanded 1024 起**」（用户决策：桌面应用不全屏时 1024 很常见）。T1/T2/T3 阈值随之变为 ≥1024；1024 的映射与 1440 相同（rail `surfaceContainer` 94.0、pane `surface` 98.1、panes 间 24 缝）。这一条只改**生效范围**，不改任何角色取值。
 | **T2 阈值** | 相邻两个并列区域若 tone 级差 **< 4（亮色）/ < 6（暗色）**，必须叠加 1dp `outlineVariant` hairline 或提升一档角色；单靠 2 个 L\* 的档差**不算分隔**。 | 逐对 pane 算 ΔL\*，对照 §4.1 的实取值 |
 | **T3 边界** | 46 个 hex **不改**；新增 `stroke/hairline` 1dp、`stroke/focus` 2dp；阴影**只**给浮层（level 2–5）且 tint 全关；任何情况下不回退到被弃用的 elevation-tint 叠色。 | 看 token 清单与组件样式 |
 
