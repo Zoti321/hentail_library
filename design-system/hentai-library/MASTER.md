@@ -271,8 +271,8 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 02 Styles | `9:10` | 30 Text Style + 样张；6 Effect + 5 Grid Style 与卡片 | 完成（`25:1234`） |
 | 03 Foundations | `9:11` | 角色用法、字阶、形状、elevation、motion、state、a11y 规则页 | 完成（`25:1314`） |
 | 04 Icons & Assets | `9:12` | Material Symbols 24px 样本、尺寸 20/24/40、filled 态 | 完成（`25:1374`）；插画/占位图待补 |
-| 05 Components | `9:13` | 无业务语义的原子组件 | 三个打样（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）+ **Button 变体集 `39:1481`**（Filled/Tonal/Outlined/Text × Default/Disabled，8 变体）+ **NavigationBar 变体集 `41:1539`**（Selected=home/library-books/history/settings，4 变体）+ **NavigationRail 变体集 `41:1577`**（Type=Collapsed/Expanded × Selected=home/library-books/history/settings，8 变体）；**FAB `41:1886`**（Regular 56 / Medium 80 / Large 96 / Extended 136×56）、**FilterChip `41:1895`**（Unselected / Selected）、**ListItem `41:1920`**（Lines 1/2/3，56/72/88）、**Card `41:1933`**（Filled / Elevated / Outlined）、**Dialog/Basic `41:1939`**（320×220）|
-| 06 Patterns | `9:14` | 有业务语义的组合（书籍行、漫画卡、章节行） | 已建：`BookListItem` `41:1946`（368×80，封面 48×64 + 标题 16 + meta 12 + 进度条）、`ComicCard` `41:1951`（160×276，封面 160×220）、`ChapterRow` `41:1955`（360×48）、`HistoryRow` `41:2498`（360×72）、`SettingsSection` `41:2496`（360×300，4 行 label/value）、`MetadataPanel` `41:2497`（320×240，5 组键值）、`ReaderToolbar` `41:2516`（1080×64）、`ReaderBottomBar` `41:2517`（1080×80，含 320 进度条）；证明 frame `41:1956` |
+| 05 Components | `9:13` | 无业务语义的原子组件 | 三个打样（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）+ **Button 变体集 `39:1481`**（Filled/Tonal/Outlined/Text × Default/Disabled，8 变体）+ **NavigationBar 变体集 `41:1539`**（Selected=home/library-books/history/settings，4 变体）+ **NavigationRail 变体集 `41:1577`**（Type=Collapsed/Expanded × Selected=home/library-books/history/settings，8 变体；collapsed 与 expanded 分两行排布；**不含「新建」FAB**：业务是先选库根路径再扫描，建库低频）；**FAB `41:1886`**（Regular 56 / Medium 80 / Large 96 / Extended 136×56）、**FilterChip `41:1895`**（Unselected / Selected）、**ListItem `41:1920`**（Lines 1/2/3，56/72/88）、**Card `41:1933`**（Filled / Elevated / Outlined）、**Dialog/Basic `41:1939`**（320×220）|
+| 06 Patterns | `9:14` | 有业务语义的组合（书籍行、漫画卡、章节行） | 已建：`BookListItem` `41:1946`（368×80，封面 48×64 + 标题 16 + meta 12 + 进度条）、`ComicCard` `41:1951`（160×276，封面 160×220）、`ChapterRow` `41:1955`（360×48）、`HistoryRow` `41:2498`（360×72）、`SettingsSection` `41:2496`（360×284：分组标题 + 4 张 56 高行卡，leading 24 图标 + 15 文案 + trailing 16 chevron）、`MetadataPanel` `41:2497`（320×240，5 组键值）、`ReaderToolbar` `41:2516`（1080×64）、`ReaderBottomBar` `41:2517`（1080×80：24 上一页 · 400 进度条 + 页码 · 24 下一页 · 24 设置，统一 28 垂直居中）；证明 frame `41:1956` |
 | 07 Templates | `9:15` | 五档壳层模板 | **五档齐全**：Compact 390×844 `41:1975`（导航栏 80 + 单栏列表 + FAB）、Medium 600×800 `41:1824`（collapsed rail 80）、Expanded 1024×768 `41:1774`（collapsed rail 80 + 列表 304 + 详情）、Large 1440×900 `41:1578`（expanded rail 256 + 列表 400 + 详情）、XL 1920×1080 `41:2384`（三栏：rail 256 + 列表 504 + 详情 + 阅读进度 360） |
 | 08 Screens | `9:16` | 带真实内容的页面实例 | Home：1440 `41:2026` / 1024 `41:2209` / 600 `41:2160` / 390 `41:2314`；Reader：1440 `41:2097` / 1024 `41:2275` / 600 `41:2139` / 390 `41:2363`；Settings：1440 `48:2663` / 390 `48:2710`；History：1440 `48:2749` / 390 `48:2803`。书库的页面实例在 07 模板（正文与数据已灌入）；首页/阅读器/设置/历史的 medium 与 expanded 由同一套 §5 规则推得，未逐档出图 |
 | 09 States & Content Lab | `9:17` | loading/empty/error/offline、长文本、CJK、大图、密度 | 完成（`41:2520`）：loading 骨架 / empty / error / offline 缓存 / 长文本两行·三行截断 / 大图 16:9 / density 40·56 对照 |
@@ -308,7 +308,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | FAB | P0 | size (56/80/96) × color × extended | 已建 `41:1886`：Regular 56/r16、Medium 80/r20、Large 96/r28、Extended 136×56；Flutter 只有 56，80/96 需自绘 |
 | Text Field / Search Bar | P0 | filled/outlined × focus/error | 已打样 filled 320×56；SearchBar `48:2651`（360×56/r28，surfaceContainer + 24 搜索图标 + 16 占位）；桌面 hover/focus state layer |
 | Top App Bar | P0 | small/medium/large × back/actions | 已建 `48:2658`：960×64，back 24 + title-large 22 + more_vert；大屏无阴影，滚动才上 tint |
-| Navigation Bar / Rail | P0 | destinations 3–5 × selected | 已建：NavigationBar `41:1539`（390×80，4 变体）；NavigationRail `41:1577`（Collapsed 80 / Expanded 256，各 4 个 Selected 变体）。切换策略见 §5.2 |
+| Navigation Bar / Rail | P0 | destinations 3–5 × selected | 已建：NavigationBar `41:1539`（390×80，4 变体）；NavigationRail `41:1577`（Collapsed 80 / Expanded 256，各 4 个 Selected 变体；条目自顶部 16 起、64 间距，无新建 FAB）。切换策略见 §5.2 |
 | List Item | P0 | 1/2/3 line × leading/trailing | 已建 `41:1920`：56/72/88，leading 40 圆头像 + 文案 + trailing more_vert；书籍场景的 2:3 封面变体放 06 Patterns |
 | Card | P0 | elevated/filled/outlined | 已建 `41:1933`：240×160/r12，Filled 用 surfaceContainerHighest、Elevated 用 surfaceContainerLow + level1、Outlined 用 surface + outlineVariant |
 | Chip | P0 | assist/filter/input/suggestion | 已建 `41:1895` FilterChip：96×32/r8，未选 outline、选中 secondaryContainer + check 18；assist/input/suggestion 后续按需 |
@@ -371,7 +371,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 叠字修复 | 01 Tokens 初版分批坐标复用导致重叠，整块重建为 147 文本 + 92 色卡 |
 | 桌面/大屏 | 调研官方 breakpoints / spacing / canonical examples / 5-steps，写成 `06-adaptive-desktop.md`；§5 扩为五档壳层、分栏矩阵、canonical layouts、页面映射与连续性规则 |
 | Button 变体集 | Figma `39:1481`：Filled/Tonal/Outlined/Text × Default/Disabled，8 变体；disabled 改实色混合避免透明底发黑 |
-| 导航组件 | `41:1539` NavigationBar（390×80，Selected 4 变体）；`41:1577` NavigationRail（Collapsed 80 / Expanded 256，Type × Selected 8 变体）；indicator 需置底，否则盖住图标 |
+| 导航组件 | `41:1539` NavigationBar（390×80，Selected 4 变体）；`41:1577` NavigationRail（Collapsed 80 / Expanded 256，Type × Selected 8 变体；条目自顶部 16 起、64 间距；无新建 FAB）；indicator 需置底，否则盖住图标 |
 | 桌面模板 | `41:1578` `Template/Library · Large 1440`：expanded rail 256 + 左侧列表 400 + 右侧详情；官方 large 分栏规则落地验证 |
 | 多断点模板 | `41:1774` Expanded 1024×768（collapsed rail 80 + 列表 304 + 详情）；`41:1824` Medium 600×800（collapsed rail 80 + 单栏列表 + 筛选 chips + FAB） |
 | P0 组件补齐 | `41:1886` FAB 4 尺寸；`41:1895` FilterChip 2 态；`41:1920` ListItem 3 行数；`41:1933` Card 3 风格；`41:1939` Dialog/Basic；全部绑定 A-Light 变量 |
@@ -379,6 +379,10 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 五档模板 | 补 Compact 390×844 `41:1975` 与 XL 1920×1080 `41:2384`（三栏，官方 XL 3-pane 上限）；至此 compact/medium/expanded/large/XL 齐全 |
 | 首批 Screens | 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)；阅读器 `41:2097`(1440)/`41:2275`(1024)/`41:2139`(600)/`41:2363`(390)；均用实例 + 真实文案，验证 supporting pane 与 feed |
 | 06 业务组件补齐 | `41:2498` HistoryRow、`41:2496` SettingsSection、`41:2497` MetadataPanel、`41:2516` ReaderToolbar、`41:2517` ReaderBottomBar；阅读器 overlay 改为组合而非整屏组件 |
+| 05 布局与对齐 | 05 页按 12 个组件分行排布，消除 proof 与 FAB/Chip、SearchBar/Snackbar 与 rail 的叠压；NavigationBar 16 个 label 按图标中线重排；rail expanded indicator 56→101 覆盖图标+文字；FilterChip 内容居中；ListItem 两行态垂直居中 |
+| Rail 去新建入口 | 业务为「先选库根路径再扫描」，建库低频：8 个 rail 变体删除「新建」FAB，条目上移（顶部 16 起、64 间距），collapsed 80 / expanded 256 分两行排布 |
+| Settings 分组样式 | `41:2496` 重做为「分组标题 + 每行一张 56 高圆角卡（leading 24 图标 + 文案 + trailing chevron）」；图标 tune/palette/download/database 取自 Material Symbols |
+| Reader 底栏重排 | `41:2517` 与四档阅读器页面 `41:2129`/`41:2306`/`41:2152`/`41:2376` 统一为 24 上一页 · 居中进度 · 页码 · 下一页 · 设置；旋转复制的下一箭头换成 arrow_forward 正立图标，修复与齿轮的垂直错位 |
 | 09 States & Content Lab | `41:2520` 七块内容实验：loading 骨架、empty、error、offline、长文本截断、大图占位、density；状态复用组件而非新建组件 |
 | 10 Motion | `48:2574` 四个时长/曲线卡 + reduce-motion 条；与 §4.3 表一致 |
 | 11 Handoff & A11y | `48:2610` 三列交接页：token→Flutter、组件→Flutter、a11y 与迁移顺序 |
