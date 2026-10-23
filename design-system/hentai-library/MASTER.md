@@ -108,13 +108,14 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 | 变量 | Light 别名 → 角色 (L\*) | Dark 别名 → 角色 (L\*) | 用途 |
 |---|---|---|---|
-| `color/desktop/window` | `surfaceDim` #E7D6D7 (87.0) | `surfaceContainerLowest` #140C0D (4.0) | 窗口底、rail、pane 间隙 |
+| `color/desktop/window` | `surfaceDim` #E7D6D7 (87.0) | `surfaceContainerLowest` #140C0D (4.0) | 窗口底、pane 间隙（作 rail 时太暗，见下一行） |
+| `color/desktop/rail` | `surfaceContainer` #FBEAEB (94.0) | `surfaceContainerHigh` #312829 (17.1) | 导航 rail（2026-10-23 新增） |
 | `color/desktop/pane` | `surface` #FFF8F7 (98.1) | `surfaceContainer` #261D1E (11.9) | 内容 pane |
 | `color/desktop/paneHeader` | `surfaceContainerLow` #FFF0F1 (96.0) | `surfaceContainerHigh` #312829 (17.1) | pane 顶栏条 |
 | `color/desktop/card` | `surfaceContainerLow` #FFF0F1 (96.0) | `surfaceContainerHigh` #312829 (17.1) | pane 内分组卡 |
 | `color/desktop/field` | `surfaceContainerLowest` #FFFFFF (100.0) | `surfaceContainerHighest` #3C3233 (21.9) | 搜索框 / 输入 |
 
-- 变量 id：Light `71:884`–`71:888`、Dark `71:889`–`71:893`，`radius/pane` `71:894`。这是别名层，不新增 hex；`#EAE8E6` 画布底板仍未升 token（§9 第 12 条）。
+- 变量 id：Light `71:884`–`71:888`（window/pane/paneHeader/card/field）+ `75:1683`（rail）、Dark `71:889`–`71:893` + `75:1684`（rail），`radius/pane` `71:894`。这是别名层，不新增 hex；`#EAE8E6` 画布底板仍未升 token（§9 第 12 条）。
 
 **命名对照（按官方博文 Introduction to tone-based surfaces 的角色名，A；本仓库一律用其 camelCase）**
 
@@ -122,10 +123,10 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 |---|---|---|
 | Surface Container Lowest | `color/surfaceContainerLowest` | 输入框 / 浮起卡 / 暗色窗口底 |
 | Surface Container Low | `color/surfaceContainerLow` | pane 顶栏条、pane 内卡片 |
-| Surface Container | `color/surfaceContainer` | 列表面板、supporting pane |
+| Surface Container | `color/surfaceContainer` | 列表面板、supporting pane、**亮色 rail**（= `desktop/rail`） |
 | Surface Container High | `color/surfaceContainerHigh` | 高强调容器 |
 | Surface Container Highest | `color/surfaceContainerHighest` | 暗色 rail / 抽屉 |
-| Surface Dim | `color/surfaceDim` | **亮色窗口底 / rail**（= `desktop/window`） |
+| Surface Dim | `color/surfaceDim` | **亮色窗口底**（= `desktop/window`；作 rail 时偏暗，见下条） |
 | Surface | `color/surface` | 内容 pane 底 |
 | Surface Bright | `color/surfaceBright` | 暗色提亮面 |
 | Surface Tint | `color/surfaceTint`（= primary） | 只给浮层 level 2–5 |
@@ -138,14 +139,15 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 | 区域 | 亮色角色 | L\* | 暗色角色 | L\* | 相邻级差（亮 / 暗） |
 |---|---|---:|---|---:|---|
-| 导航 rail | `surfaceDim` `#E7D6D7` | 87.0 | `surfaceContainerHighest` `#3C3233` | 21.9 | rail→面板 **7.0 / 10.0** |
+| 导航 rail | `surfaceContainer` `#FBEAEB` | 94.0 | `surfaceContainerHigh` `#312829` | 17.1 | rail→面板 **4.0 / 5.2**；rail→窗口底 **7.0 / 13.1** |
 | 导航列表 · supporting pane | `surfaceContainer` `#FBEAEB` | 94.0 | `surfaceContainer` `#261D1E` | 11.9 | 面板→内容 **4.0 / 6.0** |
 | 主内容 | `surface` `#FFF8F7` | 98.1 | `surface` `#191112` | 5.9 | — |
 | 面板内卡片 | `surfaceContainerLow` `#FFF0F1` | 96.0 | `surfaceContainerHigh` `#312829` | 17.1 | 对所属面板 2.0 / 5.3 |
 | 主内容浮起卡片 | `surfaceContainerLowest` `#FFFFFF` | 100.0 | `surfaceContainer` `#261D1E` | 11.9 | 对主内容 1.9 / — |
 
 - 参考位：`design-system/example.png`（Google Chat 桌面改版）实测并列面板级差 **7.05 / 3.83**，同一手法、同一量级（B）。
-- **暗色方向相反**：暗色没有更暗的 chrome，`surfaceDim` 在暗色等于 `surface`（#191112），因此 rail 走 `surfaceContainerHighest`。
+- **rail 为何不用 `surfaceDim`（2026-10-23 修订）**：参考图里 rail 与窗口是同一面（都是 87.0），但本项目窗口底用 `surfaceDim` 后，rail 若同色就只剩一条 24dp 缝，实机偏闷（用户反馈「太暗」）。改为 `surfaceContainer`（94.0）后 rail 比 pane（98.1）低 4.0，恰好够 T2 的 ≥4，且与窗口底（87.0）拉出 7.0——**rail 取「比 pane 低一档、比窗口底高一档」**，两端都有边界。Flutter 官方实现里 rail 默认就是 `surface`（`navigation_rail.dart:1230`），本项目下移到 `surfaceContainer` 是有意的区域化取舍（B）。
+- **暗色方向相反**：暗色没有更暗的 chrome，`surfaceDim` 在暗色等于 `surface`（#191112），因此 rail 走 `surfaceContainerHigh`（17.1，比窗口底 4.0 高 13.1）。
 - 级差只用于「无边界并列的面板」；带圆角/内边距的卡片仍用 2 档级差，保持安静。
 
 ## 3. 排版
@@ -444,22 +446,24 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 4. **rail 展开/收起的动效时长**：官方只说 indicator 从图标中心展开，未给时长；暂用 §4.3 的 Standard 300ms（`cubic-bezier(0.2,0,0,1)`），拿到官方数值再定。
 5. ~~**书库是否改 inline list-detail**~~（**已关闭，2026-10-23**）：用户定「书库不走 inline list-detail，设置页走」→ `41:2384` 改造为详情模板，large/XL 详情均为三栏；`09` §9.1 同步关闭。
 6. **rail 用 80 还是 256 的切换规则**：`09` §3.2 提出「同屏 ≥3 栏 ⇒ 80」，是从官方产品截图反推（B），无官方条文。需在 1440 / 1920 两帧出图对比。
-7. **桌面 rail 取 `surfaceDim` 的玫瑰倾向**：A 板 tonalSpot 在 tone 87 仍有低彩度，整片铺 rail 会偏粉。退路是 `surfaceContainerHighest`（tone 90）+ 1dp `outlineVariant`。**暗色 chrome 反向**（rail 用 `surfaceContainerHighest`）需设计评审确认。
+7. ~~**桌面 rail 取 `surfaceDim` 的玫瑰倾向**~~（**档位已改，色相倾向仍在**）：rail 已由 `surfaceDim`（87.0）改为 `surfaceContainer`（94.0），亮度问题解决；但 A 板 tonalSpot 在 tone 94 仍有低彩度（`#FBEAEB`，C\*≈5.4），整片铺 rail 会偏粉，属 §9 第 21 条的调色板决策。原记录：整片铺 rail 会偏粉。退路是 `surfaceContainerHighest`（tone 90）+ 1dp `outlineVariant`。**暗色 chrome 反向**（rail 用 `surfaceContainerHighest`）需设计评审确认。
 8. **级差感知阈值无实测**：ΔL\* 2 / 4 / 7 的「能不能看清」是 C 级工程判断，官方只给对比度可访问性标准、不给分区级差规范。要做成规范需 5–8 人快速辨色测试。
 9. **`MetadataPanel` 312 版**：组件现为固定 320 宽，装不进 expanded 支撑栏 360 的内容宽 312；出 312 版（或支持 16 内边距）之前，expanded 支撑栏只放阅读进度。
 10. **详情页 rail 256 与 80 的对比**：XL 详情按用户指定用了 expanded 256，large/expanded 用 collapsed 80。需在 1920 上各出一版看详情 1180 是否过宽。
 11. **`ChapterRow` 的「已读」不随行宽右对齐**：组件内固定 x=312，实例加宽后（XL 1132 / large 828）停在偏左；实例内子节点不能单独移动，需改组件布局属性。
 12. **桌面底板 `#EAE8E6` 的定位**：现作为画布层（非 46 角色之一），是否要升为正式 token（例如 `color/canvasShell`）待评审——若升，需同时定暗色值。
 13. ~~**详情页 A/B 选型**~~（**已关闭，2026-10-23**）：用户定**方案 1 · 文档流**（无支撑栏、无卡组），KV 按断点/宽度响应式，pane 圆角 20、卡 16，简介 4 行截断 + 「展开全文」；对照用的卡组版 `69:813` 已按用户要求**删除**（不再留作对照）。
-14. **窗口底色规则与 08 T1/T2 的坐标差**（仍开放）：窗口底 / rail 用 `surfaceContainerHigh`（91.9）替代 08 的 `surfaceDim`（87）是用户偏好，已落成 `color/desktop/*`（§2.5）；代价是 pane 98.1 与窗口 91.9 差 6.2（OK），但 pane 顶栏条 96 对窗口 91.9 只有 4.1、pane 内卡片 96 对 pane 98.1 只有 2.0（< T2 的 4）。评审需定：靠 gap/圆角认边界，还是给 pane 内卡片补 1dp `outlineVariant`。
+14. **pane 内卡片与 pane 的级差只有 2.0**（仍开放）：窗口底已改 `surfaceDim`（87.0）、rail 已改 `surfaceContainer`（94.0）、pane 仍是 `surface`（98.1）。现在 pane 内卡片 `surfaceContainerLow`（96.0）对 pane 只有 2.0（< T2 的 4），靠卡片的 16 圆角与 24 内边距认边界。评审需定：接受圆角认边界，还是给 pane 内卡片补 1dp `outlineVariant`（会打破「纯 tone 无分隔线」）。
 15. ~~**Home / Reader 残留 `ChapterRow`**~~（**已关闭，2026-10-23**）：`9:16` 的 10 个实例已删；`ChapterRow` 组件定义保留给阅读器章节列表，本批页面不再使用。
 16. **600 / 390 详情首屏装不下**：文档流按内容顺序排，600 的 pane 内容 424×752、390 为 310×812，资源 KV 末行贴着 pane 底；Figma 帧是「滚动视口」表现，超出部分被裁。评审要看的是滚动后是否仍成立（无二次留白断层）。
 17. **collapsed rail 的文字标签**：Figma 里对 80 宽实例逐个 override 隐藏了 `首页/书库/历史/设置` 文字与左侧 1px 分隔线（实例级，不进组件）；Flutter 侧对应做法是 icon + tooltip，需在迁移任务里写明。
 18. **圆角三层**：画布底板 20 / 窗口 frame chrome 12 / pane 20 / 卡 16 目前并存；底板与 frame 是「画布演示层」，pane/卡 才是产品层。评审若认为底板 20 会被误读成产品圆角，改成 12 或去掉。
 19. ~~**阅读器不套 pane**~~（**已关闭，2026-10-23**）：用户定「阅读器页面暂时不做设计稿，阅读页要走沉浸式」，四帧（`41:2097`/`41:2275`/`41:2139`/`41:2363`）与底板 `67:782` 已从 08 移到 `12 Archive`，不再参与本批评审；恢复时按全出血 + 浮层 toolbar 重做，不套 pane。
 20. **medium / compact 的 pane 内边距未统一**：现内容按 16 内边距排（pane 到内容），桌面档为 24；本轮只统一结构，padding 统一放到迁移时按 `space/*` token 处理。
-21. **中性色相与参考图不同方向（已确认不是档位问题）**：与 `example.png` 逐像素比，L\* 档位已对齐（rail 87.0 / pane 98.1 / 卡片 96.0 vs 参考 87.0 / 97.9 / 96.1），但色相相反——参考中性色 `a*≈-2.4, b*≈+4.6`（偏绿灰，C\*≈5.2），本项目 A 板 `a*≈+6.0, b*≈+1.6`（偏玫瑰粉，C\*≈6.2）。这是 D3「A 柔和玫瑰 + neutral chroma 6」的既定结果，**不是 tone 用错**。若要更接近参考的灰，需重生成 neutral 调色板（chroma 2–3 或色相归零），会改动 46 个 hex，属换调色板决策。
-22. **画布标签是画布层**：07/08 两页的列头与行名文字（`74:1399`–`74:1416`）仅用于评审阅读，不进产品、不做 token。
+21. **中性色相与参考图不同方向（已确认不是档位问题）**：与 `example.png` 逐像素比，L\* 档位已对齐（窗口底 87.0 vs 参考 rail 87.0；pane 98.1 vs 内容 97.9；卡片 96.0 vs 卡片 96.1），但色相相反——参考中性色 `a*≈-2.4, b*≈+4.6`（偏绿灰，C\*≈5.2），本项目 A 板 `a*≈+6.0, b*≈+1.6`（偏玫瑰粉，C\*≈6.2）。这是 D3「A 柔和玫瑰 + neutral chroma 6」的既定结果，**不是 tone 用错**。若要更接近参考的灰，需重生成 neutral 调色板（chroma 2–3 或色相归零），会改动 46 个 hex，属换调色板决策。
+22. ~~**rail 用透明度调色**~~（**已关闭，2026-10-23**）：用户提出「透明度也是一种影响因素」。按 CIELAB 算，surface(98.08) 叠在窗口底(86.99) 上：α=0.4→91.59（≈containerHigh 91.93）、α=0.6→93.54（≈container 94.04）、α=0.7→94.83（≈containerLow 95.97）——透明度只是在两档 tone 之间插值，落地必然等于某个既有角色（C）。所以直接用不透明 token 选档，也更符合官方「同一 region 跨断点同角色」（A）。最终 rail 定 `surfaceContainer` 94.0（`color/desktop/rail`）。
+23. ~~**NavigationRail 右侧 1dp 边框**~~（**已关闭，2026-10-23**）：根因是 rail 组件内一个 1dp `divider` 子矩形（8 个变体各一，`41:1541`/`41:1559`/`41:1652`/`41:1669`/`41:1686`/`41:1703`/`41:1721`/`41:1739`，fill `outlineVariant`），已在**组件源**关闭（实例继承），19 个实例复查全部隐藏；07 里两条残留列间分隔线 `41:1616`/`41:1795` 同批隐藏。
+24. **画布标签是画布层**：07/08 两页的列头与行名文字（`74:1399`–`74:1416`）仅用于评审阅读，不进产品、不做 token。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -526,4 +530,6 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 命名对照入档 | 按官方博文角色名（Surface Container Lowest/Low/Container/High/Highest、Surface Dim/Bright、Surface Tint）落一张官方名 ↔ 本仓库变量名对照表（§2.5），46 角色与两个新增 `stroke/*` 均用官方名的 camelCase；`color/desktop/*` 明确为区域快捷键、每个别名到官方角色，不新增角色与 hex |
 | Settings / History 补档 | 补齐 1024 与 600：Settings `75:1417`（1024，rail 80 + pane 912，三张 section 宽 864、高 224/176/152）与 `75:1480`（600，pane 488，section 宽 440、高 232/176/152，值右对齐 528）；History `75:1543`（1024，两列行 420×72 @x=120/564）与 `75:1613`（600，单列 440×72，六行分三组）。08 现 16 帧、重叠 0 |
 | D 组对照帧删除 | 原卡组对照 `69:813` 按用户要求删除，07 剩九帧（书库四 + 详情 XL + 详情四档） |
+| rail 改 `surfaceContainer` | 用户反馈 rail「太暗」并质疑定位色：官方 `navigation-rail/specs` 抓不到正文（只回 109 字符），降级到 Flutter SDK（`navigation_rail.dart:1230` rail 默认 = `surface`，B）。新建 `color/desktop/rail`（Light `75:1683` → `surfaceContainer` 94.0 / Dark `75:1684` → `surfaceContainerHigh` 17.1），19 个实例 + 8 个组件变体统一绑定；rail 与 pane 差 4.0（满足 T2）、与窗口底差 7.0。透明度方案经 CIELAB 计算否决（α 只是两档间插值，§9 第 22 条）；对照条 `75:1685` 留在 `12 Archive` 供复看 |
+| rail 分隔线关闭 | 8 个 NavigationRail 变体各自 1dp `divider`（fill `outlineVariant`，x=79）在组件源 `set_visible(false)`，实例自动继承；另隐藏 07 残留列间线 `41:1616`/`41:1795`，实现「纯 tone 分区、零 1dp 线」（§9 第 23 条） |
 | 07/08 页面分组重排 | 两页改「左侧标签栏 + 行 = 页面/分组 + 列 = 断点」：列 x 320/1820/2920/3620，08 行 y 200/1300/2400/3500，07 行 y 200/1300/2500/3700；新增列头与行名文字 `74:1399`–`74:1416`。阅读器四帧 + 底板 `67:782` 移到 `12 Archive`（沉浸式、暂缓）。重排后 07 十帧、08 十二帧重叠均为 0 |
