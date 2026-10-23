@@ -85,6 +85,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - **surfaceTint = primary**：tonal elevation 只在需要时叠加（0/1/3/6/8/12 → 0/0.05/0.08/0.11/0.12/0.14），默认不叠。
 - **桌面三区映射（large / XL，≥1200dp；官方「大窗口 add-on surface colors」，A）**：导航 rail 用 `surfaceDim`（暗色 `surfaceContainerHighest`）；导航列表与 supporting pane 用 `surfaceContainer`；主内容用 `surface`；面板内卡片 `surfaceContainerLow`（暗色 `surfaceContainerHigh`）。相邻级差亮色 7.0 / 4.0、暗色 10.0 / 6.0，**46 个 hex 一个不改**。**同一个 region 在它所存在的所有断点用同一角色**（官方「跨断点保持映射一致」，A；例如 rail 在 medium / large 都是 `surfaceDim`）。默认**纯 tone、不加线**（`example.png` 实测官方桌面产品即如此）；仅在「两个面板必须同 tone」或高环境光 / 低端屏时按需叠 1dp `outlineVariant`，**可交互边界改用 `outline`**（4.27 / 5.85 ≥ 3:1，而 `outlineVariant` 只有 1.62 / 1.99）。依据 `08` §4.1/§5、`09` §3.4。
 - **tonal elevation 与 pane 互斥**：pane 级容器一律不叠 surfaceTint（`applySurfaceTint = false`）；tonal elevation 只留移动端组件级反馈与桌面浮层（menu / dialog / side sheet）。
+- **桌面口径（硬，评审按此判定；完整版见 `08` §0.0）**：**T1 结构**——≥1200dp 的并列 pane 必须显式按区域取角色（rail `surfaceDim` / 列表与 supporting pane `surfaceContainer` / 内容 `surface`），以「区域」为参数而非以组件为参数；**T2 阈值**——相邻并列区域 ΔL\* 亮色 **< 4**、暗色 **< 6** 时必须叠 1dp `outlineVariant` 或提一档角色，**2 个 L\* 的档差不算分隔**；**T3 边界**——46 个 hex 不改、只新增 `stroke/hairline` 1dp 与 `stroke/focus` 2dp、阴影只给浮层 level 2–5 且 tint 全关、不回退 elevation-tint。桌面底板 `#EAE8E6` 是画布层，**不在 46 角色内**。
 
 ### 2.4 对比度（WCAG，计算值）
 
@@ -233,8 +234,10 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 接缝测试：599/600、839/840、1199/1200、1599/1600 各出一张对照。
 - 内容最大宽：large/XL 的正文区约 1200dp 居中，避免 1920 拉满；正文保持 40–60 字符/行。
 - 代码现状 `app/lib/shared/ui/layout/app_layout_breakpoints.dart:10,13` 是 600/1024；迁移时改五档。
-- 模板进度（五档齐全）：Compact 390×844 `41:1975`、Medium 600×800 `41:1824`、Expanded 1024×768 `41:1774`、Large 1440×900 `41:1578`、XL 1920×1080 `41:2384`。XL 现为三栏（expanded rail 256 + 列表 504 + 详情/章节 + 阅读进度 360），验证官方 XL 1–3 pane 上限。
-- **栏宽取值（见 `09-desktop-layout-reference.md` §7，下一轮改图）**：large 四栏 = rail 80 + 列表 296 + 详情 652 + supporting 412；XL 四栏 = rail 80 + 列表 320 + 详情 1108 + supporting 412；expanded 三栏 = rail 80 + 详情 584 + supporting 360。pane 间全出血（0 margin），pane 内 padding 24，依据用户偏好（`design-system/example.png`）。
+- 模板进度（五档齐全）：Compact 390×844 `41:1975`、Medium 600×800 `41:1824`、Expanded 1024×768 `41:1774`、Large 1440×900 `41:1578`。
+- **详情模板（2026-10-23 已改/已建，见 `09` §7）**：XL `41:2384` 已由「书库三栏」改造为 `Template/Comic detail · Extra-large 1920`（rail 256 + 24 + 详情 1180 + 24 + supporting 412 + 24）；另新增 large `67:509`（rail 80 + 24 + 876 + 24 + 412 + 24）与 expanded `67:431`（rail 80 + 24 + 512 + 24 + 360 + 24）。
+- **栏宽取值**：详情页三栏 = rail + 24 + 主区 + 24 + supporting + 24，主区 expanded 512 / large 876 / XL 1180，rail 80（XL 详情例外 256）；支撑栏宽见下条。**pane 间与帧右缘都留 24 画布底**（不照搬 `09` 参考图的 0 margin 全出血，用户要求支撑栏贴右但留白），pane 内 padding 24，分区靠 tone、不叠 1px 线。原「四栏 80+320+1108+412」方案**作废**（书库不走 inline list-detail）。
+- **桌面底板（画布层，非 token）**：≥1200dp 的帧加底板（帧外扩 24、圆角 20、填充 `#EAE8E6`）+ 窗口 chrome（圆角 12、1dp `outlineVariant`、`0/2/6 @12%` 投影）。`#EAE8E6` 不在 46 个颜色角色里，代码中禁止使用。
 - **supporting pane 宽**：expanded **360**（官方 A 级）；large / XL **412**（官方 A 级）。旧文档统一写 360 是漏了 large/XL 的默认值，已按 `07-supporting-pane.md` §4.1 修正。
 
 ### 5.2 官方分栏与导航矩阵
@@ -255,11 +258,13 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 **List-detail**（书库、历史、设置）：compact 1 栏；medium 1（推荐）或 2（双栏时用 bottom nav 省横向空间）；expanded 起 2 栏。单栏时 detail 才有 back；双栏时 selected 只在 list；无选中时 detail 显示占位；单/双栏切换保持最近使用的 pane。
 
-**Supporting pane**（详情页元数据、阅读进度）：compact/medium 放 primary **下方**（compact 可用 bottom sheet，A 级原文）；expanded 起转 leading/trailing 固定 **360dp**；large / XL 官方默认 **412dp**（A）。pane 间 spacer 24dp、外侧 margin 24dp（A）；large/XL 若采纳全出血则 pane 间取 0，见 §5.1 页脚。**父子关系一律改用 list-detail**（supporting pane 不是父子导航）。
+**Supporting pane**（详情页元数据、阅读进度）：compact/medium 放 primary **下方**（compact 可用 bottom sheet，A 级原文）；expanded 起转 leading/trailing 固定 **360dp**；large / XL 官方默认 **412dp**（A）。pane 间 spacer 24dp、外侧 margin 24dp（A）；本项目三档详情模板就取 24（不取参考图的 0），见 §5.1 页脚。**父子关系一律改用 list-detail**（supporting pane 不是父子导航）。
 
 - 判据（`07` §2）：**「换对象 = list-detail；换视角 = supporting pane」**。同一对象的切面（元数据、进度、评论）才进 supporting pane。
-- **本项目采纳**：书库详情 `/comic/:id` 与系列详情 `/series/:id`——元数据 + 阅读进度进 trailing 栏；compact/medium 已天然满足（元数据本来就在 primary 下方），只差 expanded 起换布局。
-- **不采纳**：① 阅读器 + 章节目录（无章节模型、无页缩略图管线、与沉浸式冲突 → 改「可召唤浮层 ≤360」，见 §5.4）；② 设置 + 分区预览（官方 list-detail key use cases 原文含 `Settings + category detail`，代码已是 list-detail，真正要改的只是阈值 600 → 840）。
+- **本项目采纳（用户决策 m00431）**：`/comic/:id`、`/series/:id` 等详情路由**共用同一个详情模板**——主区（封面 + 标题 + 元数据 + 简介 + CTA + 章节目录）+ trailing 支撑栏（阅读进度、元数据卡）；compact/medium 时支撑内容落到 primary 下方（官方 A），expanded 起转 trailing 固定栏。
+- **书库列表页不走 inline list-detail**（用户决策）：保持「列表 → 独立详情路由」，所以 `41:2384` 改造为详情模板、不再有列表栏。
+- **设置页走 inline list-detail**（用户决策）：设置根页双栏（分类 + 内容，阈值 **≥840**），二级页（阅读 / 外观 / 数据）单栏；官方 key use cases 原文 `Settings + category detail` 归 list-detail，代码现为 600，需改 840。
+- **不采纳**：阅读器 + 章节目录（无章节模型、无页缩略图管线、与沉浸式冲突 → 改「可召唤浮层 ≤360」，见 §5.4）。
 - MVP 不做拖拽调宽；官方 resize 快照取 360 / 412 / split 三档，够用。
 
 **Feed**（首页、搜索、历史列表）：网格卡片；compact 单列铺满，medium 起加列，expanded/large/XL 列数继续增加；用大小与位置表达层级，重排保持顺序。
@@ -269,8 +274,8 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 页面 | Compact | Medium | Expanded | Large / XL |
 |---|---|---|---|---|
 | 首页 Home | feed 单列 | feed 2 列 | feed 3 列 | feed 4–5 列，内容限宽 |
-| 书库 All libraries | 列表→详情路由 | feed 或双栏 | list-detail 双栏 | 双栏 + 更宽 list |
-| 单本详情 Library | 单栏 detail（元数据在下方） | 单栏（元数据在下方） | **supporting pane trailing 360** | supporting pane trailing **412**，详情区限宽 1200 |
+| 书库 All libraries | 列表 → 详情路由 | 列表 → 详情路由（**不做 inline list-detail**） | 列表 → 详情路由 | 列表 → 详情路由；详情页走 §5.3 |
+| 单本详情 Library | 单栏（元数据与阅读进度在下方） | 单栏（同 compact） | **supporting pane trailing 360**（主区 512） | supporting pane trailing **412**（主区 large 876 / XL 1180，XL rail 例外用 256） |
 | 阅读器 Reader | 全屏单栏 | 全屏单栏 | 全屏 + **可选浮层 ≤360**（非常驻栏） | 同 expanded，阅读区限宽 |
 | 历史 History | feed 单列 | 2 列 | 2 列 + 详情 | 双栏 |
 | 搜索 Search | 单列结果 | 2 列 | 2 列 | 3 列，筛选常驻 |
@@ -336,15 +341,17 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 首页 | `41:2026` | `41:2209` | `41:2160` | `41:2314` |
 | 阅读器 | `41:2097` | `41:2275` | `41:2139` | `41:2363` |
 | 书库模板 | `41:1578` | `41:1774` | `41:1824` | `41:1975` |
-| XL 三栏书库 | `41:2384` | — | — | — |
 | 设置 | `48:2663` | — | — | `48:2710` |
 | 历史 | `48:2749` | — | — | `48:2803` |
+| **详情 Screen** | `67:587` | `67:649` | `67:677` | `67:752` |
+
+详情 **模板**在 07 Templates 页：XL `41:2384`（由原书库三栏改造为 `Template/Comic detail · Extra-large 1920`）、Large `67:509`、Expanded `67:431`；三帧均带桌面底板（`67:749` / `67:750` / `67:751`），08 的 5 个 1440 帧底板为 `67:781`–`67:785`。
 
 **画布矩阵（2026-10-23 修复重叠后）**：08 / 07 两页统一按「行 = 页面、列 = 断点」排布，避免帧互相压叠。
 
 - 列 x = `0` / `1500` / `2600` / `3300` ↔ Large 1440 / Expanded 1024 / Medium 600 / Compact 390（列间留 60–100px 空隙）。
-- 行 y = `0` / `1000` / `2000` / `3000` ↔ Home（首页）/ Reader（阅读器）/ Settings（设置）/ History（历史）。
-- 07 Templates 沿用同一组列 x：第一行放四档断点模板，XL 1920 宽 1920 放不进 1500 列距，单独放第二行 `(0, 1100)`。
+- 行 y = `0` / `1000` / `2000` / `3000` / `4000` ↔ Home（首页）/ Reader（阅读器）/ Settings（设置）/ History（历史）/ Detail（详情）。
+- 07 Templates 沿用同一组列 x：第一行放四档断点模板；XL 1920 宽放不进 1500 列距，与 Large 详情模板一起放第二行。带桌面底板后的实际位置：`41:1578`(40,40)、`41:2384`(40,1140)、`67:509`(2640,1140)；底板 `67:749`(16,16)、`67:750`(16,1116)、`67:751`(2616,1116)。两页顶层帧重叠数均为 0。
 
 四个 P0 文档页的样张同样只在 Figma：Tokens 总览 `25:689`、Effect/Grid `25:1234`、Foundations `25:1314`、Material Symbols `25:1374`、Components Proof `25:1428`、Patterns Proof `41:1956`、States & Content Lab `41:2520`、Motion `48:2574`、Handoff & A11y `48:2610`。
 
@@ -404,10 +411,14 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 2. ~~**Grid margin**~~（**已关闭**）：compact 16 / medium 及以上 24 已由 `07-supporting-pane.md` §4 取到官方原文（A 级），不再是 C 级推断。Figma Grid Style 仍无 margin 参数，属工具限制，不影响决策。
 3. **导航组件精确 dp**：navigation bar 高 80、collapsed rail 宽 80、indicator 56×32 有实现值佐证（B）；expanded indicator 101×56 与行距 68 由官方截图 2× 反推（B）；rail 宽 256 是项目取值。官方 `/specs` 页 JS 渲染抓取失败，若后续拿到数值，改组件集而非模板。
 4. **rail 展开/收起的动效时长**：官方只说 indicator 从图标中心展开，未给时长；暂用 §4.3 的 Standard 300ms（`cubic-bezier(0.2,0,0,1)`），拿到官方数值再定。
-5. **书库是否改 inline list-detail**（**当前第 1 号阻塞项**）：模板画的是「列表 + 详情同屏」，而代码里详情是独立路由（`shared_content_routes.dart:33-43`）。这决定 `41:2384` 的列表栏该不该存在，也决定 large/XL 是四栏还是三栏。参见 `07` §8.1、`09` §9.1。
+5. ~~**书库是否改 inline list-detail**~~（**已关闭，2026-10-23**）：用户定「书库不走 inline list-detail，设置页走」→ `41:2384` 改造为详情模板，large/XL 详情均为三栏；`09` §9.1 同步关闭。
 6. **rail 用 80 还是 256 的切换规则**：`09` §3.2 提出「同屏 ≥3 栏 ⇒ 80」，是从官方产品截图反推（B），无官方条文。需在 1440 / 1920 两帧出图对比。
 7. **桌面 rail 取 `surfaceDim` 的玫瑰倾向**：A 板 tonalSpot 在 tone 87 仍有低彩度，整片铺 rail 会偏粉。退路是 `surfaceContainerHighest`（tone 90）+ 1dp `outlineVariant`。**暗色 chrome 反向**（rail 用 `surfaceContainerHighest`）需设计评审确认。
 8. **级差感知阈值无实测**：ΔL\* 2 / 4 / 7 的「能不能看清」是 C 级工程判断，官方只给对比度可访问性标准、不给分区级差规范。要做成规范需 5–8 人快速辨色测试。
+9. **`MetadataPanel` 312 版**：组件现为固定 320 宽，装不进 expanded 支撑栏 360 的内容宽 312；出 312 版（或支持 16 内边距）之前，expanded 支撑栏只放阅读进度。
+10. **详情页 rail 256 与 80 的对比**：XL 详情按用户指定用了 expanded 256，large/expanded 用 collapsed 80。需在 1920 上各出一版看详情 1180 是否过宽。
+11. **`ChapterRow` 的「已读」不随行宽右对齐**：组件内固定 x=312，实例加宽后（XL 1132 / large 828）停在偏左；实例内子节点不能单独移动，需改组件布局属性。
+12. **桌面底板 `#EAE8E6` 的定位**：现作为画布层（非 46 角色之一），是否要升为正式 token（例如 `color/canvasShell`）待评审——若升，需同时定暗色值。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -454,3 +465,8 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 桌面三区 tone 映射 | §2.3 新增「桌面三区映射」与「tonal elevation 与 pane 互斥」；新增 §2.6 桌面级差对照表；§4.2 注明 level↔surfaceContainer 的 1:1 只对浮层成立。**不改 46 个 hex、不新增 color 变量、不动 D3**，级差亮 7.0/4.0、暗 10.0/6.0 |
 | §5 依据修正 | ①§5.1/§5.2 括号误读改为官方原文（`1 or 2 (recommended)` 等）；②supporting pane 补 large/XL 官方 412（原统一写 360）；③§5.4 阅读器由「可选 trailing 360」改「可选浮层 ≤360」；④设置双栏阈值写明 ≥840；⑤§5.1 补 large/XL/expanded 三档拦宽取值；⑥§9 关闭 Grid margin 未决项 |
 | 画布矩阵修复 | 08 Screens 12 帧改「行 = 页面、列 = 断点」矩阵（列 x 0/1500/2600/3300，行 y 0/1000/2000/3000），消除 4 处重叠并修掉 Reader 1024 `41:2275` 的 y=−346；07 Templates 5 帧同列同规则重排（`41:1774`→1500、`41:1824`→2600、`41:1975`→3300、XL `41:2384`→(0,1100)），消除 `41:1824`∩`41:2384` 的 100×80 重叠。两页现均 0 重叠，截图仅在 Figma 内查看 |
+| 详情模板改造 | XL `41:2384` 由「书库三栏（书库列表 + 详情 + 阅读进度）」改造为 `Template/Comic detail · Extra-large 1920`：删列表栏与 2 条 1px 分隔线，详情区改「封面 180×252 + 标题 + 元数据 + 3 chips + 简介 + 开始阅读 + 章节目录 3 行」，支撑栏加 `surfaceContainer` 底色矩形 `67:418`（纯 tone）+ `MetadataPanel` 实例 `67:419`；rail 保留 256（用户指定） |
+| 详情模板补档 | 新增 `67:431` Expanded 1024（rail 80 + 24 + 512 + 24 + 360 + 24）与 `67:509` Large 1440（rail 80 + 24 + 876 + 24 + 412 + 24）；rail 换 collapsed 变体 `41:1651`。expanded 实测：主区内容 464，元数据删「共 24 话」后 208 可单行，`MetadataPanel` 320 装不进 312 → 暂不放 |
+| 详情 Screens 行 | 08 Screens 加第 5 行 `Detail`（y=4000）：`67:587`(1440) / `67:649`(1024) / `67:677`(600 单栏) / `67:752`(390 单栏)；600/390 的元数据与阅读进度落到主内容下方（官方 compact/medium） |
+| 桌面底板 | ≥1200dp 帧加画布层底板（外扩 24、圆角 20、`#EAE8E6`）+ 窗口 chrome（圆角 12、1dp `outlineVariant`、`0/2/6 @12%` 投影，OS 层不进 M3 elevation）：07 模板 `67:749`/`67:750`/`67:751`，08 `67:781`–`67:785`；两页顶层帧重叠数仍为 0 |
+| §5 布局依据回填 | 用户决策（书库不走 inline list-detail、设置走 ≥840、支撑栏按官方 expanded 360 / large·XL 412、详情模板共用）写入 §5.3；§5.4 书库行改「列表 → 独立详情」；§5.1 模板进度与栏宽换成实际三栏详情几何 + 桌面底板规则；§6.1 索引表补详情行与模板 id；§9 关闭书库阻塞项并新增 4 条未决 |
