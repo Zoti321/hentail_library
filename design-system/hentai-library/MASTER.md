@@ -104,6 +104,18 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 暗色预览：`A · 柔和玫瑰 · Dark Preview` `13:578`（y=1020），53 填充 + 2 描边绑定 `Theme/A · Dark`；切换器已隐藏、不参与原型。
 - 预览只用于色彩评审，不是首页版式交付。仓库不存截图，直接在 Figma 看节点 `13:578`。
 
+- **桌面区域 token（2026-10-23 已建别名变量，B）**：46 角色不动，在 `Theme/A · Light` / `Theme/A · Dark` 各加 5 个别名变量，另加 `radius/pane` = 20（见 §4.1）。作用是保证官方那条「同一 region 跨断点用同一角色」（A）——切主题时别名自动跟随，模板里不再写死 hex。
+
+| 变量 | Light 别名 → 角色 (L\*) | Dark 别名 → 角色 (L\*) | 用途 |
+|---|---|---|---|
+| `color/desktop/window` | `surfaceContainerHigh` #F5E4E5 (91.9) | `surfaceContainerLowest` #140C0D (4.0) | 窗口底、rail、pane 间隙 |
+| `color/desktop/pane` | `surface` #FFF8F7 (98.1) | `surfaceContainer` #261D1E (11.9) | 内容 pane |
+| `color/desktop/paneHeader` | `surfaceContainerLow` #FFF0F1 (96.0) | `surfaceContainerHigh` #312829 (17.1) | pane 顶栏条 |
+| `color/desktop/card` | `surfaceContainerLow` #FFF0F1 (96.0) | `surfaceContainerHigh` #312829 (17.1) | pane 内分组卡 |
+| `color/desktop/field` | `surfaceContainerLowest` #FFFFFF (100.0) | `surfaceContainerHighest` #3C3233 (21.9) | 搜索框 / 输入 |
+
+- 变量 id：Light `71:884`–`71:888`、Dark `71:889`–`71:893`，`radius/pane` `71:894`。这是别名层，不新增 hex；`#EAE8E6` 画布底板仍未升 token（§9 第 12 条）。
+
 ### 2.6 桌面级差对照表（large / XL，供评审与 Figma 重上色）
 
 > 前提别读反：tone-based surface **本来就是为大屏新增**的模型（官方博文副标题 `New surface color roles offer more flexibility for large screens`，A），它正是为了让大屏不必再靠 elevation 叠色分区。本节的结论是「**同一个梯级**铺到并列大区时级差不足」，正解是动用官方为大窗口开的 **区域级 add-on surface colors**（也就是用**更多** tone 角色），而不是退回阴影。完整推理见 `research/material-design-3/08-tone-based-surfaces.md` §0.5。
@@ -167,7 +179,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 组 | 值 | 用法 |
 |---|---|---|
 | spacing | 0 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 | 4/8 体系；M3 未规定 spacing scale，属项目决策 |
-| radius | none 0 / xs 4 / sm 8 / md 12 / lg 16 / xl 28 / full 999 | 卡片 12、对话框 28、FAB 16、按钮与 chip = full |
+| radius | none 0 / xs 4 / sm 8 / md 12 / lg 16 / xl 28 / **pane 20** / full 999 | 卡片 12、对话框 28、FAB 16、按钮与 chip = full；pane 20 = 官方 `large increased`（档位名 A、dp 值 B），桌面窗口内的容器用它（§2.5） |
 | size | control 40 / touch 48 / list 56·72·88 / fab 56·80·96 / extended-fab 56 | 视觉高度可 40，触达不得小于 48 |
 | state | hover 8% / focus 12% / pressed 12% / dragged 16% / disabled 38%·12% | 见 §4.4 |
 | breakpoint | 600 / 840 / 1200 / 1600 | 见 §5 |
@@ -276,7 +288,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 |---|---|---|---|---|
 | 首页 Home | feed 单列 | feed 2 列 | feed 3 列 | feed 4–5 列，内容限宽 |
 | 书库 All libraries | 列表 → 详情路由 | 列表 → 详情路由（**不做 inline list-detail**） | 列表 → 详情路由 | 列表 → 详情路由；详情页走 §5.3 |
-| 单本详情 Library | 单栏：封面 220 + 标题/概要/操作/简介 → 元数据 chip → 资源 KV（**无章节列表**） | 单栏（同 compact） | **supporting pane trailing 360**（主区 512） | supporting pane trailing **412**（主区 large 876 / XL 1180，XL rail 例外用 256）；两版待评审：`67:509` 支撑栏版 / `69:813` 卡组版 |
+| 单本详情 Library | **文档流单栏**：封面 96 + 标题/概要/CTA/简介（4 行截断 + 展开全文）/ 元数据 chip 行 / 资源 KV，pane 358（16 边距） | **文档流单栏**：折叠 rail 80 + pane 472，封面 140 + 右侧文本 260 | **文档流**：折叠 rail 80 + 24 + pane 896 + 24，内容 848（封面 220 + 24 + 文本 604） | large：rail 80 + 24 + pane 1312 + 24（主区 1120）；XL：rail 256 + 24 + pane 1616 + 24（主区 1324）；KV 在宽档排两列 |
 | 阅读器 Reader | 全屏单栏 | 全屏单栏 | 全屏 + **可选浮层 ≤360**（非常驻栏） | 同 expanded，阅读区限宽 |
 | 历史 History | feed 单列 | 2 列 | 2 列 + 详情 | 双栏 |
 | 搜索 Search | 单列结果 | 2 列 | 2 列 | 3 列，筛选常驻 |
@@ -344,15 +356,15 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 书库模板 | `41:1578` | `41:1774` | `41:1824` | `41:1975` |
 | 设置 | `48:2663` | — | — | `48:2710` |
 | 历史 | `48:2749` | — | — | `48:2803` |
-| **详情 Screen** | `67:587` | `67:649` | `67:677` | `67:752` |
+| **详情 Screen** | `72:1160` | `72:1205` | `72:1250` | `72:1295` |
 
-详情 **模板**在 07 Templates 页：XL `41:2384`（由原书库三栏改造为 `Template/Comic detail · Extra-large 1920`）、Large `67:509`、Expanded `67:431`；三帧均带桌面底板（`67:749` / `67:750` / `67:751`），08 的 5 个 1440 帧底板为 `67:781`–`67:785`。
+详情 **模板**在 07 Templates 页：XL `72:1083`（`Template/Comic detail · Extra-large 1920`，1920×1080，rail 256）、Large `67:509`（1440×900，rail 80）、Expanded `72:900`（1024×768）、Medium `72:961`（600×800）、Compact `72:1022`（390×844）。旧的 `41:2384`（书库三栏改造版）与旧 detail 屏 `67:587` / `67:649` / `67:677` / `67:752` 已删除；`69:813` 是 A/B 时的卡组版 B，保留作历史对照。模板帧的桌面底板仍是 `67:749` / `67:750` / `67:751`，08 的 5 个 1440 帧底板为 `67:781`–`67:785`。
 
 **画布矩阵（2026-10-23 修复重叠后）**：08 / 07 两页统一按「行 = 页面、列 = 断点」排布，避免帧互相压叠。
 
 - 列 x = `0` / `1500` / `2600` / `3300` ↔ Large 1440 / Expanded 1024 / Medium 600 / Compact 390（列间留 60–100px 空隙）。
 - 行 y = `0` / `1000` / `2000` / `3000` / `4000` ↔ Home（首页）/ Reader（阅读器）/ Settings（设置）/ History（历史）/ Detail（详情）。
-- 07 Templates 沿用同一组列 x：第一行放四档断点模板；XL 1920 宽放不进 1500 列距，与 Large 详情模板一起放第二行。带桌面底板后的实际位置：`41:1578`(40,40)、`41:2384`(40,1140)、`67:509`(2640,1140)；底板 `67:749`(16,16)、`67:750`(16,1116)、`67:751`(2616,1116)。两页顶层帧重叠数均为 0。
+- 07 Templates 沿用同一组列 x：第一行放书库四档模板（`41:1578`(40,40)、`41:1774`(1500,0)、`41:1824`(2600,0)、`41:1975`(3300,0)）；第二行放详情模板（XL `72:1083`(40,1140)、Large `67:509`(2640,1140)、B 版 `69:813`(4188,1140)）；第三行放详情其余三档（`72:900`(40,2320)、`72:961`(1120,2320)、`72:1022`(1800,2320)）。底板 `67:749`(16,16)、`67:750`(16,1116)、`67:751`(2616,1116)。两页顶层帧重叠数均为 0（2026-10-23 复测：07 十帧 0、08 十六帧 0）。
 
 四个 P0 文档页的样张同样只在 Figma：Tokens 总览 `25:689`、Effect/Grid `25:1234`、Foundations `25:1314`、Material Symbols `25:1374`、Components Proof `25:1428`、Patterns Proof `41:1956`、States & Content Lab `41:2520`、Motion `48:2574`、Handoff & A11y `48:2610`。
 
@@ -420,9 +432,12 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 10. **详情页 rail 256 与 80 的对比**：XL 详情按用户指定用了 expanded 256，large/expanded 用 collapsed 80。需在 1920 上各出一版看详情 1180 是否过宽。
 11. **`ChapterRow` 的「已读」不随行宽右对齐**：组件内固定 x=312，实例加宽后（XL 1132 / large 828）停在偏左；实例内子节点不能单独移动，需改组件布局属性。
 12. **桌面底板 `#EAE8E6` 的定位**：现作为画布层（非 46 角色之一），是否要升为正式 token（例如 `color/canvasShell`）待评审——若升，需同时定暗色值。
-13. **详情页 A/B 选型**：`67:509`（supporting pane 412 版）与 `69:813`（三卡分组版，无支撑栏）已出图，等设计评审定一版再回灌 07/08 全档。
-14. **窗口底色规则与 08 T1/T2 的坐标差**：窗口底 / rail 用 `surfaceContainerHigh`（91.9）替代 08 的 `surfaceDim`（87）是用户偏好；支撑栏 94 对窗口 91.9 只有 2.1 L\*（T2 要求 ≥4），需评审决定加 1dp `outlineVariant` 还是把支撑栏改 `surfaceContainerLow`。
-15. **Home / Reader 页仍残留 `ChapterRow` 占位**（`9:16` 10 个实例，`41:2026` / `41:2097` 等）：应用无章节模型，需重做成「漫画卡 / 最近阅读」后一并删组件定义。
+13. ~~**详情页 A/B 选型**~~（**已关闭，2026-10-23**）：用户定**方案 1 · 文档流**（无支撑栏、无卡组），KV 按断点/宽度响应式，pane 圆角 20、卡 16，简介 4 行截断 + 「展开全文」；`69:813` 卡组版只留作历史对照。
+14. **窗口底色规则与 08 T1/T2 的坐标差**（仍开放）：窗口底 / rail 用 `surfaceContainerHigh`（91.9）替代 08 的 `surfaceDim`（87）是用户偏好，已落成 `color/desktop/*`（§2.5）；代价是 pane 98.1 与窗口 91.9 差 6.2（OK），但 pane 顶栏条 96 对窗口 91.9 只有 4.1、pane 内卡片 96 对 pane 98.1 只有 2.0（< T2 的 4）。评审需定：靠 gap/圆角认边界，还是给 pane 内卡片补 1dp `outlineVariant`。
+15. ~~**Home / Reader 残留 `ChapterRow`**~~（**已关闭，2026-10-23**）：`9:16` 的 10 个实例已删；`ChapterRow` 组件定义保留给阅读器章节列表，本批页面不再使用。
+16. **600 / 390 详情首屏装不下**：文档流按内容顺序排，600 的 pane 内容 424×752、390 为 310×812，资源 KV 末行贴着 pane 底；Figma 帧是「滚动视口」表现，超出部分被裁。评审要看的是滚动后是否仍成立（无二次留白断层）。
+17. **collapsed rail 的文字标签**：Figma 里对 80 宽实例逐个 override 隐藏了 `首页/书库/历史/设置` 文字与左侧 1px 分隔线（实例级，不进组件）；Flutter 侧对应做法是 icon + tooltip，需在迁移任务里写明。
+18. **圆角三层**：画布底板 20 / 窗口 frame chrome 12 / pane 20 / 卡 16 目前并存；底板与 frame 是「画布演示层」，pane/卡 才是产品层。评审若认为底板 20 会被误读成产品圆角，改成 12 或去掉。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -446,6 +461,10 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | Button 变体集 | Figma `39:1481`：Filled/Tonal/Outlined/Text × Default/Disabled，8 变体；disabled 改实色混合避免透明底发黑 |
 | 导航组件 | `41:1539` NavigationBar（390×80，Selected 4 变体）；`41:1577` NavigationRail（Collapsed 80 / Expanded 256，Type × Selected 8 变体；条目自顶部 16 起、64 间距；无新建 FAB）；indicator 需置底，否则盖住图标 |
 | 桌面模板 | `41:1578` `Template/Library · Large 1440`：expanded rail 256 + 左侧列表 400 + 右侧详情；官方 large 分栏规则落地验证 |
+| 详情页重做（文档流） | 详情四档模板重做：`67:509` 1440 / `72:900` 1024 / `72:961` 600 / `72:1022` 390，XL `72:1083`；结构 = 顶栏 56 + 封面 + 标题/概要/CTA/简介（4 行 + 展开）+ 元数据 chip 行 + 资源 KV 两列；删除章节目录（应用无该结构）与阅读进度（用户定不需要） |
+| 桌面区域 token | `color/desktop/{window,pane,paneHeader,card,field}`（Light `71:884`–`71:888` / Dark `71:889`–`71:893`）+ `radius/pane` 20；全部为 46 角色的别名，无新 hex（§2.5） |
+| 窗口底色规则 | 窗口/rail 走 `desktop/window`、pane 走 `desktop/pane`、顶栏条与 pane 内卡片走 `desktop/paneHeader`/`card`；pane 之间与帧边缘留 24 gap，去掉 NavigationRail 左侧 1px 分隔线（实例级 override） |
+| 08 Detail 行重建 | 08 Screens 第五行 Detail 换成本轮四帧并置 `(0/1500/2600/3300, 4000)`；旧 `67:587`/`67:649`/`67:677`/`67:752` 与旧模板 `67:431` 删除；07/08 顶层帧重叠复测均为 0 |
 | 多断点模板 | `41:1774` Expanded 1024×768（collapsed rail 80 + 列表 304 + 详情）；`41:1824` Medium 600×800（collapsed rail 80 + 单栏列表 + 筛选 chips + FAB） |
 | P0 组件补齐 | `41:1886` FAB 4 尺寸；`41:1895` FilterChip 2 态；`41:1920` ListItem 3 行数；`41:1933` Card 3 风格；`41:1939` Dialog/Basic；全部绑定 A-Light 变量 |
 | 业务 Patterns | `41:1946` BookListItem、`41:1951` ComicCard、`41:1955` ChapterRow；证明 frame `41:1956`。业务语义不下沉到 05 |
