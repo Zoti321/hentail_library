@@ -1,6 +1,6 @@
 # Hentai Library · Material 3 设计系统（MASTER）
 
-> 状态：**Figma 设计稿阶段完成，待评审**。本文件是设计系统的唯一规划入口；颜色方向 A 已定（亮/暗预览）、44 个 Number token、30 个 Text Style、6 个 Effect Style、5 个 Grid Style、01–04 文档页已建；05 已建齐 P0 原子组件集（补 SearchBar / TopAppBar / Snackbar），06 有 8 个业务组件，07 五档模板齐全，08 首页与阅读器四档出图、Settings 与 History 各两档，09 States & Content Lab、10 Motion、11 Handoff & A11y 已建成。代码未迁移。
+> 状态：**Figma 设计稿阶段完成，待评审**。本文件是设计系统的唯一规划入口；颜色方向 A 已定（亮/暗预览）、44 个 Number token、30 个 Text Style、6 个 Effect Style、5 个 Grid Style、01–04 文档页已建；05 已建齐 P0 原子组件集（Button / IconButton / TextField / SearchBar / TopAppBar / Snackbar / NavigationBar / NavigationRail / FAB / FilterChip / ListItem / Card / Dialog），06 有 8 个业务组件，07 五档模板齐全，08 首页与阅读器四档出图、Settings 与 History 各两档，09 States & Content Lab（含文字缩放样例）、10 Motion、11 Handoff & A11y 已建成。导航组件已按 2025-05 官方 rail 规范改版（menu 切换、active indicator 贴合内容、active 图标 filled）。代码未迁移。
 > 代码未迁移：`app/` 仍是旧 Fluent 取向的主题与页面。设计稿评审通过后才改代码（见 §8）。
 > 证据底稿：`design-system/research/material-design-3/`（01 基础、02 组件、03 Flutter 实现、04 Figma 工作流、05 粉色方向、06 自适应布局）。规范数值若与本文件冲突，先查底稿的证据级别（A 官方规范 / B 官方实现源码 / C 推断）。
 
@@ -209,7 +209,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | class | 宽度 (dp) | 代表 frame | 壳层 | 分栏 | 栅格 |
 |---|---:|---|---|---|---|
 | compact | < 600 | 390×844 | Navigation bar（高 80） | 1 | 4 列 / margin 16 / gutter 16 |
-| medium | 600–839 | 800×1280 | Collapsed navigation rail（宽 80） | 1（推荐）或 2 | 8 列 / margin 24 / gutter 24 |
+| medium | 600–839 | 800×1280 | Collapsed navigation rail（宽 80，menu 可切 expanded） | 1（推荐）或 2 | 8 列 / margin 24 / gutter 24 |
 | expanded | 840–1199 | 1024×768 | Collapsed rail（可换 standard expanded） | 1 或 2（推荐 2） | 12 列 / margin 24 / gutter 24 |
 | large | 1200–1599 | 1440×900 | Expanded rail（宽 256，显示文字标签） | 1 或 2（推荐 2） | 12 列 / margin 24 / gutter 24 |
 | extra-large | ≥ 1600 | 1920×1080 | Expanded rail（宽 256） | 1–3（推荐 3） | 12 列 / margin 24 / gutter 32 |
@@ -260,6 +260,27 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 官方没有 spacing 数值表；项目用 4/8 体系（§4.1），桌面可放宽到 space/5–6。
 - 详细依据与证据级别见 `research/material-design-3/06-adaptive-desktop.md`。
 
+### 5.6 导航组件解剖（官方 A 级）
+
+来源：`m3.material.io/components/navigation-rail/` 的 overview / guidelines / accessibility（2025-05 起）。baseline navigation rail 已不再推荐，现行只有 **collapsed** 与 **expanded** 两种：collapsed 替代旧 rail，expanded 替代 navigation drawer。
+
+| 项 | Collapsed（80） | Expanded（256） |
+|---|---|---|
+| 使用档位 | medium → XL；compact 必须用 navigation bar | large / XL（可作 modal 覆盖） |
+| 条目数 | 3–7；不隐藏 | 3–7；可整体隐藏（沉浸式） |
+| Menu（切换入口） | 顶部居中 24 图标，`28,16` | 左上 `16,16`；展开后图标表示「可收起」 |
+| Active indicator | 56×32，包住图标 | **101×56，贴合图标 + 文字**（不按 rail 宽度取比例） |
+| 行距 | 64（顶部 52 起） | 68（顶部 64 起） |
+| 命中区 | 整行 80 宽 | **整行 256 宽**（indicator 只是视觉贴合） |
+| 选中图标 | **filled** + onSecondaryContainer | 同左 |
+| 选中 label | secondary（官方唯一颜色变更） | onSurface |
+| 未选中 label / 图标 | onSurfaceVariant，Label Medium | 同左 |
+| Divider | 与内容相邻一侧 1px outlineVariant | 同左 |
+
+官方原文要点：`The active indicator hugs the label text in the expanded nav rail`；`The target area should always span the full width`；indicator 从图标中心展开、rail 内只允许一个；label 必须一个词、不截断、不用省略号、不为长文案缩字号；文字放大时条目纵向增高、保留默认 padding，2× 内完整可见，超过才允许截断（样例见 09）。FAB 若存在只能顶部对齐、位于 destination 之上且 elevation 取 level 0；本项目建库低频，rail 不放 FAB。>5 destinations 时考虑 modal expanded rail；rail 与 navigation bar 不能同时出现。navigation bar 的选中图标同样用 filled。
+
+证据缺口：官方 `/specs` 页为 JS 渲染，抓取只得 109 字符，尺寸表缺失；expanded indicator 101×56、行距 68 由官方截图按 2× 反推（B 级），collapsed 56×32 与已知实现值吻合。rail 容器 256 是项目取值，不是官方数值。
+
 ## 6. Figma 库结构
 
 文件：`Hentai Library UI  (Material Design) v2`（`UI` 与 `(` 之间两个空格）。
@@ -271,11 +292,11 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 02 Styles | `9:10` | 30 Text Style + 样张；6 Effect + 5 Grid Style 与卡片 | 完成（`25:1234`） |
 | 03 Foundations | `9:11` | 角色用法、字阶、形状、elevation、motion、state、a11y 规则页 | 完成（`25:1314`） |
 | 04 Icons & Assets | `9:12` | Material Symbols 24px 样本、尺寸 20/24/40、filled 态 | 完成（`25:1374`）；插画/占位图待补 |
-| 05 Components | `9:13` | 无业务语义的原子组件 | 三个打样（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）+ **Button 变体集 `39:1481`**（Filled/Tonal/Outlined/Text × Default/Disabled，8 变体）+ **NavigationBar 变体集 `41:1539`**（Selected=home/library-books/history/settings，4 变体）+ **NavigationRail 变体集 `41:1577`**（Type=Collapsed/Expanded × Selected=home/library-books/history/settings，8 变体；collapsed 与 expanded 分两行排布；**不含「新建」FAB**：业务是先选库根路径再扫描，建库低频）；**FAB `41:1886`**（Regular 56 / Medium 80 / Large 96 / Extended 136×56）、**FilterChip `41:1895`**（Unselected / Selected）、**ListItem `41:1920`**（Lines 1/2/3，56/72/88）、**Card `41:1933`**（Filled / Elevated / Outlined）、**Dialog/Basic `41:1939`**（320×220）|
+| 05 Components | `9:13` | 无业务语义的原子组件 | 三个打样（`25:1428`：Button/Filled `25:1434`、IconButton/Standard `25:1438`、TextField/Filled `25:1442`）+ **Button 变体集 `39:1481`**（Filled/Tonal/Outlined/Text × Default/Disabled，8 变体）+ **NavigationBar 变体集 `41:1539`**（Selected=home/library-books/history/settings，4 变体）+ **NavigationRail 变体集 `41:1577`**（Type=Collapsed/Expanded × Selected=home/library-books/history/settings，8 变体；collapsed 与 expanded 分两行排布；**不含「新建」FAB**：业务是先选库根路径再扫描，建库低频；已按 §5.6 改版：顶部 menu 切换图标、选中图标 filled、collapsed 选中 label 用 secondary、expanded indicator 101×56 贴合内容、行距 68）；NavigationBar 同步改为 filled 选中图标；**FAB `41:1886`**（Regular 56 / Medium 80 / Large 96 / Extended 136×56）、**FilterChip `41:1895`**（Unselected / Selected）、**ListItem `41:1920`**（Lines 1/2/3，56/72/88）、**Card `41:1933`**（Filled / Elevated / Outlined）、**Dialog/Basic `41:1939`**（320×220）|
 | 06 Patterns | `9:14` | 有业务语义的组合（书籍行、漫画卡、章节行） | 已建：`BookListItem` `41:1946`（368×80，封面 48×64 + 标题 16 + meta 12 + 进度条）、`ComicCard` `41:1951`（160×276，封面 160×220）、`ChapterRow` `41:1955`（360×48）、`HistoryRow` `41:2498`（360×72）、`SettingsSection` `41:2496`（360×284：分组标题 + 4 张 56 高行卡，leading 24 图标 + 15 文案 + trailing 16 chevron）、`MetadataPanel` `41:2497`（320×240，5 组键值）、`ReaderToolbar` `41:2516`（1080×64）、`ReaderBottomBar` `41:2517`（1080×80：24 上一页 · 400 进度条 + 页码 · 24 下一页 · 24 设置，统一 28 垂直居中）；证明 frame `41:1956` |
 | 07 Templates | `9:15` | 五档壳层模板 | **五档齐全**：Compact 390×844 `41:1975`（导航栏 80 + 单栏列表 + FAB）、Medium 600×800 `41:1824`（collapsed rail 80）、Expanded 1024×768 `41:1774`（collapsed rail 80 + 列表 304 + 详情）、Large 1440×900 `41:1578`（expanded rail 256 + 列表 400 + 详情）、XL 1920×1080 `41:2384`（三栏：rail 256 + 列表 504 + 详情 + 阅读进度 360） |
 | 08 Screens | `9:16` | 带真实内容的页面实例 | Home：1440 `41:2026` / 1024 `41:2209` / 600 `41:2160` / 390 `41:2314`；Reader：1440 `41:2097` / 1024 `41:2275` / 600 `41:2139` / 390 `41:2363`；Settings：1440 `48:2663` / 390 `48:2710`；History：1440 `48:2749` / 390 `48:2803`。书库的页面实例在 07 模板（正文与数据已灌入）；首页/阅读器/设置/历史的 medium 与 expanded 由同一套 §5 规则推得，未逐档出图 |
-| 09 States & Content Lab | `9:17` | loading/empty/error/offline、长文本、CJK、大图、密度 | 完成（`41:2520`）：loading 骨架 / empty / error / offline 缓存 / 长文本两行·三行截断 / 大图 16:9 / density 40·56 对照 |
+| 09 States & Content Lab | `9:17` | loading/empty/error/offline、长文本、CJK、大图、密度、文字缩放 | 完成（`41:2520`）：loading 骨架 / empty / error / offline 缓存 / 长文本两行·三行截断 / 大图 16:9 / density 40·56 对照 / **Text scale `57:532`**（100% / 150% / 200% 三档导航项，行高随字号增长、不截断） |
 | 10 Motion | `9:18` | 转场与时长标注 | 完成（`48:2574`）：Standard 300ms、Emphasized decelerate 400ms、accelerate 200ms、In-screen 500ms、reduce-motion 条 |
 | 11 Handoff & A11y | `9:19` | token 映射、组件 API、do/don't、覆盖看板 | 完成（`48:2610`）：token→Flutter、组件→Flutter、a11y 验收与迁移顺序三列 |
 | 12 Archive & Scratch | `9:20` | B/C 方向、Expressive 实验 | B/C 已移入 |
@@ -308,7 +329,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | FAB | P0 | size (56/80/96) × color × extended | 已建 `41:1886`：Regular 56/r16、Medium 80/r20、Large 96/r28、Extended 136×56；Flutter 只有 56，80/96 需自绘 |
 | Text Field / Search Bar | P0 | filled/outlined × focus/error | 已打样 filled 320×56；SearchBar `48:2651`（360×56/r28，surfaceContainer + 24 搜索图标 + 16 占位）；桌面 hover/focus state layer |
 | Top App Bar | P0 | small/medium/large × back/actions | 已建 `48:2658`：960×64，back 24 + title-large 22 + more_vert；大屏无阴影，滚动才上 tint |
-| Navigation Bar / Rail | P0 | destinations 3–5 × selected | 已建：NavigationBar `41:1539`（390×80，4 变体）；NavigationRail `41:1577`（Collapsed 80 / Expanded 256，各 4 个 Selected 变体；条目自顶部 16 起、64 间距，无新建 FAB）。切换策略见 §5.2 |
+| Navigation Bar / Rail | P0 | destinations 3–5 × selected | 已建：NavigationBar `41:1539`（390×80，4 变体，选中图标 filled）；NavigationRail `41:1577`（Collapsed 80 / Expanded 256，各 4 个 Selected 变体；顶部 menu 切换；collapsed 行距 64、indicator 56×32；expanded 行距 68、indicator 101×56 贴合内容；无新建 FAB）。解剖与官方依据见 §5.6，切换策略见 §5.2 |
 | List Item | P0 | 1/2/3 line × leading/trailing | 已建 `41:1920`：56/72/88，leading 40 圆头像 + 文案 + trailing more_vert；书籍场景的 2:3 封面变体放 06 Patterns |
 | Card | P0 | elevated/filled/outlined | 已建 `41:1933`：240×160/r12，Filled 用 surfaceContainerHighest、Elevated 用 surfaceContainerLow + level1、Outlined 用 surface + outlineVariant |
 | Chip | P0 | assist/filter/input/suggestion | 已建 `41:1895` FilterChip：96×32/r8，未选 outline、选中 secondaryContainer + check 18；assist/input/suggestion 后续按需 |
@@ -350,7 +371,8 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 
 1. **插图与占位图**：04 页目前只有图标；封面、占位构图、空态插图未定来源（自绘 / 授权素材）。
 2. **Grid margin**：Figma Grid Style 无 margin 参数；项目取 compact 16 / ≥medium 24（§5.1）。M3 官方 margin 表抓取失败，仍为 C 级，模板出图后再复核。
-3. **导航组件精确 dp**：Navigation bar 高 80、rail 宽 80/256、indicator 56×32 来自实现值（B）；官方 specs 页抓取失败。已按实现值建出 `41:1539` / `41:1577` 并在 `41:1578` 模板验证；若后续拿到官方数值，改组件集而非模板。
+3. **导航组件精确 dp**：navigation bar 高 80、collapsed rail 宽 80、indicator 56×32 有实现值佐证（B）；expanded indicator 101×56 与行距 68 由官方截图 2× 反推（B）；rail 宽 256 是项目取值。官方 `/specs` 页 JS 渲染抓取失败，若后续拿到数值，改组件集而非模板。
+4. **rail 展开/收起的动效时长**：官方只说 indicator 从图标中心展开，未给时长；暂用 §4.3 的 Standard 300ms（`cubic-bezier(0.2,0,0,1)`），拿到官方数值再定。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -389,3 +411,5 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 11 Handoff & A11y | `48:2610` 三列交接页：token→Flutter、组件→Flutter、a11y 与迁移顺序 |
 | P0 补组件 | `48:2651` SearchBar、`48:2658` TopAppBar、`48:2662` Snackbar；SearchBar 替代模板里手绘的搜索框 |
 | Settings 与 History 页面 | `48:2663`/`48:2710` 设置（阅读/外观/数据三组，桌面卡片化、移动端分组列表）；`48:2749`/`48:2803` 历史（今天/昨天/更早分组，2 列/单列） |
+| Rail 官方规范改版 | 按 2025-05 官方 rail 文档（替代 baseline rail / drawer）：8 个变体补顶部 menu 切换图标；选中图标改 filled（home/library_books/history/settings 的 `_fill1_24px`）；collapsed 选中 label 改 secondary（`text.secondary`）、全部 label 用 Label Medium；expanded indicator 由 101×32 改 101×56 并提到行顶、行距 64→68；collapsed 行距 64、顶部 52 起。NavigationBar 4 变体同步改 filled 选中图标 |
+| 文字缩放样例 | 09 页新增 `57:532` Text scale 卡：100% / 150% / 200% 三档导航项，行高随字号增长、保留 padding、不截断 |
