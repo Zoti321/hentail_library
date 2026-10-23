@@ -628,12 +628,69 @@ get_node(frameId) 返回整帧递归树（characters / fontSize / x / y / width 
 | 设置 Settings 390 `48:2710` | 行文本 15 Regular（20 处）、组标题 12 Medium | 行文本 **14 Regular**；组标题保持 12 Medium |
 | 历史 History 390 `48:2803` | 24 Bold / 12 Regular / 12 Medium | 已合规，未动 |
 
-- 遗留：设置 390 没有副标题行（其他三档有）。试补会压到「阅读」组标题（组块整体只留 4dp），需连组一起下移，登记为 MASTER §9 第 30 条。
+- 设置 390 的副标题行已在 §11.15.6 补上（标题以下整体下移 26），MASTER §9 第 30 条关闭。
 
 ### 11.14.8 复核
 
 - 07 九帧 / 08 十六帧顶层两两求交：**overlap 0**（改坐标未破矩阵）。
 - 五档详情模板 + 08 四屏截图内联确认：header 同基线、系列右对齐、简介截断 + 展开紧随、KV 字阶一致、600 末行在 pane 内、390 标题 Bold。
+
+## 11.15 Chip 体系与详情页细化（2026-10-23 晚）
+
+### 11.15.1 官方取证
+
+- **A 级（guidelines 抓取成功）** `https://m3.material.io/components/chips/guidelines`：四类 Assist / Filter / Input / Suggestion；`All chips are slightly rounded with an 8dp corner`；`Use an outline to define the edge of the chip's container on regular backgrounds`；pressed 不用 elevation、用 ripple；label ≤ 20 字符、与按钮同字阶；leading icon 默认 primary；trailing 二级动作需要 48×48 触控目标 → 容器最小宽 88。
+- **抓取失败**：`https://m3.material.io/components/chips/specs` 用 read_page 只回 109 字符（`Hide previews / Switch to grid view / Default, Light / Chip - Assist / Expand all`），高度/内边距拿不到；`web_fetch` 被拦（`m3.material.io resolves to a non-public IP address`）。
+- **B 级降级**：`https://material-web.dev/components/chip/` 的 token 表（filter/input：selected container = secondary-container、outline-color = outline、shape = corner-small 8、icon 18、label-large）与 Flutter `chip.dart:2491` `_ChipDefaultsM3`（elevation 0、8 圆角、labelLarge、icon 18、padding 8）。
+- **冲突**：outline 色 material-web 用 `outline`、Flutter 用 `outlineVariant`。本项目按 `applying-elevation` 的 `For interactive components, edges must create sufficient contrast (3:1)`（A）选 **`outline`**（亮 4.27 / 暗 5.85）。
+
+### 11.15.2 组件结构（05 Components）
+
+| 组件 | id | 结构 | 尺寸 |
+|---|---|---|---|
+| `Chip/Filter` 变体集 | `79:1721` | Unselected `79:1719`（透明 + 1dp outline）／ Selected `79:1720`（secondaryContainer + 18dp 勾） | 高 32、radius 8、padding 16/16（选中左 8）、hug |
+| `Chip/Assist` | `79:1732` | 18dp + 图标（primary）+ label | 高 32、左 8 右 16 |
+| `Chip/Suggestion` | `79:1733` | 仅 label | 高 32、padding 16 |
+| `Chip/Input` | `79:1734` | label + 18dp ✕ | 高 32、minWidth 88、左 16 右 8、label 与 ✕ 间距 8 |
+| `Chip/States · Light` | `79:1753` | Enabled / Hover / Focus / Pressed / Disabled | 780×140 |
+
+- TEXT 属性名 `Label`（filter 集合 `Label#79:0`，assist `#79:3`、suggestion `#79:4`、input `#79:5`），绑定方式是 `bind_component_property(field: characters)`。
+- 高度 32 是 **B**（官方 specs 不可达）；官方只保证 8dp 圆角与最小宽 88。
+
+### 11.15.3 状态层
+
+- Hover 8% / Focus 12%（另加 2dp primary 环）/ Pressed 12% / Disabled 38%（label 与容器分别 12%/38%）。
+- **实现坑**：Figma paint 的 `color.a` 会被 set_fills 忽略并渲染成不透明黑；必须用 paint 的 `opacity` 字段，且状态层不能绑变量（绑定会把 alpha 重置为 1）。
+
+### 11.15.4 复用与对齐
+
+- Templates / Screens 的 9 个详情帧共 54 个旧 `Chip/*`（28 高、胶囊、12 Medium）换成 `Chip/Filter Unselected` 实例；library 四帧（`41:1578`/41:1774/`41:1824/`41:1975`）的 rect+text 旧 chip 或旧 Frame 也全部换成实例，筛选组 `全部/未读/已收藏` 的第一个用 Selected 变体。
+- 垂直居中：label 20 高、chip 32 高 → chip y = label y − 6（原来 chip 与 label 同 y，视觉上 chip 偏下 6）。
+- 横向：同组 chip gap **8**（原有 72/64 间距在 chip 变宽后会撞在一起，如 600 书库的 已完结 76 + 校园 62）；metadata 值 chip 与 88 宽 label 列间距 100。
+- 06 Patterns 新增两组：`标签与 Chip 组` y=2160（元数据行、筛选组、Assist、Input）与 `Chip 类型` y=2300（Filter 未选、Suggestion），说明文字 13 Regular onSurfaceVariant。
+
+### 11.15.5 详情分区标题移除
+
+用户要求去掉「元数据」「资源信息」两个 section title，靠间距表达分区。九个详情帧重算如下（首行 = 展开全文底 + 28，宽档取 max(28, 封面底 + 32)）：
+
+| 帧 | 行步距 | 元数据首行 | KV 首行 | 分区间距 |
+|---|---:|---:|---:|---:|
+| 1440 / 1920（`67:509`/`72:1083`/`72:1160`） | 40 | 444 | 608 | 44 |
+| 1024（`72:900`/`72:1205`） | 36 | 444 | 588 | 44 |
+| 600（`72:961`/`72:1250`） | 30 | 483 | 617 | 44 |
+| 390（`72:1022`/`72:1295`） | 32 | 419 | 559 | 44 |
+
+- KV value 文本框高度统一 19（路径 40 保留），消除「添加时间」看起来更小的错觉。
+- 元数据块不能进封面区域：1440/1920/1024 的封面底 412，首行被夹到 444。
+
+### 11.15.6 rail 标签、KV 高度、设置 390
+
+- collapsed rail 的文字标签（首页/书库/历史/设置）此前被实例级 override 隐藏，用户指出丢失；已在 19 个 rail 实例上恢复（共 32 个标签），1dp divider 保持隐藏。
+- 设置 390 补副标题「深色模式跟随系统 · 柔和玫瑰」（12 Regular、onSurfaceVariant，@(16,52)），标题以下整体 +26；末尾行仍在 NavigationBar 之上。
+
+### 11.15.7 复核
+
+- 07 九帧 / 08 十六帧顶层两两求交 **overlap 0**；详情 9 帧截图确认分区无重叠、chip 与 label 居中、600/390 内容在 pane 内。
 
 
 
