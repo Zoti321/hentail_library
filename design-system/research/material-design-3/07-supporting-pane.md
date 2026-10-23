@@ -114,6 +114,8 @@ list-detail 官方 key use cases 原文含 `Settings + category detail`、`Music
 
 ### 4.3 设置 `/settings` + 分区预览 → **不采纳 supporting pane；确认走 list-detail**
 
+**用户决策（m00431）**：设置页**采用 inline list-detail**，范围由实现方定为「设置根页双栏（分类 + 内容，断点 ≥840）+ 二级页（阅读 / 外观 / 数据）单栏」；书库与历史仍走「列表 → 独立详情」。
+
 理由（A + B）：
 - 官方 list-detail key use cases 原文明确含 `Settings + category detail`（A）。分区切换 = 换对象，属父子关系。
 - 官方判读句 `For content with a parent-child relationship, use a list-detail layout instead.`（A）。
@@ -145,25 +147,28 @@ list-detail 官方 key use cases 原文含 `Settings + category detail`、`Music
 | Large `41:1578` | 1440×900 | expanded rail 256 + 列表 400 + 详情 |
 | XL `41:2384` | 1920×1080 | expanded rail 256 + 列表 504 + 详情 + 阅读进度 360（**三栏**） |
 
-### 结论：**新增模板帧，不改造 `41:2384`**
+### 结论：**已执行（2026-10-23 改造 `41:2384` + 新增 expanded / large 两帧）**
 
-理由：
-1. `41:2384` 表达的是 **list-detail + supporting** 的三栏（列表 504 / 详情 / 阅读进度 360），前提是「列表与详情同屏」。但代码里详情是独立路由 `/comic/:id`（§4.1），进入详情后**列表不在屏上**，三栏不成立；改造 `41:2384` 会把这个「书库三栏上限参照」的表达力弄丢。
-2. 详情页级模板需要的是「rail + 详情主区 + 支撑栏」，与 `41:2384` 语义不同（一个是 3 个内容栏，一个是 2 个内容栏 + 导航）。
-3. 新增帧成本更低、且不破坏 MASTER §6 已记录的页面↔模板对应关系。
+用户决策（m00431）：① `41:2384` 选 A——改造为详情模板；② XL 详情用 expanded rail **256**；③ 支撑栏贴右并保留 **24** 右侧留白；④ supporting pane 模板 **共用**（`/comic/:id`、`/series/:id`、作者/元数据等同一详情模板）；⑤ 宽度「采用官方的」→ expanded **360**、large/XL **412**。原先「新增帧、不改 `41:2384`」的建议作废。
 
-建议新增（`07 Templates` 页，与既有帧并列，命名沿用既有风格）：
+| 帧 | id | 尺寸 | 结构 | 校验 |
+|---|---|---|---|---|
+| `Template/Comic detail · Extra-large 1920` | `41:2384`（改造） | 1920×1080 | rail 256 + 24 + 主区 1180 + 24 + 支撑栏 412 + 24 | 256+24+1180+24+412+24 = 1920 ✅，支撑栏 1484–1896，右留白 24 |
+| `Template/Comic detail · Large 1440` | `67:509`（新增） | 1440×900 | rail 80 + 24 + 主区 876 + 24 + 支撑栏 412 + 24 | 80+24+876+24+412+24 = 1440 ✅，支撑栏 1004–1416 |
+| `Template/Comic detail · Expanded 1024` | `67:431`（新增） | 1024×768 | rail 80 + 24 + 主区 512 + 24 + 支撑栏 360 + 24 | 80+24+512+24+360+24 = 1024 ✅，主区内容 464 = 封面 180 + 32 + 文本列 252 |
 
-| 新帧 | 尺寸 | 结构 | 数值依据 |
-|---|---|---|---|
-| `XL Supporting Pane` | 1920×1080 | expanded rail **256** + margin **24** + 详情主区 **1232** + spacer **24** + 支撑栏 **360** + margin **24** | 校验：256+24+1232+24+360+24 = 1920 ✅。rail 256 = MASTER §5.1（B，项目既有）；margin/spacer 24 = **A**（expanded 页 `leading and trailing margin of 24dp` / `spacer between panes is 24dp`）；支撑栏 360 用于 XL 属 **C**（官方 large/XL 默认 412） |
-| `Expanded Supporting Pane` | 1024×768 | collapsed rail **80** + margin **24** + 详情主区 **512** + spacer **24** + 支撑栏 **360** + margin **24** | 校验：80+24+512+24+360+24 = 1024 ✅。**风险**：主区 512 装 220 封面 + 文本列偏挤（`DetailPrimaryRowLayout` 的 `coverWidth = 220`，`detail_primary_row_layout.dart:11`），Figma 出图必须实测；若挤，expanded 档支撑栏改**可折叠**（默认收起） |
-| `Medium / Compact`（不改帧，只标注） | 600×800 / 390×844 | 在既有 `41:1824` / `41:1975` 上加 `meta below primary` 注释层 | 形态 = **A**（下方） |
+改造内容：删掉 `41:2384` 的书库三栏内容（书库标题 / Search 框 / 5 条 `BookListItem` / 2 条 1px 分隔线），详情区改为「封面 180×252 + 标题 + 元数据 + 3 chips + 简介 + 开始阅读 + 章节目录 3 行」；支撑栏 = `surfaceContainer` 底色矩形（`67:418`，纯 tone、零分隔线）+ 阅读进度键值 + `MetadataPanel` 实例（`67:419`）。large / expanded 用同一套子节点克隆后重排，组件全部复用（`MetadataPanel 41:2497`、`ChapterRow`、`Chip/*`、`NavigationRail`）。
 
-复用既有组件（不重画，B，MASTER §6 Patterns）：
-- 支撑栏容器：`MetadataPanel 41:2497`（320×240，5 组键值）——**它是 320 宽，放进 360 栏需左右各 20 内边距（320+20×2=360）；若按项目 24 内边距则需 368 > 360，装不下**。这是出图前必须先解决的冲突（见 §8.8）。
-- 阅读进度行：复用 `ChapterRow 41:1955`（360×48）与 `HistoryRow 41:2498`（360×72）的 360 宽基准 → 与 360 支撑栏正好贴合（B，Figma 组件尺寸）。
-- 分区预览（设置）不需要新帧：既有 `SettingsSection 41:2496`（360×284）。
+**expanded 512 实测（B，Figma 出图 + MiSans 字体度量）**：
+
+- 标题「深海图书馆」24 Semibold = **120**，文本列 252 够；
+- 元数据原串「校园 · 悬疑 · 共 24 话 · 更新至第 12 话」14px = **256 > 252** → 删「共 24 话」后 **208** 可单行（large / XL 保留原串，主区宽）；
+- 简介 63 字 14px 在 464 宽下 3 行，可读；章节行「第 12 话 · 闭馆之前」= **111**；
+- **`MetadataPanel` 320 装不进 360 栏的内容宽 312** → expanded 支撑栏只放阅读进度，不放元数据卡（待办见 §8）。
+
+**`08 Screens` 第 5 行 `Detail`（y = 4000）**：列 x `0` / `1500` / `2600` / `3300` ↔ 1440 / 1024 / 600 / 390；1440 与 1024 复用上面模板，600 / 390 为单栏详情（元数据与阅读进度按官方 compact/medium 落到主内容下方，见 §4.1）。
+
+**桌面底板（用户提问后追加，large/XL 专用）**：≥1200dp 的帧加「桌面底板 + 窗口 chrome」以区分桌面窗口与移动屏幕——底板 = 帧外扩 24dp、圆角 20、填充 **#EAE8E6**（中性灰，**不属于 46 个颜色角色**，只是画布层，禁止在代码里当 token 用）；帧本身圆角 12 + 1dp `outlineVariant` 内描边 + `0/2/6 @12%` 投影（属 OS 窗口层，不参与 `MASTER §4.2` 的 M3 elevation 语义）。
 
 ---
 
@@ -258,31 +263,34 @@ class SupportingPaneLayout extends StatelessWidget {
 
 ## 7. 与五档断点矩阵的整合结论
 
-| 档 | 导航 | 详情页（采纳） | 阅读器（不采纳） | 设置（list-detail） | 证据 |
+| 档 | 导航 | 详情页（已采纳） | 阅读器（不采纳） | 设置（list-detail） | 证据 |
 |---|---|---|---|---|---|
-| compact <600 | NavigationBar | 元数据在下方（现状） | 全屏 + 浮动栏 | 单栏，分类→详情滑入 | A |
-| medium 600–839 | collapsed rail 80 | 元数据仍在下方 | 同上 | **单栏**（现 600 就分裂，需改到 840） | A（medium `1 (recommended) or 2`） |
-| expanded 840–1199 | collapsed rail 80 | **trailing 固定 360** | 单栏 + 可选浮层 | 双栏 260 + 详情 | A（360dp / 24 / 24） |
-| large 1200–1599 | expanded rail 256 | trailing 固定 360（或 412，见 §8.3） | 同上 | 双栏 | 形态 B/C；数值 A（412） |
-| XL ≥1600 | expanded rail 256 | trailing 固定 360；三栏仅在「列表同屏」场景（书库）成立 | 同上 | 双栏 | A（XL ≤3 pane、side sheet ≤400dp） |
+| compact <600 | NavigationBar | 元数据与阅读进度在主内容下方（现状） | 全屏 + 浮动栏 | 单栏，分类→详情滑入 | A |
+| medium 600–839 | collapsed rail 80 | 同上（单栏，主内容下方） | 同上 | **单栏**（阈值从 600 改到 840） | A（medium `1 (recommended) or 2`） |
+| expanded 840–1199 | collapsed rail 80 | **trailing 固定 360**（主区 512） | 全屏 + 可选浮层 | 双栏 260 + 详情（≥840） | A（360dp / 24 / 24） |
+| large 1200–1599 | collapsed rail 80 | trailing 固定 **412**（主区 876） | 同上 | 双栏 | A（large 官方 412） |
+| XL ≥1600 | expanded rail 256（用户指定） | trailing 固定 **412**（主区 1180） | 同上 | 双栏 | A（XL 412、≤3 pane） |
 
-需要顺手在 MASTER 侧修正的三处（本次**未改** MASTER，交主会话同步）：
-1. **§5.2 的「推荐 2 / 推荐 3」是对官方括号的误读**。官方 breakpoints 主页原文是 `Medium: 1 (recommended) or 2`、`Expanded/Large: 1 or 2 (recommended)`、`XL: 1 to 3 (recommended)`——括号修饰的是**整个区间**（推荐落在 1–2 / 1–3），不是「恒推荐 2」「恒推荐 3」。
-2. **§5.4 阅读器**「可选 trailing 360」建议改为「可选浮层」，理由见 §4.2。
-3. **§9 未决项第 2 条（Grid margin 仍 C 级）可以关掉**：compact 16dp / medium+ 24dp 均已拿到官方原文（A）。
+需要顺手在 MASTER 侧同步的三处**已同步**（2026-10-23，见 MASTER §5.2 / §5.3 / §5.4 / §9）：①§5.2 括号改为官方原文；②§5.4 阅读器改「可选浮层 ≤360」；③§9 关闭 Grid margin 未决项。
 
 ---
 
-## 8. 剩余未决项
+## 8. 剩余未决项（2026-10-23 更新）
 
-1. **模板与路由的语义冲突**：Figma 的 Expanded/Large/XL 模板都是「列表 + 详情」双/三栏（`41:1774` / `41:1578` / `41:2384`），而代码里详情是独立路由 `/comic/:id`。要么书库走 inline list-detail（与模板一致，但要动路由结构），要么承认模板只是「视觉上限参照」并为详情页新增 §5 的两帧。**这是采纳 supporting pane 前必须先定的第一件事。**
-2. **expanded 主区 512dp 是否够**：需在 Figma 实测 220 封面 + 标题/摘要/操作列；不够就引入「支撑栏可折叠」（默认收起），而不是缩支撑栏（360 是 A 级官方值，不该动）。
-3. **360 vs 412**：官方 expanded=360 / large+XL=412。统一 360 的理由是「单一常量、与 `41:2384` 的阅读进度栏一致」；用 412 的理由是「贴合官方 large/XL 默认」。当前倾向 360（C 级取舍），需 UI 评审签字。
-4. **XL 三栏取舍**：官方 XL 表推荐 2 栏（3 属 other），正文说「考虑三栏」；项目已按三栏出图。若最终只做 2 栏 + rail，则 `41:2384` 的 504 列表栏在详情路由下无意义（见未决项 1）。
-5. **支撑栏开/关 vs 自动切换**：官方提 show-and-hide / levitate / reflow 三策略，但没规定 supporting pane 该用哪个；本项目需决定「用户手动收起后是否跨断点保持」（官方只说临时改宽不持久）。
-6. **断点迁移的回归面**：`isMedium` 语义变更影响 shell、首页、设置、元数据页、header 共 6+3 处；建议先加语义化查询（§6.3），再逐页换，不要一次性改常量。
-7. **a11y / 键盘**：支撑栏固定后焦点顺序（primary → supporting）、Tab 环、360 栏内 chip 行的键盘遍历尚未评估。
-8. **MetadataPanel 320 vs 360 栏**：Figma 组件 320 宽装不进 360 栏（需 20 内边距或改 360 版），出图前定，否则代码落地会二次返工。
+已关闭：
+
+1. ~~模板与路由的语义冲突~~ → 用户定 A：`41:2384` 改造为详情模板；书库列表页保持「列表 → 独立详情路由」，不做 inline list-detail。
+2. ~~expanded 主区 512 是否够~~ → 实测够用，代价是元数据删「共 24 话」（§5）。
+3. ~~360 vs 412~~ → 按官方分档：expanded 360、large/XL 412。
+4. ~~`MetadataPanel` 320 vs 360 栏~~ → expanded 支撑栏暂不放元数据卡；出 312 版后再放。
+
+仍开放：
+
+1. **`MetadataPanel` 312 版或 16 内边距**：决定 expanded 支撑栏能否放元数据，也影响 360 栏的组件内边距规则。
+2. **支撑栏开/关与跨断点记忆**：官方三策略（show-and-hide / levitate / reflow）未指定该用哪个；MVP 建议常驻、不做手动收起。
+3. **a11y / 键盘**：焦点顺序（primary → supporting）、Tab 环、栏内 chip 行遍历未评估。
+4. **阅读器目录**：前置条件「章节模型 / 页缩略图管线」未立项，形态定为可召唤浮层（≤360），不做固定栏。
+5. **设置 list-detail 阈值迁移回归面**：`isWide` 判定 600 → 840 影响 shell、首页、设置、元数据页、header 共 6+3 处。
 
 ---
 

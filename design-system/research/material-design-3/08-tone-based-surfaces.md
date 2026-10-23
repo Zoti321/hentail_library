@@ -1,11 +1,11 @@
-# 08 · Tone-based surface 与桌面端：它为大屏而生，为什么默认梯级仍然不够
+# 08 · 桌面端 tone-based surface：按区域取角色是默认做法，单条梯级不合格
 
-> **状态**：调研 + 可落地方案。本轮**不改** Flutter 代码、**不改** Figma，也**不改**任何 hex 值（`MASTER.md §2.2` 的 46 个值原样保留）。
+> **状态**：调研 + 已定稿的桌面口径。本轮**不改** Flutter 代码、**不改**任何 hex 值（`MASTER.md §2.2` 的 46 个值原样保留）；Figma 侧按本文口径已改造 `41:2384` 并补 large/expanded 详情模板（见 `09` §7）。
 > **决策前提**：不推翻 `MASTER.md §1` 的 D3「A · 柔和玫瑰」（seed `#E91E63` / tonalSpot / primary chroma 36 / neutral chroma 6）。本文所有方案都保留主色与整体粉调。
 > **证据分级**（沿用本目录 `README.md` 规则）：**A** = 官方规范/官方博文原文；**B** = 官方实现源码（Flutter SDK / Compose `*Tokens.kt` / material-color-utilities）或按本仓库既有一手材料实测反推；**C** = 工程推断（含视觉感知结论，未做被试实验）。
 > **抓取说明**：`https://m3.material.io/styles/color/system/overview` **抓取失败（返回空正文，JS 渲染）**，本条降级；替代主源为官方博文 `https://m3.material.io/blog/tone-based-surface-color-m3`（本次抓取成功，6067 字符）与 `https://m3.material.io/styles/elevation/{overview,applying-elevation}`、`https://m3.material.io/styles/color/roles`（均抓取成功）。逐条降级声明见「附录 B」。
 > **数值来源**：全部 tone 由 `MASTER.md §2.2` 的 hex 逐色计算（tone ≡ CIELAB L∗，方法见 §2.0，含校验），**没有编造任何数值**。
-> **索引状态**：本文件编号 08，尚未登记进 `README.md`（本任务禁止改 README，主会话同步）。`design-system/example.png` 只读未改。
+> **索引状态**：已登记 `README.md` 索引（行数与 URL 数同步）。`design-system/example.png` 只读未改，由用户自行提交入库（`854dc1d3`）。
 
 ---
 
@@ -17,6 +17,20 @@
 - **官方配套手段是有的，但我们的规范里全关掉了**：`MASTER §2.3` 写了「不要再拿 elevation 阴影表达层级」、`§4.2` 把阴影当「可选」、stroke 宽度连 token 都没有。官方原文给的是「tone 为默认 + 需要时用 hairline / 阴影 / scrim 补」（A）。
 - **推荐（本文最终合并口径）**：**主通道 = 区域级 add-on surface 映射**——桌面档 rail 用 `surfaceDim`、导航列表与 supporting pane 用 `surfaceContainer`、主内容用 `surface`，亮色级差 **7.0 / 4.0**、暗色 **10.0 / 6.0**，**46 个 hex 一个不改**（官方明文允许「在大窗口类增加 add-on surface colors」，A，§1.6）；**第二通道 = 1dp `outlineVariant` hairline**（级差不足、高环境光、低端屏时按需叠加；可交互边界换 `outline`）；**浮层 = level2–5 真阴影 + tint 全关**（§3.3 限域版）。**不采纳 b2「把整条梯级压暗」**（会动移动端观感 + 需要第二个 mode）。
 - **对 46 角色的增量**：**颜色值 0 变更、角色 0 新增**；新增 **2 个数值 token**（`stroke/hairline` 1dp、`stroke/focus` 2dp），**扩用 2 个既有颜色角色**（`outlineVariant` / `outline`），**1 条规则变更**（阴影使用范围）。
+
+### 0.0 硬口径（桌面端决策口径，2026-10-23 定稿）
+
+> **桌面端按区域取 surface 角色，是默认做法，不是可选项；只用一条 surface 梯级去铺并列大区，在本项目视为不合格设计。**
+
+三条可执行判定，评审时逐条对照：
+
+| 编号 | 口径 | 判定方式 |
+|---|---|---|
+| **T1 结构** | 任何 **≥1200dp** 的并列 pane，必须显式声明各自的区域角色：**rail → `surfaceDim`**、**导航列表 / supporting pane → `surfaceContainer`**、**主内容 → `surface`**；面板内卡片再降一档（`surfaceContainerLow`），浮起卡片用 `surfaceContainerLowest`。代码以「区域」为参数，不以组件为参数（同一个 `Card` 在内容区与面板内取不同角色）。 | 看实现里取色是否由「区域上下文」决定，是否有区域→角色的单一映射表 |
+| **T2 阈值** | 相邻两个并列区域若 tone 级差 **< 4（亮色）/ < 6（暗色）**，必须叠加 1dp `outlineVariant` hairline 或提升一档角色；单靠 2 个 L\* 的档差**不算分隔**。 | 逐对 pane 算 ΔL\*，对照 §4.1 的实取值 |
+| **T3 边界** | 46 个 hex **不改**；新增 `stroke/hairline` 1dp、`stroke/focus` 2dp；阴影**只**给浮层（level 2–5）且 tint 全关；任何情况下不回退到被弃用的 elevation-tint 叠色。 | 看 token 清单与组件样式 |
+
+这三条就是「用满官方为大窗口开的 add-on surface colors」（A，§1.6）与「默认梯级密度不够」（B，§2）的合成结论；后文的方案 1/2/3 只是它们的实现细节。
 
 ### 0.5 先消歧义：「为大屏设计」与「默认梯级在大屏上不够用」是两件事
 
