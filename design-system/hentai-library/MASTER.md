@@ -115,7 +115,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | pane 顶栏条 / 分组卡 | `surfaceContainerLow` #FFF0F1 (`10:56`, 96.0) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | 与 pane 差 2.1，靠间距而非级差分隔 |
 | 搜索框 / 输入类 | **`surfaceContainerHigh`** #F5E4E5 (`10:58`, 91.9) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | 官方 search 明确 `surface container high`（A）；与 pane 98.1 差 6.2，不在 `surfaceContainer` 背景上使用 |
 | 浮层（menu / dialog / 浮起卡） | 按各自官方 specs | 同左 | menu 用 `surfaceContainer`、dialog 用 `surfaceContainerHigh` 一类，**允许 elevation 阴影**；不套用「区域级不加阴影」 |
-| 桌面标题栏 | 与窗口/rail 同色 `surfaceContainer` | 同左 | 48 高，控件直接浮在窗口色上，不设分隔线、不设独立底色 |
+| 桌面标题栏 | 与窗口/rail 同色 `surfaceContainer` | 同左 | **56 高**（2026-10-23 加高：搜索 40 上下各 8、窗控 32 居中 y=12），控件直接浮在窗口色上，不设分隔线、不设独立底色；menu 归属 NavigationRail |
 | 全局搜索框 | `surfaceContainerHigh` #F5E4E5 (`10:58`, 91.9) | `surfaceContainerHigh` (`10:105`) | 720×40 / r20；左缘 = pane 左缘，不用页内搜索 |
 | 窗口按钮 | 图标 `onSurfaceVariant` (`10:60`)；关闭 hover 底 `errorContainer` (`10:49`) + 图标 `onErrorContainer` (`10:50`) | 暗色对应 `10:107` / `10:96` / `10:97` | 32×32 圆形；hover `onSurface` 8%、pressed 12%；无描边无阴影 |
 
@@ -275,8 +275,13 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - **桌面底板（画布层，非 token）**：≥1200dp 的帧加底板（帧外扩 24、圆角 20、填充 `#EAE8E6`）+ 窗口 chrome（圆角 12、1dp `outlineVariant`、`0/2/6 @12%` 投影）。`#EAE8E6` 不在 46 个颜色角色里，代码中禁止使用。
 - **pane 容器规则（2026-10-23 已全量铺开，10-23 晚修订）**：≥600dp 的帧一律「帧底 **`color/surfaceContainer`（与 rail / NavigationBar 同色）** → rail（同色）→ **24 画布缝** → pane（圆角 20、`color/surface`，右/下各留 24）」，pane 内内容自带 24 / 16 padding；**compact（<600dp，实际只在移动端出现）pane 全出血**：pane = 整帧 (0,0,W,H)、圆角 0、帧自身无圆角/描边/阴影，顶栏条与 NavigationBar 同样满宽——移动端没有窗口外壳，不要再套桌面留白。阅读器是例外：全出血阅读面 + toolbar / bottom bar 浮层，不套 pane。已套用：07 书库四档 `41:1578`/`41:1774`/`41:1824`/`41:1975` 与详情五档；08 非阅读器帧全部（pane id `74:1387`–`74:1398`）。
 - **supporting pane 宽**：expanded **360**（官方 A 级）；large / XL **412**（官方 A 级）。旧文档统一写 360 是漏了 large/XL 的默认值，已按 `07-supporting-pane.md` §4.1 修正。
-- **桌面 / 移动归属（2026-10-23 用户决策，覆盖此前「≥1200 才算桌面」）**：**expanded 1024 起算桌面**（桌面应用不全屏时 1024 很常见），**medium 600 / compact 390 算移动**。判据是「有没有窗口壳」：桌面帧有 48 高标题栏 + 三个窗口按钮，移动帧没有。连带：`08` 的区域取角色阈值从 ≥1200 下调为 **≥1024**。
-- **桌面标题栏（2026-10-23 已落地 13 帧）**：高 **48**、与窗口/rail 同色（不设独立底色、不加分隔线）。左 **menu 40×40**（x=(rail−40)/2、y=4，隐藏 rail 自带 hamburger；**视觉上与窗控同行，但归属 NavigationRail**）；中 **GlobalSearchBar 720×40 / r20**（x = **pane.x + 24**，fill `surfaceContainerHigh`，右端到窗口按钮前）；右 **3 枚 WindowButton 32×32 圆形**（`y=8`、间距 4、右内边距 8，顺序 最小化 → 最大化 → 关闭；最大化后该按钮图标换 **Restore**）。pane 顶从 24 下移到 **64**、高 = **H−88**（底边仍 H−24）；pane 内全部内容整体 **+40**，其中 Library1440 / Home1024 / Settings1440 / Settings1024 各压缩 20/16/16/20 以免越出底边。
+- **桌面 / 移动归属（2026-10-23 用户决策，覆盖此前「≥1200 才算桌面」）**：**expanded 1024 起算桌面**（桌面应用不全屏时 1024 很常见），**medium 600 / compact 390 算移动**。判据是「有没有窗口壳」：桌面帧有 56 高标题栏 + 三个窗口按钮，移动帧没有。连带：`08` 的区域取角色阈值从 ≥1200 下调为 **≥1024**。
+- **桌面标题栏（2026-10-23 已落地 13 帧，当晚按反馈重做为 56 高版）**：高 **56**、与窗口/rail 同色（不设独立底色、不加分隔线）。垂直排布：搜索 40 高 → y=8（上下各 8），窗口按钮 32 高 → y=12（垂直居中），rail 的 menu 中心固定 28 = 标题栏中心线。
+  - **menu 归属 NavigationRail（用户明确）**：不建外置按钮。展开态用 rail 自带的 `menu-open`（rail 图标列 x=32、y=16，40 高），折叠态用 rail 自带的 `menu`（x=28、y=16）；13 个外置 `MenuButton` 实例已删（组件本身保留备他用）。**视觉上与窗控同一行，但它是 rail 的第 0 个 item**，hover 走 rail 的 state layer，rail 折叠/展开时随 rail 移动。
+  - 中 **GlobalSearchBar 720×40 / r20**（fill `surfaceContainerHigh`）：**x = pane 左缘**（1440/1920 = 280，1024 = 104），与主 pane 严格左对齐；右端到窗口按钮前留空。
+  - 右 **3 枚 WindowButton 32×32 圆形**（`y=12`、间距 4、右内边距 8，顺序 最小化 → 最大化 → 关闭；最大化后图标换 **Restore**，无官方图标、自绘双叠方块属 B 级社区惯例）。hover 只给关闭按钮上 `errorContainer`，其余用中性 8%（用户已定）。
+  - 几何连带：pane 顶 24 → **72**、高 = **H−96**（底边仍 H−24）；pane 内全部内容整体 **+48**（相对加壳前），其中 Library1440 / Home1024 / Settings1440 / Settings1024 再压缩（累计 −28 / −24 / −24 / −28；Home1024 另重排「继续阅读」列表与卡组）以免越出底边。
+  - **「标题栏拖动区」是什么**：桌面窗口靠按住标题栏空白处拖动窗口，那层看不见的命中区就是拖动区。实现时把标题栏内**控件之外**的横向空白（rail 右侧到搜索框之间、搜索框与窗控之间、窗控右侧 8dp）交给平台 window drag，控件自身不参与拖动；Figma 画不出来，只在此记录。
 - **桌面不再有页内搜索**：Home/Library 的 1440/1024 四帧删掉页内 SearchBar（由全局搜索取代）；**600/390 仍保留页内搜索**（移动端没有标题栏）。
 - **桌面底板扩到 expanded**：凡桌面帧（含 1024）都加底板（帧外扩 24、圆角 20、`#EAE8E6`）；07 新增 `84:2301`（Library 1024）/`84:2302`（Detail 1024），08 新增 `84:2303`–`84:2306`（Home/Settings/History/Detail 1024）。
 - **断点内边距与字号（2026-10-23 修正，25 帧全覆盖）**：
@@ -403,7 +408,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 详情 **模板**在 07 Templates 页：XL `72:1083`（`Template/Comic detail · Extra-large 1920`，1920×1080，rail 256）、Large `67:509`（1440×900，rail 80）、Expanded `72:900`（1024×768）、Medium `72:961`（600×800）、Compact `72:1022`（390×844）。旧的 `41:2384`（书库三栏改造版）与旧 detail 屏 `67:587` / `67:649` / `67:677` / `67:752` 已删除；`69:813` 是 A/B 时的卡组版 B，保留作历史对照。模板帧的桌面底板仍是 `67:749` / `67:750` / `67:751`，08 的 5 个 1440 帧底板为 `67:781`–`67:785`。
 
-**桌面窗口壳（2026-10-23，13 帧）**：桌面帧（expanded 1024 / large 1440 / XL 1920）统一加 48 高标题栏——menu 40（rail 列）、GlobalSearchBar 720（pane.x+24）、WindowButton 32×3（右内 8）；桌面底板齐全（07 `67:749`/`67:750`/`67:751`/`84:2301`/`84:2302`，08 `67:781`/`67:783`/`67:784`/`67:785`/`84:2303`–`84:2306`）。移动帧（600/390）无标题栏、无窗控，保留页内搜索。
+**桌面窗口壳（2026-10-23，13 帧；当晚重做为 56 高）**：桌面帧（expanded 1024 / large 1440 / XL 1920）统一加 **56** 高标题栏——rail 自带 menu 40（不外置）、GlobalSearchBar 720（**x = pane 左缘**）、WindowButton 32×3（右内 8、y=12），pane 顶 72；桌面底板齐全（07 `67:749`/`67:750`/`67:751`/`84:2301`/`84:2302`，08 `67:781`/`67:783`/`67:784`/`67:785`/`84:2303`–`84:2306`）。移动帧（600/390）无标题栏、无窗控，保留页内搜索。
 
 **画布矩阵（2026-10-23 修复重叠后）**：08 / 07 两页统一按「行 = 页面、列 = 断点」排布，避免帧互相压叠。
 
@@ -424,7 +429,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | Button（filled/tonal/outlined/text/elevated） | P0 | emphasis × size × icon × state | `FilledButton` 等；已打样 filled 120×40 / radius full；需统一高度 40、圆角 full |
 | Icon Button | P0 | standard/filled/tonal/outlined × toggle | 已打样 standard 40×40 + 24 图标；最小点击区 48 |
 | FAB | P0 | size (56/80/96) × color × extended | 已建 `41:1886`：Regular 56/r16、Medium 80/r20、Large 96/r28、Extended 136×56；Flutter 只有 56，80/96 需自绘 |
-| Text Field / Search Bar | P0 | filled/outlined × focus/error | 已打样 filled 320×56。`SearchBar` 组件集 **`79:1980`**（05 页 (320,440)，744×56）两变体：`State=Unfocused`（`48:2651`）与 `State=Focused`（`79:1976`）。**两态容器相同**：360×56、r28、fill **`surfaceContainerHigh`（`10:58`，#F5E4E5，L\*91.9）**、**无描边无阴影**，依据官方（A）`Search bars use the surface container high color role`、`In the contained style, the search bar container remains the same shape in both the unfocused and focused states`、`Lower elevation and no shadow by default`。差异只在图标与边距：Unfocused = 24dp 搜索图标 @16,16 + hint 文本 @56,18（指向性搜索图标，非按钮）；Focused = back 箭头 `80:1981`（24dp @16,16）+ clear ✕ `80:1983`（24dp @320,16，官方 focused 可选 clear）+ 容器外边距 24dp→**12dp**（A，官方 guidelines）；back 释放焦点并收起建议。建议/结果列表另置于 bar 下方（官方 anatomy 第 6 元素），输入文本保持可见。不做尾部筛选按钮（用户明确）。**上一版按 Gmail 做的「焦点=白底 + 1dp outlineVariant 描边」已作废**（与官方 contained 样式冲突）。**已回灌 8 帧**（Home/Library × 1440/1024/600/390，实例 `80:1985`/`80:1989`/`80:1993`/`80:1997`/`80:2001`/`80:2005`/`80:2009`/`80:2013`，沿用原槽位宽度、高度统一 56；右缘仍落在「pane 右缘 − 24」，24 规则不变）；**深色样张** `81:2017`（05 页 (1600,2600)，fill 绑暗色 `surfaceContainerHigh` `10:105`、图标与 hint 绑暗色 `onSurfaceVariant` `10:107`，说明 `81:2028`）。hint 文案未做 TEXT 属性（8 实例都用默认文案） |
+| Text Field / Search Bar | P0 | filled/outlined × focus/error | 已打样 filled 320×56。`SearchBar` 组件集 **`79:1980`**（05 页 (320,440)，744×56）两变体：`State=Unfocused`（`48:2651`）与 `State=Focused`（`79:1976`）。**两态容器相同**：360×56、r28、fill **`surfaceContainerHigh`（`10:58`，#F5E4E5，L\*91.9）**、**无描边无阴影**，依据官方（A）`Search bars use the surface container high color role`、`In the contained style, the search bar container remains the same shape in both the unfocused and focused states`、`Lower elevation and no shadow by default`。差异只在图标与边距：Unfocused = 24dp 搜索图标 @16,16 + hint 文本 @56,18（指向性搜索图标，非按钮）；Focused = **同一个放大镜**（`85:2311`，24dp @16,16）+ clear ✕ `80:1983`（24dp @320,16，官方 focused 可选 clear）+ 容器外边距 24dp→**12dp**（A，官方 guidelines）。**2026-10-23 晚用户定「保留 clear、移除 back」**：原 focused back 箭头 `80:1981` 已删，leading 两态一致，返回/失焦交由页面层处理。建议/结果列表另置于 bar 下方（官方 anatomy 第 6 元素），输入文本保持可见。不做尾部筛选按钮（用户明确）。**上一版按 Gmail 做的「焦点=白底 + 1dp outlineVariant 描边」已作废**（与官方 contained 样式冲突）。**已回灌 8 帧**（Home/Library × 1440/1024/600/390，实例 `80:1985`/`80:1989`/`80:1993`/`80:1997`/`80:2001`/`80:2005`/`80:2009`/`80:2013`，沿用原槽位宽度、高度统一 56；右缘仍落在「pane 右缘 − 24」，24 规则不变）；**深色样张** `81:2017`（05 页 (1600,2600)，fill 绑暗色 `surfaceContainerHigh` `10:105`、图标与 hint 绑暗色 `onSurfaceVariant` `10:107`，说明 `81:2028`）。hint 文案未做 TEXT 属性（8 实例都用默认文案） |
 | Top App Bar | P0 | small/medium/large × back/actions | 已建 `48:2658`：960×64，back 24 + title-large 22 + more_vert；大屏无阴影，滚动才上 tint |
 | Navigation Bar / Rail | P0 | destinations 3–5 × selected | 已建：NavigationBar `41:1539`（390×80，4 变体，选中图标 filled）；NavigationRail `41:1577`（Collapsed 80 / Expanded 256，各 4 个 Selected 变体；顶部 menu 切换；collapsed 行距 64、indicator 56×32；expanded 行距 68、indicator 101×56 贴合内容；无新建 FAB）。解剖与官方依据见 §5.6，切换策略见 §5.2 |
 | List Item | P0 | 1/2/3 line × leading/trailing | 已建 `41:1920`：56/72/88，leading 40 圆头像 + 文案 + trailing more_vert；书籍场景的 2:3 封面变体放 06 Patterns |
@@ -434,7 +439,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | Snackbar | P0 | 1/2 line × action | 已建 `48:2662`：344×48/r4，inverseSurface 底 + inverseOnSurface 文案 + inversePrimary 动作；桌面底部居中、移动端贴底 |
 | 窗口控制 WindowButton | P0（桌面） | minimize / maximize / restore / close | 组件集 `84:2052`（32×32 圆形、icon 18、`onSurfaceVariant`）；状态样张 `84:2076`（Default / Hover 8% / Pressed 12% / Close hover = `errorContainer`）；**Restore 无官方图标，自绘双叠方块（B）**，与 Windows 惯例一致 |
 | 菜单按钮 MenuButton | P0（桌面） | 单形态 | `84:2053`：40×40 圆形 + menu 24；放在标题栏的 rail 列，点击折叠/展开 rail |
-| 全局搜索 GlobalSearchBar | P0（桌面） | 单形态（docked） | `84:2058`：400×40 / r20 / `surfaceContainerHigh`，搜索图标 20 + hint 14；实例按页面拉到 720；按官方只做 docked，不做 full-screen |
+| 全局搜索 GlobalSearchBar | P0（桌面） | 单形态（docked） | `84:2058`：400×40 / r20 / `surfaceContainerHigh`，搜索图标 20 + hint 14；桌面标题栏实例统一 **720×40、x = pane 左缘**（1440/1920 = 280、1024 = 104）；按官方只做 docked，不做 full-screen |
 | Progress / Slider | P1 | linear/circular × determinate | Flutter `year2023` 默认值不等于现行外观 |
 | Tabs / Menu / Tooltip / Divider / Badge | P1 | — | Tooltip 桌面最小高 24 |
 | Segmented Button | 暂缓 | — | 官方 2025-05 起不再推荐，改用 connected button group |
@@ -472,7 +477,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 1. **插图与占位图**：04 页目前只有图标；封面、占位构图、空态插图未定来源（自绘 / 授权素材）。
 2. ~~**Grid margin**~~（**已关闭**）：compact 16 / medium 及以上 24 已由 `07-supporting-pane.md` §4 取到官方原文（A 级），不再是 C 级推断。Figma Grid Style 仍无 margin 参数，属工具限制，不影响决策。
 3. **导航组件精确 dp**：navigation bar 高 80、collapsed rail 宽 80、indicator 56×32 有实现值佐证（B）；expanded indicator 101×56 与行距 68 由官方截图 2× 反推（B）；rail 宽 256 是项目取值。官方 `/specs` 页 JS 渲染抓取失败，若后续拿到数值，改组件集而非模板。
-4. **rail 展开/收起的动效时长**：官方只说 indicator 从图标中心展开，未给时长；暂用 §4.3 的 Standard 300ms（`cubic-bezier(0.2,0,0,1)`），拿到官方数值再定。
+4. **rail 展开/收起的动效（2026-10-23 用户定「采用合适的 motion」）**：官方只说 indicator 从图标中心展开、未给时长（A 只到定性）。定为：展开用 **emphasized decelerate 300ms `cubic-bezier(0.05,0.7,0.1,1)`**（进入画面、缓出），收起用 **emphasized accelerate 250ms `cubic-bezier(0.3,0,0.8,0.15)`**（离开画面、缓入）；宽度 80↔256 与文字标签淡入淡出同一时长，标签 opacity 前 100ms 先行淡出。依据：官方 motion easing/duration 页给的四条曲线与时长档（A），把「展开=进入、收起=离开」映射到对应曲线是工程判断（C）。拿到 rail 专属数值再替换。
 5. ~~**书库是否改 inline list-detail**~~（**已关闭，2026-10-23**）：用户定「书库不走 inline list-detail，设置页走」→ `41:2384` 改造为详情模板，large/XL 详情均为三栏；`09` §9.1 同步关闭。
 6. **rail 用 80 还是 256 的切换规则**：`09` §3.2 提出「同屏 ≥3 栏 ⇒ 80」，是从官方产品截图反推（B），无官方条文。需在 1440 / 1920 两帧出图对比。
 7. ~~**桌面 rail 取 `surfaceDim` 的玫瑰倾向**~~（**档位已改，色相倾向仍在**）：rail 已由 `surfaceDim`（87.0）改为 `surfaceContainer`（94.0），亮度问题解决；但 A 板 tonalSpot 在 tone 94 仍有低彩度（`#FBEAEB`，C\*≈5.4），整片铺 rail 会偏粉，属 §9 第 21 条的调色板决策。原记录：整片铺 rail 会偏粉。退路是 `surfaceContainerHighest`（tone 90）+ 1dp `outlineVariant`。**暗色 chrome 反向**（rail 用 `surfaceContainerHighest`）需设计评审确认。
@@ -504,6 +509,10 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 33. **Chip 未接入暗色样张**：`Chip/States · Light` 只做了 Light；Dark 的选中/描边/禁用对比度（`outline` 在暗色 5.85:1 够用，但 `onSurfaceVariant` 12% 禁用层需实测）待补。
 34. **SearchBar hint 文案未做成 TEXT 属性**：8 个回灌实例都显示组件默认的「搜索漫画、作者…」；按页面改文案前需要给 `79:1980` 加 `Hint` 属性，否则实例文案跟组件联动失效。
 35. **focused 的容器外边距 24→12 属布局层**：官方要求聚焦时搜索栏更贴近容器，组件本身不内建（组件只有 56 高的容器）；迁移时要在页面侧按状态切换 padding，否则视觉上只有图标变化。
+36. **标题栏拖动区（2026-10-23 用户问「拖动区是什么」）**：桌面帧标题栏里**控件之外的横向空白**是窗口拖动命中区（rail 右侧到搜索框之间、搜索框与窗控之间、窗控右侧 8dp）。Figma 画不出来，只能在代码层实现（Windows 用 `WS_CAPTION` + `WM_NCHITTEST` 返回 `HTCAPTION`，Flutter 走 `window_manager.dragToMove`/`bitsdojo_window` 一类），控件自身不参与拖动。属实现契约，不是视觉规范。
+37. ~~**桌面标题栏高度与搜索贴顶**~~（**已关闭，2026-10-23 晚**）：用户指出「搜索框离窗口顶部太近」，标题栏 48 → **56**，搜索 y=8（上下各 8）、窗控 y=12（垂直居中）、menu 中心 28；pane 顶 64 → 72、高 H−96，内容累计 +48。
+38. ~~**menu 是否外置**~~（**已关闭，2026-10-23 晚**）：用户明确「菜单按钮归 NavigationRail，只是视觉上像标题栏」→ 13 个外置 `MenuButton` 实例删除，改用 rail 自带 `menu-open`（展开）/`menu`（折叠），随 rail 折叠移动。
+39. ~~**SearchBar focused 是否保留 back**~~（**已关闭，2026-10-23 晚**）：用户定「保留 clear、移除 back」→ `80:1981` back 箭头删除，focused leading 与 unfocused 同为放大镜（新 `85:2311`），尾随 clear ✕ 保留；返回/失焦由页面层处理。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -592,3 +601,4 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | §9 新增 | 34. SearchBar hint 文案未做 TEXT 属性；35. focused 的 24→12 容器外边距属布局层、组件不内建 |
 | 桌面标题栏 + 窗口控制（2026-10-23） | 用户定「expanded 也算桌面、medium/compact 算移动」，桌面要有背景底板 + Windows 式窗口控制，并加全局搜索框（与主 pane 左对齐）。已建 `WindowButton` 组件集 `84:2052`（min/max/restore/close，32 圆形）、`MenuButton` `84:2053`（40 圆形）、`GlobalSearchBar` `84:2058`（40 高 r20 containerHigh）；13 个桌面帧各加标题栏（menu 40 + 搜索 720 + 窗控 32×3）、pane 顶 24→64 高 −40、内容 +40、四帧压缩 20/16/16/20；桌面四帧删页内搜索；1024 帧补底板 `84:2301`–`84:2306`；05 页新增「桌面窗口壳」行（`84:2059` 标题栏样张、`84:2076` 窗控状态、说明 `84:2307`–`84:2310`）|
 | 桌面口径写进断点表 | 五档表 expanded/large/XL 的壳层列补「桌面标题栏」；§5.1 新增「桌面/移动归属」「桌面标题栏」「桌面无页内搜索」「底板扩到 expanded」四条；§2.5 区域表新增标题栏/全局搜索/窗口按钮三行；§6.1 补 13 帧与底板清单；§7 新增三个桌面组件 |
+| 桌面壳重做（56 标题栏） | 用户四条反馈：menu 必须归属 NavigationRail（删 13 个外置实例，改用 rail 自带 `menu-open`/`menu`）、搜索框必须与 pane 左缘对齐（x 由 pane.x+24 改为 pane.x）、搜索离顶部太近（标题栏 48→56、搜索 y=8、窗控 y=12、pane 顶 72、高 H−96、内容 +48 与四帧累计压缩 −28/−24/−24/−28）、SearchBar focused 保留 clear 移除 back（`80:1981` 删、新放大镜 `85:2311`）；05 样张 `84:2059` 与说明 `84:2307`–`84:2310` 同步；rail 折叠 motion 定为 emphasized decelerate 300ms / accelerate 250ms |
