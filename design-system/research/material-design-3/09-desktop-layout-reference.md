@@ -426,4 +426,22 @@
 - 07 行 y = `200` / `1300` / `2500` / `3700` ↔ A 书库四档 / B 详情 XL 1920 / C 详情四档 / D 对照卡组版。
 - 标签文字节点 `74:1399`–`74:1416`（08 九条、07 九条），仅为画布层，不进产品。
 - **阅读器四帧 + 底板 `67:782` 移到 `12 Archive`**（用户定「阅读器暂时不做设计稿，走沉浸式」），从 08 撤出。08 现 12 帧、07 现 10 帧，两页重叠数均为 0。
+### 11.10 rail 统一、命名对照与补档（2026-10-23 晚，B）
+
+用户三条：拿官方博文统一命名、各模板/页面 NavigationRail 背景色不一致、删除 D 组对照帧并补 Settings / History 的 1024 与 600。
+
+**（1）rail 底色统一**：查下来是两套填充并存——旧帧实例是 `color/surface`（`10:51`，`#FFF8F7`），详情帧被 override 成 `surfaceContainerHigh`（`10:58`，`#F5E4E5`）。参考图里 rail 与窗口底是**同一面**（rail `#D9DBD1` 与窗口外沿同色），因此统一到 `color/desktop/window`（= `surfaceDim`）：07 八帧 + 08 八帧的应用实例全部重绑，另把 `05 Components` 的 8 个 NavigationRail 变体（`41:1557`/`41:1576`/`41:1651`/`41:1668`/`41:1685`/`41:1702`/`41:1720`/`41:1738`）也改到同一变量，组件源与实例从此同色。1dp 左侧分隔线仍按用户偏好关闭。
+
+**（2）命名对照（A，官方博文）**：`https://m3.material.io/blog/tone-based-surface-color-m3` 原文给出的角色名是 `surface container lowest / low / (surface) container / high / highest`，加上 `surface dim / surface bright / surface tint`。本仓库 46 角色一律用其 camelCase（`color/surfaceContainerLow` 等），桌面那五个 `color/desktop/*` 只是「区域快捷键」，各自别名到上表中的一个官方角色——没有新增角色、也没有新 hex。MASTER §2.5 已落对照表。
+
+**（3）Settings / History 补档**：
+
+| 帧 | id | 尺寸 | 结构 |
+|---|---|---|---|
+| Settings 1024 | `75:1417` | 1024×768 | rail 80（collapsed，标签 instance 级隐藏）+ pane (96,16) 912×736；三张 section 宽 864，y=128/368/560，高 224/176/152；值文本右对齐到 952 |
+| Settings 600 | `75:1480` | 600×800 | rail 80 + pane (96,16) 488×736；section 宽 440，y=128/376/568，高 232/176/152；值右对齐到 528 |
+| History 1024 | `75:1543` | 1024×768 | rail 80 + pane 912×736；两列 `HistoryRow` 420×72，x=120/564，y=160/300/440 |
+| History 600 | `75:1613` | 600×800 | rail 80 + pane 488×736；单列 `HistoryRow` 440×72，三组各两行：y=144/224、344/424、544/624 |
+
+**（4）D 组对照帧删除**：`69:813`（卡组版 B）按用户要求删除；07 现九帧。08 补齐后 16 帧、四行四列满格，两页重叠数均为 0。
 
