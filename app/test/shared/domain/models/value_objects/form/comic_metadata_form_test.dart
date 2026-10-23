@@ -3,54 +3,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 import 'package:test/test.dart';
-
-class _RecordingComicRepository implements ComicRepository {
-  String? comicId;
-  String? title;
-  String? description;
-  DateTime? publishedAt;
-  bool clearPublishedAt = false;
-  List<Author>? authors;
-  ContentRating? contentRating;
-  List<Tag>? tags;
-  List<String>? languages;
-  List<String>? parodies;
-  List<String>? characters;
-  int callCount = 0;
-
-  @override
-  Future<void> updateUserMeta(
-    String comicId, {
-    String? title,
-    String? description,
-    DateTime? publishedAt,
-    bool clearPublishedAt = false,
-    List<Author>? authors,
-    ContentRating? contentRating,
-    List<Tag>? tags,
-    List<String>? languages,
-    List<String>? parodies,
-    List<String>? characters,
-  }) async {
-    callCount += 1;
-    this.comicId = comicId;
-    this.title = title;
-    this.description = description;
-    this.publishedAt = publishedAt;
-    this.clearPublishedAt = clearPublishedAt;
-    this.authors = authors;
-    this.contentRating = contentRating;
-    this.tags = tags;
-    this.languages = languages;
-    this.parodies = parodies;
-    this.characters = characters;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
 
 Comic _comic({
   String title = '原标题',
@@ -82,6 +35,11 @@ Comic _comic({
     characters: characters,
     pageCount: 1,
   );
+}
+
+ComicMetadataDraftChanges _changedFields(ComicMetadataDraftDiff diff) {
+  expect(diff, isA<ComicMetadataDraftChanges>());
+  return diff as ComicMetadataDraftChanges;
 }
 
 void main() {
@@ -163,276 +121,193 @@ void main() {
     });
   });
 
-  group('ComicMetadataForm.applyTo', () {
-    test('returns Invalid and does not call repository', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
-      final ComicMetadataApplyResult result = await ComicMetadataForm(
+  group('ComicMetadataForm.diffAgainst', () {
+    test('blank title is invalid', () {
+      final ComicMetadataDraftDiff diff = ComicMetadataForm(
         title: '  ',
-      ).applyTo(repo, _comic());
+      ).diffAgainst(_comic());
 
-      expect(result, isA<ComicMetadataApplyInvalid>());
-      expect(repo.callCount, 0);
+      expect(diff, isA<ComicMetadataDraftInvalid>());
+      expect(
+        (diff as ComicMetadataDraftInvalid).validation.titleError,
+        '漫画标题不能为空',
+      );
     });
 
-    test('only submits changed title field', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('submits only the changed title', () {
       final Comic original = _comic(title: '原标题', description: '简介');
-      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
-        original,
-      ).copyWith(title: '新标题').applyTo(repo, original);
+      final ComicMetadataDraftChanges changes = _changedFields(
+        ComicMetadataForm.fromComic(
+          original,
+        ).copyWith(title: '新标题').diffAgainst(original),
+      );
 
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.comicId, 'comic-1');
-      expect(repo.title, '新标题');
-      expect(repo.description, isNull);
-      expect(repo.publishedAt, isNull);
-      expect(repo.clearPublishedAt, isFalse);
-      expect(repo.authors, isNull);
-      expect(repo.contentRating, isNull);
-      expect(repo.tags, isNull);
+      expect(changes.title, '新标题');
+      expect(changes.description, isNull);
+      expect(changes.publishedAt, isNull);
+      expect(changes.clearPublishedAt, isFalse);
+      expect(changes.contentRating, isNull);
+      expect(changes.authors, isNull);
+      expect(changes.tags, isNull);
+      expect(changes.languages, isNull);
+      expect(changes.parodies, isNull);
+      expect(changes.characters, isNull);
     });
 
-    test('skips repository when nothing changed', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('is unchanged when the draft matches the comic', () {
       final Comic original = _comic(description: '简介');
-      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
-        original,
-      ).applyTo(repo, original);
-
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 0);
+      expect(
+        ComicMetadataForm.fromComic(original).diffAgainst(original),
+        isA<ComicMetadataDraftUnchanged>(),
+      );
     });
 
-    test('clears publishedAt only when it changed to empty', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('clearing the published date is a separate flag', () {
       final DateTime published = DateTime.utc(2020, 5, 1);
       final Comic original = _comic(publishedAt: published);
-      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
-        original,
-      ).copyWith(publishedAt: null).applyTo(repo, original);
+      final ComicMetadataDraftChanges changes = _changedFields(
+        ComicMetadataForm.fromComic(
+          original,
+        ).copyWith(publishedAt: null).diffAgainst(original),
+      );
 
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.publishedAt, isNull);
-      expect(repo.clearPublishedAt, isTrue);
-      expect(repo.title, isNull);
+      expect(changes.publishedAt, isNull);
+      expect(changes.clearPublishedAt, isTrue);
+      expect(changes.title, isNull);
     });
 
-    test('only submits authors when ordered names change', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('submits authors when their order changes', () {
       final Comic original = _comic(
         authors: <Author>[
           Author(name: 'A'),
           Author(name: 'B'),
         ],
       );
-      final ComicMetadataApplyResult result =
-          await ComicMetadataForm.fromComic(original)
-              .copyWith(
-                authors: <Author>[
-                  Author(name: 'B'),
-                  Author(name: 'A'),
-                ],
-              )
-              .applyTo(repo, original);
+      final ComicMetadataDraftChanges changes = _changedFields(
+        ComicMetadataForm.fromComic(original)
+            .copyWith(
+              authors: <Author>[
+                Author(name: 'B'),
+                Author(name: 'A'),
+              ],
+            )
+            .diffAgainst(original),
+      );
 
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.authors?.map((Author a) => a.name).toList(), <String>[
+      expect(changes.authors?.map((Author a) => a.name).toList(), <String>[
         'B',
         'A',
       ]);
-      expect(repo.title, isNull);
-      expect(repo.tags, isNull);
+      expect(changes.title, isNull);
+      expect(changes.tags, isNull);
     });
 
-    test('only submits languages when ordered names change', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('submits languages when their order changes', () {
       final Comic original = _comic(languages: <String>['Chinese', 'Japanese']);
-      final ComicMetadataApplyResult result =
-          await ComicMetadataForm.fromComic(original)
-              .copyWith(languages: <String>['Japanese', 'Chinese'])
-              .applyTo(repo, original);
+      final ComicMetadataDraftChanges changes = _changedFields(
+        ComicMetadataForm.fromComic(original)
+            .copyWith(languages: <String>['Japanese', 'Chinese'])
+            .diffAgainst(original),
+      );
 
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.languages, <String>['Japanese', 'Chinese']);
-      expect(repo.title, isNull);
+      expect(changes.languages, <String>['Japanese', 'Chinese']);
+      expect(changes.title, isNull);
     });
 
-    test('only submits parodies when ordered names change', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('submits parodies when their order changes', () {
       final Comic original = _comic(parodies: <String>['Fate', '原创']);
-      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
-        original,
-      ).copyWith(parodies: <String>['原创', 'Fate']).applyTo(repo, original);
+      final ComicMetadataDraftChanges changes = _changedFields(
+        ComicMetadataForm.fromComic(
+          original,
+        ).copyWith(parodies: <String>['原创', 'Fate']).diffAgainst(original),
+      );
 
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.parodies, <String>['原创', 'Fate']);
-      expect(repo.title, isNull);
-      expect(repo.languages, isNull);
+      expect(changes.parodies, <String>['原创', 'Fate']);
+      expect(changes.title, isNull);
+      expect(changes.languages, isNull);
     });
 
-    test('only submits characters when ordered names change', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('submits characters when their order changes', () {
       final Comic original = _comic(characters: <String>['Saber', 'Rider']);
-      final ComicMetadataApplyResult result =
-          await ComicMetadataForm.fromComic(original)
-              .copyWith(characters: <String>['Rider', 'Saber'])
-              .applyTo(repo, original);
+      final ComicMetadataDraftChanges changes = _changedFields(
+        ComicMetadataForm.fromComic(original)
+            .copyWith(characters: <String>['Rider', 'Saber'])
+            .diffAgainst(original),
+      );
 
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.characters, <String>['Rider', 'Saber']);
-      expect(repo.title, isNull);
-      expect(repo.parodies, isNull);
+      expect(changes.characters, <String>['Rider', 'Saber']);
+      expect(changes.title, isNull);
+      expect(changes.parodies, isNull);
     });
 
-    test('persists all fields that differ from original', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('submits every field that differs from the original comic', () {
       final DateTime published = DateTime.utc(2020, 5, 1);
       final Comic original = _comic();
-      final ComicMetadataApplyResult result = await ComicMetadataForm(
-        title: ' 新标题 ',
-        description: ' 概要 ',
-        publishedAt: published,
-        isR18: true,
-        authors: <Author>[Author(name: 'A')],
-        tags: <Tag>[Tag(name: 'T')],
-        languages: <String>['Chinese'],
-        parodies: <String>['Fate'],
-        characters: <String>['Saber'],
-      ).applyTo(repo, original);
+      final ComicMetadataDraftChanges changes = _changedFields(
+        ComicMetadataForm(
+          title: ' 新标题 ',
+          description: ' 概要 ',
+          publishedAt: published,
+          isR18: true,
+          authors: <Author>[Author(name: 'A')],
+          tags: <Tag>[Tag(name: 'T')],
+          languages: <String>['Chinese'],
+          parodies: <String>['Fate'],
+          characters: <String>['Saber'],
+        ).diffAgainst(original),
+      );
 
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(repo.comicId, 'comic-1');
-      expect(repo.title, '新标题');
-      expect(repo.description, '概要');
-      expect(repo.publishedAt, published);
-      expect(repo.clearPublishedAt, isFalse);
-      expect(repo.contentRating, ContentRating.r18);
-      expect(repo.authors, <Author>[Author(name: 'A')]);
-      expect(repo.tags, <Tag>[Tag(name: 'T')]);
-      expect(repo.languages, <String>['Chinese']);
-      expect(repo.parodies, <String>['Fate']);
-      expect(repo.characters, <String>['Saber']);
+      expect(changes.title, '新标题');
+      expect(changes.description, '概要');
+      expect(changes.publishedAt, published);
+      expect(changes.clearPublishedAt, isFalse);
+      expect(changes.contentRating, ContentRating.r18);
+      expect(changes.authors, <Author>[Author(name: 'A')]);
+      expect(changes.tags, <Tag>[Tag(name: 'T')]);
+      expect(changes.languages, <String>['Chinese']);
+      expect(changes.parodies, <String>['Fate']);
+      expect(changes.characters, <String>['Saber']);
     });
 
-    test('isR18 false maps to safe when original was r18', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('maps isR18 false back to safe content rating', () {
       final Comic original = _comic(contentRating: ContentRating.r18);
-      await ComicMetadataForm.fromComic(
-        original,
-      ).copyWith(isR18: false).applyTo(repo, original);
-      expect(repo.contentRating, ContentRating.safe);
+      final ComicMetadataDraftChanges changes = _changedFields(
+        ComicMetadataForm.fromComic(
+          original,
+        ).copyWith(isR18: false).diffAgainst(original),
+      );
+      expect(changes.contentRating, ContentRating.safe);
     });
 
-    test('marks dictionary fields written only when submitted', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
+    test('includes a list only when that list changed', () {
       final Comic original = _comic();
-      final ComicMetadataApplyResult tagsOnly =
-          await ComicMetadataForm.fromComic(
-            original,
-          ).addTag('new-tag').applyTo(repo, original);
-      expect(
-        tagsOnly,
-        isA<ComicMetadataApplySucceeded>()
-            .having(
-              (ComicMetadataApplySucceeded r) => r.tagsWritten,
-              'tagsWritten',
-              isTrue,
-            )
-            .having(
-              (ComicMetadataApplySucceeded r) => r.parodiesWritten,
-              'parodiesWritten',
-              isFalse,
-            )
-            .having(
-              (ComicMetadataApplySucceeded r) => r.charactersWritten,
-              'charactersWritten',
-              isFalse,
-            ),
+      final ComicMetadataDraftChanges tagsOnly = _changedFields(
+        ComicMetadataForm.fromComic(
+          original,
+        ).addTag('new-tag').diffAgainst(original),
       );
+      expect(tagsOnly.tags, <Tag>[Tag(name: 'new-tag')]);
+      expect(tagsOnly.parodies, isNull);
+      expect(tagsOnly.characters, isNull);
 
-      final ComicMetadataApplyResult titleOnly =
-          await ComicMetadataForm.fromComic(
-            original,
-          ).copyWith(title: '仅改标题').applyTo(repo, original);
-      expect(
-        titleOnly,
-        isA<ComicMetadataApplySucceeded>()
-            .having(
-              (ComicMetadataApplySucceeded r) => r.tagsWritten,
-              'tagsWritten',
-              isFalse,
-            )
-            .having(
-              (ComicMetadataApplySucceeded r) => r.parodiesWritten,
-              'parodiesWritten',
-              isFalse,
-            )
-            .having(
-              (ComicMetadataApplySucceeded r) => r.charactersWritten,
-              'charactersWritten',
-              isFalse,
-            ),
+      final ComicMetadataDraftChanges titleOnly = _changedFields(
+        ComicMetadataForm.fromComic(
+          original,
+        ).copyWith(title: '仅改标题').diffAgainst(original),
       );
+      expect(titleOnly.title, '仅改标题');
+      expect(titleOnly.tags, isNull);
+      expect(titleOnly.parodies, isNull);
+      expect(titleOnly.characters, isNull);
 
-      final ComicMetadataApplyResult parodyAndCharacter =
-          await ComicMetadataForm.fromComic(
-            original,
-          ).addParody('Fate').addCharacter('Saber').applyTo(repo, original);
-      expect(
-        parodyAndCharacter,
-        isA<ComicMetadataApplySucceeded>()
-            .having(
-              (ComicMetadataApplySucceeded r) => r.tagsWritten,
-              'tagsWritten',
-              isFalse,
-            )
-            .having(
-              (ComicMetadataApplySucceeded r) => r.parodiesWritten,
-              'parodiesWritten',
-              isTrue,
-            )
-            .having(
-              (ComicMetadataApplySucceeded r) => r.charactersWritten,
-              'charactersWritten',
-              isTrue,
-            ),
+      final ComicMetadataDraftChanges parodyAndCharacter = _changedFields(
+        ComicMetadataForm.fromComic(
+          original,
+        ).addParody('Fate').addCharacter('Saber').diffAgainst(original),
       );
-    });
-
-    test('no repository call leaves dictionary flags false', () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
-      final Comic original = _comic(tags: <Tag>[Tag(name: 'T')]);
-      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
-        original,
-      ).applyTo(repo, original);
-
-      expect(repo.callCount, 0);
-      expect(
-        result,
-        isA<ComicMetadataApplySucceeded>()
-            .having(
-              (ComicMetadataApplySucceeded r) => r.tagsWritten,
-              'tagsWritten',
-              isFalse,
-            )
-            .having(
-              (ComicMetadataApplySucceeded r) => r.parodiesWritten,
-              'parodiesWritten',
-              isFalse,
-            )
-            .having(
-              (ComicMetadataApplySucceeded r) => r.charactersWritten,
-              'charactersWritten',
-              isFalse,
-            ),
-      );
+      expect(parodyAndCharacter.tags, isNull);
+      expect(parodyAndCharacter.parodies, <String>['Fate']);
+      expect(parodyAndCharacter.characters, <String>['Saber']);
     });
   });
 }

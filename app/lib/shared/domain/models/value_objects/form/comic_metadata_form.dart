@@ -3,7 +3,6 @@ import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
 
 part 'comic_metadata_form.freezed.dart';
 
@@ -48,37 +47,51 @@ abstract class ComicMetadataFormValidation with _$ComicMetadataFormValidation {
   bool get isValid => titleError == null;
 }
 
-/// [ComicMetadataForm.applyTo] 的结果：非法不调仓储；成功已落库。
-/// 仓储异常仍向上抛，由 UI toast。
-sealed class ComicMetadataApplyResult {
-  const ComicMetadataApplyResult();
+/// 草稿相对原 Comic 的同步差异。
+sealed class ComicMetadataDraftDiff {
+  const ComicMetadataDraftDiff();
 }
 
-final class ComicMetadataApplyInvalid extends ComicMetadataApplyResult {
-  const ComicMetadataApplyInvalid(this.validation);
+/// 标题等校验未通过，没有待提交字段。
+final class ComicMetadataDraftInvalid extends ComicMetadataDraftDiff {
+  const ComicMetadataDraftInvalid(this.validation);
 
   final ComicMetadataFormValidation validation;
 }
 
-final class ComicMetadataApplySucceeded extends ComicMetadataApplyResult {
-  const ComicMetadataApplySucceeded({
-    this.persisted = false,
-    this.tagsWritten = false,
-    this.parodiesWritten = false,
-    this.charactersWritten = false,
+/// 规范化后与原 Comic 没有值变化。
+final class ComicMetadataDraftUnchanged extends ComicMetadataDraftDiff {
+  const ComicMetadataDraftUnchanged();
+}
+
+/// 仅含相对原 Comic 值发生变化的字段。
+///
+/// `null` 表示该字段不提交。清空发布日用 [clearPublishedAt]，
+/// 不靠 [publishedAt] 本身区分。`isR18` 映射为 Content rating。
+final class ComicMetadataDraftChanges extends ComicMetadataDraftDiff {
+  const ComicMetadataDraftChanges({
+    this.title,
+    this.description,
+    this.publishedAt,
+    this.clearPublishedAt = false,
+    this.contentRating,
+    this.authors,
+    this.tags,
+    this.languages,
+    this.parodies,
+    this.characters,
   });
 
-  /// 本次是否实际调用了仓储写入（无字段变化时为 false）。
-  final bool persisted;
-
-  /// 本次是否向仓储提交了 Tag 列表（可能写入全局 Tag 字典）。
-  final bool tagsWritten;
-
-  /// 本次是否向仓储提交了 Parody 列表（可能写入全局 Parody 字典）。
-  final bool parodiesWritten;
-
-  /// 本次是否向仓储提交了 Character 列表（可能写入全局 Character 字典）。
-  final bool charactersWritten;
+  final String? title;
+  final String? description;
+  final DateTime? publishedAt;
+  final bool clearPublishedAt;
+  final ContentRating? contentRating;
+  final List<Author>? authors;
+  final List<Tag>? tags;
+  final List<String>? languages;
+  final List<String>? parodies;
+  final List<String>? characters;
 }
 
 extension ComicMetadataFormOps on ComicMetadataForm {
@@ -191,16 +204,12 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     );
   }
 
-  /// 非法 → [ComicMetadataApplyInvalid]；相对 [original] 仅提交值变化字段 →
-  /// [ComicMetadataApplySucceeded]。无变化时不调仓储。`isR18` → Content rating。
-  Future<ComicMetadataApplyResult> applyTo(
-    ComicRepository repository,
-    Comic original,
-  ) async {
+  /// 相对 [original] 的同步差异：校验失败、无变化，或仅含待提交字段。
+  ComicMetadataDraftDiff diffAgainst(Comic original) {
     final ComicMetadataForm ready = normalized;
     final ComicMetadataFormValidation validation = ready.validate();
     if (!validation.isValid) {
-      return ComicMetadataApplyInvalid(validation);
+      return ComicMetadataDraftInvalid(validation);
     }
 
     final String? title = ready.title != original.title ? ready.title : null;
@@ -265,27 +274,20 @@ extension ComicMetadataFormOps on ComicMetadataForm {
         parodies != null ||
         characters != null;
     if (!hasChanges) {
-      return const ComicMetadataApplySucceeded();
+      return const ComicMetadataDraftUnchanged();
     }
 
-    await repository.updateUserMeta(
-      original.comicId,
+    return ComicMetadataDraftChanges(
       title: title,
       description: description,
       publishedAt: publishedAt,
       clearPublishedAt: clearPublishedAt,
-      authors: authors,
       contentRating: contentRating,
+      authors: authors,
       tags: tags,
       languages: languages,
       parodies: parodies,
       characters: characters,
-    );
-    return ComicMetadataApplySucceeded(
-      persisted: true,
-      tagsWritten: tags != null,
-      parodiesWritten: parodies != null,
-      charactersWritten: characters != null,
     );
   }
 }
