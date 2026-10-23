@@ -268,7 +268,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 |---|---|---|
 | 使用档位 | medium → XL；compact 必须用 navigation bar | large / XL（可作 modal 覆盖） |
 | 条目数 | 3–7；不隐藏 | 3–7；可整体隐藏（沉浸式） |
-| Menu（切换入口） | 顶部居中 24 图标，`28,16` | 左上 `16,16`；展开后图标表示「可收起」 |
+| Menu（切换入口） | 顶部 `menu` 24 图标，`28,16`（与图标列同一 x） | `menu_open` 24 图标，`32,16`（与 destination 图标列同一 x，不是贴着 rail 左边缘）；点按收起 |
 | Active indicator | 56×32，包住图标 | **101×56，贴合图标 + 文字**（不按 rail 宽度取比例） |
 | 行距 | 64（顶部 52 起） | 68（顶部 64 起） |
 | 命中区 | 整行 80 宽 | **整行 256 宽**（indicator 只是视觉贴合） |
@@ -411,5 +411,6 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 11 Handoff & A11y | `48:2610` 三列交接页：token→Flutter、组件→Flutter、a11y 与迁移顺序 |
 | P0 补组件 | `48:2651` SearchBar、`48:2658` TopAppBar、`48:2662` Snackbar；SearchBar 替代模板里手绘的搜索框 |
 | Settings 与 History 页面 | `48:2663`/`48:2710` 设置（阅读/外观/数据三组，桌面卡片化、移动端分组列表）；`48:2749`/`48:2803` 历史（今天/昨天/更早分组，2 列/单列） |
-| Rail 官方规范改版 | 按 2025-05 官方 rail 文档（替代 baseline rail / drawer）：8 个变体补顶部 menu 切换图标；选中图标改 filled（home/library_books/history/settings 的 `_fill1_24px`）；collapsed 选中 label 改 secondary（`text.secondary`）、全部 label 用 Label Medium；expanded indicator 由 101×32 改 101×56 并提到行顶、行距 64→68；collapsed 行距 64、顶部 52 起。NavigationBar 4 变体同步改 filled 选中图标 |
+| Rail 官方规范改版 | 按 2025-05 官方 rail 文档（替代 baseline rail / drawer）：8 个变体补顶部 menu 切换图标（collapsed 用 `menu` 居中、expanded 用 `menu_open` 并与 destination 图标同 x=32）；选中图标改 filled（home/library_books/history/settings 的 `_fill1_24px`）；collapsed 选中 label 改 secondary（`text.secondary`）、全部 label 用 Label Medium；expanded indicator 由 101×32 改 101×56 并提到行顶、行距 64→68；collapsed 行距 64、顶部 52 起。NavigationBar 4 变体同步改 filled 选中图标 |
+| Rail menu 对齐 | expanded 的 menu 从 `(16,16)` 移到 `(32,16)`，与 destination 图标列对齐；图标换成 `menu_open`（收起语义），collapsed 仍是 `menu`。4 个 expanded 变体与所有模板/页面实例同步 |
 | 文字缩放样例 | 09 页新增 `57:532` Text scale 卡：100% / 150% / 200% 三档导航项，行高随字号增长、保留 padding、不截断 |
