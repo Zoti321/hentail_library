@@ -108,7 +108,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 | 区域 | 亮色角色（变量 id，L\*） | 暗色角色（变量 id，L\*） | 说明 |
 |---|---|---|---|
-| 窗口底 / pane 间隙 | `surfaceDim` #E7D6D7 (`10:53`, 87.0) | `surfaceContainerLowest` #140C0D (`10:102`, 4.0) | 与参考图窗口边带同档（B） |
+| 窗口底（帧底）/ pane 间隙 | **与 rail 同色**：`surfaceContainer` #FBEAEB (`10:57`, 94.0) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | 2026-10-23 用户定「窗口底色就用 NavigationRail 的背景色」；`surfaceDim`（87.0）不再用于桌面窗口，仅作更暗面备用（B） |
 | 导航 rail **与 NavigationBar** | `surfaceContainer` #FBEAEB (`10:57`, 94.0) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | **两者共用同一角色**（2026-10-23 定）；与 pane 差 4.0 |
 | 内容 pane | `surface` #FFF8F7 (`10:51`, 98.1) | `surfaceContainer` #261D1E (`10:104`, 11.9) | 最亮面，承载正文 |
 | pane 顶栏条 / 分组卡 | `surfaceContainerLow` #FFF0F1 (`10:56`, 96.0) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | 与 pane 差 2.1，靠间距而非级差分隔 |
@@ -125,7 +125,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | Surface Container | `color/surfaceContainer` | 列表面板、supporting pane、**亮色 rail 与 NavigationBar** |
 | Surface Container High | `color/surfaceContainerHigh` | 高强调容器 |
 | Surface Container Highest | `color/surfaceContainerHighest` | 暗色 rail / 抽屉 |
-| Surface Dim | `color/surfaceDim` | **亮色窗口底**（作 rail 时偏暗，见下条） |
+| Surface Dim | `color/surfaceDim` | 当前**不用于**桌面窗口（窗口与 rail 同色，2026-10-23）；备用更暗层 |
 | Surface | `color/surface` | 内容 pane 底 |
 | Surface Bright | `color/surfaceBright` | 暗色提亮面 |
 | Surface Tint | `color/surfaceTint`（= primary） | 只给浮层 level 2–5 |
@@ -145,7 +145,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | 主内容浮起卡片 | `surfaceContainerLowest` `#FFFFFF` | 100.0 | `surfaceContainer` `#261D1E` | 11.9 | 对主内容 1.9 / — |
 
 - 参考位：`design-system/example.png`（Google Chat 桌面改版）实测并列面板级差 **7.05 / 3.83**，同一手法、同一量级（B）。
-- **rail 为何不用 `surfaceDim`（2026-10-23 修订）**：参考图里 rail 与窗口是同一面（都是 87.0），但本项目窗口底用 `surfaceDim` 后，rail 若同色就只剩一条 24dp 缝，实机偏闷（用户反馈「太暗」）。改为 `surfaceContainer`（94.0）后 rail 比 pane（98.1）低 4.0，恰好够 T2 的 ≥4，且与窗口底（87.0）拉出 7.0——**rail 取「比 pane 低一档、比窗口底高一档」**，两端都有边界。Flutter 官方实现里 rail 默认就是 `surface`（`navigation_rail.dart:1230`），本项目下移到 `surfaceContainer` 是有意的区域化取舍（B）。
+- **rail 与窗口底同色（2026-10-23 最终）**：用户要求「窗口底色就用 NavigationRail 的背景色」，两者都绑 `surfaceContainer`（94.0）；边界不再靠窗口底与 rail 的级差，而是靠**pane（98.1，差 4.0）+ 24dp 画布缝**（T2 ≥4 仍满足）。历史上的 `surfaceDim` 窗口（87.0）已撤回（用户反馈 rail「太暗」）；`surfaceDim` 只作更暗面备用。Flutter 官方实现里 rail 默认是 `surface`（`navigation_rail.dart:1230`，B），本项目下移到 `surfaceContainer` 是有意的区域化取舍。
 - **暗色方向相反**：暗色没有更暗的 chrome，`surfaceDim` 在暗色等于 `surface`（#191112），因此 rail 走 `surfaceContainerHigh`（17.1，比窗口底 4.0 高 13.1）。
 - 级差只用于「无边界并列的面板」；带圆角/内边距的卡片仍用 2 档级差，保持安静。
 
@@ -268,15 +268,21 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - **详情模板（2026-10-23 已改/已建，见 `09` §7）**：XL `41:2384` 已由「书库三栏」改造为 `Template/Comic detail · Extra-large 1920`（rail 256 + 24 + 详情 1180 + 24 + supporting 412 + 24）；另新增 large `67:509`（rail 80 + 24 + 876 + 24 + 412 + 24）与 expanded `67:431`（rail 80 + 24 + 512 + 24 + 360 + 24）。
 - **栏宽取值**：详情页三栏 = rail + 24 + 主区 + 24 + supporting + 24，主区 expanded 512 / large 876 / XL 1180，rail 80（XL 详情例外 256）；支撑栏宽见下条。**pane 间与帧右缘都留 24 画布底**（不照搬 `09` 参考图的 0 margin 全出血，用户要求支撑栏贴右但留白），pane 内 padding 24，分区靠 tone、不叠 1px 线。原「四栏 80+320+1108+412」方案**作废**（书库不走 inline list-detail）。
 - **桌面底板（画布层，非 token）**：≥1200dp 的帧加底板（帧外扩 24、圆角 20、填充 `#EAE8E6`）+ 窗口 chrome（圆角 12、1dp `outlineVariant`、`0/2/6 @12%` 投影）。`#EAE8E6` 不在 46 个颜色角色里，代码中禁止使用。
-- **pane 容器规则（2026-10-23 已全量铺开）**：≥600dp 的帧一律「帧底 `color/surfaceDim`（暗色 `surfaceContainerLowest`）→ rail（`color/surfaceContainer`，与 NavigationBar 同角色）→ 16 画布底 → pane（圆角 20、`color/surface`，右/下各留 16）」，pane 内内容自带 16–24 padding；**compact（<600dp，实际只在移动端出现）pane 全出血**：pane = 整帧 (0,0,W,H)、圆角 0、帧自身无圆角/描边/阴影，顶栏条与 NavigationBar 同样满宽——移动端没有窗口外壳，不要再套桌面留白。阅读器是例外：全出血阅读面 + toolbar / bottom bar 浮层，不套 pane。已套用：07 书库四档 `41:1578`/`41:1774`/`41:1824`/`41:1975` 与详情五档；08 非阅读器帧全部（pane id `74:1387`–`74:1398`）。
+- **pane 容器规则（2026-10-23 已全量铺开，10-23 晚修订）**：≥600dp 的帧一律「帧底 **`color/surfaceContainer`（与 rail / NavigationBar 同色）** → rail（同色）→ **24 画布缝** → pane（圆角 20、`color/surface`，右/下各留 24）」，pane 内内容自带 24 / 16 padding；**compact（<600dp，实际只在移动端出现）pane 全出血**：pane = 整帧 (0,0,W,H)、圆角 0、帧自身无圆角/描边/阴影，顶栏条与 NavigationBar 同样满宽——移动端没有窗口外壳，不要再套桌面留白。阅读器是例外：全出血阅读面 + toolbar / bottom bar 浮层，不套 pane。已套用：07 书库四档 `41:1578`/`41:1774`/`41:1824`/`41:1975` 与详情五档；08 非阅读器帧全部（pane id `74:1387`–`74:1398`）。
 - **supporting pane 宽**：expanded **360**（官方 A 级）；large / XL **412**（官方 A 级）。旧文档统一写 360 是漏了 large/XL 的默认值，已按 `07-supporting-pane.md` §4.1 修正。
 - **断点内边距与字号（2026-10-23 修正，25 帧全覆盖）**：
-  - pane 外边距：medium(600) / expanded(1024) = **24**（pane = (rail 右缘 + 24, 24)，尺寸 = 帧宽 − rail − 48 × 帧高 − 48）；large(1440) / XL(1920) 沿用既有 16（large 已验收，本轮未动）。
+  - pane 外边距：**≥600 全档 24**（medium/expanded/large/XL；pane = (rail 右缘 + 24, 24)，尺寸 = 帧宽 − rail − 48 × 帧高 − 48）。依据是官方 canonical 原文 medium「margins of 24dp」、expanded「outer margin 24dp / spacer 24dp」（A，`07-supporting-pane.md` §4.1）。1440 / 1920 已于 2026-10-23 晚由 16 统一到 24。
   - pane 内 content = **水平 24 / 顶部 16**（medium / expanded / large）；compact 全出血，content 16。
   - 页面标题字号：large / XL **32**、expanded **28**、medium **24**、compact **24**；详情页标题单独一档 22 / 22 / 20 / 18（不跟页面标题走）。
   - 长文本（路径、URL 等）按 content 右缘截断：600 → 324、390 → 262，禁止越出 pane。
   - medium 的详情页是**滚动视口**：内容可以低于 pane 底缘表示还能滚，不要为了塞进去压缩字号或行距。
   - 复核口径：每帧脚本检查 `contentIn`（首个子节点 x/y）、`contentMax`（max x+w / y+h）与 `outsidePane`，三者必须落在 pane 内（滚动视口末行例外）。
+- **详情页文档流细节（2026-10-23 晚统一，五档模板 + 08 四屏）**：
+  - 简介：单段 4 行 → **按断点截断**——large/XL/expanded 3 行、medium 2 行、compact 3 行（Figma `maxLines` + `ENDING` 省略号，高 = 行数 × 24）。
+  - 「展开全文」：**紧跟简介末行**（间距 8），不再固定挂在 4 行高度下方；Figma 无「文字尾部自动换行吸附」，用「截断 + 紧随」模拟 Wrap 语义，实现层用 `Wrap`/`TextOverflow` + 按钮随文本流。
+  - 资源 KV 字阶：**label 14 Medium（onSurface）/ value 14 Regular（onSurfaceVariant）**，与代码 `comic_detail_info_sections.dart` 的 bodySm + w500/400 一致；此前 value 误用 16 Medium（与「添加时间」14 不一致）。
+  - pane header：← / 更多 / 编辑 在同一基线上（y = pane.y + 16，24 高文本框），系列 `‹ 3 / 5 ›` 右对齐（右缘 = pane 右 − 24 / compact 16，y = pane.y + 18），x 间距 24。
+  - 390 字号：页面标题 24 **Bold**（书库此前是 Medium，已改）、设置行 15 → **14**、历史组标签 12 Medium；设置 390 目前**缺副标题行**（其他三档有），见 §9 第 30 条。
 
 ### 5.2 官方分栏与导航矩阵
 
@@ -313,7 +319,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 |---|---|---|---|---|
 | 首页 Home | feed 单列 | feed 2 列 | feed 3 列 | feed 4–5 列，内容限宽 |
 | 书库 All libraries | 列表 → 详情路由 | 列表 → 详情路由（**不做 inline list-detail**） | 列表 → 详情路由 | 列表 → 详情路由；详情页走 §5.3 |
-| 单本详情 Library | **文档流单栏**：封面 96 + 标题/概要/CTA/简介（4 行截断 + 展开全文）/ 元数据 chip 行 / 资源 KV，pane 358（16 边距） | **文档流单栏**：折叠 rail 80 + pane 472，封面 140 + 右侧文本 260 | **文档流**：折叠 rail 80 + 24 + pane 896 + 24，内容 848（封面 220 + 24 + 文本 604） | large：rail 80 + 24 + pane 1312 + 24（主区 1120）；XL：rail 256 + 24 + pane 1616 + 24（主区 1324）；KV 在宽档排两列 |
+| 单本详情 Library | **文档流单栏**：封面 96 + 标题/概要/CTA/简介（**3 行截断 +「展开全文」紧随，间距 8**）/ 元数据 chip 行 / 资源 KV（label 14 Medium、value 14 Regular），pane 358 全出血（16 边距） | **文档流单栏**：折叠 rail 80 + pane 472，封面 140 + 右侧文本 260；简介 **2 行**截断保证首屏完整 | **文档流**：折叠 rail 80 + 24 + pane 896 + 24，内容 848（封面 220 + 24 + 文本 604）；简介 3 行 | large：rail 80 + 24 + pane 1312 + 24（主区 1120）；XL：rail 256 + 24 + pane 1616 + 24（主区 1324）；简介 3 行；KV 在宽档排两列 |
 | 阅读器 Reader | 全屏单栏 | 全屏单栏 | 全屏 + **可选浮层 ≤360**（非常驻栏） | 同 expanded，阅读区限宽 |
 | 历史 History | feed 单列 | 2 列 | 2 列 + 详情 | 双栏 |
 | 搜索 Search | 单列结果 | 2 列 | 2 列 | 3 列，筛选常驻 |
@@ -470,8 +476,12 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 22. ~~**rail 用透明度调色**~~（**已关闭，2026-10-23**）：用户提出「透明度也是一种影响因素」。按 CIELAB 算，surface(98.08) 叠在窗口底(86.99) 上：α=0.4→91.59（≈containerHigh 91.93）、α=0.6→93.54（≈container 94.04）、α=0.7→94.83（≈containerLow 95.97）——透明度只是在两档 tone 之间插值，落地必然等于某个既有角色（C）。所以直接用不透明 token 选档，也更符合官方「同一 region 跨断点同角色」（A）。最终 rail 定 `surfaceContainer` 94.0（变量 `color/surfaceContainer`；曾建别名 `color/desktop/rail`，2026-10-23 已删除）。
 23. ~~**NavigationRail 右侧 1dp 边框**~~（**已关闭，2026-10-23**）：根因是 rail 组件内一个 1dp `divider` 子矩形（8 个变体各一，`41:1541`/`41:1559`/`41:1652`/`41:1669`/`41:1686`/`41:1703`/`41:1721`/`41:1739`，fill `outlineVariant`），已在**组件源**关闭（实例继承），19 个实例复查全部隐藏；07 里两条残留列间分隔线 `41:1616`/`41:1795` 同批隐藏。
 24. **画布标签是画布层**：07/08 两页的列头与行名文字（`74:1399`–`74:1416`）仅用于评审阅读，不进产品、不做 token。
-25. **medium 详情是滚动视口**：600 详情（`72:961` / 08 `72:1250`）按 800 高窗口出图，资源 KV 末行「添加时间」落在 pane 底缘外 5dp（y=762–781，pane 底 776），属滚动继续的表现；若评审要求首屏完整，需减内容而不是压字号。
-26. **1440 / 1920 的 pane 外边距仍是 16**：与 600 / 1024 的 24 不一致（`41:2026`/`48:2663`/`48:2749`/`41:1578` 等），因 large 已验收、本轮未动。要统一需把 5 个 1440 帧 + 1 个 1920 帧整体 +8（顶/左）/−8（右），属下一轮批量改。
+25. ~~**medium 详情首屏末行越界**~~（**已关闭，2026-10-23 晚**）：600 详情简介由 3 行收到 2 行、后续内容整体上移 24，末行「添加时间」现落在 pane 内（y≈738，pane 底 776），首屏完整；仍按滚动视口出图，但不再裁内容。
+26. ~~**1440 / 1920 的 pane 外边距 16**~~（**已关闭，2026-10-23 晚**）：用户要求按 24 统一，`41:2026`/`48:2663`/`48:2749`/`41:1578` 四帧的 pane 改为 (280,24) 1136×852，子节点 +8/+8、右对齐项按「内容右缘 1392」重算；1920 `72:1083` 原本已是 24。官方依据见 §5.1（A）。
+27. **窗口底色与 rail 同色（2026-10-23 最终）**：用户定「窗口底色就用 NavigationRail 的背景色」，19 个桌面帧帧底与 19 个 rail 实例 + 8 个组件变体统一绑 `color/surfaceContainer`（94.0）；`surfaceDim`（87.0）不再用于窗口，只作更暗面备用。代价是 rail 与窗口底无级差，边界全靠 pane（98.1，差 4.0）与 24dp 画布缝。
+28. **历史/设置/书库的 390 字号已复核**：书库标题由 24 Medium 改 **24 Bold**（与 Home/Settings/History 一致）并上移到 y=16；设置 390 的 20 处行文本 15 → **14 Regular**；历史 390 保持 24 Bold / 12 Regular 副标 / 12 Medium 组标签。仍缺：设置 390 无副标题行（其他三档有），见第 30 条。
+29. **「展开全文」如何在 Figma 里表达 Wrap**：Figma 没有「按钮吸附在文本最后一行行尾、放不下才换行」的能力，当前用**截断（maxLines + ENDING）+ 按钮紧随（间距 8）**模拟；Flutter 侧必须用 `Wrap`（文本 + TextButton 同一 flow），断点换行行为以代码为准，Figma 只是视觉近似。
+30. **设置 390 缺副标题行**：1024 / 600 / 1440 都有「深色模式跟随系统 · 强调色 柔和玫瑰 · 五档断点自适应」，390 没有；补的时候要与「阅读」组标题一起下移约 24，工作量小但会牵动全部行，留到下一批统一处理。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -543,4 +553,9 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | rail 分隔线关闭 | 8 个 NavigationRail 变体各自 1dp `divider`（fill `outlineVariant`，x=79）在组件源 `set_visible(false)`，实例自动继承；另隐藏 07 残留列间线 `41:1616`/`41:1795`，实现「纯 tone 分区、零 1dp 线」（§9 第 23 条） |
 | 07/08 页面分组重排 | 两页改「左侧标签栏 + 行 = 页面/分组 + 列 = 断点」：列 x 320/1820/2920/3620，08 行 y 200/1300/2400/3500，07 行 y 200/1300/2500/3700；新增列头与行名文字 `74:1399`–`74:1416`。阅读器四帧 + 底板 `67:782` 移到 `12 Archive`（沉浸式、暂缓）。重排后 07 十帧、08 十二帧重叠均为 0 |
 | 06 Patterns 分组重排 | 原页面组件散在 x=40 与 x=1600 两簇、无分组。改为「左侧标签栏 + 行 = 分组」：①列表与卡片 y=200（BookListItem 320 / ComicCard 760 / ChapterRow 1000）②结构面板 y=560（MetadataPanel 320 / SettingsSection 700 / HistoryRow 1120）③阅读器外壳 y=920/1024（ReaderToolbar + ReaderBottomBar 上下叠）④Proof 样张 `41:1956` (320,1200)；新增页标题/副标题、4 个行名、8 条「组件名 · 尺寸」画布文字 `77:1698`–`77:1711`（MiSans，onSurface / onSurfaceVariant，不进产品）。节点重叠 0 |
+| 窗口底色 = rail 色（2026-10-23 晚） | 用户看线框稿后定「窗口底色就用 NavigationRail 的背景色」：19 个桌面帧帧底由 `surfaceDim`（87.0）改绑 `color/surfaceContainer`（94.0，`VariableID:10:57`），compact 四帧保持 `surface`；rail 与窗口同色后，rail 边界靠 pane（98.1）与 24 画布缝。`surfaceDim` 退出窗口用途（§9 第 27 条） |
+| 1440/1920 pane 外边距统一 24 | `41:2026`/`48:2663`/`48:2749`/`41:1578` 的 pane 改 (280,24) 1136×852，子节点 +8/+8、右对齐项按内容右缘 1392 重算；1920 `72:1083` 原已 24。官方依据：canonical 原文 medium「margins of 24dp」、expanded「outer margin 24dp / spacer 24dp」（A） |
+| 详情 header 对齐 + 展开紧跟 + KV 字阶 | 9 帧 detail pane header：← / 更多 / 编辑 同基线（pane.y+16）、x 间距 24，系列 `‹ 3 / 5 ›` 右对齐（pane 右 − inset − 51）；简介按断点截断（3/2/3 行）后「展开全文」紧随 8dp；资源 KV 统一 label 14 Medium / value 14 Regular（原 value 16 Medium）。lib 390 与 1024/600/1440 标题由 Medium 改 Bold |
+| 390 字号复核 | 设置 390 的 20 处行文本 15 → 14 Regular；书库 390 标题 24 Medium → 24 Bold 且 y 20 → 16；历史 390 已合规。设置 390 仍缺副标题行（§9 第 30 条） |
+| 文档流滚动视口 | 600 详情首屏不再裁内容：简介 2 行、后续上移 24，末行「添加时间」落在 pane 内（§9 第 25 条关闭）；Figma 仍按 800 高视口出图 |
 | 色彩分类撤销（不建 `color/desktop`） | 用户要求「不要造一个 color/desktop 色彩分类，尽量复用 01 Tokens 的 token；NavigationRail 与 NavigationBar 共用一个背景色」。做法：①把 86 处填充从 12 个 `color/desktop/*` 别名变量改为**直接绑 46 角色**——帧底 `surfaceDim`(`10:53`，compact 帧改 `surface` 以保持全出血语义)、pane `surface`(`10:51`)、顶栏条/卡 `surfaceContainerLow`(`10:56`)、rail `surfaceContainer`(`10:57`)，涉及 07/08 的 19 帧底 + 25 pane + 9 顶栏 + 19 rail 实例 + 8 rail 变体；②删除 12 个别名变量（Light `71:884`–`71:888` + `75:1683`、Dark `71:889`–`71:893` + `75:1684`），变量面板只剩 46 角色 + `stroke/*`；③NavigationBar 4 个变体与 4 个实例本已绑 `color/surfaceContainer`(`10:57`)，与 rail 同角色 → **共用一个背景色**已成立；④`radius/pane` 20 保留（数值 token，不属色彩分类）。`#EAE8E6` 画布底板仍未升 token |
