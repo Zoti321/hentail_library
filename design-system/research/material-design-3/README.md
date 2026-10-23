@@ -2,7 +2,7 @@
 
 > 本目录是 **设计系统重写的调研底稿**，不是最终规范。旧 Fluent 设计系统文档（`design-system/hentai-library/` 24 个文件）已整体删除（`git rm` 暂存），目录保留，历史可从 HEAD 取回。
 > 当前阶段：**Figma 设计稿阶段完成，待评审**（D1–D8 全部拍板；颜色 A 亮/暗、44 Number token、30 Text Style、6 Effect + 5 Grid Style、01–04 文档页；05 P0 原子组件（含 SearchBar / TopAppBar / Snackbar，12 个组件分行排布并完成图标/文字对齐）；06 八个业务组件（SettingsSection 改为分组卡样式、ReaderBottomBar 重排、rail 去掉新建入口）；07 五档模板 compact 390 / medium 600 / expanded 1024 / large 1440 / XL 1920；08 首页 + 阅读器四档出图，Settings 与 History 各 1440/390；09 States & Content Lab（含 Text scale 100/150/200% 样例）；10 Motion；11 Handoff & A11y；导航 rail 已按 2025-05 官方规范改版：collapsed/expanded 双形态、顶部 menu 切换、expanded active indicator 贴合内容 101×56、选中图标 filled、未选中 label 用 Label Medium），代码未动。设计稿评审通过后才进入实现。
-> 证据分级：**A** = 官方规范页/设计文档原文；**B** = 官方源码/实现（Compose `*Tokens.kt`、material-web `tokens/v0_192`、Flutter SDK 源码）——数值可信但非规范页；**C** = 未核实/工程推断。各文档正文逐条标注。
+> 证据分级：**A** = 官方规范页/设计文档原文（含官方博文）；**B** = 官方源码/实现（Compose `*Tokens.kt`、material-web `tokens/v0_192`、Flutter SDK 源码）**或按官方产品截图逐像素反推**——数值可信但非规范页；**C** = 未核实/工程推断。抓不到的官方页面不编数值。各文档正文逐条标注。
 
 ## 文档索引
 
@@ -13,7 +13,10 @@
 | `03-flutter-implementation.md` | 425 | 42 | Flutter M3 实现现状、规范差距、本仓库 theme/ADR 盘点、失效引用、迁移要点（附录性质） | 项目解析到 Flutter `>=3.38.0`；Expressive 无官方路径（#168813 Open）；主题装配点分散且有裸 `MaterialApp` |
 | `04-figma-design-workflow.md` | 391 | 31 | 官方 Figma 资源核实、Variables vs Styles、文件/组件集结构、桌面 frame、Plugin API 与 figwright 映射、交接清单 | M3 Design Kit v1.20 起已并入 Expressive → **必须自建 Figma 库**；只借 Material Theme Builder 的色板；插件 API 无 `setVariableValue`，是 `setValueForMode` |
 | `05-color-directions.md` | 117 | 0 | 粉色 A/B/C 取色、Figma 预览与切换方式、对比度、字体落地 | 免费版 1 collection 只能 1 mode → 建 6 个 collection，用三个 frame + 原型跳转切换；**已选定 A 柔和玫瑰**，亮/暗 frame 均已建；B/C 已移到 `12 Archive & Scratch` 作备选皮肤 |
-| `06-adaptive-desktop.md` | 281 | 7 | 五档断点、分栏/导航矩阵、canonical layouts（list-detail / supporting pane / feed）、栅格与间距、连续性、桌面输入、页面映射、模板矩阵 | Compact 1 栏 / Medium 1（推荐）或 2 / Expanded 起 2 栏；导航 compact=bar、medium/expanded=collapsed rail、large/XL=expanded rail；supporting pane expanded 固定 360dp；官方 spacing 页无数值，项目用 4/8 体系 |
+| `06-adaptive-desktop.md` | 281 | 7 | 五档断点、分栏/导航矩阵、canonical layouts（list-detail / supporting pane / feed）、栅格与间距、连续性、桌面输入、页面映射、模板矩阵 | Compact 1 栏 / Medium 1 `(recommended)` or 2 / Expanded 起 2 栏；导航 compact=bar、medium/expanded=collapsed rail、large/XL=expanded rail；supporting pane expanded 固定 360dp；官方 spacing 页无数值，项目用 4/8 体系 |
+| `07-supporting-pane.md` | 303 | 6 | supporting pane 定义与四问判据、五档形态、各断点宽（expanded 360 / large·XL 412）、XL 第三栏限制、本项目逐页采纳判定、Figma 与 Flutter 落点、断点迁移风险 | 判据「**换对象 = list-detail，换视角 = supporting pane**」；采纳书库/系列详情（元数据 + 阅读进度），阅读器章节目录与设置分区预览不采纳（后者官方属 list-detail，代码已是，只需阈值 600→840）；**不改 `41:2384`**，另立两帧 |
+| `08-tone-based-surfaces.md` | 536 | 5 | 官方 tone-based 博文原文（旧/新模型、5 容器角色、迁移映射、两套共存）、官方 roles / elevation 两页的 hairline 与 add-on 条款、本仓库 46 角色 tone 与 tonal elevation 叠加实测、移动 vs 桌面根因、三方案优劣矩阵、区域级映射取值、token 清单 | surface 与 elevation **已解绑**（+1→Low / +2→Container / +3→High / +4·5→Highest）；桌面根因是**亮色相邻档差最小只有 2.0、全程仅 10 个 tone 跨度**；选定**主通道 = 区域级 add-on 映射**（rail `surfaceDim` / 面板 `surfaceContainer` / 内容 `surface`，亮 7.0 / 4.0、暗 10.0 / 6.0，**不改一个 hex**）＋ **hairline 降为按需第二通道**（1dp，默认关闭）＋ **浮层才上阴影、tint 全关** |
+| `09-desktop-layout-reference.md` | 267 | 0 | `design-system/example.png` 像素反推：窗口 1440×900、四区栏宽、导航形态、内容密度、留白与分组手法、模式判定、Figma 落点 | 参考图 = rail **80** + 列表 **296** + 主内容 **632** + 支撑 **412**，**纯 tone 分隔、无分隔线**（级差 7.05 / 3.83，与 `08` 方案互证）；**rail 宽度由「同屏栏数」决定，不只由断点决定** |
 
 行数与 URL 数按本地文件统计；各文档开头的「检索说明」记录了抓取失败与降级路径，引用前先看该节。
 
@@ -29,7 +32,7 @@
 ## 合并后的核心结论
 
 1. **基线 = baseline M3，排除 Expressive。** Flutter 的 Expressive 支持（`flutter/flutter#168813`）仍 Open；Figma 官方 kit 已 Expressive 化。Expressive 的组件、shape morph、emphasized type、motion physics 均不进基线。
-2. **颜色是 49 个角色的体系，不是 26 个字段。** 3.22 起 `background/onBackground/surfaceVariant` 弃用，层级改用 tone-based `surfaceContainer*`；3.27（tokens v6.1）又把 4 个 `on*Container` 从 Tone10 改 Tone30。项目现在手工枚举 26 字段、0 处 `fromSeed/fromImageProvider`，需要重建。
+2. **颜色是 49 个角色的体系，不是 26 个字段。** 3.22 起 `background/onBackground/surfaceVariant` 弃用（**A**：docs.flutter.dev `release/breaking-changes/new-color-scheme-roles`，「In stable release: 3.22.0」），层级改用 tone-based `surfaceContainer*`；3.27（tokens v6.1）又把 4 个 `on*Container` 从 Tone10 改 Tone30，chip 边框由 `outline` 改 `outlineVariant`（**A**：`.../material-design-3-token-update`，「In stable release: 3.27」）。注意别被两处旁证带偏：Flutter `color_scheme.dart` 的 `@Deprecated` 注解写 `after v3.18.0-0.1.pre`（那是 **pre 落地版本**，不是 stable 发布版）；Compose `ColorLightTokens.kt` v0_210 仍 Tone10（**实现滞后**，不构成反证）。项目现在手工枚举 26 字段、0 处 `fromSeed/fromImageProvider`，需要重建。
 3. **surface 不再与 elevation 绑定**：baseline `surface` = Neutral98/6（旧值 99/10 已过时），`surface-tint` 恒等于 primary；tonal elevation（0→0.00、1→0.05、3→0.08、6→0.11、8→0.12、12→0.14）只是可选实现，Flutter 仍保留 `applySurfaceTint`。
 4. **排版 30 个样式**（15 baseline + 15 emphasized），字族需要 400/500/700 三档；当前 `MI_Sans_Regular` 只有单字重，撑不起 M3 字阶。Aug 2026 起 type scale 还会按语言 script height 调整行高。
 5. **state layer 是 M3 的核心反馈机制**：hover 8% / focus 12% / pressed 12% / dragged 16%（material-web v0.192）；项目 `theme.dart:62-64` 的 `NoSplash` + `highlightColor: Colors.transparent` + 桌面 `visualDensity.compact` 等于把反馈和 48dp 触达一起关掉了。
@@ -38,7 +41,10 @@
 8. **桌面实现细节与规范有落差**：`adaptivePlatformDensity` 在 Windows/macOS/Linux 返回 compact（`theme_data.dart:3233-3250`）；Tooltip 桌面最小高 24；modal bottom sheet maxWidth 640 / 圆角 28；桌面纵向滚动自动加 Scrollbar 且默认不支持鼠标拖拽。
 9. **Figma 必须自建库**：官方 kit 只能当「baseline 语义参考图」，色板走 Material Theme Builder；Expressive-only 内容排除；字阶落 Text Style（Figma 无复合排版变量）；组件状态用 variant（Button 225 变体为上限）。
 10. **figwright 已连接**（server/plugin 0.6.0，文件 `Hentai Library UI  (Material Design) v2`）。免费版每个 collection 只能 1 mode，颜色主题按「一主题一 collection」建；A/B/C 切换用三个 frame + Prototype 跳转，明细见 `05-color-directions.md`。
-11. **自适应布局已有官方依据**：五档断点之外，分栏与导航要按 breakpoint 置换（compact bar → collapsed rail → expanded rail）；list-detail 在 compact 单栏、expanded 起双栏；supporting pane 在 expanded 固定 360dp；feed 随断点加列。代码迁移时不要缓存窗口尺寸，单/双栏切换只改布局不动路由栈。
+11. **自适应布局已有官方依据**：五档断点之外，分栏与导航要按 breakpoint 置换（compact bar → collapsed rail → expanded rail）；list-detail 在 compact 单栏、expanded 起双栏；supporting pane 在 expanded 固定 360dp、large/XL 默认 412dp；feed 随断点加列。代码迁移时不要缓存窗口尺寸，单/双栏切换只改布局不动路由栈。
+12. **surface 与 elevation 已解绑（tone-based surfaces，2023-03 官方博文）**：5 个 `surfaceContainer*` 角色取代「elevation 叠 tint」，迁移映射为 +1→Low / +2→Container / +3→High / +4·+5→Highest（或 High / Surface Dim）；`surfaceVariant` 已弃用；浅色 `surface` 由 tone 99 改 98、neutral chroma 4→6、暗色略变暗。**两套模型长期共存**，详见 `08` §1。
+13. **「移动端够用、桌面端不够」的根因是档差不是角色数**：本仓库亮色相邻档差最小 **2.0**（96→98、94→92、92→90），全程只有 **10 个 tone 跨度**；而桌面同屏有 3–4 个**无边界并列**的面板，需要 ≥4 的级差。移动端靠 M3 的 containment（卡片圆角 + 内边距）吃掉 2.0 的细小级差，桌面靠不了。`08` 选定三区重映射后亮色级差 **7.0 / 4.0**、暗色 **10.0 / 6.0**，与官方桌面产品实测 **7.05 / 3.83** 同量级。
+14. **桌面结构以用户偏好为主**：`example.png`（Google Chat 桌面改版，1440×900）证明官方产品自己会用「rail 80 + 列表 296 + 主内容 632 + 支撑 412 + 纯 tone 分隔 + 全出血」。我们采纳其比例与分隔逻辑、不采纳其 38dp 行距与 296 宽的内容列表（见 `09` §6）。**冲突时以用户偏好为准，官方规范让步并记理由。**
 
 ## 设计决策（D1–D8 已全部拍板）
 
@@ -62,18 +68,21 @@ D1–D8 已全部拍板。D4 的 splash 平台策略只进了设计文档，代�
 - 本仓库 `app/test/project_layout_test.dart:36-54` 仍断言 `design-system/hentai-library/MASTER.md` 存在，MASTER 已重建且含 `## Directory charter`，但 `pages/` 目录尚未重建，该测试仍必失败；按「设计稿完成后再改代码」的约定，暂不修。
 - 06 已补齐 HistoryRow / SettingsSection / MetadataPanel / ReaderToolbar / ReaderBottomBar，阅读器 overlay 由 toolbar + bottom bar 组合；09 States 覆盖 loading 骨架 / empty / error / offline 缓存 / 长文本两行·三行截断 / 大图 16:9 / density 40·56 对照 / Text scale 100·150·200%（`57:532`）。
 - 08 仅出首页/阅读器四档与设置/历史两档；详情页（comic/series/author/metadata）、搜索结果、XL 首页/阅读器仍未出图。
+- 桌面三区 tone 映射（`08` §8）与参考布局（`09` §9）各有 5–6 条未决：rail 取 `surfaceDim` 的玫瑰倾向、暗色 chrome 反向、级差感知阈值（无用户实测）、`example.png` 全出血与 38dp 密度是否照搬。**均需出图评审，不是文档能定的。**
+- `07` 指出的第 1 号阻塞项仍未解：模板画「列表 + 详情同屏」，而代码里详情是独立路由（`shared_content_routes.dart:33-43`）→ 书库是否改 inline list-detail 需产品决策。
 
 ## 下一步（按序）
 
 1. 已定：D1 五档、D2 MiSans、D3 A 柔和玫瑰、D4 state layer + 平台 splash、D5 排除 Expressive、D6 混合建库、D7 首批稿顺序、D8 Material Symbols。
 2. `design-system/hentai-library/MASTER.md` 已建立（目录章程、颜色/字阶、断点、Figma 页面图、组件清单、代码映射）。
 3. Figma：变量 6 集合 + Number 44 项、30 Text Style、6 Effect + 5 Grid Style、A 亮/暗预览、01–04 文档页已完成。
-4. 05 已完成 P0 主体：Button 8 变体、IconButton、TextField、NavigationBar 4 变体、NavigationRail 8 变体、FAB 4 尺寸、FilterChip 2 态、ListItem 3 行数、Card 3 风格、Dialog/Basic。06 已建 BookListItem `41:1946`、ComicCard `41:1951`、ChapterRow `41:1955`、HistoryRow `41:2498`、SettingsSection `41:2496`、MetadataPanel `41:2497`、ReaderToolbar `41:2516`、ReaderBottomBar `41:2517`。NavigationRail `41:1577` 去除「新建」FAB（业务先选库根路径再扫描）、条目上移 64 间距；随后按官方 rail 文档改版：8 变体补顶部 menu、选中图标 filled、collapsed 选中 label 改 secondary、expanded indicator 101×56 贴合内容、行距 68；NavigationBar 4 变体同步改 filled 选中图标；09 补 Text scale 卡 `57:532`。07 五档齐全：Compact 390 `41:1975`、Medium 600 `41:1824`、Expanded 1024 `41:1774`、Large 1440 `41:1578`、XL 1920 `41:2384`（三栏）。08 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)、阅读器 `41:2097`/`41:2275`/`41:2139`/`41:2363`。09 `41:2520` 七块状态与内容实验；10 `48:2574` 四个时长卡 + reduce-motion；11 `48:2610` token/组件/a11y 三列交接；05 补 SearchBar `48:2651`、TopAppBar `48:2658`、Snackbar `48:2662`；08 补 Settings `48:2663`(1440)/`48:2710`(390)、History `48:2749`(1440)/`48:2803`(390)。**下一步：设计稿评审 → Flutter 迁移**（①theme ②shell/断点 ③组件 ④页面）；详情页（comic/series/author/metadata）与搜索结果为第二批。
+4. 05 已完成 P0 主体：Button 8 变体、IconButton、TextField、NavigationBar 4 变体、NavigationRail 8 变体、FAB 4 尺寸、FilterChip 2 态、ListItem 3 行数、Card 3 风格、Dialog/Basic。06 已建 BookListItem `41:1946`、ComicCard `41:1951`、ChapterRow `41:1955`、HistoryRow `41:2498`、SettingsSection `41:2496`、MetadataPanel `41:2497`、ReaderToolbar `41:2516`、ReaderBottomBar `41:2517`。NavigationRail `41:1577` 去除「新建」FAB（业务先选库根路径再扫描）、条目上移 64 间距；随后按官方 rail 文档改版：8 变体补顶部 menu、选中图标 filled、collapsed 选中 label 改 secondary、expanded indicator 101×56 贴合内容、行距 68；NavigationBar 4 变体同步改 filled 选中图标；09 补 Text scale 卡 `57:532`。07 五档齐全：Compact 390 `41:1975`、Medium 600 `41:1824`、Expanded 1024 `41:1774`、Large 1440 `41:1578`、XL 1920 `41:2384`（三栏）。08 首页 `41:2026`(1440)/`41:2209`(1024)/`41:2160`(600)/`41:2314`(390)、阅读器 `41:2097`/`41:2275`/`41:2139`/`41:2363`。09 `41:2520` 七块状态与内容实验；10 `48:2574` 四个时长卡 + reduce-motion；11 `48:2610` token/组件/a11y 三列交接；05 补 SearchBar `48:2651`、TopAppBar `48:2658`、Snackbar `48:2662`；08 补 Settings `48:2663`(1440)/`48:2710`(390)、History `48:2749`(1440)/`48:2803`(390)。**下一步：桌面补强（Figma）→ 设计稿评审 → Flutter 迁移**（①theme ②shell/断点 ③组件 ④页面）；详情页（comic/series/author/metadata）与搜索结果为第二批。桌面补强按 `09` §7–§8：改 `41:2384` 为 rail 80 + 列表 320 + 详情 1108 + 支撑 412，新增 Large 1440 两帧 + Expanded 1024 一帧，08 Screens 加 Detail 行四档。
 5. 组件状态矩阵（每组件出几态）在进入 05 前定；插画/占位图来源仍缺。
 6. 设计稿定稿并评审通过后，才进入 Flutter 主题与页面改造（`03` 的清单可作为迁移附录）。
 
 ## 复现与更新
 
 - `01-foundations.md`–`05-color-directions.md` 由并行的后台调研代理生成；`06-adaptive-desktop.md` 由主代理按用户给定的 4 个官方入口补抓 canonical examples 后写成；rail 规范由主代理按 `m3.material.io/components/navigation-rail/{overview,guidelines,accessibility}` 三页复核（`read_page` 可用、`web_fetch` 被 non-public IP 拒绝）；硬性要求：只引一手来源、逐条 URL、区分规范/实现/Expressive、中文、只写各自文件。Figma 落地顺序与截图见 `design-system/hentai-library/MASTER.md` §6。
+- `07`–`09` 于 2026-10-23 写成：**07** 由后台子代理按 `supporting-pane` / `scaffold/panes` / `breakpoints` 三页原文写成（6 个官方 URL）；**08** 主源为用户提供的官方博文 `m3.material.io/blog/tone-based-surface-color-m3`（A），并补取 `/styles/color/roles` 与 `/styles/elevation/applying-elevation` 两页原文（A）；`/styles/color/system/overview` 抓取失败（JS 渲染、空正文），**没有从该页引用任何数值**——tone 数值全部由本仓库 46 个 hex 自行按 CIELAB 计算（B 级，可复现），实现源码（Flutter `color_scheme.dart`、Compose tokens）**只用于核实版本口径**，不用于取 tone 值；**09** 无外部 URL，为 `design-system/example.png` 像素反推（Pillow 扫纯色带 + 高/宽两维度互校得 1 px = 1.152 dp）。
 - 更新某一份时，请同步改本索引的行数/结论，并在对应文档的「检索说明」里记录新抓取通道与失败原因。
 - 引用规范数值到 MASTER/页面文档时，标注来源小节与证据级别（A/B），不要只写「M3 规定」。

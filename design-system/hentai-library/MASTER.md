@@ -83,6 +83,8 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - **on* 配对**：文字/图标放在同色容器上时用对应 `on*`；不要用纯黑/纯白绕过 token。
 - **fixed 角色**：只用于跨主题保持不变的内容（品牌插画、固定徽标）；普通界面不用。
 - **surfaceTint = primary**：tonal elevation 只在需要时叠加（0/1/3/6/8/12 → 0/0.05/0.08/0.11/0.12/0.14），默认不叠。
+- **桌面三区映射（large / XL，≥1200dp；官方「大窗口 add-on surface colors」，A）**：导航 rail 用 `surfaceDim`（暗色 `surfaceContainerHighest`）；导航列表与 supporting pane 用 `surfaceContainer`；主内容用 `surface`；面板内卡片 `surfaceContainerLow`（暗色 `surfaceContainerHigh`）。相邻级差亮色 7.0 / 4.0、暗色 10.0 / 6.0，**46 个 hex 一个不改**。**同一个 region 在它所存在的所有断点用同一角色**（官方「跨断点保持映射一致」，A；例如 rail 在 medium / large 都是 `surfaceDim`）。默认**纯 tone、不加线**（`example.png` 实测官方桌面产品即如此）；仅在「两个面板必须同 tone」或高环境光 / 低端屏时按需叠 1dp `outlineVariant`，**可交互边界改用 `outline`**（4.27 / 5.85 ≥ 3:1，而 `outlineVariant` 只有 1.62 / 1.99）。依据 `08` §4.1/§5、`09` §3.4。
+- **tonal elevation 与 pane 互斥**：pane 级容器一律不叠 surfaceTint（`applySurfaceTint = false`）；tonal elevation 只留移动端组件级反馈与桌面浮层（menu / dialog / side sheet）。
 
 ### 2.4 对比度（WCAG，计算值）
 
@@ -99,6 +101,20 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 方向预览：A `10:308`、B `10:357`、C `10:404`，390×844，靠原型 `粉色方案 A/B/C` 切换；A 为起点。
 - 暗色预览：`A · 柔和玫瑰 · Dark Preview` `13:578`（y=1020），53 填充 + 2 描边绑定 `Theme/A · Dark`；切换器已隐藏、不参与原型。
 - 预览只用于色彩评审，不是首页版式交付。仓库不存截图，直接在 Figma 看节点 `13:578`。
+
+### 2.6 桌面级差对照表（large / XL，供评审与 Figma 重上色）
+
+| 区域 | 亮色角色 | L\* | 暗色角色 | L\* | 相邻级差（亮 / 暗） |
+|---|---|---:|---|---:|---|
+| 导航 rail | `surfaceDim` `#E7D6D7` | 87.0 | `surfaceContainerHighest` `#3C3233` | 21.9 | rail→面板 **7.0 / 10.0** |
+| 导航列表 · supporting pane | `surfaceContainer` `#FBEAEB` | 94.0 | `surfaceContainer` `#261D1E` | 11.9 | 面板→内容 **4.0 / 6.0** |
+| 主内容 | `surface` `#FFF8F7` | 98.1 | `surface` `#191112` | 5.9 | — |
+| 面板内卡片 | `surfaceContainerLow` `#FFF0F1` | 96.0 | `surfaceContainerHigh` `#312829` | 17.1 | 对所属面板 2.0 / 5.3 |
+| 主内容浮起卡片 | `surfaceContainerLowest` `#FFFFFF` | 100.0 | `surfaceContainer` `#261D1E` | 11.9 | 对主内容 1.9 / — |
+
+- 参考位：`design-system/example.png`（Google Chat 桌面改版）实测并列面板级差 **7.05 / 3.83**，同一手法、同一量级（B）。
+- **暗色方向相反**：暗色没有更暗的 chrome，`surfaceDim` 在暗色等于 `surface`（#191112），因此 rail 走 `surfaceContainerHighest`。
+- 级差只用于「无边界并列的面板」；带圆角/内边距的卡片仍用 2 档级差，保持安静。
 
 ## 3. 排版
 
@@ -168,6 +184,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 阴影 dp 与 3 层黑色透明度（0.20 / 0.14 / 0.12）取自 Flutter `kElevationToShadow`（B 级官方实现）。
 - **M3 的 elevation token 不含阴影**：高度主要靠 `surfaceContainer*` 色调表达；阴影是平台选择。桌面保留轻阴影，移动端可只留色调。
 - Figma 中 Effect Style 只存阴影，色调必须在组件填充里绑对应 surface 角色。
+- **上表的 level ↔ surfaceContainer 是 1:1 映射，只对浮层组件成立**（menu / dialog / side sheet / snackbar）。tone-based 模型（官方博文，A）已把 surface 与 elevation 解绑；pane 级容器按 §2.6 取角色，不按 level 取值。
 
 ### 4.3 Motion
 
@@ -205,34 +222,43 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 | class | 宽度 (dp) | 代表 frame | 壳层 | 分栏 | 栅格 |
 |---|---:|---|---|---|---|
 | compact | < 600 | 390×844 | Navigation bar（高 80） | 1 | 4 列 / margin 16 / gutter 16 |
-| medium | 600–839 | 800×1280 | Collapsed navigation rail（宽 80，menu 可切 expanded） | 1（推荐）或 2 | 8 列 / margin 24 / gutter 24 |
-| expanded | 840–1199 | 1024×768 | Collapsed rail（可换 standard expanded） | 1 或 2（推荐 2） | 12 列 / margin 24 / gutter 24 |
-| large | 1200–1599 | 1440×900 | Expanded rail（宽 256，显示文字标签） | 1 或 2（推荐 2） | 12 列 / margin 24 / gutter 24 |
-| extra-large | ≥ 1600 | 1920×1080 | Expanded rail（宽 256） | 1–3（推荐 3） | 12 列 / margin 24 / gutter 32 |
+| medium | 600–839 | 800×1280 | Collapsed navigation rail（宽 80，menu 可切 expanded） | 1 (recommended) or 2 | 8 列 / margin 24 / gutter 24 |
+| expanded | 840–1199 | 1024×768 | Collapsed rail（可换 standard expanded） | 1 or 2 (recommended) | 12 列 / margin 24 / gutter 24 |
+| large | 1200–1599 | 1440×900 | **Collapsed rail 80**（同屏 ≥3 栏）／Expanded rail 256（≤2 栏） | 1 or 2 (recommended) | 12 列 / margin 24 / gutter 24 |
+| extra-large | ≥ 1600 | 1920×1080 | 同上（rail 宽度由**同屏栏数**决定，不只由断点决定） | 1 to 3 (recommended) | 12 列 / margin 24 / gutter 32 |
 
 - 断点按**应用可用窗口**判断，不用设备类型；横竖屏、多窗口、折叠展开都会换档。
 - 接缝测试：599/600、839/840、1199/1200、1599/1600 各出一张对照。
 - 内容最大宽：large/XL 的正文区约 1200dp 居中，避免 1920 拉满；正文保持 40–60 字符/行。
 - 代码现状 `app/lib/shared/ui/layout/app_layout_breakpoints.dart:10,13` 是 600/1024；迁移时改五档。
-- 模板进度（五档齐全）：Compact 390×844 `41:1975`、Medium 600×800 `41:1824`、Expanded 1024×768 `41:1774`、Large 1440×900 `41:1578`、XL 1920×1080 `41:2384`。XL 用三栏（expanded rail 256 + 列表 504 + 详情/章节 + 阅读进度 360），验证官方 XL 1–3 pane 上限。
+- 模板进度（五档齐全）：Compact 390×844 `41:1975`、Medium 600×800 `41:1824`、Expanded 1024×768 `41:1774`、Large 1440×900 `41:1578`、XL 1920×1080 `41:2384`。XL 现为三栏（expanded rail 256 + 列表 504 + 详情/章节 + 阅读进度 360），验证官方 XL 1–3 pane 上限。
+- **栏宽取值（见 `09-desktop-layout-reference.md` §7，下一轮改图）**：large 四栏 = rail 80 + 列表 296 + 详情 652 + supporting 412；XL 四栏 = rail 80 + 列表 320 + 详情 1108 + supporting 412；expanded 三栏 = rail 80 + 详情 584 + supporting 360。pane 间全出血（0 margin），pane 内 padding 24，依据用户偏好（`design-system/example.png`）。
+- **supporting pane 宽**：expanded **360**（官方 A 级）；large / XL **412**（官方 A 级）。旧文档统一写 360 是漏了 large/XL 的默认值，已按 `07-supporting-pane.md` §4.1 修正。
 
 ### 5.2 官方分栏与导航矩阵
 
 | Breakpoint | Panes | Navigation | Communication | Action |
 |---|---|---|---|---|
 | Compact | 1 | Navigation bar；modal expanded rail | Simple / full-screen dialog | Bottom sheet |
-| Medium | 1（推荐）或 2 | Navigation bar；modal expanded rail | Simple dialog | Menu |
-| Expanded | 1 或 2（推荐 2） | Modal 或 standard expanded rail | Simple dialog | Menu |
-| Large | 1 或 2（推荐 2） | Modal 或 standard expanded rail | Simple dialog | Menu |
-| Extra-large | 1–3（推荐 3） | Modal 或 standard expanded rail | Simple dialog | Menu |
+| Medium | 1 (recommended) or 2 | Navigation bar；modal expanded rail | Simple dialog | Menu |
+| Expanded | 1 or 2 (recommended) | Modal 或 standard expanded rail | Simple dialog | Menu |
+| Large | 1 or 2 (recommended) | Modal 或 standard expanded rail | Simple dialog | Menu |
+| Extra-large | 1 to 3 (recommended) | Modal 或 standard expanded rail | Simple dialog | Menu |
 
 跨断点只做五件事：**reveal / divide / resize / reposition / swap**。不换功能不等价的组件（button↔chip、list item↔card 要谨慎）。Medium 两栏只用于低密度内容 + 清晰动作。
+
+> 括号位置已按官方原文改正（`07-supporting-pane.md` §7）：官方的括号**修饰整个区间**（如 `1 or 2 (recommended)` = 推荐用 2 栏，但 1 栏合法），不是「推荐 2 栏、1 栏次选」。旧写法把 `(recommended)` 读成了对某个数字的修饰。
 
 ### 5.3 Canonical layouts
 
 **List-detail**（书库、历史、设置）：compact 1 栏；medium 1（推荐）或 2（双栏时用 bottom nav 省横向空间）；expanded 起 2 栏。单栏时 detail 才有 back；双栏时 selected 只在 list；无选中时 detail 显示占位；单/双栏切换保持最近使用的 pane。
 
-**Supporting pane**（详情页元数据、阅读器设置）：compact/medium 放 primary 下方（compact 可用 bottom sheet）；expanded 起放 leading/trailing 固定 **360dp**。父子关系改用 list-detail。
+**Supporting pane**（详情页元数据、阅读进度）：compact/medium 放 primary **下方**（compact 可用 bottom sheet，A 级原文）；expanded 起转 leading/trailing 固定 **360dp**；large / XL 官方默认 **412dp**（A）。pane 间 spacer 24dp、外侧 margin 24dp（A）；large/XL 若采纳全出血则 pane 间取 0，见 §5.1 页脚。**父子关系一律改用 list-detail**（supporting pane 不是父子导航）。
+
+- 判据（`07` §2）：**「换对象 = list-detail；换视角 = supporting pane」**。同一对象的切面（元数据、进度、评论）才进 supporting pane。
+- **本项目采纳**：书库详情 `/comic/:id` 与系列详情 `/series/:id`——元数据 + 阅读进度进 trailing 栏；compact/medium 已天然满足（元数据本来就在 primary 下方），只差 expanded 起换布局。
+- **不采纳**：① 阅读器 + 章节目录（无章节模型、无页缩略图管线、与沉浸式冲突 → 改「可召唤浮层 ≤360」，见 §5.4）；② 设置 + 分区预览（官方 list-detail key use cases 原文含 `Settings + category detail`，代码已是 list-detail，真正要改的只是阈值 600 → 840）。
+- MVP 不做拖拽调宽；官方 resize 快照取 360 / 412 / split 三档，够用。
 
 **Feed**（首页、搜索、历史列表）：网格卡片；compact 单列铺满，medium 起加列，expanded/large/XL 列数继续增加；用大小与位置表达层级，重排保持顺序。
 
@@ -242,11 +268,11 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 |---|---|---|---|---|
 | 首页 Home | feed 单列 | feed 2 列 | feed 3 列 | feed 4–5 列，内容限宽 |
 | 书库 All libraries | 列表→详情路由 | feed 或双栏 | list-detail 双栏 | 双栏 + 更宽 list |
-| 单本详情 Library | 单栏 detail | 单栏 | supporting pane（trailing 360） | 同 expanded |
-| 阅读器 Reader | 全屏单栏 | 全屏单栏 | 单栏 + 可选 trailing 360 | 同 expanded，阅读区限宽 |
+| 单本详情 Library | 单栏 detail（元数据在下方） | 单栏（元数据在下方） | **supporting pane trailing 360** | supporting pane trailing **412**，详情区限宽 1200 |
+| 阅读器 Reader | 全屏单栏 | 全屏单栏 | 全屏 + **可选浮层 ≤360**（非常驻栏） | 同 expanded，阅读区限宽 |
 | 历史 History | feed 单列 | 2 列 | 2 列 + 详情 | 双栏 |
 | 搜索 Search | 单列结果 | 2 列 | 2 列 | 3 列，筛选常驻 |
-| 设置 Settings | 单栏 | 1 或 2（低密度） | 双栏：分类 + 内容 | 双栏 + 展开 rail |
+| 设置 Settings | 单栏 | 1 或 2（低密度） | 双栏：分类 + 内容（breakpoint **≥840**） | 双栏 + 展开 rail |
 
 ### 5.5 连续性与输入
 
@@ -254,7 +280,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 鼠标 hover / 键盘 focus / 触摸 pressed 都要有可见反馈；焦点环 2px + 12% state layer；hover 不能是唯一入口。
 - 交互目标 ≥ 48×48；桌面可收紧视觉密度，但不能缩点击区。
 - 官方没有 spacing 数值表；项目用 4/8 体系（§4.1），桌面可放宽到 space/5–6。
-- 详细依据与证据级别见 `research/material-design-3/06-adaptive-desktop.md`。
+- 详细依据与证据级别见 `research/material-design-3/06-adaptive-desktop.md`；supporting pane 采纳范围见 `07`，桌面级差见 `08`，桌面参考布局见 `09`。
 
 ### 5.6 导航组件解剖（官方 A 级）
 
@@ -373,9 +399,13 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 ## 9. 未决事项
 
 1. **插图与占位图**：04 页目前只有图标；封面、占位构图、空态插图未定来源（自绘 / 授权素材）。
-2. **Grid margin**：Figma Grid Style 无 margin 参数；项目取 compact 16 / ≥medium 24（§5.1）。M3 官方 margin 表抓取失败，仍为 C 级，模板出图后再复核。
+2. ~~**Grid margin**~~（**已关闭**）：compact 16 / medium 及以上 24 已由 `07-supporting-pane.md` §4 取到官方原文（A 级），不再是 C 级推断。Figma Grid Style 仍无 margin 参数，属工具限制，不影响决策。
 3. **导航组件精确 dp**：navigation bar 高 80、collapsed rail 宽 80、indicator 56×32 有实现值佐证（B）；expanded indicator 101×56 与行距 68 由官方截图 2× 反推（B）；rail 宽 256 是项目取值。官方 `/specs` 页 JS 渲染抓取失败，若后续拿到数值，改组件集而非模板。
 4. **rail 展开/收起的动效时长**：官方只说 indicator 从图标中心展开，未给时长；暂用 §4.3 的 Standard 300ms（`cubic-bezier(0.2,0,0,1)`），拿到官方数值再定。
+5. **书库是否改 inline list-detail**（**当前第 1 号阻塞项**）：模板画的是「列表 + 详情同屏」，而代码里详情是独立路由（`shared_content_routes.dart:33-43`）。这决定 `41:2384` 的列表栏该不该存在，也决定 large/XL 是四栏还是三栏。参见 `07` §8.1、`09` §9.1。
+6. **rail 用 80 还是 256 的切换规则**：`09` §3.2 提出「同屏 ≥3 栏 ⇒ 80」，是从官方产品截图反推（B），无官方条文。需在 1440 / 1920 两帧出图对比。
+7. **桌面 rail 取 `surfaceDim` 的玫瑰倾向**：A 板 tonalSpot 在 tone 87 仍有低彩度，整片铺 rail 会偏粉。退路是 `surfaceContainerHighest`（tone 90）+ 1dp `outlineVariant`。**暗色 chrome 反向**（rail 用 `surfaceContainerHighest`）需设计评审确认。
+8. **级差感知阈值无实测**：ΔL\* 2 / 4 / 7 的「能不能看清」是 C 级工程判断，官方只给对比度可访问性标准、不给分区级差规范。要做成规范需 5–8 人快速辨色测试。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -418,4 +448,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | Rail 官方规范改版 | 按 2025-05 官方 rail 文档（替代 baseline rail / drawer）：8 个变体补顶部 menu 切换图标（collapsed 用 `menu` 居中、expanded 用 `menu_open` 并与 destination 图标同 x=32）；选中图标改 filled（home/library_books/history/settings 的 `_fill1_24px`）；collapsed 选中 label 改 secondary（`text.secondary`）、全部 label 用 Label Medium；expanded indicator 由 101×32 改 101×56 并提到行顶、行距 64→68；collapsed 行距 64、顶部 52 起。NavigationBar 4 变体同步改 filled 选中图标 |
 | Rail menu 对齐 | expanded 的 menu 从 `(16,16)` 移到 `(32,16)`，与 destination 图标列对齐；图标换成 `menu_open`（收起语义），collapsed 仍是 `menu`。4 个 expanded 变体与所有模板/页面实例同步 |
 | 文字缩放样例 | 09 页新增 `57:532` Text scale 卡：100% / 150% / 200% 三档导航项，行高随字号增长、保留 padding、不截断 |
+| 桌面调研三篇 | `research/material-design-3/07-supporting-pane.md`（模式定义、断点形态、采纳判定、Flutter/Figma 落点）、`08-tone-based-surfaces.md`（官方博文 A 级原文 + tone 实测 + 三方案）、`09-desktop-layout-reference.md`（`design-system/example.png` 像素反推：1440×900 稿、rail 80 / 列表 296 / 主内容 632 / 支撑 412、纯 tone 无分隔线） |
+| 桌面三区 tone 映射 | §2.3 新增「桌面三区映射」与「tonal elevation 与 pane 互斥」；新增 §2.6 桌面级差对照表；§4.2 注明 level↔surfaceContainer 的 1:1 只对浮层成立。**不改 46 个 hex、不新增 color 变量、不动 D3**，级差亮 7.0/4.0、暗 10.0/6.0 |
+| §5 依据修正 | ①§5.1/§5.2 括号误读改为官方原文（`1 or 2 (recommended)` 等）；②supporting pane 补 large/XL 官方 412（原统一写 360）；③§5.4 阅读器由「可选 trailing 360」改「可选浮层 ≤360」；④设置双栏阈值写明 ≥840；⑤§5.1 补 large/XL/expanded 三档拦宽取值；⑥§9 关闭 Grid margin 未决项 |
 | 画布矩阵修复 | 08 Screens 12 帧改「行 = 页面、列 = 断点」矩阵（列 x 0/1500/2600/3300，行 y 0/1000/2000/3000），消除 4 处重叠并修掉 Reader 1024 `41:2275` 的 y=−346；07 Templates 5 帧同列同规则重排（`41:1774`→1500、`41:1824`→2600、`41:1975`→3300、XL `41:2384`→(0,1100)），消除 `41:1824`∩`41:2384` 的 100×80 重叠。两页现均 0 重叠，截图仅在 Figma 内查看 |
