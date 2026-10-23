@@ -15,7 +15,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # --- UI / 主题 / 组件（共 9）---
+  # --- UI / 主题 / 组件（共 10）---
   cupertino_icons: ^1.0.8
   custom_pop_up_menu: ^1.2.4
   flutter_acrylic: ^1.1.4
@@ -23,6 +23,7 @@ dependencies:
   google_fonts: ^7.0.1
   lucide_icons_flutter: ^3.1.9
   material_color_utilities: ^0.11.0
+  material_symbols_icons: ^4.2960.0
   scrollable_positioned_list: ^0.3.8
   system_theme: ^3.1.2
 
