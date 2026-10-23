@@ -485,7 +485,9 @@ _kAmbientShadowOpacity= 0x1F000000  // alpha 0.12
 | 8 | （方案 B 可选）`surfaceContainerHighest` / `surfaceDim` | 90 / 87 | 22 / 6 | **84（≈`#E0CDCE`，计算近似）/ 80** | 26 / **不变** | 否（同上） | 高强调容器；`surfaceDim` 桌面底 |
 | 9 | （可选新色）`color/borderStrong` | 无 | 无 | tone ≈ **60**（3:1 所需，hex 待生成） | tone ≈ **41**（3:1，待生成） | **是（新色角色）** | 仅当 `outlineVariant` 1.62 实机不够时，替代 hairline 主色 |
 
-**统计（推荐方案）**：**新增 2 个 token（均为数值，其中 `stroke/hairline` 默认关闭）＋ 扩用 2 个既有颜色角色（值不变）＋ 2 条规则变更（阴影使用范围；§4.1 区域级映射）；颜色角色新增 0、颜色值变更 0。** 若实机验证后仍偏平，再启用第 7/8 行（Light 改 5 个 tone、Dark 改 4 个）+ 可能第 9 行。
+**统计（推荐方案）**：**新增 2 个 token（均为数值，其中 `stroke/hairline` 默认关闭）＋ 扩用 2 个既有颜色角色（值不变）＋ 2 条规则变更（阴影使用范围；§4.1 区域级映射）；颜色角色新增 0、颜色值变更 0。**
+
+**已落地（2026-10-23，B）：桌面区域别名层。** §4.1 的区域映射没有写进任何 hex，而是在 `Theme/A · Light` / `Theme/A · Dark` 各加 5 个**别名变量** `color/desktop/{window,pane,paneHeader,card,field}`（Light `71:884`–`71:888` / Dark `71:889`–`71:893`），另加数值 `radius/pane` = 20（`71:894`）。Light：window→`surfaceContainerHigh`、pane→`surface`、paneHeader/card→`surfaceContainerLow`、field→`surfaceContainerLowest`；Dark：window→`surfaceContainerLowest`、pane→`surfaceContainer`、paneHeader/card→`surfaceContainerHigh`、field→`surfaceContainerHighest`。这样做的依据是官方那条「同一 region 跨断点必须同角色」（A，见 §1.6 引文），别名层保证换主题时整体跟随，46 角色一个不动。 若实机验证后仍偏平，再启用第 7/8 行（Light 改 5 个 tone、Dark 改 4 个）+ 可能第 9 行。
 
 **为什么 `borderStrong` 的 tone 是 60/41**（B，计算，写出来以便复核）：要让某个边界色对 `surface` 达到 3:1，解 `(Ysurf+0.05)/(Yb+0.05)=3`：
 - Light：`Y(#FFF8F7)=0.95110` → `Yb=(0.95110+0.05)/3−0.05=0.28370` → `L∗=60.22`；

@@ -91,7 +91,9 @@ list-detail 官方 key use cases 原文含 `Settings + category detail`、`Music
 
 因此：**compact/medium 保持现状（下方滚动区段，compact 可用折叠区段），expanded 起把 `ComicDetailMetadataBlock` 及「阅读进度」移入 trailing 固定栏（360dp）**。这与 MASTER §5.4「单本详情 = expanded 起 supporting pane(trailing 360)」、`06-adaptive-desktop.md` §7 一致。
 
-派生收益：主区在 expanded 起不再被 4 组 chip 行与 5 条键值行拉长，封面 + 简介一屏可读；同时也是 Figma `41:2384` 第三栏（阅读进度 360）的代码落点。
+派生收益：主区在 expanded 起不再被 4 组 chip 行与 5 条键值行拉长，封面 + 简介一屏可读。
+
+> **2026-10-23 晚：本条已被推翻。** 用户看过支撑栏版与卡组版后定「方案 1 · 文档流」——详情页不做常驻支撑栏，元数据与资源信息按文档流纵向排在 pane 内（见 `09-desktop-layout-reference.md` §11.5/§11.6 与 `MASTER` §5.4）。本节保留为「为什么当时考虑 supporting pane」的推理记录，**不要再据此实现 `/comic/:id`**；`/series/:id` 同样走文档流。
 
 **同构页面**：`/series/:id`（`series_detail_page/series_detail_page.dart`，`SeriesDetailMetadataBlock` 在 `series_detail_info_sections.dart:111`）结构相同 → **同样采纳**，同一套 widget 复用（系列详情支撑栏 = 元数据 + 集数/进度）。
 
@@ -145,17 +147,19 @@ list-detail 官方 key use cases 原文含 `Settings + category detail`、`Music
 | Medium `41:1824` | 600×800 | collapsed rail 80 |
 | Expanded `41:1774` | 1024×768 | collapsed rail 80 + 列表 304 + 详情 |
 | Large `41:1578` | 1440×900 | expanded rail 256 + 列表 400 + 详情 |
-| XL `41:2384` | 1920×1080 | expanded rail 256 + 列表 504 + 详情 + 阅读进度 360（**三栏**） |
+| XL | —（无书库模板） | — | `41:2384` 曾作书库 XL 三栏样张，2026-10-23 改造为详情模板后被删除；1920 尺寸以详情 XL `72:1083` 为参照，书库 XL 模板待建 |
 
-### 结论：**已执行（2026-10-23 改造 `41:2384` + 新增 expanded / large 两帧）**
+### 结论：已执行后又整体替换（2026-10-23 当日两次修订）
 
-用户决策（m00431）：① `41:2384` 选 A——改造为详情模板；② XL 详情用 expanded rail **256**；③ 支撑栏贴右并保留 **24** 右侧留白；④ supporting pane 模板 **共用**（`/comic/:id`、`/series/:id`、作者/元数据等同一详情模板）；⑤ 宽度「采用官方的」→ expanded **360**、large/XL **412**。原先「新增帧、不改 `41:2384`」的建议作废。
+> 本节记录的「详情 = 三栏 + 右侧支撑栏」版本**已作废**：`41:2384`、`67:431` 均已删除，最终落地的是方案 1 文档流（`72:1083` / `67:509` / `72:900` / `72:961` / `72:1022`，几何见 `09-desktop-layout-reference.md` §11.6）。下面保留改造过程与 expanded 512 的实测数据——那些数值（封面 180→220、主区 512 装不下原元数据串）在新版里仍然有效。
+
+首次改造的用户决策（m00431）：① `41:2384` 选 A——改造为详情模板；② XL 详情用 expanded rail **256**；③ 支撑栏贴右并保留 **24** 右侧留白；④ supporting pane 模板 **共用**（`/comic/:id`、`/series/:id`、作者/元数据等同一详情模板）；⑤ 宽度「采用官方的」→ expanded **360**、large/XL **412**。原先「新增帧、不改 `41:2384`」的建议作废。
 
 | 帧 | id | 尺寸 | 结构 | 校验 |
 |---|---|---|---|---|
-| `Template/Comic detail · Extra-large 1920` | `41:2384`（改造） | 1920×1080 | rail 256 + 24 + 主区 1180 + 24 + 支撑栏 412 + 24 | 256+24+1180+24+412+24 = 1920 ✅，支撑栏 1484–1896，右留白 24 |
-| `Template/Comic detail · Large 1440` | `67:509`（新增） | 1440×900 | rail 80 + 24 + 主区 876 + 24 + 支撑栏 412 + 24 | 80+24+876+24+412+24 = 1440 ✅，支撑栏 1004–1416 |
-| `Template/Comic detail · Expanded 1024` | `67:431`（新增） | 1024×768 | rail 80 + 24 + 主区 512 + 24 + 支撑栏 360 + 24 | 80+24+512+24+360+24 = 1024 ✅，主区内容 464 = 封面 180 + 32 + 文本列 252 |
+| ~~Extra-large 1920~~ | ~~`41:2384`~~ | 1920×1080 | 已删除 → 现为 `72:1083`（文档流，pane 1616） | — |
+| ~~Large 1440~~ | `67:509`（保留 id，已改文档流） | 1440×900 | 支撑栏版已撤，现为 rail 80 + 24 + pane 1312 + 24 | pane 内 24，内容 1264 |
+| ~~Expanded 1024~~ | ~~`67:431`~~ | 1024×768 | 已删除 → 现为 `72:900`（文档流，pane 896、内容 848） | — |
 
 改造内容：删掉 `41:2384` 的书库三栏内容（书库标题 / Search 框 / 5 条 `BookListItem` / 2 条 1px 分隔线），详情区改为「封面 180×252 + 标题 + 元数据 + 3 chips + 简介 + 开始阅读 + 章节目录 3 行」；支撑栏 = `surfaceContainer` 底色矩形（`67:418`，纯 tone、零分隔线）+ 阅读进度键值 + `MetadataPanel` 实例（`67:419`）。large / expanded 用同一套子节点克隆后重排，组件全部复用（`MetadataPanel 41:2497`、`ChapterRow`、`Chip/*`、`NavigationRail`）。
 
@@ -279,7 +283,7 @@ class SupportingPaneLayout extends StatelessWidget {
 
 已关闭：
 
-1. ~~模板与路由的语义冲突~~ → 用户定 A：`41:2384` 改造为详情模板；书库列表页保持「列表 → 独立详情路由」，不做 inline list-detail。
+1. ~~模板与路由的语义冲突~~ → 书库列表页保持「列表 → 独立详情路由」，不做 inline list-detail；详情页最终走文档流（`09` §11.5），不使用常驻支撑栏。
 2. ~~expanded 主区 512 是否够~~ → 实测够用，代价是元数据删「共 24 话」（§5）。
 3. ~~360 vs 412~~ → 按官方分档：expanded 360、large/XL 412。
 4. ~~`MetadataPanel` 320 vs 360 栏~~ → expanded 支撑栏暂不放元数据卡；出 312 版后再放。
