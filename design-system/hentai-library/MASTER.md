@@ -98,9 +98,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - 页面 `01 Tokens`（`9:9`）：6 个 collection `Theme/{A,B,C} · {Light,Dark}`（id 见 `05-color-directions.md` §2）。
 - 方向预览：A `10:308`、B `10:357`、C `10:404`，390×844，靠原型 `粉色方案 A/B/C` 切换；A 为起点。
 - 暗色预览：`A · 柔和玫瑰 · Dark Preview` `13:578`（y=1020），53 填充 + 2 描边绑定 `Theme/A · Dark`；切换器已隐藏、不参与原型。
-- 预览只用于色彩评审，不是首页版式交付。
-
-![A 柔和玫瑰 · 暗色预览](../research/material-design-3/assets/dark-preview.png)
+- 预览只用于色彩评审，不是首页版式交付。仓库不存截图，直接在 Figma 看节点 `13:578`。
 
 ## 3. 排版
 
@@ -128,9 +126,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 - tracking 采用 material-web v0.192 值，与 Flutter `englishLike2021` 对齐；与 Compose tokens 有 3 处冲突（display-large、title-medium、body-medium），已选 web/Flutter 一侧。
 - Figma 样式名与 token 同名（`display-large`、`display-large-emphasized`），无分组前缀，便于交接时直接搜 token。
-- 样张 frame `10:577`（页面 `02 Styles`）：左 baseline / 右 emphasized，30 行全量对照。
-
-![30 个 M3 Text Style 样张](../research/material-design-3/assets/type-scale.png)
+- 样张 frame `10:577`（页面 `02 Styles`）：左 baseline / 右 emphasized，30 行全量对照；仓库不存截图。
 
 ### 3.2 字体映射
 
@@ -303,19 +299,20 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 建库顺序：variables → text/effect/grid styles → primitives → patterns → templates × 断点 → screens → states/content → docs。
 
-### 6.1 首批页面
+### 6.1 首批页面（节点索引，仓库不存截图）
 
-首页与阅读器的四档出图（完整五档见 07 模板）：
+截图不入库（避免仓库被位图撑大），直接在 Figma 文件 `Hentai Library UI  (Material Design) v2` 里按节点 id 查看：
 
-![首页 1440](../research/material-design-3/assets/screen-home-large-1440.png)
+| 页面 | Large 1440 | Expanded 1024 | Medium 600 | Compact 390 |
+|---|---|---|---|---|
+| 首页 | `41:2026` | `41:2209` | `41:2160` | `41:2314` |
+| 阅读器 | `41:2097` | `41:2275` | `41:2139` | `41:2363` |
+| 书库模板 | `41:1578` | `41:1774` | `41:1824` | `41:1975` |
+| XL 三栏书库 | `41:2384` | — | — | — |
+| 设置 | `48:2663` | — | — | `48:2710` |
+| 历史 | `48:2749` | — | — | `48:2803` |
 
-![首页 600](../research/material-design-3/assets/screen-home-medium-600.png)
-
-![阅读器 1440](../research/material-design-3/assets/screen-reader-large-1440.png)
-
-![阅读器 390](../research/material-design-3/assets/screen-reader-compact-390.png)
-
-![书库 XL 三栏](../research/material-design-3/assets/template-library-extra-large-1920.png)
+四个 P0 文档页的样张同样只在 Figma：Tokens 总览 `25:689`、Effect/Grid `25:1234`、Foundations `25:1314`、Material Symbols `25:1374`、Components Proof `25:1428`、Patterns Proof `41:1956`、States & Content Lab `41:2520`、Motion `48:2574`、Handoff & A11y `48:2610`。
 
 ## 7. 组件清单（规划）
 
@@ -387,6 +384,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | D8 图标 | Material Symbols，outlined 默认 / filled 选中；代码迁移时替换 Lucide |
 | 数值 token | `Number` 集合 44 项（spacing/radius/size/state/breakpoint/icon/elevation）建成；spacing 4/8 体系获用户批准 |
 | Styles | 6 个 Effect Style（elevation/level0–5）与 5 个 Grid Style（四档栅格 + 8pt baseline）建成；02 页出对照卡 |
+| 仓库不存截图 | 删除 `design-system/research/material-design-3/assets/` 下 42 张 PNG；MASTER 内的图片引用改为节点索引（§2.5、§3.1、§6.1）；截图仅在 Figma 内查看，`design-system/example.png` 保留 |
 | 01–04 文档页 | Tokens 总览、Effect/Grid、Foundations 规则、Material Symbols 图标页建成并截图 |
 | 05 打样 | Button/Filled、IconButton/Standard、TextField/Filled 三个 COMPONENT 建成并完成变量绑定；证明 token 可落地，variant 矩阵未展开 |
 | 组件状态矩阵 | 定 P0 五态（default/hover/pressed/disabled/selected）、P1 两态；focus 用焦点层，不进 variant；其余组合交给 component properties |

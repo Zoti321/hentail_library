@@ -23,6 +23,7 @@
 - 因此 **M3 规范页的原始 dp/字号/透明度数值大多没拿到**；文档中的数值主要来自官方实现源码（B 级），并与规范页可抓到的文字交叉验证。
 - 设计稿阶段可以接受 B 级数值（最终落点是 Flutter），但凡是「规范值 vs 实现值」不一致处，文档已并列记录（如 type scale 的 3 处 tracking、rail destinations 3–7 vs 3–5）。
 - 未能从官方文档确认的项：drawer modal/standard 判定、dialog vs full-screen、snackbar/badge/tooltip 取舍、chips/cards/carousel 官方分类、Switch/Radio 尺寸、M3 桌面快捷键、spacing 数值、grid margin/gutter 数值、navigation bar/rail 的精确 dp、图标推荐尺寸 20/24dp 等。详见各文档「证据薄弱」节与 `04` §7。
+- 截图不入库：本目录 `assets/` 下的 42 张 PNG 已删除，样张与页面图只在 Figma 文件里按节点 id 查看（索引见 `../../hentai-library/MASTER.md` §6.1）。
 - `m3.material.io/components/navigation-rail/specs` 是 JS 渲染（抓取仅 109 字符），rail 尺寸表缺失；collapsed pill 56×32 有实现值佐证（B），expanded pill 101×56 与行距 68 由官方截图按 2× 反推（B），rail 宽 256 为项目取值。规范文字部分（indicator 贴合内容、命中区整行、menu/FAB/badge/divider 位置、label 规则、文字缩放行为）来自 overview / guidelines / accessibility 三页原文（A）。
 
 ## 合并后的核心结论

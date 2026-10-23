@@ -74,3 +74,6 @@ development.md
 .claude/
 app/.flutter_tool_state
 /dist_installer/
+
+# Agent 临时脚本与截图
+.scratch/
