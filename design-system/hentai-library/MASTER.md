@@ -270,6 +270,13 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - **桌面底板（画布层，非 token）**：≥1200dp 的帧加底板（帧外扩 24、圆角 20、填充 `#EAE8E6`）+ 窗口 chrome（圆角 12、1dp `outlineVariant`、`0/2/6 @12%` 投影）。`#EAE8E6` 不在 46 个颜色角色里，代码中禁止使用。
 - **pane 容器规则（2026-10-23 已全量铺开）**：≥600dp 的帧一律「帧底 `color/surfaceDim`（暗色 `surfaceContainerLowest`）→ rail（`color/surfaceContainer`，与 NavigationBar 同角色）→ 16 画布底 → pane（圆角 20、`color/surface`，右/下各留 16）」，pane 内内容自带 16–24 padding；**compact（<600dp，实际只在移动端出现）pane 全出血**：pane = 整帧 (0,0,W,H)、圆角 0、帧自身无圆角/描边/阴影，顶栏条与 NavigationBar 同样满宽——移动端没有窗口外壳，不要再套桌面留白。阅读器是例外：全出血阅读面 + toolbar / bottom bar 浮层，不套 pane。已套用：07 书库四档 `41:1578`/`41:1774`/`41:1824`/`41:1975` 与详情五档；08 非阅读器帧全部（pane id `74:1387`–`74:1398`）。
 - **supporting pane 宽**：expanded **360**（官方 A 级）；large / XL **412**（官方 A 级）。旧文档统一写 360 是漏了 large/XL 的默认值，已按 `07-supporting-pane.md` §4.1 修正。
+- **断点内边距与字号（2026-10-23 修正，25 帧全覆盖）**：
+  - pane 外边距：medium(600) / expanded(1024) = **24**（pane = (rail 右缘 + 24, 24)，尺寸 = 帧宽 − rail − 48 × 帧高 − 48）；large(1440) / XL(1920) 沿用既有 16（large 已验收，本轮未动）。
+  - pane 内 content = **水平 24 / 顶部 16**（medium / expanded / large）；compact 全出血，content 16。
+  - 页面标题字号：large / XL **32**、expanded **28**、medium **24**、compact **24**；详情页标题单独一档 22 / 22 / 20 / 18（不跟页面标题走）。
+  - 长文本（路径、URL 等）按 content 右缘截断：600 → 324、390 → 262，禁止越出 pane。
+  - medium 的详情页是**滚动视口**：内容可以低于 pane 底缘表示还能滚，不要为了塞进去压缩字号或行距。
+  - 复核口径：每帧脚本检查 `contentIn`（首个子节点 x/y）、`contentMax`（max x+w / y+h）与 `outsidePane`，三者必须落在 pane 内（滚动视口末行例外）。
 
 ### 5.2 官方分栏与导航矩阵
 
@@ -458,11 +465,13 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 17. **collapsed rail 的文字标签**：Figma 里对 80 宽实例逐个 override 隐藏了 `首页/书库/历史/设置` 文字与左侧 1px 分隔线（实例级，不进组件）；Flutter 侧对应做法是 icon + tooltip，需在迁移任务里写明。
 18. **圆角三层**：画布底板 20 / 窗口 frame chrome 12 / pane 20 / 卡 16 目前并存；底板与 frame 是「画布演示层」，pane/卡 才是产品层。评审若认为底板 20 会被误读成产品圆角，改成 12 或去掉。
 19. ~~**阅读器不套 pane**~~（**已关闭，2026-10-23**）：用户定「阅读器页面暂时不做设计稿，阅读页要走沉浸式」，四帧（`41:2097`/`41:2275`/`41:2139`/`41:2363`）与底板 `67:782` 已从 08 移到 `12 Archive`，不再参与本批评审；恢复时按全出血 + 浮层 toolbar 重做，不套 pane。
-20. **medium / compact 的 pane 内边距未统一**：现内容按 16 内边距排（pane 到内容），桌面档为 24；本轮只统一结构，padding 统一放到迁移时按 `space/*` token 处理。
+20. ~~**medium / compact 的 pane 内边距未统一**~~（**已关闭，2026-10-23**）：600 / 1024 全部改成 pane 外边距 24 + 内容水平 24 / 顶部 16（compact 保持全出血 + 16）；字号同步成 32 / 28 / 24 / 24 四档，详见 §5.1「断点内边距与字号」。1440 / 1920 沿用既有 16 外边距（large 已验收），如评审要求全站统一到 24，需要再动 5 个 1440 帧 + 1 个 1920 帧。
 21. **中性色相与参考图不同方向（已确认不是档位问题）**：与 `example.png` 逐像素比，L\* 档位已对齐（窗口底 87.0 vs 参考 rail 87.0；pane 98.1 vs 内容 97.9；卡片 96.0 vs 卡片 96.1），但色相相反——参考中性色 `a*≈-2.4, b*≈+4.6`（偏绿灰，C\*≈5.2），本项目 A 板 `a*≈+6.0, b*≈+1.6`（偏玫瑰粉，C\*≈6.2）。这是 D3「A 柔和玫瑰 + neutral chroma 6」的既定结果，**不是 tone 用错**。若要更接近参考的灰，需重生成 neutral 调色板（chroma 2–3 或色相归零），会改动 46 个 hex，属换调色板决策。
 22. ~~**rail 用透明度调色**~~（**已关闭，2026-10-23**）：用户提出「透明度也是一种影响因素」。按 CIELAB 算，surface(98.08) 叠在窗口底(86.99) 上：α=0.4→91.59（≈containerHigh 91.93）、α=0.6→93.54（≈container 94.04）、α=0.7→94.83（≈containerLow 95.97）——透明度只是在两档 tone 之间插值，落地必然等于某个既有角色（C）。所以直接用不透明 token 选档，也更符合官方「同一 region 跨断点同角色」（A）。最终 rail 定 `surfaceContainer` 94.0（变量 `color/surfaceContainer`；曾建别名 `color/desktop/rail`，2026-10-23 已删除）。
 23. ~~**NavigationRail 右侧 1dp 边框**~~（**已关闭，2026-10-23**）：根因是 rail 组件内一个 1dp `divider` 子矩形（8 个变体各一，`41:1541`/`41:1559`/`41:1652`/`41:1669`/`41:1686`/`41:1703`/`41:1721`/`41:1739`，fill `outlineVariant`），已在**组件源**关闭（实例继承），19 个实例复查全部隐藏；07 里两条残留列间分隔线 `41:1616`/`41:1795` 同批隐藏。
 24. **画布标签是画布层**：07/08 两页的列头与行名文字（`74:1399`–`74:1416`）仅用于评审阅读，不进产品、不做 token。
+25. **medium 详情是滚动视口**：600 详情（`72:961` / 08 `72:1250`）按 800 高窗口出图，资源 KV 末行「添加时间」落在 pane 底缘外 5dp（y=762–781，pane 底 776），属滚动继续的表现；若评审要求首屏完整，需减内容而不是压字号。
+26. **1440 / 1920 的 pane 外边距仍是 16**：与 600 / 1024 的 24 不一致（`41:2026`/`48:2663`/`48:2749`/`41:1578` 等），因 large 已验收、本轮未动。要统一需把 5 个 1440 帧 + 1 个 1920 帧整体 +8（顶/左）/−8（右），属下一轮批量改。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -477,6 +486,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | D8 图标 | Material Symbols，outlined 默认 / filled 选中；代码迁移时替换 Lucide |
 | 数值 token | `Number` 集合 44 项（spacing/radius/size/state/breakpoint/icon/elevation）建成；spacing 4/8 体系获用户批准 |
 | Styles | 6 个 Effect Style（elevation/level0–5）与 5 个 Grid Style（四档栅格 + 8pt baseline）建成；02 页出对照卡 |
+| 断点内边距与字号（2026-10-23） | 25 帧审计：pane 外边距 16/8(Home)/24 三种混用 → medium/expanded 统一 24；content 内边距 8/16/24 三种 → 水平 24 / 顶部 16；页面标题 24–32 混乱 → 32/28/24/24 四档（详情 22/22/20/18）。逐帧改 Home/Settings/History/Library 的 1024 与 600、Library 1440、详情 600 的「展开全文」重叠与 1440/1920 标题框越界；07 九帧、08 十六帧重叠仍为 0 |
 | 仓库不存截图 | 删除 `design-system/research/material-design-3/assets/` 下 42 张 PNG；MASTER 内的图片引用改为节点索引（§2.5、§3.1、§6.1）；截图仅在 Figma 内查看，`design-system/example.png` 保留 |
 | 01–04 文档页 | Tokens 总览、Effect/Grid、Foundations 规则、Material Symbols 图标页建成并截图 |
 | 05 打样 | Button/Filled、IconButton/Standard、TextField/Filled 三个 COMPONENT 建成并完成变量绑定；证明 token 可落地，variant 矩阵未展开 |
