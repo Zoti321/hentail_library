@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/domain/library/library_change.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/comic_user_metadata_repository.dart';
 
 /// 浏览侧保存 Comic 元数据草稿的结果。仓储异常仍向上抛，由 UI toast。
 sealed class ComicMetadataApplyResult {
@@ -37,7 +37,7 @@ final class ComicMetadataApplySucceeded extends ComicMetadataApplyResult {
 
 /// 按草稿相对原 Comic 的差异写入用户元数据，并发布 Library change。
 Future<ComicMetadataApplyResult> applyComicMetadataForm(
-  ComicRepository repository,
+  ComicUserMetadataRepository repository,
   ComicMetadataForm form,
   Comic original, {
   required void Function() notifyExternalChange,

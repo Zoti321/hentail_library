@@ -2,17 +2,17 @@ import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.da
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
 
 /// Comic trash / restore / purge 与「已删除」列表查询（ADR-0023）。
 class ComicTrashService {
   const ComicTrashService({
-    required ComicRepository comicRepository,
+    required ComicTrashRepository comicRepository,
     required ReaderSessionPort readerSessionPort,
   }) : _comicRepository = comicRepository,
        _readerSessionPort = readerSessionPort;
 
-  final ComicRepository _comicRepository;
+  final ComicTrashRepository _comicRepository;
   final ReaderSessionPort _readerSessionPort;
 
   Future<void> trashComics(Iterable<String> comicIds) async {

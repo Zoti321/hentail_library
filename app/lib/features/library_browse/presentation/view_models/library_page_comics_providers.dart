@@ -23,7 +23,7 @@ Future<Comic?> libraryComicDetail(Ref ref, String comicId) {
   ref.watch(
     libraryRevisionStateProvider.select((LibraryRevisionState s) => s.revision),
   );
-  return ref.read(comicRepoProvider).findById(comicId);
+  return ref.read(comicLookupRepositoryProvider).findById(comicId);
 }
 
 @Riverpod(keepAlive: true)
@@ -31,5 +31,5 @@ Future<List<Comic>> bulkEditComicsByIds(Ref ref, List<String> comicIds) {
   ref.watch(
     libraryRevisionStateProvider.select((LibraryRevisionState s) => s.revision),
   );
-  return ref.read(comicRepoProvider).findByIds(comicIds);
+  return ref.read(comicLookupRepositoryProvider).findByIds(comicIds);
 }

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
@@ -25,7 +25,7 @@ void main() {
     thumbnailRepo = _FakeThumbnailRepo();
     container = ProviderContainer(
       overrides: <Override>[
-        comicRepoProvider.overrideWith((Ref ref) => comicRepo),
+        comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
         comicThumbnailRepoProvider.overrideWith((Ref ref) => thumbnailRepo),
       ],
     );
@@ -105,7 +105,7 @@ void main() {
   });
 }
 
-class _FakeComicRepo implements ComicRepository {
+class _FakeComicRepo implements ComicLookupRepository {
   final List<String> findByIdCalls = <String>[];
 
   @override

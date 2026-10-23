@@ -2,6 +2,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_apply.dart';
+import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_item_sort_persist.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_change_bus.dart';
@@ -21,7 +22,7 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
     Comic original,
   ) {
     return applyComicMetadataForm(
-      ref.read(comicRepoProvider),
+      ref.read(comicUserMetadataRepositoryProvider),
       form,
       original,
       notifyExternalChange: _notifyExternalChange,
@@ -42,7 +43,7 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
     bool? characters,
   }) {
     return ref
-        .read(comicRepoProvider)
+        .read(comicUserMetadataRepositoryProvider)
         .setMetaLocks(
           comicId,
           title: title,

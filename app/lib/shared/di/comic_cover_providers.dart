@@ -130,7 +130,7 @@ class ComicCover extends _$ComicCover {
         return;
       }
       // Capture deps before the gate wait — provider may dispose while queued.
-      final comicRepo = ref.read(comicRepoProvider);
+      final comicRepo = ref.read(comicLookupRepositoryProvider);
       final thumbRepo = ref.read(comicThumbnailRepoProvider);
 
       await ComicCoverLoadGate.run(() async {

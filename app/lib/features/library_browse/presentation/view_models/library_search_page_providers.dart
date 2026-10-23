@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/domain/models/value_objects/comic_language
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
+import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
@@ -152,7 +153,7 @@ class LibrarySearchPageComicsController
     return switch (query) {
       LibrarySearchKeywordQuery(:final keyword) =>
         ref
-            .read(comicRepoProvider)
+            .read(comicCatalogRepositoryProvider)
             .searchByKeywordPage(keyword: keyword, request: request),
       LibrarySearchMetadataQuery(
         :final mustInclude,
@@ -160,7 +161,7 @@ class LibrarySearchPageComicsController
         :final mustExclude,
       ) =>
         ref
-            .read(comicRepoProvider)
+            .read(comicCatalogRepositoryProvider)
             .searchByMetadataExpressionPage(
               mustInclude: mustInclude,
               optionalOr: optionalOr,

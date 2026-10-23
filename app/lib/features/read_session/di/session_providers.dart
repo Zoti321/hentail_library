@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/di/data_providers.dart';
 final Provider<ReaderSessionService> readerSessionServiceProvider =
     Provider<ReaderSessionService>((Ref ref) {
       return ReaderSessionService(
-        comicRepo: ref.read(comicRepoProvider),
+        comicRepo: ref.read(comicLookupRepositoryProvider),
         pageSource: ref.read(comicPageSourcePortProvider),
         readingHistoryRepo: ref.read(readingHistoryRepoProvider),
         sessionPort: ref.read(readerSessionPortProvider),

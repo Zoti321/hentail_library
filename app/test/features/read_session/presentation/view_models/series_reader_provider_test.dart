@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
@@ -12,7 +12,7 @@ import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 
-class _FakeComicRepo implements ComicRepository {
+class _FakeComicRepo implements ComicLookupRepository {
   _FakeComicRepo(this._titles);
 
   final Map<String, String> _titles;
@@ -108,7 +108,7 @@ void main() {
     });
     container = ProviderContainer(
       overrides: <Override>[
-        comicRepoProvider.overrideWith((Ref ref) => comicRepo),
+        comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
         seriesRepoProvider.overrideWith(
           (Ref ref) => _FakeSeriesRepo(seriesContext),
         ),
@@ -154,7 +154,7 @@ void main() {
       container.dispose();
       container = ProviderContainer(
         overrides: <Override>[
-          comicRepoProvider.overrideWith((Ref ref) => comicRepo),
+          comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
           seriesRepoProvider.overrideWith(
             (Ref ref) => _FakeSeriesRepo(seriesContext),
           ),
@@ -185,7 +185,7 @@ void main() {
       comicRepo = _FakeComicRepo(<String, String>{'solo': 'Solo Title'});
       container = ProviderContainer(
         overrides: <Override>[
-          comicRepoProvider.overrideWith((Ref ref) => comicRepo),
+          comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
           seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo(null)),
           readingHistoryRepoProvider.overrideWith(
             (Ref ref) => _FakeHistoryRepo(),

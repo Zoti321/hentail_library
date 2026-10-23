@@ -5,7 +5,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/named_facet_form_candidate.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
@@ -192,7 +192,9 @@ Future<Map<String, int>> _siblingMatchedNames({
     );
   }
 
-  final ComicRepository comicRepo = ref.read(comicRepoProvider);
+  final ComicLookupRepository comicRepo = ref.read(
+    comicLookupRepositoryProvider,
+  );
   final Set<String> siblingNames = <String>{};
   for (final SeriesItem item in series.items) {
     if (item.comicId == scope.comicId) {

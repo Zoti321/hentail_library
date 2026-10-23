@@ -1,5 +1,7 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/features/library_browse/data/repositories/comic_frb_mapper.dart';
+import 'package:hentai_library/features/library_browse/domain/comic_catalog_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/comic_user_metadata_repository.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
@@ -9,14 +11,20 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
 /// Sentinel passed to Rust when the user clears published date.
 const int _kComicPublishedAtClearSentinel = -1;
 
 /// 漫画主表持久化；读写均经 Rust/SeaORM。
-class ComicRepositoryImpl implements ComicRepository {
+class ComicRepositoryImpl
+    implements
+        ComicLookupRepository,
+        ComicTrashRepository,
+        ComicCatalogRepository,
+        ComicUserMetadataRepository {
   const ComicRepositoryImpl();
 
   @override
