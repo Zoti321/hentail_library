@@ -86,6 +86,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - **桌面三区映射（large / XL，≥1200dp；官方「大窗口 add-on surface colors」，A）**：导航 rail 用 `surfaceDim`（暗色 `surfaceContainerHighest`）；导航列表与 supporting pane 用 `surfaceContainer`；主内容用 `surface`；面板内卡片 `surfaceContainerLow`（暗色 `surfaceContainerHigh`）。相邻级差亮色 7.0 / 4.0、暗色 10.0 / 6.0，**46 个 hex 一个不改**。**同一个 region 在它所存在的所有断点用同一角色**（官方「跨断点保持映射一致」，A；例如 rail 在 medium / large 都是 `surfaceDim`）。默认**纯 tone、不加线**（`example.png` 实测官方桌面产品即如此）；仅在「两个面板必须同 tone」或高环境光 / 低端屏时按需叠 1dp `outlineVariant`，**可交互边界改用 `outline`**（4.27 / 5.85 ≥ 3:1，而 `outlineVariant` 只有 1.62 / 1.99）。依据 `08` §4.1/§5、`09` §3.4。
 - **tonal elevation 与 pane 互斥**：pane 级容器一律不叠 surfaceTint（`applySurfaceTint = false`）；tonal elevation 只留移动端组件级反馈与桌面浮层（menu / dialog / side sheet）。
 - **桌面口径（硬，评审按此判定；完整版见 `08` §0.0）**：**T1 结构**——≥1200dp 的并列 pane 必须显式按区域取角色（rail `surfaceDim` / 列表与 supporting pane `surfaceContainer` / 内容 `surface`），以「区域」为参数而非以组件为参数；**T2 阈值**——相邻并列区域 ΔL\* 亮色 **< 4**、暗色 **< 6** 时必须叠 1dp `outlineVariant` 或提一档角色，**2 个 L\* 的档差不算分隔**；**T3 边界**——46 个 hex 不改、只新增 `stroke/hairline` 1dp 与 `stroke/focus` 2dp、阴影只给浮层 level 2–5 且 tint 全关、不回退 elevation-tint。桌面底板 `#EAE8E6` 是画布层，**不在 46 角色内**。
+- **桌面窗口与 pane 取色（窗口底色规则，用户偏好 B 级）**：窗口底与 rail 同色 = `surfaceContainerHigh`（`#F5E4E5`），内容 pane = `surface`（`#FFF8F7`），pane 内顶栏条 / 列表面板 / pane 内卡片 = `surfaceContainerLow`（`#FFF0F1`），supporting pane = `surfaceContainer`（`#FBEAEB`），输入框 / 浮起卡 = `surfaceContainerLowest`（`#FFFFFF`）。**pane 之间用 24dp 的窗口底间隙分隔**，不靠相邻 tone 硬拼（参考图里 18px 间隙即此手法，B）。与上一条「三区映射」不冲突：三区映射是「没有窗口底、pane 直接相邻」时的取法；有窗口底时 rail 用 `surfaceContainerHigh`（亮 91.9）而不是 `surfaceDim`（87）。已知张力：支撑栏 94 对窗口 91.9 只有 2.1 L\*（低于 T2 的 4），评审时按需给支撑栏边缘 1dp `outlineVariant`。
 
 ### 2.4 对比度（WCAG，计算值）
 
@@ -261,7 +262,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 **Supporting pane**（详情页元数据、阅读进度）：compact/medium 放 primary **下方**（compact 可用 bottom sheet，A 级原文）；expanded 起转 leading/trailing 固定 **360dp**；large / XL 官方默认 **412dp**（A）。pane 间 spacer 24dp、外侧 margin 24dp（A）；本项目三档详情模板就取 24（不取参考图的 0），见 §5.1 页脚。**父子关系一律改用 list-detail**（supporting pane 不是父子导航）。
 
 - 判据（`07` §2）：**「换对象 = list-detail；换视角 = supporting pane」**。同一对象的切面（元数据、进度、评论）才进 supporting pane。
-- **本项目采纳（用户决策 m00431）**：`/comic/:id`、`/series/:id` 等详情路由**共用同一个详情模板**——主区（封面 + 标题 + 元数据 + 简介 + CTA + 章节目录）+ trailing 支撑栏（阅读进度、元数据卡）；compact/medium 时支撑内容落到 primary 下方（官方 A），expanded 起转 trailing 固定栏。
+- **本项目采纳（用户决策 m00431）**：`/comic/:id`、`/series/:id` 等详情路由**共用同一个详情模板**——主区（封面 220 + 标题 + 概要 + 阅读/隐身阅读 CTA + 简介 + 元数据 chip 行 + 资源 KV）+ trailing 支撑栏（阅读进度、资源信息）；compact/medium 时支撑内容落到 primary 下方（官方 A），expanded 起转 trailing 固定栏。
 - **书库列表页不走 inline list-detail**（用户决策）：保持「列表 → 独立详情路由」，所以 `41:2384` 改造为详情模板、不再有列表栏。
 - **设置页走 inline list-detail**（用户决策）：设置根页双栏（分类 + 内容，阈值 **≥840**），二级页（阅读 / 外观 / 数据）单栏；官方 key use cases 原文 `Settings + category detail` 归 list-detail，代码现为 600，需改 840。
 - **不采纳**：阅读器 + 章节目录（无章节模型、无页缩略图管线、与沉浸式冲突 → 改「可召唤浮层 ≤360」，见 §5.4）。
@@ -275,7 +276,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 |---|---|---|---|---|
 | 首页 Home | feed 单列 | feed 2 列 | feed 3 列 | feed 4–5 列，内容限宽 |
 | 书库 All libraries | 列表 → 详情路由 | 列表 → 详情路由（**不做 inline list-detail**） | 列表 → 详情路由 | 列表 → 详情路由；详情页走 §5.3 |
-| 单本详情 Library | 单栏（元数据与阅读进度在下方） | 单栏（同 compact） | **supporting pane trailing 360**（主区 512） | supporting pane trailing **412**（主区 large 876 / XL 1180，XL rail 例外用 256） |
+| 单本详情 Library | 单栏：封面 220 + 标题/概要/操作/简介 → 元数据 chip → 资源 KV（**无章节列表**） | 单栏（同 compact） | **supporting pane trailing 360**（主区 512） | supporting pane trailing **412**（主区 large 876 / XL 1180，XL rail 例外用 256）；两版待评审：`67:509` 支撑栏版 / `69:813` 卡组版 |
 | 阅读器 Reader | 全屏单栏 | 全屏单栏 | 全屏 + **可选浮层 ≤360**（非常驻栏） | 同 expanded，阅读区限宽 |
 | 历史 History | feed 单列 | 2 列 | 2 列 + 详情 | 双栏 |
 | 搜索 Search | 单列结果 | 2 列 | 2 列 | 3 列，筛选常驻 |
@@ -419,6 +420,9 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 10. **详情页 rail 256 与 80 的对比**：XL 详情按用户指定用了 expanded 256，large/expanded 用 collapsed 80。需在 1920 上各出一版看详情 1180 是否过宽。
 11. **`ChapterRow` 的「已读」不随行宽右对齐**：组件内固定 x=312，实例加宽后（XL 1132 / large 828）停在偏左；实例内子节点不能单独移动，需改组件布局属性。
 12. **桌面底板 `#EAE8E6` 的定位**：现作为画布层（非 46 角色之一），是否要升为正式 token（例如 `color/canvasShell`）待评审——若升，需同时定暗色值。
+13. **详情页 A/B 选型**：`67:509`（supporting pane 412 版）与 `69:813`（三卡分组版，无支撑栏）已出图，等设计评审定一版再回灌 07/08 全档。
+14. **窗口底色规则与 08 T1/T2 的坐标差**：窗口底 / rail 用 `surfaceContainerHigh`（91.9）替代 08 的 `surfaceDim`（87）是用户偏好；支撑栏 94 对窗口 91.9 只有 2.1 L\*（T2 要求 ≥4），需评审决定加 1dp `outlineVariant` 还是把支撑栏改 `surfaceContainerLow`。
+15. **Home / Reader 页仍残留 `ChapterRow` 占位**（`9:16` 10 个实例，`41:2026` / `41:2097` 等）：应用无章节模型，需重做成「漫画卡 / 最近阅读」后一并删组件定义。
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -470,3 +474,6 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 详情 Screens 行 | 08 Screens 加第 5 行 `Detail`（y=4000）：`67:587`(1440) / `67:649`(1024) / `67:677`(600 单栏) / `67:752`(390 单栏)；600/390 的元数据与阅读进度落到主内容下方（官方 compact/medium） |
 | 桌面底板 | ≥1200dp 帧加画布层底板（外扩 24、圆角 20、`#EAE8E6`）+ 窗口 chrome（圆角 12、1dp `outlineVariant`、`0/2/6 @12%` 投影，OS 层不进 M3 elevation）：07 模板 `67:749`/`67:750`/`67:751`，08 `67:781`–`67:785`；两页顶层帧重叠数仍为 0 |
 | §5 布局依据回填 | 用户决策（书库不走 inline list-detail、设置走 ≥840、支撑栏按官方 expanded 360 / large·XL 412、详情模板共用）写入 §5.3；§5.4 书库行改「列表 → 独立详情」；§5.1 模板进度与栏宽换成实际三栏详情几何 + 桌面底板规则；§6.1 索引表补详情行与模板 id；§9 关闭书库阻塞项并新增 4 条未决 |
+| 详情页按应用真实结构改版 | 用户对照应用截图指出：应用是「系列详情页 + 网格」读多本漫画，**没有章节模型**。详情模板改为应用真实结构：顶栏（返回 / 更多 / 编辑 / 系列内 ‹ 3 / 5 ›）+ 封面 220 + 标题 22 + 概要（语言 ｜ 页数 · 日期）+ 阅读/隐身阅读 + 简介 4 行 + 元数据 chip 行（作品/作者/角色/标签）+ 资源 KV（格式/大小/路径/更新时间）；删光所有章节目录与 `ChapterRow` 实例（XL `41:2384`、`67:431`、`67:587`、`67:649`、`67:677`、`67:752` 共 15 个节点） |
+| 窗口底色规则 | §2.3 新增「桌面窗口与 pane 取色」：窗口底/rail = `surfaceContainerHigh`、内容 = `surface`、顶栏条/列表/卡片 = `surfaceContainerLow`、支撑栏 = `surfaceContainer`、输入/浮起卡 = `surfaceContainerLowest`；pane 之间留 24dp 窗口底间隙而非相邻 tone 硬拼。参考图逐像素取样：`#F6E4E3`≈containerHigh、`#FFF0EF`≈containerLow、`#FFF8F7`=surface、`#FFDAD9`≈primaryContainer（B 级，`09` §11） |
+| 详情页两版对照 | `67:509` 改为 A 版（supporting pane 412 + 窗口底/顶栏分色）；新增 `69:813` B 版（1440，无支撑栏，底部三张 `surfaceContainerLow` 圆角卡：元数据 / 资源 / 进度，卡宽 400）。07 顶层 8 帧重叠 0；截图只在 Figma 内查看 |
