@@ -701,7 +701,7 @@ get_node(frameId) 返回整帧递归树（characters / fontSize / x / y / width 
 | 行 | y | 组件（x=320 起） |
 |---|---:|---|
 | 操作 Actions | 200 | Button `39:1481` 660×140、FAB `41:1886` 456×96（x=1020） |
-| 输入 Input | 440 | SearchBar `48:2651` 360×56 |
+| 输入 Input | 440 | SearchBar 组件集 `79:1980`（State=Rest `48:2651` / State=Focused `79:1976`，各 360×56） |
 | 选择 Chip | 640 | Filter `79:1721` 202×32 / Assist `79:1732` 80 / Suggestion `79:1733` 62 / Input `79:1734` 88（gap 60）；状态样张 `79:1753` 780×140 @ y=760 |
 | 卡片与列表 Card & List | 1020 | Card `41:1933` 840×160、ListItem `41:1920` 1240×88 @ y=1260 |
 | 覆盖层 Overlays | 1460 | Dialog `41:1939` 320×220、Snackbar `48:2662` 344×48（x=700）、TopAppBar `48:2658` 960×64（x=1100） |
@@ -711,6 +711,39 @@ get_node(frameId) 返回整帧递归树（characters / fontSize / x / y / width 
 - 左列宽 260（x=0）：页标题 20 Semibold、副标题 13 Regular、7 个行名 16 Semibold；每个组件下方 13 Regular caption（组件名 · 变体/尺寸），全部绑 `color/onSurface`（`10:52`）或 `color/onSurfaceVariant`（`10:60`），只有画布语义、不进产品。
 - 复核：40 个顶层节点两两求交 **overlap 0**（第一版 Filter 说明 320 宽压到 Assist 说明，已收窄到 260 并换行）。
 - 组件本身就是整高元素（rail 变体分别 80/256 宽、与画布同高），所以导航行下半部是大片空白，属预期。
+## 12. SearchBar 焦点态变体（2026-10-23）
+
+用户给 Gmail 顶部搜索框的两张截图（focus / rest）后要求「参考图一给 Components SearchBar 设计焦点态变体，尾部的按钮不必参考」。
+
+### 12.1 截图实测（B，Pillow 取样）
+
+| 帧 | 页面底 | 容器填充 | 边界 | 说明 |
+|---|---|---|---|---|
+| 常态（图二） | `#F8FAFD` (248,250,253) | `#E9EEF6` (233,238,246) | 无描边 | 填充即容器边界 |
+| 焦点（图一） | `#F8FAFD` | `#FFFFFF` 白 | 约 `#DADCE0`≈1–2px + 上缘浅投影 | 由「灰底」转「白底 + 细边」 |
+
+- 尾部筛选图标是 Gmail 自有功能，按用户要求**不做**。
+- 边界对比度：`#DADCE0` 对白 **1.37:1** —— 远低于本项目 `outline`（**4.48:1**），接近 `outlineVariant`（对白 **1.70:1** / 对 surface **1.62:1**）。
+
+### 12.2 落进组件（已执行）
+
+`SearchBar` 由 COMPONENT 升级为 COMPONENT_SET `79:1980`（744×56，位于 05 页 (320,440)）：
+
+| 变体 | id | 容器填充 | 描边 | 结构 |
+|---|---|---|---|---|
+| `State=Rest` | `48:2651` | `surfaceContainer`（`10:57`，L\*94.0） | 无 | 24 搜索图标 @16,16 + 占位文本 14 @56,18 |
+| `State=Focused` | `79:1976` | `surfaceContainerLowest`（`10:55`，#FFFFFF） | 1dp `outlineVariant`（`10:62`）INSIDE | 同结构，文字/图标不变 |
+
+- 两变体各 360×56、圆角 28，并排 x=0 / 384（gap 24）。
+- **为什么用 `outlineVariant` 而不是 `outline`**：参考图的边界只有 1.37:1，`outline` 的 4.48:1 会明显重于参考；`outlineVariant` 1.70:1 与参考同量级又略强，在白底上仍能看出边缘。若评审认为不够清晰，切 `outline` 即可（值不变，只换绑定）。
+- 未加投影：本项目桌面规则是「纯 tone 分隔、容器不加阴影」，Gmail 焦点态上缘的浅投影属于其自身 elevation 体系。
+- 与 chip 的关系：`Chip/Filter` 用的是 `outline`（交互边界 ≥3:1），SearchBar 是「填充转白 + 细边」，两者都成立但语义不同，迁移时不要共用同一个 outline 常量。
+
+### 12.3 未决
+
+1. `outlineVariant` 1.70:1 在低端屏/高环境光下是否够辨识（与 08 §6 的同类未决合并）。
+2. 焦点态是否需要在键盘导航时再加 2dp `primary` 环（Gmail 无，M3 状态层有）；MVP 先不加。
+3. 深色主题的焦点态未出样张（应为 `surfaceContainerLowest` 暗值 `10:102` + `outlineVariant` 暗值 `10:122` 一类，待补）。
 
 
 
