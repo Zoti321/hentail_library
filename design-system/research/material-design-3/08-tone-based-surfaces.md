@@ -50,6 +50,8 @@
 
 > 换句话说：**「桌面端需要比移动端更大的级差」与「tone-based 更适合桌面端」是同一件事的两面**——正因为桌面要靠 tone（而不是靠阴影）表达层级，才需要动用官方为大屏开的区域级 add-on 能力把级差拉开。
 
+> **2026-10-23 晚修订（落实后）**：区域映射的 rail 一项由 `surfaceDim`（87.0）改为 `surfaceContainer`（94.0），并且**窗口底与 rail 同色**（用户看线框稿后要求「窗口底色就用 NavigationRail 的背景色」），`surfaceDim` 退出窗口用途。因此下文 §0/§4.1 里「rail → surfaceDim」「窗口底 surfaceDim」的取值以 §5「已落地」与 `MASTER` §2.5/§2.6 为准；级差也随之变化：**rail↔pane 4.0**（仍过 T2 的 ≥4）、rail↔窗口 0（靠 24dp 画布缝与 pane 圆角认边界）。模型与推理不变，只换了落地档位。
+
 ---
 
 ## 1. Tone-based surface 体系到底是什么
@@ -487,7 +489,7 @@ _kAmbientShadowOpacity= 0x1F000000  // alpha 0.12
 
 **统计（推荐方案）**：**新增 2 个 token（均为数值，其中 `stroke/hairline` 默认关闭）＋ 扩用 2 个既有颜色角色（值不变）＋ 2 条规则变更（阴影使用范围；§4.1 区域级映射）；颜色角色新增 0、颜色值变更 0。**
 
-**已落地（2026-10-23，B）：区域直接绑 46 角色，不建别名分类。** §4.1 的区域映射不新增变量、不写死 hex：模板/页面把每个区域直接绑到 `Theme/A · Light` 的角色——窗口底 `surfaceDim`（`10:53`）、pane `surface`（`10:51`）、顶栏条/卡 `surfaceContainerLow`（`10:56`）、输入 `surfaceContainerLowest`（`10:55`）、**rail 与 NavigationBar 共用 `surfaceContainer`（`10:57`）**。暗色同区域绑 `Theme/A · Dark` 的对应角色（窗口底 `surfaceContainerLowest`、pane `surfaceContainer`、顶栏/卡/rail `surfaceContainerHigh`、输入 `surfaceContainerHighest`）。中间曾用 `color/desktop/*` 别名层（Light `71:884`–`71:888` + `75:1683` / Dark `71:889`–`71:893` + `75:1684`），**2026-10-23 按用户要求删除**，86 处填充（07/08 的 19 帧底 + 25 pane + 9 顶栏 + 19 rail 实例 + 8 rail 变体）改为直绑角色；理由：`01 Tokens` 应保持唯一色彩来源，多一层分类会让变量面板出现两套命名。官方「同一 region 跨断点必须同角色」（A，见 §1.6）由「同一区域始终绑同一角色」保证，不依赖别名。透明度方案经计算否决（只是相邻两档间的插值），区域映射应直接选档、不要半透明叠加层。数值 token 只保留 `radius/pane` 20（`71:894`）。若实机验证后仍偏平，再启用第 7/8 行（Light 改 5 个 tone、Dark 改 4 个）+ 可能第 9 行。
+**已落地（2026-10-23，B）：区域直接绑 46 角色，不建别名分类。** §4.1 的区域映射不新增变量、不写死 hex：模板/页面把每个区域直接绑到 `Theme/A · Light` 的角色——**窗口底与 rail 同色 `surfaceContainer`（`10:57`，94.0；2026-10-23 晚用户定「窗口底色就用 NavigationRail 的背景色」，`surfaceDim` 退出窗口用途，§4.1 表里的 rail=`surfaceDim` 以本句为准）**、pane `surface`（`10:51`）、顶栏条/卡 `surfaceContainerLow`（`10:56`）、输入 `surfaceContainerLowest`（`10:55`）、**rail 与 NavigationBar 共用 `surfaceContainer`（`10:57`）**。暗色同区域绑 `Theme/A · Dark` 的对应角色（窗口底 `surfaceContainerLowest`、pane `surfaceContainer`、顶栏/卡/rail `surfaceContainerHigh`、输入 `surfaceContainerHighest`）。中间曾用 `color/desktop/*` 别名层（Light `71:884`–`71:888` + `75:1683` / Dark `71:889`–`71:893` + `75:1684`），**2026-10-23 按用户要求删除**，86 处填充（07/08 的 19 帧底 + 25 pane + 9 顶栏 + 19 rail 实例 + 8 rail 变体）改为直绑角色；理由：`01 Tokens` 应保持唯一色彩来源，多一层分类会让变量面板出现两套命名。官方「同一 region 跨断点必须同角色」（A，见 §1.6）由「同一区域始终绑同一角色」保证，不依赖别名。透明度方案经计算否决（只是相邻两档间的插值），区域映射应直接选档、不要半透明叠加层。数值 token 只保留 `radius/pane` 20（`71:894`）。若实机验证后仍偏平，再启用第 7/8 行（Light 改 5 个 tone、Dark 改 4 个）+ 可能第 9 行。
 
 **为什么 `borderStrong` 的 tone 是 60/41**（B，计算，写出来以便复核）：要让某个边界色对 `surface` 达到 3:1，解 `(Ysurf+0.05)/(Yb+0.05)=3`：
 - Light：`Y(#FFF8F7)=0.95110` → `Yb=(0.95110+0.05)/3−0.05=0.28370` → `L∗=60.22`；

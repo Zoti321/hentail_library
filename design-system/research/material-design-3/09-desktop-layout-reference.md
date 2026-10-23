@@ -583,6 +583,59 @@ get_node(frameId) 返回整帧递归树（characters / fontSize / x / y / width 
 - 没有改任何 token 值（46 角色、space/*、radius/* 一个未动），本轮只改节点坐标与字号引用；
 - 没有改 Flutter 代码；本文件所有数字都是设计稿坐标（B 级），落到代码要按 space/* token 取整。
 
+## §11.14 2026-10-23 晚第二轮修订：窗口底色、24 外边距、header 与 KV
+
+用户 7 条反馈（m01897，原话摘要）：①窗口底色就用 NavigationRail 背景色；②详情 pane header 子组件未水平对齐；③「展开全文」用 Wrap 语义紧跟简介；④资源 KV value 统一字阶；⑤1440/1920 pane 外边距按 24 并复核 M3 文档；⑥600 详情首屏完整；⑦Settings/History/Library 的 390 逐项复核字号。
+
+### 11.14.1 窗口底色 = rail 色（替代 11.8 的 surfaceDim 方案）
+
+- 19 个桌面帧帧底由 `surfaceDim`（#E7D6D7，L\* 87.0）改绑 `color/surfaceContainer`（`VariableID:10:57`，#FBEAEB，94.0），与 rail / NavigationBar 同色；compact 四帧保持 `surface`。
+- 改后 rail 与窗口底无级差，边界只看 pane（98.1，差 **4.0**，仍满足 T2 ≥4）与 24dp 画布缝。`surfaceDim` 退出窗口用途（MASTER §9 第 27 条）。
+- 这与 `example.png` 的做法不同（参考图 rail 与窗口同面 87.0、pane 97.9，差 **7.05**）：本项目选择「窗口 = rail = 94.0、pane 98.1」，级差从 7.05 收到 4.04，靠圆角与 24 缝补足。用户偏好优先（B）。
+
+### 11.14.2 1440/1920 的 24 外边距
+
+- 官方依据（A，见 `07-supporting-pane.md` §4.1 引文）：medium「margins of 24dp」、expanded「outer margin 24dp / spacer 24dp」。因此 ≥600 全档 24 是规范值，1440 的 16 属于早期实现偏差。
+- 已改：`41:2026`/`48:2663`/`48:2749`/`41:1578` 的 pane → (280,24) 1136×852（rail 256 + 24，右缘 1416），子节点 +8/+8，右对齐项按内容右缘 **1392** 重算（Home search → 992、查看全部 → 1336、三条列表 → 1032）。`72:1083` 原本已是 24。
+
+### 11.14.3 详情 pane header
+
+- 基线：← / 更多 / 编辑 文本高 24，y = pane.y + 16（1440/1024/600 → 40；390 → 16），x 依次 +40 / +96（间距 24）。
+- 右侧 `‹ 3 / 5 ›`（14 Regular，高 20）x = pane.x + pane.width − inset − 51、y = pane.y + 18，inset = 24（390 用 16）。
+- 修前：← 在 y=38、更多/编辑在 42、系列在 42 且未右对齐（600 档系列右缘 457 vs pane 右 576）。
+
+### 11.14.4 「展开全文」紧跟简介（Wrap 语义的 Figma 近似）
+
+- 简介改为 `maxLines` 截断：large/XL/expanded 3 行（高 72）、medium 2 行（48）、compact 3 行（72），行高 24。
+- 按钮 y = 简介底 + 8，x 与简介左缘对齐；不再固定挂在 4 行高度下方。
+- 注意：Figma 做不到「按钮吸附在文本末行行尾、放不下才换行」，只能这样近似；代码侧用 `Wrap`（文本 + TextButton 同一个 flow），行为以代码为准（C）。
+- 副作用修正：1440/1024 上移后元数据块被封面压住，已把元数据及以下整体回移 48，恢复「元数据在封面下方」的原结构。
+
+### 11.14.5 资源 KV 字阶
+
+- 实测修前：value（PDF / 128.4 MB / 路径 / 更新时间）是 **16 Medium**，「添加时间」的 value 是 14 Regular；label 也只有「添加时间」是 Medium。
+- 统一为 label **14 Medium（onSurface）** / value **14 Regular（onSurfaceVariant）**，与代码 `comic_detail_info_sections.dart` 的 bodySm + w500/400 一致；改后视觉层级靠字重与颜色，而不是字号。
+
+### 11.14.6 600 详情首屏
+
+- 简介收到 2 行、后续内容整体 −24，末行「添加时间」落在 pane 内（y≈738 < 776）；MASTER §9 第 25 条关闭。
+
+### 11.14.7 390 字号复核
+
+| 页面 | 修前 | 修后 |
+|---|---|---|
+| 书库 Library 390 `41:1975` | 标题 24 Medium @(16,20) | **24 Bold @(16,16)**，与 Home/Settings/History 一致；列表标题 16 Medium、副标 12 Regular 已合规 |
+| 设置 Settings 390 `48:2710` | 行文本 15 Regular（20 处）、组标题 12 Medium | 行文本 **14 Regular**；组标题保持 12 Medium |
+| 历史 History 390 `48:2803` | 24 Bold / 12 Regular / 12 Medium | 已合规，未动 |
+
+- 遗留：设置 390 没有副标题行（其他三档有）。试补会压到「阅读」组标题（组块整体只留 4dp），需连组一起下移，登记为 MASTER §9 第 30 条。
+
+### 11.14.8 复核
+
+- 07 九帧 / 08 十六帧顶层两两求交：**overlap 0**（改坐标未破矩阵）。
+- 五档详情模板 + 08 四屏截图内联确认：header 同基线、系列右对齐、简介截断 + 展开紧随、KV 字阶一致、600 末行在 pane 内、390 标题 Bold。
+
+
 
 
 
