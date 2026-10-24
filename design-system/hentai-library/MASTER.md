@@ -11,7 +11,7 @@
 | 路径 | 角色 | 是否规范来源 |
 |---|---|---|
 | `design-system/hentai-library/MASTER.md` | 设计系统总纲：决策、token、组件清单、Figma 页面图、代码映射 | **是**（语义与用法） |
-| `design-system/hentai-library/pages/*.md` | 每条路由的版式与状态说明（待重建） | 是（页面级） |
+| `design-system/hentai-library/pages/[page-name].md` | 每条路由的版式与状态说明（待重建） | 是（页面级） |
 | `design-system/research/material-design-3/*` | 一手来源调研、取色记录、Figma API 经验 | 否（证据底稿） |
 | `app/lib/shared/ui/theme/` | 颜色的**数值真源**；`buildAppTheme` 是唯一装配入口 | 是（数值） |
 | `app/lib/shared/ui/layout/` | 断点与壳层布局的代码实现 | 是（布局数值） |
