@@ -1094,7 +1094,51 @@ Frame `81:2017` `SearchBar · Dark (Theme/A · Dark)`，05 页 (1600,2600)，744
 
 ### 13.14.7 未决
 
-- 行首 leading 图标未采纳（参考图有、现有页面与代码 SettingsRow 都没有），见 MASTER §9 第 46 条。
+- 行首 leading 图标**已采纳并落地**（2026-10-23 深夜第三轮）：图标 24×24 @ (16, 行+16)、颜色 `onSurfaceVariant`，标签右移到 x=56；来源与导入方式见 §13.15。
 - 选中态（primaryContainer + onPrimaryContainer）未出样张，迁移前需补一行选中样例。
 - 1 行组的行圆角与 3 行组首行一致（都是上 12），视觉上等价于 Single 全 12，已在模板与屏复核。
+
+
+## 13.15 设置行第三轮：行底色、leading 图标、自适应高度与 states（2026-10-23 深夜）
+
+### 13.15.1 用户口径（原话）
+
+- 「同意你说的 行换 surfaceContainerLow / leading图标后右侧的action可以参考图一 / SettingRow允许根据内容自适应高度 / 补上hover press等态」。
+- 「图标使用GoogleSymbols的图标」；随后追问「怎么在figma中引入图标的，不可以只引用网络链接让figma联网加载吗」，明确「保持现状」。
+
+### 13.15.2 图标为什么只能走矢量导入（B，实测）
+
+| 尝试 | 结果 |
+|---|---|
+| Figma 插件设文本字体 `Material Symbols Outlined` / `Google Symbols` | `INTERNAL_ERROR: The font "… Regular" could not be loaded`（探针文本 `105:809`/`105:810` 已删） |
+| `import_image` 的 `url`（Figma 服务端下载） | 只能出栅格，24px 图标会糊、无法绑颜色变量 |
+| 本机 `web_fetch` 抓官方 SVG | 被代理挡（unpkg / raw.githubusercontent 解析到非公网 IP） |
+| **采用**：从应用依赖的 `material_symbols_icons-4.2960.0/lib/fonts/MaterialSymbolsOutlined.ttf` 抽字形 | `fontTools` + `SVGPathPen`/`TransformPen` 烘成 24×24 viewBox（视觉 20）→ `import_svg` → 单 VECTOR，颜色绑 `onSurfaceVariant` |
+
+已用 8 个 codepoint：format_size `0xe245`、format_line_spacing `0xe240`、swap_horiz `0xe8d4`、dark_mode `0xe51c`、palette `0xe40a`、translate `0xe8e2`、file_upload `0xf09b`、file_download `0xf090`；生成脚本 `.scratch/gen_icons.py`、产物 `.scratch/icons_gs/*.svg`（均未入库）。
+
+### 13.15.3 规格（当前生效）
+
+| 项 | 值 |
+|---|---|
+| 行底色 | `surfaceContainerLow` `10:56`（96.0）；对 pane 100.0 = **4.03**（过 T2） |
+| 行高 | 56；带 supporting text = **72** |
+| leading 图标 | 24×24 @ (16, 行y+16)，`onSurfaceVariant` |
+| 标签 | MiSans 15 Regular `onSurface` @x=56、y=行y+18 |
+| supporting | MiSans 13 Regular `onSurfaceVariant` @x=56、y=行y+40 |
+| 尾随 | 值（15 `onSurfaceVariant`）+ 图标 18：可选行「▾」、导航/数据行「›」；值↔图标 12 |
+| states | Hover `onSurface` 8%；Focus 12% + 2dp `primary` 环；Pressed 12%；Disabled 内容 38% |
+
+### 13.15.4 已执行（B）
+
+- 16 个组、28 个行：四档设置页 12 组（`101:926`/`101:937`/`101:948`、`101:956`/`101:967`/`101:977`、`101:985`/`101:996`/`101:1004`、`101:1012`/`101:1023`/`101:1034`）、Patterns `101:1058`、模板 `101:1042`/`101:861`/`101:869`——行矩形改 96、导入对应图标并绑色、标签 x=56、可选行尾随改「▾」。
+- `SettingsRow` 组件集 `101:925` 四个变体（`101:912`/`101:913`/`101:917`/`101:921`）补 24×24 图标（16,16）、标签 x=56、值 x=365、尾随「▾」x=392，底色改 96。
+- states 样张 `105:902`（520×640，5 行 124 步进）：Enabled / Hover / Focus / Pressed / Disabled；72 高 supporting 样张 `105:946`（460×140）。
+- 图标映射：字体大小=format_size、行距=format_line_spacing、翻页方向=swap_horiz、主题=dark_mode、强调色=palette、语言=translate、导出阅读进度=file_upload、导入备份=file_download、阅读设置=format_size、外观设置=palette、下载设置=file_download。
+
+### 13.15.5 踩坑
+
+- `create_rectangle` 没有 `cornerRadius`、`create_text` 没有 `fontName`/`fontSize` 参数（分别改用 `set_corner_radius`、`set_text_properties`）；放进 `batch` 的 `create_text` 曾静默丢失，改为单独调用。
+- 状态叠加层不能用「绑定变量 + paint opacity」（绑定会把 alpha 覆盖成 1），改为**不透明填充 + 图层 opacity**。
+- `get_node` 的 `children` 顺序与 z-order 直觉相反，叠加层需要按截图验证再调 `reorder_nodes`。
 
