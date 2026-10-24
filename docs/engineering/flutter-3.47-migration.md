@@ -28,7 +28,7 @@
 | `pubspec.lock` | 提交解析结果；`sdks.flutter` 下限会从 `>=3.38.0` 变为 `>=3.47.0` 量级 |
 | 主题 / 色板代码 | 若 MCU 0.13 行为与 0.11 不一致，对照 `MASTER.md` §2 与 `app/lib/shared/ui/theme/` 做视觉回归 |
 
-`build_runner` 后若 analyze 报 freezed `extraneous_modifier`，在升级到 **freezed 4**（需同步 **riverpod_generator 4** 与 **custom_lint** 矩阵）前执行：`./scripts/patch-freezed-dart313.sh`。
+依赖已升至 **freezed 4** + **riverpod_generator 4** + **theme_tailor 4**；`custom_lint` 暂移除（0.8.1 与 analyzer 13 矩阵冲突，待 pub 新版）。若仍用 freezed 3.x，可执行 `./scripts/patch-freezed-dart313.sh`。
 
 验证命令（合并前）：
 

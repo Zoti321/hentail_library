@@ -31,7 +31,7 @@ Future<void> runMetadataImportFlow(
   MetadataImportInvoker? importInvoker,
 }) async {
   final AppLocalizations l10n = context.l10n;
-  final FilePickerResult? picked = await FilePicker.platform.pickFiles(
+  final FilePickerResult? picked = await FilePicker.pickFiles(
     dialogTitle: l10n.settingsMetadataBackupImportPickDialogTitle,
     type: FileType.custom,
     allowedExtensions: <String>['hlmeta.json', 'gz'],

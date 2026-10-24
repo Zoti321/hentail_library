@@ -39,7 +39,7 @@ Future<void> runMetadataExportFlow(
   final String extension = options.gzip ? 'hlmeta.json.gz' : 'hlmeta.json';
   final String defaultName =
       'metadata-${DateFormat('yyyyMMdd-HHmmss').format(DateTime.now())}.$extension';
-  final String? savePath = await FilePicker.platform.saveFile(
+  final String? savePath = await FilePicker.saveFile(
     dialogTitle: l10n.settingsMetadataBackupExportSaveDialogTitle,
     fileName: defaultName,
     type: FileType.custom,

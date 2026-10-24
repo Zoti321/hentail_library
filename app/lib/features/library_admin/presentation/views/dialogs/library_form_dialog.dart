@@ -384,7 +384,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
     if (!mounted) {
       return;
     }
-    final String? directoryPath = await FilePicker.platform.getDirectoryPath();
+    final String? directoryPath = await FilePicker.getDirectoryPath();
     if (directoryPath == null || directoryPath.isEmpty || !mounted) {
       return;
     }

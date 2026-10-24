@@ -29,7 +29,7 @@ Future<void> runLogExportFlow(
 
   final String defaultName =
       'hentai-library-logs-${DateFormat('yyyyMMdd-HHmmss').format(DateTime.now())}.zip';
-  final String? savePath = await FilePicker.platform.saveFile(
+  final String? savePath = await FilePicker.saveFile(
     dialogTitle: '保存日志包',
     fileName: defaultName,
     type: FileType.custom,

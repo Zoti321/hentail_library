@@ -597,7 +597,7 @@ class _AuthorComicCoverCard extends StatelessWidget {
 IconData _platformIcon(AuthorLinkPlatform platform) {
   return switch (platform) {
     AuthorLinkPlatform.pixiv => LucideIcons.palette,
-    AuthorLinkPlatform.x => LucideIcons.twitter,
+    AuthorLinkPlatform.x => LucideIcons.x,
     AuthorLinkPlatform.patreon => LucideIcons.heart,
     AuthorLinkPlatform.fanbox => LucideIcons.brush,
     AuthorLinkPlatform.discord => LucideIcons.messageCircle,
