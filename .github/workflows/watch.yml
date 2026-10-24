@@ -7,7 +7,7 @@ on:
   workflow_call:
 
 env:
-  FLUTTER_VERSION: "3.38.5"
+  FLUTTER_VERSION: "3.47.8"
   FRB_CODEGEN_VERSION: "2.12.0"
   INTEGRATION_TEST: integration_test/pdf_reader_smoke_test.dart
 
