@@ -53,6 +53,7 @@
 > 换句话说：**「桌面端需要比移动端更大的级差」与「tone-based 更适合桌面端」是同一件事的两面**——正因为桌面要靠 tone（而不是靠阴影）表达层级，才需要动用官方为大屏开的区域级 add-on 能力把级差拉开。
 
 > **2026-10-23 晚修订（落实后）**：区域映射的 rail 一项由 `surfaceDim`（87.0）改为 `surfaceContainer`（94.0），并且**窗口底与 rail 同色**（用户看线框稿后要求「窗口底色就用 NavigationRail 的背景色」），`surfaceDim` 退出窗口用途。因此下文 §0/§4.1 里「rail → surfaceDim」「窗口底 surfaceDim」的取值以 §5「已落地」与 `MASTER` §2.5/§2.6 为准；级差也随之变化：**rail↔pane 4.0**（仍过 T2 的 ≥4）、rail↔窗口 0（靠 24dp 画布缝与 pane 圆角认边界）。模型与推理不变，只换了落地档位。
+> **2026-10-23 深夜再修订（提亮一级）**：用户观察「Gmail / Google 系桌面端耐看，背景色大多偏亮」，要求 rail 与 pane 各上调一档。现行映射（以此为准）：chrome（窗口底 / rail / NavigationBar / 标题栏）= `surfaceContainerLow` 96.0、pane = `surfaceContainerLowest` 100.0（纯白）、pane 顶栏条 = `surface` 98.1、卡 / 列表行 = `surfaceContainerLow` 96.0、搜索框 = `surfaceContainerHigh` 91.9。级差 chrome→pane **4.03**、pane→卡 **4.03**（均过 T2）；pane→顶栏条 1.93 属嵌套条、豁免。46 角色 hex 未动，暗色镜像见 §4.1 建议表与 `09` §13.11。
 
 ---
 
@@ -448,24 +449,27 @@ _kAmbientShadowOpacity= 0x1F000000  // alpha 0.12
 
 ### 4.1 主通道具体取值：区域级 add-on surface 映射
 
-**亮色（chrome 往暗走）**
+**亮色（最终版，2026-10-23 深夜「提亮一级」后）**
 
 | 区域 | 角色 | hex | L\* | 与相邻区级差 |
 |---|---|---|---:|---:|
-| 导航 rail | `surfaceDim` | `#E7D6D7` | 87.0 | rail→面板 **7.0** |
-| 导航列表 · supporting pane | `surfaceContainer` | `#FBEAEB` | 94.0 | 面板→内容 **4.0** |
-| 主内容 | `surface` | `#FFF8F7` | 98.1 | — |
-| 面板内卡片 | `surfaceContainerLow` | `#FFF0F1` | 96.0 | 对所属面板 2.0 |
-| 主内容浮起卡片 | `surfaceContainerLowest` | `#FFFFFF` | 100.0 | 对主内容 1.9 |
+| 窗口底 + 导航 rail（+ 移动端 NavigationBar） | `surfaceContainerLow` | `#FFF0F1` | 96.0 | rail→pane **4.03** |
+| 内容 pane（列表 / 详情 / 设置内容） | `surfaceContainerLowest` | `#FFFFFF` | 100.0 | — |
+| pane 顶栏条 | `surface` | `#FFF8F7` | 98.1 | 对 pane 1.93（**嵌套条，不计入 T2**） |
+| 卡片 / 列表行 / 分组卡 | `surfaceContainerLow` | `#FFF0F1` | 96.0 | 对 pane **4.03** |
+| 搜索框 / 输入类 | `surfaceContainerHigh` | `#F5E4E5` | 91.9 | 对 chrome 4.04 |
+| 浮层（menu / dialog / 浮起卡） | 各自官方 specs + elevation 阴影 | — | — | 浮层例外，允许阴影 |
 
-**暗色（chrome 往亮走——暗色没有更暗的 chrome，`surfaceDim` 在暗色等于 `surface`）**
+**暗色（建议，代码层落实前需实测复核）**
 
 | 区域 | 角色 | hex | L\* | 与相邻区级差 |
 |---|---|---|---:|---:|
-| 导航 rail | `surfaceContainerHighest` | `#3C3233` | 21.9 | 面板 **10.0** |
-| 导航列表 · supporting pane | `surfaceContainer` | `#261D1E` | 11.9 | 内容 **6.0** |
-| 主内容 | `surface` | `#191112` | 5.9 | — |
-| 面板内卡片 | `surfaceContainerHigh` | `#312829` | 17.1 | 对所属面板 5.3 |
+| 窗口底 + 导航 rail | `surfaceContainerLow` | `#22191A` | 9.9 | rail→pane **7.2** |
+| 内容 pane | `surfaceContainerHigh` | `#312829` | 17.1 | — |
+| pane 顶栏条 | `surface` | `#191112` | 5.9 | 对 pane 11.2（嵌套条） |
+| 卡片 / 列表行 | `surfaceContainerLow` | `#22191A` | 9.9 | 对 pane 7.2 |
+
+> **与之前的版本的关系**：本表替换了本节最初的「rail `surfaceDim` 87 / 面板 `surfaceContainer` 94 / 内容 `surface` 98」一版，以及中间「窗口=rail=`surfaceContainer` 94 / pane `surface` 98」一版。两次调整都只改**区域绑定**，46 个角色的 hex 与 tone 分配一个未动；每次都是「把区域往更亮一档挪」，因为实测（也是用户观察）桌面端偏亮的 chrome + 纯白内容更像 Gmail / Google 系产品，长时间阅读更舒服。
 
 - **官方口径合规**：roles 页原文「`All color mappings (i.e. surface container, primary, secondary) should remain the same for layout regions across breakpoints`」+「you can use add-on surface colors in larger window class sizes」⇒ 这是「**大窗口追加区域角色**」，不是「换掉主映射」；但必须补一条**跨断点一致性**：同一个 region 只要存在，就始终用它同一个角色（例如 rail 在 medium 80 与 large 80 都是 `surfaceDim`），不能在 1199/1200 处换色。
 - **与参考位对齐**：`design-system/example.png` 实测并列面板级差 **7.05 / 3.83**、**无任何 hairline**（B）——与上表 7.0 / 4.0 同量级。这是「纯 tone 够用」的唯一实证。
@@ -491,7 +495,7 @@ _kAmbientShadowOpacity= 0x1F000000  // alpha 0.12
 
 **统计（推荐方案）**：**新增 2 个 token（均为数值，其中 `stroke/hairline` 默认关闭）＋ 扩用 2 个既有颜色角色（值不变）＋ 2 条规则变更（阴影使用范围；§4.1 区域级映射）；颜色角色新增 0、颜色值变更 0。**
 
-**已落地（2026-10-23，B）：区域直接绑 46 角色，不建别名分类。** §4.1 的区域映射不新增变量、不写死 hex：模板/页面把每个区域直接绑到 `Theme/A · Light` 的角色——**窗口底与 rail 同色 `surfaceContainer`（`10:57`，94.0；2026-10-23 晚用户定「窗口底色就用 NavigationRail 的背景色」，`surfaceDim` 退出窗口用途，§4.1 表里的 rail=`surfaceDim` 以本句为准）**、pane `surface`（`10:51`）、顶栏条/卡 `surfaceContainerLow`（`10:56`）、输入 `surfaceContainerLowest`（`10:55`）、**rail 与 NavigationBar 共用 `surfaceContainer`（`10:57`）**。暗色同区域绑 `Theme/A · Dark` 的对应角色（窗口底 `surfaceContainerLowest`、pane `surfaceContainer`、顶栏/卡/rail `surfaceContainerHigh`、输入 `surfaceContainerHighest`）。中间曾用 `color/desktop/*` 别名层（Light `71:884`–`71:888` + `75:1683` / Dark `71:889`–`71:893` + `75:1684`），**2026-10-23 按用户要求删除**，86 处填充（07/08 的 19 帧底 + 25 pane + 9 顶栏 + 19 rail 实例 + 8 rail 变体）改为直绑角色；理由：`01 Tokens` 应保持唯一色彩来源，多一层分类会让变量面板出现两套命名。官方「同一 region 跨断点必须同角色」（A，见 §1.6）由「同一区域始终绑同一角色」保证，不依赖别名。透明度方案经计算否决（只是相邻两档间的插值），区域映射应直接选档、不要半透明叠加层。数值 token 只保留 `radius/pane` 20（`71:894`）。若实机验证后仍偏平，再启用第 7/8 行（Light 改 5 个 tone、Dark 改 4 个）+ 可能第 9 行。
+**已落地（2026-10-23，B）：区域直接绑 46 角色，不建别名分类。** §4.1 的区域映射不新增变量、不写死 hex：模板/页面把每个区域直接绑到 `Theme/A · Light` 的角色——**窗口底与 rail 同色 `surfaceContainerLow`（`10:56`，96.0；2026-10-23 深夜按用户「背景色大多偏亮」再提一级）**、**pane `surfaceContainerLowest`（`10:55`，100.0，纯白）**、顶栏条 `surface`（`10:51`，98.1）、卡/列表行 `surfaceContainerLow`（`10:56`）、搜索框 `surfaceContainerHigh`（`10:58`）、**rail 与 NavigationBar 共用 `surfaceContainerLow`（`10:56`）**。暗色在代码层按 §4.1 建议表绑 `Theme/A · Dark`（Figma 不出暗色稿）。中间曾用 `color/desktop/*` 别名层（Light `71:884`–`71:888` + `75:1683` / Dark `71:889`–`71:893` + `75:1684`），**2026-10-23 按用户要求删除**，86 处填充（07/08 的 19 帧底 + 25 pane + 9 顶栏 + 19 rail 实例 + 8 rail 变体）改为直绑角色；理由：`01 Tokens` 应保持唯一色彩来源，多一层分类会让变量面板出现两套命名。官方「同一 region 跨断点必须同角色」（A，见 §1.6）由「同一区域始终绑同一角色」保证，不依赖别名。透明度方案经计算否决（只是相邻两档间的插值），区域映射应直接选档、不要半透明叠加层。数值 token 只保留 `radius/pane` 20（`71:894`）。若实机验证后仍偏平，再启用第 7/8 行（Light 改 5 个 tone、Dark 改 4 个）+ 可能第 9 行。
 
 **为什么 `borderStrong` 的 tone 是 60/41**（B，计算，写出来以便复核）：要让某个边界色对 `surface` 达到 3:1，解 `(Ysurf+0.05)/(Yb+0.05)=3`：
 - Light：`Y(#FFF8F7)=0.95110` → `Yb=(0.95110+0.05)/3−0.05=0.28370` → `L∗=60.22`；
