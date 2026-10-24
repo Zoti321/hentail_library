@@ -8,8 +8,8 @@ import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.da
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_page/trash_page.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
@@ -26,7 +26,7 @@ class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   Stream<void> watchRevision() => events.stream;
 }
 
-class _TrashComicRepo implements ComicRepository {
+class _TrashComicRepo implements ComicTrashRepository {
   _TrashComicRepo(this.items);
 
   final List<TrashedComic> items;
@@ -93,7 +93,7 @@ Future<void> _pumpTrash(WidgetTester tester, List<TrashedComic> items) async {
     home: const Scaffold(body: TrashPage()),
     overrides: <Override>[
       libraryRevisionPortProvider.overrideWithValue(revision),
-      comicRepoProvider.overrideWithValue(_TrashComicRepo(items)),
+      comicTrashRepositoryProvider.overrideWithValue(_TrashComicRepo(items)),
       readerSessionPortProvider.overrideWithValue(_NoopReaderSessionPort()),
       for (final TrashedComic item in items)
         comicCoverProvider(

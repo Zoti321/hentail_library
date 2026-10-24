@@ -10,16 +10,18 @@ Flutter UI 已以 Riverpod Notifier/Provider 为主干，但存在以下漂移�
 
 - `view_models/` 与 `state/` 目录并存，职责相同却命名分裂。
 - 类名混用 `Notifier`、`Controller`、`ViewModel`（含函数型 provider），阅读器子模块另用 `module/controller/`。
-- 部分 `views/` 与 `ui/core/widgets/` 直接 `ref.read(*RepoProvider)`，绕过 ViewModel。
+- 部分 `views/` 与 `shared/ui/` 组件直接 `ref.read(*RepoProvider)`，绕过 ViewModel。
 - 库页等复杂屏订阅十余 Provider，View 无统一命令入口；局部采用 Intent→派生列表（类 MVI），与整体 MVVM 表述不一致。
 
 业务逻辑已在 Rust（ADR-0002）；Dart UI 层应聚焦展示、UI 状态与用户命令编排，边界需写清以便 Agent 与人类维护者一致执行。
 
 ## Decision
 
+**物理分层与 shared 依赖边界以 ADR-0027 为准**；本节专注 MVVM 角色、命名与 View–Repository 禁令。目录用语与 `app/test/gate/` 一致。
+
 ### 1. 主架构：MVVM + Riverpod
 
-- **View**：`ui/features/**/views/`、`ui/core/widgets/` — 渲染与用户手势；通过 `ref.watch` 订阅 ViewModel/Facade；通过 Notifier 方法或 callback 发出命令。
+- **View**：`features/<feature>/presentation/**`（含 `views/`）与 `shared/ui/**` — 渲染与用户手势；通过 `ref.watch` 订阅 ViewModel/Facade；通过 Notifier 方法或 callback 发出命令。
 - **ViewModel**：Riverpod `@Riverpod` 类（及聚合型 provider）— 持有 UI 状态、编排 Repository/Service、暴露命令 API。
 - **Model**：`domain/models/` + `domain/repositories/` 接口；**Repository 实现**在 `data/repositories/`（FRB 薄层）。
 
@@ -51,9 +53,9 @@ Flutter UI 已以 Riverpod Notifier/Provider 为主干，但存在以下漂移�
 ### 4. 硬规则：View 不直连 Repository
 
 - **`views/` 下任何文件** 禁止 import 并调用 `*RepoProvider`（含 `ref.read` / `ref.watch`）。
-- **`ui/core/widgets/`** 共享组件禁止持有 Repository；持久化/删除等通过 **构造参数 callback** 或 **由 feature 注入的 Notifier 命令** 完成（与 `comic_delete_flow` 经 Service 的模式一致）。
-- Dialog 在 feature 内时可调用 **ViewModel**；在 `ui/core` 时必须 dumb，只触发 `onSave` / `onDelete` 等回调。
-- Repository 调用只出现在：`view_models/`、`data/`、`domain/`（接口）、`ui/features/**/di/`（provider 定义）、以及 **非 View 的编排 helper**（如 `*_flow.dart`，且 helper 应优先委托 ViewModel/Service）。
+- **`shared/ui/**`** 共享组件禁止持有 Repository；持久化/删除等通过 **构造参数 callback** 或 **由 feature 注入的 Notifier 命令** 完成（与 `comic_delete_flow` 经 Service 的模式一致）。
+- Dialog 在 feature 内时可调用 **ViewModel**；在 `shared/ui` 时必须 dumb，只触发 `onSave` / `onDelete` 等回调。
+- Repository 调用只出现在：`view_models/`、`data/`、`domain/`（接口）、`features/<feature>/di/`（provider 定义）、以及 **非 View 的编排 helper**（如 `*_flow.dart`，且 helper 应优先委托 ViewModel/Service）。
 
 ### 5. 交付切片
 
@@ -71,9 +73,9 @@ Flutter UI 已以 Riverpod Notifier/Provider 为主干，但存在以下漂移�
 
 - 阶段一 rename/move 产生大量机械 diff，需严格分 PR。
 - Facade 过厚时可能成为 God Notifier；须约定 Facade 只做命令转发与聚合 watch，派生逻辑留子 Notifier。
-- `ui/core` Dialog 改为 callback 后，call site 略增样板。
+- `shared/ui` Dialog 改为 callback 后，call site 略增样板。
 
 ## References
 
-- ADR-0017、ADR-0027；`app/test/gate/` 强制执行分层与 import
+- ADR-0027（Shell / shared UI 分层）；`app/test/gate/` 强制执行分层与 import
 - `docs/engineering/gate.md` — ViewModel 层 mock Repo 测试为首选接缝

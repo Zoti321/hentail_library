@@ -13,7 +13,7 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
-import 'package:hentai_library/shared/ui/layout/library_blocks_layout.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/layout/catalog_blocks_sliver_group.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
@@ -281,7 +281,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     layoutTier: layoutTier,
                     horizontalPadding: horizontalPadding,
                   ),
-                  LibraryBlocksSliverGroup(
+                  CatalogBlocksSliverGroup(
                     key: _catalogBlocksKey,
                     seriesBlock: LibrarySeriesBlock(
                       layoutTier: layoutTier,

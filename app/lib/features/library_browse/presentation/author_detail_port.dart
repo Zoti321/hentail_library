@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/show_author_detail.dart';
-import 'package:hentai_library/shared/ui/ports/author_detail_port.dart';
+import 'package:hentai_library/shared/application/ports/author_detail_port.dart';
 
 /// library_browse 对 [AuthorDetailPort] 的实现（#292）。
 ///

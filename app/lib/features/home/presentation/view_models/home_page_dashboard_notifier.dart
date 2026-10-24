@@ -5,7 +5,7 @@ import 'package:hentai_library/features/home/presentation/view_models/home_probe
 import 'package:hentai_library/core/util/stream_throttle.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/shared/domain/repositories/home_page_repository.dart';
-import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
+import 'package:hentai_library/features/home/presentation/models/history_card_item.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -140,7 +140,7 @@ List<HomeLibraryAlert> _mergeProbeAlerts(
 }
 
 @Riverpod(keepAlive: true)
-List<HistoryGridItem> homeContinueReadingTop5GridItems(Ref ref) {
+List<HistoryCardItem> homeContinueReadingTop5GridItems(Ref ref) {
   final List<HomeContinueReadingEntry> entries = ref
       .watch(homeContinueReadingTop5StreamProvider)
       .maybeWhen(
@@ -149,7 +149,7 @@ List<HistoryGridItem> homeContinueReadingTop5GridItems(Ref ref) {
       );
   return entries
       .map(
-        (HomeContinueReadingEntry e) => historyGridItem(
+        (HomeContinueReadingEntry e) => historyCardItem(
           id: 'comic:${e.comicId}',
           title: e.title,
           lastReadTime: e.lastReadTime,

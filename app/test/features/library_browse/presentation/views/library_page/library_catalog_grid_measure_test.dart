@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/layout/library_blocks_layout.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/layout/catalog_blocks_sliver_group.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_cover_viewport_notifier.dart';
 
 void main() {
   testWidgets(
-    'measureScrollableKeyedContentOffset works for LibraryBlocksSliverGroup',
+    'measureScrollableKeyedContentOffset works for CatalogBlocksSliverGroup',
     (WidgetTester tester) async {
       final GlobalKey catalogBlocksKey = GlobalKey();
 
@@ -16,7 +16,7 @@ void main() {
             body: CustomScrollView(
               slivers: <Widget>[
                 const SliverToBoxAdapter(child: SizedBox(height: 80)),
-                LibraryBlocksSliverGroup(
+                CatalogBlocksSliverGroup(
                   key: catalogBlocksKey,
                   seriesBlock: const SliverToBoxAdapter(
                     child: SizedBox(height: 40),

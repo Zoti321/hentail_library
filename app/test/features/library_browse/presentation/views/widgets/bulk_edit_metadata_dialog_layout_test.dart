@@ -5,7 +5,7 @@ import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/bulk_edit_metadata_dialog.dart';
@@ -15,7 +15,7 @@ import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
 
-class _FakeComicRepo implements ComicRepository {
+class _FakeComicRepo implements ComicLookupRepository {
   _FakeComicRepo(this._comics);
 
   final List<Comic> _comics;
@@ -72,7 +72,9 @@ Future<void> _pumpDialog(
       ...sharedLibraryStateOverrides(),
       ...bootstrapCompositionOverrides(),
       libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
-      comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo(resolved)),
+      comicLookupRepositoryProvider.overrideWith(
+        (Ref ref) => _FakeComicRepo(resolved),
+      ),
     ],
     home: Scaffold(
       body: BulkEditMetadataDialog(

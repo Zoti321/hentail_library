@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/interaction/interactive_target.dart';
+import 'package:hentai_library/shared/ui/widgets/foundation/pointer_target.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 
 typedef ContentSwitcherBottomBarItem = ({IconData icon, String label});

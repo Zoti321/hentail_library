@@ -22,7 +22,7 @@ List<String> collectSharedUiFeatureImportViolations(Directory libDir) {
     'shared/ui/widgets',
     'shared/ui/layout',
     'shared/ui/shell',
-    'shared/ui/interaction',
+    'shared/ui/motion',
     'shared/ui/theme',
   ];
   final List<String> violations = <String>[];

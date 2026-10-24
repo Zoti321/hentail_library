@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
+import 'package:hentai_library/features/home/presentation/models/history_card_item.dart';
 
 class HistoryPagedFeedState {
   const HistoryPagedFeedState({
@@ -10,7 +10,7 @@ class HistoryPagedFeedState {
     this.isLoadingMore = false,
   });
 
-  final List<HistoryGridItem> items;
+  final List<HistoryCardItem> items;
   final int totalCount;
   final int loadedPage;
   final bool hasReachedEnd;
@@ -18,7 +18,7 @@ class HistoryPagedFeedState {
   final bool isLoadingMore;
 
   HistoryPagedFeedState copyWith({
-    List<HistoryGridItem>? items,
+    List<HistoryCardItem>? items,
     int? totalCount,
     int? loadedPage,
     bool? hasReachedEnd,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/dto/nav_item_data.dart';
+import 'package:hentai_library/shared/ui/shell/shell_nav_item.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -50,8 +50,8 @@ class DesktopSidebar extends HookWidget {
   /// Compact / collapsed rail cannot enter Library reorder mode.
   final bool allowLibraryReorder;
 
-  final List<NavItemData> mainNavItems;
-  final List<NavItemData> systemNavItems;
+  final List<ShellNavItem> mainNavItems;
+  final List<ShellNavItem> systemNavItems;
 
   /// [librariesSectionBuilder] is inserted after the nav item with this id.
   final String librariesAnchorNavId;
@@ -99,8 +99,8 @@ class DesktopSidebar extends HookWidget {
     }, <Object?>[isExpanded]);
 
     final l10n = context.l10n;
-    final List<NavItemData> menuItems = mainNavItems;
-    final List<NavItemData> systemItems = systemNavItems;
+    final List<ShellNavItem> menuItems = mainNavItems;
+    final List<ShellNavItem> systemItems = systemNavItems;
 
     return AnimatedBuilder(
       animation: expandController,
@@ -119,7 +119,7 @@ class DesktopSidebar extends HookWidget {
             expandController.status == AnimationStatus.dismissed;
 
         final List<Widget> mainNav = <Widget>[];
-        for (final NavItemData item in menuItems) {
+        for (final ShellNavItem item in menuItems) {
           mainNav.add(
             _SidebarButton(
               item: item,
@@ -197,7 +197,7 @@ class DesktopSidebar extends HookWidget {
               ),
               if (!reorderMode)
                 ...systemItems.map(
-                  (NavItemData item) => _SidebarButton(
+                  (ShellNavItem item) => _SidebarButton(
                     item: item,
                     isActive: activeId == item.id,
                     expandProgress: curvedT,
@@ -224,7 +224,7 @@ class _SidebarButton extends StatefulWidget {
     required this.onTap,
   });
 
-  final NavItemData item;
+  final ShellNavItem item;
   final bool isActive;
 
   /// 0 = collapsed rail, 1 = expanded (already easeOutCubic-curved).

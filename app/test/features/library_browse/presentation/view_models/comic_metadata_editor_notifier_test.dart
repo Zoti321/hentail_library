@@ -5,15 +5,17 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
 import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_editor_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 
-class _RecordingComicRepository implements ComicRepository {
+class _RecordingComicRepository implements ComicUserMetadataRepository {
   final List<String> updatedTitles = <String>[];
   final List<({String comicId, bool? title})> lockCalls =
       <({String comicId, bool? title})>[];
@@ -119,7 +121,7 @@ void main() {
       overrides: <Override>[
         ...sharedLibraryStateOverrides(),
         ...bootstrapCompositionOverrides(),
-        comicRepoProvider.overrideWithValue(comicRepo),
+        comicUserMetadataRepositoryProvider.overrideWithValue(comicRepo),
         seriesRepoProvider.overrideWithValue(seriesRepo),
         libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
       ],

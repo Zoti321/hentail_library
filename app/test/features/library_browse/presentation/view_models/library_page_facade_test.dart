@@ -13,7 +13,8 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/comic_catalog_repository.dart';
+import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
 import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_state.dart';
@@ -39,7 +40,7 @@ class _FakeLibraryRevision extends LibraryRevisionNotifier {
 }
 
 /// 固定 250 条记录：默认 page size 50 下共 5 页。
-class _FakeComicRepo implements ComicRepository {
+class _FakeComicRepo implements ComicCatalogRepository {
   @override
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
@@ -125,7 +126,9 @@ void main() {
         ...extraOverrides,
         ...idleRevisionThrottleOverrides(),
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
-        comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo()),
+        comicCatalogRepositoryProvider.overrideWith(
+          (Ref ref) => _FakeComicRepo(),
+        ),
         seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo()),
         authorRepoProvider.overrideWithValue(const EmptyAuthorRepository()),
       ],

@@ -1,12 +1,12 @@
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
 
 String comicTitleFallbackForDisplay(String comicId) {
   return comicId.length > 12 ? '${comicId.substring(0, 12)}…' : comicId;
 }
 
 Future<String> resolveComicTitleForDisplay(
-  ComicRepository repo,
+  ComicLookupRepository repo,
   String comicId,
 ) async {
   final Map<String, String> titles = await resolveComicTitlesForDisplay(
@@ -17,7 +17,7 @@ Future<String> resolveComicTitleForDisplay(
 }
 
 Future<Map<String, String>> resolveComicTitlesForDisplay(
-  ComicRepository repo,
+  ComicLookupRepository repo,
   List<String> comicIds,
 ) async {
   if (comicIds.isEmpty) {

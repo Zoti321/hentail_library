@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/dto/nav_item_data.dart';
+import 'package:hentai_library/shared/ui/shell/shell_nav_item.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -38,10 +38,10 @@ void main() {
                   showCollapseToggle: false,
                   onToggleExpanded: () {},
                   onDestinationSelected: (_) {},
-                  mainNavItems: const <NavItemData>[
+                  mainNavItems: const <ShellNavItem>[
                     (id: 'home', label: '首页', icon: LucideIcons.house),
                   ],
-                  systemNavItems: const <NavItemData>[
+                  systemNavItems: const <ShellNavItem>[
                     (id: 'settings', label: '设置', icon: LucideIcons.settings),
                   ],
                   librariesAnchorNavId: 'home',

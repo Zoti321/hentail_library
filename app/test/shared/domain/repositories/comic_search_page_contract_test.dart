@@ -2,10 +2,10 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/comic_catalog_repository.dart';
 import 'package:test/test.dart';
 
-class _RecordingComicRepo implements ComicRepository {
+class _RecordingComicRepo implements ComicCatalogRepository {
   _RecordingComicRepo();
 
   final List<PageRequest> keywordPageRequests = <PageRequest>[];

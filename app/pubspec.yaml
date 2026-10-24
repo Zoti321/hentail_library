@@ -9,79 +9,98 @@ environment:
   sdk: ^3.10.4
 
 dependencies:
+  # --- Flutter SDK ---
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
 
-  # ui/ux
+  # --- UI / 主题 / 组件（共 10）---
   cupertino_icons: ^1.0.8
-  lucide_icons_flutter: ^3.1.9
-  google_fonts: ^7.0.1
-  flutter_animate: ^4.5.2 # 动画
-  material_color_utilities: ^0.11.0
-  system_theme: ^3.1.2
-  flutter_acrylic: ^1.1.4 # windows 亚克力效果
   custom_pop_up_menu: ^1.2.4
-  scrollable_positioned_list: ^0.3.8 # 可滚动定位列表
+  flutter_acrylic: ^1.1.4
+  flutter_animate: ^4.5.2
+  google_fonts: ^7.0.1
+  lucide_icons_flutter: ^3.1.9
+  material_color_utilities: ^0.11.0
+  material_symbols_icons: ^4.2960.0
+  scrollable_positioned_list: ^0.3.8
+  system_theme: ^3.1.2
 
+  # --- 基础工具库（共 7）---
   async: ^2.11.0
   collection: ^1.0.8
-  file_picker: ^10.3.3
-  permission_handler: ^12.0.1
+  crypto: ^3.0.3
+  intl: ^0.20.2
+  logging: ^1.3.0
   path: ^1.9.1
   path_provider: ^2.1.5
-  extended_image: ^10.0.1 # 高级图片加载
-  crypto: ^3.0.3 # 哈希算法
-  intl: ^0.20.2
-  url_launcher: ^6.3.0 # 打开链接和本地资源管理器
-  logging: ^1.3.0
 
-  flutter_riverpod: ^3.0.3
+  # --- 文件 / 媒体 / 权限（共 5）---
+  archive: ^4.0.9
+  extended_image: ^10.0.1
+  file_picker: ^10.3.3
+  open_filex: ^4.7.0
+  permission_handler: ^12.0.1
+
+  # --- 网络 / 外链（共 2）---
+  dio: ^5.9.2
+  url_launcher: ^6.3.0
+
+  # --- 状态管理 Riverpod + Hooks（共 5）---
   flutter_hooks: ^0.21.3+1
+  flutter_riverpod: ^3.0.3
   hooks_riverpod: ^3.0.3
   riverpod: ^3.0.3
+  riverpod_annotation: ^3.0.3
 
+  # --- 路由（共 1）---
   go_router: ^16.3.0
 
+  # --- 桌面窗口（共 1）---
   window_manager: ^0.5.1
 
-  freezed_annotation: ^3.1.0
-  json_annotation: ^4.9.0
-  riverpod_annotation: ^3.0.3
-  dio: ^5.9.2
-  package_info_plus: ^9.0.1
-  open_filex: ^4.7.0
+  # --- Rust / FRB 核心（共 2）---
+  flutter_rust_bridge: 2.12.0
   hentai_flutter:
     path: rust_builder
-  flutter_rust_bridge: 2.12.0
-  shared_preferences: ^2.5.3
-  archive: ^4.0.9
-  flutter_secure_storage: ^10.3.1
-  pinyin_pro_flutter: ^1.0.3
-  super_clipboard: 0.9.1
+
+  # --- 代码生成用注解（共 3）---
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.9.0
   theme_tailor_annotation: ^3.1.3
 
+  # --- 应用数据 / 平台能力（共 5）---
+  flutter_secure_storage: ^10.3.1
+  package_info_plus: ^9.0.1
+  pinyin_pro_flutter: ^1.0.3
+  shared_preferences: ^2.5.3
+  super_clipboard: 0.9.1
+
 dev_dependencies:
+  # --- Flutter SDK 测试 ---
   flutter_test:
     sdk: flutter
-
   integration_test:
     sdk: flutter
 
+  # --- 单元 / 集成测试（共 2）---
   mocktail: ^1.0.4
+  test: ^1.26.3
 
-  flutter_lints: ^6.0.0
+  # --- 静态分析 / Lint（共 3）---
   custom_lint: ^0.8.1
+  flutter_lints: ^6.0.0
   riverpod_lint: ^3.0.3
 
+  # --- 代码生成（共 5）---
   build_runner: ^2.10.4
   freezed: ^3.2.3
   json_serializable: ^6.11.2
   riverpod_generator: ^3.0.3
-
-  test: ^1.26.3
   theme_tailor: ^3.1.1
+
+  # --- 组件目录 / 预览（共 1）---
   widgetbook: ^3.23.0
 
 flutter:

@@ -37,7 +37,7 @@ Future<List<ReaderComicListItem>> _buildNavItemsFromContext(
 ) async {
   final List<String> orderedIds = context.orderedComicIds;
   final Map<String, String> titlesById = await resolveComicTitlesForDisplay(
-    ref.read(comicRepoProvider),
+    ref.read(comicLookupRepositoryProvider),
     orderedIds,
   );
   return <ReaderComicListItem>[
@@ -69,7 +69,9 @@ Future<ReadSessionContextData> readSessionContextForReader(
         );
 
   if (seriesContext == null) {
-    final comic = await ref.read(comicRepoProvider).findById(normalizedComicId);
+    final comic = await ref
+        .read(comicLookupRepositoryProvider)
+        .findById(normalizedComicId);
     final String fallbackTitle = comicTitleFallbackForDisplay(
       normalizedComicId,
     );

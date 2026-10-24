@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/domain/models/entity/reading_history.dart'
     as entity;
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
+import 'package:hentai_library/features/home/presentation/models/history_card_item.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -136,8 +136,8 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     if (current == null) {
       return;
     }
-    final List<HistoryGridItem> items = current.items
-        .where((HistoryGridItem item) => item.comicId != comicId)
+    final List<HistoryCardItem> items = current.items
+        .where((HistoryCardItem item) => item.comicId != comicId)
         .toList(growable: false);
     state = AsyncData<HistoryPagedFeedState>(
       current.copyWith(
@@ -150,7 +150,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
   void _clearAllLocal() {
     state = AsyncData<HistoryPagedFeedState>(
       HistoryPagedFeedState(
-        items: const <HistoryGridItem>[],
+        items: const <HistoryCardItem>[],
         totalCount: 0,
         loadedPage: 0,
         hasReachedEnd: true,
@@ -213,7 +213,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     PagedResult<entity.ReadingHistory> page, {
     required int loadedPage,
   }) {
-    final List<HistoryGridItem> items = page.items
+    final List<HistoryCardItem> items = page.items
         .map(_mapHistoryItem)
         .toList(growable: false);
     return HistoryPagedFeedState(
@@ -230,10 +230,10 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     required PagedResult<entity.ReadingHistory> page,
     required int loadedPage,
   }) {
-    final List<HistoryGridItem> appended = page.items
+    final List<HistoryCardItem> appended = page.items
         .map(_mapHistoryItem)
         .toList(growable: false);
-    final List<HistoryGridItem> items = <HistoryGridItem>[
+    final List<HistoryCardItem> items = <HistoryCardItem>[
       ...current.items,
       ...appended,
     ];
@@ -246,8 +246,8 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     );
   }
 
-  HistoryGridItem _mapHistoryItem(entity.ReadingHistory history) {
-    return historyGridItem(
+  HistoryCardItem _mapHistoryItem(entity.ReadingHistory history) {
+    return historyCardItem(
       id: 'comic:${history.comicId}',
       title: history.title,
       lastReadTime: history.lastReadTime,

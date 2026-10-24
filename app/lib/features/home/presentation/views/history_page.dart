@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_visible_range.dart';
-import 'package:hentai_library/shared/ui/dto/history_grid_item.dart';
+import 'package:hentai_library/features/home/presentation/models/history_card_item.dart';
 import 'package:hentai_library/shared/ui/widgets/element/card/reading_history_card.dart';
 import 'package:hentai_library/shared/ui/widgets/form/custom_text_field.dart';
 import 'package:hentai_library/features/home/presentation/view_models/history_cover_viewport_notifier.dart';
@@ -352,7 +352,7 @@ class _HistoryListSliver extends ConsumerWidget {
                 ),
                 itemCount: feed.items.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final HistoryGridItem item = feed.items[index];
+                  final HistoryCardItem item = feed.items[index];
                   return ReadingHistoryCard(
                     comicId: item.comicId,
                     title: item.title,

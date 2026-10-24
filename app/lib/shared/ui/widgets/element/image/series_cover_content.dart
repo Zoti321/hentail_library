@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_image.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
@@ -37,7 +37,7 @@ class SeriesCoverContent extends ConsumerWidget {
       ),
       data: (SeriesCoverSource source) => switch (source) {
         SeriesCoverCustomThumbnail(:final thumbnail) =>
-          CardLetterboxedCoverImage(cover: ComicCoverImage.bytes(thumbnail)),
+          CardLetterboxedCoverImage(cover: ComicCoverSource.bytes(thumbnail)),
         SeriesCoverFallbackComic(:final comicId) => ComicCoverContent(
           comicId: comicId,
           priority: priority,

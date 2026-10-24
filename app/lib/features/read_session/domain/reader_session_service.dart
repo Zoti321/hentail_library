@@ -5,7 +5,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/comic_page_source_port.dart';
 import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
 import 'package:hentai_library/shared/domain/reading/read_session_page.dart';
@@ -17,7 +17,7 @@ import 'package:hentai_library/features/read_session/domain/reader_session_snaps
 /// 同一 comicId 在 close 前复用页列表，避免 open 与 loadPages 双次列页。
 class ReaderSessionService {
   ReaderSessionService({
-    required ComicRepository comicRepo,
+    required ComicLookupRepository comicRepo,
     required ComicPageSourcePort pageSource,
     required ReadingHistoryRepository readingHistoryRepo,
     required ReaderSessionPort sessionPort,
@@ -31,7 +31,7 @@ class ReaderSessionService {
   /// Resource access / reader open 的默认有界时限（Local + Remote）。
   static const Duration defaultOpenTimeout = Duration(seconds: 30);
 
-  final ComicRepository _comicRepo;
+  final ComicLookupRepository _comicRepo;
   final ComicPageSourcePort _pageSource;
   final ReadingHistoryRepository _readingHistoryRepo;
   final ReaderSessionPort _sessionPort;

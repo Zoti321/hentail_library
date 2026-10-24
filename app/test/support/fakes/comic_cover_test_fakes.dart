@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/ui/dto/comic_cover_state.dart';
+import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 
 /// 固定状态的 [ComicCover]：不读仓库、不触发缩略图生成。

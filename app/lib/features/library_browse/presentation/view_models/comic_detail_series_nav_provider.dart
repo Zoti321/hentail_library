@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/domain/comic/comic_display_title.dart';
 export 'package:hentai_library/shared/domain/comic/comic_display_title.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -80,7 +80,7 @@ Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(
 ) async {
   final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
     ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-  final ComicRepository repo = ref.read(comicRepoProvider);
+  final ComicLookupRepository repo = ref.read(comicLookupRepositoryProvider);
   final List<String> comicIds = sortedItems
       .map((SeriesItem item) => item.comicId)
       .toList(growable: false);

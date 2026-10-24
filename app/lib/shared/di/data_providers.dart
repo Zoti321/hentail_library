@@ -4,7 +4,8 @@ import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/author_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
@@ -22,9 +23,15 @@ final Provider<ComicThumbnailRepository> comicThumbnailRepoProvider =
       (Ref ref) => _unimplemented('comicThumbnailRepoProvider'),
     );
 
-final Provider<ComicRepository> comicRepoProvider = Provider<ComicRepository>(
-  (Ref ref) => _unimplemented('comicRepoProvider'),
-);
+final Provider<ComicLookupRepository> comicLookupRepositoryProvider =
+    Provider<ComicLookupRepository>(
+      (Ref ref) => _unimplemented('comicLookupRepositoryProvider'),
+    );
+
+final Provider<ComicTrashRepository> comicTrashRepositoryProvider =
+    Provider<ComicTrashRepository>(
+      (Ref ref) => _unimplemented('comicTrashRepositoryProvider'),
+    );
 
 final Provider<SeriesRepository> seriesRepoProvider =
     Provider<SeriesRepository>(

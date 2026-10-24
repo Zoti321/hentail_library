@@ -5,7 +5,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_series_nav_provider.dart';
@@ -21,7 +21,7 @@ class _FakeLibraryRevision extends LibraryRevisionNotifier {
   }
 }
 
-class _FakeComicRepo implements ComicRepository {
+class _FakeComicRepo implements ComicLookupRepository {
   _FakeComicRepo(this._titles);
 
   final Map<String, String> _titles;
@@ -140,7 +140,7 @@ void main() {
         ...sharedLibraryStateOverrides(),
         ...bootstrapCompositionOverrides(),
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
-        comicRepoProvider.overrideWith((Ref ref) => comicRepo),
+        comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
         seriesRepoProvider.overrideWith(
           (Ref ref) => _FakeSeriesRepo(<Series>[series]),
         ),
@@ -185,7 +185,7 @@ void main() {
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
           libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
-          comicRepoProvider.overrideWith((Ref ref) => comicRepo),
+          comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
           seriesRepoProvider.overrideWith(
             (Ref ref) => _FakeSeriesRepo(<Series>[series]),
           ),

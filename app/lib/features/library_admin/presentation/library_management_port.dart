@@ -7,7 +7,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/dialogs
 import 'package:hentai_library/features/library_admin/presentation/views/dialogs/scan_progress_dialog.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
-import 'package:hentai_library/shared/ui/ports/library_management_port.dart';
+import 'package:hentai_library/shared/application/ports/library_management_port.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';

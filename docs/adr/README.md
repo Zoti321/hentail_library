@@ -23,6 +23,30 @@
 
 编号递增；标题用英文 kebab-case，便于引用（如「见 ADR-0001」）。
 
+## 维护约定
+
+### Status
+
+- **Accepted**：现行决策；正文与索引表 Status 列一致。
+- **Superseded by ADR-000N**：整篇被后继 ADR 取代时，Status 写清取代关系；索引表同步；正文 Decision 可保留历史语境，但须在 Decision 前或 Status 下用一两句指向现行 ADR。
+- **部分被 ADR-000N 取代**：Status 写明被取代的**范围**（例如「用户删除立即删盘」被 0023 取代，删盘安全与 sync 语义仍有效）；正文勿再写已与后继 ADR 矛盾的绝对句。
+- **Deprecated**：不再推荐但未写清单一后继 ADR 时慎用；优先改为 Superseded 或 Accepted + 实现修订。
+
+### 实现修订 vs 新开 ADR
+
+- 实现细节、桥接方式、临时指标与代码对齐**不改变**当初 Decision 的「为什么」时，用正文中的 **实现修订** 引用块（`> **实现修订（YYYY-MM-DD）**：…`），风格对齐 ADR-0003、ADR-0015、ADR-0006。
+- 需要记录新的长期架构选择、或备选方案曾认真权衡时，才递增编号写新 ADR；勿用实现修订块替代新决策。
+
+### Superseded 与索引
+
+- 索引表「状态」列与正文 `## Status` **同一句话义**；父子 ADR 在双方 References 或 Decision 导读中互链。
+- 取代关系以 **编号更大的 ADR** 为现行语义来源；读旧 ADR 时先看 Status 与实现修订。
+
+### 避免过期快照
+
+- Consequences 与「已实现」列表写**稳定事实**（删了哪些模块、用户可见行为），勿写会随 FRB codegen 变化的 **sync/async 入口计数** 等瞬时数字。
+- 物理路径、目录分层以 `app/test/gate/` 与 ADR-0027 为准；勿保留 Wayfinder 迁移前的 `ui/features` 用语。
+
 ## 模板
 
 ```markdown
@@ -83,3 +107,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0026](./0026-library-write-seam.md) | Library-level write seam（库级写的锁与事务边界） | Accepted |
 | [0027](./0027-flutter-ui-shell-layout-component-layers.md) | Flutter UI Shell / Layout / Component 四层与 shared 依赖边界 | Accepted |
 | [0028](./0028-design-system-theme-extensions.md) | 设计系统主骨架（ThemeExtension + theme_tailor + Widgetbook dev） | Accepted |
+| [0029](./0029-design-system-documentation-charter.md) | design-system 目录章程（规划文档、Agent 规范、ui-ux-pro-max 输出） | Accepted |

@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
-import 'package:hentai_library/shared/ui/interaction/app_motion.dart';
+import 'package:hentai_library/shared/ui/motion/app_motion.dart';
 import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';

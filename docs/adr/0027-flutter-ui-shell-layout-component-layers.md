@@ -25,8 +25,12 @@ MVVM 规则不变：View 不直接调 Repository。Shell/Layout/纯 Component **
 
 ### 2. 物理目录约定
 
-- **Shell**：`app/lib/shared/ui/shell/`
-- **Layout**（含原 responsive 页面模板）：`app/lib/shared/ui/layout/`
+- **Shell**：`app/lib/shared/ui/shell/`（含 App sidebar 导航展示模型，如 `ShellNavItem`）
+- **Layout**（含原 responsive 页面模板）：`app/lib/shared/ui/layout/`；多 feature 共用模板以 `page_`、`catalog_`、`detail_` 等为文件名前缀；仅单页使用的组合块留在对应 feature，避免 `library_` 等领域前缀挂在 shared
+- **UI models**：`app/lib/shared/ui/models/` — 组件入参/展示用纯值（封面图源、封面 UI 状态等），**不是** FRB 或 domain 的 DTO
+- **Motion（实现）**：`app/lib/shared/ui/motion/` — 路由过渡、reduced-motion 运行时辅助；**时长/曲线 token** 仍在 `shared/ui/theme/tokens`（`AppMotionTokens`、`context.motion`，ADR-0028）
+- **Foundation pointer**：`app/lib/shared/ui/widgets/foundation/` — 最小点击区域、tooltip 等待、指针激活后 unfocus 等，**不属于** motion
+- **Application UI ports**：`app/lib/shared/application/ports/` — 跨 feature 的 UI 编排契约（可含 `BuildContext`、路由与对话框）；与 `shared/domain/ports`（无 Flutter、对接能力/FRB）区分
 - **Component**：`app/lib/shared/ui/widgets/`（按类目）
 - **bootstrap**：应用入口、路由表、将 feature 实现注入 Shell 插槽的**组合根**（composition root）
 - **Libraries 分区 UI** 留在 **library_admin**（`LibrariesAppSidebar`）；经 `AppShellSidebarSlot` + `AppShellSidebarBuilder` 注入 `ResponsiveAppShell`，不迁入 shared Shell 实现。
@@ -34,7 +38,7 @@ MVVM 规则不变：View 不直接调 Repository。Shell/Layout/纯 Component **
 
 ### 3. 依赖门禁
 
-`shared/ui/widgets`、`shared/ui/layout`、`shared/ui/shell` 禁止 import `package:.../features/`。已知违规以 gate allowlist 记录，每张收敛票必须缩小 allowlist（expand-contract）。测试缝与 ADR-0018 gate tier 对齐。
+`shared/ui/widgets`、`shared/ui/layout`、`shared/ui/shell`、`shared/ui/motion` 禁止 import `package:.../features/`。已知违规以 gate allowlist 记录，每张收敛票必须缩小 allowlist（expand-contract）。测试缝与 ADR-0018 gate tier 对齐。
 
 ### 4. Settings 与 Reader
 
