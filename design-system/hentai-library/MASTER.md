@@ -479,7 +479,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 图标 | `lucide_icons_flutter ^3.1.9`（全库使用） | 换 Material Symbols（outlined 默认 / filled 选中）；先替换导航、播放器、列表动作等 P0 图标 |
 | 状态与内容分支 | 各页面自管 loading / error | 统一 enum（loading / empty / error / offline）→ 同一组件不同内容分支，见 09；空态/离线/缓存文案走 l10n，不硬编码 |
 
-已知阻塞：`app/test/project_layout_test.dart:36-54` 仍断言本文件存在且含 `## Directory charter`、`pages/` 目录存在；`pages/` 尚未重建，迁移窗口内该测试会失败，按约定暂不修。
+`app/test/project_layout_test.dart`（ADR-0029）断言本文件含 `## Directory charter`、正文含 `pages/[page-name].md`、`pages/` 目录存在；`pages/` 正文按路由待补，当前以 `pages/README.md` 占位满足 Gate。
 
 ## 9. 未决事项
 
