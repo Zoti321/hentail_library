@@ -83,11 +83,11 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - **on* 配对**：文字/图标放在同色容器上时用对应 `on*`；不要用纯黑/纯白绕过 token。
 - **fixed 角色**：只用于跨主题保持不变的内容（品牌插画、固定徽标）；普通界面不用。
 - **surfaceTint = primary**：tonal elevation 只在需要时叠加（0/1/3/6/8/12 → 0/0.05/0.08/0.11/0.12/0.14），默认不叠。
-- **桌面区域取色（large / XL，≥1200dp；官方「大窗口 add-on surface colors」，A）**：窗口底与导航 rail **同色** `surfaceContainer`（暗色 `surfaceContainerHigh`）；pane（列表 / 详情 / 设置内容）`surface`；pane 内顶栏条与卡片 `surfaceContainerLow`；search bar / 输入类 `surfaceContainerHigh`（官方 search 明确 `surface container high`，A）。**46 个 hex 一个不改**，全部直接绑 `01 Tokens` 的 46 角色（不建 `color/desktop/*` 分类）。**同一个 region 在它所存在的所有断点用同一角色**（官方「跨断点保持映射一致」，A）。相邻级差：rail→pane **4.0**（T2 下限）、rail/pane→窗口缝 0（同色）、pane→pane 内卡片 2.1（靠 16 圆角 + 内边距认边界）。
+- **桌面区域取色（large / XL，≥1200dp；官方「大窗口 add-on surface colors」，A）**：窗口底与导航 rail **同色** `surfaceContainerLow`（96.0；暗色 `surfaceContainerLow` #22191A 9.9）；pane（列表 / 详情 / 设置内容）**`surfaceContainerLowest`（100.0，纯白）**；pane 内顶栏条 `surface`（98.1），卡片与列表行 `surfaceContainerLow`（96.0）；search bar / 输入类 `surfaceContainerHigh`（官方 search 明确 `surface container high`，A）。**46 个 hex 一个不改**，全部直接绑 `01 Tokens` 的 46 角色（不建 `color/desktop/*` 分类）。**同一个 region 在它所存在的所有断点用同一角色**（官方「跨断点保持映射一致」，A）。相邻级差：rail→pane **4.03**（T2 下限）、pane→卡片 4.03、顶栏条对 pane 1.93（嵌套条不计入 T2）。
   - **适用范围（2026-10-23 收敛，此前写宽了）**：这条只约束**区域级并列面板**之间的分隔——窗口底 / rail / 导航列表 / pane / 详情列之间靠「角色级差 + 24dp 画布缝」，不加 1dp 线、不加投影。它**不是**「所有容器一律无阴影」：组件各按自己的官方 specs——search bar 官方明写 `Lower elevation and no shadow by default`（A）；FAB / Dialog / Menu / Snackbar 一类浮层按官方 elevation token 允许阴影（A）。原先把这句写成跨全部容器的桌面硬规则是我的外推（C），用户本意也只是「pane、NavigationRail 这些**区域**用背景色区分而不是边框」。
 - **tonal elevation 与 pane 互斥**：pane 级容器一律不叠 surfaceTint（`applySurfaceTint = false`）；tonal elevation 只留移动端组件级反馈与桌面浮层（menu / dialog / side sheet）。
 - **桌面口径（硬，评审按此判定；完整版见 `08` §0.0）**：**T1 结构**——≥1200dp 的并列 pane 必须显式按区域取角色（窗口/rail `surfaceContainer` / pane 与内容 `surface` / 顶栏条与卡片 `surfaceContainerLow`），以「区域」为参数而非以组件为参数；**T2 阈值**——相邻并列区域 ΔL\* 亮色 **< 4**、暗色 **< 6** 时必须叠 1dp `outlineVariant` 或提一档角色，**2 个 L\* 的档差不算分隔**；**T3 边界**——46 个 hex 不改、只新增 `stroke/hairline` 1dp 与 `stroke/focus` 2dp、阴影只给浮层 level 2–5 且 tint 全关、不回退 elevation-tint。桌面底板 `#EAE8E6` 是画布层，**不在 46 角色内**。
-- **桌面窗口与 pane 取色（用户偏好 B 级，2026-10-23 最终）**：窗口底 **= rail = `surfaceContainer`**（`#FBEAEB`，L\* 94.0，暗色 `surfaceContainerHigh` 17.1）；pane = `surface`（`#FFF8F7`，98.1）；pane 内顶栏条 / 卡片 = `surfaceContainerLow`（`#FFF0F1`，96.0）；search bar / 输入类 = `surfaceContainerHigh`（`#F5E4E5`，91.9，官方 search A）。**pane 之间与 pane 右/下缘留 24dp 窗口底色缝**（B，参考图 18px 间隙即此手法），边界由「pane 比窗口高 4.0 + 24dp 缝」共同给出；compact 全出血、pane 直接 `surface`。历史上试过 `surfaceContainerHigh`（91.9）与 `surfaceDim`（87.0）作窗口底，均因「比参考更浅 / 太暗」被用户否掉，现档为 94.0。pane 顶栏条 96 对 pane 98.1 只有 2.1（< T2 的 4），pane 内卡片同样 2.1，靠圆角 + 内边距认边界（参考图卡片级差 1.74，同一手法）。
+- **桌面窗口与 pane 取色（用户偏好 B 级，2026-10-23 深夜最终）**：chrome = 窗口底 **= rail = NavigationBar = `surfaceContainerLow`**（`#FFF0F1`，L\* 96.0，暗色 `#22191A` 9.9）；pane = **`surfaceContainerLowest`**（`#FFFFFF`，100.0，纯白）；pane 顶栏条 = `surface`（`#FFF8F7`，98.1）；卡片 / 列表行 / 分组卡 = `surfaceContainerLow`（96.0）；search bar / 输入类 = `surfaceContainerHigh`（`#F5E4E5`，91.9，官方 search A）。**pane 之间与 pane 右/下缘留 24dp 窗口底色缝**（B，参考图 18px 间隙即此手法），边界由「pane 比 chrome 高 4.03 + 24dp 缝」共同给出；compact 全出血、pane 直接 `surface`。演进：`surfaceContainerHigh`(91.9) → `surfaceDim`(87.0)「太暗」→ `surfaceContainer`(94.0) → 现 `surfaceContainerLow`(96.0) + pane 纯白（用户「背景色大多偏亮」，2026-10-23 深夜）。顶栏条对 pane 只有 1.93，属嵌套条，靠 56 高与内容基线区分。
 
 ### 2.4 对比度（WCAG，计算值）
 
@@ -109,14 +109,15 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 | 区域 | 亮色角色（变量 id，L\*） | 暗色角色（变量 id，L\*） | 说明 |
 |---|---|---|---|
-| 窗口底（帧底）/ pane 间隙 | **与 rail 同色**：`surfaceContainer` #FBEAEB (`10:57`, 94.0) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | 2026-10-23 用户定「窗口底色就用 NavigationRail 的背景色」；`surfaceDim`（87.0）不再用于桌面窗口，仅作更暗面备用（B） |
-| 导航 rail **与 NavigationBar** | `surfaceContainer` #FBEAEB (`10:57`, 94.0) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | **两者共用同一角色**（2026-10-23 定）；与 pane 差 4.0 |
-| 内容 pane | `surface` #FFF8F7 (`10:51`, 98.1) | `surfaceContainer` #261D1E (`10:104`, 11.9) | 最亮面，承载正文 |
-| pane 顶栏条 / 分组卡 | `surfaceContainerLow` #FFF0F1 (`10:56`, 96.0) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | 与 pane 差 2.1，靠间距而非级差分隔 |
-| 搜索框 / 输入类 | **`surfaceContainerHigh`** #F5E4E5 (`10:58`, 91.9) | `surfaceContainerHigh` #312829 (`10:105`, 17.1) | 官方 search 明确 `surface container high`（A）；与 pane 98.1 差 6.2，不在 `surfaceContainer` 背景上使用 |
+| 窗口底（帧底）/ pane 间隙 | **与 rail 同色**：`surfaceContainerLow` #FFF0F1 (`10:56`, 96.0) | `surfaceContainerLow` #22191A (9.9) | 2026-10-23 用户定「窗口底色就用 NavigationRail 的背景色」；当晚再按「背景色大多偏亮」提亮一级（`surfaceContainer` 94.0 → 本档 96.0） |
+| 导航 rail **与 NavigationBar** | `surfaceContainerLow` #FFF0F1 (`10:56`, 96.0) | `surfaceContainerLow` #22191A (9.9) | **两者共用同一角色**（2026-10-23 定）；与 pane（100.0）差 **4.03** |
+| 内容 pane（列表 / 详情 / 设置内容） | `surfaceContainerLowest` #FFFFFF (`10:55`, 100.0) | `surfaceContainerHigh` #312829 (17.1) | 最亮面（纯白），承载正文；2026-10-23 深夜由 `surface` 98.1 提亮一级 |
+| pane 顶栏条 | `surface` #FFF8F7 (`10:51`, 98.1) | `surface` #191112 (5.9) | 嵌套条，与 pane 差 1.9（**嵌套不计入 T2**，靠 56 高与内容对齐区分） |
+| 分组卡 / 列表行 | `surfaceContainerLow` #FFF0F1 (`10:56`, 96.0) | `surfaceContainerLow` #22191A (9.9) | 与 pane 差 **4.03**（满足 T2） |
+| 搜索框 / 输入类 | **`surfaceContainerHigh`** #F5E4E5 (`10:58`, 91.9) | `surfaceContainerHigh` #312829 (17.1) | 官方 search 明确 `surface container high`（A）；与 chrome 96.0 差 4.04，与 pane 100.0 差 8.1 |
 | 浮层（menu / dialog / 浮起卡） | 按各自官方 specs | 同左 | menu 用 `surfaceContainer`、dialog 用 `surfaceContainerHigh` 一类，**允许 elevation 阴影**；不套用「区域级不加阴影」 |
-| 桌面标题栏 | 与窗口/rail 同色 `surfaceContainer` | 同左 | **64 高**（2026-10-23 两次加高后定稿：搜索 40 → y=12 上下各 12、窗控 32 居中 y=16），控件直接浮在窗口色上，不设分隔线、不设独立底色；menu 归属 NavigationRail（中心 = 标题栏中线 32） |
-| 全局搜索框 | `surfaceContainerHigh` #F5E4E5 (`10:58`, 91.9) | `surfaceContainerHigh` (`10:105`) | 720×40 / r20；左缘 = pane 左缘，不用页内搜索 |
+| 桌面标题栏 | 与窗口/rail 同色 `surfaceContainerLow` | 同左 | **64 高**（2026-10-23 两次加高后定稿：搜索 40 → y=12 上下各 12、窗控 32 居中 y=16），控件直接浮在窗口色上，不设分隔线、不设独立底色；menu 归属 NavigationRail（中心 = 标题栏中线 32） |
+| 全局搜索框 | `surfaceContainerHigh` #F5E4E5 (`10:58`, 91.9) | `surfaceContainerHigh` #312829 | 720×40 / r20；左缘 = pane 左缘，不用页内搜索 |
 | 窗口按钮 | 图标 `onSurfaceVariant` (`10:60`)；关闭 hover 底 `errorContainer` (`10:49`) + 图标 `onErrorContainer` (`10:50`) | 暗色对应 `10:107` / `10:96` / `10:97` | 32×32 圆形；hover `onSurface` 8%、pressed 12%；无描边无阴影 |
 
 - **暗色模式不做 Figma 设计稿（2026-10-23 用户定）**：Figma 侧只保留 `Theme/A · Dark` 的 46 个角色值与 `01 Tokens` 的 A Dark 预览作为**色彩约定**，不再产出暗色页面 / 组件样张（已删 `SearchBar · Dark` 样张）；暗色主题在**代码层**按这套值实现（Flutter `ColorScheme.dark`）。评审只看亮色稿，暗色按 token 对照验收。
@@ -126,13 +127,13 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 | 官方角色名（博文原文） | 本仓库变量 | 桌面用途 |
 |---|---|---|
-| Surface Container Lowest | `color/surfaceContainerLowest` | 浮起卡 / 暗色窗口底（search bar 不用它，改用 Container High） |
-| Surface Container Low | `color/surfaceContainerLow` | pane 顶栏条、pane 内卡片 |
-| Surface Container | `color/surfaceContainer` | 列表面板、supporting pane、**亮色 rail 与 NavigationBar** |
-| Surface Container High | `color/surfaceContainerHigh` | 高强调容器；**search bar 容器**（官方 A）；暗色窗口底与 rail |
-| Surface Container Highest | `color/surfaceContainerHighest` | 暗色 rail / 抽屉 |
-| Surface Dim | `color/surfaceDim` | 当前**不用于**桌面窗口（窗口与 rail 同色，2026-10-23）；备用更暗层 |
-| Surface | `color/surface` | 内容 pane 底 |
+| Surface Container Lowest | `color/surfaceContainerLowest` | **内容 pane（纯白）**；浮起卡 |
+| Surface Container Low | `color/surfaceContainerLow` | **窗口底 / rail / NavigationBar**（2026-10-23 深夜提亮后）、分组卡、列表行 |
+| Surface Container | `color/surfaceContainer` | 旧版 pane 底色（已由 Lowest 取代）；supporting pane 备用位 |
+| Surface Container High | `color/surfaceContainerHigh` | **search bar / 输入类**（官方 A）；暗色 pane 与 rail |
+| Surface Container Highest | `color/surfaceContainerHighest` | 暗色抽屉 / 最高强调容器 |
+| Surface Dim | `color/surfaceDim` | 当前**不用于**桌面窗口（窗口与 rail 同色）；备用更暗层 |
+| Surface | `color/surface` | **pane 顶栏条**（嵌套于 pane 之上） |
 | Surface Bright | `color/surfaceBright` | 暗色提亮面 |
 | Surface Tint | `color/surfaceTint`（= primary） | 只给浮层 level 2–5 |
 
@@ -144,16 +145,17 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 | 区域 | 亮色角色 | L\* | 暗色角色 | L\* | 相邻级差（亮 / 暗） |
 |---|---|---:|---|---:|---|
-| 导航 rail | `surfaceContainer` `#FBEAEB` | 94.0 | `surfaceContainerHigh` `#312829` | 17.1 | rail→面板 **4.0 / 5.2**；rail→窗口底 **7.0 / 13.1** |
-| 导航列表 · supporting pane | `surfaceContainer` `#FBEAEB` | 94.0 | `surfaceContainer` `#261D1E` | 11.9 | 面板→内容 **4.0 / 6.0** |
-| 主内容 | `surface` `#FFF8F7` | 98.1 | `surface` `#191112` | 5.9 | — |
-| 面板内卡片 | `surfaceContainerLow` `#FFF0F1` | 96.0 | `surfaceContainerHigh` `#312829` | 17.1 | 对所属面板 2.0 / 5.3 |
-| 主内容浮起卡片 | `surfaceContainerLowest` `#FFFFFF` | 100.0 | `surfaceContainer` `#261D1E` | 11.9 | 对主内容 1.9 / — |
+| 窗口底 / 导航 rail | `surfaceContainerLow` `#FFF0F1` | 96.0 | `surfaceContainerLow` `#22191A` | 9.9 | rail→pane **4.03 / 7.2** |
+| pane（列表 / 详情 / 支持栏） | `surfaceContainerLowest` `#FFFFFF` | 100.0 | `surfaceContainerHigh` `#312829` | 17.1 | — |
+| pane 顶栏条 | `surface` `#FFF8F7` | 98.1 | `surface` `#191112` | 5.9 | 对 pane 1.93（嵌套条，不计入 T2） |
+| 分组卡 / 列表行 | `surfaceContainerLow` `#FFF0F1` | 96.0 | `surfaceContainerLow` `#22191A` | 9.9 | 对 pane **4.03 / 7.2** |
+| 搜索框 | `surfaceContainerHigh` `#F5E4E5` | 91.9 | `surfaceContainerHigh` `#312829` | 17.1 | 对 chrome 4.04 / 7.2 |
 
 - 参考位：`design-system/example.png`（Google Chat 桌面改版）实测并列面板级差 **7.05 / 3.83**，同一手法、同一量级（B）。
-- **rail 与窗口底同色（2026-10-23 最终）**：用户要求「窗口底色就用 NavigationRail 的背景色」，两者都绑 `surfaceContainer`（94.0）；边界不再靠窗口底与 rail 的级差，而是靠**pane（98.1，差 4.0）+ 24dp 画布缝**（T2 ≥4 仍满足）。历史上的 `surfaceDim` 窗口（87.0）已撤回（用户反馈 rail「太暗」）；`surfaceDim` 只作更暗面备用。Flutter 官方实现里 rail 默认是 `surface`（`navigation_rail.dart:1230`，B），本项目下移到 `surfaceContainer` 是有意的区域化取舍。
-- **暗色方向相反**：暗色没有更暗的 chrome，`surfaceDim` 在暗色等于 `surface`（#191112），因此 rail 走 `surfaceContainerHigh`（17.1，比窗口底 4.0 高 13.1）。
-- 级差只用于「无边界并列的面板」；带圆角/内边距的卡片仍用 2 档级差，保持安静。
+- **chrome 往亮走（2026-10-23 深夜最终）**：用户观察「Gmail / Google 系产品桌面端耐看的一个原因是背景色大多偏亮」，要求把 pane 与 rail 各自**上调一级**。于是 chrome（窗口底 + rail + NavigationBar）= `surfaceContainerLow` 96.0、pane = `surfaceContainerLowest` 100.0（纯白）、pane 顶栏条 = `surface` 98.1、卡/列表行 = `surfaceContainerLow` 96.0、搜索框 = `surfaceContainerHigh` 91.9。chrome→pane **4.03** 仍过 T2 的 ≥4，pane→卡 4.03；1.93 那一档（顶栏条）属**嵌套条**，靠 56 高与内容基线区分，不计入并列区级差。
+- **两版历史**：更早用 `surfaceDim`（87.0）做窗口是「太暗」被否的一版；中间「窗口=rail=`surfaceContainer` 94.0 / pane `surface` 98.1」是第二版；现在是第三版（整体再亮一级）。三次都只改区域绑定，46 角色 hex 一个未动。
+- **暗色方向相反**：暗色没有更暗的 chrome，`surfaceDim` 在暗色等于 `surface`（#191112），因此 chrome 走 `surfaceContainerLow`（#22191A，9.9）、pane 走 `surfaceContainerHigh`（17.1），即「pane 比 chrome 亮」。暗色不出 Figma 稿（§2.5），代码层按此表实现后需实机复核。
+- 级差只用于「无边界并列的面板」；带圆角/内边距的卡片用 4.03 一档（提亮后 pane→卡正好 4.03），嵌套条仍可 2 档，保持安静。
 
 ## 3. 排版
 
@@ -274,7 +276,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 - **详情模板（2026-10-23 已改/已建，见 `09` §7/§11.6）**：XL `72:1083`（`Template/Comic detail · Extra-large 1920`，rail 256 + 24 + pane 1616 + 24）、Large `67:509`（1440×900，rail 80 + 24 + pane 1312 + 24）、Expanded `72:900`（1024×768，pane 896）、Medium `72:961`（600×800，pane 472）、Compact `72:1022`（390×844，pane 全出血）。旧的 `41:2384`（书库 XL 三栏）、`67:431`（旧 expanded）与旧四屏 `67:587`/`67:649`/`67:677`/`67:752` 均已删除。
 - **栏宽取值**：详情页三栏 = rail + 24 + 主区 + 24 + supporting + 24，主区 expanded 512 / large 876 / XL 1180，rail 80（XL 详情例外 256）；支撑栏宽见下条。**pane 间与帧右缘都留 24 画布底**（不照搬 `09` 参考图的 0 margin 全出血，用户要求支撑栏贴右但留白），pane 内 padding 24，分区靠 tone、不叠 1px 线。原「四栏 80+320+1108+412」方案**作废**（书库不走 inline list-detail）。
 - **桌面底板（画布层，非 token）**：≥1200dp 的帧加底板（帧外扩 24、圆角 20、填充 `#EAE8E6`）+ 窗口 chrome（圆角 12、1dp `outlineVariant`、`0/2/6 @12%` 投影）。`#EAE8E6` 不在 46 个颜色角色里，代码中禁止使用。
-- **pane 容器规则（2026-10-23 已全量铺开，10-23 晚修订）**：≥600dp 的帧一律「帧底 **`color/surfaceContainer`（与 rail / NavigationBar 同色）** → rail（同色）→ **24 画布缝** → pane（圆角 20、`color/surface`，右/下各留 24）」，pane 内内容自带 24 / 16 padding；**compact（<600dp，实际只在移动端出现）pane 全出血**：pane = 整帧 (0,0,W,H)、圆角 0、帧自身无圆角/描边/阴影，顶栏条与 NavigationBar 同样满宽——移动端没有窗口外壳，不要再套桌面留白。阅读器是例外：全出血阅读面 + toolbar / bottom bar 浮层，不套 pane。已套用：07 书库四档 `41:1578`/`41:1774`/`41:1824`/`41:1975` 与详情五档；08 非阅读器帧全部（pane id `74:1387`–`74:1398`）。
+- **pane 容器规则（2026-10-23 已全量铺开，10-23 深夜提亮后）**：≥600dp 的帧一律「帧底 **`color/surfaceContainerLow`（与 rail / NavigationBar 同色，96.0）** → rail（同色）→ **24 画布缝** → pane（圆角 20、**`color/surfaceContainerLowest`，100.0 纯白**，右/下各留 24）」，pane 顶栏条 `color/surface`（98.1），pane 内卡片 `color/surfaceContainerLow`（96.0）；pane 内内容自带 24 / 16 padding；**compact（<600dp，实际只在移动端出现）pane 全出血**：pane = 整帧 (0,0,W,H)、圆角 0、帧自身无圆角/描边/阴影，顶栏条与 NavigationBar 同样满宽——移动端没有窗口外壳，不要再套桌面留白。阅读器是例外：全出血阅读面 + toolbar / bottom bar 浮层，不套 pane。已套用：07 书库四档 `41:1578`/`41:1774`/`41:1824`/`41:1975` 与详情五档；08 非阅读器帧全部（pane id `74:1387`–`74:1398`）。
 - **supporting pane 宽**：expanded **360**（官方 A 级）；large / XL **412**（官方 A 级）。旧文档统一写 360 是漏了 large/XL 的默认值，已按 `07-supporting-pane.md` §4.1 修正。
 - **桌面 / 移动归属（2026-10-23 用户决策，覆盖此前「≥1200 才算桌面」）**：**expanded 1024 起算桌面**（桌面应用不全屏时 1024 很常见），**medium 600 / compact 390 算移动**。判据是「有没有窗口壳」：桌面帧有 56 高标题栏 + 三个窗口按钮，移动帧没有。连带：`08` 的区域取角色阈值从 ≥1200 下调为 **≥1024**。
 - **桌面标题栏（2026-10-23 已落地 13 帧，两次加高后为 64 高版）**：高 **64**、与窗口/rail 同色（不设独立底色、不加分隔线）。垂直排布：搜索 40 高 → **y=12**（上下各 12），窗口按钮 32 高 → **y=16**（垂直居中），rail 的 menu 24 高 → **y=20**（中心 32 = 标题栏中线）。
@@ -489,7 +491,7 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 11. **`ChapterRow` 的「已读」不随行宽右对齐**：组件内固定 x=312，实例加宽后（XL 1132 / large 828）停在偏左；实例内子节点不能单独移动，需改组件布局属性。
 12. **桌面底板 `#EAE8E6` 的定位**：现作为画布层（非 46 角色之一），是否要升为正式 token（例如 `color/canvasShell`）待评审——若升，需同时定暗色值。
 13. ~~**详情页 A/B 选型**~~（**已关闭，2026-10-23**）：用户定**方案 1 · 文档流**（无支撑栏、无卡组），KV 按断点/宽度响应式，pane 圆角 20、卡 16，简介 4 行截断 + 「展开全文」；对照用的卡组版 `69:813` 已按用户要求**删除**（不再留作对照）。
-14. **pane 内卡片与 pane 的级差只有 2.1**（仍开放）：窗口底 = rail = `surfaceContainer`（94.0），pane = `surface`（98.1），pane 内卡片 = `surfaceContainerLow`（96.0）。卡片对 pane 只有 2.1，靠 16 圆角与 24 内边距认边界（参考图同类手法级差 1.74）。评审需定：接受圆角认边界，还是给 pane 内卡片补 1dp `outlineVariant`——注意后者属于**组件层**做法（官方 cards 允许 outline 变体），不违反「区域级不加线」（§2.3 适用范围已按此收敛）。
+14. ~~**pane 内卡片与 pane 的级差只有 2.1**~~（**已由提亮解决，2026-10-23 深夜**：pane 100.0 / 卡片 96.0 = **4.03**，过 T2。原记录：：窗口底 = rail = `surfaceContainer`（94.0），pane = `surface`（98.1），pane 内卡片 = `surfaceContainerLow`（96.0）。卡片对 pane 只有 2.1，靠 16 圆角与 24 内边距认边界（参考图同类手法级差 1.74）。评审需定：接受圆角认边界，还是给 pane 内卡片补 1dp `outlineVariant`——注意后者属于**组件层**做法（官方 cards 允许 outline 变体），不违反「区域级不加线」（§2.3 适用范围已按此收敛）。
 15. ~~**Home / Reader 残留 `ChapterRow`**~~（**已关闭，2026-10-23**）：`9:16` 的 10 个实例已删；`ChapterRow` 组件定义保留给阅读器章节列表，本批页面不再使用。
 16. **600 / 390 详情首屏装不下**：文档流按内容顺序排，600 的 pane 内容 424×752、390 为 310×812，资源 KV 末行贴着 pane 底；Figma 帧是「滚动视口」表现，超出部分被裁。评审要看的是滚动后是否仍成立（无二次留白断层）。
 17. **collapsed rail 的文字标签**：Figma 里对 80 宽实例逐个 override 隐藏了 `首页/书库/历史/设置` 文字与左侧 1px 分隔线（实例级，不进组件）；Flutter 侧对应做法是 icon + tooltip，需在迁移任务里写明。
@@ -497,12 +499,12 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 19. ~~**阅读器不套 pane**~~（**已关闭，2026-10-23**）：用户定「阅读器页面暂时不做设计稿，阅读页要走沉浸式」，四帧（`41:2097`/`41:2275`/`41:2139`/`41:2363`）与底板 `67:782` 已从 08 移到 `12 Archive`，不再参与本批评审；恢复时按全出血 + 浮层 toolbar 重做，不套 pane。
 20. ~~**medium / compact 的 pane 内边距未统一**~~（**已关闭，2026-10-23**）：600 / 1024 全部改成 pane 外边距 24 + 内容水平 24 / 顶部 16（compact 保持全出血 + 16）；字号同步成 32 / 28 / 24 / 24 四档，详见 §5.1「断点内边距与字号」。1440 / 1920 沿用既有 16 外边距（large 已验收），如评审要求全站统一到 24，需要再动 5 个 1440 帧 + 1 个 1920 帧。
 21. **中性色相与参考图不同方向（已确认不是档位问题）**：与 `example.png` 逐像素比，L\* 档位已对齐（窗口底 87.0 vs 参考 rail 87.0；pane 98.1 vs 内容 97.9；卡片 96.0 vs 卡片 96.1），但色相相反——参考中性色 `a*≈-2.4, b*≈+4.6`（偏绿灰，C\*≈5.2），本项目 A 板 `a*≈+6.0, b*≈+1.6`（偏玫瑰粉，C\*≈6.2）。这是 D3「A 柔和玫瑰 + neutral chroma 6」的既定结果，**不是 tone 用错**。若要更接近参考的灰，需重生成 neutral 调色板（chroma 2–3 或色相归零），会改动 46 个 hex，属换调色板决策。
-22. ~~**rail 用透明度调色**~~（**已关闭，2026-10-23**）：用户提出「透明度也是一种影响因素」。按 CIELAB 算，surface(98.08) 叠在窗口底(86.99) 上：α=0.4→91.59（≈containerHigh 91.93）、α=0.6→93.54（≈container 94.04）、α=0.7→94.83（≈containerLow 95.97）——透明度只是在两档 tone 之间插值，落地必然等于某个既有角色（C）。所以直接用不透明 token 选档，也更符合官方「同一 region 跨断点同角色」（A）。最终 rail 定 `surfaceContainer` 94.0（变量 `color/surfaceContainer`；曾建别名 `color/desktop/rail`，2026-10-23 已删除）。
+22. ~~**rail 用透明度调色**~~（**已关闭，2026-10-23**；rail 最终为 `surfaceContainerLow` 96.0）：用户提出「透明度也是一种影响因素」。按 CIELAB 算，surface(98.08) 叠在窗口底(86.99) 上：α=0.4→91.59（≈containerHigh 91.93）、α=0.6→93.54（≈container 94.04）、α=0.7→94.83（≈containerLow 95.97）——透明度只是在两档 tone 之间插值，落地必然等于某个既有角色（C）。所以直接用不透明 token 选档，也更符合官方「同一 region 跨断点同角色」（A）。最终 rail 定 `surfaceContainer` 94.0（变量 `color/surfaceContainer`；曾建别名 `color/desktop/rail`，2026-10-23 已删除）。
 23. ~~**NavigationRail 右侧 1dp 边框**~~（**已关闭，2026-10-23**）：根因是 rail 组件内一个 1dp `divider` 子矩形（8 个变体各一，`41:1541`/`41:1559`/`41:1652`/`41:1669`/`41:1686`/`41:1703`/`41:1721`/`41:1739`，fill `outlineVariant`），已在**组件源**关闭（实例继承），19 个实例复查全部隐藏；07 里两条残留列间分隔线 `41:1616`/`41:1795` 同批隐藏。
 24. **画布标签是画布层**：07/08 两页的列头与行名文字（`74:1399`–`74:1416`）仅用于评审阅读，不进产品、不做 token。
 25. ~~**medium 详情首屏末行越界**~~（**已关闭，2026-10-23 晚**）：600 详情简介由 3 行收到 2 行、后续内容整体上移 24，末行「添加时间」现落在 pane 内（y≈738，pane 底 776），首屏完整；仍按滚动视口出图，但不再裁内容。
 26. ~~**1440 / 1920 的 pane 外边距 16**~~（**已关闭，2026-10-23 晚**）：用户要求按 24 统一，`41:2026`/`48:2663`/`48:2749`/`41:1578` 四帧的 pane 改为 (280,24) 1136×852，子节点 +8/+8、右对齐项按「内容右缘 1392」重算；1920 `72:1083` 原本已是 24。官方依据见 §5.1（A）。
-27. **窗口底色与 rail 同色（2026-10-23 最终）**：用户定「窗口底色就用 NavigationRail 的背景色」，19 个桌面帧帧底与 19 个 rail 实例 + 8 个组件变体统一绑 `color/surfaceContainer`（94.0）；`surfaceDim`（87.0）不再用于窗口，只作更暗面备用。代价是 rail 与窗口底无级差，边界全靠 pane（98.1，差 4.0）与 24dp 画布缝。
+27. **窗口底色与 rail 同色（2026-10-23 定，深夜再提一级）**：用户定「窗口底色就用 NavigationRail 的背景色」，19 个桌面帧帧底与 19 个 rail 实例 + 8 个组件变体 + 4 个 NavigationBar 变体统一绑 **`surfaceContainerLow`（96.0）**；`surfaceDim`（87.0）不再用于窗口，只作更暗面备用。rail 与窗口底无级差，边界全靠 pane（现 100.0，差 **4.03**）与 24dp 画布缝。
 28. **历史/设置/书库的 390 字号已复核**：书库标题由 24 Medium 改 **24 Bold**（与 Home/Settings/History 一致）并上移到 y=16；设置 390 的 20 处行文本 15 → **14 Regular**；历史 390 保持 24 Bold / 12 Regular 副标 / 12 Medium 组标签。仍缺：设置 390 无副标题行（其他三档有），见第 30 条。
 29. **「展开全文」如何在 Figma 里表达 Wrap**：Figma 没有「按钮吸附在文本最后一行行尾、放不下才换行」的能力，当前用**截断（maxLines + ENDING）+ 按钮紧随（间距 8）**模拟；Flutter 侧必须用 `Wrap`（文本 + TextButton 同一 flow），断点换行行为以代码为准，Figma 只是视觉近似。
 30. ~~**设置 390 缺副标题行**~~（**已关闭，2026-10-23**）：已补 12 Regular / onSurfaceVariant 副标题「深色模式跟随系统 · 柔和玫瑰」于 (16,52)，标题以下全部内容下移 26。
@@ -516,7 +518,8 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 38. ~~**menu 是否外置**~~（**已关闭，2026-10-23 晚**）：用户明确「菜单按钮归 NavigationRail，只是视觉上像标题栏」→ 13 个外置 `MenuButton` 实例删除，改用 rail 自带 `menu-open`（展开）/`menu`（折叠），随 rail 折叠移动。
 39. ~~**SearchBar focused 是否保留 back**~~（**已关闭，2026-10-23 晚**）：用户定「保留 clear、移除 back」→ `80:1981` back 箭头删除，focused leading 与 unfocused 同为放大镜（新 `85:2311`），尾随 clear ✕ 保留；返回/失焦由页面层处理。
 40. ~~**标题栏最终高度与 rail 首项间距**~~（**已关闭，2026-10-23 深夜**）：标题栏 56 → **64**（搜索 y=12、窗控 y=16、menu 中心 32），pane 顶 **80** / 高 **H−104** / 内容累计 **+56**；rail 内 menu 与首个导航项间距由 20 加到 **32dp**（8 个变体 item 下移 12、行距仍 68）。最终几何见 `09` §13.9 / §13.10。
-41. ~~**暗色模式是否出 Figma 设计稿**~~（**已关闭，2026-10-23**）：用户定「Figma 设计稿里不做暗色模式，约定好值之后在代码层实现」——`Theme/A · Dark` 46 角色值与 A Dark 预览保留作为约定，暗色页面/样张不再产出；`SearchBar · Dark` 样张 `81:2017` 与说明 `81:2028` 已 delete_nodes。
+41. ~~**暗色模式是否出 Figma 设计稿**~~（**已关闭，2026-10-23**）：用户定「Figma 设计稿里不做暗色模式，约定好值之后在代码层实现」——`Theme/A · Dark` 46 角色值与 A Dark 预览保留作为约定，暗色页面/样张不再产出；`SearchBar · Dark` 样张 `81:2017` 与说明 `81:2028` 已 delete_nodes。42. **chrome/pane 再提亮一级（2026-10-23 深夜，已执行）**：用户观察「Gmail / Google 系网站桌面端耐看，背景色大多偏亮」，要求 pane 与 rail 各上调一级 → chrome（窗口底 / rail / NavigationBar）= `surfaceContainerLow` 96.0，pane = `surfaceContainerLowest` 100.0（纯白），pane 顶栏条 = `surface` 98.1，卡 / 列表行 = `surfaceContainerLow` 96.0。89 处填充重绑（55 chrome + 25 pane + 9 顶栏），46 角色与 tone 分布零改动。级差：chrome→pane 4.03、pane→卡 4.03、chrome→搜索框 4.04，**唯一低于 T2 的是 pane→顶栏条 1.93**——按「嵌套条靠高度与基线区分」处理（与 M3 顶栏条 spec 一致）。暗色镜像（chrome `#22191A` 9.9 / pane `#312829` 17.1 / 顶栏 `#191112` 5.9）只写入 §2.5 与 `08` §4.1 建议表，Figma 不出暗色稿。
+
 ## 10. 变更记录
 
 | 变更 | 内容 |
@@ -611,3 +614,4 @@ P0 = 首批页面必需；P1 = 第二批。P0 原子组件已在 05 页建齐（
 | 暗色模式移出 Figma | 用户定「Figma 设计稿中不做暗色模式，约定好值后代码层实现」：保留 `Theme/A · Dark` 46 角色值 + `01 Tokens` A Dark 预览作色彩约定，删除 05 页 `SearchBar · Dark` 样张 `81:2017`（说明 `81:2028` 同步删除/合并）；§2.5 记明暗色按 token 对照验收；§9 关闭第 33 条并新增第 41 条 |
 | rail 间距最终值（2026-10-23 深夜） | 用户要求「menu 到导航项组的间距在展开/收缩状态保持一致」：改为以**首个可见图标顶 y=104** 对齐（menu 底 44 → 60dp，两态一致）。折叠 indicator 100+64i / icon 104+64i / label 136+64i；展开 indicator 88+68i / icon 104+68i / label 106+68i。同时修掉折叠首项 icon 56 / label 100（间距 20）的旧 bug；8 变体内改，19 实例继承 |
 | 暗色不出图（2026-10-23 深夜） | 按用户决策删除 `SearchBar · Dark` 样张 `81:2017` 与说明 `81:2028`；Figma 只保留 `Theme/A · Dark` 46 角色值与 A Dark 预览作色彩约定，暗色在代码层实现 |
+| 区域提亮一级（2026-10-23 深夜） | 用户观察「Gmail / Google 系网站桌面端耐看，背景色大多偏亮」，要求 pane 与 rail 各上调一级。89 处 `set_fills`（4 个 batch）：chrome（窗口底 / rail / NavigationBar / 标题栏）= `surfaceContainerLow` `10:56`（96.0），pane = `surfaceContainerLowest` `10:55`（100.0 纯白），pane 顶栏条 = `surface` `10:51`（98.1）；共 55 chrome + 25 pane + 9 顶栏。级差 chrome→pane 4.03、pane→卡 4.03、顶栏条对 pane 1.93（嵌套条不计 T2）。顺带修 Settings1440「外观」分组卡宽度 `48:2683` 220→800。§2.3/§2.5/§2.6/§5.1 与 `08` §4.1 同步；46 角色零改动 |
