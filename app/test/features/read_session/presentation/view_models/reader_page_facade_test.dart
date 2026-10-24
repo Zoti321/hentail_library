@@ -44,12 +44,10 @@ ReadSessionContextData _sessionContext() => ReadSessionContextData(
 ProviderContainer _container({String title = 'Facade'}) {
   return ProviderContainer(
     overrides: <Override>[
-      readerControllerProvider(
-        _viewKey,
-      ).overrideWith(() => _StubReaderController(title)),
-      readSessionContextForReaderProvider(
-        comicId: _comicId,
-      ).overrideWith((Ref ref) async => _sessionContext()),
+      readerControllerProvider(_viewKey)
+          .overrideWith(() => _StubReaderController(title)),
+      readSessionContextForReaderProvider(comicId: _comicId)
+          .overrideWith((Ref ref) async => _sessionContext()),
       readerFullscreenControllerProvider.overrideWith(
         _FakeReaderFullscreenController.new,
       ),
@@ -95,9 +93,9 @@ void main() {
       notifications++;
     });
 
-    final _StubReaderController controller =
-        container.read(readerControllerProvider(_viewKey).notifier)
-            as _StubReaderController;
+    final _StubReaderController controller = container.read(
+      readerControllerProvider(_viewKey).notifier,
+    ) as _StubReaderController;
     controller.turnTo(5);
     controller.turnTo(7);
     // Riverpod 3 通知监听者为异步调度，需先让出事件循环再断言。
@@ -122,9 +120,9 @@ void main() {
       notifications++;
     });
 
-    final _StubReaderController controller =
-        container.read(readerControllerProvider(_viewKey).notifier)
-            as _StubReaderController;
+    final _StubReaderController controller = container.read(
+      readerControllerProvider(_viewKey).notifier,
+    ) as _StubReaderController;
     controller.replaceComicTitle('Renamed');
     await Future<void>.delayed(Duration.zero);
 
@@ -157,9 +155,9 @@ void main() {
         notifications++;
       });
 
-      (container.read(readerFullscreenControllerProvider.notifier)
-              as _FakeReaderFullscreenController)
-          .set(true);
+      (container.read(
+        readerFullscreenControllerProvider.notifier,
+      ) as _FakeReaderFullscreenController).set(true);
       (container.read(readerControllerProvider(_viewKey).notifier)
               as _StubReaderController)
           .setSeriesBoundaryPrompt(SeriesBoundaryPrompt.advance);

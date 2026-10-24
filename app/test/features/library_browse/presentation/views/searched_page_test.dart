@@ -66,18 +66,17 @@ Future<void> _pumpSearchedPage(
 
   final List<Override> coverOverrides = comicsPage.items
       .map(
-        (Comic comic) => comicCoverProvider(
-          comic.comicId,
-        ).overrideWith(_NoCoverComicCover.new),
+        (Comic comic) =>
+            comicCoverProvider(comic.comicId)
+                .overrideWith(_NoCoverComicCover.new),
       )
       .toList();
 
   await tester.pumpWidget(
     ProviderScope(
       overrides: <Override>[
-        librarySearchPageComicsControllerProvider(
-          query,
-        ).overrideWith(() => controller),
+        librarySearchPageComicsControllerProvider(query)
+            .overrideWith(() => controller),
         ...coverOverrides,
       ],
       child: MaterialApp(
@@ -206,9 +205,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: <Override>[
-            librarySearchPageComicsControllerProvider(
-              query,
-            ).overrideWith(() => controller),
+            librarySearchPageComicsControllerProvider(query)
+                .overrideWith(() => controller),
           ],
           child: MaterialApp.router(
             locale: const Locale('zh'),
@@ -313,9 +311,9 @@ void main() {
           '2',
           reason: 'result count chip churned on idle frame $i',
         );
-        final RenderBox headerBox =
-            tester.renderObject(find.byType(SearchedPageHeaderSection))
-                as RenderBox;
+        final RenderBox headerBox = tester.renderObject(
+          find.byType(SearchedPageHeaderSection),
+        ) as RenderBox;
         headerHeights.add(headerBox.size.height);
       }
 

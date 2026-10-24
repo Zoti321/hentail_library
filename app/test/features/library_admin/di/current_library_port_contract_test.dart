@@ -117,9 +117,10 @@ void main() {
 
   CurrentLibraryPort port() => container.read(currentLibraryPortProvider);
 
-  Future<List<String>> libraryIds() async => (await container.read(
-    currentLibraryProvider.future,
-  )).libraries.map((LocalLibrary l) => l.libraryId).toList();
+  Future<List<String>> libraryIds() async =>
+      (await container.read(currentLibraryProvider.future)).libraries
+          .map((LocalLibrary l) => l.libraryId)
+          .toList();
 
   test('currentId reflects the repository current selection', () async {
     await container.read(currentLibraryProvider.future);

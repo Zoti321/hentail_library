@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter/material.dart';
@@ -263,23 +264,21 @@ void main() {
           overrides: <Override>[
             ...sharedLibraryStateOverrides(),
             ...bootstrapCompositionOverrides(),
-            readerControllerProvider(
-              _viewKey,
-            ).overrideWith(_TestReaderControllerAtPage50.new),
+            readerControllerProvider(_viewKey)
+                .overrideWith(_TestReaderControllerAtPage50.new),
             readerPrefetchControllerProvider.overrideWith(
               _FakeReaderPrefetchController.new,
             ),
-            comicImagesProvider(comicId: _testComicId).overrideWith((
-              Ref ref,
-            ) async {
-              return List<ReaderPageImageData>.generate(
-                100,
-                (int index) => ReaderArchivePageImageData(
-                  comicId: _testComicId,
-                  pageIndex: index,
-                ),
-              );
-            }),
+            comicImagesProvider(comicId: _testComicId)
+                .overrideWith((Ref ref) async {
+                  return List<ReaderPageImageData>.generate(
+                    100,
+                    (int index) => ReaderArchivePageImageData(
+                      comicId: _testComicId,
+                      pageIndex: index,
+                    ),
+                  );
+                }),
             ...List<Override>.generate(
               100,
               (int index) => comicReaderPageProvider(
@@ -328,23 +327,21 @@ void main() {
           overrides: <Override>[
             ...sharedLibraryStateOverrides(),
             ...bootstrapCompositionOverrides(),
-            readerControllerProvider(
-              _viewKey,
-            ).overrideWith(_TestReaderControllerAtPage50.new),
+            readerControllerProvider(_viewKey)
+                .overrideWith(_TestReaderControllerAtPage50.new),
             readerPrefetchControllerProvider.overrideWith(
               _FakeReaderPrefetchController.new,
             ),
-            comicImagesProvider(comicId: _testComicId).overrideWith((
-              Ref ref,
-            ) async {
-              return List<ReaderPageImageData>.generate(
-                100,
-                (int index) => ReaderArchivePageImageData(
-                  comicId: _testComicId,
-                  pageIndex: index,
-                ),
-              );
-            }),
+            comicImagesProvider(comicId: _testComicId)
+                .overrideWith((Ref ref) async {
+                  return List<ReaderPageImageData>.generate(
+                    100,
+                    (int index) => ReaderArchivePageImageData(
+                      comicId: _testComicId,
+                      pageIndex: index,
+                    ),
+                  );
+                }),
             ...List<Override>.generate(
               100,
               (int index) => comicReaderPageProvider(
@@ -406,9 +403,8 @@ List<Override> _viewportTestOverrides() {
     readerPrefetchControllerProvider.overrideWith(
       _FakeReaderPrefetchController.new,
     ),
-    comicImagesProvider(
-      comicId: _testComicId,
-    ).overrideWith((Ref ref) async => images),
+    comicImagesProvider(comicId: _testComicId)
+        .overrideWith((Ref ref) async => images),
     ...List<Override>.generate(
       100,
       (int index) => comicReaderPageProvider(

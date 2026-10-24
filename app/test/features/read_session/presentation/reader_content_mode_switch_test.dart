@@ -33,9 +33,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: <Override>[
-            readerControllerProvider(
-              _viewKey,
-            ).overrideWith(() => _StubReaderController()),
+            readerControllerProvider(_viewKey)
+                .overrideWith(() => _StubReaderController()),
             readerPrefetchControllerProvider.overrideWith(_FakePrefetch.new),
             comicImagesProvider(comicId: _comicId).overrideWith(
               (Ref ref) async => <ReaderPageImageData>[

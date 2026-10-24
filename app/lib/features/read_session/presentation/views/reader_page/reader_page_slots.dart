@@ -138,16 +138,15 @@ class _ReaderBottomBarSlot extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ({bool showControls, int currentIndex, ReadingMode readingMode})
     chrome = ref.watch(
-      readerControllerProvider(viewKey).select((
-        AsyncValue<ReaderState> asyncState,
-      ) {
-        final ReaderState? state = asyncState.asData?.value;
-        return (
-          showControls: state?.showControls ?? false,
-          currentIndex: state?.currentIndex ?? 1,
-          readingMode: state?.readingMode ?? ReadingMode.paged,
-        );
-      }),
+      readerControllerProvider(viewKey)
+          .select((AsyncValue<ReaderState> asyncState) {
+            final ReaderState? state = asyncState.asData?.value;
+            return (
+              showControls: state?.showControls ?? false,
+              currentIndex: state?.currentIndex ?? 1,
+              readingMode: state?.readingMode ?? ReadingMode.paged,
+            );
+          }),
     );
     final bool readerAutoPlayEnabled = ref.watch(
       readerControllerProvider(viewKey).select(
@@ -224,19 +223,18 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
     );
     final ({int currentIndex, int totalPages, ReadingMode readingMode})?
     autoPlayState = ref.watch(
-      readerControllerProvider(viewKey).select((
-        AsyncValue<ReaderState> asyncState,
-      ) {
-        final ReaderState? readerState = asyncState.asData?.value;
-        if (readerState == null) {
-          return null;
-        }
-        return (
-          currentIndex: readerState.currentIndex,
-          totalPages: readerState.totalPages,
-          readingMode: readerState.readingMode,
-        );
-      }),
+      readerControllerProvider(viewKey)
+          .select((AsyncValue<ReaderState> asyncState) {
+            final ReaderState? readerState = asyncState.asData?.value;
+            if (readerState == null) {
+              return null;
+            }
+            return (
+              currentIndex: readerState.currentIndex,
+              totalPages: readerState.totalPages,
+              readingMode: readerState.readingMode,
+            );
+          }),
     );
     final bool reduceMotion = reduceMotionOf(context);
     final String? nextComicId = seriesNavContext?.nextItem?.comicId;

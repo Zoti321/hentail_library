@@ -43,48 +43,46 @@ void main() {
     container.dispose();
   });
 
-  test(
-    'dispose while queued on load gate skips work and does not log SEVERE',
-    () async {
-      gateBlockers = List<Completer<void>>.generate(
-        ComicCoverLoadGate.maxConcurrent,
-        (_) => Completer<void>(),
-      );
-      for (final Completer<void> blocker in gateBlockers) {
-        unawaited(ComicCoverLoadGate.run(() => blocker.future));
-      }
+  test('dispose while queued on load gate skips work and does not log SEVERE', () async {
+    gateBlockers = List<Completer<void>>.generate(
+      ComicCoverLoadGate.maxConcurrent,
+      (_) => Completer<void>(),
+    );
+    for (final Completer<void> blocker in gateBlockers) {
+      unawaited(ComicCoverLoadGate.run(() => blocker.future));
+    }
 
-      final List<LogRecord> severeRecords = <LogRecord>[];
-      final StreamSubscription<LogRecord> logSub =
-          Logger('hentai.ui.comic_cover').onRecord.listen((LogRecord record) {
-            if (record.level >= Level.SEVERE) {
-              severeRecords.add(record);
-            }
-          });
+    final List<LogRecord> severeRecords = <LogRecord>[];
+    final StreamSubscription<LogRecord> logSub = Logger('hentai.ui.comic_cover')
+        .onRecord
+        .listen((LogRecord record) {
+          if (record.level >= Level.SEVERE) {
+            severeRecords.add(record);
+          }
+        });
 
-      final ProviderSubscription<ComicCoverState> coverSub = container.listen(
-        comicCoverProvider('comic-1'),
-        (_, _) {},
-      );
-      // build schedules ensureLoaded via microtask; let it queue behind the gate.
-      await Future<void>.delayed(Duration.zero);
-      expect(comicRepo.findByIdCalls, isEmpty);
+    final ProviderSubscription<ComicCoverState> coverSub = container.listen(
+      comicCoverProvider('comic-1'),
+      (_, _) {},
+    );
+    // build schedules ensureLoaded via microtask; let it queue behind the gate.
+    await Future<void>.delayed(Duration.zero);
+    expect(comicRepo.findByIdCalls, isEmpty);
 
-      coverSub.close();
-      await Future<void>.delayed(Duration.zero);
+    coverSub.close();
+    await Future<void>.delayed(Duration.zero);
 
-      for (final Completer<void> blocker in gateBlockers) {
-        blocker.complete();
-      }
-      await Future<void>.delayed(Duration.zero);
-      await Future<void>.delayed(Duration.zero);
+    for (final Completer<void> blocker in gateBlockers) {
+      blocker.complete();
+    }
+    await Future<void>.delayed(Duration.zero);
+    await Future<void>.delayed(Duration.zero);
 
-      expect(comicRepo.findByIdCalls, isEmpty);
-      expect(severeRecords, isEmpty);
+    expect(comicRepo.findByIdCalls, isEmpty);
+    expect(severeRecords, isEmpty);
 
-      await logSub.cancel();
-    },
-  );
+    await logSub.cancel();
+  });
 
   test('loads NoCover when comic is missing', () async {
     final ProviderSubscription<ComicCoverState> coverSub = container.listen(

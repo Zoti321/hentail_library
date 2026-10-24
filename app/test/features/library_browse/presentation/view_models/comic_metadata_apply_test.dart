@@ -83,9 +83,9 @@ void main() {
 
       await applyComicMetadataForm(
         repo,
-        ComicMetadataForm.fromComic(
-          original,
-        ).addParody('Fate').addCharacter('Saber'),
+        ComicMetadataForm.fromComic(original)
+            .addParody('Fate')
+            .addCharacter('Saber'),
         original,
         publish: published.add,
         notifyExternalChange: () {},

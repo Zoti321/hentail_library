@@ -26,39 +26,33 @@ class _MemoryLegacySettingsJsonFile implements LegacySettingsJsonFile {
 
 void main() {
   group('AppSettingRepositoryImpl', () {
-    test(
-      'load imports legacy settings.json into SharedPreferences and deletes file',
-      () async {
-        SharedPreferences.setMockInitialValues(<String, Object>{});
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        final _MemoryLegacySettingsJsonFile legacyFile =
-            _MemoryLegacySettingsJsonFile(
-              jsonEncode(<String, dynamic>{
-                'themePreference': 'dark',
-                'autoScan': true,
-                'enabledFormatGroups': <String>['pdf'],
-              }),
-            );
-        final AppSettingRepositoryImpl repo = AppSettingRepositoryImpl(
-          sharedPreferences: prefs,
-          legacySettingsFile: legacyFile,
-        );
+    test('load imports legacy settings.json into SharedPreferences and deletes file', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final _MemoryLegacySettingsJsonFile legacyFile =
+          _MemoryLegacySettingsJsonFile(
+            jsonEncode(<String, dynamic>{
+              'themePreference': 'dark',
+              'autoScan': true,
+              'enabledFormatGroups': <String>['pdf'],
+            }),
+          );
+      final AppSettingRepositoryImpl repo = AppSettingRepositoryImpl(
+        sharedPreferences: prefs,
+        legacySettingsFile: legacyFile,
+      );
 
-        final AppSetting loaded = await repo.load();
+      final AppSetting loaded = await repo.load();
 
-        expect(loaded.themePreference, AppThemePreference.dark);
-        expect(await legacyFile.exists(), isFalse);
-        expect(prefs.containsKey(AppSettingStorageKeys.aggregateJson), isTrue);
-        expect(
-          prefs.getBool(AppSettingStorageKeys.legacyImportAutoScan),
-          isTrue,
-        );
-        expect(
-          prefs.getString(AppSettingStorageKeys.legacyImportFormatGroups),
-          jsonEncode(<String>['pdf']),
-        );
-      },
-    );
+      expect(loaded.themePreference, AppThemePreference.dark);
+      expect(await legacyFile.exists(), isFalse);
+      expect(prefs.containsKey(AppSettingStorageKeys.aggregateJson), isTrue);
+      expect(prefs.getBool(AppSettingStorageKeys.legacyImportAutoScan), isTrue);
+      expect(
+        prefs.getString(AppSettingStorageKeys.legacyImportFormatGroups),
+        jsonEncode(<String>['pdf']),
+      );
+    });
 
     test('second load is idempotent and does not re-import', () async {
       SharedPreferences.setMockInitialValues(<String, Object>{});

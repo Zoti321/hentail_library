@@ -23,9 +23,8 @@ class ReaderCoverEditorNotifier extends _$ReaderCoverEditorNotifier {
       resourceType: mapResourceType(comic.resourceType),
       pageIndex: pageIndex,
     );
-    final Uint8List? bytes = (await repo.findByComicId(
-      comic.comicId,
-    ))?.thumbnail;
+    final Uint8List? bytes = (await repo.findByComicId(comic.comicId))
+        ?.thumbnail;
     if (bytes != null && bytes.isNotEmpty) {
       ref
           .read(comicCoverThumbnailCacheProvider(comic.comicId).notifier)

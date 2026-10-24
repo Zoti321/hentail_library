@@ -98,9 +98,8 @@ void main() {
     WidgetTester tester,
   ) async {
     await _pumpComicDetail(tester, 'comic-missing', <Override>[
-      libraryComicDetailProvider(
-        'comic-missing',
-      ).overrideWith((Ref ref) async => null),
+      libraryComicDetailProvider('comic-missing')
+          .overrideWith((Ref ref) async => null),
     ]);
     await tester.pumpAndSettle();
 
@@ -115,9 +114,8 @@ void main() {
     WidgetTester tester,
   ) async {
     await _pumpComicDetail(tester, 'comic-broken', <Override>[
-      libraryComicDetailProvider(
-        'comic-broken',
-      ).overrideWith((Ref ref) async => throw Exception('boom')),
+      libraryComicDetailProvider('comic-broken')
+          .overrideWith((Ref ref) async => throw Exception('boom')),
       libraryRefreshActionProvider.overrideWithValue(() {}),
     ]);
     await tester.pumpAndSettle();

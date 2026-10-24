@@ -7,12 +7,11 @@ import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Builds the Libraries section inserted after Home in [DesktopSidebar].
-typedef DesktopSidebarLibrariesSectionBuilder =
-    Widget Function({
-      required double expandProgress,
-      required double labelOpacity,
-      required bool showCollapsedTooltip,
-    });
+typedef DesktopSidebarLibrariesSectionBuilder = Widget Function({
+  required double expandProgress,
+  required double labelOpacity,
+  required bool showCollapsedTooltip,
+});
 
 class DesktopSidebar extends HookWidget {
   static const double expandedWidth = 256;

@@ -31,9 +31,9 @@ class TrashComicTile extends StatelessWidget {
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final String locale = Localizations.localeOf(context).toString();
-    final String deletedAt = DateFormat.yMMMd(
-      locale,
-    ).add_Hm().format(item.deletedAt.toLocal());
+    final String deletedAt = DateFormat.yMMMd(locale)
+        .add_Hm()
+        .format(item.deletedAt.toLocal());
     return Material(
       color: selected ? cs.primary.withAlpha(20) : Colors.transparent,
       borderRadius: BorderRadius.circular(tokens.radius.xs),

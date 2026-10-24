@@ -104,9 +104,8 @@ void main() {
 
       await widgetRef
           .read(
-            namedFacetManagementControllerProvider(
-              ManagedNamedFacetKind.author,
-            ).notifier,
+            namedFacetManagementControllerProvider(ManagedNamedFacetKind.author)
+                .notifier,
           )
           .setQuery('zs');
       await tester.pumpAndSettle();
@@ -137,9 +136,8 @@ void main() {
 
       await widgetRef
           .read(
-            namedFacetManagementControllerProvider(
-              ManagedNamedFacetKind.author,
-            ).notifier,
+            namedFacetManagementControllerProvider(ManagedNamedFacetKind.author)
+                .notifier,
           )
           .loadMore();
       await tester.pumpAndSettle();
@@ -237,9 +235,8 @@ void main() {
 
       await widgetRef
           .read(
-            namedFacetManagementControllerProvider(
-              ManagedNamedFacetKind.author,
-            ).notifier,
+            namedFacetManagementControllerProvider(ManagedNamedFacetKind.author)
+                .notifier,
           )
           .setQuery('作者 01');
       await tester.pumpAndSettle();

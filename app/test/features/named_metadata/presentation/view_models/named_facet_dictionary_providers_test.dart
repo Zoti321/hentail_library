@@ -40,21 +40,18 @@ void main() {
     },
   );
 
-  test(
-    'allCharactersProvider reads listAll through NamedFacetDictionaryRepository',
-    () async {
-      final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[
-          characterRepoProvider.overrideWithValue(
-            _FakeNamedFacetDictionaryRepository(all: <String>['Reimu']),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
+  test('allCharactersProvider reads listAll through NamedFacetDictionaryRepository', () async {
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        characterRepoProvider.overrideWithValue(
+          _FakeNamedFacetDictionaryRepository(all: <String>['Reimu']),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
 
-      expect(await container.read(allCharactersProvider.future), <String>[
-        'Reimu',
-      ]);
-    },
-  );
+    expect(await container.read(allCharactersProvider.future), <String>[
+      'Reimu',
+    ]);
+  });
 }

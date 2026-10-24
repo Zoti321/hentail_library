@@ -246,9 +246,8 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
           error: error,
           onRetry: () => ref
               .read(
-                seriesDetailComicsCatalogControllerProvider(
-                  widget.series.id,
-                ).notifier,
+                seriesDetailComicsCatalogControllerProvider(widget.series.id)
+                    .notifier,
               )
               .refresh(),
         ),

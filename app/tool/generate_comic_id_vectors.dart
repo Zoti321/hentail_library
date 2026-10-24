@@ -82,9 +82,8 @@ void main() {
   final File file = File('../core/tests/fixtures/comic_id_vectors.json');
   file.parent.createSync(recursive: true);
   file.writeAsStringSync(
-    const JsonEncoder.withIndent(
-      '  ',
-    ).convert(<String, Object>{'cases': cases}),
+    const JsonEncoder.withIndent('  ')
+        .convert(<String, Object>{'cases': cases}),
   );
   stdout.writeln('wrote ${file.absolute.path}');
 }

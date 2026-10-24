@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:hentai_library/core/util/debouncer.dart';
 
 import 'package:hentai_library/core/logging/app_log.dart';

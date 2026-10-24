@@ -17,6 +17,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/pump_localized_app.dart';
+
 import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
 
 class _FakeLibraryRevisionPort implements LibraryRevisionPort {
@@ -96,9 +97,8 @@ Future<void> _pumpTrash(WidgetTester tester, List<TrashedComic> items) async {
       comicTrashRepositoryProvider.overrideWithValue(_TrashComicRepo(items)),
       readerSessionPortProvider.overrideWithValue(_NoopReaderSessionPort()),
       for (final TrashedComic item in items)
-        comicCoverProvider(
-          item.comic.comicId,
-        ).overrideWith(_NoCoverComicCover.new),
+        comicCoverProvider(item.comic.comicId)
+            .overrideWith(_NoCoverComicCover.new),
     ],
   );
   await tester.pumpAndSettle();

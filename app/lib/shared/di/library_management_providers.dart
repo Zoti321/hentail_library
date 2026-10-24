@@ -16,9 +16,9 @@ final Provider<LibraryManagementPort> libraryManagementPortProvider =
 /// 无 ProviderScope 时回退到全部库页，与历史行为一致。
 void goCurrentLibraryBrowseFromContext(BuildContext context) {
   try {
-    ProviderScope.containerOf(
-      context,
-    ).read(libraryManagementPortProvider).goCurrentLibraryBrowse(context);
+    ProviderScope.containerOf(context)
+        .read(libraryManagementPortProvider)
+        .goCurrentLibraryBrowse(context);
   } catch (_) {
     context.go(LibrariesRoutes.all);
   }

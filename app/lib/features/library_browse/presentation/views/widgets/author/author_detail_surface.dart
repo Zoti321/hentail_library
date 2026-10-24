@@ -580,9 +580,8 @@ class _AuthorComicCoverCard extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   Navigator.of(context).maybePop();
-                  GoRouter.of(
-                    context,
-                  ).push('/comic/${Uri.encodeComponent(comic.comicId)}');
+                  GoRouter.of(context)
+                      .push('/comic/${Uri.encodeComponent(comic.comicId)}');
                 },
                 child: ComicCoverContent(comicId: comic.comicId),
               ),
@@ -597,7 +596,7 @@ class _AuthorComicCoverCard extends StatelessWidget {
 IconData _platformIcon(AuthorLinkPlatform platform) {
   return switch (platform) {
     AuthorLinkPlatform.pixiv => LucideIcons.palette,
-    AuthorLinkPlatform.x => LucideIcons.twitter,
+    AuthorLinkPlatform.x => LucideIcons.x,
     AuthorLinkPlatform.patreon => LucideIcons.heart,
     AuthorLinkPlatform.fanbox => LucideIcons.brush,
     AuthorLinkPlatform.discord => LucideIcons.messageCircle,

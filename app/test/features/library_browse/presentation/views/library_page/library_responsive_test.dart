@@ -118,9 +118,8 @@ void main() {
 
   group('libraryGridDelegateForTokens', () {
     test('returns tiered grid metrics', () {
-      final AppThemeTokens tokens = buildAppTheme(
-        Brightness.light,
-      ).extension<AppThemeTokens>()!;
+      final AppThemeTokens tokens = buildAppTheme(Brightness.light)
+          .extension<AppThemeTokens>()!;
 
       final SliverGridDelegateWithMaxCrossAxisExtent compactDelegate =
           libraryGridDelegateForTokens(tokens, LibraryLayoutTier.compact)

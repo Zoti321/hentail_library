@@ -2,7 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
+
 import '../../../../support/fakes/settings_test_fakes.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 

@@ -14,8 +14,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 typedef LibraryMetadataFilterToggle = Future<void> Function(String name);
-typedef LibraryMetadataIncludeModeChanged =
-    Future<void> Function(LibraryMetadataIncludeMode mode);
+typedef LibraryMetadataIncludeModeChanged = Future<void> Function(
+  LibraryMetadataIncludeMode mode,
+);
 typedef LibraryMetadataFilterClear = Future<void> Function();
 
 class LibraryMetadataFilterControls extends HookConsumerWidget {

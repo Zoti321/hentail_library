@@ -284,9 +284,8 @@ class _AnchoredOverlayMenuLayout extends SingleChildLayoutDelegate {
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
-    return BoxConstraints.loose(
-      constraints.biggest,
-    ).deflate(EdgeInsets.all(screenPadding) + padding);
+    return BoxConstraints.loose(constraints.biggest)
+        .deflate(EdgeInsets.all(screenPadding) + padding);
   }
 
   @override

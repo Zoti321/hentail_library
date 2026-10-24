@@ -26,9 +26,8 @@ class ReadSessionLaunchPortAdapter implements ReadSessionLaunchPort {
         .read(appRouterProvider)
         .pushNamed(
           ReaderRouteArgs.readerRouteName,
-          queryParameters: ReaderRouteArgs.fromSession(
-            session,
-          ).toQueryParameters(),
+          queryParameters: ReaderRouteArgs.fromSession(session)
+              .toQueryParameters(),
         );
   }
 }
