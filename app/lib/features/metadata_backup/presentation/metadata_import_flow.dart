@@ -14,14 +14,17 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-typedef MetadataPeekInvoker =
-    MetadataBackupManifestDto Function(Uint8List bytes);
+typedef MetadataPeekInvoker = MetadataBackupManifestDto Function(
+  Uint8List bytes,
+);
 
-typedef MetadataPreviewInvoker =
-    PreviewImportComicMetadataResultDto Function(Uint8List bytes);
+typedef MetadataPreviewInvoker = PreviewImportComicMetadataResultDto Function(
+  Uint8List bytes,
+);
 
-typedef MetadataImportInvoker =
-    ImportComicMetadataResultDto Function(Uint8List bytes);
+typedef MetadataImportInvoker = ImportComicMetadataResultDto Function(
+  Uint8List bytes,
+);
 
 /// 手动导入 Comic 用户元数据：选文件 → peek → 预演 → 确认 → import → 结果摘要。
 Future<void> runMetadataImportFlow(
@@ -463,9 +466,8 @@ class _SectionHeading extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         label,
-        style: Theme.of(
-          context,
-        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+        style: Theme.of(context).textTheme.titleSmall
+            ?.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }

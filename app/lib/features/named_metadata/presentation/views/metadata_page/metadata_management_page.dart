@@ -84,9 +84,9 @@ class _MetadataManagementPageState
 
   @override
   Widget build(BuildContext context) {
-    final String? tabParam = GoRouterState.of(
-      context,
-    ).uri.queryParameters['tab'];
+    final String? tabParam = GoRouterState.of(context)
+        .uri
+        .queryParameters['tab'];
     final int selectedIndex = _selectedTabIndex ?? _tabIndexFromQuery(tabParam);
     _selectedTabIndex ??= selectedIndex;
     _visitedTabIndexes.add(selectedIndex);
@@ -329,9 +329,8 @@ class _MetadataManagementPageState
 
     await ref
         .read(
-          namedFacetManagementControllerProvider(
-            ManagedNamedFacetKind.tag,
-          ).notifier,
+          namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag)
+              .notifier,
         )
         .deleteAll();
     if (!context.mounted) {

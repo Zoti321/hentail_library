@@ -72,9 +72,8 @@ void main() {
 
   group('ComicMetadataForm.validate / normalized', () {
     test('rejects blank title', () {
-      final ComicMetadataFormValidation v = ComicMetadataForm(
-        title: '  ',
-      ).validate();
+      final ComicMetadataFormValidation v = ComicMetadataForm(title: '  ')
+          .validate();
       expect(v.isValid, isFalse);
       expect(v.titleError, '漫画标题不能为空');
     });
@@ -123,9 +122,8 @@ void main() {
 
   group('ComicMetadataForm.diffAgainst', () {
     test('blank title is invalid', () {
-      final ComicMetadataDraftDiff diff = ComicMetadataForm(
-        title: '  ',
-      ).diffAgainst(_comic());
+      final ComicMetadataDraftDiff diff = ComicMetadataForm(title: '  ')
+          .diffAgainst(_comic());
 
       expect(diff, isA<ComicMetadataDraftInvalid>());
       expect(
@@ -137,9 +135,9 @@ void main() {
     test('submits only the changed title', () {
       final Comic original = _comic(title: '原标题', description: '简介');
       final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(
-          original,
-        ).copyWith(title: '新标题').diffAgainst(original),
+        ComicMetadataForm.fromComic(original)
+            .copyWith(title: '新标题')
+            .diffAgainst(original),
       );
 
       expect(changes.title, '新标题');
@@ -166,9 +164,9 @@ void main() {
       final DateTime published = DateTime.utc(2020, 5, 1);
       final Comic original = _comic(publishedAt: published);
       final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(
-          original,
-        ).copyWith(publishedAt: null).diffAgainst(original),
+        ComicMetadataForm.fromComic(original)
+            .copyWith(publishedAt: null)
+            .diffAgainst(original),
       );
 
       expect(changes.publishedAt, isNull);
@@ -217,9 +215,9 @@ void main() {
     test('submits parodies when their order changes', () {
       final Comic original = _comic(parodies: <String>['Fate', '原创']);
       final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(
-          original,
-        ).copyWith(parodies: <String>['原创', 'Fate']).diffAgainst(original),
+        ComicMetadataForm.fromComic(original)
+            .copyWith(parodies: <String>['原创', 'Fate'])
+            .diffAgainst(original),
       );
 
       expect(changes.parodies, <String>['原创', 'Fate']);
@@ -272,9 +270,9 @@ void main() {
     test('maps isR18 false back to safe content rating', () {
       final Comic original = _comic(contentRating: ContentRating.r18);
       final ComicMetadataDraftChanges changes = _changedFields(
-        ComicMetadataForm.fromComic(
-          original,
-        ).copyWith(isR18: false).diffAgainst(original),
+        ComicMetadataForm.fromComic(original)
+            .copyWith(isR18: false)
+            .diffAgainst(original),
       );
       expect(changes.contentRating, ContentRating.safe);
     });
@@ -282,18 +280,18 @@ void main() {
     test('includes a list only when that list changed', () {
       final Comic original = _comic();
       final ComicMetadataDraftChanges tagsOnly = _changedFields(
-        ComicMetadataForm.fromComic(
-          original,
-        ).addTag('new-tag').diffAgainst(original),
+        ComicMetadataForm.fromComic(original)
+            .addTag('new-tag')
+            .diffAgainst(original),
       );
       expect(tagsOnly.tags, <Tag>[Tag(name: 'new-tag')]);
       expect(tagsOnly.parodies, isNull);
       expect(tagsOnly.characters, isNull);
 
       final ComicMetadataDraftChanges titleOnly = _changedFields(
-        ComicMetadataForm.fromComic(
-          original,
-        ).copyWith(title: '仅改标题').diffAgainst(original),
+        ComicMetadataForm.fromComic(original)
+            .copyWith(title: '仅改标题')
+            .diffAgainst(original),
       );
       expect(titleOnly.title, '仅改标题');
       expect(titleOnly.tags, isNull);
@@ -301,9 +299,10 @@ void main() {
       expect(titleOnly.characters, isNull);
 
       final ComicMetadataDraftChanges parodyAndCharacter = _changedFields(
-        ComicMetadataForm.fromComic(
-          original,
-        ).addParody('Fate').addCharacter('Saber').diffAgainst(original),
+        ComicMetadataForm.fromComic(original)
+            .addParody('Fate')
+            .addCharacter('Saber')
+            .diffAgainst(original),
       );
       expect(parodyAndCharacter.tags, isNull);
       expect(parodyAndCharacter.parodies, <String>['Fate']);

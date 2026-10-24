@@ -161,9 +161,8 @@ void main() {
         final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
         final Series original = _series(totalCount: null);
         final SeriesMetadataApplyResult result =
-            await SeriesMetadataForm.fromSeries(
-              original,
-            ).applyTo(repo, original);
+            await SeriesMetadataForm.fromSeries(original)
+                .applyTo(repo, original);
 
         expect(result, isA<SeriesMetadataApplySucceeded>());
         expect(repo.callCount, 0);
@@ -200,9 +199,9 @@ void main() {
         totalCount: 12,
       );
       final SeriesMetadataApplyResult result =
-          await SeriesMetadataForm.fromSeries(
-            original,
-          ).copyWith(totalCountText: '').applyTo(repo, original);
+          await SeriesMetadataForm.fromSeries(original)
+              .copyWith(totalCountText: '')
+              .applyTo(repo, original);
 
       expect(result, isA<SeriesMetadataApplySucceeded>());
       expect(repo.callCount, 1);

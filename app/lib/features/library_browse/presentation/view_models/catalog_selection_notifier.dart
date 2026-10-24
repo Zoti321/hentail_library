@@ -108,8 +108,8 @@ final catalogSelectionProvider =
 
 void exitCatalogSelectionFromContext(BuildContext context) {
   try {
-    ProviderScope.containerOf(
-      context,
-    ).read(catalogSelectionProvider.notifier).exit();
+    ProviderScope.containerOf(context)
+        .read(catalogSelectionProvider.notifier)
+        .exit();
   } catch (_) {}
 }

@@ -52,31 +52,27 @@ void main() {
           .read(libraryComicFiltersProvider.notifier)
           .setSortField(LibraryComicSortField.readAt);
 
-      sort = (await container.read(
-        libraryComicFiltersProvider.future,
-      )).sortOption;
+      sort = (await container.read(libraryComicFiltersProvider.future))
+          .sortOption;
       expect(sort.field, LibraryComicSortField.readAt);
       expect(sort.descending, isFalse);
     },
   );
 
-  test(
-    'selecting a non-readAt field for the first time still defaults to ascending',
-    () async {
-      final ProviderContainer container = createContainer();
-      await container.read(libraryComicFiltersProvider.future);
+  test('selecting a non-readAt field for the first time still defaults to ascending', () async {
+    final ProviderContainer container = createContainer();
+    await container.read(libraryComicFiltersProvider.future);
 
-      await container
-          .read(libraryComicFiltersProvider.notifier)
-          .setSortField(LibraryComicSortField.createdAt);
+    await container
+        .read(libraryComicFiltersProvider.notifier)
+        .setSortField(LibraryComicSortField.createdAt);
 
-      final LibraryComicSortOption sort = (await container.read(
-        libraryComicFiltersProvider.future,
-      )).sortOption;
-      expect(sort.field, LibraryComicSortField.createdAt);
-      expect(sort.descending, isFalse);
-    },
-  );
+    final LibraryComicSortOption sort = (await container.read(
+      libraryComicFiltersProvider.future,
+    )).sortOption;
+    expect(sort.field, LibraryComicSortField.createdAt);
+    expect(sort.descending, isFalse);
+  });
 
   test('resetAll restores every comics filter and sort to defaults', () async {
     final ProviderContainer container = createContainer();

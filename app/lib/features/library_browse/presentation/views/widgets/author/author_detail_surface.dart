@@ -580,9 +580,8 @@ class _AuthorComicCoverCard extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   Navigator.of(context).maybePop();
-                  GoRouter.of(
-                    context,
-                  ).push('/comic/${Uri.encodeComponent(comic.comicId)}');
+                  GoRouter.of(context)
+                      .push('/comic/${Uri.encodeComponent(comic.comicId)}');
                 },
                 child: ComicCoverContent(comicId: comic.comicId),
               ),

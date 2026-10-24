@@ -16,8 +16,9 @@ import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.d
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
-typedef MetadataExportInvoker =
-    Uint8List Function(ExportComicMetadataOptionsDto options);
+typedef MetadataExportInvoker = Uint8List Function(
+  ExportComicMetadataOptionsDto options,
+);
 
 /// 手动导出 Comic 用户元数据：选项 dialog → 另存为 → FRB export → Toast。
 Future<void> runMetadataExportFlow(

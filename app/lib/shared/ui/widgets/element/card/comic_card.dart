@@ -73,29 +73,27 @@ class ComicCard extends StatelessWidget {
           case ComicContextAction.edit:
             onEditMetadata();
           case ComicContextAction.showInExplorer:
-            showInFileExplorer(comic.path).catchError((
-              Object error,
-              StackTrace stackTrace,
-            ) {
-              debugPrint(
-                'showInFileExplorer failed for "${comic.path}": $error',
-              );
-              if (!context.mounted) {
-                return;
-              }
-              if (error is AppException) {
-                showErrorToast(context, error);
-                return;
-              }
-              showErrorToast(
-                context,
-                AppException(
-                  l10n.comicDetailShowInExplorerFailed,
-                  cause: error,
-                  stackTrace: stackTrace,
-                ),
-              );
-            });
+            showInFileExplorer(comic.path)
+                .catchError((Object error, StackTrace stackTrace) {
+                  debugPrint(
+                    'showInFileExplorer failed for "${comic.path}": $error',
+                  );
+                  if (!context.mounted) {
+                    return;
+                  }
+                  if (error is AppException) {
+                    showErrorToast(context, error);
+                    return;
+                  }
+                  showErrorToast(
+                    context,
+                    AppException(
+                      l10n.comicDetailShowInExplorerFailed,
+                      cause: error,
+                      stackTrace: stackTrace,
+                    ),
+                  );
+                });
           case ComicContextAction.delete:
             onTrashComic();
         }

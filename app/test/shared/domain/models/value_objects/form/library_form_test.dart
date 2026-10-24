@@ -216,9 +216,9 @@ void main() {
         username: 'u',
       );
       final _RecordingLibraryRepository repo = _RecordingLibraryRepository();
-      await LibraryForm.fromLibrary(
-        original,
-      ).copyWith(rootPath: 'https://b.example/dav').applyTo(repo, original);
+      await LibraryForm.fromLibrary(original)
+          .copyWith(rootPath: 'https://b.example/dav')
+          .applyTo(repo, original);
       expect(repo.calls, contains('updateRemote'));
       expect(repo.lastPassword, isNull);
     });

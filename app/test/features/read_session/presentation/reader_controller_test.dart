@@ -591,45 +591,39 @@ void main() {
       incognito: true,
     );
 
-    test(
-      'series loop on the last spread switches to the next comic without a prompt',
-      () async {
-        final _RecordingSeriesNavigation navigation =
-            _RecordingSeriesNavigation();
-        final ProviderContainer container = _createContainer(
-          key: _incognitoKey,
-          initialSetting: AppSetting(
-            readingMode: ReadingMode.paged,
-            autoPlayMode: AutoPlayMode.seriesLoop,
-          ),
-          snapshot: _snapshot(pageCount: 5, resumePage: 5),
-          seriesNavigation: navigation,
-        );
-        addTearDown(container.dispose);
+    test('series loop on the last spread switches to the next comic without a prompt', () async {
+      final _RecordingSeriesNavigation navigation =
+          _RecordingSeriesNavigation();
+      final ProviderContainer container = _createContainer(
+        key: _incognitoKey,
+        initialSetting: AppSetting(
+          readingMode: ReadingMode.paged,
+          autoPlayMode: AutoPlayMode.seriesLoop,
+        ),
+        snapshot: _snapshot(pageCount: 5, resumePage: 5),
+        seriesNavigation: navigation,
+      );
+      addTearDown(container.dispose);
 
-        await container.read(readerControllerProvider(_incognitoKey).future);
-        final ReaderController controller = _controller(
-          container,
-          _incognitoKey,
-        );
-        controller.setAutoPlayEnabled(true);
+      await container.read(readerControllerProvider(_incognitoKey).future);
+      final ReaderController controller = _controller(container, _incognitoKey);
+      controller.setAutoPlayEnabled(true);
 
-        final bool keepTicking = await controller.advanceAutoPlay(
-          navContext: _navContext(nextComicId: nextComicId),
-          session: session,
-          router: _testRouter(),
-        );
+      final bool keepTicking = await controller.advanceAutoPlay(
+        navContext: _navContext(nextComicId: nextComicId),
+        session: session,
+        router: _testRouter(),
+      );
 
-        expect(keepTicking, isFalse);
-        expect(navigation.switchedTo, <String>[nextComicId]);
-        expect(_state(container, _incognitoKey)?.currentIndex, 5);
-        expect(_state(container, _incognitoKey)?.autoPlayEnabled, isTrue);
-        expect(
-          _state(container, _incognitoKey)?.seriesBoundaryPrompt,
-          SeriesBoundaryPrompt.none,
-        );
-      },
-    );
+      expect(keepTicking, isFalse);
+      expect(navigation.switchedTo, <String>[nextComicId]);
+      expect(_state(container, _incognitoKey)?.currentIndex, 5);
+      expect(_state(container, _incognitoKey)?.autoPlayEnabled, isTrue);
+      expect(
+        _state(container, _incognitoKey)?.seriesBoundaryPrompt,
+        SeriesBoundaryPrompt.none,
+      );
+    });
 
     test('tick before the last spread advances one page', () async {
       final _RecordingSeriesNavigation navigation =
@@ -690,37 +684,31 @@ void main() {
       expect(navigation.switchedTo, isEmpty);
     });
 
-    test(
-      'comic loop on the last spread jumps to the first page and keeps autoplay',
-      () async {
-        final ProviderContainer container = _createContainer(
-          key: _incognitoKey,
-          initialSetting: AppSetting(
-            readingMode: ReadingMode.paged,
-            autoPlayMode: AutoPlayMode.comicLoop,
-          ),
-          snapshot: _snapshot(pageCount: 5, resumePage: 5),
-          seriesNavigation: _RecordingSeriesNavigation(),
-        );
-        addTearDown(container.dispose);
+    test('comic loop on the last spread jumps to the first page and keeps autoplay', () async {
+      final ProviderContainer container = _createContainer(
+        key: _incognitoKey,
+        initialSetting: AppSetting(
+          readingMode: ReadingMode.paged,
+          autoPlayMode: AutoPlayMode.comicLoop,
+        ),
+        snapshot: _snapshot(pageCount: 5, resumePage: 5),
+        seriesNavigation: _RecordingSeriesNavigation(),
+      );
+      addTearDown(container.dispose);
 
-        await container.read(readerControllerProvider(_incognitoKey).future);
-        final ReaderController controller = _controller(
-          container,
-          _incognitoKey,
-        );
-        controller.setAutoPlayEnabled(true);
+      await container.read(readerControllerProvider(_incognitoKey).future);
+      final ReaderController controller = _controller(container, _incognitoKey);
+      controller.setAutoPlayEnabled(true);
 
-        final bool keepTicking = await controller.advanceAutoPlay(
-          navContext: _navContext(),
-          session: session,
-          router: _testRouter(),
-        );
+      final bool keepTicking = await controller.advanceAutoPlay(
+        navContext: _navContext(),
+        session: session,
+        router: _testRouter(),
+      );
 
-        expect(keepTicking, isTrue);
-        expect(_state(container, _incognitoKey)?.currentIndex, 1);
-        expect(_state(container, _incognitoKey)?.autoPlayEnabled, isTrue);
-      },
-    );
+      expect(keepTicking, isTrue);
+      expect(_state(container, _incognitoKey)?.currentIndex, 1);
+      expect(_state(container, _incognitoKey)?.autoPlayEnabled, isTrue);
+    });
   });
 }

@@ -88,9 +88,8 @@ class _BootstrapApp extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(24),
                       child: Text(
-                        AppLocalizations.of(
-                          context,
-                        ).bootstrapStartupFailed('${snapshot.error}'),
+                        AppLocalizations.of(context)
+                            .bootstrapStartupFailed('${snapshot.error}'),
                         textAlign: TextAlign.center,
                       ),
                     ),

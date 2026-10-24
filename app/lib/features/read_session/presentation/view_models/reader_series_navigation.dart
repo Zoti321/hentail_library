@@ -66,9 +66,8 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
     router.pushReplacement(
       Uri(
         path: '/reader',
-        queryParameters: ReaderRouteArgs.fromSession(
-          plan.nextSession,
-        ).toQueryParameters(),
+        queryParameters: ReaderRouteArgs.fromSession(plan.nextSession)
+            .toQueryParameters(),
       ).toString(),
     );
   }

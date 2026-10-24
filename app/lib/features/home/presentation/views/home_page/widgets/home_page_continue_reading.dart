@@ -207,9 +207,10 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
               title: item.title,
               lastReadTime: item.lastReadTime,
               pageIndex: item.pageIndex,
-              onTap: () => ProviderScope.containerOf(context)
-                  .read(readSessionLaunchPortProvider)
-                  .openComic(comicId: item.comicId),
+              onTap: () =>
+                  ProviderScope.containerOf(context)
+                      .read(readSessionLaunchPortProvider)
+                      .openComic(comicId: item.comicId),
             ),
           );
         },

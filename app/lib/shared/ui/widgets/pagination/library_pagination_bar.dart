@@ -56,9 +56,8 @@ class LibraryPaginationBar extends StatelessWidget {
             child: _LibraryPaginationPageIndicator(
               page: page,
               label: l10n.seriesDetailPaginationPage(page, totalPages),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: colorScheme.onSurfaceVariant),
             ),
           ),
           GhostButton.icon(

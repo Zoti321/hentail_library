@@ -81,9 +81,8 @@ class DetailBackHeader extends StatelessWidget {
 
   static String? _readReturnSeriesId(BuildContext context) {
     try {
-      return ProviderScope.containerOf(
-        context,
-      ).read(comicDetailReturnSeriesProvider);
+      return ProviderScope.containerOf(context)
+          .read(comicDetailReturnSeriesProvider);
     } catch (_) {
       return null;
     }

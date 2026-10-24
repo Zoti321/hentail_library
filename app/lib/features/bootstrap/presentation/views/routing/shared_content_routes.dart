@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/comic_detail_page.dart';
@@ -8,10 +8,14 @@ import 'package:hentai_library/features/read_session/presentation/reader.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_not_found_page.dart';
 
-typedef ComicDetailBuilder =
-    Widget Function(BuildContext context, String comicId);
-typedef SeriesDetailBuilder =
-    Widget Function(BuildContext context, String seriesId);
+typedef ComicDetailBuilder = Widget Function(
+  BuildContext context,
+  String comicId,
+);
+typedef SeriesDetailBuilder = Widget Function(
+  BuildContext context,
+  String seriesId,
+);
 
 Widget buildSharedComicDetailPage(BuildContext context, String comicId) {
   return ComicDetailPage(comicId: comicId);

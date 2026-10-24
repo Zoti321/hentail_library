@@ -1,17 +1,16 @@
 part of 'edit_metadata_dialog.dart';
 
-typedef _MetaLockChanged =
-    Future<void> Function({
-      bool? title,
-      bool? description,
-      bool? publishedAt,
-      bool? contentRating,
-      bool? authors,
-      bool? tags,
-      bool? languages,
-      bool? parodies,
-      bool? characters,
-    });
+typedef _MetaLockChanged = Future<void> Function({
+  bool? title,
+  bool? description,
+  bool? publishedAt,
+  bool? contentRating,
+  bool? authors,
+  bool? tags,
+  bool? languages,
+  bool? parodies,
+  bool? characters,
+});
 
 class _EditMetadataGeneralTab extends StatelessWidget {
   const _EditMetadataGeneralTab({

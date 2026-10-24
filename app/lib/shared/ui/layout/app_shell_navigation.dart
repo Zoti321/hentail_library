@@ -12,9 +12,8 @@ VoidCallback? appShellPageNavigationOpener(BuildContext context) {
     return null;
   }
   try {
-    final VoidCallback openDrawer = ProviderScope.containerOf(
-      context,
-    ).read(appShellOpenNavigationDrawerProvider);
+    final VoidCallback openDrawer = ProviderScope.containerOf(context)
+        .read(appShellOpenNavigationDrawerProvider);
     return openDrawer;
   } catch (_) {
     return null;

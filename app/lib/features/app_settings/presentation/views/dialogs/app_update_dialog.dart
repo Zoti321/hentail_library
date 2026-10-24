@@ -31,9 +31,8 @@ class AppUpdateDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final String publishedLabel = DateFormat(
-      'yyyy-MM-dd',
-    ).format(release.publishedAt.toLocal());
+    final String publishedLabel = DateFormat('yyyy-MM-dd')
+        .format(release.publishedAt.toLocal());
     return HentaiDialog(
       title: l10n.updateNewVersionTitle(release.version),
       width: 480,

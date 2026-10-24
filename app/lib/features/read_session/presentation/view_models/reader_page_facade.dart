@@ -50,24 +50,23 @@ ReaderPageFacadeState readerPageFacade(
   );
   // 外壳只关心 comic + totalPages：翻页不得重建页面根。
   final AsyncValue<_ReaderPageViewShell> viewShellAsync = ref.watch(
-    readerControllerProvider(viewKey).select((
-      AsyncValue<ReaderState> asyncState,
-    ) {
-      if (asyncState.hasError) {
-        return AsyncError<_ReaderPageViewShell>(
-          asyncState.error!,
-          asyncState.stackTrace!,
-        );
-      }
-      final ReaderState? state = asyncState.asData?.value;
-      if (state == null) {
-        return const AsyncLoading<_ReaderPageViewShell>();
-      }
-      return AsyncData<_ReaderPageViewShell>((
-        comic: state.comic,
-        totalPages: state.totalPages,
-      ));
-    }),
+    readerControllerProvider(viewKey)
+        .select((AsyncValue<ReaderState> asyncState) {
+          if (asyncState.hasError) {
+            return AsyncError<_ReaderPageViewShell>(
+              asyncState.error!,
+              asyncState.stackTrace!,
+            );
+          }
+          final ReaderState? state = asyncState.asData?.value;
+          if (state == null) {
+            return const AsyncLoading<_ReaderPageViewShell>();
+          }
+          return AsyncData<_ReaderPageViewShell>((
+            comic: state.comic,
+            totalPages: state.totalPages,
+          ));
+        }),
   );
   final AsyncValue<ReadSessionContextData> sessionAsync = ref.watch(
     readSessionContextForReaderProvider(

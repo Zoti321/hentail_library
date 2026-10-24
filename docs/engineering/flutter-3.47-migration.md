@@ -15,7 +15,7 @@
 | 同上 | | | `.github/workflows/watch.yml` |
 | 同上 | | | `.github/workflows/manual-build-android.yml` |
 | 同上 | | | `.github/workflows/manual-build-ios.yml` |
-| FRB codegen | `2.12.0` | 先保持；升级后跑 Gate，若有 breaking 再评估 | 各 workflow `FRB_CODEGEN_VERSION` + `app/pubspec.yaml` `flutter_rust_bridge` |
+| FRB codegen | `2.12.0` | **`2.13.0`**（与 `app/pubspec`、`core/crates/flutter/Cargo.toml` 一致） | 各 workflow `FRB_CODEGEN_VERSION` + 提交 FRB 生成物 |
 
 `setup-flutter-frb`  composite action 无需改版本字段，仅消费 workflow 传入的 `flutter-version`。
 
@@ -53,7 +53,7 @@ cd app && flutter pub get
 | 平台 | 关注点 |
 | --- | --- |
 | **Windows** | Impeller 桌面默认；`flutter_acrylic` / `window_manager` 窗口行为 |
-| **Android** | 3.47 Gradle/Kotlin 变更；`flutter doctor --android-licenses`；与 `app/android` 模板 diff |
+| **Android** | `gradle.properties` 已加 `android.builtInKotlin=false`、`android.newDsl=false`（kotlin-android 过渡）；发版前 `flutter build apk` |
 | **iOS / macOS** | `cd app && flutter pub get` 再生 `ios/Flutter/flutter_export_environment.sh`（已 gitignore） |
 | **Linux** | CI `ubuntu` job 与 pdfium 路径不变，仅 SDK 版本 bump |
 

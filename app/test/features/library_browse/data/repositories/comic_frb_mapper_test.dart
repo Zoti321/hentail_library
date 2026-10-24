@@ -41,9 +41,8 @@ void main() {
   test('mapLibraryFilter forwards needs metadata flag', () {
     expect(mapLibraryFilter(LibraryComicFilter()).needsMetadataOnly, isFalse);
     expect(
-      mapLibraryFilter(
-        LibraryComicFilter(needsMetadataOnly: true),
-      ).needsMetadataOnly,
+      mapLibraryFilter(LibraryComicFilter(needsMetadataOnly: true))
+          .needsMetadataOnly,
       isTrue,
     );
   });

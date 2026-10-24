@@ -64,9 +64,8 @@ class ReaderSessionService {
     final int resumePageIndex = (incognito || startFromFirstPage)
         ? 1
         : clampOneBasedResumeIndex(
-            storedPageIndex: (await _readingHistoryRepo.getByComicId(
-              comicId,
-            ))?.pageIndex,
+            storedPageIndex: (await _readingHistoryRepo.getByComicId(comicId))
+                ?.pageIndex,
             totalPages: opened.pages.length,
           );
     return ReaderSessionSnapshot(

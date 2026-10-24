@@ -100,8 +100,8 @@ abstract final class AppNavigation {
 
 void _clearComicDetailReturnSeries(BuildContext context) {
   try {
-    ProviderScope.containerOf(
-      context,
-    ).read(comicDetailReturnSeriesPortProvider).clear();
+    ProviderScope.containerOf(context)
+        .read(comicDetailReturnSeriesPortProvider)
+        .clear();
   } catch (_) {}
 }

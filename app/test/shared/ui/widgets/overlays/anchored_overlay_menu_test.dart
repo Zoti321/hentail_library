@@ -149,9 +149,8 @@ void main() {
                                         buttonContext.findRenderObject()!
                                             as RenderBox;
                                     final RenderBox overlay =
-                                        Overlay.of(
-                                              buttonContext,
-                                            ).context.findRenderObject()!
+                                        Overlay.of(buttonContext).context
+                                                .findRenderObject()!
                                             as RenderBox;
                                     rect = anchoredOverlayMenuRect(
                                       button: button,
