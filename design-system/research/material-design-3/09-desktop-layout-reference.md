@@ -1058,15 +1058,19 @@ Frame `81:2017` `SearchBar · Dark (Theme/A · Dark)`，05 页 (1600,2600)，744
 
 - **Lists guidelines**（A，https://m3.material.io/components/lists/guidelines ，read_page 全文 24255 字符）：「Use gaps for contained lists. Gaps leverage expressive shape and containment tactics. Limit dividers to uncontained or complex lists…」「Do: Use segmented gaps and filled list items to define a list group」「Container and label text are required. All other elements are optional: 01 Container 02 Label text 03 Supporting text 04 Trailing text 05 Trailing icon…」→ 间隙 + 填充行的做法有 A 级依据。
 - **Lists specs 的 Color 表**（用户提供官方页面截图，B；https://m3.material.io/components/lists/specs 正文用 read_page 只回 77 字符，抓不到）：List color roles 共 10 条——surface（container）、on surface（label text）、on surface variant（supporting text / trailing text / trailing icon / leading icon）、outline variant（divider）、primary container + on primary container（选中态）。本项目据此定：行容器 = surface；标签 = onSurface；值/chevron = onSurfaceVariant；选中态预留 primaryContainer / onPrimaryContainer。
-- **分组容器角色**：官方 tone-based 博文（A，https://m3.material.io/blog/tone-based-surface-color-m3 ）说 surface container 是「contained area against the surface color role」的推荐默认角色 → 分组容器取 surfaceContainer（94.0）。级差：行 98.1 → 容器 94.0 = **4.04**（过 T2 的 ≥4），容器 → pane 100.0 = 6.0。
+- **官方补充正文（A，2026-10-23 深夜补抓）**：
+  - Lists Overview（https://m3.material.io/components/lists/overview ，9738 字符）：「Height: The tallest element within a list item determines the list item's height - either **56dp, 72dp, or 88dp**」「Alignment: In most cases, elements in a list item are middle-aligned; if a list is 88dp or larger, or contains three or more lines of text, elements are top-aligned」→ 本项目行高 56 取官方最小档，单行标签垂直居中。
+  - Lists Guidelines（24255 字符）：「**Gaps or dividers** can separate lists into items and groups: Use **gaps** for contained lists… Limit **dividers** to uncontained or complex lists, only when a stronger visual separation is necessary.」配图 alt「Filled list items in an inbox separated by gaps.」→ 填色的是 item，不是外层容器；本项目据此**不画分隔线**。
+  - Lists Accessibility（https://m3.material.io/components/lists/accessibility ，16424 字符）：「**Indicate selection with more than color** … don't rely on color as the only visual cue. Use an additional indicator… Leading or trailing icons / A visual style not related to color」「When a person taps on a list item, a touch ripple appears」→ 选中态必须加第二视觉线索，不能只换底色。
+- **分组容器角色（第二轮改口径）**：第一版取 surfaceContainer（94.0，tone 博文「contained area」推荐角色，A），但用户 m04110 要求「SettingsGroup 不需要背景色，继承父容器或透明」→ 现为**不填色**，只保留 20 圆角 + 8 内边距作几何占位。级差随之变成：行 surface 98.1 对 pane 100.0 = **1.9**（用户选「最贴官方、最淡」的 A 方案；加了圆角与 4dp 间隙暗示分组）。备选（若要更清楚）：行改 surfaceContainerLow 96.0 → 对 pane 4.0。
 - **边界**：「首尾大圆角、中间小圆角」不是官方条文，是本项目形态决策（B）。
 
 ### 13.14.3 规格（当前生效）
 
 | 项 | 值 |
 |---|---|
-| 分组容器 | surfaceContainer（VariableID:10:57，94.0）、圆角 20、内边距 8；组标题容器内左上 (8,8)，12 Medium onSurfaceVariant |
-| 行 | surface（VariableID:10:51，98.1）、高 56、宽 = 组宽 − 16（x=8）、gap 4（pitch 60）、y = 36 + 60i |
+| 分组容器 | **不填色**（`set_fills([])`，透明继承 pane）、圆角 20、内边距 8；组标题容器内左上 (8,8)，12 Medium onSurfaceVariant |
+| 行 | surface（VariableID:10:51，98.1，官方 item container）、高 56（官方三档最小档，A）、宽 = 组宽 − 16（x=8）、gap 4（pitch 60）、y = 36 + 60i；不画分隔线（官方：limit dividers…，A） |
 | 组高 | 32 + 60n（n=1/2/3 → 92/152/212），模板只出 1–3 行 |
 | 行圆角 | Single 全 12；First 上 12 / 下 4；Middle 全 4；Last 上 4 / 下 12（嵌套 = 20 − 8） |
 | 行内 | 标签 15 Regular onSurface @x24；值 15 Regular onSurfaceVariant，值↔chevron 12；chevron「›」18 onSurfaceVariant（右缘 = W − 24） |
@@ -1078,11 +1082,17 @@ Frame `81:2017` `SearchBar · Dark (Theme/A · Dark)`，05 页 (1600,2600)，744
 - 06 Patterns：101:1058（3 行，360×212，行右 ›），旧 SettingsSection 41:2496 删除。
 - 复核：截图内联确认 1440 / 1024 / 600 / 390 四档；07 九帧、08 十六帧、05 八帧、06 两帧顶层重叠均为 0。
 
+### 13.14.6 第二轮修正（透明容器 + 去副标题 + 补抓正文）
+
+用户 m04110 两条：「设置页移除副标题」「SettingsGroup 不需要背景色，继承父容器背景色或透明」。执行（figwright，B）：①16 个组容器（12 屏 + 3 模板 + 1 Patterns）set_fills([])；②四档屏删除副标题 48:2686 / 75:1424 / 75:1487 / 79:1910，页面标题下第一组间距统一 16，12 个组整体上移 1440 −30、1024 −30、600 −48、390 −20（末组底边 778 / 654 / 592 / 688，均在 pane 内 ≥24 内边距）；③三个模板帧高度校正为 92 / 152 / 212（原 112 / 176 / 240），说明文字统一下移 16；④24 个屏内 chevron（101:1086–101:1113）与 6 个模板 chevron 补绑 onSurfaceVariant（原先实心黑），删掉模板里重复的 6 个 chevron（101:1080–101:1085）；⑤SettingsRow 4 个变体行矩形 101:858 / 101:914 / 101:918 / 101:922 补绑 surface；⑥演示框 101:1073 底色改 surfaceContainerLowest（对齐 pane 白）。截图核对四档与模板，05/06/07/08 顶层重叠仍为 0。
+
+**颜色观感说明**：容器透明后，行 surface 98.1 压在白 pane 100.0 上只有 1.9 个 L*，整块接近白底、主要靠 4dp 间隙与首尾圆角暗示分组——这是用户明确选择的方案（拍官方最淡），不是实现漏色；备选是行换 surfaceContainerLow 96.0（对 pane 4.0）。
+
 ### 13.14.5 颜色纠错记录
 
 第一版只按 guidelines 把「容器不填色 + 行填 surfaceContainer」当结论，用户指出颜色规范应以 specs 的 Color 表为准 → 改为「行 = surface、分组容器 = surfaceContainer、标签 onSurface、值/chevron onSurfaceVariant」。教训：Lists 的 guidelines 讲**形态**（gap / 填充 / 圆角），specs 的 Color 表讲**角色**，两者要一起读；只引 guidelines 会把角色选错。
 
-### 13.14.6 未决
+### 13.14.7 未决
 
 - 行首 leading 图标未采纳（参考图有、现有页面与代码 SettingsRow 都没有），见 MASTER §9 第 46 条。
 - 选中态（primaryContainer + onPrimaryContainer）未出样张，迁移前需补一行选中样例。
