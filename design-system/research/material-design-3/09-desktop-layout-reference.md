@@ -1048,3 +1048,43 @@ Frame `81:2017` `SearchBar · Dark (Theme/A · Dark)`，05 页 (1600,2600)，744
 - 每帧同一行 K/V 中心 y 完全相等：XL/1440 行 **664 / 704 / 744**；1024 行 **652 / 688**；600 行 **617 / 647 / 677 / 707**；390 行 **559 / 591 / 623 / 655 / 687**；全部 K/V 高度 20。
 - 截图内联确认 `72:900`、`72:1250`、`72:1295`：字重对比正确（K 略重、V 常规），路径单行带省略号，右侧 K 与左侧 V 在同一水平线。
 - 与 §11.14.5 的关系：那一节写的颜色是反的（label onSurface / value onSurfaceVariant），以本节为准；字阶结论（14/14、靠字重分层）两节一致。
+## 13.14 设置分组重设计（2026-10-23 深夜）
+
+### 13.14.1 用户口径
+
+「重新设计 SettingSection 和 SettingRow 组件，以 md3 文档 Lists 组件为基础……SettingSection 是一个较大圆角的容器，SettingRow 之间有一定间距，上下边界两个 SettingRow 圆角大、中间的 SettingRow 圆角小」（m03692）。后续五条修正（m03939）：①背景色没有采纳文档规范；②单行时该行四边都用大圆角；③行间距太大；④不要写 1–5 行，1–3 行够用；⑤行右一般是 action 不是值。最后追加（m04035）：「你这颜色规范没有找对，子路由 specs 下有 Color 规范」——颜色角色统一以 /components/lists/specs 的 Color 表为准。
+
+### 13.14.2 官方取证
+
+- **Lists guidelines**（A，https://m3.material.io/components/lists/guidelines ，read_page 全文 24255 字符）：「Use gaps for contained lists. Gaps leverage expressive shape and containment tactics. Limit dividers to uncontained or complex lists…」「Do: Use segmented gaps and filled list items to define a list group」「Container and label text are required. All other elements are optional: 01 Container 02 Label text 03 Supporting text 04 Trailing text 05 Trailing icon…」→ 间隙 + 填充行的做法有 A 级依据。
+- **Lists specs 的 Color 表**（用户提供官方页面截图，B；https://m3.material.io/components/lists/specs 正文用 read_page 只回 77 字符，抓不到）：List color roles 共 10 条——surface（container）、on surface（label text）、on surface variant（supporting text / trailing text / trailing icon / leading icon）、outline variant（divider）、primary container + on primary container（选中态）。本项目据此定：行容器 = surface；标签 = onSurface；值/chevron = onSurfaceVariant；选中态预留 primaryContainer / onPrimaryContainer。
+- **分组容器角色**：官方 tone-based 博文（A，https://m3.material.io/blog/tone-based-surface-color-m3 ）说 surface container 是「contained area against the surface color role」的推荐默认角色 → 分组容器取 surfaceContainer（94.0）。级差：行 98.1 → 容器 94.0 = **4.04**（过 T2 的 ≥4），容器 → pane 100.0 = 6.0。
+- **边界**：「首尾大圆角、中间小圆角」不是官方条文，是本项目形态决策（B）。
+
+### 13.14.3 规格（当前生效）
+
+| 项 | 值 |
+|---|---|
+| 分组容器 | surfaceContainer（VariableID:10:57，94.0）、圆角 20、内边距 8；组标题容器内左上 (8,8)，12 Medium onSurfaceVariant |
+| 行 | surface（VariableID:10:51，98.1）、高 56、宽 = 组宽 − 16（x=8）、gap 4（pitch 60）、y = 36 + 60i |
+| 组高 | 32 + 60n（n=1/2/3 → 92/152/212），模板只出 1–3 行 |
+| 行圆角 | Single 全 12；First 上 12 / 下 4；Middle 全 4；Last 上 4 / 下 12（嵌套 = 20 − 8） |
+| 行内 | 标签 15 Regular onSurface @x24；值 15 Regular onSurfaceVariant，值↔chevron 12；chevron「›」18 onSurfaceVariant（右缘 = W − 24） |
+
+### 13.14.4 已执行对象
+
+- 05 Components：模板 101:1042（1 行 440×92）/ 101:861（2 行 440×152）/ 101:869（3 行 440×212）；4/5 行模板 101:880 / 101:894 删除。SettingsRow 组件集 101:925（101:912 Single / 101:913 First / 101:917 Middle / 101:921 Last，行底色已同步为 surface）。
+- 08 Screens：1440 101:926 / 101:937 / 101:948；1024 101:956 / 101:967 / 101:977；600 101:985 / 101:996 / 101:1004；390 101:1012 / 101:1023 / 101:1034（共 12 组，37 个行矩形重绑 surface）。
+- 06 Patterns：101:1058（3 行，360×212，行右 ›），旧 SettingsSection 41:2496 删除。
+- 复核：截图内联确认 1440 / 1024 / 600 / 390 四档；07 九帧、08 十六帧、05 八帧、06 两帧顶层重叠均为 0。
+
+### 13.14.5 颜色纠错记录
+
+第一版只按 guidelines 把「容器不填色 + 行填 surfaceContainer」当结论，用户指出颜色规范应以 specs 的 Color 表为准 → 改为「行 = surface、分组容器 = surfaceContainer、标签 onSurface、值/chevron onSurfaceVariant」。教训：Lists 的 guidelines 讲**形态**（gap / 填充 / 圆角），specs 的 Color 表讲**角色**，两者要一起读；只引 guidelines 会把角色选错。
+
+### 13.14.6 未决
+
+- 行首 leading 图标未采纳（参考图有、现有页面与代码 SettingsRow 都没有），见 MASTER §9 第 46 条。
+- 选中态（primaryContainer + onPrimaryContainer）未出样张，迁移前需补一行选中样例。
+- 1 行组的行圆角与 3 行组首行一致（都是上 12），视觉上等价于 Single 全 12，已在模板与屏复核。
+
