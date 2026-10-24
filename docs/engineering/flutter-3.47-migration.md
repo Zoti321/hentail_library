@@ -2,7 +2,8 @@
 
 目标：将仓库 CI 与本地开发基线从 **Flutter 3.38.5** 提升到 **3.47.8**（Dart **3.13.7**），在 Gate 全绿后再合并 `main`。
 
-参考：本机已升级；Kazumi 生产版本为 3.47.x；设计/M3 依赖调研见 Issue #332。
+参考：本机已升级；Kazumi 生产版本为 3.47.x；设计/M3 依赖调研见 Issue #332。  
+**官方升级流程与 breaking 索引**（先读再改代码）：[`research/flutter-official-upgrade-3.38-to-3.47.md`](research/flutter-official-upgrade-3.38-to-3.47.md)。
 
 ## 1. CI / 工具链（必做）
 
