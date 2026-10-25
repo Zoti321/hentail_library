@@ -7,8 +7,14 @@ import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.d
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import 'md3e_widgetbook_directories.dart';
+
 List<WidgetbookNode> buildWidgetbookDirectories() {
   return <WidgetbookNode>[
+    ...buildMd3eWidgetbookDirectories(),
+    WidgetbookFolder(
+      name: 'Legacy / Baseline',
+      children: <WidgetbookNode>[
     WidgetbookFolder(
       name: 'Tokens',
       children: <WidgetbookNode>[
@@ -107,6 +113,8 @@ List<WidgetbookNode> buildWidgetbookDirectories() {
             ),
           ],
         ),
+      ],
+    ),
       ],
     ),
   ];
