@@ -21,5 +21,9 @@ void main() {
     expect(find.text('primary'), findsOneWidget);
     final ExpressiveThemeData tokens = buildMd3eExpressiveThemeData();
     expect(tokens.materialTheme.colorScheme.brightness, Brightness.light);
+    expect(
+      tokens.materialTheme.textTheme.bodyLarge?.fontFamily,
+      kMd3eAppFontFamily,
+    );
   });
 }

@@ -5,6 +5,9 @@ import 'package:material_expressive/theme.dart';
 /// Lab default seed (M3 baseline purple); not MASTER brand color yet.
 const Color kMd3eLabSeedColor = Color(0xFF6750A4);
 
+/// App UI font ([pubspec.yaml] `MI_Sans_Regular`); aligned with production shell.
+const String kMd3eAppFontFamily = 'MI_Sans_Regular';
+
 /// Builds [ExpressiveThemeData] using material_expressive defaults, optionally
 /// overlaying OS dynamic [ColorScheme]s when available.
 /// Maps [dynamic_color] schemes (material_ui [ColorScheme] at runtime) to Flutter [ColorScheme].
@@ -38,6 +41,7 @@ ExpressiveThemeData buildMd3eExpressiveThemeData({
 }) {
   return ExpressiveTheme.fromSeed(
     seedColor: kMd3eLabSeedColor,
+    fontFamily: kMd3eAppFontFamily,
     lightColorScheme: md3eFlutterColorSchemeFromDynamic(lightDynamic),
     darkColorScheme: md3eFlutterColorSchemeFromDynamic(darkDynamic),
   );
