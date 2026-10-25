@@ -43,7 +43,7 @@ D1–D8 已全部拍板；设计侧进入组件集与首批页面。代码仍按
 
 ### 2.1 生成方式
 
-- seed `#E91E63`，scheme variant `tonalSpot`（即 Flutter `ColorScheme.fromSeed` 默认），由 `material_color_utilities 0.11.1` 的 `MaterialDynamicColors` 生成。
+- seed `#E91E63`，scheme variant `tonalSpot`（即 Flutter `ColorScheme.fromSeed` 默认），由 **`material_color_utilities 0.13.0`**（与 `app/pubspec.lock`）的 `MaterialDynamicColors` 生成。§2.2 十六进制表仍来自 0.11 时代脚本输出；若与 0.13 生成结果不一致，用 `.scratch/generate_palette.dart` 重算并对照 `app/lib/shared/ui/theme/`（Issue #332 / 视觉回归）。
 - 46 个角色，命名 `color/<camelCaseRole>`；不含 3.22 起弃用的 `background` / `onBackground` / `surfaceVariant`。
 - 生成脚本与原始输出：`.scratch/generate_palette.dart`、`.scratch/palette.json`（非交付物，临时文件）。
 - Figma 是 Starter 套餐：每个 variable collection 只能 1 个 mode，所以按「一主题一 collection」建了 6 个集合（A/B/C × Light/Dark），每个 46 变量。
