@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_list_detail_adaptive_layout.dart';
 import 'package:hentai_library/md3e/patterns/settings_grouped_list_pattern.dart';
+import 'package:hentai_library/md3e/views/library_browse_list_preview_view.dart';
 import 'package:hentai_library/md3e/views/library_browse_preview_view.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
+import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/widgets/md3e_filled_button.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -103,6 +105,87 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
+              name: 'Md3eComicListItem',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: SizedBox(
+                      width: 400,
+                      child: Md3eComicListItem(
+                        title: '深海图书馆',
+                        author: '示例作者',
+                        pageLabel: '128 页',
+                        readProgress: kMd3eWidgetbookComicReadProgress,
+                        moreMenuEntries: _demoComicListMoreMenu(),
+                        cover: _demoCover(context),
+                        onTap: () {},
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'List item states',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: SizedBox(
+                      width: 400,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          for (final Md3eComicListItemVisualState state
+                              in Md3eComicListItemVisualState.values)
+                            Md3eComicListItem(
+                              title: _listItemStateLabel(state),
+                              author: '示例作者',
+                              pageLabel: '96 页',
+                              readProgress: kMd3eWidgetbookComicReadProgress,
+                              moreMenuEntries: _demoComicListMoreMenu(),
+                              visualState: state,
+                              cover: _demoCover(context),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Selection mode',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: SizedBox(
+                      width: 400,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Md3eComicListItem(
+                            title: '未选中',
+                            author: '示例作者',
+                            pageLabel: '128 页',
+                            readProgress: kMd3eWidgetbookComicReadProgress,
+                            moreMenuEntries: _demoComicListMoreMenu(),
+                            selectionMode: true,
+                            selected: false,
+                            cover: _demoCover(context),
+                            onSelectionChanged: (_) {},
+                          ),
+                          Md3eComicListItem(
+                            title: '已选中',
+                            author: '示例作者',
+                            pageLabel: '128 页',
+                            readProgress: kMd3eWidgetbookComicReadProgress,
+                            moreMenuEntries: _demoComicListMoreMenu(),
+                            selectionMode: true,
+                            selected: true,
+                            cover: _demoCover(context),
+                            onSelectionChanged: (_) {},
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
               name: 'Md3eFilledButton',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
@@ -190,6 +273,12 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                     child: Md3eLibraryBrowsePreviewView(),
                   ),
                 ),
+                WidgetbookUseCase(
+                  name: 'Fake list',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eLibraryBrowseListPreviewView(),
+                  ),
+                ),
               ],
             ),
           ],
@@ -199,8 +288,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
   ];
 }
 
-/// Sample read progress on all Md3eComicCard Widgetbook examples.
+/// Sample read progress on Md3eComicCard / Md3eComicListItem Widgetbook examples.
 const double kMd3eWidgetbookComicReadProgress = 0.42;
+
+List<Md3eComicListMoreMenuEntry> _demoComicListMoreMenu() {
+  return const <Md3eComicListMoreMenuEntry>[
+    Md3eComicListMoreMenuEntry(label: '继续阅读'),
+    Md3eComicListMoreMenuEntry(label: '编辑元数据'),
+    Md3eComicListMoreMenuEntry(label: '在资源管理器中显示'),
+    Md3eComicListMoreMenuEntry(label: '删除'),
+  ];
+}
 
 Widget _demoCover(BuildContext context) {
   return ColoredBox(
@@ -229,6 +327,25 @@ String _stateLabel(Md3eComicCardVisualState state) {
     case Md3eComicCardVisualState.selectionUnselected:
       return 'Selection off';
     case Md3eComicCardVisualState.selectionSelected:
+      return 'Selection on';
+  }
+}
+
+String _listItemStateLabel(Md3eComicListItemVisualState state) {
+  switch (state) {
+    case Md3eComicListItemVisualState.normal:
+      return 'Normal';
+    case Md3eComicListItemVisualState.hovered:
+      return 'Hovered';
+    case Md3eComicListItemVisualState.focused:
+      return 'Focused';
+    case Md3eComicListItemVisualState.pressed:
+      return 'Pressed';
+    case Md3eComicListItemVisualState.disabled:
+      return 'Disabled';
+    case Md3eComicListItemVisualState.selectionUnselected:
+      return 'Selection off';
+    case Md3eComicListItemVisualState.selectionSelected:
       return 'Selection on';
   }
 }

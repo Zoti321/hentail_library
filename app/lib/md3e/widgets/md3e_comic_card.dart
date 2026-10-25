@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/widgets/md3e_cover_read_progress_strip.dart';
 import 'package:material_expressive/theme.dart';
 
 /// Corner radius for [Md3eComicCard] (M3 elevated card / MASTER 书库卡).
@@ -8,8 +9,8 @@ const double kMd3eComicCardRadius = 12;
 /// Inset of the selection control from the cover top-left (MASTER 多选稿).
 const double kMd3eComicCardSelectionInset = 8;
 
-/// Full-width read-progress strip along the bottom edge of the cover (2dp).
-const double kMd3eComicCardCoverProgressHeight = 2;
+/// Alias of [kMd3eCoverReadProgressHeight] for comic card call sites.
+const double kMd3eComicCardCoverProgressHeight = kMd3eCoverReadProgressHeight;
 
 /// Key for the cover progress strip (tests / semantics tooling).
 const Key kMd3eComicCardCoverProgressKey = Key('md3e_comic_card_cover_progress');
@@ -54,7 +55,7 @@ class Md3eComicCard extends StatefulWidget {
   ///
   /// `null` and `0` (and negative values, if passed) do not render the strip.
   static bool showsCoverReadProgress(double? readProgress) {
-    return readProgress != null && readProgress > 0;
+    return md3eShowsReadProgressStrip(readProgress);
   }
 
   /// Grid row height at [maxCrossAxisExtent] (matches Baseline catalog formula).
@@ -239,8 +240,7 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
     const double titleSubtitleGap = 6;
 
     final double? coverProgress = widget.readProgress;
-    final bool showCoverProgress =
-        Md3eComicCard.showsCoverReadProgress(coverProgress);
+    final bool showCoverProgress = md3eShowsReadProgressStrip(coverProgress);
 
     final Widget coverLayer = AspectRatio(
       aspectRatio: 2 / 3,
@@ -270,7 +270,7 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
               right: 0,
               bottom: 0,
               height: kMd3eComicCardCoverProgressHeight,
-              child: _Md3eComicCardCoverProgress(
+              child: Md3eCoverReadProgressStrip(
                 key: kMd3eComicCardCoverProgressKey,
                 progress: widget.readProgress!,
                 activeColor: scheme.primary,
@@ -436,64 +436,10 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
     required String title,
     required double? readProgress,
   }) {
-    if (readProgress == null || readProgress <= 0) {
+    if (!md3eShowsReadProgressStrip(readProgress)) {
       return title;
     }
-    final int percent = (readProgress.clamp(0.0, 1.0) * 100).round();
+    final int percent = (readProgress!.clamp(0.0, 1.0) * 100).round();
     return '$title，已读 $percent%';
-  }
-}
-
-class _Md3eComicCardCoverProgress extends StatelessWidget {
-  const _Md3eComicCardCoverProgress({
-    super.key,
-    required this.progress,
-    required this.activeColor,
-    required this.trackColor,
-    required this.duration,
-    required this.curve,
-  });
-
-  final double progress;
-  final Color activeColor;
-  final Color trackColor;
-  final Duration duration;
-  final Curve curve;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: '阅读进度 ${(progress.clamp(0.0, 1.0) * 100).round()}%',
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double maxWidth = constraints.maxWidth;
-          return Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              ColoredBox(color: trackColor),
-              TweenAnimationBuilder<double>(
-                tween: Tween<double>(end: progress.clamp(0.0, 1.0)),
-                duration: duration,
-                curve: curve,
-                builder: (
-                  BuildContext context,
-                  double value,
-                  Widget? child,
-                ) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      width: maxWidth * value,
-                      height: kMd3eComicCardCoverProgressHeight,
-                      child: ColoredBox(color: activeColor),
-                    ),
-                  );
-                },
-              ),
-            ],
-          );
-        },
-      ),
-    );
   }
 }
