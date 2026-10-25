@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup KVM
         run: |
@@ -28,7 +28,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Setup Java toolchain
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
@@ -67,7 +67,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -110,7 +110,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -129,7 +129,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -148,7 +148,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Linux build dependencies
         run: |

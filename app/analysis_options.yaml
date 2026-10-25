@@ -1,3 +1,6 @@
+plugins:
+  riverpod_lint: 3.1.9
+
 analyzer:
   exclude:
     - rust_builder/**

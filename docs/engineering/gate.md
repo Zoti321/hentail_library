@@ -2,7 +2,7 @@
 
 **决策**：ADR-0018（三层缝、CI tier 词汇）、ADR-0002（业务真值在 Rust）。**Job 列表以** `.github/workflows/gate.yml` **为准**；本地与 CI 同源：`./scripts/run-gate.sh`。
 
-**工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 计为失败。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
+**工具链**：CI 固定 **Flutter 3.47.8**（`gate.yml` → `FLUTTER_VERSION`）。本地请用同 major/minor 的 stable；`flutter analyze` 在 GitHub Actions（`CI=true`）下会将 info 级 lint 也计为失败。Riverpod 专项规则见 `app/analysis_options.yaml` 的 `plugins: riverpod_lint`（不依赖 `custom_lint`）。SDK 升级记录见 `docs/engineering/flutter-3.47-migration.md`。
 
 ## 命令
 

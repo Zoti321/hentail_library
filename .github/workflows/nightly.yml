@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -41,7 +41,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -67,7 +67,7 @@ jobs:
           }' coverage/lcov.info | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Dart coverage lcov artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dart-coverage-lcov
           path: app/coverage/lcov.info
@@ -79,7 +79,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -106,14 +106,14 @@ jobs:
         run: zip -r rust-coverage-html.zip html
 
       - name: Upload Rust lcov
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: rust-coverage-lcov
           path: target/rust-coverage/lcov.info
           retention-days: 30
 
       - name: Upload Rust HTML coverage zip
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: rust-coverage-html
           path: target/rust-coverage/rust-coverage-html.zip

@@ -19,7 +19,7 @@
 | --- | --- |
 | `environment.sdk` | `^3.13.0` |
 | `material_color_utilities` | `^0.13.0` |
-| 依赖栈 | freezed 4、riverpod_generator 4、theme_tailor 4、go_router 18 等；`custom_lint` 暂移除（analyzer 13 矩阵） |
+| 依赖栈 | freezed 4、riverpod_generator 4、theme_tailor 4、go_router 18 等；Riverpod lint 走 `plugins: riverpod_lint`（无需 `custom_lint`） |
 
 验证：`cd app && flutter pub get` · `./scripts/run-gate.sh`
 
@@ -66,7 +66,7 @@
 | --- | --- | --- |
 | **pub** | `file_picker` 11→13、`flutter_secure_storage` 10→11、`package_info_plus` 9→10 | major 单独 PR |
 | **pub** | `freezed` 4.0.3、`build_runner` 2.17.1、`test` 1.33、`material_color_utilities` 0.13.1 | 注意 code gen 矩阵 |
-| **工具** | 恢复 `custom_lint` + `riverpod_lint` | 待 analyzer 13 兼容 |
+| **工具** | `riverpod_lint` | 经 `analysis_options.yaml` → `plugins`（`analysis_server_plugin`）；**不**再依赖 `custom_lint` |
 | **Android** | AGP 9 / built-in Kotlin | 去掉过渡 `gradle.properties` 后验 apk |
 | **平台** | iOS UIScene、桌面 Impeller | 3.47 发行说明；不做专项视觉回归 |
 | **CI** | `manual-build-*`、`release.yml`、`watch.yml` | 发版链试跑 |

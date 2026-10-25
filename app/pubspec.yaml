@@ -93,7 +93,7 @@ dev_dependencies:
   riverpod_lint: ^3.1.9
 
   # --- 代码生成（共 5）---
-  build_runner: ^2.15.1
+  build_runner: ^2.16.1
   freezed: ^4.0.1
   json_serializable: ^6.15.2
   riverpod_generator: ^4.0.9
