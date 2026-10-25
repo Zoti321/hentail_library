@@ -4,6 +4,7 @@ import 'package:hentai_library/md3e/views/library_browse_preview_view.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
+import 'package:hentai_library/md3e/widgets/md3e_tag_input_field.dart';
 import 'package:hentai_library/md3e/widgets/md3e_navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -214,6 +215,19 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   ),
                 ),
                 WidgetbookUseCase(
+                  name: 'Input',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Center(
+                      child: M3EChip(
+                        label: '深海图书馆',
+                        type: M3EChipType.input,
+                        onPressed: () {},
+                        onDeleted: () {},
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
                   name: 'Assist & Suggestion',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: Center(
@@ -273,6 +287,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                         ),
                       ),
                     ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eTagInputField',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eTagInputFieldPreview(),
                   ),
                 ),
               ],
