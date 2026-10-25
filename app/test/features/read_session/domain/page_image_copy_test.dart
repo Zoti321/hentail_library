@@ -136,26 +136,23 @@ void main() {
       },
     );
 
-    test(
-      'throws load failure and does not write clipboard when page bytes missing',
-      () async {
-        final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
-          pageBytes: null,
-        );
-        final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
-        final PageImageCopy subject = _subject(
-          pageSource: pageSource,
-          clipboard: clipboard,
-          encodePng: (_) async => _encodedPng(),
-        );
+    test('throws load failure and does not write clipboard when page bytes missing', () async {
+      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        pageBytes: null,
+      );
+      final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
+      final PageImageCopy subject = _subject(
+        pageSource: pageSource,
+        clipboard: clipboard,
+        encodePng: (_) async => _encodedPng(),
+      );
 
-        await expectLater(
-          () => subject.execute(comic: _comic(), archivePageIndex: 0),
-          throwsA(isA<PageImageCopyException>()),
-        );
-        expect(clipboard.writes, isEmpty);
-      },
-    );
+      await expectLater(
+        () => subject.execute(comic: _comic(), archivePageIndex: 0),
+        throwsA(isA<PageImageCopyException>()),
+      );
+      expect(clipboard.writes, isEmpty);
+    });
 
     test(
       'throws encode failure and does not write clipboard when encode fails',

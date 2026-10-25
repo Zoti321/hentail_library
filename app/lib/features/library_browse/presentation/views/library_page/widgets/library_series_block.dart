@@ -133,7 +133,7 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
 
 void _openSeriesDetail(BuildContext context, Series series) {
   final String encoded = Uri.encodeComponent(series.id);
-  ProviderScope.containerOf(
-    context,
-  ).read(appRouterProvider).push('/series/$encoded');
+  ProviderScope.containerOf(context)
+      .read(appRouterProvider)
+      .push('/series/$encoded');
 }

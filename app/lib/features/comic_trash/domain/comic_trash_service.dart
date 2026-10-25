@@ -7,10 +7,9 @@ import 'package:hentai_library/shared/domain/repositories/comic_trash_repository
 /// Comic trash / restore / purge 与「已删除」列表查询（ADR-0023）。
 class ComicTrashService {
   const ComicTrashService({
-    required ComicTrashRepository comicRepository,
-    required ReaderSessionPort readerSessionPort,
-  }) : _comicRepository = comicRepository,
-       _readerSessionPort = readerSessionPort;
+    required this._comicRepository,
+    required this._readerSessionPort,
+  });
 
   final ComicTrashRepository _comicRepository;
   final ReaderSessionPort _readerSessionPort;

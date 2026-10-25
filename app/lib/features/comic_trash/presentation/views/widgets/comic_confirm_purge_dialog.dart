@@ -44,19 +44,22 @@ class ComicConfirmPurgeDialog extends HookWidget {
           ),
           if (needsAcknowledgement) ...<Widget>[
             const SizedBox(height: 12),
-            CheckboxListTile(
-              value: acknowledgement.value,
-              onChanged: (bool? value) =>
-                  acknowledgement.value = value ?? false,
-              contentPadding: EdgeInsets.zero,
-              controlAffinity: ListTileControlAffinity.leading,
-              title: Text(
-                counts.local > 0
-                    ? l10n.comicDetailDeleteLocalAcknowledge
-                    : l10n.comicPurgeRemoteAcknowledge,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.hentai.textPrimary,
+            Material(
+              type: MaterialType.transparency,
+              child: CheckboxListTile(
+                value: acknowledgement.value,
+                onChanged: (bool? value) =>
+                    acknowledgement.value = value ?? false,
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(
+                  counts.local > 0
+                      ? l10n.comicDetailDeleteLocalAcknowledge
+                      : l10n.comicPurgeRemoteAcknowledge,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: context.hentai.textPrimary,
+                  ),
                 ),
               ),
             ),

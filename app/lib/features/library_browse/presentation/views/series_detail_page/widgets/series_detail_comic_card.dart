@@ -153,29 +153,27 @@ class SeriesDetailComicCard extends HookConsumerWidget {
       case SeriesItemContextAction.editMetadata:
         _openEditMetadata(context, ref);
       case SeriesItemContextAction.showInExplorer:
-        showInFileExplorer(item.comic.path).catchError((
-          Object error,
-          StackTrace stackTrace,
-        ) {
-          debugPrint(
-            'showInFileExplorer failed for "${item.comic.path}": $error',
-          );
-          if (!context.mounted) {
-            return;
-          }
-          if (error is AppException) {
-            showErrorToast(context, error);
-            return;
-          }
-          showErrorToast(
-            context,
-            AppException(
-              l10n.comicDetailShowInExplorerFailed,
-              cause: error,
-              stackTrace: stackTrace,
-            ),
-          );
-        });
+        showInFileExplorer(item.comic.path)
+            .catchError((Object error, StackTrace stackTrace) {
+              debugPrint(
+                'showInFileExplorer failed for "${item.comic.path}": $error',
+              );
+              if (!context.mounted) {
+                return;
+              }
+              if (error is AppException) {
+                showErrorToast(context, error);
+                return;
+              }
+              showErrorToast(
+                context,
+                AppException(
+                  l10n.comicDetailShowInExplorerFailed,
+                  cause: error,
+                  stackTrace: stackTrace,
+                ),
+              );
+            });
       case SeriesItemContextAction.delete:
         confirmAndTrashComic(context, ref, item.comic);
     }

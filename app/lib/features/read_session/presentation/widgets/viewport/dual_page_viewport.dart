@@ -64,9 +64,8 @@ class DualPageViewport extends HookConsumerWidget {
       ),
     );
     final Comic? comic = ref.watch(
-      readerControllerProvider(
-        viewKey,
-      ).select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
+      readerControllerProvider(viewKey)
+          .select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
     );
     if (comic == null) {
       return const SizedBox.expand();

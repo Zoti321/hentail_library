@@ -144,39 +144,36 @@ void main() {
     },
   );
 
-  test(
-    'readSessionContextForReader keeps truncated-id fallback for missing members',
-    () async {
-      comicRepo = _FakeComicRepo(<String, String>{
-        'comic-a': 'Alpha',
-        'comic-c': 'Gamma',
-      });
-      container.dispose();
-      container = ProviderContainer(
-        overrides: <Override>[
-          comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
-          seriesRepoProvider.overrideWith(
-            (Ref ref) => _FakeSeriesRepo(seriesContext),
-          ),
-          readingHistoryRepoProvider.overrideWith(
-            (Ref ref) => _FakeHistoryRepo(),
-          ),
-        ],
-      );
+  test('readSessionContextForReader keeps truncated-id fallback for missing members', () async {
+    comicRepo = _FakeComicRepo(<String, String>{
+      'comic-a': 'Alpha',
+      'comic-c': 'Gamma',
+    });
+    container.dispose();
+    container = ProviderContainer(
+      overrides: <Override>[
+        comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
+        seriesRepoProvider.overrideWith(
+          (Ref ref) => _FakeSeriesRepo(seriesContext),
+        ),
+        readingHistoryRepoProvider.overrideWith(
+          (Ref ref) => _FakeHistoryRepo(),
+        ),
+      ],
+    );
 
-      final ReadSessionContextData data = await container.read(
-        readSessionContextForReaderProvider(comicId: 'comic-b').future,
-      );
+    final ReadSessionContextData data = await container.read(
+      readSessionContextForReaderProvider(comicId: 'comic-b').future,
+    );
 
-      expect(data.navContext.items.map((item) => item.title).toList(), <String>[
-        'Alpha',
-        comicTitleFallbackForDisplay('comic-b'),
-        'Gamma',
-      ]);
-      expect(comicRepo.findByIdsCalls.length, 1);
-      expect(comicRepo.findByIdCalls, 0);
-    },
-  );
+    expect(data.navContext.items.map((item) => item.title).toList(), <String>[
+      'Alpha',
+      comicTitleFallbackForDisplay('comic-b'),
+      'Gamma',
+    ]);
+    expect(comicRepo.findByIdsCalls.length, 1);
+    expect(comicRepo.findByIdCalls, 0);
+  });
 
   test(
     'readSessionContextForReader without series still uses single findById',

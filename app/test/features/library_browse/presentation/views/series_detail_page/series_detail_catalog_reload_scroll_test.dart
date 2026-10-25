@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter/material.dart';
@@ -146,55 +147,51 @@ AsyncValue<T> _asyncReloadingWithPrevious<T>(T previous) {
 }
 
 void main() {
-  test(
-    'dependency reload makes catalog AsyncValue isReloading with previous value',
-    () async {
-      final List<Comic> comics = List<Comic>.generate(8, _comic);
-      final _DelayedSeriesRepo repo = _DelayedSeriesRepo(comics);
-      final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[
-          ...sharedLibraryStateOverrides(),
-          ...bootstrapCompositionOverrides(),
-          libraryRevisionProvider.overrideWith(
-            _ControllableLibraryRevision.new,
-          ),
-          seriesRepoProvider.overrideWith((Ref ref) => repo),
-        ],
-      );
-      addTearDown(container.dispose);
+  test('dependency reload makes catalog AsyncValue isReloading with previous value', () async {
+    final List<Comic> comics = List<Comic>.generate(8, _comic);
+    final _DelayedSeriesRepo repo = _DelayedSeriesRepo(comics);
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        ...sharedLibraryStateOverrides(),
+        ...bootstrapCompositionOverrides(),
+        libraryRevisionProvider.overrideWith(_ControllableLibraryRevision.new),
+        seriesRepoProvider.overrideWith((Ref ref) => repo),
+      ],
+    );
+    addTearDown(container.dispose);
 
-      await container.read(
-        seriesDetailComicsCatalogControllerProvider('series-1').future,
-      );
-      expect(repo.fetchCount, 1);
+    await container.read(
+      seriesDetailComicsCatalogControllerProvider('series-1').future,
+    );
+    expect(repo.fetchCount, 1);
 
-      final _ControllableLibraryRevision revision =
-          container.read(libraryRevisionProvider.notifier)
-              as _ControllableLibraryRevision;
-      revision.bump();
-      await Future<void>.delayed(Duration.zero);
+    final _ControllableLibraryRevision revision = container.read(
+      libraryRevisionProvider.notifier,
+    ) as _ControllableLibraryRevision;
+    revision.bump();
+    await Future<void>.delayed(Duration.zero);
 
-      final AsyncValue<SeriesDetailComicsCatalogState> midReload = container
-          .read(seriesDetailComicsCatalogControllerProvider('series-1'));
-      expect(midReload.isLoading, isTrue);
-      expect(midReload.hasValue, isTrue);
-      expect(midReload.isReloading, isTrue);
-      expect(midReload.value?.items.length, comics.length);
+    final AsyncValue<SeriesDetailComicsCatalogState> midReload = container.read(
+      seriesDetailComicsCatalogControllerProvider('series-1'),
+    );
+    expect(midReload.isLoading, isTrue);
+    expect(midReload.hasValue, isTrue);
+    expect(midReload.isReloading, isTrue);
+    expect(midReload.value?.items.length, comics.length);
 
-      // Same when() call as SeriesDetail before fix → drops to loading branch.
-      final String branch = midReload.when(
-        data: (_) => 'data',
-        loading: () => 'loading',
-        error: (Object error, StackTrace stackTrace) => 'error',
-      );
-      expect(branch, 'loading');
+    // Same when() call as SeriesDetail before fix → drops to loading branch.
+    final String branch = midReload.when(
+      data: (_) => 'data',
+      loading: () => 'loading',
+      error: (Object error, StackTrace stackTrace) => 'error',
+    );
+    expect(branch, 'loading');
 
-      repo.gate.complete();
-      await container.read(
-        seriesDetailComicsCatalogControllerProvider('series-1').future,
-      );
-    },
-  );
+    repo.gate.complete();
+    await container.read(
+      seriesDetailComicsCatalogControllerProvider('series-1').future,
+    );
+  });
 
   testWidgets(
     'catalog reload without skipLoadingOnReload clamps scroll to top',

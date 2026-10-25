@@ -103,9 +103,8 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
           .importTagDictionary(bytes);
       await ref
           .read(
-            namedFacetManagementControllerProvider(
-              ManagedNamedFacetKind.tag,
-            ).notifier,
+            namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag)
+                .notifier,
           )
           .refreshAfterTagDictionaryChange();
       state = state.copyWith(running: false, lastResult: result);

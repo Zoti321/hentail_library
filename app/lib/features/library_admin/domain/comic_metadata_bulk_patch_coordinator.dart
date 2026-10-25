@@ -4,18 +4,10 @@ import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_t
 /// UI-side helper: FRB bulk patch + catalog revision bump.
 class ComicMetadataBulkPatchCoordinator {
   const ComicMetadataBulkPatchCoordinator({
-    required ComicMetadataBulkPatchPort adapter,
-    required void Function() onSucceeded,
-    required void Function({
-      required bool tagsWritten,
-      required bool authorsWritten,
-      required bool parodiesWritten,
-      required bool charactersWritten,
-    })
-    onDictionariesChanged,
-  }) : _adapter = adapter,
-       _onSucceeded = onSucceeded,
-       _onDictionariesChanged = onDictionariesChanged;
+    required this._adapter,
+    required this._onSucceeded,
+    required this._onDictionariesChanged,
+  });
 
   final ComicMetadataBulkPatchPort _adapter;
   final void Function() _onSucceeded;

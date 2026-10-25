@@ -89,9 +89,11 @@ class AuthorImageView extends ConsumerWidget {
                         child: child,
                       );
                     },
-                errorBuilder:
-                    (BuildContext context, Object error, StackTrace? stack) =>
-                        const SizedBox.shrink(),
+                errorBuilder: (
+                  BuildContext context,
+                  Object error,
+                  StackTrace? stack,
+                ) => const SizedBox.shrink(),
               ),
             if (showSlotLoading)
               const Align(

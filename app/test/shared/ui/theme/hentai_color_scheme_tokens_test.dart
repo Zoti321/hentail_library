@@ -5,27 +5,23 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 void main() {
   group('HentaiColorScheme semantic colors', () {
     test('warning and error are distinct in light theme', () {
-      final HentaiColorScheme h = buildAppTheme(
-        Brightness.light,
-      ).extension<HentaiColorScheme>()!;
+      final HentaiColorScheme h = buildAppTheme(Brightness.light)
+          .extension<HentaiColorScheme>()!;
       expect(h.warning, isNot(h.error));
       expect(h.serializationHiatus, h.warning);
     });
 
     test('warning and error are distinct in dark theme', () {
-      final HentaiColorScheme h = buildAppTheme(
-        Brightness.dark,
-      ).extension<HentaiColorScheme>()!;
+      final HentaiColorScheme h = buildAppTheme(Brightness.dark)
+          .extension<HentaiColorScheme>()!;
       expect(h.warning, isNot(h.error));
     });
 
     test('destructive matches contextMenuDanger and has onDestructive', () {
-      final HentaiColorScheme light = buildAppTheme(
-        Brightness.light,
-      ).extension<HentaiColorScheme>()!;
-      final HentaiColorScheme dark = buildAppTheme(
-        Brightness.dark,
-      ).extension<HentaiColorScheme>()!;
+      final HentaiColorScheme light = buildAppTheme(Brightness.light)
+          .extension<HentaiColorScheme>()!;
+      final HentaiColorScheme dark = buildAppTheme(Brightness.dark)
+          .extension<HentaiColorScheme>()!;
 
       expect(light.destructive, light.contextMenuDanger);
       expect(dark.destructive, dark.contextMenuDanger);
@@ -49,9 +45,8 @@ void main() {
     });
 
     test('spacing and radius match design-system table (sample)', () {
-      final AppThemeTokens tokens = buildAppTheme(
-        Brightness.light,
-      ).extension<AppThemeTokens>()!;
+      final AppThemeTokens tokens = buildAppTheme(Brightness.light)
+          .extension<AppThemeTokens>()!;
       expect(tokens.spacing.md, 12);
       expect(tokens.spacing.xl, 20);
       expect(tokens.radius.sm, 6);

@@ -28,8 +28,8 @@ class ComicDetailReturnSeries extends Notifier<String?> {
 /// Best-effort clear when [context] may sit outside a [ProviderScope].
 void clearComicDetailReturnSeriesFromContext(BuildContext context) {
   try {
-    ProviderScope.containerOf(
-      context,
-    ).read(comicDetailReturnSeriesProvider.notifier).clear();
+    ProviderScope.containerOf(context)
+        .read(comicDetailReturnSeriesProvider.notifier)
+        .clear();
   } catch (_) {}
 }

@@ -17,12 +17,10 @@ void main() {
 
       final Directory logsDir = Directory(p.join(temp.path, 'logs'));
       await logsDir.create(recursive: true);
-      await File(
-        p.join(logsDir.path, 'app_log.txt'),
-      ).writeAsString('dart line');
-      await File(
-        p.join(logsDir.path, 'rust_log.txt'),
-      ).writeAsString('rust line comic_id=secret');
+      await File(p.join(logsDir.path, 'app_log.txt'))
+          .writeAsString('dart line');
+      await File(p.join(logsDir.path, 'rust_log.txt'))
+          .writeAsString('rust line comic_id=secret');
 
       final String zipPath = p.join(temp.path, 'export.zip');
       const LogExportService service = LogExportService();
@@ -54,9 +52,9 @@ void main() {
       expect(rustText, isNot(contains('secret')));
       expect(rustText, contains('comic_id='));
 
-      final Map<String, dynamic> manifest =
-          jsonDecode(utf8.decode(files['diagnostics.json']!.content))
-              as Map<String, dynamic>;
+      final Map<String, dynamic> manifest = jsonDecode(
+        utf8.decode(files['diagnostics.json']!.content),
+      ) as Map<String, dynamic>;
       expect(manifest['app_version'], '0.0.1');
       expect(manifest['diagnostic_verbose'], isFalse);
     });

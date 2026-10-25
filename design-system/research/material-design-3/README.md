@@ -10,7 +10,7 @@
 |---|---:|---:|---|---|
 | `01-foundations.md` | 577 | 34 | tokens 三层、颜色（49 角色表）、state layer、排版（30 样式）、shape、elevation、motion、布局/断点、图标、a11y、官方工具 | baseline `surface` = Neutral98/6；`surface-tint` 恒等于 primary；断点 600/840/1200/1600；type scale 有 3 处跨实现 tracking 冲突 |
 | `02-components-patterns.md` | 488 | 27 | 组件目录与逐项规格、导航/选择模式、大屏与桌面、Expressive 组件状态、组件级 a11y、state layer 落地 | Expressive 是**逐平台逐组件**可选，不是全局升级；SegmentedButton 自 2025-05 起官方不再推荐；Flutter 普遍停在 Expressive 之前 |
-| `03-flutter-implementation.md` | 425 | 42 | Flutter M3 实现现状、规范差距、本仓库 theme/ADR 盘点、失效引用、迁移要点（附录性质） | 项目解析到 Flutter `>=3.38.0`；Expressive 无官方路径（#168813 Open）；主题装配点分散且有裸 `MaterialApp` |
+| `03-flutter-implementation.md` | 425 | 42 | Flutter M3 实现现状、规范差距、本仓库 theme/ADR 盘点、失效引用、迁移要点（附录性质） | 项目解析到 Flutter `>=3.47.0`（见 `app/pubspec.lock`）；Expressive 无官方路径（#168813 Open）；主题装配点分散且有裸 `MaterialApp` |
 | `04-figma-design-workflow.md` | 391 | 31 | 官方 Figma 资源核实、Variables vs Styles、文件/组件集结构、桌面 frame、Plugin API 与 figwright 映射、交接清单 | M3 Design Kit v1.20 起已并入 Expressive → **必须自建 Figma 库**；只借 Material Theme Builder 的色板；插件 API 无 `setVariableValue`，是 `setValueForMode` |
 | `05-color-directions.md` | 117 | 0 | 粉色 A/B/C 取色、Figma 预览与切换方式、对比度、字体落地 | 免费版 1 collection 只能 1 mode → 建 6 个 collection，用三个 frame + 原型跳转切换；**已选定 A 柔和玫瑰**，亮/暗 frame 均已建；B/C 已移到 `12 Archive & Scratch` 作备选皮肤 |
 | `06-adaptive-desktop.md` | 281 | 7 | 五档断点、分栏/导航矩阵、canonical layouts（list-detail / supporting pane / feed）、栅格与间距、连续性、桌面输入、页面映射、模板矩阵 | Compact 1 栏 / Medium 1 `(recommended)` or 2 / Expanded 起 2 栏；导航 compact=bar、medium/expanded=collapsed rail、large/XL=expanded rail；supporting pane expanded 固定 360dp；官方 spacing 页无数值，项目用 4/8 体系 |

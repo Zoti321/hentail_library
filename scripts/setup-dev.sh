@@ -48,4 +48,10 @@ if [[ $SKIP_NATIVE_DEPS -eq 0 ]]; then
 fi
 
 echo "开发环境初始化完成。"
+if command -v flutter >/dev/null 2>&1; then
+  echo "当前 Flutter: $(flutter --version 2>/dev/null | head -n 1)"
+  echo "推荐与 CI 一致: Flutter 3.47.8 stable（见 docs/engineering/flutter-3.47-migration.md）"
+else
+  echo "未检测到 flutter 命令；请安装 Flutter 3.47.x stable 后再进入 app/。"
+fi
 echo "下一步: cd app && flutter pub get && flutter run -d windows"

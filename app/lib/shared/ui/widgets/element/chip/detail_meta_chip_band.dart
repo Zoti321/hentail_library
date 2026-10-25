@@ -106,16 +106,12 @@ class _RenderDetailMetaChipBandPanel extends RenderBox
           _DetailMetaChipBandParentData
         > {
   _RenderDetailMetaChipBandPanel({
-    required double availableWidth,
-    required int maxRows,
-    required double spacing,
-    required double runSpacing,
-    required double rowHeight,
-  }) : _availableWidth = availableWidth,
-       _maxRows = maxRows,
-       _spacing = spacing,
-       _runSpacing = runSpacing,
-       _rowHeight = rowHeight;
+    required this._availableWidth,
+    required this._maxRows,
+    required this._spacing,
+    required this._runSpacing,
+    required this._rowHeight,
+  });
 
   double _availableWidth;
   double get availableWidth => _availableWidth;

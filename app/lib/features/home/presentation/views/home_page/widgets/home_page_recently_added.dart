@@ -114,9 +114,10 @@ class _RecentlyAddedCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(tokens.radius.xs),
       child: InkWell(
         borderRadius: BorderRadius.circular(tokens.radius.xs),
-        onTap: () => ProviderScope.containerOf(
-          context,
-        ).read(readSessionLaunchPortProvider).openComic(comicId: entry.comicId),
+        onTap: () =>
+            ProviderScope.containerOf(context)
+                .read(readSessionLaunchPortProvider)
+                .openComic(comicId: entry.comicId),
         child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(tokens.radius.xs),

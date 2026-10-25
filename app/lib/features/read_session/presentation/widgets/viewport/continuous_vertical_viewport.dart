@@ -45,9 +45,8 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       ),
     );
     final Comic? comic = ref.watch(
-      readerControllerProvider(
-        viewKey,
-      ).select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
+      readerControllerProvider(viewKey)
+          .select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
     );
     if (comic == null) {
       return const SizedBox.expand();
@@ -328,9 +327,8 @@ int? _resolvePrimaryVisibleIndex(Iterable<ItemPosition> positions) {
     if (leadingEdgeCompare != 0) {
       return leadingEdgeCompare;
     }
-    final int visibleRatioCompare = _calculateVisibleRatio(
-      right,
-    ).compareTo(_calculateVisibleRatio(left));
+    final int visibleRatioCompare = _calculateVisibleRatio(right)
+        .compareTo(_calculateVisibleRatio(left));
     if (visibleRatioCompare != 0) {
       return visibleRatioCompare;
     }

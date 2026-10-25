@@ -44,9 +44,8 @@ void main() {
             'https://github.com/Zoti321/hentail_library/releases/tag/v1.0.1',
         assets: <AppReleaseAsset>[],
       );
-      when(
-        () => mockService.fetchLatestStableRelease(),
-      ).thenAnswer((_) async => newerRelease);
+      when(() => mockService.fetchLatestStableRelease())
+          .thenAnswer((_) async => newerRelease);
 
       await _pumpHarness(tester, mockService: mockService);
       await tester.tap(find.text('检查更新'));
@@ -68,9 +67,8 @@ void main() {
               'https://github.com/Zoti321/hentail_library/releases/tag/0.0.1',
           assets: <AppReleaseAsset>[],
         );
-        when(
-          () => mockService.fetchLatestStableRelease(),
-        ).thenAnswer((_) async => olderRelease);
+        when(() => mockService.fetchLatestStableRelease())
+            .thenAnswer((_) async => olderRelease);
 
         await _pumpHarness(tester, mockService: mockService);
         await tester.tap(find.text('检查更新'));
@@ -93,9 +91,8 @@ void main() {
             'https://github.com/Zoti321/hentail_library/releases/tag/v2.0.0',
         assets: <AppReleaseAsset>[],
       );
-      when(
-        () => mockService.fetchLatestStableRelease(),
-      ).thenAnswer((_) async => newerRelease);
+      when(() => mockService.fetchLatestStableRelease())
+          .thenAnswer((_) async => newerRelease);
 
       await _pumpHarness(tester, mockService: mockService);
       await tester.tap(find.text('检查更新'));
@@ -118,9 +115,8 @@ void main() {
               'https://github.com/Zoti321/hentail_library/releases/tag/v1.0.1',
           assets: <AppReleaseAsset>[],
         );
-        when(
-          () => mockService.fetchLatestStableRelease(),
-        ).thenAnswer((_) async => newerRelease);
+        when(() => mockService.fetchLatestStableRelease())
+            .thenAnswer((_) async => newerRelease);
 
         await pumpLocalizedApp(
           tester,

@@ -63,9 +63,8 @@ void main() {
     });
 
     test('exitSelection clears selection', () {
-      final TrashPageState state = _stateWith(<TrashedComic>[
-        _trashed('a'),
-      ]).toggleSelected('a');
+      final TrashPageState state = _stateWith(<TrashedComic>[_trashed('a')])
+          .toggleSelected('a');
 
       final TrashPageState exited = state.exitSelection();
       expect(exited.selectionMode, isFalse);

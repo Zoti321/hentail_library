@@ -47,6 +47,7 @@ run_codegen_drift() {
     cd "$APP_DIR"
     flutter_rust_bridge_codegen generate
     dart run build_runner build --delete-conflicting-outputs
+    bash "$REPO_ROOT/scripts/patch-freezed-dart313.sh"
   )
   local drift
   drift="$(git -C "$REPO_ROOT" status --porcelain -- app core)"

@@ -15,82 +15,79 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
-  test(
-    'warmWindow invalidates keepAlive pages that left the prefetch window',
-    () async {
-      const String comicId = 'prefetch-invalidate-comic';
-      final Map<int, int> loads = <int, int>{};
+  test('warmWindow invalidates keepAlive pages that left the prefetch window', () async {
+    const String comicId = 'prefetch-invalidate-comic';
+    final Map<int, int> loads = <int, int>{};
 
-      final Comic comic = Comic(
-        comicId: comicId,
-        path: '/tmp/test.cbz',
-        resourceType: ResourceType.cbz,
-        resourceSize: 1,
-        createdAt: DateTime.utc(2026, 1, 1),
-        lastUpdatedAt: DateTime.utc(2026, 1, 1),
-        title: 'Invalidate',
-        pageCount: 40,
-      );
+    final Comic comic = Comic(
+      comicId: comicId,
+      path: '/tmp/test.cbz',
+      resourceType: ResourceType.cbz,
+      resourceSize: 1,
+      createdAt: DateTime.utc(2026, 1, 1),
+      lastUpdatedAt: DateTime.utc(2026, 1, 1),
+      title: 'Invalidate',
+      pageCount: 40,
+    );
 
-      final ReaderSessionService session = ReaderSessionService(
-        comicRepo: _FakeComicRepo(comic),
-        pageSource: _FakePageSource(loads),
-        readingHistoryRepo: _FakeHistoryRepo(),
-        sessionPort: _FakeSessionPort(),
-      );
+    final ReaderSessionService session = ReaderSessionService(
+      comicRepo: _FakeComicRepo(comic),
+      pageSource: _FakePageSource(loads),
+      readingHistoryRepo: _FakeHistoryRepo(),
+      sessionPort: _FakeSessionPort(),
+    );
 
-      final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[
-          readerSessionServiceProvider.overrideWithValue(session),
-          ...List<Override>.generate(40, (int index) {
-            return comicReaderPageProvider(
-              comicId: comicId,
-              pageIndex: index,
-            ).overrideWith((Ref ref) async {
-              loads[index] = (loads[index] ?? 0) + 1;
-              return ReaderPageBytes(Uint8List(0));
-            });
-          }),
-        ],
-      );
-      addTearDown(container.dispose);
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        readerSessionServiceProvider.overrideWithValue(session),
+        ...List<Override>.generate(40, (int index) {
+          return comicReaderPageProvider(
+            comicId: comicId,
+            pageIndex: index,
+          ).overrideWith((Ref ref) async {
+            loads[index] = (loads[index] ?? 0) + 1;
+            return ReaderPageBytes(Uint8List(0));
+          });
+        }),
+      ],
+    );
+    addTearDown(container.dispose);
 
-      // Prime keepAlive for early pages.
-      await container.read(
-        comicReaderPageProvider(comicId: comicId, pageIndex: 0).future,
-      );
-      await container.read(
-        comicReaderPageProvider(comicId: comicId, pageIndex: 1).future,
-      );
-      expect(loads[0], 1);
-      expect(loads[1], 1);
+    // Prime keepAlive for early pages.
+    await container.read(
+      comicReaderPageProvider(comicId: comicId, pageIndex: 0).future,
+    );
+    await container.read(
+      comicReaderPageProvider(comicId: comicId, pageIndex: 1).future,
+    );
+    expect(loads[0], 1);
+    expect(loads[1], 1);
 
-      final ReaderPrefetchController prefetch = container.read(
-        readerPrefetchControllerProvider.notifier,
-      );
+    final ReaderPrefetchController prefetch = container.read(
+      readerPrefetchControllerProvider.notifier,
+    );
 
-      await prefetch.warmWindow(
-        comicId: comicId,
-        centerPageOneBased: 1,
-        totalPages: 40,
-      );
-      await prefetch.warmWindow(
-        comicId: comicId,
-        centerPageOneBased: 28,
-        totalPages: 40,
-      );
+    await prefetch.warmWindow(
+      comicId: comicId,
+      centerPageOneBased: 1,
+      totalPages: 40,
+    );
+    await prefetch.warmWindow(
+      comicId: comicId,
+      centerPageOneBased: 28,
+      totalPages: 40,
+    );
 
-      // Pages 1–3 left the window and must be invalidated (reload on next read).
-      await container.read(
-        comicReaderPageProvider(comicId: comicId, pageIndex: 0).future,
-      );
-      expect(
-        loads[0],
-        greaterThan(1),
-        reason: 'page 1 must reload after leaving prefetch window',
-      );
-    },
-  );
+    // Pages 1–3 left the window and must be invalidated (reload on next read).
+    await container.read(
+      comicReaderPageProvider(comicId: comicId, pageIndex: 0).future,
+    );
+    expect(
+      loads[0],
+      greaterThan(1),
+      reason: 'page 1 must reload after leaving prefetch window',
+    );
+  });
 }
 
 class _FakeComicRepo implements ComicLookupRepository {

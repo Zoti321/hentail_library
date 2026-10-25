@@ -44,9 +44,8 @@ void main() {
               _viewKey,
             ).overrideWith(() => _PagedReaderController(resumePage, pageCount)),
             readerPrefetchControllerProvider.overrideWith(_FakePrefetch.new),
-            comicImagesProvider(
-              comicId: _comicId,
-            ).overrideWith((Ref ref) => imagesCompleter.future),
+            comicImagesProvider(comicId: _comicId)
+                .overrideWith((Ref ref) => imagesCompleter.future),
             ...List<Override>.generate(
               pageCount,
               (int index) => comicReaderPageProvider(
@@ -126,9 +125,8 @@ void main() {
               _viewKey,
             ).overrideWith(() => _PagedReaderController(resumePage, pageCount)),
             readerPrefetchControllerProvider.overrideWith(_FakePrefetch.new),
-            comicImagesProvider(
-              comicId: _comicId,
-            ).overrideWith((Ref ref) async => images),
+            comicImagesProvider(comicId: _comicId)
+                .overrideWith((Ref ref) async => images),
             ...List<Override>.generate(
               pageCount,
               (int index) => comicReaderPageProvider(

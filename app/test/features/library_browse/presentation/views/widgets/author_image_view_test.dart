@@ -157,9 +157,8 @@ void main() {
     expect(find.byKey(AuthorImageView.hdImageKey), findsOneWidget);
 
     final BuildContext context = tester.element(find.byType(AuthorImageView));
-    ProviderScope.containerOf(
-      context,
-    ).invalidate(authorImageProvider(_request));
+    ProviderScope.containerOf(context)
+        .invalidate(authorImageProvider(_request));
     await tester.pump();
     await tester.pump();
 
@@ -198,9 +197,8 @@ void main() {
 
     // 平台换了新图：URL 变化应触发重取（linkId 不变）。
     repo.avatarUrl = 'https://img.example/avatar-b.png';
-    ProviderScope.containerOf(
-      tester.element(find.byType(AuthorImageView)),
-    ).invalidate(authorDetailProvider(1));
+    ProviderScope.containerOf(tester.element(find.byType(AuthorImageView)))
+        .invalidate(authorDetailProvider(1));
     await tester.pump();
     await tester.pump();
     await tester.pump();

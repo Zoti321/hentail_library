@@ -78,33 +78,31 @@ void main() {
       SharedPreferences.setMockInitialValues(<String, Object>{});
     });
 
-    test(
-      'probe success clears only the pending dismiss and leaves other kinds hidden',
-      () async {
-        final ProviderContainer container = ProviderContainer();
-        addTearDown(container.dispose);
-        final HomeAlertDismissStore store = container.read(
-          homeAlertDismissStoreProvider.notifier,
-        );
-        await container.read(homeAlertDismissStoreProvider.future);
-        await store.dismiss(pending);
-        await store.dismiss(syncFailed);
+    test('probe success clears only the pending dismiss and leaves other kinds hidden', () async {
+      final ProviderContainer container = ProviderContainer();
+      addTearDown(container.dispose);
+      final HomeAlertDismissStore store = container.read(
+        homeAlertDismissStoreProvider.notifier,
+      );
+      await container.read(homeAlertDismissStoreProvider.future);
+      await store.dismiss(pending);
+      await store.dismiss(syncFailed);
 
-        await store.clearPendingDismissAfterProbe(pending.libraryId);
+      await store.clearPendingDismissAfterProbe(pending.libraryId);
 
-        final Map<String, HomeAlertDismissEntry> dismissed = await container
-            .read(homeAlertDismissStoreProvider.future);
-        final List<HomeLibraryAlert> visible = filterDismissedHomeAlerts(
-          alerts: const <HomeLibraryAlert>[pending, syncFailed],
-          dismissed: dismissed,
-        );
+      final Map<String, HomeAlertDismissEntry> dismissed = await container.read(
+        homeAlertDismissStoreProvider.future,
+      );
+      final List<HomeLibraryAlert> visible = filterDismissedHomeAlerts(
+        alerts: const <HomeLibraryAlert>[pending, syncFailed],
+        dismissed: dismissed,
+      );
 
-        expect(
-          visible.map((HomeLibraryAlert alert) => alert.kind).toList(),
-          <HomeLibraryAlertKind>[HomeLibraryAlertKind.pendingResourcesDetected],
-        );
-      },
-    );
+      expect(
+        visible.map((HomeLibraryAlert alert) => alert.kind).toList(),
+        <HomeLibraryAlertKind>[HomeLibraryAlertKind.pendingResourcesDetected],
+      );
+    });
 
     test('sync from the alert clears every dismiss for that library', () async {
       final ProviderContainer container = ProviderContainer();

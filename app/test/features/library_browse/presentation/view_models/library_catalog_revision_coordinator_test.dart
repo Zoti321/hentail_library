@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
@@ -79,8 +80,7 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
 }
 
 class _ControllableScanLibraryController extends ScanLibraryController {
-  _ControllableScanLibraryController({required bool running})
-    : _running = running;
+  _ControllableScanLibraryController({required this._running});
 
   bool _running;
 
@@ -94,9 +94,8 @@ class _ControllableScanLibraryController extends ScanLibraryController {
 }
 
 class _ControllableThumbnailEventCoordinator extends ThumbnailEventCoordinator {
-  _ControllableThumbnailEventCoordinator({
-    ThumbnailBackgroundProgress progress = const ThumbnailBackgroundProgress(),
-  }) : _progress = progress;
+  _ControllableThumbnailEventCoordinator()
+    : _progress = const ThumbnailBackgroundProgress();
 
   ThumbnailBackgroundProgress _progress;
 

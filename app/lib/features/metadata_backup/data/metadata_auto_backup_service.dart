@@ -6,8 +6,9 @@ import 'package:hentai_library/features/metadata_backup/data/metadata_backup_pat
 import 'package:hentai_library/features/metadata_backup/data/adapters/metadata_backup_frb_types.dart';
 import 'package:path/path.dart' as p;
 
-typedef MetadataAutoBackupExportInvoker =
-    Uint8List Function(ExportComicMetadataOptionsDto options);
+typedef MetadataAutoBackupExportInvoker = Uint8List Function(
+  ExportComicMetadataOptionsDto options,
+);
 
 class MetadataAutoBackupRunResult {
   const MetadataAutoBackupRunResult({

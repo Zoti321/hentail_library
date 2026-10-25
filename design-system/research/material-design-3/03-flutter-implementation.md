@@ -25,6 +25,8 @@
 | docs.flutter.dev/release/breaking-changes/material-design-3-token-update | Timeline: Landed in version 3.26.0-0.0.pre；In stable release: 3.27；正文：tokens v6.1（PR #153385 v5.0.0、#153722 v6.1.0） | 颜色 token 映射变更 |
 | docs.flutter.dev/release/release-notes | 目录列 3.47.0 / 3.44.0 / 3.41.0 / 3.38.0 | 版本基线 |
 | flutter.dev/blog/whats-new-in-flutter-3-38 | 3.38 变更说明（predictive back 默认开启、默认页面转场改 FadeForwards 等） | 3.38 行为 |
+| flutter.dev/blog/whats-new-in-flutter-3-47 | 3.47：桌面 Impeller 默认、Dart 3.13、Material/Cupertino 解耦推进等 | 当前 CI 基线 |
+| docs/engineering/flutter-3.47-migration.md | 本仓库 3.38.5→3.47.8 清单与 Gate 注意点 | 工程基线 |
 | api.flutter.dev/flutter/material/PageTransitionsTheme-class.html | 正文分别描述 FadeUpwardsPageTransitionsBuilder / Zoom / FadeForwards 的角色，称 FadeForwards 为 default page transition | 转场默认值 |
 | api.flutter.dev/flutter/material/Typography/Typography.material2021.html | Creates a typography instance using Material Design 3 2021 defaults；englishLike2021 / dense2021 / tall2021 | M3 排版 |
 | api.flutter.dev/flutter/material/ColorScheme/ColorScheme.fromSeed.html | 参数 dynamicSchemeVariant = DynamicSchemeVariant.tonalSpot；background/onBackground @Deprecated after v3.18.0-0.1.pre | 种子色 |
@@ -51,17 +53,25 @@
 
 | 事实 | 值 | 来源 |
 | --- | --- | --- |
-| Dart SDK 约束 | ^3.10.4 | app/pubspec.yaml:9 |
-| 解析出的 Flutter SDK 约束 | flutter: ">=3.38.0" | app/pubspec.lock:1619-1621 |
-| 官方最新稳定版（抓取时目录中最高） | 3.47.0 | docs.flutter.dev/release/release-notes |
-| 因此可用 API 下限 | 3.38 及以上 | 由 pubspec.lock 推得 |
+| Dart SDK 约束 | ^3.13.0 | app/pubspec.yaml |
+| 解析出的 Flutter SDK 约束 | flutter: ">=3.47.0" | app/pubspec.lock `sdks` |
+| CI 固定 SDK | 3.47.8 | `.github/workflows/gate.yml` → `FLUTTER_VERSION` |
+| `material_color_utilities`（直接依赖） | 0.13.0 | app/pubspec.yaml / pubspec.lock |
+| 官方 stable 目录（抓取时） | 3.47.0 等 | docs.flutter.dev/release/release-notes |
 
-**结论：不能假设最新 Flutter。** 本文所有「可用」判断按 **Flutter ≥3.38.0** 给出；标注「需 >3.38」的条目在 3.38 上不可用。3.38 本身的官方行为变更（来自 flutter.dev/blog/whats-new-in-flutter-3-38）：
+**结论（2026-10 起）：** 工程与 CI 基线为 **Flutter ≥3.47.0 / Dart 3.13.x**。下文 §3–§7 中大量条目写于 3.38 调研期，**API 下限仍以 pubspec.lock 为准**；3.38→3.47 的 breaking 与平台项见 `docs/engineering/research/flutter-official-upgrade-3.38-to-3.47.md`。
 
-- predictive back route transitions are now enabled by default in MaterialApp (#173860)
-- the default page transition has been updated to FadeForwardsPageTransitionsBuilder from ZoomPageTransitionsBuilder
-- WidgetState 迁移 requires no change for existing apps，已覆盖 a wide range of widgets and their themes
-- Decoupling Material and Cupertino：Material/Cupertino 将拆成独立 package 进入 flutter/packages（下文 §3.1 的 Expressive 缺口与此相关）
+**3.47 起与本项目相关的官方行为（摘要，非穷尽）：**
+
+- **桌面 Impeller** 在 Windows / macOS / Linux 上为默认渲染后端（发版与主题 smoke 时注意与 Skia 差异）。
+- **Dart 3.13**、**MCU 0.13** 随 Flutter 3.47 工具链对齐；色板与主题数值不在 SDK 升级 PR 内重做，留给后续 **MD3E** 迁移。
+- **Material/Cupertino 解耦**仍在推进；Expressive 在 Flutter 侧仍无 stable 路径（#168813 Open）。
+
+**仍适用于本仓库的 3.38 时代行为（未在 3.47 回滚）：**
+
+- predictive back route transitions enabled by default in MaterialApp
+- 默认页面转场为 FadeForwardsPageTransitionsBuilder（本项目 `theme.dart` 仍覆盖 android 为 FadeUpwards）
+- WidgetState 迁移对既有主题代码无强制改动
 
 ## 3. Flutter 的 Material 3：［实现］现状
 
@@ -359,7 +369,7 @@ design-system/ 现仅存 design-system/.gitkeep，MASTER.md 与 pages/ 均不存
 | MaterialShapes 是否存在 | 以 404 作为弱证据（api.flutter.dev/flutter/material/MaterialShapes-class.html 不存在）。若需强证据应查 Flutter 源码/lib/material/，本次未做 |
 | Compose 侧 MaterialShapes 稳定性 | compose-material3 1.4.0 release notes 同段既有 stable 提升、也有 Revert … promotions to stable，**状态不明**，本文不断言其为 stable |
 | dynamic_color 平台矩阵 | pub.dev 抓取失败；本文只说「社区包、本项目未依赖」，不列平台清单 |
-| Flutter 3.41/3.44/3.47 的 M3 相关变更 | 只拿到 release-notes 目录（版本号存在），**未读正文**，因此不写 3.38 之后的 M3 行为 |
+| Flutter 3.41/3.44/3.47 的 M3 相关变更 | 工程已升 3.47.8；M3 逐条差异以 `docs/engineering/research/flutter-official-upgrade-3.38-to-3.47.md` 为准，本文 §3 未逐条改写 |
 | Flutter 是否把 FadeUpwardsPageTransitionsBuilder 标弃用 | 其专属文档页返回 404，但 PageTransitionsTheme 文档仍在描述它 → 只断言「仍被引用」，不断言弃用状态 |
 | 「规范 vs 实现」的数值对比（组件高度/间距/圆角） | 双侧数值缺失（规范页抽取失败、Flutter 文档不给默认 dp），本文只做定性对比 |
 

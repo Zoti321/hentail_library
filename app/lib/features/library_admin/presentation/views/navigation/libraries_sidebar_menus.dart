@@ -61,9 +61,8 @@ class _SectionAddMenuButton extends HookConsumerWidget {
         borderRadius: tokens.radius.sm,
         foregroundColor: context.hentai.textSecondary,
         hoverColor: _sidebarActionHoverBackground(context.hentai),
-        overlayColor: _sidebarActionHoverBackground(
-          context.hentai,
-        ).withAlpha(110),
+        overlayColor: _sidebarActionHoverBackground(context.hentai)
+            .withAlpha(110),
         delayTooltipThreeSeconds: true,
         onPressed: controller.toggleMenu,
       ),
@@ -140,9 +139,8 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
         borderRadius: tokens.radius.sm,
         foregroundColor: context.hentai.textSecondary,
         hoverColor: _sidebarActionHoverBackground(context.hentai),
-        overlayColor: _sidebarActionHoverBackground(
-          context.hentai,
-        ).withAlpha(110),
+        overlayColor: _sidebarActionHoverBackground(context.hentai)
+            .withAlpha(110),
         delayTooltipThreeSeconds: true,
         onPressed: controller.toggleMenu,
       ),
@@ -225,9 +223,8 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
         borderRadius: tokens.radius.sm,
         foregroundColor: context.hentai.textSecondary,
         hoverColor: _sidebarActionHoverBackground(context.hentai),
-        overlayColor: _sidebarActionHoverBackground(
-          context.hentai,
-        ).withAlpha(110),
+        overlayColor: _sidebarActionHoverBackground(context.hentai)
+            .withAlpha(110),
         delayTooltipThreeSeconds: true,
         onPressed: controller.toggleMenu,
       ),

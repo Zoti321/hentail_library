@@ -34,8 +34,7 @@ LocalLibrary _library(String id) {
 }
 
 class _FakeLibraryRepository implements LibraryRepository {
-  _FakeLibraryRepository(this.libraries, {String? currentId})
-    : _currentId = currentId;
+  _FakeLibraryRepository(this.libraries, {this._currentId});
 
   final List<LocalLibrary> libraries;
   String? _currentId;
@@ -117,9 +116,10 @@ void main() {
 
   CurrentLibraryPort port() => container.read(currentLibraryPortProvider);
 
-  Future<List<String>> libraryIds() async => (await container.read(
-    currentLibraryProvider.future,
-  )).libraries.map((LocalLibrary l) => l.libraryId).toList();
+  Future<List<String>> libraryIds() async =>
+      (await container.read(currentLibraryProvider.future)).libraries
+          .map((LocalLibrary l) => l.libraryId)
+          .toList();
 
   test('currentId reflects the repository current selection', () async {
     await container.read(currentLibraryProvider.future);

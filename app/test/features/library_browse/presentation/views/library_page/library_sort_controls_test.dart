@@ -77,9 +77,8 @@ void main() {
     await tester.tap(find.text('添加时间'));
     await tester.pumpAndSettle();
 
-    sort = (await container.read(
-      libraryComicFiltersProvider.future,
-    )).sortOption;
+    sort = (await container.read(libraryComicFiltersProvider.future))
+        .sortOption;
     expect(sort.field, LibraryComicSortField.createdAt);
   });
 }

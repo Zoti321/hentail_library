@@ -10,12 +10,10 @@ typedef PageImagePngEncoder = Future<Uint8List> Function(Uint8List imageBytes);
 
 class PageImageCopy {
   PageImageCopy({
-    required ComicPageSourcePort pageSource,
-    required ClipboardImagePort clipboardImage,
+    required this._pageSource,
+    required this._clipboardImage,
     PageImagePngEncoder? encodePng,
-  }) : _pageSource = pageSource,
-       _clipboardImage = clipboardImage,
-       _encodePng = encodePng ?? encodePageImagePng;
+  }) : _encodePng = encodePng ?? encodePageImagePng;
 
   final ComicPageSourcePort _pageSource;
   final ClipboardImagePort _clipboardImage;

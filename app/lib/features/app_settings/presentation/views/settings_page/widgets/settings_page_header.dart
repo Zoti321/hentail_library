@@ -102,7 +102,7 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             children: <Widget>[
                               ...previousChildren,
-                              if (currentChild != null) currentChild,
+                              ?currentChild,
                             ],
                           );
                         },

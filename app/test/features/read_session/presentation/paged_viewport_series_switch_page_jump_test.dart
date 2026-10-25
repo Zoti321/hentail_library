@@ -46,13 +46,11 @@ void main() {
         ProviderScope(
           overrides: <Override>[
             ...dataProviderOverrides(),
-            readerControllerProvider(
-              _uiKeyAfterVolumeSwitch,
-            ).overrideWith(() => _PagedReaderController(1, pageCount)),
+            readerControllerProvider(_uiKeyAfterVolumeSwitch)
+                .overrideWith(() => _PagedReaderController(1, pageCount)),
             readerPrefetchControllerProvider.overrideWith(_FakePrefetch.new),
-            comicImagesProvider(
-              comicId: _comicId,
-            ).overrideWith((Ref ref) async => images),
+            comicImagesProvider(comicId: _comicId)
+                .overrideWith((Ref ref) async => images),
             ...List<Override>.generate(
               pageCount,
               (int index) => comicReaderPageProvider(

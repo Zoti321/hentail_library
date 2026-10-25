@@ -46,11 +46,7 @@ class _ApplicationSupportLegacySettingsJsonFile
 }
 
 class AppSettingRepositoryImpl implements AppSettingRepository {
-  AppSettingRepositoryImpl({
-    SharedPreferences? sharedPreferences,
-    LegacySettingsJsonFile? legacySettingsFile,
-  }) : _sharedPreferences = sharedPreferences,
-       _legacySettingsFile = legacySettingsFile;
+  AppSettingRepositoryImpl({this._sharedPreferences, this._legacySettingsFile});
 
   final SharedPreferences? _sharedPreferences;
   final LegacySettingsJsonFile? _legacySettingsFile;

@@ -151,17 +151,15 @@ void main() {
         2,
       );
       expect(
-        (await container.read(
-          allTagsProvider.future,
-        )).map((Tag tag) => tag.name),
+        (await container.read(allTagsProvider.future))
+            .map((Tag tag) => tag.name),
         <String>['alpha', 'beta'],
       );
 
       await container
           .read(
-            namedFacetManagementControllerProvider(
-              ManagedNamedFacetKind.tag,
-            ).notifier,
+            namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag)
+                .notifier,
           )
           .deleteAll();
 
@@ -178,9 +176,8 @@ void main() {
     final _SharedTagNames tags = _SharedTagNames(<String>['alpha', 'beta']);
     final ProviderContainer container = _container(tags);
     final NamedFacetManagementController controller = container.read(
-      namedFacetManagementControllerProvider(
-        ManagedNamedFacetKind.tag,
-      ).notifier,
+      namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag)
+          .notifier,
     );
     await pumpEventQueue();
     await controller.setQuery('alpha');
@@ -225,9 +222,8 @@ void main() {
       expect(page.items, <String>['alpha', 'gamma']);
       expect(page.totalCount, 2);
       expect(
-        (await container.read(
-          allTagsProvider.future,
-        )).map((Tag tag) => tag.name),
+        (await container.read(allTagsProvider.future))
+            .map((Tag tag) => tag.name),
         <String>['alpha', 'gamma'],
       );
     },

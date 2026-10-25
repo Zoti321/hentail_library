@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  FLUTTER_VERSION: "3.38.5"
-  FRB_CODEGEN_VERSION: "2.12.0"
+  FLUTTER_VERSION: "3.47.8"
+  FRB_CODEGEN_VERSION: "2.13.0"
 
 jobs:
   build-ios:
@@ -25,7 +25,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Resolve version
         id: version
@@ -147,7 +147,7 @@ jobs:
           echo "path=${OUT}" >> "$GITHUB_OUTPUT"
           ls -lh "$OUT"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ios-arm64-nosign
           path: ${{ steps.package.outputs.path }}

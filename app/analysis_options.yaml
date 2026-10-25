@@ -1,6 +1,15 @@
+# `riverpod_lint` 在 pubspec 中保留；接入 `plugins: riverpod_lint` 后 CI（CI=true analyze）
+# 会对既有代码报 avoid_build_context_in_providers / only_use_keep_alive_inside_keep_alive 等
+# 数十处 info·warning。Gate 暂不启用插件；清理后可打开 plugins 段。
 analyzer:
   exclude:
     - rust_builder/**
+    - build/**
+    - android/**
+    - ios/**
+    - windows/**
+    - macos/**
+    - linux/**
   errors:
     deprecated_member_use: ignore
     use_build_context_synchronously: ignore

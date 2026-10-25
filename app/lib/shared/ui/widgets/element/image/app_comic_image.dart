@@ -5,13 +5,12 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 
 /// Builds a reader-scoped [ImageProvider] (injected from read_session).
-typedef ReaderComicImageProviderBuilder =
-    ImageProvider<Object>? Function({
-      String? filePath,
-      Uint8List? memoryBytes,
-      int? cacheWidth,
-      int? cacheHeight,
-    });
+typedef ReaderComicImageProviderBuilder = ImageProvider<Object>? Function({
+  String? filePath,
+  Uint8List? memoryBytes,
+  int? cacheWidth,
+  int? cacheHeight,
+});
 
 class AppComicImage extends StatelessWidget {
   const AppComicImage({

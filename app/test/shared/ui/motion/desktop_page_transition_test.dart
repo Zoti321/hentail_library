@@ -25,33 +25,27 @@ void main() {
       expect(page, isA<NoTransitionPage<void>>());
     });
 
-    test(
-      'one-shot request makes the next allowPendingFadeThrough page fade-through',
-      () {
-        requestShellFadeThroughOnce();
+    test('one-shot request makes the next allowPendingFadeThrough page fade-through', () {
+      requestShellFadeThroughOnce();
 
-        final Page<void> animated = buildShellNavPage(
-          state: _FakeGoRouterState(),
-          child: const SizedBox(),
-          allowPendingFadeThrough: true,
-        );
-        expect(animated, isA<CustomTransitionPage<void>>());
-        final CustomTransitionPage<void> custom =
-            animated as CustomTransitionPage<void>;
-        expect(custom.transitionDuration, kDesktopPageTransitionDuration);
-        expect(
-          custom.reverseTransitionDuration,
-          kDesktopPageTransitionDuration,
-        );
+      final Page<void> animated = buildShellNavPage(
+        state: _FakeGoRouterState(),
+        child: const SizedBox(),
+        allowPendingFadeThrough: true,
+      );
+      expect(animated, isA<CustomTransitionPage<void>>());
+      final CustomTransitionPage<void> custom =
+          animated as CustomTransitionPage<void>;
+      expect(custom.transitionDuration, kDesktopPageTransitionDuration);
+      expect(custom.reverseTransitionDuration, kDesktopPageTransitionDuration);
 
-        final Page<void> next = buildShellNavPage(
-          state: _FakeGoRouterState(),
-          child: const SizedBox(),
-          allowPendingFadeThrough: true,
-        );
-        expect(next, isA<NoTransitionPage<void>>());
-      },
-    );
+      final Page<void> next = buildShellNavPage(
+        state: _FakeGoRouterState(),
+        child: const SizedBox(),
+        allowPendingFadeThrough: true,
+      );
+      expect(next, isA<NoTransitionPage<void>>());
+    });
 
     test(
       'pending request is ignored when allowPendingFadeThrough is false',

@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FLUTTER_VERSION: "3.38.5"
-  FRB_CODEGEN_VERSION: "2.12.0"
+  FLUTTER_VERSION: "3.47.8"
+  FRB_CODEGEN_VERSION: "2.13.0"
 
 jobs:
   gate-rust-lint:
@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -47,7 +47,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -68,7 +68,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -88,7 +88,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb
@@ -106,7 +106,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Flutter FRB toolchain
         uses: ./.github/actions/setup-flutter-frb

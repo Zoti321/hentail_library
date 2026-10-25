@@ -384,7 +384,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
     if (!mounted) {
       return;
     }
-    final String? directoryPath = await FilePicker.platform.getDirectoryPath();
+    final String? directoryPath = await FilePicker.getDirectoryPath();
     if (directoryPath == null || directoryPath.isEmpty || !mounted) {
       return;
     }
@@ -424,10 +424,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
         return Stack(
           alignment: Alignment.topCenter,
           clipBehavior: Clip.hardEdge,
-          children: <Widget>[
-            ...previousChildren,
-            if (currentChild != null) currentChild,
-          ],
+          children: <Widget>[...previousChildren, ?currentChild],
         );
       },
       transitionBuilder: _buildTabTransition,

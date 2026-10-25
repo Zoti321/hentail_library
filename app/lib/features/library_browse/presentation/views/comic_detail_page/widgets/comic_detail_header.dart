@@ -149,26 +149,24 @@ class _ComicDetailOverflowMenuButtonState
                 label: l10n.comicDetailShowInExplorer,
                 onTap: () {
                   hideMenu();
-                  showInFileExplorer(widget.comic.path).catchError((
-                    Object error,
-                    StackTrace stackTrace,
-                  ) {
-                    if (!context.mounted) {
-                      return;
-                    }
-                    if (error is AppException) {
-                      showErrorToast(context, error);
-                      return;
-                    }
-                    showErrorToast(
-                      context,
-                      AppException(
-                        l10n.comicDetailShowInExplorerFailed,
-                        cause: error,
-                        stackTrace: stackTrace,
-                      ),
-                    );
-                  });
+                  showInFileExplorer(widget.comic.path)
+                      .catchError((Object error, StackTrace stackTrace) {
+                        if (!context.mounted) {
+                          return;
+                        }
+                        if (error is AppException) {
+                          showErrorToast(context, error);
+                          return;
+                        }
+                        showErrorToast(
+                          context,
+                          AppException(
+                            l10n.comicDetailShowInExplorerFailed,
+                            cause: error,
+                            stackTrace: stackTrace,
+                          ),
+                        );
+                      });
                 },
               ),
               _ComicDetailOverflowMenuItem(

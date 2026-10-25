@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2305,8 +2306,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           '$count comics will be removed from the library and their resources on disk (files or image folders) permanently deleted. This cannot be undone.',
-      one:
-          '1 comic will be removed from the library and its resource on disk (file or image folder) permanently deleted. This cannot be undone.',
+      one: '1 comic will be removed from the library and its resource on disk (file or image folder) permanently deleted. This cannot be undone.',
     );
     return '$_temp0';
   }
@@ -2318,8 +2318,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           '$count remote comics will be removed from the library only. Remote resources are not deleted.',
-      one:
-          '1 remote comic will be removed from the library only. Remote resources are not deleted.',
+      one: '1 remote comic will be removed from the library only. Remote resources are not deleted.',
     );
     return '$_temp0';
   }
