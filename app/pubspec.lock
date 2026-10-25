@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.14.12"
+  animations:
+    dependency: transitive
+    description:
+      name: animations
+      sha256: "9cb469212ea51be27097f23b519d594c01171721347b55df9334fff653659e7f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   archive:
     dependency: "direct main"
     description:
@@ -313,6 +321,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
+  dynamic_color:
+    dependency: "direct main"
+    description:
+      name: dynamic_color
+      sha256: "869b3bce0100eb519768ecd71c0111f0b5ea679f5f62e1f59c49d80067e730c5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: "3bce007a596ff8b3119c45d68aaef631272537c03d30e5d4534dd24bf4c5eaa2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   extended_image:
     dependency: "direct main"
     description:
@@ -795,6 +819,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.0"
+  material_expressive:
+    dependency: "direct main"
+    description:
+      name: material_expressive
+      sha256: "7a1347f92786b809ab36f4c6cb29bfa43490042ebe56361e498bba94ee921ad1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.0"
+  material_new_shapes:
+    dependency: "direct main"
+    description:
+      name: material_new_shapes
+      sha256: e4bc375205e187e8fb232573387112dd8c0dd45b03af8aa2b3c79eb4b9e3e0dc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   material_symbols_icons:
     dependency: "direct main"
     description:
@@ -843,6 +883,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  motor:
+    dependency: "direct main"
+    description:
+      name: motor
+      sha256: cbd49f21b00e568c2b1a55f134ed803614a107782f4fea7769693bca32940c58
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   nested:
     dependency: transitive
     description:
@@ -1384,22 +1432,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1"
-  system_theme:
-    dependency: "direct main"
-    description:
-      name: system_theme
-      sha256: "03525aaeead2bfc0d81b84ceee1dbafb90cbf9886efd861489b7c20fdf466479"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.0"
-  system_theme_web:
-    dependency: transitive
-    description:
-      name: system_theme_web
-      sha256: ae9fce643da035c9af16cc79e0bf598fa4751da91dcfe240da309ef5d78eec5f
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.5"
   term_glyph:
     dependency: transitive
     description:

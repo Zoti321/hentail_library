@@ -15,17 +15,20 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # --- UI / 主题 / 组件（共 10）---
+  # --- UI / 主题 / 组件（共 13）---
   cupertino_icons: ^2.0.0
   custom_pop_up_menu: ^1.2.4
+  dynamic_color: ^2.1.0
   flutter_acrylic: ^1.1.4
   flutter_animate: ^4.5.2
   google_fonts: ^9.0.0
   lucide_icons_flutter: ^4.0.1
   material_color_utilities: ^0.13.0
+  material_expressive: ^0.8.0
+  material_new_shapes: ^1.0.0
   material_symbols_icons: ^4.2960.0
+  motor: ^1.1.0
   scrollable_positioned_list: ^0.3.8
-  system_theme: ^3.1.2
 
   # --- 基础工具库（共 7）---
   async: ^2.11.0
