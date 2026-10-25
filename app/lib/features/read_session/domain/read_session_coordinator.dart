@@ -21,10 +21,9 @@ typedef SeriesSwitchPlan = ({
 /// 窄协调：open → 翻页进度 → 写历史 → close / 系列切卷。
 class ReadSessionCoordinator {
   ReadSessionCoordinator({
-    required ReaderSessionService sessionService,
-    required ReadingHistoryRepository readingHistoryRepo,
-  }) : _sessionService = sessionService,
-       _readingHistoryRepo = readingHistoryRepo;
+    required this._sessionService,
+    required this._readingHistoryRepo,
+  });
 
   final ReaderSessionService _sessionService;
   final ReadingHistoryRepository _readingHistoryRepo;

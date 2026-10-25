@@ -40,10 +40,7 @@ class LibraryPageAnimatedHeader extends StatelessWidget {
         return Stack(
           alignment: Alignment.topCenter,
           clipBehavior: Clip.hardEdge,
-          children: <Widget>[
-            ...previousChildren,
-            if (currentChild != null) currentChild,
-          ],
+          children: <Widget>[...previousChildren, ?currentChild],
         );
       },
       transitionBuilder: _buildTransition,

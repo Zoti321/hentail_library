@@ -11,9 +11,7 @@ import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
 class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
-  const ComicThumbnailRepositoryImpl({
-    required LibraryRepository libraryRepository,
-  }) : _libraryRepository = libraryRepository;
+  const ComicThumbnailRepositoryImpl({required this._libraryRepository});
 
   final LibraryRepository _libraryRepository;
 

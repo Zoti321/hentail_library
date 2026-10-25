@@ -17,16 +17,12 @@ import 'package:hentai_library/features/read_session/domain/reader_session_snaps
 /// 同一 comicId 在 close 前复用页列表，避免 open 与 loadPages 双次列页。
 class ReaderSessionService {
   ReaderSessionService({
-    required ComicLookupRepository comicRepo,
-    required ComicPageSourcePort pageSource,
-    required ReadingHistoryRepository readingHistoryRepo,
-    required ReaderSessionPort sessionPort,
-    Duration openTimeout = defaultOpenTimeout,
-  }) : _comicRepo = comicRepo,
-       _pageSource = pageSource,
-       _readingHistoryRepo = readingHistoryRepo,
-       _sessionPort = sessionPort,
-       _openTimeout = openTimeout;
+    required this._comicRepo,
+    required this._pageSource,
+    required this._readingHistoryRepo,
+    required this._sessionPort,
+    this._openTimeout = defaultOpenTimeout,
+  });
 
   /// Resource access / reader open 的默认有界时限（Local + Remote）。
   static const Duration defaultOpenTimeout = Duration(seconds: 30);

@@ -33,8 +33,7 @@ List<Override> settingsViewTestOverrides({
 }
 
 class FakeSettingsNotifier extends SettingsNotifier {
-  FakeSettingsNotifier({AppSetting Function()? settingBuilder})
-    : _settingBuilder = settingBuilder;
+  FakeSettingsNotifier({this._settingBuilder});
 
   final AppSetting Function()? _settingBuilder;
 

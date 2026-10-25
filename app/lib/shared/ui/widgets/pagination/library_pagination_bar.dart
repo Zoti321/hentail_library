@@ -116,10 +116,7 @@ class _LibraryPaginationPageIndicator extends StatelessWidget {
         return Stack(
           alignment: Alignment.center,
           clipBehavior: Clip.hardEdge,
-          children: <Widget>[
-            ...previousChildren,
-            if (currentChild != null) currentChild,
-          ],
+          children: <Widget>[...previousChildren, ?currentChild],
         );
       },
       transitionBuilder: (Widget child, Animation<double> animation) {

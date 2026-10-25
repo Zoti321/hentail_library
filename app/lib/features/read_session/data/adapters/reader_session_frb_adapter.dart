@@ -8,8 +8,7 @@ import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 
 /// [ReaderSessionPort] 委托 Rust 阅读会话 open/close/clear。
 class ReaderSessionFrbAdapter implements ReaderSessionPort {
-  const ReaderSessionFrbAdapter({required LibraryRepository libraryRepository})
-    : _libraryRepository = libraryRepository;
+  const ReaderSessionFrbAdapter({required this._libraryRepository});
 
   final LibraryRepository _libraryRepository;
 

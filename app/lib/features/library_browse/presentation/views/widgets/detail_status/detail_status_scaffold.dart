@@ -45,7 +45,7 @@ class DetailStatusScaffold extends StatelessWidget {
                       color: context.hentai.textSecondary,
                     ),
                   ),
-                  if (action != null) action!,
+                  ?action,
                 ],
               ),
             ),

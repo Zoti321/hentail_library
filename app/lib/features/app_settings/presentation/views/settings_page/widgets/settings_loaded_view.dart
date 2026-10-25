@@ -203,10 +203,7 @@ class _SettingsNarrowPaneSwitcher extends StatelessWidget {
         layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
           return Stack(
             alignment: Alignment.topLeft,
-            children: <Widget>[
-              ...previousChildren,
-              if (currentChild != null) currentChild,
-            ],
+            children: <Widget>[...previousChildren, ?currentChild],
           );
         },
         transitionBuilder: (Widget child, Animation<double> animation) {

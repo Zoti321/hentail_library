@@ -10,8 +10,7 @@ import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 
 /// Library sync 经 Rust FRB 执行；Dart 负责凭证注入与进度映射。
 class SyncLibraryFrbAdapter implements SyncLibraryPort {
-  SyncLibraryFrbAdapter({required LibraryRepository libraryRepository})
-    : _libraryRepository = libraryRepository;
+  SyncLibraryFrbAdapter({required this._libraryRepository});
 
   final LibraryRepository _libraryRepository;
 

@@ -76,8 +76,21 @@ cd app && flutter pub get
 
 ## 7. 合并检查表
 
-- [ ] 六个 workflow 的 `FLUTTER_VERSION` 已更新
-- [ ] `app/pubspec.yaml` + `pubspec.lock` 可在 3.47.8 下 `pub get`
-- [ ] `./scripts/run-gate.sh` 本地或 PR CI 全绿
+- [x] 六个 workflow 的 `FLUTTER_VERSION` 已更新
+- [x] `app/pubspec.yaml` + `pubspec.lock` 可在 3.47.8 下 `pub get`
+- [ ] `./scripts/run-gate.sh` 本地或 PR CI 全绿（GitHub Actions 设 `CI=true`，`flutter analyze` 将 **info** 级 lint 也计为失败，需 `dart fix` 或显式关规则）
 - [ ] 关键页面 smoke：`flutter run -d windows`（至少库 / 设置 / 阅读器入口）
 - [ ] Release / Watch 工作流（若近期要发版）在 Actions 上试跑或依赖 nightly
+
+## 8. 工程侧后续升级 backlog（本 PR 之后 / 可选）
+
+| 类别 | 项 | 说明 |
+| --- | --- | --- |
+| **pub** | `file_picker` 11→13、`flutter_secure_storage` 10→11、`package_info_plus` 9→10 | `flutter pub outdated` 显示 Latest 更高但当前解析矩阵已钉住；单独 PR 升 major 并跑 Gate |
+| **pub** | `freezed` 4.0.3、`build_runner` 2.17.1、`test` 1.33、`material_color_utilities` 0.13.1 | 小版本；注意与 `theme_tailor` / `riverpod_generator` 的 `build` 约束 |
+| **工具** | 恢复 `custom_lint` + `riverpod_lint` | 待 pub 上 `custom_lint` 与 analyzer 13 兼容 |
+| **Android** | AGP 9 / built-in Kotlin / `android.newDsl=true` | 当前 `gradle.properties` 过渡项；发版前 `flutter build apk` |
+| **平台** | iOS UIScene、桌面 Impeller 视觉回归 | 3.47 发行说明；非 Gate 必过 |
+| **CI** | `manual-build-*`、`release.yml`、`watch.yml` | SDK bump 后首次发版链试跑 |
+| **文档** | `MASTER.md` MCU 文案、`03-flutter-implementation.md` 基线 3.47 | 低优对齐 |
+| **产品** | Issue #332 Kazumi M3 包 | 与 SDK PR 分拆 |

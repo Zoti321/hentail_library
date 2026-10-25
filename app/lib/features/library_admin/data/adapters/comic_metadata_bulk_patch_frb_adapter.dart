@@ -7,9 +7,7 @@ import 'package:hentai_library/src/rust/api/comic.dart' as comic_rust;
 import 'package:hentai_library/src/rust/api/sync.dart' as sync_rust;
 
 class ComicMetadataBulkPatchFrbAdapter implements ComicMetadataBulkPatchPort {
-  ComicMetadataBulkPatchFrbAdapter({
-    required LibraryRepository libraryRepository,
-  }) : _libraryRepository = libraryRepository;
+  ComicMetadataBulkPatchFrbAdapter({required this._libraryRepository});
 
   final LibraryRepository _libraryRepository;
   sync_rust.SyncHandleDto? _activeHandle;

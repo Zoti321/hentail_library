@@ -9,8 +9,7 @@ import 'package:hentai_library/src/rust/api/sync.dart' as sync_rust;
 
 /// Metadata refresh 经 Rust FRB 执行。
 class MetadataRefreshFrbAdapter implements MetadataRefreshPort {
-  MetadataRefreshFrbAdapter({required LibraryRepository libraryRepository})
-    : _libraryRepository = libraryRepository;
+  MetadataRefreshFrbAdapter({required this._libraryRepository});
 
   final LibraryRepository _libraryRepository;
   sync_rust.SyncHandleDto? _activeHandle;

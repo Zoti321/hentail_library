@@ -34,8 +34,7 @@ LocalLibrary _library(String id) {
 }
 
 class _FakeLibraryRepository implements LibraryRepository {
-  _FakeLibraryRepository(this.libraries, {String? currentId})
-    : _currentId = currentId;
+  _FakeLibraryRepository(this.libraries, {this._currentId});
 
   final List<LocalLibrary> libraries;
   String? _currentId;
