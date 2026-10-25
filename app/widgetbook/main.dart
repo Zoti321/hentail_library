@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 
+import 'md3e_viewports.dart';
 import 'widgetbook_directories.dart';
 
 import 'package:widgetbook/widgetbook.dart';
@@ -22,29 +23,7 @@ void main() {
             WidgetbookTheme(name: 'Dark', data: buildAppTheme(Brightness.dark)),
           ],
         ),
-        ViewportAddon(<ViewportData>[
-          const ViewportData(
-            name: 'Compact',
-            width: 390,
-            height: 844,
-            pixelRatio: 1,
-            platform: TargetPlatform.android,
-          ),
-          const ViewportData(
-            name: 'Medium',
-            width: 800,
-            height: 900,
-            pixelRatio: 1,
-            platform: TargetPlatform.windows,
-          ),
-          const ViewportData(
-            name: 'Expanded',
-            width: 1280,
-            height: 800,
-            pixelRatio: 1,
-            platform: TargetPlatform.windows,
-          ),
-        ]),
+        ViewportAddon(buildMd3eWidgetbookViewports()),
       ],
     ),
   );

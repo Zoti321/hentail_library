@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// M3-style expanded breakpoint (840dp): list+detail side-by-side at or above it.
-const double kMd3eListDetailExpandedBreakpoint = 840;
+import 'md3e_breakpoints.dart';
+
+/// List+detail side-by-side at [Md3eWindowSizeClass.expanded] and wider (≥840dp).
+const double kMd3eListDetailExpandedBreakpoint = Md3eBreakpoints.expanded;
 
 /// Responsive list–detail shell for MD3E Lab (not production App Shell).
 ///

@@ -2,6 +2,7 @@
 library;
 
 export 'interaction/md3e_pointer_target.dart';
+export 'layout/md3e_breakpoints.dart';
 export 'layout/md3e_list_detail_adaptive_layout.dart';
 export 'motion/md3e_motion.dart';
 export 'patterns/settings_grouped_list_pattern.dart';
