@@ -37,7 +37,7 @@
 
 | 平台 | 状态 / 关注点 |
 | --- | --- |
-| **Windows** | 已 smoke：`flutter run -d windows`。迁移 SDK 路径后若 NuGet 报错，执行 `flutter clean` 清掉 CMake 里旧的 `nuget.exe` 缓存 |
+| **Windows** | 已 smoke：`flutter run -d windows`。Win32 插件 CMake 用 `find_program(nuget)`；本机建议固定安装 `D:\Dev\nuget\nuget.exe`（v6.0.0，与插件 FetchContent 同源）并加入用户 `PATH`，避免每次构建打印 “Nuget.exe not found…”。迁移 SDK 路径后若仍异常，执行 `flutter clean` 清 CMake 缓存 |
 | **Android** | `gradle.properties` 过渡项；发版前 `flutter build apk` |
 | **iOS / macOS** | `flutter pub get` 再生本地 ephemeral（gitignore） |
 | **Linux** | CI ubuntu + pdfium 路径不变 |
