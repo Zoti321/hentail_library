@@ -64,7 +64,7 @@
 **3.47 起与本项目相关的官方行为（摘要，非穷尽）：**
 
 - **桌面 Impeller** 在 Windows / macOS / Linux 上为默认渲染后端（发版与主题 smoke 时注意与 Skia 差异）。
-- **Dart 3.13**、**MCU 0.13** 随 Flutter 3.47 工具链对齐；色板脚本若仍按 0.11 生成，需对照 `MASTER.md` §2 与 `app/lib/shared/ui/theme/`。
+- **Dart 3.13**、**MCU 0.13** 随 Flutter 3.47 工具链对齐；色板与主题数值不在 SDK 升级 PR 内重做，留给后续 **MD3E** 迁移。
 - **Material/Cupertino 解耦**仍在推进；Expressive 在 Flutter 侧仍无 stable 路径（#168813 Open）。
 
 **仍适用于本仓库的 3.38 时代行为（未在 3.47 回滚）：**

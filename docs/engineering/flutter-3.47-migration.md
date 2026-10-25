@@ -2,7 +2,8 @@
 
 目标：将仓库 CI 与本地开发基线从 **Flutter 3.38.5** 提升到 **3.47.8**（Dart **3.13.7**），在 Gate 全绿后合并 `main`。
 
-参考：Kazumi 生产版本为 3.47.x；设计/M3 依赖调研见 Issue #332。  
+参考：Kazumi 生产版本为 3.47.x。  
+**范围**：本迁移只做 SDK / Gate / 依赖矩阵；**不做** MCU 0.11→0.13 色板视觉回归。色板、token 与 **Material 3 Expressive（MD3E）** 代码迁移另立里程碑（可跟踪 Issue #332 调研，不与本 PR 绑定）。
 **官方升级流程与 breaking 索引**：[`research/flutter-official-upgrade-3.38-to-3.47.md`](research/flutter-official-upgrade-3.38-to-3.47.md)。
 
 ## 1. CI / 工具链（必做）— 已完成
@@ -29,7 +30,7 @@
 | `README.md` | §工具链：3.47.8 / lock 下限 |
 | `docs/engineering/gate.md` | 工具链与 `CI=true` analyze |
 | `design-system/.../03-flutter-implementation.md` | §2 基线 3.47 + MCU 0.13 |
-| `design-system/hentai-library/MASTER.md` | MCU 0.13.0 与色板重算说明 |
+| `design-system/hentai-library/MASTER.md` | MCU 0.13.0 文案；色板数值待 MD3E 迁移时统一 |
 | `scripts/setup-dev.sh` | 打印 `flutter --version` 与迁移文档链 |
 
 ## 4. 平台 / 构建（升级后验证）
@@ -67,7 +68,7 @@
 | **pub** | `freezed` 4.0.3、`build_runner` 2.17.1、`test` 1.33、`material_color_utilities` 0.13.1 | 注意 code gen 矩阵 |
 | **工具** | 恢复 `custom_lint` + `riverpod_lint` | 待 analyzer 13 兼容 |
 | **Android** | AGP 9 / built-in Kotlin | 去掉过渡 `gradle.properties` 后验 apk |
-| **平台** | iOS UIScene、桌面 Impeller 视觉回归 | 3.47 发行说明 |
+| **平台** | iOS UIScene、桌面 Impeller | 3.47 发行说明；不做专项视觉回归 |
 | **CI** | `manual-build-*`、`release.yml`、`watch.yml` | 发版链试跑 |
-| **产品 / 设计** | Issue #332：MCU 0.13 色板重生成、`dynamic_color` 等 | 与 SDK PR 分拆 |
-| **调研底稿** | `05-color-directions.md`、`08-tone-based-surfaces.md` 内 0.11.1 路径引用 | 历史证据；数值以 lock 0.13 + MASTER §2 为准 |
+| **产品 / 设计（MD3E）** | 色板重生成、`dynamic_color`、Expressive 组件与 `app/` 主题迁移 | **后续专项**；SDK 3.47 不挡合并 |
+| **调研底稿** | `05-color-directions.md`、`08-tone-based-surfaces.md` 内 0.11.1 引用 | 历史证据；交付数值在 MD3E 里程碑与 MASTER 一并更新 |
