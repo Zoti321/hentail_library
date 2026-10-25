@@ -3,8 +3,9 @@ import 'package:hentai_library/md3e/views/library_browse_list_preview_view.dart'
 import 'package:hentai_library/md3e/views/library_browse_preview_view.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
-import 'package:hentai_library/md3e/widgets/md3e_filled_button.dart';
+import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
 import 'package:hentai_library/md3e/widgets/md3e_navigation_rail.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'md3e_styles_widgetbook.dart';
@@ -185,15 +186,58 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eFilledButton',
+              name: 'M3EChip',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Label',
+                  name: 'Filter',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: Center(
-                      child: Md3eFilledButton(
-                        label: '继续',
-                        onPressed: () {},
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        alignment: WrapAlignment.center,
+                        children: <Widget>[
+                          M3EChip(
+                            label: '未读',
+                            type: M3EChipType.filter,
+                            onPressed: () {},
+                          ),
+                          M3EChip(
+                            label: '已收藏',
+                            type: M3EChipType.filter,
+                            selected: true,
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Assist & Suggestion',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Center(
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        alignment: WrapAlignment.center,
+                        children: <Widget>[
+                          M3EChip(
+                            label: '添加到标签',
+                            type: M3EChipType.assist,
+                            leading: Icon(
+                              Icons.add,
+                              size: 18,
+                              color: M3ETheme.of(context).colorScheme.primary,
+                            ),
+                            onPressed: () {},
+                          ),
+                          M3EChip(
+                            label: '深海图书馆',
+                            type: M3EChipType.suggestion,
+                            onPressed: () {},
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -227,6 +271,39 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                         child: _Md3eNavigationRailPreview(
                           initialExtended: true,
                         ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'patterns',
+          children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'ComicDetailMetadataTags',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Tag section',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eComicDetailMetadataTagsSection(),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Single row',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Md3eComicDetailMetaChipRow(
+                        label: '标签',
+                        items: const <String>[
+                          '奇幻',
+                          '冒险',
+                          '校园',
+                        ],
+                        onItemTap: (_) {},
                       ),
                     ),
                   ),

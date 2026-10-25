@@ -7,6 +7,7 @@ export 'layout/md3e_catalog_grid_metrics.dart';
 export 'layout/md3e_catalog_list_layout.dart';
 export 'layout/md3e_list_detail_adaptive_layout.dart';
 export 'motion/md3e_motion.dart';
+export 'patterns/md3e_comic_detail_meta_chip_row.dart';
 export 'theme/md3e_theme.dart';
 export 'views/library_browse_list_preview_view.dart';
 export 'views/library_browse_preview_view.dart';
