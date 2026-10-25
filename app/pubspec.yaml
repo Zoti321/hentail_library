@@ -24,7 +24,6 @@ dependencies:
   google_fonts: ^9.0.0
   lucide_icons_flutter: ^4.0.1
   material_color_utilities: ^0.13.0
-  material_expressive: ^0.8.0
   material_new_shapes: ^1.0.0
   material_symbols_icons: ^4.2960.0
   motor: ^1.1.0
@@ -79,7 +78,7 @@ dependencies:
   pinyin_pro_flutter: ^1.0.3
   shared_preferences: ^2.5.3
   super_clipboard: 0.9.1
-
+  material_3_expressive: ^1.2.0
 dev_dependencies:
   # --- Flutter SDK 测试 ---
   flutter_test:

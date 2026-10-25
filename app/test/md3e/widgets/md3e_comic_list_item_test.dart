@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';
 
@@ -95,10 +97,12 @@ void main() {
         onTap: () {},
       ),
     );
-    expect(find.byIcon(Icons.more_vert), findsOneWidget);
-    await tester.tap(find.byIcon(Icons.more_vert));
+    expect(find.byType(M3EIconButton), findsOneWidget);
+    await tester.tap(find.byType(M3EIconButton));
     await tester.pumpAndSettle();
     expect(find.text('继续阅读'), findsOneWidget);
+    final Text menuLabel = tester.widget<Text>(find.text('继续阅读'));
+    expect(menuLabel.style?.fontFamily, kMd3eAppFontFamily);
   });
 
   testWidgets('Md3eComicListItem shows checkbox in selection mode', (
@@ -114,6 +118,6 @@ void main() {
         onSelectionChanged: (_) {},
       ),
     );
-    expect(find.byType(Checkbox), findsOneWidget);
+    expect(find.byType(M3ECheckbox), findsOneWidget);
   });
 }

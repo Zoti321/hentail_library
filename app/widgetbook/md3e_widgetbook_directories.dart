@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/layout/md3e_list_detail_adaptive_layout.dart';
-import 'package:hentai_library/md3e/patterns/settings_grouped_list_pattern.dart';
 import 'package:hentai_library/md3e/views/library_browse_list_preview_view.dart';
 import 'package:hentai_library/md3e/views/library_browse_preview_view.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/widgets/md3e_filled_button.dart';
+import 'package:hentai_library/md3e/widgets/md3e_navigation_rail.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'md3e_styles_widgetbook.dart';
@@ -201,58 +200,33 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 ),
               ],
             ),
-          ],
-        ),
-        WidgetbookFolder(
-          name: 'patterns',
-          children: <WidgetbookNode>[
             WidgetbookComponent(
-              name: 'SettingsGroupedListPattern',
+              name: 'Md3eNavigationRail',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Grouped sections',
+                  name: 'Collapsed',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Md3eSettingsGroupedListPattern(
-                      sections:
-                          <({String header, List<Md3eSettingsRow> rows})>[
-                        (
-                          header: '外观',
-                          rows: <Md3eSettingsRow>[
-                            const Md3eSettingsRow(
-                              title: '主题',
-                              subtitle: '跟随系统',
-                            ),
-                            Md3eSettingsRow(
-                              title: '动态取色',
-                              trailing: Switch(
-                                value: false,
-                                onChanged: (_) {},
-                              ),
-                            ),
-                          ],
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: SizedBox(
+                        height: 600,
+                        child: _Md3eNavigationRailPreview(
+                          initialExtended: false,
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            WidgetbookComponent(
-              name: 'ListDetailAdaptiveLayout',
-              useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Settings list + detail',
+                  name: 'Expanded',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Md3eListDetailAdaptiveLayout(
-                      listPane: ListView(
-                        children: const <Widget>[
-                          ListTile(title: Text('通用')),
-                          ListTile(title: Text('外观')),
-                        ],
-                      ),
-                      detailPane: const Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Text('详情 pane（宽屏并排）'),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: SizedBox(
+                        height: 600,
+                        child: _Md3eNavigationRailPreview(
+                          initialExtended: true,
+                        ),
                       ),
                     ),
                   ),
@@ -328,6 +302,33 @@ String _stateLabel(Md3eComicCardVisualState state) {
       return 'Selection off';
     case Md3eComicCardVisualState.selectionSelected:
       return 'Selection on';
+  }
+}
+
+class _Md3eNavigationRailPreview extends StatefulWidget {
+  const _Md3eNavigationRailPreview({required this.initialExtended});
+
+  final bool initialExtended;
+
+  @override
+  State<_Md3eNavigationRailPreview> createState() =>
+      _Md3eNavigationRailPreviewState();
+}
+
+class _Md3eNavigationRailPreviewState extends State<_Md3eNavigationRailPreview> {
+  late bool _extended = widget.initialExtended;
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Md3eNavigationRail(
+      destinations: md3eDefaultNavigationRailDestinations(),
+      selectedIndex: _selectedIndex,
+      extended: _extended,
+      onMenuPressed: () => setState(() => _extended = !_extended),
+      onDestinationSelected: (int index) =>
+          setState(() => _selectedIndex = index),
+    );
   }
 }
 

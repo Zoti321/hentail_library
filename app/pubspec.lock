@@ -49,14 +49,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.14.12"
-  animations:
-    dependency: transitive
-    description:
-      name: animations
-      sha256: "9cb469212ea51be27097f23b519d594c01171721347b55df9334fff653659e7f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.0"
   archive:
     dependency: "direct main"
     description:
@@ -811,6 +803,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.20"
+  material_3_expressive:
+    dependency: "direct main"
+    description:
+      name: material_3_expressive
+      sha256: "960a296792497cea3bb0dddb817dbb67b507f27eec481c631a733cb168901448"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   material_color_utilities:
     dependency: "direct main"
     description:
@@ -819,14 +819,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.13.0"
-  material_expressive:
-    dependency: "direct main"
-    description:
-      name: material_expressive
-      sha256: "7a1347f92786b809ab36f4c6cb29bfa43490042ebe56361e498bba94ee921ad1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.0"
   material_new_shapes:
     dependency: "direct main"
     description:

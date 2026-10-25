@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';
 
@@ -23,6 +25,8 @@ void main() {
     );
     expect(find.text('深海图书馆'), findsOneWidget);
     expect(find.text('128 页'), findsOneWidget);
+    final Text title = tester.widget<Text>(find.text('深海图书馆'));
+    expect(title.style?.fontFamily, kMd3eAppFontFamily);
   });
 
   testWidgets('Md3eComicCard onTap fires when enabled', (
@@ -65,8 +69,9 @@ void main() {
         ),
       ),
     );
-    expect(find.byType(Checkbox), findsOneWidget);
-    final Checkbox checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+    expect(find.byType(M3ECheckbox), findsOneWidget);
+    final M3ECheckbox checkbox =
+        tester.widget<M3ECheckbox>(find.byType(M3ECheckbox));
     expect(checkbox.value, isTrue);
   });
 

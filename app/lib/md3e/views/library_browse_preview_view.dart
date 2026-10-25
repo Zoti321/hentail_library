@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid_metrics.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
-import 'package:material_expressive/theme.dart';
+import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// Fake catalog grid for MD3E Lab / Widgetbook (no domain types).
 class Md3eLibraryBrowsePreviewView extends StatelessWidget {
@@ -12,16 +12,16 @@ class Md3eLibraryBrowsePreviewView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ExpressiveThemeData tokens = ExpressiveThemeProvider.of(context);
+    final M3ESpacing tokens = M3ETheme.of(context).spacing;
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final Md3eWindowSizeClass window = md3eWindowSizeClassOf(context);
     final double cellWidth = Md3eCatalogGridMetrics.maxCrossAxisExtent(window);
-    final double spacing = Md3eCatalogGridMetrics.gridSpacing(window);
+    final double gridSpacing = Md3eCatalogGridMetrics.gridSpacing(window);
 
     return CustomScrollView(
       slivers: <Widget>[
         SliverPadding(
-          padding: EdgeInsets.all(tokens.spacing.lg),
+          padding: EdgeInsets.all(tokens.lg),
           sliver: SliverToBoxAdapter(
             child: Text(
               '书库预览',
@@ -30,17 +30,17 @@ class Md3eLibraryBrowsePreviewView extends StatelessWidget {
           ),
         ),
         SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: tokens.spacing.lg),
+          padding: EdgeInsets.symmetric(horizontal: tokens.lg),
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: cellWidth,
               mainAxisExtent: Md3eComicCard.gridMainAxisExtent(
                 maxCrossAxisExtent: cellWidth,
-                coverToInfoGap: tokens.spacing.md,
-                infoBottomPadding: tokens.spacing.sm,
+                coverToInfoGap: tokens.md,
+                infoBottomPadding: tokens.sm,
               ),
-              mainAxisSpacing: spacing,
-              crossAxisSpacing: spacing,
+              mainAxisSpacing: gridSpacing,
+              crossAxisSpacing: gridSpacing,
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {

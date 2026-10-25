@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
-import 'package:material_expressive/theme.dart';
+import 'package:material_3_expressive/foundations/foundations.dart';
 
 import '../../support/pump_md3e_app.dart';
 
@@ -19,11 +19,15 @@ void main() {
       ),
     );
     expect(find.text('primary'), findsOneWidget);
-    final ExpressiveThemeData tokens = buildMd3eExpressiveThemeData();
-    expect(tokens.materialTheme.colorScheme.brightness, Brightness.light);
+    final M3EThemeData m3e = buildMd3eThemeData();
+    expect(m3e.colorScheme.brightness, Brightness.light);
     expect(
-      tokens.materialTheme.textTheme.bodyLarge?.fontFamily,
+      buildMd3eMaterialTheme(Brightness.light, m3e: m3e)
+          .textTheme
+          .bodyLarge
+          ?.fontFamily,
       kMd3eAppFontFamily,
     );
+    expect(m3e.typeScale.bodyLarge.fontFamily, kMd3eAppFontFamily);
   });
 }

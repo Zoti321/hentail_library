@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
-import 'package:material_expressive/theme.dart';
+import 'package:material_3_expressive/foundations/foundations.dart';
 
 import 'localized_test_app.dart';
 
@@ -12,12 +12,12 @@ Future<void> pumpMd3eApp(
   Locale locale = const Locale('zh'),
   Brightness brightness = Brightness.light,
 }) async {
-  final ExpressiveThemeData expressive = buildMd3eExpressiveThemeData();
-  final ThemeData theme = buildMd3eTheme(brightness, expressive: expressive);
+  final M3EThemeData m3e = buildMd3eThemeData(brightness: brightness);
+  final ThemeData theme = buildMd3eMaterialTheme(brightness, m3e: m3e);
   final localized = localizedTestAppConfig(locale: locale);
   await tester.pumpWidget(
     Md3eThemeScope(
-      expressive: expressive,
+      m3e: m3e,
       child: MaterialApp(
         locale: localized.locale,
         localizationsDelegates: localized.delegates,

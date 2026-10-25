@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_list_layout.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
-import 'package:material_expressive/theme.dart';
+import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// Fake catalog list for MD3E Lab / Widgetbook (no domain types).
 class Md3eLibraryBrowseListPreviewView extends StatelessWidget {
@@ -12,7 +12,7 @@ class Md3eLibraryBrowseListPreviewView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ExpressiveThemeData tokens = ExpressiveThemeProvider.of(context);
+    final M3ESpacing spacing = M3ETheme.of(context).spacing;
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final Md3eWindowSizeClass window = md3eWindowSizeClassOf(context);
     final int columns = md3eComicListColumnCount(window);
@@ -20,7 +20,7 @@ class Md3eLibraryBrowseListPreviewView extends StatelessWidget {
     return CustomScrollView(
       slivers: <Widget>[
         SliverPadding(
-          padding: EdgeInsets.all(tokens.spacing.lg),
+          padding: EdgeInsets.all(spacing.lg),
           sliver: SliverToBoxAdapter(
             child: Text(
               '书库列表预览',

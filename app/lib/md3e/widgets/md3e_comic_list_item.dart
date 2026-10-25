@@ -2,8 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/widgets/md3e_anchored_menu.dart';
 import 'package:hentai_library/md3e/widgets/md3e_cover_read_progress_strip.dart';
-import 'package:material_expressive/theme.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Middle dot between author and page label (e.g. `作者名 · 128 页`).
 const String kMd3eComicListItemMetaSeparator = ' · ';
@@ -58,12 +59,8 @@ enum Md3eComicListItemVisualState {
   selectionSelected,
 }
 
-/// Catalog list-row comic item (M3 two-line list + leading; props only).
-///
-/// Anatomy: optional selection [Checkbox], inset 60×45 (4:3) [cover], info column
-/// (title / meta / [readProgress] bar), trailing [Icons.more_vert] menu.
-/// Focus uses M3 list **state layer** (12% onSurface), not a side border.
-class Md3eComicListItem extends StatefulWidget {
+/// Catalog list-row comic item ([M3EListItem] + catalog anatomy).
+class Md3eComicListItem extends StatelessWidget {
   const Md3eComicListItem({
     super.key,
     required this.title,
@@ -84,10 +81,8 @@ class Md3eComicListItem extends StatefulWidget {
          'readProgress must be between 0 and 1',
        );
 
-  /// Fixed extent for [ListView] / sliver list delegates.
   static double itemExtent() => kMd3eComicListItemMinHeight;
 
-  /// Builds `作者 · 128 页` style supporting text.
   static String? metaLine({String? author, String? pageLabel}) {
     final List<String> parts = <String>[];
     final String? trimmedAuthor = author?.trim();
@@ -104,8 +99,6 @@ class Md3eComicListItem extends StatefulWidget {
     return parts.join(kMd3eComicListItemMetaSeparator);
   }
 
-  /// Clamps info-column progress width between [kMd3eComicListItemProgressMinWidth]
-  /// and [kMd3eComicListItemProgressMaxWidth].
   static double infoProgressWidthFor(double availableWidth) {
     final double upper = math.min(
       availableWidth,
@@ -133,112 +126,13 @@ class Md3eComicListItem extends StatefulWidget {
   final bool enabled;
   final Md3eComicListItemVisualState? visualState;
 
-  /// Read progress in \[0, 1\]. When null or 0, the info progress bar is hidden.
   final double? readProgress;
-
-  /// When non-empty, shows a trailing more menu with these entries.
   final List<Md3eComicListMoreMenuEntry> moreMenuEntries;
 
   @override
-  State<Md3eComicListItem> createState() => _Md3eComicListItemState();
-}
-
-class _Md3eComicListItemState extends State<Md3eComicListItem> {
-  bool _hovered = false;
-  bool _focused = false;
-  bool _pressed = false;
-
-  bool get _effectiveSelectionMode {
-    if (widget.visualState ==
-            Md3eComicListItemVisualState.selectionUnselected ||
-        widget.visualState == Md3eComicListItemVisualState.selectionSelected) {
-      return true;
-    }
-    return widget.selectionMode;
-  }
-
-  bool get _effectiveSelected {
-    if (widget.visualState == Md3eComicListItemVisualState.selectionSelected) {
-      return true;
-    }
-    if (widget.visualState == Md3eComicListItemVisualState.selectionUnselected) {
-      return false;
-    }
-    return widget.selected;
-  }
-
-  bool get _interactive =>
-      widget.enabled &&
-      widget.visualState == null &&
-      (widget.onTap != null || widget.onSelectionChanged != null);
-
-  Set<WidgetState> get _states {
-    if (widget.visualState != null) {
-      return _statesForVisual(widget.visualState!);
-    }
-    return <WidgetState>{
-      if (!widget.enabled) WidgetState.disabled,
-      if (_hovered) WidgetState.hovered,
-      if (_focused) WidgetState.focused,
-      if (_pressed) WidgetState.pressed,
-    };
-  }
-
-  static Set<WidgetState> _statesForVisual(Md3eComicListItemVisualState state) {
-    switch (state) {
-      case Md3eComicListItemVisualState.normal:
-      case Md3eComicListItemVisualState.selectionUnselected:
-      case Md3eComicListItemVisualState.selectionSelected:
-        return <WidgetState>{};
-      case Md3eComicListItemVisualState.hovered:
-        return <WidgetState>{WidgetState.hovered};
-      case Md3eComicListItemVisualState.focused:
-        return <WidgetState>{WidgetState.focused};
-      case Md3eComicListItemVisualState.pressed:
-        return <WidgetState>{WidgetState.pressed};
-      case Md3eComicListItemVisualState.disabled:
-        return <WidgetState>{WidgetState.disabled};
-    }
-  }
-
-  /// M3 list state-layer opacities (lists/specs).
-  static double _overlayAlphaFor(Set<WidgetState> states) {
-    if (states.contains(WidgetState.disabled)) {
-      return 0;
-    }
-    if (states.contains(WidgetState.pressed) ||
-        states.contains(WidgetState.focused)) {
-      return 0.12;
-    }
-    if (states.contains(WidgetState.hovered)) {
-      return 0.08;
-    }
-    return 0;
-  }
-
-  void _handleTap() {
-    if (_effectiveSelectionMode && widget.onSelectionChanged != null) {
-      widget.onSelectionChanged!(!_effectiveSelected);
-      return;
-    }
-    widget.onTap?.call();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final ExpressiveThemeData tokens = ExpressiveThemeProvider.of(context);
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme scheme = theme.colorScheme;
-    final Set<WidgetState> states = _states;
-    final bool disabled = states.contains(WidgetState.disabled);
-    final double overlayAlpha = _overlayAlphaFor(states);
-    final bool showInfoProgress =
-        md3eShowsReadProgressStrip(widget.readProgress);
-    final String? metaLine = Md3eComicListItem.metaLine(
-      author: widget.author,
-      pageLabel: widget.pageLabel,
-    );
-
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final M3ESpacing spacing = M3ETheme.of(context).spacing;
     final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
     final Duration motionDuration = Md3eMotion.motionDurationOf(
       context,
@@ -247,17 +141,23 @@ class _Md3eComicListItemState extends State<Md3eComicListItem> {
     final Curve stateEnter = Md3eMotion.curveForStateEnter(
       reduceMotion: reduceMotion,
     );
-    final Curve stateExit = Md3eMotion.curveForStateExit(
-      reduceMotion: reduceMotion,
-    );
 
-    const double horizontalPadding = 16;
-    const double titleMetaGap = 4;
+    final bool effectiveSelectionMode = _effectiveSelectionMode;
+    final bool effectiveSelected = _effectiveSelected;
+    final bool interactive =
+        enabled &&
+        visualState == null &&
+        (onTap != null || onSelectionChanged != null);
+    final bool rowEnabled =
+        enabled && visualState != Md3eComicListItemVisualState.disabled;
+    final String? meta = metaLine(author: author, pageLabel: pageLabel);
+    final bool showInfoProgress = md3eShowsReadProgressStrip(readProgress);
+    final double overlayAlpha = _overlayAlphaFor(visualState);
 
     final BorderRadius coverRadius =
         BorderRadius.circular(kMd3eComicListItemCoverRadius);
 
-    final Widget leadingCover = Padding(
+    final Widget coverClip = Padding(
       padding: const EdgeInsets.symmetric(
         vertical: kMd3eComicListItemVerticalInset,
       ),
@@ -266,215 +166,183 @@ class _Md3eComicListItemState extends State<Md3eComicListItem> {
         height: kMd3eComicListItemLeadingHeight,
         child: ClipRRect(
           borderRadius: coverRadius,
-          child: widget.cover,
+          child: cover,
         ),
+      ),
+    );
+
+    final double leadingSlotWidth = effectiveSelectionMode
+        ? 48 + spacing.sm + kMd3eComicListItemLeadingWidth
+        : kMd3eComicListItemLeadingWidth;
+
+    final Widget leading = SizedBox(
+      width: leadingSlotWidth,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (effectiveSelectionMode) ...<Widget>[
+            M3ECheckbox(
+              value: effectiveSelected,
+              onChanged: rowEnabled && onSelectionChanged != null
+                  ? (bool? value) {
+                      if (value == null) {
+                        return;
+                      }
+                      onSelectionChanged!.call(value);
+                    }
+                  : null,
+            ),
+            SizedBox(width: spacing.sm),
+          ],
+          coverClip,
+        ],
       ),
     );
 
     Widget? trailingMore;
-    if (widget.moreMenuEntries.isNotEmpty) {
-      trailingMore = PopupMenuButton<void>(
-        icon: Icon(
-          Icons.more_vert,
-          color: scheme.onSurfaceVariant,
-        ),
-        enabled: !disabled,
-        tooltip: '更多',
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-        onSelected: (_) {},
-        itemBuilder: (BuildContext context) {
-          return <PopupMenuEntry<void>>[
-            for (final Md3eComicListMoreMenuEntry entry
-                in widget.moreMenuEntries)
-              PopupMenuItem<void>(
-                onTap: entry.onSelected,
-                child: Text(entry.label),
-              ),
-          ];
+    if (moreMenuEntries.isNotEmpty) {
+      trailingMore = Md3eAnchoredMenu(
+        enabled: rowEnabled,
+        position: M3EMenuAnchorPosition.bottomEnd,
+        entries: <M3EMenuEntry>[
+          for (final Md3eComicListMoreMenuEntry entry in moreMenuEntries)
+            M3EMenuEntry(
+              label: entry.label,
+              enabled: rowEnabled && entry.onSelected != null,
+              onPressed: entry.onSelected,
+            ),
+        ],
+        anchorBuilder: (BuildContext context, VoidCallback open) {
+          return M3EIconButton(
+            icon: Icon(
+              Icons.more_vert,
+              color: scheme.onSurfaceVariant,
+            ),
+            variant: M3EIconButtonVariant.standard,
+            size: M3EIconButtonSize.sm,
+            tooltip: '更多',
+            onPressed: rowEnabled ? open : null,
+          );
         },
       );
     }
 
-    Widget row = SizedBox(
+    const double horizontalPadding = 16;
+
+    Widget row = M3EListItem(
+      headline: title,
+      supportingText: meta,
+      leading: leading,
+      trailing: trailingMore,
+      selected: effectiveSelected,
+      enabled: rowEnabled,
+      largeLeading: true,
+      onTap: interactive ? _handleTap : null,
+    );
+
+    row = SizedBox(
       height: kMd3eComicListItemMinHeight,
-      child: Padding(
-        padding: const EdgeInsets.only(left: horizontalPadding),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            if (_effectiveSelectionMode) ...<Widget>[
-              Checkbox(
-                value: _effectiveSelected,
-                onChanged: disabled
-                    ? null
-                    : (bool? value) {
-                        if (value == null) {
-                          return;
-                        }
-                        widget.onSelectionChanged?.call(value);
-                      },
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: <Widget>[
+          row,
+          if (showInfoProgress)
+            Positioned(
+              left: _infoTextInset(
+                selectionMode: effectiveSelectionMode,
+                spacing: spacing,
               ),
-              SizedBox(width: tokens.spacing.sm),
-            ],
-            leadingCover,
-            SizedBox(width: horizontalPadding),
-            Expanded(
+              right: moreMenuEntries.isNotEmpty ? 52 : horizontalPadding,
+              bottom: kMd3eComicListItemVerticalInset,
               child: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
-                  final double progressWidth =
-                      Md3eComicListItem.infoProgressWidthFor(
-                        constraints.maxWidth,
-                      );
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        widget.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: scheme.onSurface,
-                        ),
-                      ),
-                      if (metaLine != null) ...<Widget>[
-                        SizedBox(height: titleMetaGap),
-                        Text(
-                          metaLine,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                      if (showInfoProgress) ...<Widget>[
-                        SizedBox(height: kMd3eComicListItemProgressTopGap),
-                        SizedBox(
-                          width: progressWidth,
-                          height: kMd3eCoverReadProgressHeight,
-                          child: Md3eCoverReadProgressStrip(
-                            key: kMd3eComicListItemInfoProgressKey,
-                            progress: widget.readProgress!,
-                            activeColor: scheme.primary,
-                            trackColor: scheme.surfaceContainerHighest,
-                            duration: motionDuration,
-                            curve: stateEnter,
-                          ),
-                        ),
-                      ],
-                    ],
+                  final double progressWidth = infoProgressWidthFor(
+                    constraints.maxWidth,
+                  );
+                  return SizedBox(
+                    width: progressWidth,
+                    height: kMd3eCoverReadProgressHeight,
+                    child: Md3eCoverReadProgressStrip(
+                      key: kMd3eComicListItemInfoProgressKey,
+                      progress: readProgress!,
+                      activeColor: scheme.primary,
+                      trackColor: scheme.surfaceContainerHighest,
+                      duration: motionDuration,
+                      curve: stateEnter,
+                    ),
                   );
                 },
               ),
             ),
-            ?trailingMore,
-            const SizedBox(width: 4),
-          ],
-        ),
-      ),
-    );
-
-    row = Stack(
-      fit: StackFit.passthrough,
-      children: <Widget>[
-        row,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(end: overlayAlpha),
-              duration: motionDuration,
-              curve: overlayAlpha > 0 ? stateEnter : stateExit,
-              builder: (BuildContext context, double alpha, Widget? child) {
-                if (alpha <= 0) {
-                  return const SizedBox.shrink();
-                }
-                return ColoredBox(
-                  color: scheme.onSurface.withValues(alpha: alpha),
-                );
-              },
+          if (overlayAlpha > 0)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: ColoredBox(
+                  color: scheme.onSurface.withValues(alpha: overlayAlpha),
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
-    );
-
-    row = TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: disabled ? 0.38 : 1),
-      duration: motionDuration,
-      curve: disabled ? stateExit : stateEnter,
-      builder: (BuildContext context, double opacity, Widget? child) {
-        return Opacity(opacity: opacity, child: child);
-      },
-      child: row,
-    );
-
-    final Widget tile = Material(
-      color: Colors.transparent,
-      child: row,
-    );
-
-    final String semanticsLabel = _semanticsLabel(
-      title: widget.title,
-      readProgress: widget.readProgress,
-      metaLine: metaLine,
-    );
-
-    if (!_interactive) {
-      return Semantics(
-        button: widget.onTap != null || widget.onSelectionChanged != null,
-        label: semanticsLabel,
-        enabled: !disabled,
-        checked: _effectiveSelectionMode ? _effectiveSelected : null,
-        child: tile,
-      );
-    }
-
-    return Semantics(
-      button: true,
-      label: semanticsLabel,
-      checked: _effectiveSelectionMode ? _effectiveSelected : null,
-      child: FocusableActionDetector(
-        mouseCursor: SystemMouseCursors.click,
-        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
-        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-        actions: <Type, Action<Intent>>{
-          ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (ActivateIntent intent) {
-              _handleTap();
-              return null;
-            },
-          ),
-        },
-        child: Listener(
-          onPointerDown: (_) => setState(() => _pressed = true),
-          onPointerUp: (_) => setState(() => _pressed = false),
-          onPointerCancel: (_) => setState(() => _pressed = false),
-          child: GestureDetector(
-            onTap: _handleTap,
-            behavior: HitTestBehavior.opaque,
-            child: tile,
-          ),
-        ),
+        ],
       ),
     );
+
+    return row;
   }
 
-  static String _semanticsLabel({
-    required String title,
-    required double? readProgress,
-    required String? metaLine,
+  bool get _effectiveSelectionMode {
+    if (visualState == Md3eComicListItemVisualState.selectionUnselected ||
+        visualState == Md3eComicListItemVisualState.selectionSelected) {
+      return true;
+    }
+    return selectionMode;
+  }
+
+  bool get _effectiveSelected {
+    if (visualState == Md3eComicListItemVisualState.selectionSelected) {
+      return true;
+    }
+    if (visualState == Md3eComicListItemVisualState.selectionUnselected) {
+      return false;
+    }
+    return selected;
+  }
+
+  void _handleTap() {
+    if (_effectiveSelectionMode && onSelectionChanged != null) {
+      onSelectionChanged!(!_effectiveSelected);
+      return;
+    }
+    onTap?.call();
+  }
+
+  static double _infoTextInset({
+    required bool selectionMode,
+    required M3ESpacing spacing,
   }) {
-    final StringBuffer buffer = StringBuffer(title);
-    if (metaLine != null) {
-      buffer.write('，$metaLine');
+    const double horizontalPadding = 16;
+    const double checkboxWidth = 48;
+    double inset = horizontalPadding +
+        kMd3eComicListItemLeadingWidth +
+        horizontalPadding;
+    if (selectionMode) {
+      inset += checkboxWidth + spacing.sm;
     }
-    if (md3eShowsReadProgressStrip(readProgress)) {
-      final int percent = (readProgress!.clamp(0.0, 1.0) * 100).round();
-      buffer.write('，已读 $percent%');
+    return inset;
+  }
+
+  static double _overlayAlphaFor(Md3eComicListItemVisualState? state) {
+    switch (state) {
+      case Md3eComicListItemVisualState.pressed:
+      case Md3eComicListItemVisualState.focused:
+        return 0.12;
+      case Md3eComicListItemVisualState.hovered:
+        return 0.08;
+      case Md3eComicListItemVisualState.disabled:
+      case Md3eComicListItemVisualState.normal:
+      case Md3eComicListItemVisualState.selectionUnselected:
+      case Md3eComicListItemVisualState.selectionSelected:
+      case null:
+        return 0;
     }
-    return buffer.toString();
   }
 }

@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:material_expressive/tokens.dart';
+import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:motor/motor.dart';
 
-/// Lab defaults for MD3E motion (motor + expressive duration/curve tokens).
+/// Lab defaults for MD3E motion (motor + M3E duration/curve tokens).
 abstract final class Md3eMotion {
-  static const ExpressiveMotionTokens tokens = ExpressiveMotionTokens.standard;
+  static Duration get durationShort => M3EMotion.short4;
+
+  static Duration get durationMedium => M3EMotion.medium2;
+
+  static Curve get curveEmphasized => M3EMotion.emphasized;
+
+  static Curve get curveEmphasizedDecelerate => M3EMotion.emphasizedDecelerate;
+
+  static Curve get curveEmphasizedAccelerate => M3EMotion.emphasizedAccelerate;
 
   /// Preferred spring for expressive micro-interactions in MD3E widgets.
   static const Motion expressiveSpring = Motion.smoothSpring();
-
-  static Duration get durationShort => tokens.durationShort;
-
-  static Duration get durationMedium => tokens.durationMedium;
-
-  static Curve get curveEmphasized => tokens.curveEmphasized;
-
-  static Curve get curveEmphasizedDecelerate =>
-      tokens.curveEmphasizedDecelerate;
-
-  static Curve get curveEmphasizedAccelerate =>
-      tokens.curveEmphasizedAccelerate;
 
   /// M3 emphasized curve when a state layer or elevation **enters**.
   static Curve curveForStateEnter({required bool reduceMotion}) {

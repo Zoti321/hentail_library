@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:material_expressive/theme.dart';
-import 'package:material_expressive/tokens.dart';
+import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'md3e_widgetbook_scope.dart';
@@ -19,8 +18,7 @@ List<WidgetbookNode> buildMd3eStylesWidgetbookNodes() {
               builder: (BuildContext context) => Md3eWidgetbookScope(
                 child: Builder(
                   builder: (BuildContext context) {
-                    final ExpressiveColorTokens colors =
-                        ExpressiveThemeProvider.of(context).colors;
+                    final M3EColorScheme colors = M3ETheme.of(context).colorScheme;
                     return Padding(
                       padding: const EdgeInsets.all(24),
                       child: Wrap(
@@ -62,33 +60,32 @@ List<WidgetbookNode> buildMd3eStylesWidgetbookNodes() {
               builder: (BuildContext context) => Md3eWidgetbookScope(
                 child: Builder(
                   builder: (BuildContext context) {
-                    final ExpressiveThemeData tokens =
-                        ExpressiveThemeProvider.of(context);
+                    final M3ESpacing spacing = M3ETheme.of(context).spacing;
                     final ColorScheme scheme = Theme.of(context).colorScheme;
                     return Padding(
-                      padding: EdgeInsets.all(tokens.spacing.lg),
+                      padding: EdgeInsets.all(spacing.lg),
                       child: Wrap(
-                        spacing: tokens.spacing.md,
-                        runSpacing: tokens.spacing.md,
+                        spacing: spacing.md,
+                        runSpacing: spacing.md,
                         children: <Widget>[
                           _RadiusTile(
-                            label: 'xs ${tokens.radius.xs}',
-                            radius: tokens.radius.xs,
+                            label: 'xs ${M3EDimensions.radiusExtraSmall}',
+                            radius: M3EDimensions.radiusExtraSmall,
                             color: scheme.primaryContainer,
                           ),
                           _RadiusTile(
-                            label: 'md ${tokens.radius.md}',
-                            radius: tokens.radius.md,
+                            label: 'md ${M3EDimensions.radiusMedium}',
+                            radius: M3EDimensions.radiusMedium,
                             color: scheme.secondaryContainer,
                           ),
                           _RadiusTile(
-                            label: 'lg ${tokens.radius.lg}',
-                            radius: tokens.radius.lg,
+                            label: 'lg ${M3EDimensions.radiusLarge}',
+                            radius: M3EDimensions.radiusLarge,
                             color: scheme.tertiaryContainer,
                           ),
                           _RadiusTile(
-                            label: 'xl ${tokens.radius.xl}',
-                            radius: tokens.radius.xl,
+                            label: 'xl ${M3EDimensions.radiusExtraLarge}',
+                            radius: M3EDimensions.radiusExtraLarge,
                             color: scheme.surfaceContainerHigh,
                           ),
                         ],
@@ -104,7 +101,7 @@ List<WidgetbookNode> buildMd3eStylesWidgetbookNodes() {
           name: 'spacing',
           useCases: <WidgetbookUseCase>[
             WidgetbookUseCase(
-              name: 'Scale (phone preset)',
+              name: 'Scale (regular)',
               builder: (BuildContext context) => const Md3eWidgetbookScope(
                 child: _SpacingScalePreview(),
               ),
@@ -190,17 +187,16 @@ class _SpacingScalePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ExpressiveSpacingTokens spacing =
-        ExpressiveThemeProvider.of(context).spacing;
+    final M3ESpacing spacing = M3ETheme.of(context).spacing;
     return ListView(
       padding: const EdgeInsets.all(24),
       children: <Widget>[
-        _SpacingBar(label: 'xxs', value: spacing.xxs),
         _SpacingBar(label: 'xs', value: spacing.xs),
         _SpacingBar(label: 'sm', value: spacing.sm),
         _SpacingBar(label: 'md', value: spacing.md),
         _SpacingBar(label: 'lg', value: spacing.lg),
         _SpacingBar(label: 'xl', value: spacing.xl),
+        _SpacingBar(label: 'xxl', value: spacing.xxl),
       ],
     );
   }
@@ -240,8 +236,7 @@ class _TypographyScalePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ExpressiveTypographyTokens type =
-        ExpressiveThemeProvider.of(context).typography;
+    final TextTheme type = Theme.of(context).textTheme;
     return ListView(
       padding: const EdgeInsets.all(24),
       children: <Widget>[

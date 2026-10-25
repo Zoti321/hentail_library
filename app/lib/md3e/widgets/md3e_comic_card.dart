@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/widgets/md3e_cover_read_progress_strip.dart';
-import 'package:material_expressive/theme.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Corner radius for [Md3eComicCard] (M3 elevated card / MASTER 书库卡).
 const double kMd3eComicCardRadius = 12;
@@ -27,13 +27,12 @@ enum Md3eComicCardVisualState {
   selectionSelected,
 }
 
-/// Catalog grid comic card (MD3E elevated card; props only, no domain types).
+/// Catalog grid comic card ([M3ECard] elevated; props only, no domain types).
 ///
 /// Anatomy: flush [cover] (2:3) + padded title / [subtitle].
-/// Interaction overlays apply to the **info block only**; cover stays unchanged
-/// except an optional full-width [readProgress] strip on the cover bottom.
-/// State transitions use [Md3eMotion] durations and M3 emphasized curves.
-class Md3eComicCard extends StatefulWidget {
+/// Interaction uses M3E card state layers on the info block overlay when pinned
+/// for Widgetbook; otherwise [M3ECard] handles hover, focus, and press.
+class Md3eComicCard extends StatelessWidget {
   /// Main-axis height for a flush-cover card at [cardWidth] (grid delegate).
   static double layoutMainAxisExtent({
     required double cardWidth,
@@ -52,8 +51,6 @@ class Md3eComicCard extends StatefulWidget {
   }
 
   /// Whether the cover progress strip should be built for [readProgress].
-  ///
-  /// `null` and `0` (and negative values, if passed) do not render the strip.
   static bool showsCoverReadProgress(double? readProgress) {
     return md3eShowsReadProgressStrip(readProgress);
   }
@@ -97,137 +94,36 @@ class Md3eComicCard extends StatefulWidget {
   final Widget cover;
   final VoidCallback? onTap;
 
-  /// When true, shows a [Checkbox] on the cover; [selected] drives checked state.
   final bool selectionMode;
   final bool selected;
   final ValueChanged<bool>? onSelectionChanged;
 
   final bool enabled;
-
-  /// When set, interaction is disabled and the card renders a fixed M3 state.
   final Md3eComicCardVisualState? visualState;
-
-  /// Read progress in \[0, 1\]. When null or 0, the cover progress strip is hidden.
   final double? readProgress;
 
   @override
-  State<Md3eComicCard> createState() => _Md3eComicCardState();
-}
-
-class _Md3eComicCardState extends State<Md3eComicCard> {
-  bool _hovered = false;
-  bool _focused = false;
-  bool _pressed = false;
-
-  bool get _effectiveSelectionMode {
-    if (widget.visualState == Md3eComicCardVisualState.selectionUnselected ||
-        widget.visualState == Md3eComicCardVisualState.selectionSelected) {
-      return true;
-    }
-    return widget.selectionMode;
-  }
-
-  bool get _effectiveSelected {
-    if (widget.visualState == Md3eComicCardVisualState.selectionSelected) {
-      return true;
-    }
-    if (widget.visualState == Md3eComicCardVisualState.selectionUnselected) {
-      return false;
-    }
-    return widget.selected;
-  }
-
-  bool get _interactive =>
-      widget.enabled &&
-      widget.visualState == null &&
-      (widget.onTap != null || widget.onSelectionChanged != null);
-
-  Set<WidgetState> get _states {
-    if (widget.visualState != null) {
-      return _statesForVisual(widget.visualState!);
-    }
-    return <WidgetState>{
-      if (!widget.enabled) WidgetState.disabled,
-      if (_hovered) WidgetState.hovered,
-      if (_focused) WidgetState.focused,
-      if (_pressed) WidgetState.pressed,
-    };
-  }
-
-  static Set<WidgetState> _statesForVisual(Md3eComicCardVisualState state) {
-    switch (state) {
-      case Md3eComicCardVisualState.normal:
-      case Md3eComicCardVisualState.selectionUnselected:
-      case Md3eComicCardVisualState.selectionSelected:
-        return <WidgetState>{};
-      case Md3eComicCardVisualState.hovered:
-        return <WidgetState>{WidgetState.hovered};
-      case Md3eComicCardVisualState.focused:
-        return <WidgetState>{WidgetState.focused};
-      case Md3eComicCardVisualState.pressed:
-        return <WidgetState>{WidgetState.pressed};
-      case Md3eComicCardVisualState.dragged:
-        return <WidgetState>{WidgetState.dragged};
-      case Md3eComicCardVisualState.disabled:
-        return <WidgetState>{WidgetState.disabled};
-    }
-  }
-
-  static double _elevationFor(Set<WidgetState> states) {
-    if (states.contains(WidgetState.disabled)) {
-      return 0;
-    }
-    if (states.contains(WidgetState.dragged)) {
-      return 6;
-    }
-    return 1;
-  }
-
-  static double _infoOverlayAlphaFor(Set<WidgetState> states) {
-    if (states.contains(WidgetState.disabled)) {
-      return 0;
-    }
-    if (states.contains(WidgetState.pressed)) {
-      return 0.12;
-    }
-    if (states.contains(WidgetState.hovered) ||
-        states.contains(WidgetState.focused) ||
-        states.contains(WidgetState.dragged)) {
-      return 0.08;
-    }
-    return 0;
-  }
-
-  void _handleTap() {
-    if (_effectiveSelectionMode && widget.onSelectionChanged != null) {
-      widget.onSelectionChanged!(!_effectiveSelected);
-      return;
-    }
-    widget.onTap?.call();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final ExpressiveThemeData tokens = ExpressiveThemeProvider.of(context);
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme scheme = theme.colorScheme;
-    final Set<WidgetState> states = _states;
-    final bool disabled = states.contains(WidgetState.disabled);
-    final BorderRadius radius = BorderRadius.circular(kMd3eComicCardRadius);
-    final double elevation = _elevationFor(states);
-    final double infoOverlayAlpha = _infoOverlayAlphaFor(states);
-    final bool showFocusRing = states.contains(WidgetState.focused);
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
+    final M3ESpacing spacing = theme.spacing;
+    final M3ETypeScale type = theme.typeScale;
+
+    final bool effectiveSelectionMode = _effectiveSelectionMode;
+    final bool effectiveSelected = _effectiveSelected;
+    final bool interactive =
+        enabled &&
+        visualState == null &&
+        (onTap != null || onSelectionChanged != null);
+    final bool cardEnabled =
+        enabled && visualState != Md3eComicCardVisualState.disabled;
+    final bool dragged = visualState == Md3eComicCardVisualState.dragged;
+    final double infoOverlayAlpha = _infoOverlayAlphaFor(visualState);
 
     final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
     final Duration motionDuration = Md3eMotion.motionDurationOf(
       context,
       Md3eMotion.durationShort,
-    );
-    final Duration elevationDuration = Md3eMotion.motionDurationOf(
-      context,
-      states.contains(WidgetState.dragged)
-          ? Md3eMotion.durationMedium
-          : Md3eMotion.durationShort,
     );
     final Curve stateEnter = Md3eMotion.curveForStateEnter(
       reduceMotion: reduceMotion,
@@ -239,7 +135,7 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
     const double contentHorizontalPadding = 12;
     const double titleSubtitleGap = 6;
 
-    final double? coverProgress = widget.readProgress;
+    final double? coverProgress = readProgress;
     final bool showCoverProgress = md3eShowsReadProgressStrip(coverProgress);
 
     final Widget coverLayer = AspectRatio(
@@ -247,21 +143,21 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          widget.cover,
-          if (_effectiveSelectionMode)
+          cover,
+          if (effectiveSelectionMode)
             Positioned(
               left: kMd3eComicCardSelectionInset,
               top: kMd3eComicCardSelectionInset,
-              child: Checkbox(
-                value: _effectiveSelected,
-                onChanged: disabled
-                    ? null
-                    : (bool? value) {
+              child: M3ECheckbox(
+                value: effectiveSelected,
+                onChanged: cardEnabled && onSelectionChanged != null
+                    ? (bool? value) {
                         if (value == null) {
                           return;
                         }
-                        widget.onSelectionChanged?.call(value);
-                      },
+                        onSelectionChanged!.call(value);
+                      }
+                    : null,
               ),
             ),
           if (showCoverProgress)
@@ -272,7 +168,7 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
               height: kMd3eComicCardCoverProgressHeight,
               child: Md3eCoverReadProgressStrip(
                 key: kMd3eComicCardCoverProgressKey,
-                progress: widget.readProgress!,
+                progress: readProgress!,
                 activeColor: scheme.primary,
                 trackColor: scheme.onSurface.withValues(alpha: 0.24),
                 duration: motionDuration,
@@ -286,7 +182,7 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
     Widget infoBlock = Padding(
       padding: EdgeInsets.fromLTRB(
         contentHorizontalPadding,
-        tokens.spacing.md,
+        spacing.md,
         contentHorizontalPadding,
         contentHorizontalPadding,
       ),
@@ -295,20 +191,20 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
         spacing: titleSubtitleGap,
         children: <Widget>[
           Text(
-            widget.title,
+            title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleSmall?.copyWith(
+            style: type.titleSmall.copyWith(
               fontWeight: FontWeight.w600,
               color: scheme.onSurface,
             ),
           ),
-          if (widget.subtitle != null)
+          if (subtitle != null)
             Text(
-              widget.subtitle!,
+              subtitle!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelSmall?.copyWith(
+              style: type.labelSmall.copyWith(
                 color: scheme.onSurfaceVariant,
               ),
             ),
@@ -316,120 +212,96 @@ class _Md3eComicCardState extends State<Md3eComicCard> {
       ),
     );
 
-    infoBlock = Stack(
-      fit: StackFit.passthrough,
-      children: <Widget>[
-        infoBlock,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(end: infoOverlayAlpha),
-              duration: motionDuration,
-              curve: infoOverlayAlpha > 0 ? stateEnter : stateExit,
-              builder: (BuildContext context, double alpha, Widget? child) {
-                if (alpha <= 0) {
-                  return const SizedBox.shrink();
-                }
-                return ColoredBox(
-                  color: scheme.onSurface.withValues(alpha: alpha),
-                );
-              },
+    if (infoOverlayAlpha > 0) {
+      infoBlock = Stack(
+        fit: StackFit.passthrough,
+        children: <Widget>[
+          infoBlock,
+          Positioned.fill(
+            child: IgnorePointer(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(end: infoOverlayAlpha),
+                duration: motionDuration,
+                curve: infoOverlayAlpha > 0 ? stateEnter : stateExit,
+                builder: (BuildContext context, double alpha, Widget? child) {
+                  if (alpha <= 0) {
+                    return const SizedBox.shrink();
+                  }
+                  return ColoredBox(
+                    color: scheme.onSurface.withValues(alpha: alpha),
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      ],
-    );
-
-    Widget content = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        coverLayer,
-        infoBlock,
-      ],
-    );
-
-    content = TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: disabled ? 0.38 : 1),
-      duration: motionDuration,
-      curve: disabled ? stateExit : stateEnter,
-      builder: (BuildContext context, double opacity, Widget? child) {
-        return Opacity(opacity: opacity, child: child);
-      },
-      child: content,
-    );
-
-    Widget card = AnimatedContainer(
-      duration: motionDuration,
-      curve: showFocusRing ? stateEnter : stateExit,
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        border: Border.all(
-          color: showFocusRing ? scheme.primary : Colors.transparent,
-          width: showFocusRing ? 2 : 0,
-        ),
-      ),
-      child: TweenAnimationBuilder<double>(
-        tween: Tween<double>(end: elevation),
-        duration: elevationDuration,
-        curve: elevation > 1 ? stateEnter : stateExit,
-        builder: (BuildContext context, double animatedElevation, Widget? _) {
-          return Material(
-            color: scheme.surfaceContainerLow,
-            elevation: animatedElevation,
-            shadowColor: scheme.shadow,
-            surfaceTintColor: scheme.surfaceTint,
-            shape: RoundedRectangleBorder(borderRadius: radius),
-            clipBehavior: Clip.antiAlias,
-            child: content,
-          );
-        },
-      ),
-    );
-
-    final String semanticsLabel = _semanticsLabel(
-      title: widget.title,
-      readProgress: coverProgress,
-    );
-
-    if (!_interactive) {
-      return Semantics(
-        button: widget.onTap != null || widget.onSelectionChanged != null,
-        label: semanticsLabel,
-        enabled: !disabled,
-        checked: _effectiveSelectionMode ? _effectiveSelected : null,
-        child: card,
+        ],
       );
     }
 
-    return Semantics(
-      button: true,
-      label: semanticsLabel,
-      checked: _effectiveSelectionMode ? _effectiveSelected : null,
-      child: FocusableActionDetector(
-        mouseCursor: SystemMouseCursors.click,
-        onShowHoverHighlight: (bool value) => setState(() => _hovered = value),
-        onShowFocusHighlight: (bool value) => setState(() => _focused = value),
-        actions: <Type, Action<Intent>>{
-          ActivateIntent: CallbackAction<ActivateIntent>(
-            onInvoke: (ActivateIntent intent) {
-              _handleTap();
-              return null;
-            },
-          ),
-        },
-        child: Listener(
-          onPointerDown: (_) => setState(() => _pressed = true),
-          onPointerUp: (_) => setState(() => _pressed = false),
-          onPointerCancel: (_) => setState(() => _pressed = false),
-          child: GestureDetector(
-            onTap: _handleTap,
-            behavior: HitTestBehavior.opaque,
-            child: card,
-          ),
-        ),
+    return M3ECard(
+      variant: M3ECardVariant.elevated,
+      padding: EdgeInsets.zero,
+      borderRadius: BorderRadius.circular(kMd3eComicCardRadius),
+      enabled: cardEnabled,
+      dragged: dragged,
+      trackHover: visualState == null,
+      onPressed: interactive ? _handleTap : null,
+      semanticLabel: _semanticsLabel(
+        title: title,
+        readProgress: coverProgress,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          coverLayer,
+          infoBlock,
+        ],
       ),
     );
+  }
+
+  bool get _effectiveSelectionMode {
+    if (visualState == Md3eComicCardVisualState.selectionUnselected ||
+        visualState == Md3eComicCardVisualState.selectionSelected) {
+      return true;
+    }
+    return selectionMode;
+  }
+
+  bool get _effectiveSelected {
+    if (visualState == Md3eComicCardVisualState.selectionSelected) {
+      return true;
+    }
+    if (visualState == Md3eComicCardVisualState.selectionUnselected) {
+      return false;
+    }
+    return selected;
+  }
+
+  void _handleTap() {
+    if (_effectiveSelectionMode && onSelectionChanged != null) {
+      onSelectionChanged!(!_effectiveSelected);
+      return;
+    }
+    onTap?.call();
+  }
+
+  static double _infoOverlayAlphaFor(Md3eComicCardVisualState? state) {
+    switch (state) {
+      case Md3eComicCardVisualState.pressed:
+        return 0.12;
+      case Md3eComicCardVisualState.hovered:
+      case Md3eComicCardVisualState.focused:
+      case Md3eComicCardVisualState.dragged:
+        return 0.08;
+      case Md3eComicCardVisualState.disabled:
+      case Md3eComicCardVisualState.normal:
+      case Md3eComicCardVisualState.selectionUnselected:
+      case Md3eComicCardVisualState.selectionSelected:
+      case null:
+        return 0;
+    }
   }
 
   static String _semanticsLabel({
