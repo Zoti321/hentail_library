@@ -6,5 +6,13 @@ void main() {
     expect(Md3eMotion.durationShort.inMilliseconds, greaterThan(0));
     expect(Md3eMotion.durationMedium.inMilliseconds, greaterThan(0));
     expect(Md3eMotion.expressiveSpring, isNotNull);
+    expect(
+      Md3eMotion.curveForStateEnter(reduceMotion: false),
+      Md3eMotion.curveEmphasizedDecelerate,
+    );
+    expect(
+      Md3eMotion.curveForStateExit(reduceMotion: false),
+      Md3eMotion.curveEmphasizedAccelerate,
+    );
   });
 }

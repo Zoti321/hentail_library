@@ -14,4 +14,28 @@ abstract final class Md3eMotion {
   static Duration get durationMedium => tokens.durationMedium;
 
   static Curve get curveEmphasized => tokens.curveEmphasized;
+
+  static Curve get curveEmphasizedDecelerate =>
+      tokens.curveEmphasizedDecelerate;
+
+  static Curve get curveEmphasizedAccelerate =>
+      tokens.curveEmphasizedAccelerate;
+
+  /// M3 emphasized curve when a state layer or elevation **enters**.
+  static Curve curveForStateEnter({required bool reduceMotion}) {
+    return reduceMotion ? Curves.linear : curveEmphasizedDecelerate;
+  }
+
+  /// M3 emphasized curve when a state layer or elevation **exits**.
+  static Curve curveForStateExit({required bool reduceMotion}) {
+    return reduceMotion ? Curves.linear : curveEmphasizedAccelerate;
+  }
+
+  static bool reduceMotionOf(BuildContext context) {
+    return MediaQuery.disableAnimationsOf(context);
+  }
+
+  static Duration motionDurationOf(BuildContext context, Duration duration) {
+    return reduceMotionOf(context) ? Duration.zero : duration;
+  }
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/layout/md3e_catalog_grid_metrics.dart';
+import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
 import 'package:material_expressive/theme.dart';
 
 /// Fake catalog grid for MD3E Lab / Widgetbook (no domain types).
@@ -11,6 +14,10 @@ class Md3eLibraryBrowsePreviewView extends StatelessWidget {
   Widget build(BuildContext context) {
     final ExpressiveThemeData tokens = ExpressiveThemeProvider.of(context);
     final ColorScheme scheme = Theme.of(context).colorScheme;
+    final Md3eWindowSizeClass window = md3eWindowSizeClassOf(context);
+    final double cellWidth = Md3eCatalogGridMetrics.maxCrossAxisExtent(window);
+    final double spacing = Md3eCatalogGridMetrics.gridSpacing(window);
+
     return CustomScrollView(
       slivers: <Widget>[
         SliverPadding(
@@ -26,45 +33,34 @@ class Md3eLibraryBrowsePreviewView extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: tokens.spacing.lg),
           sliver: SliverGrid(
             gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 160,
-              mainAxisSpacing: tokens.spacing.md,
-              crossAxisSpacing: tokens.spacing.md,
-              childAspectRatio: 0.72,
+              maxCrossAxisExtent: cellWidth,
+              mainAxisExtent: Md3eComicCard.gridMainAxisExtent(
+                maxCrossAxisExtent: cellWidth,
+                coverToInfoGap: tokens.spacing.md,
+                infoBottomPadding: tokens.spacing.sm,
+              ),
+              mainAxisSpacing: spacing,
+              crossAxisSpacing: spacing,
             ),
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
-                return Material(
-                  color: scheme.surfaceContainerLow,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(tokens.radius.lg),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Expanded(
-                        child: ColoredBox(
-                          color: scheme.surfaceContainerHigh,
-                          child: Center(
-                            child: Icon(
-                              Icons.image_outlined,
-                              color: scheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
+                final double? readProgress = index.isOdd
+                    ? null
+                    : ((index % 9) + 1) / 10;
+                return Md3eComicCard(
+                  title: '示例本子 ${index + 1}',
+                  subtitle: '${64 + index * 8} 页',
+                  readProgress: readProgress,
+                  cover: ColoredBox(
+                    color: scheme.surfaceContainerHigh,
+                    child: Center(
+                      child: Icon(
+                        Icons.image_outlined,
+                        color: scheme.onSurfaceVariant,
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(tokens.spacing.sm),
-                        child: Text(
-                          '示例本子 ${index + 1}',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
+                  onTap: () {},
                 );
               },
               childCount: itemCount,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_list_detail_adaptive_layout.dart';
 import 'package:hentai_library/md3e/patterns/settings_grouped_list_pattern.dart';
 import 'package:hentai_library/md3e/views/library_browse_preview_view.dart';
+import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/md3e_filled_button.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -17,6 +18,90 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
         WidgetbookFolder(
           name: 'widgets',
           children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'Md3eComicCard',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Center(
+                      child: SizedBox(
+                        width: 160,
+                        child: Md3eComicCard(
+                          title: '深海图书馆',
+                          subtitle: '128 页',
+                          readProgress: kMd3eWidgetbookComicReadProgress,
+                          cover: _demoCover(context),
+                          onTap: () {},
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Elevated card states',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24),
+                      child: Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: <Widget>[
+                          for (final Md3eComicCardVisualState state
+                              in Md3eComicCardVisualState.values)
+                            SizedBox(
+                              width: 140,
+                              child: Md3eComicCard(
+                                title: _stateLabel(state),
+                                subtitle: '96 页',
+                                readProgress: kMd3eWidgetbookComicReadProgress,
+                                visualState: state,
+                                cover: _demoCover(context),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Selection mode',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Center(
+                      child: Wrap(
+                        spacing: 24,
+                        children: <Widget>[
+                          SizedBox(
+                            width: 160,
+                            child: Md3eComicCard(
+                              title: '未选中',
+                              subtitle: '128 页',
+                              readProgress: kMd3eWidgetbookComicReadProgress,
+                              selectionMode: true,
+                              selected: false,
+                              cover: _demoCover(context),
+                              onSelectionChanged: (_) {},
+                            ),
+                          ),
+                          SizedBox(
+                            width: 160,
+                            child: Md3eComicCard(
+                              title: '已选中',
+                              subtitle: '128 页',
+                              readProgress: kMd3eWidgetbookComicReadProgress,
+                              selectionMode: true,
+                              selected: true,
+                              cover: _demoCover(context),
+                              onSelectionChanged: (_) {},
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'Md3eFilledButton',
               useCases: <WidgetbookUseCase>[
@@ -112,4 +197,38 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
       ],
     ),
   ];
+}
+
+/// Sample read progress on all Md3eComicCard Widgetbook examples.
+const double kMd3eWidgetbookComicReadProgress = 0.42;
+
+Widget _demoCover(BuildContext context) {
+  return ColoredBox(
+    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+    child: Icon(
+      Icons.image_outlined,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    ),
+  );
+}
+
+String _stateLabel(Md3eComicCardVisualState state) {
+  switch (state) {
+    case Md3eComicCardVisualState.normal:
+      return 'Normal';
+    case Md3eComicCardVisualState.hovered:
+      return 'Hovered';
+    case Md3eComicCardVisualState.focused:
+      return 'Focused';
+    case Md3eComicCardVisualState.pressed:
+      return 'Pressed';
+    case Md3eComicCardVisualState.dragged:
+      return 'Dragged';
+    case Md3eComicCardVisualState.disabled:
+      return 'Disabled';
+    case Md3eComicCardVisualState.selectionUnselected:
+      return 'Selection off';
+    case Md3eComicCardVisualState.selectionSelected:
+      return 'Selection on';
+  }
 }
