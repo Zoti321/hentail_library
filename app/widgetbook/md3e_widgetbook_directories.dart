@@ -3,6 +3,7 @@ import 'package:hentai_library/md3e/layout/md3e_list_detail_adaptive_layout.dart
 import 'package:hentai_library/md3e/patterns/settings_grouped_list_pattern.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/views/library_browse_preview_view.dart';
+import 'package:hentai_library/md3e/widgets/md3e_filled_button.dart';
 import 'package:material_expressive/theme.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -88,6 +89,22 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                       ],
                     ),
                   ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        WidgetbookComponent(
+          name: 'Md3eFilledButton',
+          useCases: <WidgetbookUseCase>[
+            WidgetbookUseCase(
+              name: 'Label',
+              builder: (BuildContext context) => _Md3eWidgetbookScope(
+                child: Center(
+                  child: Md3eFilledButton(
+                    label: '继续',
+                    onPressed: () {},
+                  ),
                 ),
               ),
             ),

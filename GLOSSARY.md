@@ -296,6 +296,36 @@ _Avoid_: dry-run（用户文案用「导入预演」）
 应用级浏览过滤：开启后库、搜索、历史等视图隐藏 `contentRating == r18` 的 Comic；不修改 Comic 自身的分级。
 _Avoid_: 安全模式、青少年模式、R18 过滤
 
+### Design & UI
+
+**MD3E design system**:
+并行于 Baseline UI 的 Material 3 Expressive 取向设计系统实现（Lab 阶段主题色为临时默认紫，非最终品牌定稿）。含主题、布局、动效、交互、原子控件、场景 pattern 与 MD3E 预览页；不替代 Rust 业务真值。
+_Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）
+
+**Baseline UI**:
+当前生产默认的 Fluent 取向共享 UI 与 Baseline 主题装配；MD3E Pilot/Cutover 完成前仍为功能视图主壳。
+_Avoid_: 旧主题、老 UI、legacy 皮肤
+
+**MD3E preview page**:
+仅在 MD3E 设计系统内、用假数据或 Widgetbook 组装的整页预览，用于设计验收；不是带 ViewModel 的**功能视图**。
+_Avoid_: 预览 View、md3e 功能页
+
+**MD3E Lab**:
+不改动生产 feature 与 Baseline UI，在独立模块与 Widgetbook 中建设并测试 MD3E 栈。
+_Avoid_: 全仓换肤阶段
+
+**MD3E Pilot**:
+单个 feature（首选应用设置）可选接入 MD3E 组件与主题，用于真数据与路由验证。
+_Avoid_: Beta 换肤
+
+**MD3E Cutover**:
+按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。
+_Avoid_: 大重构（无阶段含义时）
+
+**MD3E pattern**:
+MD3E 内按产品场景命名的 UI 组合块（如设置分组列表），仅通过通用 props 与 callback 交互，不 import 领域类型或 feature。
+_Avoid_: 业务组件（若指 feature 内编排）、设计 pattern 混指 Figma 帧
+
 ### Reading
 
 **Read session**:
