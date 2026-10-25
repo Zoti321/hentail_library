@@ -27,6 +27,7 @@ MODULES = frozenset(
         "app_settings",
         "metadata_backup",
         "shared",
+        "md3e",
         "frb_generated",
     }
 )
@@ -42,6 +43,8 @@ def classify(relative: str) -> str:
             return parts[1]
     if p.startswith("shared/"):
         return "shared"
+    if p.startswith("md3e/"):
+        return "md3e"
     if p == "main.dart":
         return "bootstrap"
     return "shared"
@@ -68,7 +71,11 @@ def resolve_module(import_path: str) -> str | None:
 
 
 def is_ui_layer(path: str) -> bool:
-    return (path.startswith("features/") and "/presentation/" in path) or path.startswith("shared/ui/")
+    return (
+        (path.startswith("features/") and "/presentation/" in path)
+        or path.startswith("shared/ui/")
+        or path.startswith("md3e/")
+    )
 
 
 def main() -> None:

@@ -18,6 +18,7 @@ const Set<String> kImportBoundaryModules = <String>{
   'app_settings',
   'metadata_backup',
   'shared',
+  'md3e',
   'frb_generated',
 };
 
@@ -57,6 +58,7 @@ bool isStranglerExportOnlyShim(String fileContents) {
 
 bool isProductModule(String moduleId) {
   return moduleId != 'shared' &&
+      moduleId != 'md3e' &&
       moduleId != 'bootstrap' &&
       moduleId != 'frb_generated';
 }
@@ -73,6 +75,9 @@ String classifyLibPath(String relativePosix) {
   }
   if (path.startsWith('shared/')) {
     return 'shared';
+  }
+  if (path.startsWith('md3e/')) {
+    return 'md3e';
   }
   if (path.startsWith('src/rust/')) {
     return 'frb_generated';
@@ -114,7 +119,7 @@ bool isPresentationLayerPath(String libRelativePosix) {
   if (path.startsWith('features/') && path.contains('/presentation/')) {
     return true;
   }
-  return path.startsWith('shared/ui/');
+  return path.startsWith('shared/ui/') || path.startsWith('md3e/');
 }
 
 bool isDomainLayerPath(String libRelativePosix) {
@@ -313,7 +318,10 @@ void _checkModuleGraphRules({
   if (sourceModule == targetModule) {
     return;
   }
-  if (sourceModule == 'shared' || targetModule == 'shared') {
+  if (sourceModule == 'shared' ||
+      targetModule == 'shared' ||
+      sourceModule == 'md3e' ||
+      targetModule == 'md3e') {
     return;
   }
   if (sourceModule == 'bootstrap') {
