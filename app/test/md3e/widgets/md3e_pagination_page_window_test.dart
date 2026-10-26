@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/widgets/md3e_pagination_page_window.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_page_window.dart';
 
 void main() {
   group('md3eBuildPaginationPageWindow (MUI usePagination)', () {

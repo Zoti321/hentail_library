@@ -1,5 +1,5 @@
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/widgets/md3e_pagination_page_window.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_page_window.dart';
 
 /// Layout constants for [Md3ePagination].
 abstract final class Md3ePaginationMetrics {

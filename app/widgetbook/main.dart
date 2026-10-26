@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/widgets/md3e_window_manager_bindings.dart';
+import 'package:hentai_library/md3e/widgets/desktop/md3e_window_manager_bindings.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'md3e_viewports.dart';

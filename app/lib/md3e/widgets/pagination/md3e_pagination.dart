@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/widgets/md3e_pagination_compact.dart';
-import 'package:hentai_library/md3e/widgets/md3e_pagination_metrics.dart';
-import 'package:hentai_library/md3e/widgets/md3e_pagination_standard.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_compact.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_standard.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// Responsive MD3E pagination (Lab only; production uses [LibraryPaginationBar]).

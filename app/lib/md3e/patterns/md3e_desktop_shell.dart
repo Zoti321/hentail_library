@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell_surfaces.dart';
-import 'package:hentai_library/md3e/widgets/md3e_desktop_title_bar.dart';
-import 'package:hentai_library/md3e/widgets/md3e_desktop_title_bar_metrics.dart';
-import 'package:hentai_library/md3e/widgets/md3e_navigation_rail.dart';
+import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
+import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar_metrics.dart';
+import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Shell layout metrics for the desktop content card.

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_list_layout.dart';
-import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
+import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// Fake catalog list for MD3E Lab / Widgetbook (no domain types).

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/interaction/md3e_pointer_target.dart';
-import 'package:hentai_library/md3e/widgets/md3e_pagination_metrics.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Compact (&lt; 600dp) pagination: large icon prev/next and tappable page summary.

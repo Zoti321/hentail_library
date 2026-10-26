@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
-import 'package:hentai_library/md3e/widgets/md3e_cover_read_progress_strip.dart';
+import 'package:hentai_library/md3e/widgets/catalog/md3e_cover_read_progress_strip.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Corner radius for [Md3eComicCard] (M3 elevated card / MASTER 书库卡).

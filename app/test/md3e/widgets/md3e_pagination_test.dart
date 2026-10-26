@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/widgets/md3e_pagination.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';

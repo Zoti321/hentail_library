@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/widgets/md3e_pagination_metrics.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// Single page number control in the standard pagination strip.

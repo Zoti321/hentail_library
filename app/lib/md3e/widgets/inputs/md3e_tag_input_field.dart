@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/widgets/md3e_outlined_text_field_shell.dart';
+import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field_shell.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
