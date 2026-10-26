@@ -6,6 +6,9 @@ import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_standard.
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// Responsive MD3E pagination (Lab only; production uses [LibraryPaginationBar]).
+///
+/// Compact vs standard follows **window** width ([MediaQuery.sizeOf]), same as
+/// [Md3eLibraryPageHeader] breakpoints—not the parent’s shrink-wrapped width.
 class Md3ePagination extends StatelessWidget {
   const Md3ePagination({
     super.key,
@@ -32,41 +35,33 @@ class Md3ePagination extends StatelessWidget {
       return const SizedBox.shrink();
     }
     final int clampedPage = page.clamp(1, totalPages);
+    final double windowWidth = MediaQuery.sizeOf(context).width;
+    final Md3eWindowSizeClass sizeClass =
+        Md3eWindowSizeClass.fromWidth(windowWidth);
+    final bool useCompact = sizeClass.isCompact ||
+        windowWidth < Md3ePaginationMetrics.standardBarMinWidth(sizeClass);
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final double width = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : MediaQuery.sizeOf(context).width;
-        final Md3eWindowSizeClass sizeClass =
-            Md3eWindowSizeClass.fromWidth(width);
-
-        final bool useCompact = sizeClass.isCompact ||
-            width < Md3ePaginationMetrics.standardBarMinWidth(sizeClass);
-
-        if (useCompact) {
-          return Md3ePaginationCompact(
-            page: clampedPage,
-            totalPages: totalPages,
-            enabled: enabled,
-            onPageChanged: onPageChanged,
-            onOpenPagePicker: () => _showCompactPagePicker(
-              context: context,
-              page: clampedPage,
-              totalPages: totalPages,
-              onPageChanged: onPageChanged,
-            ),
-          );
-        }
-
-        return Md3ePaginationStandard(
+    if (useCompact) {
+      return Md3ePaginationCompact(
+        page: clampedPage,
+        totalPages: totalPages,
+        enabled: enabled,
+        onPageChanged: onPageChanged,
+        onOpenPagePicker: () => _showCompactPagePicker(
+          context: context,
           page: clampedPage,
           totalPages: totalPages,
-          enabled: enabled,
-          sizeClass: sizeClass,
           onPageChanged: onPageChanged,
-        );
-      },
+        ),
+      );
+    }
+
+    return Md3ePaginationStandard(
+      page: clampedPage,
+      totalPages: totalPages,
+      enabled: enabled,
+      sizeClass: sizeClass,
+      onPageChanged: onPageChanged,
     );
   }
 

@@ -67,78 +67,6 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'M3EChip',
-              useCases: <WidgetbookUseCase>[
-                WidgetbookUseCase(
-                  name: 'Filter',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Center(
-                      child: Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        alignment: WrapAlignment.center,
-                        children: <Widget>[
-                          M3EChip(
-                            label: '未读',
-                            type: M3EChipType.filter,
-                            onPressed: () {},
-                          ),
-                          M3EChip(
-                            label: '已收藏',
-                            type: M3EChipType.filter,
-                            selected: true,
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Input',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Center(
-                      child: M3EChip(
-                        label: '深海图书馆',
-                        type: M3EChipType.input,
-                        onPressed: () {},
-                        onDeleted: () {},
-                      ),
-                    ),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Assist & Suggestion',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Center(
-                      child: Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        alignment: WrapAlignment.center,
-                        children: <Widget>[
-                          M3EChip(
-                            label: '添加到标签',
-                            type: M3EChipType.assist,
-                            leading: Icon(
-                              Icons.add,
-                              size: 18,
-                              color: M3ETheme.of(context).colorScheme.primary,
-                            ),
-                            onPressed: () {},
-                          ),
-                          M3EChip(
-                            label: '深海图书馆',
-                            type: M3EChipType.suggestion,
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            WidgetbookComponent(
               name: 'Md3eDesktopTitleBar',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
@@ -184,30 +112,9 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               name: 'Md3ePagination',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Compact 390w · 10 pages',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: SizedBox(
-                      width: Md3eBreakpoints.previewWidthCompact,
-                      child: const _Md3ePaginationPreview(
-                        totalPages: 10,
-                        totalItems: 100,
-                        pageSize: 10,
-                      ),
-                    ),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Standard 1024w · page window',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: SizedBox(
-                      width: Md3eBreakpoints.previewWidthExpanded,
-                      child: const _Md3ePaginationPreview(
-                        totalPages: 12,
-                        totalItems: 120,
-                        pageSize: 10,
-                        initialPage: 5,
-                      ),
-                    ),
+                  name: 'Interactive',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: _Md3ePaginationPreview(),
                   ),
                 ),
               ],
@@ -733,35 +640,41 @@ class _Md3eLibraryFilterSortSideSheetPreviewState
 }
 
 class _Md3ePaginationPreview extends StatefulWidget {
-  const _Md3ePaginationPreview({
-    required this.totalPages,
-    this.totalItems,
-    this.pageSize,
-    this.initialPage = 1,
-  });
-
-  final int totalPages;
-  final int? totalItems;
-  final int? pageSize;
-  final int initialPage;
+  const _Md3ePaginationPreview();
 
   @override
   State<_Md3ePaginationPreview> createState() => _Md3ePaginationPreviewState();
 }
 
 class _Md3ePaginationPreviewState extends State<_Md3ePaginationPreview> {
-  late int _page = widget.initialPage;
+  static const int _totalPages = 12;
+  static const int _totalItems = 120;
+  static const int _pageSize = 10;
+
+  int _page = 5;
 
   @override
   Widget build(BuildContext context) {
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final M3ETypeScale type = M3ETheme.of(context).typeScale;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 20,
       children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            '使用 Viewport addon 切换窗口宽度（与漫画库页相同断点逻辑）。',
+            textAlign: TextAlign.center,
+            style: type.bodySmall.copyWith(color: scheme.onSurfaceVariant),
+          ),
+        ),
         Md3ePagination(
           page: _page,
-          totalPages: widget.totalPages,
-          totalItems: widget.totalItems,
-          pageSize: widget.pageSize,
+          totalPages: _totalPages,
+          totalItems: _totalItems,
+          pageSize: _pageSize,
           onPageChanged: (int page) => setState(() => _page = page),
         ),
       ],
