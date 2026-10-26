@@ -1,19 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/patterns/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/widgets/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/md3e_desktop_title_bar_metrics.dart';
 import 'package:hentai_library/md3e/widgets/md3e_navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Shell layout metrics (MASTER §5.1 pane seam).
+/// Shell layout metrics for the desktop content card.
 abstract final class Md3eDesktopShellMetrics {
   static const double paneCornerRadius = 20;
+
+  /// Content card: rounded on the leading edge only (rail side).
+  static BorderRadius contentCardLeadingRadius([double radius = paneCornerRadius]) {
+    return BorderRadius.only(
+      topLeft: Radius.circular(radius),
+      bottomLeft: Radius.circular(radius),
+    );
+  }
+
+  /// Horizontal inset for title-bar search beside the leading curve.
+  static const double titleBarContentPadding = 24;
 }
 
-/// Desktop window shell: full-height [Md3eNavigationRail] + title row + main pane.
+/// Desktop window shell: animated [Md3eNavigationRail] + clipped content card.
 ///
-/// The rail menu sits in the top [Md3eDesktopTitleBarMetrics.height] band beside
-/// the search field; pane content starts below the title bar with search and pane
-/// sharing the same leading edge.
+/// Window fill uses [Md3eDesktopShellSurfaceRoles.shellBackground] (same as rail).
+/// The content column is [ClipRRect]-rounded in a [Row] so rail width animation
+/// is not covered by a overlapping [Stack] layer.
 class Md3eDesktopShell extends StatefulWidget {
   const Md3eDesktopShell({
     super.key,
@@ -22,6 +34,7 @@ class Md3eDesktopShell extends StatefulWidget {
     this.initialRailExtended = false,
     this.destinations,
     this.paneChild,
+    this.surfaceRoles,
   });
 
   final double? width;
@@ -29,6 +42,9 @@ class Md3eDesktopShell extends StatefulWidget {
   final bool initialRailExtended;
   final List<Md3eNavigationRailDestination>? destinations;
   final Widget? paneChild;
+
+  /// When null, uses [Md3eDesktopShellSurfaceRoles.lab] (MASTER-aligned lab default).
+  final Md3eDesktopShellSurfaceRoles? surfaceRoles;
 
   @override
   State<Md3eDesktopShell> createState() => _Md3eDesktopShellState();
@@ -42,48 +58,62 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   Widget build(BuildContext context) {
     final M3EThemeData m3e = M3ETheme.of(context);
     final M3EColorScheme scheme = m3e.colorScheme;
-    final double paneGutter = m3e.spacing.lg;
+    final Md3eDesktopShellSurfaceRoles surfaces =
+        widget.surfaceRoles ?? Md3eDesktopShellSurfaceRoles.lab(scheme);
     final List<Md3eNavigationRailDestination> destinations =
         widget.destinations ?? md3eDefaultNavigationRailDestinations();
 
+    final M3EThemeData railTheme = m3e.copyWith(
+      navigationRailTheme: m3e.navigationRailTheme.copyWith(
+        containerColor: surfaces.navigationRailBackground,
+      ),
+    );
+
+    final double cornerRadius = Md3eDesktopShellMetrics.paneCornerRadius;
+
     final Widget shell = ColoredBox(
-      color: scheme.surfaceContainerLow,
+      color: surfaces.shellBackground,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SizedBox(
             height: widget.height,
-            child: Md3eNavigationRail(
-              destinations: destinations,
-              selectedIndex: _selectedIndex,
-              extended: _railExtended,
-              onMenuPressed: () => setState(() => _railExtended = !_railExtended),
-              onDestinationSelected: (int index) =>
-                  setState(() => _selectedIndex = index),
+            child: M3ETheme(
+              data: railTheme,
+              child: Md3eNavigationRail(
+                destinations: destinations,
+                selectedIndex: _selectedIndex,
+                extended: _railExtended,
+                onMenuPressed: () =>
+                    setState(() => _railExtended = !_railExtended),
+                onDestinationSelected: (int index) =>
+                    setState(() => _selectedIndex = index),
+              ),
             ),
           ),
-          SizedBox(width: paneGutter),
           Expanded(
-            child: SizedBox(
-              height: widget.height,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Md3eDesktopTitleBar(
-                    searchLeadingInset: 0,
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        right: paneGutter,
-                        bottom: paneGutter,
-                      ),
+            child: ClipRRect(
+              borderRadius: Md3eDesktopShellMetrics.contentCardLeadingRadius(
+                cornerRadius,
+              ),
+              child: ColoredBox(
+                color: surfaces.contentPaneBackground,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Md3eDesktopTitleBar(
+                      searchLeadingInset:
+                          Md3eDesktopShellMetrics.titleBarContentPadding,
+                      backgroundColor: Colors.transparent,
+                    ),
+                    Expanded(
                       child: Md3eDesktopShellPane(
+                        showDecoration: false,
                         child: widget.paneChild,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -98,24 +128,42 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   }
 }
 
-/// Main pane surface (`surfaceContainerLowest`, r=20) for shell previews.
+/// Main pane surface (role from [Md3eDesktopShellSurfaceRoles], r=20).
 class Md3eDesktopShellPane extends StatelessWidget {
-  const Md3eDesktopShellPane({super.key, this.child});
+  const Md3eDesktopShellPane({
+    super.key,
+    this.backgroundColor,
+    this.borderRadius,
+    this.showDecoration = true,
+    this.child,
+  });
 
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+
+  /// When false, only lays out [child] (fill provided by parent shell card).
+  final bool showDecoration;
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
+    final Widget content = child ?? const SizedBox.expand();
+    if (!showDecoration) {
+      return content;
+    }
+
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final Color fill =
+        backgroundColor ?? scheme.surfaceContainerLowest;
+    final BorderRadius radius = borderRadius ??
+        BorderRadius.circular(Md3eDesktopShellMetrics.paneCornerRadius);
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(
-          Md3eDesktopShellMetrics.paneCornerRadius,
-        ),
+        color: fill,
+        borderRadius: radius,
       ),
-      child: child ?? const SizedBox.expand(),
+      child: content,
     );
   }
 }

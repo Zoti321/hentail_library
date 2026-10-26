@@ -7,10 +7,12 @@ import 'md3e_widgetbook_l10n_scope.dart';
 
 /// Wraps each Widgetbook use-case preview in [M3EMaterialApp] + lab theme.
 Widget md3eWidgetbookAppBuilder(BuildContext context, Widget child) {
-  final M3EThemeData m3e = buildMd3eThemeData();
+  final M3EThemeData lightM3e = buildMd3eThemeData(brightness: Brightness.light);
 
+  // Brightness is driven by [buildMd3eWidgetbookThemeAddon]; [M3EMaterialApp]
+  // `theme` / `darkTheme` expect material_ui [ThemeData], not Flutter's.
   return M3EMaterialApp(
-    data: m3e,
+    data: lightM3e,
     fontFamily: kMd3eAppFontFamily,
     debugShowCheckedModeBanner: false,
     // material_ui MaterialLocalizations only fully covers `en`.

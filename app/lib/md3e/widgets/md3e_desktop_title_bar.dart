@@ -22,6 +22,7 @@ class Md3eDesktopTitleBar extends StatelessWidget {
     this.onWindowMinimize,
     this.onWindowMaximize,
     this.onWindowClose,
+    this.backgroundColor,
   });
 
   /// Simulated rail column width for **isolated** title-bar previews only.
@@ -40,6 +41,9 @@ class Md3eDesktopTitleBar extends StatelessWidget {
   final VoidCallback? onWindowMaximize;
   final VoidCallback? onWindowClose;
 
+  /// Defaults to [M3EColorScheme.surfaceContainerLow] (lab chrome).
+  final Color? backgroundColor;
+
   @override
   Widget build(BuildContext context) {
     final M3EThemeData m3e = M3ETheme.of(context);
@@ -50,7 +54,7 @@ class Md3eDesktopTitleBar extends StatelessWidget {
       height: Md3eDesktopTitleBarMetrics.height,
       width: double.infinity,
       child: ColoredBox(
-        color: scheme.surfaceContainerLow,
+        color: backgroundColor ?? scheme.surfaceContainerLow,
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             final double controlsWidth = showWindowControls
