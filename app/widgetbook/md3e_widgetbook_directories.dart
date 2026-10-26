@@ -6,6 +6,8 @@ import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell_surfaces.dart';
+import 'package:hentai_library/md3e/patterns/md3e_library_page_header.dart';
+import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
@@ -379,6 +381,37 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
+              name: 'Md3eLibraryPageHeader',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) {
+                    final double width = MediaQuery.sizeOf(context).width;
+                    final Md3eWindowSizeClass sizeClass =
+                        Md3eWindowSizeClass.fromWidth(width);
+                    final double horizontal =
+                        Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(
+                          sizeClass,
+                        );
+                    return Md3eWidgetbookScope(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            horizontal,
+                            24,
+                            horizontal,
+                            0,
+                          ),
+                          child: const _Md3eLibraryPageHeaderPreview(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            WidgetbookComponent(
               name: 'ComicDetailMetadataTags',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
@@ -475,6 +508,42 @@ String _stateLabel(Md3eComicCardVisualState state) {
       return 'Selection off';
     case Md3eComicCardVisualState.selectionSelected:
       return 'Selection on';
+  }
+}
+
+class _Md3eLibraryPageHeaderPreview extends StatefulWidget {
+  const _Md3eLibraryPageHeaderPreview();
+
+  @override
+  State<_Md3eLibraryPageHeaderPreview> createState() =>
+      _Md3eLibraryPageHeaderPreviewState();
+}
+
+class _Md3eLibraryPageHeaderPreviewState
+    extends State<_Md3eLibraryPageHeaderPreview> {
+  Md3eLibraryDisplayTarget _target = Md3eLibraryDisplayTarget.comics;
+  bool _filterActive = true;
+  int _pageSize = 50;
+
+  @override
+  Widget build(BuildContext context) {
+    return Md3eLibraryPageHeader(
+      displayTarget: _target,
+      filterSortActive: _filterActive,
+      pageSize: _pageSize,
+      onPageSizeChanged: (int value) => setState(() => _pageSize = value),
+      overflowMenuEntries: <M3EMenuEntry>[
+        M3EMenuEntry(
+          label: '刷新目录',
+          leading: const Icon(Icons.refresh),
+          onPressed: () {},
+        ),
+      ],
+      onDisplayTargetChanged: (Md3eLibraryDisplayTarget value) {
+        setState(() => _target = value);
+      },
+      onFilterSort: () => setState(() => _filterActive = !_filterActive),
+    );
   }
 }
 

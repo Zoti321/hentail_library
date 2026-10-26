@@ -204,7 +204,7 @@ class Md3eComicListItem extends StatelessWidget {
       trailingMore = Md3eAnchoredMenu(
         enabled: rowEnabled,
         position: M3EMenuAnchorPosition.bottomEnd,
-        entries: <M3EMenuEntry>[
+        children: <M3EMenuEntry>[
           for (final Md3eComicListMoreMenuEntry entry in moreMenuEntries)
             M3EMenuEntry(
               label: entry.label,

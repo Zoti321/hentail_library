@@ -71,13 +71,13 @@ class Md3eAnchoredMenu extends StatefulWidget {
   const Md3eAnchoredMenu({
     super.key,
     required this.anchorBuilder,
-    required this.entries,
+    required this.children,
     this.position = M3EMenuAnchorPosition.bottomEnd,
     this.enabled = true,
   });
 
   final M3EMenuAnchorBuilder anchorBuilder;
-  final List<M3EMenuEntry> entries;
+  final List<M3EMenuNode> children;
   final M3EMenuAnchorPosition position;
   final bool enabled;
 
@@ -112,7 +112,7 @@ class _Md3eAnchoredMenuState extends State<Md3eAnchoredMenu> {
     await md3eShowAnchoredMenu<void>(
       context: anchorContext,
       anchor: anchor,
-      children: widget.entries,
+      children: widget.children,
       position: widget.position,
       callerFocusNode: _anchorFocus,
     );
