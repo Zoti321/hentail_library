@@ -6,6 +6,7 @@ import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell_surfaces.dart';
+import 'package:hentai_library/md3e/patterns/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
@@ -412,6 +413,18 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
+              name: 'Md3eLibraryFilterSortSideSheet',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Modal side sheet · viewport addon',
+                  builder: (BuildContext context) =>
+                      const Md3eWidgetbookScope(
+                    child: _Md3eLibraryFilterSortSideSheetPreview(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
               name: 'ComicDetailMetadataTags',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
@@ -522,27 +535,92 @@ class _Md3eLibraryPageHeaderPreview extends StatefulWidget {
 class _Md3eLibraryPageHeaderPreviewState
     extends State<_Md3eLibraryPageHeaderPreview> {
   Md3eLibraryDisplayTarget _target = Md3eLibraryDisplayTarget.comics;
-  bool _filterActive = true;
+  Md3eLibraryFilterSortState _filterSort = Md3eLibraryFilterSortState.defaults;
   int _pageSize = 50;
 
   @override
   Widget build(BuildContext context) {
-    return Md3eLibraryPageHeader(
-      displayTarget: _target,
-      filterSortActive: _filterActive,
-      pageSize: _pageSize,
-      onPageSizeChanged: (int value) => setState(() => _pageSize = value),
-      overflowMenuEntries: <M3EMenuEntry>[
-        M3EMenuEntry(
-          label: '刷新目录',
-          leading: const Icon(Icons.refresh),
-          onPressed: () {},
-        ),
-      ],
-      onDisplayTargetChanged: (Md3eLibraryDisplayTarget value) {
-        setState(() => _target = value);
+    final double width = MediaQuery.sizeOf(context).width;
+    final Md3eWindowSizeClass sizeClass =
+        Md3eWindowSizeClass.fromWidth(width);
+    final double horizontal =
+        Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(sizeClass);
+
+    return Md3eLibraryFilterSortDrawerHost(
+      initialState: _filterSort,
+      useRootNavigator: false,
+      onStateChanged: (Md3eLibraryFilterSortState value) {
+        setState(() => _filterSort = value);
       },
-      onFilterSort: () => setState(() => _filterActive = !_filterActive),
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(horizontal, 0, horizontal, 0),
+        child: Builder(
+          builder: (BuildContext hostContext) {
+            return Md3eLibraryPageHeader(
+              displayTarget: _target,
+              filterSortActive: _filterSort.isCustomized,
+              pageSize: _pageSize,
+              onPageSizeChanged: (int value) => setState(() => _pageSize = value),
+              overflowMenuEntries: <M3EMenuEntry>[
+                M3EMenuEntry(
+                  label: '刷新目录',
+                  leading: const Icon(Icons.refresh),
+                  onPressed: () {},
+                ),
+              ],
+              onDisplayTargetChanged: (Md3eLibraryDisplayTarget value) {
+                setState(() => _target = value);
+              },
+              onFilterSort: () => Md3eLibraryFilterSortDrawerHost.openDrawer(
+                hostContext,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _Md3eLibraryFilterSortSideSheetPreview extends StatefulWidget {
+  const _Md3eLibraryFilterSortSideSheetPreview();
+
+  @override
+  State<_Md3eLibraryFilterSortSideSheetPreview> createState() =>
+      _Md3eLibraryFilterSortSideSheetPreviewState();
+}
+
+class _Md3eLibraryFilterSortSideSheetPreviewState
+    extends State<_Md3eLibraryFilterSortSideSheetPreview> {
+  Md3eLibraryFilterSortState _state = Md3eLibraryFilterSortState.defaults;
+
+  @override
+  Widget build(BuildContext context) {
+    return Md3eLibraryFilterSortDrawerHost(
+      initialState: _state,
+      openSideSheetOnMount: true,
+      useRootNavigator: false,
+      onStateChanged: (Md3eLibraryFilterSortState value) {
+        setState(() => _state = value);
+      },
+      body: Builder(
+        builder: (BuildContext hostContext) {
+          return Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: M3EButton(
+                onPressed: () =>
+                    Md3eLibraryFilterSortDrawerHost.openDrawer(hostContext),
+                style: M3EButtonStyle.filled,
+                size: M3EButtonSize.sm,
+                shape: M3EButtonShape.round,
+                label: const Text('打开筛选与排序'),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

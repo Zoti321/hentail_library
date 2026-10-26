@@ -10,6 +10,8 @@ export 'motion/md3e_motion.dart';
 export 'patterns/md3e_comic_detail_meta_chip_row.dart';
 export 'patterns/md3e_desktop_shell.dart';
 export 'patterns/md3e_desktop_shell_surfaces.dart';
+export 'patterns/md3e_library_filter_sort_metrics.dart';
+export 'patterns/md3e_library_filter_sort_side_sheet.dart';
 export 'patterns/md3e_library_page_header.dart';
 export 'theme/md3e_theme.dart';
 export 'views/library_browse_list_preview_view.dart';
