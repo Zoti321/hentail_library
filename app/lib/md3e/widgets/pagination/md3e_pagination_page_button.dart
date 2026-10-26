@@ -10,11 +10,15 @@ class Md3ePaginationPageButton extends StatelessWidget {
     required this.page,
     required this.selected,
     required this.onPressed,
+    this.showSelectionFill = true,
   });
 
   final int page;
   final bool selected;
   final VoidCallback? onPressed;
+
+  /// When false, selection is drawn by [Md3ePaginationStandardPageStrip].
+  final bool showSelectionFill;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +56,7 @@ class Md3ePaginationPageButton extends StatelessWidget {
             variant: M3ETabsVariant.primary,
             selected: selected,
           );
-          final Color? fill = selected
+          final Color? fill = showSelectionFill && selected
               ? scheme.primaryContainer
               : stateAlpha > 0
               ? stateColor.withValues(alpha: stateAlpha)

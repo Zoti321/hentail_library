@@ -74,5 +74,6 @@ void main() {
     );
     expect(find.text('2'), findsOneWidget);
     expect(find.text('上一页'), findsNothing);
+    expect(find.byType(AnimatedPositioned), findsOneWidget);
   });
 }
