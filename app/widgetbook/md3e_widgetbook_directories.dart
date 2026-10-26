@@ -35,82 +35,9 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               name: 'Md3eComicCard',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Default',
+                  name: 'Interactive',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Center(
-                      child: SizedBox(
-                        width: 160,
-                        child: Md3eComicCard(
-                          title: '深海图书馆',
-                          subtitle: '128 页',
-                          readProgress: kMd3eWidgetbookComicReadProgress,
-                          cover: _demoCover(context),
-                          onTap: () {},
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Elevated card states',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(24),
-                      child: Wrap(
-                        spacing: 16,
-                        runSpacing: 16,
-                        children: <Widget>[
-                          for (final Md3eComicCardVisualState state
-                              in Md3eComicCardVisualState.values)
-                            SizedBox(
-                              width: 140,
-                              child: Md3eComicCard(
-                                title: _stateLabel(state),
-                                subtitle: '96 页',
-                                readProgress: kMd3eWidgetbookComicReadProgress,
-                                visualState: state,
-                                cover: _demoCover(context),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Selection mode',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Center(
-                      child: Wrap(
-                        spacing: 24,
-                        children: <Widget>[
-                          SizedBox(
-                            width: 160,
-                            child: Md3eComicCard(
-                              title: '未选中',
-                              subtitle: '128 页',
-                              readProgress: kMd3eWidgetbookComicReadProgress,
-                              selectionMode: true,
-                              selected: false,
-                              cover: _demoCover(context),
-                              onSelectionChanged: (_) {},
-                            ),
-                          ),
-                          SizedBox(
-                            width: 160,
-                            child: Md3eComicCard(
-                              title: '已选中',
-                              subtitle: '128 页',
-                              readProgress: kMd3eWidgetbookComicReadProgress,
-                              selectionMode: true,
-                              selected: true,
-                              cover: _demoCover(context),
-                              onSelectionChanged: (_) {},
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: Center(child: _Md3eComicCardPreview(cover: _demoCover(context))),
                   ),
                 ),
               ],
@@ -508,24 +435,93 @@ Widget _demoCover(BuildContext context) {
   );
 }
 
-String _stateLabel(Md3eComicCardVisualState state) {
-  switch (state) {
-    case Md3eComicCardVisualState.normal:
-      return 'Normal';
-    case Md3eComicCardVisualState.hovered:
-      return 'Hovered';
-    case Md3eComicCardVisualState.focused:
-      return 'Focused';
-    case Md3eComicCardVisualState.pressed:
-      return 'Pressed';
-    case Md3eComicCardVisualState.dragged:
-      return 'Dragged';
-    case Md3eComicCardVisualState.disabled:
-      return 'Disabled';
-    case Md3eComicCardVisualState.selectionUnselected:
-      return 'Selection off';
-    case Md3eComicCardVisualState.selectionSelected:
-      return 'Selection on';
+class _Md3eComicCardPreview extends StatefulWidget {
+  const _Md3eComicCardPreview({required this.cover});
+
+  final Widget cover;
+
+  @override
+  State<_Md3eComicCardPreview> createState() => _Md3eComicCardPreviewState();
+}
+
+class _Md3eComicCardPreviewState extends State<_Md3eComicCardPreview> {
+  bool _disabled = false;
+  bool _selectionMode = false;
+  bool _selected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final M3ETypeScale type = M3ETheme.of(context).typeScale;
+    final bool cardEnabled = !_disabled;
+
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 20,
+        children: <Widget>[
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            children: <Widget>[
+              M3EChip(
+                label: '禁用',
+                type: M3EChipType.filter,
+                selected: _disabled,
+                onPressed: () {
+                  setState(() {
+                    _disabled = !_disabled;
+                    if (_disabled) {
+                      _selectionMode = false;
+                      _selected = false;
+                    }
+                  });
+                },
+              ),
+              M3EChip(
+                label: '选择模式',
+                type: M3EChipType.filter,
+                selected: _selectionMode,
+                onPressed: cardEnabled
+                    ? () {
+                        setState(() {
+                          _selectionMode = !_selectionMode;
+                          if (!_selectionMode) {
+                            _selected = false;
+                          }
+                        });
+                      }
+                    : null,
+              ),
+            ],
+          ),
+          Text(
+            '悬停、按下、聚焦（Tab）与拖拽由卡片交互呈现；'
+            '点击卡片或左上角复选框可切换选中。',
+            textAlign: TextAlign.center,
+            style: type.bodySmall.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          SizedBox(
+            width: 160,
+            child: Md3eComicCard(
+              title: '深海图书馆',
+              subtitle: '128 页',
+              readProgress: kMd3eWidgetbookComicReadProgress,
+              cover: widget.cover,
+              enabled: cardEnabled,
+              selectionMode: _selectionMode,
+              selected: _selected,
+              onTap: _selectionMode ? null : () {},
+              onSelectionChanged: _selectionMode
+                  ? (bool value) => setState(() => _selected = value)
+                  : null,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
