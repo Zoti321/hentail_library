@@ -7,7 +7,7 @@ abstract final class Md3eNavigationRailMetrics {
   static const double expandedWidth = 256;
 }
 
-/// One primary shell destination (home / library / history / settings).
+/// One primary shell destination (home / library / manage / history / settings).
 class Md3eNavigationRailDestination {
   const Md3eNavigationRailDestination({
     required this.label,
@@ -66,7 +66,7 @@ class Md3eNavigationRail extends StatelessWidget {
   }
 }
 
-/// Default four destinations matching Figma `41:1577` labels and icons.
+/// Default shell destinations aligned with production nav labels ([AppNavigation]).
 List<Md3eNavigationRailDestination> md3eDefaultNavigationRailDestinations() {
   return const <Md3eNavigationRailDestination>[
     Md3eNavigationRailDestination(
@@ -75,9 +75,14 @@ List<Md3eNavigationRailDestination> md3eDefaultNavigationRailDestinations() {
       selectedIcon: Icons.home,
     ),
     Md3eNavigationRailDestination(
-      label: '书库',
-      icon: Icons.library_books_outlined,
-      selectedIcon: Icons.library_books,
+      label: '漫画库',
+      icon: Icons.auto_stories_outlined,
+      selectedIcon: Icons.auto_stories,
+    ),
+    Md3eNavigationRailDestination(
+      label: '管理',
+      icon: Icons.layers_outlined,
+      selectedIcon: Icons.layers,
     ),
     Md3eNavigationRailDestination(
       label: '历史',

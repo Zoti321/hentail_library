@@ -293,29 +293,13 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               name: 'Md3eNavigationRail',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Collapsed',
+                  name: '600h · menu toggles width',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: SizedBox(
                         height: 600,
-                        child: _Md3eNavigationRailPreview(
-                          initialExtended: false,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Expanded',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: SizedBox(
-                        height: 600,
-                        child: _Md3eNavigationRailPreview(
-                          initialExtended: true,
-                        ),
+                        child: const _Md3eNavigationRailPreview(),
                       ),
                     ),
                   ),
@@ -462,9 +446,7 @@ String _stateLabel(Md3eComicCardVisualState state) {
 }
 
 class _Md3eNavigationRailPreview extends StatefulWidget {
-  const _Md3eNavigationRailPreview({required this.initialExtended});
-
-  final bool initialExtended;
+  const _Md3eNavigationRailPreview();
 
   @override
   State<_Md3eNavigationRailPreview> createState() =>
@@ -472,7 +454,7 @@ class _Md3eNavigationRailPreview extends StatefulWidget {
 }
 
 class _Md3eNavigationRailPreviewState extends State<_Md3eNavigationRailPreview> {
-  late bool _extended = widget.initialExtended;
+  bool _extended = false;
   int _selectedIndex = 0;
 
   @override

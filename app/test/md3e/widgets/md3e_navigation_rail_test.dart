@@ -29,8 +29,8 @@ void main() {
       ),
     );
 
-    expect(find.text('书库'), findsOneWidget);
-    await tester.tap(find.text('书库'));
+    expect(find.text('漫画库'), findsOneWidget);
+    await tester.tap(find.text('漫画库'));
     await tester.pump();
     expect(selected, 1);
 
