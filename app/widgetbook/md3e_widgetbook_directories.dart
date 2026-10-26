@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/views/library_browse_list_preview_view.dart';
 import 'package:hentai_library/md3e/views/library_browse_preview_view.dart';
+import 'package:hentai_library/md3e/widgets/actions/md3e_catalog_view_mode_button_group.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
@@ -111,6 +112,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                         ],
                       ),
                     ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eCatalogViewModeButtonGroup',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Grid · List toggle',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Center(child: _Md3eCatalogViewModeButtonGroupPreview()),
                   ),
                 ),
               ],
@@ -521,6 +533,29 @@ String _stateLabel(Md3eComicCardVisualState state) {
       return 'Selection off';
     case Md3eComicCardVisualState.selectionSelected:
       return 'Selection on';
+  }
+}
+
+class _Md3eCatalogViewModeButtonGroupPreview extends StatefulWidget {
+  const _Md3eCatalogViewModeButtonGroupPreview();
+
+  @override
+  State<_Md3eCatalogViewModeButtonGroupPreview> createState() =>
+      _Md3eCatalogViewModeButtonGroupPreviewState();
+}
+
+class _Md3eCatalogViewModeButtonGroupPreviewState
+    extends State<_Md3eCatalogViewModeButtonGroupPreview> {
+  Md3eCatalogViewMode _mode = Md3eCatalogViewMode.grid;
+
+  @override
+  Widget build(BuildContext context) {
+    return Md3eCatalogViewModeButtonGroup(
+      mode: _mode,
+      onModeChanged: (Md3eCatalogViewMode value) {
+        setState(() => _mode = value);
+      },
+    );
   }
 }
 

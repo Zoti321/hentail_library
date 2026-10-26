@@ -16,6 +16,7 @@ export 'patterns/md3e_library_page_header.dart';
 export 'theme/md3e_theme.dart';
 export 'views/library_browse_list_preview_view.dart';
 export 'views/library_browse_preview_view.dart';
+export 'widgets/actions/md3e_catalog_view_mode_button_group.dart';
 export 'widgets/actions/md3e_filled_button.dart';
 export 'widgets/catalog/md3e_comic_card.dart';
 export 'widgets/catalog/md3e_comic_list_item.dart';
