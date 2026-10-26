@@ -5,11 +5,14 @@ import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
 import 'package:hentai_library/md3e/widgets/md3e_tag_input_field.dart';
+import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/widgets/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/md3e_navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'md3e_styles_widgetbook.dart';
+import 'md3e_widgetbook_desktop_gate.dart';
 import 'md3e_widgetbook_scope.dart';
 
 List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
@@ -252,6 +255,31 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                             onPressed: () {},
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eDesktopTitleBar',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Collapsed rail · 1024',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Md3eWidgetbookDesktopExpandedGate(
+                      child: Md3eDesktopTitleBar(
+                        railWidth: Md3eNavigationRailMetrics.collapsedWidth,
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Expanded rail · 1440',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Md3eWidgetbookDesktopExpandedGate(
+                      child: Md3eDesktopTitleBar(
+                        railWidth: Md3eNavigationRailMetrics.expandedWidth,
                       ),
                     ),
                   ),
