@@ -55,7 +55,10 @@ class Md3eComicCard extends StatelessWidget {
     return md3eShowsReadProgressStrip(readProgress);
   }
 
-  /// Grid row height at [maxCrossAxisExtent] (matches Baseline catalog formula).
+  /// Grid row height when the delegate cell width equals [maxCrossAxisExtent].
+  ///
+  /// Prefer [Md3eCatalogGridMetrics.mainAxisExtentForCellWidth] with the resolved
+  /// cell width from [Md3eCatalogGridMetrics.layoutForViewportWidth].
   static double gridMainAxisExtent({
     required double maxCrossAxisExtent,
     required double coverToInfoGap,
@@ -67,8 +70,7 @@ class Md3eComicCard extends StatelessWidget {
       coverToInfoGap: coverToInfoGap,
       infoBottomPadding: infoBottomPadding,
       hasSubtitle: hasSubtitle,
-    ).ceil() +
-        16;
+    ).ceilToDouble();
   }
 
   const Md3eComicCard({

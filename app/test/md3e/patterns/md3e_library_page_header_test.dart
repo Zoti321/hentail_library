@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/patterns/md3e_library_display_target_tabs.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
 
 import '../../support/pump_md3e_app.dart';
 
@@ -31,6 +32,7 @@ void main() {
       Md3eLibraryPageHeaderLayout.singleRowWithTabs,
     );
     expect(find.text('漫画库'), findsOneWidget);
+    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
     expect(find.byType(M3ETabs), findsOneWidget);
   });
 
@@ -54,6 +56,7 @@ void main() {
       Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.large),
       Md3eLibraryPageHeaderLayout.singleRowWithTabs,
     );
+    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
     expect(find.byType(M3ETabs), findsOneWidget);
   });
 
@@ -77,6 +80,7 @@ void main() {
       Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.medium),
       Md3eLibraryPageHeaderLayout.singleRowWithTabs,
     );
+    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
     expect(find.byType(M3ETabs), findsOneWidget);
   });
 
@@ -110,10 +114,10 @@ void main() {
       Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.medium),
       Md3eLibraryPageHeaderLayout.singleRowWithTabs,
     );
-    expect(find.byType(Column), findsNothing);
+    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
   });
 
-  testWidgets('compact uses two rows with fill-width tabs', (
+  testWidgets('compact uses single row with centered tabs', (
     WidgetTester tester,
   ) async {
     await pumpMd3eApp(
@@ -138,14 +142,15 @@ void main() {
 
     expect(
       Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.compact),
-      Md3eLibraryPageHeaderLayout.twoRowTabsBelow,
+      Md3eLibraryPageHeaderLayout.singleRowWithTabs,
     );
+    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
     expect(find.byType(M3ETabs), findsOneWidget);
-    expect(
-      Md3eLibraryPageHeaderMetrics.tabThemeFor(
-        Md3eWindowSizeClass.compact,
-      ).height,
-      40,
-    );
+    final M3ETabTheme tabTheme =
+        Md3eLibraryPageHeaderMetrics.displayTargetTabThemeFor(
+          Md3eWindowSizeClass.compact,
+        );
+    expect(tabTheme.dividerHeight, 0);
+    expect(tabTheme.indicatorInset, -2);
   });
 }

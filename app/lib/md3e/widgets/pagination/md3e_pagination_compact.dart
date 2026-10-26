@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/interaction/md3e_pointer_target.dart';
+import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_compact_summary.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -50,10 +51,10 @@ class Md3ePaginationCompact extends StatelessWidget {
             onTap: enabled ? onOpenPagePicker : null,
             child: SizedBox(
               width: Md3ePaginationMetrics.compactPageSummaryMinWidth,
-              child: Text(
-                '$page / $totalPages',
+              child: Md3ePaginationCompactSummary(
+                page: page,
+                totalPages: totalPages,
                 style: summaryStyle,
-                textAlign: TextAlign.center,
               ),
             ),
           ),

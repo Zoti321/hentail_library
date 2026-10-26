@@ -1,21 +1,17 @@
-import 'dart:math' as math;
+export 'md3e_library_display_target.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/patterns/md3e_library_display_target.dart';
+import 'package:hentai_library/md3e/patterns/md3e_library_display_target_tabs.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Library catalog display target (comics grid vs series grid).
-enum Md3eLibraryDisplayTarget {
-  comics,
-  series,
-}
-
 /// Default page-size choices for the overflow submenu (Lab).
 const List<int> kMd3eLibraryPageSizeOptions = <int>[20, 50, 100, 200];
 
-/// 漫画库页内头部：标题、[M3ETabs]、操作按钮（Lab pattern）。
+/// 漫画库页内头部：标题、显示目标 tabs、操作按钮（Lab pattern）。
 class Md3eLibraryPageHeader extends StatelessWidget {
   const Md3eLibraryPageHeader({
     super.key,
@@ -51,54 +47,24 @@ class Md3eLibraryPageHeader extends StatelessWidget {
             : windowWidth;
         final Md3eWindowSizeClass sizeClass =
             Md3eWindowSizeClass.fromWidth(windowWidth);
-        final Md3eLibraryPageHeaderLayout layout =
-            Md3eLibraryPageHeaderMetrics.layoutFor(sizeClass);
-        final bool singleRow =
-            layout == Md3eLibraryPageHeaderLayout.singleRowWithTabs;
-
-        final Widget toolbar = _Md3eLibraryPageHeaderToolbar(
-          title: title,
-          displayTarget: displayTarget,
-          sizeClass: sizeClass,
-          viewportWidth: contentWidth,
-          embedTabs: singleRow,
-          onDisplayTargetChanged: onDisplayTargetChanged,
-          onFilterSort: onFilterSort,
-          overflowMenuEntries: overflowMenuEntries,
-          pageSize: pageSize,
-          onPageSizeChanged: onPageSizeChanged,
-          pageSizeOptions: pageSizeOptions,
-          filterSortActive: filterSortActive,
-        );
-
-        final Widget? tabsRow = onDisplayTargetChanged == null || singleRow
-            ? null
-            : _Md3eLibraryDisplayTargetTabs(
-                displayTarget: displayTarget,
-                sizeClass: sizeClass,
-                onChanged: onDisplayTargetChanged!,
-              );
-
         return Padding(
           padding: const EdgeInsets.symmetric(
             vertical: Md3eLibraryPageHeaderMetrics.verticalPadding,
           ),
-          child: switch (layout) {
-            Md3eLibraryPageHeaderLayout.singleRowWithTabs => toolbar,
-            Md3eLibraryPageHeaderLayout.twoRowTabsBelow => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                toolbar,
-                if (tabsRow != null) ...<Widget>[
-                  const SizedBox(
-                    height: Md3eLibraryPageHeaderMetrics.tabsRowTopGap,
-                  ),
-                  tabsRow,
-                ],
-              ],
-            ),
-          },
+          child: _Md3eLibraryPageHeaderToolbar(
+            title: title,
+            displayTarget: displayTarget,
+            sizeClass: sizeClass,
+            viewportWidth: contentWidth,
+            embedTabs: onDisplayTargetChanged != null,
+            onDisplayTargetChanged: onDisplayTargetChanged,
+            onFilterSort: onFilterSort,
+            overflowMenuEntries: overflowMenuEntries,
+            pageSize: pageSize,
+            onPageSizeChanged: onPageSizeChanged,
+            pageSizeOptions: pageSizeOptions,
+            filterSortActive: filterSortActive,
+          ),
         );
       },
     );
@@ -161,7 +127,7 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
     );
 
     final Widget? inlineTabs = embedTabs && onDisplayTargetChanged != null
-        ? _Md3eLibraryDisplayTargetTabs(
+        ? Md3eLibraryDisplayTargetTabs(
             displayTarget: displayTarget,
             sizeClass: sizeClass,
             onChanged: onDisplayTargetChanged!,
@@ -186,12 +152,6 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
       );
     }
 
-    final double tabsMaxWidth =
-        Md3eLibraryPageHeaderMetrics.centeredTabsMaxWidth(
-          viewportWidth,
-          sizeClass,
-        );
-
     return SizedBox(
       height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
       child: Stack(
@@ -209,54 +169,8 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
               actions,
             ],
           ),
-          SizedBox(
-            width: math.min(tabsMaxWidth, viewportWidth),
-            child: inlineTabs,
-          ),
+          inlineTabs,
         ],
-      ),
-    );
-  }
-}
-
-class _Md3eLibraryDisplayTargetTabs extends StatelessWidget {
-  const _Md3eLibraryDisplayTargetTabs({
-    required this.displayTarget,
-    required this.sizeClass,
-    required this.onChanged,
-  });
-
-  final Md3eLibraryDisplayTarget displayTarget;
-  final Md3eWindowSizeClass sizeClass;
-  final ValueChanged<Md3eLibraryDisplayTarget> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final int selectedIndex = displayTarget == Md3eLibraryDisplayTarget.comics
-        ? 0
-        : 1;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3ETabTheme tabTheme =
-        Md3eLibraryPageHeaderMetrics.tabThemeFor(sizeClass);
-
-    return M3ETheme(
-      data: theme.copyWith(tabTheme: tabTheme),
-      child: M3ETabs(
-        variant: M3ETabsVariant.secondary,
-        alignment: M3ETabsAlignment.fill,
-        scrollable: false,
-        tabs: const <M3ETab>[
-          M3ETab(label: '漫画'),
-          M3ETab(label: '系列'),
-        ],
-        selectedIndex: selectedIndex,
-        onTabSelected: (int index) {
-          onChanged(
-            index == 0
-                ? Md3eLibraryDisplayTarget.comics
-                : Md3eLibraryDisplayTarget.series,
-          );
-        },
       ),
     );
   }

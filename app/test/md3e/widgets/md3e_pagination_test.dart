@@ -33,22 +33,27 @@ void main() {
     var page = 2;
     await pumpMd3eApp(
       tester,
-      home: Center(
-        child: SizedBox(
-          width: Md3eBreakpoints.previewWidthCompact,
-          child: Md3ePagination(
-            page: page,
-            totalPages: 5,
-            onPageChanged: (int value) => page = value,
-          ),
-        ),
+      home: StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return Center(
+            child: SizedBox(
+              width: Md3eBreakpoints.previewWidthCompact,
+              child: Md3ePagination(
+                page: page,
+                totalPages: 5,
+                onPageChanged: (int value) => setState(() => page = value),
+              ),
+            ),
+          );
+        },
       ),
     );
     expect(find.byType(M3EIconButton), findsNWidgets(2));
     expect(find.text('2 / 5'), findsOneWidget);
     await tester.tap(find.byIcon(Icons.chevron_right));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(page, 3);
+    expect(find.text('3 / 5'), findsOneWidget);
   });
 
   testWidgets('standard layout shows numeric page controls', (

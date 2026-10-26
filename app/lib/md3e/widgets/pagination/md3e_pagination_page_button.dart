@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
-import 'package:material_3_expressive/foundations/foundations.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Single page number control in the standard pagination strip.
 class Md3ePaginationPageButton extends StatelessWidget {
@@ -17,33 +18,65 @@ class Md3ePaginationPageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
+    final M3ETabTheme tabTheme = theme.tabTheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final TextStyle? labelStyle = textTheme.labelLarge?.copyWith(
-      color: selected ? scheme.onPrimaryContainer : scheme.onSurface,
+    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
+    final Duration duration = Md3eMotion.motionDurationOf(
+      context,
+      Md3eMotion.durationShort,
     );
-
-    final Widget face = Container(
-      width: Md3ePaginationMetrics.pageButtonVisualSize,
-      height: Md3ePaginationMetrics.pageButtonVisualSize,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: selected ? scheme.primaryContainer : null,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text('$page', style: labelStyle),
+    final Curve enterCurve = Md3eMotion.curveForStateEnter(
+      reduceMotion: reduceMotion,
+    );
+    final Curve exitCurve = Md3eMotion.curveForStateExit(
+      reduceMotion: reduceMotion,
     );
 
     return SizedBox(
       width: Md3ePaginationMetrics.pageButtonSlotWidth,
       height: Md3ePaginationMetrics.pageButtonSlotWidth,
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(8),
-          child: Center(child: face),
-        ),
+      child: M3ETappable(
+        onTap: onPressed,
+        enabled: onPressed != null,
+        semanticLabel: '第 $page 页',
+        builder: (BuildContext context, M3EInteractionState state) {
+          final double stateAlpha = tabTheme.stateOpacity(
+            hovered: state.hovered,
+            focused: state.focused,
+            pressed: state.pressed,
+          );
+          final Color stateColor = tabTheme.stateLayerColor(
+            scheme,
+            variant: M3ETabsVariant.primary,
+            selected: selected,
+          );
+          final Color? fill = selected
+              ? scheme.primaryContainer
+              : stateAlpha > 0
+              ? stateColor.withValues(alpha: stateAlpha)
+              : null;
+
+          final TextStyle? labelStyle = textTheme.labelLarge?.copyWith(
+            color: selected ? scheme.onPrimaryContainer : scheme.onSurface,
+          );
+
+          return Center(
+            child: AnimatedContainer(
+              duration: duration,
+              curve: selected ? enterCurve : exitCurve,
+              width: Md3ePaginationMetrics.pageButtonVisualSize,
+              height: Md3ePaginationMetrics.pageButtonVisualSize,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: fill,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text('$page', style: labelStyle),
+            ),
+          );
+        },
       ),
     );
   }
