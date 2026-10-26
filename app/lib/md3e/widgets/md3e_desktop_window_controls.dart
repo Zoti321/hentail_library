@@ -94,11 +94,11 @@ class _Md3eWindowControlButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return M3EIconButton(
-      icon: Icon(icon, size: 16),
+      icon: Icon(icon, size: Md3eDesktopTitleBarMetrics.windowButtonIconSize),
       tooltip: tooltip,
       onPressed: onPressed,
       variant: M3EIconButtonVariant.standard,
-      size: M3EIconButtonSize.xs,
+      size: M3EIconButtonSize.sm,
       visualSize: Md3eDesktopWindowControls._buttonVisual,
       inflateHitTarget: false,
       decoration: decoration,

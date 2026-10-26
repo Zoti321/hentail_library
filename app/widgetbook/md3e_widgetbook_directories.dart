@@ -4,6 +4,7 @@ import 'package:hentai_library/md3e/views/library_browse_preview_view.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
+import 'package:hentai_library/md3e/patterns/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/widgets/md3e_tag_input_field.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/widgets/md3e_desktop_title_bar.dart';
@@ -335,6 +336,23 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
         WidgetbookFolder(
           name: 'patterns',
           children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'Md3eDesktopShell',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: '1024×768 · menu toggles rail',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Md3eWidgetbookDesktopExpandedGate(
+                      child: Md3eDesktopShell(
+                        width: Md3eBreakpoints.previewWidthExpanded,
+                        height: 768,
+                        initialRailExtended: false,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'ComicDetailMetadataTags',
               useCases: <WidgetbookUseCase>[

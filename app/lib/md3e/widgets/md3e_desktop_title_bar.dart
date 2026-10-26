@@ -12,7 +12,8 @@ import 'package:material_ui/material_ui.dart' show WidgetStatePropertyAll;
 class Md3eDesktopTitleBar extends StatelessWidget {
   const Md3eDesktopTitleBar({
     super.key,
-    required this.railWidth,
+    this.railWidth = 0,
+    this.searchLeadingInset,
     this.searchHint = '搜索…',
     this.searchController,
     this.onSearchSubmitted,
@@ -23,8 +24,12 @@ class Md3eDesktopTitleBar extends StatelessWidget {
     this.onWindowClose,
   });
 
-  /// Width of the navigation rail column (collapsed 80 or expanded 256).
+  /// Simulated rail column width for **isolated** title-bar previews only.
   final double railWidth;
+
+  /// Space before the search field. When null, uses [railWidth] + pane gutter (24).
+  /// Use `0` in [Md3eDesktopShell] so search aligns with the main pane leading edge.
+  final double? searchLeadingInset;
 
   final String searchHint;
   final TextEditingController? searchController;
@@ -52,7 +57,8 @@ class Md3eDesktopTitleBar extends StatelessWidget {
                 ? Md3eDesktopTitleBarMetrics.windowControlsWidth +
                     Md3eDesktopTitleBarMetrics.windowControlsTrailing
                 : 0;
-            final double leadingWidth = railWidth + paneGutter;
+            final double leadingWidth =
+                searchLeadingInset ?? (railWidth + paneGutter);
             final double availableSearch =
                 constraints.maxWidth - leadingWidth - controlsWidth;
             final double searchMax =
@@ -60,29 +66,29 @@ class Md3eDesktopTitleBar extends StatelessWidget {
             final double resolvedSearchWidth = searchWidth.clamp(0, searchMax);
 
             return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                SizedBox(width: railWidth),
-                SizedBox(width: paneGutter),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: Md3eDesktopTitleBarMetrics.searchTopInset,
-                  ),
-                  child: SizedBox(
-                    width: resolvedSearchWidth,
-                    height: Md3eDesktopTitleBarMetrics.searchHeight,
-                    child: _Md3eTitleBarSearchField(
-                      hintText: searchHint,
-                      controller: searchController,
-                      onSubmitted: onSearchSubmitted,
+                if (leadingWidth > 0) SizedBox(width: leadingWidth),
+                if (resolvedSearchWidth > 0)
+                  Expanded(
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: SizedBox(
+                        width: resolvedSearchWidth,
+                        height: Md3eDesktopTitleBarMetrics.searchHeight,
+                        child: _Md3eTitleBarSearchField(
+                          hintText: searchHint,
+                          controller: searchController,
+                          onSubmitted: onSearchSubmitted,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const Expanded(child: SizedBox.shrink()),
+                  )
+                else
+                  const Spacer(),
                 if (showWindowControls)
                   Padding(
                     padding: const EdgeInsets.only(
-                      top: Md3eDesktopTitleBarMetrics.windowButtonTopInset,
                       right:
                           Md3eDesktopTitleBarMetrics.windowControlsTrailing,
                     ),

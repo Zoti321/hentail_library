@@ -32,6 +32,11 @@ M3EThemeData _applyMd3eLabOverrides(M3EThemeData base) {
       expandedMinWidth: 256,
       expandedMaxWidth: 256,
       containerColor: colors.surfaceContainerLow,
+      // MASTER §5.1: menu icon vertical center on 64dp title band (y=32).
+      // M3E menu uses 48dp target below [topSpace]; 8 + 24 = 32.
+      topSpace: 8,
+      // Keep first destination icon ~y=104 when [topSpace] is tightened vs M3E default.
+      destinationTopPadding: 24,
       // Default M3E gap is 4dp; MASTER shell needs visible separation between rows.
       itemVerticalGap: 8,
       expandedItemGap: 8,
