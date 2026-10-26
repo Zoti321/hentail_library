@@ -11,6 +11,7 @@ import 'package:hentai_library/md3e/widgets/md3e_tag_input_field.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/widgets/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/md3e_navigation_rail.dart';
+import 'package:hentai_library/md3e/widgets/md3e_pagination.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -307,6 +308,38 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
+              name: 'Md3ePagination',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Compact 390w · 10 pages',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: SizedBox(
+                      width: Md3eBreakpoints.previewWidthCompact,
+                      child: const _Md3ePaginationPreview(
+                        totalPages: 10,
+                        totalItems: 100,
+                        pageSize: 10,
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Standard 1024w · page window',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: SizedBox(
+                      width: Md3eBreakpoints.previewWidthExpanded,
+                      child: const _Md3ePaginationPreview(
+                        totalPages: 12,
+                        totalItems: 120,
+                        pageSize: 10,
+                        initialPage: 5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
               name: 'Md3eTagInputField',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
@@ -442,6 +475,43 @@ String _stateLabel(Md3eComicCardVisualState state) {
       return 'Selection off';
     case Md3eComicCardVisualState.selectionSelected:
       return 'Selection on';
+  }
+}
+
+class _Md3ePaginationPreview extends StatefulWidget {
+  const _Md3ePaginationPreview({
+    required this.totalPages,
+    this.totalItems,
+    this.pageSize,
+    this.initialPage = 1,
+  });
+
+  final int totalPages;
+  final int? totalItems;
+  final int? pageSize;
+  final int initialPage;
+
+  @override
+  State<_Md3ePaginationPreview> createState() => _Md3ePaginationPreviewState();
+}
+
+class _Md3ePaginationPreviewState extends State<_Md3ePaginationPreview> {
+  late int _page = widget.initialPage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Md3ePagination(
+          page: _page,
+          totalPages: widget.totalPages,
+          totalItems: widget.totalItems,
+          pageSize: widget.pageSize,
+          onPageChanged: (int page) => setState(() => _page = page),
+        ),
+      ],
+    );
   }
 }
 

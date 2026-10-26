@@ -22,4 +22,5 @@ export 'widgets/md3e_comic_list_item.dart';
 export 'widgets/md3e_cover_read_progress_strip.dart';
 export 'widgets/md3e_filled_button.dart';
 export 'widgets/md3e_navigation_rail.dart';
+export 'widgets/md3e_pagination.dart';
 export 'widgets/md3e_tag_input_field.dart';
