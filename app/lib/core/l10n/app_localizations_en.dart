@@ -2119,6 +2119,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String readingProgressPageOfTotal(int current, int total) {
+    return '$current/$total';
+  }
+
+  @override
   String get historyDeleteRecord => 'Delete entry';
 
   @override

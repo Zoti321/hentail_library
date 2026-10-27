@@ -3702,6 +3702,12 @@ abstract class AppLocalizations {
   /// **'第 {page} 页'**
   String readingProgressPage(int page);
 
+  /// No description provided for @readingProgressPageOfTotal.
+  ///
+  /// In zh, this message translates to:
+  /// **'{current}/{total}'**
+  String readingProgressPageOfTotal(int current, int total);
+
   /// No description provided for @historyDeleteRecord.
   ///
   /// In zh, this message translates to:

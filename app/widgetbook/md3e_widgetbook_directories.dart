@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/widgets/actions/md3e_catalog_view_mode_button_group.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
+import 'package:hentai_library/md3e/layout/md3e_reading_history_list_layout.dart';
+import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item.dart';
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_meta_chip_row.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
@@ -84,6 +86,31 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                       child: _md3eComicListItemKnobsPreview(
                         context,
                         cover: _demoCover(context),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eReadingHistoryListItem',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Md3eReadingHistoryListLayout(
+                          itemCount: 6,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _Md3eReadingHistoryListItemPreview(
+                              title: _demoReadingHistoryTitles[index % 3],
+                              cover: _demoCover(context),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -274,6 +301,43 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
 
 /// Sample read progress on Md3eComicCard / Md3eComicListItem Widgetbook examples.
 const double kMd3eWidgetbookComicReadProgress = 0.42;
+
+const List<String> _demoReadingHistoryTitles = <String>[
+  '只有神知道的世界',
+  '葬送的芙莉莲',
+  '迷宫饭',
+];
+
+class _Md3eReadingHistoryListItemPreview extends StatelessWidget {
+  const _Md3eReadingHistoryListItemPreview({
+    required this.cover,
+    this.title = '只有神知道的世界',
+  });
+
+  final Widget cover;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Md3eReadingHistoryListItem(
+      title: title,
+      cover: cover,
+      currentPage: 42,
+      totalPages: 208,
+      lastReadTime: DateTime.now().subtract(const Duration(hours: 2)),
+      onTap: () {},
+      onContinueReading: () {},
+      moreMenuEntries: _demoReadingHistoryMoreMenu(),
+    );
+  }
+}
+
+List<Md3eReadingHistoryMoreMenuEntry> _demoReadingHistoryMoreMenu() {
+  return const <Md3eReadingHistoryMoreMenuEntry>[
+    Md3eReadingHistoryMoreMenuEntry(label: '删除记录'),
+    Md3eReadingHistoryMoreMenuEntry(label: '在资源管理器中显示'),
+  ];
+}
 
 List<Md3eComicListMoreMenuEntry> _demoComicListMoreMenu() {
   return const <Md3eComicListMoreMenuEntry>[

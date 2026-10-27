@@ -1005,6 +1005,13 @@
       "page": {"type": "int"}
     }
   },
+  "readingProgressPageOfTotal": "{current}/{total}",
+  "@readingProgressPageOfTotal": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
   "historyDeleteRecord": "Delete entry",
   "bootstrapStartupFailed": "Startup failed: {error}",
   "@bootstrapStartupFailed": {
