@@ -5,6 +5,7 @@ import 'package:hentai_library/md3e/layout/md3e_comic_detail_page_metrics.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_entry.dart';
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_page_header.dart';
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_scroll_content.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -153,7 +154,7 @@ class _Md3eComicDetailPageState extends State<Md3eComicDetailPage> {
     );
 
     return ColoredBox(
-      color: scheme.surface,
+      color: md3eLabBrowseCanvasColor(scheme),
       child: Stack(
         children: <Widget>[
           CustomScrollView(

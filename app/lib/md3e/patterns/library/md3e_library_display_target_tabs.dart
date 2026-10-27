@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -54,10 +55,20 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
           textDirection: Directionality.of(context),
         );
 
+    // M3ETabs bar fill is [M3ETabTheme.backgroundColor] → `scheme.surface` (M3 spec).
+    // Lab browse canvas is [md3eLabBrowseCanvasColor]; alias surface locally so the
+    // bar matches the page without repainting the whole scroll view.
+    final M3EColorScheme tabsColorScheme = scheme.copyWith(
+      surface: md3eLabBrowseCanvasColor(scheme),
+    );
+
     final Widget tabs = SizedBox(
       width: barWidth,
       child: M3ETheme(
-        data: theme.copyWith(tabTheme: tabTheme),
+        data: theme.copyWith(
+          colorScheme: tabsColorScheme,
+          tabTheme: tabTheme,
+        ),
         child: M3ETabs(
           variant: M3ETabsVariant.primary,
           scrollable: true,

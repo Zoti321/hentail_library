@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
+/// Catalog / browse 页画布色，与 [Md3eDesktopShellSurfaceRoles.lab] 主区一致。
+Color md3eLabBrowseCanvasColor(M3EColorScheme scheme) =>
+    scheme.surfaceContainerLowest;
+
 /// Region fills for [Md3eDesktopShell] (decoupled from MASTER product mapping).
 ///
 /// **Tone-based preview (A)** follows the roles-page pairing cited in
@@ -27,7 +31,7 @@ class Md3eDesktopShellSurfaceRoles {
   /// Lab preview: window chrome = rail; content card clipped on the leading edge.
   factory Md3eDesktopShellSurfaceRoles.lab(M3EColorScheme scheme) {
     final Color rail = scheme.surfaceContainerLow;
-    final Color content = scheme.surfaceContainerLowest;
+    final Color content = md3eLabBrowseCanvasColor(scheme);
     return Md3eDesktopShellSurfaceRoles(
       shellBackground: rail,
       titleBarBackground: content,

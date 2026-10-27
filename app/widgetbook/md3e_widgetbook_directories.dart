@@ -39,6 +39,8 @@ import 'package:widgetbook/widgetbook.dart';
 import 'md3e_widgetbook_desktop_gate.dart';
 import 'md3e_widgetbook_scope.dart';
 
+part 'md3e_widgetbook_desktop_app_prototype.dart';
+
 List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
   return <WidgetbookNode>[
     WidgetbookFolder(
@@ -278,6 +280,21 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                       ),
                     ),
                   ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'scenarios',
+          children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'Md3eLabDesktopApp',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Shell + primary destinations',
+                  builder: (BuildContext context) =>
+                      const _Md3eLabDesktopAppPrototype(),
                 ),
               ],
             ),

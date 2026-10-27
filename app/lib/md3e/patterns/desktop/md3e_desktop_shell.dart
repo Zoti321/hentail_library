@@ -22,6 +22,10 @@ abstract final class Md3eDesktopShellMetrics {
   static const double titleBarContentPadding = 24;
 }
 
+/// Builds the main pane for [Md3eDesktopShell] from the selected rail index.
+typedef Md3eDesktopShellPaneBuilder =
+    Widget Function(BuildContext context, int destinationIndex);
+
 /// Desktop window shell: animated [Md3eNavigationRail] + clipped content card.
 ///
 /// Window fill uses [Md3eDesktopShellSurfaceRoles.shellBackground] (same as rail).
@@ -35,6 +39,7 @@ class Md3eDesktopShell extends StatefulWidget {
     this.initialRailExtended = false,
     this.destinations,
     this.paneChild,
+    this.paneBuilder,
     this.surfaceRoles,
   });
 
@@ -43,6 +48,9 @@ class Md3eDesktopShell extends StatefulWidget {
   final bool initialRailExtended;
   final List<Md3eNavigationRailDestination>? destinations;
   final Widget? paneChild;
+
+  /// When set, builds the pane from the current rail selection (overrides [paneChild]).
+  final Md3eDesktopShellPaneBuilder? paneBuilder;
 
   /// When null, uses [Md3eDesktopShellSurfaceRoles.lab] (MASTER-aligned lab default).
   final Md3eDesktopShellSurfaceRoles? surfaceRoles;
@@ -111,7 +119,12 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
                     Expanded(
                       child: Md3eDesktopShellPane(
                         showDecoration: false,
-                        child: widget.paneChild,
+                        child: widget.paneBuilder != null
+                            ? widget.paneBuilder!(
+                                context,
+                                _selectedIndex,
+                              )
+                            : widget.paneChild,
                       ),
                     ),
                   ],
