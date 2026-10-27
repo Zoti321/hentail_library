@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

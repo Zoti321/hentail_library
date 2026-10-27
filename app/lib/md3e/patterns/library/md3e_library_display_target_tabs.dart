@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_display_target.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_display_target.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画 / 系列切换：[`M3ETabs`] primary + 局部 [`M3ETabTheme`]（动画指示条、state layer）。

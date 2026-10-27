@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_catalog_toolbar.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_create_interaction.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_facet_chip_wrap.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_create_entity_dialog.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_draft_entity_chip.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_page_header.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_pinned_header_delegate.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_catalog_toolbar.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_facet_chip_wrap.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_create_entity_dialog.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_draft_entity_chip.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_page_header.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_management_create_entity_fab.dart';
 
 /// 管理页 Lab 壳层：粘滞标题 + 胶囊维度条 + 流式 chip 列表。

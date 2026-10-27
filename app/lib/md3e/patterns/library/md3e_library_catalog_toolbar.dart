@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_display_target.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_display_target_tabs.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_display_target.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_display_target_tabs.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Body-top catalog row: display-target tabs (start) + active count (end).

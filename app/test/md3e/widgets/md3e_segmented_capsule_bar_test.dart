@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 
 import '../../support/pump_md3e_app.dart';

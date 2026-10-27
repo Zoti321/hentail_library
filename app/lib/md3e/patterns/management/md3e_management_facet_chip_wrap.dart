@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
+import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_meta_chip_row.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 管理页当前维度条目：流式 [M3EChip]（suggestion）。

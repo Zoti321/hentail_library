@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/patterns/md3e_desktop_shell_surfaces.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar_metrics.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';

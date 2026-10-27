@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
-import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_management_entity_name_field.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

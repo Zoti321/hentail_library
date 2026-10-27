@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_filter_sort_metrics.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const String _kMd3eLibraryFilterSortSideSheetTitle = '筛选与排序';
