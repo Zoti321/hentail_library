@@ -468,20 +468,11 @@ Widget _md3eComicDetailPageKnobsPreview(BuildContext context) {
     description: '控制摘要区 R18 年龄限制 chip 是否显示。',
     initialValue: true,
   );
+  final Md3eComicDetailEntry entry = Md3eComicDetailPagePreviewData.sample()
+      .copyWith(showAgeRestrictionChip: showAgeRestriction);
   return Md3eComicDetailPage(
-    entry: Md3eComicDetailPagePreviewData.sample().copyWith(
-      showAgeRestrictionChip: showAgeRestriction,
-    ),
-    onEdit: () {
-      showMd3eComicMetadataEdit(
-        context: context,
-        initialDraft: Md3eComicMetadataEditDraft.fromEntry(
-          Md3eComicDetailPagePreviewData.sample().copyWith(
-            showAgeRestrictionChip: showAgeRestriction,
-          ),
-        ),
-      );
-    },
+    entry: entry,
+    onEdit: () => _md3eWidgetbookOpenLabComicMetadataEdit(context, entry: entry),
   );
 }
 
@@ -496,22 +487,15 @@ Widget _md3eSeriesDetailPageKnobsPreview(BuildContext context) {
     description: '控制 Parody / Author / Tag 等 chip 区块。',
     initialValue: true,
   );
-  return Md3eSeriesDetailPage(
-    entry: Md3eSeriesDetailPagePreviewData.sample().copyWith(
-      showAgeRestrictionChip: showAgeRestriction,
-      showMetadataBlock: showMetadata,
-    ),
-    onEdit: () {
-      showMd3eSeriesMetadataEdit(
-        context: context,
-        initialDraft: Md3eSeriesMetadataEditDraft.fromEntry(
-          Md3eSeriesDetailPagePreviewData.sample().copyWith(
-            showAgeRestrictionChip: showAgeRestriction,
-            showMetadataBlock: showMetadata,
-          ),
-        ),
+  final Md3eSeriesDetailEntry entry = Md3eSeriesDetailPagePreviewData.sample()
+      .copyWith(
+        showAgeRestrictionChip: showAgeRestriction,
+        showMetadataBlock: showMetadata,
       );
-    },
+  return Md3eSeriesDetailPage(
+    entry: entry,
+    onEdit: () => _md3eWidgetbookOpenLabSeriesMetadataEdit(context, entry: entry),
+    onComicTap: (_) => md3eWidgetbookPushLabComicDetail(context),
   );
 }
 

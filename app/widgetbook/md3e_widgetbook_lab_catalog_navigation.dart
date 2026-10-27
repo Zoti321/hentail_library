@@ -6,17 +6,59 @@ void md3eWidgetbookOpenLabCatalogDetail(
   required LibraryDisplayTarget displayTarget,
 }) {
   final Widget page = switch (displayTarget) {
-    LibraryDisplayTarget.comics => Md3eComicDetailPage(
-      entry: Md3eComicDetailPagePreviewData.sample(),
-      onBack: () => Navigator.of(context).pop(),
-    ),
-    LibraryDisplayTarget.series => Md3eSeriesDetailPage(
-      entry: Md3eSeriesDetailPagePreviewData.sample(),
-      onBack: () => Navigator.of(context).pop(),
-    ),
+    LibraryDisplayTarget.comics => _md3eWidgetbookLabComicDetailPage(context),
+    LibraryDisplayTarget.series => _md3eWidgetbookLabSeriesDetailPage(context),
   };
 
   Navigator.of(context).push<void>(
     MaterialPageRoute<void>(builder: (BuildContext _) => page),
+  );
+}
+
+void md3eWidgetbookPushLabComicDetail(BuildContext context) {
+  Navigator.of(context).push<void>(
+    MaterialPageRoute<void>(
+      builder: (BuildContext routeContext) =>
+          _md3eWidgetbookLabComicDetailPage(routeContext),
+    ),
+  );
+}
+
+Widget _md3eWidgetbookLabComicDetailPage(BuildContext context) {
+  final Md3eComicDetailEntry entry = Md3eComicDetailPagePreviewData.sample();
+  return Md3eComicDetailPage(
+    entry: entry,
+    onBack: () => Navigator.of(context).pop(),
+    onEdit: () => _md3eWidgetbookOpenLabComicMetadataEdit(context, entry: entry),
+  );
+}
+
+Widget _md3eWidgetbookLabSeriesDetailPage(BuildContext context) {
+  final Md3eSeriesDetailEntry entry = Md3eSeriesDetailPagePreviewData.sample();
+  return Md3eSeriesDetailPage(
+    entry: entry,
+    onBack: () => Navigator.of(context).pop(),
+    onEdit: () => _md3eWidgetbookOpenLabSeriesMetadataEdit(context, entry: entry),
+    onComicTap: (_) => md3eWidgetbookPushLabComicDetail(context),
+  );
+}
+
+void _md3eWidgetbookOpenLabComicMetadataEdit(
+  BuildContext context, {
+  required Md3eComicDetailEntry entry,
+}) {
+  showMd3eComicMetadataEdit(
+    context: context,
+    initialDraft: Md3eComicMetadataEditDraft.fromEntry(entry),
+  );
+}
+
+void _md3eWidgetbookOpenLabSeriesMetadataEdit(
+  BuildContext context, {
+  required Md3eSeriesDetailEntry entry,
+}) {
+  showMd3eSeriesMetadataEdit(
+    context: context,
+    initialDraft: Md3eSeriesMetadataEditDraft.fromEntry(entry),
   );
 }
