@@ -42,11 +42,19 @@ abstract final class Md3eLibraryBrowsePageMetrics {
     return Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(sizeClass);
   }
 
-  /// Gap below pinned header before the catalog toolbar (view mode).
+  /// Gap below pinned header before tabs + count row.
   static double catalogToolbarTopSpacing(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
       Md3eWindowSizeClass.compact => 16,
       _ => 24,
+    };
+  }
+
+  /// Gap between tabs row and view-mode controls.
+  static double catalogToolbarToViewModeSpacing(Md3eWindowSizeClass sizeClass) {
+    return switch (sizeClass) {
+      Md3eWindowSizeClass.compact => 12,
+      _ => 16,
     };
   }
 

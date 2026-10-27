@@ -26,6 +26,7 @@ void main() {
     );
 
     expect(find.text('漫画库'), findsOneWidget);
+    expect(find.text('1284 本'), findsOneWidget);
     expect(find.byType(Md3eCatalogViewModeButtonGroup), findsOneWidget);
   });
 }

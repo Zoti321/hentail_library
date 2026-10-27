@@ -15,11 +15,15 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
     required this.displayTarget,
     required this.sizeClass,
     required this.onChanged,
+    this.centered = true,
   });
 
   final Md3eLibraryDisplayTarget displayTarget;
   final Md3eWindowSizeClass sizeClass;
   final ValueChanged<Md3eLibraryDisplayTarget> onChanged;
+
+  /// When false, tabs align to the start (catalog toolbar / Kazumi-style row).
+  final bool centered;
 
   @override
   Widget build(BuildContext context) {
@@ -43,29 +47,32 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
           textDirection: Directionality.of(context),
         );
 
-    return Center(
-      child: SizedBox(
-        width: barWidth,
-        child: M3ETheme(
-          data: theme.copyWith(tabTheme: tabTheme),
-          child: M3ETabs(
-            variant: M3ETabsVariant.primary,
-            scrollable: true,
-            tabs: const <M3ETab>[
-              M3ETab(label: '漫画'),
-              M3ETab(label: '系列'),
-            ],
-            selectedIndex: selectedIndex,
-            onTabSelected: (int index) {
-              onChanged(
-                index == 0
-                    ? Md3eLibraryDisplayTarget.comics
-                    : Md3eLibraryDisplayTarget.series,
-              );
-            },
-          ),
+    final Widget tabs = SizedBox(
+      width: barWidth,
+      child: M3ETheme(
+        data: theme.copyWith(tabTheme: tabTheme),
+        child: M3ETabs(
+          variant: M3ETabsVariant.primary,
+          scrollable: true,
+          tabs: const <M3ETab>[
+            M3ETab(label: '漫画'),
+            M3ETab(label: '系列'),
+          ],
+          selectedIndex: selectedIndex,
+          onTabSelected: (int index) {
+            onChanged(
+              index == 0
+                  ? Md3eLibraryDisplayTarget.comics
+                  : Md3eLibraryDisplayTarget.series,
+            );
+          },
         ),
       ),
     );
+
+    if (centered) {
+      return Center(child: tabs);
+    }
+    return Align(alignment: Alignment.centerLeft, child: tabs);
   }
 }

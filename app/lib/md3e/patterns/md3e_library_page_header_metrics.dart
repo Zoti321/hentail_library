@@ -3,8 +3,11 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 /// Layout modes for [Md3eLibraryPageHeader] (MASTER §5.1 漫画库头部).
 enum Md3eLibraryPageHeaderLayout {
-  /// 标题 + 居中 [M3ETabs] + 操作，单行 44dp（含 compact）。
+  /// 标题 + 居中 [M3ETabs] + 操作，单行 44dp（Widgetbook 页头预览等）。
   singleRowWithTabs,
+
+  /// 标题 + 操作；漫画/系列 tabs 在 [Md3eLibraryCatalogToolbar]（随列表滚动）。
+  titleAndActionsOnly,
 }
 
 /// MASTER §5.1 漫画库页内头部尺寸。

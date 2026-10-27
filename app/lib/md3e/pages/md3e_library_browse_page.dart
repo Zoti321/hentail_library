@@ -4,6 +4,7 @@ import 'package:hentai_library/md3e/layout/md3e_catalog_grid.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid_metrics.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_list_layout.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
+import 'package:hentai_library/md3e/patterns/md3e_library_catalog_toolbar.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_pinned_header_delegate.dart';
 import 'package:hentai_library/md3e/widgets/actions/md3e_catalog_view_mode_button_group.dart';
@@ -27,6 +28,8 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
     this.onPageSizeChanged,
     this.overflowMenuEntries = const <M3EMenuNode>[],
     this.itemCount = 12,
+    this.comicCount = 1284,
+    this.seriesCount = 96,
     this.page = 1,
     this.totalPages = 1,
     this.onPageChanged,
@@ -44,6 +47,8 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
   final ValueChanged<int>? onPageSizeChanged;
   final List<M3EMenuNode> overflowMenuEntries;
   final int itemCount;
+  final int comicCount;
+  final int seriesCount;
 
   /// Current catalog page (1-based).
   final int page;
@@ -121,7 +126,6 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
           pageSize: widget.pageSize,
           onPageSizeChanged: widget.onPageSizeChanged,
           overflowMenuEntries: widget.overflowMenuEntries,
-          onDisplayTargetChanged: widget.onDisplayTargetChanged,
           onFilterSort: widget.onFilterSort,
         ),
       ),
@@ -143,12 +147,35 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
                   child: header,
                 ),
               ),
+            if (widget.onDisplayTargetChanged != null)
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontal,
+                  Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(
+                    sizeClass,
+                  ),
+                  horizontal,
+                  0,
+                ),
+                sliver: SliverToBoxAdapter(
+                  child: Md3eLibraryCatalogToolbar(
+                    displayTarget: widget.displayTarget,
+                    comicCount: widget.comicCount,
+                    seriesCount: widget.seriesCount,
+                    onDisplayTargetChanged: widget.onDisplayTargetChanged!,
+                  ),
+                ),
+              ),
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 horizontal,
-                Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(
-                  sizeClass,
-                ),
+                widget.onDisplayTargetChanged != null
+                    ? Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
+                        sizeClass,
+                      )
+                    : Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(
+                        sizeClass,
+                      ),
                 horizontal,
                 0,
               ),

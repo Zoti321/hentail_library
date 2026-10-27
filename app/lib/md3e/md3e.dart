@@ -14,6 +14,7 @@ export 'patterns/md3e_desktop_shell.dart';
 export 'patterns/md3e_desktop_shell_surfaces.dart';
 export 'patterns/md3e_library_filter_sort_metrics.dart';
 export 'patterns/md3e_library_display_target.dart';
+export 'patterns/md3e_library_catalog_toolbar.dart';
 export 'patterns/md3e_library_display_target_tabs.dart';
 export 'patterns/md3e_library_filter_sort_side_sheet.dart';
 export 'pages/md3e_library_browse_page.dart';
