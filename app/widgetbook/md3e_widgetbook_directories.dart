@@ -7,6 +7,7 @@ import 'package:hentai_library/md3e/patterns/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header.dart';
@@ -268,6 +269,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 ),
               ],
             ),
+            WidgetbookComponent(
+              name: 'Md3eManagementBrowsePage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: _Md3eManagementBrowsePagePreview(),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ],
@@ -459,6 +471,35 @@ Widget _md3ePaginationKnobsPreview(BuildContext context) {
     pageSize: 10,
     onPageChanged: (_) {},
   );
+}
+
+class _Md3eManagementBrowsePagePreview extends StatefulWidget {
+  const _Md3eManagementBrowsePagePreview();
+
+  @override
+  State<_Md3eManagementBrowsePagePreview> createState() =>
+      _Md3eManagementBrowsePagePreviewState();
+}
+
+class _Md3eManagementBrowsePagePreviewState
+    extends State<_Md3eManagementBrowsePagePreview> {
+  Md3eManagementNamedFacet _facet = Md3eManagementNamedFacet.tags;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> chips =
+        Md3eManagementBrowsePagePreviewData.sampleChipsFor(_facet);
+    final int count = Md3eManagementBrowsePagePreviewData.sampleCountFor(_facet);
+
+    return Md3eManagementBrowsePage(
+      facet: _facet,
+      facetCount: count,
+      chipLabels: chips,
+      onFacetChanged: (Md3eManagementNamedFacet value) {
+        setState(() => _facet = value);
+      },
+    );
+  }
 }
 
 class _Md3eLibraryBrowsePagePreview extends StatefulWidget {
