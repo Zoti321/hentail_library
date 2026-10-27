@@ -5,7 +5,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// 与 Kazumi / 书库工具栏一致的 Lucide 图标尺寸（20dp）。
 const double kMd3eCatalogViewModeButtonGroupIconSize = 20;
 
-/// 漫画库目录展示：封面网格 vs 列表行（Lab 枚举，不绑生产 provider）。
+/// 漫画库目录展示：竖向标准卡片 vs 横向圆角矩形卡片（同一套元数据，仅容器形态不同）。
 enum Md3eCatalogViewMode {
   grid,
   list,

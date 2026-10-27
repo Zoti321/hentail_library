@@ -33,6 +33,7 @@ export 'pages/md3e_management_browse_page.dart';
 export 'theme/md3e_theme.dart';
 export 'widgets/actions/md3e_catalog_view_mode_button_group.dart';
 export 'widgets/actions/md3e_filled_button.dart';
+export 'widgets/catalog/md3e_comic_catalog_card_shell.dart';
 export 'widgets/catalog/md3e_comic_card.dart';
 export 'widgets/catalog/md3e_comic_list_item.dart';
 export 'widgets/catalog/md3e_cover_read_progress_strip.dart';

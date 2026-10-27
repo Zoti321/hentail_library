@@ -7,10 +7,9 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import '../../support/pump_md3e_app.dart';
 
 void main() {
-  test('infoProgressWidthFor clamps between min and max when space allows', () {
-    expect(Md3eComicListItem.infoProgressWidthFor(300), 240);
-    expect(Md3eComicListItem.infoProgressWidthFor(150), 150);
-    expect(Md3eComicListItem.infoProgressWidthFor(96), 96);
+  test('infoProgressWidthFor caps width without filling column', () {
+    expect(Md3eComicListItem.infoProgressWidthFor(300), 160);
+    expect(Md3eComicListItem.infoProgressWidthFor(120), 120);
     expect(Md3eComicListItem.infoProgressWidthFor(72), 72);
   });
 

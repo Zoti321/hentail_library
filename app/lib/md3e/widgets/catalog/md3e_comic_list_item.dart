@@ -3,37 +3,35 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
+import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_catalog_card_shell.dart';
+import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_cover_read_progress_strip.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Middle dot between author and page label (e.g. `作者名 · 128 页`).
 const String kMd3eComicListItemMetaSeparator = ' · ';
 
-/// Leading thumbnail width (landscape-leaning catalog thumb).
-const double kMd3eComicListItemLeadingWidth = 60;
+/// List-row cover width (2:3, same media treatment as [Md3eComicCard]).
+const double kMd3eComicListItemCoverWidth = 56;
 
-/// Leading thumbnail height (4:3).
-const double kMd3eComicListItemLeadingHeight = 45;
+/// Derived list cover height.
+double get kMd3eComicListItemCoverHeight =>
+    kMd3eComicListItemCoverWidth * 3 / 2;
 
-/// Vertical inset between leading cover and row bounds.
-const double kMd3eComicListItemVerticalInset = 12;
+/// Vertical padding inside the shared catalog card shell.
+const double kMd3eComicListItemVerticalPadding = 12;
 
-/// Minimum row height (accommodates inset cover + two-line info + progress).
-const double kMd3eComicListItemMinHeight = 88;
+/// Minimum row height (cover + vertical insets).
+double get kMd3eComicListItemMinHeight =>
+    kMd3eComicListItemCoverHeight + 2 * kMd3eComicListItemVerticalPadding;
 
-/// Corner radius on the leading cover clip.
-const double kMd3eComicListItemCoverRadius = 8;
+/// Max width of the read-progress bar when shown under meta (list-only layout).
+const double kMd3eComicListItemProgressMaxWidth = 160;
 
-/// Min width of the read-progress bar in the info column.
-const double kMd3eComicListItemProgressMinWidth = 96;
-
-/// Max width of the read-progress bar in the info column.
-const double kMd3eComicListItemProgressMaxWidth = 240;
-
-/// Gap above the info-column progress bar (below meta line).
+/// Gap between meta line and list progress bar.
 const double kMd3eComicListItemProgressTopGap = 6;
 
-/// Key for the info-area progress strip in tests.
+/// Key for list-row progress strip in tests (under title/meta, not on cover).
 const Key kMd3eComicListItemInfoProgressKey =
     Key('md3e_comic_list_item_info_progress');
 
@@ -59,7 +57,8 @@ enum Md3eComicListItemVisualState {
   selectionSelected,
 }
 
-/// Catalog list-row comic item ([M3EListItem] + catalog anatomy).
+/// Catalog list comic item: same [Md3eComicCatalogCardShell] as [Md3eComicCard],
+/// horizontal cover + text + optional trailing menu.
 class Md3eComicListItem extends StatelessWidget {
   const Md3eComicListItem({
     super.key,
@@ -100,17 +99,10 @@ class Md3eComicListItem extends StatelessWidget {
   }
 
   static double infoProgressWidthFor(double availableWidth) {
-    final double upper = math.min(
-      availableWidth,
-      kMd3eComicListItemProgressMaxWidth,
-    );
-    if (upper <= 0) {
+    if (availableWidth <= 0) {
       return 0;
     }
-    if (upper < kMd3eComicListItemProgressMinWidth) {
-      return upper;
-    }
-    return math.max(kMd3eComicListItemProgressMinWidth, upper);
+    return math.min(availableWidth, kMd3eComicListItemProgressMaxWidth);
   }
 
   final String title;
@@ -131,8 +123,10 @@ class Md3eComicListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final M3ESpacing spacing = M3ETheme.of(context).spacing;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
+    final M3ETypeScale type = theme.typeScale;
+    final M3ESpacing spacing = theme.spacing;
     final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
     final Duration motionDuration = Md3eMotion.motionDurationOf(
       context,
@@ -151,51 +145,35 @@ class Md3eComicListItem extends StatelessWidget {
     final bool rowEnabled =
         enabled && visualState != Md3eComicListItemVisualState.disabled;
     final String? meta = metaLine(author: author, pageLabel: pageLabel);
-    final bool showInfoProgress = md3eShowsReadProgressStrip(readProgress);
-    final double overlayAlpha = _overlayAlphaFor(visualState);
+    final bool showListProgress = md3eShowsReadProgressStrip(readProgress);
 
-    final BorderRadius coverRadius =
-        BorderRadius.circular(kMd3eComicListItemCoverRadius);
-
-    final Widget coverClip = Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: kMd3eComicListItemVerticalInset,
-      ),
+    final Widget coverLayer = ClipRRect(
+      borderRadius: BorderRadius.circular(kMd3eComicCardRadius),
       child: SizedBox(
-        width: kMd3eComicListItemLeadingWidth,
-        height: kMd3eComicListItemLeadingHeight,
-        child: ClipRRect(
-          borderRadius: coverRadius,
-          child: cover,
-        ),
-      ),
-    );
-
-    final double leadingSlotWidth = effectiveSelectionMode
-        ? 48 + spacing.sm + kMd3eComicListItemLeadingWidth
-        : kMd3eComicListItemLeadingWidth;
-
-    final Widget leading = SizedBox(
-      width: leadingSlotWidth,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          if (effectiveSelectionMode) ...<Widget>[
-            M3ECheckbox(
-              value: effectiveSelected,
-              onChanged: rowEnabled && onSelectionChanged != null
-                  ? (bool? value) {
-                      if (value == null) {
-                        return;
+        width: kMd3eComicListItemCoverWidth,
+        height: kMd3eComicListItemCoverHeight,
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            cover,
+          if (effectiveSelectionMode)
+            Positioned(
+              left: kMd3eComicCardSelectionInset,
+              top: kMd3eComicCardSelectionInset,
+              child: M3ECheckbox(
+                value: effectiveSelected,
+                onChanged: rowEnabled && onSelectionChanged != null
+                    ? (bool? value) {
+                        if (value == null) {
+                          return;
+                        }
+                        onSelectionChanged!.call(value);
                       }
-                      onSelectionChanged!.call(value);
-                    }
-                  : null,
+                    : null,
+              ),
             ),
-            SizedBox(width: spacing.sm),
           ],
-          coverClip,
-        ],
+        ),
       ),
     );
 
@@ -219,7 +197,7 @@ class Md3eComicListItem extends StatelessWidget {
               color: scheme.onSurfaceVariant,
             ),
             variant: M3EIconButtonVariant.standard,
-            size: M3EIconButtonSize.sm,
+            size: M3EIconButtonSize.md,
             tooltip: '更多',
             onPressed: rowEnabled ? open : null,
           );
@@ -227,66 +205,83 @@ class Md3eComicListItem extends StatelessWidget {
       );
     }
 
-    const double horizontalPadding = 16;
-
-    Widget row = M3EListItem(
-      headline: title,
-      supportingText: meta,
-      leading: leading,
-      trailing: trailingMore,
-      selected: effectiveSelected,
-      enabled: rowEnabled,
-      largeLeading: true,
-      onTap: interactive ? _handleTap : null,
+    final Widget infoColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: md3eComicCatalogTitleStyle(type, scheme),
+        ),
+        if (meta != null) ...<Widget>[
+          const SizedBox(height: 4),
+          Text(
+            meta,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: md3eComicCatalogSubtitleStyle(type, scheme),
+          ),
+        ],
+        if (showListProgress) ...<Widget>[
+          SizedBox(height: kMd3eComicListItemProgressTopGap),
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double progressWidth = infoProgressWidthFor(
+                constraints.maxWidth,
+              );
+              return SizedBox(
+                width: progressWidth,
+                height: kMd3eCoverReadProgressHeight,
+                child: Md3eCoverReadProgressStrip(
+                  key: kMd3eComicListItemInfoProgressKey,
+                  progress: readProgress!,
+                  activeColor: scheme.primary,
+                  trackColor: scheme.onSurface.withValues(alpha: 0.24),
+                  duration: motionDuration,
+                  curve: stateEnter,
+                ),
+              );
+            },
+          ),
+        ],
+      ],
     );
 
-    row = SizedBox(
-      height: kMd3eComicListItemMinHeight,
-      child: Stack(
-        fit: StackFit.passthrough,
+    final Widget row = Padding(
+      padding: const EdgeInsets.fromLTRB(
+        kMd3eComicCatalogContentHorizontalPadding,
+        kMd3eComicListItemVerticalPadding,
+        kMd3eComicCatalogContentHorizontalPadding - 4,
+        kMd3eComicListItemVerticalPadding,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          row,
-          if (showInfoProgress)
-            Positioned(
-              left: _infoTextInset(
-                selectionMode: effectiveSelectionMode,
-                spacing: spacing,
-              ),
-              right: moreMenuEntries.isNotEmpty ? 52 : horizontalPadding,
-              bottom: kMd3eComicListItemVerticalInset,
-              child: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  final double progressWidth = infoProgressWidthFor(
-                    constraints.maxWidth,
-                  );
-                  return SizedBox(
-                    width: progressWidth,
-                    height: kMd3eCoverReadProgressHeight,
-                    child: Md3eCoverReadProgressStrip(
-                      key: kMd3eComicListItemInfoProgressKey,
-                      progress: readProgress!,
-                      activeColor: scheme.primary,
-                      trackColor: scheme.surfaceContainerHighest,
-                      duration: motionDuration,
-                      curve: stateEnter,
-                    ),
-                  );
-                },
-              ),
-            ),
-          if (overlayAlpha > 0)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: ColoredBox(
-                  color: scheme.onSurface.withValues(alpha: overlayAlpha),
-                ),
-              ),
-            ),
+          coverLayer,
+          SizedBox(width: spacing.md),
+          Expanded(child: infoColumn),
+          if (trailingMore != null) ...<Widget>[
+            const SizedBox(width: 4),
+            trailingMore,
+          ],
         ],
       ),
     );
 
-    return row;
+    return Md3eComicCatalogCardShell(
+      height: kMd3eComicListItemMinHeight,
+      width: double.infinity,
+      enabled: rowEnabled,
+      trackHover: visualState == null,
+      onPressed: interactive ? _handleTap : null,
+      pinnedOverlayAlpha: _pinnedOverlayAlphaFor(visualState),
+      semanticLabel: Md3eComicCard.showsCoverReadProgress(readProgress)
+          ? '$title，已读 ${(readProgress!.clamp(0.0, 1.0) * 100).round()}%'
+          : title,
+      child: row,
+    );
   }
 
   bool get _effectiveSelectionMode {
@@ -315,28 +310,13 @@ class Md3eComicListItem extends StatelessWidget {
     onTap?.call();
   }
 
-  static double _infoTextInset({
-    required bool selectionMode,
-    required M3ESpacing spacing,
-  }) {
-    const double horizontalPadding = 16;
-    const double checkboxWidth = 48;
-    double inset = horizontalPadding +
-        kMd3eComicListItemLeadingWidth +
-        horizontalPadding;
-    if (selectionMode) {
-      inset += checkboxWidth + spacing.sm;
-    }
-    return inset;
-  }
-
-  static double _overlayAlphaFor(Md3eComicListItemVisualState? state) {
+  static double _pinnedOverlayAlphaFor(Md3eComicListItemVisualState? state) {
     switch (state) {
       case Md3eComicListItemVisualState.pressed:
       case Md3eComicListItemVisualState.focused:
-        return 0.12;
+        return kMd3eComicCatalogPinnedOverlayAlphaStrong;
       case Md3eComicListItemVisualState.hovered:
-        return 0.08;
+        return kMd3eComicCatalogPinnedOverlayAlphaLight;
       case Md3eComicListItemVisualState.disabled:
       case Md3eComicListItemVisualState.normal:
       case Md3eComicListItemVisualState.selectionUnselected:

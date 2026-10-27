@@ -82,10 +82,14 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Interactive',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Center(
-                      child: _md3eComicListItemKnobsPreview(
-                        context,
-                        cover: _demoCover(context),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: _md3eComicListItemKnobsPreview(
+                          context,
+                          cover: _demoCover(context),
+                        ),
                       ),
                     ),
                   ),

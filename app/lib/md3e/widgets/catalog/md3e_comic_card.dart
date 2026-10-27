@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_catalog_card_shell.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_cover_read_progress_strip.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Corner radius for [Md3eComicCard] (M3 elevated card / MASTER 书库卡).
-const double kMd3eComicCardRadius = 12;
+export 'package:hentai_library/md3e/widgets/catalog/md3e_comic_catalog_card_shell.dart'
+    show kMd3eComicCardRadius;
 
 /// Inset of the selection control from the cover top-left (MASTER 多选稿).
 const double kMd3eComicCardSelectionInset = 8;
@@ -27,11 +28,9 @@ enum Md3eComicCardVisualState {
   selectionSelected,
 }
 
-/// Catalog grid comic card ([M3ECard] elevated; props only, no domain types).
+/// Catalog grid comic card ([Md3eComicCatalogCardShell]; props only, no domain types).
 ///
-/// Anatomy: flush [cover] (2:3) + padded title / [subtitle].
-/// Interaction uses M3E card state layers on the info block overlay when pinned
-/// for Widgetbook; otherwise [M3ECard] handles hover, focus, and press.
+/// Anatomy: flush [cover] (2:3) + padded title / [subtitle]; progress on cover bottom.
 class Md3eComicCard extends StatelessWidget {
   /// Main-axis height for a flush-cover card at [cardWidth] (grid delegate).
   static double layoutMainAxisExtent({
@@ -56,9 +55,6 @@ class Md3eComicCard extends StatelessWidget {
   }
 
   /// Grid row height when the delegate cell width equals [maxCrossAxisExtent].
-  ///
-  /// Prefer [Md3eCatalogGridMetrics.mainAxisExtentForCellWidth] with the resolved
-  /// cell width from [Md3eCatalogGridMetrics.layoutForViewportWidth].
   static double gridMainAxisExtent({
     required double maxCrossAxisExtent,
     required double coverToInfoGap,
@@ -120,7 +116,6 @@ class Md3eComicCard extends StatelessWidget {
     final bool cardEnabled =
         enabled && visualState != Md3eComicCardVisualState.disabled;
     final bool dragged = visualState == Md3eComicCardVisualState.dragged;
-    final double infoOverlayAlpha = _infoOverlayAlphaFor(visualState);
 
     final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
     final Duration motionDuration = Md3eMotion.motionDurationOf(
@@ -130,11 +125,7 @@ class Md3eComicCard extends StatelessWidget {
     final Curve stateEnter = Md3eMotion.curveForStateEnter(
       reduceMotion: reduceMotion,
     );
-    final Curve stateExit = Md3eMotion.curveForStateExit(
-      reduceMotion: reduceMotion,
-    );
 
-    const double contentHorizontalPadding = 12;
     const double titleSubtitleGap = 6;
 
     final double? coverProgress = readProgress;
@@ -181,85 +172,52 @@ class Md3eComicCard extends StatelessWidget {
       ),
     );
 
-    Widget infoBlock = Padding(
-      padding: EdgeInsets.fromLTRB(
-        contentHorizontalPadding,
-        spacing.md,
-        contentHorizontalPadding,
-        contentHorizontalPadding,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: titleSubtitleGap,
-        children: <Widget>[
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: type.titleSmall.copyWith(
-              fontWeight: FontWeight.w600,
-              color: scheme.onSurface,
-            ),
+    final Widget body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        coverLayer,
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+            kMd3eComicCatalogContentHorizontalPadding,
+            spacing.md,
+            kMd3eComicCatalogContentHorizontalPadding,
+            kMd3eComicCatalogContentHorizontalPadding,
           ),
-          if (subtitle != null)
-            Text(
-              subtitle!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: type.labelSmall.copyWith(
-                color: scheme.onSurfaceVariant,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: titleSubtitleGap,
+            children: <Widget>[
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: md3eComicCatalogTitleStyle(type, scheme),
               ),
-            ),
-        ],
-      ),
+              if (subtitle != null)
+                Text(
+                  subtitle!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: md3eComicCatalogSubtitleStyle(type, scheme),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
 
-    if (infoOverlayAlpha > 0) {
-      infoBlock = Stack(
-        fit: StackFit.passthrough,
-        children: <Widget>[
-          infoBlock,
-          Positioned.fill(
-            child: IgnorePointer(
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(end: infoOverlayAlpha),
-                duration: motionDuration,
-                curve: infoOverlayAlpha > 0 ? stateEnter : stateExit,
-                builder: (BuildContext context, double alpha, Widget? child) {
-                  if (alpha <= 0) {
-                    return const SizedBox.shrink();
-                  }
-                  return ColoredBox(
-                    color: scheme.onSurface.withValues(alpha: alpha),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    return M3ECard(
-      variant: M3ECardVariant.elevated,
-      padding: EdgeInsets.zero,
-      borderRadius: BorderRadius.circular(kMd3eComicCardRadius),
+    return Md3eComicCatalogCardShell(
       enabled: cardEnabled,
       dragged: dragged,
       trackHover: visualState == null,
       onPressed: interactive ? _handleTap : null,
+      pinnedOverlayAlpha: _pinnedOverlayAlphaFor(visualState),
       semanticLabel: _semanticsLabel(
         title: title,
         readProgress: coverProgress,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          coverLayer,
-          infoBlock,
-        ],
-      ),
+      child: body,
     );
   }
 
@@ -289,14 +247,14 @@ class Md3eComicCard extends StatelessWidget {
     onTap?.call();
   }
 
-  static double _infoOverlayAlphaFor(Md3eComicCardVisualState? state) {
+  static double _pinnedOverlayAlphaFor(Md3eComicCardVisualState? state) {
     switch (state) {
       case Md3eComicCardVisualState.pressed:
-        return 0.12;
-      case Md3eComicCardVisualState.hovered:
       case Md3eComicCardVisualState.focused:
+        return kMd3eComicCatalogPinnedOverlayAlphaStrong;
+      case Md3eComicCardVisualState.hovered:
       case Md3eComicCardVisualState.dragged:
-        return 0.08;
+        return kMd3eComicCatalogPinnedOverlayAlphaLight;
       case Md3eComicCardVisualState.disabled:
       case Md3eComicCardVisualState.normal:
       case Md3eComicCardVisualState.selectionUnselected:

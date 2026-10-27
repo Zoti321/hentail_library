@@ -193,23 +193,21 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
     return SizedBox(
       height: spec.rowHeight,
       width: double.infinity,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: radius,
-          border: Border.all(
-            color: scheme.outlineVariant.withValues(alpha: 0.45),
-          ),
+      child: M3ECard(
+        variant: M3ECardVariant.filled,
+        color: scheme.surfaceContainerLow,
+        elevation: 0,
+        padding: EdgeInsets.zero,
+        borderRadius: radius,
+        border: BorderSide(
+          color: scheme.outlineVariant.withValues(alpha: 0.28),
         ),
-        child: M3ECard(
-          variant: M3ECardVariant.elevated,
-          padding: EdgeInsets.zero,
-          borderRadius: radius,
-          enabled: enabled,
-          trackHover: true,
-          onPressed: enabled && onTap != null ? onTap : null,
-          semanticLabel: title,
-          child: row,
-        ),
+        clipBehavior: Clip.antiAlias,
+        enabled: enabled,
+        trackHover: true,
+        onPressed: enabled && onTap != null ? onTap : null,
+        semanticLabel: title,
+        child: row,
       ),
     );
   }

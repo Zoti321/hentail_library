@@ -331,27 +331,30 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final double? readProgress =
         index.isOdd ? null : ((index % 9) + 1) / 10;
-    return Md3eComicListItem(
-      title: '示例本子 ${index + 1}',
-      author: '作者 ${index % 5 + 1}',
-      pageLabel: '${64 + index * 8} 页',
-      readProgress: readProgress,
-      moreMenuEntries: const <Md3eComicListMoreMenuEntry>[
-        Md3eComicListMoreMenuEntry(label: '继续阅读'),
-        Md3eComicListMoreMenuEntry(label: '编辑元数据'),
-        Md3eComicListMoreMenuEntry(label: '删除'),
-      ],
-      cover: ColoredBox(
-        color: scheme.surfaceContainerHigh,
-        child: Center(
-          child: Icon(
-            Icons.image_outlined,
-            color: scheme.onSurfaceVariant,
-            size: 20,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Md3eComicListItem(
+        title: '示例本子 ${index + 1}',
+        author: '作者 ${index % 5 + 1}',
+        pageLabel: '${64 + index * 8} 页',
+        readProgress: readProgress,
+        moreMenuEntries: const <Md3eComicListMoreMenuEntry>[
+          Md3eComicListMoreMenuEntry(label: '继续阅读'),
+          Md3eComicListMoreMenuEntry(label: '编辑元数据'),
+          Md3eComicListMoreMenuEntry(label: '删除'),
+        ],
+        cover: ColoredBox(
+          color: scheme.surfaceContainerHigh,
+          child: Center(
+            child: Icon(
+              Icons.image_outlined,
+              color: scheme.onSurfaceVariant,
+              size: 20,
+            ),
           ),
         ),
+        onTap: () {},
       ),
-      onTap: () {},
     );
   }
 }
