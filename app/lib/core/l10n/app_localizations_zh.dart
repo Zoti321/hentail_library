@@ -401,6 +401,28 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get historySectionToday => '今天';
+
+  @override
+  String get historySectionYesterday => '昨天';
+
+  @override
+  String get historySectionThisWeek => '本周';
+
+  @override
+  String get historySectionEarlier => '更早';
+
+  @override
+  String historySectionItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get historySearchHint => '搜索历史记录...';
 
   @override

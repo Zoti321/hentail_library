@@ -328,19 +328,23 @@ class _Md3eReadingHistoryListItemPreview extends StatelessWidget {
   const _Md3eReadingHistoryListItemPreview({
     required this.cover,
     this.title = '只有神知道的世界',
+    this.lastReadTime,
   });
 
   final Widget cover;
   final String title;
+  final DateTime? lastReadTime;
 
   @override
   Widget build(BuildContext context) {
+    final DateTime resolvedLastReadTime = lastReadTime ??
+        DateTime.now().subtract(const Duration(hours: 2));
     return Md3eReadingHistoryListItem(
       title: title,
       cover: cover,
       currentPage: 42,
       totalPages: 208,
-      lastReadTime: DateTime.now().subtract(const Duration(hours: 2)),
+      lastReadTime: resolvedLastReadTime,
       onTap: () {},
       onContinueReading: () {},
       moreMenuEntries: _demoReadingHistoryMoreMenu(),
@@ -548,21 +552,22 @@ class _Md3eHistoryBrowsePagePreview extends StatefulWidget {
 
 class _Md3eHistoryBrowsePagePreviewState
     extends State<_Md3eHistoryBrowsePagePreview> {
-  int _itemCount = Md3eHistoryBrowsePagePreviewData.sampleTitles.length;
+  late List<Md3eHistoryBrowseEntry> _entries =
+      Md3eHistoryBrowsePagePreviewData.sampleEntries();
 
   @override
   Widget build(BuildContext context) {
     return Md3eHistoryBrowsePage(
-      totalCount: _itemCount,
-      itemCount: _itemCount,
-      onClearAll: () => setState(() => _itemCount = 0),
-      itemBuilder: (BuildContext context, int index) {
-        final String title =
-            Md3eHistoryBrowsePagePreviewData.sampleTitles[
-                index % Md3eHistoryBrowsePagePreviewData.sampleTitles.length];
+      entries: _entries,
+      onClearAll: () => setState(() => _entries = <Md3eHistoryBrowseEntry>[]),
+      itemBuilder: (BuildContext context, Md3eHistoryBrowseEntry entry) {
+        final int index = _entries.indexOf(entry);
+        final String title = Md3eHistoryBrowsePagePreviewData.sampleTitles[
+            index % Md3eHistoryBrowsePagePreviewData.sampleTitles.length];
         return _Md3eReadingHistoryListItemPreview(
           title: title,
           cover: _demoCover(context),
+          lastReadTime: entry.lastReadTime,
         );
       },
     );

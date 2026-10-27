@@ -194,6 +194,18 @@
       }
     }
   },
+  "historySectionToday": "Today",
+  "historySectionYesterday": "Yesterday",
+  "historySectionThisWeek": "This week",
+  "historySectionEarlier": "Earlier",
+  "historySectionItemCount": "{count, plural, one{1 entry} other{{count} entries}}",
+  "@historySectionItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "historySearchHint": "Search history...",
   "historyEmpty": "No reading history yet",
   "historyNoMatch": "No matching entries",

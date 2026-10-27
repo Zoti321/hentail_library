@@ -413,6 +413,29 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get historySectionToday => 'Today';
+
+  @override
+  String get historySectionYesterday => 'Yesterday';
+
+  @override
+  String get historySectionThisWeek => 'This week';
+
+  @override
+  String get historySectionEarlier => 'Earlier';
+
+  @override
+  String historySectionItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get historySearchHint => 'Search history...';
 
   @override

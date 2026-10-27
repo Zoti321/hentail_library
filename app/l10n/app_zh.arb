@@ -194,6 +194,18 @@
       }
     }
   },
+  "historySectionToday": "今天",
+  "historySectionYesterday": "昨天",
+  "historySectionThisWeek": "本周",
+  "historySectionEarlier": "更早",
+  "historySectionItemCount": "{count, plural, other{{count} 条}}",
+  "@historySectionItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "historySearchHint": "搜索历史记录...",
   "historyEmpty": "暂无阅读历史",
   "historyNoMatch": "没有匹配的历史记录",

@@ -764,6 +764,36 @@ abstract class AppLocalizations {
   /// **'{count, plural, other{{count} 条记录 • 最长保留 30 天}}'**
   String historyRecordSummary(int count);
 
+  /// No description provided for @historySectionToday.
+  ///
+  /// In zh, this message translates to:
+  /// **'今天'**
+  String get historySectionToday;
+
+  /// No description provided for @historySectionYesterday.
+  ///
+  /// In zh, this message translates to:
+  /// **'昨天'**
+  String get historySectionYesterday;
+
+  /// No description provided for @historySectionThisWeek.
+  ///
+  /// In zh, this message translates to:
+  /// **'本周'**
+  String get historySectionThisWeek;
+
+  /// No description provided for @historySectionEarlier.
+  ///
+  /// In zh, this message translates to:
+  /// **'更早'**
+  String get historySectionEarlier;
+
+  /// No description provided for @historySectionItemCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 条}}'**
+  String historySectionItemCount(int count);
+
   /// No description provided for @historySearchHint.
   ///
   /// In zh, this message translates to:
