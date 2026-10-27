@@ -39,6 +39,7 @@ export 'widgets/catalog/md3e_comic_list_item.dart';
 export 'widgets/catalog/md3e_cover_read_progress_strip.dart';
 export 'widgets/history/md3e_reading_history_list_item.dart';
 export 'widgets/history/md3e_reading_history_list_item_metrics.dart';
+export 'widgets/history/md3e_reading_history_list_item_typography.dart';
 export 'widgets/desktop/md3e_desktop_title_bar.dart';
 export 'widgets/desktop/md3e_desktop_title_bar_metrics.dart';
 export 'widgets/desktop/md3e_desktop_window_controls.dart';

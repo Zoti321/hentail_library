@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item_metrics.dart';
+import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item_typography.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -69,6 +70,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
+    final M3ESpacing spacing = theme.spacing;
 
     final String progressLabel = l10n.readingProgressPageOfTotal(
       currentPage,
@@ -96,27 +98,21 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: type.titleMedium.copyWith(
-                fontWeight: FontWeight.w700,
-                color: scheme.onSurface,
-              ),
+              style: md3eReadingHistoryListItemTitleStyle(type, scheme),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: spacing.xs),
             Text(
               progressLabel,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: type.labelLarge.copyWith(
-                fontWeight: FontWeight.w600,
-                color: scheme.primary,
-              ),
+              style: md3eReadingHistoryListItemProgressStyle(type, scheme),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: spacing.xs),
             Text(
               timeLabel,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: type.bodySmall.copyWith(color: scheme.onSurfaceVariant),
+              style: md3eReadingHistoryListItemTimeStyle(type, scheme),
             ),
           ],
         ),
