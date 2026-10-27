@@ -7,7 +7,9 @@ import 'package:hentai_library/md3e/patterns/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_filter_sort_side_sheet.dart';
+import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header.dart';
+import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
@@ -43,6 +45,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                         cover: _demoCover(context),
                       ),
                     ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eSegmentedCapsuleBar',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Management facets',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Center(child: _Md3eSegmentedCapsuleBarPreview()),
                   ),
                 ),
               ],
@@ -500,6 +513,33 @@ class _Md3eLibraryBrowsePagePreviewState
             onFilterSort: () =>
                 Md3eLibraryFilterSortDrawerHost.openDrawer(hostContext),
           );
+        },
+      ),
+    );
+  }
+}
+
+class _Md3eSegmentedCapsuleBarPreview extends StatefulWidget {
+  const _Md3eSegmentedCapsuleBarPreview();
+
+  @override
+  State<_Md3eSegmentedCapsuleBarPreview> createState() =>
+      _Md3eSegmentedCapsuleBarPreviewState();
+}
+
+class _Md3eSegmentedCapsuleBarPreviewState
+    extends State<_Md3eSegmentedCapsuleBarPreview> {
+  Md3eManagementNamedFacet _facet = Md3eManagementNamedFacet.authors;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Md3eSegmentedCapsuleBar(
+        segments: Md3eManagementNamedFacet.capsuleSegments(),
+        selectedIndex: Md3eManagementNamedFacet.indexOf(_facet),
+        onSelected: (int index) {
+          setState(() => _facet = Md3eManagementNamedFacet.facetAt(index));
         },
       ),
     );
