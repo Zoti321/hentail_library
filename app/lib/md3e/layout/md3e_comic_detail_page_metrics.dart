@@ -1,11 +1,13 @@
 import 'package:flutter/painting.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/layout/md3e_pinned_toolbar_chrome_metrics.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Layout tokens for [Md3eComicDetailPage] (Lab; spacing tuned for sticky header + scroll body).
 abstract final class Md3eComicDetailPageMetrics {
-  static const double toolbarHeight = 48;
+  static const double toolbarHeight =
+      Md3ePinnedToolbarChromeMetrics.toolbarRowHeight;
   static const double coverAspectRatio = 2 / 3;
   static const double coverCornerRadius = 2;
 
@@ -26,26 +28,14 @@ abstract final class Md3eComicDetailPageMetrics {
     };
   }
 
-  static double headerTopPadding(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 6,
-      _ => 8,
-    };
-  }
+  static double headerTopPadding(Md3eWindowSizeClass sizeClass) =>
+      Md3ePinnedToolbarChromeMetrics.topPadding(sizeClass);
 
-  static double headerBottomPadding(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 0,
-      _ => 2,
-    };
-  }
+  static double headerBottomPadding(Md3eWindowSizeClass sizeClass) =>
+      Md3ePinnedToolbarChromeMetrics.bottomPadding(sizeClass);
 
-  static double catalogBodyTopSpacing(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 4,
-      _ => 6,
-    };
-  }
+  static double catalogBodyTopSpacing(Md3eWindowSizeClass sizeClass) =>
+      Md3ePinnedToolbarChromeMetrics.bodyBelowHeaderSpacing(sizeClass);
 
   static double primaryToMetadataSpacing(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {

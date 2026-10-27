@@ -40,9 +40,9 @@ class Md3eDetailHeaderToolbar extends StatelessWidget {
         ),
         if (moreMenuEntries.isEmpty)
           _iconButton(
-            icon: Symbols.more_vert,
-            tooltip: l10n.libraryMoreActions,
-            semanticLabel: l10n.libraryMoreActionsSemantic,
+            icon: Icons.more_vert,
+            tooltip: l10n.metadataMoreActions,
+            semanticLabel: l10n.metadataMoreActions,
             onPressed: null,
             iconColor: iconColor,
             iconSize: iconSize,
@@ -53,9 +53,9 @@ class Md3eDetailHeaderToolbar extends StatelessWidget {
             children: moreMenuEntries,
             anchorBuilder: (BuildContext context, VoidCallback open) {
               return _iconButton(
-                icon: Symbols.more_vert,
-                tooltip: l10n.libraryMoreActions,
-                semanticLabel: l10n.libraryMoreActionsSemantic,
+                icon: Icons.more_vert,
+                tooltip: l10n.metadataMoreActions,
+                semanticLabel: l10n.metadataMoreActions,
                 onPressed: open,
                 iconColor: iconColor,
                 iconSize: iconSize,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
+import 'package:hentai_library/md3e/patterns/shared/md3e_pinned_toolbar_chrome.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -39,11 +40,7 @@ class Md3eLibraryPageHeader extends StatelessWidget {
     final Md3eWindowSizeClass sizeClass =
         Md3eWindowSizeClass.fromWidth(windowWidth);
 
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: Md3eLibraryPageHeaderMetrics.verticalPadding,
-        bottom: Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding,
-      ),
+    return Md3ePinnedToolbarChrome(
       child: _Md3eLibraryPageHeaderToolbar(
         title: title,
         sizeClass: sizeClass,
@@ -107,9 +104,7 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
       pageSizeOptions: pageSizeOptions,
     );
 
-    return SizedBox(
-      height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
-      child: Row(
+    return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Expanded(
@@ -120,7 +115,6 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
           ),
           actions,
         ],
-      ),
     );
   }
 }

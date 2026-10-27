@@ -1,4 +1,5 @@
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/layout/md3e_pinned_toolbar_chrome_metrics.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -9,7 +10,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// 24dp medium+ between major blocks).
 abstract final class Md3eLibraryBrowsePageMetrics {
   /// Sticky 页头抬起高度（[`M3EElevation.level1`]）。
-  static const double pinnedHeaderElevation = M3EElevation.level1;
+  static const double pinnedHeaderElevation =
+      Md3ePinnedToolbarChromeMetrics.pinnedHeaderElevation;
 
   static const double scrollToTopBottomInset = 24;
   static const double scrollToTopShowViewportRatio = 1;

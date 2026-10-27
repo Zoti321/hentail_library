@@ -3,6 +3,7 @@ import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_series_detail_page_metrics.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_entry.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_comics_section.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_intro_section.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_page_header.dart';
@@ -13,7 +14,7 @@ import 'package:material_symbols_icons/symbols.dart';
 export 'package:hentai_library/md3e/pages/md3e_series_detail_entry.dart';
 export 'package:hentai_library/md3e/pages/md3e_series_detail_page_preview_data.dart';
 
-/// 系列详情页 Lab：固定顶栏 + 可滚动简介与漫画网格。
+/// 系列详情页 Lab：粘滞页头 + 可滚动简介与漫画网格。
 class Md3eSeriesDetailPage extends StatefulWidget {
   const Md3eSeriesDetailPage({
     super.key,
@@ -39,7 +40,9 @@ class Md3eSeriesDetailPage extends StatefulWidget {
 }
 
 class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
+  final GlobalKey _headerMeasureKey = GlobalKey();
   final GlobalKey _comicsSectionKey = GlobalKey();
+  double? _headerExtent;
   late int _pageSize = widget.entry.initialPageSize;
   late int _page = widget.entry.initialPage.clamp(
     1,
@@ -76,6 +79,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
     super.initState();
     _ownsScrollController = widget.scrollController == null;
     _scrollController = widget.scrollController ?? ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -85,6 +89,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
       _pageSize = widget.entry.initialPageSize;
       _page = widget.entry.initialPage.clamp(1, _totalPages);
     }
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -93,6 +98,18 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
       _scrollController.dispose();
     }
     super.dispose();
+  }
+
+  void _measureHeaderExtent(Duration _) {
+    final RenderBox? box =
+        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
+    if (!mounted || box == null) {
+      return;
+    }
+    final double height = box.size.height;
+    if (_headerExtent != height) {
+      setState(() => _headerExtent = height);
+    }
   }
 
   VoidCallback _resolveVoid(VoidCallback? handler) => handler ?? () {};
@@ -158,61 +175,68 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
     final double introTop =
         Md3eSeriesDetailPageMetrics.introTopSpacing(sizeClass);
 
+    final Widget header = KeyedSubtree(
+      key: _headerMeasureKey,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child: Md3eSeriesDetailPageHeader(
+          onBack: _resolveVoid(widget.onBack),
+          onEdit: _resolveVoid(widget.onEdit),
+          moreMenuEntries: _resolveMoreMenu(l10n),
+          pageSize: _pageSize,
+          onPageSizeChanged: _setPageSize,
+        ),
+      ),
+    );
+
     return ColoredBox(
       color: scheme.surface,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: <Widget>[
-          Md3eSeriesDetailPageHeader(
-            onBack: _resolveVoid(widget.onBack),
-            onEdit: _resolveVoid(widget.onEdit),
-            moreMenuEntries: _resolveMoreMenu(l10n),
-            pageSize: _pageSize,
-            onPageSizeChanged: _setPageSize,
+          CustomScrollView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              if (_headerExtent == null)
+                SliverToBoxAdapter(child: header)
+              else
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: Md3eLibraryPinnedHeaderDelegate(
+                    extent: _headerExtent!,
+                    child: header,
+                  ),
+                ),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  introTop,
+                  horizontalPadding,
+                  0,
+                ),
+                sliver: SliverToBoxAdapter(
+                  child: Md3eSeriesDetailIntroSection(
+                    entry: widget.entry,
+                    onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                sliver: Md3eSeriesDetailComicsSection(
+                  gridSectionKey: _comicsSectionKey,
+                  pageItems: _pageItems,
+                  page: _page,
+                  totalPages: _totalPages,
+                  onPageChanged: _setPage,
+                  onComicTap: widget.onComicTap,
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: Stack(
-              children: <Widget>[
-                CustomScrollView(
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: <Widget>[
-                    SliverPadding(
-                      padding: EdgeInsets.fromLTRB(
-                        horizontalPadding,
-                        introTop,
-                        horizontalPadding,
-                        0,
-                      ),
-                      sliver: SliverToBoxAdapter(
-                        child: Md3eSeriesDetailIntroSection(
-                          entry: widget.entry,
-                          onMetadataChipTap:
-                              widget.onMetadataChipTap ?? (_) {},
-                        ),
-                      ),
-                    ),
-                    SliverPadding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                      ),
-                      sliver: Md3eSeriesDetailComicsSection(
-                        gridSectionKey: _comicsSectionKey,
-                        pageItems: _pageItems,
-                        page: _page,
-                        totalPages: _totalPages,
-                        onPageChanged: _setPage,
-                        onComicTap: widget.onComicTap,
-                      ),
-                    ),
-                  ],
-                ),
-                Md3eLibraryScrollToTopButton(
-                  scrollController: _scrollController,
-                  horizontalPadding: horizontalPadding,
-                ),
-              ],
-            ),
+          Md3eLibraryScrollToTopButton(
+            scrollController: _scrollController,
+            horizontalPadding: horizontalPadding,
           ),
         ],
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
+import 'package:hentai_library/md3e/layout/md3e_pinned_toolbar_chrome_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Sticky library header with M3 elevation when content scrolls underneath.
@@ -24,7 +24,7 @@ class Md3eLibraryPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final bool elevated = shrinkOffset > 0 || overlapsContent;
     final double elevation = elevated
-        ? Md3eLibraryBrowsePageMetrics.pinnedHeaderElevation
+        ? Md3ePinnedToolbarChromeMetrics.pinnedHeaderElevation
         : M3EElevation.level0;
 
     return Material(

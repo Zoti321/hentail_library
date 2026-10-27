@@ -6,6 +6,7 @@ import 'package:hentai_library/md3e/pages/md3e_comic_detail_entry.dart';
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_page_header.dart';
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_scroll_content.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
+import 'package:hentai_library/md3e/widgets/navigation/md3e_library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -153,30 +154,38 @@ class _Md3eComicDetailPageState extends State<Md3eComicDetailPage> {
 
     return ColoredBox(
       color: scheme.surface,
-      child: CustomScrollView(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: <Widget>[
-          if (_headerExtent == null)
-            SliverToBoxAdapter(child: header)
-          else
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: Md3eLibraryPinnedHeaderDelegate(
-                extent: _headerExtent!,
-                child: header,
+      child: Stack(
+        children: <Widget>[
+          CustomScrollView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              if (_headerExtent == null)
+                SliverToBoxAdapter(child: header)
+              else
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: Md3eLibraryPinnedHeaderDelegate(
+                    extent: _headerExtent!,
+                    child: header,
+                  ),
+                ),
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                sliver: SliverToBoxAdapter(
+                  child: Md3eComicDetailScrollContent(
+                    entry: _entry,
+                    onRead: _resolveVoid(widget.onRead),
+                    onReadIncognito: _resolveVoid(widget.onReadIncognito),
+                    onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
+                  ),
+                ),
               ),
-            ),
-          SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            sliver: SliverToBoxAdapter(
-              child: Md3eComicDetailScrollContent(
-                entry: _entry,
-                onRead: _resolveVoid(widget.onRead),
-                onReadIncognito: _resolveVoid(widget.onReadIncognito),
-                onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
-              ),
-            ),
+            ],
+          ),
+          Md3eLibraryScrollToTopButton(
+            scrollController: _scrollController,
+            horizontalPadding: horizontalPadding,
           ),
         ],
       ),
