@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
-import 'package:hentai_library/md3e/patterns/history/md3e_history_time_section.dart';
+import 'package:hentai_library/md3e/patterns/history/md3e_history_time_grouping.dart';
+import 'package:hentai_library/md3e/patterns/history/md3e_history_time_section_labels.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

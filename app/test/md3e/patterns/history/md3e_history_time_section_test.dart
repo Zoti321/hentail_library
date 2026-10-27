@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/patterns/history/md3e_history_time_section.dart';
+import 'package:hentai_library/md3e/patterns/history/md3e_history_time_grouping.dart';
 
 void main() {
   final DateTime clock = DateTime(2026, 3, 11, 15); // Wednesday
