@@ -4,6 +4,7 @@ import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 import 'md3e_widgetbook_l10n_scope.dart';
+import 'md3e_widgetbook_localizations.dart';
 
 /// Wraps each Widgetbook use-case preview in [M3EMaterialApp] + lab theme.
 Widget md3eWidgetbookAppBuilder(BuildContext context, Widget child) {
@@ -17,7 +18,7 @@ Widget md3eWidgetbookAppBuilder(BuildContext context, Widget child) {
     debugShowCheckedModeBanner: false,
     // material_ui MaterialLocalizations only fully covers `en`.
     locale: const Locale('en'),
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    localizationsDelegates: md3eWidgetbookLocalizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     appBuilder: (BuildContext context, Widget? themedChild) {
       return DefaultTextStyle.merge(

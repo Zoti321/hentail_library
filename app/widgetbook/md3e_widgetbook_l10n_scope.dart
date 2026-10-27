@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
+
+import 'md3e_widgetbook_localizations.dart';
 
 /// Zh [AppLocalizations] for lab previews without forcing `zh` on material_ui.
 ///
@@ -16,9 +18,7 @@ class Md3eWidgetbookAppLocalizationsScope extends StatelessWidget {
     return Localizations.override(
       context: context,
       locale: const Locale('zh'),
-      delegates: const <LocalizationsDelegate<dynamic>>[
-        AppLocalizations.delegate,
-      ],
+      delegates: md3eWidgetbookLocalizationsDelegates,
       child: child,
     );
   }

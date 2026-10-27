@@ -13,7 +13,14 @@ import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_series_metadata_edit_page.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_form.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_navigation.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_draft.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_form.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
@@ -273,6 +280,40 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 ),
               ],
             ),
+            WidgetbookComponent(
+              name: 'Md3eComicMetadataEditForm',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'From preview data',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: _Md3eComicMetadataEditFormPreview(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eSeriesMetadataEditForm',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'From preview data',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: _Md3eSeriesMetadataEditFormPreview(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         WidgetbookFolder(
@@ -340,6 +381,28 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: _md3eSeriesDetailPageKnobsPreview(context),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eComicMetadataEditPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eComicMetadataEditPage(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eSeriesMetadataEditPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eSeriesMetadataEditPage(),
                   ),
                 ),
               ],
@@ -424,6 +487,16 @@ Widget _md3eComicDetailPageKnobsPreview(BuildContext context) {
     entry: Md3eComicDetailPagePreviewData.sample().copyWith(
       showAgeRestrictionChip: showAgeRestriction,
     ),
+    onEdit: () {
+      showMd3eComicMetadataEdit(
+        context: context,
+        initialDraft: Md3eComicMetadataEditDraft.fromEntry(
+          Md3eComicDetailPagePreviewData.sample().copyWith(
+            showAgeRestrictionChip: showAgeRestriction,
+          ),
+        ),
+      );
+    },
   );
 }
 
@@ -443,6 +516,17 @@ Widget _md3eSeriesDetailPageKnobsPreview(BuildContext context) {
       showAgeRestrictionChip: showAgeRestriction,
       showMetadataBlock: showMetadata,
     ),
+    onEdit: () {
+      showMd3eSeriesMetadataEdit(
+        context: context,
+        initialDraft: Md3eSeriesMetadataEditDraft.fromEntry(
+          Md3eSeriesDetailPagePreviewData.sample().copyWith(
+            showAgeRestrictionChip: showAgeRestriction,
+            showMetadataBlock: showMetadata,
+          ),
+        ),
+      );
+    },
   );
 }
 
@@ -886,6 +970,60 @@ class _Md3eLibraryFilterSortSideSheetPreviewState
               ),
             ),
           );
+        },
+      ),
+    );
+  }
+}
+
+class _Md3eComicMetadataEditFormPreview extends StatefulWidget {
+  @override
+  State<_Md3eComicMetadataEditFormPreview> createState() =>
+      _Md3eComicMetadataEditFormPreviewState();
+}
+
+class _Md3eComicMetadataEditFormPreviewState
+    extends State<_Md3eComicMetadataEditFormPreview> {
+  late Md3eComicMetadataEditDraft _draft =
+      Md3eComicMetadataEditDraft.fromEntry(Md3eComicDetailPagePreviewData.sample());
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 640),
+      child: Md3eComicMetadataEditForm(
+        draft: _draft,
+        onDraftChanged: (Md3eComicMetadataEditDraft value) {
+          setState(() => _draft = value);
+        },
+      ),
+    );
+  }
+}
+
+class _Md3eSeriesMetadataEditFormPreview extends StatefulWidget {
+  const _Md3eSeriesMetadataEditFormPreview();
+
+  @override
+  State<_Md3eSeriesMetadataEditFormPreview> createState() =>
+      _Md3eSeriesMetadataEditFormPreviewState();
+}
+
+class _Md3eSeriesMetadataEditFormPreviewState
+    extends State<_Md3eSeriesMetadataEditFormPreview> {
+  late Md3eSeriesMetadataEditDraft _draft =
+      Md3eSeriesMetadataEditDraft.fromEntry(
+        Md3eSeriesDetailPagePreviewData.sample(),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 480),
+      child: Md3eSeriesMetadataEditForm(
+        draft: _draft,
+        onDraftChanged: (Md3eSeriesMetadataEditDraft value) {
+          setState(() => _draft = value);
         },
       ),
     );
