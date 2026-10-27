@@ -1,3 +1,4 @@
+import 'package:hentai_library/md3e/widgets/inputs/md3e_calendar_month_picker.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_calendar_year_picker.dart';
 import 'package:material_3_expressive/components/date_pickers/components/m3e_date_picker_mode_toggle.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -149,7 +150,7 @@ class _Md3eEmbeddableCalendarDatePickerState
 
         if (widget.expandToFit) {
           final Widget picker = switch (_mode) {
-            M3EDatePickerMode.day => M3EMonthPicker(
+            M3EDatePickerMode.day => Md3eCalendarMonthPicker(
               initialMonth: _displayedMonth,
               firstDate: _firstDate,
               lastDate: _lastDate,
@@ -197,7 +198,7 @@ class _Md3eEmbeddableCalendarDatePickerState
               child: SizedBox(
                 height: _inlinePickerBodyHeight(context),
                 child: switch (_mode) {
-                  M3EDatePickerMode.day => M3EMonthPicker(
+                  M3EDatePickerMode.day => Md3eCalendarMonthPicker(
                     initialMonth: _displayedMonth,
                     firstDate: _firstDate,
                     lastDate: _lastDate,

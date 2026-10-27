@@ -7,19 +7,20 @@ import 'package:hentai_library/md3e/widgets/inputs/md3e_embeddable_calendar_date
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kAnchoredCalendarGap = 4;
-const EdgeInsets _kAnchoredCalendarScreenPadding = EdgeInsets.all(8);
 
-/// 在 [anchor] 附近以浮层展示 [Md3eEmbeddableCalendarDatePicker]。
+/// 在 [layerLink] 锚点处以浮层展示 [Md3eEmbeddableCalendarDatePicker]。
 ///
-/// 点击遮罩或按 Esc 关闭；在「日」视图点选某一天时关闭（年份格点选仍留在浮层内切到月历）。
+/// 使用 [CompositedTransformFollower] 对齐字段，避免 Widgetbook / 嵌套滚动下
+/// root overlay 坐标换算错位。点击遮罩或按 Esc 关闭；月历点选某一天后关闭。
 Future<void> md3eShowAnchoredCalendarDatePicker({
   required BuildContext context,
-  required Rect anchor,
+  required LayerLink layerLink,
   required DateTime firstDate,
   required DateTime lastDate,
   required ValueChanged<DateTime> onDateChanged,
   DateTime? initialDate,
   M3EDatePickerMode initialCalendarMode = M3EDatePickerMode.year,
+  BuildContext? placementContext,
 }) {
   final M3EThemeData themeData = M3ETheme.of(context);
   final Locale locale = Localizations.localeOf(context);
@@ -48,7 +49,8 @@ Future<void> md3eShowAnchoredCalendarDatePicker({
           child: M3ETheme(
             data: themeData,
             child: _Md3eAnchoredCalendarDatePickerLayer(
-              anchor: anchor,
+              layerLink: layerLink,
+              placementContext: placementContext ?? context,
               firstDate: firstDate,
               lastDate: lastDate,
               initialDate: initialDate,
@@ -66,9 +68,10 @@ Future<void> md3eShowAnchoredCalendarDatePicker({
   return completer.future;
 }
 
-class _Md3eAnchoredCalendarDatePickerLayer extends StatelessWidget {
+class _Md3eAnchoredCalendarDatePickerLayer extends StatefulWidget {
   const _Md3eAnchoredCalendarDatePickerLayer({
-    required this.anchor,
+    required this.layerLink,
+    required this.placementContext,
     required this.firstDate,
     required this.lastDate,
     required this.onDateChanged,
@@ -78,7 +81,8 @@ class _Md3eAnchoredCalendarDatePickerLayer extends StatelessWidget {
     this.initialCalendarMode = M3EDatePickerMode.year,
   });
 
-  final Rect anchor;
+  final LayerLink layerLink;
+  final BuildContext placementContext;
   final DateTime firstDate;
   final DateTime lastDate;
   final DateTime? initialDate;
@@ -88,26 +92,63 @@ class _Md3eAnchoredCalendarDatePickerLayer extends StatelessWidget {
   final VoidCallback onDismiss;
 
   @override
+  State<_Md3eAnchoredCalendarDatePickerLayer> createState() =>
+      _Md3eAnchoredCalendarDatePickerLayerState();
+}
+
+class _Md3eAnchoredCalendarDatePickerLayerState
+    extends State<_Md3eAnchoredCalendarDatePickerLayer> {
+  bool _openBelow = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _resolveVerticalPlacement());
+  }
+
+  void _resolveVerticalPlacement() {
+    if (!mounted) {
+      return;
+    }
+    final RenderObject? object =
+        widget.placementContext.findRenderObject();
+    if (object is! RenderBox || !object.hasSize || !object.attached) {
+      return;
+    }
+    const double estimatedPanelHeight = 360;
+    final double screenHeight = MediaQuery.sizeOf(context).height;
+    final Offset topLeft = object.localToGlobal(Offset.zero);
+    final double spaceBelow =
+        screenHeight - topLeft.dy - object.size.height - _kAnchoredCalendarGap;
+    final double spaceAbove = topLeft.dy - _kAnchoredCalendarGap;
+    final bool openBelow = spaceBelow >= estimatedPanelHeight
+        ? true
+        : spaceAbove >= estimatedPanelHeight
+        ? false
+        : spaceBelow >= spaceAbove;
+    if (openBelow != _openBelow) {
+      setState(() => _openBelow = openBelow);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final Size screen = MediaQuery.sizeOf(context);
-    final M3EDatePickerTheme dateTheme = M3ETheme.of(context).datePickerTheme;
-    final double panelWidth = dateTheme.width;
-    final double left = _horizontalOffset(
-      anchor: anchor,
-      panelWidth: panelWidth,
-      screenWidth: screen.width,
-    );
-    final bool openBelow = _preferOpenBelow(
-      anchor: anchor,
-      screenHeight: screen.height,
-    );
+    final Alignment targetAnchor = _openBelow
+        ? Alignment.bottomLeft
+        : Alignment.topLeft;
+    final Alignment followerAnchor = _openBelow
+        ? Alignment.topLeft
+        : Alignment.bottomLeft;
+    final double verticalOffset = _openBelow
+        ? _kAnchoredCalendarGap
+        : -_kAnchoredCalendarGap;
 
     return Focus(
       autofocus: true,
       onKeyEvent: (FocusNode node, KeyEvent event) {
         if (event is KeyDownEvent &&
             event.logicalKey == LogicalKeyboardKey.escape) {
-          onDismiss();
+          widget.onDismiss();
           return KeyEventResult.handled;
         }
         return KeyEventResult.ignored;
@@ -117,41 +158,58 @@ class _Md3eAnchoredCalendarDatePickerLayer extends StatelessWidget {
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: onDismiss,
+              onTap: widget.onDismiss,
               child: const SizedBox.expand(),
             ),
           ),
-          if (openBelow)
-            Positioned(
-              left: left,
-              top: anchor.bottom + _kAnchoredCalendarGap,
-              width: panelWidth,
-              child: _panel(
-                onDateChanged: onDateChanged,
-                onDaySelected: onDaySelected,
-              ),
-            )
-          else
-            Positioned(
-              left: left,
-              bottom: screen.height - anchor.top + _kAnchoredCalendarGap,
-              width: panelWidth,
-              child: _panel(
-                onDateChanged: onDateChanged,
-                onDaySelected: onDaySelected,
-              ),
+          CompositedTransformFollower(
+            link: widget.layerLink,
+            showWhenUnlinked: false,
+            targetAnchor: targetAnchor,
+            followerAnchor: followerAnchor,
+            offset: Offset(0, verticalOffset),
+            child: _CalendarPanel(
+              initialDate: widget.initialDate,
+              firstDate: widget.firstDate,
+              lastDate: widget.lastDate,
+              initialCalendarMode: widget.initialCalendarMode,
+              onDateChanged: widget.onDateChanged,
+              onDaySelected: widget.onDaySelected,
             ),
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _panel({
-    required ValueChanged<DateTime> onDateChanged,
-    required VoidCallback onDaySelected,
-  }) {
+class _CalendarPanel extends StatelessWidget {
+  const _CalendarPanel({
+    required this.firstDate,
+    required this.lastDate,
+    required this.onDateChanged,
+    required this.onDaySelected,
+    this.initialDate,
+    this.initialCalendarMode = M3EDatePickerMode.year,
+  });
+
+  final DateTime firstDate;
+  final DateTime lastDate;
+  final DateTime? initialDate;
+  final M3EDatePickerMode initialCalendarMode;
+  final ValueChanged<DateTime> onDateChanged;
+  final VoidCallback onDaySelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
+
     return Material(
-      type: MaterialType.transparency,
+      elevation: dateTheme.elevation,
+      borderRadius: dateTheme.borderRadius,
+      clipBehavior: Clip.antiAlias,
+      color: Colors.transparent,
       child: Md3eEmbeddableCalendarDatePicker(
         initialDate: initialDate,
         firstDate: firstDate,
@@ -161,38 +219,5 @@ class _Md3eAnchoredCalendarDatePickerLayer extends StatelessWidget {
         onDaySelected: (_) => onDaySelected(),
       ),
     );
-  }
-
-  static double _horizontalOffset({
-    required Rect anchor,
-    required double panelWidth,
-    required double screenWidth,
-  }) {
-    final double maxLeft =
-        screenWidth - panelWidth - _kAnchoredCalendarScreenPadding.right;
-    return anchor.left.clamp(
-      _kAnchoredCalendarScreenPadding.left,
-      maxLeft < _kAnchoredCalendarScreenPadding.left
-          ? _kAnchoredCalendarScreenPadding.left
-          : maxLeft,
-    );
-  }
-
-  static bool _preferOpenBelow({
-    required Rect anchor,
-    required double screenHeight,
-  }) {
-    const double estimatedPanelHeight = 360;
-    final double spaceBelow =
-        screenHeight - anchor.bottom - _kAnchoredCalendarScreenPadding.bottom;
-    final double spaceAbove =
-        anchor.top - _kAnchoredCalendarScreenPadding.top;
-    if (spaceBelow >= estimatedPanelHeight) {
-      return true;
-    }
-    if (spaceAbove >= estimatedPanelHeight) {
-      return false;
-    }
-    return spaceBelow >= spaceAbove;
   }
 }

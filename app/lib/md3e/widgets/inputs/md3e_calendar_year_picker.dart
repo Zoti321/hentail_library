@@ -6,6 +6,10 @@ import 'package:material_ui/material_ui.dart';
 /// 与 [Md3eCalendarYearPicker] 网格行高一致（略高于 M3E 默认 52，便于胶囊选中态留白）。
 const double kMd3eCalendarYearPickerRowHeight = 56;
 
+const double _kYearChipHeight = 40;
+const double _kYearChipHorizontalPadding = 12;
+final BorderRadius _kYearChipRadius = BorderRadius.circular(20);
+
 /// Lab 年份视图高度（对齐 [M3EDatePickerUtils.calendarYearViewHeight]，使用 [kMd3eCalendarYearPickerRowHeight]）。
 double md3eCalendarYearViewHeight(
   DateTime firstDate,
@@ -144,39 +148,55 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
       selected: selected,
       enabled: enabled,
     );
-    return M3ETappable(
-      enabled: enabled,
-      onTap: enabled ? () => widget.onChanged(candidate) : null,
-      semanticLabel: localizations.formatYear(DateTime(year)),
-      builder: (BuildContext context, M3EInteractionState state) {
-        return Align(
-          alignment: Alignment.center,
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 40),
-            padding: EdgeInsets.symmetric(
-              horizontal: selected ? 12 : 4,
-              vertical: 8,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: selected
-                  ? dateTheme.selectedDayBackgroundColor(theme.colorScheme)
-                  : null,
-            ),
-            child: Text(
-              localizations.formatYear(DateTime(year)),
-              maxLines: 1,
-              textAlign: TextAlign.center,
-              style: (selected
-                      ? dateTheme.selectedYearStyle
-                      : dateTheme.yearStyle)(
-                    theme.typeScale,
-                    theme.colorScheme,
-                  ).copyWith(color: foreground),
-            ),
-          ),
-        );
-      },
+    return SizedBox(
+      height: kMd3eCalendarYearPickerRowHeight,
+      width: double.infinity,
+      child: Center(
+        child: M3ETappable(
+          enabled: enabled,
+          onTap: enabled ? () => widget.onChanged(candidate) : null,
+          semanticLabel: localizations.formatYear(DateTime(year)),
+          builder: (BuildContext context, M3EInteractionState state) {
+            final M3EColorScheme scheme = theme.colorScheme;
+            final Color stateBase =
+                selected ? scheme.onPrimary : scheme.onSurface;
+            final double stateAlpha = enabled ? state.opacity : 0;
+            return SizedBox(
+              height: _kYearChipHeight,
+              width: double.infinity,
+              child: Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: _kYearChipHorizontalPadding,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: _kYearChipRadius,
+                  color: selected
+                      ? dateTheme.selectedDayBackgroundColor(scheme)
+                      : null,
+                ),
+                foregroundDecoration: stateAlpha > 0
+                    ? BoxDecoration(
+                        borderRadius: _kYearChipRadius,
+                        color: stateBase.withValues(alpha: stateAlpha),
+                      )
+                    : null,
+                child: Text(
+                  localizations.formatYear(DateTime(year)),
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  style: (selected
+                          ? dateTheme.selectedYearStyle
+                          : dateTheme.yearStyle)(
+                        theme.typeScale,
+                        scheme,
+                      ).copyWith(color: foreground),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
