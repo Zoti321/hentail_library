@@ -37,7 +37,12 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Interactive',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Center(child: _Md3eComicCardPreview(cover: _demoCover(context))),
+                    child: Center(
+                      child: _md3eComicCardKnobsPreview(
+                        context,
+                        cover: _demoCover(context),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -60,7 +65,10 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   name: 'Interactive',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: Center(
-                      child: _Md3eComicListItemPreview(cover: _demoCover(context)),
+                      child: _md3eComicListItemKnobsPreview(
+                        context,
+                        cover: _demoCover(context),
+                      ),
                     ),
                   ),
                 ),
@@ -113,8 +121,10 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Interactive',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: _Md3ePaginationPreview(),
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Center(
+                      child: _md3ePaginationKnobsPreview(context),
+                    ),
                   ),
                 ),
               ],
@@ -274,187 +284,168 @@ Widget _demoCover(BuildContext context) {
   );
 }
 
-class _Md3eComicCardPreview extends StatefulWidget {
-  const _Md3eComicCardPreview({required this.cover});
+Widget _md3eComicCardKnobsPreview(
+  BuildContext context, {
+  required Widget cover,
+}) {
+  final bool disabled = context.knobs.boolean(
+    label: '禁用',
+    initialValue: false,
+  );
+  final bool selectionMode = disabled
+      ? false
+      : context.knobs.boolean(
+          label: '选择模式',
+          description: '开启后点击卡片或复选框切换选中。',
+          initialValue: false,
+        );
 
-  final Widget cover;
-
-  @override
-  State<_Md3eComicCardPreview> createState() => _Md3eComicCardPreviewState();
+  return _Md3eComicCardKnobsHost(
+    cover: cover,
+    disabled: disabled,
+    selectionMode: selectionMode,
+  );
 }
 
-class _Md3eComicCardPreviewState extends State<_Md3eComicCardPreview> {
-  bool _disabled = false;
-  bool _selectionMode = false;
+class _Md3eComicCardKnobsHost extends StatefulWidget {
+  const _Md3eComicCardKnobsHost({
+    required this.cover,
+    required this.disabled,
+    required this.selectionMode,
+  });
+
+  final Widget cover;
+  final bool disabled;
+  final bool selectionMode;
+
+  @override
+  State<_Md3eComicCardKnobsHost> createState() => _Md3eComicCardKnobsHostState();
+}
+
+class _Md3eComicCardKnobsHostState extends State<_Md3eComicCardKnobsHost> {
   bool _selected = false;
 
   @override
-  Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final M3ETypeScale type = M3ETheme.of(context).typeScale;
-    final bool cardEnabled = !_disabled;
+  void didUpdateWidget(covariant _Md3eComicCardKnobsHost oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.disabled || !widget.selectionMode) {
+      _selected = false;
+    }
+  }
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: 20,
-        children: <Widget>[
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            alignment: WrapAlignment.center,
-            children: <Widget>[
-              M3EChip(
-                label: '禁用',
-                type: M3EChipType.filter,
-                selected: _disabled,
-                onPressed: () {
-                  setState(() {
-                    _disabled = !_disabled;
-                    if (_disabled) {
-                      _selectionMode = false;
-                      _selected = false;
-                    }
-                  });
-                },
-              ),
-              M3EChip(
-                label: '选择模式',
-                type: M3EChipType.filter,
-                selected: _selectionMode,
-                onPressed: cardEnabled
-                    ? () {
-                        setState(() {
-                          _selectionMode = !_selectionMode;
-                          if (!_selectionMode) {
-                            _selected = false;
-                          }
-                        });
-                      }
-                    : null,
-              ),
-            ],
-          ),
-          Text(
-            '悬停、按下、聚焦（Tab）与拖拽由卡片交互呈现；'
-            '点击卡片或左上角复选框可切换选中。',
-            textAlign: TextAlign.center,
-            style: type.bodySmall.copyWith(color: scheme.onSurfaceVariant),
-          ),
-          SizedBox(
-            width: 160,
-            child: Md3eComicCard(
-              title: '深海图书馆',
-              subtitle: '128 页',
-              readProgress: kMd3eWidgetbookComicReadProgress,
-              cover: widget.cover,
-              enabled: cardEnabled,
-              selectionMode: _selectionMode,
-              selected: _selected,
-              onTap: _selectionMode ? null : () {},
-              onSelectionChanged: _selectionMode
-                  ? (bool value) => setState(() => _selected = value)
-                  : null,
-            ),
-          ),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 160,
+      child: Md3eComicCard(
+        title: '深海图书馆',
+        subtitle: '128 页',
+        readProgress: kMd3eWidgetbookComicReadProgress,
+        cover: widget.cover,
+        enabled: !widget.disabled,
+        selectionMode: widget.selectionMode,
+        selected: _selected,
+        onTap: widget.selectionMode ? null : () {},
+        onSelectionChanged: widget.selectionMode
+            ? (bool value) => setState(() => _selected = value)
+            : null,
       ),
     );
   }
 }
 
-class _Md3eComicListItemPreview extends StatefulWidget {
-  const _Md3eComicListItemPreview({required this.cover});
+Widget _md3eComicListItemKnobsPreview(
+  BuildContext context, {
+  required Widget cover,
+}) {
+  final bool disabled = context.knobs.boolean(
+    label: '禁用',
+    initialValue: false,
+  );
+  final bool selectionMode = disabled
+      ? false
+      : context.knobs.boolean(
+          label: '选择模式',
+          description: '开启后点击行或复选框切换选中。',
+          initialValue: false,
+        );
 
-  final Widget cover;
-
-  @override
-  State<_Md3eComicListItemPreview> createState() =>
-      _Md3eComicListItemPreviewState();
+  return _Md3eComicListItemKnobsHost(
+    cover: cover,
+    disabled: disabled,
+    selectionMode: selectionMode,
+  );
 }
 
-class _Md3eComicListItemPreviewState extends State<_Md3eComicListItemPreview> {
-  bool _disabled = false;
-  bool _selectionMode = false;
+class _Md3eComicListItemKnobsHost extends StatefulWidget {
+  const _Md3eComicListItemKnobsHost({
+    required this.cover,
+    required this.disabled,
+    required this.selectionMode,
+  });
+
+  final Widget cover;
+  final bool disabled;
+  final bool selectionMode;
+
+  @override
+  State<_Md3eComicListItemKnobsHost> createState() =>
+      _Md3eComicListItemKnobsHostState();
+}
+
+class _Md3eComicListItemKnobsHostState extends State<_Md3eComicListItemKnobsHost> {
   bool _selected = false;
 
   @override
-  Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final M3ETypeScale type = M3ETheme.of(context).typeScale;
-    final bool rowEnabled = !_disabled;
+  void didUpdateWidget(covariant _Md3eComicListItemKnobsHost oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.disabled || !widget.selectionMode) {
+      _selected = false;
+    }
+  }
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: 20,
-        children: <Widget>[
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            alignment: WrapAlignment.center,
-            children: <Widget>[
-              M3EChip(
-                label: '禁用',
-                type: M3EChipType.filter,
-                selected: _disabled,
-                onPressed: () {
-                  setState(() {
-                    _disabled = !_disabled;
-                    if (_disabled) {
-                      _selectionMode = false;
-                      _selected = false;
-                    }
-                  });
-                },
-              ),
-              M3EChip(
-                label: '选择模式',
-                type: M3EChipType.filter,
-                selected: _selectionMode,
-                onPressed: rowEnabled
-                    ? () {
-                        setState(() {
-                          _selectionMode = !_selectionMode;
-                          if (!_selectionMode) {
-                            _selected = false;
-                          }
-                        });
-                      }
-                    : null,
-              ),
-            ],
-          ),
-          Text(
-            '悬停、按下、聚焦（Tab）由列表行交互呈现；'
-            '点击行或左侧复选框可切换选中。',
-            textAlign: TextAlign.center,
-            style: type.bodySmall.copyWith(color: scheme.onSurfaceVariant),
-          ),
-          SizedBox(
-            width: 400,
-            child: Md3eComicListItem(
-              title: '深海图书馆',
-              author: '示例作者',
-              pageLabel: '128 页',
-              readProgress: kMd3eWidgetbookComicReadProgress,
-              moreMenuEntries: _demoComicListMoreMenu(),
-              cover: widget.cover,
-              enabled: rowEnabled,
-              selectionMode: _selectionMode,
-              selected: _selected,
-              onTap: _selectionMode ? null : () {},
-              onSelectionChanged: _selectionMode
-                  ? (bool value) => setState(() => _selected = value)
-                  : null,
-            ),
-          ),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 400,
+      child: Md3eComicListItem(
+        title: '深海图书馆',
+        author: '示例作者',
+        pageLabel: '128 页',
+        readProgress: kMd3eWidgetbookComicReadProgress,
+        moreMenuEntries: _demoComicListMoreMenu(),
+        cover: widget.cover,
+        enabled: !widget.disabled,
+        selectionMode: widget.selectionMode,
+        selected: _selected,
+        onTap: widget.selectionMode ? null : () {},
+        onSelectionChanged: widget.selectionMode
+            ? (bool value) => setState(() => _selected = value)
+            : null,
       ),
     );
   }
+}
+
+const int _kMd3eWidgetbookPaginationTotalPages = 12;
+
+Widget _md3ePaginationKnobsPreview(BuildContext context) {
+  final int page = context.knobs.int.slider(
+    label: '当前页',
+    description: '紧凑/标准由 Viewport addon 窗口宽度决定（与漫画库页一致）。',
+    initialValue: 5,
+    min: 1,
+    max: _kMd3eWidgetbookPaginationTotalPages,
+    divisions: _kMd3eWidgetbookPaginationTotalPages - 1,
+  );
+
+  return Md3ePagination(
+    page: page,
+    totalPages: _kMd3eWidgetbookPaginationTotalPages,
+    totalItems: 120,
+    pageSize: 10,
+    onPageChanged: (_) {},
+  );
 }
 
 class _Md3eLibraryBrowsePagePreview extends StatefulWidget {
@@ -635,49 +626,6 @@ class _Md3eLibraryFilterSortSideSheetPreviewState
           );
         },
       ),
-    );
-  }
-}
-
-class _Md3ePaginationPreview extends StatefulWidget {
-  const _Md3ePaginationPreview();
-
-  @override
-  State<_Md3ePaginationPreview> createState() => _Md3ePaginationPreviewState();
-}
-
-class _Md3ePaginationPreviewState extends State<_Md3ePaginationPreview> {
-  static const int _totalPages = 12;
-  static const int _totalItems = 120;
-  static const int _pageSize = 10;
-
-  int _page = 5;
-
-  @override
-  Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final M3ETypeScale type = M3ETheme.of(context).typeScale;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      spacing: 20,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text(
-            '使用 Viewport addon 切换窗口宽度（与漫画库页相同断点逻辑）。',
-            textAlign: TextAlign.center,
-            style: type.bodySmall.copyWith(color: scheme.onSurfaceVariant),
-          ),
-        ),
-        Md3ePagination(
-          page: _page,
-          totalPages: _totalPages,
-          totalItems: _totalItems,
-          pageSize: _pageSize,
-          onPageChanged: (int page) => setState(() => _page = page),
-        ),
-      ],
     );
   }
 }
