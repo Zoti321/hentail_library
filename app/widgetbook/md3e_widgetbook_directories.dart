@@ -7,7 +7,6 @@ import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_it
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_metadata_tags_section.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
-import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
@@ -27,7 +26,6 @@ import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_managed_named_facet_ui.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
@@ -219,37 +217,6 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                           initialRailExtended: false,
                           surfaceRoles:
                               Md3eDesktopShellSurfaceRoles.toneBased(scheme),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            WidgetbookComponent(
-              name: 'Md3eLibraryPageHeader',
-              useCases: <WidgetbookUseCase>[
-                WidgetbookUseCase(
-                  name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) {
-                    final double width = MediaQuery.sizeOf(context).width;
-                    final Md3eWindowSizeClass sizeClass =
-                        Md3eWindowSizeClass.fromWidth(width);
-                    final double horizontal =
-                        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(
-                          sizeClass,
-                        );
-                    return Md3eWidgetbookScope(
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            horizontal,
-                            24,
-                            horizontal,
-                            0,
-                          ),
-                          child: const _Md3eLibraryPageHeaderPreview(),
                         ),
                       ),
                     );
@@ -885,50 +852,6 @@ class _Md3eCatalogViewModeButtonGroupPreviewState
       onModeChanged: (Md3eCatalogViewMode value) {
         setState(() => _mode = value);
       },
-    );
-  }
-}
-
-class _Md3eLibraryPageHeaderPreview extends StatefulWidget {
-  const _Md3eLibraryPageHeaderPreview();
-
-  @override
-  State<_Md3eLibraryPageHeaderPreview> createState() =>
-      _Md3eLibraryPageHeaderPreviewState();
-}
-
-class _Md3eLibraryPageHeaderPreviewState
-    extends State<_Md3eLibraryPageHeaderPreview> {
-  Md3eLibraryFilterSortState _filterSort = Md3eLibraryFilterSortState.defaults;
-  int _pageSize = 50;
-
-  @override
-  Widget build(BuildContext context) {
-    return Md3eLibraryFilterSortDrawerHost(
-      initialState: _filterSort,
-      useRootNavigator: false,
-      onStateChanged: (Md3eLibraryFilterSortState value) {
-        setState(() => _filterSort = value);
-      },
-      body: Builder(
-        builder: (BuildContext hostContext) {
-          return Md3eLibraryPageHeader(
-            filterSortActive: _filterSort.isCustomized,
-            pageSize: _pageSize,
-            onPageSizeChanged: (int value) => setState(() => _pageSize = value),
-            overflowMenuEntries: <M3EMenuEntry>[
-              M3EMenuEntry(
-                label: '刷新目录',
-                leading: const Icon(Icons.refresh),
-                onPressed: () {},
-              ),
-            ],
-            onFilterSort: () => Md3eLibraryFilterSortDrawerHost.openDrawer(
-              hostContext,
-            ),
-          );
-        },
-      ),
     );
   }
 }

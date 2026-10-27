@@ -27,12 +27,9 @@ class Md3eSeriesSerializationDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final Md3eSeriesSerializationStatus resolved = _selectable.contains(value)
-        ? value
-        : Md3eSeriesSerializationStatus.ongoing;
+    final bool hasSelection = _selectable.contains(value);
 
     return M3EDropdownMenu<Md3eSeriesSerializationStatus>(
-      key: ValueKey<Md3eSeriesSerializationStatus>(resolved),
       enabled: enabled,
       singleSelect: true,
       showChipAnimation: false,
@@ -41,18 +38,20 @@ class Md3eSeriesSerializationDropdown extends StatelessWidget {
             (Md3eSeriesSerializationStatus status) => M3EDropdownItem(
               label: _label(l10n, status),
               value: status,
-              selected: status == resolved,
+              selected: hasSelection && status == value,
             ),
           )
           .toList(),
       fieldStyle: M3EDropdownFieldStyle(
         hintText: l10n.formSeriesSerializationStatusLabel,
+        showClearIcon: true,
         selectedTextStyle: theme.typeScale.bodyLarge.copyWith(
           color: theme.colorScheme.onSurface,
         ),
       ),
       onSelectionChanged: (List<M3EDropdownItem<Md3eSeriesSerializationStatus>> items) {
         if (items.isEmpty) {
+          onChanged(Md3eSeriesSerializationStatus.unknown);
           return;
         }
         onChanged(items.first.value);
