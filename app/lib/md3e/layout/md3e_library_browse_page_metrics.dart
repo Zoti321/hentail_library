@@ -1,5 +1,6 @@
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_pinned_toolbar_chrome_metrics.dart';
+import 'package:hentai_library/md3e/layout/md3e_spacing.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -13,12 +14,12 @@ abstract final class Md3eLibraryBrowsePageMetrics {
   static const double pinnedHeaderElevation =
       Md3ePinnedToolbarChromeMetrics.pinnedHeaderElevation;
 
-  static const double scrollToTopBottomInset = 24;
+  static const double scrollToTopBottomInset = Md3eSpacing.space24;
   static const double scrollToTopShowViewportRatio = 1;
   static const double scrollToTopHideViewportRatio = 0.85;
 
   /// FAB 圆角（regular 规格默认 16；较大尺寸也统一为 16）。
-  static const double scrollToTopCornerRadius = 16;
+  static const double scrollToTopCornerRadius = Md3eSpacing.space16;
 
   /// 响应式 [M3EFab] 尺寸（56 / 80 / 96dp 容器）。
   static M3EFabSize scrollToTopFabSize(Md3eWindowSizeClass sizeClass) {
@@ -61,19 +62,11 @@ abstract final class Md3eLibraryBrowsePageMetrics {
   }
 
   /// Gap between view-mode row and grid / list body.
-  static double catalogBodyTopSpacing(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 16,
-      _ => 24,
-    };
-  }
+  static double catalogBodyTopSpacing(Md3eWindowSizeClass sizeClass) =>
+      Md3eSpacing.catalogBodyBelowToolbar(sizeClass);
 
-  static double paginationVerticalSpacing(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 24,
-      _ => 32,
-    };
-  }
+  static double paginationVerticalSpacing(Md3eWindowSizeClass sizeClass) =>
+      Md3eSpacing.paginationVertical(sizeClass);
 
   /// Extra scroll padding so the FAB does not cover pagination.
   static double scrollBottomInset(Md3eWindowSizeClass sizeClass) {

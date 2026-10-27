@@ -1,6 +1,7 @@
 import 'package:flutter/painting.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_pinned_toolbar_chrome_metrics.dart';
+import 'package:hentai_library/md3e/layout/md3e_spacing.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -19,10 +20,10 @@ abstract final class Md3eComicDetailPageMetrics {
 
   static double contentHorizontalPadding(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 16,
-      Md3eWindowSizeClass.medium => 24,
-      Md3eWindowSizeClass.expanded => 32,
-      Md3eWindowSizeClass.large => 40,
+      Md3eWindowSizeClass.compact => Md3eSpacing.space16,
+      Md3eWindowSizeClass.medium => Md3eSpacing.space24,
+      Md3eWindowSizeClass.expanded => Md3eSpacing.space32,
+      Md3eWindowSizeClass.large => Md3eSpacing.space40,
       Md3eWindowSizeClass.extraLarge =>
         Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(sizeClass),
     };
@@ -39,17 +40,17 @@ abstract final class Md3eComicDetailPageMetrics {
 
   static double primaryToMetadataSpacing(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 28,
-      Md3eWindowSizeClass.medium => 32,
-      _ => 40,
+      Md3eWindowSizeClass.compact => Md3eSpacing.space28,
+      Md3eWindowSizeClass.medium => Md3eSpacing.space32,
+      _ => Md3eSpacing.space40,
     };
   }
 
   static double metadataTagsToResourceSpacing(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 24,
-      Md3eWindowSizeClass.medium => 28,
-      _ => 32,
+      Md3eWindowSizeClass.compact => Md3eSpacing.space24,
+      Md3eWindowSizeClass.medium => Md3eSpacing.space28,
+      _ => Md3eSpacing.space32,
     };
   }
 
@@ -65,16 +66,16 @@ abstract final class Md3eComicDetailPageMetrics {
 
   static double primaryRowGap(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 16,
-      Md3eWindowSizeClass.medium => 20,
-      _ => 24,
+      Md3eWindowSizeClass.compact => Md3eSpacing.space16,
+      Md3eWindowSizeClass.medium => Md3eSpacing.space20,
+      _ => Md3eSpacing.space24,
     };
   }
 
   static double primaryColumnSpacing(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 12,
-      _ => 16,
+      Md3eWindowSizeClass.compact => Md3eSpacing.space12,
+      _ => Md3eSpacing.space16,
     };
   }
 
@@ -97,5 +98,5 @@ abstract final class Md3eComicDetailPageMetrics {
     );
   }
 
-  static const double scrollBottomInset = 24;
+  static const double scrollBottomInset = Md3eSpacing.space24;
 }

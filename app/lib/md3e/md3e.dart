@@ -3,6 +3,8 @@ library;
 
 export 'interaction/md3e_pointer_target.dart';
 export 'layout/md3e_breakpoints.dart';
+export 'layout/md3e_spacing.dart';
+export 'layout/md3e_pinned_toolbar_chrome_metrics.dart';
 export 'layout/md3e_catalog_grid.dart';
 export 'layout/md3e_catalog_grid_metrics.dart';
 export 'layout/md3e_catalog_list_layout.dart';
