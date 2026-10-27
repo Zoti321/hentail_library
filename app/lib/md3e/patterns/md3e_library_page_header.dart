@@ -47,16 +47,20 @@ class Md3eLibraryPageHeader extends StatelessWidget {
             : windowWidth;
         final Md3eWindowSizeClass sizeClass =
             Md3eWindowSizeClass.fromWidth(windowWidth);
+        final bool embedTabs = onDisplayTargetChanged != null;
         return Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: Md3eLibraryPageHeaderMetrics.verticalPadding,
+          padding: EdgeInsets.only(
+            top: Md3eLibraryPageHeaderMetrics.verticalPadding,
+            bottom: embedTabs
+                ? Md3eLibraryPageHeaderMetrics.verticalPadding
+                : Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding,
           ),
           child: _Md3eLibraryPageHeaderToolbar(
             title: title,
             displayTarget: displayTarget,
             sizeClass: sizeClass,
             viewportWidth: contentWidth,
-            embedTabs: onDisplayTargetChanged != null,
+            embedTabs: embedTabs,
             onDisplayTargetChanged: onDisplayTargetChanged,
             onFilterSort: onFilterSort,
             overflowMenuEntries: overflowMenuEntries,

@@ -42,11 +42,11 @@ abstract final class Md3eLibraryBrowsePageMetrics {
     return Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(sizeClass);
   }
 
-  /// Gap below pinned header before tabs + count row.
+  /// Gap below pinned header before tabs + count row (header already has bottom inset).
   static double catalogToolbarTopSpacing(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 16,
-      _ => 24,
+      Md3eWindowSizeClass.compact => 12,
+      _ => 16,
     };
   }
 

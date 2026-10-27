@@ -15,6 +15,9 @@ abstract final class Md3eLibraryPageHeaderMetrics {
   static const double toolbarHeight = 44;
   /// 与生产 `kLibraryHeaderVerticalPadding` 一致；页顶不再额外叠一层 browse 外边距。
   static const double verticalPadding = 10;
+
+  /// Browse 粘滞头无内嵌 tabs 时，缩小底距以免与 [Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing] 叠成过大空隙。
+  static const double browsePinnedHeaderBottomPadding = 4;
   static const double actionIconSize = 20;
 
   /// 与生产 [LibraryDisplayTargetTabs] 一致的两 tab 间距。
