@@ -8,6 +8,7 @@ import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_meta
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
+import 'package:hentai_library/md3e/pages/md3e_history_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
@@ -296,6 +297,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 ),
               ],
             ),
+            WidgetbookComponent(
+              name: 'Md3eHistoryBrowsePage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: _Md3eHistoryBrowsePagePreview(),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ],
@@ -524,6 +536,37 @@ Widget _md3ePaginationKnobsPreview(BuildContext context) {
     pageSize: 10,
     onPageChanged: (_) {},
   );
+}
+
+class _Md3eHistoryBrowsePagePreview extends StatefulWidget {
+  const _Md3eHistoryBrowsePagePreview();
+
+  @override
+  State<_Md3eHistoryBrowsePagePreview> createState() =>
+      _Md3eHistoryBrowsePagePreviewState();
+}
+
+class _Md3eHistoryBrowsePagePreviewState
+    extends State<_Md3eHistoryBrowsePagePreview> {
+  int _itemCount = Md3eHistoryBrowsePagePreviewData.sampleTitles.length;
+
+  @override
+  Widget build(BuildContext context) {
+    return Md3eHistoryBrowsePage(
+      totalCount: _itemCount,
+      itemCount: _itemCount,
+      onClearAll: () => setState(() => _itemCount = 0),
+      itemBuilder: (BuildContext context, int index) {
+        final String title =
+            Md3eHistoryBrowsePagePreviewData.sampleTitles[
+                index % Md3eHistoryBrowsePagePreviewData.sampleTitles.length];
+        return _Md3eReadingHistoryListItemPreview(
+          title: title,
+          cover: _demoCover(context),
+        );
+      },
+    );
+  }
 }
 
 class _Md3eManagementBrowsePagePreview extends StatefulWidget {
