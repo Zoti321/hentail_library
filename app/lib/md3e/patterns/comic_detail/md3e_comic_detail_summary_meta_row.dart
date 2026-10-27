@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_entry.dart';
-import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_age_restriction_chip_slot.dart';
+import 'package:hentai_library/md3e/patterns/shared/md3e_age_restriction_chip_mount.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const String kMd3eComicDetailSummaryMetaSeparator = ' • ';
@@ -19,25 +19,19 @@ class Md3eComicDetailSummaryMetaRow extends StatefulWidget {
 
 class _Md3eComicDetailSummaryMetaRowState
     extends State<Md3eComicDetailSummaryMetaRow> {
-  bool _ageChipMounted = false;
+  bool _ageChipInTree = false;
 
   @override
   void initState() {
     super.initState();
-    _ageChipMounted = widget.entry.showAgeRestrictionChip;
+    _ageChipInTree = widget.entry.showAgeRestrictionChip;
   }
 
   @override
   void didUpdateWidget(covariant Md3eComicDetailSummaryMetaRow oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.entry.showAgeRestrictionChip) {
-      _ageChipMounted = true;
-    }
-  }
-
-  void _onAgeChipFullyHidden() {
-    if (mounted) {
-      setState(() => _ageChipMounted = false);
+      _ageChipInTree = true;
     }
   }
 
@@ -56,11 +50,11 @@ class _Md3eComicDetailSummaryMetaRowState
 
     final List<Widget> children = <Widget>[];
 
-    if (_ageChipMounted) {
+    if (_ageChipInTree) {
       children.add(
-        Md3eComicDetailAgeRestrictionChipSlot(
+        Md3eAgeRestrictionChipMount(
           visible: widget.entry.showAgeRestrictionChip,
-          onFullyHidden: _onAgeChipFullyHidden,
+          onFullyHidden: () => setState(() => _ageChipInTree = false),
         ),
       );
     }

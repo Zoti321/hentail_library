@@ -44,6 +44,8 @@ class Md3eSeriesDetailEntry {
   final String title;
   final Widget? cover;
   final Md3eSeriesSerializationStatus serializationStatus;
+
+  /// 已本地化的语言展示名（卷册语言并集；多数系列仅一项）。
   final List<String> languages;
   final bool showAgeRestrictionChip;
   final int volumeCurrent;

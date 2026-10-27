@@ -6,6 +6,7 @@ import 'package:hentai_library/md3e/pages/md3e_series_detail_entry.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_comics_section.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_intro_section.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_page_header.dart';
+import 'package:hentai_library/md3e/widgets/navigation/md3e_library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -38,30 +39,36 @@ class Md3eSeriesDetailPage extends StatefulWidget {
 }
 
 class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
-  late Md3eSeriesDetailEntry _entry = widget.entry;
+  final GlobalKey _comicsSectionKey = GlobalKey();
   late int _pageSize = widget.entry.initialPageSize;
-  late int _page = widget.entry.initialPage.clamp(1, _totalPages);
+  late int _page = widget.entry.initialPage.clamp(
+    1,
+    _totalPagesFor(widget.entry, widget.entry.initialPageSize),
+  );
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
 
-  int get _totalPages {
-    final int count = _entry.comics.length;
+  static int _totalPagesFor(Md3eSeriesDetailEntry entry, int pageSize) {
+    final int count = entry.comics.length;
     if (count == 0) {
       return 1;
     }
-    return (count / _pageSize).ceil();
+    return (count / pageSize).ceil();
   }
 
+  int get _totalPages => _totalPagesFor(widget.entry, _pageSize);
+
   List<Md3eSeriesDetailComicItem> get _pageItems {
-    if (_entry.comics.isEmpty) {
+    final List<Md3eSeriesDetailComicItem> comics = widget.entry.comics;
+    if (comics.isEmpty) {
       return const <Md3eSeriesDetailComicItem>[];
     }
     final int start = (_page - 1) * _pageSize;
-    if (start >= _entry.comics.length) {
+    if (start >= comics.length) {
       return const <Md3eSeriesDetailComicItem>[];
     }
-    final int end = (start + _pageSize).clamp(0, _entry.comics.length);
-    return _entry.comics.sublist(start, end);
+    final int end = (start + _pageSize).clamp(0, comics.length);
+    return comics.sublist(start, end);
   }
 
   @override
@@ -75,7 +82,6 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
   void didUpdateWidget(covariant Md3eSeriesDetailPage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.entry != widget.entry) {
-      _entry = widget.entry;
       _pageSize = widget.entry.initialPageSize;
       _page = widget.entry.initialPage.clamp(1, _totalPages);
     }
@@ -114,8 +120,24 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
     ];
   }
 
+  void _scrollToComicsSection() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final BuildContext? target = _comicsSectionKey.currentContext;
+      if (!mounted || target == null) {
+        return;
+      }
+      Scrollable.ensureVisible(
+        target,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+        alignment: 0,
+      );
+    });
+  }
+
   void _setPage(int page) {
     setState(() => _page = page.clamp(1, _totalPages));
+    _scrollToComicsSection();
   }
 
   void _setPageSize(int size) {
@@ -123,6 +145,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
       _pageSize = size;
       _page = _page.clamp(1, _totalPages);
     });
+    _scrollToComicsSection();
   }
 
   @override
@@ -148,34 +171,45 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
             onPageSizeChanged: _setPageSize,
           ),
           Expanded(
-            child: CustomScrollView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: <Widget>[
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    horizontalPadding,
-                    introTop,
-                    horizontalPadding,
-                    0,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: Md3eSeriesDetailIntroSection(
-                      entry: _entry,
-                      onMetadataChipTap:
-                          widget.onMetadataChipTap ?? (_) {},
+            child: Stack(
+              children: <Widget>[
+                CustomScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: <Widget>[
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        introTop,
+                        horizontalPadding,
+                        0,
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: Md3eSeriesDetailIntroSection(
+                          entry: widget.entry,
+                          onMetadataChipTap:
+                              widget.onMetadataChipTap ?? (_) {},
+                        ),
+                      ),
                     ),
-                  ),
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                      ),
+                      sliver: Md3eSeriesDetailComicsSection(
+                        gridSectionKey: _comicsSectionKey,
+                        pageItems: _pageItems,
+                        page: _page,
+                        totalPages: _totalPages,
+                        onPageChanged: _setPage,
+                        onComicTap: widget.onComicTap,
+                      ),
+                    ),
+                  ],
                 ),
-                SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  sliver: Md3eSeriesDetailComicsSection(
-                    pageItems: _pageItems,
-                    page: _page,
-                    totalPages: _totalPages,
-                    onPageChanged: _setPage,
-                    onComicTap: widget.onComicTap,
-                  ),
+                Md3eLibraryScrollToTopButton(
+                  scrollController: _scrollController,
+                  horizontalPadding: horizontalPadding,
                 ),
               ],
             ),

@@ -18,7 +18,7 @@ abstract final class Md3eSeriesDetailPagePreviewData {
     return Md3eSeriesDetailEntry(
       title: '葬送的芙莉莲',
       serializationStatus: Md3eSeriesSerializationStatus.ongoing,
-      languages: const <String>['中文', '日文'],
+      languages: const <String>['日文'],
       showAgeRestrictionChip: true,
       volumeCurrent: comics.length,
       volumeTotal: 28,

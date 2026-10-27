@@ -39,6 +39,7 @@ class Md3eSeriesDetailComicsGrid extends StatelessWidget {
     }
 
     return Md3eCatalogGridSliver(
+      horizontalMargin: 0,
       itemCount: items.length,
       itemBuilder: (BuildContext context, int index, Md3eCatalogGridLayout _) {
         final Md3eSeriesDetailComicItem item = items[index];

@@ -5,17 +5,19 @@ import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 系列详情顶栏左侧：返回、更多、编辑系列。
-class Md3eSeriesDetailHeaderToolbar extends StatelessWidget {
-  const Md3eSeriesDetailHeaderToolbar({
+/// 漫画 / 系列详情顶栏左侧：返回、更多、编辑。
+class Md3eDetailHeaderToolbar extends StatelessWidget {
+  const Md3eDetailHeaderToolbar({
     super.key,
     this.onBack,
     this.onEdit,
+    required this.editTooltip,
     this.moreMenuEntries = const <M3EMenuNode>[],
   });
 
   final VoidCallback? onBack;
   final VoidCallback? onEdit;
+  final String editTooltip;
   final List<M3EMenuNode> moreMenuEntries;
 
   @override
@@ -62,8 +64,8 @@ class Md3eSeriesDetailHeaderToolbar extends StatelessWidget {
           ),
         _iconButton(
           icon: Symbols.edit,
-          tooltip: l10n.seriesDetailEdit,
-          semanticLabel: l10n.seriesDetailEdit,
+          tooltip: editTooltip,
+          semanticLabel: editTooltip,
           onPressed: onEdit,
           iconColor: iconColor,
           iconSize: iconSize,

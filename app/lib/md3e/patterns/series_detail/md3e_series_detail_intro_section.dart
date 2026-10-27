@@ -4,9 +4,8 @@ import 'package:hentai_library/md3e/layout/md3e_series_detail_page_metrics.dart'
 import 'package:hentai_library/md3e/pages/md3e_series_detail_entry.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_metadata_section.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_primary_block.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 系列详情滚动区上部：主信息 + 元数据 + 分隔线。
+/// 系列详情滚动区上部：主信息 + 元数据。
 class Md3eSeriesDetailIntroSection extends StatelessWidget {
   const Md3eSeriesDetailIntroSection({
     super.key,
@@ -20,10 +19,9 @@ class Md3eSeriesDetailIntroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final double primaryToMeta =
         Md3eSeriesDetailPageMetrics.primaryToMetadataSpacing(sizeClass);
-    final double beforeDivider =
+    final double beforeComics =
         Md3eSeriesDetailPageMetrics.metadataToComicsSpacing(sizeClass);
     final bool showMeta = entry.showMetadataBlock && _hasMetadataChips(entry);
 
@@ -38,14 +36,10 @@ class Md3eSeriesDetailIntroSection extends StatelessWidget {
             onChipTap: onMetadataChipTap,
           ),
         ],
-        SizedBox(height: beforeDivider),
-        Divider(
-          height: 1,
-          thickness: 1 / MediaQuery.devicePixelRatioOf(context),
-          color: scheme.outlineVariant.withValues(alpha: 0.65),
-        ),
         SizedBox(
-          height: Md3eSeriesDetailPageMetrics.comicsSectionTopSpacing(sizeClass),
+          height: showMeta
+              ? beforeComics
+              : Md3eSeriesDetailPageMetrics.comicsSectionTopSpacing(sizeClass),
         ),
       ],
     );

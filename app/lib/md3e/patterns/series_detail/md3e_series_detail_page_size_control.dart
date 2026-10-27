@@ -6,7 +6,7 @@ import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 系列详情顶栏每页条数（与漫画库溢出菜单中的 page size 子菜单一致）。
+/// 系列详情顶栏每页条数（结构对齐漫画库溢出菜单中的 page size 子菜单）。
 class Md3eSeriesDetailPageSizeControl extends StatelessWidget {
   const Md3eSeriesDetailPageSizeControl({
     super.key,
@@ -28,13 +28,19 @@ class Md3eSeriesDetailPageSizeControl extends StatelessWidget {
     return Md3eAnchoredMenu(
       position: M3EMenuAnchorPosition.bottomEnd,
       children: <M3EMenuNode>[
-        for (final int option in pageSizeOptions)
-          M3EMenuSelectable(
-            label: '$option',
-            value: option,
-            selected: option == pageSize,
-            onPressed: () => onPageSizeChanged(option),
-          ),
+        M3EMenuSubmenu(
+          label: l10n.libraryPageSizeTooltip,
+          leading: Icon(Symbols.grid_view, size: iconSize),
+          children: <M3EMenuNode>[
+            for (final int option in pageSizeOptions)
+              M3EMenuSelectable(
+                label: '$option',
+                value: option,
+                selected: option == pageSize,
+                onPressed: () => onPageSizeChanged(option),
+              ),
+          ],
+        ),
       ],
       anchorBuilder: (BuildContext context, VoidCallback open) {
         return M3EIconButton(

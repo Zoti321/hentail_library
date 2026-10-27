@@ -5,10 +5,11 @@ import 'package:hentai_library/md3e/pages/md3e_series_detail_entry.dart';
 import 'package:hentai_library/md3e/patterns/series_detail/md3e_series_detail_comics_grid.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination.dart';
 
-/// 系列漫画列表区：上下分页 + 网格。
+/// 系列漫画列表区：网格 + 底部分页。
 class Md3eSeriesDetailComicsSection extends StatelessWidget {
   const Md3eSeriesDetailComicsSection({
     super.key,
+    this.gridSectionKey,
     required this.pageItems,
     required this.page,
     required this.totalPages,
@@ -16,6 +17,7 @@ class Md3eSeriesDetailComicsSection extends StatelessWidget {
     this.onComicTap,
   });
 
+  final Key? gridSectionKey;
   final List<Md3eSeriesDetailComicItem> pageItems;
   final int page;
   final int totalPages;
@@ -31,14 +33,8 @@ class Md3eSeriesDetailComicsSection extends StatelessWidget {
     return SliverMainAxisGroup(
       slivers: <Widget>[
         SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.only(bottom: paginationGap),
-            child: Md3ePagination(
-              page: page,
-              totalPages: totalPages,
-              onPageChanged: onPageChanged,
-            ),
-          ),
+          key: gridSectionKey,
+          child: const SizedBox.shrink(),
         ),
         Md3eSeriesDetailComicsGrid(
           items: pageItems,
@@ -47,10 +43,13 @@ class Md3eSeriesDetailComicsSection extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.only(top: paginationGap),
-            child: Md3ePagination(
-              page: page,
-              totalPages: totalPages,
-              onPageChanged: onPageChanged,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Md3ePagination(
+                page: page,
+                totalPages: totalPages,
+                onPageChanged: onPageChanged,
+              ),
             ),
           ),
         ),
