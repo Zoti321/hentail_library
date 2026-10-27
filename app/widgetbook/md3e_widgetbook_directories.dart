@@ -13,6 +13,7 @@ import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
@@ -332,6 +333,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 ),
               ],
             ),
+            WidgetbookComponent(
+              name: 'Md3eSeriesDetailPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: _md3eSeriesDetailPageKnobsPreview(context),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ],
@@ -411,6 +423,25 @@ Widget _md3eComicDetailPageKnobsPreview(BuildContext context) {
   return Md3eComicDetailPage(
     entry: Md3eComicDetailPagePreviewData.sample().copyWith(
       showAgeRestrictionChip: showAgeRestriction,
+    ),
+  );
+}
+
+Widget _md3eSeriesDetailPageKnobsPreview(BuildContext context) {
+  final bool showAgeRestriction = context.knobs.boolean(
+    label: '年龄限制',
+    description: '控制摘要区 R18 chip 是否显示。',
+    initialValue: true,
+  );
+  final bool showMetadata = context.knobs.boolean(
+    label: '元数据区',
+    description: '控制 Parody / Author / Tag 等 chip 区块。',
+    initialValue: true,
+  );
+  return Md3eSeriesDetailPage(
+    entry: Md3eSeriesDetailPagePreviewData.sample().copyWith(
+      showAgeRestrictionChip: showAgeRestriction,
+      showMetadataBlock: showMetadata,
     ),
   );
 }
