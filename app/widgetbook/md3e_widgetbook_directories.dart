@@ -4,7 +4,7 @@ import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/layout/md3e_reading_history_list_layout.dart';
 import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item.dart';
-import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_meta_chip_row.dart';
+import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_metadata_tags_section.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
@@ -12,6 +12,7 @@ import 'package:hentai_library/md3e/pages/md3e_history_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
@@ -320,6 +321,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 ),
               ],
             ),
+            WidgetbookComponent(
+              name: 'Md3eComicDetailPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: _md3eComicDetailPageKnobsPreview(context),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ],
@@ -386,6 +398,19 @@ Widget _demoCover(BuildContext context) {
     child: Icon(
       Icons.image_outlined,
       color: Theme.of(context).colorScheme.onSurfaceVariant,
+    ),
+  );
+}
+
+Widget _md3eComicDetailPageKnobsPreview(BuildContext context) {
+  final bool showAgeRestriction = context.knobs.boolean(
+    label: '年龄限制',
+    description: '控制摘要区 R18 年龄限制 chip 是否显示。',
+    initialValue: true,
+  );
+  return Md3eComicDetailPage(
+    entry: Md3eComicDetailPagePreviewData.sample().copyWith(
+      showAgeRestrictionChip: showAgeRestriction,
     ),
   );
 }
