@@ -94,9 +94,6 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
       color: scheme.surfaceContainerLow,
       padding: EdgeInsets.zero,
       borderRadius: radius,
-      border: BorderSide(
-        color: scheme.outlineVariant.withValues(alpha: 0.22),
-      ),
       clipBehavior: Clip.antiAlias,
       enabled: enabled,
       dragged: dragged,

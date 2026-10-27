@@ -195,9 +195,6 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
         elevation: 0,
         padding: EdgeInsets.zero,
         borderRadius: radius,
-        border: BorderSide(
-          color: scheme.outlineVariant.withValues(alpha: 0.28),
-        ),
         clipBehavior: Clip.antiAlias,
         enabled: enabled,
         trackHover: true,
