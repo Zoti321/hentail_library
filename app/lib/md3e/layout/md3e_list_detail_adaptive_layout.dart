@@ -16,6 +16,9 @@ class Md3eListDetailAdaptiveLayout extends StatelessWidget {
     required this.detailPane,
     this.expandedBreakpoint = kMd3eListDetailExpandedBreakpoint,
     this.showDetailOnCompact = false,
+    this.showPaneDivider = true,
+    this.listPaneFixedWidth,
+    this.paneGap = 0,
     this.listPaneKey,
     this.detailPaneKey,
   });
@@ -24,6 +27,16 @@ class Md3eListDetailAdaptiveLayout extends StatelessWidget {
   final Widget detailPane;
   final double expandedBreakpoint;
   final bool showDetailOnCompact;
+
+  /// When false, list and detail share one surface (e.g. settings).
+  final bool showPaneDivider;
+
+  /// When set at expanded width, list uses this width instead of flex 2:3.
+  final double? listPaneFixedWidth;
+
+  /// Horizontal gap between panes when [listPaneFixedWidth] is set.
+  final double paneGap;
+
   final Key? listPaneKey;
   final Key? detailPaneKey;
 
@@ -33,21 +46,31 @@ class Md3eListDetailAdaptiveLayout extends StatelessWidget {
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool expanded = constraints.maxWidth >= expandedBreakpoint;
         if (expanded) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
+          final List<Widget> rowChildren = <Widget>[
+            if (listPaneFixedWidth != null)
+              SizedBox(
+                key: listPaneKey,
+                width: listPaneFixedWidth,
+                child: listPane,
+              )
+            else
               Expanded(
                 key: listPaneKey,
                 flex: 2,
                 child: listPane,
               ),
+            if (paneGap > 0) SizedBox(width: paneGap),
+            if (showPaneDivider && listPaneFixedWidth == null)
               const VerticalDivider(width: 1),
-              Expanded(
-                key: detailPaneKey,
-                flex: 3,
-                child: detailPane,
-              ),
-            ],
+            Expanded(
+              key: detailPaneKey,
+              flex: listPaneFixedWidth != null ? 1 : 3,
+              child: detailPane,
+            ),
+          ];
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: rowChildren,
           );
         }
         if (showDetailOnCompact) {
