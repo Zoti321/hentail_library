@@ -22,7 +22,6 @@ import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import 'md3e_styles_widgetbook.dart';
 import 'md3e_widgetbook_desktop_gate.dart';
 import 'md3e_widgetbook_scope.dart';
 
@@ -31,7 +30,6 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
     WidgetbookFolder(
       name: 'MD3E (Lab)',
       children: <WidgetbookNode>[
-        ...buildMd3eStylesWidgetbookNodes(),
         WidgetbookFolder(
           name: 'widgets',
           children: <WidgetbookNode>[
@@ -227,29 +225,12 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'ComicDetailMetadataTags',
+              name: 'Md3eComicDetailMetadataTagsSection',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Tag section',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
                     child: Md3eComicDetailMetadataTagsSection(),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Single row',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Md3eComicDetailMetaChipRow(
-                        label: '标签',
-                        items: const <String>[
-                          '奇幻',
-                          '冒险',
-                          '校园',
-                        ],
-                        onItemTap: (_) {},
-                      ),
-                    ),
                   ),
                 ),
               ],
