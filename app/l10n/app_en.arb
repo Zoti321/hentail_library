@@ -729,6 +729,38 @@
       }
     }
   },
+  "metadataAuthorCount": "{count, plural, one{1 author} other{{count} authors}}",
+  "@metadataAuthorCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataTagCount": "{count, plural, one{1 tag} other{{count} tags}}",
+  "@metadataTagCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataParodyCount": "{count, plural, one{1 parody} other{{count} parodies}}",
+  "@metadataParodyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataCharacterCount": "{count, plural, one{1 character} other{{count} characters}}",
+  "@metadataCharacterCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "md3eNavRailExpand": "Expand navigation",
+  "md3eNavRailCollapse": "Collapse navigation",
+  "md3ePaginationPageSemantic": "Page {page}",
+  "@md3ePaginationPageSemantic": {
+    "placeholders": {
+      "page": {"type": "int"}
+    }
+  },
   "metadataRenameAuthor": "Rename author",
   "metadataRenameTag": "Rename tag",
   "metadataRenameParody": "Rename parody",

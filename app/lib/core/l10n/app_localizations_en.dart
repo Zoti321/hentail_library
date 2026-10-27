@@ -1529,6 +1529,61 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String metadataAuthorCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count authors',
+      one: '1 author',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataTagCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags',
+      one: '1 tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataParodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count parodies',
+      one: '1 parody',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataCharacterCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count characters',
+      one: '1 character',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get md3eNavRailExpand => 'Expand navigation';
+
+  @override
+  String get md3eNavRailCollapse => 'Collapse navigation';
+
+  @override
+  String md3ePaginationPageSemantic(int page) {
+    return 'Page $page';
+  }
+
+  @override
   String get metadataRenameAuthor => 'Rename author';
 
   @override

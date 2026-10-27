@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 管理页右下角新建 FAB（移动端打开 Dialog，桌面端由 [onPressed] 触发内联字段）。
@@ -14,7 +15,7 @@ class Md3eManagementCreateEntityFab extends StatelessWidget {
     this.hidden = false,
   });
 
-  final Md3eManagementNamedFacet facet;
+  final ManagedNamedFacetKind facet;
   final double horizontalPadding;
   final VoidCallback onPressed;
   final bool hidden;
@@ -25,6 +26,7 @@ class Md3eManagementCreateEntityFab extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final double width = MediaQuery.sizeOf(context).width;
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(width);
@@ -42,7 +44,7 @@ class Md3eManagementCreateEntityFab extends StatelessWidget {
       bottom: Md3eLibraryBrowsePageMetrics.scrollToTopBottomInset,
       child: Semantics(
         button: true,
-        label: facet.createDialogTitle,
+        label: l10n.metadataAddLabel(facet),
         child: M3EFab(
           size: fabSize,
           color: M3EFabColor.primary,

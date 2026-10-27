@@ -2738,6 +2738,48 @@ abstract class AppLocalizations {
   /// **'{count, plural, other{共 {count} 条}}'**
   String metadataTotalCount(int count);
 
+  /// No description provided for @metadataAuthorCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 位作者}}'**
+  String metadataAuthorCount(int count);
+
+  /// No description provided for @metadataTagCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 个标签}}'**
+  String metadataTagCount(int count);
+
+  /// No description provided for @metadataParodyCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 部原作}}'**
+  String metadataParodyCount(int count);
+
+  /// No description provided for @metadataCharacterCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 位角色}}'**
+  String metadataCharacterCount(int count);
+
+  /// No description provided for @md3eNavRailExpand.
+  ///
+  /// In zh, this message translates to:
+  /// **'展开导航'**
+  String get md3eNavRailExpand;
+
+  /// No description provided for @md3eNavRailCollapse.
+  ///
+  /// In zh, this message translates to:
+  /// **'收起导航'**
+  String get md3eNavRailCollapse;
+
+  /// No description provided for @md3ePaginationPageSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'第 {page} 页'**
+  String md3ePaginationPageSemantic(int page);
+
   /// No description provided for @metadataRenameAuthor.
   ///
   /// In zh, this message translates to:

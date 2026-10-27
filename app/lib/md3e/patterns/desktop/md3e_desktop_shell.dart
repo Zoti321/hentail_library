@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar_metrics.dart';
@@ -61,7 +62,8 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     final Md3eDesktopShellSurfaceRoles surfaces =
         widget.surfaceRoles ?? Md3eDesktopShellSurfaceRoles.lab(scheme);
     final List<Md3eNavigationRailDestination> destinations =
-        widget.destinations ?? md3eDefaultNavigationRailDestinations();
+        widget.destinations ??
+        md3eDefaultNavigationRailDestinations(context.l10n);
 
     final M3EThemeData railTheme = m3e.copyWith(
       navigationRailTheme: m3e.navigationRailTheme.copyWith(

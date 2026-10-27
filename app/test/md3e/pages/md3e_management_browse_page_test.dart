@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_draft_entity_chip.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';
@@ -12,7 +12,7 @@ void main() {
   testWidgets('management browse page shows title, facet count, and chips', (
     WidgetTester tester,
   ) async {
-    const Md3eManagementNamedFacet facet = Md3eManagementNamedFacet.tags;
+    const ManagedNamedFacetKind facet = ManagedNamedFacetKind.tag;
     final List<String> chips =
         Md3eManagementBrowsePagePreviewData.sampleChipsFor(facet);
 
@@ -38,7 +38,7 @@ void main() {
   testWidgets('desktop draft chip appears only after FAB tap', (
     WidgetTester tester,
   ) async {
-    const Md3eManagementNamedFacet facet = Md3eManagementNamedFacet.tags;
+    const ManagedNamedFacetKind facet = ManagedNamedFacetKind.tag;
     final List<String> chips =
         Md3eManagementBrowsePagePreviewData.sampleChipsFor(facet);
 
@@ -69,7 +69,7 @@ void main() {
   testWidgets('mobile dialog create hides draft chip until FAB opens dialog', (
     WidgetTester tester,
   ) async {
-    const Md3eManagementNamedFacet facet = Md3eManagementNamedFacet.tags;
+    const ManagedNamedFacetKind facet = ManagedNamedFacetKind.tag;
     final List<String> chips =
         Md3eManagementBrowsePagePreviewData.sampleChipsFor(facet);
 
@@ -95,7 +95,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
 
-    expect(find.text('新建标签'), findsOneWidget);
+    expect(find.text('添加标签'), findsOneWidget);
     expect(find.byType(Md3eManagementDraftEntityChip), findsNothing);
   });
 }

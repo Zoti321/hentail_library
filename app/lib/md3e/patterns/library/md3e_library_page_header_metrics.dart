@@ -25,8 +25,6 @@ abstract final class Md3eLibraryPageHeaderMetrics {
   /// 指示条比文案左右各宽 2dp（[`M3ETabTheme.indicatorInset`] 为负值）。
   static const double displayTargetIndicatorSideExtend = 2;
 
-  static const List<String> _displayTargetTabLabels = <String>['漫画', '系列'];
-
   /// 注入 [`Md3eLibraryDisplayTargetTabs`] 的 [`M3ETabTheme`]（无底部分割线、生产风指示条）。
   ///
   /// [`M3ETabs`] 的 hover / focus / press 由包内 [`M3ETappable`] + 本 theme 的
@@ -51,12 +49,13 @@ abstract final class Md3eLibraryPageHeaderMetrics {
 
   /// Scrollable [`M3ETabs`] 条宽度（文案 + 水平 padding）。
   static double displayTargetTabsBarWidth({
+    required List<String> tabLabels,
     required TextStyle labelStyle,
     TextDirection textDirection = TextDirection.ltr,
   }) {
     final double horizontalPadding = displayTargetTabGap / 2;
     double width = 0;
-    for (final String label in _displayTargetTabLabels) {
+    for (final String label in tabLabels) {
       final TextPainter painter = TextPainter(
         text: TextSpan(text: label, style: labelStyle),
         maxLines: 1,

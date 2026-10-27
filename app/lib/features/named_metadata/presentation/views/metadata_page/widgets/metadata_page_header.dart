@@ -359,11 +359,8 @@ class MetadataPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
 }
 
 ManagedNamedFacetKind metadataTabKind(int index) {
-  return switch (index) {
-    0 => ManagedNamedFacetKind.author,
-    1 => ManagedNamedFacetKind.tag,
-    2 => ManagedNamedFacetKind.parody,
-    3 => ManagedNamedFacetKind.character,
-    _ => ManagedNamedFacetKind.tag,
-  };
+  if (index < 0 || index >= kManagedNamedFacetTabOrder.length) {
+    return ManagedNamedFacetKind.tag;
+  }
+  return kManagedNamedFacetTabOrder[index];
 }

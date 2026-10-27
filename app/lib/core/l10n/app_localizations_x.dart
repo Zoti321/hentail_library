@@ -22,9 +22,9 @@ import 'package:hentai_library/shared/domain/models/app_setting.dart';
 
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
-import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
-
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
+
+import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 
@@ -155,6 +155,22 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       LibraryComicSortField.fileSize => libraryComicSortFileSize,
 
       LibraryComicSortField.pageCount => libraryComicSortPageCount,
+    };
+  }
+
+  String libraryDisplayTargetTabLabel(LibraryDisplayTarget target) {
+    return switch (target) {
+      LibraryDisplayTarget.comics => libraryTabComics,
+      LibraryDisplayTarget.series => libraryTabSeries,
+    };
+  }
+
+  String managedNamedFacetCountLabel(ManagedNamedFacetKind kind, int count) {
+    return switch (kind) {
+      ManagedNamedFacetKind.author => metadataAuthorCount(count),
+      ManagedNamedFacetKind.tag => metadataTagCount(count),
+      ManagedNamedFacetKind.parody => metadataParodyCount(count),
+      ManagedNamedFacetKind.character => metadataCharacterCount(count),
     };
   }
 

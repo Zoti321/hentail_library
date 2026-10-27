@@ -3,7 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_management_entity_name_field.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -12,7 +13,7 @@ const double _kMd3eManagementCreateDialogMaxWidth = 400;
 /// 移动端：FAB 打开的新建实体 Dialog（outlined 字段 + 操作）。
 Future<void> showMd3eManagementCreateEntityDialog({
   required BuildContext context,
-  required Md3eManagementNamedFacet facet,
+  required ManagedNamedFacetKind facet,
   required ValueChanged<String> onCreate,
 }) {
   return showDialog<void>(
@@ -33,7 +34,7 @@ class _Md3eManagementCreateEntityDialog extends StatefulWidget {
     required this.onCreate,
   });
 
-  final Md3eManagementNamedFacet facet;
+  final ManagedNamedFacetKind facet;
   final ValueChanged<String> onCreate;
 
   @override
@@ -62,6 +63,7 @@ class _Md3eManagementCreateEntityDialogState
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
     final Size size = MediaQuery.sizeOf(context);
@@ -94,14 +96,14 @@ class _Md3eManagementCreateEntityDialogState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Text(
-                widget.facet.createDialogTitle,
+                l10n.metadataAddLabel(widget.facet),
                 style: theme.typeScale.titleLarge.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),
               ),
               SizedBox(height: spacing.lg),
               Md3eManagementEntityNameField(
-                label: widget.facet.createFieldLabel,
+                label: l10n.metadataAddHint(widget.facet),
                 controller: _controller,
                 autofocus: true,
                 onSubmitted: (_) => _submit(),
@@ -113,13 +115,13 @@ class _Md3eManagementCreateEntityDialogState
                   M3EButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: M3EButtonStyle.text,
-                    label: const Text('取消'),
+                    label: Text(l10n.commonCancel),
                   ),
                   SizedBox(width: spacing.sm),
                   M3EButton(
                     onPressed: _submit,
                     style: M3EButtonStyle.filled,
-                    label: const Text('创建'),
+                    label: Text(l10n.commonAdd),
                   ),
                 ],
               ),

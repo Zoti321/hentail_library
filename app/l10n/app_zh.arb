@@ -729,6 +729,38 @@
       }
     }
   },
+  "metadataAuthorCount": "{count, plural, other{{count} 位作者}}",
+  "@metadataAuthorCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataTagCount": "{count, plural, other{{count} 个标签}}",
+  "@metadataTagCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataParodyCount": "{count, plural, other{{count} 部原作}}",
+  "@metadataParodyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataCharacterCount": "{count, plural, other{{count} 位角色}}",
+  "@metadataCharacterCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "md3eNavRailExpand": "展开导航",
+  "md3eNavRailCollapse": "收起导航",
+  "md3ePaginationPageSemantic": "第 {page} 页",
+  "@md3ePaginationPageSemantic": {
+    "placeholders": {
+      "page": {"type": "int"}
+    }
+  },
   "metadataRenameAuthor": "重命名作者",
   "metadataRenameTag": "重命名标签",
   "metadataRenameParody": "重命名原作",

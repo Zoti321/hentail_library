@@ -12,6 +12,7 @@ import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_library_scroll_to_top_button.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画库页 Lab 壳层：粘滞页头 + 可滚动目录区（视图切换 / 网格·列表 / 分页）。
@@ -37,10 +38,10 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
     this.hideScrollToTop = false,
   });
 
-  final Md3eLibraryDisplayTarget displayTarget;
+  final LibraryDisplayTarget displayTarget;
   final Md3eCatalogViewMode viewMode;
   final bool filterSortActive;
-  final ValueChanged<Md3eLibraryDisplayTarget>? onDisplayTargetChanged;
+  final ValueChanged<LibraryDisplayTarget>? onDisplayTargetChanged;
   final ValueChanged<Md3eCatalogViewMode>? onViewModeChanged;
   final VoidCallback? onFilterSort;
   final int? pageSize;

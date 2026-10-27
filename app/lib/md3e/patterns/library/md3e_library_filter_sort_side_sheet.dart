@@ -1,134 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_metrics.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-const String _kMd3eLibraryFilterSortSideSheetTitle = '筛选与排序';
-
-/// Lab 用年龄限制筛选项（对齐生产 `LibraryAgeRestrictionFilter` 可选项语义）。
-enum Md3eLibraryAgeRestrictionOption {
-  allAges,
-  r18Only,
-}
-
-extension Md3eLibraryAgeRestrictionOptionX on Md3eLibraryAgeRestrictionOption {
-  String get label => switch (this) {
-    Md3eLibraryAgeRestrictionOption.allAges => '全年龄',
-    Md3eLibraryAgeRestrictionOption.r18Only => 'R18',
-  };
-}
-
-/// Lab 用媒体类型筛选项。
-enum Md3eLibraryMediaTypeOption {
-  pdf,
-  epub,
-  archive,
-}
-
-extension Md3eLibraryMediaTypeOptionX on Md3eLibraryMediaTypeOption {
-  String get label => switch (this) {
-    Md3eLibraryMediaTypeOption.pdf => 'PDF',
-    Md3eLibraryMediaTypeOption.epub => 'EPUB',
-    Md3eLibraryMediaTypeOption.archive => '压缩包',
-  };
-
-  static const List<Md3eLibraryMediaTypeOption> selectable =
-      Md3eLibraryMediaTypeOption.values;
-}
-
-/// Lab 用漫画排序字段（对齐生产 `LibraryComicSortField` 展示集）。
-enum Md3eLibraryComicSortField {
-  title,
-  createdAt,
-  lastUpdatedAt,
-  publishedAt,
-  readAt,
-  fileSize,
-  pageCount,
-}
-
-extension Md3eLibraryComicSortFieldX on Md3eLibraryComicSortField {
-  String get label => switch (this) {
-    Md3eLibraryComicSortField.title => '标题',
-    Md3eLibraryComicSortField.createdAt => '添加时间',
-    Md3eLibraryComicSortField.lastUpdatedAt => '更新时间',
-    Md3eLibraryComicSortField.publishedAt => '发布日期',
-    Md3eLibraryComicSortField.readAt => '阅读时间',
-    Md3eLibraryComicSortField.fileSize => '文件大小',
-    Md3eLibraryComicSortField.pageCount => '页数',
-  };
-
-  static const List<Md3eLibraryComicSortField> drawerOrder =
-      Md3eLibraryComicSortField.values;
-}
-
 /// 筛选排序抽屉的本地状态（Widgetbook / 测试用，不绑 Riverpod）。
+///
+/// 字段与生产 [LibraryComicFiltersState] 的抽屉子集一致。
 class Md3eLibraryFilterSortState {
-  const Md3eLibraryFilterSortState({
-    this.ageOptions = const <Md3eLibraryAgeRestrictionOption>{},
-    this.mediaTypes = const <Md3eLibraryMediaTypeOption>{},
-    this.sortField = Md3eLibraryComicSortField.title,
-    this.sortDescending = false,
-  });
+  Md3eLibraryFilterSortState({
+    this.ageRestriction = LibraryAgeRestrictionFilter.unrestricted,
+    this.mediaTypeFilter = const LibraryMediaTypeFilterSelection(),
+    LibraryComicSortOption? sortOption,
+  }) : sortOption = sortOption ?? LibraryComicSortOption();
 
-  final Set<Md3eLibraryAgeRestrictionOption> ageOptions;
-  final Set<Md3eLibraryMediaTypeOption> mediaTypes;
-  final Md3eLibraryComicSortField sortField;
-  final bool sortDescending;
+  final LibraryAgeRestrictionFilter ageRestriction;
+  final LibraryMediaTypeFilterSelection mediaTypeFilter;
+  final LibraryComicSortOption sortOption;
 
-  static const Md3eLibraryFilterSortState defaults =
+  static final Md3eLibraryFilterSortState defaults =
       Md3eLibraryFilterSortState();
 
-  bool get isCustomized =>
-      ageOptions.isNotEmpty ||
-      mediaTypes.isNotEmpty ||
-      sortField != Md3eLibraryComicSortField.title ||
-      sortDescending;
+  bool get isCustomized {
+    final LibraryComicSortOption defaultSort = LibraryComicSortOption();
+    return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
+        mediaTypeFilter.isActive ||
+        sortOption.field != defaultSort.field ||
+        sortOption.descending != defaultSort.descending;
+  }
 
   Md3eLibraryFilterSortState copyWith({
-    Set<Md3eLibraryAgeRestrictionOption>? ageOptions,
-    Set<Md3eLibraryMediaTypeOption>? mediaTypes,
-    Md3eLibraryComicSortField? sortField,
-    bool? sortDescending,
+    LibraryAgeRestrictionFilter? ageRestriction,
+    LibraryMediaTypeFilterSelection? mediaTypeFilter,
+    LibraryComicSortOption? sortOption,
   }) {
     return Md3eLibraryFilterSortState(
-      ageOptions: ageOptions ?? this.ageOptions,
-      mediaTypes: mediaTypes ?? this.mediaTypes,
-      sortField: sortField ?? this.sortField,
-      sortDescending: sortDescending ?? this.sortDescending,
+      ageRestriction: ageRestriction ?? this.ageRestriction,
+      mediaTypeFilter: mediaTypeFilter ?? this.mediaTypeFilter,
+      sortOption: sortOption ?? this.sortOption,
     );
   }
 
-  Md3eLibraryFilterSortState toggleAgeOption(
-    Md3eLibraryAgeRestrictionOption option,
+  Md3eLibraryFilterSortState toggleAgeRestriction(
+    LibraryAgeRestrictionFilter option,
   ) {
-    final Set<Md3eLibraryAgeRestrictionOption> next =
-        Set<Md3eLibraryAgeRestrictionOption>.from(ageOptions);
-    if (next.contains(option)) {
-      next.remove(option);
-    } else {
-      next.add(option);
-    }
-    return copyWith(ageOptions: next);
+    return copyWith(
+      ageRestriction: ageRestriction == option
+          ? LibraryAgeRestrictionFilter.unrestricted
+          : option,
+    );
   }
 
   Md3eLibraryFilterSortState toggleMediaType(
-    Md3eLibraryMediaTypeOption option,
+    LibraryMediaTypeFilterOption option,
   ) {
-    final Set<Md3eLibraryMediaTypeOption> next =
-        Set<Md3eLibraryMediaTypeOption>.from(mediaTypes);
-    if (next.contains(option)) {
-      next.remove(option);
-    } else {
-      next.add(option);
-    }
-    return copyWith(mediaTypes: next);
+    return copyWith(mediaTypeFilter: mediaTypeFilter.withToggled(option));
   }
 
-  Md3eLibraryFilterSortState selectSortField(Md3eLibraryComicSortField field) {
-    if (sortField == field) {
-      return copyWith(sortDescending: !sortDescending);
+  Md3eLibraryFilterSortState selectSortField(LibraryComicSortField field) {
+    if (sortOption.field == field) {
+      return copyWith(
+        sortOption: sortOption.copyWith(descending: !sortOption.descending),
+      );
     }
-    return copyWith(sortField: field, sortDescending: false);
+    return copyWith(
+      sortOption: LibraryComicSortOption(field: field, descending: false),
+    );
   }
 
   Md3eLibraryFilterSortState reset() => defaults;
@@ -168,7 +107,7 @@ abstract final class Md3eLibraryFilterSortSideSheet {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     return M3ESideSheet.show<void>(
       context,
-      title: _kMd3eLibraryFilterSortSideSheetTitle,
+      title: AppLocalizations.of(context).libraryFilterSortTooltip,
       width: md3eLibraryFilterSortSideSheetWidthForViewport(viewportWidth),
       detached: md3eLibraryFilterSortSideSheetDetachedForViewport(
         viewportWidth,
@@ -256,6 +195,7 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final Md3eLibraryFilterSortRowMetrics rowMetrics =
         Md3eLibraryFilterSortRowMetrics.forViewportWidth(
@@ -278,7 +218,9 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
             ),
             child: Row(
               children: <Widget>[
-                Expanded(child: Text('筛选', style: sectionTitle)),
+                Expanded(
+                  child: Text(l10n.libraryFilterSection, style: sectionTitle),
+                ),
                 M3EIconButton(
                   icon: Icon(
                     Icons.filter_alt_off_outlined,
@@ -287,7 +229,7 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
                         ? cs.primary
                         : cs.onSurfaceVariant.withValues(alpha: 0.38),
                   ),
-                  tooltip: '重置全部',
+                  tooltip: l10n.libraryResetAllFilters,
                   onPressed: state.isCustomized
                       ? () => onStateChanged(state.reset())
                       : null,
@@ -299,33 +241,36 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           _Md3eFilterAccordionSection(
-            title: '年龄限制',
+            title: l10n.libraryAgeRestrictionFilter,
             metrics: rowMetrics,
             child: Column(
-              children: Md3eLibraryAgeRestrictionOption.values
+              children: LibraryAgeRestrictionFilter.selectableOptions
                   .map(
-                    (Md3eLibraryAgeRestrictionOption option) =>
+                    (LibraryAgeRestrictionFilter option) =>
                         _Md3eFilterCheckboxRow(
-                          label: option.label,
-                          selected: state.ageOptions.contains(option),
+                          label: l10n.libraryAgeRestrictionFilterLabel(option),
+                          selected: state.ageRestriction == option,
                           metrics: rowMetrics,
-                          onChanged: () =>
-                              onStateChanged(state.toggleAgeOption(option)),
+                          onChanged: () => onStateChanged(
+                            state.toggleAgeRestriction(option),
+                          ),
                         ),
                   )
                   .toList(),
             ),
           ),
           _Md3eFilterAccordionSection(
-            title: '媒体类型',
+            title: l10n.libraryMediaTypeFilter,
             metrics: rowMetrics,
             child: Column(
-              children: Md3eLibraryMediaTypeOptionX.selectable
+              children: LibraryMediaTypeFilterOption.selectableOptions
                   .map(
-                    (Md3eLibraryMediaTypeOption option) =>
+                    (LibraryMediaTypeFilterOption option) =>
                         _Md3eFilterCheckboxRow(
-                          label: option.label,
-                          selected: state.mediaTypes.contains(option),
+                          label: l10n.libraryMediaTypeFilterLabel(option),
+                          selected: state.mediaTypeFilter.selected.contains(
+                            option,
+                          ),
                           metrics: rowMetrics,
                           onChanged: () =>
                               onStateChanged(state.toggleMediaType(option)),
@@ -339,16 +284,16 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
             padding: const EdgeInsets.only(
               left: kMd3eLibraryFilterSortDrawerContentInset,
             ),
-            child: Text('排序', style: sectionTitle),
+            child: Text(l10n.librarySortSection, style: sectionTitle),
           ),
           const SizedBox(height: 8),
-          ...Md3eLibraryComicSortFieldX.drawerOrder.map(
-            (Md3eLibraryComicSortField field) {
-              final bool selected = state.sortField == field;
+          ...LibraryComicSortField.values.map(
+            (LibraryComicSortField field) {
+              final bool selected = state.sortOption.field == field;
               return _Md3eSortListRow(
-                label: field.label,
+                label: l10n.libraryComicSortFieldLabel(field),
                 selected: selected,
-                ascending: !state.sortDescending,
+                ascending: !state.sortOption.descending,
                 metrics: rowMetrics,
                 onTap: () => onStateChanged(state.selectSortField(field)),
               );
@@ -362,14 +307,14 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
 
 /// 持有筛选状态并调用 [Md3eLibraryFilterSortSideSheet.show]，供 Lab 预览与测试。
 class Md3eLibraryFilterSortDrawerHost extends StatefulWidget {
-  const Md3eLibraryFilterSortDrawerHost({
+  Md3eLibraryFilterSortDrawerHost({
     super.key,
     required this.body,
-    this.initialState = Md3eLibraryFilterSortState.defaults,
+    Md3eLibraryFilterSortState? initialState,
     this.onStateChanged,
     this.openSideSheetOnMount = false,
     this.useRootNavigator = true,
-  });
+  }) : initialState = initialState ?? Md3eLibraryFilterSortState.defaults;
 
   final Widget body;
   final Md3eLibraryFilterSortState initialState;

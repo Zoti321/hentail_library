@@ -10,7 +10,10 @@ import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/md3e/patterns/management/md3e_managed_named_facet_ui.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
@@ -465,11 +468,10 @@ class _Md3eManagementBrowsePagePreview extends StatefulWidget {
 
 class _Md3eManagementBrowsePagePreviewState
     extends State<_Md3eManagementBrowsePagePreview> {
-  Md3eManagementNamedFacet _facet = Md3eManagementNamedFacet.authors;
-  late final Map<Md3eManagementNamedFacet, List<String>> _labelsByFacet =
-      <Md3eManagementNamedFacet, List<String>>{
-        for (final Md3eManagementNamedFacet facet
-            in Md3eManagementNamedFacet.managementOrder)
+  ManagedNamedFacetKind _facet = ManagedNamedFacetKind.author;
+  late final Map<ManagedNamedFacetKind, List<String>> _labelsByFacet =
+      <ManagedNamedFacetKind, List<String>>{
+        for (final ManagedNamedFacetKind facet in kManagedNamedFacetTabOrder)
           facet: Md3eManagementBrowsePagePreviewData.sampleChipsFor(facet),
       };
 
@@ -503,7 +505,7 @@ class _Md3eManagementBrowsePagePreviewState
       chipLabels: chips,
       createInteractionOverride: interactionOverride,
       onEntityCreated: _addEntity,
-      onFacetChanged: (Md3eManagementNamedFacet value) {
+      onFacetChanged: (ManagedNamedFacetKind value) {
         setState(() => _facet = value);
       },
     );
@@ -520,7 +522,7 @@ class _Md3eLibraryBrowsePagePreview extends StatefulWidget {
 
 class _Md3eLibraryBrowsePagePreviewState
     extends State<_Md3eLibraryBrowsePagePreview> {
-  Md3eLibraryDisplayTarget _target = Md3eLibraryDisplayTarget.comics;
+  LibraryDisplayTarget _target = LibraryDisplayTarget.comics;
   Md3eCatalogViewMode _viewMode = Md3eCatalogViewMode.grid;
   Md3eLibraryFilterSortState _filterSort = Md3eLibraryFilterSortState.defaults;
   int _pageSize = 50;
@@ -553,7 +555,7 @@ class _Md3eLibraryBrowsePagePreviewState
                 onPressed: () {},
               ),
             ],
-            onDisplayTargetChanged: (Md3eLibraryDisplayTarget value) {
+            onDisplayTargetChanged: (LibraryDisplayTarget value) {
               setState(() => _target = value);
             },
             onViewModeChanged: (Md3eCatalogViewMode value) {
@@ -578,17 +580,18 @@ class _Md3eSegmentedCapsuleBarPreview extends StatefulWidget {
 
 class _Md3eSegmentedCapsuleBarPreviewState
     extends State<_Md3eSegmentedCapsuleBarPreview> {
-  Md3eManagementNamedFacet _facet = Md3eManagementNamedFacet.authors;
+  ManagedNamedFacetKind _facet = ManagedNamedFacetKind.author;
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Md3eSegmentedCapsuleBar(
-        segments: Md3eManagementNamedFacet.capsuleSegments(),
-        selectedIndex: Md3eManagementNamedFacet.indexOf(_facet),
+        segments: Md3eManagedNamedFacetUi.capsuleSegments(l10n),
+        selectedIndex: Md3eManagedNamedFacetUi.indexOf(_facet),
         onSelected: (int index) {
-          setState(() => _facet = Md3eManagementNamedFacet.facetAt(index));
+          setState(() => _facet = Md3eManagedNamedFacetUi.facetAt(index));
         },
       ),
     );
@@ -720,7 +723,7 @@ class _Md3eNavigationRailPreviewState extends State<_Md3eNavigationRailPreview> 
   @override
   Widget build(BuildContext context) {
     return Md3eNavigationRail(
-      destinations: md3eDefaultNavigationRailDestinations(),
+      destinations: md3eDefaultNavigationRailDestinations(context.l10n),
       selectedIndex: _selectedIndex,
       extended: _extended,
       onMenuPressed: () => setState(() => _extended = !_extended),

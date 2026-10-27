@@ -1,6 +1,5 @@
-export 'md3e_library_display_target.dart';
-
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
@@ -15,7 +14,7 @@ const List<int> kMd3eLibraryPageSizeOptions = <int>[20, 50, 100, 200];
 class Md3eLibraryPageHeader extends StatelessWidget {
   const Md3eLibraryPageHeader({
     super.key,
-    this.title = '漫画库',
+    this.title,
     this.onFilterSort,
     this.overflowMenuEntries = const <M3EMenuNode>[],
     this.pageSize,
@@ -24,7 +23,8 @@ class Md3eLibraryPageHeader extends StatelessWidget {
     this.filterSortActive = false,
   });
 
-  final String title;
+  /// Defaults to [AppLocalizations.libraryTitle] when null.
+  final String? title;
   final VoidCallback? onFilterSort;
   final List<M3EMenuNode> overflowMenuEntries;
   final int? pageSize;
@@ -70,7 +70,8 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
     this.filterSortActive = false,
   });
 
-  final String title;
+  /// Defaults to [AppLocalizations.libraryTitle] when null.
+  final String? title;
   final Md3eWindowSizeClass sizeClass;
   final VoidCallback? onFilterSort;
   final List<M3EMenuNode> overflowMenuEntries;
@@ -81,12 +82,13 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
 
     final Widget leading = Text(
-      title,
+      title ?? l10n.libraryTitle,
       style: type.headlineSmall.copyWith(
         fontSize: Md3eLibraryPageHeaderMetrics.titleFontSize(sizeClass),
         fontWeight: Md3eLibraryPageHeaderMetrics.titleFontWeight(sizeClass),
@@ -142,12 +144,12 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
   final ValueChanged<int>? onPageSizeChanged;
   final List<int> pageSizeOptions;
 
-  List<M3EMenuNode> _menuChildren() {
+  List<M3EMenuNode> _menuChildren(AppLocalizations l10n) {
     final List<M3EMenuNode> nodes = List<M3EMenuNode>.of(overflowMenuEntries);
     if (onPageSizeChanged != null && pageSize != null) {
       nodes.add(
         M3EMenuSubmenu(
-          label: '每页数量',
+          label: l10n.libraryPageSizeTooltip,
           leading: Icon(
             Icons.view_module_outlined,
             size: Md3eLibraryPageHeaderMetrics.actionIconSize,
@@ -169,18 +171,20 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final double gap = Md3eLibraryPageHeaderMetrics.actionSpacing(sizeClass);
     final Color filterColor =
         filterSortActive ? scheme.primary : scheme.onSurfaceVariant;
-    final List<M3EMenuNode> menuChildren = _menuChildren();
+    final List<M3EMenuNode> menuChildren = _menuChildren(l10n);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         _actionIcon(
           icon: Icons.filter_list,
-          tooltip: '筛选与排序',
+          tooltip: l10n.libraryFilterSortTooltip,
+          semanticLabel: l10n.libraryFilterSortSemantic,
           color: filterColor,
           onPressed: onFilterSort,
         ),
@@ -188,7 +192,7 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
         if (menuChildren.isEmpty)
           _actionIcon(
             icon: Icons.more_vert,
-            tooltip: '更多',
+            tooltip: l10n.metadataMoreActions,
             onPressed: null,
           )
         else
@@ -198,7 +202,7 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
             anchorBuilder: (BuildContext context, VoidCallback open) {
               return _actionIcon(
                 icon: Icons.more_vert,
-                tooltip: '更多',
+                tooltip: l10n.metadataMoreActions,
                 onPressed: open,
               );
             },
@@ -210,6 +214,7 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
   Widget _actionIcon({
     required IconData icon,
     required String tooltip,
+    String? semanticLabel,
     Color? color,
     VoidCallback? onPressed,
   }) {
@@ -222,6 +227,7 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
       variant: M3EIconButtonVariant.standard,
       size: M3EIconButtonSize.sm,
       tooltip: tooltip,
+      semanticLabel: semanticLabel ?? tooltip,
       onPressed: onPressed,
     );
   }

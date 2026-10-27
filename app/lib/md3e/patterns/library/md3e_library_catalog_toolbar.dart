@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/patterns/library/md3e_library_display_target.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_display_target_tabs.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Body-top catalog row: display-target tabs (start) + active count (end).
@@ -16,17 +17,14 @@ class Md3eLibraryCatalogToolbar extends StatelessWidget {
     required this.onDisplayTargetChanged,
   });
 
-  final Md3eLibraryDisplayTarget displayTarget;
+  final LibraryDisplayTarget displayTarget;
   final int comicCount;
   final int seriesCount;
-  final ValueChanged<Md3eLibraryDisplayTarget> onDisplayTargetChanged;
-
-  static String comicCountLabel(int count) => '$count 本';
-
-  static String seriesCountLabel(int count) => '$count 个系列';
+  final ValueChanged<LibraryDisplayTarget> onDisplayTargetChanged;
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final double windowWidth = MediaQuery.sizeOf(context).width;
     final Md3eWindowSizeClass sizeClass =
         Md3eWindowSizeClass.fromWidth(windowWidth);
@@ -34,9 +32,9 @@ class Md3eLibraryCatalogToolbar extends StatelessWidget {
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
 
-    final String countLabel = displayTarget == Md3eLibraryDisplayTarget.comics
-        ? comicCountLabel(comicCount)
-        : seriesCountLabel(seriesCount);
+    final String countLabel = displayTarget == LibraryDisplayTarget.comics
+        ? l10n.comicCount(comicCount)
+        : l10n.librarySeriesCount(seriesCount);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,

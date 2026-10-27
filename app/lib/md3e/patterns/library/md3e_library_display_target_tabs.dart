@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/patterns/library/md3e_library_display_target.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画 / 系列切换：[`M3ETabs`] primary + 局部 [`M3ETabTheme`]（动画指示条、state layer）。
@@ -18,18 +19,23 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
     this.centered = true,
   });
 
-  final Md3eLibraryDisplayTarget displayTarget;
+  final LibraryDisplayTarget displayTarget;
   final Md3eWindowSizeClass sizeClass;
-  final ValueChanged<Md3eLibraryDisplayTarget> onChanged;
+  final ValueChanged<LibraryDisplayTarget> onChanged;
 
   /// When false, tabs align to the start (catalog toolbar / Kazumi-style row).
   final bool centered;
 
   @override
   Widget build(BuildContext context) {
-    final int selectedIndex = displayTarget == Md3eLibraryDisplayTarget.comics
+    final AppLocalizations l10n = context.l10n;
+    final int selectedIndex = displayTarget == LibraryDisplayTarget.comics
         ? 0
         : 1;
+    final List<String> tabLabels = <String>[
+      l10n.libraryDisplayTargetTabLabel(LibraryDisplayTarget.comics),
+      l10n.libraryDisplayTargetTabLabel(LibraryDisplayTarget.series),
+    ];
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETabTheme tabTheme =
@@ -43,6 +49,7 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
     );
     final double barWidth =
         Md3eLibraryPageHeaderMetrics.displayTargetTabsBarWidth(
+          tabLabels: tabLabels,
           labelStyle: selectedLabelStyle,
           textDirection: Directionality.of(context),
         );
@@ -54,16 +61,15 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
         child: M3ETabs(
           variant: M3ETabsVariant.primary,
           scrollable: true,
-          tabs: const <M3ETab>[
-            M3ETab(label: '漫画'),
-            M3ETab(label: '系列'),
+          tabs: <M3ETab>[
+            for (final String label in tabLabels) M3ETab(label: label),
           ],
           selectedIndex: selectedIndex,
           onTabSelected: (int index) {
             onChanged(
               index == 0
-                  ? Md3eLibraryDisplayTarget.comics
-                  : Md3eLibraryDisplayTarget.series,
+                  ? LibraryDisplayTarget.comics
+                  : LibraryDisplayTarget.series,
             );
           },
         ),

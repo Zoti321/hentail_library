@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -44,7 +45,7 @@ class Md3ePaginationPageButton extends StatelessWidget {
       child: M3ETappable(
         onTap: onPressed,
         enabled: onPressed != null,
-        semanticLabel: '第 $page 页',
+        semanticLabel: context.l10n.md3ePaginationPageSemantic(page),
         builder: (BuildContext context, M3EInteractionState state) {
           final double stateAlpha = tabTheme.stateOpacity(
             hovered: state.hovered,

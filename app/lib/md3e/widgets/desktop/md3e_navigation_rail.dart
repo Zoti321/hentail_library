@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Layout metrics from Figma `NavigationRail` `41:1577` (MASTER §5.6).
@@ -46,8 +47,8 @@ class Md3eNavigationRail extends StatelessWidget {
       expandedWidth: Md3eNavigationRailMetrics.expandedWidth,
       selectedIndex: selectedIndex,
       onDestinationSelected: onDestinationSelected,
-      expandTooltip: '展开导航',
-      collapseTooltip: '收起导航',
+      expandTooltip: context.l10n.md3eNavRailExpand,
+      collapseTooltip: context.l10n.md3eNavRailCollapse,
       onTypeChanged: (_) => onMenuPressed?.call(),
       sections: <M3ENavigationRailSection>[
         M3ENavigationRailSection(
@@ -67,30 +68,32 @@ class Md3eNavigationRail extends StatelessWidget {
 }
 
 /// Default shell destinations aligned with production nav labels ([AppNavigation]).
-List<Md3eNavigationRailDestination> md3eDefaultNavigationRailDestinations() {
-  return const <Md3eNavigationRailDestination>[
+List<Md3eNavigationRailDestination> md3eDefaultNavigationRailDestinations(
+  AppLocalizations l10n,
+) {
+  return <Md3eNavigationRailDestination>[
     Md3eNavigationRailDestination(
-      label: '首页',
+      label: l10n.navHome,
       icon: Icons.home_outlined,
       selectedIcon: Icons.home,
     ),
     Md3eNavigationRailDestination(
-      label: '漫画库',
+      label: l10n.libraryTitle,
       icon: Icons.auto_stories_outlined,
       selectedIcon: Icons.auto_stories,
     ),
     Md3eNavigationRailDestination(
-      label: '管理',
+      label: l10n.navMetadata,
       icon: Icons.layers_outlined,
       selectedIcon: Icons.layers,
     ),
     Md3eNavigationRailDestination(
-      label: '历史',
+      label: l10n.navHistory,
       icon: Icons.history_outlined,
       selectedIcon: Icons.history,
     ),
     Md3eNavigationRailDestination(
-      label: '设置',
+      label: l10n.navSettings,
       icon: Icons.settings_outlined,
       selectedIcon: Icons.settings,
     ),

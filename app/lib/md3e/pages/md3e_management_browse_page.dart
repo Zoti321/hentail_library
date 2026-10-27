@@ -6,7 +6,7 @@ import 'package:hentai_library/md3e/patterns/management/md3e_management_create_i
 import 'package:hentai_library/md3e/patterns/management/md3e_management_facet_chip_wrap.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_entity_dialog.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_draft_entity_chip.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_named_facet.dart';
+import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_page_header.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_management_create_entity_fab.dart';
@@ -22,18 +22,18 @@ class Md3eManagementBrowsePage extends StatefulWidget {
     this.onChipPressed,
     this.onEntityCreated,
     this.createInteractionOverride,
-    this.title = '管理',
+    this.title,
     this.scrollController,
   });
 
-  final Md3eManagementNamedFacet facet;
+  final ManagedNamedFacetKind facet;
   final int facetCount;
   final List<String> chipLabels;
-  final ValueChanged<Md3eManagementNamedFacet> onFacetChanged;
+  final ValueChanged<ManagedNamedFacetKind> onFacetChanged;
   final ValueChanged<String>? onChipPressed;
   final ValueChanged<String>? onEntityCreated;
   final Md3eManagementCreateInteraction? createInteractionOverride;
-  final String title;
+  final String? title;
   final ScrollController? scrollController;
 
   @override
@@ -211,27 +211,27 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
 
 /// Widgetbook / 预览用各维度示例数据。
 abstract final class Md3eManagementBrowsePagePreviewData {
-  static const Map<Md3eManagementNamedFacet, List<String>> sampleLabels =
-      <Md3eManagementNamedFacet, List<String>>{
-        Md3eManagementNamedFacet.authors: <String>[
+  static const Map<ManagedNamedFacetKind, List<String>> sampleLabels =
+      <ManagedNamedFacetKind, List<String>>{
+        ManagedNamedFacetKind.author: <String>[
           '村上水军',
           '比村兵長',
           '紺野アサラ',
           'みちきんぐ',
         ],
-        Md3eManagementNamedFacet.parodies: <String>[
+        ManagedNamedFacetKind.parody: <String>[
           '艦隊これくしょん',
           'Fate/Grand Order',
           '原神',
         ],
-        Md3eManagementNamedFacet.characters: <String>[
+        ManagedNamedFacetKind.character: <String>[
           '島風',
           'マシュ',
           '雷電将軍',
           '甘雨',
           '胡桃',
         ],
-        Md3eManagementNamedFacet.tags: <String>[
+        ManagedNamedFacetKind.tag: <String>[
           '奇幻',
           '校园',
           '恋爱',
@@ -245,11 +245,11 @@ abstract final class Md3eManagementBrowsePagePreviewData {
         ],
       };
 
-  static int sampleCountFor(Md3eManagementNamedFacet facet) {
+  static int sampleCountFor(ManagedNamedFacetKind facet) {
     return sampleLabels[facet]?.length ?? 0;
   }
 
-  static List<String> sampleChipsFor(Md3eManagementNamedFacet facet) {
+  static List<String> sampleChipsFor(ManagedNamedFacetKind facet) {
     return List<String>.of(sampleLabels[facet] ?? const <String>[]);
   }
 }

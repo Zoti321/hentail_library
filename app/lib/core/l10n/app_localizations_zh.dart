@@ -1473,6 +1473,57 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String metadataAuthorCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 位作者',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataTagCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个标签',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataParodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 部原作',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataCharacterCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 位角色',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get md3eNavRailExpand => '展开导航';
+
+  @override
+  String get md3eNavRailCollapse => '收起导航';
+
+  @override
+  String md3ePaginationPageSemantic(int page) {
+    return '第 $page 页';
+  }
+
+  @override
   String get metadataRenameAuthor => '重命名作者';
 
   @override

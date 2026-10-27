@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_metrics.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header.dart';
 
 import '../../support/pump_md3e_app.dart';
@@ -98,13 +100,13 @@ void main() {
       expect(Md3eLibraryFilterSortState.defaults.isCustomized, isFalse);
       expect(
         Md3eLibraryFilterSortState.defaults
-            .toggleAgeOption(Md3eLibraryAgeRestrictionOption.allAges)
+            .toggleAgeRestriction(LibraryAgeRestrictionFilter.allAges)
             .isCustomized,
         isTrue,
       );
       expect(
         Md3eLibraryFilterSortState.defaults
-            .selectSortField(Md3eLibraryComicSortField.createdAt)
+            .selectSortField(LibraryComicSortField.createdAt)
             .isCustomized,
         isTrue,
       );
@@ -144,11 +146,9 @@ void main() {
   testWidgets('customized filter highlights header filter action', (
     WidgetTester tester,
   ) async {
-    const Md3eLibraryFilterSortState customized =
-        Md3eLibraryFilterSortState(
-          ageOptions: <Md3eLibraryAgeRestrictionOption>{
-            Md3eLibraryAgeRestrictionOption.r18Only,
-          },
+    final Md3eLibraryFilterSortState customized =
+        Md3eLibraryFilterSortState.defaults.toggleAgeRestriction(
+          LibraryAgeRestrictionFilter.r18Only,
         );
 
     await pumpMd3eApp(
