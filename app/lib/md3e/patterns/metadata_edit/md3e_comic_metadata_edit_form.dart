@@ -3,6 +3,7 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_metadata_edit_form_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
+import 'package:hentai_library/md3e/widgets/inputs/md3e_comic_language_quick_pick.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_published_date_text_field.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
@@ -277,8 +278,26 @@ class _GeneralFields extends StatelessWidget {
           ],
         ),
         SizedBox(height: gap),
+        Text(
+          l10n.formLanguagesLabel,
+          style: M3ETheme.of(context).typeScale.labelLarge.copyWith(
+            color: M3ETheme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        SizedBox(height: M3ETheme.of(context).spacing.sm),
+        Md3eComicLanguageQuickPick(
+          selected: draft.languages,
+          onCanonicalToggled: (String canonical) {
+            if (draft.languages.contains(canonical)) {
+              onLanguageRemoved(canonical);
+            } else {
+              onLanguageAdded(canonical);
+            }
+          },
+        ),
+        SizedBox(height: M3ETheme.of(context).spacing.sm),
         Md3eTagInputField(
-          label: l10n.bulkEditMetadataFieldLanguages,
+          label: l10n.metadataAdd,
           tags: draft.languages,
           onTagCommitted: onLanguageAdded,
           onTagRemoved: onLanguageRemoved,
