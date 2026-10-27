@@ -123,8 +123,6 @@ void main() {
             body: Builder(
               builder: (BuildContext context) {
                 return Md3eLibraryPageHeader(
-                  displayTarget: Md3eLibraryDisplayTarget.comics,
-                  onDisplayTargetChanged: (_) {},
                   onFilterSort: () =>
                       Md3eLibraryFilterSortDrawerHost.openDrawer(context),
                 );
@@ -161,9 +159,7 @@ void main() {
           child: Md3eLibraryFilterSortDrawerHost(
             initialState: customized,
             body: Md3eLibraryPageHeader(
-              displayTarget: Md3eLibraryDisplayTarget.comics,
               filterSortActive: customized.isCustomized,
-              onDisplayTargetChanged: (_) {},
             ),
           ),
         ),

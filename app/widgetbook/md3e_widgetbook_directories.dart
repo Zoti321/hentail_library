@@ -5,12 +5,12 @@ import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/patterns/md3e_comic_detail_meta_chip_row.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/md3e_desktop_shell_surfaces.dart';
+import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
@@ -191,7 +191,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                     final Md3eWindowSizeClass sizeClass =
                         Md3eWindowSizeClass.fromWidth(width);
                     final double horizontal =
-                        Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(
+                        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(
                           sizeClass,
                         );
                     return Md3eWidgetbookScope(
@@ -579,49 +579,35 @@ class _Md3eLibraryPageHeaderPreview extends StatefulWidget {
 
 class _Md3eLibraryPageHeaderPreviewState
     extends State<_Md3eLibraryPageHeaderPreview> {
-  Md3eLibraryDisplayTarget _target = Md3eLibraryDisplayTarget.comics;
   Md3eLibraryFilterSortState _filterSort = Md3eLibraryFilterSortState.defaults;
   int _pageSize = 50;
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(width);
-    final double horizontal =
-        Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(sizeClass);
-
     return Md3eLibraryFilterSortDrawerHost(
       initialState: _filterSort,
       useRootNavigator: false,
       onStateChanged: (Md3eLibraryFilterSortState value) {
         setState(() => _filterSort = value);
       },
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(horizontal, 0, horizontal, 0),
-        child: Builder(
-          builder: (BuildContext hostContext) {
-            return Md3eLibraryPageHeader(
-              displayTarget: _target,
-              filterSortActive: _filterSort.isCustomized,
-              pageSize: _pageSize,
-              onPageSizeChanged: (int value) => setState(() => _pageSize = value),
-              overflowMenuEntries: <M3EMenuEntry>[
-                M3EMenuEntry(
-                  label: '刷新目录',
-                  leading: const Icon(Icons.refresh),
-                  onPressed: () {},
-                ),
-              ],
-              onDisplayTargetChanged: (Md3eLibraryDisplayTarget value) {
-                setState(() => _target = value);
-              },
-              onFilterSort: () => Md3eLibraryFilterSortDrawerHost.openDrawer(
-                hostContext,
+      body: Builder(
+        builder: (BuildContext hostContext) {
+          return Md3eLibraryPageHeader(
+            filterSortActive: _filterSort.isCustomized,
+            pageSize: _pageSize,
+            onPageSizeChanged: (int value) => setState(() => _pageSize = value),
+            overflowMenuEntries: <M3EMenuEntry>[
+              M3EMenuEntry(
+                label: '刷新目录',
+                leading: const Icon(Icons.refresh),
+                onPressed: () {},
               ),
-            );
-          },
-        ),
+            ],
+            onFilterSort: () => Md3eLibraryFilterSortDrawerHost.openDrawer(
+              hostContext,
+            ),
+          );
+        },
       ),
     );
   }

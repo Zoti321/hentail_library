@@ -121,7 +121,6 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontal),
         child: Md3eLibraryPageHeader(
-          displayTarget: widget.displayTarget,
           filterSortActive: widget.filterSortActive,
           pageSize: widget.pageSize,
           onPageSizeChanged: widget.onPageSizeChanged,

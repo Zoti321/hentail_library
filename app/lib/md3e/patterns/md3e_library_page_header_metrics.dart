@@ -1,11 +1,8 @@
 import 'package:flutter/painting.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-/// Layout modes for [Md3eLibraryPageHeader] (MASTER §5.1 漫画库头部).
+/// Layout mode for [Md3eLibraryPageHeader] (MASTER §5.1 漫画库粘滞头).
 enum Md3eLibraryPageHeaderLayout {
-  /// 标题 + 居中 [M3ETabs] + 操作，单行 44dp（Widgetbook 页头预览等）。
-  singleRowWithTabs,
-
   /// 标题 + 操作；漫画/系列 tabs 在 [Md3eLibraryCatalogToolbar]（随列表滚动）。
   titleAndActionsOnly,
 }
@@ -74,24 +71,7 @@ abstract final class Md3eLibraryPageHeaderMetrics {
   static Md3eLibraryPageHeaderLayout layoutFor(
     Md3eWindowSizeClass sizeClass,
   ) {
-    return Md3eLibraryPageHeaderLayout.singleRowWithTabs;
-  }
-
-  /// 单行布局时居中 tabs 区域宽度（避免与标题、动作重叠）。
-  static double centeredTabsMaxWidth(
-    double viewportWidth,
-    Md3eWindowSizeClass sizeClass,
-  ) {
-    if (viewportWidth <= 0 || !viewportWidth.isFinite) {
-      return 320;
-    }
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.medium => (viewportWidth * 0.38).clamp(200, 300),
-      Md3eWindowSizeClass.expanded => (viewportWidth * 0.34).clamp(220, 360),
-      Md3eWindowSizeClass.large => (viewportWidth * 0.36).clamp(260, 400),
-      Md3eWindowSizeClass.extraLarge => (viewportWidth * 0.36).clamp(280, 420),
-      _ => (viewportWidth * 0.36).clamp(240, 420),
-    };
+    return Md3eLibraryPageHeaderLayout.titleAndActionsOnly;
   }
 
   static double contentHorizontalPadding(Md3eWindowSizeClass sizeClass) {

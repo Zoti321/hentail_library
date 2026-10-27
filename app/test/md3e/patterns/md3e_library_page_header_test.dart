@@ -9,7 +9,7 @@ import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.da
 import '../../support/pump_md3e_app.dart';
 
 void main() {
-  testWidgets('expanded uses single row with centered tabs', (
+  testWidgets('expanded shows title and actions only (no inline tabs)', (
     WidgetTester tester,
   ) async {
     await pumpMd3eApp(
@@ -18,8 +18,7 @@ void main() {
         child: SizedBox(
           width: Md3eBreakpoints.previewWidthExpanded,
           child: Md3eLibraryPageHeader(
-            displayTarget: Md3eLibraryDisplayTarget.comics,
-            onDisplayTargetChanged: (_) {},
+            onFilterSort: () {},
           ),
         ),
       ),
@@ -29,14 +28,14 @@ void main() {
       Md3eLibraryPageHeaderMetrics.layoutFor(
         Md3eWindowSizeClass.expanded,
       ),
-      Md3eLibraryPageHeaderLayout.singleRowWithTabs,
+      Md3eLibraryPageHeaderLayout.titleAndActionsOnly,
     );
     expect(find.text('漫画库'), findsOneWidget);
-    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
-    expect(find.byType(M3ETabs), findsOneWidget);
+    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsNothing);
+    expect(find.byType(M3ETabs), findsNothing);
   });
 
-  testWidgets('large uses single toolbar row with inline tabs', (
+  testWidgets('large uses title row without display target tabs', (
     WidgetTester tester,
   ) async {
     await pumpMd3eApp(
@@ -44,47 +43,19 @@ void main() {
       home: Center(
         child: SizedBox(
           width: Md3eBreakpoints.previewWidthLarge,
-          child: Md3eLibraryPageHeader(
-            displayTarget: Md3eLibraryDisplayTarget.comics,
-            onDisplayTargetChanged: (_) {},
-          ),
+          child: const Md3eLibraryPageHeader(),
         ),
       ),
     );
 
     expect(
       Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.large),
-      Md3eLibraryPageHeaderLayout.singleRowWithTabs,
+      Md3eLibraryPageHeaderLayout.titleAndActionsOnly,
     );
-    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
-    expect(find.byType(M3ETabs), findsOneWidget);
+    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsNothing);
   });
 
-  testWidgets('medium uses single row with centered tabs', (
-    WidgetTester tester,
-  ) async {
-    await pumpMd3eApp(
-      tester,
-      home: Center(
-        child: SizedBox(
-          width: Md3eBreakpoints.previewWidthMedium,
-          child: Md3eLibraryPageHeader(
-            displayTarget: Md3eLibraryDisplayTarget.comics,
-            onDisplayTargetChanged: (_) {},
-          ),
-        ),
-      ),
-    );
-
-    expect(
-      Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.medium),
-      Md3eLibraryPageHeaderLayout.singleRowWithTabs,
-    );
-    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
-    expect(find.byType(M3ETabs), findsOneWidget);
-  });
-
-  testWidgets('medium layout uses window width not padded content width', (
+  testWidgets('medium uses window width for title typography', (
     WidgetTester tester,
   ) async {
     const double windowWidth = Md3eBreakpoints.previewWidthMedium;
@@ -101,10 +72,7 @@ void main() {
         child: Center(
           child: SizedBox(
             width: contentWidth,
-            child: Md3eLibraryPageHeader(
-              displayTarget: Md3eLibraryDisplayTarget.comics,
-              onDisplayTargetChanged: (_) {},
-            ),
+            child: const Md3eLibraryPageHeader(),
           ),
         ),
       ),
@@ -112,12 +80,12 @@ void main() {
 
     expect(
       Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.medium),
-      Md3eLibraryPageHeaderLayout.singleRowWithTabs,
+      Md3eLibraryPageHeaderLayout.titleAndActionsOnly,
     );
-    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
+    expect(find.text('漫画库'), findsOneWidget);
   });
 
-  testWidgets('compact uses single row with centered tabs', (
+  testWidgets('compact shows filter and overflow actions', (
     WidgetTester tester,
   ) async {
     await pumpMd3eApp(
@@ -126,14 +94,12 @@ void main() {
         child: SizedBox(
           width: Md3eBreakpoints.previewWidthCompact,
           child: Md3eLibraryPageHeader(
-            displayTarget: Md3eLibraryDisplayTarget.comics,
             filterSortActive: true,
             pageSize: 50,
             onPageSizeChanged: (_) {},
             overflowMenuEntries: const <M3EMenuEntry>[
               M3EMenuEntry(label: '刷新目录'),
             ],
-            onDisplayTargetChanged: (_) {},
             onFilterSort: () {},
           ),
         ),
@@ -142,15 +108,9 @@ void main() {
 
     expect(
       Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.compact),
-      Md3eLibraryPageHeaderLayout.singleRowWithTabs,
+      Md3eLibraryPageHeaderLayout.titleAndActionsOnly,
     );
-    expect(find.byType(Md3eLibraryDisplayTargetTabs), findsOneWidget);
-    expect(find.byType(M3ETabs), findsOneWidget);
-    final M3ETabTheme tabTheme =
-        Md3eLibraryPageHeaderMetrics.displayTargetTabThemeFor(
-          Md3eWindowSizeClass.compact,
-        );
-    expect(tabTheme.dividerHeight, 0);
-    expect(tabTheme.indicatorInset, -2);
+    expect(find.byIcon(Icons.filter_list), findsOneWidget);
+    expect(find.byIcon(Icons.more_vert), findsOneWidget);
   });
 }

@@ -2,8 +2,6 @@ export 'md3e_library_display_target.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_display_target.dart';
-import 'package:hentai_library/md3e/patterns/md3e_library_display_target_tabs.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header_metrics.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -11,13 +9,13 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// Default page-size choices for the overflow submenu (Lab).
 const List<int> kMd3eLibraryPageSizeOptions = <int>[20, 50, 100, 200];
 
-/// 漫画库页内头部：标题、显示目标 tabs、操作按钮（Lab pattern）。
+/// 漫画库粘滞页头：标题 + 操作（与 [Md3eLibraryBrowsePage] 一致）。
+///
+/// 漫画 / 系列切换在 [Md3eLibraryCatalogToolbar]，随列表滚动，不在本组件内。
 class Md3eLibraryPageHeader extends StatelessWidget {
   const Md3eLibraryPageHeader({
     super.key,
     this.title = '漫画库',
-    required this.displayTarget,
-    this.onDisplayTargetChanged,
     this.onFilterSort,
     this.overflowMenuEntries = const <M3EMenuNode>[],
     this.pageSize,
@@ -27,8 +25,6 @@ class Md3eLibraryPageHeader extends StatelessWidget {
   });
 
   final String title;
-  final Md3eLibraryDisplayTarget displayTarget;
-  final ValueChanged<Md3eLibraryDisplayTarget>? onDisplayTargetChanged;
   final VoidCallback? onFilterSort;
   final List<M3EMenuNode> overflowMenuEntries;
   final int? pageSize;
@@ -38,39 +34,26 @@ class Md3eLibraryPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        // 断点跟窗口宽（与 M3 / Viewport addon 一致），不用扣掉水平 padding 后的内容宽。
-        final double windowWidth = MediaQuery.sizeOf(context).width;
-        final double contentWidth = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : windowWidth;
-        final Md3eWindowSizeClass sizeClass =
-            Md3eWindowSizeClass.fromWidth(windowWidth);
-        final bool embedTabs = onDisplayTargetChanged != null;
-        return Padding(
-          padding: EdgeInsets.only(
-            top: Md3eLibraryPageHeaderMetrics.verticalPadding,
-            bottom: embedTabs
-                ? Md3eLibraryPageHeaderMetrics.verticalPadding
-                : Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding,
-          ),
-          child: _Md3eLibraryPageHeaderToolbar(
-            title: title,
-            displayTarget: displayTarget,
-            sizeClass: sizeClass,
-            viewportWidth: contentWidth,
-            embedTabs: embedTabs,
-            onDisplayTargetChanged: onDisplayTargetChanged,
-            onFilterSort: onFilterSort,
-            overflowMenuEntries: overflowMenuEntries,
-            pageSize: pageSize,
-            onPageSizeChanged: onPageSizeChanged,
-            pageSizeOptions: pageSizeOptions,
-            filterSortActive: filterSortActive,
-          ),
-        );
-      },
+    // 断点跟窗口宽（与 M3 / Viewport addon 一致），不用扣掉水平 padding 后的内容宽。
+    final double windowWidth = MediaQuery.sizeOf(context).width;
+    final Md3eWindowSizeClass sizeClass =
+        Md3eWindowSizeClass.fromWidth(windowWidth);
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: Md3eLibraryPageHeaderMetrics.verticalPadding,
+        bottom: Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding,
+      ),
+      child: _Md3eLibraryPageHeaderToolbar(
+        title: title,
+        sizeClass: sizeClass,
+        onFilterSort: onFilterSort,
+        overflowMenuEntries: overflowMenuEntries,
+        pageSize: pageSize,
+        onPageSizeChanged: onPageSizeChanged,
+        pageSizeOptions: pageSizeOptions,
+        filterSortActive: filterSortActive,
+      ),
     );
   }
 }
@@ -78,11 +61,7 @@ class Md3eLibraryPageHeader extends StatelessWidget {
 class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
   const _Md3eLibraryPageHeaderToolbar({
     required this.title,
-    required this.displayTarget,
     required this.sizeClass,
-    required this.viewportWidth,
-    required this.embedTabs,
-    this.onDisplayTargetChanged,
     this.onFilterSort,
     this.overflowMenuEntries = const <M3EMenuNode>[],
     this.pageSize,
@@ -92,11 +71,7 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
   });
 
   final String title;
-  final Md3eLibraryDisplayTarget displayTarget;
   final Md3eWindowSizeClass sizeClass;
-  final double viewportWidth;
-  final bool embedTabs;
-  final ValueChanged<Md3eLibraryDisplayTarget>? onDisplayTargetChanged;
   final VoidCallback? onFilterSort;
   final List<M3EMenuNode> overflowMenuEntries;
   final int? pageSize;
@@ -130,50 +105,18 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
       pageSizeOptions: pageSizeOptions,
     );
 
-    final Widget? inlineTabs = embedTabs && onDisplayTargetChanged != null
-        ? Md3eLibraryDisplayTargetTabs(
-            displayTarget: displayTarget,
-            sizeClass: sizeClass,
-            onChanged: onDisplayTargetChanged!,
-          )
-        : null;
-
-    if (inlineTabs == null) {
-      return SizedBox(
-        height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: leading,
-              ),
-            ),
-            actions,
-          ],
-        ),
-      );
-    }
-
     return SizedBox(
       height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
-      child: Stack(
-        alignment: Alignment.center,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: leading,
-                ),
-              ),
-              actions,
-            ],
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: leading,
+            ),
           ),
-          inlineTabs,
+          actions,
         ],
       ),
     );
