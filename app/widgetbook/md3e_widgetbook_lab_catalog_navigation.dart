@@ -5,13 +5,15 @@ void md3eWidgetbookOpenLabCatalogDetail(
   BuildContext context, {
   required LibraryDisplayTarget displayTarget,
 }) {
-  final Widget page = switch (displayTarget) {
-    LibraryDisplayTarget.comics => _md3eWidgetbookLabComicDetailPage(context),
-    LibraryDisplayTarget.series => _md3eWidgetbookLabSeriesDetailPage(context),
-  };
-
   Navigator.of(context).push<void>(
-    MaterialPageRoute<void>(builder: (BuildContext _) => page),
+    MaterialPageRoute<void>(
+      builder: (BuildContext routeContext) => switch (displayTarget) {
+        LibraryDisplayTarget.comics =>
+          _md3eWidgetbookLabComicDetailPage(routeContext),
+        LibraryDisplayTarget.series =>
+          _md3eWidgetbookLabSeriesDetailPage(routeContext),
+      },
+    ),
   );
 }
 
@@ -28,7 +30,7 @@ Widget _md3eWidgetbookLabComicDetailPage(BuildContext context) {
   final Md3eComicDetailEntry entry = Md3eComicDetailPagePreviewData.sample();
   return Md3eComicDetailPage(
     entry: entry,
-    onBack: () => Navigator.of(context).pop(),
+    onBack: () => _md3eWidgetbookPopLabRoute(context),
     onEdit: () => _md3eWidgetbookOpenLabComicMetadataEdit(context, entry: entry),
   );
 }
@@ -37,10 +39,17 @@ Widget _md3eWidgetbookLabSeriesDetailPage(BuildContext context) {
   final Md3eSeriesDetailEntry entry = Md3eSeriesDetailPagePreviewData.sample();
   return Md3eSeriesDetailPage(
     entry: entry,
-    onBack: () => Navigator.of(context).pop(),
+    onBack: () => _md3eWidgetbookPopLabRoute(context),
     onEdit: () => _md3eWidgetbookOpenLabSeriesMetadataEdit(context, entry: entry),
     onComicTap: (_) => md3eWidgetbookPushLabComicDetail(context),
   );
+}
+
+void _md3eWidgetbookPopLabRoute(BuildContext context) {
+  if (!context.mounted) {
+    return;
+  }
+  Navigator.of(context).pop();
 }
 
 void _md3eWidgetbookOpenLabComicMetadataEdit(
