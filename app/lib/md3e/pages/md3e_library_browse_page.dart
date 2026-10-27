@@ -36,6 +36,7 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
     this.onPageChanged,
     this.scrollController,
     this.hideScrollToTop = false,
+    this.onCatalogItemTap,
   });
 
   final LibraryDisplayTarget displayTarget;
@@ -58,6 +59,9 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
 
   final ScrollController? scrollController;
   final bool hideScrollToTop;
+
+  /// Lab / Widgetbook：目录卡片点击（生产由路由层处理）。
+  final VoidCallback? onCatalogItemTap;
 
   @override
   State<Md3eLibraryBrowsePage> createState() => _Md3eLibraryBrowsePageState();
@@ -203,6 +207,8 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
                 Md3eCatalogViewMode.list => _Md3eLibraryBrowseListSliver(
                   itemCount: widget.itemCount,
                   horizontalPadding: horizontal,
+                  displayTarget: widget.displayTarget,
+                  onCatalogItemTap: widget.onCatalogItemTap,
                 ),
               },
             ),
@@ -240,11 +246,18 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
     Md3eCatalogGridLayout _,
   ) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    final double? readProgress =
-        index.isOdd ? null : ((index % 9) + 1) / 10;
+    final double? readProgress = widget.displayTarget ==
+            LibraryDisplayTarget.comics && index.isEven
+        ? ((index % 9) + 1) / 10
+        : null;
+    final _Md3eLibraryBrowseCatalogItemCopy copy =
+        _Md3eLibraryBrowseCatalogItemCopy.forIndex(
+          displayTarget: widget.displayTarget,
+          index: index,
+        );
     return Md3eComicCard(
-      title: '示例本子 ${index + 1}',
-      subtitle: '${64 + index * 8} 页',
+      title: copy.title,
+      subtitle: copy.subtitle,
       readProgress: readProgress,
       cover: ColoredBox(
         color: scheme.surfaceContainerHigh,
@@ -255,8 +268,40 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
           ),
         ),
       ),
-      onTap: () {},
+      onTap: widget.onCatalogItemTap ?? () {},
     );
+  }
+}
+
+/// Lab 占位目录文案（漫画 / 系列卡片共用 [Md3eComicCard] / [Md3eComicListItem]）。
+@immutable
+class _Md3eLibraryBrowseCatalogItemCopy {
+  const _Md3eLibraryBrowseCatalogItemCopy({
+    required this.title,
+    required this.subtitle,
+    this.listAuthor,
+  });
+
+  final String title;
+  final String subtitle;
+  final String? listAuthor;
+
+  static _Md3eLibraryBrowseCatalogItemCopy forIndex({
+    required LibraryDisplayTarget displayTarget,
+    required int index,
+  }) {
+    return switch (displayTarget) {
+      LibraryDisplayTarget.comics => _Md3eLibraryBrowseCatalogItemCopy(
+        title: '示例本子 ${index + 1}',
+        subtitle: '${64 + index * 8} 页',
+        listAuthor: '作者 ${index % 5 + 1}',
+      ),
+      LibraryDisplayTarget.series => _Md3eLibraryBrowseCatalogItemCopy(
+        title: '示例系列 ${index + 1}',
+        subtitle: '${3 + index % 8} 本漫画',
+        listAuthor: '连载中',
+      ),
+    };
   }
 }
 
@@ -264,10 +309,14 @@ class _Md3eLibraryBrowseListSliver extends StatelessWidget {
   const _Md3eLibraryBrowseListSliver({
     required this.itemCount,
     required this.horizontalPadding,
+    required this.displayTarget,
+    this.onCatalogItemTap,
   });
 
   final int itemCount;
   final double horizontalPadding;
+  final LibraryDisplayTarget displayTarget;
+  final VoidCallback? onCatalogItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -280,8 +329,12 @@ class _Md3eLibraryBrowseListSliver extends StatelessWidget {
       sliver: switch (columns) {
         1 => SliverList(
           delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) =>
-                _Md3eLibraryBrowseListItem(scheme: scheme, index: index),
+            (BuildContext context, int index) => _Md3eLibraryBrowseListItem(
+              scheme: scheme,
+              index: index,
+              displayTarget: displayTarget,
+              onCatalogItemTap: onCatalogItemTap,
+            ),
             childCount: itemCount,
           ),
         ),
@@ -297,6 +350,8 @@ class _Md3eLibraryBrowseListSliver extends StatelessWidget {
                     child: _Md3eLibraryBrowseListItem(
                       scheme: scheme,
                       index: leftIndex,
+                      displayTarget: displayTarget,
+                      onCatalogItemTap: onCatalogItemTap,
                     ),
                   ),
                   Expanded(
@@ -304,6 +359,8 @@ class _Md3eLibraryBrowseListSliver extends StatelessWidget {
                         ? _Md3eLibraryBrowseListItem(
                             scheme: scheme,
                             index: rightIndex,
+                            displayTarget: displayTarget,
+                            onCatalogItemTap: onCatalogItemTap,
                           )
                         : const SizedBox.shrink(),
                   ),
@@ -322,21 +379,32 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
   const _Md3eLibraryBrowseListItem({
     required this.scheme,
     required this.index,
+    required this.displayTarget,
+    this.onCatalogItemTap,
   });
 
   final ColorScheme scheme;
   final int index;
+  final LibraryDisplayTarget displayTarget;
+  final VoidCallback? onCatalogItemTap;
 
   @override
   Widget build(BuildContext context) {
-    final double? readProgress =
-        index.isOdd ? null : ((index % 9) + 1) / 10;
+    final _Md3eLibraryBrowseCatalogItemCopy copy =
+        _Md3eLibraryBrowseCatalogItemCopy.forIndex(
+          displayTarget: displayTarget,
+          index: index,
+        );
+    final double? readProgress = displayTarget == LibraryDisplayTarget.comics &&
+            index.isEven
+        ? ((index % 9) + 1) / 10
+        : null;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Md3eComicListItem(
-        title: '示例本子 ${index + 1}',
-        author: '作者 ${index % 5 + 1}',
-        pageLabel: '${64 + index * 8} 页',
+        title: copy.title,
+        author: copy.listAuthor ?? '',
+        pageLabel: copy.subtitle,
         readProgress: readProgress,
         moreMenuEntries: const <Md3eComicListMoreMenuEntry>[
           Md3eComicListMoreMenuEntry(label: '继续阅读'),
@@ -353,7 +421,7 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
             ),
           ),
         ),
-        onTap: () {},
+        onTap: onCatalogItemTap ?? () {},
       ),
     );
   }

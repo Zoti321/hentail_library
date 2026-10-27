@@ -40,6 +40,7 @@ import 'md3e_widgetbook_desktop_gate.dart';
 import 'md3e_widgetbook_scope.dart';
 
 part 'md3e_widgetbook_desktop_app_prototype.dart';
+part 'md3e_widgetbook_lab_catalog_navigation.dart';
 
 List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
   return <WidgetbookNode>[
@@ -815,6 +816,10 @@ class _Md3eLibraryBrowsePagePreviewState
             },
             onFilterSort: () =>
                 Md3eLibraryFilterSortDrawerHost.openDrawer(hostContext),
+            onCatalogItemTap: () => md3eWidgetbookOpenLabCatalogDetail(
+              hostContext,
+              displayTarget: _target,
+            ),
           );
         },
       ),
