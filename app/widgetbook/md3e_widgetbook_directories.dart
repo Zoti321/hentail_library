@@ -9,6 +9,7 @@ import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_filter_sort_side_sheet.dart';
+import 'package:hentai_library/md3e/patterns/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
@@ -483,18 +484,44 @@ class _Md3eManagementBrowsePagePreview extends StatefulWidget {
 
 class _Md3eManagementBrowsePagePreviewState
     extends State<_Md3eManagementBrowsePagePreview> {
-  Md3eManagementNamedFacet _facet = Md3eManagementNamedFacet.tags;
+  Md3eManagementNamedFacet _facet = Md3eManagementNamedFacet.authors;
+  late final Map<Md3eManagementNamedFacet, List<String>> _labelsByFacet =
+      <Md3eManagementNamedFacet, List<String>>{
+        for (final Md3eManagementNamedFacet facet
+            in Md3eManagementNamedFacet.managementOrder)
+          facet: Md3eManagementBrowsePagePreviewData.sampleChipsFor(facet),
+      };
+
+  void _addEntity(String name) {
+    final List<String> list = _labelsByFacet[_facet]!;
+    if (list.contains(name)) {
+      return;
+    }
+    setState(() => list.add(name));
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<String> chips =
-        Md3eManagementBrowsePagePreviewData.sampleChipsFor(_facet);
-    final int count = Md3eManagementBrowsePagePreviewData.sampleCountFor(_facet);
+    final String interactionKnob = context.knobs.list(
+      label: '新建交互',
+      options: <String>['自动', '移动端 Dialog', '桌面端内联'],
+      initialOption: '自动',
+    );
+    final Md3eManagementCreateInteraction? interactionOverride =
+        switch (interactionKnob) {
+          '移动端 Dialog' => Md3eManagementCreateInteraction.mobileDialog,
+          '桌面端内联' => Md3eManagementCreateInteraction.desktopInline,
+          _ => null,
+        };
+
+    final List<String> chips = _labelsByFacet[_facet]!;
 
     return Md3eManagementBrowsePage(
       facet: _facet,
-      facetCount: count,
+      facetCount: chips.length,
       chipLabels: chips,
+      createInteractionOverride: interactionOverride,
+      onEntityCreated: _addEntity,
       onFacetChanged: (Md3eManagementNamedFacet value) {
         setState(() => _facet = value);
       },

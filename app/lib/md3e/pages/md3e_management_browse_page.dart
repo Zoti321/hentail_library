@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/patterns/md3e_management_catalog_toolbar.dart';
+import 'package:hentai_library/md3e/patterns/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/patterns/md3e_management_facet_chip_wrap.dart';
+import 'package:hentai_library/md3e/patterns/md3e_management_create_entity_dialog.dart';
+import 'package:hentai_library/md3e/patterns/md3e_management_draft_entity_chip.dart';
 import 'package:hentai_library/md3e/patterns/md3e_management_named_facet.dart';
 import 'package:hentai_library/md3e/patterns/md3e_management_page_header.dart';
 import 'package:hentai_library/md3e/patterns/md3e_library_pinned_header_delegate.dart';
+import 'package:hentai_library/md3e/widgets/navigation/md3e_management_create_entity_fab.dart';
 
 /// 管理页 Lab 壳层：粘滞标题 + 胶囊维度条 + 流式 chip 列表。
 class Md3eManagementBrowsePage extends StatefulWidget {
@@ -16,6 +20,8 @@ class Md3eManagementBrowsePage extends StatefulWidget {
     required this.chipLabels,
     required this.onFacetChanged,
     this.onChipPressed,
+    this.onEntityCreated,
+    this.createInteractionOverride,
     this.title = '管理',
     this.scrollController,
   });
@@ -25,6 +31,8 @@ class Md3eManagementBrowsePage extends StatefulWidget {
   final List<String> chipLabels;
   final ValueChanged<Md3eManagementNamedFacet> onFacetChanged;
   final ValueChanged<String>? onChipPressed;
+  final ValueChanged<String>? onEntityCreated;
+  final Md3eManagementCreateInteraction? createInteractionOverride;
   final String title;
   final ScrollController? scrollController;
 
@@ -38,6 +46,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
   double? _headerExtent;
+  bool _showInlineCreateField = false;
 
   @override
   void initState() {
@@ -50,6 +59,9 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
   @override
   void didUpdateWidget(covariant Md3eManagementBrowsePage oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.facet != widget.facet) {
+      _showInlineCreateField = false;
+    }
     WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
@@ -79,6 +91,25 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
     }
   }
 
+  void _handleEntityCreated(String name) {
+    widget.onEntityCreated?.call(name);
+    if (_showInlineCreateField) {
+      setState(() => _showInlineCreateField = false);
+    }
+  }
+
+  void _onCreateFabPressed(bool useMobileCreateDialog) {
+    if (!useMobileCreateDialog) {
+      setState(() => _showInlineCreateField = true);
+      return;
+    }
+    showMd3eManagementCreateEntityDialog(
+      context: context,
+      facet: widget.facet,
+      onCreate: _handleEntityCreated,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
@@ -86,6 +117,20 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
         Md3eWindowSizeClass.fromWidth(viewportWidth);
     final double horizontal =
         Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+
+    final Md3eManagementCreateInteraction interaction =
+        md3eManagementCreateInteractionOf(
+          context,
+          override: widget.createInteractionOverride,
+        );
+    final bool useMobileCreateDialog =
+        interaction == Md3eManagementCreateInteraction.mobileDialog;
+    final bool createEnabled = widget.onEntityCreated != null;
+    final bool showFab = createEnabled;
+    final bool showInlineCreate =
+        createEnabled &&
+        !useMobileCreateDialog &&
+        _showInlineCreateField;
 
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
@@ -95,47 +140,69 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
       ),
     );
 
-    return CustomScrollView(
-      controller: _scrollController,
-      physics: const AlwaysScrollableScrollPhysics(),
-      slivers: <Widget>[
-        if (_headerExtent == null)
-          SliverToBoxAdapter(child: header)
-        else
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: Md3eLibraryPinnedHeaderDelegate(
-              extent: _headerExtent!,
-              child: header,
+    final double scrollBottomPadding = createEnabled
+        ? Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass)
+        : Md3eLibraryBrowsePageMetrics.catalogBodyTopSpacing(sizeClass);
+
+    return Stack(
+      children: <Widget>[
+        CustomScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: <Widget>[
+            if (_headerExtent == null)
+              SliverToBoxAdapter(child: header)
+            else
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: Md3eLibraryPinnedHeaderDelegate(
+                  extent: _headerExtent!,
+                  child: header,
+                ),
+              ),
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                horizontal,
+                Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(sizeClass),
+                horizontal,
+                scrollBottomPadding,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Md3eManagementCatalogToolbar(
+                      facet: widget.facet,
+                      facetCount: widget.facetCount,
+                      onFacetChanged: widget.onFacetChanged,
+                    ),
+                    SizedBox(
+                      height: Md3eLibraryBrowsePageMetrics
+                          .catalogToolbarToViewModeSpacing(sizeClass),
+                    ),
+                    Md3eManagementFacetChipWrap(
+                      labels: widget.chipLabels,
+                      onLabelPressed: widget.onChipPressed,
+                      trailing: showInlineCreate
+                          ? Md3eManagementDraftEntityChip(
+                              onCommit: _handleEntityCreated,
+                              onDismiss: () {
+                                setState(() => _showInlineCreateField = false);
+                              },
+                            )
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        SliverPadding(
-          padding: EdgeInsets.fromLTRB(
-            horizontal,
-            Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(sizeClass),
-            horizontal,
-            Md3eLibraryBrowsePageMetrics.catalogBodyTopSpacing(sizeClass),
-          ),
-          sliver: SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Md3eManagementCatalogToolbar(
-                  facet: widget.facet,
-                  facetCount: widget.facetCount,
-                  onFacetChanged: widget.onFacetChanged,
-                ),
-                SizedBox(
-                  height: Md3eLibraryBrowsePageMetrics
-                      .catalogToolbarToViewModeSpacing(sizeClass),
-                ),
-                Md3eManagementFacetChipWrap(
-                  labels: widget.chipLabels,
-                  onLabelPressed: widget.onChipPressed,
-                ),
-              ],
-            ),
-          ),
+          ],
+        ),
+        Md3eManagementCreateEntityFab(
+          facet: widget.facet,
+          horizontalPadding: horizontal,
+          onPressed: () => _onCreateFabPressed(useMobileCreateDialog),
+          hidden: !showFab,
         ),
       ],
     );

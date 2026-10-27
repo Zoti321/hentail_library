@@ -8,14 +8,18 @@ class Md3eManagementFacetChipWrap extends StatelessWidget {
     super.key,
     required this.labels,
     this.onLabelPressed,
+    this.trailing,
   });
 
   final List<String> labels;
   final ValueChanged<String>? onLabelPressed;
 
+  /// 桌面端：chip 流末尾的内联新建字段等。
+  final Widget? trailing;
+
   @override
   Widget build(BuildContext context) {
-    if (labels.isEmpty) {
+    if (labels.isEmpty && trailing == null) {
       return const SizedBox.shrink();
     }
 
@@ -28,10 +32,10 @@ class Md3eManagementFacetChipWrap extends StatelessWidget {
           M3EChip(
             label: label,
             type: M3EChipType.suggestion,
-            onPressed: onLabelPressed == null
-                ? null
-                : () => onLabelPressed!(label),
+            // [M3EChip] 在 onPressed 为 null 时走禁用绘制；浏览/预览无回调也需保持启用外观。
+            onPressed: () => onLabelPressed?.call(label),
           ),
+        ?trailing,
       ],
     );
   }

@@ -14,6 +14,16 @@ enum Md3eManagementNamedFacet {
     Md3eManagementNamedFacet.tags => '标签',
   };
 
+  /// Outlined 新建字段 / Dialog 标题用语。
+  String get createFieldLabel => switch (this) {
+    Md3eManagementNamedFacet.authors => '作者名称',
+    Md3eManagementNamedFacet.parodies => '原作名称',
+    Md3eManagementNamedFacet.characters => '角色名称',
+    Md3eManagementNamedFacet.tags => '标签名称',
+  };
+
+  String get createDialogTitle => '新建$label';
+
   static const List<Md3eManagementNamedFacet> managementOrder =
       <Md3eManagementNamedFacet>[
         Md3eManagementNamedFacet.authors,
