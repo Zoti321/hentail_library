@@ -15,8 +15,9 @@ import 'package:hentai_library/md3e/pages/md3e_management_browse_page_lab_host.d
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page_lab_host.dart';
-import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page_lab_host.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_library_edit_page_lab_host.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_navigation.dart';
@@ -366,7 +367,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eComicMetadataEditPage(),
+                    child: const Md3eComicMetadataEditPageLabHost(),
                   ),
                 ),
               ],
@@ -388,7 +389,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Edit local · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eLibraryEditPage(
+                    child: const Md3eLibraryEditPageLabHost(
                       intent: Md3eLibraryEditPageIntent.editLocal,
                     ),
                   ),
@@ -396,7 +397,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Edit remote · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eLibraryEditPage(
+                    child: const Md3eLibraryEditPageLabHost(
                       intent: Md3eLibraryEditPageIntent.editRemote,
                     ),
                   ),

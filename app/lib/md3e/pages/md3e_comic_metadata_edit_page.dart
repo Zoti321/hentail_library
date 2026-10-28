@@ -14,12 +14,14 @@ class Md3eComicMetadataEditPage extends StatefulWidget {
   const Md3eComicMetadataEditPage({
     super.key,
     this.initialDraft,
+    this.initialLocks,
     this.presentation = Md3eMetadataEditPresentation.embedded,
     this.onSaved,
     this.onCancel,
   });
 
   final Md3eComicMetadataEditDraft? initialDraft;
+  final ComicMetaLocks? initialLocks;
   final Md3eMetadataEditPresentation presentation;
   final ValueChanged<Md3eComicMetadataEditDraft>? onSaved;
   final VoidCallback? onCancel;
@@ -37,6 +39,21 @@ class _Md3eComicMetadataEditPageState extends State<Md3eComicMetadataEditPage> {
   String? _titleError;
   bool _saving = false;
   ComicMetaLocks _locks = ComicMetaLocks.unlocked;
+
+  @override
+  void initState() {
+    super.initState();
+    _locks = widget.initialLocks ?? ComicMetaLocks.unlocked;
+  }
+
+  @override
+  void didUpdateWidget(covariant Md3eComicMetadataEditPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialLocks != null &&
+        widget.initialLocks != oldWidget.initialLocks) {
+      _locks = widget.initialLocks!;
+    }
+  }
 
   void _onLockChanged({
     bool? title,
