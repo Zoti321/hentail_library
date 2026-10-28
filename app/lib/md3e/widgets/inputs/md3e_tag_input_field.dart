@@ -26,7 +26,6 @@ class Md3eTagInputField extends StatefulWidget {
     this.maxWidth = kMd3eTagInputFieldMaxWidth,
     this.onTagRemoved,
     this.onTagCommitted,
-    this.labelTrailing,
   });
 
   final String label;
@@ -35,7 +34,6 @@ class Md3eTagInputField extends StatefulWidget {
   final double maxWidth;
   final ValueChanged<String>? onTagRemoved;
   final ValueChanged<String>? onTagCommitted;
-  final Widget? labelTrailing;
 
   @override
   State<Md3eTagInputField> createState() => _Md3eTagInputFieldState();
@@ -44,6 +42,8 @@ class Md3eTagInputField extends StatefulWidget {
 class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final GlobalKey<EditableTextState> _editableKey =
+      GlobalKey<EditableTextState>();
 
   @override
   void initState() {
@@ -103,7 +103,8 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
         label: widget.label,
         focusNode: _focusNode,
         isPopulated: widget.tags.isNotEmpty || _controller.text.isNotEmpty,
-        labelTrailing: widget.labelTrailing,
+        selectionController: _controller,
+        editableTextKey: _editableKey,
         inputBuilder:
             (
               BuildContext context,
@@ -147,6 +148,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                           bindings:
                               M3EFocus.editableInputShortcuts(_focusNode),
                           child: EditableText(
+                            key: _editableKey,
                             controller: _controller,
                             focusNode: _focusNode,
                             style: inputStyle,
@@ -165,6 +167,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                             onSubmitted: (_) => _commitTag(),
                             maxLines: 1,
                             scrollPadding: EdgeInsets.zero,
+                            rendererIgnoresPointer: true,
                             selectionControls: m3eTextFieldSelectionControls(
                               defaultTargetPlatform,
                             ),

@@ -124,7 +124,11 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
         rootPath: _isRemote ? null : form.rootPath,
         rootError: _isRemote ? null : validation?.rootError,
         enabled: widget.enabled,
-        onBrowseRoot: _isRemote ? null : widget.onBrowseRoot,
+        onBrowseRoot: _isRemote
+            ? null
+            : () {
+                widget.onBrowseRoot?.call();
+              },
         onNameChanged: (String value) {
           _patch((LibraryForm f) => f.copyWith(name: value));
         },
@@ -329,6 +333,7 @@ class _GeneralTab extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
+    final bool showRoot = rootPath != null && onRootChanged != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -340,10 +345,10 @@ class _GeneralTab extends StatelessWidget {
           enabled: enabled,
           onChanged: onNameChanged,
         ),
-        if (rootPath != null && onRootChanged != null) ...<Widget>[
+        if (showRoot) ...<Widget>[
           SizedBox(height: spacing.lg),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Expanded(
                 child: Md3eOutlinedTextField(
@@ -354,17 +359,12 @@ class _GeneralTab extends StatelessWidget {
                   onChanged: onRootChanged!,
                 ),
               ),
-              if (onBrowseRoot != null) ...<Widget>[
-                SizedBox(width: spacing.sm),
-                Padding(
-                  padding: const EdgeInsets.only(top: 28),
-                  child: M3EButton(
-                    onPressed: enabled ? onBrowseRoot : null,
-                    style: M3EButtonStyle.outlined,
-                    label: Text(l10n.formLibraryRootBrowse),
-                  ),
-                ),
-              ],
+              SizedBox(width: spacing.sm),
+              M3EButton(
+                onPressed: enabled ? onBrowseRoot : null,
+                style: M3EButtonStyle.tonal,
+                label: Text(l10n.formLibraryRootBrowse),
+              ),
             ],
           ),
         ],
@@ -437,6 +437,7 @@ class _WebDavTab extends StatelessWidget {
           errorText: passwordError,
           enabled: enabled,
           obscureText: true,
+          showPasswordToggle: true,
           onChanged: onPasswordChanged,
         ),
         SizedBox(height: spacing.lg),

@@ -4,10 +4,11 @@ import 'package:hentai_library/md3e/widgets/inputs/md3e_anchored_calendar_date_p
 import 'package:hentai_library/md3e/widgets/inputs/md3e_docked_calendar_date_picker.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field.dart';
 import 'package:intl/intl.dart';
+import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_affordance.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 发布日期：可编辑文本 + 右侧按钮打开锚定浮层日历。
+/// 发布日期：可编辑文本 + M3E trailing 日历 + clear。
 class Md3ePublishedDateTextField extends StatefulWidget {
   const Md3ePublishedDateTextField({
     super.key,
@@ -17,11 +18,9 @@ class Md3ePublishedDateTextField extends StatefulWidget {
     this.firstDate,
     this.lastDate,
     this.initialCalendarMode = M3EDatePickerMode.year,
-    this.labelTrailing,
   });
 
   final String label;
-  final Widget? labelTrailing;
   final String value;
   final ValueChanged<String> onChanged;
   final DateTime? firstDate;
@@ -95,7 +94,10 @@ class _Md3ePublishedDateTextFieldState extends State<Md3ePublishedDateTextField>
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
+    final M3ETextFieldTheme fieldTheme = theme.textFieldTheme;
+    final double iconSize = fieldTheme.iconSize;
 
     return CompositedTransformTarget(
       link: _layerLink,
@@ -104,19 +106,14 @@ class _Md3ePublishedDateTextFieldState extends State<Md3ePublishedDateTextField>
         controller: _controller,
         keyboardType: TextInputType.datetime,
         onChanged: widget.onChanged,
-        labelTrailing: widget.labelTrailing,
-        trailing: M3EIconButton(
-          icon: Icon(
-            _pickerOpen ? Symbols.calendar_month : Symbols.calendar_today,
-            color: _pickerOpen
-                ? scheme.onSecondaryContainer
-                : scheme.onSurfaceVariant,
-          ),
-          variant: _pickerOpen
-              ? M3EIconButtonVariant.tonal
-              : M3EIconButtonVariant.standard,
-          size: M3EIconButtonSize.sm,
-          tooltip: l10n.formDatePickerHint,
+        showClearButton: true,
+        clearButtonSemanticsLabel: l10n.formDateClearTooltip,
+        trailing: M3ETextFieldAffordance(
+          icon: _pickerOpen ? Symbols.calendar_month : Symbols.calendar_today,
+          color: _pickerOpen
+              ? scheme.onSecondaryContainer
+              : scheme.onSurfaceVariant,
+          iconSize: iconSize,
           semanticLabel: l10n.formDatePickerHint,
           onPressed: _openPicker,
         ),

@@ -124,7 +124,12 @@ class _Md3eLibraryEditPageState extends State<Md3eLibraryEditPage> {
             }
           });
         },
+        onBrowseRoot: _form.isRemote ? null : _browseLocalRoot,
       ),
     );
+  }
+
+  void _browseLocalRoot() {
+    // Lab：仅占位，不打开系统目录选择器。
   }
 }

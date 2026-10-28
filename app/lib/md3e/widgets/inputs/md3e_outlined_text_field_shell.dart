@@ -1,9 +1,11 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field_selection_scope.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_container_painter.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_label.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:motor/motor.dart';
 
 /// Builds the editable region inside [Md3eOutlinedTextFieldShell].
 typedef Md3eOutlinedTextFieldInputBuilder = Widget Function(
@@ -16,8 +18,8 @@ typedef Md3eOutlinedTextFieldInputBuilder = Widget Function(
 /// Outlined `M3ETextField` shell with a custom input slot.
 ///
 /// Container paint, notch, floating label, hover, and keyboard focus ring follow
-/// `material_3_expressive` `M3ETextField` (outlined). The package does not yet
-/// expose a composable slot; this mirrors its private build path.
+/// `material_3_expressive` `M3ETextField` (outlined). Used for composable
+/// inputs ([Md3eTagInputField]); ordinary fields use [Md3eOutlinedTextField].
 class Md3eOutlinedTextFieldShell extends StatefulWidget {
   const Md3eOutlinedTextFieldShell({
     super.key,
@@ -28,9 +30,10 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
     this.isPopulated = false,
     this.leading,
     this.trailing,
-    this.labelTrailing,
     this.onTapOutside,
     this.fieldTheme,
+    this.selectionController,
+    this.editableTextKey,
   });
 
   final String label;
@@ -40,11 +43,10 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
   final bool isPopulated;
   final Widget? leading;
   final Widget? trailing;
-
-  /// Shown at the top-trailing of the field (e.g. metadata field lock).
-  final Widget? labelTrailing;
   final TapRegionCallback? onTapOutside;
   final M3ETextFieldTheme? fieldTheme;
+  final TextEditingController? selectionController;
+  final GlobalKey<EditableTextState>? editableTextKey;
 
   @override
   State<Md3eOutlinedTextFieldShell> createState() =>
@@ -52,14 +54,29 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
 }
 
 class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   bool _hovered = false;
   bool _focused = false;
   bool _showFocusRing = false;
-  late final AnimationController _labelMotion = AnimationController(
+  late final SingleMotionController _labelMotion = SingleMotionController(
+    motion: _springOf(M3EMotion.spatialFast),
     vsync: this,
-    duration: const Duration(milliseconds: 150),
   );
+  late final SingleMotionController _effectsMotion = SingleMotionController(
+    motion: _springOf(M3EMotion.effectsFast),
+    vsync: this,
+    initialValue: 1,
+  );
+  late final Listenable _motion = Listenable.merge(<Listenable>[
+    _labelMotion,
+    _effectsMotion,
+  ]);
+  double? _floatTarget;
+  M3ETextFieldColors? _fromColors;
+  M3ETextFieldColors? _toColors;
+
+  static SpringMotion _springOf(M3ESpring spring) =>
+      SpringMotion(spring.toDescription(), snapToEnd: true);
 
   @override
   void initState() {
@@ -68,13 +85,21 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     widget.focusNode.addListener(_handleFocusChange);
     FocusManager.instance.addHighlightModeListener(_handleHighlightModeChange);
     M3EFocusInteraction.instance.addListener(_handleFocusInteractionChanged);
-    _syncLabel(progress: _labelProgress, animate: false);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncVisuals(animate: _toColors != null);
   }
 
   @override
   void didUpdateWidget(Md3eOutlinedTextFieldShell oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _syncLabel(progress: _labelProgress, animate: true);
+    if (oldWidget.isPopulated != widget.isPopulated ||
+        oldWidget.enabled != widget.enabled) {
+      _syncVisuals();
+    }
   }
 
   @override
@@ -85,13 +110,21 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     );
     M3EFocusInteraction.instance.removeListener(_handleFocusInteractionChanged);
     _labelMotion.dispose();
+    _effectsMotion.dispose();
     super.dispose();
   }
 
   bool get _floating =>
-      widget.enabled && (_focused || widget.isPopulated);
+      ((_focused && widget.enabled) || widget.isPopulated);
 
-  double get _labelProgress => _floating ? 1 : 0;
+  M3ETextFieldColors get _currentColors {
+    final M3ETextFieldColors to = _toColors!;
+    return M3ETextFieldColors.lerp(
+      _fromColors ?? to,
+      to,
+      _effectsMotion.value.clamp(0, 1),
+    );
+  }
 
   M3ETextFieldTheme _fieldThemeOf(M3EThemeData theme) =>
       widget.fieldTheme ?? theme.textFieldTheme;
@@ -103,20 +136,46 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
         error: false,
       );
 
-  void _syncLabel({required double progress, required bool animate}) {
-    if (!animate ||
-        (MediaQuery.maybeDisableAnimationsOf(context) ?? false)) {
-      _labelMotion.value = progress;
+  void _syncVisuals({bool animate = true}) {
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3ETextFieldTheme fieldTheme = _fieldThemeOf(theme);
+    final bool instant =
+        !animate || (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
+    _labelMotion.motion = _springOf(fieldTheme.labelSpring);
+    _effectsMotion.motion = _springOf(fieldTheme.effectsSpring);
+
+    final double float = _floating ? 1 : 0;
+    if (_floatTarget != float) {
+      _floatTarget = float;
+      if (instant) {
+        _labelMotion.value = float;
+      } else {
+        _labelMotion.animateTo(float);
+      }
+    }
+
+    final M3ETextFieldColors colors = fieldTheme.resolveColors(
+      theme.colorScheme,
+      variant: M3ETextFieldVariant.outlined,
+      states: _states,
+    );
+    if (colors == _toColors) {
       return;
     }
-    _labelMotion.animateTo(progress);
+    _fromColors = _toColors == null ? colors : _currentColors;
+    _toColors = colors;
+    if (instant) {
+      _effectsMotion.value = 1;
+    } else {
+      _effectsMotion.animateTo(1, from: 0);
+    }
   }
 
   void _handleFocusChange() {
     setState(() {
       _focused = widget.focusNode.hasFocus;
       _showFocusRing = M3EFocusRing.shouldShow(widget.focusNode, context);
-      _syncLabel(progress: _labelProgress, animate: true);
+      _syncVisuals();
     });
   }
 
@@ -144,7 +203,10 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     if (_hovered == hovered) {
       return;
     }
-    setState(() => _hovered = hovered);
+    setState(() {
+      _hovered = hovered;
+      _syncVisuals();
+    });
   }
 
   _Md3eTextFieldNotch _notch(
@@ -175,29 +237,19 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ETextFieldTheme fieldTheme = _fieldThemeOf(theme);
-    final M3ETextFieldColors colors = fieldTheme.resolveColors(
-      theme.colorScheme,
-      variant: M3ETextFieldVariant.outlined,
-      states: _states,
-    );
     final int density = fieldTheme.density;
     final double height = fieldTheme.heightFor(density);
     final double start = widget.leading == null
         ? fieldTheme.horizontalPadding
         : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding;
-    final double labelTrailingReserve = widget.labelTrailing == null ? 0 : 40;
     final double end = (widget.trailing == null
-            ? fieldTheme.horizontalPadding
-            : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding) +
-        labelTrailingReserve;
+        ? fieldTheme.horizontalPadding
+        : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding);
 
-    final TextStyle inputStyle = fieldTheme
-        .resolveInputStyle(theme.typeScale)
-        .copyWith(color: colors.inputText);
-
-    final Widget container = AnimatedBuilder(
-      animation: _labelMotion,
+    final Widget container = ListenableBuilder(
+      listenable: _motion,
       builder: (BuildContext context, Widget? _) {
+        final M3ETextFieldColors colors = _currentColors;
         final double progress = _labelMotion.value;
         final _Md3eTextFieldNotch notch = _notch(
           theme,
@@ -205,6 +257,10 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
           start,
           progress,
         );
+        final TextStyle inputStyle = fieldTheme
+            .resolveInputStyle(theme.typeScale)
+            .copyWith(color: colors.inputText);
+
         return CustomPaint(
           painter: M3ETextFieldContainerPainter(
             outlined: true,
@@ -248,8 +304,6 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
                 end,
                 progress,
               ),
-              if (widget.labelTrailing != null)
-                _buildLabelTrailing(fieldTheme, height, progress),
             ],
           ),
         );
@@ -259,6 +313,25 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     final double floatingLine = M3ETextFieldTheme.lineHeightOf(
       fieldTheme.resolveFloatingLabelStyle(theme.typeScale),
     );
+
+    final Widget focusRingChild = M3EFocusRing(
+      focused: _showFocusRing,
+      radius: fieldTheme.outlinedShape,
+      color: _toColors?.focusRing,
+      width: fieldTheme.focusRingWidth,
+      gap: fieldTheme.focusRingGap,
+      child: container,
+    );
+
+    final Widget interactive = Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => M3EFocusInteraction.instance
+          .notePointerInteraction(immediate: true),
+      child: focusRingChild,
+    );
+
+    final bool useSelectionGestures = widget.selectionController != null &&
+        widget.editableTextKey != null;
 
     return TextFieldTapRegion(
       enabled: widget.enabled,
@@ -274,19 +347,15 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
                 : SystemMouseCursors.basic,
             onEnter: (_) => _updateHover(hovered: true),
             onExit: (_) => _updateHover(hovered: false),
-            child: Listener(
-              behavior: HitTestBehavior.translucent,
-              onPointerDown: (_) => M3EFocusInteraction.instance
-                  .notePointerInteraction(immediate: true),
-              child: M3EFocusRing(
-                focused: _showFocusRing,
-                radius: fieldTheme.outlinedShape,
-                color: colors.focusRing,
-                width: fieldTheme.focusRingWidth,
-                gap: fieldTheme.focusRingGap,
-                child: container,
-              ),
-            ),
+            child: useSelectionGestures
+                ? Md3eOutlinedTextFieldSelectionScope(
+                    focusNode: widget.focusNode,
+                    controller: widget.selectionController!,
+                    enabled: widget.enabled,
+                    editableTextKey: widget.editableTextKey!,
+                    child: interactive,
+                  )
+                : interactive,
           ),
         ),
       ),
@@ -369,30 +438,6 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
       ),
       SizedBox(width: fieldTheme.iconSlotTextPadding),
     ];
-  }
-
-  Widget _buildLabelTrailing(
-    M3ETextFieldTheme fieldTheme,
-    double height,
-    double progress,
-  ) {
-    final TextStyle resting = fieldTheme.resolveLabelStyle(
-      M3ETheme.of(context).typeScale,
-    );
-    final TextStyle floating = fieldTheme.resolveFloatingLabelStyle(
-      M3ETheme.of(context).typeScale,
-    );
-    final double restingTop =
-        (height - M3ETextFieldTheme.lineHeightOf(resting)) / 2;
-    final double floatingTop =
-        -M3ETextFieldTheme.lineHeightOf(floating) / 2;
-    final double top = lerpDouble(restingTop, floatingTop, progress)!;
-
-    return PositionedDirectional(
-      top: top,
-      end: fieldTheme.horizontalPadding,
-      child: widget.labelTrailing!,
-    );
   }
 
   List<Widget> _trailingSlot(

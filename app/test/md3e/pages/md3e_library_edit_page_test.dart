@@ -22,6 +22,7 @@ void main() {
     expect(find.text('编辑库'), findsOneWidget);
     expect(find.text('保存'), findsOneWidget);
     expect(find.text('常规'), findsOneWidget);
+    expect(find.text('浏览'), findsOneWidget);
     await tester.binding.setSurfaceSize(null);
   });
 }

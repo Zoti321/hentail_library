@@ -1,10 +1,10 @@
-import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field_shell.dart';
-import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
+import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Lab 通用 outlined 文本字段（单行或多行）。
+/// Lab 通用 outlined 文本字段（单行或多行），封装 [M3ETextField]。
+///
+/// Tag 等可组合输入直接用 [Md3eOutlinedTextFieldShell]；勿再在此复刻 shell。
 class Md3eOutlinedTextField extends StatefulWidget {
   const Md3eOutlinedTextField({
     super.key,
@@ -21,9 +21,12 @@ class Md3eOutlinedTextField extends StatefulWidget {
     this.textInputAction,
     this.onChanged,
     this.onSubmitted,
+    this.leading,
     this.trailing,
-    this.labelTrailing,
     this.obscureText = false,
+    this.showClearButton = false,
+    this.clearButtonSemanticsLabel,
+    this.showPasswordToggle = false,
   });
 
   final String label;
@@ -39,9 +42,12 @@ class Md3eOutlinedTextField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
+  final Widget? leading;
   final Widget? trailing;
-  final Widget? labelTrailing;
   final bool obscureText;
+  final bool showClearButton;
+  final String? clearButtonSemanticsLabel;
+  final bool showPasswordToggle;
 
   @override
   State<Md3eOutlinedTextField> createState() => _Md3eOutlinedTextFieldState();
@@ -61,7 +67,6 @@ class _Md3eOutlinedTextFieldState extends State<Md3eOutlinedTextField> {
     _controller = widget.controller ??
         TextEditingController(text: widget.initialValue ?? '');
     _focusNode = widget.focusNode ?? FocusNode();
-    _controller.addListener(_onTextChanged);
     if (widget.autofocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -83,7 +88,6 @@ class _Md3eOutlinedTextFieldState extends State<Md3eOutlinedTextField> {
 
   @override
   void dispose() {
-    _controller.removeListener(_onTextChanged);
     if (_ownsController) {
       _controller.dispose();
     }
@@ -93,71 +97,31 @@ class _Md3eOutlinedTextFieldState extends State<Md3eOutlinedTextField> {
     super.dispose();
   }
 
-  void _onTextChanged() {
-    widget.onChanged?.call(_controller.text);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3ESpacing spacing = theme.spacing;
-    final Widget field = Md3eOutlinedTextFieldShell(
-      label: widget.label,
+    final AppLocalizations l10n = context.l10n;
+    return M3ETextField(
+      controller: _controller,
       focusNode: _focusNode,
+      label: widget.label,
+      variant: M3ETextFieldVariant.outlined,
+      placeholder: widget.hintText,
+      errorText: widget.errorText,
       enabled: widget.enabled,
-      isPopulated: _controller.text.isNotEmpty,
+      obscureText: widget.obscureText,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      onChanged: widget.onChanged,
+      onSubmitted: widget.onSubmitted,
+      maxLines: widget.maxLines,
+      leading: widget.leading,
       trailing: widget.trailing,
-      labelTrailing: widget.labelTrailing,
-      inputBuilder:
-          (
-            BuildContext context,
-            M3ETextFieldColors colors,
-            M3ETextFieldTheme fieldTheme,
-            TextStyle inputStyle,
-          ) {
-            return CallbackShortcuts(
-              bindings: M3EFocus.editableInputShortcuts(_focusNode),
-              child: EditableText(
-                controller: _controller,
-                focusNode: _focusNode,
-                style: inputStyle,
-                cursorColor: colors.caret,
-                backgroundCursorColor: theme.colorScheme.outlineVariant,
-                selectionColor: theme.colorScheme.primary
-                    .withValues(alpha: fieldTheme.selectionOpacity),
-                textCapitalization: TextCapitalization.sentences,
-                keyboardType: widget.keyboardType,
-                textInputAction: widget.textInputAction ??
-                    (widget.maxLines > 1
-                        ? TextInputAction.newline
-                        : TextInputAction.done),
-                onSubmitted: widget.onSubmitted,
-                maxLines: widget.maxLines,
-                obscureText: widget.obscureText,
-                scrollPadding: EdgeInsets.zero,
-                selectionControls: m3eTextFieldSelectionControls(
-                  defaultTargetPlatform,
-                ),
-              ),
-            );
-          },
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        field,
-        if (widget.errorText != null) ...<Widget>[
-          SizedBox(height: spacing.xs),
-          Text(
-            widget.errorText!,
-            style: theme.typeScale.bodySmall.copyWith(
-              color: theme.colorScheme.error,
-            ),
-          ),
-        ],
-      ],
+      showClearButton: widget.showClearButton,
+      clearButtonSemanticsLabel:
+          widget.clearButtonSemanticsLabel ?? l10n.commonClear,
+      showPasswordToggle: widget.showPasswordToggle,
+      autofocus: widget.autofocus,
+      textCapitalization: TextCapitalization.sentences,
     );
   }
 }
