@@ -14,6 +14,7 @@ import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_reader_page_lab_host.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
@@ -325,6 +326,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
                     child: Md3eSettingsPage(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eReaderPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eReaderPageLabHost(),
                   ),
                 ),
               ],

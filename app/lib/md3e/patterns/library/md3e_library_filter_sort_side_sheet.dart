@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_metrics.dart';
+import 'package:hentai_library/md3e/widgets/sheets/md3e_overlay_route_scope.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
@@ -115,9 +116,12 @@ abstract final class Md3eLibraryFilterSortSideSheet {
       theme: _sheetTheme(context),
       scrollable: true,
       useRootNavigator: useRootNavigator,
-      body: _Md3eLibraryFilterSortSideSheetModalBody(
-        initialState: state,
-        onStateChanged: onStateChanged,
+      body: md3eOverlayRouteScope(
+        anchorContext: context,
+        child: _Md3eLibraryFilterSortSideSheetModalBody(
+          initialState: state,
+          onStateChanged: onStateChanged,
+        ),
       ),
     );
   }
