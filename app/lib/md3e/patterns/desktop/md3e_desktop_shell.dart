@@ -4,14 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
+import 'package:hentai_library/md3e/data/md3e_lab_library_catalog.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_app_bar.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_library_sheet.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_modal_rail.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_column.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_layout.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_mock_libraries.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_navigation.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_rail_library_hover_metrics.dart';
+import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';
@@ -49,12 +50,11 @@ class Md3eDesktopShell extends StatefulWidget {
     this.paneChild,
     this.paneBuilder,
     this.surfaceRoles,
-    List<String>? libraryDisplayNames,
-    String? initialLibraryDisplayName,
-  }) : libraryDisplayNames =
-           libraryDisplayNames ?? Md3eShellMockLibraries.displayNames,
-       initialLibraryDisplayName = initialLibraryDisplayName ??
-           Md3eShellMockLibraries.defaultDisplayName;
+    List<Md3eHomeLibraryDashboardRow>? libraries,
+    String? initialLibraryId,
+  }) : libraries = libraries ?? Md3eLabLibraryCatalog.libraries(),
+       initialLibraryId =
+           initialLibraryId ?? Md3eLabLibraryCatalog.defaultLibraryId;
 
   final double? width;
   final double height;
@@ -64,8 +64,8 @@ class Md3eDesktopShell extends StatefulWidget {
 
   final Md3eDesktopShellPaneBuilder? paneBuilder;
   final Md3eDesktopShellSurfaceRoles? surfaceRoles;
-  final List<String> libraryDisplayNames;
-  final String initialLibraryDisplayName;
+  final List<Md3eHomeLibraryDashboardRow> libraries;
+  final String initialLibraryId;
 
   @override
   State<Md3eDesktopShell> createState() => _Md3eDesktopShellState();
@@ -74,7 +74,7 @@ class Md3eDesktopShell extends StatefulWidget {
 class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   late bool _railExtended = widget.initialRailExtended;
   int _selectedIndex = Md3eShellNavigation.homeDestinationIndex;
-  late String _selectedLibraryDisplayName = widget.initialLibraryDisplayName;
+  late String _selectedLibraryId = widget.initialLibraryId;
   bool _librarySecondaryOpen = false;
   bool _compactLibrarySheetOpen = false;
   bool _compactModalRailOpen = false;
@@ -92,9 +92,13 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     super.dispose();
   }
 
+  String get _selectedLibraryDisplayName =>
+      Md3eLabLibraryCatalog.displayNameForId(_selectedLibraryId);
+
   Md3eShellNavigationSnapshot get _navigationSnapshot {
     return Md3eShellNavigationSnapshot(
       destinationIndex: _selectedIndex,
+      selectedLibraryId: _selectedLibraryId,
       selectedLibraryDisplayName: _selectedLibraryDisplayName,
     );
   }
@@ -161,9 +165,9 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     _cancelLibrarySecondaryTimers();
   }
 
-  void _onLibrarySelected(String displayName) {
+  void _onLibrarySelected(String libraryId) {
     setState(() {
-      _selectedLibraryDisplayName = displayName;
+      _selectedLibraryId = libraryId;
       _selectedIndex = Md3eShellNavigation.libraryDestinationIndex;
       _librarySecondaryOpen = false;
       _compactLibrarySheetOpen = false;
@@ -322,8 +326,8 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       height: widget.height,
       backgroundColor: surfaces.navigationRailBackground,
       dividerColor: scheme.outlineVariant,
-      libraryDisplayNames: widget.libraryDisplayNames,
-      selectedDisplayName: _selectedLibraryDisplayName,
+      libraries: widget.libraries,
+      selectedLibraryId: _selectedLibraryId,
       onLibrarySelected: _onLibrarySelected,
       onPointerEnter: _cancelCloseLibrarySecondary,
       onPointerExit: _scheduleCloseLibrarySecondary,
@@ -427,8 +431,8 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
           ),
           Md3eShellCompactLibrarySheet(
             open: _compactLibrarySheetOpen,
-            libraryDisplayNames: widget.libraryDisplayNames,
-            selectedDisplayName: _selectedLibraryDisplayName,
+            libraries: widget.libraries,
+            selectedLibraryId: _selectedLibraryId,
             onDismiss: _dismissCompactLibrarySheet,
             onLibrarySelected: _onLibrarySelected,
           ),

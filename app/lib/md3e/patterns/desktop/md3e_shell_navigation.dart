@@ -15,10 +15,12 @@ abstract final class Md3eShellNavigation {
 class Md3eShellNavigationSnapshot {
   const Md3eShellNavigationSnapshot({
     required this.destinationIndex,
+    required this.selectedLibraryId,
     required this.selectedLibraryDisplayName,
   });
 
   final int destinationIndex;
+  final String selectedLibraryId;
   final String selectedLibraryDisplayName;
 }
 

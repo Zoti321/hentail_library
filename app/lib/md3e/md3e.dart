@@ -1,6 +1,7 @@
 /// MD3E parallel design system (Lab). Production baseline remains `shared/ui`.
 library;
 
+export 'data/md3e_lab_library_catalog.dart';
 export 'interaction/md3e_pointer_target.dart';
 export 'layout/md3e_breakpoints.dart';
 export 'layout/md3e_spacing.dart';

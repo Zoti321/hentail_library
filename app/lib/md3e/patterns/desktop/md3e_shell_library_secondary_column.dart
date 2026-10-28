@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_layout.dart';
+import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_panel.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_nav_divider.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_navigation.dart';
@@ -47,8 +48,8 @@ class Md3eShellLibrarySecondaryColumn extends StatefulWidget {
     required this.open,
     required this.height,
     required this.backgroundColor,
-    required this.libraryDisplayNames,
-    required this.selectedDisplayName,
+    required this.libraries,
+    required this.selectedLibraryId,
     required this.onLibrarySelected,
     this.dividerColor,
     this.onPointerEnter,
@@ -58,8 +59,8 @@ class Md3eShellLibrarySecondaryColumn extends StatefulWidget {
   final bool open;
   final double height;
   final Color backgroundColor;
-  final List<String> libraryDisplayNames;
-  final String selectedDisplayName;
+  final List<Md3eHomeLibraryDashboardRow> libraries;
+  final String selectedLibraryId;
   final ValueChanged<String> onLibrarySelected;
   final Color? dividerColor;
   final VoidCallback? onPointerEnter;
@@ -138,8 +139,8 @@ class _Md3eShellLibrarySecondaryColumnState
             ),
             Expanded(
               child: Md3eShellLibrarySecondaryPanel(
-                libraryDisplayNames: widget.libraryDisplayNames,
-                selectedDisplayName: widget.selectedDisplayName,
+                libraries: widget.libraries,
+                selectedLibraryId: widget.selectedLibraryId,
                 onLibrarySelected: widget.onLibrarySelected,
                 backgroundColor: widget.backgroundColor,
               ),

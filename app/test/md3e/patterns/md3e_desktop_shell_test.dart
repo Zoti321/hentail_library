@@ -1,13 +1,45 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/md3e/data/md3e_lab_library_catalog.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_app_bar.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_mock_libraries.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_navigation.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_rail_library_hover_metrics.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';
+
+Future<void> _hoverLibraryRailDestination(WidgetTester tester) async {
+  final M3EThemeData theme = M3ETheme.of(
+    tester.element(find.byType(Md3eDesktopShell)),
+  );
+  final M3ENavigationRailTheme navTheme = theme.navigationRailTheme;
+  final int libraryIndex =
+      Md3eShellRailLibraryHoverMetrics.libraryDestinationIndex;
+  final double top = Md3eShellRailLibraryHoverMetrics.destinationTop(
+    theme: navTheme,
+    railExtended: false,
+    destinationIndex: libraryIndex,
+  );
+  final double height = Md3eShellRailLibraryHoverMetrics.destinationHeight(
+    theme: navTheme,
+    railExtended: false,
+  );
+  final Rect railRect = tester.getRect(find.byType(Md3eNavigationRail));
+  final Offset center = Offset(
+    railRect.left + railRect.width / 2,
+    railRect.top + top + height / 2,
+  );
+  final TestGesture gesture = await tester.createGesture(
+    kind: PointerDeviceKind.mouse,
+  );
+  await gesture.moveTo(center);
+  await tester.pump(const Duration(milliseconds: 350));
+  await tester.pumpAndSettle();
+}
 
 void main() {
   testWidgets('expanded width shows navigation rail', (
@@ -137,13 +169,20 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(600, 768));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
+    const String targetId = 'lab-remote-nas';
+    final String targetName =
+        Md3eLabLibraryCatalog.displayNameForId(targetId);
+    Md3eShellNavigationSnapshot? lastSnapshot;
+
     await pumpMd3eApp(
       tester,
       home: Md3eDesktopShell(
         width: 600,
         height: 768,
-        paneBuilder: (_, navigation) =>
-            Text(navigation.selectedLibraryDisplayName),
+        paneBuilder: (_, navigation) {
+          lastSnapshot = navigation;
+          return Text('${navigation.selectedLibraryId}:${navigation.selectedLibraryDisplayName}');
+        },
       ),
     );
 
@@ -155,11 +194,46 @@ void main() {
     await tester.tap(find.text('漫画库'));
     await tester.pumpAndSettle();
 
-    final String target = Md3eShellMockLibraries.displayNames[2];
-    await tester.tap(find.text(target));
+    await tester.tap(find.text(targetName));
     await tester.pumpAndSettle();
 
-    expect(find.text(target), findsWidgets);
+    expect(lastSnapshot?.selectedLibraryId, targetId);
+    expect(find.text('$targetId:$targetName'), findsOneWidget);
+  });
+
+  testWidgets('expanded shell hover opens library flyout and selects library', (
+    WidgetTester tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1024, 768));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    const String targetId = 'lab-local-archive';
+    final String targetName =
+        Md3eLabLibraryCatalog.displayNameForId(targetId);
+    Md3eShellNavigationSnapshot? lastSnapshot;
+
+    await pumpMd3eApp(
+      tester,
+      home: Md3eDesktopShell(
+        width: 1024,
+        height: 768,
+        initialRailExtended: false,
+        paneBuilder: (_, navigation) {
+          lastSnapshot = navigation;
+          return Text('${navigation.selectedLibraryId}:${navigation.selectedLibraryDisplayName}');
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await _hoverLibraryRailDestination(tester);
+    expect(find.text(targetName), findsWidgets);
+
+    await tester.tap(find.text(targetName).last);
+    await tester.pumpAndSettle();
+
+    expect(lastSnapshot?.selectedLibraryId, targetId);
+    expect(lastSnapshot?.destinationIndex, Md3eShellNavigation.libraryDestinationIndex);
   });
 
   testWidgets('title band search aligns at 32dp on expanded shell', (
