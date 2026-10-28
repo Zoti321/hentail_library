@@ -25,6 +25,8 @@ import 'package:hentai_library/md3e/patterns/management/md3e_management_create_i
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_managed_named_facet_ui.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
@@ -915,6 +917,7 @@ class _Md3eComicMetadataEditFormPreviewState
     extends State<_Md3eComicMetadataEditFormPreview> {
   late Md3eComicMetadataEditDraft _draft =
       Md3eComicMetadataEditDraft.fromEntry(Md3eComicDetailPagePreviewData.sample());
+  ComicMetaLocks _locks = ComicMetaLocks.unlocked;
 
   @override
   Widget build(BuildContext context) {
@@ -922,6 +925,33 @@ class _Md3eComicMetadataEditFormPreviewState
       constraints: const BoxConstraints(maxWidth: 640),
       child: Md3eComicMetadataEditForm(
         draft: _draft,
+        locks: _locks,
+        onLockChanged:
+            ({
+              bool? title,
+              bool? description,
+              bool? publishedAt,
+              bool? contentRating,
+              bool? authors,
+              bool? tags,
+              bool? languages,
+              bool? parodies,
+              bool? characters,
+            }) {
+              setState(
+                () => _locks = _locks.copyWith(
+                  title: title,
+                  description: description,
+                  publishedAt: publishedAt,
+                  contentRating: contentRating,
+                  authors: authors,
+                  tags: tags,
+                  languages: languages,
+                  parodies: parodies,
+                  characters: characters,
+                ),
+              );
+            },
         onDraftChanged: (Md3eComicMetadataEditDraft value) {
           setState(() => _draft = value);
         },
@@ -944,6 +974,7 @@ class _Md3eSeriesMetadataEditFormPreviewState
       Md3eSeriesMetadataEditDraft.fromEntry(
         Md3eSeriesDetailPagePreviewData.sample(),
       );
+  SeriesMetaLocks _locks = SeriesMetaLocks.unlocked;
 
   @override
   Widget build(BuildContext context) {
@@ -951,6 +982,17 @@ class _Md3eSeriesMetadataEditFormPreviewState
       constraints: const BoxConstraints(maxWidth: 480),
       child: Md3eSeriesMetadataEditForm(
         draft: _draft,
+        locks: _locks,
+        onLockChanged:
+            ({bool? name, bool? serializationStatus, bool? totalCount}) {
+              setState(
+                () => _locks = _locks.copyWith(
+                  name: name,
+                  serializationStatus: serializationStatus,
+                  totalCount: totalCount,
+                ),
+              );
+            },
         onDraftChanged: (Md3eSeriesMetadataEditDraft value) {
           setState(() => _draft = value);
         },

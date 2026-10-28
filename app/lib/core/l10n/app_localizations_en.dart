@@ -1797,6 +1797,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dialogEditMetadataTabAuthorsTags => 'Authors & tags';
 
   @override
+  String get dialogEditMetadataTabFieldLocks => 'Field locks';
+
+  @override
+  String get dialogEditMetadataTabContent => 'Content';
+
+  @override
   String get smartFacetMatchToggleLabel => 'Smart match';
 
   @override

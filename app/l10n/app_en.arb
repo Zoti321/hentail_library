@@ -840,6 +840,8 @@
   "dialogEditMetadataTitle": "Edit metadata",
   "dialogEditMetadataTabGeneral": "General",
   "dialogEditMetadataTabAuthorsTags": "Authors & tags",
+  "dialogEditMetadataTabFieldLocks": "Field locks",
+  "dialogEditMetadataTabContent": "Content",
   "smartFacetMatchToggleLabel": "Smart match",
   "smartFacetMatchHintTooltip": "Suggested by smart match",
   "formSeriesNameLabel": "Series name",

@@ -11,6 +11,7 @@ class Md3eContentSection extends StatelessWidget {
     required Widget child,
     this.description,
     this.padding = const EdgeInsets.all(16),
+    this.titleTrailing,
   })  : _child = child,
         _children = null;
 
@@ -19,12 +20,14 @@ class Md3eContentSection extends StatelessWidget {
     required this.title,
     required List<Widget> children,
     this.description,
+    this.titleTrailing,
   })  : _children = children,
         _child = null,
         padding = EdgeInsets.zero;
 
   final String title;
   final String? description;
+  final Widget? titleTrailing;
   final EdgeInsetsGeometry padding;
   final Widget? _child;
   final List<Widget>? _children;
@@ -39,6 +42,7 @@ class Md3eContentSection extends StatelessWidget {
           child: Md3eSettingsSectionHeader(
             title: Text(title),
             description: description == null ? null : Text(description!),
+            trailing: titleTrailing,
           ),
         ),
         if (_children != null)

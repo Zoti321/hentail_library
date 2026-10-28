@@ -28,6 +28,7 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
     this.isPopulated = false,
     this.leading,
     this.trailing,
+    this.labelTrailing,
     this.onTapOutside,
     this.fieldTheme,
   });
@@ -39,6 +40,9 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
   final bool isPopulated;
   final Widget? leading;
   final Widget? trailing;
+
+  /// Shown at the top-trailing of the field (e.g. metadata field lock).
+  final Widget? labelTrailing;
   final TapRegionCallback? onTapOutside;
   final M3ETextFieldTheme? fieldTheme;
 
@@ -181,9 +185,11 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     final double start = widget.leading == null
         ? fieldTheme.horizontalPadding
         : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding;
-    final double end = widget.trailing == null
-        ? fieldTheme.horizontalPadding
-        : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding;
+    final double labelTrailingReserve = widget.labelTrailing == null ? 0 : 40;
+    final double end = (widget.trailing == null
+            ? fieldTheme.horizontalPadding
+            : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding) +
+        labelTrailingReserve;
 
     final TextStyle inputStyle = fieldTheme
         .resolveInputStyle(theme.typeScale)
@@ -242,6 +248,8 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
                 end,
                 progress,
               ),
+              if (widget.labelTrailing != null)
+                _buildLabelTrailing(fieldTheme, height, progress),
             ],
           ),
         );
@@ -361,6 +369,30 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
       ),
       SizedBox(width: fieldTheme.iconSlotTextPadding),
     ];
+  }
+
+  Widget _buildLabelTrailing(
+    M3ETextFieldTheme fieldTheme,
+    double height,
+    double progress,
+  ) {
+    final TextStyle resting = fieldTheme.resolveLabelStyle(
+      M3ETheme.of(context).typeScale,
+    );
+    final TextStyle floating = fieldTheme.resolveFloatingLabelStyle(
+      M3ETheme.of(context).typeScale,
+    );
+    final double restingTop =
+        (height - M3ETextFieldTheme.lineHeightOf(resting)) / 2;
+    final double floatingTop =
+        -M3ETextFieldTheme.lineHeightOf(floating) / 2;
+    final double top = lerpDouble(restingTop, floatingTop, progress)!;
+
+    return PositionedDirectional(
+      top: top,
+      end: fieldTheme.horizontalPadding,
+      child: widget.labelTrailing!,
+    );
   }
 
   List<Widget> _trailingSlot(

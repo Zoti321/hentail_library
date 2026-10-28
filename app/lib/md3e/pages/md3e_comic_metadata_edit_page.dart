@@ -5,6 +5,7 @@ import 'package:hentai_library/md3e/pages/md3e_comic_detail_page_preview_data.da
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_form.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 
 export 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
 
@@ -35,6 +36,33 @@ class _Md3eComicMetadataEditPageState extends State<Md3eComicMetadataEditPage> {
       );
   String? _titleError;
   bool _saving = false;
+  ComicMetaLocks _locks = ComicMetaLocks.unlocked;
+
+  void _onLockChanged({
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
+    bool? languages,
+    bool? parodies,
+    bool? characters,
+  }) {
+    setState(
+      () => _locks = _locks.copyWith(
+        title: title,
+        description: description,
+        publishedAt: publishedAt,
+        contentRating: contentRating,
+        authors: authors,
+        tags: tags,
+        languages: languages,
+        parodies: parodies,
+        characters: characters,
+      ),
+    );
+  }
 
   void _handleCancel() {
     widget.onCancel?.call();
@@ -76,6 +104,8 @@ class _Md3eComicMetadataEditPageState extends State<Md3eComicMetadataEditPage> {
       saving: _saving,
       body: Md3eComicMetadataEditForm(
         draft: _draft,
+        locks: _locks,
+        onLockChanged: _onLockChanged,
         titleError: _titleError,
         onDraftChanged: (Md3eComicMetadataEditDraft value) {
           setState(() {

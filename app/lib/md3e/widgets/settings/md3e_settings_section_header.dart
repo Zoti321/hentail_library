@@ -7,10 +7,12 @@ class Md3eSettingsSectionHeader extends StatelessWidget {
     super.key,
     required this.title,
     this.description,
+    this.trailing,
   });
 
   final Widget title;
   final Widget? description;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +23,23 @@ class Md3eSettingsSectionHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Semantics(
-          header: true,
-          child: DefaultTextStyle.merge(
-            style: type.titleSmall.copyWith(
-              color: scheme.primary,
-              fontWeight: FontWeight.w600,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: DefaultTextStyle.merge(
+                  style: type.titleSmall.copyWith(
+                    color: scheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  child: title,
+                ),
+              ),
             ),
-            child: title,
-          ),
+            if (trailing != null) trailing!,
+          ],
         ),
         if (description != null) ...<Widget>[
           SizedBox(height: theme.spacing.xs),

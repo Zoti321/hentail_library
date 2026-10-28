@@ -3174,6 +3174,18 @@ abstract class AppLocalizations {
   /// **'作者&标签'**
   String get dialogEditMetadataTabAuthorsTags;
 
+  /// No description provided for @dialogEditMetadataTabFieldLocks.
+  ///
+  /// In zh, this message translates to:
+  /// **'字段锁'**
+  String get dialogEditMetadataTabFieldLocks;
+
+  /// No description provided for @dialogEditMetadataTabContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'内容'**
+  String get dialogEditMetadataTabContent;
+
   /// No description provided for @smartFacetMatchToggleLabel.
   ///
   /// In zh, this message translates to:

@@ -5,6 +5,7 @@ import 'package:hentai_library/md3e/pages/md3e_series_detail_page_preview_data.d
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_draft.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_form.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 
 export 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_draft.dart';
 
@@ -36,6 +37,21 @@ class _Md3eSeriesMetadataEditPageState extends State<Md3eSeriesMetadataEditPage>
   String? _nameError;
   String? _totalCountError;
   bool _saving = false;
+  SeriesMetaLocks _locks = SeriesMetaLocks.unlocked;
+
+  void _onLockChanged({
+    bool? name,
+    bool? serializationStatus,
+    bool? totalCount,
+  }) {
+    setState(
+      () => _locks = _locks.copyWith(
+        name: name,
+        serializationStatus: serializationStatus,
+        totalCount: totalCount,
+      ),
+    );
+  }
 
   void _handleCancel() {
     widget.onCancel?.call();
@@ -79,6 +95,8 @@ class _Md3eSeriesMetadataEditPageState extends State<Md3eSeriesMetadataEditPage>
       saving: _saving,
       body: Md3eSeriesMetadataEditForm(
         draft: _draft,
+        locks: _locks,
+        onLockChanged: _onLockChanged,
         nameError: _nameError,
         totalCountError: _totalCountError,
         onDraftChanged: (Md3eSeriesMetadataEditDraft value) {

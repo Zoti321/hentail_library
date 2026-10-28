@@ -3,7 +3,11 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_metadata_edit_form_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_locks_pane.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_field_label_row.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_lock_callbacks.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_comic_language_quick_pick.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_published_date_text_field.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
@@ -13,7 +17,7 @@ import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-enum _Md3eComicMetadataEditTab { general, authorsTags }
+enum _Md3eComicMetadataEditTab { general, authorsTags, fieldLocks }
 
 List<String> _md3eTagListWithAdded(List<String> list, String value) {
   if (list.contains(value)) {
@@ -32,11 +36,15 @@ class Md3eComicMetadataEditForm extends StatefulWidget {
     super.key,
     required this.draft,
     required this.onDraftChanged,
+    required this.locks,
+    required this.onLockChanged,
     this.titleError,
   });
 
   final Md3eComicMetadataEditDraft draft;
   final ValueChanged<Md3eComicMetadataEditDraft> onDraftChanged;
+  final ComicMetaLocks locks;
+  final Md3eComicMetadataLockChanged onLockChanged;
   final String? titleError;
 
   @override
@@ -89,6 +97,10 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
             _update((d) => d.copyWith(characters: v)),
         onTagsChanged: (List<String> v) =>
             _update((d) => d.copyWith(tags: v)),
+      ),
+      _Md3eComicMetadataEditTab.fieldLocks => Md3eComicMetadataLocksPane(
+        locks: widget.locks,
+        onLockChanged: widget.onLockChanged,
       ),
     };
 
@@ -154,6 +166,7 @@ class _TopTabBar extends StatelessWidget {
         Md3eSegmentedCapsuleSegment(
           label: l10n.dialogEditMetadataTabAuthorsTags,
         ),
+        Md3eSegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabFieldLocks),
       ],
       selectedIndex: tab.index,
       onSelected: onSelected,
@@ -181,6 +194,10 @@ class _SideTabList extends StatelessWidget {
           (
             l10n.dialogEditMetadataTabAuthorsTags,
             _Md3eComicMetadataEditTab.authorsTags,
+          ),
+          (
+            l10n.dialogEditMetadataTabFieldLocks,
+            _Md3eComicMetadataEditTab.fieldLocks,
           ),
         ];
 
@@ -278,12 +295,7 @@ class _GeneralFields extends StatelessWidget {
           ],
         ),
         SizedBox(height: gap),
-        Text(
-          l10n.formLanguagesLabel,
-          style: M3ETheme.of(context).typeScale.labelLarge.copyWith(
-            color: M3ETheme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
+        Md3eMetadataFieldLabelRow(label: l10n.formLanguagesLabel),
         SizedBox(height: M3ETheme.of(context).spacing.sm),
         Md3eComicLanguageQuickPick(
           selected: draft.languages,

@@ -22,6 +22,7 @@ class Md3eOutlinedTextField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.trailing,
+    this.labelTrailing,
   });
 
   final String label;
@@ -38,6 +39,7 @@ class Md3eOutlinedTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final Widget? trailing;
+  final Widget? labelTrailing;
 
   @override
   State<Md3eOutlinedTextField> createState() => _Md3eOutlinedTextFieldState();
@@ -104,6 +106,7 @@ class _Md3eOutlinedTextFieldState extends State<Md3eOutlinedTextField> {
       enabled: widget.enabled,
       isPopulated: _controller.text.isNotEmpty,
       trailing: widget.trailing,
+      labelTrailing: widget.labelTrailing,
       inputBuilder:
           (
             BuildContext context,

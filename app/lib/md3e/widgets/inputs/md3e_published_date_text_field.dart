@@ -17,9 +17,11 @@ class Md3ePublishedDateTextField extends StatefulWidget {
     this.firstDate,
     this.lastDate,
     this.initialCalendarMode = M3EDatePickerMode.year,
+    this.labelTrailing,
   });
 
   final String label;
+  final Widget? labelTrailing;
   final String value;
   final ValueChanged<String> onChanged;
   final DateTime? firstDate;
@@ -102,6 +104,7 @@ class _Md3ePublishedDateTextFieldState extends State<Md3ePublishedDateTextField>
         controller: _controller,
         keyboardType: TextInputType.datetime,
         onChanged: widget.onChanged,
+        labelTrailing: widget.labelTrailing,
         trailing: M3EIconButton(
           icon: Icon(
             _pickerOpen ? Symbols.calendar_month : Symbols.calendar_today,

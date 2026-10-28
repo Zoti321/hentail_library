@@ -26,6 +26,7 @@ class Md3eTagInputField extends StatefulWidget {
     this.maxWidth = kMd3eTagInputFieldMaxWidth,
     this.onTagRemoved,
     this.onTagCommitted,
+    this.labelTrailing,
   });
 
   final String label;
@@ -34,6 +35,7 @@ class Md3eTagInputField extends StatefulWidget {
   final double maxWidth;
   final ValueChanged<String>? onTagRemoved;
   final ValueChanged<String>? onTagCommitted;
+  final Widget? labelTrailing;
 
   @override
   State<Md3eTagInputField> createState() => _Md3eTagInputFieldState();
@@ -101,6 +103,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
         label: widget.label,
         focusNode: _focusNode,
         isPopulated: widget.tags.isNotEmpty || _controller.text.isNotEmpty,
+        labelTrailing: widget.labelTrailing,
         inputBuilder:
             (
               BuildContext context,

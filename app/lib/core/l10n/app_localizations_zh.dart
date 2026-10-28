@@ -1732,6 +1732,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dialogEditMetadataTabAuthorsTags => '作者&标签';
 
   @override
+  String get dialogEditMetadataTabFieldLocks => '字段锁';
+
+  @override
+  String get dialogEditMetadataTabContent => '内容';
+
+  @override
   String get smartFacetMatchToggleLabel => '智能匹配';
 
   @override
