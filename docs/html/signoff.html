@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab 全应用收口清单 · MD3E</title>
+    <link rel="stylesheet" href="assets/site.css" />
+  </head>
+  <body class="signoff-page">
+    <nav class="site-nav">
+      <div class="wrap wrap-wide">
+        <a href="index.html"><strong>MD3E Lab</strong></a>
+        <span class="sep">·</span>
+        <a href="overview.html">说明</a>
+        <a href="pages.html">页面</a>
+        <a href="widgetbook.html">Widgetbook</a>
+        <a href="signoff.html"><strong>收口清单</strong></a>
+      </div>
+    </nav>
+
+    <div class="wrap wrap-wide">
+      <div class="signoff-grid">
+        <aside class="signoff-toc" aria-label="目录">
+          <strong>目录</strong>
+          <ul>
+            <li><a href="#sec-meta">方法与图例</a></li>
+            <li><a href="#sec-rollups">领域汇总</a></li>
+            <li><a href="#sec-shell">壳层与导航</a></li>
+            <li><a href="#sec-home">首页</a></li>
+            <li><a href="#sec-library">书库浏览</a></li>
+            <li><a href="#sec-management">命名管理</a></li>
+            <li><a href="#sec-history">阅读历史</a></li>
+            <li><a href="#sec-settings">设置</a></li>
+            <li><a href="#sec-detail">详情页</a></li>
+            <li><a href="#sec-metadata-edit">元数据编辑</a></li>
+            <li><a href="#sec-library-edit">库编辑</a></li>
+            <li><a href="#sec-reader">阅读器</a></li>
+            <li class="toc-l2"><a href="#sec-reader-chrome">↳ Chrome</a></li>
+            <li class="toc-l2"><a href="#sec-reader-interaction">↳ 交互</a></li>
+            <li class="toc-l2"><a href="#sec-reader-viewport">↳ 视口与会话</a></li>
+            <li><a href="#sec-widgets">共享控件</a></li>
+            <li><a href="#sec-backlog">跨领域待办</a></li>
+          </ul>
+        </aside>
+
+        <main>
+          <h1>MD3E Lab 全应用收口清单</h1>
+          <p class="lead">
+            按<strong>产品领域</strong>对照生产 Baseline UI 与 Lab（Widgetbook + 假数据 Host）。「有 UI
+            入口 / 可演示」即可标 <span class="tag ok">OK</span>，不必行为或视觉与 Fluent 一致；依赖
+            FRB / 会话 / 写库的标 <span class="tag pilot">Pilot</span>。
+          </p>
+
+          <section id="sec-meta">
+            <h2>方法与图例</h2>
+            <div class="legend">
+              <span><span class="tag ok">OK</span>入口齐，Widgetbook 可验</span>
+              <span><span class="tag stub">STUB</span>占位 / 假数据 / 字段不全</span>
+              <span><span class="tag miss">缺</span>尚无或不可演示</span>
+              <span><span class="tag pilot">Pilot</span>真业务层，非 Lab 必达</span>
+            </div>
+            <p class="lead">
+              列说明：<strong>能力</strong>为用户可感知功能；
+              <strong>生产</strong>为 <code>features/</code> 入口；
+              <strong>Lab</strong>为 <code>md3e/</code> 组件或页面；
+              <strong>WB</strong>为 Widgetbook 路径（简写）。
+            </p>
+          </section>
+
+          <section id="sec-rollups">
+            <h2>领域汇总</h2>
+            <div class="table-wrap">
+              <table class="summary-matrix">
+                <thead>
+                  <tr>
+                    <th>领域</th>
+                    <th>OK</th>
+                    <th>STUB</th>
+                    <th>缺</th>
+                    <th>Pilot</th>
+                    <th>Lab 收口</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>壳层与导航</td>
+                    <td>5</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td><span class="tag ok">可冻结</span></td>
+                  </tr>
+                  <tr>
+                    <td>首页</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td><span class="tag stub">补 stub</span></td>
+                  </tr>
+                  <tr>
+                    <td>书库浏览</td>
+                    <td>6</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td><span class="tag stub">验收中</span></td>
+                  </tr>
+                  <tr>
+                    <td>命名管理</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td><span class="tag stub">验收中</span></td>
+                  </tr>
+                  <tr>
+                    <td>阅读历史</td>
+                    <td>3</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td><span class="tag ok">可冻结</span></td>
+                  </tr>
+                  <tr>
+                    <td>设置</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td><span class="tag stub">Pane 为主</span></td>
+                  </tr>
+                  <tr>
+                    <td>Comic/Series 详情</td>
+                    <td>5</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td><span class="tag ok">可冻结 UI</span></td>
+                  </tr>
+                  <tr>
+                    <td>元数据 / 库编辑</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td><span class="tag stub">表单 OK</span></td>
+                  </tr>
+                  <tr>
+                    <td>阅读器</td>
+                    <td>11</td>
+                    <td>4</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td><span class="tag stub">Chrome 收口</span></td>
+                  </tr>
+                  <tr>
+                    <td>共享控件</td>
+                    <td>8</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td><span class="tag ok">可冻结</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="lead">汇总为人工计数，随下表迭代调整；用于排优先级而非 KPI。</p>
+          </section>
+
+          <section id="sec-shell">
+            <h2>壳层与导航</h2>
+            <details class="signoff-block" open>
+              <summary>Desktop shell · Rail · Lab 整应用原型</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>桌面壳 + 目的地切换</td>
+                        <td>Fluent shell / go_router</td>
+                        <td>Md3eLabApp scenario</td>
+                        <td>scenarios</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>viewport addon 验全链路跳转</td>
+                      </tr>
+                      <tr>
+                        <td>Surface 角色分区</td>
+                        <td>生产 theme tokens</td>
+                        <td>Md3eDesktopShell</td>
+                        <td>patterns</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>1024×768 用例</td>
+                      </tr>
+                      <tr>
+                        <td>Navigation Rail</td>
+                        <td>侧栏</td>
+                        <td>Md3eNavigationRail</td>
+                        <td>widgets</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>折叠/展开</td>
+                      </tr>
+                      <tr>
+                        <td>自定义标题栏</td>
+                        <td>flutter_acrylic 等</td>
+                        <td>Md3eDesktopTitleBar</td>
+                        <td>widgets</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>1024 / 1440 rail 宽</td>
+                      </tr>
+                      <tr>
+                        <td>库二级面板 / Sheet</td>
+                        <td>库切换 UI</td>
+                        <td>shell compact sheet</td>
+                        <td>LabApp 内</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>在 scenario 中间接覆盖</td>
+                      </tr>
+                      <tr>
+                        <td>Wayfinder 门禁布局</td>
+                        <td>gate 终态</td>
+                        <td>未单独 WB</td>
+                        <td>—</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td>Cutover 时对齐 ADR-0027</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-home">
+            <h2>首页</h2>
+            <details class="signoff-block" open>
+              <summary>Md3eHomePage · 库仪表盘</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>全库 Bento 统计</td>
+                        <td>home 聚合区</td>
+                        <td>Md3eHomeAggregateStatsSection</td>
+                        <td>HomePage</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>假计数</td>
+                      </tr>
+                      <tr>
+                        <td>漫画库列表</td>
+                        <td>库卡片列表</td>
+                        <td>Reorderable list</td>
+                        <td>HomePage</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>长按排序 Lab state</td>
+                      </tr>
+                      <tr>
+                        <td>库管理菜单</td>
+                        <td>扫描/设置等</td>
+                        <td>M3E Menu 条目</td>
+                        <td>HomePage</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>回调空实现</td>
+                      </tr>
+                      <tr>
+                        <td>添加本地/远程库</td>
+                        <td>Dialog / 向导</td>
+                        <td>LabHost 回调</td>
+                        <td>HomePage</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>未接 LibraryEdit</td>
+                      </tr>
+                      <tr>
+                        <td>打开库</td>
+                        <td>路由进书库</td>
+                        <td>onLibraryOpen</td>
+                        <td>HomePage</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>LabApp 内导航</td>
+                      </tr>
+                      <tr>
+                        <td>同步/扫描真执行</td>
+                        <td>Rust sync</td>
+                        <td>无</td>
+                        <td>—</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-library">
+            <h2>书库浏览</h2>
+            <details class="signoff-block" open>
+              <summary>Md3eLibraryBrowsePage · 目录与筛选</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Comic/Series Tabs</td>
+                        <td>library tabs</td>
+                        <td>DisplayTargetTabs</td>
+                        <td>LibraryBrowse</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>网格 / 列表</td>
+                        <td>catalog grid</td>
+                        <td>Card + ListItem</td>
+                        <td>LibraryBrowse</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>ViewMode 按钮组</td>
+                      </tr>
+                      <tr>
+                        <td>筛选排序 SideSheet</td>
+                        <td>drawer</td>
+                        <td>FilterSortSideSheet</td>
+                        <td>patterns</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>useRootNavigator false</td>
+                      </tr>
+                      <tr>
+                        <td>分页</td>
+                        <td>pagination</td>
+                        <td>Md3ePagination</td>
+                        <td>LibraryBrowse</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>粘滞页头 / 工具栏</td>
+                        <td>library header</td>
+                        <td>PinnedHeaderDelegate</td>
+                        <td>LibraryBrowse</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>条目进详情</td>
+                        <td>go_router</td>
+                        <td>Lab catalog nav</td>
+                        <td>LibraryBrowse</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>Widgetbook 内 push 预览</td>
+                      </tr>
+                      <tr>
+                        <td>真实筛选写库</td>
+                        <td>LibraryComicFilters</td>
+                        <td>LabState</td>
+                        <td>—</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-management">
+            <h2>命名管理</h2>
+            <details class="signoff-block" open>
+              <summary>Md3eManagementBrowsePage · Facet 管理</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Facet 胶囊栏</td>
+                        <td>metadata tabs</td>
+                        <td>SegmentedCapsuleBar</td>
+                        <td>Management</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Chip 列表 / 草稿</td>
+                        <td>facet chips</td>
+                        <td>DraftEntityChip</td>
+                        <td>Management</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>创建实体</td>
+                        <td>Dialog</td>
+                        <td>CreateEntityDialog</td>
+                        <td>Management</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>Lab 交互壳</td>
+                      </tr>
+                      <tr>
+                        <td>持久化 facet</td>
+                        <td>Repository</td>
+                        <td>无</td>
+                        <td>—</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-history">
+            <h2>阅读历史</h2>
+            <details class="signoff-block" open>
+              <summary>Md3eHistoryBrowsePage</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>历史列表项</td>
+                        <td>history list</td>
+                        <td>ReadingHistoryListItem</td>
+                        <td>History + widgets</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>响应式 layout</td>
+                      </tr>
+                      <tr>
+                        <td>清空历史</td>
+                        <td>confirm dialog</td>
+                        <td>ClearConfirmDialog</td>
+                        <td>pattern</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>Lab 预览数据</td>
+                      </tr>
+                      <tr>
+                        <td>继续阅读</td>
+                        <td>open session</td>
+                        <td>条目 onTap 空</td>
+                        <td>History</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>UI 入口有</td>
+                      </tr>
+                      <tr>
+                        <td>读 SQLite 历史</td>
+                        <td>FRB</td>
+                        <td>PreviewData</td>
+                        <td>—</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-settings">
+            <h2>设置</h2>
+            <details class="signoff-block" open>
+              <summary>Md3eSettingsPage · 分组 Pane</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>设置分组导航</td>
+                        <td>settings nav</td>
+                        <td>SettingsList + panes</td>
+                        <td>SettingsPage</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>list-detail adaptive</td>
+                      </tr>
+                      <tr>
+                        <td>阅读相关偏好</td>
+                        <td>AppSetting</td>
+                        <td>展示控件</td>
+                        <td>SettingsPage</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>未写 port</td>
+                      </tr>
+                      <tr>
+                        <td>备份导入</td>
+                        <td>metadata backup</td>
+                        <td>无完整流</td>
+                        <td>—</td>
+                        <td><span class="tag miss">缺</span></td>
+                        <td>Pilot 候选</td>
+                      </tr>
+                      <tr>
+                        <td>Healthy mode 等</td>
+                        <td>toggle</td>
+                        <td>部分 tile</td>
+                        <td>SettingsPage</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>写回设置</td>
+                        <td>Riverpod</td>
+                        <td>无</td>
+                        <td>—</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td>首选 Pilot feature</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-detail">
+            <h2>详情页</h2>
+            <details class="signoff-block" open>
+              <summary>Comic · Series 详情</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>封面与主操作</td>
+                        <td>detail primary</td>
+                        <td>PrimaryActions</td>
+                        <td>Comic/Series Page</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>开始阅读按钮 UI</td>
+                      </tr>
+                      <tr>
+                        <td>元数据区</td>
+                        <td>info rows</td>
+                        <td>MetadataSection</td>
+                        <td>Comic Page</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>标签区</td>
+                        <td>tags</td>
+                        <td>MetadataTagsSection</td>
+                        <td>patterns</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Series 成员/连载</td>
+                        <td>series blocks</td>
+                        <td>SummaryMetaRow 等</td>
+                        <td>Series Page</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>更多菜单</td>
+                        <td>overflow</td>
+                        <td>M3EMenu</td>
+                        <td>Knobs 预览</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>开始阅读进 Reader</td>
+                        <td>read_session route</td>
+                        <td>Lab 导航 stub</td>
+                        <td>LabApp</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-metadata-edit">
+            <h2>元数据编辑</h2>
+            <details class="signoff-block" open>
+              <summary>Comic / Series Metadata Edit Page</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>表单布局</td>
+                        <td>metadata edit</td>
+                        <td>EditSurface + forms</td>
+                        <td>Metadata pages</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>responsive metrics</td>
+                      </tr>
+                      <tr>
+                        <td>标签输入</td>
+                        <td>tag field</td>
+                        <td>Md3eTagInputField</td>
+                        <td>widgets + form</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>日期 / 下拉</td>
+                        <td>pickers</td>
+                        <td>MD3E inputs</td>
+                        <td>Metadata pages</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>字段锁 KV</td>
+                        <td>locks UI</td>
+                        <td>LocksKvList</td>
+                        <td>Comic edit</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>假数据</td>
+                      </tr>
+                      <tr>
+                        <td>保存写 core</td>
+                        <td>coordinator</td>
+                        <td>无</td>
+                        <td>—</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-library-edit">
+            <h2>库编辑</h2>
+            <details class="signoff-block" open>
+              <summary>Md3eLibraryEditPage</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>WB</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>本地库表单</td>
+                        <td>library_form_dialog</td>
+                        <td>LibraryEditPage local</td>
+                        <td>pages</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>页级非 Dialog</td>
+                      </tr>
+                      <tr>
+                        <td>远程库凭证</td>
+                        <td>remote fields</td>
+                        <td>LibraryEditPage remote</td>
+                        <td>pages</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>无真实连接</td>
+                      </tr>
+                      <tr>
+                        <td>扫描间隔等</td>
+                        <td>settings fields</td>
+                        <td>ScanIntervalDropdown</td>
+                        <td>form</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>提交建库</td>
+                        <td>repository</td>
+                        <td>无</td>
+                        <td>—</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-reader">
+            <h2>阅读器</h2>
+            <p class="lead">
+              <code>Md3eReaderPage</code> + patterns/reader · WB: Md3eReaderPage。Chrome 可 Lab
+              冻结；视口与会话见 Pilot。
+            </p>
+
+            <details class="signoff-block" open id="sec-reader-chrome">
+              <summary>顶/底 Chrome</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>返回 / 双行标题</td>
+                        <td>ReaderTopBar</td>
+                        <td>M3EAppBar + band</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>全屏</td>
+                        <td>maximize</td>
+                        <td>compact 隐藏</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>切卷 / 系列目录</td>
+                        <td>list popup</td>
+                        <td>CatalogSheet + 更多</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>AdaptivePanel</td>
+                      </tr>
+                      <tr>
+                        <td>阅读设置</td>
+                        <td>Fluent Dialog</td>
+                        <td>SettingsSideSheet</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>字段见下</td>
+                      </tr>
+                      <tr>
+                        <td>更多 / 封面</td>
+                        <td>overflow</td>
+                        <td>分享 stub</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>底栏 Slider / 翻页 / 自动播放</td>
+                        <td>ReaderBottomBar</td>
+                        <td>M3E bottom bar</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Chrome 动效</td>
+                        <td>浮岛 300ms</td>
+                        <td>tonal 250ms</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+
+            <details class="signoff-block" open id="sec-reader-interaction">
+              <summary>交互</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>点击三分区</td>
+                        <td>30/40/30</td>
+                        <td>20/60/20</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>键盘</td>
+                        <td>reader_input</td>
+                        <td>InteractionScope</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>卷边界提示</td>
+                        <td>toast</td>
+                        <td>无</td>
+                        <td><span class="tag miss">缺</span></td>
+                        <td>banner scenario</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+
+            <details class="signoff-block" id="sec-reader-viewport">
+              <summary>视口 · 会话 · 设置字段</summary>
+              <div class="signoff-block-body">
+                <h3>视口与会话</h3>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>能力</th>
+                        <th>生产</th>
+                        <th>Lab</th>
+                        <th>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>页图视口</td>
+                        <td>Paged/Dual/Scroll</td>
+                        <td>Placeholder</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                      </tr>
+                      <tr>
+                        <td>打开失败 / 加载</td>
+                        <td>ErrorPanel / loading</td>
+                        <td>无</td>
+                        <td><span class="tag miss">缺</span></td>
+                      </tr>
+                      <tr>
+                        <td>复制页图</td>
+                        <td>页图菜单</td>
+                        <td>无</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                      </tr>
+                      <tr>
+                        <td>无痕 / 历史恢复</td>
+                        <td>session</td>
+                        <td>无 UI</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <h3>阅读设置字段（Sheet 内）</h3>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>字段</th>
+                        <th>生产 Dialog</th>
+                        <th>Lab</th>
+                        <th>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>自动播放开关</td>
+                        <td>有</td>
+                        <td>Switch</td>
+                        <td><span class="tag stub">STUB</span></td>
+                      </tr>
+                      <tr>
+                        <td>播放模式 / 间隔</td>
+                        <td>有</td>
+                        <td>无</td>
+                        <td><span class="tag miss">缺</span></td>
+                      </tr>
+                      <tr>
+                        <td>阅读模式 / 条漫</td>
+                        <td>有</td>
+                        <td>无</td>
+                        <td><span class="tag pilot">Pilot</span></td>
+                      </tr>
+                      <tr>
+                        <td>分页布局</td>
+                        <td>有</td>
+                        <td>toggle 占位</td>
+                        <td><span class="tag stub">STUB</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-widgets">
+            <h2>共享控件</h2>
+            <details class="signoff-block">
+              <summary>Widgetbook widgets 层（目录级）</summary>
+              <div class="signoff-block-body">
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>控件</th>
+                        <th>典型用途</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Md3eComicCard</td>
+                        <td>库网格</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>Knobs</td>
+                      </tr>
+                      <tr>
+                        <td>Md3eComicListItem</td>
+                        <td>库列表</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Md3ePagination</td>
+                        <td>书库分页</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Md3eCatalogViewModeButtonGroup</td>
+                        <td>视图切换</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Md3eSegmentedCapsuleBar</td>
+                        <td>Facet / Tabs</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Md3eTagInputField</td>
+                        <td>元数据</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Md3eReadingHistoryListItem</td>
+                        <td>历史</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Md3eAnchoredMenu</td>
+                        <td>顶栏更多</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>overlay l10n 已修</td>
+                      </tr>
+                      <tr>
+                        <td>M3E SideSheet / BottomSheet</td>
+                        <td>筛选 / 设置</td>
+                        <td><span class="tag stub">STUB</span></td>
+                        <td>AdaptivePanel 封装</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+          </section>
+
+          <section id="sec-backlog">
+            <h2>跨领域待办</h2>
+            <details class="signoff-block" open>
+              <summary><span class="priority p0">P0</span>Lab 冻结前必做</summary>
+              <div class="signoff-block-body">
+                <ol class="tasks">
+                  <li>Widgetbook 全页 Responsive 三档（compact / medium / expanded）扫一遍。</li>
+                  <li>阅读器：三档 + sheet 挂载（useRootNavigator false）+ compact 顶栏收纳。</li>
+                  <li>书库筛选 SideSheet 与 LabApp 内导航无 regressions。</li>
+                </ol>
+              </div>
+            </details>
+            <details class="signoff-block" open>
+              <summary><span class="priority p1">P1</span>STUB 补全（仍不接 Riverpod）</summary>
+              <div class="signoff-block-body">
+                <ol class="tasks">
+                  <li>阅读器更多菜单：封面项占位；设置 sheet 静态字段行。</li>
+                  <li>首页：添加库 → 跳转 LibraryEdit 预览链。</li>
+                  <li>详情页：开始阅读 → Reader LabHost（LabApp 内）。</li>
+                </ol>
+              </div>
+            </details>
+            <details class="signoff-block">
+              <summary><span class="priority p2">P2</span>Scenario / 文档</summary>
+              <div class="signoff-block-body">
+                <ol class="tasks">
+                  <li>阅读器 error / loading / 卷边界 banner 静态 scenario。</li>
+                  <li>Lab 全应用收口 ADR 附录或 checklist 与本文同步。</li>
+                  <li>Pilot：Settings 或 Reader 择一接真 ViewModel。</li>
+                </ol>
+              </div>
+            </details>
+          </section>
+
+          <footer>
+            <a href="pages.html">页面目录</a> · <a href="widgetbook.html">Widgetbook</a> ·
+            <a href="index.html">索引</a>
+          </footer>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

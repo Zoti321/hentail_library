@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab 范围与阶段 · MD3E</title>
+    <link rel="stylesheet" href="assets/site.css" />
+  </head>
+  <body>
+    <nav class="site-nav">
+      <div class="wrap">
+        <a href="index.html"><strong>MD3E Lab</strong></a>
+        <span class="sep">·</span>
+        <a href="overview.html">说明</a>
+        <a href="pages.html">页面</a>
+        <a href="widgetbook.html">Widgetbook</a>
+        <a href="signoff.html">收口清单</a>
+      </div>
+    </nav>
+    <main class="wrap">
+      <h1>Lab 范围与阶段</h1>
+      <p class="lead">术语见仓库 <code>GLOSSARY.md</code>（MD3E design system / Lab / Pilot / Cutover）。</p>
+
+      <h2>三阶段</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>阶段</th>
+              <th>含义</th>
+              <th>本仓库现状</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag lab">Lab</span></td>
+              <td>不改生产 feature，在 md3e + Widgetbook 建 UI</td>
+              <td><span class="tag ok">OK</span>integrate/md3e 活跃</td>
+            </tr>
+            <tr>
+              <td><span class="tag pilot">Pilot</span></td>
+              <td>单 feature 接真路由 / ViewModel 验证</td>
+              <td><span class="tag stub">STUB</span>尚未系统切换</td>
+            </tr>
+            <tr>
+              <td>Cutover</td>
+              <td>生产 Baseline UI 迁到 MD3E，收双轨</td>
+              <td><span class="tag miss">未开始</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>目录结构</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>路径</th>
+              <th>内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>md3e/theme/</code></td>
+              <td>M3ETheme、MI Sans、动态色 Lab 种子</td>
+            </tr>
+            <tr>
+              <td><code>md3e/layout/</code></td>
+              <td>断点、间距、各页 metrics</td>
+            </tr>
+            <tr>
+              <td><code>md3e/widgets/</code></td>
+              <td>原子控件（M3E 封装）</td>
+            </tr>
+            <tr>
+              <td><code>md3e/patterns/</code></td>
+              <td>场景组合（无 Riverpod / 领域 import）</td>
+            </tr>
+            <tr>
+              <td><code>md3e/pages/</code></td>
+              <td>整页预览 + *LabHost 假数据壳</td>
+            </tr>
+            <tr>
+              <td><code>design-system/</code></td>
+              <td>冻结归档（Lab 不以 MASTER 为入口，ADR-0030）</td>
+            </tr>
+            <tr>
+              <td><code>app/lib/shared/ui/</code></td>
+              <td>生产 Baseline Fluent UI（仍为主壳）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>状态图例（全站表格）</h2>
+      <div class="legend">
+        <span><span class="tag ok">OK</span>Widgetbook 可验收、入口齐</span>
+        <span><span class="tag stub">STUB</span>占位 / 假数据 / 字段不全</span>
+        <span><span class="tag miss">缺</span>尚未做或无可演示入口</span>
+        <span><span class="tag pilot">Pilot</span>依赖真业务 / FRB，非 Lab 必达</span>
+      </div>
+
+      <div class="callout">
+        <strong>验收方式</strong>
+        视觉与交互以 Widgetbook 为准；本 HTML 用于给人快速浏览范围与对照，不替代测试与 ADR。
+      </div>
+
+      <footer><a href="index.html">返回索引</a></footer>
+    </main>
+  </body>
+</html>
