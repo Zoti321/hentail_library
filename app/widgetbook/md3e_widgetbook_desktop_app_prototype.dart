@@ -26,7 +26,7 @@ class _Md3eLabAppPrototype extends StatelessWidget {
   ) {
     switch (navigation.destinationIndex) {
       case Md3eShellNavigation.homeDestinationIndex:
-        return Md3eHomePage(
+        return Md3eHomePageLabHost(
           onAddLocalLibrary: _noop,
           onAddRemoteLibrary: _noop,
           onLibraryOpen: _noopId,
@@ -43,7 +43,7 @@ class _Md3eLabAppPrototype extends StatelessWidget {
       case Md3eShellNavigation.settingsDestinationIndex:
         return const Md3eSettingsPage();
       default:
-        return Md3eHomePage();
+        return Md3eHomePageLabHost();
     }
   }
 

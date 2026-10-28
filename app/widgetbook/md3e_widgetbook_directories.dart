@@ -8,6 +8,7 @@ import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_meta
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/pages/md3e_home_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_home_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
@@ -272,7 +273,19 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               name: 'Md3eHomePage',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Responsive · viewport addon',
+                  name: 'Responsive · reorder · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Md3eHomePageLabHost(
+                      onAddLocalLibrary: () {},
+                      onAddRemoteLibrary: () {},
+                      onLibraryOpen: (_) {},
+                      onLibraryAction:
+                          (String libraryId, Md3eHomeLibraryManagementAction action) {},
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Responsive · static list · viewport addon',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: Md3eHomePage(
                       onAddLocalLibrary: () {},

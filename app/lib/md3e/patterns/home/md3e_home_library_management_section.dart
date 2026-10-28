@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
+import 'package:hentai_library/md3e/patterns/home/md3e_home_library_reorderable_list.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
@@ -18,6 +19,7 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
     this.onLibraryAction,
     this.onAddLocalLibrary,
     this.onAddRemoteLibrary,
+    this.onLibrariesReorder,
   });
 
   final List<Md3eHomeLibraryDashboardRow> libraries;
@@ -26,6 +28,9 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
       onLibraryAction;
   final VoidCallback? onAddLocalLibrary;
   final VoidCallback? onAddRemoteLibrary;
+
+  /// 非 null 时列表可拖拽排序；顺序变更仅通过此回调上报（持久化由上层负责）。
+  final void Function(int oldIndex, int newIndex)? onLibrariesReorder;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +77,13 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
           Text(
             l10n.sidebarAddLibraryTooltip,
             style: type.bodyMedium.copyWith(color: scheme.onSurfaceVariant),
+          )
+        else if (onLibrariesReorder != null)
+          Md3eHomeLibraryReorderableList(
+            libraries: libraries,
+            onReorder: onLibrariesReorder!,
+            onLibraryOpen: onLibraryOpen,
+            onLibraryAction: onLibraryAction,
           )
         else
           Md3eSplitListGroup(
@@ -145,11 +157,13 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     required this.row,
     this.onOpen,
     this.onAction,
+    this.showMoreMenu = true,
   });
 
   final Md3eHomeLibraryDashboardRow row;
   final VoidCallback? onOpen;
   final ValueChanged<Md3eHomeLibraryManagementAction>? onAction;
+  final bool showMoreMenu;
 
   @override
   Widget build(BuildContext context) {
@@ -227,11 +241,12 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          _LibraryRowMoreMenu(
-            l10n: l10n,
-            row: row,
-            onAction: onAction,
-          ),
+          if (showMoreMenu)
+            Md3eHomeLibraryRowMoreMenu(
+              l10n: l10n,
+              row: row,
+              onAction: onAction,
+            ),
         ],
       ),
     );
@@ -282,8 +297,9 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
   }
 }
 
-class _LibraryRowMoreMenu extends StatelessWidget {
-  const _LibraryRowMoreMenu({
+class Md3eHomeLibraryRowMoreMenu extends StatelessWidget {
+  const Md3eHomeLibraryRowMoreMenu({
+    super.key,
     required this.l10n,
     required this.row,
     this.onAction,

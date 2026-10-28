@@ -19,6 +19,7 @@ class Md3eHomePage extends StatelessWidget {
     this.onLibraryAction,
     this.onAddLocalLibrary,
     this.onAddRemoteLibrary,
+    this.onLibrariesReorder,
   }) : libraries = libraries ?? Md3eHomePagePreviewData.sampleLibraries();
 
   final List<Md3eHomeLibraryDashboardRow> libraries;
@@ -28,6 +29,7 @@ class Md3eHomePage extends StatelessWidget {
       onLibraryAction;
   final VoidCallback? onAddLocalLibrary;
   final VoidCallback? onAddRemoteLibrary;
+  final void Function(int oldIndex, int newIndex)? onLibrariesReorder;
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +71,7 @@ class Md3eHomePage extends StatelessWidget {
                 onLibraryAction: onLibraryAction,
                 onAddLocalLibrary: onAddLocalLibrary,
                 onAddRemoteLibrary: onAddRemoteLibrary,
+                onLibrariesReorder: onLibrariesReorder,
               ),
               SizedBox(
                 height: Md3eHomePageMetrics.sectionVerticalSpacing(sizeClass),
