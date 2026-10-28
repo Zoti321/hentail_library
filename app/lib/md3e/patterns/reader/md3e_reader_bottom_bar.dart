@@ -35,9 +35,9 @@ class Md3eReaderBottomBar extends StatelessWidget {
     final bool canPrev = currentPage > 1;
     final bool canNext = totalPages > 0 && currentPage < totalPages;
     final EdgeInsets padding = EdgeInsets.fromLTRB(
-      12,
+      Md3eReaderChromeMetrics.chromeContentHorizontalPadding(media.size.width),
       8,
-      12,
+      Md3eReaderChromeMetrics.chromeContentHorizontalPadding(media.size.width),
       media.padding.bottom + Md3eReaderChromeMetrics.edgeGap,
     );
 

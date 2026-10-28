@@ -6,7 +6,7 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 /// Lab 阅读器顶/底 chrome 尺寸（沉浸 letterbox + 全宽 scrim）。
 abstract final class Md3eReaderChromeMetrics {
   static const double edgeGap = 4;
-  static const double hideSlideFraction = 0.12;
+  static const double hideSlidePx = 16;
   static const double topBarMinHeight = 48;
   static const double bottomBarMinHeight = 68;
   static const double actionIconSize = 24;
@@ -16,9 +16,16 @@ abstract final class Md3eReaderChromeMetrics {
 
   /// 画布左右 letterbox（竖向仍贴顶/底 chrome）。
   static double viewportHorizontalInset(double viewportWidth) {
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
-    return sizeClass.isCompact ? edgeGap : 12;
+    return switch (Md3eWindowSizeClass.fromWidth(viewportWidth)) {
+      Md3eWindowSizeClass.compact => 12,
+      Md3eWindowSizeClass.medium => 16,
+      _ => 24,
+    };
+  }
+
+  /// 底栏内容与画布左对齐时的水平 padding。
+  static double chromeContentHorizontalPadding(double viewportWidth) {
+    return 12 + viewportHorizontalInset(viewportWidth);
   }
 
   static double topScrimHeight(MediaQueryData media) =>

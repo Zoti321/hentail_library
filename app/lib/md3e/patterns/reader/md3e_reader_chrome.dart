@@ -4,7 +4,7 @@ import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome_overlay.d
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_top_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 阅读页顶/底 chrome（overlay + top/bottom bar）；由 [Md3eReaderPage] 叠在视口上。
+/// Lab 顶/底 chrome 组合（overlay + bars）。显隐由外层驱动；滚动隐藏待接视口后改用 [M3EAppBarController]。
 class Md3eReaderChrome extends StatelessWidget {
   const Md3eReaderChrome({
     super.key,

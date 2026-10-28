@@ -63,6 +63,7 @@ export 'patterns/reader/md3e_reader_floating_panel.dart';
 export 'patterns/reader/md3e_reader_page_copy.dart';
 export 'patterns/reader/md3e_reader_page_preview_data.dart';
 export 'patterns/reader/md3e_reader_page_progress.dart';
+export 'patterns/reader/md3e_reader_interaction_scope.dart';
 export 'patterns/reader/md3e_reader_keyboard.dart';
 export 'patterns/reader/md3e_reader_settings_side_sheet.dart';
 export 'patterns/reader/md3e_reader_tap_zone.dart';

@@ -60,6 +60,12 @@ class _Md3eReaderPageProgressState extends State<Md3eReaderPageProgress> {
             min: 1,
             max: _safeTotal.toDouble(),
             size: M3ESliderSize.xs,
+            haptic: M3EHapticFeedback.light,
+            semanticFormatterCallback: (double value) =>
+                Md3eReaderPageCopy.pageProgressLabel(
+                  value.round().clamp(1, _safeTotal),
+                  _safeTotal,
+                ),
             onChanged: (double value) => setState(() => _dragValue = value),
             onChangeEnd: (double value) {
               setState(() => _dragValue = null);

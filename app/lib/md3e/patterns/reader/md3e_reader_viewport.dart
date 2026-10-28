@@ -7,13 +7,11 @@ class Md3eReaderViewport extends StatelessWidget {
   const Md3eReaderViewport({
     super.key,
     required this.currentPage,
-    required this.chromeVisible,
     required this.onTapZone,
     this.focusNode,
   });
 
   final int currentPage;
-  final bool chromeVisible;
   final ValueChanged<Md3eReaderTapZone> onTapZone;
   final FocusNode? focusNode;
 
@@ -36,10 +34,7 @@ class Md3eReaderViewport extends StatelessWidget {
           ),
         );
       },
-      child: Md3eReaderViewportPlaceholder(
-        page: currentPage,
-        showEdgeHints: !chromeVisible,
-      ),
+      child: Md3eReaderViewportPlaceholder(page: currentPage),
     );
   }
 }

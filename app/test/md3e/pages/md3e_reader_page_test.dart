@@ -20,7 +20,7 @@ void main() {
       ),
     );
     expect(find.text('葬送的芙莉莲'), findsOneWidget);
-    expect(find.text('第 01 卷'), findsNothing);
+    expect(find.text('第 01 卷'), findsOneWidget);
     expect(
       find.text(Md3eReaderPageCopy.viewportPlaceholder(3)),
       findsOneWidget,
