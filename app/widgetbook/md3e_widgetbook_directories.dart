@@ -289,12 +289,12 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
           name: 'scenarios',
           children: <WidgetbookNode>[
             WidgetbookComponent(
-              name: 'Md3eLabDesktopApp',
+              name: 'Md3eLabApp',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Shell + primary destinations',
+                  name: 'Shell + destinations · viewport addon',
                   builder: (BuildContext context) =>
-                      const _Md3eLabDesktopAppPrototype(),
+                      const _Md3eLabAppPrototype(),
                 ),
               ],
             ),

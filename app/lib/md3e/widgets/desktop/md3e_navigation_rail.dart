@@ -30,6 +30,10 @@ class Md3eNavigationRail extends StatelessWidget {
     required this.extended,
     required this.onDestinationSelected,
     this.onMenuPressed,
+    this.modality = M3ENavigationRailModality.standard,
+    this.hideWhenCollapsed = false,
+    this.onDismissModal,
+    this.controller,
   });
 
   final List<Md3eNavigationRailDestination> destinations;
@@ -37,6 +41,10 @@ class Md3eNavigationRail extends StatelessWidget {
   final bool extended;
   final ValueChanged<int> onDestinationSelected;
   final VoidCallback? onMenuPressed;
+  final M3ENavigationRailModality modality;
+  final bool hideWhenCollapsed;
+  final VoidCallback? onDismissModal;
+  final M3ENavigationRailController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +52,10 @@ class Md3eNavigationRail extends StatelessWidget {
       type: extended
           ? M3ENavigationRailType.expanded
           : M3ENavigationRailType.collapsed,
+      modality: modality,
+      hideWhenCollapsed: hideWhenCollapsed,
+      onDismissModal: onDismissModal,
+      controller: controller,
       expandedWidth: Md3eNavigationRailMetrics.expandedWidth,
       selectedIndex: selectedIndex,
       onDestinationSelected: onDestinationSelected,

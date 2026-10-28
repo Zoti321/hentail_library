@@ -4,14 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_app_bar.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_library_sheet.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_modal_rail.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_column.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_navigation_drawer.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_layout.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_mock_libraries.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_navigation.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_rail_library_hover_metrics.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
-import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar_metrics.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -33,10 +35,10 @@ abstract final class Md3eDesktopShellMetrics {
   static const double titleBarContentPadding = 24;
 }
 
-/// Desktop window shell: navigation (drawer or rail + library flyout) + content card.
+/// Lab shell: navigation + content pane.
 ///
-/// &lt; [Md3eBreakpoints.expanded]: ☰ modal drawer. ≥ expanded: [Md3eNavigationRail]
-/// with hover library secondary flyout (overlays main content).
+/// &lt; [Md3eBreakpoints.expanded]: compact app bar + modal expanded [M3ENavigationRail]
+/// (M3 Expressive; replaces navigation drawer). ≥ expanded: standard rail + library flyout.
 class Md3eDesktopShell extends StatefulWidget {
   Md3eDesktopShell({
     super.key,
@@ -74,8 +76,8 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   int _selectedIndex = Md3eShellNavigation.homeDestinationIndex;
   late String _selectedLibraryDisplayName = widget.initialLibraryDisplayName;
   bool _librarySecondaryOpen = false;
-  bool _compactDrawerOpen = false;
-  Md3eShellDrawerLevel _drawerLevel = Md3eShellDrawerLevel.root;
+  bool _compactLibrarySheetOpen = false;
+  bool _compactModalRailOpen = false;
   Timer? _secondaryOpenTimer;
   Timer? _secondaryCloseTimer;
   bool? _usesExpandedNavigation;
@@ -105,8 +107,8 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     _usesExpandedNavigation = expandedNav;
     _cancelLibrarySecondaryTimers();
     _librarySecondaryOpen = false;
-    _compactDrawerOpen = false;
-    _drawerLevel = Md3eShellDrawerLevel.root;
+    _compactLibrarySheetOpen = false;
+    _compactModalRailOpen = false;
   }
 
   void _cancelLibrarySecondaryTimers() {
@@ -164,12 +166,91 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       _selectedLibraryDisplayName = displayName;
       _selectedIndex = Md3eShellNavigation.libraryDestinationIndex;
       _librarySecondaryOpen = false;
+      _compactLibrarySheetOpen = false;
+      _compactModalRailOpen = false;
     });
     _cancelLibrarySecondaryTimers();
   }
 
-  void _onCompactDestinationSelected(int index) {
-    setState(() => _selectedIndex = index);
+  void _onCompactRailDestinationSelected(int index) {
+    if (index == Md3eShellNavigation.libraryDestinationIndex) {
+      setState(() {
+        _compactModalRailOpen = false;
+        _compactLibrarySheetOpen = true;
+      });
+      return;
+    }
+    setState(() {
+      _selectedIndex = index;
+      _compactModalRailOpen = false;
+    });
+  }
+
+  void _dismissCompactModalRail() {
+    setState(() => _compactModalRailOpen = false);
+  }
+
+  void _openCompactModalRail() {
+    setState(() => _compactModalRailOpen = true);
+  }
+
+  Widget _buildCompactContentColumn({
+    required Md3eDesktopShellSurfaceRoles surfaces,
+    required Widget pane,
+  }) {
+    return ColoredBox(
+      color: surfaces.contentPaneBackground,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Md3eShellCompactAppBar(
+            onMenuPressed: _openCompactModalRail,
+          ),
+          Expanded(
+            child: Md3eDesktopShellPane(
+              showDecoration: false,
+              child: pane,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopContentColumn({
+    required Md3eDesktopShellSurfaceRoles surfaces,
+    required Widget pane,
+    required double cornerRadius,
+  }) {
+    return ClipRRect(
+      borderRadius: Md3eDesktopShellMetrics.contentCardLeadingRadius(
+        cornerRadius,
+      ),
+      child: ColoredBox(
+        color: surfaces.contentPaneBackground,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Md3eDesktopTitleBar(
+              showWindowControls: true,
+              searchLeadingInset:
+                  Md3eDesktopShellMetrics.titleBarContentPadding,
+              backgroundColor: Colors.transparent,
+            ),
+            Expanded(
+              child: Md3eDesktopShellPane(
+                showDecoration: false,
+                child: pane,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _dismissCompactLibrarySheet() {
+    setState(() => _compactLibrarySheetOpen = false);
   }
 
   Widget _buildPane(BuildContext context) {
@@ -306,36 +387,15 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       ),
     );
     final double cornerRadius = Md3eDesktopShellMetrics.paneCornerRadius;
+    final Widget pane = _buildPane(context);
 
-    final Widget contentColumn = ClipRRect(
-      borderRadius: Md3eDesktopShellMetrics.contentCardLeadingRadius(
-        cornerRadius,
-      ),
-      child: ColoredBox(
-        color: surfaces.contentPaneBackground,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Md3eDesktopTitleBar(
-              showNavigationMenu: !usesExpandedNav,
-              onNavigationMenuPressed: () =>
-                  setState(() => _compactDrawerOpen = true),
-              searchLeadingInset: usesExpandedNav
-                  ? Md3eDesktopShellMetrics.titleBarContentPadding
-                  : Md3eDesktopTitleBarMetrics.navigationMenuWidth +
-                        Md3eDesktopShellMetrics.titleBarContentPadding,
-              backgroundColor: Colors.transparent,
-            ),
-            Expanded(
-              child: Md3eDesktopShellPane(
-                showDecoration: false,
-                child: _buildPane(context),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    final Widget contentColumn = usesExpandedNav
+        ? _buildDesktopContentColumn(
+            surfaces: surfaces,
+            pane: pane,
+            cornerRadius: cornerRadius,
+          )
+        : _buildCompactContentColumn(surfaces: surfaces, pane: pane);
 
     final Widget chrome = ColoredBox(
       color: surfaces.shellBackground,
@@ -348,31 +408,31 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
               scheme: scheme,
               contentColumn: contentColumn,
             )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[Expanded(child: contentColumn)],
-            ),
+          : contentColumn,
     );
 
     return Stack(
       children: <Widget>[
         chrome,
-        if (!usesExpandedNav)
-          Md3eShellCompactNavigationDrawer(
-            open: _compactDrawerOpen,
-            level: _drawerLevel,
-            selectedDestinationIndex: _selectedIndex,
+        if (!usesExpandedNav) ...<Widget>[
+          Md3eShellCompactModalRailOverlay(
+            open: _compactModalRailOpen,
+            height: widget.height,
+            m3eTheme: m3e,
+            surfaceBackground: surfaces.navigationRailBackground,
+            destinations: destinations,
+            selectedIndex: _selectedIndex,
+            onDismiss: _dismissCompactModalRail,
+            onDestinationSelected: _onCompactRailDestinationSelected,
+          ),
+          Md3eShellCompactLibrarySheet(
+            open: _compactLibrarySheetOpen,
             libraryDisplayNames: widget.libraryDisplayNames,
-            selectedLibraryDisplayName: _selectedLibraryDisplayName,
-            onDismiss: () => setState(() {
-              _compactDrawerOpen = false;
-              _drawerLevel = Md3eShellDrawerLevel.root;
-            }),
-            onLevelChanged: (Md3eShellDrawerLevel level) =>
-                setState(() => _drawerLevel = level),
-            onDestinationSelected: _onCompactDestinationSelected,
+            selectedDisplayName: _selectedLibraryDisplayName,
+            onDismiss: _dismissCompactLibrarySheet,
             onLibrarySelected: _onLibrarySelected,
           ),
+        ],
       ],
     );
   }
@@ -399,10 +459,19 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       },
     );
 
+    final Widget wrappedShell = DefaultTextStyle.merge(
+      style: const TextStyle(fontFamily: kMd3eAppFontFamily),
+      child: shell,
+    );
+
     if (widget.width != null) {
-      return SizedBox(width: widget.width, height: widget.height, child: shell);
+      return SizedBox(
+        width: widget.width,
+        height: widget.height,
+        child: wrappedShell,
+      );
     }
-    return SizedBox(height: widget.height, child: shell);
+    return SizedBox(height: widget.height, child: wrappedShell);
   }
 }
 

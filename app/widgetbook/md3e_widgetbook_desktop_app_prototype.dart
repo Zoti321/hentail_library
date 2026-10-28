@@ -1,8 +1,8 @@
 part of 'md3e_widgetbook_directories.dart';
 
-/// 桌面壳 + 主导航目的地，复用各 `pages/` 预览的假数据与交互。
-class _Md3eLabDesktopAppPrototype extends StatelessWidget {
-  const _Md3eLabDesktopAppPrototype();
+/// Lab 全壳原型：同一棵树随 Viewport 在 &lt;840（modal expanded rail）与 expanded+（标准 rail）间切换。
+class _Md3eLabAppPrototype extends StatelessWidget {
+  const _Md3eLabAppPrototype();
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +76,8 @@ class _Md3eLabHomePanePlaceholder extends StatelessWidget {
               ),
               SizedBox(height: spacing.sm),
               Text(
-                'Widgetbook：≥840dp 用侧栏 rail + hover 选库；较窄窗口用顶栏 ☰ 抽屉。',
+                'Widgetbook：Viewport ≥840dp 为桌面（rail + hover 选库）；'
+                '<840dp 为移动/平板（圆形 ☰ + modal expanded rail，256dp 库列）。',
                 style: theme.typeScale.bodyMedium.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

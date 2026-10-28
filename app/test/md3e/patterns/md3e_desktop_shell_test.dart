@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_app_bar.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_mock_libraries.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';
@@ -30,7 +31,7 @@ void main() {
     expect(find.byType(M3ESearchBar), findsOneWidget);
   });
 
-  testWidgets('below expanded breakpoint uses drawer menu not rail', (
+  testWidgets('below expanded breakpoint uses compact app bar not desktop search', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(600, 768));
@@ -41,8 +42,25 @@ void main() {
       home: Md3eDesktopShell(width: 600, height: 768),
     );
 
+    expect(find.byType(Md3eShellCompactAppBar), findsOneWidget);
     expect(find.byType(Md3eNavigationRail), findsNothing);
+    expect(find.byType(M3ESearchBar), findsNothing);
     expect(find.byIcon(Icons.menu), findsOneWidget);
+  });
+
+  testWidgets('below expanded breakpoint hides desktop window controls', (
+    WidgetTester tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(600, 768));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await pumpMd3eApp(
+      tester,
+      home: Md3eDesktopShell(width: 600, height: 768),
+    );
+
+    expect(find.byIcon(Icons.remove), findsNothing);
+    expect(find.byIcon(Icons.close), findsNothing);
   });
 
   testWidgets('title bar search leading inset is flush with pane column', (
@@ -113,7 +131,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('drawer library drill-in selects browse library title', (
+  testWidgets('compact shell opens library sheet from modal rail', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(600, 768));
@@ -124,12 +142,15 @@ void main() {
       home: Md3eDesktopShell(
         width: 600,
         height: 768,
-        paneBuilder: (_, navigation) => Text(navigation.selectedLibraryDisplayName),
+        paneBuilder: (_, navigation) =>
+            Text(navigation.selectedLibraryDisplayName),
       ),
     );
 
     await tester.tap(find.byIcon(Icons.menu));
     await tester.pumpAndSettle();
+
+    expect(find.byType(Md3eNavigationRail), findsOneWidget);
 
     await tester.tap(find.text('漫画库'));
     await tester.pumpAndSettle();
@@ -138,7 +159,7 @@ void main() {
     await tester.tap(find.text(target));
     await tester.pumpAndSettle();
 
-    expect(find.text(target), findsOneWidget);
+    expect(find.text(target), findsWidgets);
   });
 
   testWidgets('title band search aligns at 32dp on expanded shell', (
