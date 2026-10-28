@@ -1,3 +1,4 @@
+import 'package:hentai_library/md3e/patterns/home/md3e_home_aggregate_counts.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 
 /// Widgetbook / Lab 首页预览数据（非生产 FRB）。
@@ -50,5 +51,24 @@ abstract final class Md3eHomePagePreviewData {
         hint: Md3eHomeLibraryRowHint.unreachable,
       ),
     ];
+  }
+
+  /// 全库聚合预览（漫画/系列与 sample 库求和一致；元数据维度为 Lab 占位）。
+  static Md3eHomeAggregateCounts sampleAggregateCounts() {
+    final List<Md3eHomeLibraryDashboardRow> rows = sampleLibraries();
+    var comicTotal = 0;
+    var seriesTotal = 0;
+    for (final Md3eHomeLibraryDashboardRow row in rows) {
+      comicTotal += row.comicCount;
+      seriesTotal += row.seriesCount;
+    }
+    return Md3eHomeAggregateCounts(
+      comicCount: comicTotal,
+      seriesCount: seriesTotal,
+      authorCount: 1842,
+      parodyCount: 512,
+      characterCount: 3289,
+      tagCount: 8764,
+    );
   }
 }

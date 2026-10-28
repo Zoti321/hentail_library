@@ -23,6 +23,21 @@ abstract final class Md3eHomePageMetrics {
     };
   }
 
+  static double statCardGap(Md3eWindowSizeClass sizeClass) {
+    return switch (sizeClass) {
+      Md3eWindowSizeClass.compact => Md3eSpacing.space8,
+      _ => Md3eSpacing.space12,
+    };
+  }
+
+  /// 标签行与上方 bento 行的额外间距（整行宽卡片需要更多留白）。
+  static double statTagsRowTopGap(Md3eWindowSizeClass sizeClass) {
+    return switch (sizeClass) {
+      Md3eWindowSizeClass.compact => Md3eSpacing.space16,
+      _ => Md3eSpacing.space24,
+    };
+  }
+
   static double greetingToSectionSpacing(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
       Md3eWindowSizeClass.compact => Md3eSpacing.space20,

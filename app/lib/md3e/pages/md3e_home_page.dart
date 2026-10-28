@@ -3,6 +3,8 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_home_page_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
+import 'package:hentai_library/md3e/patterns/home/md3e_home_aggregate_counts.dart';
+import 'package:hentai_library/md3e/patterns/home/md3e_home_aggregate_stats_section.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_section.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_page_header.dart';
@@ -14,15 +16,19 @@ class Md3eHomePage extends StatelessWidget {
   Md3eHomePage({
     super.key,
     List<Md3eHomeLibraryDashboardRow>? libraries,
+    Md3eHomeAggregateCounts? aggregateCounts,
     this.onOpenNavigation,
     this.onLibraryOpen,
     this.onLibraryAction,
     this.onAddLocalLibrary,
     this.onAddRemoteLibrary,
     this.onLibrariesReorder,
-  }) : libraries = libraries ?? Md3eHomePagePreviewData.sampleLibraries();
+  })  : libraries = libraries ?? Md3eHomePagePreviewData.sampleLibraries(),
+        aggregateCounts =
+            aggregateCounts ?? Md3eHomePagePreviewData.sampleAggregateCounts();
 
   final List<Md3eHomeLibraryDashboardRow> libraries;
+  final Md3eHomeAggregateCounts aggregateCounts;
   final VoidCallback? onOpenNavigation;
   final ValueChanged<String>? onLibraryOpen;
   final void Function(String libraryId, Md3eHomeLibraryManagementAction action)?
@@ -64,6 +70,10 @@ class Md3eHomePage extends StatelessWidget {
               ),
               SizedBox(
                 height: Md3eHomePageMetrics.greetingToSectionSpacing(sizeClass),
+              ),
+              Md3eHomeAggregateStatsSection(counts: aggregateCounts),
+              SizedBox(
+                height: Md3eHomePageMetrics.sectionVerticalSpacing(sizeClass),
               ),
               Md3eHomeLibraryManagementSection(
                 libraries: libraries,
