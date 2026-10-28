@@ -12,9 +12,12 @@ import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_metadata_edit_page.dart';
+import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_form.dart';
+import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_form.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_navigation.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_form.dart';
@@ -22,6 +25,7 @@ import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_si
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_managed_named_facet_ui.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
@@ -283,6 +287,41 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 ),
               ],
             ),
+            WidgetbookComponent(
+              name: 'Md3eLibraryEditForm',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Edit local · preview data',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: _Md3eLibraryEditFormPreview(
+                          initial: Md3eLibraryEditPreviewData.editLocalForm(),
+                          isCreate: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Edit remote · preview data',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: _Md3eLibraryEditFormPreview(
+                          initial: Md3eLibraryEditPreviewData.editRemoteForm(),
+                          isCreate: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         WidgetbookFolder(
@@ -387,6 +426,27 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
                     child: Md3eSeriesMetadataEditPage(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eLibraryEditPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Edit local · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eLibraryEditPage(
+                      intent: Md3eLibraryEditPageIntent.editLocal,
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Edit remote · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eLibraryEditPage(
+                      intent: Md3eLibraryEditPageIntent.editRemote,
+                    ),
                   ),
                 ),
               ],
@@ -995,6 +1055,38 @@ class _Md3eSeriesMetadataEditFormPreviewState
             },
         onDraftChanged: (Md3eSeriesMetadataEditDraft value) {
           setState(() => _draft = value);
+        },
+      ),
+    );
+  }
+}
+
+class _Md3eLibraryEditFormPreview extends StatefulWidget {
+  const _Md3eLibraryEditFormPreview({
+    required this.initial,
+    required this.isCreate,
+  });
+
+  final LibraryForm initial;
+  final bool isCreate;
+
+  @override
+  State<_Md3eLibraryEditFormPreview> createState() =>
+      _Md3eLibraryEditFormPreviewState();
+}
+
+class _Md3eLibraryEditFormPreviewState extends State<_Md3eLibraryEditFormPreview> {
+  late LibraryForm _form = widget.initial;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 640, maxHeight: 520),
+      child: Md3eLibraryEditForm(
+        form: _form,
+        isCreate: widget.isCreate,
+        onFormChanged: (LibraryForm value) {
+          setState(() => _form = value);
         },
       ),
     );

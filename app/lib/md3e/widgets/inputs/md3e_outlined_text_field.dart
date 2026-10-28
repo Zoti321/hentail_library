@@ -23,6 +23,7 @@ class Md3eOutlinedTextField extends StatefulWidget {
     this.onSubmitted,
     this.trailing,
     this.labelTrailing,
+    this.obscureText = false,
   });
 
   final String label;
@@ -40,6 +41,7 @@ class Md3eOutlinedTextField extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
   final Widget? trailing;
   final Widget? labelTrailing;
+  final bool obscureText;
 
   @override
   State<Md3eOutlinedTextField> createState() => _Md3eOutlinedTextFieldState();
@@ -132,6 +134,7 @@ class _Md3eOutlinedTextFieldState extends State<Md3eOutlinedTextField> {
                         : TextInputAction.done),
                 onSubmitted: widget.onSubmitted,
                 maxLines: widget.maxLines,
+                obscureText: widget.obscureText,
                 scrollPadding: EdgeInsets.zero,
                 selectionControls: m3eTextFieldSelectionControls(
                   defaultTargetPlatform,
