@@ -23,3 +23,23 @@ void md3eWidgetbookPushLabComicDetail(
     catalogIndex: catalogIndex,
   );
 }
+
+void _md3eWidgetbookOpenLabComicMetadataEdit(
+  BuildContext context, {
+  required Md3eComicDetailEntry entry,
+}) {
+  showMd3eComicMetadataEdit(
+    context: context,
+    initialDraft: Md3eComicMetadataEditDraft.fromEntry(entry),
+  );
+}
+
+void _md3eWidgetbookOpenLabSeriesMetadataEdit(
+  BuildContext context, {
+  required Md3eSeriesDetailEntry entry,
+}) {
+  showMd3eSeriesMetadataEdit(
+    context: context,
+    initialDraft: Md3eSeriesMetadataEditDraft.fromEntry(entry),
+  );
+}

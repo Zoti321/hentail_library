@@ -41,6 +41,8 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ESpacing spacing = theme.spacing;
+    final TextStyle dialogActionLabelStyle =
+        md3eLabButtonLabelStyle(theme, M3EButtonSize.sm);
 
     return M3EDialog(
       title: Md3eHomeLibraryManagementCopy.deleteConfirmTitle(
@@ -60,12 +62,16 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
         M3EButton(
           onPressed: () => Navigator.of(context).pop(false),
           style: M3EButtonStyle.text,
-          label: md3eLabText(theme, l10n.commonCancel),
+          decoration: M3EButtonDecoration(
+            textStyle: dialogActionLabelStyle,
+          ),
+          label: Text(l10n.commonCancel),
         ),
         M3EButton(
           onPressed: _acknowledged ? () => Navigator.of(context).pop(true) : null,
           style: M3EButtonStyle.filled,
           decoration: M3EButtonDecoration.styleFrom(
+            textStyle: dialogActionLabelStyle,
             backgroundColor: scheme.error,
             foregroundColor: scheme.onError,
             disabledBackgroundColor: scheme.onSurface.withValues(alpha: 0.12),
@@ -73,7 +79,7 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
               alpha: 0.38,
             ),
           ),
-          label: md3eLabText(theme, l10n.sidebarDeleteLibrary),
+          label: Text(l10n.sidebarDeleteLibrary),
         ),
       ],
     );
