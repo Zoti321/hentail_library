@@ -43,4 +43,29 @@ class Md3eHomeLibraryDashboardRow {
   final bool metadataRefreshInProgress;
 
   bool get busy => scanInProgress || metadataRefreshInProgress;
+
+  Md3eHomeLibraryDashboardRow copyWith({
+    String? libraryId,
+    String? displayName,
+    Md3eHomeLibraryKind? kind,
+    int? comicCount,
+    int? seriesCount,
+    DateTime? lastSyncedAt,
+    Md3eHomeLibraryRowHint? hint,
+    bool? scanInProgress,
+    bool? metadataRefreshInProgress,
+  }) {
+    return Md3eHomeLibraryDashboardRow(
+      libraryId: libraryId ?? this.libraryId,
+      displayName: displayName ?? this.displayName,
+      kind: kind ?? this.kind,
+      comicCount: comicCount ?? this.comicCount,
+      seriesCount: seriesCount ?? this.seriesCount,
+      lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
+      hint: hint ?? this.hint,
+      scanInProgress: scanInProgress ?? this.scanInProgress,
+      metadataRefreshInProgress:
+          metadataRefreshInProgress ?? this.metadataRefreshInProgress,
+    );
+  }
 }

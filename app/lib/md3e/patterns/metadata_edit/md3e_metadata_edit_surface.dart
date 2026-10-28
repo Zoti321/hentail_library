@@ -8,7 +8,7 @@ import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Lab 元数据编辑壳：compact 全屏分栏；较宽视口为居中卡片（Widgetbook / Dialog）。
+/// Lab 元数据编辑壳：compact / medium 全屏；expanded+ 居中卡片（须包在 [Dialog] / [showDialog] 内）。
 enum Md3eMetadataEditPresentation {
   /// 随窗口宽度在全屏与卡片间切换（Widgetbook、路由页）。
   embedded,
@@ -45,7 +45,7 @@ class Md3eMetadataEditSurface extends StatelessWidget {
   Widget build(BuildContext context) {
     final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
     final bool useFullPage = presentation == Md3eMetadataEditPresentation.embedded &&
-        sizeClass.isCompact;
+        sizeClass.usesMetadataEditFullScreenRoute;
 
     if (presentation == Md3eMetadataEditPresentation.modal) {
       return Dialog(

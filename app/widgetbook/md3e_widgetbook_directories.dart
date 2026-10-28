@@ -274,14 +274,8 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Md3eHomePageLabHost(
-                      onAddLocalLibrary: () {},
-                      onAddRemoteLibrary: () {},
-                      onLibraryOpen: (_) {},
-                      onLibraryAction:
-                          (String libraryId, Md3eHomeLibraryManagementAction action) {},
-                    ),
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eHomePageLabHost(),
                   ),
                 ),
               ],

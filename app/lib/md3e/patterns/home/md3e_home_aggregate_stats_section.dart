@@ -125,6 +125,10 @@ class Md3eHomeAggregateStatsSection extends StatelessWidget {
             : BorderRadius.circular(40),
         minHeight: wide ? 88 : 96,
         emphasis: Md3eHomeBentoStatEmphasis.compact,
+        contentPadding: Md3eHomePageMetrics.statCardContentPadding(
+          sizeClass,
+          tagPill: true,
+        ),
       );
     }
 
@@ -216,8 +220,8 @@ class _Md3eHomeStatPalette {
         parodiesForeground = scheme.onSurface,
         charactersBackground = scheme.emphasis,
         charactersForeground = scheme.onEmphasis,
-        tagsBackground = scheme.inverseSurface,
-        tagsForeground = scheme.onInverseSurface;
+        tagsBackground = scheme.surfaceContainerHigh,
+        tagsForeground = scheme.onSurface;
 
   final Color comicsBackground;
   final Color comicsForeground;

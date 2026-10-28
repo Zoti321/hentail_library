@@ -4,13 +4,13 @@ import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
 
-/// 打开漫画元数据编辑：compact 全页路由，较宽视口 Modal Dialog。
+/// 打开漫画元数据编辑：compact / medium 全屏路由，expanded+ Modal Dialog。
 Future<Md3eComicMetadataEditDraft?> showMd3eComicMetadataEdit({
   required BuildContext context,
   Md3eComicMetadataEditDraft? initialDraft,
 }) {
-  final bool compact = md3eWindowSizeClassOf(context).isCompact;
-  if (compact) {
+  final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+  if (sizeClass.usesMetadataEditFullScreenRoute) {
     return Navigator.of(context).push<Md3eComicMetadataEditDraft>(
       MaterialPageRoute<Md3eComicMetadataEditDraft>(
         builder: (BuildContext context) => Md3eComicMetadataEditPage(
@@ -40,8 +40,8 @@ Future<Md3eSeriesMetadataEditDraft?> showMd3eSeriesMetadataEdit({
   required BuildContext context,
   Md3eSeriesMetadataEditDraft? initialDraft,
 }) {
-  final bool compact = md3eWindowSizeClassOf(context).isCompact;
-  if (compact) {
+  final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+  if (sizeClass.usesMetadataEditFullScreenRoute) {
     return Navigator.of(context).push<Md3eSeriesMetadataEditDraft>(
       MaterialPageRoute<Md3eSeriesMetadataEditDraft>(
         builder: (BuildContext context) => Md3eSeriesMetadataEditPage(

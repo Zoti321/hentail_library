@@ -59,6 +59,11 @@ enum Md3eWindowSizeClass {
   bool get isCompact => this == Md3eWindowSizeClass.compact;
 
   bool get isAtLeastExpanded => index >= Md3eWindowSizeClass.expanded.index;
+
+  /// compact / medium：元数据与库表单走全屏壳；expanded+ 走 Modal Dialog。
+  bool get usesMetadataEditFullScreenRoute =>
+      this == Md3eWindowSizeClass.compact ||
+      this == Md3eWindowSizeClass.medium;
 }
 
 /// Resolves the current window size class from [MediaQuery] width.

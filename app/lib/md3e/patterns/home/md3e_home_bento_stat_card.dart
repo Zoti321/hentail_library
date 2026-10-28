@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/layout/md3e_home_page_metrics.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 import 'package:material_3_expressive/components/lists/components/m3e_card_radius_motion.dart';
@@ -17,6 +19,7 @@ class Md3eHomeBentoStatCard extends StatefulWidget {
     required this.borderRadius,
     this.minHeight = 96,
     this.emphasis = Md3eHomeBentoStatEmphasis.standard,
+    this.contentPadding,
   });
 
   final String label;
@@ -28,6 +31,7 @@ class Md3eHomeBentoStatCard extends StatefulWidget {
   final BorderRadius borderRadius;
   final double minHeight;
   final Md3eHomeBentoStatEmphasis emphasis;
+  final EdgeInsets? contentPadding;
 
   @override
   State<Md3eHomeBentoStatCard> createState() => _Md3eHomeBentoStatCardState();
@@ -53,11 +57,17 @@ class _Md3eHomeBentoStatCardState extends State<Md3eHomeBentoStatCard> {
       Md3eHomeBentoStatEmphasis.compact => 24,
     };
     final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      MediaQuery.sizeOf(context).width,
+    );
+    final EdgeInsets padding =
+        widget.contentPadding ??
+        Md3eHomePageMetrics.statCardContentPadding(sizeClass);
 
     final Widget content = ConstrainedBox(
       constraints: BoxConstraints(minHeight: widget.minHeight),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        padding: padding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

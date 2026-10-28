@@ -26,12 +26,7 @@ class _Md3eLabAppPrototype extends StatelessWidget {
   ) {
     switch (navigation.destinationIndex) {
       case Md3eShellNavigation.homeDestinationIndex:
-        return Md3eHomePageLabHost(
-          onAddLocalLibrary: _noop,
-          onAddRemoteLibrary: _noop,
-          onLibraryOpen: _noopId,
-          onLibraryAction: _noopAction,
-        );
+        return const Md3eHomePageLabHost();
       case Md3eShellNavigation.libraryDestinationIndex:
         return _Md3eLibraryBrowsePagePreview(
           libraryDisplayName: navigation.selectedLibraryDisplayName,
@@ -43,16 +38,7 @@ class _Md3eLabAppPrototype extends StatelessWidget {
       case Md3eShellNavigation.settingsDestinationIndex:
         return const Md3eSettingsPage();
       default:
-        return Md3eHomePageLabHost();
+        return const Md3eHomePageLabHost();
     }
   }
-
-  static void _noop() {}
-
-  static void _noopId(String _) {}
-
-  static void _noopAction(
-    String libraryId,
-    Md3eHomeLibraryManagementAction action,
-  ) {}
 }

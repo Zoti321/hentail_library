@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_spacing.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
@@ -25,16 +26,35 @@ abstract final class Md3eHomePageMetrics {
 
   static double statCardGap(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => Md3eSpacing.space8,
-      _ => Md3eSpacing.space12,
+      Md3eWindowSizeClass.compact => Md3eSpacing.space12,
+      _ => Md3eSpacing.space16,
+    };
+  }
+
+  /// Bento 卡片内容与圆角边缘的内边距（大圆角标签卡用 [statTagCardPadding]）。
+  static EdgeInsets statCardContentPadding(
+    Md3eWindowSizeClass sizeClass, {
+    bool tagPill = false,
+  }) {
+    if (tagPill) {
+      return switch (sizeClass) {
+        Md3eWindowSizeClass.compact =>
+          const EdgeInsets.fromLTRB(24, 16, 20, 16),
+        _ => const EdgeInsets.fromLTRB(32, 18, 28, 18),
+      };
+    }
+    return switch (sizeClass) {
+      Md3eWindowSizeClass.compact =>
+        const EdgeInsets.fromLTRB(20, 16, 20, 16),
+      _ => const EdgeInsets.fromLTRB(22, 18, 22, 18),
     };
   }
 
   /// 标签行与上方 bento 行的额外间距（整行宽卡片需要更多留白）。
   static double statTagsRowTopGap(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => Md3eSpacing.space16,
-      _ => Md3eSpacing.space24,
+      Md3eWindowSizeClass.compact => Md3eSpacing.space24,
+      _ => Md3eSpacing.space32,
     };
   }
 
