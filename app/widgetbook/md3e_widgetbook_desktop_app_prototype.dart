@@ -26,7 +26,12 @@ class _Md3eLabAppPrototype extends StatelessWidget {
   ) {
     switch (navigation.destinationIndex) {
       case Md3eShellNavigation.homeDestinationIndex:
-        return const _Md3eLabHomePanePlaceholder();
+        return Md3eHomePage(
+          onAddLocalLibrary: _noop,
+          onAddRemoteLibrary: _noop,
+          onLibraryOpen: _noopId,
+          onLibraryAction: _noopAction,
+        );
       case Md3eShellNavigation.libraryDestinationIndex:
         return _Md3eLibraryBrowsePagePreview(
           libraryDisplayName: navigation.selectedLibraryDisplayName,
@@ -38,55 +43,16 @@ class _Md3eLabAppPrototype extends StatelessWidget {
       case Md3eShellNavigation.settingsDestinationIndex:
         return const Md3eSettingsPage();
       default:
-        return const _Md3eLabHomePanePlaceholder();
+        return Md3eHomePage();
     }
   }
-}
 
-/// Lab 首页占位（生产首页尚未迁入 md3e）。
-class _Md3eLabHomePanePlaceholder extends StatelessWidget {
-  const _Md3eLabHomePanePlaceholder();
+  static void _noop() {}
 
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3ESpacing spacing = theme.spacing;
+  static void _noopId(String _) {}
 
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(spacing.xl),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(
-                Icons.home_outlined,
-                size: 48,
-                color: theme.colorScheme.primary,
-              ),
-              SizedBox(height: spacing.lg),
-              Text(
-                l10n.navHome,
-                style: theme.typeScale.headlineSmall.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: spacing.sm),
-              Text(
-                'Widgetbook：Viewport ≥840dp 为桌面（rail + hover 选库）；'
-                '<840dp 为移动/平板（圆形 ☰ + modal expanded rail，256dp 库列）。',
-                style: theme.typeScale.bodyMedium.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  static void _noopAction(
+    String libraryId,
+    Md3eHomeLibraryManagementAction action,
+  ) {}
 }
