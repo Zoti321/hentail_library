@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 首页「管库」：汇总 + 可操作的库列表（Lab；数据由调用方注入）。
+/// 首页「我的漫画库」：汇总 + 可操作的库列表（Lab；数据由调用方注入）。
 class Md3eHomeLibraryManagementSection extends StatelessWidget {
   const Md3eHomeLibraryManagementSection({
     super.key,
@@ -130,7 +130,7 @@ class _AddLibraryMenuButton extends StatelessWidget {
       ],
       anchorBuilder: (BuildContext context, VoidCallback open) {
         return M3EButton(
-          style: M3EButtonStyle.outlined,
+          style: M3EButtonStyle.tonal,
           label: Text(l10n.sidebarAddLibraryTooltip),
           onPressed: enabled ? open : null,
         );

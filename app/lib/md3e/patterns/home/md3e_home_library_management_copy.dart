@@ -1,6 +1,6 @@
-/// Lab 首页「管库」区块文案（尚未进 ARB；接生产时再迁 l10n）。
+/// Lab 首页漫画库概览区块文案（尚未进 ARB；接生产时再迁 l10n）。
 abstract final class Md3eHomeLibraryManagementCopy {
-  static const String sectionTitle = '管库';
+  static const String sectionTitle = '我的漫画库';
 
   static String libraryCountSubtitle(int count) => '共 $count 个库';
 

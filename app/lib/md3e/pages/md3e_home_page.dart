@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_home_page_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_section.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_page_header.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_page_preview_data.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Lab 首页（Widgetbook / 壳内 pane）：问候 + 「管库」区块；其余 section 后续补。
+/// Lab 首页（Widgetbook / 壳内 pane）：问候 + 漫画库概览；其余 section 后续补。
 class Md3eHomePage extends StatelessWidget {
   Md3eHomePage({
     super.key,
@@ -79,7 +80,7 @@ class Md3eHomePage extends StatelessWidget {
     );
 
     return ColoredBox(
-      color: scheme.surface,
+      color: md3eLabBrowseCanvasColor(scheme),
       child: SingleChildScrollView(
         child: body,
       ),
