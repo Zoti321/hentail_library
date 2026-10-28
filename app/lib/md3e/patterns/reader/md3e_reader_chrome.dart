@@ -18,6 +18,7 @@ class Md3eReaderChrome extends StatelessWidget {
     this.onBack,
     this.onOpenSettings,
     this.onToggleFullscreen,
+    this.onOpenSeriesCatalog,
     this.onPageChanged,
     this.onPreviousPage,
     this.onNextPage,
@@ -35,6 +36,7 @@ class Md3eReaderChrome extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onOpenSettings;
   final VoidCallback? onToggleFullscreen;
+  final VoidCallback? onOpenSeriesCatalog;
   final ValueChanged<int>? onPageChanged;
   final VoidCallback? onPreviousPage;
   final VoidCallback? onNextPage;
@@ -51,6 +53,7 @@ class Md3eReaderChrome extends StatelessWidget {
         onBack: onBack,
         onOpenSettings: onOpenSettings,
         onToggleFullscreen: onToggleFullscreen,
+        onOpenSeriesCatalog: onOpenSeriesCatalog,
         isFullscreen: isFullscreen,
         moreMenuEntries: moreMenuEntries,
       ),

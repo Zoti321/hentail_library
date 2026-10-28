@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_reader_chrome_metrics.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome_band.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome_scope.dart';
@@ -16,6 +17,7 @@ class Md3eReaderTopBar extends StatelessWidget {
     this.onBack,
     this.onOpenSettings,
     this.onToggleFullscreen,
+    this.onOpenSeriesCatalog,
     this.isFullscreen = false,
     this.moreMenuEntries = const <M3EMenuNode>[],
   });
@@ -25,6 +27,7 @@ class Md3eReaderTopBar extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onOpenSettings;
   final VoidCallback? onToggleFullscreen;
+  final VoidCallback? onOpenSeriesCatalog;
   final bool isFullscreen;
   final List<M3EMenuNode> moreMenuEntries;
 
@@ -32,11 +35,74 @@ class Md3eReaderTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
+    final bool compactChrome =
+        Md3eWindowSizeClass.fromWidth(viewportWidth).isCompact;
     final EdgeInsets horizontalInsets = EdgeInsets.symmetric(
       horizontal: Md3eReaderChromeMetrics.chromeContentHorizontalPadding(
         viewportWidth,
       ),
     );
+
+    final List<M3EMenuNode> menuEntries = <M3EMenuNode>[
+      if (compactChrome && onOpenSeriesCatalog != null)
+        M3EMenuEntry(
+          label: l10n.readerSeriesCatalog,
+          onPressed: onOpenSeriesCatalog,
+        ),
+      ...moreMenuEntries,
+    ];
+
+    final List<Widget> actions = <Widget>[
+      if (!compactChrome && onToggleFullscreen != null)
+        _iconButton(
+          context: context,
+          icon: isFullscreen ? Symbols.fullscreen_exit : Symbols.fullscreen,
+          tooltip: isFullscreen
+              ? l10n.readerExitFullscreen
+              : l10n.readerEnterFullscreen,
+          semanticLabel: isFullscreen
+              ? l10n.readerExitFullscreenSemantic
+              : l10n.readerEnterFullscreenSemantic,
+          onPressed: onToggleFullscreen,
+        ),
+      if (!compactChrome && onOpenSeriesCatalog != null)
+        _iconButton(
+          context: context,
+          icon: Symbols.list,
+          tooltip: l10n.readerSeriesCatalog,
+          semanticLabel: l10n.readerSeriesCatalog,
+          onPressed: onOpenSeriesCatalog,
+        ),
+      _iconButton(
+        context: context,
+        icon: Symbols.settings,
+        tooltip: l10n.readerSettingsTitle,
+        semanticLabel: l10n.readerSettingsTitle,
+        onPressed: onOpenSettings,
+      ),
+      if (menuEntries.isEmpty)
+        _iconButton(
+          context: context,
+          icon: Symbols.more_vert,
+          tooltip: l10n.metadataMoreActions,
+          semanticLabel: l10n.metadataMoreActions,
+          onPressed: null,
+        )
+      else
+        Md3eAnchoredMenu(
+          position: M3EMenuAnchorPosition.bottomEnd,
+          children: menuEntries,
+          anchorBuilder: (BuildContext context, VoidCallback open) {
+            return _iconButton(
+              context: context,
+              icon: Symbols.more_vert,
+              tooltip: l10n.metadataMoreActions,
+              semanticLabel: l10n.metadataMoreActions,
+              onPressed: open,
+            );
+          },
+        ),
+    ];
 
     return Md3eReaderChromeBand(
       edge: Md3eReaderChromeBandEdge.top,
@@ -57,48 +123,7 @@ class Md3eReaderTopBar extends StatelessWidget {
           semanticLabel: l10n.readerBackSemantic,
           onPressed: onBack,
         ),
-        actions: <Widget>[
-          _iconButton(
-            context: context,
-            icon: Symbols.settings,
-            tooltip: l10n.readerSettingsTitle,
-            semanticLabel: l10n.readerSettingsTitle,
-            onPressed: onOpenSettings,
-          ),
-          _iconButton(
-            context: context,
-            icon: isFullscreen ? Symbols.fullscreen_exit : Symbols.fullscreen,
-            tooltip: isFullscreen
-                ? l10n.readerExitFullscreen
-                : l10n.readerEnterFullscreen,
-            semanticLabel: isFullscreen
-                ? l10n.readerExitFullscreenSemantic
-                : l10n.readerEnterFullscreenSemantic,
-            onPressed: onToggleFullscreen,
-          ),
-          if (moreMenuEntries.isEmpty)
-            _iconButton(
-              context: context,
-              icon: Symbols.more_vert,
-              tooltip: l10n.metadataMoreActions,
-              semanticLabel: l10n.metadataMoreActions,
-              onPressed: null,
-            )
-          else
-            Md3eAnchoredMenu(
-              position: M3EMenuAnchorPosition.bottomEnd,
-              children: moreMenuEntries,
-              anchorBuilder: (BuildContext context, VoidCallback open) {
-                return _iconButton(
-                  context: context,
-                  icon: Symbols.more_vert,
-                  tooltip: l10n.metadataMoreActions,
-                  semanticLabel: l10n.metadataMoreActions,
-                  onPressed: open,
-                );
-              },
-            ),
-        ],
+        actions: actions,
       ),
     );
   }

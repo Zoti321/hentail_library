@@ -21,6 +21,7 @@ class Md3eReaderPage extends StatefulWidget {
     this.onBack,
     this.onOpenSettings,
     this.onToggleFullscreen,
+    this.onOpenSeriesCatalog,
     this.onPageChanged,
     this.onPreviousPage,
     this.onNextPage,
@@ -40,6 +41,7 @@ class Md3eReaderPage extends StatefulWidget {
   final VoidCallback? onBack;
   final VoidCallback? onOpenSettings;
   final VoidCallback? onToggleFullscreen;
+  final VoidCallback? onOpenSeriesCatalog;
   final ValueChanged<int>? onPageChanged;
   final VoidCallback? onPreviousPage;
   final VoidCallback? onNextPage;
@@ -94,6 +96,7 @@ class _Md3eReaderPageState extends State<Md3eReaderPage> {
               onBack: widget.onBack,
               onOpenSettings: widget.onOpenSettings,
               onToggleFullscreen: widget.onToggleFullscreen,
+              onOpenSeriesCatalog: widget.onOpenSeriesCatalog,
               onPageChanged: widget.onPageChanged,
               onPreviousPage: widget.onPreviousPage,
               onNextPage: widget.onNextPage,

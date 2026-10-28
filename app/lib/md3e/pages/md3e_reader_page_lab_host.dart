@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_catalog_sheet.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_settings_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -16,10 +17,14 @@ class Md3eReaderPageLabHost extends StatefulWidget {
       initialPage: 3,
     ),
     this.onBack,
+    this.useRootNavigator = false,
   });
 
   final Md3eReaderPagePreviewData preview;
   final VoidCallback? onBack;
+
+  /// Widgetbook 预览区宜为 `false`，避免 sheet 挂到整窗 overlay。
+  final bool useRootNavigator;
 
   @override
   State<Md3eReaderPageLabHost> createState() => _Md3eReaderPageLabHostState();
@@ -27,6 +32,8 @@ class Md3eReaderPageLabHost extends StatefulWidget {
 
 class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
   late int _page = widget.preview.initialPage;
+  late String _volumeId = widget.preview.currentVolumeId;
+  late String _volumeTitle = widget.preview.title;
   bool _chromeVisible = true;
   bool _fullscreen = false;
   late Md3eReaderSettingsLabState _settings = Md3eReaderSettingsLabState(
@@ -63,6 +70,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
     await Md3eReaderSettingsSideSheet.show(
       context,
       state: _settings,
+      useRootNavigator: widget.useRootNavigator,
       onStateChanged: (Md3eReaderSettingsLabState next) {
         setState(() {
           _settings = next;
@@ -71,10 +79,36 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
     );
   }
 
+  Future<void> _openSeriesCatalog() async {
+    if (widget.preview.seriesVolumes.isEmpty) {
+      return;
+    }
+    await Md3eReaderSeriesCatalogSheet.show(
+      context,
+      volumes: widget.preview.seriesVolumes,
+      currentVolumeId: _volumeId,
+      useRootNavigator: widget.useRootNavigator,
+      onVolumeSelected: (String id) {
+        for (final Md3eReaderSeriesVolumePreview volume
+            in widget.preview.seriesVolumes) {
+          if (volume.id != id) {
+            continue;
+          }
+          setState(() {
+            _volumeId = volume.id;
+            _volumeTitle = volume.title;
+            _page = 1;
+          });
+          return;
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Md3eReaderPage(
-      title: widget.preview.title,
+      title: _volumeTitle,
       subtitle: widget.preview.subtitle,
       currentPage: _page,
       totalPages: _total,
@@ -85,6 +119,9 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
       onToggleChromeFromKeyboard: _toggleChromeFromKeyboard,
       onBack: widget.onBack,
       onOpenSettings: _openSettings,
+      onOpenSeriesCatalog: widget.preview.seriesVolumes.isEmpty
+          ? null
+          : _openSeriesCatalog,
       onToggleFullscreen: () => setState(() => _fullscreen = !_fullscreen),
       onPageChanged: _setPage,
       onPreviousPage: () => _setPage(_page - 1),
