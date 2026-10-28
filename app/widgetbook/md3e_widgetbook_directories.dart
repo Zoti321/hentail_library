@@ -9,7 +9,7 @@ import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/pages/md3e_home_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
-import 'package:hentai_library/md3e/pages/md3e_history_browse_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_history_browse_page_lab_host.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
@@ -309,7 +309,9 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: _Md3eHistoryBrowsePagePreview(),
+                    child: const Md3eHistoryBrowsePageLabHost(
+                      clock: DateTime(2026, 6, 15, 14),
+                    ),
                   ),
                 ),
               ],
@@ -670,38 +672,6 @@ Widget _md3ePaginationKnobsPreview(BuildContext context) {
     pageSize: 10,
     onPageChanged: (_) {},
   );
-}
-
-class _Md3eHistoryBrowsePagePreview extends StatefulWidget {
-  const _Md3eHistoryBrowsePagePreview();
-
-  @override
-  State<_Md3eHistoryBrowsePagePreview> createState() =>
-      _Md3eHistoryBrowsePagePreviewState();
-}
-
-class _Md3eHistoryBrowsePagePreviewState
-    extends State<_Md3eHistoryBrowsePagePreview> {
-  late List<Md3eHistoryBrowseEntry> _entries =
-      Md3eHistoryBrowsePagePreviewData.sampleEntries();
-
-  @override
-  Widget build(BuildContext context) {
-    return Md3eHistoryBrowsePage(
-      entries: _entries,
-      onClearAll: () => setState(() => _entries = <Md3eHistoryBrowseEntry>[]),
-      itemBuilder: (BuildContext context, Md3eHistoryBrowseEntry entry) {
-        final int index = _entries.indexOf(entry);
-        final String title = Md3eHistoryBrowsePagePreviewData.sampleTitles[
-            index % Md3eHistoryBrowsePagePreviewData.sampleTitles.length];
-        return _Md3eReadingHistoryListItemPreview(
-          title: title,
-          cover: _demoCover(context),
-          lastReadTime: entry.lastReadTime,
-        );
-      },
-    );
-  }
 }
 
 class _Md3eManagementBrowsePagePreview extends StatefulWidget {
