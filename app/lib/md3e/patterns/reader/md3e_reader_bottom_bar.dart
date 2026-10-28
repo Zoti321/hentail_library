@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_reader_chrome_metrics.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome_band.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome_scope.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_progress.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Lab 阅读器底栏：scrim 上的进度 · 翻页 · 自动播放。
+/// Lab 阅读器底栏：tonal 面板上的进度 · 翻页 · 自动播放。
 class Md3eReaderBottomBar extends StatelessWidget {
   const Md3eReaderBottomBar({
     super.key,
@@ -66,17 +65,24 @@ class Md3eReaderBottomBar extends StatelessWidget {
                   semanticLabel: l10n.readerPrevPage,
                   onPressed: canPrev ? onPreviousPage : null,
                 ),
-                const Spacer(),
-                if (onAutoPlayChanged != null)
-                  _iconButton(
-                    context: context,
-                    icon: autoPlayEnabled ? Symbols.pause : Symbols.play_arrow,
-                    tooltip: l10n.readerSettingsAutoPlay,
-                    semanticLabel: l10n.readerSettingsAutoPlay,
-                    onPressed: () => onAutoPlayChanged!(!autoPlayEnabled),
-                    filled: autoPlayEnabled,
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: onAutoPlayChanged != null
+                        ? _iconButton(
+                            context: context,
+                            icon: autoPlayEnabled
+                                ? Symbols.pause
+                                : Symbols.play_arrow,
+                            tooltip: l10n.readerSettingsAutoPlay,
+                            semanticLabel: l10n.readerSettingsAutoPlay,
+                            onPressed: () =>
+                                onAutoPlayChanged!(!autoPlayEnabled),
+                            filled: autoPlayEnabled,
+                          )
+                        : const SizedBox.shrink(),
                   ),
-                const Spacer(),
+                ),
                 _iconButton(
                   context: context,
                   icon: Symbols.chevron_right,
@@ -100,13 +106,8 @@ class Md3eReaderBottomBar extends StatelessWidget {
     VoidCallback? onPressed,
     bool filled = false,
   }) {
-    final Color foreground = Md3eReaderChromeScope.of(context).onChrome;
     return M3EIconButton(
-      icon: Icon(
-        icon,
-        size: Md3eReaderChromeMetrics.actionIconSize,
-        color: foreground,
-      ),
+      icon: Icon(icon, size: Md3eReaderChromeMetrics.actionIconSize),
       variant: filled
           ? M3EIconButtonVariant.tonal
           : M3EIconButtonVariant.standard,

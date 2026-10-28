@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_reader_chrome_metrics.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome_band.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome_scope.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Lab 顶栏：[M3EAppBar.top] + scrim（主标题漫画名 · 副标题系列名）。
+/// Lab 顶栏：磨砂 tonal surface + [M3EAppBar.top]（漫画名/系列名双行）。
 class Md3eReaderTopBar extends StatelessWidget {
   const Md3eReaderTopBar({
     super.key,
@@ -30,90 +31,87 @@ class Md3eReaderTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final Color foreground = Md3eReaderImmersiveColors.onChrome(scheme);
+    final double viewportWidth = MediaQuery.sizeOf(context).width;
+    final EdgeInsets horizontalInsets = EdgeInsets.symmetric(
+      horizontal: Md3eReaderChromeMetrics.chromeContentHorizontalPadding(
+        viewportWidth,
+      ),
+    );
 
-    return M3EAppBar.top(
-      backgroundColor: scheme.scrim,
-      foregroundColor: foreground,
-      elevation: 0,
-      safeArea: true,
-      centerTitle: false,
-      title: _ReaderAppBarTitleBlock(
-        title: title,
-        subtitle: subtitle,
-      ),
-      leading: _iconButton(
-        context: context,
-        foreground: foreground,
-        icon: Symbols.arrow_back,
-        tooltip: l10n.shellBack,
-        semanticLabel: l10n.readerBackSemantic,
-        onPressed: onBack,
-      ),
-      actions: <Widget>[
-        _iconButton(
-          context: context,
-          foreground: foreground,
-          icon: Symbols.settings,
-          tooltip: l10n.readerSettingsTitle,
-          semanticLabel: l10n.readerSettingsTitle,
-          onPressed: onOpenSettings,
+    return Md3eReaderChromeBand(
+      edge: Md3eReaderChromeBandEdge.top,
+      padding: horizontalInsets,
+      child: M3EAppBar.top(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        safeArea: true,
+        centerTitle: false,
+        title: _ReaderAppBarTitleBlock(
+          title: title,
+          subtitle: subtitle,
         ),
-        _iconButton(
+        leading: _iconButton(
           context: context,
-          foreground: foreground,
-          icon: isFullscreen ? Symbols.fullscreen_exit : Symbols.fullscreen,
-          tooltip: isFullscreen
-              ? l10n.readerExitFullscreen
-              : l10n.readerEnterFullscreen,
-          semanticLabel: isFullscreen
-              ? l10n.readerExitFullscreenSemantic
-              : l10n.readerEnterFullscreenSemantic,
-          onPressed: onToggleFullscreen,
+          icon: Symbols.arrow_back,
+          tooltip: l10n.shellBack,
+          semanticLabel: l10n.readerBackSemantic,
+          onPressed: onBack,
         ),
-        if (moreMenuEntries.isEmpty)
+        actions: <Widget>[
           _iconButton(
             context: context,
-            foreground: foreground,
-            icon: Symbols.more_vert,
-            tooltip: l10n.metadataMoreActions,
-            semanticLabel: l10n.metadataMoreActions,
-            onPressed: null,
-          )
-        else
-          Md3eAnchoredMenu(
-            position: M3EMenuAnchorPosition.bottomEnd,
-            children: moreMenuEntries,
-            anchorBuilder: (BuildContext context, VoidCallback open) {
-              return _iconButton(
-                context: context,
-                foreground: foreground,
-                icon: Symbols.more_vert,
-                tooltip: l10n.metadataMoreActions,
-                semanticLabel: l10n.metadataMoreActions,
-                onPressed: open,
-              );
-            },
+            icon: Symbols.settings,
+            tooltip: l10n.readerSettingsTitle,
+            semanticLabel: l10n.readerSettingsTitle,
+            onPressed: onOpenSettings,
           ),
-      ],
+          _iconButton(
+            context: context,
+            icon: isFullscreen ? Symbols.fullscreen_exit : Symbols.fullscreen,
+            tooltip: isFullscreen
+                ? l10n.readerExitFullscreen
+                : l10n.readerEnterFullscreen,
+            semanticLabel: isFullscreen
+                ? l10n.readerExitFullscreenSemantic
+                : l10n.readerEnterFullscreenSemantic,
+            onPressed: onToggleFullscreen,
+          ),
+          if (moreMenuEntries.isEmpty)
+            _iconButton(
+              context: context,
+              icon: Symbols.more_vert,
+              tooltip: l10n.metadataMoreActions,
+              semanticLabel: l10n.metadataMoreActions,
+              onPressed: null,
+            )
+          else
+            Md3eAnchoredMenu(
+              position: M3EMenuAnchorPosition.bottomEnd,
+              children: moreMenuEntries,
+              anchorBuilder: (BuildContext context, VoidCallback open) {
+                return _iconButton(
+                  context: context,
+                  icon: Symbols.more_vert,
+                  tooltip: l10n.metadataMoreActions,
+                  semanticLabel: l10n.metadataMoreActions,
+                  onPressed: open,
+                );
+              },
+            ),
+        ],
+      ),
     );
   }
 
   static Widget _iconButton({
     required BuildContext context,
-    required Color foreground,
     required IconData icon,
     required String tooltip,
     required String semanticLabel,
     VoidCallback? onPressed,
   }) {
     return M3EIconButton(
-      icon: Icon(
-        icon,
-        size: Md3eReaderChromeMetrics.actionIconSize,
-        color: foreground,
-      ),
+      icon: Icon(icon, size: Md3eReaderChromeMetrics.actionIconSize),
       variant: M3EIconButtonVariant.standard,
       size: M3EIconButtonSize.sm,
       tooltip: tooltip,
@@ -123,7 +121,6 @@ class Md3eReaderTopBar extends StatelessWidget {
   }
 }
 
-/// 顶栏标题区：漫画名 [titleSmall] · 系列名 [labelMedium]（Lab 自定排版，非 AppBar 内置副标题样式）。
 class _ReaderAppBarTitleBlock extends StatelessWidget {
   const _ReaderAppBarTitleBlock({
     required this.title,

@@ -34,11 +34,11 @@ abstract final class Md3eReaderChromeMetrics {
   static double bottomScrimHeight(MediaQueryData media) =>
       media.padding.bottom + _scrimExtendBottom;
 
-  /// 宽屏下控件行最大宽度；紧凑屏铺满。
+  /// 超大屏（≥1600）时顶/底控件行的最大宽度；其余宽度铺满。
   static double chromeContentMaxWidth(double viewportWidth) {
     final Md3eWindowSizeClass sizeClass =
         Md3eWindowSizeClass.fromWidth(viewportWidth);
-    if (sizeClass.isCompact) {
+    if (sizeClass != Md3eWindowSizeClass.extraLarge) {
       return viewportWidth;
     }
     return (viewportWidth * 0.82).clamp(560.0, 1120.0);

@@ -1,5 +1,7 @@
-/// Lab 阅读器水平点击分区（与生产 [resolveReaderTapZone] 比例一致，不依赖 read_session）。
+/// Lab 阅读器水平点击分区（MD3 沉浸：左右约 20% 翻页，中间约 60% 呼出 chrome）。
 enum Md3eReaderTapZone { left, center, right }
+
+const double _kReaderEdgeTapFraction = 0.2;
 
 Md3eReaderTapZone md3eResolveReaderTapZone({
   required double localX,
@@ -8,10 +10,10 @@ Md3eReaderTapZone md3eResolveReaderTapZone({
   if (width <= 0) {
     return Md3eReaderTapZone.center;
   }
-  if (localX < width * 0.3) {
+  if (localX < width * _kReaderEdgeTapFraction) {
     return Md3eReaderTapZone.left;
   }
-  if (localX > width * 0.7) {
+  if (localX > width * (1 - _kReaderEdgeTapFraction)) {
     return Md3eReaderTapZone.right;
   }
   return Md3eReaderTapZone.center;
