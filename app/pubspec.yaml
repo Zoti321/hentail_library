@@ -79,6 +79,7 @@ dependencies:
   shared_preferences: ^2.5.3
   super_clipboard: 0.9.1
   material_3_expressive: ^1.2.0
+  material_ui: ^1.8.0
 dev_dependencies:
   # --- Flutter SDK 测试 ---
   flutter_test:

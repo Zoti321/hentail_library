@@ -5,7 +5,6 @@ import 'package:hentai_library/md3e/patterns/history/md3e_history_empty_body.dar
 import 'package:hentai_library/md3e/patterns/history/md3e_history_record_summary.dart';
 import 'package:hentai_library/md3e/patterns/history/md3e_history_time_grouping.dart';
 import 'package:hentai_library/md3e/patterns/history/md3e_reading_history_grouped_list.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 阅读历史页滚动区正文：摘要 + 分组列表或空状态。
 class Md3eHistoryBrowseContent<T> extends StatelessWidget {

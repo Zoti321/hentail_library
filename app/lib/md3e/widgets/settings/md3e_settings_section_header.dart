@@ -38,7 +38,7 @@ class Md3eSettingsSectionHeader extends StatelessWidget {
                 ),
               ),
             ),
-            if (trailing != null) trailing!,
+            ?trailing,
           ],
         ),
         if (description != null) ...<Widget>[

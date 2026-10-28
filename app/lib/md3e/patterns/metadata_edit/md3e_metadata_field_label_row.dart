@@ -23,7 +23,7 @@ class Md3eMetadataFieldLabelRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(child: Text(label, style: style)),
-        if (trailing != null) trailing!,
+        ?trailing,
       ],
     );
   }

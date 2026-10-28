@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid.dart';
-import 'package:hentai_library/md3e/layout/md3e_catalog_grid_metrics.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 
 import '../../support/pump_md3e_app.dart';

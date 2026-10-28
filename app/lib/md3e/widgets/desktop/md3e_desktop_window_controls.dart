@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar_metrics.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_window_manager_bindings.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_ui/material_ui.dart'
-    show WidgetState, WidgetStateProperty;
 
 /// Windows-style minimize / maximize / close cluster (MASTER `WindowButton` set).
 class Md3eDesktopWindowControls extends StatelessWidget {

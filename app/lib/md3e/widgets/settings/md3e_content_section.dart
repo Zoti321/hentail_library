@@ -12,6 +12,8 @@ class Md3eContentSection extends StatelessWidget {
     this.description,
     this.padding = const EdgeInsets.all(16),
     this.titleTrailing,
+    // Single-field ctor: public `child` maps to private storage (API stays `child:`).
+    // ignore: prefer_initializing_formals
   })  : _child = child,
         _children = null;
 
@@ -21,6 +23,7 @@ class Md3eContentSection extends StatelessWidget {
     required List<Widget> children,
     this.description,
     this.titleTrailing,
+    // ignore: prefer_initializing_formals
   })  : _children = children,
         _child = null,
         padding = EdgeInsets.zero;
