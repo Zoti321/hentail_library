@@ -12,23 +12,16 @@ import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
-import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_metadata_edit_page.dart';
-import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_form.dart';
-import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_preview_data.dart';
-import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_form.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_navigation.dart';
-import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_form.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_managed_named_facet_ui.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
@@ -249,75 +242,6 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   name: 'Tag section',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
                     child: Md3eComicDetailMetadataTagsSection(),
-                  ),
-                ),
-              ],
-            ),
-            WidgetbookComponent(
-              name: 'Md3eComicMetadataEditForm',
-              useCases: <WidgetbookUseCase>[
-                WidgetbookUseCase(
-                  name: 'From preview data',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: _Md3eComicMetadataEditFormPreview(),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            WidgetbookComponent(
-              name: 'Md3eSeriesMetadataEditForm',
-              useCases: <WidgetbookUseCase>[
-                WidgetbookUseCase(
-                  name: 'From preview data',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: EdgeInsets.all(24),
-                        child: _Md3eSeriesMetadataEditFormPreview(),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            WidgetbookComponent(
-              name: 'Md3eLibraryEditForm',
-              useCases: <WidgetbookUseCase>[
-                WidgetbookUseCase(
-                  name: 'Edit local · preview data',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: _Md3eLibraryEditFormPreview(
-                          initial: Md3eLibraryEditPreviewData.editLocalForm(),
-                          isCreate: false,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Edit remote · preview data',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: _Md3eLibraryEditFormPreview(
-                          initial: Md3eLibraryEditPreviewData.editRemoteForm(),
-                          isCreate: false,
-                        ),
-                      ),
-                    ),
                   ),
                 ),
               ],
@@ -961,132 +885,6 @@ class _Md3eLibraryFilterSortSideSheetPreviewState
               ),
             ),
           );
-        },
-      ),
-    );
-  }
-}
-
-class _Md3eComicMetadataEditFormPreview extends StatefulWidget {
-  @override
-  State<_Md3eComicMetadataEditFormPreview> createState() =>
-      _Md3eComicMetadataEditFormPreviewState();
-}
-
-class _Md3eComicMetadataEditFormPreviewState
-    extends State<_Md3eComicMetadataEditFormPreview> {
-  late Md3eComicMetadataEditDraft _draft =
-      Md3eComicMetadataEditDraft.fromEntry(Md3eComicDetailPagePreviewData.sample());
-  ComicMetaLocks _locks = ComicMetaLocks.unlocked;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 640),
-      child: Md3eComicMetadataEditForm(
-        draft: _draft,
-        locks: _locks,
-        onLockChanged:
-            ({
-              bool? title,
-              bool? description,
-              bool? publishedAt,
-              bool? contentRating,
-              bool? authors,
-              bool? tags,
-              bool? languages,
-              bool? parodies,
-              bool? characters,
-            }) {
-              setState(
-                () => _locks = _locks.copyWith(
-                  title: title,
-                  description: description,
-                  publishedAt: publishedAt,
-                  contentRating: contentRating,
-                  authors: authors,
-                  tags: tags,
-                  languages: languages,
-                  parodies: parodies,
-                  characters: characters,
-                ),
-              );
-            },
-        onDraftChanged: (Md3eComicMetadataEditDraft value) {
-          setState(() => _draft = value);
-        },
-      ),
-    );
-  }
-}
-
-class _Md3eSeriesMetadataEditFormPreview extends StatefulWidget {
-  const _Md3eSeriesMetadataEditFormPreview();
-
-  @override
-  State<_Md3eSeriesMetadataEditFormPreview> createState() =>
-      _Md3eSeriesMetadataEditFormPreviewState();
-}
-
-class _Md3eSeriesMetadataEditFormPreviewState
-    extends State<_Md3eSeriesMetadataEditFormPreview> {
-  late Md3eSeriesMetadataEditDraft _draft =
-      Md3eSeriesMetadataEditDraft.fromEntry(
-        Md3eSeriesDetailPagePreviewData.sample(),
-      );
-  SeriesMetaLocks _locks = SeriesMetaLocks.unlocked;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 480),
-      child: Md3eSeriesMetadataEditForm(
-        draft: _draft,
-        locks: _locks,
-        onLockChanged:
-            ({bool? name, bool? serializationStatus, bool? totalCount}) {
-              setState(
-                () => _locks = _locks.copyWith(
-                  name: name,
-                  serializationStatus: serializationStatus,
-                  totalCount: totalCount,
-                ),
-              );
-            },
-        onDraftChanged: (Md3eSeriesMetadataEditDraft value) {
-          setState(() => _draft = value);
-        },
-      ),
-    );
-  }
-}
-
-class _Md3eLibraryEditFormPreview extends StatefulWidget {
-  const _Md3eLibraryEditFormPreview({
-    required this.initial,
-    required this.isCreate,
-  });
-
-  final LibraryForm initial;
-  final bool isCreate;
-
-  @override
-  State<_Md3eLibraryEditFormPreview> createState() =>
-      _Md3eLibraryEditFormPreviewState();
-}
-
-class _Md3eLibraryEditFormPreviewState extends State<_Md3eLibraryEditFormPreview> {
-  late LibraryForm _form = widget.initial;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 640, maxHeight: 520),
-      child: Md3eLibraryEditForm(
-        form: _form,
-        isCreate: widget.isCreate,
-        onFormChanged: (LibraryForm value) {
-          setState(() => _form = value);
         },
       ),
     );
