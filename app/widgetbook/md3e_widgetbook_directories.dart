@@ -308,8 +308,8 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: const Md3eHistoryBrowsePageLabHost(
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Md3eHistoryBrowsePageLabHost(
                       clock: DateTime(2026, 6, 15, 14),
                     ),
                   ),
