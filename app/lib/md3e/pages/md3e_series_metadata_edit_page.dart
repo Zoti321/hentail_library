@@ -60,6 +60,8 @@ class _Md3eSeriesMetadataEditPageState extends State<Md3eSeriesMetadataEditPage>
     }
   }
 
+  Future<void> saveAndPop() => _handleSave();
+
   Future<void> _handleSave() async {
     final String? nameError = _draft.validateName();
     final String? totalError = _draft.validateTotalCount();

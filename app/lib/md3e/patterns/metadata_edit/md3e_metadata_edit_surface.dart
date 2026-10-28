@@ -5,16 +5,19 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_metadata_edit_form_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_actions.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
-/// Lab 元数据编辑壳：compact / medium 全屏；expanded+ 居中卡片（须包在 [Dialog] / [showDialog] 内）。
+/// Lab 元数据编辑壳：compact / medium 用 M3E 全屏 dialog；expanded+ 用 M3EDialog basic。
 enum Md3eMetadataEditPresentation {
-  /// 随窗口宽度在全屏与卡片间切换（Widgetbook、路由页）。
+  /// Widgetbook：宽屏居中卡片 / 窄屏全屏（由 [Md3eLabDialogPresenter] 打开时勿用）。
   embedded,
 
-  /// 始终使用 [Dialog] 卡片（较宽视口从详情打开编辑）。
+  /// [M3EDialog] basic 内容（由 presenter 包裹路由）。
   modal,
+
+  /// 仅表单 body（用于 [M3EDialog.showFullScreen] 的 body 槽）。
+  labFormBody,
 }
 
 class Md3eMetadataEditSurface extends StatelessWidget {
@@ -47,16 +50,23 @@ class Md3eMetadataEditSurface extends StatelessWidget {
     final bool useFullPage = presentation == Md3eMetadataEditPresentation.embedded &&
         sizeClass.usesMetadataEditFullScreenRoute;
 
+    if (presentation == Md3eMetadataEditPresentation.labFormBody) {
+      return body;
+    }
+
     if (presentation == Md3eMetadataEditPresentation.modal) {
-      return Dialog(
-        insetPadding: EdgeInsets.symmetric(
-          horizontal: Md3eMetadataEditFormMetrics.contentHorizontalPadding(sizeClass),
-          vertical: M3ETheme.of(context).spacing.lg,
+      return M3EDialog(
+        title: title,
+        content: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: maxWidth,
+            maxHeight: MediaQuery.sizeOf(context).height * 0.55,
+          ),
+          child: SingleChildScrollView(child: body),
         ),
-        child: _DialogCard(
-          maxWidth: maxWidth,
-          title: title,
-          body: body,
+        bottomDivider: true,
+        actions: md3eMetadataEditDialogActions(
+          context,
           onCancel: onCancel,
           onSave: onSave,
           saving: saving,
@@ -66,14 +76,19 @@ class Md3eMetadataEditSurface extends StatelessWidget {
     }
 
     if (useFullPage) {
-      return _FullPageShell(
+      return M3EFullScreenDialog(
         title: title,
-        body: body,
-        onCancel: onCancel,
-        onSave: onSave,
-        saving: saving,
-        saveEnabled: saveEnabled,
-        onBack: onBack ?? onCancel,
+        body: SingleChildScrollView(child: body),
+        confirmLabel: context.l10n.commonSave,
+        onConfirm: saving || !saveEnabled ? null : onSave,
+        bottomActions: <Widget>[
+          M3EButton(
+            onPressed: saving ? null : onCancel,
+            style: M3EButtonStyle.text,
+            label: Text(context.l10n.commonCancel),
+          ),
+        ],
+        onClose: onBack ?? onCancel,
       );
     }
 
@@ -93,83 +108,6 @@ class Md3eMetadataEditSurface extends StatelessWidget {
             saving: saving,
             saveEnabled: saveEnabled,
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FullPageShell extends StatelessWidget {
-  const _FullPageShell({
-    required this.title,
-    required this.body,
-    required this.onCancel,
-    required this.onSave,
-    required this.saving,
-    required this.saveEnabled,
-    required this.onBack,
-  });
-
-  final String title;
-  final Widget body;
-  final VoidCallback onCancel;
-  final VoidCallback onSave;
-  final bool saving;
-  final bool saveEnabled;
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3ESpacing spacing = theme.spacing;
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final double horizontal =
-        Md3eMetadataEditFormMetrics.contentHorizontalPadding(sizeClass);
-
-    return ColoredBox(
-      color: theme.colorScheme.surface,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(horizontal - spacing.xs, 0, horizontal, 0),
-              child: Row(
-                children: <Widget>[
-                  M3EIconButton(
-                    onPressed: onBack,
-                    icon: const Icon(Symbols.arrow_back),
-                    variant: M3EIconButtonVariant.standard,
-                    size: M3EIconButtonSize.sm,
-                    tooltip: context.l10n.shellBack,
-                    semanticLabel: context.l10n.shellBack,
-                  ),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: theme.typeScale.titleLarge.copyWith(
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(horizontal, spacing.md, horizontal, spacing.lg),
-                child: body,
-              ),
-            ),
-            const Divider(height: 1),
-            _ActionBar(
-              onCancel: onCancel,
-              onSave: onSave,
-              saving: saving,
-              saveEnabled: saveEnabled,
-              padding: EdgeInsets.fromLTRB(horizontal, spacing.md, horizontal, spacing.md),
-            ),
-          ],
         ),
       ),
     );

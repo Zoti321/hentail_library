@@ -8,8 +8,7 @@ import 'package:material_ui/material_ui.dart' as mui;
 /// [M3ECalendarDatePicker] 等调用的是 `package:material_ui` 的
 /// [mui.MaterialLocalizations.of]，须保留 [mui.GlobalMaterialLocalizations.delegates]。
 ///
-/// Lab 里仍有 `package:flutter/material.dart` 的 [showDialog] / [Dialog]（如管理页新建实体），
-/// 其校验的是 Flutter 自带的 [MaterialLocalizations]，故额外挂上
+/// Lab 对话框走 [M3EDialog]；Flutter [MaterialLocalizations] 仍保留给 M3E 日历等。
 /// [GlobalMaterialLocalizations.delegate]（与 material_ui 的 MaterialLocalizations 类型不同，可并存）。
 List<LocalizationsDelegate<dynamic>> get md3eMaterialLocalizationsDelegates =>
     <LocalizationsDelegate<dynamic>>[

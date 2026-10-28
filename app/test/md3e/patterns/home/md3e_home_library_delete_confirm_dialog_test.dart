@@ -44,7 +44,7 @@ void main() {
     );
 
     final Finder deleteButton = find.descendant(
-      of: find.byType(Dialog),
+      of: find.byType(M3EDialog),
       matching: find.text('删除'),
     );
     expect(deleteButton, findsOneWidget);

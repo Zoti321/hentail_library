@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/md3e/patterns/dialog/md3e_lab_dialog_presenter.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -8,14 +9,11 @@ Future<bool> showMd3eHomeLibraryDeleteConfirmDialog({
   required BuildContext context,
   required String libraryDisplayName,
 }) async {
-  final bool? confirmed = await showDialog<bool>(
-    context: context,
-    useRootNavigator: false,
-    builder: (BuildContext dialogContext) {
-      return _Md3eHomeLibraryDeleteConfirmDialog(
-        libraryDisplayName: libraryDisplayName,
-      );
-    },
+  final bool? confirmed = await Md3eLabDialogPresenter.showBasic<bool>(
+    context,
+    dialog: _Md3eHomeLibraryDeleteConfirmDialog(
+      libraryDisplayName: libraryDisplayName,
+    ),
   );
   return confirmed ?? false;
 }
@@ -43,68 +41,40 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ESpacing spacing = theme.spacing;
 
-    return Dialog(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          spacing.lg,
-          spacing.lg,
-          spacing.lg,
-          spacing.md,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(
-              Md3eHomeLibraryManagementCopy.deleteConfirmTitle(
-                widget.libraryDisplayName,
-              ),
-              style: theme.typeScale.titleLarge.copyWith(
-                color: scheme.onSurface,
-              ),
-            ),
-            SizedBox(height: spacing.md),
-            _Md3eHomeLibraryDeleteConfirmBody(
-              acknowledged: _acknowledged,
-              onAcknowledgementChanged: (bool value) {
-                setState(() => _acknowledged = value);
-              },
-              scheme: scheme,
-              spacing: spacing,
-              theme: theme,
-            ),
-            SizedBox(height: spacing.lg),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                M3EButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  style: M3EButtonStyle.text,
-                  label: Text(l10n.commonCancel),
-                ),
-                SizedBox(width: spacing.sm),
-                M3EButton(
-                  onPressed: _acknowledged
-                      ? () => Navigator.of(context).pop(true)
-                      : null,
-                  style: M3EButtonStyle.filled,
-                  decoration: M3EButtonDecoration.styleFrom(
-                    backgroundColor: scheme.error,
-                    foregroundColor: scheme.onError,
-                    disabledBackgroundColor: scheme.onSurface.withValues(
-                      alpha: 0.12,
-                    ),
-                    disabledForegroundColor: scheme.onSurface.withValues(
-                      alpha: 0.38,
-                    ),
-                  ),
-                  label: Text(l10n.sidebarDeleteLibrary),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return M3EDialog(
+      title: Md3eHomeLibraryManagementCopy.deleteConfirmTitle(
+        widget.libraryDisplayName,
       ),
+      content: _Md3eHomeLibraryDeleteConfirmBody(
+        acknowledged: _acknowledged,
+        onAcknowledgementChanged: (bool value) {
+          setState(() => _acknowledged = value);
+        },
+        scheme: scheme,
+        spacing: spacing,
+        theme: theme,
+      ),
+      bottomDivider: true,
+      actions: <Widget>[
+        M3EButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          style: M3EButtonStyle.text,
+          label: Text(l10n.commonCancel),
+        ),
+        M3EButton(
+          onPressed: _acknowledged ? () => Navigator.of(context).pop(true) : null,
+          style: M3EButtonStyle.filled,
+          decoration: M3EButtonDecoration.styleFrom(
+            backgroundColor: scheme.error,
+            foregroundColor: scheme.onError,
+            disabledBackgroundColor: scheme.onSurface.withValues(alpha: 0.12),
+            disabledForegroundColor: scheme.onSurface.withValues(
+              alpha: 0.38,
+            ),
+          ),
+          label: Text(l10n.sidebarDeleteLibrary),
+        ),
+      ],
     );
   }
 }

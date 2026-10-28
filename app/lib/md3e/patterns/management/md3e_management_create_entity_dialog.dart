@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/md3e/patterns/dialog/md3e_lab_dialog_presenter.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_management_entity_name_field.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -16,15 +17,12 @@ Future<void> showMd3eManagementCreateEntityDialog({
   required ManagedNamedFacetKind facet,
   required ValueChanged<String> onCreate,
 }) {
-  return showDialog<void>(
-    context: context,
-    useRootNavigator: false,
-    builder: (BuildContext dialogContext) {
-      return _Md3eManagementCreateEntityDialog(
-        facet: facet,
-        onCreate: onCreate,
-      );
-    },
+  return Md3eLabDialogPresenter.showBasic<void>(
+    context,
+    dialog: _Md3eManagementCreateEntityDialog(
+      facet: facet,
+      onCreate: onCreate,
+    ),
   );
 }
 
@@ -77,58 +75,30 @@ class _Md3eManagementCreateEntityDialogState
       size.width - horizontalInset * 2,
     );
 
-    return Dialog(
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: horizontalInset,
-        vertical: spacing.lg,
-      ),
-      child: SizedBox(
+    return M3EDialog(
+      title: l10n.metadataAddLabel(widget.facet),
+      content: SizedBox(
         width: contentWidth,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            spacing.lg,
-            spacing.lg,
-            spacing.lg,
-            spacing.md,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                l10n.metadataAddLabel(widget.facet),
-                style: theme.typeScale.titleLarge.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-              SizedBox(height: spacing.lg),
-              Md3eManagementEntityNameField(
-                label: l10n.metadataAddHint(widget.facet),
-                controller: _controller,
-                autofocus: true,
-                onSubmitted: (_) => _submit(),
-              ),
-              SizedBox(height: spacing.lg),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  M3EButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: M3EButtonStyle.text,
-                    label: Text(l10n.commonCancel),
-                  ),
-                  SizedBox(width: spacing.sm),
-                  M3EButton(
-                    onPressed: _submit,
-                    style: M3EButtonStyle.filled,
-                    label: Text(l10n.commonAdd),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        child: Md3eManagementEntityNameField(
+          label: l10n.metadataAddHint(widget.facet),
+          controller: _controller,
+          autofocus: true,
+          onSubmitted: (_) => _submit(),
         ),
       ),
+      bottomDivider: true,
+      actions: <Widget>[
+        M3EButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: M3EButtonStyle.text,
+          label: Text(l10n.commonCancel),
+        ),
+        M3EButton(
+          onPressed: _submit,
+          style: M3EButtonStyle.filled,
+          label: Text(l10n.commonAdd),
+        ),
+      ],
     );
   }
 }

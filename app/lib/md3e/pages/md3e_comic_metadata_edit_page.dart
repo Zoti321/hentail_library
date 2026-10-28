@@ -71,6 +71,8 @@ class _Md3eComicMetadataEditPageState extends State<Md3eComicMetadataEditPage> {
     }
   }
 
+  Future<void> saveAndPop() => _handleSave();
+
   Future<void> _handleSave() async {
     final String? error = _draft.validateTitle();
     if (error != null) {
