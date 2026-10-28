@@ -6,6 +6,8 @@ import 'package:hentai_library/md3e/pages/md3e_library_edit_page_lab_host.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
 import '../../support/pump_md3e_app.dart';
+
+void main() {
   testWidgets('LabHost 远程 WebDAV 凭证编辑后保存 preview 表单', (
     WidgetTester tester,
   ) async {
