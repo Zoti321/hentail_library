@@ -37,6 +37,7 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
     this.scrollController,
     this.hideScrollToTop = false,
     this.onCatalogItemTap,
+    this.libraryDisplayName,
   });
 
   final LibraryDisplayTarget displayTarget;
@@ -62,6 +63,9 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
 
   /// Lab / Widgetbook：目录卡片点击（生产由路由层处理）。
   final VoidCallback? onCatalogItemTap;
+
+  /// Lab shell：当前库显示名（rehearsal for Current library display name）。
+  final String? libraryDisplayName;
 
   @override
   State<Md3eLibraryBrowsePage> createState() => _Md3eLibraryBrowsePageState();
@@ -126,6 +130,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontal),
         child: Md3eLibraryPageHeader(
+          title: widget.libraryDisplayName,
           filterSortActive: widget.filterSortActive,
           pageSize: widget.pageSize,
           onPageSizeChanged: widget.onPageSizeChanged,

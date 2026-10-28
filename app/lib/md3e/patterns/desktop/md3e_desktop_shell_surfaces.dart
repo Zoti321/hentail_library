@@ -20,12 +20,14 @@ class Md3eDesktopShellSurfaceRoles {
     required this.shellBackground,
     required this.titleBarBackground,
     required this.navigationRailBackground,
+    required this.librarySecondaryPanelBackground,
     required this.contentPaneBackground,
   });
 
   final Color shellBackground;
   final Color titleBarBackground;
   final Color navigationRailBackground;
+  final Color librarySecondaryPanelBackground;
   final Color contentPaneBackground;
 
   /// Lab preview: window chrome = rail; content card clipped on the leading edge.
@@ -36,6 +38,7 @@ class Md3eDesktopShellSurfaceRoles {
       shellBackground: rail,
       titleBarBackground: content,
       navigationRailBackground: rail,
+      librarySecondaryPanelBackground: rail,
       contentPaneBackground: content,
     );
   }
@@ -48,6 +51,7 @@ class Md3eDesktopShellSurfaceRoles {
       shellBackground: rail,
       titleBarBackground: content,
       navigationRailBackground: rail,
+      librarySecondaryPanelBackground: rail,
       contentPaneBackground: content,
     );
   }

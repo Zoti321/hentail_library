@@ -4,43 +4,38 @@ part of 'md3e_widgetbook_directories.dart';
 class _Md3eLabDesktopAppPrototype extends StatelessWidget {
   const _Md3eLabDesktopAppPrototype();
 
-  static const int _homeDestinationIndex = 0;
-  static const int _libraryDestinationIndex = 1;
-  static const int _managementDestinationIndex = 2;
-  static const int _historyDestinationIndex = 3;
-  static const int _settingsDestinationIndex = 4;
-
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final double viewportHeight = MediaQuery.sizeOf(context).height;
     final double shellHeight = viewportHeight >= 560 ? viewportHeight : 768;
 
-    return Md3eWidgetbookDesktopExpandedGate(
-      alignment: Alignment.topLeft,
+    return Md3eWidgetbookScope(
       child: Md3eDesktopShell(
         height: shellHeight,
         initialRailExtended: false,
         surfaceRoles: Md3eDesktopShellSurfaceRoles.lab(scheme),
-        paneBuilder: _paneForDestination,
+        paneBuilder: _paneForNavigation,
       ),
     );
   }
 
-  static Widget _paneForDestination(
+  static Widget _paneForNavigation(
     BuildContext context,
-    int destinationIndex,
+    Md3eShellNavigationSnapshot navigation,
   ) {
-    switch (destinationIndex) {
-      case _homeDestinationIndex:
+    switch (navigation.destinationIndex) {
+      case Md3eShellNavigation.homeDestinationIndex:
         return const _Md3eLabHomePanePlaceholder();
-      case _libraryDestinationIndex:
-        return const _Md3eLibraryBrowsePagePreview();
-      case _managementDestinationIndex:
+      case Md3eShellNavigation.libraryDestinationIndex:
+        return _Md3eLibraryBrowsePagePreview(
+          libraryDisplayName: navigation.selectedLibraryDisplayName,
+        );
+      case Md3eShellNavigation.managementDestinationIndex:
         return const _Md3eManagementBrowsePagePreview();
-      case _historyDestinationIndex:
+      case Md3eShellNavigation.historyDestinationIndex:
         return const _Md3eHistoryBrowsePagePreview();
-      case _settingsDestinationIndex:
+      case Md3eShellNavigation.settingsDestinationIndex:
         return const Md3eSettingsPage();
       default:
         return const _Md3eLabHomePanePlaceholder();
@@ -81,7 +76,7 @@ class _Md3eLabHomePanePlaceholder extends StatelessWidget {
               ),
               SizedBox(height: spacing.sm),
               Text(
-                'Widgetbook 场景预览：请用左侧导航切换到漫画库、管理、历史或设置。',
+                'Widgetbook：≥840dp 用侧栏 rail + hover 选库；较窄窗口用顶栏 ☰ 抽屉。',
                 style: theme.typeScale.bodyMedium.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

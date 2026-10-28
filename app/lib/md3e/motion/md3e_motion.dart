@@ -17,6 +17,10 @@ abstract final class Md3eMotion {
   /// Preferred spring for expressive micro-interactions in MD3E widgets.
   static const Motion expressiveSpring = Motion.smoothSpring();
 
+  /// Spatial reveal for shell library secondary pane (M3E navigation drawer).
+  static const MaterialSpringMotion shellLibrarySecondaryReveal =
+      MaterialSpringMotion.expressiveSpatialDefault();
+
   /// M3 emphasized curve when a state layer or elevation **enters**.
   static Curve curveForStateEnter({required bool reduceMotion}) {
     return reduceMotion ? Curves.linear : curveEmphasizedDecelerate;

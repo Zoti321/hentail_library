@@ -3,12 +3,11 @@ import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar_metri
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_window_controls.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_ui/material_ui.dart' show WidgetStatePropertyAll;
 
 /// Desktop window title strip: global search aligned to the pane + window controls.
 ///
-/// Menu for the navigation rail lives in [Md3eNavigationRail], not here. The
-/// region above the rail column is reserved for platform window drag (Lab: inert).
+/// When [showNavigationMenu] is true (drawer shell), ☰ opens app navigation.
+/// On expanded rail shells, the rail menu lives in [Md3eNavigationRail].
 class Md3eDesktopTitleBar extends StatelessWidget {
   const Md3eDesktopTitleBar({
     super.key,
@@ -19,6 +18,8 @@ class Md3eDesktopTitleBar extends StatelessWidget {
     this.onSearchSubmitted,
     this.searchWidth = Md3eDesktopTitleBarMetrics.defaultSearchWidth,
     this.showWindowControls = true,
+    this.showNavigationMenu = false,
+    this.onNavigationMenuPressed,
     this.onWindowMinimize,
     this.onWindowMaximize,
     this.onWindowClose,
@@ -37,6 +38,8 @@ class Md3eDesktopTitleBar extends StatelessWidget {
   final ValueChanged<String>? onSearchSubmitted;
   final double searchWidth;
   final bool showWindowControls;
+  final bool showNavigationMenu;
+  final VoidCallback? onNavigationMenuPressed;
   final VoidCallback? onWindowMinimize;
   final VoidCallback? onWindowMaximize;
   final VoidCallback? onWindowClose;
@@ -61,10 +64,16 @@ class Md3eDesktopTitleBar extends StatelessWidget {
                 ? Md3eDesktopTitleBarMetrics.windowControlsWidth +
                     Md3eDesktopTitleBarMetrics.windowControlsTrailing
                 : 0;
+            final double menuWidth = showNavigationMenu
+                ? Md3eDesktopTitleBarMetrics.navigationMenuWidth
+                : 0;
             final double leadingWidth =
                 searchLeadingInset ?? (railWidth + paneGutter);
             final double availableSearch =
-                constraints.maxWidth - leadingWidth - controlsWidth;
+                constraints.maxWidth -
+                leadingWidth -
+                menuWidth -
+                controlsWidth;
             final double searchMax =
                 availableSearch < 0 ? 0.0 : availableSearch;
             final double resolvedSearchWidth = searchWidth.clamp(0, searchMax);
@@ -73,6 +82,19 @@ class Md3eDesktopTitleBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 if (leadingWidth > 0) SizedBox(width: leadingWidth),
+                if (showNavigationMenu)
+                  SizedBox(
+                    width: menuWidth,
+                    height: Md3eDesktopTitleBarMetrics.height,
+                    child: Center(
+                      child: M3EIconButton(
+                        icon: const Icon(Icons.menu),
+                        onPressed: onNavigationMenuPressed,
+                        variant: M3EIconButtonVariant.standard,
+                        size: M3EIconButtonSize.md,
+                      ),
+                    ),
+                  ),
                 if (resolvedSearchWidth > 0)
                   Expanded(
                     child: Align(

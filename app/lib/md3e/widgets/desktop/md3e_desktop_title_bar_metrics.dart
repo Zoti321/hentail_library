@@ -9,4 +9,7 @@ abstract final class Md3eDesktopTitleBarMetrics {
   static const double windowButtonIconSize = 18;
   static const double windowControlsTrailing = 8;
   static const double windowControlsWidth = 144;
+
+  /// Leading ☰ when shell uses modal drawer (&lt; expanded breakpoint).
+  static const double navigationMenuWidth = 48;
 }

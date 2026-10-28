@@ -15,10 +15,8 @@ import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_metadata_edit_page.dart';
-import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_form.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_navigation.dart';
-import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_draft.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_form.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
@@ -29,7 +27,6 @@ import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_loc
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
-import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
@@ -752,7 +749,9 @@ class _Md3eManagementBrowsePagePreviewState
 }
 
 class _Md3eLibraryBrowsePagePreview extends StatefulWidget {
-  const _Md3eLibraryBrowsePagePreview();
+  const _Md3eLibraryBrowsePagePreview({this.libraryDisplayName});
+
+  final String? libraryDisplayName;
 
   @override
   State<_Md3eLibraryBrowsePagePreview> createState() =>
@@ -779,6 +778,7 @@ class _Md3eLibraryBrowsePagePreviewState
       body: Builder(
         builder: (BuildContext hostContext) {
           return Md3eLibraryBrowsePage(
+            libraryDisplayName: widget.libraryDisplayName,
             displayTarget: _target,
             viewMode: _viewMode,
             filterSortActive: _filterSort.isCustomized,
