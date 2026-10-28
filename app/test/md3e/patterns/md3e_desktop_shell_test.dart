@@ -163,42 +163,49 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('compact shell opens library sheet from modal rail', (
+  testWidgets('compact and medium drill into library secondary from modal rail', (
     WidgetTester tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(600, 768));
+    Future<void> pumpAndSelectLibrary(double width) async {
+      const String targetId = 'lab-remote-nas';
+      final String targetName =
+          Md3eLabLibraryCatalog.displayNameForId(targetId);
+      Md3eShellNavigationSnapshot? lastSnapshot;
+
+      await tester.binding.setSurfaceSize(Size(width, 768));
+      await pumpMd3eApp(
+        tester,
+        home: Md3eDesktopShell(
+          width: width,
+          height: 768,
+          paneBuilder: (_, navigation) {
+            lastSnapshot = navigation;
+            return Text(
+              '${navigation.selectedLibraryId}:${navigation.selectedLibraryDisplayName}',
+            );
+          },
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+
+      await tester.tap(find.text('漫画库'));
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+
+      await tester.tap(find.text(targetName));
+      await tester.pumpAndSettle();
+
+      expect(lastSnapshot?.selectedLibraryId, targetId);
+      expect(find.text('$targetId:$targetName'), findsOneWidget);
+    }
+
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    const String targetId = 'lab-remote-nas';
-    final String targetName =
-        Md3eLabLibraryCatalog.displayNameForId(targetId);
-    Md3eShellNavigationSnapshot? lastSnapshot;
-
-    await pumpMd3eApp(
-      tester,
-      home: Md3eDesktopShell(
-        width: 600,
-        height: 768,
-        paneBuilder: (_, navigation) {
-          lastSnapshot = navigation;
-          return Text('${navigation.selectedLibraryId}:${navigation.selectedLibraryDisplayName}');
-        },
-      ),
-    );
-
-    await tester.tap(find.byIcon(Icons.menu));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(Md3eNavigationRail), findsOneWidget);
-
-    await tester.tap(find.text('漫画库'));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text(targetName));
-    await tester.pumpAndSettle();
-
-    expect(lastSnapshot?.selectedLibraryId, targetId);
-    expect(find.text('$targetId:$targetName'), findsOneWidget);
+    await pumpAndSelectLibrary(390);
+    await pumpAndSelectLibrary(600);
   });
 
   testWidgets('expanded shell hover opens library flyout and selects library', (

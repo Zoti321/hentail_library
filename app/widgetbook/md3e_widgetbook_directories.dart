@@ -5,11 +5,8 @@ import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_list_item.dart';
 import 'package:hentai_library/md3e/layout/md3e_reading_history_list_layout.dart';
 import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item.dart';
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_metadata_tags_section.dart';
-import 'package:hentai_library/md3e/data/md3e_lab_library_catalog.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_library_sheet.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_column.dart';
 import 'package:hentai_library/md3e/pages/md3e_home_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page.dart';
@@ -31,7 +28,6 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_tag_input_field.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
 import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination.dart';
@@ -207,90 +203,26 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
           name: 'patterns',
           children: <WidgetbookNode>[
             WidgetbookComponent(
-              name: 'Md3eDesktopShell',
+              name: 'Md3eAppShell',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: '1024×768 · surface + surfaceContainer (M3 roles)',
+                  name: 'Responsive · viewport addon',
                   builder: (BuildContext context) {
                     final M3EColorScheme scheme =
                         M3ETheme.of(context).colorScheme;
-                    return Md3eWidgetbookScope(
-                      child: Md3eWidgetbookDesktopExpandedGate(
-                        child: Md3eDesktopShell(
-                          width: Md3eBreakpoints.previewWidthExpanded,
-                          height: 768,
-                          initialRailExtended: false,
-                          surfaceRoles:
-                              Md3eDesktopShellSurfaceRoles.toneBased(scheme),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                WidgetbookUseCase(
-                  name: '600×768 compact · modal rail + library sheet',
-                  builder: (BuildContext context) {
-                    final M3EColorScheme scheme =
-                        M3ETheme.of(context).colorScheme;
+                    final double viewportHeight =
+                        MediaQuery.sizeOf(context).height;
+                    final double shellHeight =
+                        viewportHeight >= 560 ? viewportHeight : 768;
                     return Md3eWidgetbookScope(
                       child: Md3eDesktopShell(
-                        width: 600,
-                        height: 768,
+                        height: shellHeight,
+                        initialRailExtended: false,
                         surfaceRoles:
                             Md3eDesktopShellSurfaceRoles.toneBased(scheme),
                       ),
                     );
                   },
-                ),
-              ],
-            ),
-            WidgetbookComponent(
-              name: 'Md3eShellLibrarySecondaryColumn',
-              useCases: <WidgetbookUseCase>[
-                WidgetbookUseCase(
-                  name: 'Flyout open · Lab catalog',
-                  builder: (BuildContext context) {
-                    final M3EColorScheme scheme =
-                        M3ETheme.of(context).colorScheme;
-                    return Md3eWidgetbookScope(
-                      child: SizedBox(
-                        height: 768,
-                        child: Md3eShellLibrarySecondaryColumn(
-                          open: true,
-                          height: 768,
-                          backgroundColor: scheme.surfaceContainerLow,
-                          libraries: Md3eLabLibraryCatalog.libraries(),
-                          selectedLibraryId:
-                              Md3eLabLibraryCatalog.defaultLibraryId,
-                          onLibrarySelected: (_) {},
-                          dividerColor: scheme.outlineVariant,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            WidgetbookComponent(
-              name: 'Md3eShellCompactLibrarySheet',
-              useCases: <WidgetbookUseCase>[
-                WidgetbookUseCase(
-                  name: 'Sheet open · Lab catalog',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Stack(
-                      children: <Widget>[
-                        const ColoredBox(color: Color(0xFFE8EAED)),
-                        Md3eShellCompactLibrarySheet(
-                          open: true,
-                          libraries: Md3eLabLibraryCatalog.libraries(),
-                          selectedLibraryId:
-                              Md3eLabLibraryCatalog.defaultLibraryId,
-                          onDismiss: () {},
-                          onLibrarySelected: (_) {},
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             ),

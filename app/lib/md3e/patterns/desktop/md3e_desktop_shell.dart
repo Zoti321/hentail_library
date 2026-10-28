@@ -6,7 +6,6 @@ import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/data/md3e_lab_library_catalog.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_app_bar.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_library_sheet.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_modal_rail.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_column.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_library_secondary_layout.dart';
@@ -38,8 +37,8 @@ abstract final class Md3eDesktopShellMetrics {
 
 /// Lab shell: navigation + content pane.
 ///
-/// &lt; [Md3eBreakpoints.expanded]: compact app bar + modal expanded [M3ENavigationRail]
-/// (M3 Expressive; replaces navigation drawer). ≥ expanded: standard rail + library flyout.
+/// &lt; [Md3eBreakpoints.expanded]: compact app bar + modal navigation (compact/medium:
+/// chevron + drill-in library secondary). ≥ expanded: standard rail + library flyout.
 class Md3eDesktopShell extends StatefulWidget {
   Md3eDesktopShell({
     super.key,
@@ -76,8 +75,8 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   int _selectedIndex = Md3eShellNavigation.homeDestinationIndex;
   late String _selectedLibraryId = widget.initialLibraryId;
   bool _librarySecondaryOpen = false;
-  bool _compactLibrarySheetOpen = false;
   bool _compactModalRailOpen = false;
+  bool _compactModalLibrarySecondaryOpen = false;
   Timer? _secondaryOpenTimer;
   Timer? _secondaryCloseTimer;
   bool? _usesExpandedNavigation;
@@ -111,8 +110,13 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     _usesExpandedNavigation = expandedNav;
     _cancelLibrarySecondaryTimers();
     _librarySecondaryOpen = false;
-    _compactLibrarySheetOpen = false;
     _compactModalRailOpen = false;
+    _compactModalLibrarySecondaryOpen = false;
+  }
+
+  /// Compact + medium (&lt; expanded): modal drill-in for library secondary.
+  static bool _modalLibraryDrillInEnabledForWidth(double width) {
+    return width < Md3eBreakpoints.expanded;
   }
 
   void _cancelLibrarySecondaryTimers() {
@@ -170,32 +174,40 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       _selectedLibraryId = libraryId;
       _selectedIndex = Md3eShellNavigation.libraryDestinationIndex;
       _librarySecondaryOpen = false;
-      _compactLibrarySheetOpen = false;
       _compactModalRailOpen = false;
+      _compactModalLibrarySecondaryOpen = false;
     });
     _cancelLibrarySecondaryTimers();
   }
 
   void _onCompactRailDestinationSelected(int index) {
     if (index == Md3eShellNavigation.libraryDestinationIndex) {
-      setState(() {
-        _compactModalRailOpen = false;
-        _compactLibrarySheetOpen = true;
-      });
+      setState(() => _compactModalLibrarySecondaryOpen = true);
       return;
     }
     setState(() {
       _selectedIndex = index;
       _compactModalRailOpen = false;
+      _compactModalLibrarySecondaryOpen = false;
     });
   }
 
+  void _onCompactLibrarySecondaryBack() {
+    setState(() => _compactModalLibrarySecondaryOpen = false);
+  }
+
   void _dismissCompactModalRail() {
-    setState(() => _compactModalRailOpen = false);
+    setState(() {
+      _compactModalRailOpen = false;
+      _compactModalLibrarySecondaryOpen = false;
+    });
   }
 
   void _openCompactModalRail() {
-    setState(() => _compactModalRailOpen = true);
+    setState(() {
+      _compactModalRailOpen = true;
+      _compactModalLibrarySecondaryOpen = false;
+    });
   }
 
   Widget _buildCompactContentColumn({
@@ -251,10 +263,6 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
         ),
       ),
     );
-  }
-
-  void _dismissCompactLibrarySheet() {
-    setState(() => _compactLibrarySheetOpen = false);
   }
 
   Widget _buildPane(BuildContext context) {
@@ -380,7 +388,8 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     Md3eDesktopShellSurfaceRoles surfaces,
     List<Md3eNavigationRailDestination> destinations,
   ) {
-    _syncShellLayout(constraints.maxWidth);
+    final double shellWidth = constraints.maxWidth;
+    _syncShellLayout(shellWidth);
     final bool usesExpandedNav = _usesExpandedNavigation ?? false;
     final M3EThemeData m3e = M3ETheme.of(context);
     final M3EColorScheme scheme = m3e.colorScheme;
@@ -428,12 +437,11 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
             selectedIndex: _selectedIndex,
             onDismiss: _dismissCompactModalRail,
             onDestinationSelected: _onCompactRailDestinationSelected,
-          ),
-          Md3eShellCompactLibrarySheet(
-            open: _compactLibrarySheetOpen,
+            libraryDrillInEnabled: _modalLibraryDrillInEnabledForWidth(shellWidth),
+            librarySecondaryOpen: _compactModalLibrarySecondaryOpen,
             libraries: widget.libraries,
             selectedLibraryId: _selectedLibraryId,
-            onDismiss: _dismissCompactLibrarySheet,
+            onLibrarySecondaryBack: _onCompactLibrarySecondaryBack,
             onLibrarySelected: _onLibrarySelected,
           ),
         ],
