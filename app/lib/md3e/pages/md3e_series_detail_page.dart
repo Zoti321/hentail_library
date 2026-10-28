@@ -230,7 +230,13 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
                   page: _page,
                   totalPages: _totalPages,
                   onPageChanged: _setPage,
-                  onComicTap: widget.onComicTap,
+                  onComicTap: widget.onComicTap == null
+                      ? null
+                      : (int localIndex) {
+                          final int globalIndex =
+                              (_page - 1) * _pageSize + localIndex;
+                          widget.onComicTap!(globalIndex);
+                        },
                 ),
               ),
             ],

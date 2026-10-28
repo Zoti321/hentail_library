@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/dialog/md3e_lab_dialog_presenter.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
+import 'package:hentai_library/md3e/theme/md3e_lab_text.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab：从 Home 预览列表移除 Library 的确认（不写 FRB / 不删 Resource）。
@@ -59,7 +60,7 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
         M3EButton(
           onPressed: () => Navigator.of(context).pop(false),
           style: M3EButtonStyle.text,
-          label: Text(l10n.commonCancel),
+          label: md3eLabText(theme, l10n.commonCancel),
         ),
         M3EButton(
           onPressed: _acknowledged ? () => Navigator.of(context).pop(true) : null,
@@ -72,7 +73,7 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
               alpha: 0.38,
             ),
           ),
-          label: Text(l10n.sidebarDeleteLibrary),
+          label: md3eLabText(theme, l10n.sidebarDeleteLibrary),
         ),
       ],
     );

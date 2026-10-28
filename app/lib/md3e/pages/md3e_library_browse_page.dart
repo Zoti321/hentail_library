@@ -5,6 +5,7 @@ import 'package:hentai_library/md3e/layout/md3e_catalog_grid_metrics.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_list_layout.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_catalog_toolbar.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_lab_catalog_item_preview.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
 import 'package:hentai_library/md3e/widgets/actions/md3e_catalog_view_mode_button_group.dart';
@@ -61,8 +62,8 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
   final ScrollController? scrollController;
   final bool hideScrollToTop;
 
-  /// Lab / Widgetbook：目录卡片点击（生产由路由层处理）。
-  final VoidCallback? onCatalogItemTap;
+  /// Lab：目录卡片点击（index 与网格/列表一致；生产由路由层处理）。
+  final ValueChanged<int>? onCatalogItemTap;
 
   /// Lab shell：当前库显示名（rehearsal for Current library display name）。
   final String? libraryDisplayName;
@@ -256,9 +257,11 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
         ? ((index % 9) + 1) / 10
         : null;
     final _Md3eLibraryBrowseCatalogItemCopy copy =
-        _Md3eLibraryBrowseCatalogItemCopy.forIndex(
-          displayTarget: widget.displayTarget,
-          index: index,
+        _Md3eLibraryBrowseCatalogItemCopy.fromPreview(
+          Md3eLabCatalogItemPreview.forIndex(
+            displayTarget: widget.displayTarget,
+            index: index,
+          ),
         );
     return Md3eComicCard(
       title: copy.title,
@@ -273,7 +276,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
           ),
         ),
       ),
-      onTap: widget.onCatalogItemTap ?? () {},
+      onTap: () => widget.onCatalogItemTap?.call(index),
     );
   }
 }
@@ -291,22 +294,14 @@ class _Md3eLibraryBrowseCatalogItemCopy {
   final String subtitle;
   final String? listAuthor;
 
-  static _Md3eLibraryBrowseCatalogItemCopy forIndex({
-    required LibraryDisplayTarget displayTarget,
-    required int index,
-  }) {
-    return switch (displayTarget) {
-      LibraryDisplayTarget.comics => _Md3eLibraryBrowseCatalogItemCopy(
-        title: '示例本子 ${index + 1}',
-        subtitle: '${64 + index * 8} 页',
-        listAuthor: '作者 ${index % 5 + 1}',
-      ),
-      LibraryDisplayTarget.series => _Md3eLibraryBrowseCatalogItemCopy(
-        title: '示例系列 ${index + 1}',
-        subtitle: '${3 + index % 8} 本漫画',
-        listAuthor: '连载中',
-      ),
-    };
+  static _Md3eLibraryBrowseCatalogItemCopy fromPreview(
+    Md3eLabCatalogItemPreview preview,
+  ) {
+    return _Md3eLibraryBrowseCatalogItemCopy(
+      title: preview.title,
+      subtitle: preview.subtitle,
+      listAuthor: preview.listAuthor,
+    );
   }
 }
 
@@ -321,7 +316,7 @@ class _Md3eLibraryBrowseListSliver extends StatelessWidget {
   final int itemCount;
   final double horizontalPadding;
   final LibraryDisplayTarget displayTarget;
-  final VoidCallback? onCatalogItemTap;
+  final ValueChanged<int>? onCatalogItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -391,14 +386,16 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
   final ColorScheme scheme;
   final int index;
   final LibraryDisplayTarget displayTarget;
-  final VoidCallback? onCatalogItemTap;
+  final ValueChanged<int>? onCatalogItemTap;
 
   @override
   Widget build(BuildContext context) {
     final _Md3eLibraryBrowseCatalogItemCopy copy =
-        _Md3eLibraryBrowseCatalogItemCopy.forIndex(
-          displayTarget: displayTarget,
-          index: index,
+        _Md3eLibraryBrowseCatalogItemCopy.fromPreview(
+          Md3eLabCatalogItemPreview.forIndex(
+            displayTarget: displayTarget,
+            index: index,
+          ),
         );
     final double? readProgress = displayTarget == LibraryDisplayTarget.comics &&
             index.isEven
@@ -426,7 +423,7 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
             ),
           ),
         ),
-        onTap: onCatalogItemTap ?? () {},
+        onTap: () => onCatalogItemTap?.call(index),
       ),
     );
   }

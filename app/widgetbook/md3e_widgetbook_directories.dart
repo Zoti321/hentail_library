@@ -20,6 +20,7 @@ import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_navigation.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_lab_catalog_navigation.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
@@ -811,9 +812,10 @@ class _Md3eLibraryBrowsePagePreviewState
             },
             onFilterSort: () =>
                 Md3eLibraryFilterSortDrawerHost.openDrawer(hostContext),
-            onCatalogItemTap: () => md3eWidgetbookOpenLabCatalogDetail(
+            onCatalogItemTap: (int index) => openMd3eLabCatalogDetail(
               hostContext,
               displayTarget: _target,
+              catalogIndex: index,
             ),
           );
         },
