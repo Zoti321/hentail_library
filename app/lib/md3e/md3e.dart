@@ -71,6 +71,7 @@ export 'patterns/reader/md3e_reader_page_progress.dart';
 export 'patterns/reader/md3e_reader_interaction_scope.dart';
 export 'patterns/reader/md3e_reader_keyboard.dart';
 export 'patterns/reader/md3e_reader_series_catalog_sheet.dart';
+export 'patterns/reader/md3e_lab_reader_navigation.dart';
 export 'patterns/reader/md3e_reader_settings_side_sheet.dart';
 export 'patterns/reader/md3e_reader_tap_zone.dart';
 export 'patterns/reader/md3e_reader_viewport.dart';

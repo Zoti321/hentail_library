@@ -100,11 +100,11 @@
                   </tr>
                   <tr>
                     <td>书库浏览</td>
-                    <td>7</td>
-                    <td>1</td>
+                    <td>6</td>
+                    <td>0</td>
                     <td>0</td>
                     <td>1</td>
-                    <td><span class="tag stub">验收中</span></td>
+                    <td><span class="tag ok">可冻结</span></td>
                   </tr>
                   <tr>
                     <td>命名管理</td>
@@ -112,7 +112,7 @@
                     <td>0</td>
                     <td>0</td>
                     <td>1</td>
-                    <td><span class="tag stub">验收中</span></td>
+                    <td><span class="tag ok">可冻结</span></td>
                   </tr>
                   <tr>
                     <td>阅读历史</td>
@@ -132,32 +132,32 @@
                   </tr>
                   <tr>
                     <td>Comic/Series 详情</td>
-                    <td>5</td>
-                    <td>2</td>
+                    <td>7</td>
+                    <td>0</td>
                     <td>0</td>
                     <td>2</td>
                     <td><span class="tag ok">可冻结 UI</span></td>
                   </tr>
                   <tr>
                     <td>元数据 / 库编辑</td>
-                    <td>6</td>
-                    <td>1</td>
+                    <td>8</td>
+                    <td>0</td>
                     <td>0</td>
                     <td>2</td>
-                    <td><span class="tag stub">表单 OK</span></td>
+                    <td><span class="tag ok">可冻结</span></td>
                   </tr>
                   <tr>
                     <td>阅读器</td>
-                    <td>11</td>
-                    <td>4</td>
+                    <td>15</td>
+                    <td>0</td>
                     <td>4</td>
                     <td>5</td>
                     <td><span class="tag stub">Chrome 收口</span></td>
                   </tr>
                   <tr>
                     <td>共享控件</td>
-                    <td>8</td>
-                    <td>1</td>
+                    <td>9</td>
+                    <td>0</td>
                     <td>0</td>
                     <td>0</td>
                     <td><span class="tag ok">可冻结</span></td>
@@ -629,16 +629,16 @@
                         <td>overflow</td>
                         <td>M3EMenu</td>
                         <td>Knobs 预览</td>
-                        <td><span class="tag stub">STUB</span></td>
-                        <td></td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>Lab 详情 M3EMenu 占位</td>
                       </tr>
                       <tr>
                         <td>开始阅读进 Reader</td>
                         <td>read_session route</td>
-                        <td>Lab 导航 stub</td>
+                        <td>openMd3eLabReader</td>
                         <td>LabApp</td>
-                        <td><span class="tag pilot">Pilot</span></td>
-                        <td></td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>目录/系列 → 详情 → Reader LabHost</td>
                       </tr>
                     </tbody>
                   </table>
@@ -824,15 +824,15 @@
                         <td>阅读设置</td>
                         <td>Fluent Dialog</td>
                         <td>SettingsSideSheet</td>
-                        <td><span class="tag stub">STUB</span></td>
-                        <td>字段见下</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>LabHost preview 内存；Md3eReaderAdaptivePanel</td>
                       </tr>
                       <tr>
                         <td>更多 / 封面</td>
                         <td>overflow</td>
-                        <td>分享 stub</td>
-                        <td><span class="tag stub">STUB</span></td>
-                        <td></td>
+                        <td>Reader LabHost 菜单</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>查看封面 + 分享占位</td>
                       </tr>
                       <tr>
                         <td>底栏 Slider / 翻页 / 自动播放</td>
@@ -954,7 +954,7 @@
                         <td>自动播放开关</td>
                         <td>有</td>
                         <td>Switch</td>
-                        <td><span class="tag stub">STUB</span></td>
+                        <td><span class="tag ok">OK</span></td>
                       </tr>
                       <tr>
                         <td>播放模式 / 间隔</td>
@@ -972,7 +972,7 @@
                         <td>分页布局</td>
                         <td>有</td>
                         <td>toggle 占位</td>
-                        <td><span class="tag stub">STUB</span></td>
+                        <td><span class="tag ok">OK</span></td>
                       </tr>
                     </tbody>
                   </table>
@@ -1048,8 +1048,8 @@
                       <tr>
                         <td>M3E SideSheet / BottomSheet</td>
                         <td>筛选 / 设置</td>
-                        <td><span class="tag stub">STUB</span></td>
-                        <td>AdaptivePanel 封装</td>
+                        <td><span class="tag ok">OK</span></td>
+                        <td>筛选 SideSheet + 阅读 Settings · AdaptivePanel</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1074,9 +1074,10 @@
               <summary><span class="priority p1">P1</span>STUB 补全（仍不接 Riverpod）</summary>
               <div class="signoff-block-body">
                 <ol class="tasks">
-                  <li>阅读器更多菜单：封面项占位；设置 sheet 静态字段行。</li>
-                  <li>首页：添加库 → 跳转 LibraryEdit 预览链。</li>
-                  <li>详情页：开始阅读 → Reader LabHost（LabApp 内）。</li>
+                  <li><s>阅读器更多菜单：封面项占位；设置 sheet 静态字段行。</s> → Reader LabHost 已接。</li>
+                  <li><s>首页：添加库 → 跳转 LibraryEdit 预览链。</s> → signoff 首页 OK。</li>
+                  <li><s>详情页：开始阅读 → Reader LabHost（LabApp 内）。</s> → openMd3eLabReader。</li>
+                  <li>设置页：阅读偏好 / Healthy mode 等 tile 接 Lab preview 状态（仍不写 port）。</li>
                 </ol>
               </div>
             </details>

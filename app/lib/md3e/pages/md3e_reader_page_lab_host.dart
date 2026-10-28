@@ -130,6 +130,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
         setState(() => _settings = _settings.copyWith(autoPlayEnabled: value));
       },
       moreMenuEntries: const <M3EMenuNode>[
+        M3EMenuEntry(label: 'Lab · 查看封面'),
         M3EMenuEntry(label: 'Lab · 分享'),
       ],
     );
