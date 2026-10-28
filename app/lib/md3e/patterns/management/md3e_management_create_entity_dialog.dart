@@ -6,6 +6,7 @@ import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/dialog/md3e_lab_dialog_presenter.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/md3e/theme/md3e_lab_text.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_management_entity_name_field.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -63,7 +64,8 @@ class _Md3eManagementCreateEntityDialogState
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final M3ESpacing spacing = theme.spacing;
+    final TextStyle actionLabelStyle =
+        md3eLabButtonLabelStyle(theme, M3EButtonSize.sm);
     final Size size = MediaQuery.sizeOf(context);
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
       size.width,
@@ -91,11 +93,17 @@ class _Md3eManagementCreateEntityDialogState
         M3EButton(
           onPressed: () => Navigator.of(context).pop(),
           style: M3EButtonStyle.text,
+          decoration: M3EButtonDecoration(
+            textStyle: actionLabelStyle,
+          ),
           label: Text(l10n.commonCancel),
         ),
         M3EButton(
           onPressed: _submit,
           style: M3EButtonStyle.filled,
+          decoration: M3EButtonDecoration(
+            textStyle: actionLabelStyle,
+          ),
           label: Text(l10n.commonAdd),
         ),
       ],

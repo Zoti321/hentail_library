@@ -81,6 +81,7 @@ export 'pages/md3e_home_page.dart';
 export 'pages/md3e_home_page_lab_host.dart';
 export 'pages/md3e_library_browse_page.dart';
 export 'pages/md3e_management_browse_page.dart';
+export 'pages/md3e_management_browse_page_lab_host.dart';
 export 'pages/md3e_reader_page.dart';
 export 'pages/md3e_reader_page_lab_host.dart';
 export 'pages/md3e_settings_page.dart';

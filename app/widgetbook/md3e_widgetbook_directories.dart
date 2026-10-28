@@ -11,7 +11,7 @@ import 'package:hentai_library/md3e/pages/md3e_home_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page_lab_host.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
-import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
+import 'package:hentai_library/md3e/pages/md3e_management_browse_page_lab_host.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page_lab_host.dart';
@@ -297,8 +297,8 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: _Md3eManagementBrowsePagePreview(),
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: _md3eManagementBrowsePageLabHostPreview(context),
                   ),
                 ),
               ],
@@ -674,58 +674,22 @@ Widget _md3ePaginationKnobsPreview(BuildContext context) {
   );
 }
 
-class _Md3eManagementBrowsePagePreview extends StatefulWidget {
-  const _Md3eManagementBrowsePagePreview();
-
-  @override
-  State<_Md3eManagementBrowsePagePreview> createState() =>
-      _Md3eManagementBrowsePagePreviewState();
-}
-
-class _Md3eManagementBrowsePagePreviewState
-    extends State<_Md3eManagementBrowsePagePreview> {
-  ManagedNamedFacetKind _facet = ManagedNamedFacetKind.author;
-  late final Map<ManagedNamedFacetKind, List<String>> _labelsByFacet =
-      <ManagedNamedFacetKind, List<String>>{
-        for (final ManagedNamedFacetKind facet in kManagedNamedFacetTabOrder)
-          facet: Md3eManagementBrowsePagePreviewData.sampleChipsFor(facet),
+Widget _md3eManagementBrowsePageLabHostPreview(BuildContext context) {
+  final String interactionKnob = context.knobs.list(
+    label: '新建交互',
+    options: <String>['自动', '移动端 Dialog', '桌面端内联'],
+    initialOption: '自动',
+  );
+  final Md3eManagementCreateInteraction? interactionOverride =
+      switch (interactionKnob) {
+        '移动端 Dialog' => Md3eManagementCreateInteraction.mobileDialog,
+        '桌面端内联' => Md3eManagementCreateInteraction.desktopInline,
+        _ => null,
       };
 
-  void _addEntity(String name) {
-    final List<String> list = _labelsByFacet[_facet]!;
-    if (list.contains(name)) {
-      return;
-    }
-    setState(() => list.add(name));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final String interactionKnob = context.knobs.list(
-      label: '新建交互',
-      options: <String>['自动', '移动端 Dialog', '桌面端内联'],
-      initialOption: '自动',
-    );
-    final Md3eManagementCreateInteraction? interactionOverride =
-        switch (interactionKnob) {
-          '移动端 Dialog' => Md3eManagementCreateInteraction.mobileDialog,
-          '桌面端内联' => Md3eManagementCreateInteraction.desktopInline,
-          _ => null,
-        };
-
-    final List<String> chips = _labelsByFacet[_facet]!;
-
-    return Md3eManagementBrowsePage(
-      facet: _facet,
-      facetCount: chips.length,
-      chipLabels: chips,
-      createInteractionOverride: interactionOverride,
-      onEntityCreated: _addEntity,
-      onFacetChanged: (ManagedNamedFacetKind value) {
-        setState(() => _facet = value);
-      },
-    );
-  }
+  return Md3eManagementBrowsePageLabHost(
+    createInteractionOverride: interactionOverride,
+  );
 }
 
 class _Md3eLibraryBrowsePagePreview extends StatefulWidget {
