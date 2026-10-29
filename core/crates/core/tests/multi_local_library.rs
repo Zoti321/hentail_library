@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
+use hentai_core::ComicGrouping;
 use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::{
@@ -304,7 +305,7 @@ fn delete_library_clears_only_that_library_comics_and_series() {
                     page_size: 50,
                 },
                 ComicFilterDto::default(),
-                false,
+                ComicGrouping::None,
                 Default::default(),
             )
             .await
@@ -350,7 +351,7 @@ fn browse_defaults_to_current_library_scope() {
                     page_size: 50,
                 },
                 ComicFilterDto::default(),
-                false,
+                ComicGrouping::None,
                 Default::default(),
             )
             .await
@@ -367,7 +368,7 @@ fn browse_defaults_to_current_library_scope() {
                     page_size: 50,
                 },
                 ComicFilterDto::default(),
-                false,
+                ComicGrouping::None,
                 Default::default(),
             )
             .await

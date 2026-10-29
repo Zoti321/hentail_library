@@ -44,7 +44,9 @@ class ComicRepositoryImpl
       () => rust.fetchComicsPageFrb(
         request: mapPageRequest(request),
         filter: mapLibraryFilter(filter),
-        expandBySeries: expandBySeries,
+        grouping: expandBySeries
+            ? rust.ComicGroupingDto.bySeries
+            : rust.ComicGroupingDto.none,
         sort: mapSortOption(sortOption),
       ),
       fallbackMessage: '读取漫画分页失败',

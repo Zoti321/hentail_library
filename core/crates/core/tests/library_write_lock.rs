@@ -3,6 +3,7 @@
 mod common;
 
 use hentai_core::library_write::{begin_library_write_txn, try_acquire_library_write_lock};
+use hentai_core::ComicGrouping;
 use hentai_core::{
     add_author, add_tag, clear_all_reading, count_trashed_comics, create_sync_handle,
     delete_authors_by_names, delete_named_facet_by_names, delete_tags_by_names, fetch_comics_page,
@@ -172,7 +173,7 @@ fn single_comic_user_writes_stay_available_while_the_lock_is_held() {
                     library_id: Some(library.library_id.clone()),
                     ..Default::default()
                 },
-                false,
+                ComicGrouping::None,
                 ComicSortOptionDto::default(),
             )
             .await

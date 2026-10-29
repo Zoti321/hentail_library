@@ -2,6 +2,7 @@ mod common;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::sync::writer::clear_all_comics;
+use hentai_core::ComicGrouping;
 use hentai_core::{
     connection, create_local_library, fetch_comics_page, find_comic_by_id, init_db_at_path,
     set_current_library_id, ComicFilterDto, ComicSortOptionDto, PageRequestDto,
@@ -85,7 +86,7 @@ fn fetch_comics_page_hides_r18_by_default() {
                     show_r18: false,
                     ..Default::default()
                 },
-                false,
+                ComicGrouping::None,
                 ComicSortOptionDto::default(),
             )
             .await

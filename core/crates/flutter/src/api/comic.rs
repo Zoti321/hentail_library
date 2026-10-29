@@ -1,9 +1,24 @@
 use hentai_core::{
-    self, count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, init_db,
+    self, count_all, fetch_comics_page, ComicGrouping, find_comic_by_id, find_comics_by_ids, init_db,
     search_by_keyword, search_by_keyword_page, search_by_tag_expression_page,
 };
 
 use super::init::HentaiErrorDto;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ComicGroupingDto {
+    None,
+    BySeries,
+}
+
+impl From<ComicGroupingDto> for ComicGrouping {
+    fn from(value: ComicGroupingDto) -> Self {
+        match value {
+            ComicGroupingDto::None => Self::None,
+            ComicGroupingDto::BySeries => Self::BySeries,
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct ComicFilterDto {
@@ -201,10 +216,10 @@ pub fn comic_id_from_path_frb(raw_path: String) -> String {
 pub async fn fetch_comics_page_frb(
     request: PageRequestDto,
     filter: ComicFilterDto,
-    expand_by_series: bool,
+    grouping: ComicGroupingDto,
     sort: ComicSortOptionDto,
 ) -> Result<PagedComicResultDto, HentaiErrorDto> {
-    fetch_comics_page(request.into(), filter.into(), expand_by_series, sort.into())
+    fetch_comics_page(request.into(), filter.into(), grouping.into(), sort.into())
         .await
         .map(PagedComicResultDto::from)
         .map_err(HentaiErrorDto::from)

@@ -2,6 +2,7 @@
 
 mod common;
 
+use hentai_core::ComicGrouping;
 use hentai_core::image_cache::{ImageCache, PlatformImageKey};
 use hentai_core::{
     add_author, add_author_link, connection, create_local_library, delete_author_link,
@@ -126,7 +127,7 @@ fn rename_keeps_links_delete_cascades_and_filter_uses_id() {
                     library_id: Some(lib.library_id.clone()),
                     ..Default::default()
                 },
-                false,
+                ComicGrouping::None,
                 ComicSortOptionDto::default(),
             )
             .await

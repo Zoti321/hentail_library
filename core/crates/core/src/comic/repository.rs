@@ -15,6 +15,7 @@ use crate::error::HentaiError;
 use super::dto::{
     ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
+use super::grouping::ComicGrouping;
 use super::page_query::{build_count_query, build_ids_page_query};
 use super::pagination::paginate;
 use super::visibility::visible_comic_sql;
@@ -39,7 +40,7 @@ pub async fn count_all() -> Result<i64, HentaiError> {
 pub async fn fetch_comics_page(
     request: PageRequestDto,
     filter: ComicFilterDto,
-    expand_by_series: bool,
+    grouping: ComicGrouping,
     sort: ComicSortOptionDto,
 ) -> Result<PagedComicResultDto, HentaiError> {
     let db = connection()?;
@@ -63,11 +64,11 @@ pub async fn fetch_comics_page(
             page_size: window.page_size,
         });
     }
-    let library_root_path = resolve_library_root_path(&filter, expand_by_series).await?;
+    let library_root_path = resolve_library_root_path(&filter, grouping).await?;
     let ids_query = build_ids_page_query(
         &filter,
         &sort,
-        expand_by_series,
+        grouping,
         library_root_path.as_deref(),
         window.page_size,
         window.offset as i32,
@@ -84,9 +85,9 @@ pub async fn fetch_comics_page(
 
 async fn resolve_library_root_path(
     filter: &ComicFilterDto,
-    expand_by_series: bool,
+    grouping: ComicGrouping,
 ) -> Result<Option<String>, HentaiError> {
-    if !expand_by_series {
+    if !grouping.needs_library_root() {
         return Ok(None);
     }
     let Some(library_id) = filter.library_id.as_deref() else {

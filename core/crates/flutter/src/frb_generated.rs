@@ -1218,7 +1218,7 @@ fn wire__crate__api__comic__fetch_comics_page_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
             let api_filter = <crate::api::comic::ComicFilterDto>::sse_decode(&mut deserializer);
-            let api_expand_by_series = <bool>::sse_decode(&mut deserializer);
+            let api_grouping = <crate::api::comic::ComicGroupingDto>::sse_decode(&mut deserializer);
             let api_sort = <crate::api::comic::ComicSortOptionDto>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -1227,7 +1227,7 @@ fn wire__crate__api__comic__fetch_comics_page_frb_impl(
                         let output_ok = crate::api::comic::fetch_comics_page_frb(
                             api_request,
                             api_filter,
-                            api_expand_by_series,
+                            api_grouping,
                             api_sort,
                         )
                         .await?;
@@ -5435,6 +5435,18 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
     }
 }
 
+impl SseDecode for crate::api::comic::ComicGroupingDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::comic::ComicGroupingDto::None,
+            1 => crate::api::comic::ComicGroupingDto::BySeries,
+            _ => unreachable!("Invalid variant for ComicGroupingDto: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::api::comic::ComicMetaLocksDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -8164,6 +8176,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicFilterDto>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicGroupingDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::None => 0.into_dart(),
+            Self::BySeries => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::comic::ComicGroupingDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicGroupingDto>
+    for crate::api::comic::ComicGroupingDto
+{
+    fn into_into_dart(self) -> crate::api::comic::ComicGroupingDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicMetaLocksDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -10191,6 +10224,22 @@ impl SseEncode for crate::api::comic::ComicFilterDto {
         <Vec<String>>::sse_encode(self.characters, serializer);
         <bool>::sse_encode(self.needs_metadata_only, serializer);
         <Option<String>>::sse_encode(self.library_id, serializer);
+    }
+}
+
+impl SseEncode for crate::api::comic::ComicGroupingDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::comic::ComicGroupingDto::None => 0,
+                crate::api::comic::ComicGroupingDto::BySeries => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 

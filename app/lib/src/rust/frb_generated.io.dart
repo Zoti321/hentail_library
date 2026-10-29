@@ -251,6 +251,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicFilterDto dco_decode_comic_filter_dto(dynamic raw);
 
   @protected
+  ComicGroupingDto dco_decode_comic_grouping_dto(dynamic raw);
+
+  @protected
   ComicMetaLocksDto dco_decode_comic_meta_locks_dto(dynamic raw);
 
   @protected
@@ -950,6 +953,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer);
+
+  @protected
+  ComicGroupingDto sse_decode_comic_grouping_dto(SseDeserializer deserializer);
 
   @protected
   ComicMetaLocksDto sse_decode_comic_meta_locks_dto(
@@ -1821,6 +1827,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_comic_filter_dto(
     ComicFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_comic_grouping_dto(
+    ComicGroupingDto self,
     SseSerializer serializer,
   );
 

@@ -1,5 +1,6 @@
 mod common;
 
+use hentai_core::ComicGrouping;
 use hentai_core::sync::writer::replace_comic_authors;
 use hentai_core::util::compute_sort_key;
 use hentai_core::{
@@ -80,7 +81,7 @@ async fn fetch_ids(filter: ComicFilterDto, page_size: i32) -> (Vec<String>, i64)
     let page = fetch_comics_page(
         PageRequestDto { page: 1, page_size },
         filter,
-        false,
+        ComicGrouping::None,
         ComicSortOptionDto {
             field: ComicSortFieldDto::Title,
             descending: false,

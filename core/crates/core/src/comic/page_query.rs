@@ -1,7 +1,8 @@
 use sea_orm::Value;
 
-use super::dto::{ComicFilterDto, ComicSortFieldDto, ComicSortOptionDto};
+use super::dto::{ComicFilterDto, ComicSortOptionDto};
 use super::filter_predicate::build_catalog_where_clause;
+use super::grouping::ComicGrouping;
 
 pub struct PageSqlQuery {
     pub sql: String,
@@ -22,94 +23,29 @@ pub fn build_count_query(filter: &ComicFilterDto) -> PageSqlQuery {
 pub fn build_ids_page_query(
     filter: &ComicFilterDto,
     sort: &ComicSortOptionDto,
-    expand_by_series: bool,
+    grouping: ComicGrouping,
     library_root_path: Option<&str>,
     limit: i32,
     offset: i32,
 ) -> PageSqlQuery {
     let mut values = Vec::new();
     let where_clause = build_catalog_where_clause(filter, &mut values);
-    let sort_join = sort_join_clause(sort.field, expand_by_series);
-    let order_by = build_order_by_clause(sort, expand_by_series, library_root_path, &mut values);
+    let join_clause = grouping.join_clause(sort.field);
+    let order_by = grouping.order_by(sort, library_root_path, &mut values);
     values.push(Value::Int(Some(limit)));
     values.push(Value::Int(Some(offset)));
     PageSqlQuery {
         sql: format!(
-            "SELECT c.comic_id AS comic_id FROM comics c {COMIC_META_JOIN}{sort_join} \
-             WHERE {where_clause} \
-             ORDER BY {order_by} \
-             LIMIT ? OFFSET ?"
+            "SELECT c.comic_id AS comic_id FROM comics c {COMIC_META_JOIN}{join_clause}              WHERE {where_clause}              ORDER BY {order_by}              LIMIT ? OFFSET ?"
         ),
         values,
-    }
-}
-
-fn sort_join_clause(field: ComicSortFieldDto, expand_by_series: bool) -> &'static str {
-    if expand_by_series {
-        return " LEFT JOIN series_items si ON si.comic_id = c.comic_id \
-                LEFT JOIN series s ON s.series_id = si.series_id";
-    }
-    match field {
-        ComicSortFieldDto::ReadAt => {
-            " LEFT JOIN comic_reading_histories rh ON rh.comic_id = c.comic_id"
-        }
-        _ => "",
-    }
-}
-
-fn build_order_by_clause(
-    sort: &ComicSortOptionDto,
-    expand_by_series: bool,
-    library_root_path: Option<&str>,
-    values: &mut Vec<Value>,
-) -> String {
-    if expand_by_series {
-        if let Some(root) = library_root_path {
-            values.push(Value::String(Some(Box::new(root.to_string()))));
-        }
-        let root_priority = if library_root_path.is_some() {
-            "CASE \
-                 WHEN s.series_id IS NULL THEN 2 \
-                 WHEN s.folder_path = ? THEN 0 \
-                 ELSE 1 \
-             END"
-        } else {
-            "CASE WHEN s.series_id IS NULL THEN 1 ELSE 0 END"
-        };
-        return format!(
-            "{root_priority} ASC, \
-             CASE WHEN s.series_id IS NULL THEN NULL ELSE s.name_sort_key END ASC NULLS LAST, \
-             CASE WHEN s.series_id IS NULL THEN NULL ELSE si.sort_order END ASC NULLS LAST, \
-             m.title_sort_key ASC, c.comic_id ASC"
-        );
-    }
-    let direction = if sort.descending { "DESC" } else { "ASC" };
-    match sort.field {
-        ComicSortFieldDto::Title => {
-            format!("m.title_sort_key {direction}, c.comic_id ASC")
-        }
-        other => {
-            let primary = match other {
-                ComicSortFieldDto::Title => unreachable!(),
-                ComicSortFieldDto::CreatedAt => format!("c.created_at {direction}"),
-                ComicSortFieldDto::LastUpdatedAt => format!("c.last_updated_at {direction}"),
-                ComicSortFieldDto::PublishedAt => {
-                    format!("m.published_at {direction} NULLS LAST")
-                }
-                ComicSortFieldDto::ReadAt => {
-                    format!("rh.last_read_time {direction} NULLS LAST")
-                }
-                ComicSortFieldDto::FileSize => format!("c.resource_size {direction}"),
-                ComicSortFieldDto::PageCount => format!("m.page_count {direction}"),
-            };
-            format!("{primary}, m.title_sort_key ASC, c.comic_id ASC")
-        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::comic::dto::ComicSortFieldDto;
 
     #[test]
     fn order_by_read_at_joins_history_and_nulls_last() {
@@ -119,7 +55,7 @@ mod tests {
                 field: ComicSortFieldDto::ReadAt,
                 descending: true,
             },
-            false,
+            ComicGrouping::None,
             None,
             20,
             0,
@@ -139,7 +75,7 @@ mod tests {
                 field: ComicSortFieldDto::PageCount,
                 descending: false,
             },
-            false,
+            ComicGrouping::None,
             None,
             10,
             5,
@@ -158,7 +94,7 @@ mod tests {
                 field: ComicSortFieldDto::Title,
                 descending: false,
             },
-            false,
+            ComicGrouping::None,
             None,
             10,
             0,
@@ -176,7 +112,7 @@ mod tests {
                 field: ComicSortFieldDto::PublishedAt,
                 descending: false,
             },
-            false,
+            ComicGrouping::None,
             None,
             10,
             0,
@@ -193,7 +129,7 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
-            false,
+            ComicGrouping::None,
             None,
             10,
             0,
@@ -210,7 +146,7 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
-            false,
+            ComicGrouping::None,
             None,
             10,
             0,
@@ -227,7 +163,7 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
-            false,
+            ComicGrouping::None,
             None,
             10,
             0,
@@ -244,7 +180,7 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
-            false,
+            ComicGrouping::None,
             None,
             10,
             0,
@@ -261,7 +197,7 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
-            false,
+            ComicGrouping::None,
             None,
             10,
             0,
@@ -278,7 +214,7 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
-            false,
+            ComicGrouping::None,
             None,
             10,
             0,
@@ -291,11 +227,11 @@ mod tests {
     }
 
     #[test]
-    fn expand_by_series_orders_root_then_series_then_unassigned() {
+    fn by_series_grouping_orders_root_then_series_then_unassigned() {
         let sql = build_ids_page_query(
             &ComicFilterDto::default(),
             &ComicSortOptionDto::default(),
-            true,
+            ComicGrouping::BySeries,
             Some("E:/lib"),
             10,
             0,

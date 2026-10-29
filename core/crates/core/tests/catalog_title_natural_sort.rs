@@ -2,6 +2,7 @@ mod common;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::util::compute_sort_key;
+use hentai_core::ComicGrouping;
 use hentai_core::{
     connection, create_local_library, fetch_comics_page, fetch_series_page, init_db_at_path,
     set_current_library_id, update_comic_user_meta, ComicFilterDto, ComicSortFieldDto,
@@ -141,7 +142,7 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
                     show_r18: true,
                     ..Default::default()
                 },
-                false,
+                ComicGrouping::None,
                 ComicSortOptionDto {
                     field: ComicSortFieldDto::Title,
                     descending: false,
@@ -157,7 +158,7 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
 }
 
 #[test]
-fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
+fn fetch_comics_page_by_series_grouping_flattens_series_blocks() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = common::create_fixture_db(temp.path());
@@ -223,7 +224,7 @@ fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
                     show_r18: true,
                     ..Default::default()
                 },
-                true,
+                ComicGrouping::BySeries,
                 ComicSortOptionDto {
                     field: ComicSortFieldDto::CreatedAt,
                     descending: true,

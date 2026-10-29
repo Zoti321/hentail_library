@@ -2,6 +2,7 @@ mod common;
 
 use std::path::{Path, PathBuf};
 
+use hentai_core::ComicGrouping;
 use hentai_core::{
     close_reader, comic_id_from_path, count_all, count_all_series, count_named_facet_attachments,
     count_trashed_comics, create_local_library, create_remote_library, create_sync_handle,
@@ -119,7 +120,7 @@ async fn catalog_ids(library: &LibraryDto) -> Vec<String> {
             library_id: Some(library.library_id.clone()),
             ..Default::default()
         },
-        false,
+        ComicGrouping::None,
         ComicSortOptionDto::default(),
     )
     .await

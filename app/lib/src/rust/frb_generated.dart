@@ -21,11412 +21,6980 @@ import 'api/shutdown.dart';
 import 'api/sync.dart';
 import 'api/tag.dart';
 import 'api/thumbnail.dart';
-
 import 'dart:async';
 import 'dart:convert';
-
 import 'frb_generated.dart';
-import 'frb_generated.io.dart'
-    if (dart.library.js_interop) 'frb_generated.web.dart';
-
+import 'frb_generated.io.dart' if (dart.library.js_interop) 'frb_generated.web.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-/// Main entrypoint of the Rust API
-class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
-  @internal
-  static final instance = RustLib._();
-
-  RustLib._();
-
-  /// Initialize flutter_rust_bridge
-  static Future<void> init({
-    RustLibApi? api,
-    BaseHandler? handler,
-    ExternalLibrary? externalLibrary,
-    bool forceSameCodegenVersion = true,
-  }) async {
-    await instance.initImpl(
-      api: api,
-      handler: handler,
-      externalLibrary: externalLibrary,
-      forceSameCodegenVersion: forceSameCodegenVersion,
-    );
-  }
-
-  /// Initialize flutter_rust_bridge in mock mode.
-  /// No libraries for FFI are loaded.
-  static void initMock({required RustLibApi api}) {
-    instance.initMockImpl(api: api);
-  }
-
-  /// Dispose flutter_rust_bridge
-  ///
-  /// The call to this function is optional, since flutter_rust_bridge (and everything else)
-  /// is automatically disposed when the app stops.
-  static void dispose() => instance.disposeImpl();
-
-  @override
-  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor =>
-      RustLibApiImpl.new;
-
-  @override
-  WireConstructor<RustLibWire> get wireConstructor =>
-      RustLibWire.fromExternalLibrary;
-
-  @override
-  Future<void> executeRustInitializers() async {
-    await api.crateApiComicInitApp();
-  }
-
-  @override
-  ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig =>
-      kDefaultExternalLibraryLoaderConfig;
-
-  @override
-  String get codegenVersion => '2.13.0';
-
-  @override
-  int get rustContentHash => 479003567;
 
-  static const kDefaultExternalLibraryLoaderConfig =
-      ExternalLibraryLoaderConfig(
-        stem: 'hentai_flutter',
-        ioDirectory: '../core/crates/flutter/target/release/',
-        webPrefix: 'pkg/',
-        wasmBindgenName: 'wasm_bindgen',
-      );
-}
+                /// Main entrypoint of the Rust API
+                class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
+                  @internal
+                  static final instance = RustLib._();
 
-abstract class RustLibApi extends BaseApi {
-  Future<AuthorIdentityFrbDto> crateApiAuthorAddAuthorFrb({
-    required String name,
-  });
+                  RustLib._();
 
-  Future<AuthorLinkFrbDto> crateApiAuthorAddAuthorLinkFrb({
-    required PlatformInt64 authorId,
-    required AuthorLinkPlatformFrb platform,
-    required String url,
-    String? platformDisplayName,
-  });
-
-  void crateApiNamedFacetAddNamedFacetNameFrb({
-    required JunctionNamedFacetFrb facet,
-    required String name,
-  });
-
-  void crateApiTagAddTagFrb({required String name});
-
-  Future<BulkPatchResultFrbDto> crateApiComicApplyComicMetadataBulkPatchFrb({
-    required List<String> comicIds,
-    required ComicMetadataBulkPatchFrbDto patch,
-    required SyncHandleDto handle,
-  });
-
-  Future<BulkPatchResultFrbDto> crateApiComicBulkPatchResultFrbDtoDefault();
-
-  void crateApiSyncCancelSyncFrb({required SyncHandleDto handle});
-
-  int crateApiHistoryClearAllReadingFrb();
-
-  Future<void> crateApiReaderClearReaderPageCacheFrb({required String comicId});
-
-  void crateApiReaderClearReaderSessionsFrb();
-
-  void crateApiReaderCloseReaderFrb({required String comicId});
+                  /// Initialize flutter_rust_bridge
+                  static Future<void> init({
+                    RustLibApi? api,
+                    BaseHandler? handler,
+                    ExternalLibrary? externalLibrary,
+                    bool forceSameCodegenVersion = true,
+                  }) async {
+                    await instance.initImpl(
+                      api: api,
+                      handler: handler,
+                      externalLibrary: externalLibrary,
+                      forceSameCodegenVersion: forceSameCodegenVersion,
+                    );
+                  }
 
-  String crateApiComicComicIdFromPathFrb({required String rawPath});
+                  /// Initialize flutter_rust_bridge in mock mode.
+                  /// No libraries for FFI are loaded.
+                  static void initMock({
+                    required RustLibApi api,
+                  }) {
+                    instance.initMockImpl(
+                      api: api,
+                    );
+                  }
 
-  Future<ComicMetadataBulkPatchFrbDto>
-  crateApiComicComicMetadataBulkPatchFrbDtoDefault();
+                  /// Dispose flutter_rust_bridge
+                  ///
+                  /// The call to this function is optional, since flutter_rust_bridge (and everything else)
+                  /// is automatically disposed when the app stops.
+                  static void dispose() => instance.disposeImpl();
 
-  Future<ComicSortFieldDto> crateApiComicComicSortFieldDtoDefault();
+                  @override
+                  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor => RustLibApiImpl.new;
 
-  void crateApiLoggingConfigureRustLogFrb({required String appDataDir});
+                  @override
+                  WireConstructor<RustLibWire> get wireConstructor => RustLibWire.fromExternalLibrary;
 
-  Future<PlatformInt64> crateApiComicCountAllComicsFrb();
+                  @override
+                  Future<void> executeRustInitializers() async {
+                    await api.crateApiComicInitApp();
 
-  Future<PlatformInt64> crateApiSeriesCountAllSeriesFrb();
+                    
+                  }
 
-  Future<PlatformInt64> crateApiNamedFacetCountNamedFacetAttachmentsFrb({
-    required JunctionNamedFacetFrb facet,
-    required String name,
-  });
+                  @override
+                  ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig => kDefaultExternalLibraryLoaderConfig;
 
-  Future<TrashedComicCountsFrbDto> crateApiComicCountTrashedComicsFrb();
+                  @override
+                  String get codegenVersion => '2.13.0';
 
-  LibraryDto crateApiLibraryCreateLocalLibraryFrb({
-    required String rootPath,
-    String? name,
-  });
+                  @override
+                  int get rustContentHash => 479003567;
 
-  LibraryDto crateApiLibraryCreateRemoteLibraryFrb({
-    required String rootUrl,
-    required String username,
-    required bool allowHttp,
-    String? name,
-  });
+                  static const kDefaultExternalLibraryLoaderConfig = ExternalLibraryLoaderConfig(
+                    stem: 'hentai_flutter',
+                    ioDirectory: '../core/crates/flutter/target/release/',
+                    webPrefix: 'pkg/',
+                    wasmBindgenName: 'wasm_bindgen',
+                  );
+                }
+                
 
-  SyncHandleDto crateApiSyncCreateSyncHandleFrb();
+                abstract class RustLibApi extends BaseApi {
+                  Future<AuthorIdentityFrbDto> crateApiAuthorAddAuthorFrb({required String name });
 
-  Future<void> crateApiAuthorDeleteAuthorLinkFrb({
-    required PlatformInt64 authorId,
-    required PlatformInt64 linkId,
-  });
+Future<AuthorLinkFrbDto> crateApiAuthorAddAuthorLinkFrb({required PlatformInt64 authorId , required AuthorLinkPlatformFrb platform , required String url , String? platformDisplayName });
 
-  Future<void> crateApiAuthorDeleteAuthorsByNamesFrb({
-    required List<String> names,
-  });
+void crateApiNamedFacetAddNamedFacetNameFrb({required JunctionNamedFacetFrb facet , required String name });
 
-  void crateApiLibraryDeleteLibraryFrb({required String libraryId});
+void crateApiTagAddTagFrb({required String name });
 
-  void crateApiNamedFacetDeleteNamedFacetByNamesFrb({
-    required JunctionNamedFacetFrb facet,
-    required List<String> names,
-  });
+Future<BulkPatchResultFrbDto> crateApiComicApplyComicMetadataBulkPatchFrb({required List<String> comicIds , required ComicMetadataBulkPatchFrbDto patch , required SyncHandleDto handle });
 
-  int crateApiHistoryDeleteReadingByComicIdFrb({required String comicId});
+Future<BulkPatchResultFrbDto> crateApiComicBulkPatchResultFrbDtoDefault();
 
-  int crateApiHistoryDeleteReadingByComicIdsFrb({
-    required List<String> comicIds,
-  });
+void crateApiSyncCancelSyncFrb({required SyncHandleDto handle });
 
-  void crateApiTagDeleteTagsByNamesFrb({required List<String> names});
+int crateApiHistoryClearAllReadingFrb();
 
-  void crateApiThumbnailDeleteThumbnailsByComicIdsFrb({
-    required List<String> comicIds,
-  });
+Future<void> crateApiReaderClearReaderPageCacheFrb({required String comicId });
 
-  Future<ComicThumbnailDto?> crateApiThumbnailEnsureThumbnailByComicIdFrb({
-    required String comicId,
-    required ThumbnailPriorityDto priority,
-  });
+void crateApiReaderClearReaderSessionsFrb();
 
-  Uint8List crateApiMetadataBackupExportComicMetadataFrb({
-    required ExportComicMetadataOptionsDto options,
-  });
+void crateApiReaderCloseReaderFrb({required String comicId });
 
-  Future<AuthorPagedDto> crateApiAuthorFetchAuthorsPageFrb({
-    required PageRequestDto request,
-  });
+String crateApiComicComicIdFromPathFrb({required String rawPath });
 
-  Future<PagedComicResultDto> crateApiComicFetchComicsPageFrb({
-    required PageRequestDto request,
-    required ComicFilterDto filter,
-    required bool expandBySeries,
-    required ComicSortOptionDto sort,
-  });
+Future<ComicMetadataBulkPatchFrbDto> crateApiComicComicMetadataBulkPatchFrbDtoDefault();
 
-  Future<NamedFacetPagedNamesDto> crateApiNamedFacetFetchNamedFacetPageFrb({
-    required JunctionNamedFacetFrb facet,
-    required PageRequestDto request,
-  });
+Future<ComicSortFieldDto> crateApiComicComicSortFieldDtoDefault();
 
-  Future<PagedReadingHistoryDto> crateApiHistoryFetchReadingPageFrb({
-    required int page,
-    required int pageSize,
-    String? keyword,
-  });
+void crateApiLoggingConfigureRustLogFrb({required String appDataDir });
 
-  Future<SeriesComicsMetadataDto> crateApiSeriesFetchSeriesComicsMetadataFrb({
-    required String seriesId,
-  });
+Future<PlatformInt64> crateApiComicCountAllComicsFrb();
 
-  Future<PagedSeriesComicsResultDto> crateApiSeriesFetchSeriesComicsPageFrb({
-    required String seriesId,
-    required PageRequestDto request,
-  });
+Future<PlatformInt64> crateApiSeriesCountAllSeriesFrb();
 
-  Future<PagedSeriesResultDto> crateApiSeriesFetchSeriesPageFrb({
-    required PageRequestDto request,
-    required SeriesFilterDto filter,
-    required SeriesSortOptionDto sort,
-  });
+Future<PlatformInt64> crateApiNamedFacetCountNamedFacetAttachmentsFrb({required JunctionNamedFacetFrb facet , required String name });
 
-  TagPagedNamesDto crateApiTagFetchTagsPageFrb({
-    required PageRequestDto request,
-  });
+Future<TrashedComicCountsFrbDto> crateApiComicCountTrashedComicsFrb();
 
-  Future<PagedTrashedComicResultFrbDto> crateApiComicFetchTrashedComicsPageFrb({
-    required int page,
-    required int pageSize,
-  });
+LibraryDto crateApiLibraryCreateLocalLibraryFrb({required String rootPath , String? name });
 
-  Future<ComicDto?> crateApiComicFindComicByIdFrb({required String comicId});
+LibraryDto crateApiLibraryCreateRemoteLibraryFrb({required String rootUrl , required String username , required bool allowHttp , String? name });
 
-  Future<List<ComicDto>> crateApiComicFindComicsByIdsFrb({
-    required List<String> comicIds,
-  });
+SyncHandleDto crateApiSyncCreateSyncHandleFrb();
 
-  Future<SeriesDto?> crateApiSeriesFindSeriesByIdFrb({
-    required String seriesId,
-  });
+Future<void> crateApiAuthorDeleteAuthorLinkFrb({required PlatformInt64 authorId , required PlatformInt64 linkId });
 
-  Future<SeriesItemDto?> crateApiSeriesFindSeriesItemByComicIdFrb({
-    required String comicId,
-  });
+Future<void> crateApiAuthorDeleteAuthorsByNamesFrb({required List<String> names });
 
-  Future<SeriesThumbnailDto?>
-  crateApiThumbnailFindSeriesThumbnailBySeriesIdFrb({required String seriesId});
+void crateApiLibraryDeleteLibraryFrb({required String libraryId });
 
-  Future<ComicThumbnailDto?> crateApiThumbnailFindThumbnailByComicIdFrb({
-    required String comicId,
-  });
+void crateApiNamedFacetDeleteNamedFacetByNamesFrb({required JunctionNamedFacetFrb facet , required List<String> names });
 
-  Future<AuthorDetailFrbDto?> crateApiAuthorGetAuthorDetailFrb({
-    required PlatformInt64 authorId,
-    required bool showR18,
-  });
+int crateApiHistoryDeleteReadingByComicIdFrb({required String comicId });
 
-  Future<String?> crateApiLibraryGetCurrentLibraryIdFrb();
+int crateApiHistoryDeleteReadingByComicIdsFrb({required List<String> comicIds });
 
-  Future<ReadingHistoryDto?> crateApiHistoryGetReadingByComicIdFrb({
-    required String comicId,
-  });
+void crateApiTagDeleteTagsByNamesFrb({required List<String> names });
 
-  Future<SeriesReadingContextDto?>
-  crateApiSeriesGetSeriesReadingContextByComicIdFrb({required String comicId});
+void crateApiThumbnailDeleteThumbnailsByComicIdsFrb({required List<String> comicIds });
 
-  ImportComicMetadataResultDto crateApiMetadataBackupImportComicMetadataFrb({
-    required List<int> bytes,
-  });
+Future<ComicThumbnailDto?> crateApiThumbnailEnsureThumbnailByComicIdFrb({required String comicId , required ThumbnailPriorityDto priority });
 
-  TagDictionaryImportResultDto crateApiTagImportTagDictionaryFrb({
-    required List<int> jsonBytes,
-  });
+Uint8List crateApiMetadataBackupExportComicMetadataFrb({required ExportComicMetadataOptionsDto options });
 
-  Future<void> crateApiComicInitApp();
+Future<AuthorPagedDto> crateApiAuthorFetchAuthorsPageFrb({required PageRequestDto request });
 
-  void crateApiComicInitDbFrb({
-    required String appDataDir,
-    required String dbFileName,
-  });
+Future<PagedComicResultDto> crateApiComicFetchComicsPageFrb({required PageRequestDto request , required ComicFilterDto filter , required ComicGroupingDto grouping , required ComicSortOptionDto sort });
 
-  Future<LibrarySyncCountsDto> crateApiSyncLibrarySyncCountsDtoDefault();
+Future<NamedFacetPagedNamesDto> crateApiNamedFacetFetchNamedFacetPageFrb({required JunctionNamedFacetFrb facet , required PageRequestDto request });
 
-  Future<List<AuthorIdentityFrbDto>> crateApiAuthorListAllAuthorsFrb();
+Future<PagedReadingHistoryDto> crateApiHistoryFetchReadingPageFrb({required int page , required int pageSize , String? keyword });
 
-  Future<List<String>> crateApiCharacterListAllCharactersFrb();
+Future<SeriesComicsMetadataDto> crateApiSeriesFetchSeriesComicsMetadataFrb({required String seriesId });
 
-  Future<List<String>> crateApiNamedFacetListAllNamedFacetNamesFrb({
-    required JunctionNamedFacetFrb facet,
-  });
+Future<PagedSeriesComicsResultDto> crateApiSeriesFetchSeriesComicsPageFrb({required String seriesId , required PageRequestDto request });
 
-  Future<List<String>> crateApiParodyListAllParodiesFrb();
+Future<PagedSeriesResultDto> crateApiSeriesFetchSeriesPageFrb({required PageRequestDto request , required SeriesFilterDto filter , required SeriesSortOptionDto sort });
 
-  List<String> crateApiTagListAllTagsFrb();
+TagPagedNamesDto crateApiTagFetchTagsPageFrb({required PageRequestDto request });
 
-  Future<List<AuthorLinkFrbDto>> crateApiAuthorListAuthorLinksFrb({
-    required PlatformInt64 authorId,
-  });
+Future<PagedTrashedComicResultFrbDto> crateApiComicFetchTrashedComicsPageFrb({required int page , required int pageSize });
 
-  Future<List<String>> crateApiCharacterListDistinctCharactersFrb({
-    String? libraryId,
-  });
+Future<ComicDto?> crateApiComicFindComicByIdFrb({required String comicId });
 
-  Future<List<String>> crateApiParodyListDistinctParodiesFrb({
-    String? libraryId,
-  });
+Future<List<ComicDto>> crateApiComicFindComicsByIdsFrb({required List<String> comicIds });
 
-  Future<List<LibraryDto>> crateApiLibraryListLibrariesFrb();
+Future<SeriesDto?> crateApiSeriesFindSeriesByIdFrb({required String seriesId });
 
-  Future<List<NamedFacetFormEntryFrbDto>>
-  crateApiNamedFacetListNamedFacetForFormFrb({
-    required JunctionNamedFacetFrb facet,
-  });
+Future<SeriesItemDto?> crateApiSeriesFindSeriesItemByComicIdFrb({required String comicId });
 
-  Future<List<String>> crateApiComicListTrashedComicIdsFrb();
+Future<SeriesThumbnailDto?> crateApiThumbnailFindSeriesThumbnailBySeriesIdFrb({required String seriesId });
 
-  Future<Uint8List?> crateApiAuthorLoadAuthorImageFrb({
-    required PlatformInt64 authorId,
-    required AuthorImageSlotFrb slot,
-    required bool showR18,
-  });
+Future<ComicThumbnailDto?> crateApiThumbnailFindThumbnailByComicIdFrb({required String comicId });
 
-  List<SeriesComicOrderEntryDto> crateApiSeriesLoadHomeSeriesComicOrderMapFrb();
+Future<AuthorDetailFrbDto?> crateApiAuthorGetAuthorDetailFrb({required PlatformInt64 authorId , required bool showR18 });
 
-  Uint8List crateApiReaderLoadPageBytesFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required int pageIndex,
-  });
+Future<String?> crateApiLibraryGetCurrentLibraryIdFrb();
 
-  Future<ReaderPageListDto> crateApiReaderLoadPageListFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-  });
+Future<ReadingHistoryDto?> crateApiHistoryGetReadingByComicIdFrb({required String comicId });
 
-  Future<ReaderPageDto> crateApiReaderLoadReaderPageFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required int pageIndex,
-  });
+Future<SeriesReadingContextDto?> crateApiSeriesGetSeriesReadingContextByComicIdFrb({required String comicId });
 
-  void crateApiNamedFacetMergeNamedFacetNameFrb({
-    required JunctionNamedFacetFrb facet,
-    required String sourceName,
-    required String targetName,
-  });
-
-  Future<void> crateApiReaderOpenReaderFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-  });
-
-  MetadataBackupManifestDto
-  crateApiMetadataBackupPeekMetadataBackupManifestFrb({
-    required List<int> bytes,
-  });
-
-  Future<void> crateApiReaderPrefetchReaderPagesFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required List<int> pageIndexes,
-    required BigInt generation,
-  });
+ImportComicMetadataResultDto crateApiMetadataBackupImportComicMetadataFrb({required List<int> bytes });
 
-  PreviewImportComicMetadataResultDto
-  crateApiMetadataBackupPreviewImportComicMetadataFrb({
-    required List<int> bytes,
-  });
+TagDictionaryImportResultDto crateApiTagImportTagDictionaryFrb({required List<int> jsonBytes });
 
-  Future<LibraryProbeResultDto> crateApiProbeProbeLibraryFrb({
-    required String libraryId,
-    String? password,
-  });
+Future<void> crateApiComicInitApp();
 
-  Future<ComicPurgeResultFrbDto> crateApiComicPurgeComicsFrb({
-    required List<String> comicIds,
-  });
+void crateApiComicInitDbFrb({required String appDataDir , required String dbFileName });
 
-  void crateApiHistoryRecordReadingFrb({required ReadingHistoryDto history});
+Future<LibrarySyncCountsDto> crateApiSyncLibrarySyncCountsDtoDefault();
 
-  Future<void> crateApiComicRefreshComicMetadataFrb({required String comicId});
+Future<List<AuthorIdentityFrbDto>> crateApiAuthorListAllAuthorsFrb();
 
-  Future<RefreshLibraryResultFrbDto> crateApiSeriesRefreshLibraryMetadataFrb({
-    required String libraryId,
-    required SyncHandleDto handle,
-  });
+Future<List<String>> crateApiCharacterListAllCharactersFrb();
 
-  Future<RefreshSeriesResultFrbDto> crateApiSeriesRefreshSeriesMetadataFrb({
-    required String seriesId,
-    required SyncHandleDto handle,
-  });
+Future<List<String>> crateApiNamedFacetListAllNamedFacetNamesFrb({required JunctionNamedFacetFrb facet });
 
-  Future<void> crateApiAuthorRenameAuthorFrb({
-    required String oldName,
-    required String newName,
-  });
+Future<List<String>> crateApiParodyListAllParodiesFrb();
 
-  void crateApiNamedFacetRenameNamedFacetNameFrb({
-    required JunctionNamedFacetFrb facet,
-    required String oldName,
-    required String newName,
-  });
+List<String> crateApiTagListAllTagsFrb();
 
-  void crateApiTagRenameTagFrb({
-    required String oldName,
-    required String newName,
-  });
+Future<List<AuthorLinkFrbDto>> crateApiAuthorListAuthorLinksFrb({required PlatformInt64 authorId });
 
-  Future<AuthorImageRefFrbDto> crateApiAuthorResolveAuthorImageFrb({
-    required PlatformInt64 authorId,
-    required bool showR18,
-  });
+Future<List<String>> crateApiCharacterListDistinctCharactersFrb({String? libraryId });
 
-  Future<SeriesCoverSourceDto> crateApiThumbnailResolveSeriesCoverFrb({
-    required String seriesId,
-  });
-
-  Future<void> crateApiComicRestoreComicsFrb({required List<String> comicIds});
+Future<List<String>> crateApiParodyListDistinctParodiesFrb({String? libraryId });
 
-  Future<List<ComicDto>> crateApiComicSearchByKeywordFrb({
-    required String keyword,
-  });
+Future<List<LibraryDto>> crateApiLibraryListLibrariesFrb();
 
-  Future<PagedComicResultDto> crateApiComicSearchByKeywordPageFrb({
-    required String keyword,
-    required int page,
-    required int pageSize,
-  });
-
-  Future<List<ComicDto>> crateApiComicSearchByTagExpressionFrb({
-    required List<String> mustInclude,
-    required List<String> optionalOr,
-    required List<String> mustExclude,
-  });
+Future<List<NamedFacetFormEntryFrbDto>> crateApiNamedFacetListNamedFacetForFormFrb({required JunctionNamedFacetFrb facet });
 
-  Future<PagedComicResultDto> crateApiComicSearchByTagExpressionPageFrb({
-    required List<String> mustInclude,
-    required List<String> optionalOr,
-    required List<String> mustExclude,
-    required int page,
-    required int pageSize,
-  });
-
-  Future<List<SeriesDto>> crateApiSeriesSearchSeriesByKeywordFrb({
-    required String keyword,
-  });
-
-  Future<List<SeriesDto>> crateApiSeriesSearchSeriesByTagExpressionFrb({
-    required List<String> mustInclude,
-    required List<String> optionalOr,
-    required List<String> mustExclude,
-  });
-
-  Future<SeriesComicsMetadataDto>
-  crateApiSeriesSeriesComicsMetadataDtoDefault();
-
-  Future<SeriesMetaLocksDto> crateApiSeriesSeriesMetaLocksDtoDefault();
-
-  Future<SeriesSortFieldDto> crateApiSeriesSeriesSortFieldDtoDefault();
-
-  Future<SeriesSortOptionDto> crateApiSeriesSeriesSortOptionDtoDefault();
-
-  void crateApiLibrarySetAllLibrariesScanOnStartupFrb({required bool enabled});
-
-  void crateApiComicSetComicMetaLocksFrb({
-    required String comicId,
-    required SetComicMetaLocksFrbDto locks,
-  });
-
-  Future<SetComicMetaLocksFrbDto> crateApiComicSetComicMetaLocksFrbDtoDefault();
-
-  void crateApiThumbnailSetComicThumbnailFromPageFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required int pageIndex,
-  });
-
-  Future<void> crateApiLibrarySetCurrentLibraryIdFrb({String? libraryId});
-
-  void crateApiLoggingSetDiagnosticLoggingFrb({required bool verbose});
-
-  void crateApiSyncSetRemoteLibraryCredentialsFrb({
-    required List<RemoteLibraryCredentialDto> credentials,
-  });
-
-  void crateApiSeriesSetSeriesItemSortOrderLockedFrb({
-    required String seriesId,
-    required String comicId,
-    required bool locked,
-  });
-
-  Future<SetSeriesMetaLocksDto> crateApiSeriesSetSeriesMetaLocksDtoDefault();
-
-  void crateApiSeriesSetSeriesMetaLocksFrb({
-    required String seriesId,
-    required SetSeriesMetaLocksDto locks,
-  });
-
-  void crateApiThumbnailSetSeriesThumbnailFromPageFrb({
-    required String seriesId,
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required int pageIndex,
-  });
+Future<List<String>> crateApiComicListTrashedComicIdsFrb();
 
-  void crateApiShutdownShutdownAppDataFrb();
+Future<Uint8List?> crateApiAuthorLoadAuthorImageFrb({required PlatformInt64 authorId , required AuthorImageSlotFrb slot , required bool showR18 });
 
-  Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
-    required SyncHandleDto handle,
-    required SyncScanModeDto scanMode,
-    required bool syncAll,
-    String? targetLibraryId,
-    required List<RemoteLibraryCredentialDto> credentials,
-  });
+List<SeriesComicOrderEntryDto> crateApiSeriesLoadHomeSeriesComicOrderMapFrb();
 
-  Future<void> crateApiComicTrashComicsFrb({required List<String> comicIds});
+Uint8List crateApiReaderLoadPageBytesFrb({required String comicId , required String path , required String resourceType , required int pageIndex });
 
-  Future<void> crateApiAuthorUpdateAuthorLinkFrb({
-    required PlatformInt64 linkId,
-    required AuthorLinkPlatformFrb platform,
-    required String url,
-    String? platformDisplayName,
-  });
-
-  void crateApiComicUpdateComicUserMetaFrb({
-    required String comicId,
-    required UpdateComicUserMetaFrbDto meta,
-  });
-
-  Future<UpdateComicUserMetaFrbDto>
-  crateApiComicUpdateComicUserMetaFrbDtoDefault();
-
-  LibraryDto crateApiLibraryUpdateLibraryResourceFormatCategoriesFrb({
-    required String libraryId,
-    required List<ResourceFormatCategoryDto> groups,
-  });
-
-  LibraryDto crateApiLibraryUpdateLibrarySettingsFrb({
-    required String libraryId,
-    required String name,
-    required List<ResourceFormatCategoryDto> groups,
-    required bool scanOnStartup,
-    required ScanIntervalDto scanInterval,
-  });
-
-  List<LibraryDto> crateApiLibraryUpdateLibrarySidebarLayoutFrb({
-    required List<LibrarySidebarPlacementDto> placements,
-  });
-
-  LibraryDto crateApiLibraryUpdateLocalLibraryRootFrb({
-    required String libraryId,
-    required String rootPath,
-  });
-
-  LibraryDto crateApiLibraryUpdateRemoteLibraryFrb({
-    required String libraryId,
-    required String rootUrl,
-    required String username,
-    required bool allowHttp,
-  });
-
-  void crateApiSeriesUpdateSeriesItemSortOrderFrb({
-    required String seriesId,
-    required String comicId,
-    required double sortOrder,
-  });
-
-  Future<UpdateSeriesUserMetaDto>
-  crateApiSeriesUpdateSeriesUserMetaDtoDefault();
-
-  void crateApiSeriesUpdateSeriesUserMetaFrb({
-    required String seriesId,
-    required UpdateSeriesUserMetaDto meta,
-  });
-
-  Stream<List<AuthorIdentityFrbDto>> crateApiAuthorWatchAuthorsFrb();
-
-  Stream<int> crateApiComicWatchComicChanges();
-
-  Stream<List<HomeContinueReadingDto>> crateApiHomeWatchContinueReadingTop5Frb({
-    required bool excludeR18,
-  });
-
-  Stream<List<HomeLibraryAlertDto>> crateApiHomeWatchHomeLibraryAlertsFrb();
-
-  Stream<HomePageCountsDto> crateApiHomeWatchHomePageCountsFrb({
-    required bool excludeR18,
-  });
-
-  Stream<List<SeriesComicOrderEntryDto>>
-  crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
-
-  Stream<List<ReadingHistoryDto>> crateApiHistoryWatchReadingHistoriesFrb();
-
-  Stream<List<HomeRecentlyAddedDto>> crateApiHomeWatchRecentlyAddedOnHomeFrb({
-    required bool excludeR18,
-  });
-
-  Stream<List<String>> crateApiTagWatchTagsFrb();
-
-  Stream<ThumbnailEventDto> crateApiThumbnailWatchThumbnailEventsFrb();
-
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_SyncHandleDto;
-
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_SyncHandleDto;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_SyncHandleDtoPtr;
-}
-
-class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
-  RustLibApiImpl({
-    required super.handler,
-    required super.wire,
-    required super.generalizedFrbRustBinding,
-    required super.portManager,
-  });
-
-  @override
-  Future<AuthorIdentityFrbDto> crateApiAuthorAddAuthorFrb({
-    required String name,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(name, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 1,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+Future<ReaderPageListDto> crateApiReaderLoadPageListFrb({required String comicId , required String path , required String resourceType });
+
+Future<ReaderPageDto> crateApiReaderLoadReaderPageFrb({required String comicId , required String path , required String resourceType , required int pageIndex });
+
+void crateApiNamedFacetMergeNamedFacetNameFrb({required JunctionNamedFacetFrb facet , required String sourceName , required String targetName });
+
+Future<void> crateApiReaderOpenReaderFrb({required String comicId , required String path , required String resourceType });
+
+MetadataBackupManifestDto crateApiMetadataBackupPeekMetadataBackupManifestFrb({required List<int> bytes });
+
+Future<void> crateApiReaderPrefetchReaderPagesFrb({required String comicId , required String path , required String resourceType , required List<int> pageIndexes , required BigInt generation });
+
+PreviewImportComicMetadataResultDto crateApiMetadataBackupPreviewImportComicMetadataFrb({required List<int> bytes });
+
+Future<LibraryProbeResultDto> crateApiProbeProbeLibraryFrb({required String libraryId , String? password });
+
+Future<ComicPurgeResultFrbDto> crateApiComicPurgeComicsFrb({required List<String> comicIds });
+
+void crateApiHistoryRecordReadingFrb({required ReadingHistoryDto history });
+
+Future<void> crateApiComicRefreshComicMetadataFrb({required String comicId });
+
+Future<RefreshLibraryResultFrbDto> crateApiSeriesRefreshLibraryMetadataFrb({required String libraryId , required SyncHandleDto handle });
+
+Future<RefreshSeriesResultFrbDto> crateApiSeriesRefreshSeriesMetadataFrb({required String seriesId , required SyncHandleDto handle });
+
+Future<void> crateApiAuthorRenameAuthorFrb({required String oldName , required String newName });
+
+void crateApiNamedFacetRenameNamedFacetNameFrb({required JunctionNamedFacetFrb facet , required String oldName , required String newName });
+
+void crateApiTagRenameTagFrb({required String oldName , required String newName });
+
+Future<AuthorImageRefFrbDto> crateApiAuthorResolveAuthorImageFrb({required PlatformInt64 authorId , required bool showR18 });
+
+Future<SeriesCoverSourceDto> crateApiThumbnailResolveSeriesCoverFrb({required String seriesId });
+
+Future<void> crateApiComicRestoreComicsFrb({required List<String> comicIds });
+
+Future<List<ComicDto>> crateApiComicSearchByKeywordFrb({required String keyword });
+
+Future<PagedComicResultDto> crateApiComicSearchByKeywordPageFrb({required String keyword , required int page , required int pageSize });
+
+Future<List<ComicDto>> crateApiComicSearchByTagExpressionFrb({required List<String> mustInclude , required List<String> optionalOr , required List<String> mustExclude });
+
+Future<PagedComicResultDto> crateApiComicSearchByTagExpressionPageFrb({required List<String> mustInclude , required List<String> optionalOr , required List<String> mustExclude , required int page , required int pageSize });
+
+Future<List<SeriesDto>> crateApiSeriesSearchSeriesByKeywordFrb({required String keyword });
+
+Future<List<SeriesDto>> crateApiSeriesSearchSeriesByTagExpressionFrb({required List<String> mustInclude , required List<String> optionalOr , required List<String> mustExclude });
+
+Future<SeriesComicsMetadataDto> crateApiSeriesSeriesComicsMetadataDtoDefault();
+
+Future<SeriesMetaLocksDto> crateApiSeriesSeriesMetaLocksDtoDefault();
+
+Future<SeriesSortFieldDto> crateApiSeriesSeriesSortFieldDtoDefault();
+
+Future<SeriesSortOptionDto> crateApiSeriesSeriesSortOptionDtoDefault();
+
+void crateApiLibrarySetAllLibrariesScanOnStartupFrb({required bool enabled });
+
+void crateApiComicSetComicMetaLocksFrb({required String comicId , required SetComicMetaLocksFrbDto locks });
+
+Future<SetComicMetaLocksFrbDto> crateApiComicSetComicMetaLocksFrbDtoDefault();
+
+void crateApiThumbnailSetComicThumbnailFromPageFrb({required String comicId , required String path , required String resourceType , required int pageIndex });
+
+Future<void> crateApiLibrarySetCurrentLibraryIdFrb({String? libraryId });
+
+void crateApiLoggingSetDiagnosticLoggingFrb({required bool verbose });
+
+void crateApiSyncSetRemoteLibraryCredentialsFrb({required List<RemoteLibraryCredentialDto> credentials });
+
+void crateApiSeriesSetSeriesItemSortOrderLockedFrb({required String seriesId , required String comicId , required bool locked });
+
+Future<SetSeriesMetaLocksDto> crateApiSeriesSetSeriesMetaLocksDtoDefault();
+
+void crateApiSeriesSetSeriesMetaLocksFrb({required String seriesId , required SetSeriesMetaLocksDto locks });
+
+void crateApiThumbnailSetSeriesThumbnailFromPageFrb({required String seriesId , required String comicId , required String path , required String resourceType , required int pageIndex });
+
+void crateApiShutdownShutdownAppDataFrb();
+
+Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({required SyncHandleDto handle , required SyncScanModeDto scanMode , required bool syncAll , String? targetLibraryId , required List<RemoteLibraryCredentialDto> credentials });
+
+Future<void> crateApiComicTrashComicsFrb({required List<String> comicIds });
+
+Future<void> crateApiAuthorUpdateAuthorLinkFrb({required PlatformInt64 linkId , required AuthorLinkPlatformFrb platform , required String url , String? platformDisplayName });
+
+void crateApiComicUpdateComicUserMetaFrb({required String comicId , required UpdateComicUserMetaFrbDto meta });
+
+Future<UpdateComicUserMetaFrbDto> crateApiComicUpdateComicUserMetaFrbDtoDefault();
+
+LibraryDto crateApiLibraryUpdateLibraryResourceFormatCategoriesFrb({required String libraryId , required List<ResourceFormatCategoryDto> groups });
+
+LibraryDto crateApiLibraryUpdateLibrarySettingsFrb({required String libraryId , required String name , required List<ResourceFormatCategoryDto> groups , required bool scanOnStartup , required ScanIntervalDto scanInterval });
+
+List<LibraryDto> crateApiLibraryUpdateLibrarySidebarLayoutFrb({required List<LibrarySidebarPlacementDto> placements });
+
+LibraryDto crateApiLibraryUpdateLocalLibraryRootFrb({required String libraryId , required String rootPath });
+
+LibraryDto crateApiLibraryUpdateRemoteLibraryFrb({required String libraryId , required String rootUrl , required String username , required bool allowHttp });
+
+void crateApiSeriesUpdateSeriesItemSortOrderFrb({required String seriesId , required String comicId , required double sortOrder });
+
+Future<UpdateSeriesUserMetaDto> crateApiSeriesUpdateSeriesUserMetaDtoDefault();
+
+void crateApiSeriesUpdateSeriesUserMetaFrb({required String seriesId , required UpdateSeriesUserMetaDto meta });
+
+Stream<List<AuthorIdentityFrbDto>> crateApiAuthorWatchAuthorsFrb();
+
+Stream<int> crateApiComicWatchComicChanges();
+
+Stream<List<HomeContinueReadingDto>> crateApiHomeWatchContinueReadingTop5Frb({required bool excludeR18 });
+
+Stream<List<HomeLibraryAlertDto>> crateApiHomeWatchHomeLibraryAlertsFrb();
+
+Stream<HomePageCountsDto> crateApiHomeWatchHomePageCountsFrb({required bool excludeR18 });
+
+Stream<List<SeriesComicOrderEntryDto>> crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
+
+Stream<List<ReadingHistoryDto>> crateApiHistoryWatchReadingHistoriesFrb();
+
+Stream<List<HomeRecentlyAddedDto>> crateApiHomeWatchRecentlyAddedOnHomeFrb({required bool excludeR18 });
+
+Stream<List<String>> crateApiTagWatchTagsFrb();
+
+Stream<ThumbnailEventDto> crateApiThumbnailWatchThumbnailEventsFrb();
+
+RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_SyncHandleDto;
+
+RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_SyncHandleDto;
+
+CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_SyncHandleDtoPtr;
+
+
+                }
+                
+
+                class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
+                  RustLibApiImpl({
+                    required super.handler,
+                    required super.wire,
+                    required super.generalizedFrbRustBinding,
+                    required super.portManager,
+                  });
+
+                  @override Future<AuthorIdentityFrbDto> crateApiAuthorAddAuthorFrb({required String name })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(name, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_author_identity_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorAddAuthorFrbConstMeta,
-        argValues: [name],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorAddAuthorFrbConstMeta,
+            argValues: [name],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorAddAuthorFrbConstMeta =>
-      const TaskConstMeta(debugName: "add_author_frb", argNames: ["name"]);
 
-  @override
-  Future<AuthorLinkFrbDto> crateApiAuthorAddAuthorLinkFrb({
-    required PlatformInt64 authorId,
-    required AuthorLinkPlatformFrb platform,
-    required String url,
-    String? platformDisplayName,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(authorId, serializer);
-          sse_encode_author_link_platform_frb(platform, serializer);
-          sse_encode_String(url, serializer);
-          sse_encode_opt_String(platformDisplayName, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 2,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorAddAuthorFrbConstMeta => const TaskConstMeta(
+            debugName: "add_author_frb",
+            argNames: ["name"],
+        );
+        
+
+@override Future<AuthorLinkFrbDto> crateApiAuthorAddAuthorLinkFrb({required PlatformInt64 authorId , required AuthorLinkPlatformFrb platform , required String url , String? platformDisplayName })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_64(authorId, serializer);
+sse_encode_author_link_platform_frb(platform, serializer);
+sse_encode_String(url, serializer);
+sse_encode_opt_String(platformDisplayName, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_author_link_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorAddAuthorLinkFrbConstMeta,
-        argValues: [authorId, platform, url, platformDisplayName],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorAddAuthorLinkFrbConstMeta,
+            argValues: [authorId, platform, url, platformDisplayName],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorAddAuthorLinkFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "add_author_link_frb",
-        argNames: ["authorId", "platform", "url", "platformDisplayName"],
-      );
 
-  @override
-  void crateApiNamedFacetAddNamedFacetNameFrb({
-    required JunctionNamedFacetFrb facet,
-    required String name,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_junction_named_facet_frb(facet, serializer);
-          sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorAddAuthorLinkFrbConstMeta => const TaskConstMeta(
+            debugName: "add_author_link_frb",
+            argNames: ["authorId", "platform", "url", "platformDisplayName"],
+        );
+        
+
+@override void crateApiNamedFacetAddNamedFacetNameFrb({required JunctionNamedFacetFrb facet , required String name })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_junction_named_facet_frb(facet, serializer);
+sse_encode_String(name, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiNamedFacetAddNamedFacetNameFrbConstMeta,
-        argValues: [facet, name],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiNamedFacetAddNamedFacetNameFrbConstMeta,
+            argValues: [facet, name],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiNamedFacetAddNamedFacetNameFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "add_named_facet_name_frb",
-        argNames: ["facet", "name"],
-      );
 
-  @override
-  void crateApiTagAddTagFrb({required String name}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiNamedFacetAddNamedFacetNameFrbConstMeta => const TaskConstMeta(
+            debugName: "add_named_facet_name_frb",
+            argNames: ["facet", "name"],
+        );
+        
+
+@override void crateApiTagAddTagFrb({required String name })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(name, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiTagAddTagFrbConstMeta,
-        argValues: [name],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiTagAddTagFrbConstMeta,
+            argValues: [name],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiTagAddTagFrbConstMeta =>
-      const TaskConstMeta(debugName: "add_tag_frb", argNames: ["name"]);
 
-  @override
-  Future<BulkPatchResultFrbDto> crateApiComicApplyComicMetadataBulkPatchFrb({
-    required List<String> comicIds,
-    required ComicMetadataBulkPatchFrbDto patch,
-    required SyncHandleDto handle,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(comicIds, serializer);
-          sse_encode_box_autoadd_comic_metadata_bulk_patch_frb_dto(
-            patch,
-            serializer,
-          );
-          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-            handle,
-            serializer,
-          );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 5,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiTagAddTagFrbConstMeta => const TaskConstMeta(
+            debugName: "add_tag_frb",
+            argNames: ["name"],
+        );
+        
+
+@override Future<BulkPatchResultFrbDto> crateApiComicApplyComicMetadataBulkPatchFrb({required List<String> comicIds , required ComicMetadataBulkPatchFrbDto patch , required SyncHandleDto handle })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(comicIds, serializer);
+sse_encode_box_autoadd_comic_metadata_bulk_patch_frb_dto(patch, serializer);
+sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(handle, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_bulk_patch_result_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicApplyComicMetadataBulkPatchFrbConstMeta,
-        argValues: [comicIds, patch, handle],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicApplyComicMetadataBulkPatchFrbConstMeta,
+            argValues: [comicIds, patch, handle],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicApplyComicMetadataBulkPatchFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "apply_comic_metadata_bulk_patch_frb",
-        argNames: ["comicIds", "patch", "handle"],
-      );
 
-  @override
-  Future<BulkPatchResultFrbDto> crateApiComicBulkPatchResultFrbDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 6,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicApplyComicMetadataBulkPatchFrbConstMeta => const TaskConstMeta(
+            debugName: "apply_comic_metadata_bulk_patch_frb",
+            argNames: ["comicIds", "patch", "handle"],
+        );
+        
+
+@override Future<BulkPatchResultFrbDto> crateApiComicBulkPatchResultFrbDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_bulk_patch_result_frb_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiComicBulkPatchResultFrbDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicBulkPatchResultFrbDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicBulkPatchResultFrbDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "bulk_patch_result_frb_dto_default",
-        argNames: [],
-      );
 
-  @override
-  void crateApiSyncCancelSyncFrb({required SyncHandleDto handle}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-            handle,
-            serializer,
-          );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicBulkPatchResultFrbDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "bulk_patch_result_frb_dto_default",
+            argNames: [],
+        );
+        
+
+@override void crateApiSyncCancelSyncFrb({required SyncHandleDto handle })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(handle, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSyncCancelSyncFrbConstMeta,
-        argValues: [handle],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSyncCancelSyncFrbConstMeta,
+            argValues: [handle],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSyncCancelSyncFrbConstMeta =>
-      const TaskConstMeta(debugName: "cancel_sync_frb", argNames: ["handle"]);
 
-  @override
-  int crateApiHistoryClearAllReadingFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSyncCancelSyncFrbConstMeta => const TaskConstMeta(
+            debugName: "cancel_sync_frb",
+            argNames: ["handle"],
+        );
+        
+
+@override int crateApiHistoryClearAllReadingFrb()  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_i_32,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiHistoryClearAllReadingFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiHistoryClearAllReadingFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiHistoryClearAllReadingFrbConstMeta =>
-      const TaskConstMeta(debugName: "clear_all_reading_frb", argNames: []);
 
-  @override
-  Future<void> crateApiReaderClearReaderPageCacheFrb({
-    required String comicId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 9,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiHistoryClearAllReadingFrbConstMeta => const TaskConstMeta(
+            debugName: "clear_all_reading_frb",
+            argNames: [],
+        );
+        
+
+@override Future<void> crateApiReaderClearReaderPageCacheFrb({required String comicId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiReaderClearReaderPageCacheFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiReaderClearReaderPageCacheFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiReaderClearReaderPageCacheFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "clear_reader_page_cache_frb",
-        argNames: ["comicId"],
-      );
 
-  @override
-  void crateApiReaderClearReaderSessionsFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiReaderClearReaderPageCacheFrbConstMeta => const TaskConstMeta(
+            debugName: "clear_reader_page_cache_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override void crateApiReaderClearReaderSessionsFrb()  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiReaderClearReaderSessionsFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiReaderClearReaderSessionsFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiReaderClearReaderSessionsFrbConstMeta =>
-      const TaskConstMeta(debugName: "clear_reader_sessions_frb", argNames: []);
 
-  @override
-  void crateApiReaderCloseReaderFrb({required String comicId}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiReaderClearReaderSessionsFrbConstMeta => const TaskConstMeta(
+            debugName: "clear_reader_sessions_frb",
+            argNames: [],
+        );
+        
+
+@override void crateApiReaderCloseReaderFrb({required String comicId })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiReaderCloseReaderFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiReaderCloseReaderFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiReaderCloseReaderFrbConstMeta =>
-      const TaskConstMeta(debugName: "close_reader_frb", argNames: ["comicId"]);
 
-  @override
-  String crateApiComicComicIdFromPathFrb({required String rawPath}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(rawPath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiReaderCloseReaderFrbConstMeta => const TaskConstMeta(
+            debugName: "close_reader_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override String crateApiComicComicIdFromPathFrb({required String rawPath })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(rawPath, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_String,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiComicComicIdFromPathFrbConstMeta,
-        argValues: [rawPath],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicComicIdFromPathFrbConstMeta,
+            argValues: [rawPath],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicComicIdFromPathFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "comic_id_from_path_frb",
-        argNames: ["rawPath"],
-      );
 
-  @override
-  Future<ComicMetadataBulkPatchFrbDto>
-  crateApiComicComicMetadataBulkPatchFrbDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 13,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicComicIdFromPathFrbConstMeta => const TaskConstMeta(
+            debugName: "comic_id_from_path_frb",
+            argNames: ["rawPath"],
+        );
+        
+
+@override Future<ComicMetadataBulkPatchFrbDto> crateApiComicComicMetadataBulkPatchFrbDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_comic_metadata_bulk_patch_frb_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiComicComicMetadataBulkPatchFrbDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicComicMetadataBulkPatchFrbDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta
-  get kCrateApiComicComicMetadataBulkPatchFrbDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "comic_metadata_bulk_patch_frb_dto_default",
-        argNames: [],
-      );
 
-  @override
-  Future<ComicSortFieldDto> crateApiComicComicSortFieldDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 14,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicComicMetadataBulkPatchFrbDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "comic_metadata_bulk_patch_frb_dto_default",
+            argNames: [],
+        );
+        
+
+@override Future<ComicSortFieldDto> crateApiComicComicSortFieldDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_comic_sort_field_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiComicComicSortFieldDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicComicSortFieldDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicComicSortFieldDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "comic_sort_field_dto_default",
-        argNames: [],
-      );
 
-  @override
-  void crateApiLoggingConfigureRustLogFrb({required String appDataDir}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(appDataDir, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicComicSortFieldDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "comic_sort_field_dto_default",
+            argNames: [],
+        );
+        
+
+@override void crateApiLoggingConfigureRustLogFrb({required String appDataDir })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(appDataDir, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLoggingConfigureRustLogFrbConstMeta,
-        argValues: [appDataDir],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLoggingConfigureRustLogFrbConstMeta,
+            argValues: [appDataDir],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLoggingConfigureRustLogFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "configure_rust_log_frb",
-        argNames: ["appDataDir"],
-      );
 
-  @override
-  Future<PlatformInt64> crateApiComicCountAllComicsFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 16,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLoggingConfigureRustLogFrbConstMeta => const TaskConstMeta(
+            debugName: "configure_rust_log_frb",
+            argNames: ["appDataDir"],
+        );
+        
+
+@override Future<PlatformInt64> crateApiComicCountAllComicsFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_i_64,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicCountAllComicsFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicCountAllComicsFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicCountAllComicsFrbConstMeta =>
-      const TaskConstMeta(debugName: "count_all_comics_frb", argNames: []);
 
-  @override
-  Future<PlatformInt64> crateApiSeriesCountAllSeriesFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 17,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicCountAllComicsFrbConstMeta => const TaskConstMeta(
+            debugName: "count_all_comics_frb",
+            argNames: [],
+        );
+        
+
+@override Future<PlatformInt64> crateApiSeriesCountAllSeriesFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_i_64,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesCountAllSeriesFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesCountAllSeriesFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesCountAllSeriesFrbConstMeta =>
-      const TaskConstMeta(debugName: "count_all_series_frb", argNames: []);
 
-  @override
-  Future<PlatformInt64> crateApiNamedFacetCountNamedFacetAttachmentsFrb({
-    required JunctionNamedFacetFrb facet,
-    required String name,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_junction_named_facet_frb(facet, serializer);
-          sse_encode_String(name, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 18,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesCountAllSeriesFrbConstMeta => const TaskConstMeta(
+            debugName: "count_all_series_frb",
+            argNames: [],
+        );
+        
+
+@override Future<PlatformInt64> crateApiNamedFacetCountNamedFacetAttachmentsFrb({required JunctionNamedFacetFrb facet , required String name })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_junction_named_facet_frb(facet, serializer);
+sse_encode_String(name, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_i_64,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiNamedFacetCountNamedFacetAttachmentsFrbConstMeta,
-        argValues: [facet, name],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiNamedFacetCountNamedFacetAttachmentsFrbConstMeta,
+            argValues: [facet, name],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiNamedFacetCountNamedFacetAttachmentsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "count_named_facet_attachments_frb",
-        argNames: ["facet", "name"],
-      );
 
-  @override
-  Future<TrashedComicCountsFrbDto> crateApiComicCountTrashedComicsFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 19,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiNamedFacetCountNamedFacetAttachmentsFrbConstMeta => const TaskConstMeta(
+            debugName: "count_named_facet_attachments_frb",
+            argNames: ["facet", "name"],
+        );
+        
+
+@override Future<TrashedComicCountsFrbDto> crateApiComicCountTrashedComicsFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_trashed_comic_counts_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicCountTrashedComicsFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicCountTrashedComicsFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicCountTrashedComicsFrbConstMeta =>
-      const TaskConstMeta(debugName: "count_trashed_comics_frb", argNames: []);
 
-  @override
-  LibraryDto crateApiLibraryCreateLocalLibraryFrb({
-    required String rootPath,
-    String? name,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(rootPath, serializer);
-          sse_encode_opt_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicCountTrashedComicsFrbConstMeta => const TaskConstMeta(
+            debugName: "count_trashed_comics_frb",
+            argNames: [],
+        );
+        
+
+@override LibraryDto crateApiLibraryCreateLocalLibraryFrb({required String rootPath , String? name })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(rootPath, serializer);
+sse_encode_opt_String(name, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryCreateLocalLibraryFrbConstMeta,
-        argValues: [rootPath, name],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryCreateLocalLibraryFrbConstMeta,
+            argValues: [rootPath, name],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryCreateLocalLibraryFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_local_library_frb",
-        argNames: ["rootPath", "name"],
-      );
 
-  @override
-  LibraryDto crateApiLibraryCreateRemoteLibraryFrb({
-    required String rootUrl,
-    required String username,
-    required bool allowHttp,
-    String? name,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(rootUrl, serializer);
-          sse_encode_String(username, serializer);
-          sse_encode_bool(allowHttp, serializer);
-          sse_encode_opt_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryCreateLocalLibraryFrbConstMeta => const TaskConstMeta(
+            debugName: "create_local_library_frb",
+            argNames: ["rootPath", "name"],
+        );
+        
+
+@override LibraryDto crateApiLibraryCreateRemoteLibraryFrb({required String rootUrl , required String username , required bool allowHttp , String? name })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(rootUrl, serializer);
+sse_encode_String(username, serializer);
+sse_encode_bool(allowHttp, serializer);
+sse_encode_opt_String(name, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryCreateRemoteLibraryFrbConstMeta,
-        argValues: [rootUrl, username, allowHttp, name],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryCreateRemoteLibraryFrbConstMeta,
+            argValues: [rootUrl, username, allowHttp, name],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryCreateRemoteLibraryFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "create_remote_library_frb",
-        argNames: ["rootUrl", "username", "allowHttp", "name"],
-      );
 
-  @override
-  SyncHandleDto crateApiSyncCreateSyncHandleFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData:
-              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto,
+        TaskConstMeta get kCrateApiLibraryCreateRemoteLibraryFrbConstMeta => const TaskConstMeta(
+            debugName: "create_remote_library_frb",
+            argNames: ["rootUrl", "username", "allowHttp", "name"],
+        );
+        
+
+@override SyncHandleDto crateApiSyncCreateSyncHandleFrb()  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSyncCreateSyncHandleFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSyncCreateSyncHandleFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSyncCreateSyncHandleFrbConstMeta =>
-      const TaskConstMeta(debugName: "create_sync_handle_frb", argNames: []);
 
-  @override
-  Future<void> crateApiAuthorDeleteAuthorLinkFrb({
-    required PlatformInt64 authorId,
-    required PlatformInt64 linkId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(authorId, serializer);
-          sse_encode_i_64(linkId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 23,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSyncCreateSyncHandleFrbConstMeta => const TaskConstMeta(
+            debugName: "create_sync_handle_frb",
+            argNames: [],
+        );
+        
+
+@override Future<void> crateApiAuthorDeleteAuthorLinkFrb({required PlatformInt64 authorId , required PlatformInt64 linkId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_64(authorId, serializer);
+sse_encode_i_64(linkId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorDeleteAuthorLinkFrbConstMeta,
-        argValues: [authorId, linkId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorDeleteAuthorLinkFrbConstMeta,
+            argValues: [authorId, linkId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorDeleteAuthorLinkFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_author_link_frb",
-        argNames: ["authorId", "linkId"],
-      );
 
-  @override
-  Future<void> crateApiAuthorDeleteAuthorsByNamesFrb({
-    required List<String> names,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(names, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 24,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorDeleteAuthorLinkFrbConstMeta => const TaskConstMeta(
+            debugName: "delete_author_link_frb",
+            argNames: ["authorId", "linkId"],
+        );
+        
+
+@override Future<void> crateApiAuthorDeleteAuthorsByNamesFrb({required List<String> names })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(names, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorDeleteAuthorsByNamesFrbConstMeta,
-        argValues: [names],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorDeleteAuthorsByNamesFrbConstMeta,
+            argValues: [names],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorDeleteAuthorsByNamesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_authors_by_names_frb",
-        argNames: ["names"],
-      );
 
-  @override
-  void crateApiLibraryDeleteLibraryFrb({required String libraryId}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(libraryId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorDeleteAuthorsByNamesFrbConstMeta => const TaskConstMeta(
+            debugName: "delete_authors_by_names_frb",
+            argNames: ["names"],
+        );
+        
+
+@override void crateApiLibraryDeleteLibraryFrb({required String libraryId })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(libraryId, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryDeleteLibraryFrbConstMeta,
-        argValues: [libraryId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryDeleteLibraryFrbConstMeta,
+            argValues: [libraryId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryDeleteLibraryFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_library_frb",
-        argNames: ["libraryId"],
-      );
 
-  @override
-  void crateApiNamedFacetDeleteNamedFacetByNamesFrb({
-    required JunctionNamedFacetFrb facet,
-    required List<String> names,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_junction_named_facet_frb(facet, serializer);
-          sse_encode_list_String(names, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryDeleteLibraryFrbConstMeta => const TaskConstMeta(
+            debugName: "delete_library_frb",
+            argNames: ["libraryId"],
+        );
+        
+
+@override void crateApiNamedFacetDeleteNamedFacetByNamesFrb({required JunctionNamedFacetFrb facet , required List<String> names })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_junction_named_facet_frb(facet, serializer);
+sse_encode_list_String(names, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiNamedFacetDeleteNamedFacetByNamesFrbConstMeta,
-        argValues: [facet, names],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiNamedFacetDeleteNamedFacetByNamesFrbConstMeta,
+            argValues: [facet, names],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiNamedFacetDeleteNamedFacetByNamesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_named_facet_by_names_frb",
-        argNames: ["facet", "names"],
-      );
 
-  @override
-  int crateApiHistoryDeleteReadingByComicIdFrb({required String comicId}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiNamedFacetDeleteNamedFacetByNamesFrbConstMeta => const TaskConstMeta(
+            debugName: "delete_named_facet_by_names_frb",
+            argNames: ["facet", "names"],
+        );
+        
+
+@override int crateApiHistoryDeleteReadingByComicIdFrb({required String comicId })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_i_32,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiHistoryDeleteReadingByComicIdFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiHistoryDeleteReadingByComicIdFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiHistoryDeleteReadingByComicIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_reading_by_comic_id_frb",
-        argNames: ["comicId"],
-      );
 
-  @override
-  int crateApiHistoryDeleteReadingByComicIdsFrb({
-    required List<String> comicIds,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(comicIds, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiHistoryDeleteReadingByComicIdFrbConstMeta => const TaskConstMeta(
+            debugName: "delete_reading_by_comic_id_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override int crateApiHistoryDeleteReadingByComicIdsFrb({required List<String> comicIds })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(comicIds, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_i_32,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiHistoryDeleteReadingByComicIdsFrbConstMeta,
-        argValues: [comicIds],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiHistoryDeleteReadingByComicIdsFrbConstMeta,
+            argValues: [comicIds],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiHistoryDeleteReadingByComicIdsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_reading_by_comic_ids_frb",
-        argNames: ["comicIds"],
-      );
 
-  @override
-  void crateApiTagDeleteTagsByNamesFrb({required List<String> names}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(names, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiHistoryDeleteReadingByComicIdsFrbConstMeta => const TaskConstMeta(
+            debugName: "delete_reading_by_comic_ids_frb",
+            argNames: ["comicIds"],
+        );
+        
+
+@override void crateApiTagDeleteTagsByNamesFrb({required List<String> names })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(names, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiTagDeleteTagsByNamesFrbConstMeta,
-        argValues: [names],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiTagDeleteTagsByNamesFrbConstMeta,
+            argValues: [names],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiTagDeleteTagsByNamesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_tags_by_names_frb",
-        argNames: ["names"],
-      );
 
-  @override
-  void crateApiThumbnailDeleteThumbnailsByComicIdsFrb({
-    required List<String> comicIds,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(comicIds, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiTagDeleteTagsByNamesFrbConstMeta => const TaskConstMeta(
+            debugName: "delete_tags_by_names_frb",
+            argNames: ["names"],
+        );
+        
+
+@override void crateApiThumbnailDeleteThumbnailsByComicIdsFrb({required List<String> comicIds })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(comicIds, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiThumbnailDeleteThumbnailsByComicIdsFrbConstMeta,
-        argValues: [comicIds],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiThumbnailDeleteThumbnailsByComicIdsFrbConstMeta,
+            argValues: [comicIds],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiThumbnailDeleteThumbnailsByComicIdsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_thumbnails_by_comic_ids_frb",
-        argNames: ["comicIds"],
-      );
 
-  @override
-  Future<ComicThumbnailDto?> crateApiThumbnailEnsureThumbnailByComicIdFrb({
-    required String comicId,
-    required ThumbnailPriorityDto priority,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_thumbnail_priority_dto(priority, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 31,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiThumbnailDeleteThumbnailsByComicIdsFrbConstMeta => const TaskConstMeta(
+            debugName: "delete_thumbnails_by_comic_ids_frb",
+            argNames: ["comicIds"],
+        );
+        
+
+@override Future<ComicThumbnailDto?> crateApiThumbnailEnsureThumbnailByComicIdFrb({required String comicId , required ThumbnailPriorityDto priority })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_thumbnail_priority_dto(priority, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_comic_thumbnail_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiThumbnailEnsureThumbnailByComicIdFrbConstMeta,
-        argValues: [comicId, priority],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiThumbnailEnsureThumbnailByComicIdFrbConstMeta,
+            argValues: [comicId, priority],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiThumbnailEnsureThumbnailByComicIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "ensure_thumbnail_by_comic_id_frb",
-        argNames: ["comicId", "priority"],
-      );
 
-  @override
-  Uint8List crateApiMetadataBackupExportComicMetadataFrb({
-    required ExportComicMetadataOptionsDto options,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_export_comic_metadata_options_dto(
-            options,
-            serializer,
-          );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiThumbnailEnsureThumbnailByComicIdFrbConstMeta => const TaskConstMeta(
+            debugName: "ensure_thumbnail_by_comic_id_frb",
+            argNames: ["comicId", "priority"],
+        );
+        
+
+@override Uint8List crateApiMetadataBackupExportComicMetadataFrb({required ExportComicMetadataOptionsDto options })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_export_comic_metadata_options_dto(options, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiMetadataBackupExportComicMetadataFrbConstMeta,
-        argValues: [options],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiMetadataBackupExportComicMetadataFrbConstMeta,
+            argValues: [options],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiMetadataBackupExportComicMetadataFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "export_comic_metadata_frb",
-        argNames: ["options"],
-      );
 
-  @override
-  Future<AuthorPagedDto> crateApiAuthorFetchAuthorsPageFrb({
-    required PageRequestDto request,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_page_request_dto(request, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 33,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiMetadataBackupExportComicMetadataFrbConstMeta => const TaskConstMeta(
+            debugName: "export_comic_metadata_frb",
+            argNames: ["options"],
+        );
+        
+
+@override Future<AuthorPagedDto> crateApiAuthorFetchAuthorsPageFrb({required PageRequestDto request })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_page_request_dto(request, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_author_paged_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorFetchAuthorsPageFrbConstMeta,
-        argValues: [request],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorFetchAuthorsPageFrbConstMeta,
+            argValues: [request],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorFetchAuthorsPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_authors_page_frb",
-        argNames: ["request"],
-      );
 
-  @override
-  Future<PagedComicResultDto> crateApiComicFetchComicsPageFrb({
-    required PageRequestDto request,
-    required ComicFilterDto filter,
-    required bool expandBySeries,
-    required ComicSortOptionDto sort,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_page_request_dto(request, serializer);
-          sse_encode_box_autoadd_comic_filter_dto(filter, serializer);
-          sse_encode_bool(expandBySeries, serializer);
-          sse_encode_box_autoadd_comic_sort_option_dto(sort, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 34,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorFetchAuthorsPageFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_authors_page_frb",
+            argNames: ["request"],
+        );
+        
+
+@override Future<PagedComicResultDto> crateApiComicFetchComicsPageFrb({required PageRequestDto request , required ComicFilterDto filter , required ComicGroupingDto grouping , required ComicSortOptionDto sort })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_page_request_dto(request, serializer);
+sse_encode_box_autoadd_comic_filter_dto(filter, serializer);
+sse_encode_comic_grouping_dto(grouping, serializer);
+sse_encode_box_autoadd_comic_sort_option_dto(sort, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_paged_comic_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicFetchComicsPageFrbConstMeta,
-        argValues: [request, filter, expandBySeries, sort],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicFetchComicsPageFrbConstMeta,
+            argValues: [request, filter, grouping, sort],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicFetchComicsPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_comics_page_frb",
-        argNames: ["request", "filter", "expandBySeries", "sort"],
-      );
 
-  @override
-  Future<NamedFacetPagedNamesDto> crateApiNamedFacetFetchNamedFacetPageFrb({
-    required JunctionNamedFacetFrb facet,
-    required PageRequestDto request,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_junction_named_facet_frb(facet, serializer);
-          sse_encode_box_autoadd_page_request_dto(request, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 35,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicFetchComicsPageFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_comics_page_frb",
+            argNames: ["request", "filter", "grouping", "sort"],
+        );
+        
+
+@override Future<NamedFacetPagedNamesDto> crateApiNamedFacetFetchNamedFacetPageFrb({required JunctionNamedFacetFrb facet , required PageRequestDto request })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_junction_named_facet_frb(facet, serializer);
+sse_encode_box_autoadd_page_request_dto(request, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_named_facet_paged_names_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiNamedFacetFetchNamedFacetPageFrbConstMeta,
-        argValues: [facet, request],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiNamedFacetFetchNamedFacetPageFrbConstMeta,
+            argValues: [facet, request],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiNamedFacetFetchNamedFacetPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_named_facet_page_frb",
-        argNames: ["facet", "request"],
-      );
 
-  @override
-  Future<PagedReadingHistoryDto> crateApiHistoryFetchReadingPageFrb({
-    required int page,
-    required int pageSize,
-    String? keyword,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_32(page, serializer);
-          sse_encode_i_32(pageSize, serializer);
-          sse_encode_opt_String(keyword, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 36,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiNamedFacetFetchNamedFacetPageFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_named_facet_page_frb",
+            argNames: ["facet", "request"],
+        );
+        
+
+@override Future<PagedReadingHistoryDto> crateApiHistoryFetchReadingPageFrb({required int page , required int pageSize , String? keyword })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_32(page, serializer);
+sse_encode_i_32(pageSize, serializer);
+sse_encode_opt_String(keyword, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_paged_reading_history_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiHistoryFetchReadingPageFrbConstMeta,
-        argValues: [page, pageSize, keyword],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiHistoryFetchReadingPageFrbConstMeta,
+            argValues: [page, pageSize, keyword],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiHistoryFetchReadingPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_reading_page_frb",
-        argNames: ["page", "pageSize", "keyword"],
-      );
 
-  @override
-  Future<SeriesComicsMetadataDto> crateApiSeriesFetchSeriesComicsMetadataFrb({
-    required String seriesId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 37,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiHistoryFetchReadingPageFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_reading_page_frb",
+            argNames: ["page", "pageSize", "keyword"],
+        );
+        
+
+@override Future<SeriesComicsMetadataDto> crateApiSeriesFetchSeriesComicsMetadataFrb({required String seriesId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_series_comics_metadata_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesFetchSeriesComicsMetadataFrbConstMeta,
-        argValues: [seriesId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesFetchSeriesComicsMetadataFrbConstMeta,
+            argValues: [seriesId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesFetchSeriesComicsMetadataFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_series_comics_metadata_frb",
-        argNames: ["seriesId"],
-      );
 
-  @override
-  Future<PagedSeriesComicsResultDto> crateApiSeriesFetchSeriesComicsPageFrb({
-    required String seriesId,
-    required PageRequestDto request,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          sse_encode_box_autoadd_page_request_dto(request, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 38,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesFetchSeriesComicsMetadataFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_series_comics_metadata_frb",
+            argNames: ["seriesId"],
+        );
+        
+
+@override Future<PagedSeriesComicsResultDto> crateApiSeriesFetchSeriesComicsPageFrb({required String seriesId , required PageRequestDto request })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+sse_encode_box_autoadd_page_request_dto(request, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_paged_series_comics_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesFetchSeriesComicsPageFrbConstMeta,
-        argValues: [seriesId, request],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesFetchSeriesComicsPageFrbConstMeta,
+            argValues: [seriesId, request],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesFetchSeriesComicsPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_series_comics_page_frb",
-        argNames: ["seriesId", "request"],
-      );
 
-  @override
-  Future<PagedSeriesResultDto> crateApiSeriesFetchSeriesPageFrb({
-    required PageRequestDto request,
-    required SeriesFilterDto filter,
-    required SeriesSortOptionDto sort,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_page_request_dto(request, serializer);
-          sse_encode_box_autoadd_series_filter_dto(filter, serializer);
-          sse_encode_box_autoadd_series_sort_option_dto(sort, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 39,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesFetchSeriesComicsPageFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_series_comics_page_frb",
+            argNames: ["seriesId", "request"],
+        );
+        
+
+@override Future<PagedSeriesResultDto> crateApiSeriesFetchSeriesPageFrb({required PageRequestDto request , required SeriesFilterDto filter , required SeriesSortOptionDto sort })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_page_request_dto(request, serializer);
+sse_encode_box_autoadd_series_filter_dto(filter, serializer);
+sse_encode_box_autoadd_series_sort_option_dto(sort, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_paged_series_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesFetchSeriesPageFrbConstMeta,
-        argValues: [request, filter, sort],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesFetchSeriesPageFrbConstMeta,
+            argValues: [request, filter, sort],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesFetchSeriesPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_series_page_frb",
-        argNames: ["request", "filter", "sort"],
-      );
 
-  @override
-  TagPagedNamesDto crateApiTagFetchTagsPageFrb({
-    required PageRequestDto request,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_page_request_dto(request, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesFetchSeriesPageFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_series_page_frb",
+            argNames: ["request", "filter", "sort"],
+        );
+        
+
+@override TagPagedNamesDto crateApiTagFetchTagsPageFrb({required PageRequestDto request })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_page_request_dto(request, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_tag_paged_names_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiTagFetchTagsPageFrbConstMeta,
-        argValues: [request],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiTagFetchTagsPageFrbConstMeta,
+            argValues: [request],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiTagFetchTagsPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_tags_page_frb",
-        argNames: ["request"],
-      );
 
-  @override
-  Future<PagedTrashedComicResultFrbDto> crateApiComicFetchTrashedComicsPageFrb({
-    required int page,
-    required int pageSize,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_32(page, serializer);
-          sse_encode_i_32(pageSize, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 41,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiTagFetchTagsPageFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_tags_page_frb",
+            argNames: ["request"],
+        );
+        
+
+@override Future<PagedTrashedComicResultFrbDto> crateApiComicFetchTrashedComicsPageFrb({required int page , required int pageSize })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_32(page, serializer);
+sse_encode_i_32(pageSize, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_paged_trashed_comic_result_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicFetchTrashedComicsPageFrbConstMeta,
-        argValues: [page, pageSize],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicFetchTrashedComicsPageFrbConstMeta,
+            argValues: [page, pageSize],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicFetchTrashedComicsPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "fetch_trashed_comics_page_frb",
-        argNames: ["page", "pageSize"],
-      );
 
-  @override
-  Future<ComicDto?> crateApiComicFindComicByIdFrb({required String comicId}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 42,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicFetchTrashedComicsPageFrbConstMeta => const TaskConstMeta(
+            debugName: "fetch_trashed_comics_page_frb",
+            argNames: ["page", "pageSize"],
+        );
+        
+
+@override Future<ComicDto?> crateApiComicFindComicByIdFrb({required String comicId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_comic_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicFindComicByIdFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicFindComicByIdFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicFindComicByIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "find_comic_by_id_frb",
-        argNames: ["comicId"],
-      );
 
-  @override
-  Future<List<ComicDto>> crateApiComicFindComicsByIdsFrb({
-    required List<String> comicIds,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(comicIds, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 43,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicFindComicByIdFrbConstMeta => const TaskConstMeta(
+            debugName: "find_comic_by_id_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override Future<List<ComicDto>> crateApiComicFindComicsByIdsFrb({required List<String> comicIds })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(comicIds, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_comic_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicFindComicsByIdsFrbConstMeta,
-        argValues: [comicIds],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicFindComicsByIdsFrbConstMeta,
+            argValues: [comicIds],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicFindComicsByIdsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "find_comics_by_ids_frb",
-        argNames: ["comicIds"],
-      );
 
-  @override
-  Future<SeriesDto?> crateApiSeriesFindSeriesByIdFrb({
-    required String seriesId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 44,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicFindComicsByIdsFrbConstMeta => const TaskConstMeta(
+            debugName: "find_comics_by_ids_frb",
+            argNames: ["comicIds"],
+        );
+        
+
+@override Future<SeriesDto?> crateApiSeriesFindSeriesByIdFrb({required String seriesId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_series_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesFindSeriesByIdFrbConstMeta,
-        argValues: [seriesId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesFindSeriesByIdFrbConstMeta,
+            argValues: [seriesId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesFindSeriesByIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "find_series_by_id_frb",
-        argNames: ["seriesId"],
-      );
 
-  @override
-  Future<SeriesItemDto?> crateApiSeriesFindSeriesItemByComicIdFrb({
-    required String comicId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 45,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesFindSeriesByIdFrbConstMeta => const TaskConstMeta(
+            debugName: "find_series_by_id_frb",
+            argNames: ["seriesId"],
+        );
+        
+
+@override Future<SeriesItemDto?> crateApiSeriesFindSeriesItemByComicIdFrb({required String comicId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_series_item_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesFindSeriesItemByComicIdFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesFindSeriesItemByComicIdFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesFindSeriesItemByComicIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "find_series_item_by_comic_id_frb",
-        argNames: ["comicId"],
-      );
 
-  @override
-  Future<SeriesThumbnailDto?>
-  crateApiThumbnailFindSeriesThumbnailBySeriesIdFrb({
-    required String seriesId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 46,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesFindSeriesItemByComicIdFrbConstMeta => const TaskConstMeta(
+            debugName: "find_series_item_by_comic_id_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override Future<SeriesThumbnailDto?> crateApiThumbnailFindSeriesThumbnailBySeriesIdFrb({required String seriesId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_series_thumbnail_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiThumbnailFindSeriesThumbnailBySeriesIdFrbConstMeta,
-        argValues: [seriesId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiThumbnailFindSeriesThumbnailBySeriesIdFrbConstMeta,
+            argValues: [seriesId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta
-  get kCrateApiThumbnailFindSeriesThumbnailBySeriesIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "find_series_thumbnail_by_series_id_frb",
-        argNames: ["seriesId"],
-      );
 
-  @override
-  Future<ComicThumbnailDto?> crateApiThumbnailFindThumbnailByComicIdFrb({
-    required String comicId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 47,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiThumbnailFindSeriesThumbnailBySeriesIdFrbConstMeta => const TaskConstMeta(
+            debugName: "find_series_thumbnail_by_series_id_frb",
+            argNames: ["seriesId"],
+        );
+        
+
+@override Future<ComicThumbnailDto?> crateApiThumbnailFindThumbnailByComicIdFrb({required String comicId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_comic_thumbnail_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiThumbnailFindThumbnailByComicIdFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiThumbnailFindThumbnailByComicIdFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiThumbnailFindThumbnailByComicIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "find_thumbnail_by_comic_id_frb",
-        argNames: ["comicId"],
-      );
 
-  @override
-  Future<AuthorDetailFrbDto?> crateApiAuthorGetAuthorDetailFrb({
-    required PlatformInt64 authorId,
-    required bool showR18,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(authorId, serializer);
-          sse_encode_bool(showR18, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 48,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiThumbnailFindThumbnailByComicIdFrbConstMeta => const TaskConstMeta(
+            debugName: "find_thumbnail_by_comic_id_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override Future<AuthorDetailFrbDto?> crateApiAuthorGetAuthorDetailFrb({required PlatformInt64 authorId , required bool showR18 })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_64(authorId, serializer);
+sse_encode_bool(showR18, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_author_detail_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorGetAuthorDetailFrbConstMeta,
-        argValues: [authorId, showR18],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorGetAuthorDetailFrbConstMeta,
+            argValues: [authorId, showR18],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorGetAuthorDetailFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_author_detail_frb",
-        argNames: ["authorId", "showR18"],
-      );
 
-  @override
-  Future<String?> crateApiLibraryGetCurrentLibraryIdFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 49,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorGetAuthorDetailFrbConstMeta => const TaskConstMeta(
+            debugName: "get_author_detail_frb",
+            argNames: ["authorId", "showR18"],
+        );
+        
+
+@override Future<String?> crateApiLibraryGetCurrentLibraryIdFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_String,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryGetCurrentLibraryIdFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryGetCurrentLibraryIdFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryGetCurrentLibraryIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_current_library_id_frb",
-        argNames: [],
-      );
 
-  @override
-  Future<ReadingHistoryDto?> crateApiHistoryGetReadingByComicIdFrb({
-    required String comicId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 50,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryGetCurrentLibraryIdFrbConstMeta => const TaskConstMeta(
+            debugName: "get_current_library_id_frb",
+            argNames: [],
+        );
+        
+
+@override Future<ReadingHistoryDto?> crateApiHistoryGetReadingByComicIdFrb({required String comicId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_reading_history_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiHistoryGetReadingByComicIdFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiHistoryGetReadingByComicIdFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiHistoryGetReadingByComicIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_reading_by_comic_id_frb",
-        argNames: ["comicId"],
-      );
 
-  @override
-  Future<SeriesReadingContextDto?>
-  crateApiSeriesGetSeriesReadingContextByComicIdFrb({required String comicId}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 51,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData:
-              sse_decode_opt_box_autoadd_series_reading_context_dto,
+        TaskConstMeta get kCrateApiHistoryGetReadingByComicIdFrbConstMeta => const TaskConstMeta(
+            debugName: "get_reading_by_comic_id_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override Future<SeriesReadingContextDto?> crateApiSeriesGetSeriesReadingContextByComicIdFrb({required String comicId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_series_reading_context_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesGetSeriesReadingContextByComicIdFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesGetSeriesReadingContextByComicIdFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta
-  get kCrateApiSeriesGetSeriesReadingContextByComicIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_series_reading_context_by_comic_id_frb",
-        argNames: ["comicId"],
-      );
 
-  @override
-  ImportComicMetadataResultDto crateApiMetadataBackupImportComicMetadataFrb({
-    required List<int> bytes,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_u_8_loose(bytes, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesGetSeriesReadingContextByComicIdFrbConstMeta => const TaskConstMeta(
+            debugName: "get_series_reading_context_by_comic_id_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override ImportComicMetadataResultDto crateApiMetadataBackupImportComicMetadataFrb({required List<int> bytes })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(bytes, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_import_comic_metadata_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiMetadataBackupImportComicMetadataFrbConstMeta,
-        argValues: [bytes],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiMetadataBackupImportComicMetadataFrbConstMeta,
+            argValues: [bytes],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiMetadataBackupImportComicMetadataFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "import_comic_metadata_frb",
-        argNames: ["bytes"],
-      );
 
-  @override
-  TagDictionaryImportResultDto crateApiTagImportTagDictionaryFrb({
-    required List<int> jsonBytes,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_u_8_loose(jsonBytes, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiMetadataBackupImportComicMetadataFrbConstMeta => const TaskConstMeta(
+            debugName: "import_comic_metadata_frb",
+            argNames: ["bytes"],
+        );
+        
+
+@override TagDictionaryImportResultDto crateApiTagImportTagDictionaryFrb({required List<int> jsonBytes })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(jsonBytes, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_tag_dictionary_import_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiTagImportTagDictionaryFrbConstMeta,
-        argValues: [jsonBytes],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiTagImportTagDictionaryFrbConstMeta,
+            argValues: [jsonBytes],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiTagImportTagDictionaryFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "import_tag_dictionary_frb",
-        argNames: ["jsonBytes"],
-      );
 
-  @override
-  Future<void> crateApiComicInitApp() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 54,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiTagImportTagDictionaryFrbConstMeta => const TaskConstMeta(
+            debugName: "import_tag_dictionary_frb",
+            argNames: ["jsonBytes"],
+        );
+        
+
+@override Future<void> crateApiComicInitApp()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiComicInitAppConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicInitAppConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicInitAppConstMeta =>
-      const TaskConstMeta(debugName: "init_app", argNames: []);
 
-  @override
-  void crateApiComicInitDbFrb({
-    required String appDataDir,
-    required String dbFileName,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(appDataDir, serializer);
-          sse_encode_String(dbFileName, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicInitAppConstMeta => const TaskConstMeta(
+            debugName: "init_app",
+            argNames: [],
+        );
+        
+
+@override void crateApiComicInitDbFrb({required String appDataDir , required String dbFileName })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(appDataDir, serializer);
+sse_encode_String(dbFileName, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicInitDbFrbConstMeta,
-        argValues: [appDataDir, dbFileName],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicInitDbFrbConstMeta,
+            argValues: [appDataDir, dbFileName],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicInitDbFrbConstMeta => const TaskConstMeta(
-    debugName: "init_db_frb",
-    argNames: ["appDataDir", "dbFileName"],
-  );
 
-  @override
-  Future<LibrarySyncCountsDto> crateApiSyncLibrarySyncCountsDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 56,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicInitDbFrbConstMeta => const TaskConstMeta(
+            debugName: "init_db_frb",
+            argNames: ["appDataDir", "dbFileName"],
+        );
+        
+
+@override Future<LibrarySyncCountsDto> crateApiSyncLibrarySyncCountsDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_library_sync_counts_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSyncLibrarySyncCountsDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSyncLibrarySyncCountsDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSyncLibrarySyncCountsDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "library_sync_counts_dto_default",
-        argNames: [],
-      );
 
-  @override
-  Future<List<AuthorIdentityFrbDto>> crateApiAuthorListAllAuthorsFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 57,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSyncLibrarySyncCountsDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "library_sync_counts_dto_default",
+            argNames: [],
+        );
+        
+
+@override Future<List<AuthorIdentityFrbDto>> crateApiAuthorListAllAuthorsFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_author_identity_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorListAllAuthorsFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorListAllAuthorsFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorListAllAuthorsFrbConstMeta =>
-      const TaskConstMeta(debugName: "list_all_authors_frb", argNames: []);
 
-  @override
-  Future<List<String>> crateApiCharacterListAllCharactersFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 58,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorListAllAuthorsFrbConstMeta => const TaskConstMeta(
+            debugName: "list_all_authors_frb",
+            argNames: [],
+        );
+        
+
+@override Future<List<String>> crateApiCharacterListAllCharactersFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiCharacterListAllCharactersFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiCharacterListAllCharactersFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiCharacterListAllCharactersFrbConstMeta =>
-      const TaskConstMeta(debugName: "list_all_characters_frb", argNames: []);
 
-  @override
-  Future<List<String>> crateApiNamedFacetListAllNamedFacetNamesFrb({
-    required JunctionNamedFacetFrb facet,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_junction_named_facet_frb(facet, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 59,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiCharacterListAllCharactersFrbConstMeta => const TaskConstMeta(
+            debugName: "list_all_characters_frb",
+            argNames: [],
+        );
+        
+
+@override Future<List<String>> crateApiNamedFacetListAllNamedFacetNamesFrb({required JunctionNamedFacetFrb facet })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_junction_named_facet_frb(facet, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiNamedFacetListAllNamedFacetNamesFrbConstMeta,
-        argValues: [facet],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiNamedFacetListAllNamedFacetNamesFrbConstMeta,
+            argValues: [facet],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiNamedFacetListAllNamedFacetNamesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_all_named_facet_names_frb",
-        argNames: ["facet"],
-      );
 
-  @override
-  Future<List<String>> crateApiParodyListAllParodiesFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 60,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiNamedFacetListAllNamedFacetNamesFrbConstMeta => const TaskConstMeta(
+            debugName: "list_all_named_facet_names_frb",
+            argNames: ["facet"],
+        );
+        
+
+@override Future<List<String>> crateApiParodyListAllParodiesFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiParodyListAllParodiesFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiParodyListAllParodiesFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiParodyListAllParodiesFrbConstMeta =>
-      const TaskConstMeta(debugName: "list_all_parodies_frb", argNames: []);
 
-  @override
-  List<String> crateApiTagListAllTagsFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiParodyListAllParodiesFrbConstMeta => const TaskConstMeta(
+            debugName: "list_all_parodies_frb",
+            argNames: [],
+        );
+        
+
+@override List<String> crateApiTagListAllTagsFrb()  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiTagListAllTagsFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiTagListAllTagsFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiTagListAllTagsFrbConstMeta =>
-      const TaskConstMeta(debugName: "list_all_tags_frb", argNames: []);
 
-  @override
-  Future<List<AuthorLinkFrbDto>> crateApiAuthorListAuthorLinksFrb({
-    required PlatformInt64 authorId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(authorId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 62,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiTagListAllTagsFrbConstMeta => const TaskConstMeta(
+            debugName: "list_all_tags_frb",
+            argNames: [],
+        );
+        
+
+@override Future<List<AuthorLinkFrbDto>> crateApiAuthorListAuthorLinksFrb({required PlatformInt64 authorId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_64(authorId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_author_link_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorListAuthorLinksFrbConstMeta,
-        argValues: [authorId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorListAuthorLinksFrbConstMeta,
+            argValues: [authorId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorListAuthorLinksFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_author_links_frb",
-        argNames: ["authorId"],
-      );
 
-  @override
-  Future<List<String>> crateApiCharacterListDistinctCharactersFrb({
-    String? libraryId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_opt_String(libraryId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 63,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorListAuthorLinksFrbConstMeta => const TaskConstMeta(
+            debugName: "list_author_links_frb",
+            argNames: ["authorId"],
+        );
+        
+
+@override Future<List<String>> crateApiCharacterListDistinctCharactersFrb({String? libraryId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_opt_String(libraryId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiCharacterListDistinctCharactersFrbConstMeta,
-        argValues: [libraryId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiCharacterListDistinctCharactersFrbConstMeta,
+            argValues: [libraryId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiCharacterListDistinctCharactersFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_distinct_characters_frb",
-        argNames: ["libraryId"],
-      );
 
-  @override
-  Future<List<String>> crateApiParodyListDistinctParodiesFrb({
-    String? libraryId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_opt_String(libraryId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 64,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiCharacterListDistinctCharactersFrbConstMeta => const TaskConstMeta(
+            debugName: "list_distinct_characters_frb",
+            argNames: ["libraryId"],
+        );
+        
+
+@override Future<List<String>> crateApiParodyListDistinctParodiesFrb({String? libraryId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_opt_String(libraryId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 64, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiParodyListDistinctParodiesFrbConstMeta,
-        argValues: [libraryId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiParodyListDistinctParodiesFrbConstMeta,
+            argValues: [libraryId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiParodyListDistinctParodiesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_distinct_parodies_frb",
-        argNames: ["libraryId"],
-      );
 
-  @override
-  Future<List<LibraryDto>> crateApiLibraryListLibrariesFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 65,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiParodyListDistinctParodiesFrbConstMeta => const TaskConstMeta(
+            debugName: "list_distinct_parodies_frb",
+            argNames: ["libraryId"],
+        );
+        
+
+@override Future<List<LibraryDto>> crateApiLibraryListLibrariesFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 65, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryListLibrariesFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryListLibrariesFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryListLibrariesFrbConstMeta =>
-      const TaskConstMeta(debugName: "list_libraries_frb", argNames: []);
 
-  @override
-  Future<List<NamedFacetFormEntryFrbDto>>
-  crateApiNamedFacetListNamedFacetForFormFrb({
-    required JunctionNamedFacetFrb facet,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_junction_named_facet_frb(facet, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 66,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryListLibrariesFrbConstMeta => const TaskConstMeta(
+            debugName: "list_libraries_frb",
+            argNames: [],
+        );
+        
+
+@override Future<List<NamedFacetFormEntryFrbDto>> crateApiNamedFacetListNamedFacetForFormFrb({required JunctionNamedFacetFrb facet })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_junction_named_facet_frb(facet, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_named_facet_form_entry_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiNamedFacetListNamedFacetForFormFrbConstMeta,
-        argValues: [facet],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiNamedFacetListNamedFacetForFormFrbConstMeta,
+            argValues: [facet],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiNamedFacetListNamedFacetForFormFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_named_facet_for_form_frb",
-        argNames: ["facet"],
-      );
 
-  @override
-  Future<List<String>> crateApiComicListTrashedComicIdsFrb() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 67,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiNamedFacetListNamedFacetForFormFrbConstMeta => const TaskConstMeta(
+            debugName: "list_named_facet_for_form_frb",
+            argNames: ["facet"],
+        );
+        
+
+@override Future<List<String>> crateApiComicListTrashedComicIdsFrb()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicListTrashedComicIdsFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicListTrashedComicIdsFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicListTrashedComicIdsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "list_trashed_comic_ids_frb",
-        argNames: [],
-      );
 
-  @override
-  Future<Uint8List?> crateApiAuthorLoadAuthorImageFrb({
-    required PlatformInt64 authorId,
-    required AuthorImageSlotFrb slot,
-    required bool showR18,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(authorId, serializer);
-          sse_encode_author_image_slot_frb(slot, serializer);
-          sse_encode_bool(showR18, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 68,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicListTrashedComicIdsFrbConstMeta => const TaskConstMeta(
+            debugName: "list_trashed_comic_ids_frb",
+            argNames: [],
+        );
+        
+
+@override Future<Uint8List?> crateApiAuthorLoadAuthorImageFrb({required PlatformInt64 authorId , required AuthorImageSlotFrb slot , required bool showR18 })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_64(authorId, serializer);
+sse_encode_author_image_slot_frb(slot, serializer);
+sse_encode_bool(showR18, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_opt_list_prim_u_8_strict,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorLoadAuthorImageFrbConstMeta,
-        argValues: [authorId, slot, showR18],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorLoadAuthorImageFrbConstMeta,
+            argValues: [authorId, slot, showR18],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorLoadAuthorImageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "load_author_image_frb",
-        argNames: ["authorId", "slot", "showR18"],
-      );
 
-  @override
-  List<SeriesComicOrderEntryDto>
-  crateApiSeriesLoadHomeSeriesComicOrderMapFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorLoadAuthorImageFrbConstMeta => const TaskConstMeta(
+            debugName: "load_author_image_frb",
+            argNames: ["authorId", "slot", "showR18"],
+        );
+        
+
+@override List<SeriesComicOrderEntryDto> crateApiSeriesLoadHomeSeriesComicOrderMapFrb()  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_series_comic_order_entry_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesLoadHomeSeriesComicOrderMapFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesLoadHomeSeriesComicOrderMapFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesLoadHomeSeriesComicOrderMapFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "load_home_series_comic_order_map_frb",
-        argNames: [],
-      );
 
-  @override
-  Uint8List crateApiReaderLoadPageBytesFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required int pageIndex,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_String(path, serializer);
-          sse_encode_String(resourceType, serializer);
-          sse_encode_i_32(pageIndex, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesLoadHomeSeriesComicOrderMapFrbConstMeta => const TaskConstMeta(
+            debugName: "load_home_series_comic_order_map_frb",
+            argNames: [],
+        );
+        
+
+@override Uint8List crateApiReaderLoadPageBytesFrb({required String comicId , required String path , required String resourceType , required int pageIndex })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_String(path, serializer);
+sse_encode_String(resourceType, serializer);
+sse_encode_i_32(pageIndex, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiReaderLoadPageBytesFrbConstMeta,
-        argValues: [comicId, path, resourceType, pageIndex],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiReaderLoadPageBytesFrbConstMeta,
+            argValues: [comicId, path, resourceType, pageIndex],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiReaderLoadPageBytesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "load_page_bytes_frb",
-        argNames: ["comicId", "path", "resourceType", "pageIndex"],
-      );
 
-  @override
-  Future<ReaderPageListDto> crateApiReaderLoadPageListFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_String(path, serializer);
-          sse_encode_String(resourceType, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 71,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiReaderLoadPageBytesFrbConstMeta => const TaskConstMeta(
+            debugName: "load_page_bytes_frb",
+            argNames: ["comicId", "path", "resourceType", "pageIndex"],
+        );
+        
+
+@override Future<ReaderPageListDto> crateApiReaderLoadPageListFrb({required String comicId , required String path , required String resourceType })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_String(path, serializer);
+sse_encode_String(resourceType, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_reader_page_list_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiReaderLoadPageListFrbConstMeta,
-        argValues: [comicId, path, resourceType],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiReaderLoadPageListFrbConstMeta,
+            argValues: [comicId, path, resourceType],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiReaderLoadPageListFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "load_page_list_frb",
-        argNames: ["comicId", "path", "resourceType"],
-      );
 
-  @override
-  Future<ReaderPageDto> crateApiReaderLoadReaderPageFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required int pageIndex,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_String(path, serializer);
-          sse_encode_String(resourceType, serializer);
-          sse_encode_i_32(pageIndex, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 72,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiReaderLoadPageListFrbConstMeta => const TaskConstMeta(
+            debugName: "load_page_list_frb",
+            argNames: ["comicId", "path", "resourceType"],
+        );
+        
+
+@override Future<ReaderPageDto> crateApiReaderLoadReaderPageFrb({required String comicId , required String path , required String resourceType , required int pageIndex })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_String(path, serializer);
+sse_encode_String(resourceType, serializer);
+sse_encode_i_32(pageIndex, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 72, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_reader_page_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiReaderLoadReaderPageFrbConstMeta,
-        argValues: [comicId, path, resourceType, pageIndex],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiReaderLoadReaderPageFrbConstMeta,
+            argValues: [comicId, path, resourceType, pageIndex],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiReaderLoadReaderPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "load_reader_page_frb",
-        argNames: ["comicId", "path", "resourceType", "pageIndex"],
-      );
 
-  @override
-  void crateApiNamedFacetMergeNamedFacetNameFrb({
-    required JunctionNamedFacetFrb facet,
-    required String sourceName,
-    required String targetName,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_junction_named_facet_frb(facet, serializer);
-          sse_encode_String(sourceName, serializer);
-          sse_encode_String(targetName, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 73)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiReaderLoadReaderPageFrbConstMeta => const TaskConstMeta(
+            debugName: "load_reader_page_frb",
+            argNames: ["comicId", "path", "resourceType", "pageIndex"],
+        );
+        
+
+@override void crateApiNamedFacetMergeNamedFacetNameFrb({required JunctionNamedFacetFrb facet , required String sourceName , required String targetName })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_junction_named_facet_frb(facet, serializer);
+sse_encode_String(sourceName, serializer);
+sse_encode_String(targetName, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 73)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiNamedFacetMergeNamedFacetNameFrbConstMeta,
-        argValues: [facet, sourceName, targetName],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiNamedFacetMergeNamedFacetNameFrbConstMeta,
+            argValues: [facet, sourceName, targetName],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiNamedFacetMergeNamedFacetNameFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "merge_named_facet_name_frb",
-        argNames: ["facet", "sourceName", "targetName"],
-      );
 
-  @override
-  Future<void> crateApiReaderOpenReaderFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_String(path, serializer);
-          sse_encode_String(resourceType, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 74,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiNamedFacetMergeNamedFacetNameFrbConstMeta => const TaskConstMeta(
+            debugName: "merge_named_facet_name_frb",
+            argNames: ["facet", "sourceName", "targetName"],
+        );
+        
+
+@override Future<void> crateApiReaderOpenReaderFrb({required String comicId , required String path , required String resourceType })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_String(path, serializer);
+sse_encode_String(resourceType, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 74, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiReaderOpenReaderFrbConstMeta,
-        argValues: [comicId, path, resourceType],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiReaderOpenReaderFrbConstMeta,
+            argValues: [comicId, path, resourceType],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiReaderOpenReaderFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "open_reader_frb",
-        argNames: ["comicId", "path", "resourceType"],
-      );
 
-  @override
-  MetadataBackupManifestDto
-  crateApiMetadataBackupPeekMetadataBackupManifestFrb({
-    required List<int> bytes,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_u_8_loose(bytes, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiReaderOpenReaderFrbConstMeta => const TaskConstMeta(
+            debugName: "open_reader_frb",
+            argNames: ["comicId", "path", "resourceType"],
+        );
+        
+
+@override MetadataBackupManifestDto crateApiMetadataBackupPeekMetadataBackupManifestFrb({required List<int> bytes })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(bytes, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_metadata_backup_manifest_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta:
-            kCrateApiMetadataBackupPeekMetadataBackupManifestFrbConstMeta,
-        argValues: [bytes],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiMetadataBackupPeekMetadataBackupManifestFrbConstMeta,
+            argValues: [bytes],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta
-  get kCrateApiMetadataBackupPeekMetadataBackupManifestFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "peek_metadata_backup_manifest_frb",
-        argNames: ["bytes"],
-      );
 
-  @override
-  Future<void> crateApiReaderPrefetchReaderPagesFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required List<int> pageIndexes,
-    required BigInt generation,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_String(path, serializer);
-          sse_encode_String(resourceType, serializer);
-          sse_encode_list_prim_i_32_loose(pageIndexes, serializer);
-          sse_encode_u_64(generation, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 76,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiMetadataBackupPeekMetadataBackupManifestFrbConstMeta => const TaskConstMeta(
+            debugName: "peek_metadata_backup_manifest_frb",
+            argNames: ["bytes"],
+        );
+        
+
+@override Future<void> crateApiReaderPrefetchReaderPagesFrb({required String comicId , required String path , required String resourceType , required List<int> pageIndexes , required BigInt generation })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_String(path, serializer);
+sse_encode_String(resourceType, serializer);
+sse_encode_list_prim_i_32_loose(pageIndexes, serializer);
+sse_encode_u_64(generation, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 76, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiReaderPrefetchReaderPagesFrbConstMeta,
-        argValues: [comicId, path, resourceType, pageIndexes, generation],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiReaderPrefetchReaderPagesFrbConstMeta,
+            argValues: [comicId, path, resourceType, pageIndexes, generation],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiReaderPrefetchReaderPagesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "prefetch_reader_pages_frb",
-        argNames: [
-          "comicId",
-          "path",
-          "resourceType",
-          "pageIndexes",
-          "generation",
-        ],
-      );
 
-  @override
-  PreviewImportComicMetadataResultDto
-  crateApiMetadataBackupPreviewImportComicMetadataFrb({
-    required List<int> bytes,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_prim_u_8_loose(bytes, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 77)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData:
-              sse_decode_preview_import_comic_metadata_result_dto,
+        TaskConstMeta get kCrateApiReaderPrefetchReaderPagesFrbConstMeta => const TaskConstMeta(
+            debugName: "prefetch_reader_pages_frb",
+            argNames: ["comicId", "path", "resourceType", "pageIndexes", "generation"],
+        );
+        
+
+@override PreviewImportComicMetadataResultDto crateApiMetadataBackupPreviewImportComicMetadataFrb({required List<int> bytes })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_prim_u_8_loose(bytes, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 77)!;
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_preview_import_comic_metadata_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta:
-            kCrateApiMetadataBackupPreviewImportComicMetadataFrbConstMeta,
-        argValues: [bytes],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiMetadataBackupPreviewImportComicMetadataFrbConstMeta,
+            argValues: [bytes],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta
-  get kCrateApiMetadataBackupPreviewImportComicMetadataFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "preview_import_comic_metadata_frb",
-        argNames: ["bytes"],
-      );
 
-  @override
-  Future<LibraryProbeResultDto> crateApiProbeProbeLibraryFrb({
-    required String libraryId,
-    String? password,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(libraryId, serializer);
-          sse_encode_opt_String(password, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 78,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiMetadataBackupPreviewImportComicMetadataFrbConstMeta => const TaskConstMeta(
+            debugName: "preview_import_comic_metadata_frb",
+            argNames: ["bytes"],
+        );
+        
+
+@override Future<LibraryProbeResultDto> crateApiProbeProbeLibraryFrb({required String libraryId , String? password })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(libraryId, serializer);
+sse_encode_opt_String(password, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 78, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_library_probe_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiProbeProbeLibraryFrbConstMeta,
-        argValues: [libraryId, password],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiProbeProbeLibraryFrbConstMeta,
+            argValues: [libraryId, password],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiProbeProbeLibraryFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "probe_library_frb",
-        argNames: ["libraryId", "password"],
-      );
 
-  @override
-  Future<ComicPurgeResultFrbDto> crateApiComicPurgeComicsFrb({
-    required List<String> comicIds,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(comicIds, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 79,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiProbeProbeLibraryFrbConstMeta => const TaskConstMeta(
+            debugName: "probe_library_frb",
+            argNames: ["libraryId", "password"],
+        );
+        
+
+@override Future<ComicPurgeResultFrbDto> crateApiComicPurgeComicsFrb({required List<String> comicIds })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(comicIds, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 79, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_comic_purge_result_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicPurgeComicsFrbConstMeta,
-        argValues: [comicIds],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicPurgeComicsFrbConstMeta,
+            argValues: [comicIds],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicPurgeComicsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "purge_comics_frb",
-        argNames: ["comicIds"],
-      );
 
-  @override
-  void crateApiHistoryRecordReadingFrb({required ReadingHistoryDto history}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_box_autoadd_reading_history_dto(history, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 80)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicPurgeComicsFrbConstMeta => const TaskConstMeta(
+            debugName: "purge_comics_frb",
+            argNames: ["comicIds"],
+        );
+        
+
+@override void crateApiHistoryRecordReadingFrb({required ReadingHistoryDto history })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_box_autoadd_reading_history_dto(history, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 80)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiHistoryRecordReadingFrbConstMeta,
-        argValues: [history],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiHistoryRecordReadingFrbConstMeta,
+            argValues: [history],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiHistoryRecordReadingFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "record_reading_frb",
-        argNames: ["history"],
-      );
 
-  @override
-  Future<void> crateApiComicRefreshComicMetadataFrb({required String comicId}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 81,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiHistoryRecordReadingFrbConstMeta => const TaskConstMeta(
+            debugName: "record_reading_frb",
+            argNames: ["history"],
+        );
+        
+
+@override Future<void> crateApiComicRefreshComicMetadataFrb({required String comicId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 81, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicRefreshComicMetadataFrbConstMeta,
-        argValues: [comicId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicRefreshComicMetadataFrbConstMeta,
+            argValues: [comicId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicRefreshComicMetadataFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "refresh_comic_metadata_frb",
-        argNames: ["comicId"],
-      );
 
-  @override
-  Future<RefreshLibraryResultFrbDto> crateApiSeriesRefreshLibraryMetadataFrb({
-    required String libraryId,
-    required SyncHandleDto handle,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(libraryId, serializer);
-          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-            handle,
-            serializer,
-          );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 82,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicRefreshComicMetadataFrbConstMeta => const TaskConstMeta(
+            debugName: "refresh_comic_metadata_frb",
+            argNames: ["comicId"],
+        );
+        
+
+@override Future<RefreshLibraryResultFrbDto> crateApiSeriesRefreshLibraryMetadataFrb({required String libraryId , required SyncHandleDto handle })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(libraryId, serializer);
+sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(handle, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 82, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_refresh_library_result_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesRefreshLibraryMetadataFrbConstMeta,
-        argValues: [libraryId, handle],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesRefreshLibraryMetadataFrbConstMeta,
+            argValues: [libraryId, handle],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesRefreshLibraryMetadataFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "refresh_library_metadata_frb",
-        argNames: ["libraryId", "handle"],
-      );
 
-  @override
-  Future<RefreshSeriesResultFrbDto> crateApiSeriesRefreshSeriesMetadataFrb({
-    required String seriesId,
-    required SyncHandleDto handle,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-            handle,
-            serializer,
-          );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 83,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesRefreshLibraryMetadataFrbConstMeta => const TaskConstMeta(
+            debugName: "refresh_library_metadata_frb",
+            argNames: ["libraryId", "handle"],
+        );
+        
+
+@override Future<RefreshSeriesResultFrbDto> crateApiSeriesRefreshSeriesMetadataFrb({required String seriesId , required SyncHandleDto handle })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(handle, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 83, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_refresh_series_result_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesRefreshSeriesMetadataFrbConstMeta,
-        argValues: [seriesId, handle],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesRefreshSeriesMetadataFrbConstMeta,
+            argValues: [seriesId, handle],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesRefreshSeriesMetadataFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "refresh_series_metadata_frb",
-        argNames: ["seriesId", "handle"],
-      );
 
-  @override
-  Future<void> crateApiAuthorRenameAuthorFrb({
-    required String oldName,
-    required String newName,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(oldName, serializer);
-          sse_encode_String(newName, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 84,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesRefreshSeriesMetadataFrbConstMeta => const TaskConstMeta(
+            debugName: "refresh_series_metadata_frb",
+            argNames: ["seriesId", "handle"],
+        );
+        
+
+@override Future<void> crateApiAuthorRenameAuthorFrb({required String oldName , required String newName })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(oldName, serializer);
+sse_encode_String(newName, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 84, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorRenameAuthorFrbConstMeta,
-        argValues: [oldName, newName],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorRenameAuthorFrbConstMeta,
+            argValues: [oldName, newName],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorRenameAuthorFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "rename_author_frb",
-        argNames: ["oldName", "newName"],
-      );
 
-  @override
-  void crateApiNamedFacetRenameNamedFacetNameFrb({
-    required JunctionNamedFacetFrb facet,
-    required String oldName,
-    required String newName,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_junction_named_facet_frb(facet, serializer);
-          sse_encode_String(oldName, serializer);
-          sse_encode_String(newName, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 85)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorRenameAuthorFrbConstMeta => const TaskConstMeta(
+            debugName: "rename_author_frb",
+            argNames: ["oldName", "newName"],
+        );
+        
+
+@override void crateApiNamedFacetRenameNamedFacetNameFrb({required JunctionNamedFacetFrb facet , required String oldName , required String newName })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_junction_named_facet_frb(facet, serializer);
+sse_encode_String(oldName, serializer);
+sse_encode_String(newName, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 85)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiNamedFacetRenameNamedFacetNameFrbConstMeta,
-        argValues: [facet, oldName, newName],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiNamedFacetRenameNamedFacetNameFrbConstMeta,
+            argValues: [facet, oldName, newName],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiNamedFacetRenameNamedFacetNameFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "rename_named_facet_name_frb",
-        argNames: ["facet", "oldName", "newName"],
-      );
 
-  @override
-  void crateApiTagRenameTagFrb({
-    required String oldName,
-    required String newName,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(oldName, serializer);
-          sse_encode_String(newName, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 86)!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiNamedFacetRenameNamedFacetNameFrbConstMeta => const TaskConstMeta(
+            debugName: "rename_named_facet_name_frb",
+            argNames: ["facet", "oldName", "newName"],
+        );
+        
+
+@override void crateApiTagRenameTagFrb({required String oldName , required String newName })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(oldName, serializer);
+sse_encode_String(newName, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 86)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiTagRenameTagFrbConstMeta,
-        argValues: [oldName, newName],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiTagRenameTagFrbConstMeta,
+            argValues: [oldName, newName],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiTagRenameTagFrbConstMeta => const TaskConstMeta(
-    debugName: "rename_tag_frb",
-    argNames: ["oldName", "newName"],
-  );
 
-  @override
-  Future<AuthorImageRefFrbDto> crateApiAuthorResolveAuthorImageFrb({
-    required PlatformInt64 authorId,
-    required bool showR18,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(authorId, serializer);
-          sse_encode_bool(showR18, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 87,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiTagRenameTagFrbConstMeta => const TaskConstMeta(
+            debugName: "rename_tag_frb",
+            argNames: ["oldName", "newName"],
+        );
+        
+
+@override Future<AuthorImageRefFrbDto> crateApiAuthorResolveAuthorImageFrb({required PlatformInt64 authorId , required bool showR18 })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_64(authorId, serializer);
+sse_encode_bool(showR18, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 87, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_author_image_ref_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorResolveAuthorImageFrbConstMeta,
-        argValues: [authorId, showR18],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiAuthorResolveAuthorImageFrbConstMeta,
+            argValues: [authorId, showR18],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiAuthorResolveAuthorImageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "resolve_author_image_frb",
-        argNames: ["authorId", "showR18"],
-      );
 
-  @override
-  Future<SeriesCoverSourceDto> crateApiThumbnailResolveSeriesCoverFrb({
-    required String seriesId,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 88,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiAuthorResolveAuthorImageFrbConstMeta => const TaskConstMeta(
+            debugName: "resolve_author_image_frb",
+            argNames: ["authorId", "showR18"],
+        );
+        
+
+@override Future<SeriesCoverSourceDto> crateApiThumbnailResolveSeriesCoverFrb({required String seriesId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 88, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_series_cover_source_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiThumbnailResolveSeriesCoverFrbConstMeta,
-        argValues: [seriesId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiThumbnailResolveSeriesCoverFrbConstMeta,
+            argValues: [seriesId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiThumbnailResolveSeriesCoverFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "resolve_series_cover_frb",
-        argNames: ["seriesId"],
-      );
 
-  @override
-  Future<void> crateApiComicRestoreComicsFrb({required List<String> comicIds}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(comicIds, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 89,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiThumbnailResolveSeriesCoverFrbConstMeta => const TaskConstMeta(
+            debugName: "resolve_series_cover_frb",
+            argNames: ["seriesId"],
+        );
+        
+
+@override Future<void> crateApiComicRestoreComicsFrb({required List<String> comicIds })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(comicIds, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 89, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicRestoreComicsFrbConstMeta,
-        argValues: [comicIds],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicRestoreComicsFrbConstMeta,
+            argValues: [comicIds],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicRestoreComicsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "restore_comics_frb",
-        argNames: ["comicIds"],
-      );
 
-  @override
-  Future<List<ComicDto>> crateApiComicSearchByKeywordFrb({
-    required String keyword,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(keyword, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 90,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicRestoreComicsFrbConstMeta => const TaskConstMeta(
+            debugName: "restore_comics_frb",
+            argNames: ["comicIds"],
+        );
+        
+
+@override Future<List<ComicDto>> crateApiComicSearchByKeywordFrb({required String keyword })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(keyword, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 90, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_comic_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicSearchByKeywordFrbConstMeta,
-        argValues: [keyword],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicSearchByKeywordFrbConstMeta,
+            argValues: [keyword],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicSearchByKeywordFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "search_by_keyword_frb",
-        argNames: ["keyword"],
-      );
 
-  @override
-  Future<PagedComicResultDto> crateApiComicSearchByKeywordPageFrb({
-    required String keyword,
-    required int page,
-    required int pageSize,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(keyword, serializer);
-          sse_encode_i_32(page, serializer);
-          sse_encode_i_32(pageSize, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 91,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicSearchByKeywordFrbConstMeta => const TaskConstMeta(
+            debugName: "search_by_keyword_frb",
+            argNames: ["keyword"],
+        );
+        
+
+@override Future<PagedComicResultDto> crateApiComicSearchByKeywordPageFrb({required String keyword , required int page , required int pageSize })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(keyword, serializer);
+sse_encode_i_32(page, serializer);
+sse_encode_i_32(pageSize, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 91, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_paged_comic_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicSearchByKeywordPageFrbConstMeta,
-        argValues: [keyword, page, pageSize],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicSearchByKeywordPageFrbConstMeta,
+            argValues: [keyword, page, pageSize],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicSearchByKeywordPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "search_by_keyword_page_frb",
-        argNames: ["keyword", "page", "pageSize"],
-      );
 
-  @override
-  Future<List<ComicDto>> crateApiComicSearchByTagExpressionFrb({
-    required List<String> mustInclude,
-    required List<String> optionalOr,
-    required List<String> mustExclude,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(mustInclude, serializer);
-          sse_encode_list_String(optionalOr, serializer);
-          sse_encode_list_String(mustExclude, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 92,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicSearchByKeywordPageFrbConstMeta => const TaskConstMeta(
+            debugName: "search_by_keyword_page_frb",
+            argNames: ["keyword", "page", "pageSize"],
+        );
+        
+
+@override Future<List<ComicDto>> crateApiComicSearchByTagExpressionFrb({required List<String> mustInclude , required List<String> optionalOr , required List<String> mustExclude })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(mustInclude, serializer);
+sse_encode_list_String(optionalOr, serializer);
+sse_encode_list_String(mustExclude, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 92, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_comic_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicSearchByTagExpressionFrbConstMeta,
-        argValues: [mustInclude, optionalOr, mustExclude],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicSearchByTagExpressionFrbConstMeta,
+            argValues: [mustInclude, optionalOr, mustExclude],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicSearchByTagExpressionFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "search_by_tag_expression_frb",
-        argNames: ["mustInclude", "optionalOr", "mustExclude"],
-      );
 
-  @override
-  Future<PagedComicResultDto> crateApiComicSearchByTagExpressionPageFrb({
-    required List<String> mustInclude,
-    required List<String> optionalOr,
-    required List<String> mustExclude,
-    required int page,
-    required int pageSize,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(mustInclude, serializer);
-          sse_encode_list_String(optionalOr, serializer);
-          sse_encode_list_String(mustExclude, serializer);
-          sse_encode_i_32(page, serializer);
-          sse_encode_i_32(pageSize, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 93,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicSearchByTagExpressionFrbConstMeta => const TaskConstMeta(
+            debugName: "search_by_tag_expression_frb",
+            argNames: ["mustInclude", "optionalOr", "mustExclude"],
+        );
+        
+
+@override Future<PagedComicResultDto> crateApiComicSearchByTagExpressionPageFrb({required List<String> mustInclude , required List<String> optionalOr , required List<String> mustExclude , required int page , required int pageSize })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(mustInclude, serializer);
+sse_encode_list_String(optionalOr, serializer);
+sse_encode_list_String(mustExclude, serializer);
+sse_encode_i_32(page, serializer);
+sse_encode_i_32(pageSize, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 93, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_paged_comic_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicSearchByTagExpressionPageFrbConstMeta,
-        argValues: [mustInclude, optionalOr, mustExclude, page, pageSize],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicSearchByTagExpressionPageFrbConstMeta,
+            argValues: [mustInclude, optionalOr, mustExclude, page, pageSize],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicSearchByTagExpressionPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "search_by_tag_expression_page_frb",
-        argNames: [
-          "mustInclude",
-          "optionalOr",
-          "mustExclude",
-          "page",
-          "pageSize",
-        ],
-      );
 
-  @override
-  Future<List<SeriesDto>> crateApiSeriesSearchSeriesByKeywordFrb({
-    required String keyword,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(keyword, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 94,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicSearchByTagExpressionPageFrbConstMeta => const TaskConstMeta(
+            debugName: "search_by_tag_expression_page_frb",
+            argNames: ["mustInclude", "optionalOr", "mustExclude", "page", "pageSize"],
+        );
+        
+
+@override Future<List<SeriesDto>> crateApiSeriesSearchSeriesByKeywordFrb({required String keyword })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(keyword, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 94, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_series_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesSearchSeriesByKeywordFrbConstMeta,
-        argValues: [keyword],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSearchSeriesByKeywordFrbConstMeta,
+            argValues: [keyword],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSearchSeriesByKeywordFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "search_series_by_keyword_frb",
-        argNames: ["keyword"],
-      );
 
-  @override
-  Future<List<SeriesDto>> crateApiSeriesSearchSeriesByTagExpressionFrb({
-    required List<String> mustInclude,
-    required List<String> optionalOr,
-    required List<String> mustExclude,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(mustInclude, serializer);
-          sse_encode_list_String(optionalOr, serializer);
-          sse_encode_list_String(mustExclude, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 95,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSearchSeriesByKeywordFrbConstMeta => const TaskConstMeta(
+            debugName: "search_series_by_keyword_frb",
+            argNames: ["keyword"],
+        );
+        
+
+@override Future<List<SeriesDto>> crateApiSeriesSearchSeriesByTagExpressionFrb({required List<String> mustInclude , required List<String> optionalOr , required List<String> mustExclude })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(mustInclude, serializer);
+sse_encode_list_String(optionalOr, serializer);
+sse_encode_list_String(mustExclude, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 95, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_series_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesSearchSeriesByTagExpressionFrbConstMeta,
-        argValues: [mustInclude, optionalOr, mustExclude],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSearchSeriesByTagExpressionFrbConstMeta,
+            argValues: [mustInclude, optionalOr, mustExclude],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSearchSeriesByTagExpressionFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "search_series_by_tag_expression_frb",
-        argNames: ["mustInclude", "optionalOr", "mustExclude"],
-      );
 
-  @override
-  Future<SeriesComicsMetadataDto>
-  crateApiSeriesSeriesComicsMetadataDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 96,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSearchSeriesByTagExpressionFrbConstMeta => const TaskConstMeta(
+            debugName: "search_series_by_tag_expression_frb",
+            argNames: ["mustInclude", "optionalOr", "mustExclude"],
+        );
+        
+
+@override Future<SeriesComicsMetadataDto> crateApiSeriesSeriesComicsMetadataDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 96, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_series_comics_metadata_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSeriesSeriesComicsMetadataDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSeriesComicsMetadataDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSeriesComicsMetadataDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "series_comics_metadata_dto_default",
-        argNames: [],
-      );
 
-  @override
-  Future<SeriesMetaLocksDto> crateApiSeriesSeriesMetaLocksDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 97,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSeriesComicsMetadataDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "series_comics_metadata_dto_default",
+            argNames: [],
+        );
+        
+
+@override Future<SeriesMetaLocksDto> crateApiSeriesSeriesMetaLocksDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 97, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_series_meta_locks_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSeriesSeriesMetaLocksDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSeriesMetaLocksDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSeriesMetaLocksDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "series_meta_locks_dto_default",
-        argNames: [],
-      );
 
-  @override
-  Future<SeriesSortFieldDto> crateApiSeriesSeriesSortFieldDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 98,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSeriesMetaLocksDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "series_meta_locks_dto_default",
+            argNames: [],
+        );
+        
+
+@override Future<SeriesSortFieldDto> crateApiSeriesSeriesSortFieldDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 98, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_series_sort_field_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSeriesSeriesSortFieldDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSeriesSortFieldDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSeriesSortFieldDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "series_sort_field_dto_default",
-        argNames: [],
-      );
 
-  @override
-  Future<SeriesSortOptionDto> crateApiSeriesSeriesSortOptionDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 99,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSeriesSortFieldDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "series_sort_field_dto_default",
+            argNames: [],
+        );
+        
+
+@override Future<SeriesSortOptionDto> crateApiSeriesSeriesSortOptionDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 99, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_series_sort_option_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSeriesSeriesSortOptionDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSeriesSortOptionDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSeriesSortOptionDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "series_sort_option_dto_default",
-        argNames: [],
-      );
 
-  @override
-  void crateApiLibrarySetAllLibrariesScanOnStartupFrb({required bool enabled}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_bool(enabled, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 100,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSeriesSortOptionDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "series_sort_option_dto_default",
+            argNames: [],
+        );
+        
+
+@override void crateApiLibrarySetAllLibrariesScanOnStartupFrb({required bool enabled })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_bool(enabled, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 100)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibrarySetAllLibrariesScanOnStartupFrbConstMeta,
-        argValues: [enabled],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibrarySetAllLibrariesScanOnStartupFrbConstMeta,
+            argValues: [enabled],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibrarySetAllLibrariesScanOnStartupFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_all_libraries_scan_on_startup_frb",
-        argNames: ["enabled"],
-      );
 
-  @override
-  void crateApiComicSetComicMetaLocksFrb({
-    required String comicId,
-    required SetComicMetaLocksFrbDto locks,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_box_autoadd_set_comic_meta_locks_frb_dto(
-            locks,
-            serializer,
-          );
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 101,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibrarySetAllLibrariesScanOnStartupFrbConstMeta => const TaskConstMeta(
+            debugName: "set_all_libraries_scan_on_startup_frb",
+            argNames: ["enabled"],
+        );
+        
+
+@override void crateApiComicSetComicMetaLocksFrb({required String comicId , required SetComicMetaLocksFrbDto locks })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_box_autoadd_set_comic_meta_locks_frb_dto(locks, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 101)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicSetComicMetaLocksFrbConstMeta,
-        argValues: [comicId, locks],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicSetComicMetaLocksFrbConstMeta,
+            argValues: [comicId, locks],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicSetComicMetaLocksFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_comic_meta_locks_frb",
-        argNames: ["comicId", "locks"],
-      );
 
-  @override
-  Future<SetComicMetaLocksFrbDto>
-  crateApiComicSetComicMetaLocksFrbDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 102,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicSetComicMetaLocksFrbConstMeta => const TaskConstMeta(
+            debugName: "set_comic_meta_locks_frb",
+            argNames: ["comicId", "locks"],
+        );
+        
+
+@override Future<SetComicMetaLocksFrbDto> crateApiComicSetComicMetaLocksFrbDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 102, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_set_comic_meta_locks_frb_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiComicSetComicMetaLocksFrbDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicSetComicMetaLocksFrbDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicSetComicMetaLocksFrbDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_comic_meta_locks_frb_dto_default",
-        argNames: [],
-      );
 
-  @override
-  void crateApiThumbnailSetComicThumbnailFromPageFrb({
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required int pageIndex,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_String(path, serializer);
-          sse_encode_String(resourceType, serializer);
-          sse_encode_i_32(pageIndex, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 103,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicSetComicMetaLocksFrbDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "set_comic_meta_locks_frb_dto_default",
+            argNames: [],
+        );
+        
+
+@override void crateApiThumbnailSetComicThumbnailFromPageFrb({required String comicId , required String path , required String resourceType , required int pageIndex })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_String(path, serializer);
+sse_encode_String(resourceType, serializer);
+sse_encode_i_32(pageIndex, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 103)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiThumbnailSetComicThumbnailFromPageFrbConstMeta,
-        argValues: [comicId, path, resourceType, pageIndex],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiThumbnailSetComicThumbnailFromPageFrbConstMeta,
+            argValues: [comicId, path, resourceType, pageIndex],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiThumbnailSetComicThumbnailFromPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_comic_thumbnail_from_page_frb",
-        argNames: ["comicId", "path", "resourceType", "pageIndex"],
-      );
 
-  @override
-  Future<void> crateApiLibrarySetCurrentLibraryIdFrb({String? libraryId}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_opt_String(libraryId, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 104,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiThumbnailSetComicThumbnailFromPageFrbConstMeta => const TaskConstMeta(
+            debugName: "set_comic_thumbnail_from_page_frb",
+            argNames: ["comicId", "path", "resourceType", "pageIndex"],
+        );
+        
+
+@override Future<void> crateApiLibrarySetCurrentLibraryIdFrb({String? libraryId })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_opt_String(libraryId, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 104, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibrarySetCurrentLibraryIdFrbConstMeta,
-        argValues: [libraryId],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibrarySetCurrentLibraryIdFrbConstMeta,
+            argValues: [libraryId],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibrarySetCurrentLibraryIdFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_current_library_id_frb",
-        argNames: ["libraryId"],
-      );
 
-  @override
-  void crateApiLoggingSetDiagnosticLoggingFrb({required bool verbose}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_bool(verbose, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 105,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibrarySetCurrentLibraryIdFrbConstMeta => const TaskConstMeta(
+            debugName: "set_current_library_id_frb",
+            argNames: ["libraryId"],
+        );
+        
+
+@override void crateApiLoggingSetDiagnosticLoggingFrb({required bool verbose })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_bool(verbose, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 105)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiLoggingSetDiagnosticLoggingFrbConstMeta,
-        argValues: [verbose],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLoggingSetDiagnosticLoggingFrbConstMeta,
+            argValues: [verbose],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLoggingSetDiagnosticLoggingFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_diagnostic_logging_frb",
-        argNames: ["verbose"],
-      );
 
-  @override
-  void crateApiSyncSetRemoteLibraryCredentialsFrb({
-    required List<RemoteLibraryCredentialDto> credentials,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_remote_library_credential_dto(
-            credentials,
-            serializer,
-          );
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 106,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLoggingSetDiagnosticLoggingFrbConstMeta => const TaskConstMeta(
+            debugName: "set_diagnostic_logging_frb",
+            argNames: ["verbose"],
+        );
+        
+
+@override void crateApiSyncSetRemoteLibraryCredentialsFrb({required List<RemoteLibraryCredentialDto> credentials })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_remote_library_credential_dto(credentials, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 106)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSyncSetRemoteLibraryCredentialsFrbConstMeta,
-        argValues: [credentials],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSyncSetRemoteLibraryCredentialsFrbConstMeta,
+            argValues: [credentials],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSyncSetRemoteLibraryCredentialsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_remote_library_credentials_frb",
-        argNames: ["credentials"],
-      );
 
-  @override
-  void crateApiSeriesSetSeriesItemSortOrderLockedFrb({
-    required String seriesId,
-    required String comicId,
-    required bool locked,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          sse_encode_String(comicId, serializer);
-          sse_encode_bool(locked, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 107,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSyncSetRemoteLibraryCredentialsFrbConstMeta => const TaskConstMeta(
+            debugName: "set_remote_library_credentials_frb",
+            argNames: ["credentials"],
+        );
+        
+
+@override void crateApiSeriesSetSeriesItemSortOrderLockedFrb({required String seriesId , required String comicId , required bool locked })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+sse_encode_String(comicId, serializer);
+sse_encode_bool(locked, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 107)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesSetSeriesItemSortOrderLockedFrbConstMeta,
-        argValues: [seriesId, comicId, locked],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSetSeriesItemSortOrderLockedFrbConstMeta,
+            argValues: [seriesId, comicId, locked],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSetSeriesItemSortOrderLockedFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_series_item_sort_order_locked_frb",
-        argNames: ["seriesId", "comicId", "locked"],
-      );
 
-  @override
-  Future<SetSeriesMetaLocksDto> crateApiSeriesSetSeriesMetaLocksDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 108,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSetSeriesItemSortOrderLockedFrbConstMeta => const TaskConstMeta(
+            debugName: "set_series_item_sort_order_locked_frb",
+            argNames: ["seriesId", "comicId", "locked"],
+        );
+        
+
+@override Future<SetSeriesMetaLocksDto> crateApiSeriesSetSeriesMetaLocksDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 108, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_set_series_meta_locks_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSeriesSetSeriesMetaLocksDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSetSeriesMetaLocksDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSetSeriesMetaLocksDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_series_meta_locks_dto_default",
-        argNames: [],
-      );
 
-  @override
-  void crateApiSeriesSetSeriesMetaLocksFrb({
-    required String seriesId,
-    required SetSeriesMetaLocksDto locks,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          sse_encode_box_autoadd_set_series_meta_locks_dto(locks, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 109,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSetSeriesMetaLocksDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "set_series_meta_locks_dto_default",
+            argNames: [],
+        );
+        
+
+@override void crateApiSeriesSetSeriesMetaLocksFrb({required String seriesId , required SetSeriesMetaLocksDto locks })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+sse_encode_box_autoadd_set_series_meta_locks_dto(locks, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 109)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesSetSeriesMetaLocksFrbConstMeta,
-        argValues: [seriesId, locks],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesSetSeriesMetaLocksFrbConstMeta,
+            argValues: [seriesId, locks],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesSetSeriesMetaLocksFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_series_meta_locks_frb",
-        argNames: ["seriesId", "locks"],
-      );
 
-  @override
-  void crateApiThumbnailSetSeriesThumbnailFromPageFrb({
-    required String seriesId,
-    required String comicId,
-    required String path,
-    required String resourceType,
-    required int pageIndex,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          sse_encode_String(comicId, serializer);
-          sse_encode_String(path, serializer);
-          sse_encode_String(resourceType, serializer);
-          sse_encode_i_32(pageIndex, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 110,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesSetSeriesMetaLocksFrbConstMeta => const TaskConstMeta(
+            debugName: "set_series_meta_locks_frb",
+            argNames: ["seriesId", "locks"],
+        );
+        
+
+@override void crateApiThumbnailSetSeriesThumbnailFromPageFrb({required String seriesId , required String comicId , required String path , required String resourceType , required int pageIndex })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+sse_encode_String(comicId, serializer);
+sse_encode_String(path, serializer);
+sse_encode_String(resourceType, serializer);
+sse_encode_i_32(pageIndex, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 110)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiThumbnailSetSeriesThumbnailFromPageFrbConstMeta,
-        argValues: [seriesId, comicId, path, resourceType, pageIndex],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiThumbnailSetSeriesThumbnailFromPageFrbConstMeta,
+            argValues: [seriesId, comicId, path, resourceType, pageIndex],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiThumbnailSetSeriesThumbnailFromPageFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_series_thumbnail_from_page_frb",
-        argNames: ["seriesId", "comicId", "path", "resourceType", "pageIndex"],
-      );
 
-  @override
-  void crateApiShutdownShutdownAppDataFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 111,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiThumbnailSetSeriesThumbnailFromPageFrbConstMeta => const TaskConstMeta(
+            debugName: "set_series_thumbnail_from_page_frb",
+            argNames: ["seriesId", "comicId", "path", "resourceType", "pageIndex"],
+        );
+        
+
+@override void crateApiShutdownShutdownAppDataFrb()  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 111)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiShutdownShutdownAppDataFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiShutdownShutdownAppDataFrbConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiShutdownShutdownAppDataFrbConstMeta =>
-      const TaskConstMeta(debugName: "shutdown_app_data_frb", argNames: []);
 
-  @override
-  Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
-    required SyncHandleDto handle,
-    required SyncScanModeDto scanMode,
-    required bool syncAll,
-    String? targetLibraryId,
-    required List<RemoteLibraryCredentialDto> credentials,
-  }) {
-    final sink = RustStreamSink<SyncLibraryProgressDto>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
+        TaskConstMeta get kCrateApiShutdownShutdownAppDataFrbConstMeta => const TaskConstMeta(
+            debugName: "shutdown_app_data_frb",
+            argNames: [],
+        );
+        
+
+@override Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({required SyncHandleDto handle , required SyncScanModeDto scanMode , required bool syncAll , String? targetLibraryId , required List<RemoteLibraryCredentialDto> credentials })  { 
+            final sink = RustStreamSink<SyncLibraryProgressDto>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(handle, serializer);
+sse_encode_sync_scan_mode_dto(scanMode, serializer);
+sse_encode_bool(syncAll, serializer);
+sse_encode_opt_String(targetLibraryId, serializer);
+sse_encode_list_remote_library_credential_dto(credentials, serializer);
+sse_encode_StreamSink_sync_library_progress_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 112, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        )
+        ,
+            constMeta: kCrateApiSyncSyncLibraryFrbConstMeta,
+            argValues: [handle, scanMode, syncAll, targetLibraryId, credentials, sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiSyncSyncLibraryFrbConstMeta => const TaskConstMeta(
+            debugName: "sync_library_frb",
+            argNames: ["handle", "scanMode", "syncAll", "targetLibraryId", "credentials", "sink"],
+        );
+        
+
+@override Future<void> crateApiComicTrashComicsFrb({required List<String> comicIds })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_String(comicIds, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 113, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiComicTrashComicsFrbConstMeta,
+            argValues: [comicIds],
+            apiImpl: this,
+        )); }
+
+
+        TaskConstMeta get kCrateApiComicTrashComicsFrbConstMeta => const TaskConstMeta(
+            debugName: "trash_comics_frb",
+            argNames: ["comicIds"],
+        );
+        
+
+@override Future<void> crateApiAuthorUpdateAuthorLinkFrb({required PlatformInt64 linkId , required AuthorLinkPlatformFrb platform , required String url , String? platformDisplayName })  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_i_64(linkId, serializer);
+sse_encode_author_link_platform_frb(platform, serializer);
+sse_encode_String(url, serializer);
+sse_encode_opt_String(platformDisplayName, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 114, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiAuthorUpdateAuthorLinkFrbConstMeta,
+            argValues: [linkId, platform, url, platformDisplayName],
+            apiImpl: this,
+        )); }
+
+
+        TaskConstMeta get kCrateApiAuthorUpdateAuthorLinkFrbConstMeta => const TaskConstMeta(
+            debugName: "update_author_link_frb",
+            argNames: ["linkId", "platform", "url", "platformDisplayName"],
+        );
+        
+
+@override void crateApiComicUpdateComicUserMetaFrb({required String comicId , required UpdateComicUserMetaFrbDto meta })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(comicId, serializer);
+sse_encode_box_autoadd_update_comic_user_meta_frb_dto(meta, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 115)!;
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiComicUpdateComicUserMetaFrbConstMeta,
+            argValues: [comicId, meta],
+            apiImpl: this,
+        )); }
+
+
+        TaskConstMeta get kCrateApiComicUpdateComicUserMetaFrbConstMeta => const TaskConstMeta(
+            debugName: "update_comic_user_meta_frb",
+            argNames: ["comicId", "meta"],
+        );
+        
+
+@override Future<UpdateComicUserMetaFrbDto> crateApiComicUpdateComicUserMetaFrbDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
             final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-              handle,
-              serializer,
-            );
-            sse_encode_sync_scan_mode_dto(scanMode, serializer);
-            sse_encode_bool(syncAll, serializer);
-            sse_encode_opt_String(targetLibraryId, serializer);
-            sse_encode_list_remote_library_credential_dto(
-              credentials,
-              serializer,
-            );
-            sse_encode_StreamSink_sync_library_progress_dto_Sse(
-              sink,
-              serializer,
-            );
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 112,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: null,
-          ),
-          constMeta: kCrateApiSyncSyncLibraryFrbConstMeta,
-          argValues: [
-            handle,
-            scanMode,
-            syncAll,
-            targetLibraryId,
-            credentials,
-            sink,
-          ],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiSyncSyncLibraryFrbConstMeta => const TaskConstMeta(
-    debugName: "sync_library_frb",
-    argNames: [
-      "handle",
-      "scanMode",
-      "syncAll",
-      "targetLibraryId",
-      "credentials",
-      "sink",
-    ],
-  );
-
-  @override
-  Future<void> crateApiComicTrashComicsFrb({required List<String> comicIds}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_String(comicIds, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 113,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicTrashComicsFrbConstMeta,
-        argValues: [comicIds],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiComicTrashComicsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "trash_comics_frb",
-        argNames: ["comicIds"],
-      );
-
-  @override
-  Future<void> crateApiAuthorUpdateAuthorLinkFrb({
-    required PlatformInt64 linkId,
-    required AuthorLinkPlatformFrb platform,
-    required String url,
-    String? platformDisplayName,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_64(linkId, serializer);
-          sse_encode_author_link_platform_frb(platform, serializer);
-          sse_encode_String(url, serializer);
-          sse_encode_opt_String(platformDisplayName, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 114,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiAuthorUpdateAuthorLinkFrbConstMeta,
-        argValues: [linkId, platform, url, platformDisplayName],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiAuthorUpdateAuthorLinkFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_author_link_frb",
-        argNames: ["linkId", "platform", "url", "platformDisplayName"],
-      );
-
-  @override
-  void crateApiComicUpdateComicUserMetaFrb({
-    required String comicId,
-    required UpdateComicUserMetaFrbDto meta,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(comicId, serializer);
-          sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
-            meta,
-            serializer,
-          );
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 115,
-          )!;
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiComicUpdateComicUserMetaFrbConstMeta,
-        argValues: [comicId, meta],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiComicUpdateComicUserMetaFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_comic_user_meta_frb",
-        argNames: ["comicId", "meta"],
-      );
-
-  @override
-  Future<UpdateComicUserMetaFrbDto>
-  crateApiComicUpdateComicUserMetaFrbDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 116,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 116, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_update_comic_user_meta_frb_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiComicUpdateComicUserMetaFrbDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiComicUpdateComicUserMetaFrbDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiComicUpdateComicUserMetaFrbDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_comic_user_meta_frb_dto_default",
-        argNames: [],
-      );
 
-  @override
-  LibraryDto crateApiLibraryUpdateLibraryResourceFormatCategoriesFrb({
-    required String libraryId,
-    required List<ResourceFormatCategoryDto> groups,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(libraryId, serializer);
-          sse_encode_list_resource_format_category_dto(groups, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 117,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiComicUpdateComicUserMetaFrbDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "update_comic_user_meta_frb_dto_default",
+            argNames: [],
+        );
+        
+
+@override LibraryDto crateApiLibraryUpdateLibraryResourceFormatCategoriesFrb({required String libraryId , required List<ResourceFormatCategoryDto> groups })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(libraryId, serializer);
+sse_encode_list_resource_format_category_dto(groups, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 117)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta:
-            kCrateApiLibraryUpdateLibraryResourceFormatCategoriesFrbConstMeta,
-        argValues: [libraryId, groups],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryUpdateLibraryResourceFormatCategoriesFrbConstMeta,
+            argValues: [libraryId, groups],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta
-  get kCrateApiLibraryUpdateLibraryResourceFormatCategoriesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_library_resource_format_categories_frb",
-        argNames: ["libraryId", "groups"],
-      );
 
-  @override
-  LibraryDto crateApiLibraryUpdateLibrarySettingsFrb({
-    required String libraryId,
-    required String name,
-    required List<ResourceFormatCategoryDto> groups,
-    required bool scanOnStartup,
-    required ScanIntervalDto scanInterval,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(libraryId, serializer);
-          sse_encode_String(name, serializer);
-          sse_encode_list_resource_format_category_dto(groups, serializer);
-          sse_encode_bool(scanOnStartup, serializer);
-          sse_encode_scan_interval_dto(scanInterval, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 118,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryUpdateLibraryResourceFormatCategoriesFrbConstMeta => const TaskConstMeta(
+            debugName: "update_library_resource_format_categories_frb",
+            argNames: ["libraryId", "groups"],
+        );
+        
+
+@override LibraryDto crateApiLibraryUpdateLibrarySettingsFrb({required String libraryId , required String name , required List<ResourceFormatCategoryDto> groups , required bool scanOnStartup , required ScanIntervalDto scanInterval })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(libraryId, serializer);
+sse_encode_String(name, serializer);
+sse_encode_list_resource_format_category_dto(groups, serializer);
+sse_encode_bool(scanOnStartup, serializer);
+sse_encode_scan_interval_dto(scanInterval, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 118)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryUpdateLibrarySettingsFrbConstMeta,
-        argValues: [libraryId, name, groups, scanOnStartup, scanInterval],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryUpdateLibrarySettingsFrbConstMeta,
+            argValues: [libraryId, name, groups, scanOnStartup, scanInterval],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryUpdateLibrarySettingsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_library_settings_frb",
-        argNames: [
-          "libraryId",
-          "name",
-          "groups",
-          "scanOnStartup",
-          "scanInterval",
-        ],
-      );
 
-  @override
-  List<LibraryDto> crateApiLibraryUpdateLibrarySidebarLayoutFrb({
-    required List<LibrarySidebarPlacementDto> placements,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_list_library_sidebar_placement_dto(placements, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 119,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryUpdateLibrarySettingsFrbConstMeta => const TaskConstMeta(
+            debugName: "update_library_settings_frb",
+            argNames: ["libraryId", "name", "groups", "scanOnStartup", "scanInterval"],
+        );
+        
+
+@override List<LibraryDto> crateApiLibraryUpdateLibrarySidebarLayoutFrb({required List<LibrarySidebarPlacementDto> placements })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_list_library_sidebar_placement_dto(placements, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 119)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_list_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryUpdateLibrarySidebarLayoutFrbConstMeta,
-        argValues: [placements],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryUpdateLibrarySidebarLayoutFrbConstMeta,
+            argValues: [placements],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryUpdateLibrarySidebarLayoutFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_library_sidebar_layout_frb",
-        argNames: ["placements"],
-      );
 
-  @override
-  LibraryDto crateApiLibraryUpdateLocalLibraryRootFrb({
-    required String libraryId,
-    required String rootPath,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(libraryId, serializer);
-          sse_encode_String(rootPath, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 120,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryUpdateLibrarySidebarLayoutFrbConstMeta => const TaskConstMeta(
+            debugName: "update_library_sidebar_layout_frb",
+            argNames: ["placements"],
+        );
+        
+
+@override LibraryDto crateApiLibraryUpdateLocalLibraryRootFrb({required String libraryId , required String rootPath })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(libraryId, serializer);
+sse_encode_String(rootPath, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 120)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryUpdateLocalLibraryRootFrbConstMeta,
-        argValues: [libraryId, rootPath],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryUpdateLocalLibraryRootFrbConstMeta,
+            argValues: [libraryId, rootPath],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryUpdateLocalLibraryRootFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_local_library_root_frb",
-        argNames: ["libraryId", "rootPath"],
-      );
 
-  @override
-  LibraryDto crateApiLibraryUpdateRemoteLibraryFrb({
-    required String libraryId,
-    required String rootUrl,
-    required String username,
-    required bool allowHttp,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(libraryId, serializer);
-          sse_encode_String(rootUrl, serializer);
-          sse_encode_String(username, serializer);
-          sse_encode_bool(allowHttp, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 121,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryUpdateLocalLibraryRootFrbConstMeta => const TaskConstMeta(
+            debugName: "update_local_library_root_frb",
+            argNames: ["libraryId", "rootPath"],
+        );
+        
+
+@override LibraryDto crateApiLibraryUpdateRemoteLibraryFrb({required String libraryId , required String rootUrl , required String username , required bool allowHttp })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(libraryId, serializer);
+sse_encode_String(rootUrl, serializer);
+sse_encode_String(username, serializer);
+sse_encode_bool(allowHttp, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 121)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiLibraryUpdateRemoteLibraryFrbConstMeta,
-        argValues: [libraryId, rootUrl, username, allowHttp],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiLibraryUpdateRemoteLibraryFrbConstMeta,
+            argValues: [libraryId, rootUrl, username, allowHttp],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiLibraryUpdateRemoteLibraryFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_remote_library_frb",
-        argNames: ["libraryId", "rootUrl", "username", "allowHttp"],
-      );
 
-  @override
-  void crateApiSeriesUpdateSeriesItemSortOrderFrb({
-    required String seriesId,
-    required String comicId,
-    required double sortOrder,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          sse_encode_String(comicId, serializer);
-          sse_encode_f_64(sortOrder, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 122,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiLibraryUpdateRemoteLibraryFrbConstMeta => const TaskConstMeta(
+            debugName: "update_remote_library_frb",
+            argNames: ["libraryId", "rootUrl", "username", "allowHttp"],
+        );
+        
+
+@override void crateApiSeriesUpdateSeriesItemSortOrderFrb({required String seriesId , required String comicId , required double sortOrder })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+sse_encode_String(comicId, serializer);
+sse_encode_f_64(sortOrder, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 122)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesUpdateSeriesItemSortOrderFrbConstMeta,
-        argValues: [seriesId, comicId, sortOrder],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesUpdateSeriesItemSortOrderFrbConstMeta,
+            argValues: [seriesId, comicId, sortOrder],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesUpdateSeriesItemSortOrderFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_series_item_sort_order_frb",
-        argNames: ["seriesId", "comicId", "sortOrder"],
-      );
 
-  @override
-  Future<UpdateSeriesUserMetaDto>
-  crateApiSeriesUpdateSeriesUserMetaDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 123,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesUpdateSeriesItemSortOrderFrbConstMeta => const TaskConstMeta(
+            debugName: "update_series_item_sort_order_frb",
+            argNames: ["seriesId", "comicId", "sortOrder"],
+        );
+        
+
+@override Future<UpdateSeriesUserMetaDto> crateApiSeriesUpdateSeriesUserMetaDtoDefault()  { return handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 123, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_update_series_user_meta_dto,
           decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSeriesUpdateSeriesUserMetaDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
+        )
+        ,
+            constMeta: kCrateApiSeriesUpdateSeriesUserMetaDtoDefaultConstMeta,
+            argValues: [],
+            apiImpl: this,
+        )); }
 
-  TaskConstMeta get kCrateApiSeriesUpdateSeriesUserMetaDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_series_user_meta_dto_default",
-        argNames: [],
-      );
 
-  @override
-  void crateApiSeriesUpdateSeriesUserMetaFrb({
-    required String seriesId,
-    required UpdateSeriesUserMetaDto meta,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(seriesId, serializer);
-          sse_encode_box_autoadd_update_series_user_meta_dto(meta, serializer);
-          return pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 124,
-          )!;
-        },
-        codec: SseCodec(
+        TaskConstMeta get kCrateApiSeriesUpdateSeriesUserMetaDtoDefaultConstMeta => const TaskConstMeta(
+            debugName: "update_series_user_meta_dto_default",
+            argNames: [],
+        );
+        
+
+@override void crateApiSeriesUpdateSeriesUserMetaFrb({required String seriesId , required UpdateSeriesUserMetaDto meta })  { return handler.executeSync(SyncTask(
+            callFfi: () {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_String(seriesId, serializer);
+sse_encode_box_autoadd_update_series_user_meta_dto(meta, serializer);
+            return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 124)!;
+            
+            },
+            codec: 
+        SseCodec(
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesUpdateSeriesUserMetaFrbConstMeta,
-        argValues: [seriesId, meta],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiSeriesUpdateSeriesUserMetaFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_series_user_meta_frb",
-        argNames: ["seriesId", "meta"],
-      );
-
-  @override
-  Stream<List<AuthorIdentityFrbDto>> crateApiAuthorWatchAuthorsFrb() {
-    final sink = RustStreamSink<List<AuthorIdentityFrbDto>>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_StreamSink_list_author_identity_frb_dto_Sse(
-              sink,
-              serializer,
-            );
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 125,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiAuthorWatchAuthorsFrbConstMeta,
-          argValues: [sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiAuthorWatchAuthorsFrbConstMeta =>
-      const TaskConstMeta(debugName: "watch_authors_frb", argNames: ["sink"]);
-
-  @override
-  Stream<int> crateApiComicWatchComicChanges() {
-    final sink = RustStreamSink<int>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_StreamSink_i_32_Sse(sink, serializer);
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 126,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiComicWatchComicChangesConstMeta,
-          argValues: [sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiComicWatchComicChangesConstMeta =>
-      const TaskConstMeta(debugName: "watch_comic_changes", argNames: ["sink"]);
-
-  @override
-  Stream<List<HomeContinueReadingDto>> crateApiHomeWatchContinueReadingTop5Frb({
-    required bool excludeR18,
-  }) {
-    final sink = RustStreamSink<List<HomeContinueReadingDto>>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_bool(excludeR18, serializer);
-            sse_encode_StreamSink_list_home_continue_reading_dto_Sse(
-              sink,
-              serializer,
-            );
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 127,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiHomeWatchContinueReadingTop5FrbConstMeta,
-          argValues: [excludeR18, sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiHomeWatchContinueReadingTop5FrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "watch_continue_reading_top5_frb",
-        argNames: ["excludeR18", "sink"],
-      );
-
-  @override
-  Stream<List<HomeLibraryAlertDto>> crateApiHomeWatchHomeLibraryAlertsFrb() {
-    final sink = RustStreamSink<List<HomeLibraryAlertDto>>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_StreamSink_list_home_library_alert_dto_Sse(
-              sink,
-              serializer,
-            );
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 128,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiHomeWatchHomeLibraryAlertsFrbConstMeta,
-          argValues: [sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiHomeWatchHomeLibraryAlertsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "watch_home_library_alerts_frb",
-        argNames: ["sink"],
-      );
-
-  @override
-  Stream<HomePageCountsDto> crateApiHomeWatchHomePageCountsFrb({
-    required bool excludeR18,
-  }) {
-    final sink = RustStreamSink<HomePageCountsDto>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_bool(excludeR18, serializer);
-            sse_encode_StreamSink_home_page_counts_dto_Sse(sink, serializer);
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 129,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiHomeWatchHomePageCountsFrbConstMeta,
-          argValues: [excludeR18, sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiHomeWatchHomePageCountsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "watch_home_page_counts_frb",
-        argNames: ["excludeR18", "sink"],
-      );
-
-  @override
-  Stream<List<SeriesComicOrderEntryDto>>
-  crateApiSeriesWatchHomeSeriesComicOrderMapFrb() {
-    final sink = RustStreamSink<List<SeriesComicOrderEntryDto>>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(
-              sink,
-              serializer,
-            );
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 130,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiSeriesWatchHomeSeriesComicOrderMapFrbConstMeta,
-          argValues: [sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiSeriesWatchHomeSeriesComicOrderMapFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "watch_home_series_comic_order_map_frb",
-        argNames: ["sink"],
-      );
-
-  @override
-  Stream<List<ReadingHistoryDto>> crateApiHistoryWatchReadingHistoriesFrb() {
-    final sink = RustStreamSink<List<ReadingHistoryDto>>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_StreamSink_list_reading_history_dto_Sse(
-              sink,
-              serializer,
-            );
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 131,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiHistoryWatchReadingHistoriesFrbConstMeta,
-          argValues: [sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiHistoryWatchReadingHistoriesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "watch_reading_histories_frb",
-        argNames: ["sink"],
-      );
-
-  @override
-  Stream<List<HomeRecentlyAddedDto>> crateApiHomeWatchRecentlyAddedOnHomeFrb({
-    required bool excludeR18,
-  }) {
-    final sink = RustStreamSink<List<HomeRecentlyAddedDto>>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_bool(excludeR18, serializer);
-            sse_encode_StreamSink_list_home_recently_added_dto_Sse(
-              sink,
-              serializer,
-            );
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 132,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiHomeWatchRecentlyAddedOnHomeFrbConstMeta,
-          argValues: [excludeR18, sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiHomeWatchRecentlyAddedOnHomeFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "watch_recently_added_on_home_frb",
-        argNames: ["excludeR18", "sink"],
-      );
-
-  @override
-  Stream<List<String>> crateApiTagWatchTagsFrb() {
-    final sink = RustStreamSink<List<String>>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_StreamSink_list_String_Sse(sink, serializer);
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 133,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiTagWatchTagsFrbConstMeta,
-          argValues: [sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiTagWatchTagsFrbConstMeta =>
-      const TaskConstMeta(debugName: "watch_tags_frb", argNames: ["sink"]);
-
-  @override
-  Stream<ThumbnailEventDto> crateApiThumbnailWatchThumbnailEventsFrb() {
-    final sink = RustStreamSink<ThumbnailEventDto>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_StreamSink_thumbnail_event_dto_Sse(sink, serializer);
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 134,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiThumbnailWatchThumbnailEventsFrbConstMeta,
-          argValues: [sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiThumbnailWatchThumbnailEventsFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "watch_thumbnail_events_frb",
-        argNames: ["sink"],
-      );
-
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_SyncHandleDto => wire
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
-
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_SyncHandleDto => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
-
-  @protected
-  AnyhowException dco_decode_AnyhowException(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AnyhowException(raw as String);
-  }
-
-  @protected
-  SyncHandleDto
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
-  SyncHandleDto
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
-  SyncHandleDto
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
-  RustStreamSink<HomePageCountsDto>
-  dco_decode_StreamSink_home_page_counts_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<List<String>> dco_decode_StreamSink_list_String_Sse(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<List<AuthorIdentityFrbDto>>
-  dco_decode_StreamSink_list_author_identity_frb_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<List<HomeContinueReadingDto>>
-  dco_decode_StreamSink_list_home_continue_reading_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<List<HomeLibraryAlertDto>>
-  dco_decode_StreamSink_list_home_library_alert_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<List<HomeRecentlyAddedDto>>
-  dco_decode_StreamSink_list_home_recently_added_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<List<ReadingHistoryDto>>
-  dco_decode_StreamSink_list_reading_history_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<List<SeriesComicOrderEntryDto>>
-  dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<SyncLibraryProgressDto>
-  dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<ThumbnailEventDto>
-  dco_decode_StreamSink_thumbnail_event_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  String dco_decode_String(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as String;
-  }
-
-  @protected
-  AmbiguousSampleDto dco_decode_ambiguous_sample_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return AmbiguousSampleDto(
-      comicId: dco_decode_String(arr[0]),
-      path: dco_decode_String(arr[1]),
-      title: dco_decode_String(arr[2]),
-      candidateComicIds: dco_decode_list_String(arr[3]),
-    );
-  }
-
-  @protected
-  AuthorDetailFrbDto dco_decode_author_detail_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
-    return AuthorDetailFrbDto(
-      identity: dco_decode_author_identity_frb_dto(arr[0]),
-      links: dco_decode_list_author_link_frb_dto(arr[1]),
-      tags: dco_decode_list_author_facet_count_frb_dto(arr[2]),
-      parodies: dco_decode_list_author_facet_count_frb_dto(arr[3]),
-      characters: dco_decode_list_author_facet_count_frb_dto(arr[4]),
-      topComics: dco_decode_list_author_top_comic_frb_dto(arr[5]),
-      comicCount: dco_decode_i_64(arr[6]),
-    );
-  }
-
-  @protected
-  AuthorFacetCountFrbDto dco_decode_author_facet_count_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return AuthorFacetCountFrbDto(
-      name: dco_decode_String(arr[0]),
-      attachmentCount: dco_decode_i_64(arr[1]),
-    );
-  }
-
-  @protected
-  AuthorIdentityFrbDto dco_decode_author_identity_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return AuthorIdentityFrbDto(
-      id: dco_decode_i_64(arr[0]),
-      name: dco_decode_String(arr[1]),
-      verified: dco_decode_bool(arr[2]),
-    );
-  }
-
-  @protected
-  AuthorImageRefFrbDto dco_decode_author_image_ref_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
-    return AuthorImageRefFrbDto(
-      avatarSource: dco_decode_author_image_source_frb(arr[0]),
-      avatarComicId: dco_decode_opt_String(arr[1]),
-      avatarLinkId: dco_decode_opt_box_autoadd_i_64(arr[2]),
-      avatarImageUrl: dco_decode_opt_String(arr[3]),
-      backgroundSource: dco_decode_author_image_source_frb(arr[4]),
-      backgroundComicId: dco_decode_opt_String(arr[5]),
-      backgroundLinkId: dco_decode_opt_box_autoadd_i_64(arr[6]),
-      backgroundImageUrl: dco_decode_opt_String(arr[7]),
-    );
-  }
-
-  @protected
-  AuthorImageSlotFrb dco_decode_author_image_slot_frb(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AuthorImageSlotFrb.values[raw as int];
-  }
-
-  @protected
-  AuthorImageSourceFrb dco_decode_author_image_source_frb(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AuthorImageSourceFrb.values[raw as int];
-  }
-
-  @protected
-  AuthorLinkFrbDto dco_decode_author_link_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return AuthorLinkFrbDto(
-      id: dco_decode_i_64(arr[0]),
-      platform: dco_decode_author_link_platform_frb(arr[1]),
-      url: dco_decode_String(arr[2]),
-      platformDisplayName: dco_decode_opt_String(arr[3]),
-      sortKey: dco_decode_i_64(arr[4]),
-    );
-  }
-
-  @protected
-  AuthorLinkPlatformFrb dco_decode_author_link_platform_frb(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AuthorLinkPlatformFrb.values[raw as int];
-  }
-
-  @protected
-  AuthorPagedDto dco_decode_author_paged_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return AuthorPagedDto(
-      items: dco_decode_list_author_identity_frb_dto(arr[0]),
-      totalCount: dco_decode_i_64(arr[1]),
-      page: dco_decode_i_32(arr[2]),
-      pageSize: dco_decode_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  AuthorTopComicFrbDto dco_decode_author_top_comic_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return AuthorTopComicFrbDto(
-      comicId: dco_decode_String(arr[0]),
-      title: dco_decode_String(arr[1]),
-    );
-  }
-
-  @protected
-  bool dco_decode_bool(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as bool;
-  }
-
-  @protected
-  AuthorDetailFrbDto dco_decode_box_autoadd_author_detail_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_author_detail_frb_dto(raw);
-  }
-
-  @protected
-  bool dco_decode_box_autoadd_bool(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as bool;
-  }
-
-  @protected
-  ComicDto dco_decode_box_autoadd_comic_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_comic_dto(raw);
-  }
-
-  @protected
-  ComicFilterDto dco_decode_box_autoadd_comic_filter_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_comic_filter_dto(raw);
-  }
-
-  @protected
-  ComicMetadataBulkPatchFrbDto
-  dco_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_comic_metadata_bulk_patch_frb_dto(raw);
-  }
-
-  @protected
-  ComicSortOptionDto dco_decode_box_autoadd_comic_sort_option_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_comic_sort_option_dto(raw);
-  }
-
-  @protected
-  ComicThumbnailDto dco_decode_box_autoadd_comic_thumbnail_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_comic_thumbnail_dto(raw);
-  }
-
-  @protected
-  ExportComicMetadataOptionsDto
-  dco_decode_box_autoadd_export_comic_metadata_options_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_export_comic_metadata_options_dto(raw);
-  }
-
-  @protected
-  int dco_decode_box_autoadd_i_32(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as int;
-  }
-
-  @protected
-  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_i_64(raw);
-  }
-
-  @protected
-  MatchTierDto dco_decode_box_autoadd_match_tier_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_match_tier_dto(raw);
-  }
-
-  @protected
-  MultiValuePatchFrbDto dco_decode_box_autoadd_multi_value_patch_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_multi_value_patch_frb_dto(raw);
-  }
-
-  @protected
-  PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_page_request_dto(raw);
-  }
-
-  @protected
-  PublishedAtPatchFrbDto dco_decode_box_autoadd_published_at_patch_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_published_at_patch_frb_dto(raw);
-  }
-
-  @protected
-  ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_reading_history_dto(raw);
-  }
-
-  @protected
-  ScalarPatchFrbDto dco_decode_box_autoadd_scalar_patch_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_scalar_patch_frb_dto(raw);
-  }
-
-  @protected
-  SeriesDto dco_decode_box_autoadd_series_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_series_dto(raw);
-  }
-
-  @protected
-  SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_series_filter_dto(raw);
-  }
-
-  @protected
-  SeriesItemDto dco_decode_box_autoadd_series_item_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_series_item_dto(raw);
-  }
-
-  @protected
-  SeriesReadingContextDto dco_decode_box_autoadd_series_reading_context_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_series_reading_context_dto(raw);
-  }
-
-  @protected
-  SeriesSortOptionDto dco_decode_box_autoadd_series_sort_option_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_series_sort_option_dto(raw);
-  }
-
-  @protected
-  SeriesThumbnailDto dco_decode_box_autoadd_series_thumbnail_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_series_thumbnail_dto(raw);
-  }
-
-  @protected
-  SetComicMetaLocksFrbDto dco_decode_box_autoadd_set_comic_meta_locks_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_set_comic_meta_locks_frb_dto(raw);
-  }
-
-  @protected
-  SetSeriesMetaLocksDto dco_decode_box_autoadd_set_series_meta_locks_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_set_series_meta_locks_dto(raw);
-  }
-
-  @protected
-  UpdateComicUserMetaFrbDto
-  dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_update_comic_user_meta_frb_dto(raw);
-  }
-
-  @protected
-  UpdateSeriesUserMetaDto dco_decode_box_autoadd_update_series_user_meta_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_update_series_user_meta_dto(raw);
-  }
-
-  @protected
-  BulkPatchResultFrbDto dco_decode_bulk_patch_result_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return BulkPatchResultFrbDto(
-      succeeded: dco_decode_i_32(arr[0]),
-      failed: dco_decode_i_32(arr[1]),
-      unchanged: dco_decode_i_32(arr[2]),
-      cancelled: dco_decode_bool(arr[3]),
-      errorSamples: dco_decode_list_String(arr[4]),
-    );
-  }
-
-  @protected
-  ComicDto dco_decode_comic_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 19)
-      throw Exception('unexpected arr length: expect 19 but see ${arr.length}');
-    return ComicDto(
-      comicId: dco_decode_String(arr[0]),
-      path: dco_decode_String(arr[1]),
-      resourceType: dco_decode_String(arr[2]),
-      resourceSize: dco_decode_i_64(arr[3]),
-      createdAt: dco_decode_i_64(arr[4]),
-      lastUpdatedAt: dco_decode_i_64(arr[5]),
-      title: dco_decode_String(arr[6]),
-      contentRating: dco_decode_String(arr[7]),
-      pageCount: dco_decode_i_32(arr[8]),
-      description: dco_decode_opt_String(arr[9]),
-      publishedAt: dco_decode_opt_box_autoadd_i_64(arr[10]),
-      lastReadTimeMs: dco_decode_opt_box_autoadd_i_64(arr[11]),
-      authors: dco_decode_list_String(arr[12]),
-      tags: dco_decode_list_String(arr[13]),
-      languages: dco_decode_list_String(arr[14]),
-      parodies: dco_decode_list_String(arr[15]),
-      characters: dco_decode_list_String(arr[16]),
-      locks: dco_decode_comic_meta_locks_dto(arr[17]),
-      libraryId: dco_decode_String(arr[18]),
-    );
-  }
-
-  @protected
-  ComicFilterDto dco_decode_comic_filter_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 15)
-      throw Exception('unexpected arr length: expect 15 but see ${arr.length}');
-    return ComicFilterDto(
-      showR18: dco_decode_bool(arr[0]),
-      query: dco_decode_opt_String(arr[1]),
-      resourceTypes: dco_decode_list_String(arr[2]),
-      contentRatings: dco_decode_list_String(arr[3]),
-      tagsAll: dco_decode_list_String(arr[4]),
-      tagsAny: dco_decode_list_String(arr[5]),
-      tagsExclude: dco_decode_list_String(arr[6]),
-      authorsAll: dco_decode_list_String(arr[7]),
-      authorsAny: dco_decode_list_String(arr[8]),
-      authorsExclude: dco_decode_list_String(arr[9]),
-      languages: dco_decode_list_String(arr[10]),
-      parodies: dco_decode_list_String(arr[11]),
-      characters: dco_decode_list_String(arr[12]),
-      needsMetadataOnly: dco_decode_bool(arr[13]),
-      libraryId: dco_decode_opt_String(arr[14]),
-    );
-  }
-
-  @protected
-  ComicMetaLocksDto dco_decode_comic_meta_locks_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
-    return ComicMetaLocksDto(
-      title: dco_decode_bool(arr[0]),
-      description: dco_decode_bool(arr[1]),
-      publishedAt: dco_decode_bool(arr[2]),
-      contentRating: dco_decode_bool(arr[3]),
-      authors: dco_decode_bool(arr[4]),
-      tags: dco_decode_bool(arr[5]),
-      languages: dco_decode_bool(arr[6]),
-      parodies: dco_decode_bool(arr[7]),
-      characters: dco_decode_bool(arr[8]),
-    );
-  }
-
-  @protected
-  ComicMetadataBulkPatchFrbDto dco_decode_comic_metadata_bulk_patch_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
-    return ComicMetadataBulkPatchFrbDto(
-      tags: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[0]),
-      authors: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[1]),
-      languages: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[2]),
-      parodies: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[3]),
-      characters: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[4]),
-      contentRating: dco_decode_opt_String(arr[5]),
-      description: dco_decode_opt_box_autoadd_scalar_patch_frb_dto(arr[6]),
-      publishedAt: dco_decode_opt_box_autoadd_published_at_patch_frb_dto(
-        arr[7],
-      ),
-    );
-  }
-
-  @protected
-  ComicPurgeResultFrbDto dco_decode_comic_purge_result_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return ComicPurgeResultFrbDto(
-      succeeded: dco_decode_i_32(arr[0]),
-      failed: dco_decode_i_32(arr[1]),
-      errorSamples: dco_decode_list_String(arr[2]),
-    );
-  }
-
-  @protected
-  ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ComicSortFieldDto.values[raw as int];
-  }
-
-  @protected
-  ComicSortOptionDto dco_decode_comic_sort_option_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return ComicSortOptionDto(
-      field: dco_decode_comic_sort_field_dto(arr[0]),
-      descending: dco_decode_bool(arr[1]),
-    );
-  }
-
-  @protected
-  ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return ComicThumbnailDto(
-      thumbnail: dco_decode_list_prim_u_8_strict(arr[0]),
-      sourceModifiedMs: dco_decode_i_64(arr[1]),
-      sourceSize: dco_decode_i_64(arr[2]),
-      isUserSet: dco_decode_bool(arr[3]),
-    );
-  }
-
-  @protected
-  ExportComicMetadataOptionsDto dco_decode_export_comic_metadata_options_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return ExportComicMetadataOptionsDto(
-      libraryId: dco_decode_opt_String(arr[0]),
-      includeOrphanFacets: dco_decode_bool(arr[1]),
-    );
-  }
-
-  @protected
-  double dco_decode_f_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as double;
-  }
-
-  @protected
-  HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return HentaiErrorDto(
-      code: dco_decode_String(arr[0]),
-      message: dco_decode_String(arr[1]),
-      context: dco_decode_opt_String(arr[2]),
-    );
-  }
-
-  @protected
-  HomeContinueReadingDto dco_decode_home_continue_reading_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return HomeContinueReadingDto(
-      comicId: dco_decode_String(arr[0]),
-      title: dco_decode_String(arr[1]),
-      lastReadTimeMs: dco_decode_i_64(arr[2]),
-      pageIndex: dco_decode_opt_box_autoadd_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  HomeLibraryAlertDto dco_decode_home_library_alert_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
-    return HomeLibraryAlertDto(
-      libraryId: dco_decode_String(arr[0]),
-      displayName: dco_decode_String(arr[1]),
-      kind: dco_decode_home_library_alert_kind_dto(arr[2]),
-      lastSuccessAtMs: dco_decode_opt_box_autoadd_i_64(arr[3]),
-      lastErrorMessage: dco_decode_opt_String(arr[4]),
-      staleDays: dco_decode_opt_box_autoadd_i_32(arr[5]),
-      pendingResourceCount: dco_decode_opt_box_autoadd_i_32(arr[6]),
-    );
-  }
-
-  @protected
-  HomeLibraryAlertKindDto dco_decode_home_library_alert_kind_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return HomeLibraryAlertKindDto.values[raw as int];
-  }
-
-  @protected
-  HomePageCountsDto dco_decode_home_page_counts_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return HomePageCountsDto(
-      comicCount: dco_decode_i_32(arr[0]),
-      tagCount: dco_decode_i_32(arr[1]),
-      seriesCount: dco_decode_i_32(arr[2]),
-      authorCount: dco_decode_i_32(arr[3]),
-      libraryCount: dco_decode_i_32(arr[4]),
-    );
-  }
-
-  @protected
-  HomeRecentlyAddedDto dco_decode_home_recently_added_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return HomeRecentlyAddedDto(
-      comicId: dco_decode_String(arr[0]),
-      title: dco_decode_String(arr[1]),
-      libraryId: dco_decode_String(arr[2]),
-      libraryDisplayName: dco_decode_String(arr[3]),
-      createdAtMs: dco_decode_i_64(arr[4]),
-    );
-  }
-
-  @protected
-  int dco_decode_i_32(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as int;
-  }
-
-  @protected
-  PlatformInt64 dco_decode_i_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dcoDecodeI64(raw);
-  }
-
-  @protected
-  ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return ImportComicMetadataResultDto(
-      applied: dco_decode_i_32(arr[0]),
-      skippedNotFound: dco_decode_i_32(arr[1]),
-      skippedAmbiguous: dco_decode_i_32(arr[2]),
-      errors: dco_decode_list_String(arr[3]),
-    );
-  }
-
-  @protected
-  JunctionNamedFacetFrb dco_decode_junction_named_facet_frb(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return JunctionNamedFacetFrb.values[raw as int];
-  }
-
-  @protected
-  LibraryDto dco_decode_library_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 12)
-      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
-    return LibraryDto(
-      libraryId: dco_decode_String(arr[0]),
-      kind: dco_decode_String(arr[1]),
-      rootPath: dco_decode_String(arr[2]),
-      name: dco_decode_String(arr[3]),
-      enabledResourceFormatCategories:
-          dco_decode_list_resource_format_category_dto(arr[4]),
-      createdAt: dco_decode_i_64(arr[5]),
-      username: dco_decode_String(arr[6]),
-      allowHttp: dco_decode_bool(arr[7]),
-      scanOnStartup: dco_decode_bool(arr[8]),
-      scanInterval: dco_decode_scan_interval_dto(arr[9]),
-      pinned: dco_decode_bool(arr[10]),
-      sidebarOrder: dco_decode_i_32(arr[11]),
-    );
-  }
-
-  @protected
-  LibraryProbeResultDto dco_decode_library_probe_result_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
-    return LibraryProbeResultDto(
-      libraryId: dco_decode_String(arr[0]),
-      addedCount: dco_decode_i_32(arr[1]),
-      changedCount: dco_decode_i_32(arr[2]),
-      removedCount: dco_decode_i_32(arr[3]),
-      unreachable: dco_decode_bool(arr[4]),
-      errorMessage: dco_decode_opt_String(arr[5]),
-      probedAtMs: dco_decode_i_64(arr[6]),
-      baselineMissing: dco_decode_bool(arr[7]),
-    );
-  }
-
-  @protected
-  LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return LibrarySidebarPlacementDto(
-      libraryId: dco_decode_String(arr[0]),
-      pinned: dco_decode_bool(arr[1]),
-      sidebarOrder: dco_decode_i_32(arr[2]),
-    );
-  }
-
-  @protected
-  LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
-    return LibrarySyncCountsDto(
-      dir: dco_decode_i_32(arr[0]),
-      zip: dco_decode_i_32(arr[1]),
-      cbz: dco_decode_i_32(arr[2]),
-      epub: dco_decode_i_32(arr[3]),
-      cbr: dco_decode_i_32(arr[4]),
-      rar: dco_decode_i_32(arr[5]),
-      cb7: dco_decode_i_32(arr[6]),
-      sevenz: dco_decode_i_32(arr[7]),
-      pdf: dco_decode_i_32(arr[8]),
-    );
-  }
-
-  @protected
-  List<String> dco_decode_list_String(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_String).toList();
-  }
-
-  @protected
-  List<AmbiguousSampleDto> dco_decode_list_ambiguous_sample_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_ambiguous_sample_dto).toList();
-  }
-
-  @protected
-  List<AuthorFacetCountFrbDto> dco_decode_list_author_facet_count_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_author_facet_count_frb_dto)
-        .toList();
-  }
-
-  @protected
-  List<AuthorIdentityFrbDto> dco_decode_list_author_identity_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_author_identity_frb_dto)
-        .toList();
-  }
-
-  @protected
-  List<AuthorLinkFrbDto> dco_decode_list_author_link_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_author_link_frb_dto).toList();
-  }
-
-  @protected
-  List<AuthorTopComicFrbDto> dco_decode_list_author_top_comic_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_author_top_comic_frb_dto)
-        .toList();
-  }
-
-  @protected
-  List<ComicDto> dco_decode_list_comic_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_comic_dto).toList();
-  }
-
-  @protected
-  List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_home_continue_reading_dto)
-        .toList();
-  }
-
-  @protected
-  List<HomeLibraryAlertDto> dco_decode_list_home_library_alert_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_home_library_alert_dto)
-        .toList();
-  }
-
-  @protected
-  List<HomeRecentlyAddedDto> dco_decode_list_home_recently_added_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_home_recently_added_dto)
-        .toList();
-  }
-
-  @protected
-  List<LibraryDto> dco_decode_list_library_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_library_dto).toList();
-  }
-
-  @protected
-  List<LibrarySidebarPlacementDto>
-  dco_decode_list_library_sidebar_placement_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_library_sidebar_placement_dto)
-        .toList();
-  }
-
-  @protected
-  List<NamedFacetFormEntryFrbDto>
-  dco_decode_list_named_facet_form_entry_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_named_facet_form_entry_frb_dto)
-        .toList();
-  }
-
-  @protected
-  List<NotFoundSampleDto> dco_decode_list_not_found_sample_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_not_found_sample_dto).toList();
-  }
-
-  @protected
-  List<int> dco_decode_list_prim_i_32_loose(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as List<int>;
-  }
-
-  @protected
-  Int32List dco_decode_list_prim_i_32_strict(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as Int32List;
-  }
-
-  @protected
-  List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as List<int>;
-  }
-
-  @protected
-  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as Uint8List;
-  }
-
-  @protected
-  List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_reading_history_dto).toList();
-  }
-
-  @protected
-  List<RemoteLibraryCredentialDto>
-  dco_decode_list_remote_library_credential_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_remote_library_credential_dto)
-        .toList();
-  }
-
-  @protected
-  List<ResourceFormatCategoryDto> dco_decode_list_resource_format_category_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_resource_format_category_dto)
-        .toList();
-  }
-
-  @protected
-  List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_series_comic_order_entry_dto)
-        .toList();
-  }
-
-  @protected
-  List<SeriesComicPageItemDto> dco_decode_list_series_comic_page_item_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_series_comic_page_item_dto)
-        .toList();
-  }
-
-  @protected
-  List<SeriesDto> dco_decode_list_series_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_series_dto).toList();
-  }
-
-  @protected
-  List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_series_item_dto).toList();
-  }
-
-  @protected
-  List<TrashedComicFrbDto> dco_decode_list_trashed_comic_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_trashed_comic_frb_dto)
-        .toList();
-  }
-
-  @protected
-  List<WouldApplySampleDto> dco_decode_list_would_apply_sample_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_would_apply_sample_dto)
-        .toList();
-  }
-
-  @protected
-  MatchTierDto dco_decode_match_tier_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return MatchTierDto.values[raw as int];
-  }
-
-  @protected
-  MetadataBackupManifestDto dco_decode_metadata_backup_manifest_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
-    return MetadataBackupManifestDto(
-      schemaVersion: dco_decode_i_32(arr[0]),
-      exportedAt: dco_decode_String(arr[1]),
-      appVersion: dco_decode_String(arr[2]),
-      comicCount: dco_decode_i_32(arr[3]),
-      includeOrphanFacets: dco_decode_bool(arr[4]),
-      libraryId: dco_decode_opt_String(arr[5]),
-    );
-  }
-
-  @protected
-  MultiValueOpFrbDto dco_decode_multi_value_op_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return MultiValueOpFrbDto.values[raw as int];
-  }
-
-  @protected
-  MultiValuePatchFrbDto dco_decode_multi_value_patch_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return MultiValuePatchFrbDto(
-      op: dco_decode_multi_value_op_frb_dto(arr[0]),
-      values: dco_decode_list_String(arr[1]),
-    );
-  }
-
-  @protected
-  NamedFacetFormEntryFrbDto dco_decode_named_facet_form_entry_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return NamedFacetFormEntryFrbDto(
-      name: dco_decode_String(arr[0]),
-      attachmentCount: dco_decode_i_64(arr[1]),
-    );
-  }
-
-  @protected
-  NamedFacetPagedNamesDto dco_decode_named_facet_paged_names_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return NamedFacetPagedNamesDto(
-      items: dco_decode_list_String(arr[0]),
-      totalCount: dco_decode_i_64(arr[1]),
-      page: dco_decode_i_32(arr[2]),
-      pageSize: dco_decode_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  NotFoundSampleDto dco_decode_not_found_sample_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return NotFoundSampleDto(
-      comicId: dco_decode_String(arr[0]),
-      path: dco_decode_String(arr[1]),
-      title: dco_decode_String(arr[2]),
-    );
-  }
-
-  @protected
-  String? dco_decode_opt_String(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_String(raw);
-  }
-
-  @protected
-  AuthorDetailFrbDto? dco_decode_opt_box_autoadd_author_detail_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null
-        ? null
-        : dco_decode_box_autoadd_author_detail_frb_dto(raw);
-  }
-
-  @protected
-  bool? dco_decode_opt_box_autoadd_bool(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_bool(raw);
-  }
-
-  @protected
-  ComicDto? dco_decode_opt_box_autoadd_comic_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_comic_dto(raw);
-  }
-
-  @protected
-  ComicThumbnailDto? dco_decode_opt_box_autoadd_comic_thumbnail_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_comic_thumbnail_dto(raw);
-  }
-
-  @protected
-  int? dco_decode_opt_box_autoadd_i_32(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_i_32(raw);
-  }
-
-  @protected
-  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_i_64(raw);
-  }
-
-  @protected
-  MatchTierDto? dco_decode_opt_box_autoadd_match_tier_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_match_tier_dto(raw);
-  }
-
-  @protected
-  MultiValuePatchFrbDto? dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null
-        ? null
-        : dco_decode_box_autoadd_multi_value_patch_frb_dto(raw);
-  }
-
-  @protected
-  PublishedAtPatchFrbDto? dco_decode_opt_box_autoadd_published_at_patch_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null
-        ? null
-        : dco_decode_box_autoadd_published_at_patch_frb_dto(raw);
-  }
-
-  @protected
-  ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_reading_history_dto(raw);
-  }
-
-  @protected
-  ScalarPatchFrbDto? dco_decode_opt_box_autoadd_scalar_patch_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null
-        ? null
-        : dco_decode_box_autoadd_scalar_patch_frb_dto(raw);
-  }
-
-  @protected
-  SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_series_dto(raw);
-  }
-
-  @protected
-  SeriesItemDto? dco_decode_opt_box_autoadd_series_item_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_box_autoadd_series_item_dto(raw);
-  }
-
-  @protected
-  SeriesReadingContextDto?
-  dco_decode_opt_box_autoadd_series_reading_context_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null
-        ? null
-        : dco_decode_box_autoadd_series_reading_context_dto(raw);
-  }
-
-  @protected
-  SeriesThumbnailDto? dco_decode_opt_box_autoadd_series_thumbnail_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null
-        ? null
-        : dco_decode_box_autoadd_series_thumbnail_dto(raw);
-  }
-
-  @protected
-  List<String>? dco_decode_opt_list_String(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_list_String(raw);
-  }
-
-  @protected
-  Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw == null ? null : dco_decode_list_prim_u_8_strict(raw);
-  }
-
-  @protected
-  PageRequestDto dco_decode_page_request_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return PageRequestDto(
-      page: dco_decode_i_32(arr[0]),
-      pageSize: dco_decode_i_32(arr[1]),
-    );
-  }
-
-  @protected
-  PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return PagedComicResultDto(
-      items: dco_decode_list_comic_dto(arr[0]),
-      totalCount: dco_decode_i_64(arr[1]),
-      page: dco_decode_i_32(arr[2]),
-      pageSize: dco_decode_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return PagedReadingHistoryDto(
-      items: dco_decode_list_reading_history_dto(arr[0]),
-      totalCount: dco_decode_i_64(arr[1]),
-    );
-  }
-
-  @protected
-  PagedSeriesComicsResultDto dco_decode_paged_series_comics_result_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return PagedSeriesComicsResultDto(
-      items: dco_decode_list_series_comic_page_item_dto(arr[0]),
-      totalCount: dco_decode_i_64(arr[1]),
-      page: dco_decode_i_32(arr[2]),
-      pageSize: dco_decode_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return PagedSeriesResultDto(
-      items: dco_decode_list_series_dto(arr[0]),
-      totalCount: dco_decode_i_64(arr[1]),
-      page: dco_decode_i_32(arr[2]),
-      pageSize: dco_decode_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  PagedTrashedComicResultFrbDto dco_decode_paged_trashed_comic_result_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return PagedTrashedComicResultFrbDto(
-      items: dco_decode_list_trashed_comic_frb_dto(arr[0]),
-      totalCount: dco_decode_i_64(arr[1]),
-      page: dco_decode_i_32(arr[2]),
-      pageSize: dco_decode_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  PreviewImportComicMetadataResultDto
-  dco_decode_preview_import_comic_metadata_result_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
-    return PreviewImportComicMetadataResultDto(
-      wouldApply: dco_decode_i_32(arr[0]),
-      skippedNotFound: dco_decode_i_32(arr[1]),
-      skippedAmbiguous: dco_decode_i_32(arr[2]),
-      wouldUpsertOrphanFacetCount: dco_decode_i_32(arr[3]),
-      samplesWouldApply: dco_decode_list_would_apply_sample_dto(arr[4]),
-      samplesNotFound: dco_decode_list_not_found_sample_dto(arr[5]),
-      samplesAmbiguous: dco_decode_list_ambiguous_sample_dto(arr[6]),
-    );
-  }
-
-  @protected
-  PublishedAtPatchFrbDto dco_decode_published_at_patch_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    switch (raw[0]) {
-      case 0:
-        return PublishedAtPatchFrbDto_Replace(dco_decode_i_64(raw[1]));
-      case 1:
-        return PublishedAtPatchFrbDto_Clear();
-      default:
-        throw Exception("unreachable");
-    }
-  }
-
-  @protected
-  ReaderPageDto dco_decode_reader_page_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    switch (raw[0]) {
-      case 0:
-        return ReaderPageDto_FilePath(path: dco_decode_String(raw[1]));
-      case 1:
-        return ReaderPageDto_Bytes(
-          data: dco_decode_list_prim_u_8_strict(raw[1]),
+        )
+        ,
+            constMeta: kCrateApiSeriesUpdateSeriesUserMetaFrbConstMeta,
+            argValues: [seriesId, meta],
+            apiImpl: this,
+        )); }
+
+
+        TaskConstMeta get kCrateApiSeriesUpdateSeriesUserMetaFrbConstMeta => const TaskConstMeta(
+            debugName: "update_series_user_meta_frb",
+            argNames: ["seriesId", "meta"],
         );
-      default:
-        throw Exception("unreachable");
-    }
-  }
+        
 
-  @protected
-  ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return ReaderPageListDto(
-      resourceType: dco_decode_String(arr[0]),
-      pageCount: dco_decode_i_32(arr[1]),
-      dirPagePaths: dco_decode_list_String(arr[2]),
-    );
-  }
+@override Stream<List<AuthorIdentityFrbDto>> crateApiAuthorWatchAuthorsFrb()  { 
+            final sink = RustStreamSink<List<AuthorIdentityFrbDto>>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_StreamSink_list_author_identity_frb_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 125, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiAuthorWatchAuthorsFrbConstMeta,
+            argValues: [sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
 
-  @protected
-  ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return ReadingHistoryDto(
-      comicId: dco_decode_String(arr[0]),
-      title: dco_decode_String(arr[1]),
-      lastReadTimeMs: dco_decode_i_64(arr[2]),
-      pageIndex: dco_decode_opt_box_autoadd_i_32(arr[3]),
-    );
-  }
 
-  @protected
-  RefreshLibraryResultFrbDto dco_decode_refresh_library_result_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return RefreshLibraryResultFrbDto(
-      succeeded: dco_decode_i_32(arr[0]),
-      failed: dco_decode_i_32(arr[1]),
-      cancelled: dco_decode_bool(arr[2]),
-      skipped: dco_decode_bool(arr[3]),
-      skipMessage: dco_decode_opt_String(arr[4]),
-    );
-  }
-
-  @protected
-  RefreshSeriesResultFrbDto dco_decode_refresh_series_result_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return RefreshSeriesResultFrbDto(
-      succeeded: dco_decode_i_32(arr[0]),
-      failed: dco_decode_i_32(arr[1]),
-      cancelled: dco_decode_bool(arr[2]),
-    );
-  }
-
-  @protected
-  RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return RemoteLibraryCredentialDto(
-      libraryId: dco_decode_String(arr[0]),
-      password: dco_decode_String(arr[1]),
-    );
-  }
-
-  @protected
-  ResourceFormatCategoryDto dco_decode_resource_format_category_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ResourceFormatCategoryDto.values[raw as int];
-  }
-
-  @protected
-  ScalarPatchFrbDto dco_decode_scalar_patch_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    switch (raw[0]) {
-      case 0:
-        return ScalarPatchFrbDto_Replace(dco_decode_String(raw[1]));
-      case 1:
-        return ScalarPatchFrbDto_Clear();
-      default:
-        throw Exception("unreachable");
-    }
-  }
-
-  @protected
-  ScanIntervalDto dco_decode_scan_interval_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ScanIntervalDto.values[raw as int];
-  }
-
-  @protected
-  SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return SeriesComicOrderEntryDto(
-      key: dco_decode_String(arr[0]),
-      sortOrder: dco_decode_f_64(arr[1]),
-    );
-  }
-
-  @protected
-  SeriesComicPageItemDto dco_decode_series_comic_page_item_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return SeriesComicPageItemDto(
-      comic: dco_decode_comic_dto(arr[0]),
-      sortOrder: dco_decode_f_64(arr[1]),
-      sortOrderLocked: dco_decode_bool(arr[2]),
-    );
-  }
-
-  @protected
-  SeriesComicsMetadataDto dco_decode_series_comics_metadata_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
-    return SeriesComicsMetadataDto(
-      authors: dco_decode_list_String(arr[0]),
-      tags: dco_decode_list_String(arr[1]),
-      hasR18: dco_decode_bool(arr[2]),
-      languages: dco_decode_list_String(arr[3]),
-      parodies: dco_decode_list_String(arr[4]),
-      characters: dco_decode_list_String(arr[5]),
-    );
-  }
-
-  @protected
-  SeriesCoverSourceDto dco_decode_series_cover_source_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    switch (raw[0]) {
-      case 0:
-        return SeriesCoverSourceDto_CustomThumbnail(
-          thumbnail: dco_decode_list_prim_u_8_strict(raw[1]),
+        TaskConstMeta get kCrateApiAuthorWatchAuthorsFrbConstMeta => const TaskConstMeta(
+            debugName: "watch_authors_frb",
+            argNames: ["sink"],
         );
-      case 1:
-        return SeriesCoverSourceDto_FallbackComic(
-          comicId: dco_decode_String(raw[1]),
+        
+
+@override Stream<int> crateApiComicWatchComicChanges()  { 
+            final sink = RustStreamSink<int>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_StreamSink_i_32_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 126, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiComicWatchComicChangesConstMeta,
+            argValues: [sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiComicWatchComicChangesConstMeta => const TaskConstMeta(
+            debugName: "watch_comic_changes",
+            argNames: ["sink"],
         );
-      case 2:
-        return SeriesCoverSourceDto_Missing();
-      default:
-        throw Exception("unreachable");
-    }
-  }
+        
 
-  @protected
-  SeriesDto dco_decode_series_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
-    return SeriesDto(
-      seriesId: dco_decode_String(arr[0]),
-      folderPath: dco_decode_String(arr[1]),
-      name: dco_decode_String(arr[2]),
-      serializationStatus: dco_decode_String(arr[3]),
-      totalCount: dco_decode_opt_box_autoadd_i_32(arr[4]),
-      locks: dco_decode_series_meta_locks_dto(arr[5]),
-      items: dco_decode_list_series_item_dto(arr[6]),
-    );
-  }
+@override Stream<List<HomeContinueReadingDto>> crateApiHomeWatchContinueReadingTop5Frb({required bool excludeR18 })  { 
+            final sink = RustStreamSink<List<HomeContinueReadingDto>>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_bool(excludeR18, serializer);
+sse_encode_StreamSink_list_home_continue_reading_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 127, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiHomeWatchContinueReadingTop5FrbConstMeta,
+            argValues: [excludeR18, sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
 
-  @protected
-  SeriesFilterDto dco_decode_series_filter_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
-    return SeriesFilterDto(
-      showR18: dco_decode_bool(arr[0]),
-      r18Only: dco_decode_bool(arr[1]),
-      query: dco_decode_opt_String(arr[2]),
-      requireItems: dco_decode_bool(arr[3]),
-      serializationStatus: dco_decode_opt_String(arr[4]),
-      libraryId: dco_decode_opt_String(arr[5]),
-      preferLibraryRootSeries: dco_decode_bool(arr[6]),
-    );
-  }
 
-  @protected
-  SeriesItemDto dco_decode_series_item_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return SeriesItemDto(
-      seriesId: dco_decode_String(arr[0]),
-      comicId: dco_decode_String(arr[1]),
-      sortOrder: dco_decode_f_64(arr[2]),
-      sortOrderLocked: dco_decode_bool(arr[3]),
-    );
-  }
-
-  @protected
-  SeriesMetaLocksDto dco_decode_series_meta_locks_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return SeriesMetaLocksDto(
-      name: dco_decode_bool(arr[0]),
-      serializationStatus: dco_decode_bool(arr[1]),
-      totalCount: dco_decode_bool(arr[2]),
-    );
-  }
-
-  @protected
-  SeriesReadingContextDto dco_decode_series_reading_context_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return SeriesReadingContextDto(
-      seriesId: dco_decode_String(arr[0]),
-      seriesName: dco_decode_String(arr[1]),
-      orderedComicIds: dco_decode_list_String(arr[2]),
-      currentIndex: dco_decode_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  SeriesSortFieldDto dco_decode_series_sort_field_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SeriesSortFieldDto.values[raw as int];
-  }
-
-  @protected
-  SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return SeriesSortOptionDto(
-      field: dco_decode_series_sort_field_dto(arr[0]),
-      descending: dco_decode_bool(arr[1]),
-    );
-  }
-
-  @protected
-  SeriesThumbnailDto dco_decode_series_thumbnail_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return SeriesThumbnailDto(
-      thumbnail: dco_decode_list_prim_u_8_strict(arr[0]),
-      sourceComicId: dco_decode_String(arr[1]),
-      sourcePageIndex: dco_decode_i_32(arr[2]),
-    );
-  }
-
-  @protected
-  SetComicMetaLocksFrbDto dco_decode_set_comic_meta_locks_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
-    return SetComicMetaLocksFrbDto(
-      title: dco_decode_opt_box_autoadd_bool(arr[0]),
-      description: dco_decode_opt_box_autoadd_bool(arr[1]),
-      publishedAt: dco_decode_opt_box_autoadd_bool(arr[2]),
-      contentRating: dco_decode_opt_box_autoadd_bool(arr[3]),
-      authors: dco_decode_opt_box_autoadd_bool(arr[4]),
-      tags: dco_decode_opt_box_autoadd_bool(arr[5]),
-      languages: dco_decode_opt_box_autoadd_bool(arr[6]),
-      parodies: dco_decode_opt_box_autoadd_bool(arr[7]),
-      characters: dco_decode_opt_box_autoadd_bool(arr[8]),
-    );
-  }
-
-  @protected
-  SetSeriesMetaLocksDto dco_decode_set_series_meta_locks_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return SetSeriesMetaLocksDto(
-      name: dco_decode_opt_box_autoadd_bool(arr[0]),
-      serializationStatus: dco_decode_opt_box_autoadd_bool(arr[1]),
-      totalCount: dco_decode_opt_box_autoadd_bool(arr[2]),
-    );
-  }
-
-  @protected
-  SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SyncLibraryPhaseDto.values[raw as int];
-  }
-
-  @protected
-  SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 13)
-      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
-    return SyncLibraryProgressDto(
-      phase: dco_decode_sync_library_phase_dto(arr[0]),
-      route: dco_decode_sync_library_route_dto(arr[1]),
-      currentPath: dco_decode_opt_String(arr[2]),
-      acceptedTotal: dco_decode_i_32(arr[3]),
-      counts: dco_decode_library_sync_counts_dto(arr[4]),
-      removedCount: dco_decode_opt_box_autoadd_i_32(arr[5]),
-      addedCount: dco_decode_opt_box_autoadd_i_32(arr[6]),
-      keptCount: dco_decode_opt_box_autoadd_i_32(arr[7]),
-      migratedCount: dco_decode_opt_box_autoadd_i_32(arr[8]),
-      thumbnailTotal: dco_decode_opt_box_autoadd_i_32(arr[9]),
-      thumbnailDone: dco_decode_opt_box_autoadd_i_32(arr[10]),
-      thumbnailFailedCount: dco_decode_opt_box_autoadd_i_32(arr[11]),
-      errorMessage: dco_decode_opt_String(arr[12]),
-    );
-  }
-
-  @protected
-  SyncLibraryRouteDto dco_decode_sync_library_route_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SyncLibraryRouteDto.values[raw as int];
-  }
-
-  @protected
-  SyncScanModeDto dco_decode_sync_scan_mode_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SyncScanModeDto.values[raw as int];
-  }
-
-  @protected
-  TagDictionaryImportResultDto dco_decode_tag_dictionary_import_result_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return TagDictionaryImportResultDto(
-      added: dco_decode_i_32(arr[0]),
-      skippedExisting: dco_decode_i_32(arr[1]),
-      skippedFilteredOrEmptyOrDedupe: dco_decode_i_32(arr[2]),
-    );
-  }
-
-  @protected
-  TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return TagPagedNamesDto(
-      items: dco_decode_list_String(arr[0]),
-      totalCount: dco_decode_i_64(arr[1]),
-      page: dco_decode_i_32(arr[2]),
-      pageSize: dco_decode_i_32(arr[3]),
-    );
-  }
-
-  @protected
-  ThumbnailEventDto dco_decode_thumbnail_event_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    switch (raw[0]) {
-      case 0:
-        return ThumbnailEventDto_Ready(comicId: dco_decode_String(raw[1]));
-      case 1:
-        return ThumbnailEventDto_Progress(
-          done: dco_decode_i_32(raw[1]),
-          total: dco_decode_i_32(raw[2]),
-          failed: dco_decode_i_32(raw[3]),
+        TaskConstMeta get kCrateApiHomeWatchContinueReadingTop5FrbConstMeta => const TaskConstMeta(
+            debugName: "watch_continue_reading_top5_frb",
+            argNames: ["excludeR18", "sink"],
         );
-      default:
-        throw Exception("unreachable");
-    }
-  }
-
-  @protected
-  ThumbnailPriorityDto dco_decode_thumbnail_priority_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return ThumbnailPriorityDto.values[raw as int];
-  }
-
-  @protected
-  TrashedComicCountsFrbDto dco_decode_trashed_comic_counts_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return TrashedComicCountsFrbDto(
-      total: dco_decode_i_64(arr[0]),
-      local: dco_decode_i_64(arr[1]),
-      remote: dco_decode_i_64(arr[2]),
-    );
-  }
-
-  @protected
-  TrashedComicFrbDto dco_decode_trashed_comic_frb_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return TrashedComicFrbDto(
-      comic: dco_decode_comic_dto(arr[0]),
-      deletedAt: dco_decode_i_64(arr[1]),
-      libraryName: dco_decode_String(arr[2]),
-      libraryKind: dco_decode_String(arr[3]),
-    );
-  }
-
-  @protected
-  BigInt dco_decode_u_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dcoDecodeU64(raw);
-  }
-
-  @protected
-  int dco_decode_u_8(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return raw as int;
-  }
-
-  @protected
-  void dco_decode_unit(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return;
-  }
-
-  @protected
-  UpdateComicUserMetaFrbDto dco_decode_update_comic_user_meta_frb_dto(
-    dynamic raw,
-  ) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
-    return UpdateComicUserMetaFrbDto(
-      title: dco_decode_opt_String(arr[0]),
-      contentRating: dco_decode_opt_String(arr[1]),
-      description: dco_decode_opt_String(arr[2]),
-      publishedAt: dco_decode_opt_box_autoadd_i_64(arr[3]),
-      authors: dco_decode_opt_list_String(arr[4]),
-      tags: dco_decode_opt_list_String(arr[5]),
-      languages: dco_decode_opt_list_String(arr[6]),
-      parodies: dco_decode_opt_list_String(arr[7]),
-      characters: dco_decode_opt_list_String(arr[8]),
-    );
-  }
-
-  @protected
-  UpdateSeriesUserMetaDto dco_decode_update_series_user_meta_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return UpdateSeriesUserMetaDto(
-      name: dco_decode_opt_String(arr[0]),
-      serializationStatus: dco_decode_opt_String(arr[1]),
-      totalCount: dco_decode_opt_box_autoadd_i_32(arr[2]),
-      clearTotalCount: dco_decode_bool(arr[3]),
-    );
-  }
-
-  @protected
-  BigInt dco_decode_usize(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dcoDecodeU64(raw);
-  }
-
-  @protected
-  WouldApplySampleDto dco_decode_would_apply_sample_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return WouldApplySampleDto(
-      comicId: dco_decode_String(arr[0]),
-      path: dco_decode_String(arr[1]),
-      title: dco_decode_String(arr[2]),
-      matchedComicId: dco_decode_String(arr[3]),
-      matchTier: dco_decode_opt_box_autoadd_match_tier_dto(arr[4]),
-    );
-  }
-
-  @protected
-  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_String(deserializer);
-    return AnyhowException(inner);
-  }
-
-  @protected
-  SyncHandleDto
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return SyncHandleDtoImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  SyncHandleDto
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return SyncHandleDtoImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  SyncHandleDto
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return SyncHandleDtoImpl.frbInternalSseDecode(
-      sse_decode_usize(deserializer),
-      sse_decode_i_32(deserializer),
-    );
-  }
-
-  @protected
-  RustStreamSink<HomePageCountsDto>
-  sse_decode_StreamSink_home_page_counts_dto_Sse(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<List<String>> sse_decode_StreamSink_list_String_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<List<AuthorIdentityFrbDto>>
-  sse_decode_StreamSink_list_author_identity_frb_dto_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<List<HomeContinueReadingDto>>
-  sse_decode_StreamSink_list_home_continue_reading_dto_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<List<HomeLibraryAlertDto>>
-  sse_decode_StreamSink_list_home_library_alert_dto_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<List<HomeRecentlyAddedDto>>
-  sse_decode_StreamSink_list_home_recently_added_dto_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<List<ReadingHistoryDto>>
-  sse_decode_StreamSink_list_reading_history_dto_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<List<SeriesComicOrderEntryDto>>
-  sse_decode_StreamSink_list_series_comic_order_entry_dto_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<SyncLibraryProgressDto>
-  sse_decode_StreamSink_sync_library_progress_dto_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  RustStreamSink<ThumbnailEventDto>
-  sse_decode_StreamSink_thumbnail_event_dto_Sse(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
-  String sse_decode_String(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_list_prim_u_8_strict(deserializer);
-    return utf8.decoder.convert(inner);
-  }
-
-  @protected
-  AmbiguousSampleDto sse_decode_ambiguous_sample_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicId = sse_decode_String(deserializer);
-    var var_path = sse_decode_String(deserializer);
-    var var_title = sse_decode_String(deserializer);
-    var var_candidateComicIds = sse_decode_list_String(deserializer);
-    return AmbiguousSampleDto(
-      comicId: var_comicId,
-      path: var_path,
-      title: var_title,
-      candidateComicIds: var_candidateComicIds,
-    );
-  }
-
-  @protected
-  AuthorDetailFrbDto sse_decode_author_detail_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_identity = sse_decode_author_identity_frb_dto(deserializer);
-    var var_links = sse_decode_list_author_link_frb_dto(deserializer);
-    var var_tags = sse_decode_list_author_facet_count_frb_dto(deserializer);
-    var var_parodies = sse_decode_list_author_facet_count_frb_dto(deserializer);
-    var var_characters = sse_decode_list_author_facet_count_frb_dto(
-      deserializer,
-    );
-    var var_topComics = sse_decode_list_author_top_comic_frb_dto(deserializer);
-    var var_comicCount = sse_decode_i_64(deserializer);
-    return AuthorDetailFrbDto(
-      identity: var_identity,
-      links: var_links,
-      tags: var_tags,
-      parodies: var_parodies,
-      characters: var_characters,
-      topComics: var_topComics,
-      comicCount: var_comicCount,
-    );
-  }
-
-  @protected
-  AuthorFacetCountFrbDto sse_decode_author_facet_count_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_name = sse_decode_String(deserializer);
-    var var_attachmentCount = sse_decode_i_64(deserializer);
-    return AuthorFacetCountFrbDto(
-      name: var_name,
-      attachmentCount: var_attachmentCount,
-    );
-  }
-
-  @protected
-  AuthorIdentityFrbDto sse_decode_author_identity_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_id = sse_decode_i_64(deserializer);
-    var var_name = sse_decode_String(deserializer);
-    var var_verified = sse_decode_bool(deserializer);
-    return AuthorIdentityFrbDto(
-      id: var_id,
-      name: var_name,
-      verified: var_verified,
-    );
-  }
-
-  @protected
-  AuthorImageRefFrbDto sse_decode_author_image_ref_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_avatarSource = sse_decode_author_image_source_frb(deserializer);
-    var var_avatarComicId = sse_decode_opt_String(deserializer);
-    var var_avatarLinkId = sse_decode_opt_box_autoadd_i_64(deserializer);
-    var var_avatarImageUrl = sse_decode_opt_String(deserializer);
-    var var_backgroundSource = sse_decode_author_image_source_frb(deserializer);
-    var var_backgroundComicId = sse_decode_opt_String(deserializer);
-    var var_backgroundLinkId = sse_decode_opt_box_autoadd_i_64(deserializer);
-    var var_backgroundImageUrl = sse_decode_opt_String(deserializer);
-    return AuthorImageRefFrbDto(
-      avatarSource: var_avatarSource,
-      avatarComicId: var_avatarComicId,
-      avatarLinkId: var_avatarLinkId,
-      avatarImageUrl: var_avatarImageUrl,
-      backgroundSource: var_backgroundSource,
-      backgroundComicId: var_backgroundComicId,
-      backgroundLinkId: var_backgroundLinkId,
-      backgroundImageUrl: var_backgroundImageUrl,
-    );
-  }
-
-  @protected
-  AuthorImageSlotFrb sse_decode_author_image_slot_frb(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return AuthorImageSlotFrb.values[inner];
-  }
-
-  @protected
-  AuthorImageSourceFrb sse_decode_author_image_source_frb(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return AuthorImageSourceFrb.values[inner];
-  }
-
-  @protected
-  AuthorLinkFrbDto sse_decode_author_link_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_id = sse_decode_i_64(deserializer);
-    var var_platform = sse_decode_author_link_platform_frb(deserializer);
-    var var_url = sse_decode_String(deserializer);
-    var var_platformDisplayName = sse_decode_opt_String(deserializer);
-    var var_sortKey = sse_decode_i_64(deserializer);
-    return AuthorLinkFrbDto(
-      id: var_id,
-      platform: var_platform,
-      url: var_url,
-      platformDisplayName: var_platformDisplayName,
-      sortKey: var_sortKey,
-    );
-  }
-
-  @protected
-  AuthorLinkPlatformFrb sse_decode_author_link_platform_frb(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return AuthorLinkPlatformFrb.values[inner];
-  }
-
-  @protected
-  AuthorPagedDto sse_decode_author_paged_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_author_identity_frb_dto(deserializer);
-    var var_totalCount = sse_decode_i_64(deserializer);
-    var var_page = sse_decode_i_32(deserializer);
-    var var_pageSize = sse_decode_i_32(deserializer);
-    return AuthorPagedDto(
-      items: var_items,
-      totalCount: var_totalCount,
-      page: var_page,
-      pageSize: var_pageSize,
-    );
-  }
-
-  @protected
-  AuthorTopComicFrbDto sse_decode_author_top_comic_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicId = sse_decode_String(deserializer);
-    var var_title = sse_decode_String(deserializer);
-    return AuthorTopComicFrbDto(comicId: var_comicId, title: var_title);
-  }
-
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
-  }
-
-  @protected
-  AuthorDetailFrbDto sse_decode_box_autoadd_author_detail_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_author_detail_frb_dto(deserializer));
-  }
-
-  @protected
-  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_bool(deserializer));
-  }
-
-  @protected
-  ComicDto sse_decode_box_autoadd_comic_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_comic_dto(deserializer));
-  }
-
-  @protected
-  ComicFilterDto sse_decode_box_autoadd_comic_filter_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_comic_filter_dto(deserializer));
-  }
-
-  @protected
-  ComicMetadataBulkPatchFrbDto
-  sse_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_comic_metadata_bulk_patch_frb_dto(deserializer));
-  }
-
-  @protected
-  ComicSortOptionDto sse_decode_box_autoadd_comic_sort_option_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_comic_sort_option_dto(deserializer));
-  }
-
-  @protected
-  ComicThumbnailDto sse_decode_box_autoadd_comic_thumbnail_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_comic_thumbnail_dto(deserializer));
-  }
-
-  @protected
-  ExportComicMetadataOptionsDto
-  sse_decode_box_autoadd_export_comic_metadata_options_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_export_comic_metadata_options_dto(deserializer));
-  }
-
-  @protected
-  int sse_decode_box_autoadd_i_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_i_32(deserializer));
-  }
-
-  @protected
-  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_i_64(deserializer));
-  }
-
-  @protected
-  MatchTierDto sse_decode_box_autoadd_match_tier_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_match_tier_dto(deserializer));
-  }
-
-  @protected
-  MultiValuePatchFrbDto sse_decode_box_autoadd_multi_value_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_multi_value_patch_frb_dto(deserializer));
-  }
-
-  @protected
-  PageRequestDto sse_decode_box_autoadd_page_request_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_page_request_dto(deserializer));
-  }
-
-  @protected
-  PublishedAtPatchFrbDto sse_decode_box_autoadd_published_at_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_published_at_patch_frb_dto(deserializer));
-  }
-
-  @protected
-  ReadingHistoryDto sse_decode_box_autoadd_reading_history_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_reading_history_dto(deserializer));
-  }
-
-  @protected
-  ScalarPatchFrbDto sse_decode_box_autoadd_scalar_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_scalar_patch_frb_dto(deserializer));
-  }
-
-  @protected
-  SeriesDto sse_decode_box_autoadd_series_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_series_dto(deserializer));
-  }
-
-  @protected
-  SeriesFilterDto sse_decode_box_autoadd_series_filter_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_series_filter_dto(deserializer));
-  }
-
-  @protected
-  SeriesItemDto sse_decode_box_autoadd_series_item_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_series_item_dto(deserializer));
-  }
-
-  @protected
-  SeriesReadingContextDto sse_decode_box_autoadd_series_reading_context_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_series_reading_context_dto(deserializer));
-  }
-
-  @protected
-  SeriesSortOptionDto sse_decode_box_autoadd_series_sort_option_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_series_sort_option_dto(deserializer));
-  }
-
-  @protected
-  SeriesThumbnailDto sse_decode_box_autoadd_series_thumbnail_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_series_thumbnail_dto(deserializer));
-  }
-
-  @protected
-  SetComicMetaLocksFrbDto sse_decode_box_autoadd_set_comic_meta_locks_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_set_comic_meta_locks_frb_dto(deserializer));
-  }
-
-  @protected
-  SetSeriesMetaLocksDto sse_decode_box_autoadd_set_series_meta_locks_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_set_series_meta_locks_dto(deserializer));
-  }
-
-  @protected
-  UpdateComicUserMetaFrbDto
-  sse_decode_box_autoadd_update_comic_user_meta_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_update_comic_user_meta_frb_dto(deserializer));
-  }
-
-  @protected
-  UpdateSeriesUserMetaDto sse_decode_box_autoadd_update_series_user_meta_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_update_series_user_meta_dto(deserializer));
-  }
-
-  @protected
-  BulkPatchResultFrbDto sse_decode_bulk_patch_result_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_succeeded = sse_decode_i_32(deserializer);
-    var var_failed = sse_decode_i_32(deserializer);
-    var var_unchanged = sse_decode_i_32(deserializer);
-    var var_cancelled = sse_decode_bool(deserializer);
-    var var_errorSamples = sse_decode_list_String(deserializer);
-    return BulkPatchResultFrbDto(
-      succeeded: var_succeeded,
-      failed: var_failed,
-      unchanged: var_unchanged,
-      cancelled: var_cancelled,
-      errorSamples: var_errorSamples,
-    );
-  }
-
-  @protected
-  ComicDto sse_decode_comic_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicId = sse_decode_String(deserializer);
-    var var_path = sse_decode_String(deserializer);
-    var var_resourceType = sse_decode_String(deserializer);
-    var var_resourceSize = sse_decode_i_64(deserializer);
-    var var_createdAt = sse_decode_i_64(deserializer);
-    var var_lastUpdatedAt = sse_decode_i_64(deserializer);
-    var var_title = sse_decode_String(deserializer);
-    var var_contentRating = sse_decode_String(deserializer);
-    var var_pageCount = sse_decode_i_32(deserializer);
-    var var_description = sse_decode_opt_String(deserializer);
-    var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
-    var var_lastReadTimeMs = sse_decode_opt_box_autoadd_i_64(deserializer);
-    var var_authors = sse_decode_list_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_languages = sse_decode_list_String(deserializer);
-    var var_parodies = sse_decode_list_String(deserializer);
-    var var_characters = sse_decode_list_String(deserializer);
-    var var_locks = sse_decode_comic_meta_locks_dto(deserializer);
-    var var_libraryId = sse_decode_String(deserializer);
-    return ComicDto(
-      comicId: var_comicId,
-      path: var_path,
-      resourceType: var_resourceType,
-      resourceSize: var_resourceSize,
-      createdAt: var_createdAt,
-      lastUpdatedAt: var_lastUpdatedAt,
-      title: var_title,
-      contentRating: var_contentRating,
-      pageCount: var_pageCount,
-      description: var_description,
-      publishedAt: var_publishedAt,
-      lastReadTimeMs: var_lastReadTimeMs,
-      authors: var_authors,
-      tags: var_tags,
-      languages: var_languages,
-      parodies: var_parodies,
-      characters: var_characters,
-      locks: var_locks,
-      libraryId: var_libraryId,
-    );
-  }
-
-  @protected
-  ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_showR18 = sse_decode_bool(deserializer);
-    var var_query = sse_decode_opt_String(deserializer);
-    var var_resourceTypes = sse_decode_list_String(deserializer);
-    var var_contentRatings = sse_decode_list_String(deserializer);
-    var var_tagsAll = sse_decode_list_String(deserializer);
-    var var_tagsAny = sse_decode_list_String(deserializer);
-    var var_tagsExclude = sse_decode_list_String(deserializer);
-    var var_authorsAll = sse_decode_list_String(deserializer);
-    var var_authorsAny = sse_decode_list_String(deserializer);
-    var var_authorsExclude = sse_decode_list_String(deserializer);
-    var var_languages = sse_decode_list_String(deserializer);
-    var var_parodies = sse_decode_list_String(deserializer);
-    var var_characters = sse_decode_list_String(deserializer);
-    var var_needsMetadataOnly = sse_decode_bool(deserializer);
-    var var_libraryId = sse_decode_opt_String(deserializer);
-    return ComicFilterDto(
-      showR18: var_showR18,
-      query: var_query,
-      resourceTypes: var_resourceTypes,
-      contentRatings: var_contentRatings,
-      tagsAll: var_tagsAll,
-      tagsAny: var_tagsAny,
-      tagsExclude: var_tagsExclude,
-      authorsAll: var_authorsAll,
-      authorsAny: var_authorsAny,
-      authorsExclude: var_authorsExclude,
-      languages: var_languages,
-      parodies: var_parodies,
-      characters: var_characters,
-      needsMetadataOnly: var_needsMetadataOnly,
-      libraryId: var_libraryId,
-    );
-  }
-
-  @protected
-  ComicMetaLocksDto sse_decode_comic_meta_locks_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_title = sse_decode_bool(deserializer);
-    var var_description = sse_decode_bool(deserializer);
-    var var_publishedAt = sse_decode_bool(deserializer);
-    var var_contentRating = sse_decode_bool(deserializer);
-    var var_authors = sse_decode_bool(deserializer);
-    var var_tags = sse_decode_bool(deserializer);
-    var var_languages = sse_decode_bool(deserializer);
-    var var_parodies = sse_decode_bool(deserializer);
-    var var_characters = sse_decode_bool(deserializer);
-    return ComicMetaLocksDto(
-      title: var_title,
-      description: var_description,
-      publishedAt: var_publishedAt,
-      contentRating: var_contentRating,
-      authors: var_authors,
-      tags: var_tags,
-      languages: var_languages,
-      parodies: var_parodies,
-      characters: var_characters,
-    );
-  }
-
-  @protected
-  ComicMetadataBulkPatchFrbDto sse_decode_comic_metadata_bulk_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_tags = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-      deserializer,
-    );
-    var var_authors = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-      deserializer,
-    );
-    var var_languages = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-      deserializer,
-    );
-    var var_parodies = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-      deserializer,
-    );
-    var var_characters = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-      deserializer,
-    );
-    var var_contentRating = sse_decode_opt_String(deserializer);
-    var var_description = sse_decode_opt_box_autoadd_scalar_patch_frb_dto(
-      deserializer,
-    );
-    var var_publishedAt = sse_decode_opt_box_autoadd_published_at_patch_frb_dto(
-      deserializer,
-    );
-    return ComicMetadataBulkPatchFrbDto(
-      tags: var_tags,
-      authors: var_authors,
-      languages: var_languages,
-      parodies: var_parodies,
-      characters: var_characters,
-      contentRating: var_contentRating,
-      description: var_description,
-      publishedAt: var_publishedAt,
-    );
-  }
-
-  @protected
-  ComicPurgeResultFrbDto sse_decode_comic_purge_result_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_succeeded = sse_decode_i_32(deserializer);
-    var var_failed = sse_decode_i_32(deserializer);
-    var var_errorSamples = sse_decode_list_String(deserializer);
-    return ComicPurgeResultFrbDto(
-      succeeded: var_succeeded,
-      failed: var_failed,
-      errorSamples: var_errorSamples,
-    );
-  }
-
-  @protected
-  ComicSortFieldDto sse_decode_comic_sort_field_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return ComicSortFieldDto.values[inner];
-  }
-
-  @protected
-  ComicSortOptionDto sse_decode_comic_sort_option_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field = sse_decode_comic_sort_field_dto(deserializer);
-    var var_descending = sse_decode_bool(deserializer);
-    return ComicSortOptionDto(field: var_field, descending: var_descending);
-  }
-
-  @protected
-  ComicThumbnailDto sse_decode_comic_thumbnail_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_thumbnail = sse_decode_list_prim_u_8_strict(deserializer);
-    var var_sourceModifiedMs = sse_decode_i_64(deserializer);
-    var var_sourceSize = sse_decode_i_64(deserializer);
-    var var_isUserSet = sse_decode_bool(deserializer);
-    return ComicThumbnailDto(
-      thumbnail: var_thumbnail,
-      sourceModifiedMs: var_sourceModifiedMs,
-      sourceSize: var_sourceSize,
-      isUserSet: var_isUserSet,
-    );
-  }
-
-  @protected
-  ExportComicMetadataOptionsDto sse_decode_export_comic_metadata_options_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_libraryId = sse_decode_opt_String(deserializer);
-    var var_includeOrphanFacets = sse_decode_bool(deserializer);
-    return ExportComicMetadataOptionsDto(
-      libraryId: var_libraryId,
-      includeOrphanFacets: var_includeOrphanFacets,
-    );
-  }
-
-  @protected
-  double sse_decode_f_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getFloat64();
-  }
-
-  @protected
-  HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_code = sse_decode_String(deserializer);
-    var var_message = sse_decode_String(deserializer);
-    var var_context = sse_decode_opt_String(deserializer);
-    return HentaiErrorDto(
-      code: var_code,
-      message: var_message,
-      context: var_context,
-    );
-  }
-
-  @protected
-  HomeContinueReadingDto sse_decode_home_continue_reading_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicId = sse_decode_String(deserializer);
-    var var_title = sse_decode_String(deserializer);
-    var var_lastReadTimeMs = sse_decode_i_64(deserializer);
-    var var_pageIndex = sse_decode_opt_box_autoadd_i_32(deserializer);
-    return HomeContinueReadingDto(
-      comicId: var_comicId,
-      title: var_title,
-      lastReadTimeMs: var_lastReadTimeMs,
-      pageIndex: var_pageIndex,
-    );
-  }
-
-  @protected
-  HomeLibraryAlertDto sse_decode_home_library_alert_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_libraryId = sse_decode_String(deserializer);
-    var var_displayName = sse_decode_String(deserializer);
-    var var_kind = sse_decode_home_library_alert_kind_dto(deserializer);
-    var var_lastSuccessAtMs = sse_decode_opt_box_autoadd_i_64(deserializer);
-    var var_lastErrorMessage = sse_decode_opt_String(deserializer);
-    var var_staleDays = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_pendingResourceCount = sse_decode_opt_box_autoadd_i_32(
-      deserializer,
-    );
-    return HomeLibraryAlertDto(
-      libraryId: var_libraryId,
-      displayName: var_displayName,
-      kind: var_kind,
-      lastSuccessAtMs: var_lastSuccessAtMs,
-      lastErrorMessage: var_lastErrorMessage,
-      staleDays: var_staleDays,
-      pendingResourceCount: var_pendingResourceCount,
-    );
-  }
-
-  @protected
-  HomeLibraryAlertKindDto sse_decode_home_library_alert_kind_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return HomeLibraryAlertKindDto.values[inner];
-  }
-
-  @protected
-  HomePageCountsDto sse_decode_home_page_counts_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicCount = sse_decode_i_32(deserializer);
-    var var_tagCount = sse_decode_i_32(deserializer);
-    var var_seriesCount = sse_decode_i_32(deserializer);
-    var var_authorCount = sse_decode_i_32(deserializer);
-    var var_libraryCount = sse_decode_i_32(deserializer);
-    return HomePageCountsDto(
-      comicCount: var_comicCount,
-      tagCount: var_tagCount,
-      seriesCount: var_seriesCount,
-      authorCount: var_authorCount,
-      libraryCount: var_libraryCount,
-    );
-  }
-
-  @protected
-  HomeRecentlyAddedDto sse_decode_home_recently_added_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicId = sse_decode_String(deserializer);
-    var var_title = sse_decode_String(deserializer);
-    var var_libraryId = sse_decode_String(deserializer);
-    var var_libraryDisplayName = sse_decode_String(deserializer);
-    var var_createdAtMs = sse_decode_i_64(deserializer);
-    return HomeRecentlyAddedDto(
-      comicId: var_comicId,
-      title: var_title,
-      libraryId: var_libraryId,
-      libraryDisplayName: var_libraryDisplayName,
-      createdAtMs: var_createdAtMs,
-    );
-  }
-
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getInt32();
-  }
-
-  @protected
-  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getPlatformInt64();
-  }
-
-  @protected
-  ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_applied = sse_decode_i_32(deserializer);
-    var var_skippedNotFound = sse_decode_i_32(deserializer);
-    var var_skippedAmbiguous = sse_decode_i_32(deserializer);
-    var var_errors = sse_decode_list_String(deserializer);
-    return ImportComicMetadataResultDto(
-      applied: var_applied,
-      skippedNotFound: var_skippedNotFound,
-      skippedAmbiguous: var_skippedAmbiguous,
-      errors: var_errors,
-    );
-  }
-
-  @protected
-  JunctionNamedFacetFrb sse_decode_junction_named_facet_frb(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return JunctionNamedFacetFrb.values[inner];
-  }
-
-  @protected
-  LibraryDto sse_decode_library_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_libraryId = sse_decode_String(deserializer);
-    var var_kind = sse_decode_String(deserializer);
-    var var_rootPath = sse_decode_String(deserializer);
-    var var_name = sse_decode_String(deserializer);
-    var var_enabledResourceFormatCategories =
-        sse_decode_list_resource_format_category_dto(deserializer);
-    var var_createdAt = sse_decode_i_64(deserializer);
-    var var_username = sse_decode_String(deserializer);
-    var var_allowHttp = sse_decode_bool(deserializer);
-    var var_scanOnStartup = sse_decode_bool(deserializer);
-    var var_scanInterval = sse_decode_scan_interval_dto(deserializer);
-    var var_pinned = sse_decode_bool(deserializer);
-    var var_sidebarOrder = sse_decode_i_32(deserializer);
-    return LibraryDto(
-      libraryId: var_libraryId,
-      kind: var_kind,
-      rootPath: var_rootPath,
-      name: var_name,
-      enabledResourceFormatCategories: var_enabledResourceFormatCategories,
-      createdAt: var_createdAt,
-      username: var_username,
-      allowHttp: var_allowHttp,
-      scanOnStartup: var_scanOnStartup,
-      scanInterval: var_scanInterval,
-      pinned: var_pinned,
-      sidebarOrder: var_sidebarOrder,
-    );
-  }
-
-  @protected
-  LibraryProbeResultDto sse_decode_library_probe_result_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_libraryId = sse_decode_String(deserializer);
-    var var_addedCount = sse_decode_i_32(deserializer);
-    var var_changedCount = sse_decode_i_32(deserializer);
-    var var_removedCount = sse_decode_i_32(deserializer);
-    var var_unreachable = sse_decode_bool(deserializer);
-    var var_errorMessage = sse_decode_opt_String(deserializer);
-    var var_probedAtMs = sse_decode_i_64(deserializer);
-    var var_baselineMissing = sse_decode_bool(deserializer);
-    return LibraryProbeResultDto(
-      libraryId: var_libraryId,
-      addedCount: var_addedCount,
-      changedCount: var_changedCount,
-      removedCount: var_removedCount,
-      unreachable: var_unreachable,
-      errorMessage: var_errorMessage,
-      probedAtMs: var_probedAtMs,
-      baselineMissing: var_baselineMissing,
-    );
-  }
-
-  @protected
-  LibrarySidebarPlacementDto sse_decode_library_sidebar_placement_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_libraryId = sse_decode_String(deserializer);
-    var var_pinned = sse_decode_bool(deserializer);
-    var var_sidebarOrder = sse_decode_i_32(deserializer);
-    return LibrarySidebarPlacementDto(
-      libraryId: var_libraryId,
-      pinned: var_pinned,
-      sidebarOrder: var_sidebarOrder,
-    );
-  }
-
-  @protected
-  LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_dir = sse_decode_i_32(deserializer);
-    var var_zip = sse_decode_i_32(deserializer);
-    var var_cbz = sse_decode_i_32(deserializer);
-    var var_epub = sse_decode_i_32(deserializer);
-    var var_cbr = sse_decode_i_32(deserializer);
-    var var_rar = sse_decode_i_32(deserializer);
-    var var_cb7 = sse_decode_i_32(deserializer);
-    var var_sevenz = sse_decode_i_32(deserializer);
-    var var_pdf = sse_decode_i_32(deserializer);
-    return LibrarySyncCountsDto(
-      dir: var_dir,
-      zip: var_zip,
-      cbz: var_cbz,
-      epub: var_epub,
-      cbr: var_cbr,
-      rar: var_rar,
-      cb7: var_cb7,
-      sevenz: var_sevenz,
-      pdf: var_pdf,
-    );
-  }
-
-  @protected
-  List<String> sse_decode_list_String(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <String>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_String(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<AmbiguousSampleDto> sse_decode_list_ambiguous_sample_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <AmbiguousSampleDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_ambiguous_sample_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<AuthorFacetCountFrbDto> sse_decode_list_author_facet_count_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <AuthorFacetCountFrbDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_author_facet_count_frb_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<AuthorIdentityFrbDto> sse_decode_list_author_identity_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <AuthorIdentityFrbDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_author_identity_frb_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<AuthorLinkFrbDto> sse_decode_list_author_link_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <AuthorLinkFrbDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_author_link_frb_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<AuthorTopComicFrbDto> sse_decode_list_author_top_comic_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <AuthorTopComicFrbDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_author_top_comic_frb_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ComicDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_comic_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <HomeContinueReadingDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_home_continue_reading_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<HomeLibraryAlertDto> sse_decode_list_home_library_alert_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <HomeLibraryAlertDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_home_library_alert_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<HomeRecentlyAddedDto> sse_decode_list_home_recently_added_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <HomeRecentlyAddedDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_home_recently_added_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<LibraryDto> sse_decode_list_library_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <LibraryDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_library_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<LibrarySidebarPlacementDto>
-  sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <LibrarySidebarPlacementDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_library_sidebar_placement_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<NamedFacetFormEntryFrbDto>
-  sse_decode_list_named_facet_form_entry_frb_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <NamedFacetFormEntryFrbDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_named_facet_form_entry_frb_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<NotFoundSampleDto> sse_decode_list_not_found_sample_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <NotFoundSampleDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_not_found_sample_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var len_ = sse_decode_i_32(deserializer);
-    return deserializer.buffer.getInt32List(len_);
-  }
-
-  @protected
-  Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var len_ = sse_decode_i_32(deserializer);
-    return deserializer.buffer.getInt32List(len_);
-  }
-
-  @protected
-  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var len_ = sse_decode_i_32(deserializer);
-    return deserializer.buffer.getUint8List(len_);
-  }
-
-  @protected
-  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var len_ = sse_decode_i_32(deserializer);
-    return deserializer.buffer.getUint8List(len_);
-  }
-
-  @protected
-  List<ReadingHistoryDto> sse_decode_list_reading_history_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ReadingHistoryDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_reading_history_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<RemoteLibraryCredentialDto>
-  sse_decode_list_remote_library_credential_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <RemoteLibraryCredentialDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_remote_library_credential_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<ResourceFormatCategoryDto> sse_decode_list_resource_format_category_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <ResourceFormatCategoryDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_resource_format_category_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <SeriesComicOrderEntryDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_series_comic_order_entry_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<SeriesComicPageItemDto> sse_decode_list_series_comic_page_item_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <SeriesComicPageItemDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_series_comic_page_item_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<SeriesDto> sse_decode_list_series_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <SeriesDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_series_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<SeriesItemDto> sse_decode_list_series_item_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <SeriesItemDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_series_item_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<TrashedComicFrbDto> sse_decode_list_trashed_comic_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <TrashedComicFrbDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_trashed_comic_frb_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<WouldApplySampleDto> sse_decode_list_would_apply_sample_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <WouldApplySampleDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_would_apply_sample_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  MatchTierDto sse_decode_match_tier_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return MatchTierDto.values[inner];
-  }
-
-  @protected
-  MetadataBackupManifestDto sse_decode_metadata_backup_manifest_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_schemaVersion = sse_decode_i_32(deserializer);
-    var var_exportedAt = sse_decode_String(deserializer);
-    var var_appVersion = sse_decode_String(deserializer);
-    var var_comicCount = sse_decode_i_32(deserializer);
-    var var_includeOrphanFacets = sse_decode_bool(deserializer);
-    var var_libraryId = sse_decode_opt_String(deserializer);
-    return MetadataBackupManifestDto(
-      schemaVersion: var_schemaVersion,
-      exportedAt: var_exportedAt,
-      appVersion: var_appVersion,
-      comicCount: var_comicCount,
-      includeOrphanFacets: var_includeOrphanFacets,
-      libraryId: var_libraryId,
-    );
-  }
-
-  @protected
-  MultiValueOpFrbDto sse_decode_multi_value_op_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return MultiValueOpFrbDto.values[inner];
-  }
-
-  @protected
-  MultiValuePatchFrbDto sse_decode_multi_value_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_op = sse_decode_multi_value_op_frb_dto(deserializer);
-    var var_values = sse_decode_list_String(deserializer);
-    return MultiValuePatchFrbDto(op: var_op, values: var_values);
-  }
-
-  @protected
-  NamedFacetFormEntryFrbDto sse_decode_named_facet_form_entry_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_name = sse_decode_String(deserializer);
-    var var_attachmentCount = sse_decode_i_64(deserializer);
-    return NamedFacetFormEntryFrbDto(
-      name: var_name,
-      attachmentCount: var_attachmentCount,
-    );
-  }
-
-  @protected
-  NamedFacetPagedNamesDto sse_decode_named_facet_paged_names_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_String(deserializer);
-    var var_totalCount = sse_decode_i_64(deserializer);
-    var var_page = sse_decode_i_32(deserializer);
-    var var_pageSize = sse_decode_i_32(deserializer);
-    return NamedFacetPagedNamesDto(
-      items: var_items,
-      totalCount: var_totalCount,
-      page: var_page,
-      pageSize: var_pageSize,
-    );
-  }
-
-  @protected
-  NotFoundSampleDto sse_decode_not_found_sample_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicId = sse_decode_String(deserializer);
-    var var_path = sse_decode_String(deserializer);
-    var var_title = sse_decode_String(deserializer);
-    return NotFoundSampleDto(
-      comicId: var_comicId,
-      path: var_path,
-      title: var_title,
-    );
-  }
-
-  @protected
-  String? sse_decode_opt_String(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_String(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  AuthorDetailFrbDto? sse_decode_opt_box_autoadd_author_detail_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_author_detail_frb_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_bool(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  ComicDto? sse_decode_opt_box_autoadd_comic_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_comic_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  ComicThumbnailDto? sse_decode_opt_box_autoadd_comic_thumbnail_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_comic_thumbnail_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_i_32(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_i_64(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  MatchTierDto? sse_decode_opt_box_autoadd_match_tier_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_match_tier_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  MultiValuePatchFrbDto? sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_multi_value_patch_frb_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  PublishedAtPatchFrbDto? sse_decode_opt_box_autoadd_published_at_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_published_at_patch_frb_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_reading_history_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  ScalarPatchFrbDto? sse_decode_opt_box_autoadd_scalar_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_scalar_patch_frb_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  SeriesDto? sse_decode_opt_box_autoadd_series_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_series_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  SeriesItemDto? sse_decode_opt_box_autoadd_series_item_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_series_item_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  SeriesReadingContextDto?
-  sse_decode_opt_box_autoadd_series_reading_context_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_series_reading_context_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  SeriesThumbnailDto? sse_decode_opt_box_autoadd_series_thumbnail_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_box_autoadd_series_thumbnail_dto(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_list_String(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    if (sse_decode_bool(deserializer)) {
-      return (sse_decode_list_prim_u_8_strict(deserializer));
-    } else {
-      return null;
-    }
-  }
-
-  @protected
-  PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_page = sse_decode_i_32(deserializer);
-    var var_pageSize = sse_decode_i_32(deserializer);
-    return PageRequestDto(page: var_page, pageSize: var_pageSize);
-  }
-
-  @protected
-  PagedComicResultDto sse_decode_paged_comic_result_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_comic_dto(deserializer);
-    var var_totalCount = sse_decode_i_64(deserializer);
-    var var_page = sse_decode_i_32(deserializer);
-    var var_pageSize = sse_decode_i_32(deserializer);
-    return PagedComicResultDto(
-      items: var_items,
-      totalCount: var_totalCount,
-      page: var_page,
-      pageSize: var_pageSize,
-    );
-  }
-
-  @protected
-  PagedReadingHistoryDto sse_decode_paged_reading_history_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_reading_history_dto(deserializer);
-    var var_totalCount = sse_decode_i_64(deserializer);
-    return PagedReadingHistoryDto(items: var_items, totalCount: var_totalCount);
-  }
-
-  @protected
-  PagedSeriesComicsResultDto sse_decode_paged_series_comics_result_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_series_comic_page_item_dto(deserializer);
-    var var_totalCount = sse_decode_i_64(deserializer);
-    var var_page = sse_decode_i_32(deserializer);
-    var var_pageSize = sse_decode_i_32(deserializer);
-    return PagedSeriesComicsResultDto(
-      items: var_items,
-      totalCount: var_totalCount,
-      page: var_page,
-      pageSize: var_pageSize,
-    );
-  }
-
-  @protected
-  PagedSeriesResultDto sse_decode_paged_series_result_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_series_dto(deserializer);
-    var var_totalCount = sse_decode_i_64(deserializer);
-    var var_page = sse_decode_i_32(deserializer);
-    var var_pageSize = sse_decode_i_32(deserializer);
-    return PagedSeriesResultDto(
-      items: var_items,
-      totalCount: var_totalCount,
-      page: var_page,
-      pageSize: var_pageSize,
-    );
-  }
-
-  @protected
-  PagedTrashedComicResultFrbDto sse_decode_paged_trashed_comic_result_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_trashed_comic_frb_dto(deserializer);
-    var var_totalCount = sse_decode_i_64(deserializer);
-    var var_page = sse_decode_i_32(deserializer);
-    var var_pageSize = sse_decode_i_32(deserializer);
-    return PagedTrashedComicResultFrbDto(
-      items: var_items,
-      totalCount: var_totalCount,
-      page: var_page,
-      pageSize: var_pageSize,
-    );
-  }
-
-  @protected
-  PreviewImportComicMetadataResultDto
-  sse_decode_preview_import_comic_metadata_result_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_wouldApply = sse_decode_i_32(deserializer);
-    var var_skippedNotFound = sse_decode_i_32(deserializer);
-    var var_skippedAmbiguous = sse_decode_i_32(deserializer);
-    var var_wouldUpsertOrphanFacetCount = sse_decode_i_32(deserializer);
-    var var_samplesWouldApply = sse_decode_list_would_apply_sample_dto(
-      deserializer,
-    );
-    var var_samplesNotFound = sse_decode_list_not_found_sample_dto(
-      deserializer,
-    );
-    var var_samplesAmbiguous = sse_decode_list_ambiguous_sample_dto(
-      deserializer,
-    );
-    return PreviewImportComicMetadataResultDto(
-      wouldApply: var_wouldApply,
-      skippedNotFound: var_skippedNotFound,
-      skippedAmbiguous: var_skippedAmbiguous,
-      wouldUpsertOrphanFacetCount: var_wouldUpsertOrphanFacetCount,
-      samplesWouldApply: var_samplesWouldApply,
-      samplesNotFound: var_samplesNotFound,
-      samplesAmbiguous: var_samplesAmbiguous,
-    );
-  }
-
-  @protected
-  PublishedAtPatchFrbDto sse_decode_published_at_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var tag_ = sse_decode_i_32(deserializer);
-    switch (tag_) {
-      case 0:
-        var var_field0 = sse_decode_i_64(deserializer);
-        return PublishedAtPatchFrbDto_Replace(var_field0);
-      case 1:
-        return PublishedAtPatchFrbDto_Clear();
-      default:
-        throw UnimplementedError('');
-    }
-  }
-
-  @protected
-  ReaderPageDto sse_decode_reader_page_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var tag_ = sse_decode_i_32(deserializer);
-    switch (tag_) {
-      case 0:
-        var var_path = sse_decode_String(deserializer);
-        return ReaderPageDto_FilePath(path: var_path);
-      case 1:
-        var var_data = sse_decode_list_prim_u_8_strict(deserializer);
-        return ReaderPageDto_Bytes(data: var_data);
-      default:
-        throw UnimplementedError('');
-    }
-  }
-
-  @protected
-  ReaderPageListDto sse_decode_reader_page_list_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_resourceType = sse_decode_String(deserializer);
-    var var_pageCount = sse_decode_i_32(deserializer);
-    var var_dirPagePaths = sse_decode_list_String(deserializer);
-    return ReaderPageListDto(
-      resourceType: var_resourceType,
-      pageCount: var_pageCount,
-      dirPagePaths: var_dirPagePaths,
-    );
-  }
-
-  @protected
-  ReadingHistoryDto sse_decode_reading_history_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicId = sse_decode_String(deserializer);
-    var var_title = sse_decode_String(deserializer);
-    var var_lastReadTimeMs = sse_decode_i_64(deserializer);
-    var var_pageIndex = sse_decode_opt_box_autoadd_i_32(deserializer);
-    return ReadingHistoryDto(
-      comicId: var_comicId,
-      title: var_title,
-      lastReadTimeMs: var_lastReadTimeMs,
-      pageIndex: var_pageIndex,
-    );
-  }
-
-  @protected
-  RefreshLibraryResultFrbDto sse_decode_refresh_library_result_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_succeeded = sse_decode_i_32(deserializer);
-    var var_failed = sse_decode_i_32(deserializer);
-    var var_cancelled = sse_decode_bool(deserializer);
-    var var_skipped = sse_decode_bool(deserializer);
-    var var_skipMessage = sse_decode_opt_String(deserializer);
-    return RefreshLibraryResultFrbDto(
-      succeeded: var_succeeded,
-      failed: var_failed,
-      cancelled: var_cancelled,
-      skipped: var_skipped,
-      skipMessage: var_skipMessage,
-    );
-  }
-
-  @protected
-  RefreshSeriesResultFrbDto sse_decode_refresh_series_result_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_succeeded = sse_decode_i_32(deserializer);
-    var var_failed = sse_decode_i_32(deserializer);
-    var var_cancelled = sse_decode_bool(deserializer);
-    return RefreshSeriesResultFrbDto(
-      succeeded: var_succeeded,
-      failed: var_failed,
-      cancelled: var_cancelled,
-    );
-  }
-
-  @protected
-  RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_libraryId = sse_decode_String(deserializer);
-    var var_password = sse_decode_String(deserializer);
-    return RemoteLibraryCredentialDto(
-      libraryId: var_libraryId,
-      password: var_password,
-    );
-  }
-
-  @protected
-  ResourceFormatCategoryDto sse_decode_resource_format_category_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return ResourceFormatCategoryDto.values[inner];
-  }
-
-  @protected
-  ScalarPatchFrbDto sse_decode_scalar_patch_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var tag_ = sse_decode_i_32(deserializer);
-    switch (tag_) {
-      case 0:
-        var var_field0 = sse_decode_String(deserializer);
-        return ScalarPatchFrbDto_Replace(var_field0);
-      case 1:
-        return ScalarPatchFrbDto_Clear();
-      default:
-        throw UnimplementedError('');
-    }
-  }
-
-  @protected
-  ScanIntervalDto sse_decode_scan_interval_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return ScanIntervalDto.values[inner];
-  }
-
-  @protected
-  SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_key = sse_decode_String(deserializer);
-    var var_sortOrder = sse_decode_f_64(deserializer);
-    return SeriesComicOrderEntryDto(key: var_key, sortOrder: var_sortOrder);
-  }
-
-  @protected
-  SeriesComicPageItemDto sse_decode_series_comic_page_item_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comic = sse_decode_comic_dto(deserializer);
-    var var_sortOrder = sse_decode_f_64(deserializer);
-    var var_sortOrderLocked = sse_decode_bool(deserializer);
-    return SeriesComicPageItemDto(
-      comic: var_comic,
-      sortOrder: var_sortOrder,
-      sortOrderLocked: var_sortOrderLocked,
-    );
-  }
-
-  @protected
-  SeriesComicsMetadataDto sse_decode_series_comics_metadata_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_authors = sse_decode_list_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_hasR18 = sse_decode_bool(deserializer);
-    var var_languages = sse_decode_list_String(deserializer);
-    var var_parodies = sse_decode_list_String(deserializer);
-    var var_characters = sse_decode_list_String(deserializer);
-    return SeriesComicsMetadataDto(
-      authors: var_authors,
-      tags: var_tags,
-      hasR18: var_hasR18,
-      languages: var_languages,
-      parodies: var_parodies,
-      characters: var_characters,
-    );
-  }
-
-  @protected
-  SeriesCoverSourceDto sse_decode_series_cover_source_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var tag_ = sse_decode_i_32(deserializer);
-    switch (tag_) {
-      case 0:
-        var var_thumbnail = sse_decode_list_prim_u_8_strict(deserializer);
-        return SeriesCoverSourceDto_CustomThumbnail(thumbnail: var_thumbnail);
-      case 1:
-        var var_comicId = sse_decode_String(deserializer);
-        return SeriesCoverSourceDto_FallbackComic(comicId: var_comicId);
-      case 2:
-        return SeriesCoverSourceDto_Missing();
-      default:
-        throw UnimplementedError('');
-    }
-  }
-
-  @protected
-  SeriesDto sse_decode_series_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_seriesId = sse_decode_String(deserializer);
-    var var_folderPath = sse_decode_String(deserializer);
-    var var_name = sse_decode_String(deserializer);
-    var var_serializationStatus = sse_decode_String(deserializer);
-    var var_totalCount = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_locks = sse_decode_series_meta_locks_dto(deserializer);
-    var var_items = sse_decode_list_series_item_dto(deserializer);
-    return SeriesDto(
-      seriesId: var_seriesId,
-      folderPath: var_folderPath,
-      name: var_name,
-      serializationStatus: var_serializationStatus,
-      totalCount: var_totalCount,
-      locks: var_locks,
-      items: var_items,
-    );
-  }
-
-  @protected
-  SeriesFilterDto sse_decode_series_filter_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_showR18 = sse_decode_bool(deserializer);
-    var var_r18Only = sse_decode_bool(deserializer);
-    var var_query = sse_decode_opt_String(deserializer);
-    var var_requireItems = sse_decode_bool(deserializer);
-    var var_serializationStatus = sse_decode_opt_String(deserializer);
-    var var_libraryId = sse_decode_opt_String(deserializer);
-    var var_preferLibraryRootSeries = sse_decode_bool(deserializer);
-    return SeriesFilterDto(
-      showR18: var_showR18,
-      r18Only: var_r18Only,
-      query: var_query,
-      requireItems: var_requireItems,
-      serializationStatus: var_serializationStatus,
-      libraryId: var_libraryId,
-      preferLibraryRootSeries: var_preferLibraryRootSeries,
-    );
-  }
-
-  @protected
-  SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_seriesId = sse_decode_String(deserializer);
-    var var_comicId = sse_decode_String(deserializer);
-    var var_sortOrder = sse_decode_f_64(deserializer);
-    var var_sortOrderLocked = sse_decode_bool(deserializer);
-    return SeriesItemDto(
-      seriesId: var_seriesId,
-      comicId: var_comicId,
-      sortOrder: var_sortOrder,
-      sortOrderLocked: var_sortOrderLocked,
-    );
-  }
-
-  @protected
-  SeriesMetaLocksDto sse_decode_series_meta_locks_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_name = sse_decode_bool(deserializer);
-    var var_serializationStatus = sse_decode_bool(deserializer);
-    var var_totalCount = sse_decode_bool(deserializer);
-    return SeriesMetaLocksDto(
-      name: var_name,
-      serializationStatus: var_serializationStatus,
-      totalCount: var_totalCount,
-    );
-  }
-
-  @protected
-  SeriesReadingContextDto sse_decode_series_reading_context_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_seriesId = sse_decode_String(deserializer);
-    var var_seriesName = sse_decode_String(deserializer);
-    var var_orderedComicIds = sse_decode_list_String(deserializer);
-    var var_currentIndex = sse_decode_i_32(deserializer);
-    return SeriesReadingContextDto(
-      seriesId: var_seriesId,
-      seriesName: var_seriesName,
-      orderedComicIds: var_orderedComicIds,
-      currentIndex: var_currentIndex,
-    );
-  }
-
-  @protected
-  SeriesSortFieldDto sse_decode_series_sort_field_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return SeriesSortFieldDto.values[inner];
-  }
-
-  @protected
-  SeriesSortOptionDto sse_decode_series_sort_option_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field = sse_decode_series_sort_field_dto(deserializer);
-    var var_descending = sse_decode_bool(deserializer);
-    return SeriesSortOptionDto(field: var_field, descending: var_descending);
-  }
-
-  @protected
-  SeriesThumbnailDto sse_decode_series_thumbnail_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_thumbnail = sse_decode_list_prim_u_8_strict(deserializer);
-    var var_sourceComicId = sse_decode_String(deserializer);
-    var var_sourcePageIndex = sse_decode_i_32(deserializer);
-    return SeriesThumbnailDto(
-      thumbnail: var_thumbnail,
-      sourceComicId: var_sourceComicId,
-      sourcePageIndex: var_sourcePageIndex,
-    );
-  }
-
-  @protected
-  SetComicMetaLocksFrbDto sse_decode_set_comic_meta_locks_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_title = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_description = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_publishedAt = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_contentRating = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_authors = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_tags = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_languages = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_parodies = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_characters = sse_decode_opt_box_autoadd_bool(deserializer);
-    return SetComicMetaLocksFrbDto(
-      title: var_title,
-      description: var_description,
-      publishedAt: var_publishedAt,
-      contentRating: var_contentRating,
-      authors: var_authors,
-      tags: var_tags,
-      languages: var_languages,
-      parodies: var_parodies,
-      characters: var_characters,
-    );
-  }
-
-  @protected
-  SetSeriesMetaLocksDto sse_decode_set_series_meta_locks_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_name = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_serializationStatus = sse_decode_opt_box_autoadd_bool(deserializer);
-    var var_totalCount = sse_decode_opt_box_autoadd_bool(deserializer);
-    return SetSeriesMetaLocksDto(
-      name: var_name,
-      serializationStatus: var_serializationStatus,
-      totalCount: var_totalCount,
-    );
-  }
-
-  @protected
-  SyncLibraryPhaseDto sse_decode_sync_library_phase_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return SyncLibraryPhaseDto.values[inner];
-  }
-
-  @protected
-  SyncLibraryProgressDto sse_decode_sync_library_progress_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_phase = sse_decode_sync_library_phase_dto(deserializer);
-    var var_route = sse_decode_sync_library_route_dto(deserializer);
-    var var_currentPath = sse_decode_opt_String(deserializer);
-    var var_acceptedTotal = sse_decode_i_32(deserializer);
-    var var_counts = sse_decode_library_sync_counts_dto(deserializer);
-    var var_removedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_addedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_keptCount = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_migratedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_thumbnailTotal = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_thumbnailDone = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_thumbnailFailedCount = sse_decode_opt_box_autoadd_i_32(
-      deserializer,
-    );
-    var var_errorMessage = sse_decode_opt_String(deserializer);
-    return SyncLibraryProgressDto(
-      phase: var_phase,
-      route: var_route,
-      currentPath: var_currentPath,
-      acceptedTotal: var_acceptedTotal,
-      counts: var_counts,
-      removedCount: var_removedCount,
-      addedCount: var_addedCount,
-      keptCount: var_keptCount,
-      migratedCount: var_migratedCount,
-      thumbnailTotal: var_thumbnailTotal,
-      thumbnailDone: var_thumbnailDone,
-      thumbnailFailedCount: var_thumbnailFailedCount,
-      errorMessage: var_errorMessage,
-    );
-  }
-
-  @protected
-  SyncLibraryRouteDto sse_decode_sync_library_route_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return SyncLibraryRouteDto.values[inner];
-  }
-
-  @protected
-  SyncScanModeDto sse_decode_sync_scan_mode_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return SyncScanModeDto.values[inner];
-  }
-
-  @protected
-  TagDictionaryImportResultDto sse_decode_tag_dictionary_import_result_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_added = sse_decode_i_32(deserializer);
-    var var_skippedExisting = sse_decode_i_32(deserializer);
-    var var_skippedFilteredOrEmptyOrDedupe = sse_decode_i_32(deserializer);
-    return TagDictionaryImportResultDto(
-      added: var_added,
-      skippedExisting: var_skippedExisting,
-      skippedFilteredOrEmptyOrDedupe: var_skippedFilteredOrEmptyOrDedupe,
-    );
-  }
-
-  @protected
-  TagPagedNamesDto sse_decode_tag_paged_names_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_items = sse_decode_list_String(deserializer);
-    var var_totalCount = sse_decode_i_64(deserializer);
-    var var_page = sse_decode_i_32(deserializer);
-    var var_pageSize = sse_decode_i_32(deserializer);
-    return TagPagedNamesDto(
-      items: var_items,
-      totalCount: var_totalCount,
-      page: var_page,
-      pageSize: var_pageSize,
-    );
-  }
-
-  @protected
-  ThumbnailEventDto sse_decode_thumbnail_event_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var tag_ = sse_decode_i_32(deserializer);
-    switch (tag_) {
-      case 0:
-        var var_comicId = sse_decode_String(deserializer);
-        return ThumbnailEventDto_Ready(comicId: var_comicId);
-      case 1:
-        var var_done = sse_decode_i_32(deserializer);
-        var var_total = sse_decode_i_32(deserializer);
-        var var_failed = sse_decode_i_32(deserializer);
-        return ThumbnailEventDto_Progress(
-          done: var_done,
-          total: var_total,
-          failed: var_failed,
+        
+
+@override Stream<List<HomeLibraryAlertDto>> crateApiHomeWatchHomeLibraryAlertsFrb()  { 
+            final sink = RustStreamSink<List<HomeLibraryAlertDto>>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_StreamSink_list_home_library_alert_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 128, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiHomeWatchHomeLibraryAlertsFrbConstMeta,
+            argValues: [sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiHomeWatchHomeLibraryAlertsFrbConstMeta => const TaskConstMeta(
+            debugName: "watch_home_library_alerts_frb",
+            argNames: ["sink"],
         );
-      default:
-        throw UnimplementedError('');
-    }
-  }
-
-  @protected
-  ThumbnailPriorityDto sse_decode_thumbnail_priority_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return ThumbnailPriorityDto.values[inner];
-  }
-
-  @protected
-  TrashedComicCountsFrbDto sse_decode_trashed_comic_counts_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_total = sse_decode_i_64(deserializer);
-    var var_local = sse_decode_i_64(deserializer);
-    var var_remote = sse_decode_i_64(deserializer);
-    return TrashedComicCountsFrbDto(
-      total: var_total,
-      local: var_local,
-      remote: var_remote,
-    );
-  }
-
-  @protected
-  TrashedComicFrbDto sse_decode_trashed_comic_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comic = sse_decode_comic_dto(deserializer);
-    var var_deletedAt = sse_decode_i_64(deserializer);
-    var var_libraryName = sse_decode_String(deserializer);
-    var var_libraryKind = sse_decode_String(deserializer);
-    return TrashedComicFrbDto(
-      comic: var_comic,
-      deletedAt: var_deletedAt,
-      libraryName: var_libraryName,
-      libraryKind: var_libraryKind,
-    );
-  }
-
-  @protected
-  BigInt sse_decode_u_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getBigUint64();
-  }
-
-  @protected
-  int sse_decode_u_8(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8();
-  }
-
-  @protected
-  void sse_decode_unit(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-  }
-
-  @protected
-  UpdateComicUserMetaFrbDto sse_decode_update_comic_user_meta_frb_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_title = sse_decode_opt_String(deserializer);
-    var var_contentRating = sse_decode_opt_String(deserializer);
-    var var_description = sse_decode_opt_String(deserializer);
-    var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
-    var var_authors = sse_decode_opt_list_String(deserializer);
-    var var_tags = sse_decode_opt_list_String(deserializer);
-    var var_languages = sse_decode_opt_list_String(deserializer);
-    var var_parodies = sse_decode_opt_list_String(deserializer);
-    var var_characters = sse_decode_opt_list_String(deserializer);
-    return UpdateComicUserMetaFrbDto(
-      title: var_title,
-      contentRating: var_contentRating,
-      description: var_description,
-      publishedAt: var_publishedAt,
-      authors: var_authors,
-      tags: var_tags,
-      languages: var_languages,
-      parodies: var_parodies,
-      characters: var_characters,
-    );
-  }
-
-  @protected
-  UpdateSeriesUserMetaDto sse_decode_update_series_user_meta_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_name = sse_decode_opt_String(deserializer);
-    var var_serializationStatus = sse_decode_opt_String(deserializer);
-    var var_totalCount = sse_decode_opt_box_autoadd_i_32(deserializer);
-    var var_clearTotalCount = sse_decode_bool(deserializer);
-    return UpdateSeriesUserMetaDto(
-      name: var_name,
-      serializationStatus: var_serializationStatus,
-      totalCount: var_totalCount,
-      clearTotalCount: var_clearTotalCount,
-    );
-  }
-
-  @protected
-  BigInt sse_decode_usize(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getBigUint64();
-  }
-
-  @protected
-  WouldApplySampleDto sse_decode_would_apply_sample_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_comicId = sse_decode_String(deserializer);
-    var var_path = sse_decode_String(deserializer);
-    var var_title = sse_decode_String(deserializer);
-    var var_matchedComicId = sse_decode_String(deserializer);
-    var var_matchTier = sse_decode_opt_box_autoadd_match_tier_dto(deserializer);
-    return WouldApplySampleDto(
-      comicId: var_comicId,
-      path: var_path,
-      title: var_title,
-      matchedComicId: var_matchedComicId,
-      matchTier: var_matchTier,
-    );
-  }
-
-  @protected
-  void sse_encode_AnyhowException(
-    AnyhowException self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.message, serializer);
-  }
-
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SyncHandleDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as SyncHandleDtoImpl).frbInternalSseEncode(move: true),
-      serializer,
-    );
-  }
-
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SyncHandleDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as SyncHandleDtoImpl).frbInternalSseEncode(move: false),
-      serializer,
-    );
-  }
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SyncHandleDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-      (self as SyncHandleDtoImpl).frbInternalSseEncode(move: null),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_home_page_counts_dto_Sse(
-    RustStreamSink<HomePageCountsDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_home_page_counts_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_i_32_Sse(
-    RustStreamSink<int> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_i_32,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_list_String_Sse(
-    RustStreamSink<List<String>> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_String,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_list_author_identity_frb_dto_Sse(
-    RustStreamSink<List<AuthorIdentityFrbDto>> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_author_identity_frb_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_list_home_continue_reading_dto_Sse(
-    RustStreamSink<List<HomeContinueReadingDto>> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_home_continue_reading_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_list_home_library_alert_dto_Sse(
-    RustStreamSink<List<HomeLibraryAlertDto>> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_home_library_alert_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_list_home_recently_added_dto_Sse(
-    RustStreamSink<List<HomeRecentlyAddedDto>> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_home_recently_added_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_list_reading_history_dto_Sse(
-    RustStreamSink<List<ReadingHistoryDto>> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_reading_history_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(
-    RustStreamSink<List<SeriesComicOrderEntryDto>> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_series_comic_order_entry_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_sync_library_progress_dto_Sse(
-    RustStreamSink<SyncLibraryProgressDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_sync_library_progress_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_StreamSink_thumbnail_event_dto_Sse(
-    RustStreamSink<ThumbnailEventDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_thumbnail_event_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_String(String self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
-  }
-
-  @protected
-  void sse_encode_ambiguous_sample_dto(
-    AmbiguousSampleDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_String(self.path, serializer);
-    sse_encode_String(self.title, serializer);
-    sse_encode_list_String(self.candidateComicIds, serializer);
-  }
-
-  @protected
-  void sse_encode_author_detail_frb_dto(
-    AuthorDetailFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_author_identity_frb_dto(self.identity, serializer);
-    sse_encode_list_author_link_frb_dto(self.links, serializer);
-    sse_encode_list_author_facet_count_frb_dto(self.tags, serializer);
-    sse_encode_list_author_facet_count_frb_dto(self.parodies, serializer);
-    sse_encode_list_author_facet_count_frb_dto(self.characters, serializer);
-    sse_encode_list_author_top_comic_frb_dto(self.topComics, serializer);
-    sse_encode_i_64(self.comicCount, serializer);
-  }
-
-  @protected
-  void sse_encode_author_facet_count_frb_dto(
-    AuthorFacetCountFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.name, serializer);
-    sse_encode_i_64(self.attachmentCount, serializer);
-  }
-
-  @protected
-  void sse_encode_author_identity_frb_dto(
-    AuthorIdentityFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_64(self.id, serializer);
-    sse_encode_String(self.name, serializer);
-    sse_encode_bool(self.verified, serializer);
-  }
-
-  @protected
-  void sse_encode_author_image_ref_frb_dto(
-    AuthorImageRefFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_author_image_source_frb(self.avatarSource, serializer);
-    sse_encode_opt_String(self.avatarComicId, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.avatarLinkId, serializer);
-    sse_encode_opt_String(self.avatarImageUrl, serializer);
-    sse_encode_author_image_source_frb(self.backgroundSource, serializer);
-    sse_encode_opt_String(self.backgroundComicId, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.backgroundLinkId, serializer);
-    sse_encode_opt_String(self.backgroundImageUrl, serializer);
-  }
-
-  @protected
-  void sse_encode_author_image_slot_frb(
-    AuthorImageSlotFrb self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_author_image_source_frb(
-    AuthorImageSourceFrb self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_author_link_frb_dto(
-    AuthorLinkFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_64(self.id, serializer);
-    sse_encode_author_link_platform_frb(self.platform, serializer);
-    sse_encode_String(self.url, serializer);
-    sse_encode_opt_String(self.platformDisplayName, serializer);
-    sse_encode_i_64(self.sortKey, serializer);
-  }
-
-  @protected
-  void sse_encode_author_link_platform_frb(
-    AuthorLinkPlatformFrb self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_author_paged_dto(
-    AuthorPagedDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_author_identity_frb_dto(self.items, serializer);
-    sse_encode_i_64(self.totalCount, serializer);
-    sse_encode_i_32(self.page, serializer);
-    sse_encode_i_32(self.pageSize, serializer);
-  }
-
-  @protected
-  void sse_encode_author_top_comic_frb_dto(
-    AuthorTopComicFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_String(self.title, serializer);
-  }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_author_detail_frb_dto(
-    AuthorDetailFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_author_detail_frb_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_bool(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_comic_dto(
-    ComicDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_comic_filter_dto(
-    ComicFilterDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_filter_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_comic_metadata_bulk_patch_frb_dto(
-    ComicMetadataBulkPatchFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_metadata_bulk_patch_frb_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_comic_sort_option_dto(
-    ComicSortOptionDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_sort_option_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_comic_thumbnail_dto(
-    ComicThumbnailDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_thumbnail_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_export_comic_metadata_options_dto(
-    ExportComicMetadataOptionsDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_export_comic_metadata_options_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_i_64(
-    PlatformInt64 self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_64(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_match_tier_dto(
-    MatchTierDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_match_tier_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_multi_value_patch_frb_dto(
-    MultiValuePatchFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_multi_value_patch_frb_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_page_request_dto(
-    PageRequestDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_page_request_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_published_at_patch_frb_dto(
-    PublishedAtPatchFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_published_at_patch_frb_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_reading_history_dto(
-    ReadingHistoryDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_reading_history_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_scalar_patch_frb_dto(
-    ScalarPatchFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_scalar_patch_frb_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_series_dto(
-    SeriesDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_series_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_series_filter_dto(
-    SeriesFilterDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_series_filter_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_series_item_dto(
-    SeriesItemDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_series_item_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_series_reading_context_dto(
-    SeriesReadingContextDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_series_reading_context_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_series_sort_option_dto(
-    SeriesSortOptionDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_series_sort_option_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_series_thumbnail_dto(
-    SeriesThumbnailDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_series_thumbnail_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_set_comic_meta_locks_frb_dto(
-    SetComicMetaLocksFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_set_comic_meta_locks_frb_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_set_series_meta_locks_dto(
-    SetSeriesMetaLocksDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_set_series_meta_locks_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
-    UpdateComicUserMetaFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_update_comic_user_meta_frb_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_update_series_user_meta_dto(
-    UpdateSeriesUserMetaDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_update_series_user_meta_dto(self, serializer);
-  }
-
-  @protected
-  void sse_encode_bulk_patch_result_frb_dto(
-    BulkPatchResultFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.succeeded, serializer);
-    sse_encode_i_32(self.failed, serializer);
-    sse_encode_i_32(self.unchanged, serializer);
-    sse_encode_bool(self.cancelled, serializer);
-    sse_encode_list_String(self.errorSamples, serializer);
-  }
-
-  @protected
-  void sse_encode_comic_dto(ComicDto self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_String(self.path, serializer);
-    sse_encode_String(self.resourceType, serializer);
-    sse_encode_i_64(self.resourceSize, serializer);
-    sse_encode_i_64(self.createdAt, serializer);
-    sse_encode_i_64(self.lastUpdatedAt, serializer);
-    sse_encode_String(self.title, serializer);
-    sse_encode_String(self.contentRating, serializer);
-    sse_encode_i_32(self.pageCount, serializer);
-    sse_encode_opt_String(self.description, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.lastReadTimeMs, serializer);
-    sse_encode_list_String(self.authors, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_list_String(self.languages, serializer);
-    sse_encode_list_String(self.parodies, serializer);
-    sse_encode_list_String(self.characters, serializer);
-    sse_encode_comic_meta_locks_dto(self.locks, serializer);
-    sse_encode_String(self.libraryId, serializer);
-  }
-
-  @protected
-  void sse_encode_comic_filter_dto(
-    ComicFilterDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_bool(self.showR18, serializer);
-    sse_encode_opt_String(self.query, serializer);
-    sse_encode_list_String(self.resourceTypes, serializer);
-    sse_encode_list_String(self.contentRatings, serializer);
-    sse_encode_list_String(self.tagsAll, serializer);
-    sse_encode_list_String(self.tagsAny, serializer);
-    sse_encode_list_String(self.tagsExclude, serializer);
-    sse_encode_list_String(self.authorsAll, serializer);
-    sse_encode_list_String(self.authorsAny, serializer);
-    sse_encode_list_String(self.authorsExclude, serializer);
-    sse_encode_list_String(self.languages, serializer);
-    sse_encode_list_String(self.parodies, serializer);
-    sse_encode_list_String(self.characters, serializer);
-    sse_encode_bool(self.needsMetadataOnly, serializer);
-    sse_encode_opt_String(self.libraryId, serializer);
-  }
-
-  @protected
-  void sse_encode_comic_meta_locks_dto(
-    ComicMetaLocksDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_bool(self.title, serializer);
-    sse_encode_bool(self.description, serializer);
-    sse_encode_bool(self.publishedAt, serializer);
-    sse_encode_bool(self.contentRating, serializer);
-    sse_encode_bool(self.authors, serializer);
-    sse_encode_bool(self.tags, serializer);
-    sse_encode_bool(self.languages, serializer);
-    sse_encode_bool(self.parodies, serializer);
-    sse_encode_bool(self.characters, serializer);
-  }
-
-  @protected
-  void sse_encode_comic_metadata_bulk_patch_frb_dto(
-    ComicMetadataBulkPatchFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(self.tags, serializer);
-    sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
-      self.authors,
-      serializer,
-    );
-    sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
-      self.languages,
-      serializer,
-    );
-    sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
-      self.parodies,
-      serializer,
-    );
-    sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
-      self.characters,
-      serializer,
-    );
-    sse_encode_opt_String(self.contentRating, serializer);
-    sse_encode_opt_box_autoadd_scalar_patch_frb_dto(
-      self.description,
-      serializer,
-    );
-    sse_encode_opt_box_autoadd_published_at_patch_frb_dto(
-      self.publishedAt,
-      serializer,
-    );
-  }
-
-  @protected
-  void sse_encode_comic_purge_result_frb_dto(
-    ComicPurgeResultFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.succeeded, serializer);
-    sse_encode_i_32(self.failed, serializer);
-    sse_encode_list_String(self.errorSamples, serializer);
-  }
-
-  @protected
-  void sse_encode_comic_sort_field_dto(
-    ComicSortFieldDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_comic_sort_option_dto(
-    ComicSortOptionDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_sort_field_dto(self.field, serializer);
-    sse_encode_bool(self.descending, serializer);
-  }
-
-  @protected
-  void sse_encode_comic_thumbnail_dto(
-    ComicThumbnailDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_prim_u_8_strict(self.thumbnail, serializer);
-    sse_encode_i_64(self.sourceModifiedMs, serializer);
-    sse_encode_i_64(self.sourceSize, serializer);
-    sse_encode_bool(self.isUserSet, serializer);
-  }
-
-  @protected
-  void sse_encode_export_comic_metadata_options_dto(
-    ExportComicMetadataOptionsDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_String(self.libraryId, serializer);
-    sse_encode_bool(self.includeOrphanFacets, serializer);
-  }
-
-  @protected
-  void sse_encode_f_64(double self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putFloat64(self);
-  }
-
-  @protected
-  void sse_encode_hentai_error_dto(
-    HentaiErrorDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.code, serializer);
-    sse_encode_String(self.message, serializer);
-    sse_encode_opt_String(self.context, serializer);
-  }
-
-  @protected
-  void sse_encode_home_continue_reading_dto(
-    HomeContinueReadingDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_String(self.title, serializer);
-    sse_encode_i_64(self.lastReadTimeMs, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.pageIndex, serializer);
-  }
-
-  @protected
-  void sse_encode_home_library_alert_dto(
-    HomeLibraryAlertDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.libraryId, serializer);
-    sse_encode_String(self.displayName, serializer);
-    sse_encode_home_library_alert_kind_dto(self.kind, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.lastSuccessAtMs, serializer);
-    sse_encode_opt_String(self.lastErrorMessage, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.staleDays, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.pendingResourceCount, serializer);
-  }
-
-  @protected
-  void sse_encode_home_library_alert_kind_dto(
-    HomeLibraryAlertKindDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_home_page_counts_dto(
-    HomePageCountsDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.comicCount, serializer);
-    sse_encode_i_32(self.tagCount, serializer);
-    sse_encode_i_32(self.seriesCount, serializer);
-    sse_encode_i_32(self.authorCount, serializer);
-    sse_encode_i_32(self.libraryCount, serializer);
-  }
-
-  @protected
-  void sse_encode_home_recently_added_dto(
-    HomeRecentlyAddedDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_String(self.title, serializer);
-    sse_encode_String(self.libraryId, serializer);
-    sse_encode_String(self.libraryDisplayName, serializer);
-    sse_encode_i_64(self.createdAtMs, serializer);
-  }
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putInt32(self);
-  }
-
-  @protected
-  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putPlatformInt64(self);
-  }
-
-  @protected
-  void sse_encode_import_comic_metadata_result_dto(
-    ImportComicMetadataResultDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.applied, serializer);
-    sse_encode_i_32(self.skippedNotFound, serializer);
-    sse_encode_i_32(self.skippedAmbiguous, serializer);
-    sse_encode_list_String(self.errors, serializer);
-  }
-
-  @protected
-  void sse_encode_junction_named_facet_frb(
-    JunctionNamedFacetFrb self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_library_dto(LibraryDto self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.libraryId, serializer);
-    sse_encode_String(self.kind, serializer);
-    sse_encode_String(self.rootPath, serializer);
-    sse_encode_String(self.name, serializer);
-    sse_encode_list_resource_format_category_dto(
-      self.enabledResourceFormatCategories,
-      serializer,
-    );
-    sse_encode_i_64(self.createdAt, serializer);
-    sse_encode_String(self.username, serializer);
-    sse_encode_bool(self.allowHttp, serializer);
-    sse_encode_bool(self.scanOnStartup, serializer);
-    sse_encode_scan_interval_dto(self.scanInterval, serializer);
-    sse_encode_bool(self.pinned, serializer);
-    sse_encode_i_32(self.sidebarOrder, serializer);
-  }
-
-  @protected
-  void sse_encode_library_probe_result_dto(
-    LibraryProbeResultDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.libraryId, serializer);
-    sse_encode_i_32(self.addedCount, serializer);
-    sse_encode_i_32(self.changedCount, serializer);
-    sse_encode_i_32(self.removedCount, serializer);
-    sse_encode_bool(self.unreachable, serializer);
-    sse_encode_opt_String(self.errorMessage, serializer);
-    sse_encode_i_64(self.probedAtMs, serializer);
-    sse_encode_bool(self.baselineMissing, serializer);
-  }
-
-  @protected
-  void sse_encode_library_sidebar_placement_dto(
-    LibrarySidebarPlacementDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.libraryId, serializer);
-    sse_encode_bool(self.pinned, serializer);
-    sse_encode_i_32(self.sidebarOrder, serializer);
-  }
-
-  @protected
-  void sse_encode_library_sync_counts_dto(
-    LibrarySyncCountsDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.dir, serializer);
-    sse_encode_i_32(self.zip, serializer);
-    sse_encode_i_32(self.cbz, serializer);
-    sse_encode_i_32(self.epub, serializer);
-    sse_encode_i_32(self.cbr, serializer);
-    sse_encode_i_32(self.rar, serializer);
-    sse_encode_i_32(self.cb7, serializer);
-    sse_encode_i_32(self.sevenz, serializer);
-    sse_encode_i_32(self.pdf, serializer);
-  }
-
-  @protected
-  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_String(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_ambiguous_sample_dto(
-    List<AmbiguousSampleDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_ambiguous_sample_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_author_facet_count_frb_dto(
-    List<AuthorFacetCountFrbDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_author_facet_count_frb_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_author_identity_frb_dto(
-    List<AuthorIdentityFrbDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_author_identity_frb_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_author_link_frb_dto(
-    List<AuthorLinkFrbDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_author_link_frb_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_author_top_comic_frb_dto(
-    List<AuthorTopComicFrbDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_author_top_comic_frb_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_comic_dto(
-    List<ComicDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_comic_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_home_continue_reading_dto(
-    List<HomeContinueReadingDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_home_continue_reading_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_home_library_alert_dto(
-    List<HomeLibraryAlertDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_home_library_alert_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_home_recently_added_dto(
-    List<HomeRecentlyAddedDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_home_recently_added_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_library_dto(
-    List<LibraryDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_library_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_library_sidebar_placement_dto(
-    List<LibrarySidebarPlacementDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_library_sidebar_placement_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_named_facet_form_entry_frb_dto(
-    List<NamedFacetFormEntryFrbDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_named_facet_form_entry_frb_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_not_found_sample_dto(
-    List<NotFoundSampleDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_not_found_sample_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_prim_i_32_loose(
-    List<int> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    serializer.buffer.putInt32List(
-      self is Int32List ? self : Int32List.fromList(self),
-    );
-  }
-
-  @protected
-  void sse_encode_list_prim_i_32_strict(
-    Int32List self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    serializer.buffer.putInt32List(self);
-  }
-
-  @protected
-  void sse_encode_list_prim_u_8_loose(
-    List<int> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    serializer.buffer.putUint8List(
-      self is Uint8List ? self : Uint8List.fromList(self),
-    );
-  }
-
-  @protected
-  void sse_encode_list_prim_u_8_strict(
-    Uint8List self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    serializer.buffer.putUint8List(self);
-  }
-
-  @protected
-  void sse_encode_list_reading_history_dto(
-    List<ReadingHistoryDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_reading_history_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_remote_library_credential_dto(
-    List<RemoteLibraryCredentialDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_remote_library_credential_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_resource_format_category_dto(
-    List<ResourceFormatCategoryDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_resource_format_category_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_series_comic_order_entry_dto(
-    List<SeriesComicOrderEntryDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_series_comic_order_entry_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_series_comic_page_item_dto(
-    List<SeriesComicPageItemDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_series_comic_page_item_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_series_dto(
-    List<SeriesDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_series_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_series_item_dto(
-    List<SeriesItemDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_series_item_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_trashed_comic_frb_dto(
-    List<TrashedComicFrbDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_trashed_comic_frb_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_would_apply_sample_dto(
-    List<WouldApplySampleDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_would_apply_sample_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_match_tier_dto(MatchTierDto self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_metadata_backup_manifest_dto(
-    MetadataBackupManifestDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.schemaVersion, serializer);
-    sse_encode_String(self.exportedAt, serializer);
-    sse_encode_String(self.appVersion, serializer);
-    sse_encode_i_32(self.comicCount, serializer);
-    sse_encode_bool(self.includeOrphanFacets, serializer);
-    sse_encode_opt_String(self.libraryId, serializer);
-  }
-
-  @protected
-  void sse_encode_multi_value_op_frb_dto(
-    MultiValueOpFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_multi_value_patch_frb_dto(
-    MultiValuePatchFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_multi_value_op_frb_dto(self.op, serializer);
-    sse_encode_list_String(self.values, serializer);
-  }
-
-  @protected
-  void sse_encode_named_facet_form_entry_frb_dto(
-    NamedFacetFormEntryFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.name, serializer);
-    sse_encode_i_64(self.attachmentCount, serializer);
-  }
-
-  @protected
-  void sse_encode_named_facet_paged_names_dto(
-    NamedFacetPagedNamesDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_String(self.items, serializer);
-    sse_encode_i_64(self.totalCount, serializer);
-    sse_encode_i_32(self.page, serializer);
-    sse_encode_i_32(self.pageSize, serializer);
-  }
-
-  @protected
-  void sse_encode_not_found_sample_dto(
-    NotFoundSampleDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_String(self.path, serializer);
-    sse_encode_String(self.title, serializer);
-  }
-
-  @protected
-  void sse_encode_opt_String(String? self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_String(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_author_detail_frb_dto(
-    AuthorDetailFrbDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_author_detail_frb_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_bool(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_comic_dto(
-    ComicDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_comic_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_comic_thumbnail_dto(
-    ComicThumbnailDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_comic_thumbnail_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_i_32(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_i_64(
-    PlatformInt64? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_i_64(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_match_tier_dto(
-    MatchTierDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_match_tier_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
-    MultiValuePatchFrbDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_multi_value_patch_frb_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_published_at_patch_frb_dto(
-    PublishedAtPatchFrbDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_published_at_patch_frb_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_reading_history_dto(
-    ReadingHistoryDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_reading_history_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_scalar_patch_frb_dto(
-    ScalarPatchFrbDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_scalar_patch_frb_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_series_dto(
-    SeriesDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_series_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_series_item_dto(
-    SeriesItemDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_series_item_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_series_reading_context_dto(
-    SeriesReadingContextDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_series_reading_context_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_box_autoadd_series_thumbnail_dto(
-    SeriesThumbnailDto? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_box_autoadd_series_thumbnail_dto(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_list_String(
-    List<String>? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_list_String(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_opt_list_prim_u_8_strict(
-    Uint8List? self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    sse_encode_bool(self != null, serializer);
-    if (self != null) {
-      sse_encode_list_prim_u_8_strict(self, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_page_request_dto(
-    PageRequestDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.page, serializer);
-    sse_encode_i_32(self.pageSize, serializer);
-  }
-
-  @protected
-  void sse_encode_paged_comic_result_dto(
-    PagedComicResultDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_comic_dto(self.items, serializer);
-    sse_encode_i_64(self.totalCount, serializer);
-    sse_encode_i_32(self.page, serializer);
-    sse_encode_i_32(self.pageSize, serializer);
-  }
-
-  @protected
-  void sse_encode_paged_reading_history_dto(
-    PagedReadingHistoryDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_reading_history_dto(self.items, serializer);
-    sse_encode_i_64(self.totalCount, serializer);
-  }
-
-  @protected
-  void sse_encode_paged_series_comics_result_dto(
-    PagedSeriesComicsResultDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_series_comic_page_item_dto(self.items, serializer);
-    sse_encode_i_64(self.totalCount, serializer);
-    sse_encode_i_32(self.page, serializer);
-    sse_encode_i_32(self.pageSize, serializer);
-  }
-
-  @protected
-  void sse_encode_paged_series_result_dto(
-    PagedSeriesResultDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_series_dto(self.items, serializer);
-    sse_encode_i_64(self.totalCount, serializer);
-    sse_encode_i_32(self.page, serializer);
-    sse_encode_i_32(self.pageSize, serializer);
-  }
-
-  @protected
-  void sse_encode_paged_trashed_comic_result_frb_dto(
-    PagedTrashedComicResultFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_trashed_comic_frb_dto(self.items, serializer);
-    sse_encode_i_64(self.totalCount, serializer);
-    sse_encode_i_32(self.page, serializer);
-    sse_encode_i_32(self.pageSize, serializer);
-  }
-
-  @protected
-  void sse_encode_preview_import_comic_metadata_result_dto(
-    PreviewImportComicMetadataResultDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.wouldApply, serializer);
-    sse_encode_i_32(self.skippedNotFound, serializer);
-    sse_encode_i_32(self.skippedAmbiguous, serializer);
-    sse_encode_i_32(self.wouldUpsertOrphanFacetCount, serializer);
-    sse_encode_list_would_apply_sample_dto(self.samplesWouldApply, serializer);
-    sse_encode_list_not_found_sample_dto(self.samplesNotFound, serializer);
-    sse_encode_list_ambiguous_sample_dto(self.samplesAmbiguous, serializer);
-  }
-
-  @protected
-  void sse_encode_published_at_patch_frb_dto(
-    PublishedAtPatchFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    switch (self) {
-      case PublishedAtPatchFrbDto_Replace(field0: final field0):
-        sse_encode_i_32(0, serializer);
-        sse_encode_i_64(field0, serializer);
-      case PublishedAtPatchFrbDto_Clear():
-        sse_encode_i_32(1, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_reader_page_dto(
-    ReaderPageDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    switch (self) {
-      case ReaderPageDto_FilePath(path: final path):
-        sse_encode_i_32(0, serializer);
-        sse_encode_String(path, serializer);
-      case ReaderPageDto_Bytes(data: final data):
-        sse_encode_i_32(1, serializer);
-        sse_encode_list_prim_u_8_strict(data, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_reader_page_list_dto(
-    ReaderPageListDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.resourceType, serializer);
-    sse_encode_i_32(self.pageCount, serializer);
-    sse_encode_list_String(self.dirPagePaths, serializer);
-  }
-
-  @protected
-  void sse_encode_reading_history_dto(
-    ReadingHistoryDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_String(self.title, serializer);
-    sse_encode_i_64(self.lastReadTimeMs, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.pageIndex, serializer);
-  }
-
-  @protected
-  void sse_encode_refresh_library_result_frb_dto(
-    RefreshLibraryResultFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.succeeded, serializer);
-    sse_encode_i_32(self.failed, serializer);
-    sse_encode_bool(self.cancelled, serializer);
-    sse_encode_bool(self.skipped, serializer);
-    sse_encode_opt_String(self.skipMessage, serializer);
-  }
-
-  @protected
-  void sse_encode_refresh_series_result_frb_dto(
-    RefreshSeriesResultFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.succeeded, serializer);
-    sse_encode_i_32(self.failed, serializer);
-    sse_encode_bool(self.cancelled, serializer);
-  }
-
-  @protected
-  void sse_encode_remote_library_credential_dto(
-    RemoteLibraryCredentialDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.libraryId, serializer);
-    sse_encode_String(self.password, serializer);
-  }
-
-  @protected
-  void sse_encode_resource_format_category_dto(
-    ResourceFormatCategoryDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_scalar_patch_frb_dto(
-    ScalarPatchFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    switch (self) {
-      case ScalarPatchFrbDto_Replace(field0: final field0):
-        sse_encode_i_32(0, serializer);
-        sse_encode_String(field0, serializer);
-      case ScalarPatchFrbDto_Clear():
-        sse_encode_i_32(1, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_scan_interval_dto(
-    ScanIntervalDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_series_comic_order_entry_dto(
-    SeriesComicOrderEntryDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.key, serializer);
-    sse_encode_f_64(self.sortOrder, serializer);
-  }
-
-  @protected
-  void sse_encode_series_comic_page_item_dto(
-    SeriesComicPageItemDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_dto(self.comic, serializer);
-    sse_encode_f_64(self.sortOrder, serializer);
-    sse_encode_bool(self.sortOrderLocked, serializer);
-  }
-
-  @protected
-  void sse_encode_series_comics_metadata_dto(
-    SeriesComicsMetadataDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_String(self.authors, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_bool(self.hasR18, serializer);
-    sse_encode_list_String(self.languages, serializer);
-    sse_encode_list_String(self.parodies, serializer);
-    sse_encode_list_String(self.characters, serializer);
-  }
-
-  @protected
-  void sse_encode_series_cover_source_dto(
-    SeriesCoverSourceDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    switch (self) {
-      case SeriesCoverSourceDto_CustomThumbnail(thumbnail: final thumbnail):
-        sse_encode_i_32(0, serializer);
-        sse_encode_list_prim_u_8_strict(thumbnail, serializer);
-      case SeriesCoverSourceDto_FallbackComic(comicId: final comicId):
-        sse_encode_i_32(1, serializer);
-        sse_encode_String(comicId, serializer);
-      case SeriesCoverSourceDto_Missing():
-        sse_encode_i_32(2, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_series_dto(SeriesDto self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.seriesId, serializer);
-    sse_encode_String(self.folderPath, serializer);
-    sse_encode_String(self.name, serializer);
-    sse_encode_String(self.serializationStatus, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.totalCount, serializer);
-    sse_encode_series_meta_locks_dto(self.locks, serializer);
-    sse_encode_list_series_item_dto(self.items, serializer);
-  }
-
-  @protected
-  void sse_encode_series_filter_dto(
-    SeriesFilterDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_bool(self.showR18, serializer);
-    sse_encode_bool(self.r18Only, serializer);
-    sse_encode_opt_String(self.query, serializer);
-    sse_encode_bool(self.requireItems, serializer);
-    sse_encode_opt_String(self.serializationStatus, serializer);
-    sse_encode_opt_String(self.libraryId, serializer);
-    sse_encode_bool(self.preferLibraryRootSeries, serializer);
-  }
-
-  @protected
-  void sse_encode_series_item_dto(
-    SeriesItemDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.seriesId, serializer);
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_f_64(self.sortOrder, serializer);
-    sse_encode_bool(self.sortOrderLocked, serializer);
-  }
-
-  @protected
-  void sse_encode_series_meta_locks_dto(
-    SeriesMetaLocksDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_bool(self.name, serializer);
-    sse_encode_bool(self.serializationStatus, serializer);
-    sse_encode_bool(self.totalCount, serializer);
-  }
-
-  @protected
-  void sse_encode_series_reading_context_dto(
-    SeriesReadingContextDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.seriesId, serializer);
-    sse_encode_String(self.seriesName, serializer);
-    sse_encode_list_String(self.orderedComicIds, serializer);
-    sse_encode_i_32(self.currentIndex, serializer);
-  }
-
-  @protected
-  void sse_encode_series_sort_field_dto(
-    SeriesSortFieldDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_series_sort_option_dto(
-    SeriesSortOptionDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_series_sort_field_dto(self.field, serializer);
-    sse_encode_bool(self.descending, serializer);
-  }
-
-  @protected
-  void sse_encode_series_thumbnail_dto(
-    SeriesThumbnailDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_prim_u_8_strict(self.thumbnail, serializer);
-    sse_encode_String(self.sourceComicId, serializer);
-    sse_encode_i_32(self.sourcePageIndex, serializer);
-  }
-
-  @protected
-  void sse_encode_set_comic_meta_locks_frb_dto(
-    SetComicMetaLocksFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_box_autoadd_bool(self.title, serializer);
-    sse_encode_opt_box_autoadd_bool(self.description, serializer);
-    sse_encode_opt_box_autoadd_bool(self.publishedAt, serializer);
-    sse_encode_opt_box_autoadd_bool(self.contentRating, serializer);
-    sse_encode_opt_box_autoadd_bool(self.authors, serializer);
-    sse_encode_opt_box_autoadd_bool(self.tags, serializer);
-    sse_encode_opt_box_autoadd_bool(self.languages, serializer);
-    sse_encode_opt_box_autoadd_bool(self.parodies, serializer);
-    sse_encode_opt_box_autoadd_bool(self.characters, serializer);
-  }
-
-  @protected
-  void sse_encode_set_series_meta_locks_dto(
-    SetSeriesMetaLocksDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_box_autoadd_bool(self.name, serializer);
-    sse_encode_opt_box_autoadd_bool(self.serializationStatus, serializer);
-    sse_encode_opt_box_autoadd_bool(self.totalCount, serializer);
-  }
-
-  @protected
-  void sse_encode_sync_library_phase_dto(
-    SyncLibraryPhaseDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_sync_library_progress_dto(
-    SyncLibraryProgressDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_sync_library_phase_dto(self.phase, serializer);
-    sse_encode_sync_library_route_dto(self.route, serializer);
-    sse_encode_opt_String(self.currentPath, serializer);
-    sse_encode_i_32(self.acceptedTotal, serializer);
-    sse_encode_library_sync_counts_dto(self.counts, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.removedCount, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.addedCount, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.keptCount, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.migratedCount, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.thumbnailTotal, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.thumbnailDone, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.thumbnailFailedCount, serializer);
-    sse_encode_opt_String(self.errorMessage, serializer);
-  }
-
-  @protected
-  void sse_encode_sync_library_route_dto(
-    SyncLibraryRouteDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_sync_scan_mode_dto(
-    SyncScanModeDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_tag_dictionary_import_result_dto(
-    TagDictionaryImportResultDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.added, serializer);
-    sse_encode_i_32(self.skippedExisting, serializer);
-    sse_encode_i_32(self.skippedFilteredOrEmptyOrDedupe, serializer);
-  }
-
-  @protected
-  void sse_encode_tag_paged_names_dto(
-    TagPagedNamesDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_String(self.items, serializer);
-    sse_encode_i_64(self.totalCount, serializer);
-    sse_encode_i_32(self.page, serializer);
-    sse_encode_i_32(self.pageSize, serializer);
-  }
-
-  @protected
-  void sse_encode_thumbnail_event_dto(
-    ThumbnailEventDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    switch (self) {
-      case ThumbnailEventDto_Ready(comicId: final comicId):
-        sse_encode_i_32(0, serializer);
-        sse_encode_String(comicId, serializer);
-      case ThumbnailEventDto_Progress(
-        done: final done,
-        total: final total,
-        failed: final failed,
-      ):
-        sse_encode_i_32(1, serializer);
-        sse_encode_i_32(done, serializer);
-        sse_encode_i_32(total, serializer);
-        sse_encode_i_32(failed, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_thumbnail_priority_dto(
-    ThumbnailPriorityDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_trashed_comic_counts_frb_dto(
-    TrashedComicCountsFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_64(self.total, serializer);
-    sse_encode_i_64(self.local, serializer);
-    sse_encode_i_64(self.remote, serializer);
-  }
-
-  @protected
-  void sse_encode_trashed_comic_frb_dto(
-    TrashedComicFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_comic_dto(self.comic, serializer);
-    sse_encode_i_64(self.deletedAt, serializer);
-    sse_encode_String(self.libraryName, serializer);
-    sse_encode_String(self.libraryKind, serializer);
-  }
-
-  @protected
-  void sse_encode_u_64(BigInt self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putBigUint64(self);
-  }
-
-  @protected
-  void sse_encode_u_8(int self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self);
-  }
-
-  @protected
-  void sse_encode_unit(void self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-  }
-
-  @protected
-  void sse_encode_update_comic_user_meta_frb_dto(
-    UpdateComicUserMetaFrbDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_String(self.title, serializer);
-    sse_encode_opt_String(self.contentRating, serializer);
-    sse_encode_opt_String(self.description, serializer);
-    sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
-    sse_encode_opt_list_String(self.authors, serializer);
-    sse_encode_opt_list_String(self.tags, serializer);
-    sse_encode_opt_list_String(self.languages, serializer);
-    sse_encode_opt_list_String(self.parodies, serializer);
-    sse_encode_opt_list_String(self.characters, serializer);
-  }
-
-  @protected
-  void sse_encode_update_series_user_meta_dto(
-    UpdateSeriesUserMetaDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_opt_String(self.name, serializer);
-    sse_encode_opt_String(self.serializationStatus, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.totalCount, serializer);
-    sse_encode_bool(self.clearTotalCount, serializer);
-  }
-
-  @protected
-  void sse_encode_usize(BigInt self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putBigUint64(self);
-  }
-
-  @protected
-  void sse_encode_would_apply_sample_dto(
-    WouldApplySampleDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.comicId, serializer);
-    sse_encode_String(self.path, serializer);
-    sse_encode_String(self.title, serializer);
-    sse_encode_String(self.matchedComicId, serializer);
-    sse_encode_opt_box_autoadd_match_tier_dto(self.matchTier, serializer);
-  }
-}
-
-@sealed
-class SyncHandleDtoImpl extends RustOpaque implements SyncHandleDto {
-  // Not to be used by end users
-  SyncHandleDtoImpl.frbInternalDcoDecode(List<dynamic> wire)
-    : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  SyncHandleDtoImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_SyncHandleDto,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_SyncHandleDto,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_SyncHandleDtoPtr,
-  );
-}
+        
+
+@override Stream<HomePageCountsDto> crateApiHomeWatchHomePageCountsFrb({required bool excludeR18 })  { 
+            final sink = RustStreamSink<HomePageCountsDto>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_bool(excludeR18, serializer);
+sse_encode_StreamSink_home_page_counts_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 129, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiHomeWatchHomePageCountsFrbConstMeta,
+            argValues: [excludeR18, sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiHomeWatchHomePageCountsFrbConstMeta => const TaskConstMeta(
+            debugName: "watch_home_page_counts_frb",
+            argNames: ["excludeR18", "sink"],
+        );
+        
+
+@override Stream<List<SeriesComicOrderEntryDto>> crateApiSeriesWatchHomeSeriesComicOrderMapFrb()  { 
+            final sink = RustStreamSink<List<SeriesComicOrderEntryDto>>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 130, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiSeriesWatchHomeSeriesComicOrderMapFrbConstMeta,
+            argValues: [sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiSeriesWatchHomeSeriesComicOrderMapFrbConstMeta => const TaskConstMeta(
+            debugName: "watch_home_series_comic_order_map_frb",
+            argNames: ["sink"],
+        );
+        
+
+@override Stream<List<ReadingHistoryDto>> crateApiHistoryWatchReadingHistoriesFrb()  { 
+            final sink = RustStreamSink<List<ReadingHistoryDto>>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_StreamSink_list_reading_history_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 131, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiHistoryWatchReadingHistoriesFrbConstMeta,
+            argValues: [sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiHistoryWatchReadingHistoriesFrbConstMeta => const TaskConstMeta(
+            debugName: "watch_reading_histories_frb",
+            argNames: ["sink"],
+        );
+        
+
+@override Stream<List<HomeRecentlyAddedDto>> crateApiHomeWatchRecentlyAddedOnHomeFrb({required bool excludeR18 })  { 
+            final sink = RustStreamSink<List<HomeRecentlyAddedDto>>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_bool(excludeR18, serializer);
+sse_encode_StreamSink_list_home_recently_added_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 132, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiHomeWatchRecentlyAddedOnHomeFrbConstMeta,
+            argValues: [excludeR18, sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiHomeWatchRecentlyAddedOnHomeFrbConstMeta => const TaskConstMeta(
+            debugName: "watch_recently_added_on_home_frb",
+            argNames: ["excludeR18", "sink"],
+        );
+        
+
+@override Stream<List<String>> crateApiTagWatchTagsFrb()  { 
+            final sink = RustStreamSink<List<String>>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_StreamSink_list_String_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 133, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiTagWatchTagsFrbConstMeta,
+            argValues: [sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiTagWatchTagsFrbConstMeta => const TaskConstMeta(
+            debugName: "watch_tags_frb",
+            argNames: ["sink"],
+        );
+        
+
+@override Stream<ThumbnailEventDto> crateApiThumbnailWatchThumbnailEventsFrb()  { 
+            final sink = RustStreamSink<ThumbnailEventDto>();
+            unawaited(handler.executeNormal(NormalTask(
+            callFfi: (port_) {
+              
+            final serializer = SseSerializer(generalizedFrbRustBinding);sse_encode_StreamSink_thumbnail_event_dto_Sse(sink, serializer);
+            pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 134, port: port_);
+            
+            },
+            codec: 
+        SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        )
+        ,
+            constMeta: kCrateApiThumbnailWatchThumbnailEventsFrbConstMeta,
+            argValues: [sink],
+            apiImpl: this,
+        )));
+            return sink.stream;
+             }
+
+
+        TaskConstMeta get kCrateApiThumbnailWatchThumbnailEventsFrbConstMeta => const TaskConstMeta(
+            debugName: "watch_thumbnail_events_frb",
+            argNames: ["sink"],
+        );
+        
+
+RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_SyncHandleDto => wire.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
+
+RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_SyncHandleDto => wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
+
+
+
+                  @protected AnyhowException dco_decode_AnyhowException(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return AnyhowException(raw as String); }
+
+@protected SyncHandleDto dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>); }
+
+@protected SyncHandleDto dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>); }
+
+@protected SyncHandleDto dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>); }
+
+@protected RustStreamSink<HomePageCountsDto> dco_decode_StreamSink_home_page_counts_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<List<String>> dco_decode_StreamSink_list_String_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<List<AuthorIdentityFrbDto>> dco_decode_StreamSink_list_author_identity_frb_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<List<HomeContinueReadingDto>> dco_decode_StreamSink_list_home_continue_reading_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<List<HomeLibraryAlertDto>> dco_decode_StreamSink_list_home_library_alert_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<List<HomeRecentlyAddedDto>> dco_decode_StreamSink_list_home_recently_added_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<List<ReadingHistoryDto>> dco_decode_StreamSink_list_reading_history_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<List<SeriesComicOrderEntryDto>> dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<SyncLibraryProgressDto> dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected RustStreamSink<ThumbnailEventDto> dco_decode_StreamSink_thumbnail_event_dto_Sse(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+throw UnimplementedError(); }
+
+@protected String dco_decode_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as String; }
+
+@protected AmbiguousSampleDto dco_decode_ambiguous_sample_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return AmbiguousSampleDto(comicId: dco_decode_String(arr[0]),
+path: dco_decode_String(arr[1]),
+title: dco_decode_String(arr[2]),
+candidateComicIds: dco_decode_list_String(arr[3]),); }
+
+@protected AuthorDetailFrbDto dco_decode_author_detail_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 7) throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+                return AuthorDetailFrbDto(identity: dco_decode_author_identity_frb_dto(arr[0]),
+links: dco_decode_list_author_link_frb_dto(arr[1]),
+tags: dco_decode_list_author_facet_count_frb_dto(arr[2]),
+parodies: dco_decode_list_author_facet_count_frb_dto(arr[3]),
+characters: dco_decode_list_author_facet_count_frb_dto(arr[4]),
+topComics: dco_decode_list_author_top_comic_frb_dto(arr[5]),
+comicCount: dco_decode_i_64(arr[6]),); }
+
+@protected AuthorFacetCountFrbDto dco_decode_author_facet_count_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return AuthorFacetCountFrbDto(name: dco_decode_String(arr[0]),
+attachmentCount: dco_decode_i_64(arr[1]),); }
+
+@protected AuthorIdentityFrbDto dco_decode_author_identity_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return AuthorIdentityFrbDto(id: dco_decode_i_64(arr[0]),
+name: dco_decode_String(arr[1]),
+verified: dco_decode_bool(arr[2]),); }
+
+@protected AuthorImageRefFrbDto dco_decode_author_image_ref_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+                return AuthorImageRefFrbDto(avatarSource: dco_decode_author_image_source_frb(arr[0]),
+avatarComicId: dco_decode_opt_String(arr[1]),
+avatarLinkId: dco_decode_opt_box_autoadd_i_64(arr[2]),
+avatarImageUrl: dco_decode_opt_String(arr[3]),
+backgroundSource: dco_decode_author_image_source_frb(arr[4]),
+backgroundComicId: dco_decode_opt_String(arr[5]),
+backgroundLinkId: dco_decode_opt_box_autoadd_i_64(arr[6]),
+backgroundImageUrl: dco_decode_opt_String(arr[7]),); }
+
+@protected AuthorImageSlotFrb dco_decode_author_image_slot_frb(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return AuthorImageSlotFrb.values[raw as int]; }
+
+@protected AuthorImageSourceFrb dco_decode_author_image_source_frb(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return AuthorImageSourceFrb.values[raw as int]; }
+
+@protected AuthorLinkFrbDto dco_decode_author_link_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+                return AuthorLinkFrbDto(id: dco_decode_i_64(arr[0]),
+platform: dco_decode_author_link_platform_frb(arr[1]),
+url: dco_decode_String(arr[2]),
+platformDisplayName: dco_decode_opt_String(arr[3]),
+sortKey: dco_decode_i_64(arr[4]),); }
+
+@protected AuthorLinkPlatformFrb dco_decode_author_link_platform_frb(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return AuthorLinkPlatformFrb.values[raw as int]; }
+
+@protected AuthorPagedDto dco_decode_author_paged_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return AuthorPagedDto(items: dco_decode_list_author_identity_frb_dto(arr[0]),
+totalCount: dco_decode_i_64(arr[1]),
+page: dco_decode_i_32(arr[2]),
+pageSize: dco_decode_i_32(arr[3]),); }
+
+@protected AuthorTopComicFrbDto dco_decode_author_top_comic_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return AuthorTopComicFrbDto(comicId: dco_decode_String(arr[0]),
+title: dco_decode_String(arr[1]),); }
+
+@protected bool dco_decode_bool(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as bool; }
+
+@protected AuthorDetailFrbDto dco_decode_box_autoadd_author_detail_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_author_detail_frb_dto(raw); }
+
+@protected bool dco_decode_box_autoadd_bool(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as bool; }
+
+@protected ComicDto dco_decode_box_autoadd_comic_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_comic_dto(raw); }
+
+@protected ComicFilterDto dco_decode_box_autoadd_comic_filter_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_comic_filter_dto(raw); }
+
+@protected ComicMetadataBulkPatchFrbDto dco_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_comic_metadata_bulk_patch_frb_dto(raw); }
+
+@protected ComicSortOptionDto dco_decode_box_autoadd_comic_sort_option_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_comic_sort_option_dto(raw); }
+
+@protected ComicThumbnailDto dco_decode_box_autoadd_comic_thumbnail_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_comic_thumbnail_dto(raw); }
+
+@protected ExportComicMetadataOptionsDto dco_decode_box_autoadd_export_comic_metadata_options_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_export_comic_metadata_options_dto(raw); }
+
+@protected int dco_decode_box_autoadd_i_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as int; }
+
+@protected PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_i_64(raw); }
+
+@protected MatchTierDto dco_decode_box_autoadd_match_tier_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_match_tier_dto(raw); }
+
+@protected MultiValuePatchFrbDto dco_decode_box_autoadd_multi_value_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_multi_value_patch_frb_dto(raw); }
+
+@protected PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_page_request_dto(raw); }
+
+@protected PublishedAtPatchFrbDto dco_decode_box_autoadd_published_at_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_published_at_patch_frb_dto(raw); }
+
+@protected ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_reading_history_dto(raw); }
+
+@protected ScalarPatchFrbDto dco_decode_box_autoadd_scalar_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_scalar_patch_frb_dto(raw); }
+
+@protected SeriesDto dco_decode_box_autoadd_series_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_series_dto(raw); }
+
+@protected SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_series_filter_dto(raw); }
+
+@protected SeriesItemDto dco_decode_box_autoadd_series_item_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_series_item_dto(raw); }
+
+@protected SeriesReadingContextDto dco_decode_box_autoadd_series_reading_context_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_series_reading_context_dto(raw); }
+
+@protected SeriesSortOptionDto dco_decode_box_autoadd_series_sort_option_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_series_sort_option_dto(raw); }
+
+@protected SeriesThumbnailDto dco_decode_box_autoadd_series_thumbnail_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_series_thumbnail_dto(raw); }
+
+@protected SetComicMetaLocksFrbDto dco_decode_box_autoadd_set_comic_meta_locks_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_set_comic_meta_locks_frb_dto(raw); }
+
+@protected SetSeriesMetaLocksDto dco_decode_box_autoadd_set_series_meta_locks_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_set_series_meta_locks_dto(raw); }
+
+@protected UpdateComicUserMetaFrbDto dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_update_comic_user_meta_frb_dto(raw); }
+
+@protected UpdateSeriesUserMetaDto dco_decode_box_autoadd_update_series_user_meta_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dco_decode_update_series_user_meta_dto(raw); }
+
+@protected BulkPatchResultFrbDto dco_decode_bulk_patch_result_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+                return BulkPatchResultFrbDto(succeeded: dco_decode_i_32(arr[0]),
+failed: dco_decode_i_32(arr[1]),
+unchanged: dco_decode_i_32(arr[2]),
+cancelled: dco_decode_bool(arr[3]),
+errorSamples: dco_decode_list_String(arr[4]),); }
+
+@protected ComicDto dco_decode_comic_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 19) throw Exception('unexpected arr length: expect 19 but see ${arr.length}');
+                return ComicDto(comicId: dco_decode_String(arr[0]),
+path: dco_decode_String(arr[1]),
+resourceType: dco_decode_String(arr[2]),
+resourceSize: dco_decode_i_64(arr[3]),
+createdAt: dco_decode_i_64(arr[4]),
+lastUpdatedAt: dco_decode_i_64(arr[5]),
+title: dco_decode_String(arr[6]),
+contentRating: dco_decode_String(arr[7]),
+pageCount: dco_decode_i_32(arr[8]),
+description: dco_decode_opt_String(arr[9]),
+publishedAt: dco_decode_opt_box_autoadd_i_64(arr[10]),
+lastReadTimeMs: dco_decode_opt_box_autoadd_i_64(arr[11]),
+authors: dco_decode_list_String(arr[12]),
+tags: dco_decode_list_String(arr[13]),
+languages: dco_decode_list_String(arr[14]),
+parodies: dco_decode_list_String(arr[15]),
+characters: dco_decode_list_String(arr[16]),
+locks: dco_decode_comic_meta_locks_dto(arr[17]),
+libraryId: dco_decode_String(arr[18]),); }
+
+@protected ComicFilterDto dco_decode_comic_filter_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 15) throw Exception('unexpected arr length: expect 15 but see ${arr.length}');
+                return ComicFilterDto(showR18: dco_decode_bool(arr[0]),
+query: dco_decode_opt_String(arr[1]),
+resourceTypes: dco_decode_list_String(arr[2]),
+contentRatings: dco_decode_list_String(arr[3]),
+tagsAll: dco_decode_list_String(arr[4]),
+tagsAny: dco_decode_list_String(arr[5]),
+tagsExclude: dco_decode_list_String(arr[6]),
+authorsAll: dco_decode_list_String(arr[7]),
+authorsAny: dco_decode_list_String(arr[8]),
+authorsExclude: dco_decode_list_String(arr[9]),
+languages: dco_decode_list_String(arr[10]),
+parodies: dco_decode_list_String(arr[11]),
+characters: dco_decode_list_String(arr[12]),
+needsMetadataOnly: dco_decode_bool(arr[13]),
+libraryId: dco_decode_opt_String(arr[14]),); }
+
+@protected ComicGroupingDto dco_decode_comic_grouping_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return ComicGroupingDto.values[raw as int]; }
+
+@protected ComicMetaLocksDto dco_decode_comic_meta_locks_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 9) throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+                return ComicMetaLocksDto(title: dco_decode_bool(arr[0]),
+description: dco_decode_bool(arr[1]),
+publishedAt: dco_decode_bool(arr[2]),
+contentRating: dco_decode_bool(arr[3]),
+authors: dco_decode_bool(arr[4]),
+tags: dco_decode_bool(arr[5]),
+languages: dco_decode_bool(arr[6]),
+parodies: dco_decode_bool(arr[7]),
+characters: dco_decode_bool(arr[8]),); }
+
+@protected ComicMetadataBulkPatchFrbDto dco_decode_comic_metadata_bulk_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+                return ComicMetadataBulkPatchFrbDto(tags: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[0]),
+authors: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[1]),
+languages: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[2]),
+parodies: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[3]),
+characters: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[4]),
+contentRating: dco_decode_opt_String(arr[5]),
+description: dco_decode_opt_box_autoadd_scalar_patch_frb_dto(arr[6]),
+publishedAt: dco_decode_opt_box_autoadd_published_at_patch_frb_dto(arr[7]),); }
+
+@protected ComicPurgeResultFrbDto dco_decode_comic_purge_result_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return ComicPurgeResultFrbDto(succeeded: dco_decode_i_32(arr[0]),
+failed: dco_decode_i_32(arr[1]),
+errorSamples: dco_decode_list_String(arr[2]),); }
+
+@protected ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return ComicSortFieldDto.values[raw as int]; }
+
+@protected ComicSortOptionDto dco_decode_comic_sort_option_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return ComicSortOptionDto(field: dco_decode_comic_sort_field_dto(arr[0]),
+descending: dco_decode_bool(arr[1]),); }
+
+@protected ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return ComicThumbnailDto(thumbnail: dco_decode_list_prim_u_8_strict(arr[0]),
+sourceModifiedMs: dco_decode_i_64(arr[1]),
+sourceSize: dco_decode_i_64(arr[2]),
+isUserSet: dco_decode_bool(arr[3]),); }
+
+@protected ExportComicMetadataOptionsDto dco_decode_export_comic_metadata_options_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return ExportComicMetadataOptionsDto(libraryId: dco_decode_opt_String(arr[0]),
+includeOrphanFacets: dco_decode_bool(arr[1]),); }
+
+@protected double dco_decode_f_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as double; }
+
+@protected HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return HentaiErrorDto(code: dco_decode_String(arr[0]),
+message: dco_decode_String(arr[1]),
+context: dco_decode_opt_String(arr[2]),); }
+
+@protected HomeContinueReadingDto dco_decode_home_continue_reading_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return HomeContinueReadingDto(comicId: dco_decode_String(arr[0]),
+title: dco_decode_String(arr[1]),
+lastReadTimeMs: dco_decode_i_64(arr[2]),
+pageIndex: dco_decode_opt_box_autoadd_i_32(arr[3]),); }
+
+@protected HomeLibraryAlertDto dco_decode_home_library_alert_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 7) throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+                return HomeLibraryAlertDto(libraryId: dco_decode_String(arr[0]),
+displayName: dco_decode_String(arr[1]),
+kind: dco_decode_home_library_alert_kind_dto(arr[2]),
+lastSuccessAtMs: dco_decode_opt_box_autoadd_i_64(arr[3]),
+lastErrorMessage: dco_decode_opt_String(arr[4]),
+staleDays: dco_decode_opt_box_autoadd_i_32(arr[5]),
+pendingResourceCount: dco_decode_opt_box_autoadd_i_32(arr[6]),); }
+
+@protected HomeLibraryAlertKindDto dco_decode_home_library_alert_kind_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return HomeLibraryAlertKindDto.values[raw as int]; }
+
+@protected HomePageCountsDto dco_decode_home_page_counts_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+                return HomePageCountsDto(comicCount: dco_decode_i_32(arr[0]),
+tagCount: dco_decode_i_32(arr[1]),
+seriesCount: dco_decode_i_32(arr[2]),
+authorCount: dco_decode_i_32(arr[3]),
+libraryCount: dco_decode_i_32(arr[4]),); }
+
+@protected HomeRecentlyAddedDto dco_decode_home_recently_added_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+                return HomeRecentlyAddedDto(comicId: dco_decode_String(arr[0]),
+title: dco_decode_String(arr[1]),
+libraryId: dco_decode_String(arr[2]),
+libraryDisplayName: dco_decode_String(arr[3]),
+createdAtMs: dco_decode_i_64(arr[4]),); }
+
+@protected int dco_decode_i_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as int; }
+
+@protected PlatformInt64 dco_decode_i_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dcoDecodeI64(raw); }
+
+@protected ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return ImportComicMetadataResultDto(applied: dco_decode_i_32(arr[0]),
+skippedNotFound: dco_decode_i_32(arr[1]),
+skippedAmbiguous: dco_decode_i_32(arr[2]),
+errors: dco_decode_list_String(arr[3]),); }
+
+@protected JunctionNamedFacetFrb dco_decode_junction_named_facet_frb(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return JunctionNamedFacetFrb.values[raw as int]; }
+
+@protected LibraryDto dco_decode_library_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 12) throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+                return LibraryDto(libraryId: dco_decode_String(arr[0]),
+kind: dco_decode_String(arr[1]),
+rootPath: dco_decode_String(arr[2]),
+name: dco_decode_String(arr[3]),
+enabledResourceFormatCategories: dco_decode_list_resource_format_category_dto(arr[4]),
+createdAt: dco_decode_i_64(arr[5]),
+username: dco_decode_String(arr[6]),
+allowHttp: dco_decode_bool(arr[7]),
+scanOnStartup: dco_decode_bool(arr[8]),
+scanInterval: dco_decode_scan_interval_dto(arr[9]),
+pinned: dco_decode_bool(arr[10]),
+sidebarOrder: dco_decode_i_32(arr[11]),); }
+
+@protected LibraryProbeResultDto dco_decode_library_probe_result_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+                return LibraryProbeResultDto(libraryId: dco_decode_String(arr[0]),
+addedCount: dco_decode_i_32(arr[1]),
+changedCount: dco_decode_i_32(arr[2]),
+removedCount: dco_decode_i_32(arr[3]),
+unreachable: dco_decode_bool(arr[4]),
+errorMessage: dco_decode_opt_String(arr[5]),
+probedAtMs: dco_decode_i_64(arr[6]),
+baselineMissing: dco_decode_bool(arr[7]),); }
+
+@protected LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return LibrarySidebarPlacementDto(libraryId: dco_decode_String(arr[0]),
+pinned: dco_decode_bool(arr[1]),
+sidebarOrder: dco_decode_i_32(arr[2]),); }
+
+@protected LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 9) throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+                return LibrarySyncCountsDto(dir: dco_decode_i_32(arr[0]),
+zip: dco_decode_i_32(arr[1]),
+cbz: dco_decode_i_32(arr[2]),
+epub: dco_decode_i_32(arr[3]),
+cbr: dco_decode_i_32(arr[4]),
+rar: dco_decode_i_32(arr[5]),
+cb7: dco_decode_i_32(arr[6]),
+sevenz: dco_decode_i_32(arr[7]),
+pdf: dco_decode_i_32(arr[8]),); }
+
+@protected List<String> dco_decode_list_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_String).toList(); }
+
+@protected List<AmbiguousSampleDto> dco_decode_list_ambiguous_sample_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_ambiguous_sample_dto).toList(); }
+
+@protected List<AuthorFacetCountFrbDto> dco_decode_list_author_facet_count_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_author_facet_count_frb_dto).toList(); }
+
+@protected List<AuthorIdentityFrbDto> dco_decode_list_author_identity_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_author_identity_frb_dto).toList(); }
+
+@protected List<AuthorLinkFrbDto> dco_decode_list_author_link_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_author_link_frb_dto).toList(); }
+
+@protected List<AuthorTopComicFrbDto> dco_decode_list_author_top_comic_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_author_top_comic_frb_dto).toList(); }
+
+@protected List<ComicDto> dco_decode_list_comic_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_comic_dto).toList(); }
+
+@protected List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_home_continue_reading_dto).toList(); }
+
+@protected List<HomeLibraryAlertDto> dco_decode_list_home_library_alert_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_home_library_alert_dto).toList(); }
+
+@protected List<HomeRecentlyAddedDto> dco_decode_list_home_recently_added_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_home_recently_added_dto).toList(); }
+
+@protected List<LibraryDto> dco_decode_list_library_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_library_dto).toList(); }
+
+@protected List<LibrarySidebarPlacementDto> dco_decode_list_library_sidebar_placement_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_library_sidebar_placement_dto).toList(); }
+
+@protected List<NamedFacetFormEntryFrbDto> dco_decode_list_named_facet_form_entry_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_named_facet_form_entry_frb_dto).toList(); }
+
+@protected List<NotFoundSampleDto> dco_decode_list_not_found_sample_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_not_found_sample_dto).toList(); }
+
+@protected List<int> dco_decode_list_prim_i_32_loose(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as List<int>; }
+
+@protected Int32List dco_decode_list_prim_i_32_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as Int32List; }
+
+@protected List<int> dco_decode_list_prim_u_8_loose(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as List<int>; }
+
+@protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as Uint8List; }
+
+@protected List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_reading_history_dto).toList(); }
+
+@protected List<RemoteLibraryCredentialDto> dco_decode_list_remote_library_credential_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_remote_library_credential_dto).toList(); }
+
+@protected List<ResourceFormatCategoryDto> dco_decode_list_resource_format_category_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_resource_format_category_dto).toList(); }
+
+@protected List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_series_comic_order_entry_dto).toList(); }
+
+@protected List<SeriesComicPageItemDto> dco_decode_list_series_comic_page_item_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_series_comic_page_item_dto).toList(); }
+
+@protected List<SeriesDto> dco_decode_list_series_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_series_dto).toList(); }
+
+@protected List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_series_item_dto).toList(); }
+
+@protected List<TrashedComicFrbDto> dco_decode_list_trashed_comic_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_trashed_comic_frb_dto).toList(); }
+
+@protected List<WouldApplySampleDto> dco_decode_list_would_apply_sample_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return (raw as List<dynamic>).map(dco_decode_would_apply_sample_dto).toList(); }
+
+@protected MatchTierDto dco_decode_match_tier_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return MatchTierDto.values[raw as int]; }
+
+@protected MetadataBackupManifestDto dco_decode_metadata_backup_manifest_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 6) throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+                return MetadataBackupManifestDto(schemaVersion: dco_decode_i_32(arr[0]),
+exportedAt: dco_decode_String(arr[1]),
+appVersion: dco_decode_String(arr[2]),
+comicCount: dco_decode_i_32(arr[3]),
+includeOrphanFacets: dco_decode_bool(arr[4]),
+libraryId: dco_decode_opt_String(arr[5]),); }
+
+@protected MultiValueOpFrbDto dco_decode_multi_value_op_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return MultiValueOpFrbDto.values[raw as int]; }
+
+@protected MultiValuePatchFrbDto dco_decode_multi_value_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return MultiValuePatchFrbDto(op: dco_decode_multi_value_op_frb_dto(arr[0]),
+values: dco_decode_list_String(arr[1]),); }
+
+@protected NamedFacetFormEntryFrbDto dco_decode_named_facet_form_entry_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return NamedFacetFormEntryFrbDto(name: dco_decode_String(arr[0]),
+attachmentCount: dco_decode_i_64(arr[1]),); }
+
+@protected NamedFacetPagedNamesDto dco_decode_named_facet_paged_names_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return NamedFacetPagedNamesDto(items: dco_decode_list_String(arr[0]),
+totalCount: dco_decode_i_64(arr[1]),
+page: dco_decode_i_32(arr[2]),
+pageSize: dco_decode_i_32(arr[3]),); }
+
+@protected NotFoundSampleDto dco_decode_not_found_sample_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return NotFoundSampleDto(comicId: dco_decode_String(arr[0]),
+path: dco_decode_String(arr[1]),
+title: dco_decode_String(arr[2]),); }
+
+@protected String? dco_decode_opt_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_String(raw); }
+
+@protected AuthorDetailFrbDto? dco_decode_opt_box_autoadd_author_detail_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_author_detail_frb_dto(raw); }
+
+@protected bool? dco_decode_opt_box_autoadd_bool(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_bool(raw); }
+
+@protected ComicDto? dco_decode_opt_box_autoadd_comic_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_comic_dto(raw); }
+
+@protected ComicThumbnailDto? dco_decode_opt_box_autoadd_comic_thumbnail_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_comic_thumbnail_dto(raw); }
+
+@protected int? dco_decode_opt_box_autoadd_i_32(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_i_32(raw); }
+
+@protected PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_i_64(raw); }
+
+@protected MatchTierDto? dco_decode_opt_box_autoadd_match_tier_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_match_tier_dto(raw); }
+
+@protected MultiValuePatchFrbDto? dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_multi_value_patch_frb_dto(raw); }
+
+@protected PublishedAtPatchFrbDto? dco_decode_opt_box_autoadd_published_at_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_published_at_patch_frb_dto(raw); }
+
+@protected ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_reading_history_dto(raw); }
+
+@protected ScalarPatchFrbDto? dco_decode_opt_box_autoadd_scalar_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_scalar_patch_frb_dto(raw); }
+
+@protected SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_series_dto(raw); }
+
+@protected SeriesItemDto? dco_decode_opt_box_autoadd_series_item_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_series_item_dto(raw); }
+
+@protected SeriesReadingContextDto? dco_decode_opt_box_autoadd_series_reading_context_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_series_reading_context_dto(raw); }
+
+@protected SeriesThumbnailDto? dco_decode_opt_box_autoadd_series_thumbnail_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_box_autoadd_series_thumbnail_dto(raw); }
+
+@protected List<String>? dco_decode_opt_list_String(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_list_String(raw); }
+
+@protected Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw == null ? null : dco_decode_list_prim_u_8_strict(raw); }
+
+@protected PageRequestDto dco_decode_page_request_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return PageRequestDto(page: dco_decode_i_32(arr[0]),
+pageSize: dco_decode_i_32(arr[1]),); }
+
+@protected PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return PagedComicResultDto(items: dco_decode_list_comic_dto(arr[0]),
+totalCount: dco_decode_i_64(arr[1]),
+page: dco_decode_i_32(arr[2]),
+pageSize: dco_decode_i_32(arr[3]),); }
+
+@protected PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return PagedReadingHistoryDto(items: dco_decode_list_reading_history_dto(arr[0]),
+totalCount: dco_decode_i_64(arr[1]),); }
+
+@protected PagedSeriesComicsResultDto dco_decode_paged_series_comics_result_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return PagedSeriesComicsResultDto(items: dco_decode_list_series_comic_page_item_dto(arr[0]),
+totalCount: dco_decode_i_64(arr[1]),
+page: dco_decode_i_32(arr[2]),
+pageSize: dco_decode_i_32(arr[3]),); }
+
+@protected PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return PagedSeriesResultDto(items: dco_decode_list_series_dto(arr[0]),
+totalCount: dco_decode_i_64(arr[1]),
+page: dco_decode_i_32(arr[2]),
+pageSize: dco_decode_i_32(arr[3]),); }
+
+@protected PagedTrashedComicResultFrbDto dco_decode_paged_trashed_comic_result_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return PagedTrashedComicResultFrbDto(items: dco_decode_list_trashed_comic_frb_dto(arr[0]),
+totalCount: dco_decode_i_64(arr[1]),
+page: dco_decode_i_32(arr[2]),
+pageSize: dco_decode_i_32(arr[3]),); }
+
+@protected PreviewImportComicMetadataResultDto dco_decode_preview_import_comic_metadata_result_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 7) throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+                return PreviewImportComicMetadataResultDto(wouldApply: dco_decode_i_32(arr[0]),
+skippedNotFound: dco_decode_i_32(arr[1]),
+skippedAmbiguous: dco_decode_i_32(arr[2]),
+wouldUpsertOrphanFacetCount: dco_decode_i_32(arr[3]),
+samplesWouldApply: dco_decode_list_would_apply_sample_dto(arr[4]),
+samplesNotFound: dco_decode_list_not_found_sample_dto(arr[5]),
+samplesAmbiguous: dco_decode_list_ambiguous_sample_dto(arr[6]),); }
+
+@protected PublishedAtPatchFrbDto dco_decode_published_at_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+switch (raw[0]) {
+                case 0: return PublishedAtPatchFrbDto_Replace(dco_decode_i_64(raw[1]),);
+case 1: return PublishedAtPatchFrbDto_Clear();
+                default: throw Exception("unreachable");
+            } }
+
+@protected ReaderPageDto dco_decode_reader_page_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+switch (raw[0]) {
+                case 0: return ReaderPageDto_FilePath(path: dco_decode_String(raw[1]),);
+case 1: return ReaderPageDto_Bytes(data: dco_decode_list_prim_u_8_strict(raw[1]),);
+                default: throw Exception("unreachable");
+            } }
+
+@protected ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return ReaderPageListDto(resourceType: dco_decode_String(arr[0]),
+pageCount: dco_decode_i_32(arr[1]),
+dirPagePaths: dco_decode_list_String(arr[2]),); }
+
+@protected ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return ReadingHistoryDto(comicId: dco_decode_String(arr[0]),
+title: dco_decode_String(arr[1]),
+lastReadTimeMs: dco_decode_i_64(arr[2]),
+pageIndex: dco_decode_opt_box_autoadd_i_32(arr[3]),); }
+
+@protected RefreshLibraryResultFrbDto dco_decode_refresh_library_result_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+                return RefreshLibraryResultFrbDto(succeeded: dco_decode_i_32(arr[0]),
+failed: dco_decode_i_32(arr[1]),
+cancelled: dco_decode_bool(arr[2]),
+skipped: dco_decode_bool(arr[3]),
+skipMessage: dco_decode_opt_String(arr[4]),); }
+
+@protected RefreshSeriesResultFrbDto dco_decode_refresh_series_result_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return RefreshSeriesResultFrbDto(succeeded: dco_decode_i_32(arr[0]),
+failed: dco_decode_i_32(arr[1]),
+cancelled: dco_decode_bool(arr[2]),); }
+
+@protected RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return RemoteLibraryCredentialDto(libraryId: dco_decode_String(arr[0]),
+password: dco_decode_String(arr[1]),); }
+
+@protected ResourceFormatCategoryDto dco_decode_resource_format_category_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return ResourceFormatCategoryDto.values[raw as int]; }
+
+@protected ScalarPatchFrbDto dco_decode_scalar_patch_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+switch (raw[0]) {
+                case 0: return ScalarPatchFrbDto_Replace(dco_decode_String(raw[1]),);
+case 1: return ScalarPatchFrbDto_Clear();
+                default: throw Exception("unreachable");
+            } }
+
+@protected ScanIntervalDto dco_decode_scan_interval_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return ScanIntervalDto.values[raw as int]; }
+
+@protected SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return SeriesComicOrderEntryDto(key: dco_decode_String(arr[0]),
+sortOrder: dco_decode_f_64(arr[1]),); }
+
+@protected SeriesComicPageItemDto dco_decode_series_comic_page_item_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return SeriesComicPageItemDto(comic: dco_decode_comic_dto(arr[0]),
+sortOrder: dco_decode_f_64(arr[1]),
+sortOrderLocked: dco_decode_bool(arr[2]),); }
+
+@protected SeriesComicsMetadataDto dco_decode_series_comics_metadata_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 6) throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+                return SeriesComicsMetadataDto(authors: dco_decode_list_String(arr[0]),
+tags: dco_decode_list_String(arr[1]),
+hasR18: dco_decode_bool(arr[2]),
+languages: dco_decode_list_String(arr[3]),
+parodies: dco_decode_list_String(arr[4]),
+characters: dco_decode_list_String(arr[5]),); }
+
+@protected SeriesCoverSourceDto dco_decode_series_cover_source_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+switch (raw[0]) {
+                case 0: return SeriesCoverSourceDto_CustomThumbnail(thumbnail: dco_decode_list_prim_u_8_strict(raw[1]),);
+case 1: return SeriesCoverSourceDto_FallbackComic(comicId: dco_decode_String(raw[1]),);
+case 2: return SeriesCoverSourceDto_Missing();
+                default: throw Exception("unreachable");
+            } }
+
+@protected SeriesDto dco_decode_series_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 7) throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+                return SeriesDto(seriesId: dco_decode_String(arr[0]),
+folderPath: dco_decode_String(arr[1]),
+name: dco_decode_String(arr[2]),
+serializationStatus: dco_decode_String(arr[3]),
+totalCount: dco_decode_opt_box_autoadd_i_32(arr[4]),
+locks: dco_decode_series_meta_locks_dto(arr[5]),
+items: dco_decode_list_series_item_dto(arr[6]),); }
+
+@protected SeriesFilterDto dco_decode_series_filter_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 7) throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+                return SeriesFilterDto(showR18: dco_decode_bool(arr[0]),
+r18Only: dco_decode_bool(arr[1]),
+query: dco_decode_opt_String(arr[2]),
+requireItems: dco_decode_bool(arr[3]),
+serializationStatus: dco_decode_opt_String(arr[4]),
+libraryId: dco_decode_opt_String(arr[5]),
+preferLibraryRootSeries: dco_decode_bool(arr[6]),); }
+
+@protected SeriesItemDto dco_decode_series_item_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return SeriesItemDto(seriesId: dco_decode_String(arr[0]),
+comicId: dco_decode_String(arr[1]),
+sortOrder: dco_decode_f_64(arr[2]),
+sortOrderLocked: dco_decode_bool(arr[3]),); }
+
+@protected SeriesMetaLocksDto dco_decode_series_meta_locks_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return SeriesMetaLocksDto(name: dco_decode_bool(arr[0]),
+serializationStatus: dco_decode_bool(arr[1]),
+totalCount: dco_decode_bool(arr[2]),); }
+
+@protected SeriesReadingContextDto dco_decode_series_reading_context_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return SeriesReadingContextDto(seriesId: dco_decode_String(arr[0]),
+seriesName: dco_decode_String(arr[1]),
+orderedComicIds: dco_decode_list_String(arr[2]),
+currentIndex: dco_decode_i_32(arr[3]),); }
+
+@protected SeriesSortFieldDto dco_decode_series_sort_field_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return SeriesSortFieldDto.values[raw as int]; }
+
+@protected SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 2) throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+                return SeriesSortOptionDto(field: dco_decode_series_sort_field_dto(arr[0]),
+descending: dco_decode_bool(arr[1]),); }
+
+@protected SeriesThumbnailDto dco_decode_series_thumbnail_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return SeriesThumbnailDto(thumbnail: dco_decode_list_prim_u_8_strict(arr[0]),
+sourceComicId: dco_decode_String(arr[1]),
+sourcePageIndex: dco_decode_i_32(arr[2]),); }
+
+@protected SetComicMetaLocksFrbDto dco_decode_set_comic_meta_locks_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 9) throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+                return SetComicMetaLocksFrbDto(title: dco_decode_opt_box_autoadd_bool(arr[0]),
+description: dco_decode_opt_box_autoadd_bool(arr[1]),
+publishedAt: dco_decode_opt_box_autoadd_bool(arr[2]),
+contentRating: dco_decode_opt_box_autoadd_bool(arr[3]),
+authors: dco_decode_opt_box_autoadd_bool(arr[4]),
+tags: dco_decode_opt_box_autoadd_bool(arr[5]),
+languages: dco_decode_opt_box_autoadd_bool(arr[6]),
+parodies: dco_decode_opt_box_autoadd_bool(arr[7]),
+characters: dco_decode_opt_box_autoadd_bool(arr[8]),); }
+
+@protected SetSeriesMetaLocksDto dco_decode_set_series_meta_locks_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return SetSeriesMetaLocksDto(name: dco_decode_opt_box_autoadd_bool(arr[0]),
+serializationStatus: dco_decode_opt_box_autoadd_bool(arr[1]),
+totalCount: dco_decode_opt_box_autoadd_bool(arr[2]),); }
+
+@protected SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return SyncLibraryPhaseDto.values[raw as int]; }
+
+@protected SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 13) throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
+                return SyncLibraryProgressDto(phase: dco_decode_sync_library_phase_dto(arr[0]),
+route: dco_decode_sync_library_route_dto(arr[1]),
+currentPath: dco_decode_opt_String(arr[2]),
+acceptedTotal: dco_decode_i_32(arr[3]),
+counts: dco_decode_library_sync_counts_dto(arr[4]),
+removedCount: dco_decode_opt_box_autoadd_i_32(arr[5]),
+addedCount: dco_decode_opt_box_autoadd_i_32(arr[6]),
+keptCount: dco_decode_opt_box_autoadd_i_32(arr[7]),
+migratedCount: dco_decode_opt_box_autoadd_i_32(arr[8]),
+thumbnailTotal: dco_decode_opt_box_autoadd_i_32(arr[9]),
+thumbnailDone: dco_decode_opt_box_autoadd_i_32(arr[10]),
+thumbnailFailedCount: dco_decode_opt_box_autoadd_i_32(arr[11]),
+errorMessage: dco_decode_opt_String(arr[12]),); }
+
+@protected SyncLibraryRouteDto dco_decode_sync_library_route_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return SyncLibraryRouteDto.values[raw as int]; }
+
+@protected SyncScanModeDto dco_decode_sync_scan_mode_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return SyncScanModeDto.values[raw as int]; }
+
+@protected TagDictionaryImportResultDto dco_decode_tag_dictionary_import_result_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return TagDictionaryImportResultDto(added: dco_decode_i_32(arr[0]),
+skippedExisting: dco_decode_i_32(arr[1]),
+skippedFilteredOrEmptyOrDedupe: dco_decode_i_32(arr[2]),); }
+
+@protected TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return TagPagedNamesDto(items: dco_decode_list_String(arr[0]),
+totalCount: dco_decode_i_64(arr[1]),
+page: dco_decode_i_32(arr[2]),
+pageSize: dco_decode_i_32(arr[3]),); }
+
+@protected ThumbnailEventDto dco_decode_thumbnail_event_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+switch (raw[0]) {
+                case 0: return ThumbnailEventDto_Ready(comicId: dco_decode_String(raw[1]),);
+case 1: return ThumbnailEventDto_Progress(done: dco_decode_i_32(raw[1]),total: dco_decode_i_32(raw[2]),failed: dco_decode_i_32(raw[3]),);
+                default: throw Exception("unreachable");
+            } }
+
+@protected ThumbnailPriorityDto dco_decode_thumbnail_priority_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return ThumbnailPriorityDto.values[raw as int]; }
+
+@protected TrashedComicCountsFrbDto dco_decode_trashed_comic_counts_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+                return TrashedComicCountsFrbDto(total: dco_decode_i_64(arr[0]),
+local: dco_decode_i_64(arr[1]),
+remote: dco_decode_i_64(arr[2]),); }
+
+@protected TrashedComicFrbDto dco_decode_trashed_comic_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return TrashedComicFrbDto(comic: dco_decode_comic_dto(arr[0]),
+deletedAt: dco_decode_i_64(arr[1]),
+libraryName: dco_decode_String(arr[2]),
+libraryKind: dco_decode_String(arr[3]),); }
+
+@protected BigInt dco_decode_u_64(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dcoDecodeU64(raw); }
+
+@protected int dco_decode_u_8(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return raw as int; }
+
+@protected void dco_decode_unit(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return; }
+
+@protected UpdateComicUserMetaFrbDto dco_decode_update_comic_user_meta_frb_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 9) throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+                return UpdateComicUserMetaFrbDto(title: dco_decode_opt_String(arr[0]),
+contentRating: dco_decode_opt_String(arr[1]),
+description: dco_decode_opt_String(arr[2]),
+publishedAt: dco_decode_opt_box_autoadd_i_64(arr[3]),
+authors: dco_decode_opt_list_String(arr[4]),
+tags: dco_decode_opt_list_String(arr[5]),
+languages: dco_decode_opt_list_String(arr[6]),
+parodies: dco_decode_opt_list_String(arr[7]),
+characters: dco_decode_opt_list_String(arr[8]),); }
+
+@protected UpdateSeriesUserMetaDto dco_decode_update_series_user_meta_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 4) throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+                return UpdateSeriesUserMetaDto(name: dco_decode_opt_String(arr[0]),
+serializationStatus: dco_decode_opt_String(arr[1]),
+totalCount: dco_decode_opt_box_autoadd_i_32(arr[2]),
+clearTotalCount: dco_decode_bool(arr[3]),); }
+
+@protected BigInt dco_decode_usize(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+return dcoDecodeU64(raw); }
+
+@protected WouldApplySampleDto dco_decode_would_apply_sample_dto(dynamic raw){ // Codec=Dco (DartCObject based), see doc to use other codecs
+final arr = raw as List<dynamic>;
+                if (arr.length != 5) throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+                return WouldApplySampleDto(comicId: dco_decode_String(arr[0]),
+path: dco_decode_String(arr[1]),
+title: dco_decode_String(arr[2]),
+matchedComicId: dco_decode_String(arr[3]),
+matchTier: dco_decode_opt_box_autoadd_match_tier_dto(arr[4]),); }
+
+@protected AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_String(deserializer);
+        return AnyhowException(inner); }
+
+@protected SyncHandleDto sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return SyncHandleDtoImpl.frbInternalSseDecode(sse_decode_usize(deserializer), sse_decode_i_32(deserializer)); }
+
+@protected SyncHandleDto sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return SyncHandleDtoImpl.frbInternalSseDecode(sse_decode_usize(deserializer), sse_decode_i_32(deserializer)); }
+
+@protected SyncHandleDto sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return SyncHandleDtoImpl.frbInternalSseDecode(sse_decode_usize(deserializer), sse_decode_i_32(deserializer)); }
+
+@protected RustStreamSink<HomePageCountsDto> sse_decode_StreamSink_home_page_counts_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<List<String>> sse_decode_StreamSink_list_String_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<List<AuthorIdentityFrbDto>> sse_decode_StreamSink_list_author_identity_frb_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<List<HomeContinueReadingDto>> sse_decode_StreamSink_list_home_continue_reading_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<List<HomeLibraryAlertDto>> sse_decode_StreamSink_list_home_library_alert_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<List<HomeRecentlyAddedDto>> sse_decode_StreamSink_list_home_recently_added_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<List<ReadingHistoryDto>> sse_decode_StreamSink_list_reading_history_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<List<SeriesComicOrderEntryDto>> sse_decode_StreamSink_list_series_comic_order_entry_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<SyncLibraryProgressDto> sse_decode_StreamSink_sync_library_progress_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected RustStreamSink<ThumbnailEventDto> sse_decode_StreamSink_thumbnail_event_dto_Sse(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+throw UnimplementedError('Unreachable ()'); }
+
+@protected String sse_decode_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_list_prim_u_8_strict(deserializer);
+        return utf8.decoder.convert(inner); }
+
+@protected AmbiguousSampleDto sse_decode_ambiguous_sample_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicId = sse_decode_String(deserializer);
+var var_path = sse_decode_String(deserializer);
+var var_title = sse_decode_String(deserializer);
+var var_candidateComicIds = sse_decode_list_String(deserializer);
+return AmbiguousSampleDto(comicId: var_comicId, path: var_path, title: var_title, candidateComicIds: var_candidateComicIds); }
+
+@protected AuthorDetailFrbDto sse_decode_author_detail_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_identity = sse_decode_author_identity_frb_dto(deserializer);
+var var_links = sse_decode_list_author_link_frb_dto(deserializer);
+var var_tags = sse_decode_list_author_facet_count_frb_dto(deserializer);
+var var_parodies = sse_decode_list_author_facet_count_frb_dto(deserializer);
+var var_characters = sse_decode_list_author_facet_count_frb_dto(deserializer);
+var var_topComics = sse_decode_list_author_top_comic_frb_dto(deserializer);
+var var_comicCount = sse_decode_i_64(deserializer);
+return AuthorDetailFrbDto(identity: var_identity, links: var_links, tags: var_tags, parodies: var_parodies, characters: var_characters, topComics: var_topComics, comicCount: var_comicCount); }
+
+@protected AuthorFacetCountFrbDto sse_decode_author_facet_count_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_name = sse_decode_String(deserializer);
+var var_attachmentCount = sse_decode_i_64(deserializer);
+return AuthorFacetCountFrbDto(name: var_name, attachmentCount: var_attachmentCount); }
+
+@protected AuthorIdentityFrbDto sse_decode_author_identity_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_id = sse_decode_i_64(deserializer);
+var var_name = sse_decode_String(deserializer);
+var var_verified = sse_decode_bool(deserializer);
+return AuthorIdentityFrbDto(id: var_id, name: var_name, verified: var_verified); }
+
+@protected AuthorImageRefFrbDto sse_decode_author_image_ref_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_avatarSource = sse_decode_author_image_source_frb(deserializer);
+var var_avatarComicId = sse_decode_opt_String(deserializer);
+var var_avatarLinkId = sse_decode_opt_box_autoadd_i_64(deserializer);
+var var_avatarImageUrl = sse_decode_opt_String(deserializer);
+var var_backgroundSource = sse_decode_author_image_source_frb(deserializer);
+var var_backgroundComicId = sse_decode_opt_String(deserializer);
+var var_backgroundLinkId = sse_decode_opt_box_autoadd_i_64(deserializer);
+var var_backgroundImageUrl = sse_decode_opt_String(deserializer);
+return AuthorImageRefFrbDto(avatarSource: var_avatarSource, avatarComicId: var_avatarComicId, avatarLinkId: var_avatarLinkId, avatarImageUrl: var_avatarImageUrl, backgroundSource: var_backgroundSource, backgroundComicId: var_backgroundComicId, backgroundLinkId: var_backgroundLinkId, backgroundImageUrl: var_backgroundImageUrl); }
+
+@protected AuthorImageSlotFrb sse_decode_author_image_slot_frb(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return AuthorImageSlotFrb.values[inner]; }
+
+@protected AuthorImageSourceFrb sse_decode_author_image_source_frb(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return AuthorImageSourceFrb.values[inner]; }
+
+@protected AuthorLinkFrbDto sse_decode_author_link_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_id = sse_decode_i_64(deserializer);
+var var_platform = sse_decode_author_link_platform_frb(deserializer);
+var var_url = sse_decode_String(deserializer);
+var var_platformDisplayName = sse_decode_opt_String(deserializer);
+var var_sortKey = sse_decode_i_64(deserializer);
+return AuthorLinkFrbDto(id: var_id, platform: var_platform, url: var_url, platformDisplayName: var_platformDisplayName, sortKey: var_sortKey); }
+
+@protected AuthorLinkPlatformFrb sse_decode_author_link_platform_frb(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return AuthorLinkPlatformFrb.values[inner]; }
+
+@protected AuthorPagedDto sse_decode_author_paged_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_items = sse_decode_list_author_identity_frb_dto(deserializer);
+var var_totalCount = sse_decode_i_64(deserializer);
+var var_page = sse_decode_i_32(deserializer);
+var var_pageSize = sse_decode_i_32(deserializer);
+return AuthorPagedDto(items: var_items, totalCount: var_totalCount, page: var_page, pageSize: var_pageSize); }
+
+@protected AuthorTopComicFrbDto sse_decode_author_top_comic_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicId = sse_decode_String(deserializer);
+var var_title = sse_decode_String(deserializer);
+return AuthorTopComicFrbDto(comicId: var_comicId, title: var_title); }
+
+@protected bool sse_decode_bool(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return deserializer.buffer.getUint8() != 0; }
+
+@protected AuthorDetailFrbDto sse_decode_box_autoadd_author_detail_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_author_detail_frb_dto(deserializer)); }
+
+@protected bool sse_decode_box_autoadd_bool(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_bool(deserializer)); }
+
+@protected ComicDto sse_decode_box_autoadd_comic_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_comic_dto(deserializer)); }
+
+@protected ComicFilterDto sse_decode_box_autoadd_comic_filter_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_comic_filter_dto(deserializer)); }
+
+@protected ComicMetadataBulkPatchFrbDto sse_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_comic_metadata_bulk_patch_frb_dto(deserializer)); }
+
+@protected ComicSortOptionDto sse_decode_box_autoadd_comic_sort_option_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_comic_sort_option_dto(deserializer)); }
+
+@protected ComicThumbnailDto sse_decode_box_autoadd_comic_thumbnail_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_comic_thumbnail_dto(deserializer)); }
+
+@protected ExportComicMetadataOptionsDto sse_decode_box_autoadd_export_comic_metadata_options_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_export_comic_metadata_options_dto(deserializer)); }
+
+@protected int sse_decode_box_autoadd_i_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_i_32(deserializer)); }
+
+@protected PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_i_64(deserializer)); }
+
+@protected MatchTierDto sse_decode_box_autoadd_match_tier_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_match_tier_dto(deserializer)); }
+
+@protected MultiValuePatchFrbDto sse_decode_box_autoadd_multi_value_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_multi_value_patch_frb_dto(deserializer)); }
+
+@protected PageRequestDto sse_decode_box_autoadd_page_request_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_page_request_dto(deserializer)); }
+
+@protected PublishedAtPatchFrbDto sse_decode_box_autoadd_published_at_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_published_at_patch_frb_dto(deserializer)); }
+
+@protected ReadingHistoryDto sse_decode_box_autoadd_reading_history_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_reading_history_dto(deserializer)); }
+
+@protected ScalarPatchFrbDto sse_decode_box_autoadd_scalar_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_scalar_patch_frb_dto(deserializer)); }
+
+@protected SeriesDto sse_decode_box_autoadd_series_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_series_dto(deserializer)); }
+
+@protected SeriesFilterDto sse_decode_box_autoadd_series_filter_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_series_filter_dto(deserializer)); }
+
+@protected SeriesItemDto sse_decode_box_autoadd_series_item_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_series_item_dto(deserializer)); }
+
+@protected SeriesReadingContextDto sse_decode_box_autoadd_series_reading_context_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_series_reading_context_dto(deserializer)); }
+
+@protected SeriesSortOptionDto sse_decode_box_autoadd_series_sort_option_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_series_sort_option_dto(deserializer)); }
+
+@protected SeriesThumbnailDto sse_decode_box_autoadd_series_thumbnail_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_series_thumbnail_dto(deserializer)); }
+
+@protected SetComicMetaLocksFrbDto sse_decode_box_autoadd_set_comic_meta_locks_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_set_comic_meta_locks_frb_dto(deserializer)); }
+
+@protected SetSeriesMetaLocksDto sse_decode_box_autoadd_set_series_meta_locks_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_set_series_meta_locks_dto(deserializer)); }
+
+@protected UpdateComicUserMetaFrbDto sse_decode_box_autoadd_update_comic_user_meta_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_update_comic_user_meta_frb_dto(deserializer)); }
+
+@protected UpdateSeriesUserMetaDto sse_decode_box_autoadd_update_series_user_meta_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return (sse_decode_update_series_user_meta_dto(deserializer)); }
+
+@protected BulkPatchResultFrbDto sse_decode_bulk_patch_result_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_succeeded = sse_decode_i_32(deserializer);
+var var_failed = sse_decode_i_32(deserializer);
+var var_unchanged = sse_decode_i_32(deserializer);
+var var_cancelled = sse_decode_bool(deserializer);
+var var_errorSamples = sse_decode_list_String(deserializer);
+return BulkPatchResultFrbDto(succeeded: var_succeeded, failed: var_failed, unchanged: var_unchanged, cancelled: var_cancelled, errorSamples: var_errorSamples); }
+
+@protected ComicDto sse_decode_comic_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicId = sse_decode_String(deserializer);
+var var_path = sse_decode_String(deserializer);
+var var_resourceType = sse_decode_String(deserializer);
+var var_resourceSize = sse_decode_i_64(deserializer);
+var var_createdAt = sse_decode_i_64(deserializer);
+var var_lastUpdatedAt = sse_decode_i_64(deserializer);
+var var_title = sse_decode_String(deserializer);
+var var_contentRating = sse_decode_String(deserializer);
+var var_pageCount = sse_decode_i_32(deserializer);
+var var_description = sse_decode_opt_String(deserializer);
+var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
+var var_lastReadTimeMs = sse_decode_opt_box_autoadd_i_64(deserializer);
+var var_authors = sse_decode_list_String(deserializer);
+var var_tags = sse_decode_list_String(deserializer);
+var var_languages = sse_decode_list_String(deserializer);
+var var_parodies = sse_decode_list_String(deserializer);
+var var_characters = sse_decode_list_String(deserializer);
+var var_locks = sse_decode_comic_meta_locks_dto(deserializer);
+var var_libraryId = sse_decode_String(deserializer);
+return ComicDto(comicId: var_comicId, path: var_path, resourceType: var_resourceType, resourceSize: var_resourceSize, createdAt: var_createdAt, lastUpdatedAt: var_lastUpdatedAt, title: var_title, contentRating: var_contentRating, pageCount: var_pageCount, description: var_description, publishedAt: var_publishedAt, lastReadTimeMs: var_lastReadTimeMs, authors: var_authors, tags: var_tags, languages: var_languages, parodies: var_parodies, characters: var_characters, locks: var_locks, libraryId: var_libraryId); }
+
+@protected ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_showR18 = sse_decode_bool(deserializer);
+var var_query = sse_decode_opt_String(deserializer);
+var var_resourceTypes = sse_decode_list_String(deserializer);
+var var_contentRatings = sse_decode_list_String(deserializer);
+var var_tagsAll = sse_decode_list_String(deserializer);
+var var_tagsAny = sse_decode_list_String(deserializer);
+var var_tagsExclude = sse_decode_list_String(deserializer);
+var var_authorsAll = sse_decode_list_String(deserializer);
+var var_authorsAny = sse_decode_list_String(deserializer);
+var var_authorsExclude = sse_decode_list_String(deserializer);
+var var_languages = sse_decode_list_String(deserializer);
+var var_parodies = sse_decode_list_String(deserializer);
+var var_characters = sse_decode_list_String(deserializer);
+var var_needsMetadataOnly = sse_decode_bool(deserializer);
+var var_libraryId = sse_decode_opt_String(deserializer);
+return ComicFilterDto(showR18: var_showR18, query: var_query, resourceTypes: var_resourceTypes, contentRatings: var_contentRatings, tagsAll: var_tagsAll, tagsAny: var_tagsAny, tagsExclude: var_tagsExclude, authorsAll: var_authorsAll, authorsAny: var_authorsAny, authorsExclude: var_authorsExclude, languages: var_languages, parodies: var_parodies, characters: var_characters, needsMetadataOnly: var_needsMetadataOnly, libraryId: var_libraryId); }
+
+@protected ComicGroupingDto sse_decode_comic_grouping_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return ComicGroupingDto.values[inner]; }
+
+@protected ComicMetaLocksDto sse_decode_comic_meta_locks_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_title = sse_decode_bool(deserializer);
+var var_description = sse_decode_bool(deserializer);
+var var_publishedAt = sse_decode_bool(deserializer);
+var var_contentRating = sse_decode_bool(deserializer);
+var var_authors = sse_decode_bool(deserializer);
+var var_tags = sse_decode_bool(deserializer);
+var var_languages = sse_decode_bool(deserializer);
+var var_parodies = sse_decode_bool(deserializer);
+var var_characters = sse_decode_bool(deserializer);
+return ComicMetaLocksDto(title: var_title, description: var_description, publishedAt: var_publishedAt, contentRating: var_contentRating, authors: var_authors, tags: var_tags, languages: var_languages, parodies: var_parodies, characters: var_characters); }
+
+@protected ComicMetadataBulkPatchFrbDto sse_decode_comic_metadata_bulk_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_tags = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(deserializer);
+var var_authors = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(deserializer);
+var var_languages = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(deserializer);
+var var_parodies = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(deserializer);
+var var_characters = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(deserializer);
+var var_contentRating = sse_decode_opt_String(deserializer);
+var var_description = sse_decode_opt_box_autoadd_scalar_patch_frb_dto(deserializer);
+var var_publishedAt = sse_decode_opt_box_autoadd_published_at_patch_frb_dto(deserializer);
+return ComicMetadataBulkPatchFrbDto(tags: var_tags, authors: var_authors, languages: var_languages, parodies: var_parodies, characters: var_characters, contentRating: var_contentRating, description: var_description, publishedAt: var_publishedAt); }
+
+@protected ComicPurgeResultFrbDto sse_decode_comic_purge_result_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_succeeded = sse_decode_i_32(deserializer);
+var var_failed = sse_decode_i_32(deserializer);
+var var_errorSamples = sse_decode_list_String(deserializer);
+return ComicPurgeResultFrbDto(succeeded: var_succeeded, failed: var_failed, errorSamples: var_errorSamples); }
+
+@protected ComicSortFieldDto sse_decode_comic_sort_field_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return ComicSortFieldDto.values[inner]; }
+
+@protected ComicSortOptionDto sse_decode_comic_sort_option_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_field = sse_decode_comic_sort_field_dto(deserializer);
+var var_descending = sse_decode_bool(deserializer);
+return ComicSortOptionDto(field: var_field, descending: var_descending); }
+
+@protected ComicThumbnailDto sse_decode_comic_thumbnail_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_thumbnail = sse_decode_list_prim_u_8_strict(deserializer);
+var var_sourceModifiedMs = sse_decode_i_64(deserializer);
+var var_sourceSize = sse_decode_i_64(deserializer);
+var var_isUserSet = sse_decode_bool(deserializer);
+return ComicThumbnailDto(thumbnail: var_thumbnail, sourceModifiedMs: var_sourceModifiedMs, sourceSize: var_sourceSize, isUserSet: var_isUserSet); }
+
+@protected ExportComicMetadataOptionsDto sse_decode_export_comic_metadata_options_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_libraryId = sse_decode_opt_String(deserializer);
+var var_includeOrphanFacets = sse_decode_bool(deserializer);
+return ExportComicMetadataOptionsDto(libraryId: var_libraryId, includeOrphanFacets: var_includeOrphanFacets); }
+
+@protected double sse_decode_f_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return deserializer.buffer.getFloat64(); }
+
+@protected HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_code = sse_decode_String(deserializer);
+var var_message = sse_decode_String(deserializer);
+var var_context = sse_decode_opt_String(deserializer);
+return HentaiErrorDto(code: var_code, message: var_message, context: var_context); }
+
+@protected HomeContinueReadingDto sse_decode_home_continue_reading_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicId = sse_decode_String(deserializer);
+var var_title = sse_decode_String(deserializer);
+var var_lastReadTimeMs = sse_decode_i_64(deserializer);
+var var_pageIndex = sse_decode_opt_box_autoadd_i_32(deserializer);
+return HomeContinueReadingDto(comicId: var_comicId, title: var_title, lastReadTimeMs: var_lastReadTimeMs, pageIndex: var_pageIndex); }
+
+@protected HomeLibraryAlertDto sse_decode_home_library_alert_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_libraryId = sse_decode_String(deserializer);
+var var_displayName = sse_decode_String(deserializer);
+var var_kind = sse_decode_home_library_alert_kind_dto(deserializer);
+var var_lastSuccessAtMs = sse_decode_opt_box_autoadd_i_64(deserializer);
+var var_lastErrorMessage = sse_decode_opt_String(deserializer);
+var var_staleDays = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_pendingResourceCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+return HomeLibraryAlertDto(libraryId: var_libraryId, displayName: var_displayName, kind: var_kind, lastSuccessAtMs: var_lastSuccessAtMs, lastErrorMessage: var_lastErrorMessage, staleDays: var_staleDays, pendingResourceCount: var_pendingResourceCount); }
+
+@protected HomeLibraryAlertKindDto sse_decode_home_library_alert_kind_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return HomeLibraryAlertKindDto.values[inner]; }
+
+@protected HomePageCountsDto sse_decode_home_page_counts_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicCount = sse_decode_i_32(deserializer);
+var var_tagCount = sse_decode_i_32(deserializer);
+var var_seriesCount = sse_decode_i_32(deserializer);
+var var_authorCount = sse_decode_i_32(deserializer);
+var var_libraryCount = sse_decode_i_32(deserializer);
+return HomePageCountsDto(comicCount: var_comicCount, tagCount: var_tagCount, seriesCount: var_seriesCount, authorCount: var_authorCount, libraryCount: var_libraryCount); }
+
+@protected HomeRecentlyAddedDto sse_decode_home_recently_added_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicId = sse_decode_String(deserializer);
+var var_title = sse_decode_String(deserializer);
+var var_libraryId = sse_decode_String(deserializer);
+var var_libraryDisplayName = sse_decode_String(deserializer);
+var var_createdAtMs = sse_decode_i_64(deserializer);
+return HomeRecentlyAddedDto(comicId: var_comicId, title: var_title, libraryId: var_libraryId, libraryDisplayName: var_libraryDisplayName, createdAtMs: var_createdAtMs); }
+
+@protected int sse_decode_i_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return deserializer.buffer.getInt32(); }
+
+@protected PlatformInt64 sse_decode_i_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return deserializer.buffer.getPlatformInt64(); }
+
+@protected ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_applied = sse_decode_i_32(deserializer);
+var var_skippedNotFound = sse_decode_i_32(deserializer);
+var var_skippedAmbiguous = sse_decode_i_32(deserializer);
+var var_errors = sse_decode_list_String(deserializer);
+return ImportComicMetadataResultDto(applied: var_applied, skippedNotFound: var_skippedNotFound, skippedAmbiguous: var_skippedAmbiguous, errors: var_errors); }
+
+@protected JunctionNamedFacetFrb sse_decode_junction_named_facet_frb(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return JunctionNamedFacetFrb.values[inner]; }
+
+@protected LibraryDto sse_decode_library_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_libraryId = sse_decode_String(deserializer);
+var var_kind = sse_decode_String(deserializer);
+var var_rootPath = sse_decode_String(deserializer);
+var var_name = sse_decode_String(deserializer);
+var var_enabledResourceFormatCategories = sse_decode_list_resource_format_category_dto(deserializer);
+var var_createdAt = sse_decode_i_64(deserializer);
+var var_username = sse_decode_String(deserializer);
+var var_allowHttp = sse_decode_bool(deserializer);
+var var_scanOnStartup = sse_decode_bool(deserializer);
+var var_scanInterval = sse_decode_scan_interval_dto(deserializer);
+var var_pinned = sse_decode_bool(deserializer);
+var var_sidebarOrder = sse_decode_i_32(deserializer);
+return LibraryDto(libraryId: var_libraryId, kind: var_kind, rootPath: var_rootPath, name: var_name, enabledResourceFormatCategories: var_enabledResourceFormatCategories, createdAt: var_createdAt, username: var_username, allowHttp: var_allowHttp, scanOnStartup: var_scanOnStartup, scanInterval: var_scanInterval, pinned: var_pinned, sidebarOrder: var_sidebarOrder); }
+
+@protected LibraryProbeResultDto sse_decode_library_probe_result_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_libraryId = sse_decode_String(deserializer);
+var var_addedCount = sse_decode_i_32(deserializer);
+var var_changedCount = sse_decode_i_32(deserializer);
+var var_removedCount = sse_decode_i_32(deserializer);
+var var_unreachable = sse_decode_bool(deserializer);
+var var_errorMessage = sse_decode_opt_String(deserializer);
+var var_probedAtMs = sse_decode_i_64(deserializer);
+var var_baselineMissing = sse_decode_bool(deserializer);
+return LibraryProbeResultDto(libraryId: var_libraryId, addedCount: var_addedCount, changedCount: var_changedCount, removedCount: var_removedCount, unreachable: var_unreachable, errorMessage: var_errorMessage, probedAtMs: var_probedAtMs, baselineMissing: var_baselineMissing); }
+
+@protected LibrarySidebarPlacementDto sse_decode_library_sidebar_placement_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_libraryId = sse_decode_String(deserializer);
+var var_pinned = sse_decode_bool(deserializer);
+var var_sidebarOrder = sse_decode_i_32(deserializer);
+return LibrarySidebarPlacementDto(libraryId: var_libraryId, pinned: var_pinned, sidebarOrder: var_sidebarOrder); }
+
+@protected LibrarySyncCountsDto sse_decode_library_sync_counts_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_dir = sse_decode_i_32(deserializer);
+var var_zip = sse_decode_i_32(deserializer);
+var var_cbz = sse_decode_i_32(deserializer);
+var var_epub = sse_decode_i_32(deserializer);
+var var_cbr = sse_decode_i_32(deserializer);
+var var_rar = sse_decode_i_32(deserializer);
+var var_cb7 = sse_decode_i_32(deserializer);
+var var_sevenz = sse_decode_i_32(deserializer);
+var var_pdf = sse_decode_i_32(deserializer);
+return LibrarySyncCountsDto(dir: var_dir, zip: var_zip, cbz: var_cbz, epub: var_epub, cbr: var_cbr, rar: var_rar, cb7: var_cb7, sevenz: var_sevenz, pdf: var_pdf); }
+
+@protected List<String> sse_decode_list_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <String>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_String(deserializer)); }
+        return ans_;
+         }
+
+@protected List<AmbiguousSampleDto> sse_decode_list_ambiguous_sample_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <AmbiguousSampleDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_ambiguous_sample_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<AuthorFacetCountFrbDto> sse_decode_list_author_facet_count_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <AuthorFacetCountFrbDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_author_facet_count_frb_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<AuthorIdentityFrbDto> sse_decode_list_author_identity_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <AuthorIdentityFrbDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_author_identity_frb_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<AuthorLinkFrbDto> sse_decode_list_author_link_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <AuthorLinkFrbDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_author_link_frb_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<AuthorTopComicFrbDto> sse_decode_list_author_top_comic_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <AuthorTopComicFrbDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_author_top_comic_frb_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <ComicDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_comic_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <HomeContinueReadingDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_home_continue_reading_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<HomeLibraryAlertDto> sse_decode_list_home_library_alert_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <HomeLibraryAlertDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_home_library_alert_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<HomeRecentlyAddedDto> sse_decode_list_home_recently_added_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <HomeRecentlyAddedDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_home_recently_added_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<LibraryDto> sse_decode_list_library_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <LibraryDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_library_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<LibrarySidebarPlacementDto> sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <LibrarySidebarPlacementDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_library_sidebar_placement_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<NamedFacetFormEntryFrbDto> sse_decode_list_named_facet_form_entry_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <NamedFacetFormEntryFrbDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_named_facet_form_entry_frb_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<NotFoundSampleDto> sse_decode_list_not_found_sample_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <NotFoundSampleDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_not_found_sample_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var len_ = sse_decode_i_32(deserializer);
+                return deserializer.buffer.getInt32List(len_); }
+
+@protected Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var len_ = sse_decode_i_32(deserializer);
+                return deserializer.buffer.getInt32List(len_); }
+
+@protected List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var len_ = sse_decode_i_32(deserializer);
+                return deserializer.buffer.getUint8List(len_); }
+
+@protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var len_ = sse_decode_i_32(deserializer);
+                return deserializer.buffer.getUint8List(len_); }
+
+@protected List<ReadingHistoryDto> sse_decode_list_reading_history_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <ReadingHistoryDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_reading_history_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<RemoteLibraryCredentialDto> sse_decode_list_remote_library_credential_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <RemoteLibraryCredentialDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_remote_library_credential_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<ResourceFormatCategoryDto> sse_decode_list_resource_format_category_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <ResourceFormatCategoryDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_resource_format_category_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <SeriesComicOrderEntryDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_series_comic_order_entry_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<SeriesComicPageItemDto> sse_decode_list_series_comic_page_item_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <SeriesComicPageItemDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_series_comic_page_item_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<SeriesDto> sse_decode_list_series_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <SeriesDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_series_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<SeriesItemDto> sse_decode_list_series_item_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <SeriesItemDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_series_item_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<TrashedComicFrbDto> sse_decode_list_trashed_comic_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <TrashedComicFrbDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_trashed_comic_frb_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected List<WouldApplySampleDto> sse_decode_list_would_apply_sample_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+        var len_ = sse_decode_i_32(deserializer);
+        var ans_ = <WouldApplySampleDto>[];
+        for (var idx_ = 0; idx_ < len_; ++idx_) { ans_.add(sse_decode_would_apply_sample_dto(deserializer)); }
+        return ans_;
+         }
+
+@protected MatchTierDto sse_decode_match_tier_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return MatchTierDto.values[inner]; }
+
+@protected MetadataBackupManifestDto sse_decode_metadata_backup_manifest_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_schemaVersion = sse_decode_i_32(deserializer);
+var var_exportedAt = sse_decode_String(deserializer);
+var var_appVersion = sse_decode_String(deserializer);
+var var_comicCount = sse_decode_i_32(deserializer);
+var var_includeOrphanFacets = sse_decode_bool(deserializer);
+var var_libraryId = sse_decode_opt_String(deserializer);
+return MetadataBackupManifestDto(schemaVersion: var_schemaVersion, exportedAt: var_exportedAt, appVersion: var_appVersion, comicCount: var_comicCount, includeOrphanFacets: var_includeOrphanFacets, libraryId: var_libraryId); }
+
+@protected MultiValueOpFrbDto sse_decode_multi_value_op_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return MultiValueOpFrbDto.values[inner]; }
+
+@protected MultiValuePatchFrbDto sse_decode_multi_value_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_op = sse_decode_multi_value_op_frb_dto(deserializer);
+var var_values = sse_decode_list_String(deserializer);
+return MultiValuePatchFrbDto(op: var_op, values: var_values); }
+
+@protected NamedFacetFormEntryFrbDto sse_decode_named_facet_form_entry_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_name = sse_decode_String(deserializer);
+var var_attachmentCount = sse_decode_i_64(deserializer);
+return NamedFacetFormEntryFrbDto(name: var_name, attachmentCount: var_attachmentCount); }
+
+@protected NamedFacetPagedNamesDto sse_decode_named_facet_paged_names_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_items = sse_decode_list_String(deserializer);
+var var_totalCount = sse_decode_i_64(deserializer);
+var var_page = sse_decode_i_32(deserializer);
+var var_pageSize = sse_decode_i_32(deserializer);
+return NamedFacetPagedNamesDto(items: var_items, totalCount: var_totalCount, page: var_page, pageSize: var_pageSize); }
+
+@protected NotFoundSampleDto sse_decode_not_found_sample_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicId = sse_decode_String(deserializer);
+var var_path = sse_decode_String(deserializer);
+var var_title = sse_decode_String(deserializer);
+return NotFoundSampleDto(comicId: var_comicId, path: var_path, title: var_title); }
+
+@protected String? sse_decode_opt_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_String(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected AuthorDetailFrbDto? sse_decode_opt_box_autoadd_author_detail_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_author_detail_frb_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_bool(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected ComicDto? sse_decode_opt_box_autoadd_comic_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_comic_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected ComicThumbnailDto? sse_decode_opt_box_autoadd_comic_thumbnail_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_comic_thumbnail_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_i_32(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_i_64(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected MatchTierDto? sse_decode_opt_box_autoadd_match_tier_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_match_tier_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected MultiValuePatchFrbDto? sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_multi_value_patch_frb_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected PublishedAtPatchFrbDto? sse_decode_opt_box_autoadd_published_at_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_published_at_patch_frb_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_reading_history_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected ScalarPatchFrbDto? sse_decode_opt_box_autoadd_scalar_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_scalar_patch_frb_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected SeriesDto? sse_decode_opt_box_autoadd_series_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_series_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected SeriesItemDto? sse_decode_opt_box_autoadd_series_item_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_series_item_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected SeriesReadingContextDto? sse_decode_opt_box_autoadd_series_reading_context_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_series_reading_context_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected SeriesThumbnailDto? sse_decode_opt_box_autoadd_series_thumbnail_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_box_autoadd_series_thumbnail_dto(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected List<String>? sse_decode_opt_list_String(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_list_String(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            if (sse_decode_bool(deserializer)) {
+                return (sse_decode_list_prim_u_8_strict(deserializer));
+            } else {
+                return null;
+            }
+             }
+
+@protected PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_page = sse_decode_i_32(deserializer);
+var var_pageSize = sse_decode_i_32(deserializer);
+return PageRequestDto(page: var_page, pageSize: var_pageSize); }
+
+@protected PagedComicResultDto sse_decode_paged_comic_result_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_items = sse_decode_list_comic_dto(deserializer);
+var var_totalCount = sse_decode_i_64(deserializer);
+var var_page = sse_decode_i_32(deserializer);
+var var_pageSize = sse_decode_i_32(deserializer);
+return PagedComicResultDto(items: var_items, totalCount: var_totalCount, page: var_page, pageSize: var_pageSize); }
+
+@protected PagedReadingHistoryDto sse_decode_paged_reading_history_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_items = sse_decode_list_reading_history_dto(deserializer);
+var var_totalCount = sse_decode_i_64(deserializer);
+return PagedReadingHistoryDto(items: var_items, totalCount: var_totalCount); }
+
+@protected PagedSeriesComicsResultDto sse_decode_paged_series_comics_result_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_items = sse_decode_list_series_comic_page_item_dto(deserializer);
+var var_totalCount = sse_decode_i_64(deserializer);
+var var_page = sse_decode_i_32(deserializer);
+var var_pageSize = sse_decode_i_32(deserializer);
+return PagedSeriesComicsResultDto(items: var_items, totalCount: var_totalCount, page: var_page, pageSize: var_pageSize); }
+
+@protected PagedSeriesResultDto sse_decode_paged_series_result_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_items = sse_decode_list_series_dto(deserializer);
+var var_totalCount = sse_decode_i_64(deserializer);
+var var_page = sse_decode_i_32(deserializer);
+var var_pageSize = sse_decode_i_32(deserializer);
+return PagedSeriesResultDto(items: var_items, totalCount: var_totalCount, page: var_page, pageSize: var_pageSize); }
+
+@protected PagedTrashedComicResultFrbDto sse_decode_paged_trashed_comic_result_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_items = sse_decode_list_trashed_comic_frb_dto(deserializer);
+var var_totalCount = sse_decode_i_64(deserializer);
+var var_page = sse_decode_i_32(deserializer);
+var var_pageSize = sse_decode_i_32(deserializer);
+return PagedTrashedComicResultFrbDto(items: var_items, totalCount: var_totalCount, page: var_page, pageSize: var_pageSize); }
+
+@protected PreviewImportComicMetadataResultDto sse_decode_preview_import_comic_metadata_result_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_wouldApply = sse_decode_i_32(deserializer);
+var var_skippedNotFound = sse_decode_i_32(deserializer);
+var var_skippedAmbiguous = sse_decode_i_32(deserializer);
+var var_wouldUpsertOrphanFacetCount = sse_decode_i_32(deserializer);
+var var_samplesWouldApply = sse_decode_list_would_apply_sample_dto(deserializer);
+var var_samplesNotFound = sse_decode_list_not_found_sample_dto(deserializer);
+var var_samplesAmbiguous = sse_decode_list_ambiguous_sample_dto(deserializer);
+return PreviewImportComicMetadataResultDto(wouldApply: var_wouldApply, skippedNotFound: var_skippedNotFound, skippedAmbiguous: var_skippedAmbiguous, wouldUpsertOrphanFacetCount: var_wouldUpsertOrphanFacetCount, samplesWouldApply: var_samplesWouldApply, samplesNotFound: var_samplesNotFound, samplesAmbiguous: var_samplesAmbiguous); }
+
+@protected PublishedAtPatchFrbDto sse_decode_published_at_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            var tag_ = sse_decode_i_32(deserializer);
+            switch (tag_) { case 0: var var_field0 = sse_decode_i_64(deserializer);
+return PublishedAtPatchFrbDto_Replace(var_field0);case 1: return PublishedAtPatchFrbDto_Clear(); default: throw UnimplementedError(''); }
+             }
+
+@protected ReaderPageDto sse_decode_reader_page_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            var tag_ = sse_decode_i_32(deserializer);
+            switch (tag_) { case 0: var var_path = sse_decode_String(deserializer);
+return ReaderPageDto_FilePath(path: var_path);case 1: var var_data = sse_decode_list_prim_u_8_strict(deserializer);
+return ReaderPageDto_Bytes(data: var_data); default: throw UnimplementedError(''); }
+             }
+
+@protected ReaderPageListDto sse_decode_reader_page_list_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_resourceType = sse_decode_String(deserializer);
+var var_pageCount = sse_decode_i_32(deserializer);
+var var_dirPagePaths = sse_decode_list_String(deserializer);
+return ReaderPageListDto(resourceType: var_resourceType, pageCount: var_pageCount, dirPagePaths: var_dirPagePaths); }
+
+@protected ReadingHistoryDto sse_decode_reading_history_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicId = sse_decode_String(deserializer);
+var var_title = sse_decode_String(deserializer);
+var var_lastReadTimeMs = sse_decode_i_64(deserializer);
+var var_pageIndex = sse_decode_opt_box_autoadd_i_32(deserializer);
+return ReadingHistoryDto(comicId: var_comicId, title: var_title, lastReadTimeMs: var_lastReadTimeMs, pageIndex: var_pageIndex); }
+
+@protected RefreshLibraryResultFrbDto sse_decode_refresh_library_result_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_succeeded = sse_decode_i_32(deserializer);
+var var_failed = sse_decode_i_32(deserializer);
+var var_cancelled = sse_decode_bool(deserializer);
+var var_skipped = sse_decode_bool(deserializer);
+var var_skipMessage = sse_decode_opt_String(deserializer);
+return RefreshLibraryResultFrbDto(succeeded: var_succeeded, failed: var_failed, cancelled: var_cancelled, skipped: var_skipped, skipMessage: var_skipMessage); }
+
+@protected RefreshSeriesResultFrbDto sse_decode_refresh_series_result_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_succeeded = sse_decode_i_32(deserializer);
+var var_failed = sse_decode_i_32(deserializer);
+var var_cancelled = sse_decode_bool(deserializer);
+return RefreshSeriesResultFrbDto(succeeded: var_succeeded, failed: var_failed, cancelled: var_cancelled); }
+
+@protected RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_libraryId = sse_decode_String(deserializer);
+var var_password = sse_decode_String(deserializer);
+return RemoteLibraryCredentialDto(libraryId: var_libraryId, password: var_password); }
+
+@protected ResourceFormatCategoryDto sse_decode_resource_format_category_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return ResourceFormatCategoryDto.values[inner]; }
+
+@protected ScalarPatchFrbDto sse_decode_scalar_patch_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            var tag_ = sse_decode_i_32(deserializer);
+            switch (tag_) { case 0: var var_field0 = sse_decode_String(deserializer);
+return ScalarPatchFrbDto_Replace(var_field0);case 1: return ScalarPatchFrbDto_Clear(); default: throw UnimplementedError(''); }
+             }
+
+@protected ScanIntervalDto sse_decode_scan_interval_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return ScanIntervalDto.values[inner]; }
+
+@protected SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_key = sse_decode_String(deserializer);
+var var_sortOrder = sse_decode_f_64(deserializer);
+return SeriesComicOrderEntryDto(key: var_key, sortOrder: var_sortOrder); }
+
+@protected SeriesComicPageItemDto sse_decode_series_comic_page_item_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comic = sse_decode_comic_dto(deserializer);
+var var_sortOrder = sse_decode_f_64(deserializer);
+var var_sortOrderLocked = sse_decode_bool(deserializer);
+return SeriesComicPageItemDto(comic: var_comic, sortOrder: var_sortOrder, sortOrderLocked: var_sortOrderLocked); }
+
+@protected SeriesComicsMetadataDto sse_decode_series_comics_metadata_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_authors = sse_decode_list_String(deserializer);
+var var_tags = sse_decode_list_String(deserializer);
+var var_hasR18 = sse_decode_bool(deserializer);
+var var_languages = sse_decode_list_String(deserializer);
+var var_parodies = sse_decode_list_String(deserializer);
+var var_characters = sse_decode_list_String(deserializer);
+return SeriesComicsMetadataDto(authors: var_authors, tags: var_tags, hasR18: var_hasR18, languages: var_languages, parodies: var_parodies, characters: var_characters); }
+
+@protected SeriesCoverSourceDto sse_decode_series_cover_source_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            var tag_ = sse_decode_i_32(deserializer);
+            switch (tag_) { case 0: var var_thumbnail = sse_decode_list_prim_u_8_strict(deserializer);
+return SeriesCoverSourceDto_CustomThumbnail(thumbnail: var_thumbnail);case 1: var var_comicId = sse_decode_String(deserializer);
+return SeriesCoverSourceDto_FallbackComic(comicId: var_comicId);case 2: return SeriesCoverSourceDto_Missing(); default: throw UnimplementedError(''); }
+             }
+
+@protected SeriesDto sse_decode_series_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_seriesId = sse_decode_String(deserializer);
+var var_folderPath = sse_decode_String(deserializer);
+var var_name = sse_decode_String(deserializer);
+var var_serializationStatus = sse_decode_String(deserializer);
+var var_totalCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_locks = sse_decode_series_meta_locks_dto(deserializer);
+var var_items = sse_decode_list_series_item_dto(deserializer);
+return SeriesDto(seriesId: var_seriesId, folderPath: var_folderPath, name: var_name, serializationStatus: var_serializationStatus, totalCount: var_totalCount, locks: var_locks, items: var_items); }
+
+@protected SeriesFilterDto sse_decode_series_filter_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_showR18 = sse_decode_bool(deserializer);
+var var_r18Only = sse_decode_bool(deserializer);
+var var_query = sse_decode_opt_String(deserializer);
+var var_requireItems = sse_decode_bool(deserializer);
+var var_serializationStatus = sse_decode_opt_String(deserializer);
+var var_libraryId = sse_decode_opt_String(deserializer);
+var var_preferLibraryRootSeries = sse_decode_bool(deserializer);
+return SeriesFilterDto(showR18: var_showR18, r18Only: var_r18Only, query: var_query, requireItems: var_requireItems, serializationStatus: var_serializationStatus, libraryId: var_libraryId, preferLibraryRootSeries: var_preferLibraryRootSeries); }
+
+@protected SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_seriesId = sse_decode_String(deserializer);
+var var_comicId = sse_decode_String(deserializer);
+var var_sortOrder = sse_decode_f_64(deserializer);
+var var_sortOrderLocked = sse_decode_bool(deserializer);
+return SeriesItemDto(seriesId: var_seriesId, comicId: var_comicId, sortOrder: var_sortOrder, sortOrderLocked: var_sortOrderLocked); }
+
+@protected SeriesMetaLocksDto sse_decode_series_meta_locks_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_name = sse_decode_bool(deserializer);
+var var_serializationStatus = sse_decode_bool(deserializer);
+var var_totalCount = sse_decode_bool(deserializer);
+return SeriesMetaLocksDto(name: var_name, serializationStatus: var_serializationStatus, totalCount: var_totalCount); }
+
+@protected SeriesReadingContextDto sse_decode_series_reading_context_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_seriesId = sse_decode_String(deserializer);
+var var_seriesName = sse_decode_String(deserializer);
+var var_orderedComicIds = sse_decode_list_String(deserializer);
+var var_currentIndex = sse_decode_i_32(deserializer);
+return SeriesReadingContextDto(seriesId: var_seriesId, seriesName: var_seriesName, orderedComicIds: var_orderedComicIds, currentIndex: var_currentIndex); }
+
+@protected SeriesSortFieldDto sse_decode_series_sort_field_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return SeriesSortFieldDto.values[inner]; }
+
+@protected SeriesSortOptionDto sse_decode_series_sort_option_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_field = sse_decode_series_sort_field_dto(deserializer);
+var var_descending = sse_decode_bool(deserializer);
+return SeriesSortOptionDto(field: var_field, descending: var_descending); }
+
+@protected SeriesThumbnailDto sse_decode_series_thumbnail_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_thumbnail = sse_decode_list_prim_u_8_strict(deserializer);
+var var_sourceComicId = sse_decode_String(deserializer);
+var var_sourcePageIndex = sse_decode_i_32(deserializer);
+return SeriesThumbnailDto(thumbnail: var_thumbnail, sourceComicId: var_sourceComicId, sourcePageIndex: var_sourcePageIndex); }
+
+@protected SetComicMetaLocksFrbDto sse_decode_set_comic_meta_locks_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_title = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_description = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_publishedAt = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_contentRating = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_authors = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_tags = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_languages = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_parodies = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_characters = sse_decode_opt_box_autoadd_bool(deserializer);
+return SetComicMetaLocksFrbDto(title: var_title, description: var_description, publishedAt: var_publishedAt, contentRating: var_contentRating, authors: var_authors, tags: var_tags, languages: var_languages, parodies: var_parodies, characters: var_characters); }
+
+@protected SetSeriesMetaLocksDto sse_decode_set_series_meta_locks_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_name = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_serializationStatus = sse_decode_opt_box_autoadd_bool(deserializer);
+var var_totalCount = sse_decode_opt_box_autoadd_bool(deserializer);
+return SetSeriesMetaLocksDto(name: var_name, serializationStatus: var_serializationStatus, totalCount: var_totalCount); }
+
+@protected SyncLibraryPhaseDto sse_decode_sync_library_phase_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return SyncLibraryPhaseDto.values[inner]; }
+
+@protected SyncLibraryProgressDto sse_decode_sync_library_progress_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_phase = sse_decode_sync_library_phase_dto(deserializer);
+var var_route = sse_decode_sync_library_route_dto(deserializer);
+var var_currentPath = sse_decode_opt_String(deserializer);
+var var_acceptedTotal = sse_decode_i_32(deserializer);
+var var_counts = sse_decode_library_sync_counts_dto(deserializer);
+var var_removedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_addedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_keptCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_migratedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_thumbnailTotal = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_thumbnailDone = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_thumbnailFailedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_errorMessage = sse_decode_opt_String(deserializer);
+return SyncLibraryProgressDto(phase: var_phase, route: var_route, currentPath: var_currentPath, acceptedTotal: var_acceptedTotal, counts: var_counts, removedCount: var_removedCount, addedCount: var_addedCount, keptCount: var_keptCount, migratedCount: var_migratedCount, thumbnailTotal: var_thumbnailTotal, thumbnailDone: var_thumbnailDone, thumbnailFailedCount: var_thumbnailFailedCount, errorMessage: var_errorMessage); }
+
+@protected SyncLibraryRouteDto sse_decode_sync_library_route_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return SyncLibraryRouteDto.values[inner]; }
+
+@protected SyncScanModeDto sse_decode_sync_scan_mode_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return SyncScanModeDto.values[inner]; }
+
+@protected TagDictionaryImportResultDto sse_decode_tag_dictionary_import_result_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_added = sse_decode_i_32(deserializer);
+var var_skippedExisting = sse_decode_i_32(deserializer);
+var var_skippedFilteredOrEmptyOrDedupe = sse_decode_i_32(deserializer);
+return TagDictionaryImportResultDto(added: var_added, skippedExisting: var_skippedExisting, skippedFilteredOrEmptyOrDedupe: var_skippedFilteredOrEmptyOrDedupe); }
+
+@protected TagPagedNamesDto sse_decode_tag_paged_names_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_items = sse_decode_list_String(deserializer);
+var var_totalCount = sse_decode_i_64(deserializer);
+var var_page = sse_decode_i_32(deserializer);
+var var_pageSize = sse_decode_i_32(deserializer);
+return TagPagedNamesDto(items: var_items, totalCount: var_totalCount, page: var_page, pageSize: var_pageSize); }
+
+@protected ThumbnailEventDto sse_decode_thumbnail_event_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+            var tag_ = sse_decode_i_32(deserializer);
+            switch (tag_) { case 0: var var_comicId = sse_decode_String(deserializer);
+return ThumbnailEventDto_Ready(comicId: var_comicId);case 1: var var_done = sse_decode_i_32(deserializer);
+var var_total = sse_decode_i_32(deserializer);
+var var_failed = sse_decode_i_32(deserializer);
+return ThumbnailEventDto_Progress(done: var_done, total: var_total, failed: var_failed); default: throw UnimplementedError(''); }
+             }
+
+@protected ThumbnailPriorityDto sse_decode_thumbnail_priority_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var inner = sse_decode_i_32(deserializer);
+        return ThumbnailPriorityDto.values[inner]; }
+
+@protected TrashedComicCountsFrbDto sse_decode_trashed_comic_counts_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_total = sse_decode_i_64(deserializer);
+var var_local = sse_decode_i_64(deserializer);
+var var_remote = sse_decode_i_64(deserializer);
+return TrashedComicCountsFrbDto(total: var_total, local: var_local, remote: var_remote); }
+
+@protected TrashedComicFrbDto sse_decode_trashed_comic_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comic = sse_decode_comic_dto(deserializer);
+var var_deletedAt = sse_decode_i_64(deserializer);
+var var_libraryName = sse_decode_String(deserializer);
+var var_libraryKind = sse_decode_String(deserializer);
+return TrashedComicFrbDto(comic: var_comic, deletedAt: var_deletedAt, libraryName: var_libraryName, libraryKind: var_libraryKind); }
+
+@protected BigInt sse_decode_u_64(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return deserializer.buffer.getBigUint64(); }
+
+@protected int sse_decode_u_8(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return deserializer.buffer.getUint8(); }
+
+@protected void sse_decode_unit(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+ }
+
+@protected UpdateComicUserMetaFrbDto sse_decode_update_comic_user_meta_frb_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_title = sse_decode_opt_String(deserializer);
+var var_contentRating = sse_decode_opt_String(deserializer);
+var var_description = sse_decode_opt_String(deserializer);
+var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
+var var_authors = sse_decode_opt_list_String(deserializer);
+var var_tags = sse_decode_opt_list_String(deserializer);
+var var_languages = sse_decode_opt_list_String(deserializer);
+var var_parodies = sse_decode_opt_list_String(deserializer);
+var var_characters = sse_decode_opt_list_String(deserializer);
+return UpdateComicUserMetaFrbDto(title: var_title, contentRating: var_contentRating, description: var_description, publishedAt: var_publishedAt, authors: var_authors, tags: var_tags, languages: var_languages, parodies: var_parodies, characters: var_characters); }
+
+@protected UpdateSeriesUserMetaDto sse_decode_update_series_user_meta_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_name = sse_decode_opt_String(deserializer);
+var var_serializationStatus = sse_decode_opt_String(deserializer);
+var var_totalCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+var var_clearTotalCount = sse_decode_bool(deserializer);
+return UpdateSeriesUserMetaDto(name: var_name, serializationStatus: var_serializationStatus, totalCount: var_totalCount, clearTotalCount: var_clearTotalCount); }
+
+@protected BigInt sse_decode_usize(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+return deserializer.buffer.getBigUint64(); }
+
+@protected WouldApplySampleDto sse_decode_would_apply_sample_dto(SseDeserializer deserializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+var var_comicId = sse_decode_String(deserializer);
+var var_path = sse_decode_String(deserializer);
+var var_title = sse_decode_String(deserializer);
+var var_matchedComicId = sse_decode_String(deserializer);
+var var_matchTier = sse_decode_opt_box_autoadd_match_tier_dto(deserializer);
+return WouldApplySampleDto(comicId: var_comicId, path: var_path, title: var_title, matchedComicId: var_matchedComicId, matchTier: var_matchTier); }
+
+@protected void sse_encode_AnyhowException(AnyhowException self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.message, serializer); }
+
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SyncHandleDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_usize((self as SyncHandleDtoImpl).frbInternalSseEncode(move: true), serializer); }
+
+@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SyncHandleDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_usize((self as SyncHandleDtoImpl).frbInternalSseEncode(move: false), serializer); }
+
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SyncHandleDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_usize((self as SyncHandleDtoImpl).frbInternalSseEncode(move: null), serializer); }
+
+@protected void sse_encode_StreamSink_home_page_counts_dto_Sse(RustStreamSink<HomePageCountsDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_home_page_counts_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_i_32_Sse(RustStreamSink<int> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_i_32,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_list_String_Sse(RustStreamSink<List<String>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_list_String,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_list_author_identity_frb_dto_Sse(RustStreamSink<List<AuthorIdentityFrbDto>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_list_author_identity_frb_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_list_home_continue_reading_dto_Sse(RustStreamSink<List<HomeContinueReadingDto>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_list_home_continue_reading_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_list_home_library_alert_dto_Sse(RustStreamSink<List<HomeLibraryAlertDto>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_list_home_library_alert_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_list_home_recently_added_dto_Sse(RustStreamSink<List<HomeRecentlyAddedDto>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_list_home_recently_added_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_list_reading_history_dto_Sse(RustStreamSink<List<ReadingHistoryDto>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_list_reading_history_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(RustStreamSink<List<SeriesComicOrderEntryDto>> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_list_series_comic_order_entry_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_sync_library_progress_dto_Sse(RustStreamSink<SyncLibraryProgressDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_sync_library_progress_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_StreamSink_thumbnail_event_dto_Sse(RustStreamSink<ThumbnailEventDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.setupAndSerialize(codec: SseCodec(
+            decodeSuccessData: sse_decode_thumbnail_event_dto,
+            decodeErrorData: sse_decode_AnyhowException,
+        )), serializer); }
+
+@protected void sse_encode_String(String self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer); }
+
+@protected void sse_encode_ambiguous_sample_dto(AmbiguousSampleDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.comicId, serializer);
+sse_encode_String(self.path, serializer);
+sse_encode_String(self.title, serializer);
+sse_encode_list_String(self.candidateComicIds, serializer);
+ }
+
+@protected void sse_encode_author_detail_frb_dto(AuthorDetailFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_author_identity_frb_dto(self.identity, serializer);
+sse_encode_list_author_link_frb_dto(self.links, serializer);
+sse_encode_list_author_facet_count_frb_dto(self.tags, serializer);
+sse_encode_list_author_facet_count_frb_dto(self.parodies, serializer);
+sse_encode_list_author_facet_count_frb_dto(self.characters, serializer);
+sse_encode_list_author_top_comic_frb_dto(self.topComics, serializer);
+sse_encode_i_64(self.comicCount, serializer);
+ }
+
+@protected void sse_encode_author_facet_count_frb_dto(AuthorFacetCountFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.name, serializer);
+sse_encode_i_64(self.attachmentCount, serializer);
+ }
+
+@protected void sse_encode_author_identity_frb_dto(AuthorIdentityFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_64(self.id, serializer);
+sse_encode_String(self.name, serializer);
+sse_encode_bool(self.verified, serializer);
+ }
+
+@protected void sse_encode_author_image_ref_frb_dto(AuthorImageRefFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_author_image_source_frb(self.avatarSource, serializer);
+sse_encode_opt_String(self.avatarComicId, serializer);
+sse_encode_opt_box_autoadd_i_64(self.avatarLinkId, serializer);
+sse_encode_opt_String(self.avatarImageUrl, serializer);
+sse_encode_author_image_source_frb(self.backgroundSource, serializer);
+sse_encode_opt_String(self.backgroundComicId, serializer);
+sse_encode_opt_box_autoadd_i_64(self.backgroundLinkId, serializer);
+sse_encode_opt_String(self.backgroundImageUrl, serializer);
+ }
+
+@protected void sse_encode_author_image_slot_frb(AuthorImageSlotFrb self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_author_image_source_frb(AuthorImageSourceFrb self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_author_link_frb_dto(AuthorLinkFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_64(self.id, serializer);
+sse_encode_author_link_platform_frb(self.platform, serializer);
+sse_encode_String(self.url, serializer);
+sse_encode_opt_String(self.platformDisplayName, serializer);
+sse_encode_i_64(self.sortKey, serializer);
+ }
+
+@protected void sse_encode_author_link_platform_frb(AuthorLinkPlatformFrb self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_author_paged_dto(AuthorPagedDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_author_identity_frb_dto(self.items, serializer);
+sse_encode_i_64(self.totalCount, serializer);
+sse_encode_i_32(self.page, serializer);
+sse_encode_i_32(self.pageSize, serializer);
+ }
+
+@protected void sse_encode_author_top_comic_frb_dto(AuthorTopComicFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.comicId, serializer);
+sse_encode_String(self.title, serializer);
+ }
+
+@protected void sse_encode_bool(bool self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+serializer.buffer.putUint8(self ? 1 : 0); }
+
+@protected void sse_encode_box_autoadd_author_detail_frb_dto(AuthorDetailFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_author_detail_frb_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_bool(self, serializer); }
+
+@protected void sse_encode_box_autoadd_comic_dto(ComicDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_comic_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_comic_filter_dto(ComicFilterDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_comic_filter_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_comic_metadata_bulk_patch_frb_dto(ComicMetadataBulkPatchFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_comic_metadata_bulk_patch_frb_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_comic_sort_option_dto(ComicSortOptionDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_comic_sort_option_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_comic_thumbnail_dto(ComicThumbnailDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_comic_thumbnail_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_export_comic_metadata_options_dto(ExportComicMetadataOptionsDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_export_comic_metadata_options_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self, serializer); }
+
+@protected void sse_encode_box_autoadd_i_64(PlatformInt64 self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_64(self, serializer); }
+
+@protected void sse_encode_box_autoadd_match_tier_dto(MatchTierDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_match_tier_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_multi_value_patch_frb_dto(MultiValuePatchFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_multi_value_patch_frb_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_page_request_dto(PageRequestDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_page_request_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_published_at_patch_frb_dto(PublishedAtPatchFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_published_at_patch_frb_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_reading_history_dto(ReadingHistoryDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_reading_history_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_scalar_patch_frb_dto(ScalarPatchFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_scalar_patch_frb_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_series_dto(SeriesDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_series_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_series_filter_dto(SeriesFilterDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_series_filter_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_series_item_dto(SeriesItemDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_series_item_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_series_reading_context_dto(SeriesReadingContextDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_series_reading_context_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_series_sort_option_dto(SeriesSortOptionDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_series_sort_option_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_series_thumbnail_dto(SeriesThumbnailDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_series_thumbnail_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_set_comic_meta_locks_frb_dto(SetComicMetaLocksFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_set_comic_meta_locks_frb_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_set_series_meta_locks_dto(SetSeriesMetaLocksDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_set_series_meta_locks_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(UpdateComicUserMetaFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_update_comic_user_meta_frb_dto(self, serializer); }
+
+@protected void sse_encode_box_autoadd_update_series_user_meta_dto(UpdateSeriesUserMetaDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_update_series_user_meta_dto(self, serializer); }
+
+@protected void sse_encode_bulk_patch_result_frb_dto(BulkPatchResultFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.succeeded, serializer);
+sse_encode_i_32(self.failed, serializer);
+sse_encode_i_32(self.unchanged, serializer);
+sse_encode_bool(self.cancelled, serializer);
+sse_encode_list_String(self.errorSamples, serializer);
+ }
+
+@protected void sse_encode_comic_dto(ComicDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.comicId, serializer);
+sse_encode_String(self.path, serializer);
+sse_encode_String(self.resourceType, serializer);
+sse_encode_i_64(self.resourceSize, serializer);
+sse_encode_i_64(self.createdAt, serializer);
+sse_encode_i_64(self.lastUpdatedAt, serializer);
+sse_encode_String(self.title, serializer);
+sse_encode_String(self.contentRating, serializer);
+sse_encode_i_32(self.pageCount, serializer);
+sse_encode_opt_String(self.description, serializer);
+sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
+sse_encode_opt_box_autoadd_i_64(self.lastReadTimeMs, serializer);
+sse_encode_list_String(self.authors, serializer);
+sse_encode_list_String(self.tags, serializer);
+sse_encode_list_String(self.languages, serializer);
+sse_encode_list_String(self.parodies, serializer);
+sse_encode_list_String(self.characters, serializer);
+sse_encode_comic_meta_locks_dto(self.locks, serializer);
+sse_encode_String(self.libraryId, serializer);
+ }
+
+@protected void sse_encode_comic_filter_dto(ComicFilterDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_bool(self.showR18, serializer);
+sse_encode_opt_String(self.query, serializer);
+sse_encode_list_String(self.resourceTypes, serializer);
+sse_encode_list_String(self.contentRatings, serializer);
+sse_encode_list_String(self.tagsAll, serializer);
+sse_encode_list_String(self.tagsAny, serializer);
+sse_encode_list_String(self.tagsExclude, serializer);
+sse_encode_list_String(self.authorsAll, serializer);
+sse_encode_list_String(self.authorsAny, serializer);
+sse_encode_list_String(self.authorsExclude, serializer);
+sse_encode_list_String(self.languages, serializer);
+sse_encode_list_String(self.parodies, serializer);
+sse_encode_list_String(self.characters, serializer);
+sse_encode_bool(self.needsMetadataOnly, serializer);
+sse_encode_opt_String(self.libraryId, serializer);
+ }
+
+@protected void sse_encode_comic_grouping_dto(ComicGroupingDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_comic_meta_locks_dto(ComicMetaLocksDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_bool(self.title, serializer);
+sse_encode_bool(self.description, serializer);
+sse_encode_bool(self.publishedAt, serializer);
+sse_encode_bool(self.contentRating, serializer);
+sse_encode_bool(self.authors, serializer);
+sse_encode_bool(self.tags, serializer);
+sse_encode_bool(self.languages, serializer);
+sse_encode_bool(self.parodies, serializer);
+sse_encode_bool(self.characters, serializer);
+ }
+
+@protected void sse_encode_comic_metadata_bulk_patch_frb_dto(ComicMetadataBulkPatchFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(self.tags, serializer);
+sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(self.authors, serializer);
+sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(self.languages, serializer);
+sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(self.parodies, serializer);
+sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(self.characters, serializer);
+sse_encode_opt_String(self.contentRating, serializer);
+sse_encode_opt_box_autoadd_scalar_patch_frb_dto(self.description, serializer);
+sse_encode_opt_box_autoadd_published_at_patch_frb_dto(self.publishedAt, serializer);
+ }
+
+@protected void sse_encode_comic_purge_result_frb_dto(ComicPurgeResultFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.succeeded, serializer);
+sse_encode_i_32(self.failed, serializer);
+sse_encode_list_String(self.errorSamples, serializer);
+ }
+
+@protected void sse_encode_comic_sort_field_dto(ComicSortFieldDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_comic_sort_option_dto(ComicSortOptionDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_comic_sort_field_dto(self.field, serializer);
+sse_encode_bool(self.descending, serializer);
+ }
+
+@protected void sse_encode_comic_thumbnail_dto(ComicThumbnailDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_prim_u_8_strict(self.thumbnail, serializer);
+sse_encode_i_64(self.sourceModifiedMs, serializer);
+sse_encode_i_64(self.sourceSize, serializer);
+sse_encode_bool(self.isUserSet, serializer);
+ }
+
+@protected void sse_encode_export_comic_metadata_options_dto(ExportComicMetadataOptionsDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_opt_String(self.libraryId, serializer);
+sse_encode_bool(self.includeOrphanFacets, serializer);
+ }
+
+@protected void sse_encode_f_64(double self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+serializer.buffer.putFloat64(self); }
+
+@protected void sse_encode_hentai_error_dto(HentaiErrorDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.code, serializer);
+sse_encode_String(self.message, serializer);
+sse_encode_opt_String(self.context, serializer);
+ }
+
+@protected void sse_encode_home_continue_reading_dto(HomeContinueReadingDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.comicId, serializer);
+sse_encode_String(self.title, serializer);
+sse_encode_i_64(self.lastReadTimeMs, serializer);
+sse_encode_opt_box_autoadd_i_32(self.pageIndex, serializer);
+ }
+
+@protected void sse_encode_home_library_alert_dto(HomeLibraryAlertDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.libraryId, serializer);
+sse_encode_String(self.displayName, serializer);
+sse_encode_home_library_alert_kind_dto(self.kind, serializer);
+sse_encode_opt_box_autoadd_i_64(self.lastSuccessAtMs, serializer);
+sse_encode_opt_String(self.lastErrorMessage, serializer);
+sse_encode_opt_box_autoadd_i_32(self.staleDays, serializer);
+sse_encode_opt_box_autoadd_i_32(self.pendingResourceCount, serializer);
+ }
+
+@protected void sse_encode_home_library_alert_kind_dto(HomeLibraryAlertKindDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_home_page_counts_dto(HomePageCountsDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.comicCount, serializer);
+sse_encode_i_32(self.tagCount, serializer);
+sse_encode_i_32(self.seriesCount, serializer);
+sse_encode_i_32(self.authorCount, serializer);
+sse_encode_i_32(self.libraryCount, serializer);
+ }
+
+@protected void sse_encode_home_recently_added_dto(HomeRecentlyAddedDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.comicId, serializer);
+sse_encode_String(self.title, serializer);
+sse_encode_String(self.libraryId, serializer);
+sse_encode_String(self.libraryDisplayName, serializer);
+sse_encode_i_64(self.createdAtMs, serializer);
+ }
+
+@protected void sse_encode_i_32(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+serializer.buffer.putInt32(self); }
+
+@protected void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+serializer.buffer.putPlatformInt64(self); }
+
+@protected void sse_encode_import_comic_metadata_result_dto(ImportComicMetadataResultDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.applied, serializer);
+sse_encode_i_32(self.skippedNotFound, serializer);
+sse_encode_i_32(self.skippedAmbiguous, serializer);
+sse_encode_list_String(self.errors, serializer);
+ }
+
+@protected void sse_encode_junction_named_facet_frb(JunctionNamedFacetFrb self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_library_dto(LibraryDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.libraryId, serializer);
+sse_encode_String(self.kind, serializer);
+sse_encode_String(self.rootPath, serializer);
+sse_encode_String(self.name, serializer);
+sse_encode_list_resource_format_category_dto(self.enabledResourceFormatCategories, serializer);
+sse_encode_i_64(self.createdAt, serializer);
+sse_encode_String(self.username, serializer);
+sse_encode_bool(self.allowHttp, serializer);
+sse_encode_bool(self.scanOnStartup, serializer);
+sse_encode_scan_interval_dto(self.scanInterval, serializer);
+sse_encode_bool(self.pinned, serializer);
+sse_encode_i_32(self.sidebarOrder, serializer);
+ }
+
+@protected void sse_encode_library_probe_result_dto(LibraryProbeResultDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.libraryId, serializer);
+sse_encode_i_32(self.addedCount, serializer);
+sse_encode_i_32(self.changedCount, serializer);
+sse_encode_i_32(self.removedCount, serializer);
+sse_encode_bool(self.unreachable, serializer);
+sse_encode_opt_String(self.errorMessage, serializer);
+sse_encode_i_64(self.probedAtMs, serializer);
+sse_encode_bool(self.baselineMissing, serializer);
+ }
+
+@protected void sse_encode_library_sidebar_placement_dto(LibrarySidebarPlacementDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.libraryId, serializer);
+sse_encode_bool(self.pinned, serializer);
+sse_encode_i_32(self.sidebarOrder, serializer);
+ }
+
+@protected void sse_encode_library_sync_counts_dto(LibrarySyncCountsDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.dir, serializer);
+sse_encode_i_32(self.zip, serializer);
+sse_encode_i_32(self.cbz, serializer);
+sse_encode_i_32(self.epub, serializer);
+sse_encode_i_32(self.cbr, serializer);
+sse_encode_i_32(self.rar, serializer);
+sse_encode_i_32(self.cb7, serializer);
+sse_encode_i_32(self.sevenz, serializer);
+sse_encode_i_32(self.pdf, serializer);
+ }
+
+@protected void sse_encode_list_String(List<String> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_String(item, serializer); } }
+
+@protected void sse_encode_list_ambiguous_sample_dto(List<AmbiguousSampleDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_ambiguous_sample_dto(item, serializer); } }
+
+@protected void sse_encode_list_author_facet_count_frb_dto(List<AuthorFacetCountFrbDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_author_facet_count_frb_dto(item, serializer); } }
+
+@protected void sse_encode_list_author_identity_frb_dto(List<AuthorIdentityFrbDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_author_identity_frb_dto(item, serializer); } }
+
+@protected void sse_encode_list_author_link_frb_dto(List<AuthorLinkFrbDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_author_link_frb_dto(item, serializer); } }
+
+@protected void sse_encode_list_author_top_comic_frb_dto(List<AuthorTopComicFrbDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_author_top_comic_frb_dto(item, serializer); } }
+
+@protected void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_comic_dto(item, serializer); } }
+
+@protected void sse_encode_list_home_continue_reading_dto(List<HomeContinueReadingDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_home_continue_reading_dto(item, serializer); } }
+
+@protected void sse_encode_list_home_library_alert_dto(List<HomeLibraryAlertDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_home_library_alert_dto(item, serializer); } }
+
+@protected void sse_encode_list_home_recently_added_dto(List<HomeRecentlyAddedDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_home_recently_added_dto(item, serializer); } }
+
+@protected void sse_encode_list_library_dto(List<LibraryDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_library_dto(item, serializer); } }
+
+@protected void sse_encode_list_library_sidebar_placement_dto(List<LibrarySidebarPlacementDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_library_sidebar_placement_dto(item, serializer); } }
+
+@protected void sse_encode_list_named_facet_form_entry_frb_dto(List<NamedFacetFormEntryFrbDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_named_facet_form_entry_frb_dto(item, serializer); } }
+
+@protected void sse_encode_list_not_found_sample_dto(List<NotFoundSampleDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_not_found_sample_dto(item, serializer); } }
+
+@protected void sse_encode_list_prim_i_32_loose(List<int> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+                    serializer.buffer.putInt32List(self is Int32List ? self : Int32List.fromList(self)); }
+
+@protected void sse_encode_list_prim_i_32_strict(Int32List self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+                    serializer.buffer.putInt32List(self); }
+
+@protected void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+                    serializer.buffer.putUint8List(self is Uint8List ? self : Uint8List.fromList(self)); }
+
+@protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+                    serializer.buffer.putUint8List(self); }
+
+@protected void sse_encode_list_reading_history_dto(List<ReadingHistoryDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_reading_history_dto(item, serializer); } }
+
+@protected void sse_encode_list_remote_library_credential_dto(List<RemoteLibraryCredentialDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_remote_library_credential_dto(item, serializer); } }
+
+@protected void sse_encode_list_resource_format_category_dto(List<ResourceFormatCategoryDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_resource_format_category_dto(item, serializer); } }
+
+@protected void sse_encode_list_series_comic_order_entry_dto(List<SeriesComicOrderEntryDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_series_comic_order_entry_dto(item, serializer); } }
+
+@protected void sse_encode_list_series_comic_page_item_dto(List<SeriesComicPageItemDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_series_comic_page_item_dto(item, serializer); } }
+
+@protected void sse_encode_list_series_dto(List<SeriesDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_series_dto(item, serializer); } }
+
+@protected void sse_encode_list_series_item_dto(List<SeriesItemDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_series_item_dto(item, serializer); } }
+
+@protected void sse_encode_list_trashed_comic_frb_dto(List<TrashedComicFrbDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_trashed_comic_frb_dto(item, serializer); } }
+
+@protected void sse_encode_list_would_apply_sample_dto(List<WouldApplySampleDto> self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.length, serializer);
+        for (final item in self) { sse_encode_would_apply_sample_dto(item, serializer); } }
+
+@protected void sse_encode_match_tier_dto(MatchTierDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_metadata_backup_manifest_dto(MetadataBackupManifestDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.schemaVersion, serializer);
+sse_encode_String(self.exportedAt, serializer);
+sse_encode_String(self.appVersion, serializer);
+sse_encode_i_32(self.comicCount, serializer);
+sse_encode_bool(self.includeOrphanFacets, serializer);
+sse_encode_opt_String(self.libraryId, serializer);
+ }
+
+@protected void sse_encode_multi_value_op_frb_dto(MultiValueOpFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_multi_value_patch_frb_dto(MultiValuePatchFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_multi_value_op_frb_dto(self.op, serializer);
+sse_encode_list_String(self.values, serializer);
+ }
+
+@protected void sse_encode_named_facet_form_entry_frb_dto(NamedFacetFormEntryFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.name, serializer);
+sse_encode_i_64(self.attachmentCount, serializer);
+ }
+
+@protected void sse_encode_named_facet_paged_names_dto(NamedFacetPagedNamesDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_String(self.items, serializer);
+sse_encode_i_64(self.totalCount, serializer);
+sse_encode_i_32(self.page, serializer);
+sse_encode_i_32(self.pageSize, serializer);
+ }
+
+@protected void sse_encode_not_found_sample_dto(NotFoundSampleDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.comicId, serializer);
+sse_encode_String(self.path, serializer);
+sse_encode_String(self.title, serializer);
+ }
+
+@protected void sse_encode_opt_String(String? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_String(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_author_detail_frb_dto(AuthorDetailFrbDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_author_detail_frb_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_bool(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_comic_dto(ComicDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_comic_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_comic_thumbnail_dto(ComicThumbnailDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_comic_thumbnail_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_i_32(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_i_64(PlatformInt64? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_i_64(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_match_tier_dto(MatchTierDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_match_tier_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(MultiValuePatchFrbDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_multi_value_patch_frb_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_published_at_patch_frb_dto(PublishedAtPatchFrbDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_published_at_patch_frb_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_reading_history_dto(ReadingHistoryDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_reading_history_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_scalar_patch_frb_dto(ScalarPatchFrbDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_scalar_patch_frb_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_series_dto(SeriesDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_series_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_series_item_dto(SeriesItemDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_series_item_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_series_reading_context_dto(SeriesReadingContextDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_series_reading_context_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_box_autoadd_series_thumbnail_dto(SeriesThumbnailDto? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_box_autoadd_series_thumbnail_dto(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_list_String(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_opt_list_prim_u_8_strict(Uint8List? self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+
+                sse_encode_bool(self != null, serializer);
+                if (self != null) {
+                    sse_encode_list_prim_u_8_strict(self, serializer);
+                }
+                 }
+
+@protected void sse_encode_page_request_dto(PageRequestDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.page, serializer);
+sse_encode_i_32(self.pageSize, serializer);
+ }
+
+@protected void sse_encode_paged_comic_result_dto(PagedComicResultDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_comic_dto(self.items, serializer);
+sse_encode_i_64(self.totalCount, serializer);
+sse_encode_i_32(self.page, serializer);
+sse_encode_i_32(self.pageSize, serializer);
+ }
+
+@protected void sse_encode_paged_reading_history_dto(PagedReadingHistoryDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_reading_history_dto(self.items, serializer);
+sse_encode_i_64(self.totalCount, serializer);
+ }
+
+@protected void sse_encode_paged_series_comics_result_dto(PagedSeriesComicsResultDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_series_comic_page_item_dto(self.items, serializer);
+sse_encode_i_64(self.totalCount, serializer);
+sse_encode_i_32(self.page, serializer);
+sse_encode_i_32(self.pageSize, serializer);
+ }
+
+@protected void sse_encode_paged_series_result_dto(PagedSeriesResultDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_series_dto(self.items, serializer);
+sse_encode_i_64(self.totalCount, serializer);
+sse_encode_i_32(self.page, serializer);
+sse_encode_i_32(self.pageSize, serializer);
+ }
+
+@protected void sse_encode_paged_trashed_comic_result_frb_dto(PagedTrashedComicResultFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_trashed_comic_frb_dto(self.items, serializer);
+sse_encode_i_64(self.totalCount, serializer);
+sse_encode_i_32(self.page, serializer);
+sse_encode_i_32(self.pageSize, serializer);
+ }
+
+@protected void sse_encode_preview_import_comic_metadata_result_dto(PreviewImportComicMetadataResultDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.wouldApply, serializer);
+sse_encode_i_32(self.skippedNotFound, serializer);
+sse_encode_i_32(self.skippedAmbiguous, serializer);
+sse_encode_i_32(self.wouldUpsertOrphanFacetCount, serializer);
+sse_encode_list_would_apply_sample_dto(self.samplesWouldApply, serializer);
+sse_encode_list_not_found_sample_dto(self.samplesNotFound, serializer);
+sse_encode_list_ambiguous_sample_dto(self.samplesAmbiguous, serializer);
+ }
+
+@protected void sse_encode_published_at_patch_frb_dto(PublishedAtPatchFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+switch (self) { case PublishedAtPatchFrbDto_Replace(field0: final field0): sse_encode_i_32(0, serializer); sse_encode_i_64(field0, serializer);
+case PublishedAtPatchFrbDto_Clear(): sse_encode_i_32(1, serializer);   } }
+
+@protected void sse_encode_reader_page_dto(ReaderPageDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+switch (self) { case ReaderPageDto_FilePath(path: final path): sse_encode_i_32(0, serializer); sse_encode_String(path, serializer);
+case ReaderPageDto_Bytes(data: final data): sse_encode_i_32(1, serializer); sse_encode_list_prim_u_8_strict(data, serializer);
+  } }
+
+@protected void sse_encode_reader_page_list_dto(ReaderPageListDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.resourceType, serializer);
+sse_encode_i_32(self.pageCount, serializer);
+sse_encode_list_String(self.dirPagePaths, serializer);
+ }
+
+@protected void sse_encode_reading_history_dto(ReadingHistoryDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.comicId, serializer);
+sse_encode_String(self.title, serializer);
+sse_encode_i_64(self.lastReadTimeMs, serializer);
+sse_encode_opt_box_autoadd_i_32(self.pageIndex, serializer);
+ }
+
+@protected void sse_encode_refresh_library_result_frb_dto(RefreshLibraryResultFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.succeeded, serializer);
+sse_encode_i_32(self.failed, serializer);
+sse_encode_bool(self.cancelled, serializer);
+sse_encode_bool(self.skipped, serializer);
+sse_encode_opt_String(self.skipMessage, serializer);
+ }
+
+@protected void sse_encode_refresh_series_result_frb_dto(RefreshSeriesResultFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.succeeded, serializer);
+sse_encode_i_32(self.failed, serializer);
+sse_encode_bool(self.cancelled, serializer);
+ }
+
+@protected void sse_encode_remote_library_credential_dto(RemoteLibraryCredentialDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.libraryId, serializer);
+sse_encode_String(self.password, serializer);
+ }
+
+@protected void sse_encode_resource_format_category_dto(ResourceFormatCategoryDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_scalar_patch_frb_dto(ScalarPatchFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+switch (self) { case ScalarPatchFrbDto_Replace(field0: final field0): sse_encode_i_32(0, serializer); sse_encode_String(field0, serializer);
+case ScalarPatchFrbDto_Clear(): sse_encode_i_32(1, serializer);   } }
+
+@protected void sse_encode_scan_interval_dto(ScanIntervalDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_series_comic_order_entry_dto(SeriesComicOrderEntryDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.key, serializer);
+sse_encode_f_64(self.sortOrder, serializer);
+ }
+
+@protected void sse_encode_series_comic_page_item_dto(SeriesComicPageItemDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_comic_dto(self.comic, serializer);
+sse_encode_f_64(self.sortOrder, serializer);
+sse_encode_bool(self.sortOrderLocked, serializer);
+ }
+
+@protected void sse_encode_series_comics_metadata_dto(SeriesComicsMetadataDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_String(self.authors, serializer);
+sse_encode_list_String(self.tags, serializer);
+sse_encode_bool(self.hasR18, serializer);
+sse_encode_list_String(self.languages, serializer);
+sse_encode_list_String(self.parodies, serializer);
+sse_encode_list_String(self.characters, serializer);
+ }
+
+@protected void sse_encode_series_cover_source_dto(SeriesCoverSourceDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+switch (self) { case SeriesCoverSourceDto_CustomThumbnail(thumbnail: final thumbnail): sse_encode_i_32(0, serializer); sse_encode_list_prim_u_8_strict(thumbnail, serializer);
+case SeriesCoverSourceDto_FallbackComic(comicId: final comicId): sse_encode_i_32(1, serializer); sse_encode_String(comicId, serializer);
+case SeriesCoverSourceDto_Missing(): sse_encode_i_32(2, serializer);   } }
+
+@protected void sse_encode_series_dto(SeriesDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.seriesId, serializer);
+sse_encode_String(self.folderPath, serializer);
+sse_encode_String(self.name, serializer);
+sse_encode_String(self.serializationStatus, serializer);
+sse_encode_opt_box_autoadd_i_32(self.totalCount, serializer);
+sse_encode_series_meta_locks_dto(self.locks, serializer);
+sse_encode_list_series_item_dto(self.items, serializer);
+ }
+
+@protected void sse_encode_series_filter_dto(SeriesFilterDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_bool(self.showR18, serializer);
+sse_encode_bool(self.r18Only, serializer);
+sse_encode_opt_String(self.query, serializer);
+sse_encode_bool(self.requireItems, serializer);
+sse_encode_opt_String(self.serializationStatus, serializer);
+sse_encode_opt_String(self.libraryId, serializer);
+sse_encode_bool(self.preferLibraryRootSeries, serializer);
+ }
+
+@protected void sse_encode_series_item_dto(SeriesItemDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.seriesId, serializer);
+sse_encode_String(self.comicId, serializer);
+sse_encode_f_64(self.sortOrder, serializer);
+sse_encode_bool(self.sortOrderLocked, serializer);
+ }
+
+@protected void sse_encode_series_meta_locks_dto(SeriesMetaLocksDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_bool(self.name, serializer);
+sse_encode_bool(self.serializationStatus, serializer);
+sse_encode_bool(self.totalCount, serializer);
+ }
+
+@protected void sse_encode_series_reading_context_dto(SeriesReadingContextDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.seriesId, serializer);
+sse_encode_String(self.seriesName, serializer);
+sse_encode_list_String(self.orderedComicIds, serializer);
+sse_encode_i_32(self.currentIndex, serializer);
+ }
+
+@protected void sse_encode_series_sort_field_dto(SeriesSortFieldDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_series_sort_option_dto(SeriesSortOptionDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_series_sort_field_dto(self.field, serializer);
+sse_encode_bool(self.descending, serializer);
+ }
+
+@protected void sse_encode_series_thumbnail_dto(SeriesThumbnailDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_prim_u_8_strict(self.thumbnail, serializer);
+sse_encode_String(self.sourceComicId, serializer);
+sse_encode_i_32(self.sourcePageIndex, serializer);
+ }
+
+@protected void sse_encode_set_comic_meta_locks_frb_dto(SetComicMetaLocksFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_opt_box_autoadd_bool(self.title, serializer);
+sse_encode_opt_box_autoadd_bool(self.description, serializer);
+sse_encode_opt_box_autoadd_bool(self.publishedAt, serializer);
+sse_encode_opt_box_autoadd_bool(self.contentRating, serializer);
+sse_encode_opt_box_autoadd_bool(self.authors, serializer);
+sse_encode_opt_box_autoadd_bool(self.tags, serializer);
+sse_encode_opt_box_autoadd_bool(self.languages, serializer);
+sse_encode_opt_box_autoadd_bool(self.parodies, serializer);
+sse_encode_opt_box_autoadd_bool(self.characters, serializer);
+ }
+
+@protected void sse_encode_set_series_meta_locks_dto(SetSeriesMetaLocksDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_opt_box_autoadd_bool(self.name, serializer);
+sse_encode_opt_box_autoadd_bool(self.serializationStatus, serializer);
+sse_encode_opt_box_autoadd_bool(self.totalCount, serializer);
+ }
+
+@protected void sse_encode_sync_library_phase_dto(SyncLibraryPhaseDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_sync_library_progress_dto(SyncLibraryProgressDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_sync_library_phase_dto(self.phase, serializer);
+sse_encode_sync_library_route_dto(self.route, serializer);
+sse_encode_opt_String(self.currentPath, serializer);
+sse_encode_i_32(self.acceptedTotal, serializer);
+sse_encode_library_sync_counts_dto(self.counts, serializer);
+sse_encode_opt_box_autoadd_i_32(self.removedCount, serializer);
+sse_encode_opt_box_autoadd_i_32(self.addedCount, serializer);
+sse_encode_opt_box_autoadd_i_32(self.keptCount, serializer);
+sse_encode_opt_box_autoadd_i_32(self.migratedCount, serializer);
+sse_encode_opt_box_autoadd_i_32(self.thumbnailTotal, serializer);
+sse_encode_opt_box_autoadd_i_32(self.thumbnailDone, serializer);
+sse_encode_opt_box_autoadd_i_32(self.thumbnailFailedCount, serializer);
+sse_encode_opt_String(self.errorMessage, serializer);
+ }
+
+@protected void sse_encode_sync_library_route_dto(SyncLibraryRouteDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_sync_scan_mode_dto(SyncScanModeDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_tag_dictionary_import_result_dto(TagDictionaryImportResultDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.added, serializer);
+sse_encode_i_32(self.skippedExisting, serializer);
+sse_encode_i_32(self.skippedFilteredOrEmptyOrDedupe, serializer);
+ }
+
+@protected void sse_encode_tag_paged_names_dto(TagPagedNamesDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_list_String(self.items, serializer);
+sse_encode_i_64(self.totalCount, serializer);
+sse_encode_i_32(self.page, serializer);
+sse_encode_i_32(self.pageSize, serializer);
+ }
+
+@protected void sse_encode_thumbnail_event_dto(ThumbnailEventDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+switch (self) { case ThumbnailEventDto_Ready(comicId: final comicId): sse_encode_i_32(0, serializer); sse_encode_String(comicId, serializer);
+case ThumbnailEventDto_Progress(done: final done,total: final total,failed: final failed): sse_encode_i_32(1, serializer); sse_encode_i_32(done, serializer);
+sse_encode_i_32(total, serializer);
+sse_encode_i_32(failed, serializer);
+  } }
+
+@protected void sse_encode_thumbnail_priority_dto(ThumbnailPriorityDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_32(self.index, serializer); }
+
+@protected void sse_encode_trashed_comic_counts_frb_dto(TrashedComicCountsFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_i_64(self.total, serializer);
+sse_encode_i_64(self.local, serializer);
+sse_encode_i_64(self.remote, serializer);
+ }
+
+@protected void sse_encode_trashed_comic_frb_dto(TrashedComicFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_comic_dto(self.comic, serializer);
+sse_encode_i_64(self.deletedAt, serializer);
+sse_encode_String(self.libraryName, serializer);
+sse_encode_String(self.libraryKind, serializer);
+ }
+
+@protected void sse_encode_u_64(BigInt self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+serializer.buffer.putBigUint64(self); }
+
+@protected void sse_encode_u_8(int self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+serializer.buffer.putUint8(self); }
+
+@protected void sse_encode_unit(void self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+ }
+
+@protected void sse_encode_update_comic_user_meta_frb_dto(UpdateComicUserMetaFrbDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_opt_String(self.title, serializer);
+sse_encode_opt_String(self.contentRating, serializer);
+sse_encode_opt_String(self.description, serializer);
+sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
+sse_encode_opt_list_String(self.authors, serializer);
+sse_encode_opt_list_String(self.tags, serializer);
+sse_encode_opt_list_String(self.languages, serializer);
+sse_encode_opt_list_String(self.parodies, serializer);
+sse_encode_opt_list_String(self.characters, serializer);
+ }
+
+@protected void sse_encode_update_series_user_meta_dto(UpdateSeriesUserMetaDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_opt_String(self.name, serializer);
+sse_encode_opt_String(self.serializationStatus, serializer);
+sse_encode_opt_box_autoadd_i_32(self.totalCount, serializer);
+sse_encode_bool(self.clearTotalCount, serializer);
+ }
+
+@protected void sse_encode_usize(BigInt self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+serializer.buffer.putBigUint64(self); }
+
+@protected void sse_encode_would_apply_sample_dto(WouldApplySampleDto self, SseSerializer serializer){ // Codec=Sse (Serialization based), see doc to use other codecs
+sse_encode_String(self.comicId, serializer);
+sse_encode_String(self.path, serializer);
+sse_encode_String(self.title, serializer);
+sse_encode_String(self.matchedComicId, serializer);
+sse_encode_opt_box_autoadd_match_tier_dto(self.matchTier, serializer);
+ }
+                }
+                
+
+            @sealed class SyncHandleDtoImpl extends RustOpaque implements SyncHandleDto {
+                // Not to be used by end users
+                SyncHandleDtoImpl.frbInternalDcoDecode(List<dynamic> wire):
+                    super.frbInternalDcoDecode(wire, _kStaticData);
+
+                // Not to be used by end users
+                SyncHandleDtoImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative):
+                    super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+                static final _kStaticData = RustArcStaticData(
+                    rustArcIncrementStrongCount: RustLib.instance.api.rust_arc_increment_strong_count_SyncHandleDto,
+                    rustArcDecrementStrongCount: RustLib.instance.api.rust_arc_decrement_strong_count_SyncHandleDto,
+                    rustArcDecrementStrongCountPtr: RustLib.instance.api.rust_arc_decrement_strong_count_SyncHandleDtoPtr,
+                );
+
+                
+            }

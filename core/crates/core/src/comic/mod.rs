@@ -1,6 +1,7 @@
 pub mod bulk_patch;
 mod dto;
 mod filter_predicate;
+mod grouping;
 mod page_query;
 pub mod pagination;
 pub mod repository;
@@ -12,6 +13,7 @@ pub use bulk_patch::{
     apply_comic_metadata_bulk_patch, BulkPatchResultDto, ComicMetadataBulkPatch, MultiValueOp,
     MultiValuePatch, PublishedAtPatch, ScalarPatch, BULK_PATCH_MAX_IDS,
 };
+pub use grouping::ComicGrouping;
 pub use dto::{
     now_ms, parse_languages_json, serialize_languages, ComicDto, ComicFilterDto, ComicMetaLocks,
     ComicSortFieldDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
