@@ -111,11 +111,11 @@ _Avoid_: 同步、刷新（太泛，未体现镜像语义）
 _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
 
 **Supported resource formats**:
-按 Library 配置的、Library sync 会收录的 Resource 格式范围；按 Format group 勾选。未启用分组下的 Resource 不进入该次扫描结果，库中对应 Comic 按 orphan 删除。默认值与 Local / Remote 首版能力见产品定位；取消勾选仅在下次 sync 生效。
+按 Library 配置的、Library sync 会收录的 Resource 格式范围；按 Resource format category 勾选。未启用分组下的 Resource 不进入该次扫描结果，库中对应 Comic 按 orphan 删除。默认值与 Local / Remote 首版能力见产品定位；取消勾选仅在下次 sync 生效。
 _Avoid_: 媒体类型（库页浏览筛选用语）、导入格式、全局唯一一份格式设置（已改为每库）
 
-**Format group**:
-Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。分组到 `resource_type` 的展开由 core 维护。Remote library 首版不收录 `folder`。
+**Resource format category**（资源格式类别）:
+Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。归类到 `resource_type` 的展开由 core 维护。Remote library 首版不收录 `folder`。
 _Avoid_: 扩展名列表（用户设置层用分组）
 
 **Scan on startup**:
@@ -160,16 +160,16 @@ _Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
 Library browse preference：Series 浏览列表中，开启时若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
 _Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
 
-**Expand by series**:
-Library browse preference：Comics 浏览列表中，开启时仍为扁平 Comic 列表，但按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」展开；开启时忽略 Comics 排序字段。默认开启；非视觉分组/折叠，也不共用 Prefer library root series 开关。
-_Avoid_: 分组浏览、按系列折叠、group by series、系列模式列表
+**Group by series**（按系列分组）:
+Library browse preference（分组方式 `bySeries`）：Comics 浏览列表保持扁平（无分组标题、无折叠），按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」排序；分组开启时忽略 Comics 排序字段。默认开启；不是视觉分组或折叠，也不共用 Prefer library root series 开关。
+_Avoid_: 按系列展开、expand by series、按系列折叠、系列模式列表
 
 **App preference**:
 应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
 _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
 
 **Library browse preference**:
-库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Expand by series、Prefer library root series、Smart facet match、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
+库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Group by series、Prefer library root series、Smart facet match、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
 _Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
 
 **Library property**:
