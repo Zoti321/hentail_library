@@ -63,22 +63,23 @@ void main() {
     expect(find.byType(M3ESearchBar), findsOneWidget);
   });
 
-  testWidgets('below expanded breakpoint uses compact app bar not desktop search', (
-    WidgetTester tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(600, 768));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+  testWidgets(
+    'below expanded breakpoint uses compact app bar not desktop search',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 768));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await pumpMd3eApp(
-      tester,
-      home: Md3eDesktopShell(width: 600, height: 768),
-    );
+      await pumpMd3eApp(
+        tester,
+        home: Md3eDesktopShell(width: 600, height: 768),
+      );
 
-    expect(find.byType(Md3eShellCompactAppBar), findsOneWidget);
-    expect(find.byType(Md3eNavigationRail), findsNothing);
-    expect(find.byType(M3ESearchBar), findsNothing);
-    expect(find.byIcon(Icons.menu), findsOneWidget);
-  });
+      expect(find.byType(Md3eShellCompactAppBar), findsOneWidget);
+      expect(find.byType(Md3eNavigationRail), findsNothing);
+      expect(find.byType(M3ESearchBar), findsNothing);
+      expect(find.byIcon(Icons.menu), findsOneWidget);
+    },
+  );
 
   testWidgets('below expanded breakpoint hides desktop window controls', (
     WidgetTester tester,
@@ -86,10 +87,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(600, 768));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await pumpMd3eApp(
-      tester,
-      home: Md3eDesktopShell(width: 600, height: 768),
-    );
+    await pumpMd3eApp(tester, home: Md3eDesktopShell(width: 600, height: 768));
 
     expect(find.byIcon(Icons.remove), findsNothing);
     expect(find.byIcon(Icons.close), findsNothing);
@@ -101,10 +99,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(1024, 768));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await pumpMd3eApp(
-      tester,
-      home: Md3eDesktopShell(width: 1024, height: 768),
-    );
+    await pumpMd3eApp(tester, home: Md3eDesktopShell(width: 1024, height: 768));
 
     final Finder titleBar = find.byType(Md3eDesktopTitleBar);
     final Finder pane = find.byType(Md3eDesktopShellPane);
@@ -121,10 +116,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(1024, 768));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await pumpMd3eApp(
-      tester,
-      home: Md3eDesktopShell(width: 1024, height: 768),
-    );
+    await pumpMd3eApp(tester, home: Md3eDesktopShell(width: 1024, height: 768));
     await tester.pumpAndSettle();
 
     final Rect searchRect = tester.getRect(find.byType(M3ESearchBar));
@@ -145,31 +137,33 @@ void main() {
     );
   });
 
-  testWidgets('expanded rail at expanded breakpoint does not overflow title bar', (
-    WidgetTester tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(848, 768));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+  testWidgets(
+    'expanded rail at expanded breakpoint does not overflow title bar',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(848, 768));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await pumpMd3eApp(
-      tester,
-      home: Md3eDesktopShell(
-        width: 848,
-        height: 768,
-        initialRailExtended: true,
-      ),
-    );
+      await pumpMd3eApp(
+        tester,
+        home: Md3eDesktopShell(
+          width: 848,
+          height: 768,
+          initialRailExtended: true,
+        ),
+      );
 
-    expect(tester.takeException(), isNull);
-  });
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('compact and medium drill into library secondary from modal rail', (
     WidgetTester tester,
   ) async {
     Future<void> pumpAndSelectLibrary(double width) async {
       const String targetId = 'lab-remote-nas';
-      final String targetName =
-          Md3eLabLibraryCatalog.displayNameForId(targetId);
+      final String targetName = Md3eLabLibraryCatalog.displayNameForId(
+        targetId,
+      );
       Md3eShellNavigationSnapshot? lastSnapshot;
 
       await tester.binding.setSurfaceSize(Size(width, 768));
@@ -208,6 +202,49 @@ void main() {
     await pumpAndSelectLibrary(600);
   });
 
+  testWidgets(
+    'compact settings hides shell menu and back returns to previous destination',
+    (WidgetTester tester) async {
+      Md3eShellNavigationSnapshot? lastSnapshot;
+
+      await tester.binding.setSurfaceSize(const Size(390, 768));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await pumpMd3eApp(
+        tester,
+        home: Md3eDesktopShell(
+          width: 390,
+          height: 768,
+          paneBuilder: (_, navigation) {
+            lastSnapshot = navigation;
+            return Text('pane:${navigation.destinationIndex}');
+          },
+        ),
+      );
+
+      final int previousIndex = lastSnapshot!.destinationIndex;
+      expect(find.byIcon(Icons.menu), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.settings_outlined));
+      await tester.pumpAndSettle();
+
+      expect(
+        lastSnapshot?.destinationIndex,
+        Md3eShellNavigation.settingsDestinationIndex,
+      );
+      expect(find.byIcon(Icons.menu), findsNothing);
+      expect(lastSnapshot?.onBackToPreviousDestination, isNotNull);
+
+      lastSnapshot!.onBackToPreviousDestination!();
+      await tester.pumpAndSettle();
+
+      expect(lastSnapshot?.destinationIndex, previousIndex);
+      expect(find.text('pane:$previousIndex'), findsOneWidget);
+      expect(find.byIcon(Icons.menu), findsOneWidget);
+    },
+  );
+
   testWidgets('expanded shell hover opens library flyout and selects library', (
     WidgetTester tester,
   ) async {
@@ -215,8 +252,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     const String targetId = 'lab-local-archive';
-    final String targetName =
-        Md3eLabLibraryCatalog.displayNameForId(targetId);
+    final String targetName = Md3eLabLibraryCatalog.displayNameForId(targetId);
     Md3eShellNavigationSnapshot? lastSnapshot;
 
     await pumpMd3eApp(
@@ -227,7 +263,9 @@ void main() {
         initialRailExtended: false,
         paneBuilder: (_, navigation) {
           lastSnapshot = navigation;
-          return Text('${navigation.selectedLibraryId}:${navigation.selectedLibraryDisplayName}');
+          return Text(
+            '${navigation.selectedLibraryId}:${navigation.selectedLibraryDisplayName}',
+          );
         },
       ),
     );
@@ -240,7 +278,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(lastSnapshot?.selectedLibraryId, targetId);
-    expect(lastSnapshot?.destinationIndex, Md3eShellNavigation.libraryDestinationIndex);
+    expect(
+      lastSnapshot?.destinationIndex,
+      Md3eShellNavigation.libraryDestinationIndex,
+    );
   });
 
   testWidgets('title band search aligns at 32dp on expanded shell', (
@@ -249,10 +290,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(1024, 768));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    await pumpMd3eApp(
-      tester,
-      home: Md3eDesktopShell(width: 1024, height: 768),
-    );
+    await pumpMd3eApp(tester, home: Md3eDesktopShell(width: 1024, height: 768));
     await tester.pumpAndSettle();
 
     const double titleBandCenter = 32;

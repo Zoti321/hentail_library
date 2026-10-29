@@ -34,11 +34,11 @@ class _Md3eLabAppPrototype extends StatelessWidget {
       case Md3eShellNavigation.managementDestinationIndex:
         return const Md3eManagementBrowsePageLabHost();
       case Md3eShellNavigation.historyDestinationIndex:
-        return Md3eHistoryBrowsePageLabHost(
-          clock: DateTime(2026, 6, 15, 14),
-        );
+        return Md3eHistoryBrowsePageLabHost(clock: DateTime(2026, 6, 15, 14));
       case Md3eShellNavigation.settingsDestinationIndex:
-        return const Md3eSettingsPageLabHost();
+        return Md3eSettingsPageLabHost(
+          onBack: navigation.onBackToPreviousDestination,
+        );
       default:
         return const Md3eHomePageLabHost();
     }

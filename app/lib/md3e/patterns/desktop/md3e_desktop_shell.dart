@@ -76,6 +76,7 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   late String _selectedLibraryId = widget.initialLibraryId;
   bool _librarySecondaryOpen = false;
   bool _compactModalRailOpen = false;
+  int? _previousCompactDestinationIndex;
   bool _compactModalLibrarySecondaryOpen = false;
   Timer? _secondaryOpenTimer;
   Timer? _secondaryCloseTimer;
@@ -99,7 +100,26 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       destinationIndex: _selectedIndex,
       selectedLibraryId: _selectedLibraryId,
       selectedLibraryDisplayName: _selectedLibraryDisplayName,
+      onBackToPreviousDestination: _canBackToPreviousCompactDestination
+          ? _onBackToPreviousCompactDestination
+          : null,
     );
+  }
+
+  bool get _canBackToPreviousCompactDestination {
+    return !(_usesExpandedNavigation ?? false) &&
+        _previousCompactDestinationIndex != null;
+  }
+
+  void _onBackToPreviousCompactDestination() {
+    final int? previous = _previousCompactDestinationIndex;
+    if (previous == null) {
+      return;
+    }
+    setState(() {
+      _selectedIndex = previous;
+      _previousCompactDestinationIndex = null;
+    });
   }
 
   void _syncShellLayout(double width) {
@@ -186,6 +206,9 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       return;
     }
     setState(() {
+      if (index != _selectedIndex) {
+        _previousCompactDestinationIndex = _selectedIndex;
+      }
       _selectedIndex = index;
       _compactModalRailOpen = false;
       _compactModalLibrarySecondaryOpen = false;
@@ -214,19 +237,26 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     required Md3eDesktopShellSurfaceRoles surfaces,
     required Widget pane,
   }) {
+    final bool isSettings =
+        _selectedIndex == Md3eShellNavigation.settingsDestinationIndex;
+    final Widget paneWithChrome = Md3eDesktopShellPane(
+      showDecoration: false,
+      child: pane,
+    );
     return ColoredBox(
       color: surfaces.contentPaneBackground,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Md3eShellCompactAppBar(
-            onMenuPressed: _openCompactModalRail,
-          ),
-          Expanded(
-            child: Md3eDesktopShellPane(
-              showDecoration: false,
-              child: pane,
+          // 设置页自带返回/标题工具栏，不再显示壳层左上角菜单按钮。
+          if (!isSettings)
+            Md3eShellCompactAppBar(
+              onMenuPressed: _openCompactModalRail,
             ),
+          Expanded(
+            child: isSettings
+                ? SafeArea(bottom: false, child: paneWithChrome)
+                : paneWithChrome,
           ),
         ],
       ),

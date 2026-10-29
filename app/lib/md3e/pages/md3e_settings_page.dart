@@ -19,12 +19,16 @@ class Md3eSettingsPage extends StatefulWidget {
     this.masterGroupTitle = '应用',
     this.labState = const Md3eSettingsLabState(),
     this.onLabStateChanged,
+    this.onBack,
   });
 
   final Md3eSettingsCategory initialCategory;
   final String? masterGroupTitle;
   final Md3eSettingsLabState labState;
   final ValueChanged<Md3eSettingsLabState>? onLabStateChanged;
+
+  /// 列表页（非 list-detail）返回：由外层决定回到哪里（壳层上一目的地 / 路由）。
+  final VoidCallback? onBack;
 
   @override
   State<Md3eSettingsPage> createState() => _Md3eSettingsPageState();
@@ -57,8 +61,36 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
     });
   }
 
+  /// 头部返回按钮与系统返回共用：窄屏详情先回分类列表，列表页交给 [Md3eSettingsPage.onBack] 或路由。
+  void _handleBack() {
+    if (_showingNarrowDetail) {
+      setState(() => _showingNarrowDetail = false);
+      return;
+    }
+    final VoidCallback? onBack = widget.onBack;
+    if (onBack != null) {
+      onBack();
+      return;
+    }
+    Navigator.maybePop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // list-detail 判断使用页面实际可用宽度（壳层 pane 可能窄于整窗），与主体布局保持一致。
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return _buildPage(
+          context,
+          listDetailWide: Md3eSettingsPageMetrics.useListDetail(
+            constraints.maxWidth,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPage(BuildContext context, {required bool listDetailWide}) {
     final double windowWidth = MediaQuery.sizeOf(context).width;
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
       windowWidth,
@@ -67,15 +99,12 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
     final double horizontalPadding =
         Md3eSettingsPageMetrics.contentHorizontalPadding(sizeClass);
 
-    final bool listDetailWide = Md3eSettingsPageMetrics.useListDetail(
-      windowWidth,
-    );
-
     return PopScope<Object?>(
-      canPop: listDetailWide || !_showingNarrowDetail,
+      canPop:
+          listDetailWide || (!_showingNarrowDetail && widget.onBack == null),
       onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (!didPop && _showingNarrowDetail) {
-          setState(() => _showingNarrowDetail = false);
+        if (!didPop) {
+          _handleBack();
         }
       },
       child: Column(
@@ -93,7 +122,11 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
                     (!listDetailWide && _showingNarrowDetail)
                     ? selectedInfo.label(l10n)
                     : null;
-                return Md3eSettingsPageHeader(title: headerTitle);
+                return Md3eSettingsPageHeader(
+                  title: headerTitle,
+                  showBack: !listDetailWide,
+                  onBack: _handleBack,
+                );
               },
             ),
           ),

@@ -9,11 +9,13 @@ class Md3eSettingsPageLabHost extends StatefulWidget {
     this.initialCategory = Md3eSettingsCategory.personalization,
     this.masterGroupTitle = '应用',
     this.initialLabState = const Md3eSettingsLabState(),
+    this.onBack,
   });
 
   final Md3eSettingsCategory initialCategory;
   final String? masterGroupTitle;
   final Md3eSettingsLabState initialLabState;
+  final VoidCallback? onBack;
 
   @override
   State<Md3eSettingsPageLabHost> createState() =>
@@ -34,6 +36,7 @@ class _Md3eSettingsPageLabHostState extends State<Md3eSettingsPageLabHost> {
       masterGroupTitle: widget.masterGroupTitle,
       labState: _labState,
       onLabStateChanged: _onLabStateChanged,
+      onBack: widget.onBack,
     );
   }
 }
