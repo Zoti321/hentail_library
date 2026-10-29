@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_catalog_sheet.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_settings_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+
+/// 系列边界提示方向（与生产 `SeriesBoundaryPrompt` 语义一致，Lab 不依赖 read_session）。
+enum _SeriesBoundaryPrompt { none, advance, retreat }
 
 /// Widgetbook / Lab：本地维护页码与 chrome 显隐。
 class Md3eReaderPageLabHost extends StatefulWidget {
@@ -34,6 +39,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
   late int _page = widget.preview.initialPage;
   late String _volumeId = widget.preview.currentVolumeId;
   late String _volumeTitle = widget.preview.title;
+  _SeriesBoundaryPrompt _boundaryPrompt = _SeriesBoundaryPrompt.none;
   bool _chromeVisible = true;
   bool _fullscreen = false;
   late Md3eReaderSettingsLabState _settings = Md3eReaderSettingsLabState(
@@ -43,8 +49,64 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
   int get _total =>
       widget.preview.totalPages < 1 ? 1 : widget.preview.totalPages;
 
+  int get _volumeIndex => widget.preview.seriesVolumes.indexWhere(
+    (Md3eReaderSeriesVolumePreview volume) => volume.id == _volumeId,
+  );
+
   void _setPage(int page) {
-    setState(() => _page = page.clamp(1, _total));
+    final bool hadPrompt = _boundaryPrompt != _SeriesBoundaryPrompt.none;
+    setState(() {
+      _page = page.clamp(1, _total);
+      _boundaryPrompt = _SeriesBoundaryPrompt.none;
+    });
+    if (hadPrompt) {
+      M3ESnackbar.defaultController.dismiss();
+    }
+  }
+
+  /// 逐页翻页；越过本卷首/末页时进入边界确认（同卷内两次翻页才跨卷）。
+  void _stepPage(int delta) {
+    final int target = _page + delta;
+    if (target >= 1 && target <= _total) {
+      _setPage(target);
+      return;
+    }
+    _requestSeriesBoundary(
+      delta > 0 ? _SeriesBoundaryPrompt.advance : _SeriesBoundaryPrompt.retreat,
+    );
+  }
+
+  void _requestSeriesBoundary(_SeriesBoundaryPrompt direction) {
+    final List<Md3eReaderSeriesVolumePreview> volumes =
+        widget.preview.seriesVolumes;
+    final int current = _volumeIndex;
+    final int neighbor =
+        current + (direction == _SeriesBoundaryPrompt.advance ? 1 : -1);
+    // 无相邻卷（或当前卷不在系列内）时保持原地，不提示。
+    if (current < 0 || neighbor < 0 || neighbor >= volumes.length) {
+      return;
+    }
+
+    if (_boundaryPrompt != direction) {
+      setState(() => _boundaryPrompt = direction);
+      final AppLocalizations l10n = context.l10n;
+      final String message = switch (direction) {
+        _SeriesBoundaryPrompt.advance => l10n.readerSeriesAdvancePrompt,
+        _SeriesBoundaryPrompt.retreat => l10n.readerSeriesRetreatPrompt,
+        _SeriesBoundaryPrompt.none => '',
+      };
+      M3ESnackbar.show(context, message: message);
+      return;
+    }
+
+    final Md3eReaderSeriesVolumePreview target = volumes[neighbor];
+    setState(() {
+      _volumeId = target.id;
+      _volumeTitle = target.title;
+      _page = 1;
+      _boundaryPrompt = _SeriesBoundaryPrompt.none;
+    });
+    M3ESnackbar.defaultController.dismiss();
   }
 
   void _handleTapZone(Md3eReaderTapZone zone) {
@@ -54,9 +116,9 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
     }
     switch (zone) {
       case Md3eReaderTapZone.left:
-        _setPage(_page - 1);
+        _stepPage(-1);
       case Md3eReaderTapZone.right:
-        _setPage(_page + 1);
+        _stepPage(1);
       case Md3eReaderTapZone.center:
         setState(() => _chromeVisible = true);
     }
@@ -98,6 +160,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
             _volumeId = volume.id;
             _volumeTitle = volume.title;
             _page = 1;
+            _boundaryPrompt = _SeriesBoundaryPrompt.none;
           });
           return;
         }
@@ -124,8 +187,8 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
           : _openSeriesCatalog,
       onToggleFullscreen: () => setState(() => _fullscreen = !_fullscreen),
       onPageChanged: _setPage,
-      onPreviousPage: () => _setPage(_page - 1),
-      onNextPage: () => _setPage(_page + 1),
+      onPreviousPage: () => _stepPage(-1),
+      onNextPage: () => _stepPage(1),
       onAutoPlayChanged: (bool value) {
         setState(() => _settings = _settings.copyWith(autoPlayEnabled: value));
       },
