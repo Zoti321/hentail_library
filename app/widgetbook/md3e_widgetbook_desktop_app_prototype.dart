@@ -38,7 +38,7 @@ class _Md3eLabAppPrototype extends StatelessWidget {
           clock: DateTime(2026, 6, 15, 14),
         );
       case Md3eShellNavigation.settingsDestinationIndex:
-        return const Md3eSettingsPage();
+        return const Md3eSettingsPageLabHost();
       default:
         return const Md3eHomePageLabHost();
     }

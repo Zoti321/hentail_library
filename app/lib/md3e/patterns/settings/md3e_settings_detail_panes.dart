@@ -100,6 +100,39 @@ List<Widget> _sectionsForCategory(
           ),
         ],
       ),
+      Md3eSettingsSection(
+        title: const Text('阅读相关偏好'),
+        tiles: <Widget>[
+          Md3eSettingsNavigationTile(
+            leading: Symbols.menu_book,
+            title: Text(l10n.readerSettingsReadingMode),
+            value: Text(labState.readingModeLabel),
+            onTap: () {
+              onChanged(
+                labState.copyWith(
+                  readingModeLabel: _nextReadingModeLabel(
+                    labState.readingModeLabel,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      Md3eSettingsSection(
+        title: const Text('内容浏览'),
+        tiles: <Widget>[
+          Md3eSettingsSwitchTile(
+            leading: Symbols.shield,
+            title: const Text('Healthy mode'),
+            description: const Text('库、搜索与历史中隐藏 R18 Comic，不修改分级'),
+            value: labState.healthyMode,
+            onChanged: (bool value) {
+              onChanged(labState.copyWith(healthyMode: value));
+            },
+          ),
+        ],
+      ),
     ],
     Md3eSettingsCategory.metadataBackup => <Widget>[
       Md3eSettingsSection(
@@ -181,6 +214,20 @@ List<Widget> _sectionsForCategory(
   };
 }
 
+/// 阅读模式 preview 取值（与生产 `ReadingMode` 展示名对齐，循环切换）。
+const List<String> kMd3eSettingsReadingModeLabels = <String>[
+  '单页',
+  '双页',
+  '双页（封面独立）',
+  'Webtoon',
+];
+
+String _nextReadingModeLabel(String current) {
+  final int index = kMd3eSettingsReadingModeLabels.indexOf(current);
+  return kMd3eSettingsReadingModeLabels[(index + 1) %
+      kMd3eSettingsReadingModeLabels.length];
+}
+
 class Md3eSettingsLabState {
   const Md3eSettingsLabState({
     this.themeLabel = '深色',
@@ -188,6 +235,8 @@ class Md3eSettingsLabState {
     this.autoMetadataBackup = true,
     this.diagnosticMode = false,
     this.autoUpdate = true,
+    this.readingModeLabel = '单页',
+    this.healthyMode = false,
   });
 
   final String themeLabel;
@@ -195,6 +244,8 @@ class Md3eSettingsLabState {
   final bool autoMetadataBackup;
   final bool diagnosticMode;
   final bool autoUpdate;
+  final String readingModeLabel;
+  final bool healthyMode;
 
   Md3eSettingsLabState copyWith({
     String? themeLabel,
@@ -202,6 +253,8 @@ class Md3eSettingsLabState {
     bool? autoMetadataBackup,
     bool? diagnosticMode,
     bool? autoUpdate,
+    String? readingModeLabel,
+    bool? healthyMode,
   }) {
     return Md3eSettingsLabState(
       themeLabel: themeLabel ?? this.themeLabel,
@@ -209,6 +262,8 @@ class Md3eSettingsLabState {
       autoMetadataBackup: autoMetadataBackup ?? this.autoMetadataBackup,
       diagnosticMode: diagnosticMode ?? this.diagnosticMode,
       autoUpdate: autoUpdate ?? this.autoUpdate,
+      readingModeLabel: readingModeLabel ?? this.readingModeLabel,
+      healthyMode: healthyMode ?? this.healthyMode,
     );
   }
 }
