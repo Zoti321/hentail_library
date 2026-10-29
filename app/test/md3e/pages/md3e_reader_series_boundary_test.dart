@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_copy.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';
 
@@ -148,6 +150,37 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets(
+    'boundary snackbar is scoped to reader canvas and uses lab font',
+    (WidgetTester tester) async {
+      await _pumpHost(
+        tester,
+        const Md3eReaderPagePreviewData(
+          title: '第 01 卷',
+          totalPages: 3,
+          initialPage: 3,
+        ),
+      );
+
+      await _tapNext(tester);
+
+      expect(
+        find.descendant(
+          of: find.byType(Md3eReaderPageLabHost),
+          matching: find.byType(M3ESnackbar),
+        ),
+        findsOneWidget,
+      );
+      final BuildContext textContext = tester.element(
+        find.text(_advancePrompt),
+      );
+      expect(
+        DefaultTextStyle.of(textContext).style.fontFamily,
+        kMd3eAppFontFamily,
+      );
+    },
+  );
 
   testWidgets('moving away from boundary clears pending prompt', (
     WidgetTester tester,
