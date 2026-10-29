@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_settings_page_metrics.dart';
+import 'package:hentai_library/md3e/patterns/settings/md3e_metadata_backup_import_lab_flow.dart';
 import 'package:hentai_library/md3e/patterns/settings/md3e_settings_catalog.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_settings_list.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
@@ -163,6 +164,12 @@ List<Widget> _sectionsForCategory(
             title: Text(l10n.settingsMetadataBackupOpenFolderLabel),
             description: Text(l10n.settingsMetadataBackupOpenFolderDescription),
             onTap: () {},
+          ),
+          Md3eSettingsNavigationTile(
+            leading: Symbols.restore,
+            title: Text(l10n.settingsMetadataBackupImportLabel),
+            description: Text(l10n.settingsMetadataBackupImportDescription),
+            onTap: () => showMd3eMetadataBackupImportLabFlow(context),
           ),
         ],
       ),
