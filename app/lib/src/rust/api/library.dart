@@ -10,7 +10,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 import 'sync.dart';
 
-// These functions are ignored because they are not marked as `pub`: `map_format_group_core`, `map_format_group`, `map_scan_interval_core`, `map_scan_interval`
+// These functions are ignored because they are not marked as `pub`: `map_resource_format_category_core`, `map_resource_format_category`, `map_scan_interval_core`, `map_scan_interval`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
 
 Future<List<LibraryDto>> listLibrariesFrb() =>
@@ -63,18 +63,19 @@ Future<String?> getCurrentLibraryIdFrb() =>
 Future<void> setCurrentLibraryIdFrb({String? libraryId}) => RustLib.instance.api
     .crateApiLibrarySetCurrentLibraryIdFrb(libraryId: libraryId);
 
-LibraryDto updateLibraryFormatGroupsFrb({
+LibraryDto updateLibraryResourceFormatCategoriesFrb({
   required String libraryId,
-  required List<FormatGroupDto> groups,
-}) => RustLib.instance.api.crateApiLibraryUpdateLibraryFormatGroupsFrb(
-  libraryId: libraryId,
-  groups: groups,
-);
+  required List<ResourceFormatCategoryDto> groups,
+}) => RustLib.instance.api
+    .crateApiLibraryUpdateLibraryResourceFormatCategoriesFrb(
+      libraryId: libraryId,
+      groups: groups,
+    );
 
 LibraryDto updateLibrarySettingsFrb({
   required String libraryId,
   required String name,
-  required List<FormatGroupDto> groups,
+  required List<ResourceFormatCategoryDto> groups,
   required bool scanOnStartup,
   required ScanIntervalDto scanInterval,
 }) => RustLib.instance.api.crateApiLibraryUpdateLibrarySettingsFrb(
@@ -101,7 +102,7 @@ class LibraryDto {
   final String kind;
   final String rootPath;
   final String name;
-  final List<FormatGroupDto> enabledFormatGroups;
+  final List<ResourceFormatCategoryDto> enabledResourceFormatCategories;
   final PlatformInt64 createdAt;
   final String username;
   final bool allowHttp;
@@ -115,7 +116,7 @@ class LibraryDto {
     required this.kind,
     required this.rootPath,
     required this.name,
-    required this.enabledFormatGroups,
+    required this.enabledResourceFormatCategories,
     required this.createdAt,
     required this.username,
     required this.allowHttp,
@@ -131,7 +132,7 @@ class LibraryDto {
       kind.hashCode ^
       rootPath.hashCode ^
       name.hashCode ^
-      enabledFormatGroups.hashCode ^
+      enabledResourceFormatCategories.hashCode ^
       createdAt.hashCode ^
       username.hashCode ^
       allowHttp.hashCode ^
@@ -149,7 +150,8 @@ class LibraryDto {
           kind == other.kind &&
           rootPath == other.rootPath &&
           name == other.name &&
-          enabledFormatGroups == other.enabledFormatGroups &&
+          enabledResourceFormatCategories ==
+              other.enabledResourceFormatCategories &&
           createdAt == other.createdAt &&
           username == other.username &&
           allowHttp == other.allowHttp &&

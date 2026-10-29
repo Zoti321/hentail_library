@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -46,12 +46,12 @@ class MemoryAppSettingRepository implements AppSettingRepository {
   MemoryAppSettingRepository({
     AppSetting? initial,
     this.legacyAutoScan,
-    this.legacyEnabledFormatGroups,
+    this.legacyEnabledResourceFormatCategories,
     this.roundTripJsonOnSave = false,
   }) : _setting = initial ?? AppSetting();
 
   final bool? legacyAutoScan;
-  final List<FormatGroup>? legacyEnabledFormatGroups;
+  final List<ResourceFormatCategory>? legacyEnabledResourceFormatCategories;
   final bool roundTripJsonOnSave;
 
   AppSetting _setting;
@@ -71,8 +71,8 @@ class MemoryAppSettingRepository implements AppSettingRepository {
   Future<bool?> peekLegacyAutoScan() async => legacyAutoScan;
 
   @override
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async =>
-      legacyEnabledFormatGroups;
+  Future<List<ResourceFormatCategory>?> peekLegacyEnabledResourceFormatCategories() async =>
+      legacyEnabledResourceFormatCategories;
 
   @override
   Future<void> clearLegacyImportPayload() async {

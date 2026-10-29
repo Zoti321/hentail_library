@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 
@@ -216,12 +216,12 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     };
   }
 
-  String formatGroupLabel(FormatGroup group) {
+  String resourceFormatCategoryLabel(ResourceFormatCategory group) {
     return switch (group) {
-      FormatGroup.folder => settingsFormatGroupFolder,
-      FormatGroup.pdf => settingsFormatGroupPdf,
-      FormatGroup.epub => settingsFormatGroupEpub,
-      FormatGroup.archive => settingsFormatGroupArchive,
+      ResourceFormatCategory.folder => settingsFormatGroupFolder,
+      ResourceFormatCategory.pdf => settingsFormatGroupPdf,
+      ResourceFormatCategory.epub => settingsFormatGroupEpub,
+      ResourceFormatCategory.archive => settingsFormatGroupArchive,
     };
   }
 

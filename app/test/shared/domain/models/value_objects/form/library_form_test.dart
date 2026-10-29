@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
@@ -10,7 +10,7 @@ class _RecordingLibraryRepository implements LibraryRepository {
   String? lastName;
   String? lastRoot;
   String? lastPassword;
-  List<FormatGroup>? lastGroups;
+  List<ResourceFormatCategory>? lastGroups;
   bool? lastScanOnStartup;
   ScanInterval? lastScanInterval;
 
@@ -77,7 +77,7 @@ class _RecordingLibraryRepository implements LibraryRepository {
   Future<LocalLibrary> updateSettings({
     required String libraryId,
     required String name,
-    required List<FormatGroup> groups,
+    required List<ResourceFormatCategory> groups,
     required bool scanOnStartup,
     required ScanInterval scanInterval,
   }) async {
@@ -99,7 +99,7 @@ LocalLibrary _lib({
   required String name,
   String username = '',
   bool allowHttp = false,
-  List<FormatGroup>? groups,
+  List<ResourceFormatCategory>? groups,
   bool scanOnStartup = false,
   ScanInterval scanInterval = ScanInterval.disabled,
 }) {
@@ -108,15 +108,15 @@ LocalLibrary _lib({
     kind: kind,
     rootPath: root,
     name: name,
-    enabledFormatGroups:
+    enabledResourceFormatCategories:
         groups ??
         (kind == 'remote'
-            ? <FormatGroup>[
-                FormatGroup.pdf,
-                FormatGroup.epub,
-                FormatGroup.archive,
+            ? <ResourceFormatCategory>[
+                ResourceFormatCategory.pdf,
+                ResourceFormatCategory.epub,
+                ResourceFormatCategory.archive,
               ]
-            : FormatGroup.all),
+            : ResourceFormatCategory.all),
     username: username,
     allowHttp: allowHttp,
     scanOnStartup: scanOnStartup,

@@ -230,7 +230,7 @@ async fn sync_one_library(
         &ctx,
         handle,
         force_full_parse,
-        &library.enabled_format_groups,
+        &library.enabled_resource_format_categories,
     )?;
     for item in &mut scan_items {
         item.comic.library_id = library.library_id.clone();
@@ -295,7 +295,7 @@ async fn sync_remote_library(
         &library.root_path,
         &ctx,
         handle,
-        &library.enabled_format_groups,
+        &library.enabled_resource_format_categories,
     )?;
     let mut scan_items = match outcome {
         RemoteScanOutcome::Unreachable { message } => {

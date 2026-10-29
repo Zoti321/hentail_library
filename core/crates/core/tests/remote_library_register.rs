@@ -1,6 +1,6 @@
 mod common;
 
-use hentai_core::sync::format_group::FormatGroup;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::{
     connection, create_remote_library, delete_library, init_db_at_path, list_libraries,
     update_remote_library,
@@ -9,7 +9,7 @@ use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
 
 #[test]
-fn create_remote_library_defaults_https_and_remote_format_groups() {
+fn create_remote_library_defaults_https_and_remote_resource_format_categories() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = common::create_fixture_db(temp.path());
@@ -26,8 +26,8 @@ fn create_remote_library_defaults_https_and_remote_format_groups() {
             assert_eq!(lib.username, "alice");
             assert!(!lib.allow_http);
             assert_eq!(
-                lib.enabled_format_groups,
-                vec![FormatGroup::Pdf, FormatGroup::Epub, FormatGroup::Archive]
+                lib.enabled_resource_format_categories,
+                vec![ResourceFormatCategory::Pdf, ResourceFormatCategory::Epub, ResourceFormatCategory::Archive]
             );
 
             let db = connection().expect("db");

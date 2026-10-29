@@ -1,6 +1,6 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/features/library_admin/data/repositories/flutter_secure_remote_library_credential_store.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -142,15 +142,15 @@ class LibraryRepositoryImpl implements LibraryRepository {
   }
 
   @override
-  Future<LocalLibrary> updateFormatGroups({
+  Future<LocalLibrary> updateResourceFormatCategories({
     required String libraryId,
-    required List<FormatGroup> groups,
+    required List<ResourceFormatCategory> groups,
   }) async {
     return guardFrbSync(
       () => _mapLibrary(
-        rust.updateLibraryFormatGroupsFrb(
+        rust.updateLibraryResourceFormatCategoriesFrb(
           libraryId: libraryId,
-          groups: groups.map(_mapFormatGroup).toList(growable: false),
+          groups: groups.map(_mapResourceFormatCategory).toList(growable: false),
         ),
       ),
       fallbackMessage: '更新库格式失败',
@@ -161,7 +161,7 @@ class LibraryRepositoryImpl implements LibraryRepository {
   Future<LocalLibrary> updateSettings({
     required String libraryId,
     required String name,
-    required List<FormatGroup> groups,
+    required List<ResourceFormatCategory> groups,
     required bool scanOnStartup,
     required ScanInterval scanInterval,
   }) async {
@@ -170,7 +170,7 @@ class LibraryRepositoryImpl implements LibraryRepository {
         rust.updateLibrarySettingsFrb(
           libraryId: libraryId,
           name: name,
-          groups: groups.map(_mapFormatGroup).toList(growable: false),
+          groups: groups.map(_mapResourceFormatCategory).toList(growable: false),
           scanOnStartup: scanOnStartup,
           scanInterval: _mapScanInterval(scanInterval),
         ),
@@ -223,8 +223,8 @@ LocalLibrary _mapLibrary(rust.LibraryDto dto) {
     kind: dto.kind,
     rootPath: dto.rootPath,
     name: dto.name,
-    enabledFormatGroups: dto.enabledFormatGroups
-        .map(_mapFormatGroupFromRust)
+    enabledResourceFormatCategories: dto.enabledResourceFormatCategories
+        .map(_mapResourceFormatCategoryFromRust)
         .toList(growable: false),
     username: dto.username,
     allowHttp: dto.allowHttp,
@@ -235,21 +235,21 @@ LocalLibrary _mapLibrary(rust.LibraryDto dto) {
   );
 }
 
-rust_sync.FormatGroupDto _mapFormatGroup(FormatGroup group) {
+rust_sync.ResourceFormatCategoryDto _mapResourceFormatCategory(ResourceFormatCategory group) {
   return switch (group) {
-    FormatGroup.folder => rust_sync.FormatGroupDto.folder,
-    FormatGroup.pdf => rust_sync.FormatGroupDto.pdf,
-    FormatGroup.epub => rust_sync.FormatGroupDto.epub,
-    FormatGroup.archive => rust_sync.FormatGroupDto.archive,
+    ResourceFormatCategory.folder => rust_sync.ResourceFormatCategoryDto.folder,
+    ResourceFormatCategory.pdf => rust_sync.ResourceFormatCategoryDto.pdf,
+    ResourceFormatCategory.epub => rust_sync.ResourceFormatCategoryDto.epub,
+    ResourceFormatCategory.archive => rust_sync.ResourceFormatCategoryDto.archive,
   };
 }
 
-FormatGroup _mapFormatGroupFromRust(rust_sync.FormatGroupDto group) {
+ResourceFormatCategory _mapResourceFormatCategoryFromRust(rust_sync.ResourceFormatCategoryDto group) {
   return switch (group) {
-    rust_sync.FormatGroupDto.folder => FormatGroup.folder,
-    rust_sync.FormatGroupDto.pdf => FormatGroup.pdf,
-    rust_sync.FormatGroupDto.epub => FormatGroup.epub,
-    rust_sync.FormatGroupDto.archive => FormatGroup.archive,
+    rust_sync.ResourceFormatCategoryDto.folder => ResourceFormatCategory.folder,
+    rust_sync.ResourceFormatCategoryDto.pdf => ResourceFormatCategory.pdf,
+    rust_sync.ResourceFormatCategoryDto.epub => ResourceFormatCategory.epub,
+    rust_sync.ResourceFormatCategoryDto.archive => ResourceFormatCategory.archive,
   };
 }
 

@@ -66,10 +66,10 @@ pub use home::{
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
     get_current_library_id, library_id_from_root, library_id_from_webdav_root, list_libraries,
-    normalize_webdav_root, parse_format_groups_json, parse_scan_interval,
+    normalize_webdav_root, parse_resource_format_categories_json, parse_scan_interval,
     record_library_sync_failure, record_library_sync_success, resolve_access_for_comic,
-    resolve_browse_library_id, serialize_format_groups, set_all_libraries_scan_on_startup,
-    set_current_library_id, set_remote_library_credentials, update_library_format_groups,
+    resolve_browse_library_id, serialize_resource_format_categories, set_all_libraries_scan_on_startup,
+    set_current_library_id, set_remote_library_credentials, update_library_resource_format_categories,
     update_library_settings, update_library_sidebar_layout, update_local_library_root,
     update_remote_library, LibraryDto, LibrarySidebarPlacement, RemoteLibraryCredential,
     ResolvedAccess, ScanInterval,
@@ -111,7 +111,7 @@ pub use series_id::{
 pub use sync::{
     cancel_sync, comic_id_for_remote_location, create_sync_handle, refresh_comic_metadata,
     refresh_library_metadata, refresh_series_metadata, scan_remote_lightweight, sync_library,
-    try_acquire_library_write_lock, FormatGroup, LibrarySyncCountsDto, RefreshLibraryResultDto,
+    try_acquire_library_write_lock, ResourceFormatCategory, LibrarySyncCountsDto, RefreshLibraryResultDto,
     RefreshSeriesProgressDto, RefreshSeriesResultDto, RemoteScanOutcome, SyncHandle,
     SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
 };

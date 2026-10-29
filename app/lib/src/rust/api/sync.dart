@@ -39,8 +39,6 @@ Stream<SyncLibraryProgressDto> syncLibraryFrb({
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>
 abstract class SyncHandleDto implements RustOpaqueInterface {}
 
-enum FormatGroupDto { folder, pdf, epub, archive }
-
 class LibrarySyncCountsDto {
   final int dir;
   final int zip;
@@ -115,6 +113,8 @@ class RemoteLibraryCredentialDto {
           libraryId == other.libraryId &&
           password == other.password;
 }
+
+enum ResourceFormatCategoryDto { folder, pdf, epub, archive }
 
 enum SyncLibraryPhaseDto {
   clearingLibrary,

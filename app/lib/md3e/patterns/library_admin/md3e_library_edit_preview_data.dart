@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
@@ -10,7 +10,7 @@ abstract final class Md3eLibraryEditPreviewData {
     kind: 'local',
     rootPath: r'D:\library\NAS 漫画库',
     name: 'NAS 漫画库',
-    enabledFormatGroups: List<FormatGroup>.from(FormatGroup.all),
+    enabledResourceFormatCategories: List<ResourceFormatCategory>.from(ResourceFormatCategory.all),
     username: '',
     allowHttp: false,
     scanOnStartup: true,
@@ -24,8 +24,8 @@ abstract final class Md3eLibraryEditPreviewData {
     kind: 'remote',
     rootPath: 'https://nas.example/dav/comics',
     name: 'WebDAV 同步库',
-    enabledFormatGroups: FormatGroup.all
-        .where((FormatGroup g) => g != FormatGroup.folder)
+    enabledResourceFormatCategories: ResourceFormatCategory.all
+        .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
         .toList(growable: false),
     username: 'reader',
     allowHttp: false,

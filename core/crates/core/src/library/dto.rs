@@ -7,14 +7,14 @@ use sha1::{Digest, Sha1};
 use crate::comic_id::normalize_path_for_key;
 use crate::entity::libraries;
 use crate::error::HentaiError;
-use crate::sync::format_group::FormatGroup;
+use crate::sync::resource_format_category::ResourceFormatCategory;
 
 pub(crate) const PREF_CURRENT_LIBRARY_ID: &str = "current_library_id";
 pub(crate) const KIND_LOCAL: &str = "local";
 pub(crate) const KIND_REMOTE: &str = "remote";
-pub(crate) const DEFAULT_FORMAT_GROUPS: [FormatGroup; 4] = FormatGroup::ALL;
-pub(crate) const REMOTE_DEFAULT_FORMAT_GROUPS: [FormatGroup; 3] =
-    [FormatGroup::Pdf, FormatGroup::Epub, FormatGroup::Archive];
+pub(crate) const DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 4] = ResourceFormatCategory::ALL;
+pub(crate) const REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 3] =
+    [ResourceFormatCategory::Pdf, ResourceFormatCategory::Epub, ResourceFormatCategory::Archive];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScanInterval {
@@ -75,7 +75,7 @@ pub struct LibraryDto {
     pub kind: String,
     pub root_path: String,
     pub name: String,
-    pub enabled_format_groups: Vec<FormatGroup>,
+    pub enabled_resource_format_categories: Vec<ResourceFormatCategory>,
     pub created_at: i64,
     pub username: String,
     pub allow_http: bool,
@@ -102,14 +102,14 @@ pub fn library_id_from_root(root: &str) -> String {
     format!("{:x}", hasher.finalize())
 }
 
-pub fn serialize_format_groups(groups: &[FormatGroup]) -> String {
-    let names: Vec<&str> = groups.iter().map(format_group_name).collect();
+pub fn serialize_resource_format_categories(groups: &[ResourceFormatCategory]) -> String {
+    let names: Vec<&str> = groups.iter().map(resource_format_category_name).collect();
     serde_json::to_string(&names).unwrap_or_else(|_| "[]".to_string())
 }
 
-pub fn parse_format_groups_json(raw: &str) -> Vec<FormatGroup> {
+pub fn parse_resource_format_categories_json(raw: &str) -> Vec<ResourceFormatCategory> {
     let Ok(names) = serde_json::from_str::<Vec<String>>(raw) else {
-        return DEFAULT_FORMAT_GROUPS.to_vec();
+        return DEFAULT_RESOURCE_FORMAT_CATEGORIES.to_vec();
     };
     // Explicit empty JSON array means all groups disabled.
     if names.is_empty() {
@@ -117,7 +117,7 @@ pub fn parse_format_groups_json(raw: &str) -> Vec<FormatGroup> {
     }
     let mut groups = Vec::new();
     for name in names {
-        if let Some(group) = format_group_from_name(&name) {
+        if let Some(group) = resource_format_category_from_name(&name) {
             if !groups.contains(&group) {
                 groups.push(group);
             }
@@ -125,27 +125,27 @@ pub fn parse_format_groups_json(raw: &str) -> Vec<FormatGroup> {
     }
     if groups.is_empty() {
         // Non-empty but all unrecognized → fall back to defaults.
-        DEFAULT_FORMAT_GROUPS.to_vec()
+        DEFAULT_RESOURCE_FORMAT_CATEGORIES.to_vec()
     } else {
         groups
     }
 }
 
-pub(crate) fn format_group_name(group: &FormatGroup) -> &'static str {
+pub(crate) fn resource_format_category_name(group: &ResourceFormatCategory) -> &'static str {
     match group {
-        FormatGroup::Folder => "folder",
-        FormatGroup::Pdf => "pdf",
-        FormatGroup::Epub => "epub",
-        FormatGroup::Archive => "archive",
+        ResourceFormatCategory::Folder => "folder",
+        ResourceFormatCategory::Pdf => "pdf",
+        ResourceFormatCategory::Epub => "epub",
+        ResourceFormatCategory::Archive => "archive",
     }
 }
 
-pub(crate) fn format_group_from_name(name: &str) -> Option<FormatGroup> {
+pub(crate) fn resource_format_category_from_name(name: &str) -> Option<ResourceFormatCategory> {
     match name.trim().to_ascii_lowercase().as_str() {
-        "folder" => Some(FormatGroup::Folder),
-        "pdf" => Some(FormatGroup::Pdf),
-        "epub" => Some(FormatGroup::Epub),
-        "archive" => Some(FormatGroup::Archive),
+        "folder" => Some(ResourceFormatCategory::Folder),
+        "pdf" => Some(ResourceFormatCategory::Pdf),
+        "epub" => Some(ResourceFormatCategory::Epub),
+        "archive" => Some(ResourceFormatCategory::Archive),
         _ => None,
     }
 }
@@ -184,7 +184,7 @@ pub(crate) fn model_to_dto(model: libraries::Model) -> LibraryDto {
         kind: model.kind,
         root_path: model.root_path,
         name: model.name,
-        enabled_format_groups: parse_format_groups_json(&model.enabled_format_groups),
+        enabled_resource_format_categories: parse_resource_format_categories_json(&model.enabled_resource_format_categories),
         created_at: model.created_at,
         username: model.username,
         allow_http: model.allow_http != 0,

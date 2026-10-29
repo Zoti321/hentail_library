@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
@@ -23,7 +23,7 @@ LocalLibrary _lib(String id) {
     kind: 'local',
     rootPath: '/$id',
     name: id,
-    enabledFormatGroups: const <FormatGroup>[],
+    enabledResourceFormatCategories: const <ResourceFormatCategory>[],
     username: '',
     allowHttp: false,
     scanOnStartup: false,

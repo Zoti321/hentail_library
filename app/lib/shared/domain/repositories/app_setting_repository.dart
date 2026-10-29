@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 
@@ -11,7 +11,7 @@ abstract class AppSettingRepository {
   Future<bool?> peekLegacyAutoScan();
 
   /// Legacy app-global format groups before per-library SQLite migration.
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups();
+  Future<List<ResourceFormatCategory>?> peekLegacyEnabledResourceFormatCategories();
 
   /// Clears staged legacy import keys after one-shot library migrations.
   Future<void> clearLegacyImportPayload();

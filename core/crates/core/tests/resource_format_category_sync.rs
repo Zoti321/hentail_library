@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use hentai_core::sync::format_group::FormatGroup;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
 use hentai_core::sync::scanner::{scan_roots, ScanContext};
@@ -25,7 +25,7 @@ fn write_cbz(path: &Path) {
 }
 
 #[test]
-fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
+fn disabling_archive_resource_format_category_removes_existing_archive_comic_on_resync() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = common::create_fixture_db(temp.path());
@@ -54,7 +54,7 @@ fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("first scan");
             assert_eq!(first_scan.len(), 2);
@@ -81,7 +81,7 @@ fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
                 &empty_ctx,
                 &handle,
                 true,
-                &[FormatGroup::Folder],
+                &[ResourceFormatCategory::Folder],
             )
             .expect("second scan");
             assert_eq!(second_scan.len(), 1);

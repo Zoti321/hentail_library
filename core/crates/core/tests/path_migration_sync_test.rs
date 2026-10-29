@@ -6,7 +6,7 @@ use std::io::Write;
 use std::path::Path;
 
 use hentai_core::comic::UpdateComicUserMetaDto;
-use hentai_core::sync::format_group::FormatGroup;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
 use hentai_core::sync::scanner::{scan_roots, ScanContext};
@@ -55,7 +55,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("first scan");
             let plan = build_scan_replace_plan(&db, first_scan, "")
@@ -94,7 +94,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("second scan");
             let plan = build_scan_replace_plan(&db, second_scan, "")
@@ -161,7 +161,7 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("first scan");
             apply_scan_replace_plan(
@@ -201,7 +201,7 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("second scan");
             let plan = build_scan_replace_plan(&db, second_scan, "")

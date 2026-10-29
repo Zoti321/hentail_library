@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use hentai_core::sync::format_group::FormatGroup;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
 use hentai_core::sync::scanner::{scan_roots, ScanContext};
@@ -50,7 +50,7 @@ async fn sync_once(root: &Path) {
         &empty_ctx,
         &handle,
         true,
-        &FormatGroup::ALL,
+        &ResourceFormatCategory::ALL,
     )
     .expect("scan");
     let plan = build_scan_replace_plan(&db, scanned, "")
@@ -162,7 +162,7 @@ fn whole_folder_rename_preserves_series_user_state_and_updates_unlocked_name() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("scan");
             let plan = build_scan_replace_plan(&db, scanned, "")
@@ -293,7 +293,7 @@ fn partial_member_move_keeps_old_series_state_and_creates_default_destination() 
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("scan");
             let plan = build_scan_replace_plan(&db, scanned, "")
@@ -365,7 +365,7 @@ fn ambiguous_comic_fingerprints_skip_series_migration() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("scan");
             let plan = build_scan_replace_plan(&db, scanned, "")

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/disable_all_format_groups_confirm_dialog.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/disable_all_resource_format_categories_confirm_dialog.dart';
 
 import '../../../../../../support/pump_localized_app.dart';
 
@@ -16,7 +16,7 @@ void main() {
                 showDialog<bool>(
                   context: context,
                   builder: (BuildContext dialogContext) =>
-                      const DisableAllFormatGroupsConfirmDialog(),
+                      const DisableAllResourceFormatCategoriesConfirmDialog(),
                 );
               },
               child: const Text('open'),
@@ -42,7 +42,7 @@ void main() {
                 result = await showDialog<bool>(
                   context: context,
                   builder: (BuildContext dialogContext) =>
-                      const DisableAllFormatGroupsConfirmDialog(),
+                      const DisableAllResourceFormatCategoriesConfirmDialog(),
                 );
               },
               child: const Text('open'),
@@ -78,7 +78,7 @@ void main() {
                 result = await showDialog<bool>(
                   context: context,
                   builder: (BuildContext dialogContext) =>
-                      const DisableAllFormatGroupsConfirmDialog(),
+                      const DisableAllResourceFormatCategoriesConfirmDialog(),
                 );
               },
               child: const Text('open'),

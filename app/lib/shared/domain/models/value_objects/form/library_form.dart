@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
@@ -16,7 +16,7 @@ abstract class LibraryForm with _$LibraryForm {
     @Default('') String username,
     @Default('') String password,
     @Default(false) bool allowHttp,
-    required List<FormatGroup> enabledFormatGroups,
+    required List<ResourceFormatCategory> enabledResourceFormatCategories,
     required bool scanOnStartup,
     required ScanInterval scanInterval,
   }) = _LibraryForm;
@@ -26,7 +26,7 @@ abstract class LibraryForm with _$LibraryForm {
       isRemote: false,
       name: '',
       rootPath: '',
-      enabledFormatGroups: List<FormatGroup>.from(FormatGroup.all),
+      enabledResourceFormatCategories: List<ResourceFormatCategory>.from(ResourceFormatCategory.all),
       scanOnStartup: false,
       scanInterval: ScanInterval.disabled,
     );
@@ -37,8 +37,8 @@ abstract class LibraryForm with _$LibraryForm {
       isRemote: true,
       name: '',
       rootPath: '',
-      enabledFormatGroups: FormatGroup.all
-          .where((FormatGroup g) => g != FormatGroup.folder)
+      enabledResourceFormatCategories: ResourceFormatCategory.all
+          .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
           .toList(growable: false),
       scanOnStartup: false,
       scanInterval: ScanInterval.disabled,
@@ -47,12 +47,12 @@ abstract class LibraryForm with _$LibraryForm {
 
   factory LibraryForm.fromLibrary(LocalLibrary library) {
     final bool remote = isRemoteLibrary(library);
-    List<FormatGroup> groups = List<FormatGroup>.from(
-      library.enabledFormatGroups,
+    List<ResourceFormatCategory> groups = List<ResourceFormatCategory>.from(
+      library.enabledResourceFormatCategories,
     );
     if (remote) {
       groups = groups
-          .where((FormatGroup g) => g != FormatGroup.folder)
+          .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
           .toList(growable: false);
     }
     return LibraryForm(
@@ -62,7 +62,7 @@ abstract class LibraryForm with _$LibraryForm {
       username: library.username,
       password: '',
       allowHttp: library.allowHttp,
-      enabledFormatGroups: groups,
+      enabledResourceFormatCategories: groups,
       scanOnStartup: library.scanOnStartup,
       scanInterval: library.scanInterval,
     );
@@ -127,15 +127,15 @@ extension LibraryFormOps on LibraryForm {
   }
 
   LibraryForm get normalized {
-    final Set<FormatGroup> unique = enabledFormatGroups.toSet();
+    final Set<ResourceFormatCategory> unique = enabledResourceFormatCategories.toSet();
     if (isRemote) {
-      unique.remove(FormatGroup.folder);
+      unique.remove(ResourceFormatCategory.folder);
     }
     return copyWith(
       name: name.trim(),
       rootPath: rootPath.trim(),
       username: username.trim(),
-      enabledFormatGroups: FormatGroup.all
+      enabledResourceFormatCategories: ResourceFormatCategory.all
           .where(unique.contains)
           .toList(growable: false),
     );
@@ -211,7 +211,7 @@ extension LibraryFormOps on LibraryForm {
       await repository.updateSettings(
         libraryId: original.libraryId,
         name: ready.name,
-        groups: ready.enabledFormatGroups,
+        groups: ready.enabledResourceFormatCategories,
         scanOnStartup: ready.scanOnStartup,
         scanInterval: ready.scanInterval,
       );
@@ -226,8 +226,8 @@ bool _settingsDiffer(LibraryForm ready, LocalLibrary original) {
       ready.scanOnStartup != original.scanOnStartup ||
       ready.scanInterval != original.scanInterval ||
       !_sameOrderedGroups(
-        ready.enabledFormatGroups,
-        original.enabledFormatGroups,
+        ready.enabledResourceFormatCategories,
+        original.enabledResourceFormatCategories,
       );
 }
 
@@ -242,13 +242,13 @@ Future<void> _writeSettingsIfNeeded(
   await repository.updateSettings(
     libraryId: created.libraryId,
     name: ready.name,
-    groups: ready.enabledFormatGroups,
+    groups: ready.enabledResourceFormatCategories,
     scanOnStartup: ready.scanOnStartup,
     scanInterval: ready.scanInterval,
   );
 }
 
-bool _sameOrderedGroups(List<FormatGroup> a, List<FormatGroup> b) {
+bool _sameOrderedGroups(List<ResourceFormatCategory> a, List<ResourceFormatCategory> b) {
   if (a.length != b.length) {
     return false;
   }

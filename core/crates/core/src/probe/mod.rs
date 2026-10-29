@@ -10,7 +10,7 @@ use crate::resource::{
     local_access, normalize_roots, read_source_stat_with, ResourceAccess, ResourceKind,
     WebDavResourceAccess,
 };
-use crate::sync::format_group::resource_type_enabled;
+use crate::sync::resource_format_category::resource_type_enabled;
 use crate::sync::handle::create_sync_handle;
 use crate::sync::remote::{
     collect_remote_files, normalize_remote_location_key, remote_resource_type_from_location,
@@ -152,7 +152,7 @@ fn probe_enumerate_local(
         &roots,
         exclude_roots,
         handle,
-        &library.enabled_format_groups,
+        &library.enabled_resource_format_categories,
     )?;
     Ok(ProbeEnumerateOutcome::Ok(items))
 }
@@ -183,7 +183,7 @@ fn probe_enumerate_remote(
         &access,
         &library.root_path,
         handle,
-        &library.enabled_format_groups,
+        &library.enabled_resource_format_categories,
     ) {
         Ok(items) => Ok(ProbeEnumerateOutcome::Ok(items)),
         Err(err) if err.is_remote_access_failure() => {
@@ -197,7 +197,7 @@ fn enumerate_remote_resources(
     access: &dyn ResourceAccess,
     root: &str,
     handle: &crate::sync::handle::SyncHandle,
-    enabled_groups: &[crate::sync::format_group::FormatGroup],
+    enabled_groups: &[crate::sync::resource_format_category::ResourceFormatCategory],
 ) -> Result<Vec<EnumeratedResource>, HentaiError> {
     let root_key = normalize_remote_location_key(root);
     if root_key.is_empty() {

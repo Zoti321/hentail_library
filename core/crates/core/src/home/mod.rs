@@ -367,7 +367,7 @@ mod tests {
             allow_http: 0,
             scan_on_startup: 0,
             scan_interval: scan_interval.to_string(),
-            enabled_format_groups: "[]".to_string(),
+            enabled_resource_format_categories: "[]".to_string(),
             created_at: 0,
             pinned: 0,
             sidebar_order: 0,

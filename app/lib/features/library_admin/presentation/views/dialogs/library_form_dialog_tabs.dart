@@ -171,22 +171,22 @@ class _LibraryFormScannerTab extends StatelessWidget {
     super.key,
     required this.scanOnStartup,
     required this.scanInterval,
-    required this.enabledFormatGroups,
-    required this.selectableFormatGroups,
+    required this.enabledResourceFormatCategories,
+    required this.selectableResourceFormatCategories,
     required this.enabled,
     required this.onScanOnStartupChanged,
     required this.onScanIntervalChanged,
-    required this.onFormatGroupChanged,
+    required this.onResourceFormatCategoryChanged,
   });
 
   final bool scanOnStartup;
   final ScanInterval scanInterval;
-  final Set<FormatGroup> enabledFormatGroups;
-  final List<FormatGroup> selectableFormatGroups;
+  final Set<ResourceFormatCategory> enabledResourceFormatCategories;
+  final List<ResourceFormatCategory> selectableResourceFormatCategories;
   final bool enabled;
   final ValueChanged<bool> onScanOnStartupChanged;
   final ValueChanged<ScanInterval> onScanIntervalChanged;
-  final void Function(FormatGroup group, bool enabled) onFormatGroupChanged;
+  final void Function(ResourceFormatCategory group, bool enabled) onResourceFormatCategoryChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -230,16 +230,16 @@ class _LibraryFormScannerTab extends StatelessWidget {
               ),
             ),
             SizedBox(height: tokens.spacing.sm),
-            for (final FormatGroup group in selectableFormatGroups)
+            for (final ResourceFormatCategory group in selectableResourceFormatCategories)
               CheckboxListTile(
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 controlAffinity: ListTileControlAffinity.leading,
-                value: enabledFormatGroups.contains(group),
-                title: Text(l10n.formatGroupLabel(group)),
+                value: enabledResourceFormatCategories.contains(group),
+                title: Text(l10n.resourceFormatCategoryLabel(group)),
                 onChanged: enabled
                     ? (bool? checked) =>
-                          onFormatGroupChanged(group, checked ?? false)
+                          onResourceFormatCategoryChanged(group, checked ?? false)
                     : null,
               ),
           ],

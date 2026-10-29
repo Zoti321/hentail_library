@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -37,15 +37,15 @@ abstract class LibraryRepository {
 
   Future<void> setCurrentId(String? libraryId);
 
-  Future<LocalLibrary> updateFormatGroups({
+  Future<LocalLibrary> updateResourceFormatCategories({
     required String libraryId,
-    required List<FormatGroup> groups,
+    required List<ResourceFormatCategory> groups,
   });
 
   Future<LocalLibrary> updateSettings({
     required String libraryId,
     required String name,
-    required List<FormatGroup> groups,
+    required List<ResourceFormatCategory> groups,
     required bool scanOnStartup,
     required ScanInterval scanInterval,
   });

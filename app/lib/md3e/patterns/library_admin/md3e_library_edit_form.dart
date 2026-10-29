@@ -8,7 +8,7 @@ import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field.dart
 import 'package:hentai_library/md3e/widgets/inputs/md3e_scan_interval_dropdown.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -54,13 +54,13 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
           _Md3eLibraryEditTab.scanner,
         ];
 
-  List<FormatGroup> get _selectableFormatGroups {
+  List<ResourceFormatCategory> get _selectableResourceFormatCategories {
     if (_isRemote) {
-      return FormatGroup.all
-          .where((FormatGroup g) => g != FormatGroup.folder)
+      return ResourceFormatCategory.all
+          .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
           .toList(growable: false);
     }
-    return FormatGroup.all;
+    return ResourceFormatCategory.all;
   }
 
   @override
@@ -89,8 +89,8 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
     widget.onFormChanged(fn(widget.form));
   }
 
-  void _setFormatGroup(FormatGroup group, bool enabled) {
-    final Set<FormatGroup> next = widget.form.enabledFormatGroups.toSet();
+  void _setResourceFormatCategory(ResourceFormatCategory group, bool enabled) {
+    final Set<ResourceFormatCategory> next = widget.form.enabledResourceFormatCategories.toSet();
     if (enabled) {
       next.add(group);
     } else {
@@ -98,7 +98,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
     }
     _patch(
       (LibraryForm f) => f.copyWith(
-        enabledFormatGroups: FormatGroup.all
+        enabledResourceFormatCategories: ResourceFormatCategory.all
             .where(next.contains)
             .toList(growable: false),
       ),
@@ -163,8 +163,8 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
       _Md3eLibraryEditTab.scanner => _ScannerTab(
         scanOnStartup: form.scanOnStartup,
         scanInterval: form.scanInterval,
-        enabledFormatGroups: form.enabledFormatGroups.toSet(),
-        selectableFormatGroups: _selectableFormatGroups,
+        enabledResourceFormatCategories: form.enabledResourceFormatCategories.toSet(),
+        selectableResourceFormatCategories: _selectableResourceFormatCategories,
         enabled: widget.enabled,
         onScanOnStartupChanged: (bool value) {
           _patch((LibraryForm f) => f.copyWith(scanOnStartup: value));
@@ -172,7 +172,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
         onScanIntervalChanged: (ScanInterval value) {
           _patch((LibraryForm f) => f.copyWith(scanInterval: value));
         },
-        onFormatGroupChanged: _setFormatGroup,
+        onResourceFormatCategoryChanged: _setResourceFormatCategory,
       ),
     };
 
@@ -461,22 +461,22 @@ class _ScannerTab extends StatelessWidget {
   const _ScannerTab({
     required this.scanOnStartup,
     required this.scanInterval,
-    required this.enabledFormatGroups,
-    required this.selectableFormatGroups,
+    required this.enabledResourceFormatCategories,
+    required this.selectableResourceFormatCategories,
     required this.enabled,
     required this.onScanOnStartupChanged,
     required this.onScanIntervalChanged,
-    required this.onFormatGroupChanged,
+    required this.onResourceFormatCategoryChanged,
   });
 
   final bool scanOnStartup;
   final ScanInterval scanInterval;
-  final Set<FormatGroup> enabledFormatGroups;
-  final List<FormatGroup> selectableFormatGroups;
+  final Set<ResourceFormatCategory> enabledResourceFormatCategories;
+  final List<ResourceFormatCategory> selectableResourceFormatCategories;
   final bool enabled;
   final ValueChanged<bool> onScanOnStartupChanged;
   final ValueChanged<ScanInterval> onScanIntervalChanged;
-  final void Function(FormatGroup group, bool enabled) onFormatGroupChanged;
+  final void Function(ResourceFormatCategory group, bool enabled) onResourceFormatCategoryChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -522,20 +522,20 @@ class _ScannerTab extends StatelessWidget {
           ),
         ),
         SizedBox(height: spacing.sm),
-        for (final FormatGroup group in selectableFormatGroups)
-          _FormatGroupRow(
-            label: l10n.formatGroupLabel(group),
-            selected: enabledFormatGroups.contains(group),
+        for (final ResourceFormatCategory group in selectableResourceFormatCategories)
+          _ResourceFormatCategoryRow(
+            label: l10n.resourceFormatCategoryLabel(group),
+            selected: enabledResourceFormatCategories.contains(group),
             enabled: enabled,
-            onChanged: (bool value) => onFormatGroupChanged(group, value),
+            onChanged: (bool value) => onResourceFormatCategoryChanged(group, value),
           ),
       ],
     );
   }
 }
 
-class _FormatGroupRow extends StatelessWidget {
-  const _FormatGroupRow({
+class _ResourceFormatCategoryRow extends StatelessWidget {
+  const _ResourceFormatCategoryRow({
     required this.label,
     required this.selected,
     required this.enabled,

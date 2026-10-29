@@ -6,7 +6,7 @@ import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
@@ -29,7 +29,7 @@ LocalLibrary _library(String id) {
     kind: 'local',
     rootPath: '/$id',
     name: id,
-    enabledFormatGroups: const <FormatGroup>[],
+    enabledResourceFormatCategories: const <ResourceFormatCategory>[],
     username: '',
     allowHttp: false,
     scanOnStartup: false,

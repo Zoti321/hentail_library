@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
@@ -40,8 +40,8 @@ LocalLibrary _remoteLibrary() {
     kind: 'remote',
     rootPath: 'https://example.com/dav',
     name: '远程库',
-    enabledFormatGroups: FormatGroup.all
-        .where((FormatGroup g) => g != FormatGroup.folder)
+    enabledResourceFormatCategories: ResourceFormatCategory.all
+        .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
         .toList(growable: false),
     username: 'user',
     allowHttp: false,
@@ -58,7 +58,7 @@ LocalLibrary _localLibrary() {
     kind: 'local',
     rootPath: '/data/comics',
     name: '本地库',
-    enabledFormatGroups: List<FormatGroup>.from(FormatGroup.all),
+    enabledResourceFormatCategories: List<ResourceFormatCategory>.from(ResourceFormatCategory.all),
     username: '',
     allowHttp: false,
     scanOnStartup: false,
@@ -189,7 +189,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 200));
 
-      for (final FormatGroup group in FormatGroup.all) {
+      for (final ResourceFormatCategory group in ResourceFormatCategory.all) {
         final Finder tile = find.widgetWithText(
           CheckboxListTile,
           _formatLabel(group),
@@ -233,7 +233,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
 
-    for (final FormatGroup group in FormatGroup.all) {
+    for (final ResourceFormatCategory group in ResourceFormatCategory.all) {
       final Finder tile = find.widgetWithText(
         CheckboxListTile,
         _formatLabel(group),
@@ -255,7 +255,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(notifier.submitCalls, hasLength(1));
-    expect(notifier.submitCalls.single.form.enabledFormatGroups, isEmpty);
+    expect(notifier.submitCalls.single.form.enabledResourceFormatCategories, isEmpty);
     expect(find.byType(LibraryFormDialog), findsNothing);
   });
 
@@ -301,11 +301,11 @@ void main() {
   });
 }
 
-String _formatLabel(FormatGroup group) {
+String _formatLabel(ResourceFormatCategory group) {
   return switch (group) {
-    FormatGroup.folder => '漫画文件夹',
-    FormatGroup.pdf => 'PDF',
-    FormatGroup.epub => 'EPUB',
-    FormatGroup.archive => '漫画压缩包',
+    ResourceFormatCategory.folder => '漫画文件夹',
+    ResourceFormatCategory.pdf => 'PDF',
+    ResourceFormatCategory.epub => 'EPUB',
+    ResourceFormatCategory.archive => '漫画压缩包',
   };
 }

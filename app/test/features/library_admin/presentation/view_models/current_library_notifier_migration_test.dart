@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
@@ -17,7 +17,7 @@ LocalLibrary _library({required String id}) {
     kind: 'local',
     rootPath: '/$id',
     name: id,
-    enabledFormatGroups: const <FormatGroup>[],
+    enabledResourceFormatCategories: const <ResourceFormatCategory>[],
     username: '',
     allowHttp: false,
     scanOnStartup: false,
@@ -32,8 +32,8 @@ class _FakeLibraryRepository implements LibraryRepository {
 
   final List<LocalLibrary> _libraries;
   bool allScanOnStartup = false;
-  final Map<String, List<FormatGroup>> formatGroupsByLibrary =
-      <String, List<FormatGroup>>{};
+  final Map<String, List<ResourceFormatCategory>> resourceFormatCategoriesByLibrary =
+      <String, List<ResourceFormatCategory>>{};
 
   @override
   Future<List<LocalLibrary>> list() async =>
@@ -52,11 +52,11 @@ class _FakeLibraryRepository implements LibraryRepository {
   }
 
   @override
-  Future<LocalLibrary> updateFormatGroups({
+  Future<LocalLibrary> updateResourceFormatCategories({
     required String libraryId,
-    required List<FormatGroup> groups,
+    required List<ResourceFormatCategory> groups,
   }) async {
-    formatGroupsByLibrary[libraryId] = List<FormatGroup>.from(groups);
+    resourceFormatCategoriesByLibrary[libraryId] = List<ResourceFormatCategory>.from(groups);
     for (final LocalLibrary library in _libraries) {
       if (library.libraryId == libraryId) {
         return (
@@ -64,7 +64,7 @@ class _FakeLibraryRepository implements LibraryRepository {
           kind: library.kind,
           rootPath: library.rootPath,
           name: library.name,
-          enabledFormatGroups: List<FormatGroup>.from(groups),
+          enabledResourceFormatCategories: List<ResourceFormatCategory>.from(groups),
           username: library.username,
           allowHttp: library.allowHttp,
           scanOnStartup: library.scanOnStartup,
@@ -92,7 +92,7 @@ void main() {
       final MemoryAppSettingRepository appSettingRepo =
           MemoryAppSettingRepository(
             legacyAutoScan: true,
-            legacyEnabledFormatGroups: <FormatGroup>[FormatGroup.pdf],
+            legacyEnabledResourceFormatCategories: <ResourceFormatCategory>[ResourceFormatCategory.pdf],
           );
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
@@ -106,11 +106,11 @@ void main() {
       await container.read(currentLibraryProvider.future);
 
       expect(libraryRepo.allScanOnStartup, isTrue);
-      expect(libraryRepo.formatGroupsByLibrary['lib-a'], <FormatGroup>[
-        FormatGroup.pdf,
+      expect(libraryRepo.resourceFormatCategoriesByLibrary['lib-a'], <ResourceFormatCategory>[
+        ResourceFormatCategory.pdf,
       ]);
-      expect(libraryRepo.formatGroupsByLibrary['lib-b'], <FormatGroup>[
-        FormatGroup.pdf,
+      expect(libraryRepo.resourceFormatCategoriesByLibrary['lib-b'], <ResourceFormatCategory>[
+        ResourceFormatCategory.pdf,
       ]);
       expect(appSettingRepo.clearLegacyImportPayloadCalls, 1);
       final SharedPreferences prefs = await SharedPreferences.getInstance();

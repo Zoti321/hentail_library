@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
@@ -18,7 +18,7 @@ LocalLibrary _library(String id) {
     kind: 'local',
     rootPath: '/$id',
     name: id,
-    enabledFormatGroups: const <FormatGroup>[],
+    enabledResourceFormatCategories: const <ResourceFormatCategory>[],
     username: '',
     allowHttp: false,
     scanOnStartup: false,
@@ -62,7 +62,7 @@ class _FakeLibraryRepository implements LibraryRepository {
   Future<LocalLibrary> updateSettings({
     required String libraryId,
     required String name,
-    required List<FormatGroup> groups,
+    required List<ResourceFormatCategory> groups,
     required bool scanOnStartup,
     required ScanInterval scanInterval,
   }) async {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -17,7 +17,7 @@ LocalLibrary _lib(String id, String name, {bool pinned = true}) => (
   kind: 'local',
   rootPath: '/$id',
   name: name,
-  enabledFormatGroups: const <FormatGroup>[],
+  enabledResourceFormatCategories: const <ResourceFormatCategory>[],
   username: '',
   allowHttp: false,
   scanOnStartup: false,

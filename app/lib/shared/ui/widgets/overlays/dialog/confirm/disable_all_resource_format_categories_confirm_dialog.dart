@@ -4,8 +4,8 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 
 /// 保存「支持的资源格式」为全关前的强确认对话框。
-class DisableAllFormatGroupsConfirmDialog extends StatelessWidget {
-  const DisableAllFormatGroupsConfirmDialog({super.key});
+class DisableAllResourceFormatCategoriesConfirmDialog extends StatelessWidget {
+  const DisableAllResourceFormatCategoriesConfirmDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

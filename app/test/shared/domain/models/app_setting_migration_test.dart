@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/app_setting_migration.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
@@ -34,9 +34,9 @@ void main() {
   });
 
   group('legacy import helpers', () {
-    test('legacyEnabledFormatGroupsFromJson preserves explicit empty list', () {
+    test('legacyEnabledResourceFormatCategoriesFromJson preserves explicit empty list', () {
       expect(
-        legacyEnabledFormatGroupsFromJson(<String, dynamic>{
+        legacyEnabledResourceFormatCategoriesFromJson(<String, dynamic>{
           'enabledFormatGroups': <String>[],
         }),
         isEmpty,
@@ -44,11 +44,11 @@ void main() {
     });
 
     test(
-      'legacyEnabledFormatGroupsFromJson defaults to all groups when absent',
+      'legacyEnabledResourceFormatCategoriesFromJson defaults to all groups when absent',
       () {
         expect(
-          legacyEnabledFormatGroupsFromJson(<String, dynamic>{}),
-          FormatGroup.all,
+          legacyEnabledResourceFormatCategoriesFromJson(<String, dynamic>{}),
+          ResourceFormatCategory.all,
         );
       },
     );

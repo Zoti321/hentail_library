@@ -8,7 +8,7 @@ use crate::error::HentaiError;
 use crate::library::normalize_webdav_root;
 use crate::resource::{basename_without_extension, extension_lower, ResourceAccess, ResourceKind};
 
-use super::format_group::{resource_type_enabled, FormatGroup};
+use super::resource_format_category::{resource_type_enabled, ResourceFormatCategory};
 use super::handle::SyncHandle;
 use super::scanner::{ScanContext, ScanItem};
 
@@ -47,7 +47,7 @@ pub fn scan_remote_lightweight(
     root: &str,
     _ctx: &ScanContext,
     handle: &SyncHandle,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
 ) -> Result<RemoteScanOutcome, HentaiError> {
     let root_key = normalize_remote_location_key(root);
     if root_key.is_empty() {
@@ -127,7 +127,7 @@ pub(crate) fn collect_remote_files(
 fn register_remote_file(
     access: &dyn ResourceAccess,
     location: &str,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
 ) -> Result<Option<ScanItem>, HentaiError> {
     let Some(resource_type) = remote_resource_type_from_location(location) else {
         return Ok(None);

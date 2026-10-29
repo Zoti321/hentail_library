@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 
@@ -34,11 +34,11 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
 }
 
 /// Reads legacy app-global format groups before they are dropped from AppSetting.
-List<FormatGroup> legacyEnabledFormatGroupsFromJson(Map<String, dynamic> json) {
+List<ResourceFormatCategory> legacyEnabledResourceFormatCategoriesFromJson(Map<String, dynamic> json) {
   if (json.containsKey('enabledFormatGroups')) {
-    return formatGroupsFromStorage(json['enabledFormatGroups']);
+    return resourceFormatCategoriesFromStorage(json['enabledFormatGroups']);
   }
-  return List<FormatGroup>.from(FormatGroup.all);
+  return List<ResourceFormatCategory>.from(ResourceFormatCategory.all);
 }
 
 /// Reads legacy app-level autoScan before it is dropped from AppSetting.

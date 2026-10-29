@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1650663409;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 479003567;
 
 // Section: executor
 
@@ -4273,14 +4273,14 @@ fn wire__crate__api__comic__update_comic_user_meta_frb_dto_default_impl(
         },
     )
 }
-fn wire__crate__api__library__update_library_format_groups_frb_impl(
+fn wire__crate__api__library__update_library_resource_format_categories_frb_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "update_library_format_groups_frb",
+            debug_name: "update_library_resource_format_categories_frb",
             port: None,
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
         },
@@ -4295,10 +4295,11 @@ fn wire__crate__api__library__update_library_format_groups_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_library_id = <String>::sse_decode(&mut deserializer);
-            let api_groups = <Vec<crate::api::sync::FormatGroupDto>>::sse_decode(&mut deserializer);
+            let api_groups =
+                <Vec<crate::api::sync::ResourceFormatCategoryDto>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::library::update_library_format_groups_frb(
+                let output_ok = crate::api::library::update_library_resource_format_categories_frb(
                     api_library_id,
                     api_groups,
                 )?;
@@ -4330,7 +4331,8 @@ fn wire__crate__api__library__update_library_settings_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_library_id = <String>::sse_decode(&mut deserializer);
             let api_name = <String>::sse_decode(&mut deserializer);
-            let api_groups = <Vec<crate::api::sync::FormatGroupDto>>::sse_decode(&mut deserializer);
+            let api_groups =
+                <Vec<crate::api::sync::ResourceFormatCategoryDto>>::sse_decode(&mut deserializer);
             let api_scan_on_startup = <bool>::sse_decode(&mut deserializer);
             let api_scan_interval =
                 <crate::api::library::ScanIntervalDto>::sse_decode(&mut deserializer);
@@ -5568,20 +5570,6 @@ impl SseDecode for f64 {
     }
 }
 
-impl SseDecode for crate::api::sync::FormatGroupDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
-        return match inner {
-            0 => crate::api::sync::FormatGroupDto::Folder,
-            1 => crate::api::sync::FormatGroupDto::Pdf,
-            2 => crate::api::sync::FormatGroupDto::Epub,
-            3 => crate::api::sync::FormatGroupDto::Archive,
-            _ => unreachable!("Invalid variant for FormatGroupDto: {}", inner),
-        };
-    }
-}
-
 impl SseDecode for crate::api::init::HentaiErrorDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5735,8 +5723,8 @@ impl SseDecode for crate::api::library::LibraryDto {
         let mut var_kind = <String>::sse_decode(deserializer);
         let mut var_rootPath = <String>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
-        let mut var_enabledFormatGroups =
-            <Vec<crate::api::sync::FormatGroupDto>>::sse_decode(deserializer);
+        let mut var_enabledResourceFormatCategories =
+            <Vec<crate::api::sync::ResourceFormatCategoryDto>>::sse_decode(deserializer);
         let mut var_createdAt = <i64>::sse_decode(deserializer);
         let mut var_username = <String>::sse_decode(deserializer);
         let mut var_allowHttp = <bool>::sse_decode(deserializer);
@@ -5749,7 +5737,7 @@ impl SseDecode for crate::api::library::LibraryDto {
             kind: var_kind,
             root_path: var_rootPath,
             name: var_name,
-            enabled_format_groups: var_enabledFormatGroups,
+            enabled_resource_format_categories: var_enabledResourceFormatCategories,
             created_at: var_createdAt,
             username: var_username,
             allow_http: var_allowHttp,
@@ -5917,18 +5905,6 @@ impl SseDecode for Vec<crate::api::comic::ComicDto> {
     }
 }
 
-impl SseDecode for Vec<crate::api::sync::FormatGroupDto> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = Vec::with_capacity(len_ as usize);
-        for idx_ in 0..len_ {
-            ans_.push(<crate::api::sync::FormatGroupDto>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
 impl SseDecode for Vec<crate::api::home::HomeContinueReadingDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -6066,6 +6042,20 @@ impl SseDecode for Vec<crate::api::sync::RemoteLibraryCredentialDto> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::api::sync::RemoteLibraryCredentialDto>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::sync::ResourceFormatCategoryDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::sync::ResourceFormatCategoryDto>::sse_decode(
                 deserializer,
             ));
         }
@@ -6693,6 +6683,20 @@ impl SseDecode for crate::api::sync::RemoteLibraryCredentialDto {
         return crate::api::sync::RemoteLibraryCredentialDto {
             library_id: var_libraryId,
             password: var_password,
+        };
+    }
+}
+
+impl SseDecode for crate::api::sync::ResourceFormatCategoryDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::sync::ResourceFormatCategoryDto::Folder,
+            1 => crate::api::sync::ResourceFormatCategoryDto::Pdf,
+            2 => crate::api::sync::ResourceFormatCategoryDto::Epub,
+            3 => crate::api::sync::ResourceFormatCategoryDto::Archive,
+            _ => unreachable!("Invalid variant for ResourceFormatCategoryDto: {}", inner),
         };
     }
 }
@@ -7761,7 +7765,7 @@ fn pde_ffi_dispatcher_sync_impl(
         115 => {
             wire__crate__api__comic__update_comic_user_meta_frb_impl(ptr, rust_vec_len, data_len)
         }
-        117 => wire__crate__api__library__update_library_format_groups_frb_impl(
+        117 => wire__crate__api__library__update_library_resource_format_categories_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
@@ -8328,29 +8332,6 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::metadata_backup::ExportComicM
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::sync::FormatGroupDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self {
-            Self::Folder => 0.into_dart(),
-            Self::Pdf => 1.into_dart(),
-            Self::Epub => 2.into_dart(),
-            Self::Archive => 3.into_dart(),
-            _ => unreachable!(),
-        }
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::sync::FormatGroupDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::FormatGroupDto>
-    for crate::api::sync::FormatGroupDto
-{
-    fn into_into_dart(self) -> crate::api::sync::FormatGroupDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::init::HentaiErrorDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -8546,7 +8527,9 @@ impl flutter_rust_bridge::IntoDart for crate::api::library::LibraryDto {
             self.kind.into_into_dart().into_dart(),
             self.root_path.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
-            self.enabled_format_groups.into_into_dart().into_dart(),
+            self.enabled_resource_format_categories
+                .into_into_dart()
+                .into_dart(),
             self.created_at.into_into_dart().into_dart(),
             self.username.into_into_dart().into_dart(),
             self.allow_http.into_into_dart().into_dart(),
@@ -9128,6 +9111,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::RemoteLibraryCredential
     for crate::api::sync::RemoteLibraryCredentialDto
 {
     fn into_into_dart(self) -> crate::api::sync::RemoteLibraryCredentialDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::sync::ResourceFormatCategoryDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Folder => 0.into_dart(),
+            Self::Pdf => 1.into_dart(),
+            Self::Epub => 2.into_dart(),
+            Self::Archive => 3.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::sync::ResourceFormatCategoryDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::ResourceFormatCategoryDto>
+    for crate::api::sync::ResourceFormatCategoryDto
+{
+    fn into_into_dart(self) -> crate::api::sync::ResourceFormatCategoryDto {
         self
     }
 }
@@ -10283,24 +10289,6 @@ impl SseEncode for f64 {
     }
 }
 
-impl SseEncode for crate::api::sync::FormatGroupDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                crate::api::sync::FormatGroupDto::Folder => 0,
-                crate::api::sync::FormatGroupDto::Pdf => 1,
-                crate::api::sync::FormatGroupDto::Epub => 2,
-                crate::api::sync::FormatGroupDto::Archive => 3,
-                _ => {
-                    unimplemented!("");
-                }
-            },
-            serializer,
-        );
-    }
-}
-
 impl SseEncode for crate::api::init::HentaiErrorDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -10422,7 +10410,10 @@ impl SseEncode for crate::api::library::LibraryDto {
         <String>::sse_encode(self.kind, serializer);
         <String>::sse_encode(self.root_path, serializer);
         <String>::sse_encode(self.name, serializer);
-        <Vec<crate::api::sync::FormatGroupDto>>::sse_encode(self.enabled_format_groups, serializer);
+        <Vec<crate::api::sync::ResourceFormatCategoryDto>>::sse_encode(
+            self.enabled_resource_format_categories,
+            serializer,
+        );
         <i64>::sse_encode(self.created_at, serializer);
         <String>::sse_encode(self.username, serializer);
         <bool>::sse_encode(self.allow_http, serializer);
@@ -10541,16 +10532,6 @@ impl SseEncode for Vec<crate::api::comic::ComicDto> {
     }
 }
 
-impl SseEncode for Vec<crate::api::sync::FormatGroupDto> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <crate::api::sync::FormatGroupDto>::sse_encode(item, serializer);
-        }
-    }
-}
-
 impl SseEncode for Vec<crate::api::home::HomeContinueReadingDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -10657,6 +10638,16 @@ impl SseEncode for Vec<crate::api::sync::RemoteLibraryCredentialDto> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::api::sync::RemoteLibraryCredentialDto>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::sync::ResourceFormatCategoryDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::sync::ResourceFormatCategoryDto>::sse_encode(item, serializer);
         }
     }
 }
@@ -11140,6 +11131,24 @@ impl SseEncode for crate::api::sync::RemoteLibraryCredentialDto {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.library_id, serializer);
         <String>::sse_encode(self.password, serializer);
+    }
+}
+
+impl SseEncode for crate::api::sync::ResourceFormatCategoryDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::sync::ResourceFormatCategoryDto::Folder => 0,
+                crate::api::sync::ResourceFormatCategoryDto::Pdf => 1,
+                crate::api::sync::ResourceFormatCategoryDto::Epub => 2,
+                crate::api::sync::ResourceFormatCategoryDto::Archive => 3,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 

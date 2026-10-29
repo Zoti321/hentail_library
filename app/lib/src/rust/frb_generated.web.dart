@@ -281,9 +281,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double dco_decode_f_64(dynamic raw);
 
   @protected
-  FormatGroupDto dco_decode_format_group_dto(dynamic raw);
-
-  @protected
   HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw);
 
   @protected
@@ -357,9 +354,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
 
   @protected
-  List<FormatGroupDto> dco_decode_list_format_group_dto(dynamic raw);
-
-  @protected
   List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
     dynamic raw,
   );
@@ -404,6 +398,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<RemoteLibraryCredentialDto>
   dco_decode_list_remote_library_credential_dto(dynamic raw);
+
+  @protected
+  List<ResourceFormatCategoryDto> dco_decode_list_resource_format_category_dto(
+    dynamic raw,
+  );
 
   @protected
   List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
@@ -571,6 +570,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ResourceFormatCategoryDto dco_decode_resource_format_category_dto(
     dynamic raw,
   );
 
@@ -988,9 +992,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double sse_decode_f_64(SseDeserializer deserializer);
 
   @protected
-  FormatGroupDto sse_decode_format_group_dto(SseDeserializer deserializer);
-
-  @protected
   HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer);
 
   @protected
@@ -1084,11 +1085,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
 
   @protected
-  List<FormatGroupDto> sse_decode_list_format_group_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
   List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
     SseDeserializer deserializer,
   );
@@ -1139,6 +1135,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<RemoteLibraryCredentialDto>
   sse_decode_list_remote_library_credential_dto(SseDeserializer deserializer);
+
+  @protected
+  List<ResourceFormatCategoryDto> sse_decode_list_resource_format_category_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
@@ -1342,6 +1343,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ResourceFormatCategoryDto sse_decode_resource_format_category_dto(
     SseDeserializer deserializer,
   );
 
@@ -1866,12 +1872,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_f_64(double self, SseSerializer serializer);
 
   @protected
-  void sse_encode_format_group_dto(
-    FormatGroupDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_hentai_error_dto(
     HentaiErrorDto self,
     SseSerializer serializer,
@@ -1983,12 +1983,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
 
   @protected
-  void sse_encode_list_format_group_dto(
-    List<FormatGroupDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_list_home_continue_reading_dto(
     List<HomeContinueReadingDto> self,
     SseSerializer serializer,
@@ -2060,6 +2054,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_remote_library_credential_dto(
     List<RemoteLibraryCredentialDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_resource_format_category_dto(
+    List<ResourceFormatCategoryDto> self,
     SseSerializer serializer,
   );
 
@@ -2312,6 +2312,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_remote_library_credential_dto(
     RemoteLibraryCredentialDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_resource_format_category_dto(
+    ResourceFormatCategoryDto self,
     SseSerializer serializer,
   );
 

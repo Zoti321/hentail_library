@@ -6,7 +6,7 @@ use rayon::prelude::*;
 use crate::comic::ComicDto;
 use crate::error::HentaiError;
 
-use super::format_group::{resource_type_enabled, FormatGroup};
+use super::resource_format_category::{resource_type_enabled, ResourceFormatCategory};
 use super::handle::SyncHandle;
 use std::path::Path;
 
@@ -40,7 +40,7 @@ pub fn scan_roots(
     ctx: &ScanContext,
     handle: &SyncHandle,
     force_full_parse: bool,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
 ) -> Result<Vec<ScanItem>, HentaiError> {
     scan_roots_excluding(roots, &[], ctx, handle, force_full_parse, enabled_groups)
 }
@@ -51,7 +51,7 @@ pub fn scan_roots_excluding(
     ctx: &ScanContext,
     handle: &SyncHandle,
     force_full_parse: bool,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
 ) -> Result<Vec<ScanItem>, HentaiError> {
     let root_locs: Vec<String> = roots
         .iter()
@@ -75,7 +75,7 @@ pub fn scan_roots_with(
     ctx: &ScanContext,
     handle: &SyncHandle,
     force_full_parse: bool,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
 ) -> Result<Vec<ScanItem>, HentaiError> {
     let exclude_keys: Vec<String> = exclude_roots
         .iter()
@@ -130,7 +130,7 @@ pub fn enumerate_local_resources(
     roots: &[PathBuf],
     exclude_roots: &[String],
     handle: &SyncHandle,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
 ) -> Result<Vec<EnumeratedResource>, HentaiError> {
     let root_locs: Vec<String> = roots
         .iter()
@@ -151,7 +151,7 @@ pub fn enumerate_resources_with(
     roots: &[String],
     exclude_roots: &[String],
     handle: &SyncHandle,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
     normalize_key: fn(&str) -> String,
 ) -> Result<Vec<EnumeratedResource>, HentaiError> {
     let exclude_keys: Vec<String> = exclude_roots
@@ -199,7 +199,7 @@ pub fn enumerate_resources_with(
 fn enumerate_candidate(
     access: &dyn ResourceAccess,
     path: &str,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
     normalize_key: fn(&str) -> String,
 ) -> Result<Option<EnumeratedResource>, HentaiError> {
     let resource_type = match access.stat(path)? {
@@ -262,7 +262,7 @@ fn collect_from_directory(
     exclude_keys: &[String],
     out: &mut Vec<String>,
     handle: &SyncHandle,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
 ) -> Result<(), HentaiError> {
     if handle.is_cancelled() {
         return Ok(());
@@ -302,7 +302,7 @@ fn resolve_scan_item(
     path: &str,
     ctx: &ScanContext,
     force_full_parse: bool,
-    enabled_groups: &[FormatGroup],
+    enabled_groups: &[ResourceFormatCategory],
 ) -> Result<Option<ScanItem>, HentaiError> {
     let comic_id = comic_id_for_path(path);
     if !force_full_parse {
@@ -440,7 +440,7 @@ mod tests {
         };
 
         let handle = create_sync_handle();
-        let items = scan_roots(&[path], &ctx, &handle, false, &FormatGroup::ALL).expect("scan");
+        let items = scan_roots(&[path], &ctx, &handle, false, &ResourceFormatCategory::ALL).expect("scan");
         assert_eq!(items.len(), 1);
         assert!(
             items[0].comic.resource_size > 0,
@@ -450,7 +450,7 @@ mod tests {
     }
 
     #[test]
-    fn scan_roots_skips_resource_types_outside_enabled_format_groups() {
+    fn scan_roots_skips_resource_types_outside_enabled_resource_format_categories() {
         let temp = TempDir::new().expect("tempdir");
         let root = temp.path();
 
@@ -476,7 +476,7 @@ mod tests {
             &ctx,
             &handle,
             false,
-            &[FormatGroup::Folder],
+            &[ResourceFormatCategory::Folder],
         )
         .expect("scan");
 
@@ -507,7 +507,7 @@ mod tests {
             &ctx,
             &handle,
             true,
-            &[FormatGroup::Folder, FormatGroup::Archive],
+            &[ResourceFormatCategory::Folder, ResourceFormatCategory::Archive],
         )
         .expect("scan");
         let mut paths: Vec<_> = items.iter().map(|i| i.path.as_str()).collect();

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_repository_impl.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,7 +49,7 @@ void main() {
       expect(prefs.containsKey(AppSettingStorageKeys.aggregateJson), isTrue);
       expect(prefs.getBool(AppSettingStorageKeys.legacyImportAutoScan), isTrue);
       expect(
-        prefs.getString(AppSettingStorageKeys.legacyImportFormatGroups),
+        prefs.getString(AppSettingStorageKeys.legacyImportResourceFormatCategories),
         jsonEncode(<String>['pdf']),
       );
     });
@@ -114,9 +114,9 @@ void main() {
       await repo.load();
 
       expect(await repo.peekLegacyAutoScan(), isTrue);
-      expect(await repo.peekLegacyEnabledFormatGroups(), <FormatGroup>[
-        FormatGroup.epub,
-        FormatGroup.archive,
+      expect(await repo.peekLegacyEnabledResourceFormatCategories(), <ResourceFormatCategory>[
+        ResourceFormatCategory.epub,
+        ResourceFormatCategory.archive,
       ]);
     });
   });

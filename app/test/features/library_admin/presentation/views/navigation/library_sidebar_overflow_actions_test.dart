@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_sidebar_overflow_actions.dart';
@@ -10,7 +10,7 @@ LocalLibrary _lib({required String kind}) {
     kind: kind,
     rootPath: kind == 'remote' ? 'https://dav.example' : r'D:\comics',
     name: 'Lib',
-    enabledFormatGroups: FormatGroup.all,
+    enabledResourceFormatCategories: ResourceFormatCategory.all,
     username: '',
     allowHttp: false,
     scanOnStartup: false,

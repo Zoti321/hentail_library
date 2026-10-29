@@ -4,13 +4,13 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use hentai_core::sync::format_group::FormatGroup;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::{
     comic_id_from_path, connection, create_local_library, delete_library, fetch_comics_page,
     find_comic_by_id, get_current_library_id, get_reading_by_comic_id, init_db_at_path,
     library_id_from_root, list_libraries, record_reading, set_current_library_id, sync_library,
-    update_library_format_groups, ComicFilterDto, PageRequestDto, ReadingHistoryDto, SyncScanMode,
+    update_library_resource_format_categories, ComicFilterDto, PageRequestDto, ReadingHistoryDto, SyncScanMode,
 };
 use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
@@ -191,7 +191,7 @@ fn sync_current_library_does_not_remove_other_library_comics() {
 }
 
 #[test]
-fn per_library_format_groups_only_affect_that_library_on_sync() {
+fn per_library_resource_format_categories_only_affect_that_library_on_sync() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = common::create_fixture_db(temp.path());
@@ -223,7 +223,7 @@ fn per_library_format_groups_only_affect_that_library_on_sync() {
             assert!(find_comic_by_id(&archive_a).await.unwrap().is_some());
             assert!(find_comic_by_id(&archive_b).await.unwrap().is_some());
 
-            update_library_format_groups(&lib_a.library_id, vec![FormatGroup::Folder])
+            update_library_resource_format_categories(&lib_a.library_id, vec![ResourceFormatCategory::Folder])
                 .await
                 .expect("formats a");
             set_current_library_id(Some(&lib_a.library_id))

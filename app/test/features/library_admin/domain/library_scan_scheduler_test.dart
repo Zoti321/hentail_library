@@ -16,7 +16,7 @@ void main() {
       kind: 'local',
       rootPath: '/$id',
       name: id,
-      enabledFormatGroups: const [],
+      enabledResourceFormatCategories: const [],
       username: '',
       allowHttp: false,
       scanOnStartup: scanOnStartup,

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -10,7 +10,7 @@ LocalLibrary _lib(String id, {bool pinned = true, int sidebarOrder = 0}) {
     kind: 'local',
     rootPath: '/$id',
     name: id,
-    enabledFormatGroups: FormatGroup.all,
+    enabledResourceFormatCategories: ResourceFormatCategory.all,
     username: '',
     allowHttp: false,
     scanOnStartup: false,

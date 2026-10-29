@@ -6,7 +6,7 @@ import 'package:hentai_library/features/library_admin/data/local_library_root_ac
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
@@ -18,7 +18,7 @@ import 'package:hentai_library/shared/ui/widgets/form/fluent_select_field.dart';
 import 'package:hentai_library/shared/ui/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/shared/ui/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/adaptive_form_surface.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/disable_all_format_groups_confirm_dialog.dart';
+import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/disable_all_resource_format_categories_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -77,13 +77,13 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
   bool get _isCreate => widget.mode != LibraryFormMode.edit;
   bool get _isRemote => _form.isRemote;
 
-  List<FormatGroup> get _selectableFormatGroups {
+  List<ResourceFormatCategory> get _selectableResourceFormatCategories {
     if (_isRemote) {
-      return FormatGroup.all
-          .where((FormatGroup g) => g != FormatGroup.folder)
+      return ResourceFormatCategory.all
+          .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
           .toList(growable: false);
     }
-    return FormatGroup.all;
+    return ResourceFormatCategory.all;
   }
 
   @override
@@ -274,12 +274,12 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
       return;
     }
 
-    if (requiresDisableAllFormatGroupsConfirm(_form.enabledFormatGroups)) {
+    if (requiresDisableAllResourceFormatCategoriesConfirm(_form.enabledResourceFormatCategories)) {
       final bool confirmed =
           await showDialog<bool>(
             context: context,
             builder: (BuildContext dialogContext) =>
-                const DisableAllFormatGroupsConfirmDialog(),
+                const DisableAllResourceFormatCategoriesConfirmDialog(),
           ) ??
           false;
       if (!confirmed || !mounted) {
@@ -363,8 +363,8 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
     }
   }
 
-  void _setFormatGroup(FormatGroup group, bool enabled) {
-    final Set<FormatGroup> next = _form.enabledFormatGroups.toSet();
+  void _setResourceFormatCategory(ResourceFormatCategory group, bool enabled) {
+    final Set<ResourceFormatCategory> next = _form.enabledResourceFormatCategories.toSet();
     if (enabled) {
       next.add(group);
     } else {
@@ -372,7 +372,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
     }
     setState(() {
       _form = _form.copyWith(
-        enabledFormatGroups: FormatGroup.all
+        enabledResourceFormatCategories: ResourceFormatCategory.all
             .where(next.contains)
             .toList(growable: false),
       );
@@ -501,8 +501,8 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
           key: const ValueKey<String>('scanner'),
           scanOnStartup: _form.scanOnStartup,
           scanInterval: _form.scanInterval,
-          enabledFormatGroups: _form.enabledFormatGroups.toSet(),
-          selectableFormatGroups: _selectableFormatGroups,
+          enabledResourceFormatCategories: _form.enabledResourceFormatCategories.toSet(),
+          selectableResourceFormatCategories: _selectableResourceFormatCategories,
           enabled: !_saving,
           onScanOnStartupChanged: (bool value) {
             setState(() => _form = _form.copyWith(scanOnStartup: value));
@@ -510,7 +510,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
           onScanIntervalChanged: (ScanInterval value) {
             setState(() => _form = _form.copyWith(scanInterval: value));
           },
-          onFormatGroupChanged: _setFormatGroup,
+          onResourceFormatCategoryChanged: _setResourceFormatCategory,
         ),
       },
     );

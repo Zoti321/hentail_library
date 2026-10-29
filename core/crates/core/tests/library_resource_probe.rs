@@ -8,7 +8,7 @@ use hentai_core::probe::{
     diff_enumerated, load_snapshot_map, probe_library, rebuild_snapshot_from_scan_items,
 };
 use hentai_core::resource::FakeResourceAccess;
-use hentai_core::sync::format_group::FormatGroup;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::scanner::{enumerate_resources_with, ScanItem};
 use hentai_core::{
@@ -33,7 +33,7 @@ fn probe_diff_counts_added_changed_removed_with_fake_access() {
         &["/lib".to_string()],
         &[],
         &handle,
-        &[FormatGroup::Archive],
+        &[ResourceFormatCategory::Archive],
         hentai_core::normalize_path_for_key,
     )
     .expect("enumerate");
@@ -66,7 +66,7 @@ fn probe_diff_counts_removed_when_snapshot_entry_missing_from_enumeration() {
         &["/lib".to_string()],
         &[],
         &handle,
-        &[FormatGroup::Archive],
+        &[ResourceFormatCategory::Archive],
         hentai_core::normalize_path_for_key,
     )
     .expect("enumerate");
@@ -87,7 +87,7 @@ fn probe_diff_counts_removed_when_snapshot_entry_missing_from_enumeration() {
 }
 
 #[test]
-fn enumerate_respects_enabled_format_groups() {
+fn enumerate_respects_enabled_resource_format_categories() {
     let mut fake = FakeResourceAccess::new();
     fake.insert_dir("/lib");
     fake.insert_file("/lib/a.cbz", b"archive");
@@ -99,7 +99,7 @@ fn enumerate_respects_enabled_format_groups() {
         &["/lib".to_string()],
         &[],
         &handle,
-        &[FormatGroup::Archive],
+        &[ResourceFormatCategory::Archive],
         hentai_core::normalize_path_for_key,
     )
     .expect("enumerate");
@@ -125,7 +125,7 @@ fn enumerate_excludes_nested_library_root() {
         &["/parent".to_string()],
         &["/parent/nested".to_string()],
         &handle,
-        &[FormatGroup::Archive],
+        &[ResourceFormatCategory::Archive],
         hentai_core::normalize_path_for_key,
     )
     .expect("enumerate");

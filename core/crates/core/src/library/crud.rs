@@ -11,14 +11,14 @@ use crate::comic::now_ms;
 use crate::db::{connection, map_db_err};
 use crate::entity::{app_prefs, libraries, prelude::*};
 use crate::error::HentaiError;
-use crate::sync::format_group::FormatGroup;
+use crate::sync::resource_format_category::ResourceFormatCategory;
 use crate::sync::writer::delete_comics_side_effects;
 
 use super::dto::{
     library_id_from_root, library_name_from_root, library_name_from_webdav_root, model_to_dto,
-    serialize_format_groups, LibraryDto, LibrarySidebarPlacement, ScanInterval,
-    DEFAULT_FORMAT_GROUPS, KIND_LOCAL, KIND_REMOTE, PREF_CURRENT_LIBRARY_ID,
-    REMOTE_DEFAULT_FORMAT_GROUPS,
+    serialize_resource_format_categories, LibraryDto, LibrarySidebarPlacement, ScanInterval,
+    DEFAULT_RESOURCE_FORMAT_CATEGORIES, KIND_LOCAL, KIND_REMOTE, PREF_CURRENT_LIBRARY_ID,
+    REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES,
 };
 use super::local_root_update::ensure_local_root_not_nested;
 use super::webdav_root::{library_id_from_webdav_root, normalize_webdav_root};
@@ -135,7 +135,7 @@ pub async fn create_local_library(
         kind: KIND_LOCAL.to_string(),
         root_path: root.to_string(),
         name: resolve_library_name(name, library_name_from_root(root)),
-        enabled_format_groups: DEFAULT_FORMAT_GROUPS.to_vec(),
+        enabled_resource_format_categories: DEFAULT_RESOURCE_FORMAT_CATEGORIES.to_vec(),
         created_at: now_ms(),
         username: String::new(),
         allow_http: false,
@@ -149,7 +149,7 @@ pub async fn create_local_library(
         kind: Set(dto.kind.clone()),
         root_path: Set(dto.root_path.clone()),
         name: Set(dto.name.clone()),
-        enabled_format_groups: Set(serialize_format_groups(&dto.enabled_format_groups)),
+        enabled_resource_format_categories: Set(serialize_resource_format_categories(&dto.enabled_resource_format_categories)),
         created_at: Set(dto.created_at),
         username: Set(String::new()),
         allow_http: Set(0),
@@ -205,7 +205,7 @@ pub async fn create_remote_library(
         kind: KIND_REMOTE.to_string(),
         root_path: root.clone(),
         name: resolve_library_name(name, library_name_from_webdav_root(&root)),
-        enabled_format_groups: REMOTE_DEFAULT_FORMAT_GROUPS.to_vec(),
+        enabled_resource_format_categories: REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES.to_vec(),
         created_at: now_ms(),
         username: user.clone(),
         allow_http,
@@ -219,7 +219,7 @@ pub async fn create_remote_library(
         kind: Set(dto.kind.clone()),
         root_path: Set(dto.root_path.clone()),
         name: Set(dto.name.clone()),
-        enabled_format_groups: Set(serialize_format_groups(&dto.enabled_format_groups)),
+        enabled_resource_format_categories: Set(serialize_resource_format_categories(&dto.enabled_resource_format_categories)),
         created_at: Set(dto.created_at),
         username: Set(user),
         allow_http: Set(if allow_http { 1 } else { 0 }),
@@ -369,9 +369,9 @@ pub async fn set_current_library_id(library_id: Option<&str>) -> Result<(), Hent
     Ok(())
 }
 
-pub async fn update_library_format_groups(
+pub async fn update_library_resource_format_categories(
     library_id: &str,
-    groups: Vec<FormatGroup>,
+    groups: Vec<ResourceFormatCategory>,
 ) -> Result<LibraryDto, HentaiError> {
     let id = library_id.trim();
     if id.is_empty() {
@@ -387,7 +387,7 @@ pub async fn update_library_format_groups(
     };
     // Empty list is intentional (user may disable all groups until next sync).
     let mut active: libraries::ActiveModel = model.into();
-    active.enabled_format_groups = Set(serialize_format_groups(&groups));
+    active.enabled_resource_format_categories = Set(serialize_resource_format_categories(&groups));
     let updated = active.update(&db).await.map_err(map_db_err)?;
     Ok(model_to_dto(updated))
 }
@@ -395,7 +395,7 @@ pub async fn update_library_format_groups(
 pub async fn update_library_settings(
     library_id: &str,
     name: &str,
-    groups: Vec<FormatGroup>,
+    groups: Vec<ResourceFormatCategory>,
     scan_on_startup: bool,
     scan_interval: ScanInterval,
 ) -> Result<LibraryDto, HentaiError> {
@@ -417,7 +417,7 @@ pub async fn update_library_settings(
     };
     let mut active: libraries::ActiveModel = model.into();
     active.name = Set(trimmed_name.to_string());
-    active.enabled_format_groups = Set(serialize_format_groups(&groups));
+    active.enabled_resource_format_categories = Set(serialize_resource_format_categories(&groups));
     active.scan_on_startup = Set(if scan_on_startup { 1 } else { 0 });
     active.scan_interval = Set(scan_interval.as_str().to_string());
     let updated = active.update(&db).await.map_err(map_db_err)?;

@@ -10,7 +10,7 @@ use hentai_core::{
 use super::init::HentaiErrorDto;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FormatGroupDto {
+pub enum ResourceFormatCategoryDto {
     Folder,
     Pdf,
     Epub,

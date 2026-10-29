@@ -3,17 +3,17 @@ use hentai_core::{
     delete_library as core_delete, get_current_library_id as core_get_current,
     list_libraries as core_list, set_all_libraries_scan_on_startup as core_set_all_scan_on_startup,
     set_current_library_id as core_set_current,
-    update_library_format_groups as core_update_formats,
+    update_library_resource_format_categories as core_update_formats,
     update_library_settings as core_update_settings,
     update_library_sidebar_layout as core_update_sidebar,
     update_local_library_root as core_update_local_root,
-    update_remote_library as core_update_remote, FormatGroup as CoreFormatGroup,
+    update_remote_library as core_update_remote, ResourceFormatCategory as CoreResourceFormatCategory,
     LibraryDto as CoreLibrary, LibrarySidebarPlacement as CoreSidebarPlacement,
     ScanInterval as CoreScanInterval,
 };
 
 use super::init::HentaiErrorDto;
-use super::sync::FormatGroupDto;
+use super::sync::ResourceFormatCategoryDto;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScanIntervalDto {
@@ -31,7 +31,7 @@ pub struct LibraryDto {
     pub kind: String,
     pub root_path: String,
     pub name: String,
-    pub enabled_format_groups: Vec<FormatGroupDto>,
+    pub enabled_resource_format_categories: Vec<ResourceFormatCategoryDto>,
     pub created_at: i64,
     pub username: String,
     pub allow_http: bool,
@@ -48,10 +48,10 @@ impl From<CoreLibrary> for LibraryDto {
             kind: value.kind,
             root_path: value.root_path,
             name: value.name,
-            enabled_format_groups: value
-                .enabled_format_groups
+            enabled_resource_format_categories: value
+                .enabled_resource_format_categories
                 .into_iter()
-                .map(map_format_group)
+                .map(map_resource_format_category)
                 .collect(),
             created_at: value.created_at,
             username: value.username,
@@ -71,21 +71,21 @@ pub struct LibrarySidebarPlacementDto {
     pub sidebar_order: i32,
 }
 
-fn map_format_group(group: CoreFormatGroup) -> FormatGroupDto {
+fn map_resource_format_category(group: CoreResourceFormatCategory) -> ResourceFormatCategoryDto {
     match group {
-        CoreFormatGroup::Folder => FormatGroupDto::Folder,
-        CoreFormatGroup::Pdf => FormatGroupDto::Pdf,
-        CoreFormatGroup::Epub => FormatGroupDto::Epub,
-        CoreFormatGroup::Archive => FormatGroupDto::Archive,
+        CoreResourceFormatCategory::Folder => ResourceFormatCategoryDto::Folder,
+        CoreResourceFormatCategory::Pdf => ResourceFormatCategoryDto::Pdf,
+        CoreResourceFormatCategory::Epub => ResourceFormatCategoryDto::Epub,
+        CoreResourceFormatCategory::Archive => ResourceFormatCategoryDto::Archive,
     }
 }
 
-fn map_format_group_core(group: FormatGroupDto) -> CoreFormatGroup {
+fn map_resource_format_category_core(group: ResourceFormatCategoryDto) -> CoreResourceFormatCategory {
     match group {
-        FormatGroupDto::Folder => CoreFormatGroup::Folder,
-        FormatGroupDto::Pdf => CoreFormatGroup::Pdf,
-        FormatGroupDto::Epub => CoreFormatGroup::Epub,
-        FormatGroupDto::Archive => CoreFormatGroup::Archive,
+        ResourceFormatCategoryDto::Folder => CoreResourceFormatCategory::Folder,
+        ResourceFormatCategoryDto::Pdf => CoreResourceFormatCategory::Pdf,
+        ResourceFormatCategoryDto::Epub => CoreResourceFormatCategory::Epub,
+        ResourceFormatCategoryDto::Archive => CoreResourceFormatCategory::Archive,
     }
 }
 
@@ -191,11 +191,11 @@ pub async fn set_current_library_id_frb(library_id: Option<String>) -> Result<()
 }
 
 #[flutter_rust_bridge::frb(sync)]
-pub fn update_library_format_groups_frb(
+pub fn update_library_resource_format_categories_frb(
     library_id: String,
-    groups: Vec<FormatGroupDto>,
+    groups: Vec<ResourceFormatCategoryDto>,
 ) -> Result<LibraryDto, HentaiErrorDto> {
-    let core_groups = groups.into_iter().map(map_format_group_core).collect();
+    let core_groups = groups.into_iter().map(map_resource_format_category_core).collect();
     hentai_core::runtime::block_on(core_update_formats(&library_id, core_groups))
         .map(LibraryDto::from)
         .map_err(HentaiErrorDto::from)
@@ -205,11 +205,11 @@ pub fn update_library_format_groups_frb(
 pub fn update_library_settings_frb(
     library_id: String,
     name: String,
-    groups: Vec<FormatGroupDto>,
+    groups: Vec<ResourceFormatCategoryDto>,
     scan_on_startup: bool,
     scan_interval: ScanIntervalDto,
 ) -> Result<LibraryDto, HentaiErrorDto> {
-    let core_groups = groups.into_iter().map(map_format_group_core).collect();
+    let core_groups = groups.into_iter().map(map_resource_format_category_core).collect();
     hentai_core::runtime::block_on(core_update_settings(
         &library_id,
         &name,

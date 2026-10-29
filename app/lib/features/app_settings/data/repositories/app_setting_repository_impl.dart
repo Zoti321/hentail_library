@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/models/app_setting_migration.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
@@ -108,21 +108,21 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   }
 
   @override
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async {
+  Future<List<ResourceFormatCategory>?> peekLegacyEnabledResourceFormatCategories() async {
     try {
       final Map<String, dynamic>? raw = await _readLegacyJsonMap();
       if (raw != null) {
-        return legacyEnabledFormatGroupsFromJson(raw);
+        return legacyEnabledResourceFormatCategoriesFromJson(raw);
       }
       final SharedPreferences prefs = await _prefs();
       final String? staged = prefs.getString(
-        AppSettingStorageKeys.legacyImportFormatGroups,
+        AppSettingStorageKeys.legacyImportResourceFormatCategories,
       );
       if (staged == null || staged.isEmpty) {
         return null;
       }
       final Object? decoded = jsonDecode(staged);
-      return formatGroupsFromStorage(decoded);
+      return resourceFormatCategoriesFromStorage(decoded);
     } catch (_) {
       return null;
     }
@@ -132,7 +132,7 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   Future<void> clearLegacyImportPayload() async {
     final SharedPreferences prefs = await _prefs();
     await prefs.remove(AppSettingStorageKeys.legacyImportAutoScan);
-    await prefs.remove(AppSettingStorageKeys.legacyImportFormatGroups);
+    await prefs.remove(AppSettingStorageKeys.legacyImportResourceFormatCategories);
   }
 
   Future<void> _importLegacySettingsJsonIfPresent(
@@ -153,12 +153,12 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
         legacyAutoScan,
       );
     }
-    final List<FormatGroup> legacyGroups = legacyEnabledFormatGroupsFromJson(
+    final List<ResourceFormatCategory> legacyGroups = legacyEnabledResourceFormatCategoriesFromJson(
       raw,
     );
     await prefs.setString(
-      AppSettingStorageKeys.legacyImportFormatGroups,
-      jsonEncode(formatGroupsToStorage(legacyGroups)),
+      AppSettingStorageKeys.legacyImportResourceFormatCategories,
+      jsonEncode(resourceFormatCategoriesToStorage(legacyGroups)),
     );
 
     final AppSetting setting = AppSetting.fromJson(raw);

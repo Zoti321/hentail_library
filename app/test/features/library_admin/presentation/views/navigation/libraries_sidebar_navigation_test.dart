@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -289,7 +289,7 @@ LocalLibrary _lib(
   kind: 'local',
   rootPath: 'C:\\libs\\$name',
   name: name,
-  enabledFormatGroups: const <FormatGroup>[],
+  enabledResourceFormatCategories: const <ResourceFormatCategory>[],
   username: '',
   allowHttp: false,
   scanOnStartup: false,

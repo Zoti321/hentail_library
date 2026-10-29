@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
@@ -38,7 +38,7 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
       kind: 'local',
       rootPath: '/a',
       name: 'A',
-      enabledFormatGroups: <FormatGroup>[],
+      enabledResourceFormatCategories: <ResourceFormatCategory>[],
       username: '',
       allowHttp: false,
       scanOnStartup: false,

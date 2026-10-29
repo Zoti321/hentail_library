@@ -1,6 +1,6 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/features/library_admin/data/adapters/sync_library_frb_adapter.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -38,7 +38,7 @@ LocalLibrary _lib({required String id, required String kind}) => (
   kind: kind,
   rootPath: kind == 'remote' ? 'https://example/dav' : 'C:/lib',
   name: id,
-  enabledFormatGroups: FormatGroup.all,
+  enabledResourceFormatCategories: ResourceFormatCategory.all,
   username: kind == 'remote' ? 'u' : '',
   allowHttp: false,
   scanOnStartup: false,

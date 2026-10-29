@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 
 /// Library 轻量快照（FRB LibraryDto → domain）。含 Local 与 Remote。
@@ -9,7 +9,7 @@ typedef LocalLibrary = ({
   String kind,
   String rootPath,
   String name,
-  List<FormatGroup> enabledFormatGroups,
+  List<ResourceFormatCategory> enabledResourceFormatCategories,
 
   /// Remote Basic 用户名；Local 为空。
   String username,

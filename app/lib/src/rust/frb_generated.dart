@@ -86,7 +86,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 1650663409;
+  int get rustContentHash => 479003567;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -559,15 +559,15 @@ abstract class RustLibApi extends BaseApi {
   Future<UpdateComicUserMetaFrbDto>
   crateApiComicUpdateComicUserMetaFrbDtoDefault();
 
-  LibraryDto crateApiLibraryUpdateLibraryFormatGroupsFrb({
+  LibraryDto crateApiLibraryUpdateLibraryResourceFormatCategoriesFrb({
     required String libraryId,
-    required List<FormatGroupDto> groups,
+    required List<ResourceFormatCategoryDto> groups,
   });
 
   LibraryDto crateApiLibraryUpdateLibrarySettingsFrb({
     required String libraryId,
     required String name,
-    required List<FormatGroupDto> groups,
+    required List<ResourceFormatCategoryDto> groups,
     required bool scanOnStartup,
     required ScanIntervalDto scanInterval,
   });
@@ -4391,16 +4391,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  LibraryDto crateApiLibraryUpdateLibraryFormatGroupsFrb({
+  LibraryDto crateApiLibraryUpdateLibraryResourceFormatCategoriesFrb({
     required String libraryId,
-    required List<FormatGroupDto> groups,
+    required List<ResourceFormatCategoryDto> groups,
   }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(libraryId, serializer);
-          sse_encode_list_format_group_dto(groups, serializer);
+          sse_encode_list_resource_format_category_dto(groups, serializer);
           return pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -4411,16 +4411,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_library_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiLibraryUpdateLibraryFormatGroupsFrbConstMeta,
+        constMeta:
+            kCrateApiLibraryUpdateLibraryResourceFormatCategoriesFrbConstMeta,
         argValues: [libraryId, groups],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiLibraryUpdateLibraryFormatGroupsFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiLibraryUpdateLibraryResourceFormatCategoriesFrbConstMeta =>
       const TaskConstMeta(
-        debugName: "update_library_format_groups_frb",
+        debugName: "update_library_resource_format_categories_frb",
         argNames: ["libraryId", "groups"],
       );
 
@@ -4428,7 +4430,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LibraryDto crateApiLibraryUpdateLibrarySettingsFrb({
     required String libraryId,
     required String name,
-    required List<FormatGroupDto> groups,
+    required List<ResourceFormatCategoryDto> groups,
     required bool scanOnStartup,
     required ScanIntervalDto scanInterval,
   }) {
@@ -4438,7 +4440,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(libraryId, serializer);
           sse_encode_String(name, serializer);
-          sse_encode_list_format_group_dto(groups, serializer);
+          sse_encode_list_resource_format_category_dto(groups, serializer);
           sse_encode_bool(scanOnStartup, serializer);
           sse_encode_scan_interval_dto(scanInterval, serializer);
           return pdeCallFfi(
@@ -5656,12 +5658,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FormatGroupDto dco_decode_format_group_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return FormatGroupDto.values[raw as int];
-  }
-
-  @protected
   HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -5786,7 +5782,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       kind: dco_decode_String(arr[1]),
       rootPath: dco_decode_String(arr[2]),
       name: dco_decode_String(arr[3]),
-      enabledFormatGroups: dco_decode_list_format_group_dto(arr[4]),
+      enabledResourceFormatCategories:
+          dco_decode_list_resource_format_category_dto(arr[4]),
       createdAt: dco_decode_i_64(arr[5]),
       username: dco_decode_String(arr[6]),
       allowHttp: dco_decode_bool(arr[7]),
@@ -5904,12 +5901,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<FormatGroupDto> dco_decode_list_format_group_dto(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_format_group_dto).toList();
-  }
-
-  @protected
   List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
     dynamic raw,
   ) {
@@ -6005,6 +5996,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>)
         .map(dco_decode_remote_library_credential_dto)
+        .toList();
+  }
+
+  @protected
+  List<ResourceFormatCategoryDto> dco_decode_list_resource_format_category_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_resource_format_category_dto)
         .toList();
   }
 
@@ -6477,6 +6478,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       libraryId: dco_decode_String(arr[0]),
       password: dco_decode_String(arr[1]),
     );
+  }
+
+  @protected
+  ResourceFormatCategoryDto dco_decode_resource_format_category_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ResourceFormatCategoryDto.values[raw as int];
   }
 
   @protected
@@ -7648,13 +7657,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  FormatGroupDto sse_decode_format_group_dto(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return FormatGroupDto.values[inner];
-  }
-
-  @protected
   HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_code = sse_decode_String(deserializer);
@@ -7801,9 +7803,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_kind = sse_decode_String(deserializer);
     var var_rootPath = sse_decode_String(deserializer);
     var var_name = sse_decode_String(deserializer);
-    var var_enabledFormatGroups = sse_decode_list_format_group_dto(
-      deserializer,
-    );
+    var var_enabledResourceFormatCategories =
+        sse_decode_list_resource_format_category_dto(deserializer);
     var var_createdAt = sse_decode_i_64(deserializer);
     var var_username = sse_decode_String(deserializer);
     var var_allowHttp = sse_decode_bool(deserializer);
@@ -7816,7 +7817,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       kind: var_kind,
       rootPath: var_rootPath,
       name: var_name,
-      enabledFormatGroups: var_enabledFormatGroups,
+      enabledResourceFormatCategories: var_enabledResourceFormatCategories,
       createdAt: var_createdAt,
       username: var_username,
       allowHttp: var_allowHttp,
@@ -7989,20 +7990,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<FormatGroupDto> sse_decode_list_format_group_dto(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <FormatGroupDto>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_format_group_dto(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
     SseDeserializer deserializer,
   ) {
@@ -8147,6 +8134,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <RemoteLibraryCredentialDto>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_remote_library_credential_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ResourceFormatCategoryDto> sse_decode_list_resource_format_category_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ResourceFormatCategoryDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_resource_format_category_dto(deserializer));
     }
     return ans_;
   }
@@ -8774,6 +8775,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       libraryId: var_libraryId,
       password: var_password,
     );
+  }
+
+  @protected
+  ResourceFormatCategoryDto sse_decode_resource_format_category_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return ResourceFormatCategoryDto.values[inner];
   }
 
   @protected
@@ -10050,15 +10060,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_format_group_dto(
-    FormatGroupDto self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
   void sse_encode_hentai_error_dto(
     HentaiErrorDto self,
     SseSerializer serializer,
@@ -10171,7 +10172,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.kind, serializer);
     sse_encode_String(self.rootPath, serializer);
     sse_encode_String(self.name, serializer);
-    sse_encode_list_format_group_dto(self.enabledFormatGroups, serializer);
+    sse_encode_list_resource_format_category_dto(
+      self.enabledResourceFormatCategories,
+      serializer,
+    );
     sse_encode_i_64(self.createdAt, serializer);
     sse_encode_String(self.username, serializer);
     sse_encode_bool(self.allowHttp, serializer);
@@ -10303,18 +10307,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_comic_dto(item, serializer);
-    }
-  }
-
-  @protected
-  void sse_encode_list_format_group_dto(
-    List<FormatGroupDto> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_format_group_dto(item, serializer);
     }
   }
 
@@ -10467,6 +10459,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_remote_library_credential_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_resource_format_category_dto(
+    List<ResourceFormatCategoryDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_resource_format_category_dto(item, serializer);
     }
   }
 
@@ -11008,6 +11012,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.libraryId, serializer);
     sse_encode_String(self.password, serializer);
+  }
+
+  @protected
+  void sse_encode_resource_format_category_dto(
+    ResourceFormatCategoryDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected

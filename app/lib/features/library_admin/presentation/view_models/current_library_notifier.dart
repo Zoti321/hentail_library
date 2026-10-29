@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
@@ -13,7 +13,7 @@ export 'package:hentai_library/shared/domain/library/current_library_state.dart'
 
 part 'current_library_notifier.g.dart';
 
-const String _kMigratedFormatGroupsPref =
+const String _kMigratedResourceFormatCategoriesPref =
     'migrated_enabled_format_groups_to_libraries_v1';
 const String _kMigratedAutoScanPref = 'migrated_auto_scan_to_libraries_v1';
 
@@ -85,7 +85,7 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
   }
 
   Future<CurrentLibraryState> _load() async {
-    await _migrateFormatGroupsFromLegacyIfNeeded();
+    await _migrateResourceFormatCategoriesFromLegacyIfNeeded();
     await _migrateAutoScanFromLegacyIfNeeded();
     try {
       await ref.read(appSettingRepoProvider).clearLegacyImportPayload();
@@ -98,29 +98,29 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
   }
 
   /// One-shot: copy legacy app-global format groups onto each Local library.
-  Future<void> _migrateFormatGroupsFromLegacyIfNeeded() async {
+  Future<void> _migrateResourceFormatCategoriesFromLegacyIfNeeded() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool(_kMigratedFormatGroupsPref) == true) {
+      if (prefs.getBool(_kMigratedResourceFormatCategoriesPref) == true) {
         return;
       }
       final List<LocalLibrary> libraries = await _repo.list();
       if (libraries.isEmpty) {
-        await prefs.setBool(_kMigratedFormatGroupsPref, true);
+        await prefs.setBool(_kMigratedResourceFormatCategoriesPref, true);
         return;
       }
-      final List<FormatGroup>? legacyGroups = await ref
+      final List<ResourceFormatCategory>? legacyGroups = await ref
           .read(appSettingRepoProvider)
-          .peekLegacyEnabledFormatGroups();
-      final List<FormatGroup> groups =
-          legacyGroups ?? List<FormatGroup>.from(FormatGroup.all);
+          .peekLegacyEnabledResourceFormatCategories();
+      final List<ResourceFormatCategory> groups =
+          legacyGroups ?? List<ResourceFormatCategory>.from(ResourceFormatCategory.all);
       for (final LocalLibrary library in libraries) {
-        await _repo.updateFormatGroups(
+        await _repo.updateResourceFormatCategories(
           libraryId: library.libraryId,
           groups: groups,
         );
       }
-      await prefs.setBool(_kMigratedFormatGroupsPref, true);
+      await prefs.setBool(_kMigratedResourceFormatCategoriesPref, true);
     } catch (_) {
       // Best-effort upgrade path; browse still works with DB defaults.
     }
