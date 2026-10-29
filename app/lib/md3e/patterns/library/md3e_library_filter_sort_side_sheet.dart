@@ -106,6 +106,8 @@ abstract final class Md3eLibraryFilterSortSideSheet {
     bool useRootNavigator = true,
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
+    final Md3eOverlayRouteScopeSnapshot scope =
+        Md3eOverlayRouteScopeSnapshot.capture(context);
     return M3ESideSheet.show<void>(
       context,
       title: AppLocalizations.of(context).libraryFilterSortTooltip,
@@ -117,7 +119,7 @@ abstract final class Md3eLibraryFilterSortSideSheet {
       scrollable: true,
       useRootNavigator: useRootNavigator,
       body: md3eOverlayRouteScope(
-        anchorContext: context,
+        scope: scope,
         child: _Md3eLibraryFilterSortSideSheetModalBody(
           initialState: state,
           onStateChanged: onStateChanged,
@@ -291,18 +293,16 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
             child: Text(l10n.librarySortSection, style: sectionTitle),
           ),
           const SizedBox(height: 8),
-          ...LibraryComicSortField.values.map(
-            (LibraryComicSortField field) {
-              final bool selected = state.sortOption.field == field;
-              return _Md3eSortListRow(
-                label: l10n.libraryComicSortFieldLabel(field),
-                selected: selected,
-                ascending: !state.sortOption.descending,
-                metrics: rowMetrics,
-                onTap: () => onStateChanged(state.selectSortField(field)),
-              );
-            },
-          ),
+          ...LibraryComicSortField.values.map((LibraryComicSortField field) {
+            final bool selected = state.sortOption.field == field;
+            return _Md3eSortListRow(
+              label: l10n.libraryComicSortFieldLabel(field),
+              selected: selected,
+              ascending: !state.sortOption.descending,
+              metrics: rowMetrics,
+              onTap: () => onStateChanged(state.selectSortField(field)),
+            );
+          }),
         ],
       ),
     );
@@ -403,7 +403,8 @@ class _Md3eFilterAccordionSection extends StatefulWidget {
       _Md3eFilterAccordionSectionState();
 }
 
-class _Md3eFilterAccordionSectionState extends State<_Md3eFilterAccordionSection> {
+class _Md3eFilterAccordionSectionState
+    extends State<_Md3eFilterAccordionSection> {
   bool _expanded = false;
 
   static const Duration _duration = Duration(milliseconds: 200);
@@ -472,10 +473,7 @@ TextStyle _md3eLibraryFilterSortOptionLabelStyle(
   ColorScheme cs,
   Md3eLibraryFilterSortRowMetrics metrics,
 ) {
-  return TextStyle(
-    fontSize: metrics.optionLabelFontSize,
-    color: cs.onSurface,
-  );
+  return TextStyle(fontSize: metrics.optionLabelFontSize, color: cs.onSurface);
 }
 
 class _Md3eFilterCheckboxRow extends StatelessWidget {

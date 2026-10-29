@@ -43,7 +43,7 @@ abstract final class Md3eReaderAdaptivePanel {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     final M3EThemeData m3e = M3ETheme.of(context);
     final Widget scopedBody = md3eOverlayRouteScope(
-      anchorContext: context,
+      scope: Md3eOverlayRouteScopeSnapshot.capture(context),
       child: body,
     );
 
@@ -55,9 +55,7 @@ abstract final class Md3eReaderAdaptivePanel {
         fullScreenTitle: title,
         theme: m3e.bottomSheetTheme,
         builder: (BuildContext sheetContext) {
-          return PrimaryScrollController.none(
-            child: scopedBody,
-          );
+          return PrimaryScrollController.none(child: scopedBody);
         },
       );
     }

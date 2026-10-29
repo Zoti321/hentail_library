@@ -11,12 +11,14 @@ Future<void> openMd3eLabReader(
 }) {
   final Md3eReaderPagePreviewData data =
       preview ?? Md3eReaderPagePreviewData.sample();
+  final Md3eOverlayRouteScopeSnapshot scope =
+      Md3eOverlayRouteScopeSnapshot.capture(context);
 
   return Navigator.of(context, rootNavigator: false).push<void>(
     MaterialPageRoute<void>(
       builder: (BuildContext routeContext) {
         return md3eOverlayRouteScope(
-          anchorContext: context,
+          scope: scope,
           child: Md3eReaderPageLabHost(
             preview: data,
             onBack: () => Navigator.of(routeContext).maybePop(),

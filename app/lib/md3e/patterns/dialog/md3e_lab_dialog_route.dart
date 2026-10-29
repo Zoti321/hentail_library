@@ -27,6 +27,8 @@ Future<T?> md3ePushLabDialogRoute<T>(
     return M3EDialog.showDiscardConfirmation(context, labels: labels);
   }
 
+  final Md3eOverlayRouteScopeSnapshot overlayScope =
+      Md3eOverlayRouteScopeSnapshot.capture(anchorContext);
   return Navigator.of(anchorContext, rootNavigator: false).push<T>(
     RawDialogRoute<T>(
       barrierDismissible: barrierDismissible,
@@ -46,7 +48,7 @@ Future<T?> md3ePushLabDialogRoute<T>(
               variant: variant,
               discardPrompt: discardPrompt,
               child: md3eOverlayRouteScope(
-                anchorContext: anchorContext,
+                scope: overlayScope,
                 child: builder(themedContext),
               ),
             );
@@ -55,13 +57,13 @@ Future<T?> md3ePushLabDialogRoute<T>(
       },
       transitionBuilder:
           (BuildContext context, Animation<double> animation, _, Widget child) {
-        return M3EDialogTransition(
-          animation: animation,
-          variant: variant,
-          dialogTheme: dialogTheme,
-          child: child,
-        );
-      },
+            return M3EDialogTransition(
+              animation: animation,
+              variant: variant,
+              dialogTheme: dialogTheme,
+              child: child,
+            );
+          },
     ),
   );
 }

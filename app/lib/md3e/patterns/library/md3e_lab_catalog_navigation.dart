@@ -21,11 +21,13 @@ Future<void> openMd3eLabCatalogDetail(
   required LibraryDisplayTarget displayTarget,
   required int catalogIndex,
 }) {
+  final Md3eOverlayRouteScopeSnapshot scope =
+      Md3eOverlayRouteScopeSnapshot.capture(context);
   return Navigator.of(context, rootNavigator: false).push<void>(
     MaterialPageRoute<void>(
       builder: (BuildContext routeContext) {
         return md3eOverlayRouteScope(
-          anchorContext: context,
+          scope: scope,
           child: switch (displayTarget) {
             LibraryDisplayTarget.comics => _Md3eLabComicDetailRoute(
               catalogIndex: catalogIndex,
@@ -83,7 +85,9 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Md3eSeriesDetailEntry entry =
-        Md3eLabCatalogDetailPreviewData.seriesDetail(catalogIndex: catalogIndex);
+        Md3eLabCatalogDetailPreviewData.seriesDetail(
+          catalogIndex: catalogIndex,
+        );
     return Md3eSeriesDetailPage(
       entry: entry,
       onBack: () => Navigator.of(context).maybePop(),
@@ -99,11 +103,13 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
               series: entry,
               comicIndex: comicIndex,
             );
+        final Md3eOverlayRouteScopeSnapshot scope =
+            Md3eOverlayRouteScopeSnapshot.capture(context);
         Navigator.of(context, rootNavigator: false).push<void>(
           MaterialPageRoute<void>(
             builder: (BuildContext routeContext) {
               return md3eOverlayRouteScope(
-                anchorContext: context,
+                scope: scope,
                 child: Md3eComicDetailPage(
                   entry: comicEntry,
                   onBack: () => Navigator.of(routeContext).maybePop(),
