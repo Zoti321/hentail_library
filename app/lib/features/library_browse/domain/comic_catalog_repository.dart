@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
@@ -11,7 +12,7 @@ abstract class ComicCatalogRepository {
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
     required LibraryComicFilter filter,
-    required bool expandBySeries,
+    required LibraryComicGrouping grouping,
     required LibraryComicSortOption sortOption,
   });
 

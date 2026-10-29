@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/domain/library/library_age_restriction_fil
 import 'package:hentai_library/shared/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/library_comic_projection.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
-import 'package:hentai_library/features/library_browse/domain/library_expand_by_series.dart';
+import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/features/library_browse/domain/library_needs_metadata_only.dart';
@@ -39,7 +39,7 @@ class LibraryComicFiltersState {
     required this.tagFilter,
     required this.authorFilter,
     required this.needsMetadataOnly,
-    required this.expandBySeries,
+    required this.grouping,
     required this.sortOption,
     this.languageFilter = const <String>{},
     this.parodyFilter = const <String>{},
@@ -53,7 +53,7 @@ class LibraryComicFiltersState {
     tagFilter: const LibraryMetadataFilterSelection(),
     authorFilter: const LibraryMetadataFilterSelection(),
     needsMetadataOnly: LibraryNeedsMetadataOnly.defaultValue,
-    expandBySeries: LibraryExpandBySeries.defaultValue,
+    grouping: LibraryComicGrouping.defaultValue,
     sortOption: LibraryComicSortOption(),
   );
 
@@ -62,7 +62,7 @@ class LibraryComicFiltersState {
   final LibraryMetadataFilterSelection tagFilter;
   final LibraryMetadataFilterSelection authorFilter;
   final bool needsMetadataOnly;
-  final bool expandBySeries;
+  final LibraryComicGrouping grouping;
   final LibraryComicSortOption sortOption;
 
   /// 会话级 include-only 维度。
@@ -82,7 +82,7 @@ class LibraryComicFiltersState {
     LibraryMetadataFilterSelection? tagFilter,
     LibraryMetadataFilterSelection? authorFilter,
     bool? needsMetadataOnly,
-    bool? expandBySeries,
+    LibraryComicGrouping? grouping,
     LibraryComicSortOption? sortOption,
     Set<String>? languageFilter,
     Set<String>? parodyFilter,
@@ -94,7 +94,7 @@ class LibraryComicFiltersState {
       tagFilter: tagFilter ?? this.tagFilter,
       authorFilter: authorFilter ?? this.authorFilter,
       needsMetadataOnly: needsMetadataOnly ?? this.needsMetadataOnly,
-      expandBySeries: expandBySeries ?? this.expandBySeries,
+      grouping: grouping ?? this.grouping,
       sortOption: sortOption ?? this.sortOption,
       languageFilter: languageFilter ?? this.languageFilter,
       parodyFilter: parodyFilter ?? this.parodyFilter,
@@ -114,7 +114,7 @@ class LibraryComicFiltersState {
             other.tagFilter == tagFilter &&
             other.authorFilter == authorFilter &&
             other.needsMetadataOnly == needsMetadataOnly &&
-            other.expandBySeries == expandBySeries &&
+            other.grouping == grouping &&
             other.sortOption == sortOption &&
             setEquals(other.languageFilter, languageFilter) &&
             setEquals(other.parodyFilter, parodyFilter) &&
@@ -128,7 +128,7 @@ class LibraryComicFiltersState {
     tagFilter,
     authorFilter,
     needsMetadataOnly,
-    expandBySeries,
+    grouping,
     sortOption,
     Object.hashAllUnordered(languageFilter),
     Object.hashAllUnordered(parodyFilter),
@@ -142,6 +142,27 @@ const String kLibraryComicsAgeRestrictionStorageKey =
     'library_age_restriction_filter_comics';
 const String kLibrarySeriesAgeRestrictionStorageKey =
     'library_age_restriction_filter_series';
+
+/// 旧版「按系列展开」布尔偏好一次性迁移为分组方式（新键缺失时才迁移）。
+///
+/// 旧键为 `false` 迁移为 [LibraryComicGrouping.none]，否则为 [LibraryComicGrouping.bySeries]；
+/// 迁移后删除旧键，重复执行结果一致。
+Future<void> migrateLegacyLibraryComicGrouping(SharedPreferences prefs) async {
+  const String legacyKey = LibraryComicGrouping.legacyExpandBySeriesStorageKey;
+  if (!prefs.containsKey(legacyKey)) {
+    return;
+  }
+  if (!prefs.containsKey(LibraryComicGrouping.storageKey)) {
+    final bool expandBySeries = prefs.getBool(legacyKey) ?? true;
+    final LibraryComicGrouping migrated = expandBySeries
+        ? LibraryComicGrouping.bySeries
+        : LibraryComicGrouping.none;
+    if (migrated != LibraryComicGrouping.defaultValue) {
+      await prefs.setString(LibraryComicGrouping.storageKey, migrated.name);
+    }
+  }
+  await prefs.remove(legacyKey);
+}
 
 /// 旧版单键年龄限制一次性迁移到 Comics / Series 双键。
 Future<void> migrateLegacyLibraryAgeRestriction(SharedPreferences prefs) async {
@@ -194,6 +215,7 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
   Future<LibraryComicFiltersState> build() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await migrateLegacyLibraryAgeRestriction(prefs);
+    await migrateLegacyLibraryComicGrouping(prefs);
 
     final LibraryMetadataFilterSelection authorFilter = await _loadAuthorFilter(
       prefs,
@@ -215,8 +237,8 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
       needsMetadataOnly: LibraryNeedsMetadataOnly.fromStorage(
         prefs.getBool(LibraryNeedsMetadataOnly.storageKey),
       ),
-      expandBySeries: LibraryExpandBySeries.fromStorage(
-        prefs.getBool(LibraryExpandBySeries.storageKey),
+      grouping: LibraryComicGrouping.fromStorage(
+        prefs.getString(LibraryComicGrouping.storageKey),
       ),
       sortOption: _decodeComicSortOption(prefs.getString(_sortStorageKey)),
     );
@@ -376,13 +398,13 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
     }
   }
 
-  Future<void> setExpandBySeries(bool enabled) async {
-    _apply((await future).copyWith(expandBySeries: enabled));
+  Future<void> setGrouping(LibraryComicGrouping grouping) async {
+    _apply((await future).copyWith(grouping: grouping));
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (enabled == LibraryExpandBySeries.defaultValue) {
-      await prefs.remove(LibraryExpandBySeries.storageKey);
+    if (grouping == LibraryComicGrouping.defaultValue) {
+      await prefs.remove(LibraryComicGrouping.storageKey);
     } else {
-      await prefs.setBool(LibraryExpandBySeries.storageKey, enabled);
+      await prefs.setString(LibraryComicGrouping.storageKey, grouping.name);
     }
   }
 
@@ -416,7 +438,8 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
     await prefs.remove(_authorIncludeModeStorageKey);
     await prefs.remove(_sortStorageKey);
     await prefs.remove(LibraryNeedsMetadataOnly.storageKey);
-    await prefs.remove(LibraryExpandBySeries.storageKey);
+    await prefs.remove(LibraryComicGrouping.storageKey);
+    await prefs.remove(LibraryComicGrouping.legacyExpandBySeriesStorageKey);
     _apply(LibraryComicFiltersState.defaults);
   }
 }
@@ -459,7 +482,7 @@ final Provider<bool> libraryComicFiltersIsCustomizedProvider = Provider<bool>((
       filters.languageFilter.isNotEmpty ||
       filters.parodyFilter.isNotEmpty ||
       filters.characterFilter.isNotEmpty ||
-      filters.expandBySeries != LibraryExpandBySeries.defaultValue ||
+      filters.grouping != LibraryComicGrouping.defaultValue ||
       filters.needsMetadataOnly != LibraryNeedsMetadataOnly.defaultValue) {
     return true;
   }

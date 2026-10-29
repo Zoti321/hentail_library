@@ -1,6 +1,7 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/features/library_browse/data/repositories/comic_frb_mapper.dart';
 import 'package:hentai_library/features/library_browse/domain/comic_catalog_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
 import 'package:hentai_library/features/library_browse/domain/comic_user_metadata_repository.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
@@ -37,16 +38,14 @@ class ComicRepositoryImpl
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
     required LibraryComicFilter filter,
-    required bool expandBySeries,
+    required LibraryComicGrouping grouping,
     required LibraryComicSortOption sortOption,
   }) async {
     final rust.PagedComicResultDto page = await guardFrb(
       () => rust.fetchComicsPageFrb(
         request: mapPageRequest(request),
         filter: mapLibraryFilter(filter),
-        grouping: expandBySeries
-            ? rust.ComicGroupingDto.bySeries
-            : rust.ComicGroupingDto.none,
+        grouping: mapComicGrouping(grouping),
         sort: mapSortOption(sortOption),
       ),
       fallbackMessage: '读取漫画分页失败',
@@ -267,3 +266,9 @@ class ComicRepositoryImpl
     return mapPagedResult(page);
   }
 }
+
+rust.ComicGroupingDto mapComicGrouping(LibraryComicGrouping grouping) =>
+    switch (grouping) {
+      LibraryComicGrouping.none => rust.ComicGroupingDto.none,
+      LibraryComicGrouping.bySeries => rust.ComicGroupingDto.bySeries,
+    };

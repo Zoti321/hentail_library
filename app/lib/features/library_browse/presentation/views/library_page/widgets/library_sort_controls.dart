@@ -71,10 +71,10 @@ class _ComicSortListRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final bool expandBySeries = ref.watch(
+    final bool groupingOverridesSort = ref.watch(
       libraryComicFiltersProvider.select(
         (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.expandBySeries ?? false,
+            state.value?.grouping.overridesSort ?? false,
       ),
     );
     final LibraryComicSortOption sortOption = ref.watch(
@@ -82,7 +82,7 @@ class _ComicSortListRow extends ConsumerWidget {
     );
     final bool isSelected = sortOption.field == field;
     final bool isImplemented = field.isImplemented;
-    final bool isEnabled = isImplemented && !expandBySeries;
+    final bool isEnabled = isImplemented && !groupingOverridesSort;
     final bool isAscending = !sortOption.descending;
     final AppLocalizations l10n = context.l10n;
     final TextStyle labelStyle = TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
@@ -45,7 +46,7 @@ class _FakeComicRepo implements ComicCatalogRepository {
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
     required LibraryComicFilter filter,
-    required bool expandBySeries,
+    required LibraryComicGrouping grouping,
     required LibraryComicSortOption sortOption,
   }) async {
     return PagedResult<Comic>(

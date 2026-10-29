@@ -5,11 +5,12 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/foundation/toggle_switch.dart';
+import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_filter_sort_drawer.dart';
 
-/// Comics Tab：Expand by series 开关（排序区顶部）。
+/// Comics Tab：按系列分组开关（排序区顶部）；文案沿用 `libraryExpandBySeries`（接口层重构，UI 不变）。
 class LibraryExpandBySeriesControls extends ConsumerWidget {
   const LibraryExpandBySeriesControls({super.key});
 
@@ -28,7 +29,7 @@ class LibraryExpandBySeriesControls extends ConsumerWidget {
     final bool enabled = ref.watch(
       libraryComicFiltersProvider.select(
         (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.expandBySeries ?? false,
+            state.value?.grouping == LibraryComicGrouping.bySeries,
       ),
     );
 
@@ -38,7 +39,11 @@ class LibraryExpandBySeriesControls extends ConsumerWidget {
         onTap: () {
           ref
               .read(libraryComicFiltersProvider.notifier)
-              .setExpandBySeries(!enabled);
+              .setGrouping(
+                enabled
+                    ? LibraryComicGrouping.none
+                    : LibraryComicGrouping.bySeries,
+              );
         },
         hoverColor: theme.hoverColor,
         splashColor: theme.splashColor,

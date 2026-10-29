@@ -81,7 +81,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
           .fetchComicsPage(
             request: request,
             filter: filter,
-            expandBySeries: filters.expandBySeries,
+            grouping: filters.grouping,
             sortOption: filters.sortOption,
           ),
     );

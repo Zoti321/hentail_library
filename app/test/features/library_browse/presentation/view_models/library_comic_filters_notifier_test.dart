@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
-import 'package:hentai_library/features/library_browse/domain/library_expand_by_series.dart';
+import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/library_needs_metadata_only.dart';
 import 'package:hentai_library/shared/domain/library/library_tri_state_pick.dart';
@@ -89,7 +89,7 @@ void main() {
     await notifier.toggleIncludeSet(LibraryIncludeSetKind.parody, 'p');
     await notifier.toggleIncludeSet(LibraryIncludeSetKind.character, 'c');
     await notifier.setNeedsMetadataOnly(true);
-    await notifier.setExpandBySeries(false);
+    await notifier.setGrouping(LibraryComicGrouping.none);
     await notifier.setSortField(LibraryComicSortField.createdAt);
 
     await notifier.resetAll();
@@ -105,7 +105,7 @@ void main() {
     expect(state.parodyFilter, isEmpty);
     expect(state.characterFilter, isEmpty);
     expect(state.needsMetadataOnly, LibraryNeedsMetadataOnly.defaultValue);
-    expect(state.expandBySeries, LibraryExpandBySeries.defaultValue);
+    expect(state.grouping, LibraryComicGrouping.defaultValue);
     expect(state.sortOption.field, kLibraryDefaultSortOption.field);
     expect(state.sortOption.descending, kLibraryDefaultSortOption.descending);
   });
@@ -119,7 +119,7 @@ void main() {
     await notifier.setAgeRestriction(LibraryAgeRestrictionFilter.allAges);
     await notifier.toggleMediaType(LibraryMediaTypeFilterOption.epub);
     await notifier.setNeedsMetadataOnly(true);
-    await notifier.setExpandBySeries(false);
+    await notifier.setGrouping(LibraryComicGrouping.none);
     await notifier.setSortField(LibraryComicSortField.fileSize);
     first.dispose();
 
@@ -132,7 +132,7 @@ void main() {
       LibraryMediaTypeFilterOption.epub,
     });
     expect(state.needsMetadataOnly, isTrue);
-    expect(state.expandBySeries, isFalse);
+    expect(state.grouping, LibraryComicGrouping.none);
     expect(state.sortOption.field, LibraryComicSortField.fileSize);
   });
 

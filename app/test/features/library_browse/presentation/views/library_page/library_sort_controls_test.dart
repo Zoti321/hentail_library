@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -70,8 +71,8 @@ void main() {
     await tester.tap(find.text('按系列展开'));
     await tester.pumpAndSettle();
     expect(
-      (await container.read(libraryComicFiltersProvider.future)).expandBySeries,
-      isFalse,
+      (await container.read(libraryComicFiltersProvider.future)).grouping,
+      LibraryComicGrouping.none,
     );
 
     await tester.tap(find.text('添加时间'));
