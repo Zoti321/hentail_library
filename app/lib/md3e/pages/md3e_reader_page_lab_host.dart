@@ -1,10 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_boundary_snackbar.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_catalog_sheet.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_settings_side_sheet.dart';
@@ -39,51 +37,48 @@ class Md3eReaderPageLabHost extends StatefulWidget {
 }
 
 class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
-  static const Duration _boundaryMessageDuration = Duration(seconds: 4);
-
   late int _page = widget.preview.initialPage;
   late String _volumeId = widget.preview.currentVolumeId;
   late String _volumeTitle = widget.preview.title;
   _SeriesBoundaryPrompt _boundaryPrompt = _SeriesBoundaryPrompt.none;
+
+  /// 非空时展示边界提示条；[_boundarySeq] 区分同文案的重复提示，保证每次都重新进场动画。
   String? _boundaryMessage;
-  Timer? _boundaryMessageTimer;
+  int _boundarySeq = 0;
   bool _chromeVisible = true;
   bool _fullscreen = false;
   late Md3eReaderSettingsLabState _settings = Md3eReaderSettingsLabState(
     autoPlayEnabled: false,
   );
 
-  @override
-  void dispose() {
-    _boundaryMessageTimer?.cancel();
-    super.dispose();
-  }
-
   int get _total =>
       widget.preview.totalPages < 1 ? 1 : widget.preview.totalPages;
 
-  /// 边界提示挂在阅读页自身的 Stack 内（不用根 Overlay），仅在本画布上显示。
+  int get _volumeIndex => widget.preview.seriesVolumes.indexWhere(
+    (Md3eReaderSeriesVolumePreview volume) => volume.id == _volumeId,
+  );
+
   void _showBoundaryMessage(String message) {
-    _boundaryMessageTimer?.cancel();
-    setState(() => _boundaryMessage = message);
-    _boundaryMessageTimer = Timer(
-      _boundaryMessageDuration,
-      _dismissBoundaryMessage,
-    );
+    setState(() {
+      _boundaryMessage = message;
+      _boundarySeq++;
+    });
   }
 
-  void _dismissBoundaryMessage() {
-    _boundaryMessageTimer?.cancel();
-    _boundaryMessageTimer = null;
-    if (_boundaryMessage == null || !mounted) {
+  /// 立即移除提示（翻页离开边界、跨卷时）。自动消失走组件自己的退场动画。
+  void _clearBoundaryMessage() {
+    if (_boundaryMessage == null) {
       return;
     }
     setState(() => _boundaryMessage = null);
   }
 
-  int get _volumeIndex => widget.preview.seriesVolumes.indexWhere(
-    (Md3eReaderSeriesVolumePreview volume) => volume.id == _volumeId,
-  );
+  void _onBoundaryMessageClosed(int seq) {
+    if (!mounted || seq != _boundarySeq) {
+      return;
+    }
+    setState(() => _boundaryMessage = null);
+  }
 
   void _setPage(int page) {
     final bool hadPrompt = _boundaryPrompt != _SeriesBoundaryPrompt.none;
@@ -92,7 +87,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
       _boundaryPrompt = _SeriesBoundaryPrompt.none;
     });
     if (hadPrompt) {
-      _dismissBoundaryMessage();
+      _clearBoundaryMessage();
     }
   }
 
@@ -138,7 +133,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
       _page = 1;
       _boundaryPrompt = _SeriesBoundaryPrompt.none;
     });
-    _dismissBoundaryMessage();
+    _clearBoundaryMessage();
   }
 
   void _handleTapZone(Md3eReaderTapZone zone) {
@@ -194,6 +189,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
             _page = 1;
             _boundaryPrompt = _SeriesBoundaryPrompt.none;
           });
+          _clearBoundaryMessage();
           return;
         }
       },
@@ -239,16 +235,12 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 24,
+            bottom: 0,
             child: IgnorePointer(
-              child: Center(
-                child: DefaultTextStyle.merge(
-                  style: const TextStyle(fontFamily: kMd3eAppFontFamily),
-                  child: M3EComponentTheme(
-                    builder: (BuildContext context) =>
-                        M3ESnackbar(message: boundaryMessage),
-                  ),
-                ),
+              child: Md3eReaderBoundarySnackbar(
+                key: ValueKey<int>(_boundarySeq),
+                message: boundaryMessage,
+                onClosed: () => _onBoundaryMessageClosed(_boundarySeq),
               ),
             ),
           ),

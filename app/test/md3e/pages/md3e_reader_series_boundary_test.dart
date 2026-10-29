@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_copy.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_boundary_snackbar.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -181,6 +182,41 @@ void main() {
       );
     },
   );
+
+  testWidgets('boundary snackbar slides in from below and auto-dismisses', (
+    WidgetTester tester,
+  ) async {
+    await _pumpHost(
+      tester,
+      const Md3eReaderPagePreviewData(
+        title: '第 01 卷',
+        totalPages: 3,
+        initialPage: 3,
+      ),
+    );
+
+    // 只点击、不 pumpAndSettle，才能观察到进场起点。
+    await tester.tapAt(const Offset(900, 400));
+    await tester.pump();
+    final Finder slide = find.descendant(
+      of: find.byType(Md3eReaderBoundarySnackbar),
+      matching: find.byType(SlideTransition),
+    );
+    expect(slide, findsOneWidget);
+
+    // 进场起点：位于下方（offset.dy > 0），动画结束后归位。
+    expect(
+      tester.widget<SlideTransition>(slide).position.value.dy,
+      greaterThan(0),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.widget<SlideTransition>(slide).position.value, Offset.zero);
+
+    // 4 秒后自动退场，退场动画结束后移除。
+    await tester.pump(const Duration(seconds: 4, milliseconds: 1));
+    await tester.pumpAndSettle();
+    expect(find.text(_advancePrompt), findsNothing);
+  });
 
   testWidgets('moving away from boundary clears pending prompt', (
     WidgetTester tester,
