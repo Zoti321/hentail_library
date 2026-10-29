@@ -35,16 +35,10 @@ abstract final class Md3eMotion {
     return MediaQuery.disableAnimationsOf(context);
   }
 
-  /// Reader chrome show/hide; aligns with M3E [_kAppBarTravel] (250ms).
-  static const Duration readerChromeTravel = Duration(milliseconds: 250);
-
-  static Curve readerChromeCurveForReveal({required bool reduceMotion}) {
-    return reduceMotion ? Curves.linear : curveEmphasizedDecelerate;
-  }
-
-  static Curve readerChromeCurveForDismiss({required bool reduceMotion}) {
-    return reduceMotion ? Curves.linear : curveEmphasizedAccelerate;
-  }
+  /// 阅读页顶/底栏显隐：与 M3E 工具栏显隐同款 expressive spatial spring（过冲很轻，符合 M3E 手感），
+  /// 不用固定时长曲线。
+  static const MaterialSpringMotion readerChromeReveal =
+      MaterialSpringMotion.expressiveSpatialDefault();
 
   static Duration motionDurationOf(BuildContext context, Duration duration) {
     return reduceMotionOf(context) ? Duration.zero : duration;
