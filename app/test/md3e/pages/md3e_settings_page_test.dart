@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/patterns/settings/md3e_settings_catalog.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../support/pump_md3e_app.dart';
 
@@ -32,14 +33,42 @@ void main() {
   ) async {
     await pumpMd3eApp(
       tester,
-      home: const SizedBox(
-        width: 390,
-        height: 800,
-        child: Md3eSettingsPage(),
-      ),
+      home: const SizedBox(width: 390, height: 800, child: Md3eSettingsPage()),
     );
     expect(find.byKey(const Key('md3e_settings_master')), findsOneWidget);
     expect(find.byKey(const Key('md3e_settings_detail')), findsNothing);
     await tester.binding.setSurfaceSize(null);
   });
+
+  testWidgets(
+    'compact header has no back button; system back returns to master list',
+    (WidgetTester tester) async {
+      await pumpMd3eApp(
+        tester,
+        home: const SizedBox(
+          width: 390,
+          height: 800,
+          child: Md3eSettingsPage(),
+        ),
+      );
+      expect(find.byIcon(Symbols.arrow_back), findsNothing);
+
+      await tester.tap(
+        find
+            .descendant(
+              of: find.byKey(const Key('md3e_settings_master')),
+              matching: find.byType(InkWell),
+            )
+            .first,
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('md3e_settings_detail')), findsOneWidget);
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('md3e_settings_master')), findsOneWidget);
+      expect(find.byKey(const Key('md3e_settings_detail')), findsNothing);
+      await tester.binding.setSurfaceSize(null);
+    },
+  );
 }

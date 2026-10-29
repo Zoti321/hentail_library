@@ -57,100 +57,99 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
     });
   }
 
-  void _onBack(BuildContext context, {required bool wide}) {
-    if (!wide && _showingNarrowDetail) {
-      setState(() => _showingNarrowDetail = false);
-      return;
-    }
-    Navigator.maybePop(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(windowWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      windowWidth,
+    );
     final AppLocalizations l10n = context.l10n;
     final double horizontalPadding =
         Md3eSettingsPageMetrics.contentHorizontalPadding(sizeClass);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Builder(
-            builder: (BuildContext context) {
-              final bool headerWide = Md3eSettingsPageMetrics.useListDetail(
-                windowWidth,
-              );
-              final Md3eSettingsCategoryInfo selectedInfo =
-                  kMd3eSettingsCategories.firstWhere(
-                    (Md3eSettingsCategoryInfo e) => e.category == _selected,
-                  );
-              final String? headerTitle =
-                  (!headerWide && _showingNarrowDetail)
-                  ? selectedInfo.label(l10n)
-                  : null;
-              return Md3eSettingsPageHeader(
-                title: headerTitle,
-                onBack: () => _onBack(context, wide: headerWide),
-              );
-            },
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              horizontalPadding,
-              0,
-              horizontalPadding,
-              MediaQuery.viewPaddingOf(context).bottom + 16,
-            ),
-            child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                final bool wide = Md3eSettingsPageMetrics.useListDetail(
-                  constraints.maxWidth,
-                );
+    final bool listDetailWide = Md3eSettingsPageMetrics.useListDetail(
+      windowWidth,
+    );
 
-                final Widget master = Md3eSettingsMasterMenu(
-                  key: const Key('md3e_settings_master'),
-                  wide: wide,
-                  selected: _selected,
-                  masterGroupTitle: widget.masterGroupTitle,
-                  onSelect: (Md3eSettingsCategory category) {
-                    _selectCategory(category, wide: wide);
-                  },
-                );
-
-                final Widget detail = Md3eSettingsDetailPane(
-                  key: const Key('md3e_settings_detail'),
-                  category: _selected,
-                  showTitle: wide,
-                  labState: _labState,
-                  onLabStateChanged: _updateLabState,
-                );
-
-                if (wide) {
-                  return Md3eListDetailAdaptiveLayout(
-                    showPaneDivider: false,
-                    listPaneFixedWidth:
-                        Md3eSettingsPageMetrics.masterPaneWidth,
-                    paneGap: Md3eSettingsPageMetrics.paneGap,
-                    listPane: master,
-                    detailPane: detail,
-                  );
-                }
-                return Md3eSettingsNarrowPaneSwitcher(
-                  showingDetail: _showingNarrowDetail,
-                  masterList: master,
-                  detailPane: detail,
-                );
+    return PopScope<Object?>(
+      canPop: listDetailWide || !_showingNarrowDetail,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop && _showingNarrowDetail) {
+          setState(() => _showingNarrowDetail = false);
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Builder(
+              builder: (BuildContext context) {
+                final Md3eSettingsCategoryInfo selectedInfo =
+                    kMd3eSettingsCategories.firstWhere(
+                      (Md3eSettingsCategoryInfo e) => e.category == _selected,
+                    );
+                final String? headerTitle =
+                    (!listDetailWide && _showingNarrowDetail)
+                    ? selectedInfo.label(l10n)
+                    : null;
+                return Md3eSettingsPageHeader(title: headerTitle);
               },
             ),
           ),
-        ),
-      ],
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                0,
+                horizontalPadding,
+                MediaQuery.viewPaddingOf(context).bottom + 16,
+              ),
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final bool wide = Md3eSettingsPageMetrics.useListDetail(
+                    constraints.maxWidth,
+                  );
+
+                  final Widget master = Md3eSettingsMasterMenu(
+                    key: const Key('md3e_settings_master'),
+                    wide: wide,
+                    selected: _selected,
+                    masterGroupTitle: widget.masterGroupTitle,
+                    onSelect: (Md3eSettingsCategory category) {
+                      _selectCategory(category, wide: wide);
+                    },
+                  );
+
+                  final Widget detail = Md3eSettingsDetailPane(
+                    key: const Key('md3e_settings_detail'),
+                    category: _selected,
+                    showTitle: wide,
+                    labState: _labState,
+                    onLabStateChanged: _updateLabState,
+                  );
+
+                  if (wide) {
+                    return Md3eListDetailAdaptiveLayout(
+                      showPaneDivider: false,
+                      listPaneFixedWidth:
+                          Md3eSettingsPageMetrics.masterPaneWidth,
+                      paneGap: Md3eSettingsPageMetrics.paneGap,
+                      listPane: master,
+                      detailPane: detail,
+                    );
+                  }
+                  return Md3eSettingsNarrowPaneSwitcher(
+                    showingDetail: _showingNarrowDetail,
+                    masterList: master,
+                    detailPane: detail,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -194,9 +193,7 @@ class Md3eSettingsNarrowPaneSwitcher extends StatelessWidget {
         transitionBuilder: (Widget child, Animation<double> animation) {
           final bool isIncoming = child.key == ValueKey<bool>(showingDetail);
           final Offset begin = isIncoming
-              ? (showingDetail
-                    ? const Offset(0.12, 0)
-                    : const Offset(-0.08, 0))
+              ? (showingDetail ? const Offset(0.12, 0) : const Offset(-0.08, 0))
               : (showingDetail
                     ? const Offset(-0.08, 0)
                     : const Offset(0.12, 0));
