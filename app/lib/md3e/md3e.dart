@@ -37,7 +37,6 @@ export 'patterns/home/md3e_home_library_dashboard_models.dart';
 export 'patterns/home/md3e_home_page_copy.dart';
 export 'patterns/home/md3e_home_library_list_order.dart';
 export 'patterns/home/md3e_home_library_management_section.dart';
-export 'patterns/home/md3e_home_library_reorderable_list.dart';
 export 'patterns/home/md3e_home_page_header.dart';
 export 'patterns/home/md3e_home_page_preview_data.dart';
 export 'patterns/library/md3e_lab_catalog_detail_preview_data.dart';
