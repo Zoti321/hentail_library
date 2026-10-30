@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_effects_decorated_box.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -41,11 +41,6 @@ class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme colors = M3ETheme.of(context).colorScheme;
-    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-    final Duration duration = Md3eMotion.motionDurationOf(
-      context,
-      const Duration(milliseconds: 250),
-    );
     final Widget child = widget.onTap == null
         ? widget.child
         : InkWell(
@@ -54,10 +49,7 @@ class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
             child: widget.child,
           );
 
-    return AnimatedContainer(
-      duration: duration,
-      curve: Md3eMotion.curveForStateEnter(reduceMotion: reduceMotion),
-      clipBehavior: Clip.antiAlias,
+    return Md3eEffectsDecoratedBox(
       decoration: BoxDecoration(
         color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.vertical(

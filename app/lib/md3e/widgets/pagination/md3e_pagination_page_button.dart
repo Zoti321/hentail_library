@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_effects_decorated_box.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -27,17 +27,6 @@ class Md3ePaginationPageButton extends StatelessWidget {
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETabTheme tabTheme = theme.tabTheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
-    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-    final Duration duration = Md3eMotion.motionDurationOf(
-      context,
-      Md3eMotion.durationShort,
-    );
-    final Curve enterCurve = Md3eMotion.curveForStateEnter(
-      reduceMotion: reduceMotion,
-    );
-    final Curve exitCurve = Md3eMotion.curveForStateExit(
-      reduceMotion: reduceMotion,
-    );
 
     return SizedBox(
       width: Md3ePaginationMetrics.pageButtonSlotWidth,
@@ -68,17 +57,16 @@ class Md3ePaginationPageButton extends StatelessWidget {
           );
 
           return Center(
-            child: AnimatedContainer(
-              duration: duration,
-              curve: selected ? enterCurve : exitCurve,
-              width: Md3ePaginationMetrics.pageButtonVisualSize,
-              height: Md3ePaginationMetrics.pageButtonVisualSize,
-              alignment: Alignment.center,
+            child: Md3eEffectsDecoratedBox(
               decoration: BoxDecoration(
                 color: fill,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text('$page', style: labelStyle),
+              child: SizedBox(
+                width: Md3ePaginationMetrics.pageButtonVisualSize,
+                height: Md3ePaginationMetrics.pageButtonVisualSize,
+                child: Center(child: Text('$page', style: labelStyle)),
+              ),
             ),
           );
         },
