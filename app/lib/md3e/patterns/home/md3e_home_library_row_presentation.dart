@@ -61,17 +61,3 @@ String? md3eHomeLibraryStatusLine(Md3eHomeLibraryDashboardRow row) {
     Md3eHomeLibraryRowHint.none => null,
   };
 }
-
-/// 可拖拽行使用的单字符串副标题（统计 / 同步时间 / 状态，按行拼接）。
-String md3eHomeLibrarySupportingText(
-  BuildContext context,
-  AppLocalizations l10n,
-  Md3eHomeLibraryDashboardRow row,
-) {
-  final List<String> lines = <String>[
-    md3eHomeLibraryStatsLine(l10n, row),
-    ?md3eHomeLibrarySyncLine(context, row.lastSyncedAt),
-    ?md3eHomeLibraryStatusLine(row),
-  ];
-  return lines.join('\n');
-}

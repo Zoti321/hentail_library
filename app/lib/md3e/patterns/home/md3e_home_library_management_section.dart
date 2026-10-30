@@ -9,6 +9,7 @@ import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 import 'package:material_3_expressive/components/lists/components/m3e_card_radius_motion.dart';
+import 'package:material_3_expressive/components/lists/components/m3e_list_reorder_exclude.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 首页「我的漫画库」：汇总 + 可操作的库列表（Lab；数据由调用方注入）。
@@ -176,6 +177,7 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     this.borderRadius = const BorderRadius.all(
       Radius.circular(kMd3eSplitListInnerRadius),
     ),
+    this.embeddedInList = false,
   });
 
   final Md3eHomeLibraryDashboardRow row;
@@ -183,6 +185,10 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
   final ValueChanged<Md3eHomeLibraryManagementAction>? onAction;
   final bool showMoreMenu;
   final BorderRadius borderRadius;
+
+  /// 为 true 时只输出行内容，表面、圆角、点击与拖拽交由外层 [M3EList] 的
+  /// `M3ECardListItem` 提供；「更多」用 [M3EListReorderExclude] 包裹，长按它不会开始拖拽。
+  final bool embeddedInList;
 
   @override
   Widget build(BuildContext context) {
@@ -194,6 +200,40 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     final String statsLine = md3eHomeLibraryStatsLine(l10n, row);
     final String? statusLine = md3eHomeLibraryStatusLine(row);
     final String? syncLine = md3eHomeLibrarySyncLine(context, row.lastSyncedAt);
+
+    if (embeddedInList) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: <Widget>[
+            // 打开只绑定在内容区：M3EList 的行级 onTap 会在点击「更多」时也触发，
+            // 所以行级 onTap 不负责打开（见 Md3eHomeLibraryReorderableList）。
+            Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onOpen,
+                child: _buildContent(
+                  scheme: scheme,
+                  type: type,
+                  leadingIcon: md3eHomeLibraryKindIcon(row.kind),
+                  statsLine: statsLine,
+                  statusLine: statusLine,
+                  syncLine: syncLine,
+                ),
+              ),
+            ),
+            if (showMoreMenu)
+              M3EListReorderExclude(
+                child: Md3eHomeLibraryRowMoreMenu(
+                  l10n: l10n,
+                  row: row,
+                  onAction: onAction,
+                ),
+              ),
+          ],
+        ),
+      );
+    }
 
     // 「更多」按钮放在 Stack 的兄弟位置，而非卡片子树内：
     // M3ETappable 通过原始指针监听按压，子树内的按钮会让整行进入按压态。
