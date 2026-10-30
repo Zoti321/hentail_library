@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_reveal.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -24,15 +25,11 @@ class Md3eLibraryScrollToTopButton extends StatefulWidget {
 
 class _Md3eLibraryScrollToTopButtonState
     extends State<Md3eLibraryScrollToTopButton> {
-  late final M3EFabController _fabController = M3EFabController();
-
   bool _scrollPastShowThreshold = false;
 
   @override
   void initState() {
     super.initState();
-    _fabController.hide();
-    _fabController.attachScroll(widget.scrollController);
     widget.scrollController.addListener(_onScrollOffset);
     WidgetsBinding.instance.addPostFrameCallback((_) => _onScrollOffset());
   }
@@ -42,20 +39,14 @@ class _Md3eLibraryScrollToTopButtonState
     super.didUpdateWidget(oldWidget);
     if (oldWidget.scrollController != widget.scrollController) {
       oldWidget.scrollController.removeListener(_onScrollOffset);
-      _fabController.detachScroll();
-      _fabController.attachScroll(widget.scrollController);
       widget.scrollController.addListener(_onScrollOffset);
       _onScrollOffset();
-    }
-    if (oldWidget.hidden != widget.hidden) {
-      _applyThresholdVisibility(pastThreshold: _scrollPastShowThreshold);
     }
   }
 
   @override
   void dispose() {
     widget.scrollController.removeListener(_onScrollOffset);
-    _fabController.dispose();
     super.dispose();
   }
 
@@ -76,15 +67,6 @@ class _Md3eLibraryScrollToTopButtonState
 
     if (nextPastThreshold != _scrollPastShowThreshold) {
       setState(() => _scrollPastShowThreshold = nextPastThreshold);
-      _applyThresholdVisibility(pastThreshold: nextPastThreshold);
-    }
-  }
-
-  void _applyThresholdVisibility({required bool pastThreshold}) {
-    if (widget.hidden || !pastThreshold) {
-      _fabController.hide();
-    } else {
-      _fabController.show();
     }
   }
 
@@ -104,8 +86,9 @@ class _Md3eLibraryScrollToTopButtonState
     final M3EThemeData theme = M3ETheme.of(context);
     final double width = MediaQuery.sizeOf(context).width;
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(width);
-    final M3EFabSize fabSize =
-        Md3eLibraryBrowsePageMetrics.scrollToTopFabSize(sizeClass);
+    final M3EFabSize fabSize = Md3eLibraryBrowsePageMetrics.scrollToTopFabSize(
+      sizeClass,
+    );
     final M3EFabMetrics metrics = theme.fabTheme.resolve(
       size: fabSize,
       color: M3EFabColor.primary,
@@ -113,22 +96,23 @@ class _Md3eLibraryScrollToTopButtonState
       enabled: true,
     );
 
+    // 显隐（位移 + 透明度）由外层 M3E 空间弹簧驱动，不再使用 FAB 内置的滚动显隐。
     return Positioned(
       right: widget.horizontalPadding,
       bottom: Md3eLibraryBrowsePageMetrics.scrollToTopBottomInset,
-      child: Semantics(
-        button: true,
-        label: '回到顶部',
-        child: M3EFab(
-          controller: _fabController,
-          size: fabSize,
-          color: M3EFabColor.primary,
-          cornerRadius: Md3eLibraryBrowsePageMetrics.scrollToTopCornerRadius,
-          icon: Icon(
-            LucideIcons.arrowUp,
-            size: metrics.iconSize,
+      child: Md3eSpringReveal(
+        visible: _scrollPastShowThreshold && !widget.hidden,
+        hiddenOffset: const Offset(0, 24),
+        child: Semantics(
+          button: true,
+          label: '回到顶部',
+          child: M3EFab(
+            size: fabSize,
+            color: M3EFabColor.primary,
+            cornerRadius: Md3eLibraryBrowsePageMetrics.scrollToTopCornerRadius,
+            icon: Icon(LucideIcons.arrowUp, size: metrics.iconSize),
+            onPressed: _scrollToTop,
           ),
-          onPressed: _scrollToTop,
         ),
       ),
     );
