@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_chrome_scope.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_interaction_scope.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -28,6 +29,8 @@ class Md3eReaderPage extends StatefulWidget {
     this.onAutoPlayChanged,
     this.onToggleChromeFromKeyboard,
     this.moreMenuEntries = const <M3EMenuNode>[],
+    this.viewportStatus = Md3eReaderViewportStatus.ready,
+    this.onViewportRetry,
   });
 
   final String title;
@@ -48,6 +51,8 @@ class Md3eReaderPage extends StatefulWidget {
   final ValueChanged<bool>? onAutoPlayChanged;
   final VoidCallback? onToggleChromeFromKeyboard;
   final List<M3EMenuNode> moreMenuEntries;
+  final Md3eReaderViewportStatus viewportStatus;
+  final VoidCallback? onViewportRetry;
 
   @override
   State<Md3eReaderPage> createState() => _Md3eReaderPageState();
@@ -80,11 +85,14 @@ class _Md3eReaderPageState extends State<Md3eReaderPage> {
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-                Md3eReaderViewport(
-                  currentPage: widget.currentPage,
-                  focusNode: _focusNode,
-                  onTapZone: widget.onTapZone,
-                ),
+            Md3eReaderViewport(
+              currentPage: widget.currentPage,
+              focusNode: _focusNode,
+              onTapZone: widget.onTapZone,
+              status: widget.viewportStatus,
+              onBack: widget.onBack,
+              onRetry: widget.onViewportRetry,
+            ),
             Md3eReaderChrome(
               visible: widget.chromeVisible,
               title: widget.title,

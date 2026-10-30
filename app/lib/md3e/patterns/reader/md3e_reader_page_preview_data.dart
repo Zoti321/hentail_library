@@ -1,3 +1,6 @@
+/// Lab 阅读画布状态（对应生产 read_session 的打开中 / 打开失败；静态预览用）。
+enum Md3eReaderViewportStatus { ready, loading, error }
+
 /// Lab 阅读页预览态（非 FRB Read session）。
 class Md3eReaderPagePreviewData {
   const Md3eReaderPagePreviewData({
@@ -7,6 +10,7 @@ class Md3eReaderPagePreviewData {
     this.initialPage = 1,
     this.currentVolumeId = 'vol-01',
     this.seriesVolumes = kMd3eReaderPreviewSeriesVolumes,
+    this.viewportStatus = Md3eReaderViewportStatus.ready,
   });
 
   final String title;
@@ -15,6 +19,7 @@ class Md3eReaderPagePreviewData {
   final int initialPage;
   final String currentVolumeId;
   final List<Md3eReaderSeriesVolumePreview> seriesVolumes;
+  final Md3eReaderViewportStatus viewportStatus;
 
   static Md3eReaderPagePreviewData sample() => const Md3eReaderPagePreviewData(
         title: '第 01 卷',

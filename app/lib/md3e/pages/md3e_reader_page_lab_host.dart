@@ -41,6 +41,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
   late String _volumeId = widget.preview.currentVolumeId;
   late String _volumeTitle = widget.preview.title;
   _SeriesBoundaryPrompt _boundaryPrompt = _SeriesBoundaryPrompt.none;
+  late Md3eReaderViewportStatus _viewportStatus = widget.preview.viewportStatus;
 
   /// 非空时展示边界提示条；[_boundarySeq] 区分同文案的重复提示，保证每次都重新进场动画。
   String? _boundaryMessage;
@@ -80,7 +81,12 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
     setState(() => _boundaryMessage = null);
   }
 
+  bool get _canPaginate => _viewportStatus == Md3eReaderViewportStatus.ready;
+
   void _setPage(int page) {
+    if (!_canPaginate) {
+      return;
+    }
     final bool hadPrompt = _boundaryPrompt != _SeriesBoundaryPrompt.none;
     setState(() {
       _page = page.clamp(1, _total);
@@ -93,6 +99,9 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
 
   /// 逐页翻页；越过本卷首/末页时进入边界确认（同卷内两次翻页才跨卷）。
   void _stepPage(int delta) {
+    if (!_canPaginate) {
+      return;
+    }
     final int target = _page + delta;
     if (target >= 1 && target <= _total) {
       _setPage(target);
@@ -213,6 +222,9 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
           onTapZone: _handleTapZone,
           onToggleChromeFromKeyboard: _toggleChromeFromKeyboard,
           onBack: widget.onBack,
+          viewportStatus: _viewportStatus,
+          onViewportRetry: () =>
+              setState(() => _viewportStatus = Md3eReaderViewportStatus.ready),
           onOpenSettings: _openSettings,
           onOpenSeriesCatalog: widget.preview.seriesVolumes.isEmpty
               ? null

@@ -353,6 +353,34 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                     ),
                   ),
                 ),
+                WidgetbookUseCase(
+                  name: 'Viewport · loading',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eReaderPageLabHost(
+                      preview: Md3eReaderPagePreviewData(
+                        title: '第 01 卷',
+                        subtitle: '葬送的芙莉莲',
+                        totalPages: 24,
+                        initialPage: 3,
+                        viewportStatus: Md3eReaderViewportStatus.loading,
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Viewport · open error',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eReaderPageLabHost(
+                      preview: Md3eReaderPagePreviewData(
+                        title: '第 01 卷',
+                        subtitle: '葬送的芙莉莲',
+                        totalPages: 24,
+                        initialPage: 3,
+                        viewportStatus: Md3eReaderViewportStatus.error,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
             WidgetbookComponent(
