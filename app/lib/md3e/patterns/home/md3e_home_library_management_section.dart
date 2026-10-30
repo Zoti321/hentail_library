@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_reorderable_list.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_row_presentation.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
+import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
-import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
-import 'package:material_3_expressive/components/lists/components/m3e_card_radius_motion.dart';
-import 'package:material_3_expressive/components/lists/components/m3e_list_reorder_exclude.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 首页「我的漫画库」：汇总 + 可操作的库列表（Lab；数据由调用方注入）。
+///
+/// 列表样式与设置页一致（[Md3eSplitListGroup] 分段圆角）。
 class Md3eHomeLibraryManagementSection extends StatelessWidget {
   const Md3eHomeLibraryManagementSection({
     super.key,
@@ -31,7 +29,7 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
   final VoidCallback? onAddLocalLibrary;
   final VoidCallback? onAddRemoteLibrary;
 
-  /// 非 null 时列表可拖拽排序；顺序变更仅通过此回调上报（持久化由上层负责）。
+  /// 拖拽排序暂未接入，当前参数保留但不生效（待拖拽实现时再启用）。
   final void Function(int oldIndex, int newIndex)? onLibrariesReorder;
 
   @override
@@ -80,45 +78,22 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
             l10n.sidebarAddLibraryTooltip,
             style: type.bodyMedium.copyWith(color: scheme.onSurfaceVariant),
           )
-        else if (onLibrariesReorder != null)
-          Md3eHomeLibraryReorderableList(
-            libraries: libraries,
-            onReorder: onLibrariesReorder!,
-            onLibraryOpen: onLibraryOpen,
-            onLibraryAction: onLibraryAction,
-          )
         else
-          _buildStaticRows(),
-      ],
-    );
-  }
-
-  Widget _buildStaticRows() {
-    final int last = libraries.length - 1;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        for (int i = 0; i < libraries.length; i++) ...<Widget>[
-          if (i > 0) const SizedBox(height: kMd3eSplitListRowGap),
-          Md3eHomeLibraryDashboardTile(
-            row: libraries[i],
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(
-                i == 0 ? kMd3eTonalSurfaceRadius : kMd3eSplitListInnerRadius,
-              ),
-              bottom: Radius.circular(
-                i == last ? kMd3eTonalSurfaceRadius : kMd3eSplitListInnerRadius,
-              ),
-            ),
-            onOpen: onLibraryOpen == null
-                ? null
-                : () => onLibraryOpen!(libraries[i].libraryId),
-            onAction: onLibraryAction == null
-                ? null
-                : (Md3eHomeLibraryManagementAction action) =>
-                      onLibraryAction!(libraries[i].libraryId, action),
+          Md3eSplitListGroup(
+            children: <Widget>[
+              for (final Md3eHomeLibraryDashboardRow row in libraries)
+                Md3eHomeLibraryDashboardTile(
+                  row: row,
+                  onOpen: onLibraryOpen == null
+                      ? null
+                      : () => onLibraryOpen!(row.libraryId),
+                  onAction: onLibraryAction == null
+                      ? null
+                      : (Md3eHomeLibraryManagementAction action) =>
+                            onLibraryAction!(row.libraryId, action),
+                ),
+            ],
           ),
-        ],
       ],
     );
   }
@@ -167,6 +142,9 @@ class _AddLibraryMenuButton extends StatelessWidget {
   }
 }
 
+/// 库列表的一行，与设置页 [Md3eSettingsTileShell] 同款（点按反馈与分段圆角由外层分段组提供）。
+///
+/// 「更多」菜单位于点按区域右侧，不在 [Md3eSettingsTileShell] 内，因此点它不会打开整行。
 class Md3eHomeLibraryDashboardTile extends StatelessWidget {
   const Md3eHomeLibraryDashboardTile({
     super.key,
@@ -174,113 +152,54 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     this.onOpen,
     this.onAction,
     this.showMoreMenu = true,
-    this.borderRadius = const BorderRadius.all(
-      Radius.circular(kMd3eSplitListInnerRadius),
-    ),
-    this.embeddedInList = false,
   });
 
   final Md3eHomeLibraryDashboardRow row;
   final VoidCallback? onOpen;
   final ValueChanged<Md3eHomeLibraryManagementAction>? onAction;
   final bool showMoreMenu;
-  final BorderRadius borderRadius;
-
-  /// 为 true 时只输出行内容，表面、圆角、点击与拖拽交由外层行容器提供
-  /// （如 [Md3eReorderableSplitListGroup]）；「更多」用 [M3EListReorderExclude] 包裹，长按它不会开始拖拽。
-  /// 此模式下 [onOpen] 不使用，打开由外层行的点击回调负责。
-  final bool embeddedInList;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EColorScheme scheme = theme.colorScheme;
-    final M3ETypeScale type = theme.typeScale;
+
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Md3eSettingsTileShell(
+            onTap: onOpen,
+            child: _Md3eHomeLibraryRowContent(row: row),
+          ),
+        ),
+        if (showMoreMenu)
+          Md3eHomeLibraryRowMoreMenu(l10n: l10n, row: row, onAction: onAction),
+      ],
+    );
+  }
+}
+
+class _Md3eHomeLibraryRowContent extends StatelessWidget {
+  const _Md3eHomeLibraryRowContent({required this.row});
+
+  final Md3eHomeLibraryDashboardRow row;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final M3ETypeScale type = M3ETheme.of(context).typeScale;
 
     final String statsLine = md3eHomeLibraryStatsLine(l10n, row);
     final String? statusLine = md3eHomeLibraryStatusLine(row);
     final String? syncLine = md3eHomeLibrarySyncLine(context, row.lastSyncedAt);
 
-    if (embeddedInList) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: _buildContent(
-                scheme: scheme,
-                type: type,
-                leadingIcon: md3eHomeLibraryKindIcon(row.kind),
-                statsLine: statsLine,
-                statusLine: statusLine,
-                syncLine: syncLine,
-              ),
-            ),
-            if (showMoreMenu)
-              M3EListReorderExclude(
-                child: Md3eHomeLibraryRowMoreMenu(
-                  l10n: l10n,
-                  row: row,
-                  onAction: onAction,
-                ),
-              ),
-          ],
-        ),
-      );
-    }
-
-    // 「更多」按钮放在 Stack 的兄弟位置，而非卡片子树内：
-    // M3ETappable 通过原始指针监听按压，子树内的按钮会让整行进入按压态。
-    return Stack(
-      children: <Widget>[
-        _Md3eHomeLibraryRowSurface(
-          onTap: onOpen,
-          borderRadius: borderRadius,
-          child: Padding(
-            padding: EdgeInsets.only(right: showMoreMenu ? 44 : 0),
-            child: _buildContent(
-              scheme: scheme,
-              type: type,
-              leadingIcon: md3eHomeLibraryKindIcon(row.kind),
-              statsLine: statsLine,
-              statusLine: statusLine,
-              syncLine: syncLine,
-            ),
-          ),
-        ),
-        if (showMoreMenu)
-          Positioned(
-            top: 0,
-            bottom: 0,
-            right: 12,
-            child: Center(
-              child: Md3eHomeLibraryRowMoreMenu(
-                l10n: l10n,
-                row: row,
-                onAction: onAction,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildContent({
-    required M3EColorScheme scheme,
-    required M3ETypeScale type,
-    required IconData leadingIcon,
-    required String statsLine,
-    required String? statusLine,
-    required String? syncLine,
-  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(top: 2),
           child: Icon(
-            leadingIcon,
+            md3eHomeLibraryKindIcon(row.kind),
             size: 24,
             color: md3eHomeLibraryHintColor(scheme, row.hint),
           ),
@@ -329,73 +248,6 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// 库列表行的 M3E 表面：与统计卡片一致的按压圆角动画（[M3ECardRadiusMotion]）与 state layer。
-///
-/// 仅按压时圆角变为 [kMd3eTonalSurfaceRadius]，hover 不改变圆角。
-/// 无 [onTap] 时仍响应 hover / 按压，但不可聚焦、不显示点击光标、不触发 haptic。
-class _Md3eHomeLibraryRowSurface extends StatefulWidget {
-  const _Md3eHomeLibraryRowSurface({
-    required this.child,
-    required this.borderRadius,
-    this.onTap,
-  });
-
-  final Widget child;
-  final BorderRadius borderRadius;
-  final VoidCallback? onTap;
-
-  @override
-  State<_Md3eHomeLibraryRowSurface> createState() =>
-      _Md3eHomeLibraryRowSurfaceState();
-}
-
-class _Md3eHomeLibraryRowSurfaceState
-    extends State<_Md3eHomeLibraryRowSurface> {
-  bool _pressed = false;
-
-  BorderRadius get _motionRadius => _pressed
-      ? BorderRadius.circular(kMd3eTonalSurfaceRadius)
-      : widget.borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final bool interactive = widget.onTap != null;
-    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-
-    return M3ECardRadiusMotion(
-      radius: _motionRadius,
-      snap: reduceMotion,
-      builder: (BuildContext context, BorderRadius animatedRadius) {
-        return M3ECard(
-          variant: M3ECardVariant.filled,
-          color: scheme.surfaceContainerLow,
-          borderRadius: animatedRadius,
-          elevation: M3EElevation.level0,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          onPressed: widget.onTap ?? () {},
-          focusable: interactive,
-          showFocusRing: false,
-          haptic: M3EHapticFeedback.none,
-          mouseCursor: interactive
-              ? SystemMouseCursors.click
-              : SystemMouseCursors.basic,
-          onStateChanged: (M3EInteractionState state) {
-            if (_pressed != state.pressed) {
-              setState(() => _pressed = state.pressed);
-            }
-          },
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 32),
-            child: widget.child,
-          ),
-        );
-      },
     );
   }
 }
