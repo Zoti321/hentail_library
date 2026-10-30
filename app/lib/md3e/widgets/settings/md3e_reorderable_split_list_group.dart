@@ -115,6 +115,7 @@ class _Md3eReorderableSplitListGroupState
   Offset _settleFrom = Offset.zero;
   Offset _settleTo = Offset.zero;
   List<Offset> _slotOrigins = <Offset>[];
+  List<double> _slotHeights = <double>[];
 
   @override
   void dispose() {
@@ -228,6 +229,7 @@ class _Md3eReorderableSplitListGroupState
   /// 测量所有行在列表 Stack 内的左上角与尺寸（拖拽开始时调用，此刻让位偏移均为 0）。
   bool _captureSlots(RenderBox stack) {
     final List<Offset> origins = <Offset>[];
+    final List<double> heights = <double>[];
     for (int i = 0; i < widget.itemCount; i++) {
       final RenderBox? box =
           _rowKey(_idOf(i)).currentContext?.findRenderObject() as RenderBox?;
@@ -235,9 +237,44 @@ class _Md3eReorderableSplitListGroupState
         return false;
       }
       origins.add(stack.globalToLocal(box.localToGlobal(Offset.zero)));
+      heights.add(box.size.height);
     }
     _slotOrigins = origins;
+    _slotHeights = heights;
     return true;
+  }
+
+  /// 假设 [from] 行被放到 [to] 位置时，所有行在列表中的新 top（各行按自身高度累加）。
+  ///
+  /// 让位与占位都以这套真实布局为准，因此行高不同时也不会错位、重叠。
+  List<double> _layoutTops(int from, int to) {
+    final List<int> order = <int>[
+      for (int i = 0; i < widget.itemCount; i++)
+        if (i != from) i,
+    ]..insert(to, from);
+    final List<double> tops = List<double>.filled(widget.itemCount, 0);
+    double cursor = _slotOrigins.isEmpty ? 0 : _slotOrigins[0].dy;
+    for (final int index in order) {
+      tops[index] = cursor;
+      cursor += _slotHeights[index] + kMd3eSplitListRowGap;
+    }
+    return tops;
+  }
+
+  /// 目标位置：拖拽浮层的中心越过了几条「其他行」的中线，就放到第几位。
+  /// 使用各行原始位置的中线，不依赖行高相同。
+  int _placementFor(int from, double centerY) {
+    int to = 0;
+    for (int i = 0; i < widget.itemCount; i++) {
+      if (i == from) {
+        continue;
+      }
+      final double mid = _slotOrigins[i].dy + _slotHeights[i] / 2;
+      if (mid < centerY) {
+        to++;
+      }
+    }
+    return to;
   }
 
   // ---- 拖拽 ----
@@ -291,58 +328,28 @@ class _Md3eReorderableSplitListGroupState
     _pointer = stack.globalToLocal(global);
     final Offset center = _pointer - _grab + _dragSize.center(Offset.zero);
 
-    int best = from;
-    double closest = double.infinity;
-    for (int i = 0; i < _slotOrigins.length; i++) {
-      final Offset slotCenter = _slotOrigins[i] + _dragSize.center(Offset.zero);
-      final double distance = (center - slotCenter).distance;
-      if (distance < closest) {
-        closest = distance;
-        best = i;
-      }
-    }
-
-    if (best != _targetIndex) {
-      _targetIndex = best;
+    final int to = _placementFor(from, center.dy);
+    if (to != _targetIndex) {
+      _targetIndex = to;
       HapticFeedback.selectionClick();
       _retarget(from);
     }
     setState(() {});
   }
 
-  /// 目标槽位变化：占位块与邻行都以弹簧追向新位置。
+  /// 目标变化：占位块与其他行都以弹簧追向「目标布局」中的真实位置。
   void _retarget(int from) {
     final int to = _targetIndex ?? from;
-    if (to < _slotOrigins.length) {
-      _springTo(_placeholder, _slotOrigins[to].dy, _shiftSpring);
-    }
-    for (int i = 0; i < widget.itemCount && i < _slotOrigins.length; i++) {
-      final double target = _retargetOffset(i, from, to);
+    final List<double> tops = _layoutTops(from, to);
+    _springTo(_placeholder, tops[from], _shiftSpring);
+    for (int i = 0; i < widget.itemCount; i++) {
+      final double target = i == from ? 0 : tops[i] - _slotOrigins[i].dy;
       if (_offsetGoals[i] == target) {
         continue;
       }
       _offsetGoals[i] = target;
       _springTo(_offsetCtrl(i), target, _shiftSpring);
     }
-  }
-
-  double _retargetOffset(int i, int from, int to) {
-    if (i == from) {
-      return 0;
-    }
-    final int visual = _retargetVisualSlot(i, from, to);
-    return _slotOrigins[visual].dy - _slotOrigins[i].dy;
-  }
-
-  /// 拖拽后第 [i] 行（重排前下标）在视觉上应占据的槽位。
-  int _retargetVisualSlot(int i, int from, int to) {
-    if (from < to && i > from && i <= to) {
-      return i - 1;
-    }
-    if (from > to && i >= to && i < from) {
-      return i + 1;
-    }
-    return i;
   }
 
   /// 浮层当前的绘制位置（跟随指针，抬起时带 12dp 偏移）。
@@ -358,7 +365,7 @@ class _Md3eReorderableSplitListGroupState
     }
     final int to = _targetIndex ?? from;
     _settleFrom = _proxyPosition(_lift.value.clamp(0.0, 1.0));
-    _settleTo = _slotOrigins[to];
+    _settleTo = Offset(_slotOrigins[to].dx, _layoutTops(from, to)[from]);
     _dropFrom = from;
     _dropTo = to;
 

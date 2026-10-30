@@ -132,6 +132,33 @@ void main() {
       expect(applyMd3eReorder(_items, from, to), <String>['B', 'C', 'A']);
     });
 
+    testWidgets('行高不同时拖动仍按各行真实位置判定目标（不因高度错位）', (WidgetTester tester) async {
+      const List<double> heights = <double>[56, 120, 56];
+      final List<(int, int)> calls = <(int, int)>[];
+      await pumpMd3eApp(
+        tester,
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: Md3eReorderableSplitListGroup(
+              itemCount: heights.length,
+              onReorder: (int from, int to) => calls.add((from, to)),
+              itemBuilder: (BuildContext context, int index) => SizedBox(
+                height: heights[index],
+                child: Center(child: Text(_items[index])),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // A 下移 150：中心越过 B 的中线（120），但未越过 C 的中线（212）。
+      await _longPressDrag(tester, find.text('A'), dy: 150);
+
+      expect(calls, hasLength(1));
+      final (int from, int to) = calls.single;
+      expect(applyMd3eReorder(_items, from, to), <String>['B', 'A', 'C']);
+    });
+
     testWidgets('拖拽过程中存在浮层（Md3eSplitDragScope），松手后移除', (
       WidgetTester tester,
     ) async {
