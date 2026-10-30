@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_list_order.dart';
+import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_index.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_section.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
@@ -35,10 +35,8 @@ class Md3eHomeLibraryReorderableList extends StatelessWidget {
       gap: kMd3eSplitListRowGap,
       color: scheme.surfaceContainerLow,
       itemCount: libraries.length,
-      onReorder: (int from, int to) => onReorder(
-        from,
-        md3eHomeLibraryReorderTargetToFlutterNewIndex(from, to),
-      ),
+      onReorder: (int from, int to) =>
+          onReorder(from, md3eReorderTargetToFlutterNewIndex(from, to)),
       // 行级 onTap 只为挂载 hover/按压 state layer（M3EList 仅在 onTap 非空时挂载），
       // 故始终提供且为空操作；真正的打开由 Tile 内容区的 onOpen 负责，避免点「更多」时误开。
       onTap: (int _) {},
