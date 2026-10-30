@@ -60,6 +60,18 @@ void main() {
       expect(rows.last.bottomRadius, kMd3eTonalSurfaceRadius);
     });
 
+    testWidgets('无 onOpen 时行仍挂载可点按表面（保留 state layer），点击无动作', (
+      WidgetTester tester,
+    ) async {
+      await _pumpSection(tester);
+
+      final InkWell ink = tester.widget<InkWell>(find.byType(InkWell).first);
+      expect(ink.onTap, isNotNull);
+
+      await tester.tap(find.text('演示库A'));
+      await tester.pumpAndSettle();
+    });
+
     testWidgets('点击行内容触发打开回调', (WidgetTester tester) async {
       String? opened;
       await _pumpSection(tester, onLibraryOpen: (String id) => opened = id);

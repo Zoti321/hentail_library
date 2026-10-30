@@ -144,6 +144,7 @@ class _AddLibraryMenuButton extends StatelessWidget {
 
 /// 库列表的一行，与设置页 [Md3eSettingsTileShell] 同款（点按反馈与分段圆角由外层分段组提供）。
 ///
+/// 行始终挂载可点按表面：即使没有 [onOpen]，按压 / 悬停 state layer 仍显示，只是点击不产生动作。
 /// 「更多」菜单位于点按区域右侧，不在 [Md3eSettingsTileShell] 内，因此点它不会打开整行。
 class Md3eHomeLibraryDashboardTile extends StatelessWidget {
   const Md3eHomeLibraryDashboardTile({
@@ -167,7 +168,7 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: Md3eSettingsTileShell(
-            onTap: onOpen,
+            onTap: onOpen ?? _doNothing,
             child: _Md3eHomeLibraryRowContent(row: row),
           ),
         ),
@@ -177,6 +178,8 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     );
   }
 }
+
+void _doNothing() {}
 
 class _Md3eHomeLibraryRowContent extends StatelessWidget {
   const _Md3eHomeLibraryRowContent({required this.row});
