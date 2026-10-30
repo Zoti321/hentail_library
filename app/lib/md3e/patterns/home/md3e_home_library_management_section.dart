@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
+import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_reorderable_list.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
-import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
+import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -25,7 +26,7 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
   final List<Md3eHomeLibraryDashboardRow> libraries;
   final ValueChanged<String>? onLibraryOpen;
   final void Function(String libraryId, Md3eHomeLibraryManagementAction action)?
-      onLibraryAction;
+  onLibraryAction;
   final VoidCallback? onAddLocalLibrary;
   final VoidCallback? onAddRemoteLibrary;
 
@@ -86,23 +87,37 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
             onLibraryAction: onLibraryAction,
           )
         else
-          Md3eSplitListGroup(
-            children: libraries
-                .map(
-                  (Md3eHomeLibraryDashboardRow row) =>
-                      Md3eHomeLibraryDashboardTile(
-                    row: row,
-                    onOpen: onLibraryOpen == null
-                        ? null
-                        : () => onLibraryOpen!(row.libraryId),
-                    onAction: onLibraryAction == null
-                        ? null
-                        : (Md3eHomeLibraryManagementAction action) =>
-                            onLibraryAction!(row.libraryId, action),
-                  ),
-                )
-                .toList(growable: false),
+          _buildStaticRows(),
+      ],
+    );
+  }
+
+  Widget _buildStaticRows() {
+    final int last = libraries.length - 1;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        for (int i = 0; i < libraries.length; i++) ...<Widget>[
+          if (i > 0) const SizedBox(height: kMd3eSplitListRowGap),
+          Md3eHomeLibraryDashboardTile(
+            row: libraries[i],
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(
+                i == 0 ? kMd3eTonalSurfaceRadius : kMd3eSplitListInnerRadius,
+              ),
+              bottom: Radius.circular(
+                i == last ? kMd3eTonalSurfaceRadius : kMd3eSplitListInnerRadius,
+              ),
+            ),
+            onOpen: onLibraryOpen == null
+                ? null
+                : () => onLibraryOpen!(libraries[i].libraryId),
+            onAction: onLibraryAction == null
+                ? null
+                : (Md3eHomeLibraryManagementAction action) =>
+                      onLibraryAction!(libraries[i].libraryId, action),
           ),
+        ],
       ],
     );
   }
@@ -158,12 +173,16 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     this.onOpen,
     this.onAction,
     this.showMoreMenu = true,
+    this.borderRadius = const BorderRadius.all(
+      Radius.circular(kMd3eSplitListInnerRadius),
+    ),
   });
 
   final Md3eHomeLibraryDashboardRow row;
   final VoidCallback? onOpen;
   final ValueChanged<Md3eHomeLibraryManagementAction>? onAction;
   final bool showMoreMenu;
+  final BorderRadius borderRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -182,73 +201,105 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     final String? statusLine = _statusLine(context, row);
     final String? syncLine = _syncLine(context, row.lastSyncedAt);
 
-    return Md3eSettingsTileShell(
-      onTap: onOpen,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Icon(
-              leadingIcon,
-              size: 24,
-              color: _leadingColor(scheme, row.hint),
+    // 「更多」按钮放在 Stack 的兄弟位置，而非卡片子树内：
+    // M3ETappable 通过原始指针监听按压，子树内的按钮会让整行进入按压态。
+    return Stack(
+      children: <Widget>[
+        _Md3eHomeLibraryRowSurface(
+          onTap: onOpen,
+          borderRadius: borderRadius,
+          child: Padding(
+            padding: EdgeInsets.only(right: showMoreMenu ? 44 : 0),
+            child: _buildContent(
+              scheme: scheme,
+              type: type,
+              leadingIcon: leadingIcon,
+              statsLine: statsLine,
+              statusLine: statusLine,
+              syncLine: syncLine,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
+        ),
+        if (showMoreMenu)
+          Positioned(
+            top: 0,
+            bottom: 0,
+            right: 12,
+            child: Center(
+              child: Md3eHomeLibraryRowMoreMenu(
+                l10n: l10n,
+                row: row,
+                onAction: onAction,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildContent({
+    required M3EColorScheme scheme,
+    required M3ETypeScale type,
+    required IconData leadingIcon,
+    required String statsLine,
+    required String? statusLine,
+    required String? syncLine,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(
+            leadingIcon,
+            size: 24,
+            color: _leadingColor(scheme, row.hint),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                row.displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: type.titleMedium.copyWith(color: scheme.onSurface),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                statsLine,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: type.bodySmall.copyWith(color: scheme.onSurfaceVariant),
+              ),
+              if (syncLine != null) ...<Widget>[
+                const SizedBox(height: 2),
                 Text(
-                  row.displayName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: type.titleMedium.copyWith(color: scheme.onSurface),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  statsLine,
+                  syncLine,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: type.bodySmall.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
                 ),
-                if (syncLine != null) ...<Widget>[
-                  const SizedBox(height: 2),
-                  Text(
-                    syncLine,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: type.bodySmall.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-                if (statusLine != null) ...<Widget>[
-                  const SizedBox(height: 4),
-                  Text(
-                    statusLine,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: type.labelSmall.copyWith(
-                      color: _hintColor(scheme, row.hint),
-                    ),
-                  ),
-                ],
               ],
-            ),
+              if (statusLine != null) ...<Widget>[
+                const SizedBox(height: 4),
+                Text(
+                  statusLine,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: type.labelSmall.copyWith(
+                    color: _hintColor(scheme, row.hint),
+                  ),
+                ),
+              ],
+            ],
           ),
-          const SizedBox(width: 4),
-          if (showMoreMenu)
-            Md3eHomeLibraryRowMoreMenu(
-              l10n: l10n,
-              row: row,
-              onAction: onAction,
-            ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -277,10 +328,7 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     return '${Md3eHomeLibraryManagementCopy.lastSyncLabel} · $formatted';
   }
 
-  String? _statusLine(
-    BuildContext context,
-    Md3eHomeLibraryDashboardRow row,
-  ) {
+  String? _statusLine(BuildContext context, Md3eHomeLibraryDashboardRow row) {
     if (row.scanInProgress) {
       return Md3eHomeLibraryManagementCopy.scanInProgressHint;
     }
@@ -294,6 +342,51 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
         Md3eHomeLibraryManagementCopy.unreachableHint,
       Md3eHomeLibraryRowHint.none => null,
     };
+  }
+}
+
+/// 库列表行的 M3E state layer 表面。
+///
+/// 无 [onTap] 时仍响应 hover / 按压（与统计卡片一致），但不可聚焦、不显示点击光标、不触发 haptic。
+/// 按压不改变圆角（不做 [Md3eSplitListRow] 的圆角形变）。
+class _Md3eHomeLibraryRowSurface extends StatelessWidget {
+  const _Md3eHomeLibraryRowSurface({
+    required this.child,
+    required this.borderRadius,
+    this.onTap,
+  });
+
+  final Widget child;
+  final BorderRadius borderRadius;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final bool interactive = onTap != null;
+
+    return M3ECard(
+      variant: M3ECardVariant.filled,
+      color: scheme.surfaceContainerLow,
+      borderRadius: borderRadius,
+      elevation: M3EElevation.level0,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      animationDuration: Md3eMotion.reduceMotionOf(context)
+          ? Duration.zero
+          : null,
+      onPressed: onTap ?? () {},
+      focusable: interactive,
+      showFocusRing: false,
+      haptic: M3EHapticFeedback.none,
+      mouseCursor: interactive
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 32),
+        child: child,
+      ),
+    );
   }
 }
 
@@ -353,8 +446,9 @@ class Md3eHomeLibraryRowMoreMenu extends StatelessWidget {
       M3EMenuEntry(
         label: l10n.sidebarDeleteLibrary,
         enabled: menuEnabled,
-        onPressed:
-            menuEnabled ? () => emit(Md3eHomeLibraryManagementAction.delete) : null,
+        onPressed: menuEnabled
+            ? () => emit(Md3eHomeLibraryManagementAction.delete)
+            : null,
       ),
     ];
 

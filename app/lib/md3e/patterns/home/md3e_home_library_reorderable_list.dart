@@ -28,7 +28,7 @@ class Md3eHomeLibraryReorderableList extends StatelessWidget {
   final void Function(int oldIndex, int newIndex) onReorder;
   final ValueChanged<String>? onLibraryOpen;
   final void Function(String libraryId, Md3eHomeLibraryManagementAction action)?
-      onLibraryAction;
+  onLibraryAction;
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +47,12 @@ class Md3eHomeLibraryReorderableList extends StatelessWidget {
         from,
         md3eHomeLibraryReorderTargetToFlutterNewIndex(from, to),
       ),
-      onTap: onLibraryOpen == null
-          ? null
-          : (int index) => onLibraryOpen!(libraries[index].libraryId),
+      // 始终提供 onTap：M3EList 仅在 onTap 非空时才挂载行的 hover/按压 state layer。
+      // 无 onLibraryOpen 时点击为空操作，光标保持普通箭头。
+      onTap: (int index) => onLibraryOpen?.call(libraries[index].libraryId),
+      mouseCursor: onLibraryOpen == null
+          ? SystemMouseCursors.basic
+          : SystemMouseCursors.click,
       itemBuilder: (BuildContext context, int index) {
         final Md3eHomeLibraryDashboardRow row = libraries[index];
         final IconData leadingIcon = switch (row.kind) {
@@ -72,7 +75,7 @@ class Md3eHomeLibraryReorderableList extends StatelessWidget {
               onAction: onLibraryAction == null
                   ? null
                   : (Md3eHomeLibraryManagementAction action) =>
-                      onLibraryAction!(row.libraryId, action),
+                        onLibraryAction!(row.libraryId, action),
             ),
           ),
         );
