@@ -1,4 +1,6 @@
 import 'package:flutter/services.dart';
+import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_curve.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_calendar_day_picker.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart';
@@ -45,6 +47,12 @@ class _Md3eCalendarMonthPickerState extends State<Md3eCalendarMonthPicker> {
   late DateTime _currentMonth;
   late int _monthCount;
 
+  /// 月份翻页曲线：M3E 空间弹簧（允许轻微回弹），采样时长与 [Md3eMotion.monthSwitchDuration] 一致。
+  final Curve _monthCurve = Md3eSpringCurve(
+    motion: Md3eMotion.routeSpring,
+    duration: Md3eMotion.monthSwitchDuration,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -72,10 +80,14 @@ class _Md3eCalendarMonthPickerState extends State<Md3eCalendarMonthPicker> {
   }
 
   void _goToPage(int page) {
+    if (Md3eMotion.reduceMotionOf(context)) {
+      _pageController.jumpToPage(page);
+      return;
+    }
     _pageController.animateToPage(
       page,
-      duration: M3EDatePickerConstants.monthScrollDuration,
-      curve: Curves.ease,
+      duration: Md3eMotion.monthSwitchDuration,
+      curve: _monthCurve,
     );
   }
 

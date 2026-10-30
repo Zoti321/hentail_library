@@ -35,7 +35,7 @@ class Md3eCoverReadProgressStrip extends StatelessWidget {
               ColoredBox(color: trackColor),
               Md3eSpringValue(
                 value: progress.clamp(0.0, 1.0),
-                builder: (BuildContext context, double value) {
+                builder: (BuildContext context, double value, Widget? child) {
                   return Align(
                     alignment: Alignment.centerLeft,
                     child: SizedBox(

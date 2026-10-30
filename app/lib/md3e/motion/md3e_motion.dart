@@ -55,6 +55,9 @@ abstract final class Md3eMotion {
   /// Lab 页面转场时长（弹簧按此时长采样；0.5s 内基本稳定）。
   static const Duration routeTransitionDuration = Duration(milliseconds: 500);
 
+  /// 日历月份切换（PageView 弹簧翻页）的采样时长；弹簧在此时长内收敛。
+  static const Duration monthSwitchDuration = Duration(milliseconds: 400);
+
   /// Lab 模拟保存耗时（页面里的模拟等待，不是动画时长，与转场解耦）。
   static const Duration labSimulatedSaveDuration = Duration(milliseconds: 280);
 

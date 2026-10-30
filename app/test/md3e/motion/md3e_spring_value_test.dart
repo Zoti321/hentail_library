@@ -53,7 +53,7 @@ void main() {
         key: key,
         onBuild: (double target) => Md3eSpringValue(
           value: target,
-          builder: (BuildContext context, double value) {
+          builder: (BuildContext context, double value, Widget? child) {
             shown = value;
             return const SizedBox();
           },

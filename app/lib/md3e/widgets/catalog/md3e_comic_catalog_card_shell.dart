@@ -59,7 +59,7 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
               child: IgnorePointer(
                 child: Md3eSpringValue(
                   value: pinnedOverlayAlpha,
-                  builder: (BuildContext context, double alpha) {
+                  builder: (BuildContext context, double alpha, Widget? child) {
                     if (alpha <= 0) {
                       return const SizedBox.shrink();
                     }

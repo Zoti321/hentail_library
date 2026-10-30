@@ -1,3 +1,5 @@
+import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_value.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_calendar_month_picker.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_calendar_year_picker.dart';
 import 'package:material_3_expressive/components/date_pickers/components/m3e_date_picker_mode_toggle.dart';
@@ -183,6 +185,8 @@ class _Md3eEmbeddableCalendarDatePickerState
           );
         }
 
+        // 展开 / 收起（日视图 ↔ 年视图）的高度变化：M3E 空间弹簧，允许回弹。
+        final double bodyHeight = _inlinePickerBodyHeight(context);
         final Widget content = Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -191,12 +195,24 @@ class _Md3eEmbeddableCalendarDatePickerState
               monthDate: _displayedMonth,
               onChanged: _handleModeChanged,
             ),
-            AnimatedSize(
-              duration: M3EDatePickerConstants.dialogSizeAnimationDuration,
-              curve: Curves.easeIn,
-              alignment: Alignment.topCenter,
+            Md3eSpringValue(
+              value: bodyHeight,
+              motion: Md3eMotion.spatialReveal,
+              builder: (BuildContext context, double height, Widget? child) {
+                return SizedBox(
+                  height: height,
+                  child: ClipRect(
+                    child: OverflowBox(
+                      alignment: Alignment.topCenter,
+                      minHeight: bodyHeight,
+                      maxHeight: bodyHeight,
+                      child: child,
+                    ),
+                  ),
+                );
+              },
               child: SizedBox(
-                height: _inlinePickerBodyHeight(context),
+                height: bodyHeight,
                 child: switch (_mode) {
                   M3EDatePickerMode.day => Md3eCalendarMonthPicker(
                     initialMonth: _displayedMonth,

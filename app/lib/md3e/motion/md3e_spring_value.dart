@@ -10,10 +10,20 @@ class Md3eSpringValue extends StatefulWidget {
     super.key,
     required this.value,
     required this.builder,
+    this.motion = Md3eMotion.effectsSpring,
+    this.child,
   });
 
   final double value;
-  final Widget Function(BuildContext context, double value) builder;
+
+  /// 默认效果弹簧（无过冲）；需要回弹时传入空间弹簧（如 [Md3eMotion.spatialReveal]）。
+  final Motion motion;
+
+  /// 不随数值变化的子组件，原样传给 [builder]。
+  final Widget? child;
+
+  final Widget Function(BuildContext context, double value, Widget? child)
+  builder;
 
   @override
   State<Md3eSpringValue> createState() => _Md3eSpringValueState();
@@ -29,7 +39,7 @@ class _Md3eSpringValueState extends State<Md3eSpringValue>
   void initState() {
     super.initState();
     _controller = SingleMotionController(
-      motion: Md3eMotion.effectsSpring,
+      motion: widget.motion,
       vsync: this,
       initialValue: 1,
     );
@@ -63,8 +73,9 @@ class _Md3eSpringValueState extends State<Md3eSpringValue>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
+      child: widget.child,
       builder: (BuildContext context, Widget? child) {
-        return widget.builder(context, _current());
+        return widget.builder(context, _current(), child);
       },
     );
   }
