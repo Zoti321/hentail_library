@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_edit_form_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
 import 'package:hentai_library/md3e/patterns/dialog/md3e_lab_dialog_presenter.dart';
 import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_form.dart';
@@ -133,7 +134,7 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
       _validation = null;
       _saving = true;
     });
-    await Future<void>.delayed(const Duration(milliseconds: 280));
+    await Future<void>.delayed(Md3eMotion.labSimulatedSaveDuration);
     if (!mounted) {
       return;
     }

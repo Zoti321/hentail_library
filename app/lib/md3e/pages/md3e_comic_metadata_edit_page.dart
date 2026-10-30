@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_metadata_edit_form_metrics.dart';
+import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_form.dart';
@@ -99,7 +100,7 @@ class _Md3eComicMetadataEditPageState extends State<Md3eComicMetadataEditPage> {
       return;
     }
     setState(() => _saving = true);
-    await Future<void>.delayed(const Duration(milliseconds: 280));
+    await Future<void>.delayed(Md3eMotion.labSimulatedSaveDuration);
     if (!mounted) {
       return;
     }
