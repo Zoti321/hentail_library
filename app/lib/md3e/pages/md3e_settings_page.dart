@@ -4,6 +4,7 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_list_detail_adaptive_layout.dart';
 import 'package:hentai_library/md3e/layout/md3e_settings_page_metrics.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_curve.dart';
 import 'package:hentai_library/md3e/patterns/settings/md3e_settings_catalog.dart';
 import 'package:hentai_library/md3e/patterns/settings/md3e_settings_detail_panes.dart';
 import 'package:hentai_library/md3e/patterns/settings/md3e_settings_master_menu.dart';
@@ -208,15 +209,20 @@ class Md3eSettingsNarrowPaneSwitcher extends StatelessWidget {
 
     final Duration duration = Md3eMotion.motionDurationOf(
       context,
-      const Duration(milliseconds: 220),
+      Md3eMotion.routeTransitionDuration,
+    );
+    // 与 Lab 页面转场同款 M3E expressive spatial 弹簧：进场允许轻微过冲，退场沿反向曲线收回。
+    final Curve springCurve = Md3eSpringCurve(
+      motion: Md3eMotion.routeSpring,
+      duration: Md3eMotion.routeTransitionDuration,
     );
 
     return ClipRect(
       child: AnimatedSwitcher(
         duration: duration,
         reverseDuration: duration,
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeInCubic,
+        switchInCurve: springCurve,
+        switchOutCurve: springCurve.flipped,
         layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
           return Stack(
             alignment: Alignment.topLeft,
