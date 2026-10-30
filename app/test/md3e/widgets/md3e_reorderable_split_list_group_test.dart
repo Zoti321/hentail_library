@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_exclude.dart';
 import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_index.dart';
+import 'package:hentai_library/md3e/widgets/settings/md3e_reorderable_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
-import 'package:material_3_expressive/components/lists/components/m3e_list_drag_proxy_scope.dart';
-import 'package:material_3_expressive/components/lists/components/m3e_list_reorder_exclude.dart';
 
 import '../../support/pump_md3e_app.dart';
 
@@ -12,7 +12,7 @@ const List<String> _items = <String>['A', 'B', 'C'];
 
 Future<void> _pumpGroup(
   WidgetTester tester, {
-  required ReorderCallback onReorder,
+  required void Function(int oldIndex, int newIndex) onReorder,
   List<String> items = _items,
 }) {
   return pumpMd3eApp(
@@ -35,7 +35,6 @@ Future<void> _longPressDrag(
   WidgetTester tester,
   Finder start, {
   required double dy,
-  bool settle = true,
 }) async {
   final TestGesture gesture = await tester.startGesture(
     tester.getCenter(start),
@@ -46,9 +45,7 @@ Future<void> _longPressDrag(
     await tester.pump(const Duration(milliseconds: 16));
   }
   await gesture.up();
-  if (settle) {
-    await tester.pumpAndSettle();
-  }
+  await tester.pumpAndSettle();
 }
 
 void main() {
@@ -87,7 +84,7 @@ void main() {
       expect(applyMd3eReorder(_items, from, to), <String>['B', 'C', 'A']);
     });
 
-    testWidgets('拖拽过程中存在浮层 proxy（M3EListDragProxyScope）', (
+    testWidgets('拖拽过程中存在浮层（Md3eSplitDragScope），松手后移除', (
       WidgetTester tester,
     ) async {
       await _pumpGroup(tester, onReorder: (int _, int _) {});
@@ -99,14 +96,14 @@ void main() {
       await gesture.moveBy(const Offset(0, 20));
       await tester.pump(const Duration(milliseconds: 16));
 
-      expect(find.byType(M3EListDragProxyScope), findsOneWidget);
+      expect(find.byType(Md3eSplitDragScope), findsOneWidget);
 
       await gesture.up();
       await tester.pumpAndSettle();
-      expect(find.byType(M3EListDragProxyScope), findsNothing);
+      expect(find.byType(Md3eSplitDragScope), findsNothing);
     });
 
-    testWidgets('点击行时触发 onItemTap，点击 M3EListReorderExclude 区域不触发', (
+    testWidgets('点击行时触发 onItemTap，点击 Md3eReorderExclude 区域不触发', (
       WidgetTester tester,
     ) async {
       final List<int> taps = <int>[];
@@ -123,7 +120,7 @@ void main() {
                 child: Row(
                   children: <Widget>[
                     Expanded(child: Text('row-$index')),
-                    M3EListReorderExclude(
+                    Md3eReorderExclude(
                       child: IconButton(
                         key: ValueKey<String>('control-$index'),
                         icon: const Icon(Icons.tune),
@@ -147,9 +144,7 @@ void main() {
       expect(taps, <int>[1]);
     });
 
-    testWidgets('长按 M3EListReorderExclude 区域不会开始拖拽', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('长按 Md3eReorderExclude 区域不会开始拖拽', (WidgetTester tester) async {
       final List<(int, int)> calls = <(int, int)>[];
       await pumpMd3eApp(
         tester,
@@ -163,7 +158,7 @@ void main() {
                 child: Row(
                   children: <Widget>[
                     const Expanded(child: SizedBox()),
-                    M3EListReorderExclude(
+                    Md3eReorderExclude(
                       child: IconButton(
                         key: ValueKey<String>('control-$index'),
                         icon: const Icon(Icons.tune),

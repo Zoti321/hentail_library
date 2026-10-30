@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_section.dart';
+import 'package:hentai_library/md3e/widgets/settings/md3e_reorderable_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 
@@ -27,6 +28,7 @@ const List<Md3eHomeLibraryDashboardRow> _rows = <Md3eHomeLibraryDashboardRow>[
 Future<void> _pumpSection(
   WidgetTester tester, {
   ValueChanged<String>? onLibraryOpen,
+  void Function(int oldIndex, int newIndex)? onLibrariesReorder,
 }) {
   return pumpMd3eApp(
     tester,
@@ -35,6 +37,7 @@ Future<void> _pumpSection(
         child: Md3eHomeLibraryManagementSection(
           libraries: _rows,
           onLibraryOpen: onLibraryOpen,
+          onLibrariesReorder: onLibrariesReorder,
         ),
       ),
     ),
@@ -102,6 +105,52 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(opened, isNull);
+    });
+
+    testWidgets('传入 onLibrariesReorder 时使用可拖拽分段组，长按行可拖动重排', (
+      WidgetTester tester,
+    ) async {
+      final List<(int, int)> calls = <(int, int)>[];
+      await _pumpSection(
+        tester,
+        onLibrariesReorder: (int from, int to) => calls.add((from, to)),
+      );
+
+      expect(find.byType(Md3eReorderableSplitListGroup), findsOneWidget);
+
+      final TestGesture gesture = await tester.startGesture(
+        tester.getCenter(find.text('演示库A')),
+      );
+      await tester.pump(const Duration(milliseconds: 600));
+      for (int i = 0; i < 10; i++) {
+        await gesture.moveBy(const Offset(0, 40));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      expect(calls, <(int, int)>[(0, 2)]);
+    });
+
+    testWidgets('长按「更多」不会开始拖拽', (WidgetTester tester) async {
+      final List<(int, int)> calls = <(int, int)>[];
+      await _pumpSection(
+        tester,
+        onLibrariesReorder: (int from, int to) => calls.add((from, to)),
+      );
+
+      final TestGesture gesture = await tester.startGesture(
+        tester.getCenter(find.byIcon(Icons.more_vert).first),
+      );
+      await tester.pump(const Duration(milliseconds: 600));
+      for (int i = 0; i < 10; i++) {
+        await gesture.moveBy(const Offset(0, 40));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      expect(calls, isEmpty);
     });
   });
 }

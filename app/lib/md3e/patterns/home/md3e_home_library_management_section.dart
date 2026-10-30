@@ -3,7 +3,9 @@ import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_row_presentation.dart';
+import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_exclude.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
+import 'package:hentai_library/md3e/widgets/settings/md3e_reorderable_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -29,7 +31,8 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
   final VoidCallback? onAddLocalLibrary;
   final VoidCallback? onAddRemoteLibrary;
 
-  /// 拖拽排序暂未接入，当前参数保留但不生效（待拖拽实现时再启用）。
+  /// 传入时启用长按拖拽排序（[Md3eReorderableSplitListGroup]，Flutter [ReorderCallback] 约定）；
+  /// 为 null 时使用静态分段列表。
   final void Function(int oldIndex, int newIndex)? onLibrariesReorder;
 
   @override
@@ -78,23 +81,35 @@ class Md3eHomeLibraryManagementSection extends StatelessWidget {
             l10n.sidebarAddLibraryTooltip,
             style: type.bodyMedium.copyWith(color: scheme.onSurfaceVariant),
           )
+        else if (onLibrariesReorder != null)
+          Md3eReorderableSplitListGroup(
+            itemCount: libraries.length,
+            itemKeyOf: (int index) => libraries[index].libraryId,
+            onReorder: onLibrariesReorder!,
+            itemBuilder: (BuildContext context, int index) =>
+                _buildLibraryTile(libraries[index]),
+          )
         else
           Md3eSplitListGroup(
             children: <Widget>[
               for (final Md3eHomeLibraryDashboardRow row in libraries)
-                Md3eHomeLibraryDashboardTile(
-                  row: row,
-                  onOpen: onLibraryOpen == null
-                      ? null
-                      : () => onLibraryOpen!(row.libraryId),
-                  onAction: onLibraryAction == null
-                      ? null
-                      : (Md3eHomeLibraryManagementAction action) =>
-                            onLibraryAction!(row.libraryId, action),
-                ),
+                _buildLibraryTile(row),
             ],
           ),
       ],
+    );
+  }
+
+  Widget _buildLibraryTile(Md3eHomeLibraryDashboardRow row) {
+    return Md3eHomeLibraryDashboardTile(
+      row: row,
+      onOpen: onLibraryOpen == null
+          ? null
+          : () => onLibraryOpen!(row.libraryId),
+      onAction: onLibraryAction == null
+          ? null
+          : (Md3eHomeLibraryManagementAction action) =>
+                onLibraryAction!(row.libraryId, action),
     );
   }
 }
@@ -188,10 +203,13 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
             if (showMoreMenu)
               Padding(
                 padding: const EdgeInsets.only(right: 4),
-                child: Md3eHomeLibraryRowMoreMenu(
-                  l10n: l10n,
-                  row: row,
-                  onAction: onAction,
+                // 长按「更多」不触发列表拖拽。
+                child: Md3eReorderExclude(
+                  child: Md3eHomeLibraryRowMoreMenu(
+                    l10n: l10n,
+                    row: row,
+                    onAction: onAction,
+                  ),
                 ),
               ),
           ],
