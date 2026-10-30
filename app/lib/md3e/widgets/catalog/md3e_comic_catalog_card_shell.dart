@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_value.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Shared corner radius for catalog grid [Md3eComicCard] and list [Md3eComicListItem].
@@ -49,14 +49,6 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
 
     Widget content = child;
     if (pinnedOverlayAlpha > 0) {
-      final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-      final Duration motionDuration = Md3eMotion.motionDurationOf(
-        context,
-        Md3eMotion.durationShort,
-      );
-      final Curve curve = Md3eMotion.curveForStateEnter(
-        reduceMotion: reduceMotion,
-      );
       content = ClipRRect(
         borderRadius: radius,
         child: Stack(
@@ -65,15 +57,9 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
             child,
             Positioned.fill(
               child: IgnorePointer(
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(end: pinnedOverlayAlpha),
-                  duration: motionDuration,
-                  curve: curve,
-                  builder: (
-                    BuildContext context,
-                    double alpha,
-                    Widget? child,
-                  ) {
+                child: Md3eSpringValue(
+                  value: pinnedOverlayAlpha,
+                  builder: (BuildContext context, double alpha) {
                     if (alpha <= 0) {
                       return const SizedBox.shrink();
                     }

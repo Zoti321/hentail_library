@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_catalog_card_shell.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_cover_read_progress_strip.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -117,14 +116,6 @@ class Md3eComicCard extends StatelessWidget {
         enabled && visualState != Md3eComicCardVisualState.disabled;
     final bool dragged = visualState == Md3eComicCardVisualState.dragged;
 
-    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-    final Duration motionDuration = Md3eMotion.motionDurationOf(
-      context,
-      Md3eMotion.durationShort,
-    );
-    final Curve stateEnter = Md3eMotion.curveForStateEnter(
-      reduceMotion: reduceMotion,
-    );
 
     const double titleSubtitleGap = 6;
 
@@ -164,8 +155,6 @@ class Md3eComicCard extends StatelessWidget {
                 progress: readProgress!,
                 activeColor: scheme.primary,
                 trackColor: scheme.onSurface.withValues(alpha: 0.24),
-                duration: motionDuration,
-                curve: stateEnter,
               ),
             ),
         ],

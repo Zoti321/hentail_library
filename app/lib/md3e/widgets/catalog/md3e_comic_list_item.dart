@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_catalog_card_shell.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
@@ -127,14 +126,6 @@ class Md3eComicListItem extends StatelessWidget {
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
     final M3ESpacing spacing = theme.spacing;
-    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-    final Duration motionDuration = Md3eMotion.motionDurationOf(
-      context,
-      Md3eMotion.durationShort,
-    );
-    final Curve stateEnter = Md3eMotion.curveForStateEnter(
-      reduceMotion: reduceMotion,
-    );
 
     final bool effectiveSelectionMode = _effectiveSelectionMode;
     final bool effectiveSelected = _effectiveSelected;
@@ -239,8 +230,6 @@ class Md3eComicListItem extends StatelessWidget {
                   progress: readProgress!,
                   activeColor: scheme.primary,
                   trackColor: scheme.onSurface.withValues(alpha: 0.24),
-                  duration: motionDuration,
-                  curve: stateEnter,
                 ),
               );
             },
