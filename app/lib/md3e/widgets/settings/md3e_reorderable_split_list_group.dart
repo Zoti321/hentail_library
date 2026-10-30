@@ -82,16 +82,16 @@ class _Md3eReorderableSplitListGroupState
   final Map<Object, GlobalKey> _rowKeys = <Object, GlobalKey>{};
 
   // 所有动画都是无界控制器 + 弹簧模拟，便于保留速度做中途改向。
+  // 逐帧变化的量只由各自的 AnimatedBuilder 读取，不触发整列重建。
   late final AnimationController _lift = AnimationController.unbounded(
     vsync: this,
-  )..addListener(_onTick);
-  late final AnimationController _settle =
-      AnimationController.unbounded(vsync: this)
-        ..addListener(_onTick)
-        ..addStatusListener(_onSettleStatus);
+  );
+  late final AnimationController _settle = AnimationController.unbounded(
+    vsync: this,
+  )..addStatusListener(_onSettleStatus);
   late final AnimationController _placeholder = AnimationController.unbounded(
     vsync: this,
-  )..addListener(_onTick);
+  );
   final Map<int, AnimationController> _offsets = <int, AnimationController>{};
   final Map<int, double> _offsetGoals = <int, double>{};
 
@@ -133,12 +133,6 @@ class _Md3eReorderableSplitListGroupState
 
   GlobalKey _rowKey(Object id) => _rowKeys.putIfAbsent(id, GlobalKey.new);
 
-  void _onTick() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   void _onSettleStatus(AnimationStatus status) {
     if (status == AnimationStatus.completed && _settling) {
       _finishDrag();
@@ -147,11 +141,9 @@ class _Md3eReorderableSplitListGroupState
 
   AnimationController _offsetCtrl(int index) {
     return _offsets.putIfAbsent(index, () {
-      return AnimationController.unbounded(vsync: this)..addListener(_onTick);
+      return AnimationController.unbounded(vsync: this);
     });
   }
-
-  double _offsetValue(int index) => _offsets[index]?.value ?? 0;
 
   /// 以弹簧从当前位置与速度追到 [target]（中途改向时不会突变）。
   void _springTo(
@@ -480,10 +472,7 @@ class _Md3eReorderableSplitListGroupState
     final Widget slot = _dragIndex == index
         // 源行：保留布局高度但隐藏，浮层负责绘制它。
         ? IgnorePointer(child: Opacity(opacity: 0, child: listening))
-        : Transform.translate(
-            offset: Offset(0, _offsetValue(index)),
-            child: listening,
-          );
+        : _offsetSlot(index, listening);
 
     return KeyedSubtree(
       key: ValueKey<Object>(id),
@@ -494,57 +483,87 @@ class _Md3eReorderableSplitListGroupState
     );
   }
 
+  /// 让位偏移：只重绘这一行的 transform，不重建行内容。
+  Widget _offsetSlot(int index, Widget listening) {
+    final AnimationController offset = _offsetCtrl(index);
+    return AnimatedBuilder(
+      animation: offset,
+      child: listening,
+      builder: (BuildContext context, Widget? child) {
+        return Transform.translate(
+          offset: Offset(0, offset.value),
+          child: child,
+        );
+      },
+    );
+  }
+
   Widget _buildPlaceholder(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final double lift = _lift.value.clamp(0.0, 1.0);
-    return Positioned(
-      left: _slotOrigins[0].dx,
-      top: _placeholder.value,
-      width: _dragSize.width,
-      height: _dragSize.height,
-      child: IgnorePointer(
-        child: Opacity(
-          opacity: lift,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: scheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(widget.outerRadius),
-            ),
-          ),
+    final Widget fill = IgnorePointer(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(widget.outerRadius),
         ),
       ),
+    );
+    return AnimatedBuilder(
+      animation: Listenable.merge(<Listenable>[_placeholder, _lift]),
+      child: fill,
+      builder: (BuildContext context, Widget? child) {
+        return Positioned(
+          left: _slotOrigins[0].dx,
+          top: _placeholder.value,
+          width: _dragSize.width,
+          height: _dragSize.height,
+          child: Opacity(opacity: _lift.value.clamp(0.0, 1.0), child: child),
+        );
+      },
     );
   }
 
   Widget _buildProxy(BuildContext context) {
     final int from = _dragIndex!;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final double lift = _lift.value.clamp(0.0, 1.0);
-    final Offset offset = _settling
-        ? Offset.lerp(_settleFrom, _settleTo, _settle.value.clamp(0.0, 1.0))!
-        : _proxyPosition(lift);
-
-    return Positioned(
-      left: offset.dx,
-      top: offset.dy,
-      width: _dragSize.width,
-      height: _dragSize.height,
-      child: IgnorePointer(
-        child: PhysicalModel(
+    // 行内容只在父级重建时构建一次；逐帧移动的只是外层定位。
+    final Widget content = IgnorePointer(
+      child: PhysicalModel(
+        color: scheme.surfaceContainerHigh,
+        elevation: _kDragElevation,
+        borderRadius: BorderRadius.circular(widget.outerRadius),
+        child: Md3eSplitDragScope(
           color: scheme.surfaceContainerHigh,
-          elevation: _kDragElevation,
-          borderRadius: BorderRadius.circular(widget.outerRadius),
-          child: Md3eSplitDragScope(
-            color: scheme.surfaceContainerHigh,
-            radius: widget.outerRadius,
-            child: Md3eSplitListRow(
-              topRadius: widget.outerRadius,
-              bottomRadius: widget.outerRadius,
-              child: widget.itemBuilder(context, from),
-            ),
+          radius: widget.outerRadius,
+          child: Md3eSplitListRow(
+            topRadius: widget.outerRadius,
+            bottomRadius: widget.outerRadius,
+            child: widget.itemBuilder(context, from),
           ),
         ),
       ),
+    );
+
+    return AnimatedBuilder(
+      animation: Listenable.merge(<Listenable>[_lift, _settle]),
+      child: content,
+      builder: (BuildContext context, Widget? child) {
+        final double lift = _lift.value.clamp(0.0, 1.0);
+        final Offset offset = _settling
+            ? Offset.lerp(
+                _settleFrom,
+                _settleTo,
+                _settle.value.clamp(0.0, 1.0),
+              )!
+            : _proxyPosition(lift);
+        return Positioned(
+          left: offset.dx,
+          top: offset.dy,
+          width: _dragSize.width,
+          height: _dragSize.height,
+          child: child!,
+        );
+      },
     );
   }
 }
