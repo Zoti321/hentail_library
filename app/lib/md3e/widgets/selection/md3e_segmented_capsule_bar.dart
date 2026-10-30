@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_positioned.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -15,7 +15,7 @@ class Md3eSegmentedCapsuleSegment {
 }
 
 /// Kazumi-style horizontal **segmented control**: spaced text pills with a single
-/// sliding selection block ([AnimatedPositioned]).
+/// sliding selection block ([Md3eSpringPositioned]).
 class Md3eSegmentedCapsuleBar extends StatefulWidget {
   const Md3eSegmentedCapsuleBar({
     super.key,
@@ -91,22 +91,11 @@ class _Md3eSegmentedCapsuleBarState extends State<Md3eSegmentedCapsuleBar> {
     });
   }
 
-  Duration _motionDuration(BuildContext context) {
-    return Md3eMotion.motionDurationOf(context, Md3eMotion.durationShort);
-  }
-
-  Curve _motionCurve(BuildContext context) {
-    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-    return Md3eMotion.curveForStateEnter(reduceMotion: reduceMotion);
-  }
-
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
-    final Duration duration = _motionDuration(context);
-    final Curve curve = _motionCurve(context);
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -118,13 +107,13 @@ class _Md3eSegmentedCapsuleBarState extends State<Md3eSegmentedCapsuleBar> {
           alignment: Alignment.centerLeft,
           children: <Widget>[
             if (_indicatorWidth > 0)
-              AnimatedPositioned(
-                duration: duration,
-                curve: curve,
-                left: _indicatorLeft,
-                width: _indicatorWidth,
-                top: 0,
-                bottom: 0,
+              Md3eSpringPositioned(
+                rect: Rect.fromLTWH(
+                  _indicatorLeft,
+                  0,
+                  _indicatorWidth,
+                  Md3eSegmentedCapsuleBarMetrics.barHeight,
+                ),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: scheme.secondaryContainer,

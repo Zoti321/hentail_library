@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
-import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_positioned.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_page_button.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_page_window.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -98,14 +97,6 @@ class _Md3ePaginationSelectionStripState
     final double slot = Md3ePaginationMetrics.pageButtonSlotWidth;
     final double visual = Md3ePaginationMetrics.pageButtonVisualSize;
     final double inset = (slot - visual) / 2;
-    final Duration duration = Md3eMotion.motionDurationOf(
-      context,
-      Md3ePaginationMotion.pageChangeDuration,
-    );
-    final bool reduceMotion = duration == Duration.zero;
-    final Curve curve = Md3eMotion.curveForStateEnter(
-      reduceMotion: reduceMotion,
-    );
 
     return SizedBox(
       height: Md3ePaginationMetrics.pageButtonSlotWidth,
@@ -114,13 +105,13 @@ class _Md3ePaginationSelectionStripState
         alignment: Alignment.centerLeft,
         children: <Widget>[
           if (selectedIndex != null)
-            AnimatedPositioned(
-              duration: duration,
-              curve: curve,
-              left: selectedIndex * slot + inset,
-              top: inset,
-              width: visual,
-              height: visual,
+            Md3eSpringPositioned(
+              rect: Rect.fromLTWH(
+                selectedIndex * slot + inset,
+                inset,
+                visual,
+                visual,
+              ),
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: scheme.primaryContainer,
