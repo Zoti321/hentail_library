@@ -4,13 +4,12 @@ import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_mo
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_reorderable_list.dart';
+import 'package:hentai_library/md3e/patterns/home/md3e_home_library_row_presentation.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
-import 'package:intl/intl.dart';
 import 'package:material_3_expressive/components/lists/components/m3e_card_radius_motion.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 /// 首页「我的漫画库」：汇总 + 可操作的库列表（Lab；数据由调用方注入）。
 class Md3eHomeLibraryManagementSection extends StatelessWidget {
@@ -191,16 +190,10 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
-    final IconData leadingIcon = switch (row.kind) {
-      Md3eHomeLibraryKind.local => Symbols.folder,
-      Md3eHomeLibraryKind.remote => Symbols.cloud,
-    };
 
-    final String statsLine =
-        '${l10n.comicCount(row.comicCount)} · ${l10n.librarySeriesCount(row.seriesCount)}';
-
-    final String? statusLine = _statusLine(context, row);
-    final String? syncLine = _syncLine(context, row.lastSyncedAt);
+    final String statsLine = md3eHomeLibraryStatsLine(l10n, row);
+    final String? statusLine = md3eHomeLibraryStatusLine(row);
+    final String? syncLine = md3eHomeLibrarySyncLine(context, row.lastSyncedAt);
 
     // 「更多」按钮放在 Stack 的兄弟位置，而非卡片子树内：
     // M3ETappable 通过原始指针监听按压，子树内的按钮会让整行进入按压态。
@@ -214,7 +207,7 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
             child: _buildContent(
               scheme: scheme,
               type: type,
-              leadingIcon: leadingIcon,
+              leadingIcon: md3eHomeLibraryKindIcon(row.kind),
               statsLine: statsLine,
               statusLine: statusLine,
               syncLine: syncLine,
@@ -254,7 +247,7 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
           child: Icon(
             leadingIcon,
             size: 24,
-            color: _leadingColor(scheme, row.hint),
+            color: md3eHomeLibraryHintColor(scheme, row.hint),
           ),
         ),
         const SizedBox(width: 12),
@@ -293,7 +286,7 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: type.labelSmall.copyWith(
-                    color: _hintColor(scheme, row.hint),
+                    color: md3eHomeLibraryHintColor(scheme, row.hint),
                   ),
                 ),
               ],
@@ -302,47 +295,6 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  Color _leadingColor(M3EColorScheme scheme, Md3eHomeLibraryRowHint hint) {
-    return switch (hint) {
-      Md3eHomeLibraryRowHint.unreachable => scheme.error,
-      Md3eHomeLibraryRowHint.syncWarning => scheme.tertiary,
-      Md3eHomeLibraryRowHint.none => scheme.onSurfaceVariant,
-    };
-  }
-
-  Color _hintColor(M3EColorScheme scheme, Md3eHomeLibraryRowHint hint) {
-    return switch (hint) {
-      Md3eHomeLibraryRowHint.unreachable => scheme.error,
-      Md3eHomeLibraryRowHint.syncWarning => scheme.tertiary,
-      Md3eHomeLibraryRowHint.none => scheme.onSurfaceVariant,
-    };
-  }
-
-  String? _syncLine(BuildContext context, DateTime? at) {
-    if (at == null) {
-      return null;
-    }
-    final String locale = Localizations.localeOf(context).toString();
-    final String formatted = DateFormat.yMd(locale).add_Hm().format(at);
-    return '${Md3eHomeLibraryManagementCopy.lastSyncLabel} · $formatted';
-  }
-
-  String? _statusLine(BuildContext context, Md3eHomeLibraryDashboardRow row) {
-    if (row.scanInProgress) {
-      return Md3eHomeLibraryManagementCopy.scanInProgressHint;
-    }
-    if (row.metadataRefreshInProgress) {
-      return Md3eHomeLibraryManagementCopy.metadataRefreshInProgressHint;
-    }
-    return switch (row.hint) {
-      Md3eHomeLibraryRowHint.syncWarning =>
-        Md3eHomeLibraryManagementCopy.syncWarningHint(9),
-      Md3eHomeLibraryRowHint.unreachable =>
-        Md3eHomeLibraryManagementCopy.unreachableHint,
-      Md3eHomeLibraryRowHint.none => null,
-    };
   }
 }
 

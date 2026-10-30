@@ -5,6 +5,7 @@ import 'package:hentai_library/md3e/pages/md3e_home_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
 import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_navigation.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
+import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_list_order.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_page_preview_data.dart';
@@ -28,7 +29,7 @@ class Md3eHomePageLabHost extends StatefulWidget {
   final VoidCallback? onOpenNavigation;
   final ValueChanged<String>? onLibraryOpen;
   final void Function(String libraryId, Md3eHomeLibraryManagementAction action)?
-      onLibraryAction;
+  onLibraryAction;
   final VoidCallback? onAddLocalLibrary;
   final VoidCallback? onAddRemoteLibrary;
   final bool enableReorder;
@@ -58,7 +59,9 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
     super.didUpdateWidget(oldWidget);
     if (widget.initialLibraries != null &&
         widget.initialLibraries != oldWidget.initialLibraries) {
-      _libraries = List<Md3eHomeLibraryDashboardRow>.of(widget.initialLibraries!);
+      _libraries = List<Md3eHomeLibraryDashboardRow>.of(
+        widget.initialLibraries!,
+      );
     }
   }
 
@@ -105,10 +108,7 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
         return;
       }
       _updateRow(
-        row.copyWith(
-          scanInProgress: false,
-          metadataRefreshInProgress: false,
-        ),
+        row.copyWith(scanInProgress: false, metadataRefreshInProgress: false),
       );
       _busyResetTimers.remove(libraryId);
     });
@@ -148,7 +148,11 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
         _scheduleBusyReset(libraryId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Lab 预览：未执行 Library sync')),
+            const SnackBar(
+              content: Text(
+                Md3eHomeLibraryManagementCopy.labScanPreviewSnackBar,
+              ),
+            ),
           );
         }
       case Md3eHomeLibraryManagementAction.refreshMetadata:
@@ -156,7 +160,11 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
         _scheduleBusyReset(libraryId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Lab 预览：未执行 Metadata refresh')),
+            const SnackBar(
+              content: Text(
+                Md3eHomeLibraryManagementCopy.labMetadataRefreshPreviewSnackBar,
+              ),
+            ),
           );
         }
       case Md3eHomeLibraryManagementAction.delete:
@@ -196,10 +204,8 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
       onOpenNavigation: widget.onOpenNavigation,
       onLibraryOpen: widget.onLibraryOpen,
       onLibraryAction: _handleLibraryAction,
-      onAddLocalLibrary:
-          widget.onAddLocalLibrary ?? _defaultAddLocalLibrary,
-      onAddRemoteLibrary:
-          widget.onAddRemoteLibrary ?? _defaultAddRemoteLibrary,
+      onAddLocalLibrary: widget.onAddLocalLibrary ?? _defaultAddLocalLibrary,
+      onAddRemoteLibrary: widget.onAddRemoteLibrary ?? _defaultAddRemoteLibrary,
       onLibrariesReorder: widget.enableReorder ? _handleReorder : null,
     );
   }

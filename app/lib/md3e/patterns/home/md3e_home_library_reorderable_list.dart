@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_list_order.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_section.dart';
+import 'package:hentai_library/md3e/patterns/home/md3e_home_library_row_presentation.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
-import 'package:intl/intl.dart';
 import 'package:material_3_expressive/components/lists/components/m3e_list_reorder_exclude.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 /// 可拖拽排序的库列表（视觉对齐 [Md3eSplitListGroup]；嵌在父级 [ScrollView] 时用 shrinkWrap）。
 ///
@@ -55,18 +53,14 @@ class Md3eHomeLibraryReorderableList extends StatelessWidget {
           : SystemMouseCursors.click,
       itemBuilder: (BuildContext context, int index) {
         final Md3eHomeLibraryDashboardRow row = libraries[index];
-        final IconData leadingIcon = switch (row.kind) {
-          Md3eHomeLibraryKind.local => Symbols.folder,
-          Md3eHomeLibraryKind.remote => Symbols.cloud,
-        };
 
         return M3EListItem(
           headline: row.displayName,
-          supportingText: _supportingText(context, l10n, row),
+          supportingText: md3eHomeLibrarySupportingText(context, l10n, row),
           leading: Icon(
-            leadingIcon,
+            md3eHomeLibraryKindIcon(row.kind),
             size: 24,
-            color: _leadingColor(scheme, row.hint),
+            color: md3eHomeLibraryHintColor(scheme, row.hint),
           ),
           trailing: M3EListReorderExclude(
             child: Md3eHomeLibraryRowMoreMenu(
@@ -82,56 +76,4 @@ class Md3eHomeLibraryReorderableList extends StatelessWidget {
       },
     );
   }
-}
-
-Color _leadingColor(M3EColorScheme scheme, Md3eHomeLibraryRowHint hint) {
-  return switch (hint) {
-    Md3eHomeLibraryRowHint.unreachable => scheme.error,
-    Md3eHomeLibraryRowHint.syncWarning => scheme.tertiary,
-    Md3eHomeLibraryRowHint.none => scheme.onSurfaceVariant,
-  };
-}
-
-String _supportingText(
-  BuildContext context,
-  AppLocalizations l10n,
-  Md3eHomeLibraryDashboardRow row,
-) {
-  final String stats =
-      '${l10n.comicCount(row.comicCount)} · ${l10n.librarySeriesCount(row.seriesCount)}';
-  final String? sync = _syncLine(context, row.lastSyncedAt);
-  final String? status = _statusLine(row);
-  final List<String> lines = <String>[stats];
-  if (sync != null) {
-    lines.add(sync);
-  }
-  if (status != null) {
-    lines.add(status);
-  }
-  return lines.join('\n');
-}
-
-String? _syncLine(BuildContext context, DateTime? at) {
-  if (at == null) {
-    return null;
-  }
-  final String locale = Localizations.localeOf(context).toString();
-  final String formatted = DateFormat.yMd(locale).add_Hm().format(at);
-  return '${Md3eHomeLibraryManagementCopy.lastSyncLabel} · $formatted';
-}
-
-String? _statusLine(Md3eHomeLibraryDashboardRow row) {
-  if (row.scanInProgress) {
-    return Md3eHomeLibraryManagementCopy.scanInProgressHint;
-  }
-  if (row.metadataRefreshInProgress) {
-    return Md3eHomeLibraryManagementCopy.metadataRefreshInProgressHint;
-  }
-  return switch (row.hint) {
-    Md3eHomeLibraryRowHint.syncWarning =>
-      Md3eHomeLibraryManagementCopy.syncWarningHint(9),
-    Md3eHomeLibraryRowHint.unreachable =>
-      Md3eHomeLibraryManagementCopy.unreachableHint,
-    Md3eHomeLibraryRowHint.none => null,
-  };
 }

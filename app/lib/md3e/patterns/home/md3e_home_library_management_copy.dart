@@ -14,12 +14,16 @@ abstract final class Md3eHomeLibraryManagementCopy {
 
   static const String unreachableHint = '无法连接远程库';
 
+  static const String labScanPreviewSnackBar = 'Lab 预览：未执行 Library sync';
+
+  static const String labMetadataRefreshPreviewSnackBar =
+      'Lab 预览：未执行 Metadata refresh';
+
   /// 标题点明对象，正文一句说明后果（见 ADR-0023 勾选闸门；对齐生产 purge 文案结构）。
   static String deleteConfirmTitle(String libraryDisplayName) =>
       '删除「$libraryDisplayName」？';
 
-  static const String deleteConfirmBody =
-      '将从应用中移除此库。漫画文件会保留在原位置。';
+  static const String deleteConfirmBody = '将从应用中移除此库。漫画文件会保留在原位置。';
 
   static const String deleteConfirmAcknowledgement = '我了解不会删除漫画文件';
 }
