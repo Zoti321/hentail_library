@@ -65,10 +65,7 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
     final Widget tabs = SizedBox(
       width: barWidth,
       child: M3ETheme(
-        data: theme.copyWith(
-          colorScheme: tabsColorScheme,
-          tabTheme: tabTheme,
-        ),
+        data: theme.copyWith(colorScheme: tabsColorScheme, tabTheme: tabTheme),
         child: M3ETabs(
           variant: M3ETabsVariant.primary,
           scrollable: true,

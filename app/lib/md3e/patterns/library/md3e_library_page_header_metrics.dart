@@ -1,6 +1,7 @@
 import 'package:flutter/painting.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+
 /// Layout mode for [Md3eLibraryPageHeader] (MASTER §5.1 漫画库粘滞头).
 enum Md3eLibraryPageHeaderLayout {
   /// 标题 + 操作；漫画/系列 tabs 在 [Md3eLibraryCatalogToolbar]（随列表滚动）。
@@ -10,6 +11,7 @@ enum Md3eLibraryPageHeaderLayout {
 /// MASTER §5.1 漫画库页内头部尺寸。
 abstract final class Md3eLibraryPageHeaderMetrics {
   static const double toolbarHeight = 44;
+
   /// 与生产 `kLibraryHeaderVerticalPadding` 一致；页顶不再额外叠一层 browse 外边距。
   static const double verticalPadding = 10;
 
@@ -67,9 +69,7 @@ abstract final class Md3eLibraryPageHeaderMetrics {
     return width;
   }
 
-  static Md3eLibraryPageHeaderLayout layoutFor(
-    Md3eWindowSizeClass sizeClass,
-  ) {
+  static Md3eLibraryPageHeaderLayout layoutFor(Md3eWindowSizeClass sizeClass) {
     return Md3eLibraryPageHeaderLayout.titleAndActionsOnly;
   }
 

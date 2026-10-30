@@ -5,9 +5,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// 由目录 index 生成 Lab 详情 preview（与 [Md3eLabCatalogItemPreview] 标题一致）。
 abstract final class Md3eLabCatalogDetailPreviewData {
-  static Md3eComicDetailEntry comicDetail({
-    required int catalogIndex,
-  }) {
+  static Md3eComicDetailEntry comicDetail({required int catalogIndex}) {
     final Md3eLabCatalogItemPreview item = Md3eLabCatalogItemPreview.forIndex(
       displayTarget: LibraryDisplayTarget.comics,
       index: catalogIndex,
@@ -15,10 +13,10 @@ abstract final class Md3eLabCatalogDetailPreviewData {
     final int pageCount = 64 + catalogIndex * 8;
     return Md3eComicDetailEntry(
       title: item.title,
-      description:
-          'Lab 预览：${item.title}。简介由占位数据生成，用于验收目录 → 详情标题一致。',
+      description: 'Lab 预览：${item.title}。简介由占位数据生成，用于验收目录 → 详情标题一致。',
       pageCount: pageCount,
-      publishedLabel: '2020-${(catalogIndex % 12 + 1).toString().padLeft(2, '0')}-15',
+      publishedLabel:
+          '2020-${(catalogIndex % 12 + 1).toString().padLeft(2, '0')}-15',
       authors: <String>[item.listAuthor ?? '作者未知'],
       tags: <String>['Lab', '预览', '漫画'],
       resourceFormat: 'ZIP',
@@ -28,18 +26,13 @@ abstract final class Md3eLabCatalogDetailPreviewData {
       updatedAtLabel: '2026-03-01 09:00',
       showSeriesNav: catalogIndex.isEven,
       seriesCatalog: catalogIndex.isEven
-          ? <String>[
-              '${item.title} 上',
-              '${item.title} 下',
-            ]
+          ? <String>['${item.title} 上', '${item.title} 下']
           : const <String>[],
       seriesCurrentIndex: 0,
     );
   }
 
-  static Md3eSeriesDetailEntry seriesDetail({
-    required int catalogIndex,
-  }) {
+  static Md3eSeriesDetailEntry seriesDetail({required int catalogIndex}) {
     final Md3eLabCatalogItemPreview item = Md3eLabCatalogItemPreview.forIndex(
       displayTarget: LibraryDisplayTarget.series,
       index: catalogIndex,
@@ -82,7 +75,9 @@ abstract final class Md3eLabCatalogDetailPreviewData {
       authors: series.authors,
       tags: series.tags,
       showSeriesNav: true,
-      seriesCatalog: series.comics.map((Md3eSeriesDetailComicItem c) => c.title).toList(),
+      seriesCatalog: series.comics
+          .map((Md3eSeriesDetailComicItem c) => c.title)
+          .toList(),
       seriesCurrentIndex: comicIndex,
     );
   }

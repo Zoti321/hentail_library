@@ -115,8 +115,9 @@ abstract final class Md3eReadingHistoryListItemMetrics {
     double viewportWidth, {
     double? horizontalInset,
   }) {
-    final Md3eWindowSizeClass window =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
+    final Md3eWindowSizeClass window = Md3eWindowSizeClass.fromWidth(
+      viewportWidth,
+    );
     final Md3eReadingHistoryListItemSpec itemSpec = specFor(window);
     final double inset =
         horizontalInset ??

@@ -37,8 +37,9 @@ class Md3eLibraryPageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     // 断点跟窗口宽（与 M3 / Viewport addon 一致），不用扣掉水平 padding 后的内容宽。
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(windowWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      windowWidth,
+    );
 
     return Md3ePinnedToolbarChrome(
       child: _Md3eLibraryPageHeaderToolbar(
@@ -105,16 +106,13 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
     );
 
     return Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: leading,
-            ),
-          ),
-          actions,
-        ],
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Expanded(
+          child: Align(alignment: Alignment.centerLeft, child: leading),
+        ),
+        actions,
+      ],
     );
   }
 }
@@ -168,8 +166,9 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final double gap = Md3eLibraryPageHeaderMetrics.actionSpacing(sizeClass);
-    final Color filterColor =
-        filterSortActive ? scheme.primary : scheme.onSurfaceVariant;
+    final Color filterColor = filterSortActive
+        ? scheme.primary
+        : scheme.onSurfaceVariant;
     final List<M3EMenuNode> menuChildren = _menuChildren(l10n);
 
     return Row(
