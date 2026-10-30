@@ -40,6 +40,13 @@ abstract final class Md3eMotion {
   static const MaterialSpringMotion readerChromeReveal =
       MaterialSpringMotion.expressiveSpatialDefault();
 
+  /// 效果类动效（透明度、颜色、形状背景）：与 M3E 包 expressiveEffectsDefault 同值。
+  static const MaterialSpringMotion effectsSpring =
+      MaterialSpringMotion.expressiveEffectsDefault();
+
+  /// Lab 模拟保存耗时（页面里的模拟等待，不是动画时长，与转场解耦）。
+  static const Duration labSimulatedSaveDuration = Duration(milliseconds: 280);
+
   static Duration motionDurationOf(BuildContext context, Duration duration) {
     return reduceMotionOf(context) ? Duration.zero : duration;
   }
