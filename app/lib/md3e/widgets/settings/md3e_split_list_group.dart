@@ -22,6 +22,7 @@ class Md3eSplitListRow extends StatefulWidget {
     this.bottomRadius = kMd3eSplitListInnerRadius,
     this.pressedRadius = kMd3eTonalSurfaceRadius,
     this.onTap,
+    this.mouseCursor,
   });
 
   final Widget child;
@@ -29,6 +30,7 @@ class Md3eSplitListRow extends StatefulWidget {
   final double bottomRadius;
   final double pressedRadius;
   final VoidCallback? onTap;
+  final MouseCursor? mouseCursor;
 
   static ValueChanged<bool>? pressReporterOf(BuildContext context) {
     return context
@@ -43,7 +45,43 @@ class Md3eSplitListRow extends StatefulWidget {
 class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
   bool _pressed = false;
 
+  /// 本次按下是否落在 [M3EListReorderExclude] 区域（如行内「更多」按钮）内；
+  /// 是则不触发行点击，避免点控件时误打开整行。
+  bool _pressStartedInExclude = false;
+
   void _reportPress(bool pressed) => setState(() => _pressed = pressed);
+
+  bool _isOverExclude(Offset globalPosition) {
+    bool hit = false;
+    void visit(Element element) {
+      if (hit) {
+        return;
+      }
+      if (element.widget is M3EListReorderExclude) {
+        final RenderObject? renderObject = element.renderObject;
+        if (renderObject is RenderBox &&
+            renderObject.hasSize &&
+            renderObject.attached) {
+          final Offset local = renderObject.globalToLocal(globalPosition);
+          if ((Offset.zero & renderObject.size).contains(local)) {
+            hit = true;
+            return;
+          }
+        }
+      }
+      element.visitChildren(visit);
+    }
+
+    context.visitChildElements(visit);
+    return hit;
+  }
+
+  void _handleTap() {
+    if (_pressStartedInExclude) {
+      return;
+    }
+    widget.onTap?.call();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +91,15 @@ class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
     );
     final Widget child = widget.onTap == null
         ? widget.child
-        : InkWell(
-            onTap: widget.onTap,
-            onHighlightChanged: _reportPress,
-            child: widget.child,
+        : Listener(
+            onPointerDown: (PointerDownEvent event) =>
+                _pressStartedInExclude = _isOverExclude(event.position),
+            child: InkWell(
+              onTap: _handleTap,
+              mouseCursor: widget.mouseCursor,
+              onHighlightChanged: _reportPress,
+              child: widget.child,
+            ),
           );
 
     final double topRadius =
@@ -139,12 +182,18 @@ class Md3eReorderableSplitListGroup extends StatelessWidget {
     required this.itemCount,
     required this.itemBuilder,
     required this.onReorder,
+    this.onItemTap,
+    this.mouseCursor,
     this.outerRadius = kMd3eTonalSurfaceRadius,
   });
 
   final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
   final ReorderCallback onReorder;
+
+  /// 行级点击（有 ripple 与按压圆角反馈）；为 null 时行不可点击。
+  final ValueChanged<int>? onItemTap;
+  final MouseCursor? mouseCursor;
   final double outerRadius;
 
   @override
@@ -165,6 +214,8 @@ class Md3eReorderableSplitListGroup extends StatelessWidget {
             topRadius: first ? outerRadius : kMd3eSplitListInnerRadius,
             bottomRadius: last ? outerRadius : kMd3eSplitListInnerRadius,
             pressedRadius: outerRadius,
+            mouseCursor: onItemTap == null ? null : mouseCursor,
+            onTap: onItemTap == null ? null : () => onItemTap!(index),
             child: itemBuilder(context, index),
           ),
         );

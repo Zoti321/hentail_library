@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_section.dart';
+import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -82,8 +83,7 @@ void main() {
     testWidgets('hover 不改变圆角，按压后圆角变为统计卡片同款的 24dp', (WidgetTester tester) async {
       await _pumpSection(tester);
       final Finder card = find.byType(M3ECard).first;
-      final BorderRadius resting =
-          tester.widget<M3ECard>(card).borderRadius!;
+      final BorderRadius resting = tester.widget<M3ECard>(card).borderRadius!;
 
       await _hoverRow(tester);
       await tester.pumpAndSettle();
@@ -145,21 +145,27 @@ void main() {
   });
 
   group('可拖拽列表（提供 onLibrariesReorder）', () {
-    testWidgets('无 onOpen 时 hover 仍显示 state layer', (
+    testWidgets('无 onOpen 时行不可点击（不挂载行级 InkWell，光标保持普通箭头）', (
       WidgetTester tester,
     ) async {
       await _pumpSection(tester, onLibrariesReorder: (int _, int _) {});
 
-      await _hoverRow(tester);
-
-      expect(_rowStateLayer(tester).state.hovered, isTrue);
+      final Md3eSplitListRow row = tester.widget<Md3eSplitListRow>(
+        find.byType(Md3eSplitListRow).first,
+      );
+      expect(row.onTap, isNull);
+      expect(find.byType(InkWell), findsNothing);
     });
 
-    testWidgets('无 onOpen 时光标保持普通箭头', (WidgetTester tester) async {
-      await _pumpSection(tester, onLibrariesReorder: (int _, int _) {});
+    testWidgets('有 onOpen 时行挂载 InkWell 并带点击光标', (WidgetTester tester) async {
+      await _pumpSection(
+        tester,
+        onLibraryOpen: (_) {},
+        onLibrariesReorder: (int _, int _) {},
+      );
 
-      final M3EList list = tester.widget<M3EList>(find.byType(M3EList));
-      expect(list.mouseCursor, SystemMouseCursors.basic);
+      final InkWell ink = tester.widget<InkWell>(find.byType(InkWell).first);
+      expect(ink.mouseCursor, SystemMouseCursors.click);
     });
 
     testWidgets('有 onOpen 时点击行仍触发打开回调', (WidgetTester tester) async {

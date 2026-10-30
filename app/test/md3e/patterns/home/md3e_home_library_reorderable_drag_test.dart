@@ -58,54 +58,55 @@ Future<void> _longPressDrag(
 }
 
 void main() {
-  group('可拖拽列表（M3EList + Md3eHomeLibraryDashboardTile）', () {
-    testWidgets('长按行并拖动会触发 onLibrariesReorder', (WidgetTester tester) async {
-      final List<(int, int)> calls = <(int, int)>[];
-      await _pumpReorderable(
-        tester,
-        onReorder: (int from, int to) => calls.add((from, to)),
-      );
+  group(
+    '可拖拽首页库列表（Md3eReorderableSplitListGroup + Md3eHomeLibraryDashboardTile）',
+    () {
+      testWidgets('长按行并拖动会触发 onLibrariesReorder', (WidgetTester tester) async {
+        final List<(int, int)> calls = <(int, int)>[];
+        await _pumpReorderable(
+          tester,
+          onReorder: (int from, int to) => calls.add((from, to)),
+        );
 
-      await _longPressDrag(tester, find.text('演示库A'));
+        await _longPressDrag(tester, find.text('演示库A'));
 
-      expect(calls, isNotEmpty);
-      expect(calls.first.$1, 0);
-    });
+        expect(calls, isNotEmpty);
+        expect(calls.first.$1, 0);
+      });
 
-    testWidgets('长按「更多」不会开始拖拽', (WidgetTester tester) async {
-      final List<(int, int)> calls = <(int, int)>[];
-      await _pumpReorderable(
-        tester,
-        onReorder: (int from, int to) => calls.add((from, to)),
-      );
+      testWidgets('长按「更多」不会开始拖拽', (WidgetTester tester) async {
+        final List<(int, int)> calls = <(int, int)>[];
+        await _pumpReorderable(
+          tester,
+          onReorder: (int from, int to) => calls.add((from, to)),
+        );
 
-      await _longPressDrag(tester, find.byIcon(Icons.more_vert).first);
+        await _longPressDrag(tester, find.byIcon(Icons.more_vert).first);
 
-      expect(calls, isEmpty);
-    });
+        expect(calls, isEmpty);
+      });
 
-    // 已知限制：M3EList 的行表面由 M3ECardListItem 提供，「更多」位于其子树内，
-    // 按压「更多」时整行仍会显示按压态（无法像静态行那样把按钮移出表面）。
-    // 这里只保证点击「更多」不会触发整行打开。
-    testWidgets('点击「更多」不会触发整行打开', (WidgetTester tester) async {
-      String? opened;
-      await pumpMd3eApp(
-        tester,
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: Md3eHomeLibraryManagementSection(
-              libraries: _rows,
-              onLibraryOpen: (String id) => opened = id,
-              onLibrariesReorder: (int _, int _) {},
+      // 「更多」位于行内，点击它不得触发整行打开（由 Md3eSplitListRow 按 M3EListReorderExclude 区域过滤）。
+      testWidgets('点击「更多」不会触发整行打开', (WidgetTester tester) async {
+        String? opened;
+        await pumpMd3eApp(
+          tester,
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Md3eHomeLibraryManagementSection(
+                libraries: _rows,
+                onLibraryOpen: (String id) => opened = id,
+                onLibrariesReorder: (int _, int _) {},
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.byIcon(Icons.more_vert).first);
-      await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.more_vert).first);
+        await tester.pumpAndSettle();
 
-      expect(opened, isNull);
-    });
-  });
+        expect(opened, isNull);
+      });
+    },
+  );
 }

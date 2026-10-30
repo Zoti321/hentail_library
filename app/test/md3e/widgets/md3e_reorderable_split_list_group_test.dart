@@ -106,6 +106,47 @@ void main() {
       expect(find.byType(M3EListDragProxyScope), findsNothing);
     });
 
+    testWidgets('点击行时触发 onItemTap，点击 M3EListReorderExclude 区域不触发', (
+      WidgetTester tester,
+    ) async {
+      final List<int> taps = <int>[];
+      await pumpMd3eApp(
+        tester,
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: Md3eReorderableSplitListGroup(
+              itemCount: 2,
+              onReorder: (int _, int _) {},
+              onItemTap: taps.add,
+              itemBuilder: (BuildContext context, int index) => SizedBox(
+                height: 56,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(child: Text('row-$index')),
+                    M3EListReorderExclude(
+                      child: IconButton(
+                        key: ValueKey<String>('control-$index'),
+                        icon: const Icon(Icons.tune),
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('row-1'));
+      await tester.pumpAndSettle();
+      expect(taps, <int>[1]);
+
+      await tester.tap(find.byKey(const ValueKey<String>('control-1')));
+      await tester.pumpAndSettle();
+      expect(taps, <int>[1]);
+    });
+
     testWidgets('长按 M3EListReorderExclude 区域不会开始拖拽', (
       WidgetTester tester,
     ) async {

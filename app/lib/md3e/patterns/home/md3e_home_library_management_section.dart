@@ -186,8 +186,9 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
   final bool showMoreMenu;
   final BorderRadius borderRadius;
 
-  /// 为 true 时只输出行内容，表面、圆角、点击与拖拽交由外层 [M3EList] 的
-  /// `M3ECardListItem` 提供；「更多」用 [M3EListReorderExclude] 包裹，长按它不会开始拖拽。
+  /// 为 true 时只输出行内容，表面、圆角、点击与拖拽交由外层行容器提供
+  /// （如 [Md3eReorderableSplitListGroup]）；「更多」用 [M3EListReorderExclude] 包裹，长按它不会开始拖拽。
+  /// 此模式下 [onOpen] 不使用，打开由外层行的点击回调负责。
   final bool embeddedInList;
 
   @override
@@ -206,20 +207,14 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: <Widget>[
-            // 打开只绑定在内容区：M3EList 的行级 onTap 会在点击「更多」时也触发，
-            // 所以行级 onTap 不负责打开（见 Md3eHomeLibraryReorderableList）。
             Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: onOpen,
-                child: _buildContent(
-                  scheme: scheme,
-                  type: type,
-                  leadingIcon: md3eHomeLibraryKindIcon(row.kind),
-                  statsLine: statsLine,
-                  statusLine: statusLine,
-                  syncLine: syncLine,
-                ),
+              child: _buildContent(
+                scheme: scheme,
+                type: type,
+                leadingIcon: md3eHomeLibraryKindIcon(row.kind),
+                statsLine: statsLine,
+                statusLine: statusLine,
+                syncLine: syncLine,
               ),
             ),
             if (showMoreMenu)
