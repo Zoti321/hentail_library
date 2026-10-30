@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_section.dart';
+import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../../support/pump_md3e_app.dart';
@@ -74,6 +75,28 @@ void main() {
       await tester.pump();
 
       expect(_rowStateLayer(tester).state.pressed, isTrue);
+      await press.up();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('hover 不改变圆角，按压后圆角变为统计卡片同款的 24dp', (WidgetTester tester) async {
+      await _pumpSection(tester);
+      final Finder card = find.byType(M3ECard).first;
+      final BorderRadius resting =
+          tester.widget<M3ECard>(card).borderRadius!;
+
+      await _hoverRow(tester);
+      await tester.pumpAndSettle();
+      expect(tester.widget<M3ECard>(card).borderRadius, resting);
+
+      final TestGesture press = await tester.startGesture(
+        tester.getCenter(find.text('演示库')),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<M3ECard>(card).borderRadius,
+        BorderRadius.circular(kMd3eTonalSurfaceRadius),
+      );
       await press.up();
       await tester.pumpAndSettle();
     });

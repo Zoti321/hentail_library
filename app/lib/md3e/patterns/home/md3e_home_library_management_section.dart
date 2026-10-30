@@ -8,6 +8,7 @@ import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 import 'package:intl/intl.dart';
+import 'package:material_3_expressive/components/lists/components/m3e_card_radius_motion.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -345,11 +346,11 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
   }
 }
 
-/// 库列表行的 M3E state layer 表面。
+/// 库列表行的 M3E 表面：与统计卡片一致的按压圆角动画（[M3ECardRadiusMotion]）与 state layer。
 ///
-/// 无 [onTap] 时仍响应 hover / 按压（与统计卡片一致），但不可聚焦、不显示点击光标、不触发 haptic。
-/// 按压不改变圆角（不做 [Md3eSplitListRow] 的圆角形变）。
-class _Md3eHomeLibraryRowSurface extends StatelessWidget {
+/// 仅按压时圆角变为 [kMd3eTonalSurfaceRadius]，hover 不改变圆角。
+/// 无 [onTap] 时仍响应 hover / 按压，但不可聚焦、不显示点击光标、不触发 haptic。
+class _Md3eHomeLibraryRowSurface extends StatefulWidget {
   const _Md3eHomeLibraryRowSurface({
     required this.child,
     required this.borderRadius,
@@ -361,31 +362,53 @@ class _Md3eHomeLibraryRowSurface extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
+  State<_Md3eHomeLibraryRowSurface> createState() =>
+      _Md3eHomeLibraryRowSurfaceState();
+}
+
+class _Md3eHomeLibraryRowSurfaceState
+    extends State<_Md3eHomeLibraryRowSurface> {
+  bool _pressed = false;
+
+  BorderRadius get _motionRadius => _pressed
+      ? BorderRadius.circular(kMd3eTonalSurfaceRadius)
+      : widget.borderRadius;
+
+  @override
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final bool interactive = onTap != null;
+    final bool interactive = widget.onTap != null;
+    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
 
-    return M3ECard(
-      variant: M3ECardVariant.filled,
-      color: scheme.surfaceContainerLow,
-      borderRadius: borderRadius,
-      elevation: M3EElevation.level0,
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      animationDuration: Md3eMotion.reduceMotionOf(context)
-          ? Duration.zero
-          : null,
-      onPressed: onTap ?? () {},
-      focusable: interactive,
-      showFocusRing: false,
-      haptic: M3EHapticFeedback.none,
-      mouseCursor: interactive
-          ? SystemMouseCursors.click
-          : SystemMouseCursors.basic,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 32),
-        child: child,
-      ),
+    return M3ECardRadiusMotion(
+      radius: _motionRadius,
+      snap: reduceMotion,
+      builder: (BuildContext context, BorderRadius animatedRadius) {
+        return M3ECard(
+          variant: M3ECardVariant.filled,
+          color: scheme.surfaceContainerLow,
+          borderRadius: animatedRadius,
+          elevation: M3EElevation.level0,
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          onPressed: widget.onTap ?? () {},
+          focusable: interactive,
+          showFocusRing: false,
+          haptic: M3EHapticFeedback.none,
+          mouseCursor: interactive
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          onStateChanged: (M3EInteractionState state) {
+            if (_pressed != state.pressed) {
+              setState(() => _pressed = state.pressed);
+            }
+          },
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 32),
+            child: widget.child,
+          ),
+        );
+      },
     );
   }
 }
