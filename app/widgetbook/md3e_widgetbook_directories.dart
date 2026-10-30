@@ -235,7 +235,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               name: 'Md3eLibraryFilterSortSideSheet',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Modal side sheet · viewport addon',
+                  name: 'Adaptive modal · bottom (<840) / side (≥840)',
                   builder: (BuildContext context) =>
                       const Md3eWidgetbookScope(
                     child: _Md3eLibraryFilterSortSideSheetPreview(),

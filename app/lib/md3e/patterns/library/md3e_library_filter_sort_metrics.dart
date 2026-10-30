@@ -10,11 +10,7 @@ const double kMd3eLibraryFilterSortDrawerContentInset = 16;
 const Color kMd3eLibraryFilterSortDrawerScrimColor = Color(0x52000000);
 
 /// 与生产 [LibraryLayoutTier] 一致的三档，用于抽屉宽度（600 / 1024 阈值）。
-enum Md3eLibraryFilterSortLayoutTier {
-  compact,
-  medium,
-  expanded,
-}
+enum Md3eLibraryFilterSortLayoutTier { compact, medium, expanded }
 
 Md3eLibraryFilterSortLayoutTier md3eLibraryFilterSortLayoutTierForWidth(
   double width,
@@ -77,6 +73,11 @@ double md3eLibraryFilterSortSideSheetWidthForViewport(double viewportWidth) {
 /// [M3ESideSheet] detached：M3 expanded 及以上（≥840）距窗口 16、四角圆角。
 bool md3eLibraryFilterSortSideSheetDetachedForViewport(double viewportWidth) {
   return Md3eWindowSizeClass.fromWidth(viewportWidth).isAtLeastExpanded;
+}
+
+/// 筛选排序面板：compact / medium（宽度小于 840）用 [M3EBottomSheet]，expanded+ 用 [M3ESideSheet]。
+bool md3eLibraryFilterSortPrefersBottomSheetForViewport(double viewportWidth) {
+  return viewportWidth < Md3eBreakpoints.expanded;
 }
 
 /// 筛选 / 排序列表行与手风琴头的触控与字号（按书库三档布局）。

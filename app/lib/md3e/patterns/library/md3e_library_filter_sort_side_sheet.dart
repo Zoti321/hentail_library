@@ -75,7 +75,7 @@ class Md3eLibraryFilterSortState {
   Md3eLibraryFilterSortState reset() => defaults;
 }
 
-/// 漫画库筛选与排序模态 side sheet（[M3ESideSheet]、即时生效、无底部「应用」）。
+/// 漫画库筛选与排序模态面板：compact / medium 为 bottom sheet，expanded+ 为 side sheet（即时生效、无底部「应用」）。
 abstract final class Md3eLibraryFilterSortSideSheet {
   Md3eLibraryFilterSortSideSheet._();
 
@@ -99,7 +99,7 @@ abstract final class Md3eLibraryFilterSortSideSheet {
     );
   }
 
-  /// 以模态 [M3ESideSheet] 呈现；宽度随视口，expanded+ 为 detached。
+  /// 模态呈现：compact / medium 用 [M3EBottomSheet]（全屏展开），expanded+ 用 [M3ESideSheet]（detached）。
   static Future<void> show(
     BuildContext context, {
     required Md3eLibraryFilterSortState state,
@@ -107,11 +107,35 @@ abstract final class Md3eLibraryFilterSortSideSheet {
     bool useRootNavigator = true,
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
+    final String title = AppLocalizations.of(context).libraryFilterSortTooltip;
     final Md3eOverlayRouteScopeSnapshot scope =
         Md3eOverlayRouteScopeSnapshot.capture(context);
+    final Widget modalBody = md3eOverlayRouteScope(
+      scope: scope,
+      child: _Md3eLibraryFilterSortSideSheetModalBody(
+        initialState: state,
+        onStateChanged: onStateChanged,
+      ),
+    );
+
+    if (md3eLibraryFilterSortPrefersBottomSheetForViewport(viewportWidth)) {
+      return M3EBottomSheet.show<void>(
+        context,
+        useRootNavigator: useRootNavigator,
+        expandToFullScreen: true,
+        fullScreenTitle: title,
+        theme: M3ETheme.of(context).bottomSheetTheme,
+        builder: (BuildContext sheetContext) {
+          return PrimaryScrollController.none(
+            child: SingleChildScrollView(child: modalBody),
+          );
+        },
+      );
+    }
+
     return M3ESideSheet.show<void>(
       context,
-      title: AppLocalizations.of(context).libraryFilterSortTooltip,
+      title: title,
       width: md3eLibraryFilterSortSideSheetWidthForViewport(viewportWidth),
       detached: md3eLibraryFilterSortSideSheetDetachedForViewport(
         viewportWidth,
@@ -119,13 +143,7 @@ abstract final class Md3eLibraryFilterSortSideSheet {
       theme: _sheetTheme(context),
       scrollable: true,
       useRootNavigator: useRootNavigator,
-      body: md3eOverlayRouteScope(
-        scope: scope,
-        child: _Md3eLibraryFilterSortSideSheetModalBody(
-          initialState: state,
-          onStateChanged: onStateChanged,
-        ),
-      ),
+      body: modalBody,
     );
   }
 }
