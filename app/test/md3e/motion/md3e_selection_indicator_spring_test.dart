@@ -30,7 +30,7 @@ Future<List<double>> _sampleLeft(WidgetTester tester, {int frames = 60}) async {
 }
 
 class _SegmentHost extends StatefulWidget {
-  const _SegmentHost({super.key});
+  const _SegmentHost();
 
   @override
   State<_SegmentHost> createState() => _SegmentHostState();
@@ -56,7 +56,7 @@ class _SegmentHostState extends State<_SegmentHost> {
 }
 
 class _PageHost extends StatefulWidget {
-  const _PageHost({super.key});
+  const _PageHost();
 
   @override
   State<_PageHost> createState() => _PageHostState();
