@@ -145,7 +145,7 @@ class _AddLibraryMenuButton extends StatelessWidget {
 /// 库列表的一行，与设置页 [Md3eSettingsTileShell] 同款（点按反馈与分段圆角由外层分段组提供）。
 ///
 /// 行始终挂载可点按表面：即使没有 [onOpen]，按压 / 悬停 state layer 仍显示，只是点击不产生动作。
-/// 「更多」菜单位于点按区域右侧，不在 [Md3eSettingsTileShell] 内，因此点它不会打开整行。
+/// 点按层铺满整行（含「更多」所在区域），「更多」在其上层，点它只打开菜单，不打开整行。
 class Md3eHomeLibraryDashboardTile extends StatelessWidget {
   const Md3eHomeLibraryDashboardTile({
     super.key,
@@ -164,16 +164,38 @@ class Md3eHomeLibraryDashboardTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
 
-    return Row(
+    // 点按层铺满整行并位于最底层：内容与「更多」在上层。
+    // 点「更多」时命中按钮，不会冒泡到整行；其余区域命中点按层，state layer 覆盖整行。
+    return Stack(
       children: <Widget>[
-        Expanded(
+        Positioned.fill(
           child: Md3eSettingsTileShell(
             onTap: onOpen ?? _doNothing,
-            child: _Md3eHomeLibraryRowContent(row: row),
+            child: const SizedBox.shrink(),
           ),
         ),
-        if (showMoreMenu)
-          Md3eHomeLibraryRowMoreMenu(l10n: l10n, row: row, onAction: onAction),
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 0, 12),
+                // 内容区点击穿透到底层点按层；只有「更多」参与命中。
+                child: IgnorePointer(
+                  child: _Md3eHomeLibraryRowContent(row: row),
+                ),
+              ),
+            ),
+            if (showMoreMenu)
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Md3eHomeLibraryRowMoreMenu(
+                  l10n: l10n,
+                  row: row,
+                  onAction: onAction,
+                ),
+              ),
+          ],
+        ),
       ],
     );
   }

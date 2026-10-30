@@ -72,6 +72,18 @@ void main() {
       await tester.pumpAndSettle();
     });
 
+    testWidgets('点按层铺满整行宽度（含「更多」区域），state layer 不缺角', (
+      WidgetTester tester,
+    ) async {
+      await _pumpSection(tester);
+
+      final Size rowSize = tester.getSize(
+        find.byType(Md3eHomeLibraryDashboardTile).first,
+      );
+      final Size inkSize = tester.getSize(find.byType(InkWell).first);
+      expect(inkSize.width, rowSize.width);
+    });
+
     testWidgets('点击行内容触发打开回调', (WidgetTester tester) async {
       String? opened;
       await _pumpSection(tester, onLibraryOpen: (String id) => opened = id);
