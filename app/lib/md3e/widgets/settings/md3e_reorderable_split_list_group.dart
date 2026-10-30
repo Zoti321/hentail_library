@@ -2,31 +2,48 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
+import 'package:flutter/services.dart';
 import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_exclude.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_split_list_group.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-const Duration _kLiftDuration = Duration(milliseconds: 150);
-const Duration _kShiftDuration = Duration(milliseconds: 200);
-const Duration _kSettleDuration = Duration(milliseconds: 200);
+/// 弹簧：`ratio` 为阻尼比（1 无过冲，越小回弹越明显）。
+SpringDescription _spring(double stiffness, double ratio) {
+  return SpringDescription.withDampingRatio(
+    mass: 1,
+    stiffness: stiffness,
+    ratio: ratio,
+  );
+}
 
-/// 拖拽浮层的放大倍数（抬起时放大到此值）。
-const double _kDragScale = 1.02;
+/// 抬起：快速、无过冲。
+final SpringDescription _liftSpring = _spring(3800, 1);
 
-/// 可拖拽排序的分段列表：长按行后拖动，视觉与 [Md3eSplitListGroup] 一致。
+/// 邻行让位、占位块、松手回落：中等刚度、轻微回弹。
+final SpringDescription _shiftSpring = _spring(380, 0.8);
+
+/// 抬起时浮层向右下偏移的距离（与 M3E 列表拖拽的抬起感一致）。
+const double _kLiftOffset = 12;
+
+/// 拖拽浮层阴影高度（level 4）。
+const double _kDragElevation = 8;
+
+/// 可拖拽排序的分段列表：长按行后拖动，未拖拽时视觉与 [Md3eSplitListGroup] 完全一致。
 ///
-/// 交互与视觉（自实现，参考 M3E 列表的拖拽行为）：
-/// - 长按 [kLongPressTimeout] 开始拖拽，移动超过 [kTouchSlop] 则取消；
-/// - 拖拽时源行原地保留高度但隐藏，浮层跟随指针并轻微放大、加阴影；
-/// - 相邻行平移让出目标位置，目标位置显示占位块；
-/// - 松手时浮层回落到目标位置，然后才回调重排。
+/// 交互与视觉（自实现，手感对齐 M3E 列表拖拽）：
+/// - 长按 [kLongPressTimeout] 开始拖拽，移动超过 [kTouchSlop] 则取消；开始时触发中等震动；
+/// - 源行原位保留高度但隐藏；浮层跟随指针，抬起时向右下偏移 12dp 并投影；
+/// - 占位块（[M3ETheme] 的 surfaceContainerLow）以弹簧跟随目标槽位；
+/// - 相邻行以弹簧让位，目标变化时触发选择震动；
+/// - 松手时浮层以弹簧回落到目标槽位，回落完成后才回调重排。
 ///
-/// [onReorder] 使用 Flutter [ReorderCallback] 约定（与 [ReorderableListView] 一致）：
-/// `newIndex` 需先减一再插入，可直接用 `applyMd3eReorder` 处理。
+/// [onReorder] 使用 Flutter [ReorderCallback] 约定（`newIndex` 需先减一再插入，
+/// 可直接用 `applyMd3eReorder` 处理）。
 ///
-/// [itemKeyOf] 给出每行的稳定标识（如库 id），用于重排后保持行的状态与动画；缺省按下标。
-/// 行内的按钮、开关等应包在 [Md3eReorderExclude] 中，长按它们不会开始拖拽。
+/// [itemKeyOf] 给出每行的稳定标识，用于重排后保持行的状态；缺省按下标。
+/// 行内的按钮等应包在 [Md3eReorderExclude] 中，长按它们不会开始拖拽。
 class Md3eReorderableSplitListGroup extends StatefulWidget {
   const Md3eReorderableSplitListGroup({
     super.key,
@@ -64,48 +81,50 @@ class _Md3eReorderableSplitListGroupState
   final GlobalKey _listKey = GlobalKey();
   final Map<Object, GlobalKey> _rowKeys = <Object, GlobalKey>{};
 
-  late final AnimationController _lift = AnimationController(
+  // 所有动画都是无界控制器 + 弹簧模拟，便于保留速度做中途改向。
+  late final AnimationController _lift = AnimationController.unbounded(
     vsync: this,
-    duration: _kLiftDuration,
-  );
-  late final AnimationController _settle = AnimationController(
+  )..addListener(_onTick);
+  late final AnimationController _settle =
+      AnimationController.unbounded(vsync: this)
+        ..addListener(_onTick)
+        ..addStatusListener(_onSettleStatus);
+  late final AnimationController _placeholder = AnimationController.unbounded(
     vsync: this,
-    duration: _kSettleDuration,
-  );
+  )..addListener(_onTick);
+  final Map<int, AnimationController> _offsets = <int, AnimationController>{};
+  final Map<int, double> _offsetGoals = <int, double>{};
 
-  // 指针状态
+  // 指针
   int? _activePointer;
   Offset? _downGlobal;
   int? _downIndex;
+  PointerDeviceKind _deviceKind = PointerDeviceKind.touch;
   Timer? _longPressTimer;
+  VelocityTracker _velocity = VelocityTracker.withKind(PointerDeviceKind.touch);
 
-  // 拖拽状态（布局坐标均相对于列表 Stack）
-  int? _dragFrom;
-  int? _dragTarget;
-  double _dragHeight = 0;
-  double _grabOffset = 0;
-  double _proxyTop = 0;
-  List<double> _slotTops = <double>[];
-  List<double> _slotHeights = <double>[];
+  // 拖拽（坐标均为列表 Stack 内的局部坐标）
+  int? _dragIndex;
+  int? _targetIndex;
+  int? _dropFrom;
+  int? _dropTo;
   bool _settling = false;
-  double _settleFrom = 0;
-  double _settleTo = 0;
-
-  /// 松手重排的那一帧关闭让位动画，避免行在重排时出现回弹。
-  bool _suppressShiftAnimation = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _lift.addListener(_onLiftTick);
-    _settle.addListener(_onSettleTick);
-  }
+  Size _dragSize = Size.zero;
+  Offset _pointer = Offset.zero;
+  Offset _grab = Offset.zero;
+  Offset _settleFrom = Offset.zero;
+  Offset _settleTo = Offset.zero;
+  List<Offset> _slotOrigins = <Offset>[];
 
   @override
   void dispose() {
     _longPressTimer?.cancel();
     _lift.dispose();
     _settle.dispose();
+    _placeholder.dispose();
+    for (final AnimationController c in _offsets.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -113,26 +132,41 @@ class _Md3eReorderableSplitListGroupState
 
   GlobalKey _rowKey(Object id) => _rowKeys.putIfAbsent(id, GlobalKey.new);
 
-  void _onLiftTick() {
+  void _onTick() {
     if (mounted) {
       setState(() {});
     }
   }
 
-  void _onSettleTick() {
-    if (!mounted || !_settling) {
-      return;
+  void _onSettleStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed && _settling) {
+      _finishDrag();
     }
-    final double t = Curves.easeOutCubic.transform(_settle.value);
-    setState(() {
-      _proxyTop = _settleFrom + (_settleTo - _settleFrom) * t;
+  }
+
+  AnimationController _offsetCtrl(int index) {
+    return _offsets.putIfAbsent(index, () {
+      return AnimationController.unbounded(vsync: this)..addListener(_onTick);
     });
+  }
+
+  double _offsetValue(int index) => _offsets[index]?.value ?? 0;
+
+  /// 以弹簧从当前位置与速度追到 [target]（中途改向时不会突变）。
+  void _springTo(
+    AnimationController controller,
+    double target,
+    SpringDescription spring,
+  ) {
+    controller.animateWith(
+      SpringSimulation(spring, controller.value, target, controller.velocity),
+    );
   }
 
   // ---- 指针 ----
 
   void _onSlotPointerDown(int index, PointerDownEvent event) {
-    if (_dragFrom != null || _settling) {
+    if (_dragIndex != null || _settling) {
       return;
     }
     final BuildContext? rowContext = _rowKey(_idOf(index)).currentContext;
@@ -143,6 +177,7 @@ class _Md3eReorderableSplitListGroupState
     _activePointer = event.pointer;
     _downGlobal = event.position;
     _downIndex = index;
+    _deviceKind = event.kind;
     _longPressTimer?.cancel();
     _longPressTimer = Timer(kLongPressTimeout, _onLongPressTimeout);
   }
@@ -159,7 +194,8 @@ class _Md3eReorderableSplitListGroupState
     if (event.pointer != _activePointer || _settling) {
       return;
     }
-    if (_dragFrom != null) {
+    if (_dragIndex != null) {
+      _velocity.addPosition(event.timeStamp, event.position);
       _updateDrag(event.position);
       return;
     }
@@ -177,7 +213,7 @@ class _Md3eReorderableSplitListGroupState
     _activePointer = null;
     _downGlobal = null;
     _downIndex = null;
-    if (_dragFrom != null && !_settling) {
+    if (_dragIndex != null && !_settling) {
       _endDrag();
     }
   }
@@ -189,32 +225,18 @@ class _Md3eReorderableSplitListGroupState
 
   // ---- 几何 ----
 
-  Offset _toListLocal(Offset global) {
-    final RenderBox? box =
-        _listKey.currentContext?.findRenderObject() as RenderBox?;
-    return box == null ? global : box.globalToLocal(global);
-  }
-
-  /// 在拖拽开始时测量所有行的位置与高度（此时尚未发生让位，测量值即原始布局）。
-  bool _measure() {
-    final RenderBox? listBox =
-        _listKey.currentContext?.findRenderObject() as RenderBox?;
-    if (listBox == null || !listBox.hasSize) {
-      return false;
-    }
-    final List<double> tops = <double>[];
-    final List<double> heights = <double>[];
+  /// 测量所有行在列表 Stack 内的左上角与尺寸（拖拽开始时调用，此刻让位偏移均为 0）。
+  bool _captureSlots(RenderBox stack) {
+    final List<Offset> origins = <Offset>[];
     for (int i = 0; i < widget.itemCount; i++) {
       final RenderBox? box =
           _rowKey(_idOf(i)).currentContext?.findRenderObject() as RenderBox?;
       if (box == null || !box.hasSize) {
         return false;
       }
-      tops.add(listBox.globalToLocal(box.localToGlobal(Offset.zero)).dy);
-      heights.add(box.size.height);
+      origins.add(stack.globalToLocal(box.localToGlobal(Offset.zero)));
     }
-    _slotTops = tops;
-    _slotHeights = heights;
+    _slotOrigins = origins;
     return true;
   }
 
@@ -225,84 +247,172 @@ class _Md3eReorderableSplitListGroupState
     if (down == null || index < 0 || index >= widget.itemCount) {
       return;
     }
-    if (!_measure()) {
+    final RenderBox? stack =
+        _listKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? box =
+        _rowKey(_idOf(index)).currentContext?.findRenderObject() as RenderBox?;
+    if (stack == null || box == null || !box.hasSize) {
       return;
     }
-    final double pointerTop = _toListLocal(down).dy;
-    _dragFrom = index;
-    _dragTarget = index;
-    _dragHeight = _slotHeights[index];
-    _grabOffset = pointerTop - _slotTops[index];
-    _proxyTop = _slotTops[index];
-    _lift.forward(from: 0);
+    if (!_captureSlots(stack)) {
+      return;
+    }
+    _dragSize = box.size;
+    _pointer = stack.globalToLocal(down);
+    _grab = _pointer - _slotOrigins[index];
+    _velocity = VelocityTracker.withKind(_deviceKind);
+
+    _dragIndex = index;
+    _targetIndex = index;
+    HapticFeedback.mediumImpact();
+
+    _lift.value = 0;
+    _springTo(_lift, 1, _liftSpring);
+    _settle.value = 0;
+    _placeholder.value = _slotOrigins[index].dy;
+    _offsetGoals.clear();
+    for (final AnimationController c in _offsets.values) {
+      c.value = 0;
+    }
+    _retarget(index);
     setState(() {});
   }
 
   void _updateDrag(Offset global) {
-    if (_slotTops.length != widget.itemCount) {
+    final int? from = _dragIndex;
+    final RenderBox? stack =
+        _listKey.currentContext?.findRenderObject() as RenderBox?;
+    if (from == null || _settling || stack == null) {
       return;
     }
-    _proxyTop = _toListLocal(global).dy - _grabOffset;
-    final double centerY = _proxyTop + _dragHeight / 2;
-    int target = widget.itemCount - 1;
-    for (int i = 0; i < widget.itemCount; i++) {
-      if (centerY < _slotTops[i] + _slotHeights[i] / 2) {
-        target = i;
-        break;
+    if (_slotOrigins.length != widget.itemCount) {
+      return;
+    }
+    _pointer = stack.globalToLocal(global);
+    final Offset center = _pointer - _grab + _dragSize.center(Offset.zero);
+
+    int best = from;
+    double closest = double.infinity;
+    for (int i = 0; i < _slotOrigins.length; i++) {
+      final Offset slotCenter = _slotOrigins[i] + _dragSize.center(Offset.zero);
+      final double distance = (center - slotCenter).distance;
+      if (distance < closest) {
+        closest = distance;
+        best = i;
       }
     }
-    _dragTarget = target;
+
+    if (best != _targetIndex) {
+      _targetIndex = best;
+      HapticFeedback.selectionClick();
+      _retarget(from);
+    }
     setState(() {});
   }
 
-  /// 第 [index] 行（重排前的下标）因拖拽需要让出的竖向位移。
-  double _shiftFor(int index) {
-    final int? from = _dragFrom;
-    final int? to = _dragTarget;
-    if (from == null || to == null) {
+  /// 目标槽位变化：占位块与邻行都以弹簧追向新位置。
+  void _retarget(int from) {
+    final int to = _targetIndex ?? from;
+    if (to < _slotOrigins.length) {
+      _springTo(_placeholder, _slotOrigins[to].dy, _shiftSpring);
+    }
+    for (int i = 0; i < widget.itemCount && i < _slotOrigins.length; i++) {
+      final double target = _retargetOffset(i, from, to);
+      if (_offsetGoals[i] == target) {
+        continue;
+      }
+      _offsetGoals[i] = target;
+      _springTo(_offsetCtrl(i), target, _shiftSpring);
+    }
+  }
+
+  double _retargetOffset(int i, int from, int to) {
+    if (i == from) {
       return 0;
     }
-    final double step = _dragHeight + kMd3eSplitListRowGap;
-    if (to > from && index > from && index <= to) {
-      return -step;
+    final int visual = _retargetVisualSlot(i, from, to);
+    return _slotOrigins[visual].dy - _slotOrigins[i].dy;
+  }
+
+  /// 拖拽后第 [i] 行（重排前下标）在视觉上应占据的槽位。
+  int _retargetVisualSlot(int i, int from, int to) {
+    if (from < to && i > from && i <= to) {
+      return i - 1;
     }
-    if (to < from && index >= to && index < from) {
-      return step;
+    if (from > to && i >= to && i < from) {
+      return i + 1;
     }
-    return 0;
+    return i;
+  }
+
+  /// 浮层当前的绘制位置（跟随指针，抬起时带 12dp 偏移）。
+  Offset _proxyPosition(double lift) {
+    return (_pointer - _grab) +
+        Offset(_kLiftOffset * lift, _kLiftOffset * lift);
   }
 
   void _endDrag() {
-    final int? from = _dragFrom;
-    if (from == null) {
+    final int? from = _dragIndex;
+    if (from == null || _settling) {
       return;
     }
-    final int target = _dragTarget ?? from;
-    _settling = true;
-    _settleFrom = _proxyTop;
-    _settleTo = _slotTops[target];
-    _settle.forward(from: 0).whenComplete(() => _commit(from, target));
+    final int to = _targetIndex ?? from;
+    _settleFrom = _proxyPosition(_lift.value.clamp(0.0, 1.0));
+    _settleTo = _slotOrigins[to];
+    _dropFrom = from;
+    _dropTo = to;
+
+    final Offset travel = _settleTo - _settleFrom;
+    setState(() => _settling = true);
+    if (travel.distance <= 1) {
+      _finishDrag();
+      return;
+    }
+
+    final Velocity velocity = _velocity.getVelocity();
+    final double along =
+        (velocity.pixelsPerSecond.dx * travel.dx +
+            velocity.pixelsPerSecond.dy * travel.dy) /
+        travel.distance;
+    _settle.value = 0;
+    _settle.animateWith(
+      SpringSimulation(
+        _shiftSpring,
+        0,
+        1,
+        (along / travel.distance).clamp(-10.0, 10.0),
+      ),
+    );
   }
 
-  void _commit(int from, int target) {
-    if (!mounted) {
+  void _finishDrag() {
+    final int? from = _dropFrom;
+    final int? to = _dropTo;
+    if (!mounted || from == null || to == null) {
       return;
     }
-    _suppressShiftAnimation = true;
-    if (target != from) {
-      widget.onReorder(from, target > from ? target + 1 : target);
-    }
+    _settling = false;
+    _dragIndex = null;
+    _targetIndex = null;
+    _dropFrom = null;
+    _dropTo = null;
+
+    _settle.stop();
+    _settle.value = 0;
+    _placeholder.stop();
+    _lift.stop();
     _lift.value = 0;
-    setState(() {
-      _dragFrom = null;
-      _dragTarget = null;
-      _settling = false;
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _suppressShiftAnimation = false;
-      }
-    });
+    for (final AnimationController c in _offsets.values) {
+      c.stop();
+      c.value = 0;
+    }
+    _offsetGoals.clear();
+
+    // 同一帧内先复位让位偏移再回调重排，避免行回弹。
+    if (from != to) {
+      widget.onReorder(from, to > from ? to + 1 : to);
+    }
+    setState(() {});
   }
 
   // ---- 构建 ----
@@ -310,8 +420,7 @@ class _Md3eReorderableSplitListGroupState
   @override
   Widget build(BuildContext context) {
     final int n = widget.itemCount;
-    final bool dragging =
-        _dragFrom != null && _dragTarget != null && _slotTops.length == n;
+    final bool dragging = _dragIndex != null && _slotOrigins.length == n;
     final List<Widget> slots = <Widget>[
       for (int i = 0; i < n; i++) _buildSlot(context, i),
     ];
@@ -324,14 +433,7 @@ class _Md3eReorderableSplitListGroupState
         key: _listKey,
         clipBehavior: Clip.none,
         children: <Widget>[
-          if (dragging)
-            Positioned(
-              top: _slotTops[_dragTarget!],
-              left: 0,
-              right: 0,
-              height: _dragHeight,
-              child: _buildPlaceholder(context),
-            ),
+          if (dragging) _buildPlaceholder(context),
           Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -349,7 +451,7 @@ class _Md3eReorderableSplitListGroupState
     final bool first = index == 0;
     final bool last = index == n - 1;
 
-    Widget row = KeyedSubtree(
+    final Widget row = KeyedSubtree(
       key: _rowKey(id),
       child: Md3eSplitListRow(
         topRadius: first ? widget.outerRadius : kMd3eSplitListInnerRadius,
@@ -361,105 +463,81 @@ class _Md3eReorderableSplitListGroupState
       ),
     );
 
-    row = Listener(
+    final Widget listening = Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (PointerDownEvent event) =>
           _onSlotPointerDown(index, event),
       child: row,
     );
 
-    if (_dragFrom == index) {
-      // 源行：保留布局高度但隐藏，浮层负责绘制它。
-      row = IgnorePointer(child: Opacity(opacity: 0, child: row));
-    } else {
-      row = _ShiftedRow(
-        offsetY: _shiftFor(index),
-        duration: _suppressShiftAnimation ? Duration.zero : _kShiftDuration,
-        child: row,
-      );
-    }
+    final Widget slot = _dragIndex == index
+        // 源行：保留布局高度但隐藏，浮层负责绘制它。
+        ? IgnorePointer(child: Opacity(opacity: 0, child: listening))
+        : Transform.translate(
+            offset: Offset(0, _offsetValue(index)),
+            child: listening,
+          );
 
     return KeyedSubtree(
       key: ValueKey<Object>(id),
       child: Padding(
         padding: EdgeInsets.only(bottom: last ? 0 : kMd3eSplitListRowGap),
-        child: row,
+        child: slot,
       ),
     );
   }
 
   Widget _buildPlaceholder(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(widget.outerRadius),
-      ),
-    );
-  }
-
-  Widget _buildProxy(BuildContext context) {
-    final int from = _dragFrom!;
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final double lift = _lift.value;
-
+    final double lift = _lift.value.clamp(0.0, 1.0);
     return Positioned(
-      left: 0,
-      right: 0,
-      top: _proxyTop,
-      height: _dragHeight,
+      left: _slotOrigins[0].dx,
+      top: _placeholder.value,
+      width: _dragSize.width,
+      height: _dragSize.height,
       child: IgnorePointer(
-        child: Transform.scale(
-          scale: 1 + (_kDragScale - 1) * lift,
+        child: Opacity(
+          opacity: lift,
           child: DecoratedBox(
             decoration: BoxDecoration(
+              color: scheme.surfaceContainerLow,
               borderRadius: BorderRadius.circular(widget.outerRadius),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2 * lift),
-                  blurRadius: 8 * lift,
-                  offset: Offset(0, 4 * lift),
-                ),
-              ],
-            ),
-            child: Md3eSplitDragScope(
-              color: scheme.surfaceContainerHigh,
-              radius: widget.outerRadius,
-              child: Md3eSplitListRow(
-                topRadius: widget.outerRadius,
-                bottomRadius: widget.outerRadius,
-                child: widget.itemBuilder(context, from),
-              ),
             ),
           ),
         ),
       ),
     );
   }
-}
 
-/// 行的竖向让位动画：目标位移变化时平滑过渡；[duration] 为零时瞬时跳转。
-class _ShiftedRow extends StatelessWidget {
-  const _ShiftedRow({
-    required this.offsetY,
-    required this.duration,
-    required this.child,
-  });
+  Widget _buildProxy(BuildContext context) {
+    final int from = _dragIndex!;
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final double lift = _lift.value.clamp(0.0, 1.0);
+    final Offset offset = _settling
+        ? Offset.lerp(_settleFrom, _settleTo, _settle.value.clamp(0.0, 1.0))!
+        : _proxyPosition(lift);
 
-  final double offsetY;
-  final Duration duration;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0, end: offsetY),
-      duration: duration,
-      curve: Curves.easeOutCubic,
-      child: child,
-      builder: (BuildContext context, double value, Widget? child) {
-        return Transform.translate(offset: Offset(0, value), child: child);
-      },
+    return Positioned(
+      left: offset.dx,
+      top: offset.dy,
+      width: _dragSize.width,
+      height: _dragSize.height,
+      child: IgnorePointer(
+        child: PhysicalModel(
+          color: scheme.surfaceContainerHigh,
+          elevation: _kDragElevation,
+          borderRadius: BorderRadius.circular(widget.outerRadius),
+          child: Md3eSplitDragScope(
+            color: scheme.surfaceContainerHigh,
+            radius: widget.outerRadius,
+            child: Md3eSplitListRow(
+              topRadius: widget.outerRadius,
+              bottomRadius: widget.outerRadius,
+              child: widget.itemBuilder(context, from),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

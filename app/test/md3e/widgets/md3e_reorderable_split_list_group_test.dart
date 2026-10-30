@@ -66,6 +66,54 @@ void main() {
       expect(rows.last.bottomRadius, kMd3eTonalSurfaceRadius);
     });
 
+    testWidgets('未拖拽时与 Md3eSplitListGroup 的行位置、尺寸、圆角完全一致', (
+      WidgetTester tester,
+    ) async {
+      Widget child(int index) =>
+          SizedBox(height: 56, child: Center(child: Text(_items[index])));
+
+      await pumpMd3eApp(
+        tester,
+        home: Scaffold(
+          body: Md3eSplitListGroup(
+            children: <Widget>[for (int i = 0; i < 3; i++) child(i)],
+          ),
+        ),
+      );
+      final List<Rect> staticRects = <Rect>[
+        for (final String t in _items) tester.getRect(find.text(t)),
+      ];
+      final List<(double, double, Size)> staticRows = <(double, double, Size)>[
+        for (final Md3eSplitListRow r in tester.widgetList<Md3eSplitListRow>(
+          find.byType(Md3eSplitListRow),
+        ))
+          (r.topRadius, r.bottomRadius, tester.getSize(find.byWidget(r))),
+      ];
+
+      await pumpMd3eApp(
+        tester,
+        home: Scaffold(
+          body: Md3eReorderableSplitListGroup(
+            itemCount: 3,
+            onReorder: (int _, int _) {},
+            itemBuilder: (BuildContext context, int index) => child(index),
+          ),
+        ),
+      );
+      final List<Rect> reorderRects = <Rect>[
+        for (final String t in _items) tester.getRect(find.text(t)),
+      ];
+      final List<(double, double, Size)> reorderRows = <(double, double, Size)>[
+        for (final Md3eSplitListRow r in tester.widgetList<Md3eSplitListRow>(
+          find.byType(Md3eSplitListRow),
+        ))
+          (r.topRadius, r.bottomRadius, tester.getSize(find.byWidget(r))),
+      ];
+
+      expect(reorderRects, staticRects);
+      expect(reorderRows, staticRows);
+    });
+
     testWidgets('长按首行并向下拖动会回调重排（Flutter newIndex 约定）', (
       WidgetTester tester,
     ) async {
