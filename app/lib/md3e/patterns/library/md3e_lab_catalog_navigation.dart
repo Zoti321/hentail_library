@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
+import 'package:hentai_library/md3e/motion/md3e_shared_axis_route.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_lab_catalog_detail_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_navigation.dart';
@@ -24,7 +25,8 @@ Future<void> openMd3eLabCatalogDetail(
   final Md3eOverlayRouteScopeSnapshot scope =
       Md3eOverlayRouteScopeSnapshot.capture(context);
   return Navigator.of(context, rootNavigator: false).push<void>(
-    MaterialPageRoute<void>(
+    md3eSharedAxisRoute<void>(
+      context,
       builder: (BuildContext routeContext) {
         return md3eOverlayRouteScope(
           scope: scope,
@@ -106,7 +108,8 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
         final Md3eOverlayRouteScopeSnapshot scope =
             Md3eOverlayRouteScopeSnapshot.capture(context);
         Navigator.of(context, rootNavigator: false).push<void>(
-          MaterialPageRoute<void>(
+          md3eSharedAxisRoute<void>(
+            context,
             builder: (BuildContext routeContext) {
               return md3eOverlayRouteScope(
                 scope: scope,

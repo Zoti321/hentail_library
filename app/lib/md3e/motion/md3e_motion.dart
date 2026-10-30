@@ -44,6 +44,13 @@ abstract final class Md3eMotion {
   static const MaterialSpringMotion effectsSpring =
       MaterialSpringMotion.expressiveEffectsDefault();
 
+  /// Lab 页面转场（shared-axis）的空间弹簧：与 M3E expressiveSpatialDefault 同值。
+  static const MaterialSpringMotion routeSpring =
+      MaterialSpringMotion.expressiveSpatialDefault();
+
+  /// Lab 页面转场时长（弹簧按此时长采样；0.5s 内基本稳定）。
+  static const Duration routeTransitionDuration = Duration(milliseconds: 500);
+
   /// Lab 模拟保存耗时（页面里的模拟等待，不是动画时长，与转场解耦）。
   static const Duration labSimulatedSaveDuration = Duration(milliseconds: 280);
 
