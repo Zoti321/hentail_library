@@ -10,6 +10,7 @@ import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces
 import 'package:hentai_library/md3e/pages/md3e_home_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page_lab_host.dart';
+import 'package:hentai_library/md3e/pages/md3e_history_browse_page_preview_data.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_management_browse_page_lab_host.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page_lab_host.dart';
@@ -458,16 +459,9 @@ class _Md3eReadingHistoryListItemPreview extends StatelessWidget {
       lastReadTime: resolvedLastReadTime,
       onTap: () {},
       onContinueReading: () {},
-      moreMenuEntries: _demoReadingHistoryMoreMenu(),
+      moreMenuEntries: Md3eHistoryBrowsePagePreviewData.sampleMoreMenuEntries(),
     );
   }
-}
-
-List<Md3eReadingHistoryMoreMenuEntry> _demoReadingHistoryMoreMenu() {
-  return const <Md3eReadingHistoryMoreMenuEntry>[
-    Md3eReadingHistoryMoreMenuEntry(label: '删除记录'),
-    Md3eReadingHistoryMoreMenuEntry(label: '在资源管理器中显示'),
-  ];
 }
 
 List<Md3eComicListMoreMenuEntry> _demoComicListMoreMenu() {

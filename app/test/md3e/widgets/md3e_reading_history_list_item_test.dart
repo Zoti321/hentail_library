@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';
 
@@ -30,6 +31,8 @@ void main() {
 
     expect(find.text('测试漫画'), findsOneWidget);
     expect(find.text('12/200'), findsOneWidget);
+    expect(find.text('2026年01月01日'), findsOneWidget);
+    expect(find.byType(M3EProgressIndicator), findsOneWidget);
     expect(find.byIcon(Icons.menu_book_rounded), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
   });

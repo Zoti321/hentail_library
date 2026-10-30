@@ -10,19 +10,19 @@ TextStyle md3eReadingHistoryListItemTitleStyle(
   return md3eComicCatalogTitleStyle(type, scheme);
 }
 
-/// Page progress (`current/total`) — accent via [M3EColorScheme.primary].
+/// Page label (`current/total`) beside the progress bar.
 TextStyle md3eReadingHistoryListItemProgressStyle(
   M3ETypeScale type,
   M3EColorScheme scheme,
 ) {
-  return type.labelLarge.copyWith(
+  return type.labelMedium.copyWith(
     fontWeight: FontWeight.w500,
-    color: scheme.primary,
+    color: scheme.onSurfaceVariant,
     height: 1.2,
   );
 }
 
-/// Relative last-read time (secondary meta).
+/// Last-read date (secondary meta).
 TextStyle md3eReadingHistoryListItemTimeStyle(
   M3ETypeScale type,
   M3EColorScheme scheme,

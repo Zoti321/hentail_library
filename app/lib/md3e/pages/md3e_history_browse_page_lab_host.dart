@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_entry.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page_preview_data.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_lab_reader_navigation.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
 import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -25,16 +27,32 @@ class Md3eHistoryBrowsePageLabHost extends StatefulWidget {
 
 class _Md3eHistoryBrowsePageLabHostState
     extends State<Md3eHistoryBrowsePageLabHost> {
-  late List<Md3eHistoryBrowseEntry> _entries =
-      List<Md3eHistoryBrowseEntry>.of(
-        widget.initialEntries ??
-            Md3eHistoryBrowsePagePreviewData.sampleEntries(
-              clock: widget.clock,
-            ),
-      );
+  static const int _previewTotalPages = 48;
+
+  late List<Md3eHistoryBrowseEntry> _entries = List<Md3eHistoryBrowseEntry>.of(
+    widget.initialEntries ??
+        Md3eHistoryBrowsePagePreviewData.sampleEntries(clock: widget.clock),
+  );
 
   void _clearAllPreviewEntries() {
     setState(() => _entries = <Md3eHistoryBrowseEntry>[]);
+  }
+
+  void _deletePreviewEntry(Md3eHistoryBrowseEntry entry) {
+    setState(
+      () => _entries = List<Md3eHistoryBrowseEntry>.of(_entries)..remove(entry),
+    );
+  }
+
+  void _openReader(BuildContext context, String title, int currentPage) {
+    openMd3eLabReader(
+      context,
+      preview: Md3eReaderPagePreviewData(
+        title: title,
+        totalPages: _previewTotalPages,
+        initialPage: currentPage,
+      ),
+    );
   }
 
   @override
@@ -47,13 +65,22 @@ class _Md3eHistoryBrowsePageLabHostState
       onClearAll: _clearAllPreviewEntries,
       itemBuilder: (BuildContext context, Md3eHistoryBrowseEntry entry) {
         final int index = _entries.indexOf(entry);
-        final String title = Md3eHistoryBrowsePagePreviewData.sampleTitles[
-            index % Md3eHistoryBrowsePagePreviewData.sampleTitles.length];
+        final String title =
+            Md3eHistoryBrowsePagePreviewData.sampleTitles[index %
+                Md3eHistoryBrowsePagePreviewData.sampleTitles.length];
+        final int currentPage = 12 + index;
+        void openReader() => _openReader(context, title, currentPage);
         return Md3eReadingHistoryListItem(
           title: title,
-          currentPage: 12 + index,
-          totalPages: 48,
+          currentPage: currentPage,
+          totalPages: _previewTotalPages,
           lastReadTime: entry.lastReadTime,
+          onTap: openReader,
+          onContinueReading: openReader,
+          moreMenuEntries:
+              Md3eHistoryBrowsePagePreviewData.sampleMoreMenuEntries(
+                onDeleteRecord: () => _deletePreviewEntry(entry),
+              ),
           cover: ColoredBox(
             color: scheme.surfaceContainerHigh,
             child: Icon(

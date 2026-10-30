@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item_metrics.dart';
 import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item_typography.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
+import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Overflow menu entry on the history list row.
 class Md3eReadingHistoryMoreMenuEntry {
-  const Md3eReadingHistoryMoreMenuEntry({
-    required this.label,
-    this.onSelected,
-  });
+  const Md3eReadingHistoryMoreMenuEntry({required this.label, this.onSelected});
 
   final String label;
   final VoidCallback? onSelected;
 }
 
-/// 阅读历史列表行：封面 + 标题 + 页码进度 + 上次阅读时间 + 继续阅读 / 更多。
+/// 上次阅读日期：`{YYYY}年{MM}月{DD}日`（如 2026年06月15日）。
+String md3eReadingHistoryLastReadDateLabel(DateTime lastReadTime) {
+  return DateFormat('yyyy年MM月dd日').format(lastReadTime);
+}
+
+/// 阅读历史列表行：封面 + 标题 + 进度条与页码 + 上次阅读日期 + 继续阅读 / 更多。
 ///
-/// 行级 hover / press 由 [M3ECard] elevated 提供；尺寸见 [Md3eReadingHistoryListItemMetrics]。
+/// 行级 hover / press 由 [M3ECard] 提供；state layer 动效使用 M3E 标准 token，减少动效时为 0。
+/// 尺寸见 [Md3eReadingHistoryListItemMetrics]。
 class Md3eReadingHistoryListItem extends StatelessWidget {
   const Md3eReadingHistoryListItem({
     super.key,
@@ -76,7 +81,8 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
       currentPage,
       totalPages,
     );
-    final String timeLabel = l10n.relativeTimeAgo(lastReadTime);
+    final String dateLabel = md3eReadingHistoryLastReadDateLabel(lastReadTime);
+    final double progress = currentPage / totalPages;
 
     final Widget coverLeading = ClipRRect(
       borderRadius: BorderRadius.circular(spec.coverRadius),
@@ -100,16 +106,28 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: md3eReadingHistoryListItemTitleStyle(type, scheme),
             ),
-            SizedBox(height: spacing.xs),
-            Text(
-              progressLabel,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: md3eReadingHistoryListItemProgressStyle(type, scheme),
+            SizedBox(height: spacing.sm),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: M3EProgressIndicator.linear(
+                    value: progress,
+                    color: scheme.primary,
+                    trackColor: scheme.surfaceContainerHighest,
+                    semanticsLabel: progressLabel,
+                  ),
+                ),
+                SizedBox(width: spacing.sm),
+                Text(
+                  progressLabel,
+                  maxLines: 1,
+                  style: md3eReadingHistoryListItemProgressStyle(type, scheme),
+                ),
+              ],
             ),
             SizedBox(height: spacing.xs),
             Text(
-              timeLabel,
+              dateLabel,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: md3eReadingHistoryListItemTimeStyle(type, scheme),
@@ -176,15 +194,15 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          coverLeading,
-          info,
-          actions,
-        ],
+        children: <Widget>[coverLeading, info, actions],
       ),
     );
 
     final BorderRadius radius = BorderRadius.circular(spec.containerRadius);
+    final Duration stateDuration = Md3eMotion.motionDurationOf(
+      context,
+      M3EMotion.short3,
+    );
 
     return SizedBox(
       height: spec.rowHeight,
@@ -198,6 +216,8 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         enabled: enabled,
         trackHover: true,
+        animationDuration: stateDuration,
+        animationCurve: M3EMotion.standard,
         onPressed: enabled && onTap != null ? onTap : null,
         semanticLabel: title,
         child: row,
