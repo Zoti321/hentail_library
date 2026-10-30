@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_size.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_metrics.dart';
 import 'package:hentai_library/md3e/widgets/sheets/md3e_overlay_route_scope.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
@@ -458,11 +459,10 @@ class _Md3eFilterAccordionSectionState
             ),
           ),
         ),
-        AnimatedSize(
-          duration: _duration,
-          curve: _curve,
+        Md3eSpringSize(
+          expanded: _expanded,
           alignment: Alignment.topCenter,
-          child: _expanded ? widget.child : const SizedBox.shrink(),
+          child: widget.child,
         ),
       ],
     );

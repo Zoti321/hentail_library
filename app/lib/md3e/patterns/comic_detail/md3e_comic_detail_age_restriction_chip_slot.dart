@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_age_restriction_chip.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_size.dart';
 
 /// 关闭 [visible] 后延迟收起，避免 knob / 状态切换时摘要行瞬间跳动。
-const Duration kMd3eComicDetailAgeRestrictionChipHideDebounce =
-    Duration(milliseconds: 300);
+const Duration kMd3eComicDetailAgeRestrictionChipHideDebounce = Duration(
+  milliseconds: 300,
+);
 
 /// 带移除防抖与尺寸动画的年龄限制 chip 槽位。
 class Md3eComicDetailAgeRestrictionChipSlot extends StatefulWidget {
@@ -36,7 +37,9 @@ class _Md3eComicDetailAgeRestrictionChipSlotState
   }
 
   @override
-  void didUpdateWidget(covariant Md3eComicDetailAgeRestrictionChipSlot oldWidget) {
+  void didUpdateWidget(
+    covariant Md3eComicDetailAgeRestrictionChipSlot oldWidget,
+  ) {
     super.didUpdateWidget(oldWidget);
     if (widget.visible) {
       _hideTimer?.cancel();
@@ -67,13 +70,10 @@ class _Md3eComicDetailAgeRestrictionChipSlotState
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: Md3eMotion.durationShort,
-      curve: Md3eMotion.curveEmphasized,
+    return Md3eSpringSize(
+      expanded: _rendered,
       alignment: Alignment.centerLeft,
-      child: _rendered
-          ? const Md3eComicDetailAgeRestrictionChip()
-          : const SizedBox.shrink(),
+      child: const Md3eComicDetailAgeRestrictionChip(),
     );
   }
 }

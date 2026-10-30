@@ -40,6 +40,10 @@ abstract final class Md3eMotion {
   static const MaterialSpringMotion readerChromeReveal =
       MaterialSpringMotion.expressiveSpatialDefault();
 
+  /// 空间类显隐 / 尺寸展开（无固定时长，由弹簧自然收敛）：与 M3E expressive spatial 同值。
+  static const MaterialSpringMotion spatialReveal =
+      MaterialSpringMotion.expressiveSpatialDefault();
+
   /// 效果类动效（透明度、颜色、形状背景）：与 M3E 包 expressiveEffectsDefault 同值。
   static const MaterialSpringMotion effectsSpring =
       MaterialSpringMotion.expressiveEffectsDefault();
