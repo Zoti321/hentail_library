@@ -47,33 +47,29 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final BorderRadius radius = BorderRadius.circular(kMd3eComicCardRadius);
 
-    Widget content = child;
-    if (pinnedOverlayAlpha > 0) {
-      content = ClipRRect(
-        borderRadius: radius,
-        child: Stack(
-          fit: StackFit.passthrough,
-          children: <Widget>[
-            child,
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Md3eSpringValue(
-                  value: pinnedOverlayAlpha,
-                  builder: (BuildContext context, double alpha, Widget? child) {
-                    if (alpha <= 0) {
-                      return const SizedBox.shrink();
-                    }
-                    return ColoredBox(
-                      color: scheme.onSurface.withValues(alpha: alpha),
-                    );
-                  },
-                ),
-              ),
+    // 遮罩层常驻于树中，使 0 ↔ 非 0 的变化能走弹簧补间（而不是重新挂载直接出现）。
+    // 圆角由 M3ECard 的 clipBehavior 统一裁剪。
+    final Widget content = Stack(
+      fit: StackFit.passthrough,
+      children: <Widget>[
+        child,
+        Positioned.fill(
+          child: IgnorePointer(
+            child: Md3eSpringValue(
+              value: pinnedOverlayAlpha,
+              builder: (BuildContext context, double alpha, Widget? child) {
+                if (alpha <= 0) {
+                  return const SizedBox.shrink();
+                }
+                return ColoredBox(
+                  color: scheme.onSurface.withValues(alpha: alpha),
+                );
+              },
             ),
-          ],
+          ),
         ),
-      );
-    }
+      ],
+    );
 
     final Widget card = M3ECard(
       variant: M3ECardVariant.elevated,
