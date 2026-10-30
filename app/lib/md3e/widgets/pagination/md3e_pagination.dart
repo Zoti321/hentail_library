@@ -3,7 +3,7 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_compact.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_metrics.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination_standard.dart';
-import 'package:material_3_expressive/foundations/foundations.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Responsive MD3E pagination (Lab only; production uses [LibraryPaginationBar]).
 ///
@@ -36,9 +36,11 @@ class Md3ePagination extends StatelessWidget {
     }
     final int clampedPage = page.clamp(1, totalPages);
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(windowWidth);
-    final bool useCompact = sizeClass.isCompact ||
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      windowWidth,
+    );
+    final bool useCompact =
+        sizeClass.isCompact ||
         windowWidth < Md3ePaginationMetrics.standardBarMinWidth(sizeClass);
 
     if (useCompact) {
@@ -72,12 +74,13 @@ class Md3ePagination extends StatelessWidget {
     required ValueChanged<int> onPageChanged,
   }) async {
     final M3EThemeData theme = M3ETheme.of(context);
-    final int? picked = await showModalBottomSheet<int>(
-      context: context,
-      showDragHandle: true,
+    final int? picked = await M3EBottomSheet.show<int>(
+      context,
+      theme: theme.bottomSheetTheme,
       builder: (BuildContext sheetContext) {
-        return M3ETheme(
-          data: theme,
+        // ListTile 需要 Material 祖先；背景由 M3E 底部弹窗提供，此处保持透明。
+        return Material(
+          type: MaterialType.transparency,
           child: SafeArea(
             child: ListView.builder(
               shrinkWrap: true,
