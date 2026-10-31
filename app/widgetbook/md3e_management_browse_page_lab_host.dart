@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/pages/md3e_management_browse_page.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
+
+import 'md3e_management_browse_page.dart';
+
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_interaction.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 
 /// Lab / Widgetbook：preview facet chip 列表 + 新建实体（Dialog / 内联草稿 → 内存列表，不写 FRB）。

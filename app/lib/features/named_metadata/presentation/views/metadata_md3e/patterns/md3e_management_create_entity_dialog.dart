@@ -20,10 +20,7 @@ Future<void> showMd3eManagementCreateEntityDialog({
 }) {
   return Md3eLabDialogPresenter.showBasic<void>(
     context,
-    dialog: _Md3eManagementCreateEntityDialog(
-      facet: facet,
-      onCreate: onCreate,
-    ),
+    dialog: _Md3eManagementCreateEntityDialog(facet: facet, onCreate: onCreate),
   );
 }
 
@@ -64,8 +61,10 @@ class _Md3eManagementCreateEntityDialogState
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle =
-        md3eLabButtonLabelStyle(theme, M3EButtonSize.sm);
+    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+      theme,
+      M3EButtonSize.sm,
+    );
     final Size size = MediaQuery.sizeOf(context);
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
       size.width,
@@ -93,17 +92,13 @@ class _Md3eManagementCreateEntityDialogState
         M3EButton(
           onPressed: () => Navigator.of(context).pop(),
           style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(
-            textStyle: actionLabelStyle,
-          ),
+          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
           label: Text(l10n.commonCancel),
         ),
         M3EButton(
           onPressed: _submit,
           style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration(
-            textStyle: actionLabelStyle,
-          ),
+          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
           label: Text(l10n.commonAdd),
         ),
       ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_managed_named_facet_ui.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_managed_named_facet_ui.dart';
 import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

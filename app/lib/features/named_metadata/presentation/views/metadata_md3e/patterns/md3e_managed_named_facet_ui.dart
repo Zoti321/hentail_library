@@ -10,9 +10,8 @@ abstract final class Md3eManagedNamedFacetUi {
   ) {
     return kManagedNamedFacetTabOrder
         .map(
-          (ManagedNamedFacetKind kind) => Md3eSegmentedCapsuleSegment(
-            label: l10n.metadataTabLabel(kind),
-          ),
+          (ManagedNamedFacetKind kind) =>
+              Md3eSegmentedCapsuleSegment(label: l10n.metadataTabLabel(kind)),
         )
         .toList();
   }
@@ -22,8 +21,10 @@ abstract final class Md3eManagedNamedFacetUi {
   }
 
   static ManagedNamedFacetKind facetAt(int index) {
-    return kManagedNamedFacetTabOrder[
-        index.clamp(0, kManagedNamedFacetTabOrder.length - 1)];
+    return kManagedNamedFacetTabOrder[index.clamp(
+      0,
+      kManagedNamedFacetTabOrder.length - 1,
+    )];
   }
 
   static String countLabel(

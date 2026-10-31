@@ -14,8 +14,9 @@ class Md3eManagementPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(windowWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      windowWidth,
+    );
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
@@ -34,7 +35,9 @@ class Md3eManagementPageHeader extends StatelessWidget {
             title ?? l10n.navMetadata,
             style: type.headlineSmall.copyWith(
               fontSize: Md3eLibraryPageHeaderMetrics.titleFontSize(sizeClass),
-              fontWeight: Md3eLibraryPageHeaderMetrics.titleFontWeight(sizeClass),
+              fontWeight: Md3eLibraryPageHeaderMetrics.titleFontWeight(
+                sizeClass,
+              ),
               color: scheme.onSurface,
               letterSpacing: -0.4,
             ),

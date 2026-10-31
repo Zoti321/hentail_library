@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_catalog_toolbar.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_create_interaction.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_facet_chip_wrap.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_create_entity_dialog.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_draft_entity_chip.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_catalog_toolbar.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_interaction.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_facet_chip_wrap.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_entity_dialog.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_draft_entity_chip.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/md3e/patterns/management/md3e_management_page_header.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_page_header.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_management_create_entity_fab.dart';
 
@@ -113,8 +113,9 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      viewportWidth,
+    );
     final double horizontal =
         Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
 
@@ -128,9 +129,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
     final bool createEnabled = widget.onEntityCreated != null;
     final bool showFab = createEnabled;
     final bool showInlineCreate =
-        createEnabled &&
-        !useMobileCreateDialog &&
-        _showInlineCreateField;
+        createEnabled && !useMobileCreateDialog && _showInlineCreateField;
 
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
@@ -163,7 +162,9 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 horizontal,
-                Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(sizeClass),
+                Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(
+                  sizeClass,
+                ),
                 horizontal,
                 scrollBottomPadding,
               ),
@@ -177,8 +178,10 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
                       onFacetChanged: widget.onFacetChanged,
                     ),
                     SizedBox(
-                      height: Md3eLibraryBrowsePageMetrics
-                          .catalogToolbarToViewModeSpacing(sizeClass),
+                      height:
+                          Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
+                            sizeClass,
+                          ),
                     ),
                     Md3eManagementFacetChipWrap(
                       labels: widget.chipLabels,
@@ -211,39 +214,28 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
 
 /// Widgetbook / 预览用各维度示例数据。
 abstract final class Md3eManagementBrowsePagePreviewData {
-  static const Map<ManagedNamedFacetKind, List<String>> sampleLabels =
-      <ManagedNamedFacetKind, List<String>>{
-        ManagedNamedFacetKind.author: <String>[
-          '村上水军',
-          '比村兵長',
-          '紺野アサラ',
-          'みちきんぐ',
-        ],
-        ManagedNamedFacetKind.parody: <String>[
-          '艦隊これくしょん',
-          'Fate/Grand Order',
-          '原神',
-        ],
-        ManagedNamedFacetKind.character: <String>[
-          '島風',
-          'マシュ',
-          '雷電将軍',
-          '甘雨',
-          '胡桃',
-        ],
-        ManagedNamedFacetKind.tag: <String>[
-          '奇幻',
-          '校园',
-          '恋爱',
-          '冒险',
-          '治愈',
-          '日常',
-          '科幻',
-          '悬疑',
-          '搞笑',
-          '百合',
-        ],
-      };
+  static const Map<ManagedNamedFacetKind, List<String>>
+  sampleLabels = <ManagedNamedFacetKind, List<String>>{
+    ManagedNamedFacetKind.author: <String>['村上水军', '比村兵長', '紺野アサラ', 'みちきんぐ'],
+    ManagedNamedFacetKind.parody: <String>[
+      '艦隊これくしょん',
+      'Fate/Grand Order',
+      '原神',
+    ],
+    ManagedNamedFacetKind.character: <String>['島風', 'マシュ', '雷電将軍', '甘雨', '胡桃'],
+    ManagedNamedFacetKind.tag: <String>[
+      '奇幻',
+      '校园',
+      '恋爱',
+      '冒险',
+      '治愈',
+      '日常',
+      '科幻',
+      '悬疑',
+      '搞笑',
+      '百合',
+    ],
+  };
 
   static int sampleCountFor(ManagedNamedFacetKind facet) {
     return sampleLabels[facet]?.length ?? 0;
