@@ -128,7 +128,7 @@ class _LibraryComicsGridSliver extends StatelessWidget {
             comic: manga,
             gridIndex: index,
             onEditMetadata: () =>
-                context.push('/comic/${Uri.encodeComponent(manga.comicId)}/edit'),
+                showComicMetadataEditMd3e(context: context, comic: manga),
             onOpenDetail: () {
               final ProviderContainer container = ProviderScope.containerOf(
                 context,

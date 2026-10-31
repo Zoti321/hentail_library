@@ -13,6 +13,7 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_md3e_cover.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_md3e_entry.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
@@ -133,7 +134,7 @@ class _SeriesDetailMd3eContentState
           ref.read(seriesDetailPageSizeProvider.notifier).setPageSize(size),
       onBack: () => DetailBackHeader.popOrGoLibrary(context),
       onEdit: () =>
-          context.push('/series/${Uri.encodeComponent(series.id)}/edit'),
+          showSeriesMetadataEditMd3e(context: context, series: series),
       moreMenuEntries: <M3EMenuNode>[
         M3EMenuEntry(
           label: l10n.refreshMetadata,

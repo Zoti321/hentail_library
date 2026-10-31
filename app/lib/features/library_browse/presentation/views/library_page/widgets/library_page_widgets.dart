@@ -1,7 +1,7 @@
-import 'package:go_router/go_router.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';

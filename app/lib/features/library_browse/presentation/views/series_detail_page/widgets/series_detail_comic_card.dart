@@ -1,9 +1,9 @@
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
@@ -116,7 +116,7 @@ class SeriesDetailComicCard extends HookConsumerWidget {
   }
 
   void _openEditMetadata(BuildContext context, WidgetRef ref) {
-    context.push('/comic/${Uri.encodeComponent(item.comic.comicId)}/edit');
+    showComicMetadataEditMd3e(context: context, comic: item.comic);
   }
 
   void _showContextMenu(

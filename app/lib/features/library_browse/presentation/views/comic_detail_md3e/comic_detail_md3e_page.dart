@@ -12,6 +12,7 @@ import 'package:hentai_library/features/library_browse/presentation/views/author
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_format.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_md3e_cover.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_md3e_entry.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_status_scaffold.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
@@ -117,7 +118,7 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
       entry: entry,
       onBack: () => DetailBackHeader.popOrGoLibrary(context),
       onEdit: () =>
-          context.push('/comic/${Uri.encodeComponent(comic.comicId)}/edit'),
+          showComicMetadataEditMd3e(context: context, comic: comic),
       moreMenuEntries: <M3EMenuNode>[
         M3EMenuEntry(
           label: l10n.refreshMetadata,

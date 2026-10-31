@@ -3,8 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_md3e_page.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/comic_metadata_edit_md3e_page.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/series_metadata_edit_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_md3e_page.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_page.dart';
 import 'package:hentai_library/features/read_session/presentation/reader.dart';
@@ -45,30 +43,6 @@ List<RouteBase> buildSharedContentRoutes({
         return buildDesktopFadeThroughPage(
           state: state,
           child: resolvedComicDetailBuilder(context, comicId),
-        );
-      },
-    ),
-    GoRoute(
-      path: '/comic/:id/edit',
-      name: '编辑漫画元数据',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final String comicId = Uri.decodeComponent(state.pathParameters['id']!);
-        return buildDesktopFadeThroughPage(
-          state: state,
-          child: ComicMetadataEditMd3ePage(comicId: comicId),
-        );
-      },
-    ),
-    GoRoute(
-      path: '/series/:id/edit',
-      name: '编辑系列元数据',
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final String seriesId = Uri.decodeComponent(
-          state.pathParameters['id']!,
-        );
-        return buildDesktopFadeThroughPage(
-          state: state,
-          child: SeriesMetadataEditMd3ePage(seriesId: seriesId),
         );
       },
     ),

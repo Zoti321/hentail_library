@@ -1,6 +1,6 @@
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
@@ -43,7 +43,7 @@ Future<void> openComicMetadataEditorForIds(
     if (!context.mounted || comic == null) {
       return;
     }
-    await context.push<void>('/comic/${Uri.encodeComponent(comic.comicId)}/edit');
+    await showComicMetadataEditMd3e(context: context, comic: comic);
     if (context.mounted && exitSelectionOnDone) {
       ref.read(catalogSelectionProvider.notifier).exit();
     }

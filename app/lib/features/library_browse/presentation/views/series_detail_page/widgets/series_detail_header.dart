@@ -1,9 +1,9 @@
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
@@ -125,7 +125,7 @@ class _SeriesDetailDefaultHeaderRow extends ConsumerWidget {
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
             onPressed: () {
-              context.push('/series/${Uri.encodeComponent(series.id)}/edit');
+              showSeriesMetadataEditMd3e(context: context, series: series);
             },
           ),
           const Spacer(),

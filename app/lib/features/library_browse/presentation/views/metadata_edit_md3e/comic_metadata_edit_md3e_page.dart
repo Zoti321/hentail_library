@@ -3,69 +3,34 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_editor_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_mappers.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_status_scaffold.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_form.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
-
-/// 生产漫画元数据编辑整页（MD3E）：按 id 加载后渲染 [ComicMetadataEditMd3eView]。
-class ComicMetadataEditMd3ePage extends ConsumerWidget {
-  const ComicMetadataEditMd3ePage({super.key, required this.comicId});
-
-  final String comicId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<Comic?> comicAsync = ref.watch(
-      libraryComicDetailProvider(comicId),
-    );
-    return M3ETheme(
-      data: md3eWithAppFontFamily(M3ETheme.of(context)),
-      child: comicAsync.when(
-        data: (Comic? comic) {
-          if (comic == null) {
-            return DetailNotFoundStatus(
-              icon: LucideIcons.bookOpen,
-              label: context.l10n.comicDetailNotFound,
-            );
-          }
-          return ComicMetadataEditMd3eView(comic: comic);
-        },
-        loading: () => const DetailLoadingStatus(),
-        error: (Object error, StackTrace stackTrace) => DetailErrorStatus(
-          label: context.l10n.comicDetailLoadFailedRetry,
-          onRetry: ref.read(libraryRefreshActionProvider),
-        ),
-        skipLoadingOnReload: true,
-        skipLoadingOnRefresh: true,
-      ),
-    );
-  }
-}
 
 /// 漫画元数据编辑视图（已加载实体）：Lab 表单 + Lab 编辑壳，保存走生产 notifier。
 class ComicMetadataEditMd3eView extends ConsumerStatefulWidget {
-  const ComicMetadataEditMd3eView({super.key, required this.comic});
+  const ComicMetadataEditMd3eView({
+    super.key,
+    required this.comic,
+    this.presentation = Md3eMetadataEditPresentation.modal,
+  });
 
   final Comic comic;
+  final Md3eMetadataEditPresentation presentation;
 
   @override
   ConsumerState<ComicMetadataEditMd3eView> createState() =>
-      _ComicMetadataEditMd3eViewState();
+      ComicMetadataEditMd3eViewState();
 }
 
-class _ComicMetadataEditMd3eViewState
+class ComicMetadataEditMd3eViewState
     extends ConsumerState<ComicMetadataEditMd3eView> {
   late Md3eComicMetadataEditDraft _draft;
   late ComicMetaLocks _locks;
@@ -161,7 +126,8 @@ class _ComicMetadataEditMd3eViewState
     }
   }
 
-  Future<void> _handleSave() async {
+  /// 供全屏底栏确认按钮调用。
+  Future<void> save() async {
     if (_saving) {
       return;
     }
@@ -236,10 +202,10 @@ class _ComicMetadataEditMd3eViewState
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     return Md3eMetadataEditSurface(
-      presentation: Md3eMetadataEditPresentation.embedded,
+      presentation: widget.presentation,
       title: l10n.dialogEditMetadataTitle,
       onCancel: _leave,
-      onSave: _handleSave,
+      onSave: save,
       saving: _saving,
       body: Md3eComicMetadataEditForm(
         draft: _draft,

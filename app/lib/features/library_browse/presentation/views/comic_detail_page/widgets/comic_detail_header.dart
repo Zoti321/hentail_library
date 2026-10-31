@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
@@ -86,7 +87,7 @@ class ComicDetailHeader extends ConsumerWidget {
   }
 
   void _openEditMetadata(BuildContext context, WidgetRef ref) {
-    context.push('/comic/${Uri.encodeComponent(comic.comicId)}/edit');
+    showComicMetadataEditMd3e(context: context, comic: comic);
   }
 }
 
