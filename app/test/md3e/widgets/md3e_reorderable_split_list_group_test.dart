@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/md3e/motion/md3e_effects_decorated_box.dart';
 import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_exclude.dart';
 import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_index.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_reorderable_split_list_group.dart';
@@ -176,6 +177,58 @@ void main() {
       await gesture.up();
       await tester.pumpAndSettle();
       expect(find.byType(Md3eSplitDragScope), findsNothing);
+    });
+
+    testWidgets('拖拽松手后被拖的行圆角恢复为其槽位圆角（不残留按压圆角）', (
+      WidgetTester tester,
+    ) async {
+      List<String> items = List<String>.of(_items);
+      await pumpMd3eApp(
+        tester,
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Md3eReorderableSplitListGroup(
+                  itemCount: items.length,
+                  itemKeyOf: (int index) => items[index],
+                  onReorder: (int from, int to) => setState(() {
+                    items = applyMd3eReorder(items, from, to);
+                  }),
+                  itemBuilder: (BuildContext context, int index) => SizedBox(
+                    height: 56,
+                    child: Center(child: Text(items[index])),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      // 长按 C 并上移，落到中间槽位（index 1），中间行应为内圆角。
+      await _longPressDrag(tester, find.text('C'), dy: -70);
+      expect(items, <String>['A', 'C', 'B']);
+
+      final Finder rowC = find.ancestor(
+        of: find.text('C'),
+        matching: find.byType(Md3eSplitListRow),
+      );
+      final BoxDecoration decoration = tester
+          .widget<Md3eEffectsDecoratedBox>(
+            find.descendant(
+              of: rowC,
+              matching: find.byType(Md3eEffectsDecoratedBox),
+            ),
+          )
+          .decoration;
+      expect(
+        decoration.borderRadius,
+        BorderRadius.vertical(
+          top: const Radius.circular(kMd3eSplitListInnerRadius),
+          bottom: const Radius.circular(kMd3eSplitListInnerRadius),
+        ),
+      );
     });
 
     testWidgets('点击行时触发 onItemTap，点击 Md3eReorderExclude 区域不触发', (

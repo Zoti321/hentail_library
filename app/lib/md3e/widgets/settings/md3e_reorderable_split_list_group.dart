@@ -109,6 +109,8 @@ class _Md3eReorderableSplitListGroupState
   int? _dropFrom;
   int? _dropTo;
   bool _settling = false;
+  // 每次拖拽结束递增，使行被重建，清掉拖拽期间可能残留的按压态（否则圆角不会回落）。
+  int _rowEpoch = 0;
   Size _dragSize = Size.zero;
   Offset _pointer = Offset.zero;
   Offset _grab = Offset.zero;
@@ -398,6 +400,7 @@ class _Md3eReorderableSplitListGroupState
 
     _settle.stop();
     _settle.value = 0;
+    _rowEpoch++;
     _placeholder.stop();
     _lift.stop();
     _lift.value = 0;
@@ -453,6 +456,7 @@ class _Md3eReorderableSplitListGroupState
     final Widget row = KeyedSubtree(
       key: _rowKey(id),
       child: Md3eSplitListRow(
+        key: ValueKey<int>(_rowEpoch),
         topRadius: first ? widget.outerRadius : kMd3eSplitListInnerRadius,
         bottomRadius: last ? widget.outerRadius : kMd3eSplitListInnerRadius,
         pressedRadius: widget.outerRadius,
