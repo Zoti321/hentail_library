@@ -11,7 +11,6 @@ import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/anchored_overlay_menu.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic_delete_flow.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_series_nav.dart';
@@ -87,7 +86,7 @@ class ComicDetailHeader extends ConsumerWidget {
   }
 
   void _openEditMetadata(BuildContext context, WidgetRef ref) {
-    showEditMetadataDialog(context: context, comic: comic);
+    context.push('/comic/${Uri.encodeComponent(comic.comicId)}/edit');
   }
 }
 

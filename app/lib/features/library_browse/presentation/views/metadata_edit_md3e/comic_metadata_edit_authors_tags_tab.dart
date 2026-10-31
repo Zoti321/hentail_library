@@ -1,4 +1,4 @@
-part of 'edit_metadata_dialog.dart';
+part of 'comic_metadata_edit_md3e_page.dart';
 
 class _EditMetadataAuthorsTagsTab extends ConsumerWidget {
   const _EditMetadataAuthorsTagsTab({

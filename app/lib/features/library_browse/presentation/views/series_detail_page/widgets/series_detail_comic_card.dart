@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
@@ -12,7 +13,6 @@ import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_conte
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/series_item_context_menu.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic_delete_flow.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -116,16 +116,7 @@ class SeriesDetailComicCard extends HookConsumerWidget {
   }
 
   void _openEditMetadata(BuildContext context, WidgetRef ref) {
-    final Comic comic = item.comic;
-    showEditMetadataDialog(
-      context: context,
-      comic: comic,
-      seriesItemSort: (
-        seriesId: seriesId,
-        sortOrder: item.sortOrder,
-        sortOrderLocked: item.sortOrderLocked,
-      ),
-    );
+    context.push('/comic/${Uri.encodeComponent(item.comic.comicId)}/edit');
   }
 
   void _showContextMenu(

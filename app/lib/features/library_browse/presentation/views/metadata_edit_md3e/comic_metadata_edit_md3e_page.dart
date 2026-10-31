@@ -1,6 +1,9 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_status_scaffold.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_comics_providers.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
@@ -26,8 +29,6 @@ import 'package:hentai_library/features/library_browse/presentation/views/widget
 import 'package:hentai_library/shared/ui/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/widgets/chrome/capsule_tab_bar.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/adaptive_form_surface.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/features/library_browse/domain/smart_facet_match_preference.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_editor_notifier.dart';
@@ -35,48 +36,59 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-part 'edit_metadata_dialog_general_tab.dart';
-part 'edit_metadata_dialog_authors_tags_tab.dart';
-
-/// 漫画元数据编辑：medium/expanded 为 dialog，compact 为全页（[AdaptiveFormSurface]）。
-const double _kEditMetadataDialogWidth = 720;
-const double _kEditMetadataDialogRadius = 4;
-
-/// 壳标题区与底栏的近似高度，用于限制 dialog body 最大滚动区。
-const double _kEditMetadataShellChromeReserve = 120;
-
-const double _kEditMetadataBodyMinHeight = 240;
+part 'comic_metadata_edit_general_tab.dart';
+part 'comic_metadata_edit_authors_tags_tab.dart';
 
 enum _EditMetadataTab { general, authorsAndTags }
 
-/// 打开漫画元数据编辑表面。有 Series 归属时在常规页展示成员排序区。
-Future<void> showEditMetadataDialog({
-  required BuildContext context,
-  required Comic comic,
-  SeriesItemMembership? seriesItemSort,
-}) {
-  return showAdaptiveFormSurfaceWidget<void>(
-    context: context,
-    surface: EditMetadataDialog(comic: comic, seriesItemSort: seriesItemSort),
-  );
+/// 生产漫画元数据编辑整页（MD3E）：按 id 加载后渲染 [ComicMetadataEditMd3eView]。
+class ComicMetadataEditMd3ePage extends ConsumerWidget {
+  const ComicMetadataEditMd3ePage({super.key, required this.comicId});
+
+  final String comicId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<Comic?> comicAsync = ref.watch(
+      libraryComicDetailProvider(comicId),
+    );
+    return M3ETheme(
+      data: md3eWithAppFontFamily(M3ETheme.of(context)),
+      child: comicAsync.when(
+        data: (Comic? comic) {
+          if (comic == null) {
+            return DetailNotFoundStatus(
+              icon: LucideIcons.bookOpen,
+              label: context.l10n.comicDetailNotFound,
+            );
+          }
+          return ComicMetadataEditMd3eView(comic: comic);
+        },
+        loading: () => const DetailLoadingStatus(),
+        error: (Object error, StackTrace stackTrace) => DetailErrorStatus(
+          label: context.l10n.comicDetailLoadFailedRetry,
+          onRetry: ref.read(libraryRefreshActionProvider),
+        ),
+        skipLoadingOnReload: true,
+        skipLoadingOnRefresh: true,
+      ),
+    );
+  }
 }
 
-class EditMetadataDialog extends StatefulHookConsumerWidget {
-  const EditMetadataDialog({
-    super.key,
-    required this.comic,
-    this.seriesItemSort,
-  });
+/// 漫画元数据编辑表单视图（已加载实体）。
+class ComicMetadataEditMd3eView extends StatefulHookConsumerWidget {
+  const ComicMetadataEditMd3eView({super.key, required this.comic});
 
   final Comic comic;
-  final SeriesItemMembership? seriesItemSort;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _EditMetadataDialogState();
+      _ComicMetadataEditMd3eViewState();
 }
 
-class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
+class _ComicMetadataEditMd3eViewState
+    extends ConsumerState<ComicMetadataEditMd3eView> {
   late ComicMetadataForm _form;
   late ComicMetaLocks _locks;
   ComicMetadataFormValidation? _validation;
@@ -89,18 +101,6 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   late String _sortOrderText;
   late bool _sortOrderLocked;
   String? _sortOrderError;
-
-  List<DialogSideTabItem> _sideTabs(AppLocalizations l10n) =>
-      <DialogSideTabItem>[
-        DialogSideTabItem(
-          label: l10n.dialogEditMetadataTabGeneral,
-          icon: LucideIcons.textAlignCenter,
-        ),
-        DialogSideTabItem(
-          label: l10n.dialogEditMetadataTabAuthorsTags,
-          icon: LucideIcons.users,
-        ),
-      ];
 
   List<CapsuleTabItem> _capsuleTabs(AppLocalizations l10n) => <CapsuleTabItem>[
     CapsuleTabItem(
@@ -118,16 +118,11 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     super.initState();
     _form = ComicMetadataForm.fromComic(widget.comic);
     _locks = widget.comic.locks;
-    final SeriesItemMembership? seed = widget.seriesItemSort;
-    if (seed != null) {
-      _applySeriesSortSeed(seed);
-    } else {
-      _sortOrderText = '';
-      _sortOrderLocked = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _loadSeriesSortMembership();
-      });
-    }
+    _sortOrderText = '';
+    _sortOrderLocked = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSeriesSortMembership();
+    });
   }
 
   void _applySeriesSortSeed(SeriesItemMembership seed) {
@@ -236,6 +231,15 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     setState(() => _form = transform(_form));
   }
 
+  void _leaveAfterSave() {
+    final NavigatorState navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+      return;
+    }
+    DetailBackHeader.popOrGoLibrary(context);
+  }
+
   Future<void> _handleSave() async {
     if (_saving) {
       return;
@@ -284,7 +288,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       }
       if (mounted) {
         showSuccessToast(context, context.l10n.commonSavedToast);
-        Navigator.of(context).pop();
+        _leaveAfterSave();
       }
     } catch (error, stackTrace) {
       logError(AppLog.ui('editMetadata'), '保存漫画元数据失败', error, stackTrace);
@@ -397,114 +401,79 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
-    final int selectedTabIndex = _selectedTab.index;
-    final bool compact = AppLayoutBreakpoints.isCompact(
-      MediaQuery.sizeOf(context).width,
-    );
-
-    final Widget body;
-    if (compact) {
-      body = Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              tokens.spacing.lg,
-              0,
-              tokens.spacing.lg,
-              tokens.spacing.md,
-            ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: CapsuleTabBar(
-                items: _capsuleTabs(l10n),
-                selectedIndex: selectedTabIndex,
-                onSelected: _selectTab,
-              ),
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: cs.surface,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const DetailBackHeader(),
+            Padding(
               padding: EdgeInsets.fromLTRB(
                 tokens.spacing.lg,
                 0,
                 tokens.spacing.lg,
-                tokens.spacing.xs,
+                tokens.spacing.md,
               ),
-              child: _buildTabPane(tokens),
-            ),
-          ),
-        ],
-      );
-    } else {
-      body = ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: _kEditMetadataBodyMinHeight,
-          maxHeight: math.max(
-            _kEditMetadataBodyMinHeight,
-            MediaQuery.sizeOf(context).height * 0.88 -
-                _kEditMetadataShellChromeReserve,
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            DialogSideTabBar(
-              items: _sideTabs(l10n),
-              selectedIndex: selectedTabIndex,
-              showDivider: false,
-              onSelected: _selectTab,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: CapsuleTabBar(
+                  items: _capsuleTabs(l10n),
+                  selectedIndex: _selectedTab.index,
+                  onSelected: _selectTab,
+                ),
+              ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  tokens.spacing.lg,
-                  0,
-                  18,
-                  tokens.spacing.xs,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      tokens.spacing.lg,
+                      0,
+                      tokens.spacing.lg,
+                      tokens.spacing.xs,
+                    ),
+                    child: _buildTabPane(tokens),
+                  ),
                 ),
-                child: _buildTabPane(tokens),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(tokens.spacing.lg),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: _saving
+                        ? null
+                        : () => DetailBackHeader.popOrGoLibrary(context),
+                    child: Text(l10n.commonCancel),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: _saving ? null : _handleSave,
+                    child: _saving
+                        ? SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: cs.onPrimary,
+                            ),
+                          )
+                        : Text(l10n.commonSaveChanges),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-      );
-    }
-
-    return AdaptiveFormSurface(
-      title: l10n.dialogEditMetadataTitle,
-      maxDialogWidth: _kEditMetadataDialogWidth,
-      borderRadius: _kEditMetadataDialogRadius,
-      scrollableBody: false,
-      bodyPadding: EdgeInsets.zero,
-      backgroundColor: cs.surface,
-      showFooterDivider: false,
-      fitContentHeight: true,
-      actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      body: body,
-      actions: <Widget>[
-        TextButton(
-          onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          child: Text(l10n.commonCancel),
-        ),
-        const SizedBox(width: 8),
-        FilledButton(
-          onPressed: _saving ? null : _handleSave,
-          child: _saving
-              ? SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: cs.onPrimary,
-                  ),
-                )
-              : Text(l10n.commonSaveChanges),
-        ),
-      ],
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_types.dart';
@@ -6,7 +7,6 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/bulk_edit_metadata_dialog.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/comic_metadata_bulk_patch_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -43,7 +43,7 @@ Future<void> openComicMetadataEditorForIds(
     if (!context.mounted || comic == null) {
       return;
     }
-    await showEditMetadataDialog(context: context, comic: comic);
+    await context.push<void>('/comic/${Uri.encodeComponent(comic.comicId)}/edit');
     if (context.mounted && exitSelectionOnDone) {
       ref.read(catalogSelectionProvider.notifier).exit();
     }

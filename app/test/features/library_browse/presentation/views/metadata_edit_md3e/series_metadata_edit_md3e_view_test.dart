@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/series_metadata_edit_md3e_page.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/series_metadata_editor_notifier.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/series_metadata_editor_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_series_dialog.dart';
+import 'package:hentai_library/shared/ui/widgets/form/metadata_lock_button.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
@@ -44,7 +45,8 @@ Series _series() {
   return Series(id: 'series-1', name: '系列甲', folderPath: '/library/series-1');
 }
 
-Future<void> _pumpEditSeriesDialog(
+/// 在路由中打开整页（与生产 push 行为一致，保存后可 pop 回来）。
+Future<void> _pumpEditSeriesPage(
   WidgetTester tester, {
   required _RecordingSeriesMetadataEditor editor,
   Series? series,
@@ -54,21 +56,33 @@ Future<void> _pumpEditSeriesDialog(
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
+  final Series target = series ?? _series();
   await pumpLocalizedApp(
     tester,
     overrides: <Override>[
       seriesMetadataEditorProvider.overrideWith(() => editor),
     ],
-    home: Scaffold(body: EditSeriesDialog(series: series ?? _series())),
+    home: Builder(
+      builder: (BuildContext context) => TextButton(
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) =>
+                Scaffold(body: SeriesMetadataEditMd3eView(series: target)),
+          ),
+        ),
+        child: const Text('open'),
+      ),
+    ),
   );
+  await tester.tap(find.text('open'));
   await tester.pump();
-  await tester.pump(const Duration(milliseconds: 200));
+  await tester.pump(const Duration(milliseconds: 300));
 }
 
 Finder _nameField(WidgetTester tester) {
   return find
       .descendant(
-        of: find.byType(EditSeriesDialog),
+        of: find.byType(SeriesMetadataEditMd3eView),
         matching: find.byType(TextField),
       )
       .first;
@@ -80,7 +94,7 @@ void main() {
   ) async {
     final _RecordingSeriesMetadataEditor editor =
         _RecordingSeriesMetadataEditor();
-    await _pumpEditSeriesDialog(tester, editor: editor);
+    await _pumpEditSeriesPage(tester, editor: editor);
 
     await tester.enterText(_nameField(tester), '   ');
     await tester.tap(find.text('保存'));
@@ -89,7 +103,7 @@ void main() {
 
     expect(find.text('系列名称不能为空'), findsOneWidget);
     expect(editor.applyForms, isEmpty);
-    expect(find.byType(EditSeriesDialog), findsOneWidget);
+    expect(find.byType(SeriesMetadataEditMd3eView), findsOneWidget);
   });
 
   testWidgets('lock button forwards setLocks to editor notifier', (
@@ -97,12 +111,12 @@ void main() {
   ) async {
     final _RecordingSeriesMetadataEditor editor =
         _RecordingSeriesMetadataEditor();
-    await _pumpEditSeriesDialog(tester, editor: editor);
+    await _pumpEditSeriesPage(tester, editor: editor);
 
     await tester.tap(
       find
           .descendant(
-            of: find.byType(EditSeriesDialog),
+            of: find.byType(MetadataLockButton).first,
             matching: find.byType(IconButton),
           )
           .first,
@@ -115,12 +129,12 @@ void main() {
     ]);
   });
 
-  testWidgets('unchanged save calls apply and closes dialog', (
+  testWidgets('unchanged save calls apply and leaves the page', (
     WidgetTester tester,
   ) async {
     final _RecordingSeriesMetadataEditor editor =
         _RecordingSeriesMetadataEditor();
-    await _pumpEditSeriesDialog(tester, editor: editor);
+    await _pumpEditSeriesPage(tester, editor: editor);
 
     await tester.tap(find.text('保存'));
     await tester.pump();
@@ -128,7 +142,7 @@ void main() {
 
     expect(editor.applyForms, hasLength(1));
     expect(editor.applyForms.single.name, '系列甲');
-    expect(find.byType(EditSeriesDialog), findsNothing);
+    expect(find.byType(SeriesMetadataEditMd3eView), findsNothing);
   });
 
   testWidgets('changed name save calls apply with new name', (
@@ -136,7 +150,7 @@ void main() {
   ) async {
     final _RecordingSeriesMetadataEditor editor =
         _RecordingSeriesMetadataEditor();
-    await _pumpEditSeriesDialog(tester, editor: editor);
+    await _pumpEditSeriesPage(tester, editor: editor);
 
     await tester.enterText(_nameField(tester), '新名称');
     await tester.tap(find.text('保存'));
@@ -144,6 +158,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(editor.applyForms.single.name, '新名称');
-    expect(find.byType(EditSeriesDialog), findsNothing);
+    expect(find.byType(SeriesMetadataEditMd3eView), findsNothing);
   });
 }

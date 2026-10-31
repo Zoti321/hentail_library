@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,7 +34,6 @@ import 'package:hentai_library/features/library_browse/presentation/views/librar
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/library_empty_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_catalog_grid_animation.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/catalog_selectable_comic_card.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

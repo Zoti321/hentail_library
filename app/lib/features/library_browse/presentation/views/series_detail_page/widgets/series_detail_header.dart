@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -13,7 +14,6 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/anchored_overlay_menu.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/catalog_selection_header_section.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_series_dialog.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_detail_page_size_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
@@ -125,7 +125,7 @@ class _SeriesDetailDefaultHeaderRow extends ConsumerWidget {
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
             onPressed: () {
-              showEditSeriesDialog(context: context, series: series);
+              context.push('/series/${Uri.encodeComponent(series.id)}/edit');
             },
           ),
           const Spacer(),

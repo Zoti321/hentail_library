@@ -14,7 +14,6 @@ import 'package:hentai_library/features/library_browse/presentation/views/comic_
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_md3e_entry.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_status_scaffold.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/di/comic_detail_providers.dart';
@@ -117,7 +116,8 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
     return Md3eComicDetailPage(
       entry: entry,
       onBack: () => DetailBackHeader.popOrGoLibrary(context),
-      onEdit: () => showEditMetadataDialog(context: context, comic: comic),
+      onEdit: () =>
+          context.push('/comic/${Uri.encodeComponent(comic.comicId)}/edit'),
       moreMenuEntries: <M3EMenuNode>[
         M3EMenuEntry(
           label: l10n.refreshMetadata,
@@ -157,11 +157,8 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
         final String query = formatLibrarySearchExactMetaQuery(value);
         context.push('/searched?q=${Uri.encodeQueryComponent(query)}');
       },
-      onAuthorTap: (String name) => openAuthorDetailByName(
-        context: context,
-        ref: ref,
-        name: name,
-      ),
+      onAuthorTap: (String name) =>
+          openAuthorDetailByName(context: context, ref: ref, name: name),
       onSeriesSelect: (int index) {
         final List<ComicDetailSeriesNavItem>? items = seriesNav?.items;
         if (items == null || index < 0 || index >= items.length) {

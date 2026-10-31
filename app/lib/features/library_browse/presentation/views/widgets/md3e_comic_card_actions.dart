@@ -1,3 +1,4 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
@@ -5,7 +6,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/shell_file_explorer.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic_card_host.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
@@ -57,7 +57,7 @@ class Md3eComicCardActions extends ConsumerWidget {
         M3EMenuEntry(
           label: l10n.comicDetailEditMetadata,
           onPressed: () =>
-              showEditMetadataDialog(context: context, comic: comic),
+              context.push('/comic/${Uri.encodeComponent(comic.comicId)}/edit'),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailShowInExplorer,

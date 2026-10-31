@@ -17,7 +17,6 @@ import 'package:hentai_library/features/library_browse/presentation/views/series
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_md3e_entry.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_status_scaffold.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/edit_series_dialog.dart';
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
@@ -133,7 +132,8 @@ class _SeriesDetailMd3eContentState
       onPageSizeChanged: (int size) =>
           ref.read(seriesDetailPageSizeProvider.notifier).setPageSize(size),
       onBack: () => DetailBackHeader.popOrGoLibrary(context),
-      onEdit: () => showEditSeriesDialog(context: context, series: series),
+      onEdit: () =>
+          context.push('/series/${Uri.encodeComponent(series.id)}/edit'),
       moreMenuEntries: <M3EMenuNode>[
         M3EMenuEntry(
           label: l10n.refreshMetadata,
@@ -155,11 +155,8 @@ class _SeriesDetailMd3eContentState
         final String query = formatLibrarySearchExactMetaQuery(value);
         context.push('/searched?q=${Uri.encodeQueryComponent(query)}');
       },
-      onAuthorTap: (String name) => openAuthorDetailByName(
-        context: context,
-        ref: ref,
-        name: name,
-      ),
+      onAuthorTap: (String name) =>
+          openAuthorDetailByName(context: context, ref: ref, name: name),
       onComicTap: (int globalIndex) {
         final int localIndex = globalIndex - (page - 1) * pageSize;
         if (localIndex < 0 || localIndex >= items.length) {
