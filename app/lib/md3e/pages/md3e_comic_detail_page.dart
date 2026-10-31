@@ -26,6 +26,7 @@ class Md3eComicDetailPage extends StatefulWidget {
     this.onReadIncognito,
     this.onMetadataChipTap,
     this.onSeriesSelect,
+    this.onAuthorTap,
     this.scrollController,
   });
 
@@ -39,6 +40,9 @@ class Md3eComicDetailPage extends StatefulWidget {
 
   /// 系列导航切换回调（生产：路由到对应漫画）；为空时仅在页内切换标题（Lab）。
   final ValueChanged<int>? onSeriesSelect;
+
+  /// 作者 chip 点击（生产：打开作者详情）；为空时作者 chip 走 [onMetadataChipTap]。
+  final ValueChanged<String>? onAuthorTap;
   final ScrollController? scrollController;
 
   @override
@@ -191,6 +195,7 @@ class _Md3eComicDetailPageState extends State<Md3eComicDetailPage> {
                     onRead: _resolveVoid(widget.onRead),
                     onReadIncognito: _resolveVoid(widget.onReadIncognito),
                     onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
+                    onAuthorTap: widget.onAuthorTap,
                   ),
                 ),
               ),

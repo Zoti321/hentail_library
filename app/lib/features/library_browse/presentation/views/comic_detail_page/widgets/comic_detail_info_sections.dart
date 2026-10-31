@@ -13,7 +13,7 @@ import 'package:hentai_library/shared/ui/widgets/element/chip/detail_meta_chip_b
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/show_author_detail.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_sheet.dart';
 import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -234,7 +234,7 @@ class ComicDetailMetadataBlock extends ConsumerWidget {
           items: authors,
           maxRows: kDetailMetaChipBandMaxRowsSingle,
           onItemTap: (String name) {
-            showAuthorDetailByName(context: context, ref: ref, name: name);
+            showAuthorDetailMd3eByName(context: context, ref: ref, name: name);
           },
         ),
       );

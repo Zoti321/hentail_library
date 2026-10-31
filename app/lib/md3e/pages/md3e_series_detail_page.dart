@@ -25,6 +25,7 @@ class Md3eSeriesDetailPage extends StatefulWidget {
     this.moreMenuEntries,
     this.onMetadataChipTap,
     this.onComicTap,
+    this.onAuthorTap,
     this.scrollController,
     this.page,
     this.pageSize,
@@ -39,6 +40,9 @@ class Md3eSeriesDetailPage extends StatefulWidget {
   final List<M3EMenuNode>? moreMenuEntries;
   final ValueChanged<String>? onMetadataChipTap;
   final ValueChanged<int>? onComicTap;
+
+  /// 作者 chip 点击（生产：打开作者详情）；为空时作者 chip 走 [onMetadataChipTap]。
+  final ValueChanged<String>? onAuthorTap;
   final ScrollController? scrollController;
 
   /// 外部分页（生产：服务端分页）。传入 [onPageChanged] 时，[entry.comics] 仅为当前页，
@@ -257,6 +261,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
                   child: Md3eSeriesDetailIntroSection(
                     entry: widget.entry,
                     onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
+                    onAuthorTap: widget.onAuthorTap,
                   ),
                 ),
               ),

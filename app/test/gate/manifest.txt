@@ -30,8 +30,8 @@ test/shared/ui/widgets/overlays/dialog/confirm
 test/features/named_metadata/presentation/views/metadata_md3e/named_facet_fill_viewport_test.dart
 test/features/library_browse/presentation/views/series_detail_md3e/series_detail_md3e_entry_test.dart
 test/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_md3e_entry_test.dart
-test/features/library_browse/presentation/views/widgets/author_detail_surface_test.dart
-test/features/library_browse/presentation/views/widgets/author_image_view_test.dart
+test/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_body_test.dart
+test/features/library_browse/presentation/views/author_detail_md3e/author_image_view_test.dart
 test/features/read_session/presentation/reader_viewport_pages_test.dart
 test/features/read_session/presentation/reader_open_error_message_test.dart
 test/features/read_session/presentation/views/reader_page/reader_chrome_layout_test.dart

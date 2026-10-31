@@ -13,10 +13,12 @@ class Md3eComicDetailMetadataSection extends StatelessWidget {
     super.key,
     required this.entry,
     this.onChipTap,
+    this.onAuthorTap,
   });
 
   final Md3eComicDetailEntry entry;
   final ValueChanged<String>? onChipTap;
+  final ValueChanged<String>? onAuthorTap;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,7 @@ class Md3eComicDetailMetadataSection extends StatelessWidget {
       characters: entry.characters,
       tags: entry.tags,
       onChipTap: onChipTap,
+      onAuthorTap: onAuthorTap,
     );
 
     final List<Widget> infoRows = <Widget>[

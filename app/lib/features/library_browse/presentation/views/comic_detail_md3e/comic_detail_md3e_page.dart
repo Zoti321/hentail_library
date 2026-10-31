@@ -8,6 +8,7 @@ import 'package:hentai_library/features/library_browse/presentation/comic_delete
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_sheet.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_format.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_md3e_cover.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_md3e_entry.dart';
@@ -156,6 +157,11 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
         final String query = formatLibrarySearchExactMetaQuery(value);
         context.push('/searched?q=${Uri.encodeQueryComponent(query)}');
       },
+      onAuthorTap: (String name) => showAuthorDetailMd3eByName(
+        context: context,
+        ref: ref,
+        name: name,
+      ),
       onSeriesSelect: (int index) {
         final List<ComicDetailSeriesNavItem>? items = seriesNav?.items;
         if (items == null || index < 0 || index >= items.length) {

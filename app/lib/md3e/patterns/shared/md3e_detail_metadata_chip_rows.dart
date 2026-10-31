@@ -12,6 +12,7 @@ class Md3eDetailMetadataChipRows extends StatelessWidget {
     this.characters = const <String>[],
     this.tags = const <String>[],
     this.onChipTap,
+    this.onAuthorTap,
   });
 
   final List<String> parodies;
@@ -19,6 +20,9 @@ class Md3eDetailMetadataChipRows extends StatelessWidget {
   final List<String> characters;
   final List<String> tags;
   final ValueChanged<String>? onChipTap;
+
+  /// 作者 chip 点击（生产：打开作者详情）；为空时与其它 chip 一样走 [onChipTap]。
+  final ValueChanged<String>? onAuthorTap;
 
   bool get isEmpty =>
       parodies.isEmpty &&
@@ -35,7 +39,11 @@ class Md3eDetailMetadataChipRows extends StatelessWidget {
     final M3ESpacing spacing = M3ETheme.of(context).spacing;
     final List<Widget> rows = <Widget>[];
 
-    void addRow(String label, List<String> items) {
+    void addRow(
+      String label,
+      List<String> items, {
+      ValueChanged<String>? onTap,
+    }) {
       if (items.isEmpty) {
         return;
       }
@@ -43,13 +51,17 @@ class Md3eDetailMetadataChipRows extends StatelessWidget {
         Md3eComicDetailMetaChipRow(
           label: label,
           items: items,
-          onItemTap: onChipTap,
+          onItemTap: onTap ?? onChipTap,
         ),
       );
     }
 
     addRow(l10n.comicDetailParodies, parodies);
-    addRow(l10n.comicDetailAuthors, authors);
+    addRow(
+      l10n.comicDetailAuthors,
+      authors,
+      onTap: onAuthorTap ?? onChipTap,
+    );
     addRow(l10n.comicDetailCharacters, characters);
     addRow(l10n.comicDetailTags, tags);
 

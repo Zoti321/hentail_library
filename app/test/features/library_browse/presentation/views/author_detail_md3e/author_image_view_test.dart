@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/author_detail_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/author_image_view.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_image_view.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart' show ProviderScope, Ref;
 import 'package:riverpod/misc.dart' show Override;

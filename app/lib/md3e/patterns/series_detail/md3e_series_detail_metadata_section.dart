@@ -8,10 +8,12 @@ class Md3eSeriesDetailMetadataSection extends StatelessWidget {
     super.key,
     required this.entry,
     this.onChipTap,
+    this.onAuthorTap,
   });
 
   final Md3eSeriesDetailEntry entry;
   final ValueChanged<String>? onChipTap;
+  final ValueChanged<String>? onAuthorTap;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class Md3eSeriesDetailMetadataSection extends StatelessWidget {
       characters: entry.characters,
       tags: entry.tags,
       onChipTap: onChipTap,
+      onAuthorTap: onAuthorTap,
     );
   }
 }

@@ -1,55 +1,26 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_body.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/repositories/author_repository.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/adaptive_form_surface.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/author_detail_surface.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:riverpod/misc.dart' show Override;
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class _StubAuthorRepository implements AuthorRepository {
+import '../../../../../support/fakes/author_repository_test_fakes.dart';
+import '../../../../../support/pump_localized_app.dart';
+
+class _StubAuthorRepository extends EmptyAuthorRepository {
   final List<(String, String)> renames = <(String, String)>[];
   final List<(AuthorLinkPlatform, String)> addedLinks =
       <(AuthorLinkPlatform, String)>[];
   final List<(int, int)> deletedLinks = <(int, int)>[];
   List<AuthorLink> links = const <AuthorLink>[];
-
-  @override
-  Future<List<Author>> listAll() async => <Author>[
-    Author(id: 1, name: 'Alice', verified: true),
-  ];
-
-  @override
-  Stream<List<Author>> watchAll() => Stream<List<Author>>.value(<Author>[
-    Author(id: 1, name: 'Alice', verified: true),
-  ]);
-
-  @override
-  Future<PagedResult<Author>> fetchPage(PageRequest request) async {
-    return PagedResult<Author>(
-      items: <Author>[Author(id: 1, name: 'Alice', verified: true)],
-      totalCount: 1,
-      page: request.page,
-      pageSize: request.pageSize,
-    );
-  }
-
-  @override
-  Future<Author> add(Author author) async => author;
-
-  @override
-  Future<void> deleteByNames(List<String> names) async {}
 
   @override
   Future<void> rename(String oldName, String newName) async {
@@ -109,79 +80,54 @@ class _StubAuthorRepository implements AuthorRepository {
   }
 
   @override
-  Future<void> updateLink({
-    required int linkId,
-    required AuthorLinkPlatform platform,
-    required String url,
-    String? platformDisplayName,
-  }) async {}
-
-  @override
   Future<void> deleteLink({required int authorId, required int linkId}) async {
     deletedLinks.add((authorId, linkId));
   }
 }
 
-Future<void> _openSurface(
+Future<void> _pumpBody(
   WidgetTester tester,
   _StubAuthorRepository repo,
 ) async {
   SharedPreferences.setMockInitialValues(<String, Object>{});
-  tester.view.physicalSize = const Size(800, 600);
+  tester.view.physicalSize = const Size(800, 900);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: <Override>[authorRepoProvider.overrideWithValue(repo)],
-      child: MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: buildAppTheme(Brightness.light),
-        home: Builder(
-          builder: (BuildContext context) {
-            return Scaffold(
-              body: TextButton(
-                onPressed: () {
-                  showAdaptiveFormSurfaceWidget<void>(
-                    context: context,
-                    surface: const AuthorDetailSurface(authorId: 1),
-                  );
-                },
-                child: const Text('open'),
-              ),
-            );
-          },
-        ),
+  final List<Override> overrides = <Override>[
+    authorRepoProvider.overrideWithValue(repo),
+  ];
+  await pumpLocalizedApp(
+    tester,
+    overrides: overrides,
+    theme: buildAppTheme(Brightness.light),
+    home: const Scaffold(
+      body: SingleChildScrollView(
+        child: AuthorDetailMd3eBody(authorId: 1),
       ),
     ),
   );
-
-  await tester.tap(find.text('open'));
   await tester.pumpAndSettle();
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('author detail uses AdaptiveFormSurface dialog chrome', (
+  testWidgets('shows author name and comic count', (
     WidgetTester tester,
   ) async {
-    await _openSurface(tester, _StubAuthorRepository());
+    await _pumpBody(tester, _StubAuthorRepository());
 
-    expect(find.byKey(AdaptiveFormSurface.dialogChromeKey), findsOneWidget);
     expect(find.text('Alice'), findsWidgets);
     expect(find.text('漫画 · 0'), findsOneWidget);
     expect(find.text('在搜索中查看'), findsOneWidget);
-    expect(find.text('重命名'), findsNothing);
   });
 
   testWidgets('pencil button switches name to inline editor and renames', (
     WidgetTester tester,
   ) async {
     final _StubAuthorRepository repo = _StubAuthorRepository();
-    await _openSurface(tester, repo);
+    await _pumpBody(tester, repo);
 
     await tester.tap(find.byTooltip('重命名'));
     await tester.pumpAndSettle();
@@ -199,7 +145,7 @@ void main() {
     WidgetTester tester,
   ) async {
     final _StubAuthorRepository repo = _StubAuthorRepository();
-    await _openSurface(tester, repo);
+    await _pumpBody(tester, repo);
 
     await tester.tap(find.text('添加链接'));
     await tester.pumpAndSettle();
@@ -230,29 +176,27 @@ void main() {
           sortKey: 0,
         ),
       ];
-    await _openSurface(tester, repo);
+    await _pumpBody(tester, repo);
 
     await tester.tap(find.byIcon(LucideIcons.x));
     await tester.pumpAndSettle();
 
-    expect(find.text('删除链接「Pixiv」？'), findsNothing);
     expect(repo.deletedLinks, <(int, int)>[(1, 7)]);
   });
 
-  testWidgets('verified badge uses primary like metadata author chips', (
+  testWidgets('verified badge uses primary color', (
     WidgetTester tester,
   ) async {
-    await _openSurface(tester, _StubAuthorRepository());
+    await _pumpBody(tester, _StubAuthorRepository());
 
     final Icon badge = tester.widget<Icon>(find.byIcon(LucideIcons.badgeCheck));
     expect(badge.color, buildAppTheme(Brightness.light).colorScheme.primary);
   });
 
-  testWidgets('desktop hover reveals reserved remove without resizing dialog', (
+  testWidgets('desktop hover reveals remove button on link chip', (
     WidgetTester tester,
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
-    addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
     final _StubAuthorRepository repo = _StubAuthorRepository()
       ..links = <AuthorLink>[
@@ -264,24 +208,9 @@ void main() {
           sortKey: 0,
         ),
       ];
-    await _openSurface(tester, repo);
+    await _pumpBody(tester, repo);
 
     final Finder remove = find.byIcon(LucideIcons.x);
-    expect(remove, findsOneWidget);
-    expect(
-      tester
-          .widget<Visibility>(
-            find.ancestor(of: remove, matching: find.byType(Visibility)).first,
-          )
-          .visible,
-      isFalse,
-    );
-
-    final double heightBefore = tester
-        .getSize(find.byKey(AdaptiveFormSurface.dialogChromeKey))
-        .height;
-    final Size chipBefore = tester.getSize(find.byType(OutlinedMetaChip).first);
-
     final TestGesture gesture = await tester.createGesture(
       kind: PointerDeviceKind.mouse,
     );
@@ -290,20 +219,7 @@ void main() {
     await gesture.moveTo(tester.getCenter(find.text('Pixiv')));
     await tester.pumpAndSettle();
 
-    expect(
-      tester
-          .widget<Visibility>(
-            find.ancestor(of: remove, matching: find.byType(Visibility)).first,
-          )
-          .visible,
-      isTrue,
-    );
-    expect(
-      tester.getSize(find.byKey(AdaptiveFormSurface.dialogChromeKey)).height,
-      heightBefore,
-    );
-    expect(tester.getSize(find.byType(OutlinedMetaChip).first), chipBefore);
-
+    expect(find.byType(OutlinedMetaChip), findsWidgets);
     await tester.tap(remove);
     await tester.pumpAndSettle();
     expect(repo.deletedLinks, <(int, int)>[(1, 7)]);

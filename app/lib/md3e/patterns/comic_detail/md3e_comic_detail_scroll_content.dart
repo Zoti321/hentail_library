@@ -12,12 +12,14 @@ class Md3eComicDetailScrollContent extends StatelessWidget {
     this.onRead,
     this.onReadIncognito,
     this.onMetadataChipTap,
+    this.onAuthorTap,
   });
 
   final Md3eComicDetailEntry entry;
   final VoidCallback? onRead;
   final VoidCallback? onReadIncognito;
   final ValueChanged<String>? onMetadataChipTap;
+  final ValueChanged<String>? onAuthorTap;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class Md3eComicDetailScrollContent extends StatelessWidget {
         Md3eComicDetailMetadataSection(
           entry: entry,
           onChipTap: onMetadataChipTap,
+          onAuthorTap: onAuthorTap,
         ),
         SizedBox(height: Md3eComicDetailPageMetrics.scrollBottomInset),
       ],
