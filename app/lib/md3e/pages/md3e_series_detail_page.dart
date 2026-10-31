@@ -26,6 +26,11 @@ class Md3eSeriesDetailPage extends StatefulWidget {
     this.onMetadataChipTap,
     this.onComicTap,
     this.scrollController,
+    this.page,
+    this.pageSize,
+    this.totalPages,
+    this.onPageChanged,
+    this.onPageSizeChanged,
   });
 
   final Md3eSeriesDetailEntry entry;
@@ -35,6 +40,14 @@ class Md3eSeriesDetailPage extends StatefulWidget {
   final ValueChanged<String>? onMetadataChipTap;
   final ValueChanged<int>? onComicTap;
   final ScrollController? scrollController;
+
+  /// 外部分页（生产：服务端分页）。传入 [onPageChanged] 时，[entry.comics] 仅为当前页，
+  /// 页码、页大小与总页数由调用方提供；为空时使用页内分页（Lab）。
+  final int? page;
+  final int? pageSize;
+  final int? totalPages;
+  final ValueChanged<int>? onPageChanged;
+  final ValueChanged<int>? onPageSizeChanged;
 
   @override
   State<Md3eSeriesDetailPage> createState() => _Md3eSeriesDetailPageState();
@@ -60,10 +73,23 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
     return (count / pageSize).ceil();
   }
 
-  int get _totalPages => _totalPagesFor(widget.entry, _pageSize);
+  bool get _isExternalPaging => widget.onPageChanged != null;
+
+  int get _currentPage => _isExternalPaging ? (widget.page ?? 1) : _page;
+
+  int get _currentPageSize => _isExternalPaging
+      ? (widget.pageSize ?? widget.entry.initialPageSize)
+      : _pageSize;
+
+  int get _totalPages => _isExternalPaging
+      ? (widget.totalPages ?? 1)
+      : _totalPagesFor(widget.entry, _pageSize);
 
   List<Md3eSeriesDetailComicItem> get _pageItems {
     final List<Md3eSeriesDetailComicItem> comics = widget.entry.comics;
+    if (_isExternalPaging) {
+      return comics;
+    }
     if (comics.isEmpty) {
       return const <Md3eSeriesDetailComicItem>[];
     }
@@ -154,15 +180,26 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
   }
 
   void _setPage(int page) {
-    setState(() => _page = page.clamp(1, _totalPages));
+    final int target = page.clamp(1, _totalPages);
+    final ValueChanged<int>? onPageChanged = widget.onPageChanged;
+    if (onPageChanged != null) {
+      onPageChanged(target);
+    } else {
+      setState(() => _page = target);
+    }
     _scrollToComicsSection();
   }
 
   void _setPageSize(int size) {
-    setState(() {
-      _pageSize = size;
-      _page = _page.clamp(1, _totalPages);
-    });
+    final ValueChanged<int>? onPageSizeChanged = widget.onPageSizeChanged;
+    if (_isExternalPaging) {
+      onPageSizeChanged?.call(size);
+    } else {
+      setState(() {
+        _pageSize = size;
+        _page = _page.clamp(1, _totalPages);
+      });
+    }
     _scrollToComicsSection();
   }
 
@@ -173,8 +210,9 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
     final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
     final double horizontalPadding =
         Md3eSeriesDetailPageMetrics.contentHorizontalPadding(sizeClass);
-    final double introTop =
-        Md3eSeriesDetailPageMetrics.introTopSpacing(sizeClass);
+    final double introTop = Md3eSeriesDetailPageMetrics.introTopSpacing(
+      sizeClass,
+    );
 
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
@@ -184,7 +222,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
           onBack: _resolveVoid(widget.onBack),
           onEdit: _resolveVoid(widget.onEdit),
           moreMenuEntries: _resolveMoreMenu(l10n),
-          pageSize: _pageSize,
+          pageSize: _currentPageSize,
           onPageSizeChanged: _setPageSize,
         ),
       ),
@@ -227,14 +265,15 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
                 sliver: Md3eSeriesDetailComicsSection(
                   gridSectionKey: _comicsSectionKey,
                   pageItems: _pageItems,
-                  page: _page,
+                  page: _currentPage,
                   totalPages: _totalPages,
                   onPageChanged: _setPage,
                   onComicTap: widget.onComicTap == null
                       ? null
                       : (int localIndex) {
                           final int globalIndex =
-                              (_page - 1) * _pageSize + localIndex;
+                              (_currentPage - 1) * _currentPageSize +
+                              localIndex;
                           widget.onComicTap!(globalIndex);
                         },
                 ),
