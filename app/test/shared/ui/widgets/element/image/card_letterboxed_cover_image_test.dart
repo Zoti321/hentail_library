@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
@@ -12,6 +13,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       MaterialApp(
+        theme: buildAppTheme(Brightness.light),
         home: Scaffold(
           body: SizedBox(
             width: 120,

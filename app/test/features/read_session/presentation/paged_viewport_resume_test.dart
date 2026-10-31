@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -54,7 +55,8 @@ void main() {
               ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
             ),
           ],
-          child: const MaterialApp(
+          child: MaterialApp(
+            theme: buildAppTheme(Brightness.light),
             home: Scaffold(
               body: PagedViewport(
                 comicId: _comicId,
@@ -135,7 +137,8 @@ void main() {
               ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
             ),
           ],
-          child: const MaterialApp(
+          child: MaterialApp(
+            theme: buildAppTheme(Brightness.light),
             home: Scaffold(
               body: PagedViewport(
                 comicId: _comicId,

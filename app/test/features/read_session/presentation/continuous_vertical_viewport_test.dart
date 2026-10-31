@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
@@ -57,6 +58,7 @@ void main() {
             ...dataProviderOverrides(),
           ],
           child: MaterialApp(
+            theme: buildAppTheme(Brightness.light),
             home: Scaffold(
               body: ReaderViewportHost(
                 comicId: _testComicId,
@@ -86,6 +88,7 @@ void main() {
             ...dataProviderOverrides(),
           ],
           child: MaterialApp(
+            theme: buildAppTheme(Brightness.light),
             home: Scaffold(
               body: ReaderViewportHost(
                 comicId: _testComicId,
@@ -128,7 +131,8 @@ void main() {
           appSettingRepoProvider.overrideWithValue(repo),
           ..._viewportTestOverrides(),
         ],
-        child: const MaterialApp(
+        child: MaterialApp(
+          theme: buildAppTheme(Brightness.light),
           home: Scaffold(
             body: ContinuousVerticalViewport(
               comicId: _testComicId,
@@ -172,7 +176,8 @@ void main() {
           appSettingRepoProvider.overrideWithValue(repo),
           ..._viewportTestOverrides(),
         ],
-        child: const MaterialApp(
+        child: MaterialApp(
+          theme: buildAppTheme(Brightness.light),
           home: Scaffold(
             body: ContinuousVerticalViewport(
               comicId: _testComicId,
@@ -217,7 +222,8 @@ void main() {
             ..._viewportTestOverrides(),
             ...dataProviderOverrides(),
           ],
-          child: const MaterialApp(
+          child: MaterialApp(
+            theme: buildAppTheme(Brightness.light),
             home: Scaffold(
               body: ContinuousVerticalViewport(
                 comicId: _testComicId,
@@ -287,7 +293,8 @@ void main() {
               ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
             ),
           ],
-          child: const MaterialApp(
+          child: MaterialApp(
+            theme: buildAppTheme(Brightness.light),
             home: Scaffold(
               body: ContinuousVerticalViewport(
                 comicId: _testComicId,
@@ -351,6 +358,7 @@ void main() {
             ),
           ],
           child: MaterialApp(
+            theme: buildAppTheme(Brightness.light),
             home: Scaffold(
               body: ReaderViewportHost(
                 comicId: _testComicId,
