@@ -6,13 +6,11 @@ import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_mo
 abstract final class Md3eHomePagePreviewData {
   static List<Md3eHomeLibraryDashboardRow> sampleLibraries({
     DateTime? referenceNow,
-  }) =>
-      libraries(referenceNow: referenceNow);
+  }) => libraries(referenceNow: referenceNow);
 
   static List<Md3eHomeLibraryDashboardRow> libraries({
     DateTime? referenceNow,
-  }) =>
-      Md3eLabLibraryCatalog.libraries(referenceNow: referenceNow);
+  }) => Md3eLabLibraryCatalog.libraries(referenceNow: referenceNow);
 
   static Md3eHomeAggregateCounts sampleAggregateCounts() =>
       Md3eLabLibraryCatalog.aggregateCounts();

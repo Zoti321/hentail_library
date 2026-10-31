@@ -7,7 +7,7 @@ import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_it
 import 'package:hentai_library/md3e/patterns/comic_detail/md3e_comic_detail_metadata_tags_section.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
-import 'package:hentai_library/md3e/pages/md3e_home_page_lab_host.dart';
+import 'md3e_home_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page_lab_host.dart';

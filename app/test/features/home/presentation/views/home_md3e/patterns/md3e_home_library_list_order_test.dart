@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_list_order.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_list_order.dart';
 
 void main() {
   test('applyMd3eHomeLibraryListReorder moves item down', () {

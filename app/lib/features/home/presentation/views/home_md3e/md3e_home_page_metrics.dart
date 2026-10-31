@@ -38,14 +38,17 @@ abstract final class Md3eHomePageMetrics {
   }) {
     if (tagPill) {
       return switch (sizeClass) {
-        Md3eWindowSizeClass.compact =>
-          const EdgeInsets.fromLTRB(24, 16, 20, 16),
+        Md3eWindowSizeClass.compact => const EdgeInsets.fromLTRB(
+          24,
+          16,
+          20,
+          16,
+        ),
         _ => const EdgeInsets.fromLTRB(32, 18, 28, 18),
       };
     }
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact =>
-        const EdgeInsets.fromLTRB(20, 16, 20, 16),
+      Md3eWindowSizeClass.compact => const EdgeInsets.fromLTRB(20, 16, 20, 16),
       _ => const EdgeInsets.fromLTRB(22, 18, 22, 18),
     };
   }

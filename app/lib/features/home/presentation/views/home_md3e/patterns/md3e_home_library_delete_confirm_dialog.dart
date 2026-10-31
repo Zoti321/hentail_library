@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/dialog/md3e_lab_dialog_presenter.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
 import 'package:hentai_library/md3e/theme/md3e_lab_text.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -20,9 +20,7 @@ Future<bool> showMd3eHomeLibraryDeleteConfirmDialog({
 }
 
 class _Md3eHomeLibraryDeleteConfirmDialog extends StatefulWidget {
-  const _Md3eHomeLibraryDeleteConfirmDialog({
-    required this.libraryDisplayName,
-  });
+  const _Md3eHomeLibraryDeleteConfirmDialog({required this.libraryDisplayName});
 
   final String libraryDisplayName;
 
@@ -41,8 +39,10 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ESpacing spacing = theme.spacing;
-    final TextStyle dialogActionLabelStyle =
-        md3eLabButtonLabelStyle(theme, M3EButtonSize.sm);
+    final TextStyle dialogActionLabelStyle = md3eLabButtonLabelStyle(
+      theme,
+      M3EButtonSize.sm,
+    );
 
     return M3EDialog(
       title: Md3eHomeLibraryManagementCopy.deleteConfirmTitle(
@@ -62,22 +62,20 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
         M3EButton(
           onPressed: () => Navigator.of(context).pop(false),
           style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(
-            textStyle: dialogActionLabelStyle,
-          ),
+          decoration: M3EButtonDecoration(textStyle: dialogActionLabelStyle),
           label: Text(l10n.commonCancel),
         ),
         M3EButton(
-          onPressed: _acknowledged ? () => Navigator.of(context).pop(true) : null,
+          onPressed: _acknowledged
+              ? () => Navigator.of(context).pop(true)
+              : null,
           style: M3EButtonStyle.filled,
           decoration: M3EButtonDecoration.styleFrom(
             textStyle: dialogActionLabelStyle,
             backgroundColor: scheme.error,
             foregroundColor: scheme.onError,
             disabledBackgroundColor: scheme.onSurface.withValues(alpha: 0.12),
-            disabledForegroundColor: scheme.onSurface.withValues(
-              alpha: 0.38,
-            ),
+            disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.38),
           ),
           label: Text(l10n.sidebarDeleteLibrary),
         ),

@@ -11,10 +11,11 @@ import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
-import 'package:hentai_library/features/home/presentation/views/home_page/home_page.dart';
-import 'package:hentai_library/features/home/presentation/views/home_page/widgets/home_page_header.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/home_md3e_page.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -26,19 +27,12 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('首页'), findsOneWidget);
-    expect(find.byType(HomePageHeaderSection), findsOneWidget);
+    expect(find.byType(Md3eHomePageHeader), findsOneWidget);
     expect(
       find.byWidgetPredicate(
-        (Widget widget) => widget is Icon && widget.icon == LucideIcons.menu,
+        (Widget widget) => widget is Icon && widget.icon == Symbols.menu,
       ),
       findsOneWidget,
-    );
-    expect(
-      find.descendant(
-        of: find.byType(HomePageHeaderToolbar),
-        matching: find.text('扫描漫画库'),
-      ),
-      findsNothing,
     );
   });
 
@@ -86,7 +80,7 @@ Future<void> _pumpShellHome(WidgetTester tester, Size viewportSize) async {
                 GoRoute(
                   path: '/home',
                   builder: (BuildContext context, GoRouterState state) {
-                    return const HomePage();
+                    return const HomeMd3ePage();
                   },
                 ),
               ],

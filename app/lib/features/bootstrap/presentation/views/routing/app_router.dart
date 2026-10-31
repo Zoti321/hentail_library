@@ -7,7 +7,7 @@ import 'package:hentai_library/features/library_browse/presentation/views/search
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_page.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
-import 'package:hentai_library/features/home/presentation/views/home_page/home_page.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/home_md3e_page.dart';
 import 'package:hentai_library/features/home/presentation/views/history_page.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
@@ -40,7 +40,7 @@ final GoRouter appRouter = GoRouter(
           path: '/home',
           name: '主页',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const HomePage()),
+              buildShellNavPage(state: state, child: const HomeMd3ePage()),
         ),
         GoRoute(
           path: LibrariesRoutes.root,

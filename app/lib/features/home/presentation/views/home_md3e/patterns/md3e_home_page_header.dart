@@ -7,18 +7,16 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// 首页粘滞顶栏：compact 可打开导航；标题为 [AppLocalizations.navHome]。
 class Md3eHomePageHeader extends StatelessWidget {
-  const Md3eHomePageHeader({
-    super.key,
-    this.onOpenNavigation,
-  });
+  const Md3eHomePageHeader({super.key, this.onOpenNavigation});
 
   final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(windowWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      windowWidth,
+    );
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;

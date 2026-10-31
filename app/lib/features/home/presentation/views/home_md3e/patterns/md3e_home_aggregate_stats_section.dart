@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/layout/md3e_home_page_metrics.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page_metrics.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_aggregate_counts.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_bento_stat_card.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_page_copy.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_bento_stat_card.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_copy.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 首页「全库统计」：Kazumi 风 bento 色块（漫画/系列/作者/原作/角色/标签）。
 class Md3eHomeAggregateStatsSection extends StatelessWidget {
-  const Md3eHomeAggregateStatsSection({
-    super.key,
-    required this.counts,
-  });
+  const Md3eHomeAggregateStatsSection({super.key, required this.counts});
 
   final Md3eHomeAggregateCounts counts;
 
@@ -210,18 +207,18 @@ class Md3eHomeAggregateStatsSection extends StatelessWidget {
 
 class _Md3eHomeStatPalette {
   _Md3eHomeStatPalette(M3EColorScheme scheme)
-      : comicsBackground = scheme.primaryContainer,
-        comicsForeground = scheme.onPrimaryContainer,
-        seriesBackground = scheme.secondaryContainer,
-        seriesForeground = scheme.onSecondaryContainer,
-        authorsBackground = scheme.tertiaryContainer,
-        authorsForeground = scheme.onTertiaryContainer,
-        parodiesBackground = scheme.surfaceContainerHighest,
-        parodiesForeground = scheme.onSurface,
-        charactersBackground = scheme.emphasis,
-        charactersForeground = scheme.onEmphasis,
-        tagsBackground = scheme.surfaceContainerHigh,
-        tagsForeground = scheme.onSurface;
+    : comicsBackground = scheme.primaryContainer,
+      comicsForeground = scheme.onPrimaryContainer,
+      seriesBackground = scheme.secondaryContainer,
+      seriesForeground = scheme.onSecondaryContainer,
+      authorsBackground = scheme.tertiaryContainer,
+      authorsForeground = scheme.onTertiaryContainer,
+      parodiesBackground = scheme.surfaceContainerHighest,
+      parodiesForeground = scheme.onSurface,
+      charactersBackground = scheme.emphasis,
+      charactersForeground = scheme.onEmphasis,
+      tagsBackground = scheme.surfaceContainerHigh,
+      tagsForeground = scheme.onSurface;
 
   final Color comicsBackground;
   final Color comicsForeground;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_copy.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_row_presentation.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_row_presentation.dart';
 import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_exclude.dart';
 import 'package:hentai_library/md3e/widgets/menu/md3e_anchored_menu.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_reorderable_split_list_group.dart';

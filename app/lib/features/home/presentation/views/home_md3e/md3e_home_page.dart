@@ -1,38 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/layout/md3e_home_page_metrics.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_aggregate_counts.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_aggregate_stats_section.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_aggregate_stats_section.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_management_section.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_page_header.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_page_preview_data.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_section.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Lab 首页（Widgetbook / 壳内 pane）：问候 + 漫画库概览；其余 section 后续补。
+/// 生产首页（MD3E）：问候 + 页头 + 聚合统计 + 库列表（本票只读）。
 class Md3eHomePage extends StatelessWidget {
-  Md3eHomePage({
+  const Md3eHomePage({
     super.key,
-    List<Md3eHomeLibraryDashboardRow>? libraries,
-    Md3eHomeAggregateCounts? aggregateCounts,
+    required this.libraries,
+    required this.aggregateCounts,
     this.onOpenNavigation,
     this.onLibraryOpen,
     this.onLibraryAction,
     this.onAddLocalLibrary,
     this.onAddRemoteLibrary,
     this.onLibrariesReorder,
-  })  : libraries = libraries ?? Md3eHomePagePreviewData.sampleLibraries(),
-        aggregateCounts =
-            aggregateCounts ?? Md3eHomePagePreviewData.sampleAggregateCounts();
+  });
 
   final List<Md3eHomeLibraryDashboardRow> libraries;
   final Md3eHomeAggregateCounts aggregateCounts;
   final VoidCallback? onOpenNavigation;
   final ValueChanged<String>? onLibraryOpen;
   final void Function(String libraryId, Md3eHomeLibraryManagementAction action)?
-      onLibraryAction;
+  onLibraryAction;
   final VoidCallback? onAddLocalLibrary;
   final VoidCallback? onAddRemoteLibrary;
   final void Function(int oldIndex, int newIndex)? onLibrariesReorder;
@@ -40,8 +37,9 @@ class Md3eHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(windowWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      windowWidth,
+    );
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
@@ -94,9 +92,7 @@ class Md3eHomePage extends StatelessWidget {
 
     return ColoredBox(
       color: md3eLabBrowseCanvasColor(scheme),
-      child: SingleChildScrollView(
-        child: body,
-      ),
+      child: SingleChildScrollView(child: body),
     );
   }
 }

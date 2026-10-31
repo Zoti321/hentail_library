@@ -68,8 +68,10 @@ test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dar
 test/features/home/presentation/view_models/home_probe_coordinator_notifier_test.dart
 test/shared/ui/layout/page_header_layout_test.dart
 test/features/home/presentation/views/history_page/history_responsive_test.dart
-test/features/home/presentation/views/home_page/home_page_constants_test.dart
-test/features/home/presentation/views/home_page/home_page_responsive_test.dart
+test/features/home/presentation/views/home_md3e/md3e_home_page_test.dart
+test/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_row_test.dart
+test/features/home/presentation/views/home_md3e/patterns/md3e_home_library_delete_confirm_dialog_test.dart
+test/features/home/presentation/views/home_md3e/patterns/md3e_home_library_list_order_test.dart
 test/features/library_admin/presentation/view_models/library_revision_throttle_busy_test.dart
 test/features/library_admin/presentation/view_models/library_scan_toasts_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_toasts_test.dart
