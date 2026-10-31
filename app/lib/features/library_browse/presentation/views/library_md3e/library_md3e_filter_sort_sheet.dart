@@ -49,8 +49,12 @@ abstract final class Md3eLibraryFilterSortSheet {
       detached: md3eLibraryFilterSortSideSheetDetachedForViewport(
         viewportWidth,
       ),
-      theme: M3ETheme.of(context).sideSheetTheme
-          .copyWith(horizontalPadding: 16, topElementsGap: 8),
+      // 侧栏标题由 sheet 自身上下文读取主题，需显式指定应用字体。
+      theme: M3ETheme.of(context).sideSheetTheme.copyWith(
+        horizontalPadding: 16,
+        topElementsGap: 8,
+        headlineTextStyle: const TextStyle(fontFamily: kMd3eAppFontFamily),
+      ),
       scrollable: true,
       useRootNavigator: true,
       body: body,
@@ -92,16 +96,18 @@ class Md3eLibraryFilterSortContent extends ConsumerWidget {
                     ),
                   ),
                 ),
-                if (isCustomized)
-                  TextButton(
-                    onPressed: () => ref
-                        .read(libraryPageFacadeProvider.notifier)
-                        .resetFilters(),
-                    child: Text(
-                      l10n.libraryResetAllFilters,
-                      style: TextStyle(fontSize: 12, color: cs.primary),
-                    ),
+                // 始终占位、无变化时禁用，避免出现/消失造成布局抖动。
+                TextButton(
+                  onPressed: isCustomized
+                      ? () => ref
+                            .read(libraryPageFacadeProvider.notifier)
+                            .resetFilters()
+                      : null,
+                  child: Text(
+                    l10n.libraryResetAllFilters,
+                    style: TextStyle(fontSize: 12, color: cs.primary),
                   ),
+                ),
               ],
             ),
           ),

@@ -19,7 +19,6 @@ import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const Duration _kFilterAccordionDuration = Duration(milliseconds: 200);
@@ -31,7 +30,6 @@ typedef LibraryMetadataFilterToggle = Future<void> Function(String name);
 typedef LibraryMetadataIncludeModeChanged = Future<void> Function(
   LibraryMetadataIncludeMode mode,
 );
-typedef LibraryMetadataFilterClear = Future<void> Function();
 
 final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((
   Ref ref,
@@ -238,7 +236,6 @@ class _Md3eTagFilterGroup extends ConsumerWidget {
       isLoading: namesAsync.isLoading,
       onToggle: notifier.toggleTag,
       onIncludeModeChanged: notifier.setTagIncludeMode,
-      onClear: notifier.clearTag,
     );
   }
 }
@@ -289,7 +286,6 @@ class _Md3eAuthorFilterGroup extends ConsumerWidget {
       },
       onToggle: notifier.toggleAuthor,
       onIncludeModeChanged: notifier.setAuthorIncludeMode,
-      onClear: notifier.clearAuthor,
     );
   }
 }
@@ -321,7 +317,6 @@ class _Md3eLanguageFilterGroup extends ConsumerWidget {
       labelFor: context.l10n.comicLanguageLabel,
       onToggle: (String name) =>
           notifier.toggleIncludeSet(LibraryIncludeSetKind.language, name),
-      onClear: () => notifier.clearIncludeSet(LibraryIncludeSetKind.language),
     );
   }
 }
@@ -359,7 +354,6 @@ class _Md3eParodyFilterGroup extends ConsumerWidget {
       isLoading: parodiesAsync.isLoading,
       onToggle: (String name) =>
           notifier.toggleIncludeSet(LibraryIncludeSetKind.parody, name),
-      onClear: () => notifier.clearIncludeSet(LibraryIncludeSetKind.parody),
     );
   }
 }
@@ -397,7 +391,6 @@ class _Md3eCharacterFilterGroup extends ConsumerWidget {
       isLoading: charactersAsync.isLoading,
       onToggle: (String name) =>
           notifier.toggleIncludeSet(LibraryIncludeSetKind.character, name),
-      onClear: () => notifier.clearIncludeSet(LibraryIncludeSetKind.character),
     );
   }
 }
@@ -435,15 +428,10 @@ class _Md3eOrganizeFilterGroup extends ConsumerWidget {
 
 /// 可折叠筛选分组：标题行 + chevron，展开时高度动画显示 [child]。
 class _Md3eFilterAccordion extends StatefulWidget {
-  const _Md3eFilterAccordion({
-    required this.title,
-    required this.child,
-    this.trailing,
-  });
+  const _Md3eFilterAccordion({required this.title, required this.child});
 
   final String title;
   final Widget child;
-  final Widget? trailing;
 
   @override
   State<_Md3eFilterAccordion> createState() => _Md3eFilterAccordionState();
@@ -478,7 +466,6 @@ class _Md3eFilterAccordionState extends State<_Md3eFilterAccordion> {
                     ),
                   ),
                 ),
-                ?widget.trailing,
                 AnimatedRotation(
                   turns: _expanded ? 0.5 : 0,
                   duration: _kFilterAccordionDuration,
@@ -576,7 +563,6 @@ class _Md3eMetadataFilterGroup extends StatefulWidget {
     required this.names,
     required this.selection,
     required this.onToggle,
-    required this.onClear,
     this.onIncludeModeChanged,
     this.isLoading = false,
     this.includeOnly = false,
@@ -589,7 +575,6 @@ class _Md3eMetadataFilterGroup extends StatefulWidget {
   final LibraryMetadataFilterSelection selection;
   final LibraryMetadataFilterToggle onToggle;
   final LibraryMetadataIncludeModeChanged? onIncludeModeChanged;
-  final LibraryMetadataFilterClear onClear;
   final bool isLoading;
   final bool includeOnly;
 
@@ -603,48 +588,21 @@ class _Md3eMetadataFilterGroup extends StatefulWidget {
 }
 
 class _Md3eMetadataFilterGroupState extends State<_Md3eMetadataFilterGroup> {
-  String _query = '';
-
   String _labelOf(String name) => widget.labelFor?.call(name) ?? name;
-
-  bool _matches(String name) {
-    final String haystack = _labelOf(name);
-    if (!widget.enablePinyinAssistedNameMatch) {
-      final String normalized = _query.trim().toLowerCase();
-      return normalized.isEmpty || haystack.toLowerCase().contains(normalized);
-    }
-    return nameMatchesPinyinAssistedFilter(haystack, _query);
-  }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppLocalizations l10n = context.l10n;
-    final List<String> filteredNames = widget.names
-        .where(_matches)
-        .toList(growable: false);
+    final List<String> filteredNames = widget.names;
 
     return _Md3eFilterAccordion(
       title: widget.title,
-      trailing: widget.selection.isActive
-          ? TextButton(
-              onPressed: () => widget.onClear(),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                l10n.libraryMetadataFilterClear,
-                style: TextStyle(fontSize: 12, color: cs.primary),
-              ),
-            )
-          : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          if (!widget.includeOnly || widget.names.length > 6)
+          if (!widget.includeOnly && widget.onIncludeModeChanged != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 kLibraryMd3eSortSectionInset,
@@ -652,45 +610,12 @@ class _Md3eMetadataFilterGroupState extends State<_Md3eMetadataFilterGroup> {
                 kLibraryMd3eSortSectionInset,
                 8,
               ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      onChanged: (String value) =>
-                          setState(() => _query = value),
-                      style: theme.textTheme.bodyMedium,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        hintText: l10n.libraryMetadataFilterSearchHint,
-                        prefixIcon: Icon(
-                          LucideIcons.search,
-                          size: 16,
-                          color: cs.onSurfaceVariant,
-                        ),
-                        prefixIconConstraints: const BoxConstraints(
-                          minWidth: 36,
-                          minHeight: 32,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (!widget.includeOnly &&
-                      widget.onIncludeModeChanged != null)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4),
-                      child: _IncludeModeIconButton(
-                        mode: widget.selection.includeMode,
-                        onChanged: widget.onIncludeModeChanged!,
-                      ),
-                    ),
-                ],
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: _IncludeModeIconButton(
+                  mode: widget.selection.includeMode,
+                  onChanged: widget.onIncludeModeChanged!,
+                ),
               ),
             ),
           if (widget.isLoading)

@@ -10,6 +10,7 @@ import 'package:hentai_library/md3e/widgets/sheets/md3e_overlay_route_scope.dart
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 筛选排序抽屉的本地状态（Widgetbook / 测试用，不绑 Riverpod）。
@@ -94,6 +95,7 @@ abstract final class Md3eLibraryFilterSortSideSheet {
     return m3e.sideSheetTheme.copyWith(
       horizontalPadding: 16,
       topElementsGap: 8,
+      headlineTextStyle: const TextStyle(fontFamily: kMd3eAppFontFamily),
     );
   }
 
