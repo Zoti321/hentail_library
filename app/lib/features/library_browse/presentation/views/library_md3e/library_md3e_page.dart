@@ -55,14 +55,29 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _headerMeasureKey = GlobalKey();
   double? _headerExtent;
+  bool _measureScheduled = false;
 
-  void _measureHeaderExtent(Duration _) {
-    final RenderBox? box =
-        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
-    if (!mounted || box == null) {
+  void _scheduleHeaderMeasure() {
+    if (_measureScheduled) {
       return;
     }
-    final double height = box.size.height;
+    _measureScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  void _measureHeaderExtent(Duration _) {
+    _measureScheduled = false;
+    if (!mounted) {
+      return;
+    }
+    final RenderObject? object =
+        _headerMeasureKey.currentContext?.findRenderObject();
+    // 页头可能在本帧之后仍需布局（如 sliver 类型切换），未就绪则下一帧重试。
+    if (object is! RenderBox || !object.hasSize) {
+      _scheduleHeaderMeasure();
+      return;
+    }
+    final double height = object.size.height;
     if (_headerExtent != height) {
       setState(() => _headerExtent = height);
     }
@@ -151,7 +166,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       LibraryDisplayTarget.series => seriesCatalog?.pagination,
     };
 
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+    _scheduleHeaderMeasure();
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
       child: Padding(
