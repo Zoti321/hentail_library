@@ -1,6 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/motion/md3e_spring_size.dart';
+import 'package:hentai_library/md3e/motion/md3e_spring_value.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_metrics.dart';
 import 'package:hentai_library/md3e/widgets/sheets/md3e_overlay_route_scope.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
@@ -426,9 +430,6 @@ class _Md3eFilterAccordionSectionState
     extends State<_Md3eFilterAccordionSection> {
   bool _expanded = false;
 
-  static const Duration _duration = Duration(milliseconds: 200);
-  static const Curve _curve = Curves.easeOutCubic;
-
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
@@ -461,15 +462,21 @@ class _Md3eFilterAccordionSectionState
                         ),
                       ),
                     ),
-                    AnimatedRotation(
-                      turns: _expanded ? 0.5 : 0,
-                      duration: _duration,
-                      curve: _curve,
+                    Md3eSpringValue(
+                      value: _expanded ? 0.5 : 0,
+                      motion: Md3eMotion.spatialReveal,
                       child: Icon(
                         Icons.keyboard_arrow_down,
                         size: widget.metrics.sortIconSize + 4,
                         color: cs.onSurfaceVariant,
                       ),
+                      builder:
+                          (BuildContext context, double turns, Widget? child) {
+                            return Transform.rotate(
+                              angle: turns * 2 * math.pi,
+                              child: child,
+                            );
+                          },
                     ),
                   ],
                 ),

@@ -211,6 +211,69 @@ void main() {
     expect(find.text('年龄限制'), findsOneWidget);
   });
 
+  testWidgets('折叠分组箭头用弹簧旋转：中间帧介于起止角度之间，结束后到达 180°', (
+    WidgetTester tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1200, 800);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await pumpMd3eApp(
+      tester,
+      home: Center(
+        child: SizedBox(
+          width: Md3eBreakpoints.previewWidthExpanded,
+          child: Md3eLibraryFilterSortDrawerHost(
+            body: Builder(
+              builder: (BuildContext context) {
+                return Md3eLibraryPageHeader(
+                  onFilterSort: () =>
+                      Md3eLibraryFilterSortDrawerHost.openDrawer(context),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.filter_list));
+    await tester.pumpAndSettle();
+
+    final Finder header = find.ancestor(
+      of: find.text('年龄限制'),
+      matching: find.byType(InkWell),
+    );
+    final Finder arrow = find.descendant(
+      of: header.first,
+      matching: find.byIcon(Icons.keyboard_arrow_down),
+    );
+    // 取箭头最近的 Transform（旋转所在层）。
+    double angle() {
+      Transform? nearest;
+      tester.element(arrow).visitAncestorElements((Element element) {
+        if (element.widget is Transform) {
+          nearest = element.widget as Transform;
+          return false;
+        }
+        return true;
+      });
+      return nearest!.transform.storage[0];
+    }
+
+    await tester.tap(find.text('年龄限制'));
+    final List<double> samples = <double>[];
+    for (int i = 0; i < 8; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+      samples.add(angle());
+    }
+    // 弹簧过程中至少有一帧处于起止之间（不是瞬间切换）。
+    expect(samples.any((double c) => c > -0.999 && c < 0.999), isTrue);
+
+    await tester.pumpAndSettle();
+    expect(angle(), closeTo(-1.0, 1e-3));
+  });
+
   testWidgets('customized filter highlights header filter action', (
     WidgetTester tester,
   ) async {
