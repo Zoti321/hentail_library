@@ -31,6 +31,43 @@ Future<bool> showLibraryMd3eConfirmDialog(
   return confirmed ?? false;
 }
 
+/// 从已保存路径列表中移除一条路径前的确认（不删除磁盘文件）。
+Future<bool> showLibraryMd3eRemovePathConfirm(
+  BuildContext context, {
+  required String path,
+}) {
+  final AppLocalizations l10n = context.l10n;
+  final M3EThemeData theme = M3ETheme.of(context);
+  return showLibraryMd3eConfirmDialog(
+    context,
+    title: l10n.confirmRemovePathTitle,
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Text(
+          l10n.confirmRemovePathContent,
+          style: theme.typeScale.bodyMedium.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          path,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: theme.typeScale.bodyMedium.copyWith(
+            fontWeight: FontWeight.w500,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+      ],
+    ),
+    confirmLabel: l10n.commonRemove,
+    destructive: true,
+  );
+}
+
 class _LibraryMd3eConfirmDialog extends StatelessWidget {
   const _LibraryMd3eConfirmDialog({
     required this.title,

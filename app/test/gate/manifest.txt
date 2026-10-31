@@ -70,7 +70,7 @@ test/shared/ui/layout/page_header_layout_test.dart
 test/features/home/presentation/views/history_page/history_responsive_test.dart
 test/features/home/presentation/views/home_md3e/md3e_home_page_test.dart
 test/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_row_test.dart
-test/md3e/patterns/library_admin/md3e_library_delete_confirm_dialog_test.dart
+test/features/home/presentation/views/home_md3e/patterns/md3e_home_library_delete_confirm_dialog_test.dart
 test/features/home/presentation/views/home_md3e/patterns/md3e_home_library_list_order_test.dart
 test/features/library_admin/presentation/view_models/library_revision_throttle_busy_test.dart
 test/features/library_admin/presentation/view_models/library_scan_toasts_test.dart

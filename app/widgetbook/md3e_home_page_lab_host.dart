@@ -6,7 +6,7 @@ import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
 import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_navigation.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
-import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_delete_confirm_dialog.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_list_order.dart';
 
 import 'md3e_home_page_preview_data.dart';
@@ -169,7 +169,7 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
           );
         }
       case Md3eHomeLibraryManagementAction.delete:
-        final bool confirmed = await showMd3eLibraryDeleteConfirmDialog(
+        final bool confirmed = await showMd3eHomeLibraryDeleteConfirmDialog(
           context: context,
           libraryDisplayName: row.displayName,
         );

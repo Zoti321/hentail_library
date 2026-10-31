@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_delete_confirm_dialog.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_delete_confirm_dialog.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-import '../../../support/pump_md3e_app.dart';
+import '../../../../../../support/pump_md3e_app.dart';
 
 void main() {
   testWidgets('删除库确认须勾选闸门后才能确认', (WidgetTester tester) async {
@@ -18,7 +19,7 @@ void main() {
             child: FilledButton(
               onPressed: () {
                 unawaited(
-                  showMd3eLibraryDeleteConfirmDialog(
+                  showMd3eHomeLibraryDeleteConfirmDialog(
                     context: context,
                     libraryDisplayName: '演示库',
                   ),
@@ -35,10 +36,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text(Md3eLibraryDeleteCopy.deleteConfirmAcknowledgement),
+      find.text(Md3eHomeLibraryManagementCopy.deleteConfirmAcknowledgement),
       findsOneWidget,
     );
-    expect(find.text(Md3eLibraryDeleteCopy.deleteConfirmBody), findsOneWidget);
+    expect(
+      find.text(Md3eHomeLibraryManagementCopy.deleteConfirmBody),
+      findsOneWidget,
+    );
 
     final Finder deleteButton = find.descendant(
       of: find.byType(M3EDialog),
@@ -53,7 +57,7 @@ void main() {
     await tester.tap(deleteButton);
     await tester.pumpAndSettle();
     expect(
-      find.text(Md3eLibraryDeleteCopy.deleteConfirmAcknowledgement),
+      find.text(Md3eHomeLibraryManagementCopy.deleteConfirmAcknowledgement),
       findsOneWidget,
     );
 
@@ -63,7 +67,7 @@ void main() {
     await tester.tap(deleteButton);
     await tester.pumpAndSettle();
     expect(
-      find.text(Md3eLibraryDeleteCopy.deleteConfirmAcknowledgement),
+      find.text(Md3eHomeLibraryManagementCopy.deleteConfirmAcknowledgement),
       findsNothing,
     );
   });
