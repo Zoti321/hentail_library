@@ -103,6 +103,9 @@ double libraryFilterSortDrawerWidth(
   };
 }
 
+/// 筛选排序抽屉分区标题等内容相对左缘的内边距。
+const double kLibraryFilterSortDrawerContentInset = 16;
+
 double libraryFilterSortDrawerWidthForViewport(double viewportWidth) {
   return libraryFilterSortDrawerWidth(
     libraryLayoutTierForWidth(viewportWidth),

@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_facade_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_filter_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_sort_section.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_filter_controls.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_metadata_filter_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 
-/// 抽屉分区标题等内容相对左缘的内边距。
-const double kLibraryFilterSortDrawerContentInset = 16;
-
-class LibraryFilterSortDrawer extends ConsumerWidget {
-  const LibraryFilterSortDrawer({super.key});
+/// 库页筛选排序抽屉（MD3E 生产实现）：筛选区 + 排序区。
+class Md3eLibraryFilterSortDrawer extends ConsumerWidget {
+  const Md3eLibraryFilterSortDrawer({super.key});
 
   static double widthFor(BuildContext context) {
     return libraryFilterSortDrawerWidthForViewport(
@@ -25,7 +21,6 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final AppLocalizations l10n = context.l10n;
     final bool isCustomized = ref.watch(
       libraryPageFacadeProvider.select(
         (LibraryPageFacadeState state) => state.isFilterSortCustomized,
@@ -42,21 +37,18 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  kLibraryFilterSortDrawerContentInset,
-                  0,
-                  kLibraryFilterSortDrawerContentInset,
-                  0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: kLibraryMd3eSortSectionInset,
                 ),
                 child: Row(
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        l10n.libraryFilterSection,
+                        context.l10n.libraryFilterSection,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: context.hentai.textSecondary,
+                          color: cs.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -71,7 +63,7 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
-                          l10n.libraryResetAllFilters,
+                          context.l10n.libraryResetAllFilters,
                           style: TextStyle(fontSize: 12, color: cs.primary),
                         ),
                       ),
@@ -79,26 +71,18 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: tokens.spacing.sm),
-              const LibraryFilterControls(),
-              const LibraryMediaTypeFilterControls(),
-              const LibrarySerializationStatusFilterControls(),
-              const LibraryTagFilterControls(),
-              const LibraryAuthorFilterControls(),
-              const LibraryLanguageFilterControls(),
-              const LibraryParodyFilterControls(),
-              const LibraryCharacterFilterControls(),
-              const LibraryOrganizeFilterControls(),
+              const Md3eLibraryFilterSection(),
               SizedBox(height: tokens.spacing.lg),
               Padding(
                 padding: const EdgeInsets.only(
-                  left: kLibraryFilterSortDrawerContentInset,
+                  left: kLibraryMd3eSortSectionInset,
                 ),
                 child: Text(
-                  l10n.librarySortSection,
+                  context.l10n.librarySortSection,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: context.hentai.textSecondary,
+                    color: cs.onSurfaceVariant,
                   ),
                 ),
               ),

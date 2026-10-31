@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/ui/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_tab_page_size_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_filter_sort_drawer.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_filter_sort_drawer.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_page_widgets.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_pinned_header.dart';
@@ -100,7 +100,7 @@ void main() {
             theme: buildAppTheme(Brightness.light),
             home: MediaQuery(
               data: const MediaQueryData(size: Size(viewportWidth, 800)),
-              child: const Scaffold(body: LibraryFilterSortDrawer()),
+              child: const Scaffold(body: Md3eLibraryFilterSortDrawer()),
             ),
           ),
         ),

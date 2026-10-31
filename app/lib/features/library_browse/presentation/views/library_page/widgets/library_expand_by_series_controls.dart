@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/ui/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_filter_sort_drawer.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
 
 /// Comics Tab：按系列分组开关（排序区顶部）；文案沿用 `libraryExpandBySeries`（接口层重构，UI 不变）。
 class LibraryExpandBySeriesControls extends ConsumerWidget {

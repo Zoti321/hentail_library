@@ -10,7 +10,7 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_series_catalog_controller.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_filter_sort_drawer.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_filter_sort_drawer.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/md3e_comic_card_actions.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid.dart';
@@ -36,8 +36,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 搜索入口 + 网格 + 分页。
 ///
-/// 数据来自库目录控制器（真实 provider）。筛选排序抽屉暂复用 Baseline
-/// [LibraryFilterSortDrawer]，待抽屉迁移后再删除。
+/// 数据来自库目录控制器（真实 provider）。筛选排序抽屉为 [Md3eLibraryFilterSortDrawer]。
 class LibraryMd3ePage extends ConsumerStatefulWidget {
   const LibraryMd3ePage({super.key});
 
@@ -147,7 +146,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       data: md3eWithAppFontFamily(M3ETheme.of(context)),
       child: Scaffold(
         key: _scaffoldKey,
-        endDrawer: const LibraryFilterSortDrawer(),
+        endDrawer: const Md3eLibraryFilterSortDrawer(),
         onEndDrawerChanged: (bool isOpen) {
           if (_isEndDrawerOpen != isOpen) {
             setState(() => _isEndDrawerOpen = isOpen);

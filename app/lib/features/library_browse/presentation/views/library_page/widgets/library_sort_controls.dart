@@ -10,7 +10,7 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_tab_filter_sort_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_filter_sort_drawer.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double kLibrarySortIconSlotWidth = 20;
