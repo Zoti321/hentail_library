@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_format.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -15,7 +16,6 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/author/show_author_detail.dart';
 import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 
 /// 容纳最长 meta label 的固定宽度。
 const double kComicDetailMetaLabelWidth = 88;
@@ -306,19 +306,6 @@ class ComicDetailMetadataBlock extends ConsumerWidget {
   }
 }
 
-String formatComicResourceSize(int bytes) {
-  if (bytes < 1024) {
-    return '$bytes B';
-  }
-  if (bytes < 1024 * 1024) {
-    return '${(bytes / 1024).toStringAsFixed(1)} KB';
-  }
-  if (bytes < 1024 * 1024 * 1024) {
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-  }
-  return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
-}
-
 class LabeledMetaChipRow extends StatelessWidget {
   const LabeledMetaChipRow({
     super.key,
@@ -448,20 +435,4 @@ class ComicDetailInfoRow extends StatelessWidget {
       ],
     );
   }
-}
-
-String? formatComicPublishedDate(BuildContext context, DateTime? date) {
-  if (date == null) {
-    return null;
-  }
-  final String locale = Localizations.localeOf(context).toString();
-  return DateFormat.yMMMd(locale).format(date.toLocal());
-}
-
-String? formatComicDetailDateTime(BuildContext context, DateTime? date) {
-  if (date == null) {
-    return null;
-  }
-  final String locale = Localizations.localeOf(context).toString();
-  return DateFormat.yMMMd(locale).add_Hm().format(date.toLocal());
 }

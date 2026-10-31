@@ -25,6 +25,7 @@ class Md3eComicDetailPage extends StatefulWidget {
     this.onRead,
     this.onReadIncognito,
     this.onMetadataChipTap,
+    this.onSeriesSelect,
     this.scrollController,
   });
 
@@ -35,6 +36,9 @@ class Md3eComicDetailPage extends StatefulWidget {
   final VoidCallback? onRead;
   final VoidCallback? onReadIncognito;
   final ValueChanged<String>? onMetadataChipTap;
+
+  /// 系列导航切换回调（生产：路由到对应漫画）；为空时仅在页内切换标题（Lab）。
+  final ValueChanged<int>? onSeriesSelect;
   final ScrollController? scrollController;
 
   @override
@@ -101,7 +105,10 @@ class _Md3eComicDetailPageState extends State<Md3eComicDetailPage> {
       ),
       M3EMenuEntry(
         label: l10n.comicDetailDelete,
-        leading: Icon(Symbols.delete, color: M3ETheme.of(context).colorScheme.error),
+        leading: Icon(
+          Symbols.delete,
+          color: M3ETheme.of(context).colorScheme.error,
+        ),
         onPressed: () {},
       ),
     ];
@@ -109,6 +116,11 @@ class _Md3eComicDetailPageState extends State<Md3eComicDetailPage> {
 
   void _selectSeriesIndex(int index) {
     if (index < 0 || index >= _entry.seriesCatalog.length) {
+      return;
+    }
+    final ValueChanged<int>? onSeriesSelect = widget.onSeriesSelect;
+    if (onSeriesSelect != null) {
+      onSeriesSelect(index);
       return;
     }
     setState(() {
