@@ -8,23 +8,33 @@ import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Detail pane for one [Md3eSettingsCategory] (Lab stateful mocks).
+/// 生产或 Lab 注入某分类的 section 列表（每项为 [Md3eSettingsSection] 等组件）。
+typedef Md3eSettingsSectionsBuilder = List<Widget> Function(
+  BuildContext context,
+  Md3eSettingsCategory category,
+);
+
+/// Detail pane for one [Md3eSettingsCategory].
+///
+/// 未提供 [sectionsBuilder] 时使用 Lab 的 mock 内容（[labState] 驱动）。
 class Md3eSettingsDetailPane extends StatelessWidget {
   const Md3eSettingsDetailPane({
     super.key,
     required this.category,
     required this.showTitle,
-    required this.labState,
-    required this.onLabStateChanged,
+    this.labState = const Md3eSettingsLabState(),
+    this.onLabStateChanged,
     this.optionLabels = const Md3eSettingsOptionLabels(),
     this.showUnwiredTiles = true,
+    this.sectionsBuilder,
   });
 
   final Md3eSettingsCategory category;
   final bool showTitle;
   final Md3eSettingsLabState labState;
-  final ValueChanged<Md3eSettingsLabState> onLabStateChanged;
+  final ValueChanged<Md3eSettingsLabState>? onLabStateChanged;
   final Md3eSettingsOptionLabels optionLabels;
+  final Md3eSettingsSectionsBuilder? sectionsBuilder;
 
   /// 为 false 时隐藏尚未接入业务的 tile（Pilot 页面使用）。
   final bool showUnwiredTiles;
@@ -35,16 +45,19 @@ class Md3eSettingsDetailPane extends StatelessWidget {
     final Md3eSettingsCategoryInfo info = kMd3eSettingsCategories.firstWhere(
       (Md3eSettingsCategoryInfo e) => e.category == category,
     );
+    final List<Widget> sections =
+        sectionsBuilder?.call(context, category) ??
+        _sectionsForCategory(
+          context,
+          category,
+          labState,
+          onLabStateChanged ?? (Md3eSettingsLabState _) {},
+          optionLabels,
+          showUnwiredTiles,
+        );
     final Widget body = Md3eSettingsList(
       maxWidth: Md3eSettingsPageMetrics.detailListMaxWidth,
-      sections: _sectionsForCategory(
-        context,
-        category,
-        labState,
-        onLabStateChanged,
-        optionLabels,
-        showUnwiredTiles,
-      ),
+      sections: sections,
     );
 
     if (!showTitle) {

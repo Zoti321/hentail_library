@@ -1322,6 +1322,18 @@ abstract class AppLocalizations {
   /// **'元数据已导出至 {fileName}'**
   String settingsMetadataBackupExportSuccess(String fileName);
 
+  /// No description provided for @settingsHealthyModeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'健康模式'**
+  String get settingsHealthyModeLabel;
+
+  /// No description provided for @settingsHealthyModeDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'库、搜索与历史中隐藏 R18 Comic，不修改分级'**
+  String get settingsHealthyModeDescription;
+
   /// No description provided for @settingsDiagnosticModeLabel.
   ///
   /// In zh, this message translates to:

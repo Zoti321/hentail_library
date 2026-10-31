@@ -315,6 +315,8 @@
       }
     }
   },
+  "settingsHealthyModeLabel": "健康模式",
+  "settingsHealthyModeDescription": "库、搜索与历史中隐藏 R18 Comic，不修改分级",
   "settingsDiagnosticModeLabel": "详细诊断",
   "settingsDiagnosticModeDescriptionEnabled": "已开启：Dart 与 Rust 记录更详细日志",
   "settingsDiagnosticModeDescriptionDisabled": "临时提高日志详细程度，便于复现问题",

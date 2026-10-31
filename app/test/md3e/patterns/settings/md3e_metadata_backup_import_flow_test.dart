@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
-import 'package:hentai_library/md3e/pages/md3e_settings_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/settings/md3e_settings_catalog.dart';
 import 'package:hentai_library/md3e/patterns/settings/md3e_metadata_backup_import_lab_flow.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+
+import '../../../../widgetbook/md3e_settings_page_lab_host.dart';
 
 import '../../../support/pump_md3e_app.dart';
 

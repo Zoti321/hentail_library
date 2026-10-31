@@ -315,6 +315,8 @@
       }
     }
   },
+  "settingsHealthyModeLabel": "Healthy mode",
+  "settingsHealthyModeDescription": "Hide R18 comics in library, search and history. Ratings are not changed.",
   "settingsDiagnosticModeLabel": "Verbose diagnostics",
   "settingsDiagnosticModeDescriptionEnabled": "Enabled: Dart and Rust log more detail",
   "settingsDiagnosticModeDescriptionDisabled": "Temporarily increase log verbosity to help reproduce issues",

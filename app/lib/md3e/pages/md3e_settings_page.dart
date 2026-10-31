@@ -24,6 +24,7 @@ class Md3eSettingsPage extends StatefulWidget {
     this.optionLabels = const Md3eSettingsOptionLabels(),
     this.showUnwiredTiles = true,
     this.visibleCategories,
+    this.sectionsBuilder,
   });
 
   final Md3eSettingsCategory initialCategory;
@@ -39,6 +40,9 @@ class Md3eSettingsPage extends StatefulWidget {
 
   /// 为 null 时显示全部分类；否则只显示列表中的分类。
   final Set<Md3eSettingsCategory>? visibleCategories;
+
+  /// 为 null 时使用 Lab mock 分类内容；生产注入真实 section。
+  final Md3eSettingsSectionsBuilder? sectionsBuilder;
 
   /// 列表页（非 list-detail）返回：由外层决定回到哪里（壳层上一目的地 / 路由）。
   final VoidCallback? onBack;
@@ -176,6 +180,7 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
                     onLabStateChanged: _updateLabState,
                     optionLabels: widget.optionLabels,
                     showUnwiredTiles: widget.showUnwiredTiles,
+                    sectionsBuilder: widget.sectionsBuilder,
                   );
 
                   if (wide) {

@@ -51,6 +51,12 @@ class SettingsNotifier extends _$SettingsNotifier {
     await updateSettings(current.copyWith(autoUpdate: value));
   }
 
+  Future<void> setHealthyMode(bool value) async {
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(healthyMode: value));
+  }
+
   Future<void> setDismissedUpdateVersion(String value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;

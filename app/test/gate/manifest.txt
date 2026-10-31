@@ -9,8 +9,7 @@ test/shared/domain
 test/core
 test/shared/di
 test/features/app_settings/presentation/app_data_wipe_flow_test.dart
-test/features/app_settings/presentation/views/settings_page/settings_md3e_pilot_mapping_test.dart
-test/features/app_settings/presentation/views/settings_page/settings_md3e_pilot_page_test.dart
+test/features/app_settings/presentation/views/settings_page/settings_md3e_page_test.dart
 test/shared/data
 
 # FRB 线缝冒烟（真实 cdylib；run-gate.sh dart-test 会先 cargo build）

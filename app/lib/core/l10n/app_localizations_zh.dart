@@ -700,6 +700,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get settingsHealthyModeLabel => '健康模式';
+
+  @override
+  String get settingsHealthyModeDescription => '库、搜索与历史中隐藏 R18 Comic，不修改分级';
+
+  @override
   String get settingsDiagnosticModeLabel => '详细诊断';
 
   @override

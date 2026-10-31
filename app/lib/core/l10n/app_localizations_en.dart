@@ -735,6 +735,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsHealthyModeLabel => 'Healthy mode';
+
+  @override
+  String get settingsHealthyModeDescription =>
+      'Hide R18 comics in library, search and history. Ratings are not changed.';
+
+  @override
   String get settingsDiagnosticModeLabel => 'Verbose diagnostics';
 
   @override

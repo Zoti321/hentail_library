@@ -27,6 +27,9 @@ abstract class AppSetting with _$AppSetting {
 
     /// 用户选择「稍后提醒」所忽略的远程版本号；空字符串表示未忽略。
     @Default('') String dismissedUpdateVersion,
+
+    /// Healthy mode：库、搜索与历史中隐藏 R18 Comic（不修改分级）。
+    @Default(false) bool healthyMode,
   }) = _AppSetting;
 
   factory AppSetting.fromJson(Map<String, dynamic> json) =>
