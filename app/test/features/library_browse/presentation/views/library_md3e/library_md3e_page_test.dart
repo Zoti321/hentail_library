@@ -204,6 +204,24 @@ void main() {
     expect(find.text('Series Alpha'), findsOneWidget);
   });
 
+  testWidgets('long-pressing a comic card opens the comic action menu', (
+    WidgetTester tester,
+  ) async {
+    await _pumpLibraryMd3ePage(
+      tester,
+      target: LibraryDisplayTarget.comics,
+      comics: <Comic>[_comic('c1', 'Comic One')],
+    );
+
+    await tester.longPress(find.byType(Md3eComicCard));
+    await tester.pumpAndSettle();
+
+    expect(find.text(l10n.comicDetailRead), findsOneWidget);
+    expect(find.text(l10n.comicDetailEditMetadata), findsOneWidget);
+    expect(find.text(l10n.comicDetailShowInExplorer), findsOneWidget);
+    expect(find.text(l10n.comicDetailDelete), findsOneWidget);
+  });
+
   testWidgets('empty comics catalog shows the empty-library title', (
     WidgetTester tester,
   ) async {

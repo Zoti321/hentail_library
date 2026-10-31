@@ -7,6 +7,7 @@ import 'package:hentai_library/features/library_browse/presentation/content_brea
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_return_series_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_page_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/md3e_comic_card_actions.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid_metrics.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
@@ -209,12 +210,15 @@ class _SearchedMd3ePageState extends ConsumerState<SearchedMd3ePage> {
           itemBuilder:
               (BuildContext context, int index, Md3eCatalogGridLayout _) {
                 final Comic comic = comics[index];
-                return Md3eComicCard(
+                return Md3eComicCardActions(
                   key: Key('search-comic-${comic.comicId}'),
-                  title: comic.title,
-                  subtitle: l10n.comicDetailPageCount(comic.pageCount),
-                  cover: ComicCoverContent(comicId: comic.comicId),
-                  onTap: () => _openComicDetail(comic.comicId),
+                  comic: comic,
+                  child: Md3eComicCard(
+                    title: comic.title,
+                    subtitle: l10n.comicDetailPageCount(comic.pageCount),
+                    cover: ComicCoverContent(comicId: comic.comicId),
+                    onTap: () => _openComicDetail(comic.comicId),
+                  ),
                 );
               },
         ),
