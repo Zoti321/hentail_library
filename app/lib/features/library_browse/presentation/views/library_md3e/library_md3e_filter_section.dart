@@ -224,16 +224,13 @@ class _Md3eTagFilterGroup extends ConsumerWidget {
             state.value?.tagFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
-    final List<String> names = namesAsync.maybeWhen(
-      data: (List<String> value) => value,
-      orElse: () => const <String>[],
-    );
+    final List<String> names = namesAsync.value ?? const <String>[];
     final notifier = ref.read(libraryComicFiltersProvider.notifier);
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryTagFilter,
       names: names,
       selection: selection,
-      isLoading: namesAsync.isLoading,
+      isLoading: namesAsync.isLoading && !namesAsync.hasValue,
       onToggle: notifier.toggleTag,
       onIncludeModeChanged: notifier.setTagIncludeMode,
     );
@@ -260,16 +257,13 @@ class _Md3eAuthorFilterGroup extends ConsumerWidget {
             state.value?.authorFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
-    final List<String> names = namesAsync.maybeWhen(
-      data: (List<String> value) => value,
-      orElse: () => const <String>[],
-    );
+    final List<String> names = namesAsync.value ?? const <String>[];
     final notifier = ref.read(libraryComicFiltersProvider.notifier);
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryAuthorFilter,
       names: names,
       selection: selection,
-      isLoading: namesAsync.isLoading,
+      isLoading: namesAsync.isLoading && !namesAsync.hasValue,
       labelFor: (String id) {
         final List<Author> authors = ref
             .watch(libraryAuthorDictionaryStateProvider)
@@ -341,17 +335,15 @@ class _Md3eParodyFilterGroup extends ConsumerWidget {
             state.value?.parodyFilter ?? const <String>{},
       ),
     );
-    final List<String> names = parodiesAsync.maybeWhen(
-      data: (List<String> parodies) => parodies.toList()..sort(),
-      orElse: () => const <String>[],
-    );
+    final List<String> names =
+        (parodiesAsync.value ?? const <String>[]).toList()..sort();
     final notifier = ref.read(libraryComicFiltersProvider.notifier);
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryParodyFilter,
       names: names,
       selection: _includeOnlySelection(selected),
       includeOnly: true,
-      isLoading: parodiesAsync.isLoading,
+      isLoading: parodiesAsync.isLoading && !parodiesAsync.hasValue,
       onToggle: (String name) =>
           notifier.toggleIncludeSet(LibraryIncludeSetKind.parody, name),
     );
@@ -378,17 +370,15 @@ class _Md3eCharacterFilterGroup extends ConsumerWidget {
             state.value?.characterFilter ?? const <String>{},
       ),
     );
-    final List<String> names = charactersAsync.maybeWhen(
-      data: (List<String> characters) => characters.toList()..sort(),
-      orElse: () => const <String>[],
-    );
+    final List<String> names =
+        (charactersAsync.value ?? const <String>[]).toList()..sort();
     final notifier = ref.read(libraryComicFiltersProvider.notifier);
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryCharacterFilter,
       names: names,
       selection: _includeOnlySelection(selected),
       includeOnly: true,
-      isLoading: charactersAsync.isLoading,
+      isLoading: charactersAsync.isLoading && !charactersAsync.hasValue,
       onToggle: (String name) =>
           notifier.toggleIncludeSet(LibraryIncludeSetKind.character, name),
     );

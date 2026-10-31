@@ -28,15 +28,41 @@ abstract final class Md3eLibraryFilterSortSheet {
     );
 
     if (md3eLibraryFilterSortPrefersBottomSheetForViewport(viewportWidth)) {
+      // 底部 sheet 的全屏标题由包内 header 读取自身上下文主题，无法注入应用字体；
+      // 因此不传 fullScreenTitle，改在 body 内用已带应用字体的主题绘制标题。
+      final Widget sheetBody = M3ETheme(
+        data: m3e,
+        child: Builder(
+          builder: (BuildContext themed) {
+            final M3EThemeData theme = M3ETheme.of(themed);
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.typeScale.titleLarge.copyWith(
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                body,
+              ],
+            );
+          },
+        ),
+      );
       return M3EBottomSheet.show<void>(
         context,
         useRootNavigator: true,
         expandToFullScreen: true,
-        fullScreenTitle: title,
         theme: M3ETheme.of(context).bottomSheetTheme,
         builder: (BuildContext sheetContext) {
           return PrimaryScrollController.none(
-            child: SingleChildScrollView(child: body),
+            child: SingleChildScrollView(child: sheetBody),
           );
         },
       );
