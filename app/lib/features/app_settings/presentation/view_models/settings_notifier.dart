@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppLocalePreference, AppSetting, AppThemePreference;
+import 'package:hentai_library/shared/domain/reading/auto_play_interval.dart';
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
@@ -11,9 +12,6 @@ part 'settings_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 class SettingsNotifier extends _$SettingsNotifier {
-  static const int _readerAutoPlayIntervalMin = 1;
-  static const int _readerAutoPlayIntervalMax = 60;
-
   @override
   Future<AppSetting> build() async {
     return ref.read(appSettingRepoProvider).load();
@@ -104,10 +102,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> setReaderAutoPlayIntervalSeconds(int value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    final int normalizedValue = value.clamp(
-      _readerAutoPlayIntervalMin,
-      _readerAutoPlayIntervalMax,
-    );
+    final int normalizedValue = clampReaderAutoPlayInterval(value);
     final AppSetting newSetting = current.copyWith(
       readerAutoPlayIntervalSeconds: normalizedValue,
     );

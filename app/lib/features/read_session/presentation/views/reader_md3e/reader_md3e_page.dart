@@ -9,12 +9,12 @@ import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart
 import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_cover_editor_notifier.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_series_navigation.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/reader_content.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/reader_open_error_panel.dart';
 import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_md3e_cover_actions.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_md3e_settings_sheet.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/reader_auto_play_binder.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -32,7 +32,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// 阅读页（MD3E 生产实现）：会话 / 翻页 / 续读 / 退出 / 全屏 / 键盘 / 自动播放 / 系列目录 / 封面设置。
 ///
 /// 外壳为 [Md3eReaderPage]；页图由 Baseline [ReaderContent] 提供（三种视口保留）。
-/// 设置面板暂复用 Baseline [showReaderSettingsDialog]，待后续批次 MD3E 化。
+/// 设置面板为 MD3E 版（[ReaderMd3eSettingsSheet]）。
 class ReaderMd3ePage extends HookConsumerWidget {
   const ReaderMd3ePage({
     super.key,
@@ -460,7 +460,9 @@ List<M3EMenuNode> _buildMoreMenuEntries(
       label: l10n.readerSetComicCover,
       leading: const Icon(Icons.image_outlined),
       onPressed: () {
-        unawaited(_setComicCover(context, ref, viewKey: viewKey, l10n: l10n));
+        unawaited(
+          setComicCoverFromReader(context, ref, viewKey: viewKey, l10n: l10n),
+        );
       },
     ),
     if (seriesId != null)
@@ -469,7 +471,7 @@ List<M3EMenuNode> _buildMoreMenuEntries(
         leading: const Icon(Icons.collections_outlined),
         onPressed: () {
           unawaited(
-            _setSeriesCover(
+            setSeriesCoverFromReader(
               context,
               ref,
               viewKey: viewKey,
@@ -481,73 +483,3 @@ List<M3EMenuNode> _buildMoreMenuEntries(
       ),
   ];
 }
-
-Future<void> _setComicCover(
-  BuildContext context,
-  WidgetRef ref, {
-  required ReaderControllerKey viewKey,
-  required AppLocalizations l10n,
-}) async {
-  final ReaderState? state = ref
-      .read(readerControllerProvider(viewKey))
-      .asData
-      ?.value;
-  if (state == null) {
-    showCustomToast(context, message: l10n.readerStateNotReady);
-    return;
-  }
-  try {
-    await ref
-        .read(readerCoverEditorProvider.notifier)
-        .setComicCover(state.comic, pageIndex: _coverPageIndex(state));
-    if (context.mounted) {
-      showCustomToast(context, message: l10n.readerComicCoverSet);
-    }
-  } on Object catch (error) {
-    if (context.mounted) {
-      showCustomToast(
-        context,
-        message: l10n.readerComicCoverSetFailed('$error'),
-      );
-    }
-  }
-}
-
-Future<void> _setSeriesCover(
-  BuildContext context,
-  WidgetRef ref, {
-  required ReaderControllerKey viewKey,
-  required String seriesId,
-  required AppLocalizations l10n,
-}) async {
-  final ReaderState? state = ref
-      .read(readerControllerProvider(viewKey))
-      .asData
-      ?.value;
-  if (state == null) {
-    showCustomToast(context, message: l10n.readerStateNotReady);
-    return;
-  }
-  try {
-    await ref
-        .read(readerCoverEditorProvider.notifier)
-        .setSeriesCover(
-          seriesId.trim(),
-          state.comic,
-          pageIndex: _coverPageIndex(state),
-        );
-    if (context.mounted) {
-      showCustomToast(context, message: l10n.readerSeriesCoverSet);
-    }
-  } on Object catch (error) {
-    if (context.mounted) {
-      showCustomToast(
-        context,
-        message: l10n.readerSeriesCoverSetFailed('$error'),
-      );
-    }
-  }
-}
-
-int _coverPageIndex(ReaderState state) =>
-    (state.currentIndex - 1).clamp(0, 1 << 30);

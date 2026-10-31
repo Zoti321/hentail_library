@@ -10,6 +10,7 @@ import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/shared/domain/ports/reader_settings_command_port.dart';
+import 'package:hentai_library/shared/domain/reading/auto_play_interval.dart';
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -27,10 +28,6 @@ abstract final class ReaderMd3eSettingsSheet {
     );
   }
 }
-
-/// 自动播放间隔（秒）取值范围，与生产设置一致。
-const int _kIntervalMin = 1;
-const int _kIntervalMax = 60;
 
 /// 条漫边距可选值（百分比），步长 5。
 final List<int> _kWebtoonMarginOptions = List<int>.generate(
@@ -182,19 +179,23 @@ class _ReaderMd3eSettingsBody extends ConsumerWidget {
                 children: <Widget>[
                   IconButton(
                     icon: const Icon(Symbols.remove),
-                    onPressed: interval <= _kIntervalMin
+                    onPressed: interval <= kReaderAutoPlayIntervalMin
                         ? null
                         : () => unawaited(
-                            port.setReaderAutoPlayIntervalSeconds(interval - 1),
+                            port.setReaderAutoPlayIntervalSeconds(
+                              clampReaderAutoPlayInterval(interval - 1),
+                            ),
                           ),
                   ),
                   Text('$interval ${l10n.readerSettingsSecondsSuffix}'),
                   IconButton(
                     icon: const Icon(Symbols.add),
-                    onPressed: interval >= _kIntervalMax
+                    onPressed: interval >= kReaderAutoPlayIntervalMax
                         ? null
                         : () => unawaited(
-                            port.setReaderAutoPlayIntervalSeconds(interval + 1),
+                            port.setReaderAutoPlayIntervalSeconds(
+                              clampReaderAutoPlayInterval(interval + 1),
+                            ),
                           ),
                   ),
                 ],
