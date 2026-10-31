@@ -15,7 +15,7 @@ class Md3eReaderPage extends StatefulWidget {
     required this.currentPage,
     required this.totalPages,
     required this.chromeVisible,
-    required this.onTapZone,
+    this.onTapZone,
     this.subtitle,
     this.isFullscreen = false,
     this.autoPlayEnabled = false,
@@ -44,7 +44,7 @@ class Md3eReaderPage extends StatefulWidget {
   final bool chromeVisible;
   final bool isFullscreen;
   final bool autoPlayEnabled;
-  final ValueChanged<Md3eReaderTapZone> onTapZone;
+  final ValueChanged<Md3eReaderTapZone>? onTapZone;
   final VoidCallback? onBack;
   final VoidCallback? onOpenSettings;
   final VoidCallback? onToggleFullscreen;

@@ -21,7 +21,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_catalog_sheet.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_volume.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
@@ -279,8 +278,6 @@ class ReaderMd3ePage extends HookConsumerWidget {
                       isFullscreen: readerFullscreen,
                       autoPlayEnabled:
                           supportsAutoPlay && chrome.autoPlayEnabled,
-                      // 内容层（_ReaderMd3eContent）自行处理点击分区，此回调不使用。
-                      onTapZone: (Md3eReaderTapZone _) {},
                       viewportStatus: Md3eReaderViewportStatus.ready,
                       onBack: () {
                         unawaited(exitReader());
