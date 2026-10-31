@@ -9,11 +9,18 @@ import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart
 import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_cover_editor_notifier.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_series_navigation.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_content.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_open_error_panel.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_settings_dialog.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/reader_auto_play_binder.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_catalog_sheet.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_volume.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
@@ -23,10 +30,10 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 阅读页（MD3E 生产实现，#393 第一批）：会话 / 翻页 / 续读 / 退出 / 全屏 / 键盘。
+/// 阅读页（MD3E 生产实现）：会话 / 翻页 / 续读 / 退出 / 全屏 / 键盘 / 自动播放 / 系列目录 / 封面设置。
 ///
 /// 外壳为 [Md3eReaderPage]；页图由 Baseline [ReaderContent] 提供（三种视口保留）。
-/// 设置面板、系列导航、自动播放、页图复制留待后续批次。
+/// 设置面板暂复用 Baseline [showReaderSettingsDialog]，待后续批次 MD3E 化。
 class ReaderMd3ePage extends HookConsumerWidget {
   const ReaderMd3ePage({
     super.key,
@@ -176,16 +183,23 @@ class ReaderMd3ePage extends HookConsumerWidget {
       return null;
     }, <Object?>[seriesBoundaryPrompt, context]);
 
-    final ({bool showControls, int currentIndex}) chrome = ref.watch(
-      readerControllerProvider(viewKey).select((
-        AsyncValue<ReaderState> asyncState,
-      ) {
-        final ReaderState? state = asyncState.asData?.value;
-        return (
-          showControls: state?.showControls ?? false,
-          currentIndex: state?.currentIndex ?? 1,
-        );
-      }),
+    final ({
+      bool showControls,
+      int currentIndex,
+      ReadingMode readingMode,
+      bool autoPlayEnabled,
+    })
+    chrome = ref.watch(
+      readerControllerProvider(viewKey)
+          .select((AsyncValue<ReaderState> asyncState) {
+            final ReaderState? state = asyncState.asData?.value;
+            return (
+              showControls: state?.showControls ?? false,
+              currentIndex: state?.currentIndex ?? 1,
+              readingMode: state?.readingMode ?? ReadingMode.paged,
+              autoPlayEnabled: state?.autoPlayEnabled ?? false,
+            );
+          }),
     );
 
     Future<void> exitReader() => controller.executeExitReader(
@@ -248,38 +262,77 @@ class ReaderMd3ePage extends HookConsumerWidget {
                   router: GoRouter.of(context),
                 );
 
-                return Md3eReaderPage(
-                  title: shell.comic.title,
-                  currentPage: chrome.currentIndex,
-                  totalPages: shell.totalPages,
-                  chromeVisible: chrome.showControls,
-                  isFullscreen: readerFullscreen,
-                  // 内容层（_ReaderMd3eContent）自行处理点击分区，此回调不使用。
-                  onTapZone: (Md3eReaderTapZone _) {},
-                  viewportStatus: Md3eReaderViewportStatus.ready,
-                  onBack: () {
-                    unawaited(exitReader());
-                  },
-                  onToggleFullscreen: () {
-                    unawaited(controller.toggleFullscreen());
-                  },
-                  onPageChanged: controller.setIndex,
-                  onPreviousPage: () {
-                    unawaited(requestPrevPage());
-                  },
-                  onNextPage: () {
-                    unawaited(requestNextPage());
-                  },
-                  onToggleChromeFromKeyboard: controller.toggleShowControls,
-                  contentBuilder: (FocusNode focusNode) => _ReaderMd3eContent(
-                    viewKey: viewKey,
-                    routeContext: routeContext,
-                    focusNode: focusNode,
-                    initialPage: frozenInitialPage.value ?? 0,
-                    preferredPageIndex:
-                        shell.sessionContext.preferredPageIndex,
-                    seriesNavContext: seriesNavContext,
-                  ),
+                final bool supportsAutoPlay =
+                    chrome.readingMode.supportsAutoPlay;
+                final String? seriesId = shell.sessionContext.seriesId;
+                final bool isSeriesRead =
+                    seriesId != null && seriesId.trim().isNotEmpty;
+
+                return Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    Md3eReaderPage(
+                      title: shell.comic.title,
+                      currentPage: chrome.currentIndex,
+                      totalPages: shell.totalPages,
+                      chromeVisible: chrome.showControls,
+                      isFullscreen: readerFullscreen,
+                      autoPlayEnabled:
+                          supportsAutoPlay && chrome.autoPlayEnabled,
+                      // 内容层（_ReaderMd3eContent）自行处理点击分区，此回调不使用。
+                      onTapZone: (Md3eReaderTapZone _) {},
+                      viewportStatus: Md3eReaderViewportStatus.ready,
+                      onBack: () {
+                        unawaited(exitReader());
+                      },
+                      onToggleFullscreen: () {
+                        unawaited(controller.toggleFullscreen());
+                      },
+                      onPageChanged: controller.setIndex,
+                      onPreviousPage: () {
+                        unawaited(requestPrevPage());
+                      },
+                      onNextPage: () {
+                        unawaited(requestNextPage());
+                      },
+                      onToggleChromeFromKeyboard: controller.toggleShowControls,
+                      onAutoPlayChanged: supportsAutoPlay
+                          ? controller.setAutoPlayEnabled
+                          : null,
+                      onOpenSettings: () {
+                        showReaderSettingsDialog(context);
+                      },
+                      onOpenSeriesCatalog: seriesNavContext == null
+                          ? null
+                          : () => _openSeriesCatalog(
+                              context,
+                              ref,
+                              routeContext: routeContext,
+                              navContext: seriesNavContext,
+                            ),
+                      moreMenuEntries: _buildMoreMenuEntries(
+                        context,
+                        ref,
+                        viewKey: viewKey,
+                        seriesId: isSeriesRead ? seriesId : null,
+                      ),
+                      contentBuilder: (FocusNode focusNode) =>
+                          _ReaderMd3eContent(
+                            viewKey: viewKey,
+                            routeContext: routeContext,
+                            focusNode: focusNode,
+                            initialPage: frozenInitialPage.value ?? 0,
+                            preferredPageIndex:
+                                shell.sessionContext.preferredPageIndex,
+                            seriesNavContext: seriesNavContext,
+                          ),
+                    ),
+                    ReaderAutoPlayBinder(
+                      viewKey: viewKey,
+                      routeContext: routeContext,
+                      seriesNavContext: seriesNavContext,
+                    ),
+                  ],
                 );
               },
             ),
@@ -363,3 +416,141 @@ class _ReaderMd3eContent extends ConsumerWidget {
     );
   }
 }
+
+/// 打开系列目录；选中卷即切卷（与 Baseline 顶栏系列菜单共用 [readerSeriesNavigationProvider]）。
+void _openSeriesCatalog(
+  BuildContext context,
+  WidgetRef ref, {
+  required ReaderRouteContext routeContext,
+  required ReaderNavContextData navContext,
+}) {
+  final List<Md3eReaderSeriesVolume> volumes = <Md3eReaderSeriesVolume>[
+    for (final ReaderComicListItem item in navContext.items)
+      Md3eReaderSeriesVolume(id: item.comicId, title: item.title),
+  ];
+  final GoRouter router = GoRouter.of(context);
+  Md3eReaderSeriesCatalogSheet.show(
+    context,
+    volumes: volumes,
+    currentVolumeId: routeContext.comicId,
+    onVolumeSelected: (String targetComicId) {
+      if (targetComicId == routeContext.comicId) {
+        return;
+      }
+      unawaited(
+        ref
+            .read(readerSeriesNavigationProvider.notifier)
+            .switchComic(
+              router: router,
+              currentSession: routeContext.session,
+              targetComicId: targetComicId,
+            ),
+      );
+    },
+  );
+}
+
+/// 更多菜单：设为漫画封面；系列读取时额外提供设为系列封面。
+List<M3EMenuNode> _buildMoreMenuEntries(
+  BuildContext context,
+  WidgetRef ref, {
+  required ReaderControllerKey viewKey,
+  required String? seriesId,
+}) {
+  final AppLocalizations l10n = context.l10n;
+  return <M3EMenuNode>[
+    M3EMenuEntry(
+      label: l10n.readerSetComicCover,
+      leading: const Icon(Icons.image_outlined),
+      onPressed: () {
+        unawaited(_setComicCover(context, ref, viewKey: viewKey, l10n: l10n));
+      },
+    ),
+    if (seriesId != null)
+      M3EMenuEntry(
+        label: l10n.readerSetSeriesCover,
+        leading: const Icon(Icons.collections_outlined),
+        onPressed: () {
+          unawaited(
+            _setSeriesCover(
+              context,
+              ref,
+              viewKey: viewKey,
+              seriesId: seriesId,
+              l10n: l10n,
+            ),
+          );
+        },
+      ),
+  ];
+}
+
+Future<void> _setComicCover(
+  BuildContext context,
+  WidgetRef ref, {
+  required ReaderControllerKey viewKey,
+  required AppLocalizations l10n,
+}) async {
+  final ReaderState? state = ref
+      .read(readerControllerProvider(viewKey))
+      .asData
+      ?.value;
+  if (state == null) {
+    showCustomToast(context, message: l10n.readerStateNotReady);
+    return;
+  }
+  try {
+    await ref
+        .read(readerCoverEditorProvider.notifier)
+        .setComicCover(state.comic, pageIndex: _coverPageIndex(state));
+    if (context.mounted) {
+      showCustomToast(context, message: l10n.readerComicCoverSet);
+    }
+  } on Object catch (error) {
+    if (context.mounted) {
+      showCustomToast(
+        context,
+        message: l10n.readerComicCoverSetFailed('$error'),
+      );
+    }
+  }
+}
+
+Future<void> _setSeriesCover(
+  BuildContext context,
+  WidgetRef ref, {
+  required ReaderControllerKey viewKey,
+  required String seriesId,
+  required AppLocalizations l10n,
+}) async {
+  final ReaderState? state = ref
+      .read(readerControllerProvider(viewKey))
+      .asData
+      ?.value;
+  if (state == null) {
+    showCustomToast(context, message: l10n.readerStateNotReady);
+    return;
+  }
+  try {
+    await ref
+        .read(readerCoverEditorProvider.notifier)
+        .setSeriesCover(
+          seriesId.trim(),
+          state.comic,
+          pageIndex: _coverPageIndex(state),
+        );
+    if (context.mounted) {
+      showCustomToast(context, message: l10n.readerSeriesCoverSet);
+    }
+  } on Object catch (error) {
+    if (context.mounted) {
+      showCustomToast(
+        context,
+        message: l10n.readerSeriesCoverSetFailed('$error'),
+      );
+    }
+  }
+}
+
+int _coverPageIndex(ReaderState state) =>
+    (state.currentIndex - 1).clamp(0, 1 << 30);

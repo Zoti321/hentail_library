@@ -5,13 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/models.dart'
-    show AppSetting;
-import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
-import 'package:hentai_library/shared/ui/motion/app_motion.dart';
 import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
@@ -24,8 +20,8 @@ import 'package:hentai_library/features/read_session/di/session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/reader_auto_play_binder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/shared/di/app_settings_providers.dart';
 
 part 'reader_page_slots.dart';
 
@@ -330,7 +326,7 @@ class ReaderPage extends HookConsumerWidget {
                         seriesNavContext: seriesNavContext,
                         routeContext: routeContext,
                       ),
-                      _ReaderAutoPlayBinder(
+                      ReaderAutoPlayBinder(
                         viewKey: viewKey,
                         routeContext: routeContext,
                         seriesNavContext: seriesNavContext,
