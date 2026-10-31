@@ -110,21 +110,6 @@ class _Md3eMergeConfirmDialogState extends State<_Md3eMergeConfirmDialog> {
   }
 }
 
-/// 删除全部标签的危险确认（无勾选闸门，沿用 Baseline 语义）。
-Future<bool> showMetadataMd3eDeleteAllTagsDialog({
-  required BuildContext context,
-  required int count,
-}) async {
-  final bool? confirmed = await Md3eLabDialogPresenter.showBasic<bool>(
-    context,
-    dialog: _Md3eDestructiveConfirmDialog(
-      title: context.l10n.confirmDeleteTagsTitle,
-      message: context.l10n.confirmDeleteTagsContent(count),
-    ),
-  );
-  return confirmed ?? false;
-}
-
 /// 删除单个命名元数据（作者 / 标签 / 原作 / 角色）的确认。
 Future<bool> showMetadataMd3eDeleteFacetDialog({
   required BuildContext context,

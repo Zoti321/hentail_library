@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
-import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_actions.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_dialogs.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_facet_list.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_header.dart';
@@ -148,11 +147,7 @@ class _MetadataManagementPageState
                   child: MetadataMd3eHeader(
                     compact: compact,
                     totalCount: count,
-                    showDeleteAllTags: kind == ManagedNamedFacetKind.tag,
                     onOpenNavigation: appShellPageNavigationOpener(context),
-                    onDeleteAllTags: kind == ManagedNamedFacetKind.tag
-                        ? () => unawaited(deleteAllTags(context, ref))
-                        : null,
                     mergeSelectionCount: mergeMode
                         ? 1 + _mergeSources.length
                         : 0,

@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_controller.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_dialogs.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/tag_dictionary_import_result.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
@@ -77,31 +75,6 @@ Future<void> deleteNamedFacet(
       showErrorToast(context, error);
     }
   }
-}
-
-/// 删除全部标签（仅标签页提供入口）。
-Future<void> deleteAllTags(BuildContext context, WidgetRef ref) async {
-  final List<Tag> tags = await ref.read(allTagsProvider.future);
-  if (!context.mounted || tags.isEmpty) {
-    return;
-  }
-  final bool confirmed = await showMetadataMd3eDeleteAllTagsDialog(
-    context: context,
-    count: tags.length,
-  );
-  if (!confirmed || !context.mounted) {
-    return;
-  }
-  await ref
-      .read(
-        namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag)
-            .notifier,
-      )
-      .deleteAll();
-  if (!context.mounted) {
-    return;
-  }
-  showSuccessToast(context, context.l10n.metadataTagsDeletedAllToast);
 }
 
 /// 从网络导入标签词典；成功返回结果，取消 / 失败返回 null。

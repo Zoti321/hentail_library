@@ -17,9 +17,7 @@ class MetadataMd3eHeader extends StatelessWidget {
   const MetadataMd3eHeader({
     required this.compact,
     required this.totalCount,
-    required this.showDeleteAllTags,
     this.onOpenNavigation,
-    this.onDeleteAllTags,
     this.mergeSelectionCount = 0,
     this.onExitMergeSelection,
     this.onMergeSelection,
@@ -28,9 +26,7 @@ class MetadataMd3eHeader extends StatelessWidget {
 
   final bool compact;
   final int totalCount;
-  final bool showDeleteAllTags;
   final VoidCallback? onOpenNavigation;
-  final VoidCallback? onDeleteAllTags;
   final int mergeSelectionCount;
   final VoidCallback? onExitMergeSelection;
   final VoidCallback? onMergeSelection;
@@ -95,15 +91,6 @@ class MetadataMd3eHeader extends StatelessWidget {
             ),
           ],
           const Spacer(),
-          if (showDeleteAllTags && onDeleteAllTags != null)
-            M3EIconButton(
-              icon: const Icon(Symbols.delete_sweep),
-              variant: M3EIconButtonVariant.standard,
-              size: M3EIconButtonSize.sm,
-              tooltip: l10n.commonDelete,
-              semanticLabel: l10n.commonDelete,
-              onPressed: onDeleteAllTags,
-            ),
         ],
       );
     }
