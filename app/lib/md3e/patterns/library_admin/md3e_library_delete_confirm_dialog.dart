@@ -1,36 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/dialog/md3e_lab_dialog_presenter.dart';
-import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
 import 'package:hentai_library/md3e/theme/md3e_lab_text.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Lab：从 Home 预览列表移除 Library 的确认（不写 FRB / 不删 Resource）。
-Future<bool> showMd3eHomeLibraryDeleteConfirmDialog({
+/// 删除库（从应用移除，不删漫画文件）的确认文案。
+abstract final class Md3eLibraryDeleteCopy {
+  /// 标题点明对象，正文一句说明后果（见 ADR-0023 勾选闸门；对齐生产 purge 文案结构）。
+  static String deleteConfirmTitle(String libraryDisplayName) =>
+      '删除「$libraryDisplayName」？';
+
+  static const String deleteConfirmBody = '将从应用中移除此库。漫画文件会保留在原位置。';
+
+  static const String deleteConfirmAcknowledgement = '我了解不会删除漫画文件';
+}
+
+/// 删除库确认（MD3E Lab 单一来源）：标题 + 正文 + 勾选闸门后才能确认删除（不写 FRB / 不删 Resource）。
+Future<bool> showMd3eLibraryDeleteConfirmDialog({
   required BuildContext context,
   required String libraryDisplayName,
 }) async {
   final bool? confirmed = await Md3eLabDialogPresenter.showBasic<bool>(
     context,
-    dialog: _Md3eHomeLibraryDeleteConfirmDialog(
+    dialog: _Md3eLibraryDeleteConfirmDialog(
       libraryDisplayName: libraryDisplayName,
     ),
   );
   return confirmed ?? false;
 }
 
-class _Md3eHomeLibraryDeleteConfirmDialog extends StatefulWidget {
-  const _Md3eHomeLibraryDeleteConfirmDialog({required this.libraryDisplayName});
+class _Md3eLibraryDeleteConfirmDialog extends StatefulWidget {
+  const _Md3eLibraryDeleteConfirmDialog({required this.libraryDisplayName});
 
   final String libraryDisplayName;
 
   @override
-  State<_Md3eHomeLibraryDeleteConfirmDialog> createState() =>
-      _Md3eHomeLibraryDeleteConfirmDialogState();
+  State<_Md3eLibraryDeleteConfirmDialog> createState() =>
+      _Md3eLibraryDeleteConfirmDialogState();
 }
 
-class _Md3eHomeLibraryDeleteConfirmDialogState
-    extends State<_Md3eHomeLibraryDeleteConfirmDialog> {
+class _Md3eLibraryDeleteConfirmDialogState
+    extends State<_Md3eLibraryDeleteConfirmDialog> {
   bool _acknowledged = false;
 
   @override
@@ -45,10 +55,10 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
     );
 
     return M3EDialog(
-      title: Md3eHomeLibraryManagementCopy.deleteConfirmTitle(
+      title: Md3eLibraryDeleteCopy.deleteConfirmTitle(
         widget.libraryDisplayName,
       ),
-      content: _Md3eHomeLibraryDeleteConfirmBody(
+      content: _Md3eLibraryDeleteConfirmBody(
         acknowledged: _acknowledged,
         onAcknowledgementChanged: (bool value) {
           setState(() => _acknowledged = value);
@@ -85,8 +95,8 @@ class _Md3eHomeLibraryDeleteConfirmDialogState
 }
 
 /// Dialog 正文：说明 + 勾选闸门（复选框与说明文案垂直居中）。
-class _Md3eHomeLibraryDeleteConfirmBody extends StatelessWidget {
-  const _Md3eHomeLibraryDeleteConfirmBody({
+class _Md3eLibraryDeleteConfirmBody extends StatelessWidget {
+  const _Md3eLibraryDeleteConfirmBody({
     required this.acknowledged,
     required this.onAcknowledgementChanged,
     required this.scheme,
@@ -116,10 +126,7 @@ class _Md3eHomeLibraryDeleteConfirmBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          Md3eHomeLibraryManagementCopy.deleteConfirmBody,
-          style: descriptionStyle,
-        ),
+        Text(Md3eLibraryDeleteCopy.deleteConfirmBody, style: descriptionStyle),
         SizedBox(height: spacing.md),
         Material(
           color: scheme.surfaceContainerHigh,
@@ -147,8 +154,7 @@ class _Md3eHomeLibraryDeleteConfirmBody extends StatelessWidget {
                     SizedBox(width: spacing.sm),
                     Expanded(
                       child: Text(
-                        Md3eHomeLibraryManagementCopy
-                            .deleteConfirmAcknowledgement,
+                        Md3eLibraryDeleteCopy.deleteConfirmAcknowledgement,
                         style: acknowledgementStyle,
                       ),
                     ),

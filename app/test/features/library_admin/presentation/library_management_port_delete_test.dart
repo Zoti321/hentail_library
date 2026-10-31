@@ -176,13 +176,16 @@ Future<void> _tapDelete(WidgetTester tester, String id) async {
   await tester.pumpAndSettle();
 }
 
-/// MD3E 确认对话框：按钮顺序为「取消」「移除」，最后一个为确认。
+/// MD3E 确认对话框：按钮顺序为「取消」「删除」，最后一个为确认。
 Finder _dialogButtons() => find.descendant(
   of: find.byType(M3EDialog),
   matching: find.byType(M3EButton),
 );
 
 Future<void> _confirmRemove(WidgetTester tester) async {
+  // Lab 确认须先勾选「我了解不会删除漫画文件」闸门。
+  await tester.tap(find.byType(M3ECheckbox));
+  await tester.pumpAndSettle();
   await tester.tap(_dialogButtons().last);
   await tester.pumpAndSettle();
 }
