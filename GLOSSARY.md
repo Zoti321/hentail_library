@@ -319,7 +319,7 @@ _Avoid_: 全仓换肤阶段
 _Avoid_: Beta 换肤
 
 **MD3E Cutover**:
-按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。
+按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。完成判定与 spec 分批规则见 ADR-0031。
 _Avoid_: 大重构（无阶段含义时）
 
 **MD3E pattern**:
