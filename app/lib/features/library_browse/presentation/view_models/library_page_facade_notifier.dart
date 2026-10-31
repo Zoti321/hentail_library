@@ -107,6 +107,16 @@ class LibraryPageFacadeNotifier extends _$LibraryPageFacadeNotifier {
         .setPageSize(state.displayTarget, pageSize);
   }
 
+  /// 直接跳到指定页（1-based）；越界或未变化时为 no-op。
+  void setPage(LibraryDisplayTarget target, int page) {
+    switch (target) {
+      case LibraryDisplayTarget.comics:
+        ref.read(libraryComicsCatalogControllerProvider.notifier).setPage(page);
+      case LibraryDisplayTarget.series:
+        ref.read(librarySeriesCatalogControllerProvider.notifier).setPage(page);
+    }
+  }
+
   /// 越界跳转（如末页再下一页）为 no-op；目录未加载时忽略。
   void jumpPage(LibraryDisplayTarget target, PageJump jump) {
     switch (target) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/library_page.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_md3e/searched_md3e_page.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_page.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
@@ -147,7 +147,7 @@ class LibraryBrowsePage extends HookConsumerWidget {
       return null;
     }, <Object?>[libraryId]);
 
-    return const LibraryPage();
+    return const LibraryMd3ePage();
   }
 }
 
