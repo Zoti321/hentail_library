@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/series_metadata_edit_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/series_metadata_editor_notifier.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_field_locks_kv_list.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
-import 'package:hentai_library/shared/ui/widgets/form/metadata_lock_button.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
@@ -83,7 +83,7 @@ Finder _nameField(WidgetTester tester) {
   return find
       .descendant(
         of: find.byType(SeriesMetadataEditMd3eView),
-        matching: find.byType(TextField),
+        matching: find.byType(EditableText),
       )
       .first;
 }
@@ -113,11 +113,13 @@ void main() {
         _RecordingSeriesMetadataEditor();
     await _pumpEditSeriesPage(tester, editor: editor);
 
+    await tester.tap(find.text('字段锁'));
+    await tester.pump();
     await tester.tap(
       find
           .descendant(
-            of: find.byType(MetadataLockButton).first,
-            matching: find.byType(IconButton),
+            of: find.byType(Md3eMetadataFieldLocksKvList),
+            matching: find.byType(InkWell),
           )
           .first,
     );

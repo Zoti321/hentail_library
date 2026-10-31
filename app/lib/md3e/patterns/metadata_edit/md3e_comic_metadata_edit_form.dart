@@ -84,6 +84,8 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
         onLanguageRemoved: (String v) => _update(
           (d) => d.copyWith(languages: _md3eTagListWithRemoved(d.languages, v)),
         ),
+        onSortOrderChanged: (String v) =>
+            _update((d) => d.copyWith(seriesSortOrderText: v)),
       ),
       _Md3eComicMetadataEditTab.authorsTags => _AuthorsTagsFields(
         draft: draft,
@@ -239,11 +241,13 @@ class _GeneralFields extends StatelessWidget {
     required this.onR18Changed,
     required this.onLanguageAdded,
     required this.onLanguageRemoved,
+    required this.onSortOrderChanged,
   });
 
   final Md3eComicMetadataEditDraft draft;
   final String? titleError;
   final double gap;
+  final ValueChanged<String> onSortOrderChanged;
   final ValueChanged<String> onTitleChanged;
   final ValueChanged<String> onDescriptionChanged;
   final ValueChanged<String> onPublishedChanged;
@@ -315,6 +319,15 @@ class _GeneralFields extends StatelessWidget {
           onTagRemoved: onLanguageRemoved,
           maxWidth: double.infinity,
         ),
+        if (draft.seriesSortOrderText != null) ...<Widget>[
+          SizedBox(height: gap),
+          Md3eOutlinedTextField(
+            label: l10n.formSeriesItemSortOrderLabel,
+            initialValue: draft.seriesSortOrderText!,
+            hintText: l10n.formSeriesItemSortOrderHint,
+            onChanged: onSortOrderChanged,
+          ),
+        ],
       ],
     );
   }

@@ -1,45 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_status_scaffold.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_comics_providers.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_editor_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_comics_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/metadata_edit_mappers.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_status_scaffold.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_form.dart';
+import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/form/author_library_multi_select_field.dart';
-import 'package:hentai_library/shared/ui/widgets/form/fluent_date_picker_field.dart';
-import 'package:hentai_library/shared/ui/widgets/form/fluent_number_stepper_field.dart';
-import 'package:hentai_library/shared/ui/widgets/form/fluent_text_field.dart';
-import 'package:hentai_library/shared/ui/widgets/form/fluent_toggle_field.dart';
-import 'package:hentai_library/shared/ui/widgets/form/metadata_lock_button.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/form/character_library_multi_select_field.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/form/parody_library_multi_select_field.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/widgets/form/tag_library_multi_select_field.dart';
-import 'package:hentai_library/shared/ui/widgets/foundation/toggle_switch.dart';
-import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/shared/ui/widgets/chrome/capsule_tab_bar.dart';
-import 'package:hentai_library/features/library_browse/domain/smart_facet_match_preference.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/comic_metadata_editor_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
-part 'comic_metadata_edit_general_tab.dart';
-part 'comic_metadata_edit_authors_tags_tab.dart';
-
-enum _EditMetadataTab { general, authorsAndTags }
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 生产漫画元数据编辑整页（MD3E）：按 id 加载后渲染 [ComicMetadataEditMd3eView]。
 class ComicMetadataEditMd3ePage extends ConsumerWidget {
@@ -76,59 +54,33 @@ class ComicMetadataEditMd3ePage extends ConsumerWidget {
   }
 }
 
-/// 漫画元数据编辑表单视图（已加载实体）。
-class ComicMetadataEditMd3eView extends StatefulHookConsumerWidget {
+/// 漫画元数据编辑视图（已加载实体）：Lab 表单 + Lab 编辑壳，保存走生产 notifier。
+class ComicMetadataEditMd3eView extends ConsumerStatefulWidget {
   const ComicMetadataEditMd3eView({super.key, required this.comic});
 
   final Comic comic;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
+  ConsumerState<ComicMetadataEditMd3eView> createState() =>
       _ComicMetadataEditMd3eViewState();
 }
 
 class _ComicMetadataEditMd3eViewState
     extends ConsumerState<ComicMetadataEditMd3eView> {
-  late ComicMetadataForm _form;
+  late Md3eComicMetadataEditDraft _draft;
   late ComicMetaLocks _locks;
-  ComicMetadataFormValidation? _validation;
-  _EditMetadataTab _selectedTab = _EditMetadataTab.general;
+  SeriesItemMembership? _seed;
+  String? _titleError;
   bool _saving = false;
-  bool _lockBusy = false;
-
-  /// null = 无归属或尚未加载到归属。
-  SeriesItemMembership? _seriesSortSeed;
-  late String _sortOrderText;
-  late bool _sortOrderLocked;
-  String? _sortOrderError;
-
-  List<CapsuleTabItem> _capsuleTabs(AppLocalizations l10n) => <CapsuleTabItem>[
-    CapsuleTabItem(
-      label: l10n.dialogEditMetadataTabGeneral,
-      icon: LucideIcons.textAlignCenter,
-    ),
-    CapsuleTabItem(
-      label: l10n.dialogEditMetadataTabAuthorsTags,
-      icon: LucideIcons.users,
-    ),
-  ];
 
   @override
   void initState() {
     super.initState();
-    _form = ComicMetadataForm.fromComic(widget.comic);
+    _draft = comicMetadataDraftFromComic(widget.comic);
     _locks = widget.comic.locks;
-    _sortOrderText = '';
-    _sortOrderLocked = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadSeriesSortMembership();
     });
-  }
-
-  void _applySeriesSortSeed(SeriesItemMembership seed) {
-    _seriesSortSeed = seed;
-    _sortOrderText = _formatSortOrder(seed.sortOrder);
-    _sortOrderLocked = seed.sortOrderLocked;
   }
 
   Future<void> _loadSeriesSortMembership() async {
@@ -140,19 +92,15 @@ class _ComicMetadataEditMd3eViewState
         return;
       }
       setState(() {
+        _seed = membership;
         if (membership != null) {
-          _applySeriesSortSeed(membership);
-        } else {
-          _seriesSortSeed = null;
+          _draft = _draft.copyWith(
+            seriesSortOrderText: _formatSortOrder(membership.sortOrder),
+          );
         }
       });
     } catch (_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _seriesSortSeed = null;
-      });
+      // 没有系列归属或读取失败时不显示排序字段。
     }
   }
 
@@ -167,10 +115,9 @@ class _ComicMetadataEditMd3eViewState
     bool? parodies,
     bool? characters,
   }) async {
-    if (_lockBusy) {
+    if (_saving) {
       return;
     }
-    setState(() => _lockBusy = true);
     try {
       await ref
           .read(comicMetadataEditorProvider.notifier)
@@ -211,84 +158,56 @@ class _ComicMetadataEditMd3eViewState
           type: AppToastType.error,
         );
       }
-    } finally {
-      if (mounted) {
-        setState(() => _lockBusy = false);
-      }
     }
-  }
-
-  void _selectTab(int index) {
-    if (index == _selectedTab.index) {
-      return;
-    }
-    setState(() {
-      _selectedTab = _EditMetadataTab.values[index];
-    });
-  }
-
-  void _updateForm(ComicMetadataForm Function(ComicMetadataForm) transform) {
-    setState(() => _form = transform(_form));
-  }
-
-  void _leaveAfterSave() {
-    final NavigatorState navigator = Navigator.of(context);
-    if (navigator.canPop()) {
-      navigator.pop();
-      return;
-    }
-    DetailBackHeader.popOrGoLibrary(context);
   }
 
   Future<void> _handleSave() async {
     if (_saving) {
       return;
     }
-    final ComicMetadataFormValidation validation = _form.validate();
-    if (!validation.isValid) {
-      setState(() {
-        _validation = validation;
-        _selectedTab = _EditMetadataTab.general;
-      });
+    final String? titleError = _draft.validateTitle();
+    if (titleError != null) {
+      setState(() => _titleError = titleError);
       return;
     }
 
-    final SeriesItemMembership? seed = _seriesSortSeed;
-    double? parsedSortOrder;
-    if (seed != null) {
-      final String trimmed = _sortOrderText.trim();
+    final SeriesItemMembership? seed = _seed;
+    final String? sortText = _draft.seriesSortOrderText;
+    double? sortOrder;
+    if (seed != null && sortText != null) {
+      final String trimmed = sortText.trim();
       final double? parsed = double.tryParse(trimmed);
       if (trimmed.isEmpty || parsed == null || !parsed.isFinite) {
-        setState(() {
-          _sortOrderError = context.l10n.formSeriesItemSortOrderInvalid;
-          _selectedTab = _EditMetadataTab.general;
-        });
+        showCustomToast(
+          context,
+          message: context.l10n.formSeriesItemSortOrderInvalid,
+          type: AppToastType.error,
+        );
         return;
       }
-      parsedSortOrder = parsed;
+      sortOrder = parsed;
     }
 
-    setState(() {
-      _validation = null;
-      _sortOrderError = null;
-      _saving = true;
-    });
+    setState(() => _saving = true);
     try {
       final ComicMetadataEditorNotifier editor = ref.read(
         comicMetadataEditorProvider.notifier,
       );
-      await editor.apply(_form.normalized, widget.comic);
-      if (seed != null && parsedSortOrder != null) {
+      await editor.apply(
+        comicMetadataFormFromDraft(_draft, widget.comic).normalized,
+        widget.comic,
+      );
+      if (seed != null && sortOrder != null) {
         await editor.persistSeriesSort(
           comicId: widget.comic.comicId,
           seed: seed,
-          sortOrder: parsedSortOrder,
-          draftLocked: _sortOrderLocked,
+          sortOrder: sortOrder,
+          draftLocked: seed.sortOrderLocked,
         );
       }
       if (mounted) {
         showSuccessToast(context, context.l10n.commonSavedToast);
-        _leaveAfterSave();
+        _leave();
       }
     } catch (error, stackTrace) {
       logError(AppLog.ui('editMetadata'), '保存漫画元数据失败', error, stackTrace);
@@ -306,174 +225,43 @@ class _ComicMetadataEditMd3eViewState
     }
   }
 
-  Widget _buildTabPane(AppThemeTokens tokens) {
-    return switch (_selectedTab) {
-      _EditMetadataTab.general => _EditMetadataGeneralTab(
-        title: _form.title,
-        titleError: _validation?.titleError,
-        description: _form.description ?? '',
-        publishedAt: _form.publishedAt,
-        isR18: _form.isR18,
-        languages: _form.languages,
-        locks: _locks,
-        lockBusy: _lockBusy || _saving,
-        showSeriesSort: _seriesSortSeed != null,
-        sortOrderText: _sortOrderText,
-        sortOrderLocked: _sortOrderLocked,
-        sortOrderError: _sortOrderError,
-        onTitleChanged: (String value) {
-          setState(() {
-            _form = _form.copyWith(title: value);
-            if (_validation?.titleError != null) {
-              _validation = const ComicMetadataFormValidation();
-            }
-          });
-        },
-        onDescriptionChanged: (String value) {
-          _updateForm((ComicMetadataForm f) => f.copyWith(description: value));
-        },
-        onPublishedAtChanged: (DateTime? value) {
-          _updateForm((ComicMetadataForm f) => f.copyWith(publishedAt: value));
-        },
-        onIsR18Changed: (bool value) {
-          _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
-        },
-        onAddLanguage: (String name) {
-          _updateForm((ComicMetadataForm f) => f.addLanguage(name));
-        },
-        onRemoveLanguage: (String name) {
-          _updateForm((ComicMetadataForm f) => f.removeLanguage(name));
-        },
-        onSortOrderChanged: (String value) {
-          setState(() {
-            _sortOrderText = value;
-            if (_sortOrderError != null) {
-              _sortOrderError = null;
-            }
-          });
-        },
-        onSortOrderLockedChanged: (bool locked) {
-          setState(() => _sortOrderLocked = locked);
-        },
-        onLockChanged: _setLock,
-      ),
-      _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
-        scope: (
-          comicId: widget.comic.comicId,
-          title: _form.title,
-          resourcePath: widget.comic.path,
-          seriesId: _seriesSortSeed?.seriesId,
-        ),
-        authors: _form.authors,
-        tags: _form.tags,
-        parodies: _form.parodies,
-        characters: _form.characters,
-        locks: _locks,
-        lockBusy: _lockBusy || _saving,
-        onAddAuthor: (String name) {
-          _updateForm((ComicMetadataForm f) => f.addAuthor(name));
-        },
-        onRemoveAuthor: (String name) {
-          _updateForm((ComicMetadataForm f) => f.removeAuthor(name));
-        },
-        onAddTag: (String name) {
-          _updateForm((ComicMetadataForm f) => f.addTag(name));
-        },
-        onRemoveTag: (String name) {
-          _updateForm((ComicMetadataForm f) => f.removeTag(name));
-        },
-        onAddParody: (String name) {
-          _updateForm((ComicMetadataForm f) => f.addParody(name));
-        },
-        onRemoveParody: (String name) {
-          _updateForm((ComicMetadataForm f) => f.removeParody(name));
-        },
-        onAddCharacter: (String name) {
-          _updateForm((ComicMetadataForm f) => f.addCharacter(name));
-        },
-        onRemoveCharacter: (String name) {
-          _updateForm((ComicMetadataForm f) => f.removeCharacter(name));
-        },
-        onLockChanged: _setLock,
-      ),
-    };
+  void _leave() {
+    final NavigatorState navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return ColoredBox(
-      color: cs.surface,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            const DetailBackHeader(),
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                tokens.spacing.lg,
-                0,
-                tokens.spacing.lg,
-                tokens.spacing.md,
-              ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: CapsuleTabBar(
-                  items: _capsuleTabs(l10n),
-                  selectedIndex: _selectedTab.index,
-                  onSelected: _selectTab,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 720),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                      tokens.spacing.lg,
-                      0,
-                      tokens.spacing.lg,
-                      tokens.spacing.xs,
-                    ),
-                    child: _buildTabPane(tokens),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(tokens.spacing.lg),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  TextButton(
-                    onPressed: _saving
-                        ? null
-                        : () => DetailBackHeader.popOrGoLibrary(context),
-                    child: Text(l10n.commonCancel),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    onPressed: _saving ? null : _handleSave,
-                    child: _saving
-                        ? SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: cs.onPrimary,
-                            ),
-                          )
-                        : Text(l10n.commonSaveChanges),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+    return Md3eMetadataEditSurface(
+      presentation: Md3eMetadataEditPresentation.embedded,
+      title: l10n.dialogEditMetadataTitle,
+      onCancel: _leave,
+      onSave: _handleSave,
+      saving: _saving,
+      body: Md3eComicMetadataEditForm(
+        draft: _draft,
+        locks: _locks,
+        onLockChanged: _setLock,
+        titleError: _titleError,
+        onDraftChanged: (Md3eComicMetadataEditDraft value) {
+          setState(() {
+            _draft = value;
+            if (_titleError != null && value.validateTitle() == null) {
+              _titleError = null;
+            }
+          });
+        },
       ),
     );
   }
+}
+
+String _formatSortOrder(double value) {
+  if (value == value.roundToDouble()) {
+    return value.round().toString();
+  }
+  return value.toString();
 }

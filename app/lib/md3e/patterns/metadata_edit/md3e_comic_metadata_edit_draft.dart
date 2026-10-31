@@ -12,6 +12,7 @@ class Md3eComicMetadataEditDraft {
     this.authors = const <String>[],
     this.characters = const <String>[],
     this.tags = const <String>[],
+    this.seriesSortOrderText,
   });
 
   final String title;
@@ -23,6 +24,9 @@ class Md3eComicMetadataEditDraft {
   final List<String> authors;
   final List<String> characters;
   final List<String> tags;
+
+  /// 所属系列内排序文本；null 表示该漫画不属于系列，不显示排序字段。
+  final String? seriesSortOrderText;
 
   factory Md3eComicMetadataEditDraft.fromEntry(Md3eComicDetailEntry entry) {
     return Md3eComicMetadataEditDraft(
@@ -48,6 +52,7 @@ class Md3eComicMetadataEditDraft {
     List<String>? authors,
     List<String>? characters,
     List<String>? tags,
+    String? seriesSortOrderText,
   }) {
     return Md3eComicMetadataEditDraft(
       title: title ?? this.title,
@@ -59,6 +64,7 @@ class Md3eComicMetadataEditDraft {
       authors: authors ?? this.authors,
       characters: characters ?? this.characters,
       tags: tags ?? this.tags,
+      seriesSortOrderText: seriesSortOrderText ?? this.seriesSortOrderText,
     );
   }
 
