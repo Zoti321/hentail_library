@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/layout/md3e_fab_sizing.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/motion/md3e_spring_reveal.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -86,9 +87,7 @@ class _Md3eLibraryScrollToTopButtonState
     final M3EThemeData theme = M3ETheme.of(context);
     final double width = MediaQuery.sizeOf(context).width;
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(width);
-    final M3EFabSize fabSize = Md3eLibraryBrowsePageMetrics.scrollToTopFabSize(
-      sizeClass,
-    );
+    final M3EFabSize fabSize = Md3eFabSizing.responsive(sizeClass);
     final M3EFabMetrics metrics = theme.fabTheme.resolve(
       size: fabSize,
       color: M3EFabColor.primary,

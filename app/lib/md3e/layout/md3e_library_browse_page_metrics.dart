@@ -1,4 +1,5 @@
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/layout/md3e_fab_sizing.dart';
 import 'package:hentai_library/md3e/layout/md3e_pinned_toolbar_chrome_metrics.dart';
 import 'package:hentai_library/md3e/layout/md3e_spacing.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
@@ -20,26 +21,6 @@ abstract final class Md3eLibraryBrowsePageMetrics {
 
   /// FAB 圆角（regular 规格默认 16；较大尺寸也统一为 16）。
   static const double scrollToTopCornerRadius = Md3eSpacing.space16;
-
-  /// 响应式 [M3EFab] 尺寸（56 / 80 / 96dp 容器）。
-  static M3EFabSize scrollToTopFabSize(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact ||
-      Md3eWindowSizeClass.medium => M3EFabSize.regular,
-      Md3eWindowSizeClass.expanded => M3EFabSize.medium,
-      Md3eWindowSizeClass.large || Md3eWindowSizeClass.extraLarge =>
-        M3EFabSize.large,
-    };
-  }
-
-  static double _scrollToTopFabContainerExtent(M3EFabSize size) {
-    return switch (size) {
-      M3EFabSize.small => 40,
-      M3EFabSize.regular => 56,
-      M3EFabSize.medium => 80,
-      M3EFabSize.large => 96,
-    };
-  }
 
   static double contentHorizontalPadding(Md3eWindowSizeClass sizeClass) {
     return Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(sizeClass);
@@ -70,8 +51,8 @@ abstract final class Md3eLibraryBrowsePageMetrics {
 
   /// Extra scroll padding so the FAB does not cover pagination.
   static double scrollBottomInset(Md3eWindowSizeClass sizeClass) {
-    final M3EFabSize fabSize = scrollToTopFabSize(sizeClass);
+    final M3EFabSize fabSize = Md3eFabSizing.responsive(sizeClass);
     return paginationVerticalSpacing(sizeClass) +
-        _scrollToTopFabContainerExtent(fabSize);
+        Md3eFabSizing.containerExtent(fabSize);
   }
 }

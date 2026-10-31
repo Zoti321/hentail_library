@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/md3e/layout/md3e_fab_sizing.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
@@ -31,7 +31,7 @@ class Md3eManagementCreateEntityFab extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final double width = MediaQuery.sizeOf(context).width;
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(width);
-    final M3EFabSize fabSize = _fabSizeFor(sizeClass);
+    final M3EFabSize fabSize = Md3eFabSizing.responsive(sizeClass);
     final M3EFabMetrics metrics = theme.fabTheme.resolve(
       size: fabSize,
       color: M3EFabColor.primary,
@@ -57,20 +57,5 @@ class Md3eManagementCreateEntityFab extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// 鼠标平台（Windows / macOS / Linux）用小号 FAB 与更小热区；窄窗口仍用 regular。
-  /// 触屏平台沿用书库同款响应式尺寸。
-  static M3EFabSize _fabSizeFor(Md3eWindowSizeClass sizeClass) {
-    final bool pointerPlatform = switch (defaultTargetPlatform) {
-      TargetPlatform.windows ||
-      TargetPlatform.macOS ||
-      TargetPlatform.linux => true,
-      _ => false,
-    };
-    if (!pointerPlatform) {
-      return Md3eLibraryBrowsePageMetrics.scrollToTopFabSize(sizeClass);
-    }
-    return sizeClass.isCompact ? M3EFabSize.regular : M3EFabSize.small;
   }
 }
