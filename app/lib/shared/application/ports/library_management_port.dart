@@ -34,7 +34,4 @@ abstract interface class LibraryManagementPort {
   });
 
   Future<void> scanAllLibraries({ScanMode mode = ScanMode.incremental});
-
-  /// 展示扫描进度对话框（扫描由调用方先行发起）。
-  Future<void> showScanProgressDialog(BuildContext context);
 }

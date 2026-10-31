@@ -14,6 +14,8 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/m
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/data/recent_metadata_backup_at.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/metadata_export_flow.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/views/metadata_backup_settings_sections.dart';
 import 'package:hentai_library/features/app_settings/di/shared_state_ports.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
@@ -86,6 +88,15 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
   ),
   metadataBackupSettingsSectionBuilderProvider.overrideWithValue(
     (BuildContext context) => const MetadataBackupSettingsSections(),
+  ),
+  libraryMetadataExportActionProvider.overrideWithValue(
+    (BuildContext context, String libraryId) => runMetadataExportFlow(
+      context,
+      initialOptions: MetadataExportOptions(
+        currentLibraryOnly: true,
+        libraryId: libraryId,
+      ),
+    ),
   ),
   recentMetadataBackupAtReaderProvider.overrideWithValue(
     readRecentMetadataBackupAt,

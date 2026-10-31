@@ -3,15 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/dialogs/library_form_dialog.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/dialogs/scan_progress_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_md3e_confirm_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_md3e_form_dialog.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:hentai_library/shared/application/ports/library_management_port.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
 
 /// library_admin 对 [LibraryManagementPort] 的实现（#292）。
 ///
@@ -22,23 +21,25 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
   final Ref _ref;
 
   @override
-  Future<void> addLocalLibrary(BuildContext context) => showLibraryFormDialog(
-    context: context,
-    mode: LibraryFormMode.createLocal,
-  );
+  Future<void> addLocalLibrary(BuildContext context) =>
+      showLibraryMd3eFormDialog(
+        context: context,
+        mode: LibraryFormMode.createLocal,
+      );
 
   @override
-  Future<void> addRemoteLibrary(BuildContext context) => showLibraryFormDialog(
-    context: context,
-    mode: LibraryFormMode.createRemote,
-  );
+  Future<void> addRemoteLibrary(BuildContext context) =>
+      showLibraryMd3eFormDialog(
+        context: context,
+        mode: LibraryFormMode.createRemote,
+      );
 
   @override
   Future<void> editRemoteLibrary(BuildContext context, LocalLibrary library) {
     if (!isRemoteLibrary(library)) {
       return Future<void>.value();
     }
-    return showLibraryFormDialog(
+    return showLibraryMd3eFormDialog(
       context: context,
       mode: LibraryFormMode.edit,
       library: library,
@@ -49,7 +50,7 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
   Future<void> editLibrarySettings(
     BuildContext context,
     LocalLibrary library,
-  ) => showLibraryFormDialog(
+  ) => showLibraryMd3eFormDialog(
     context: context,
     mode: LibraryFormMode.edit,
     library: library,
@@ -61,13 +62,10 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     LocalLibrary library, {
     bool navigateAfter = true,
   }) async {
-    final bool confirmed =
-        await showDialog<bool>(
-          context: context,
-          builder: (BuildContext dialogContext) =>
-              RemoveSavedPathConfirmDialog(path: library.rootPath),
-        ) ??
-        false;
+    final bool confirmed = await showLibraryMd3eRemovePathConfirm(
+      context,
+      path: library.rootPath,
+    );
     if (!context.mounted || !confirmed) {
       return;
     }
@@ -170,13 +168,6 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
         .read(libraryScanCommandPortProvider)
         .start(mode: mode, syncAll: true, silent: true);
   }
-
-  @override
-  Future<void> showScanProgressDialog(BuildContext context) => showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => const ScanProgressDialog(),
-  );
 }
 
 LibraryManagementPort createLibraryManagementPort(Ref ref) =>

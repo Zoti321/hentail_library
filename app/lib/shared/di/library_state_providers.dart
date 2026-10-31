@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/library/current_library_port.dart';
 import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_edit_command_port.dart';
@@ -49,6 +50,15 @@ comicMetadataBulkEditCommandPortProvider =
     Provider<ComicMetadataBulkEditCommandPort>(
       (Ref ref) => throw UnimplementedError(
         'comicMetadataBulkEditCommandPortProvider 未注入，请在 bootstrap 中 override',
+      ),
+    );
+
+/// 导出当前库元数据：实现位于 metadata_backup，由 bootstrap 注入，library_browse 不直接依赖 metadata_backup。
+final Provider<Future<void> Function(BuildContext context, String libraryId)>
+libraryMetadataExportActionProvider =
+    Provider<Future<void> Function(BuildContext context, String libraryId)>(
+      (Ref ref) => throw UnimplementedError(
+        'libraryMetadataExportActionProvider 未注入，请在 bootstrap 中 override',
       ),
     );
 

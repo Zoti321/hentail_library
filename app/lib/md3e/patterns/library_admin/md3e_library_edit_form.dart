@@ -86,7 +86,13 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
   }
 
   void _patch(LibraryForm Function(LibraryForm f) fn) {
-    widget.onFormChanged(fn(widget.form));
+    // 文本框在 build 期间同步 initialValue 时会回调相同值；忽略无变化的更新，
+    // 避免父级在 build 中 setState。
+    final LibraryForm next = fn(widget.form);
+    if (next == widget.form) {
+      return;
+    }
+    widget.onFormChanged(next);
   }
 
   void _setResourceFormatCategory(ResourceFormatCategory group, bool enabled) {

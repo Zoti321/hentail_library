@@ -8,9 +8,10 @@ import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 库页页头「更多」菜单条目（MD3E）：刷新、选择漫画、扫描、深度扫描；扫描进行中仅显示取消扫描。
+/// 库页页头「更多」菜单条目（MD3E）：刷新、选择漫画、扫描、深度扫描、导出当前库元数据；
+/// 扫描进行中仅显示取消扫描。
 ///
-/// 行为与 Baseline 溢出菜单一致；页面大小子菜单由页头自行追加。
+/// 页面大小子菜单由页头自行追加。
 List<M3EMenuNode> buildLibraryMd3eOverflowEntries({
   required BuildContext context,
   required WidgetRef ref,
@@ -27,6 +28,11 @@ List<M3EMenuNode> buildLibraryMd3eOverflowEntries({
       ),
     ];
   }
+  final String? currentLibraryId = ref
+      .read(currentLibraryStateProvider)
+      .asData
+      ?.value
+      .currentId;
   return <M3EMenuNode>[
     M3EMenuEntry(
       label: l10n.libraryRefresh,
@@ -52,5 +58,13 @@ List<M3EMenuNode> buildLibraryMd3eOverflowEntries({
           .read(libraryScanCommandPortProvider)
           .start(mode: ScanMode.full, silent: true),
     ),
+    if (currentLibraryId != null)
+      M3EMenuEntry(
+        label: l10n.settingsMetadataBackupExportLabel,
+        leading: const Icon(Icons.download_outlined),
+        onPressed: () => ref
+            .read(libraryMetadataExportActionProvider)
+            .call(context, currentLibraryId),
+      ),
   ];
 }

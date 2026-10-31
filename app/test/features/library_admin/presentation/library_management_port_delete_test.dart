@@ -12,8 +12,7 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/destructive_filled_button.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -177,8 +176,14 @@ Future<void> _tapDelete(WidgetTester tester, String id) async {
   await tester.pumpAndSettle();
 }
 
+/// MD3E 确认对话框：按钮顺序为「取消」「移除」，最后一个为确认。
+Finder _dialogButtons() => find.descendant(
+  of: find.byType(M3EDialog),
+  matching: find.byType(M3EButton),
+);
+
 Future<void> _confirmRemove(WidgetTester tester) async {
-  await tester.tap(find.byType(DestructiveFilledButton));
+  await tester.tap(_dialogButtons().last);
   await tester.pumpAndSettle();
 }
 
@@ -239,14 +244,7 @@ void main() {
     );
 
     await _tapDelete(tester, 'a');
-    await tester.tap(
-      find
-          .descendant(
-            of: find.byType(HentaiDialog),
-            matching: find.byType(TextButton),
-          )
-          .first,
-    );
+    await tester.tap(_dialogButtons().first);
     await tester.pumpAndSettle();
 
     expect(h.repo.libraries.length, 2);
