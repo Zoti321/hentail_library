@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -12,13 +10,13 @@ import 'package:hentai_library/shared/domain/repositories/named_facet_management
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_entity_dialog.dart';
-
 /// 当前维度的名称列表（chip 流）：加载 / 错误 / 空 / 列表 / 底部状态。
 class MetadataMd3eFacetSliver extends ConsumerWidget {
   const MetadataMd3eFacetSliver({
     required this.kind,
     required this.horizontalPadding,
+    required this.onCreatePressed,
+    this.draftChip,
     this.mergeTarget,
     this.mergeSources = const <String>{},
     this.onMergeTargetSelected,
@@ -26,6 +24,12 @@ class MetadataMd3eFacetSliver extends ConsumerWidget {
     this.onMergeSelectionExited,
     super.key,
   });
+
+  /// 空态「添加」按钮与 FAB 共用的新建入口（由页面按断点决定 Dialog / 内联）。
+  final VoidCallback onCreatePressed;
+
+  /// 桌面端内联新建草稿 chip，挂在 chip 流末尾；移动端为 null。
+  final Widget? draftChip;
 
   final ManagedNamedFacetKind kind;
   final double horizontalPadding;
@@ -51,15 +55,27 @@ class MetadataMd3eFacetSliver extends ConsumerWidget {
             .refresh(),
       );
     } else if (state.items.isEmpty) {
-      child = _FacetEmpty(
-        kind: kind,
-        hasSearchQuery: state.hasSearchQuery,
-        onCreate: () => _openCreate(context, ref),
+      child = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          _FacetEmpty(
+            kind: kind,
+            hasSearchQuery: state.hasSearchQuery,
+            onCreate: onCreatePressed,
+          ),
+          if (draftChip != null)
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: <Widget>[draftChip!],
+            ),
+        ],
       );
     } else {
       child = _FacetList(
         kind: kind,
         state: state,
+        draftChip: draftChip,
         mergeTarget: mergeTarget,
         mergeSources: mergeSources,
         onMergeTargetSelected: onMergeTargetSelected,
@@ -73,21 +89,6 @@ class MetadataMd3eFacetSliver extends ConsumerWidget {
     );
   }
 
-  void _openCreate(BuildContext context, WidgetRef ref) {
-    unawaited(
-      showMd3eManagementCreateEntityDialog(
-        context: context,
-        facet: kind,
-        onCreate: (String name) {
-          unawaited(
-            ref
-                .read(namedFacetManagementControllerProvider(kind).notifier)
-                .add(name),
-          );
-        },
-      ),
-    );
-  }
 }
 
 class _FacetList extends ConsumerWidget {
@@ -95,6 +96,7 @@ class _FacetList extends ConsumerWidget {
     required this.kind,
     required this.state,
     required this.mergeSources,
+    this.draftChip,
     this.mergeTarget,
     this.onMergeTargetSelected,
     this.onMergeSourceSelected,
@@ -103,6 +105,7 @@ class _FacetList extends ConsumerWidget {
 
   final ManagedNamedFacetKind kind;
   final NamedFacetManagementState state;
+  final Widget? draftChip;
   final String? mergeTarget;
   final Set<String> mergeSources;
   final ValueChanged<String>? onMergeTargetSelected;
@@ -148,6 +151,7 @@ class _FacetList extends ConsumerWidget {
                 onMergeSourceSelected: onMergeSourceSelected,
                 onMergeSelectionExited: onMergeSelectionExited,
               ),
+            ?draftChip,
           ],
         ),
         if (hasError) ...<Widget>[

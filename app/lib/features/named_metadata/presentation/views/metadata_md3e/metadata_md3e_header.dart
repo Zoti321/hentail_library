@@ -3,7 +3,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:hentai_library/md3e/widgets/actions/md3e_filled_button.dart';
-import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -19,8 +18,6 @@ class MetadataMd3eHeader extends StatelessWidget {
     required this.compact,
     required this.totalCount,
     required this.showDeleteAllTags,
-    required this.addTooltip,
-    required this.onAdd,
     this.onOpenNavigation,
     this.onDeleteAllTags,
     this.mergeSelectionCount = 0,
@@ -32,8 +29,6 @@ class MetadataMd3eHeader extends StatelessWidget {
   final bool compact;
   final int totalCount;
   final bool showDeleteAllTags;
-  final String addTooltip;
-  final VoidCallback onAdd;
   final VoidCallback? onOpenNavigation;
   final VoidCallback? onDeleteAllTags;
   final int mergeSelectionCount;
@@ -109,14 +104,6 @@ class MetadataMd3eHeader extends StatelessWidget {
               semanticLabel: l10n.commonDelete,
               onPressed: onDeleteAllTags,
             ),
-          M3EIconButton(
-            icon: const Icon(Symbols.add),
-            variant: M3EIconButtonVariant.tonal,
-            size: M3EIconButtonSize.sm,
-            tooltip: addTooltip,
-            semanticLabel: addTooltip,
-            onPressed: onAdd,
-          ),
         ],
       );
     }
@@ -130,30 +117,6 @@ class MetadataMd3eHeader extends StatelessWidget {
         height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
         child: content,
       ),
-    );
-  }
-}
-
-/// 名称搜索框（M3E 轮廓输入框）。
-class MetadataMd3eSearchField extends StatelessWidget {
-  const MetadataMd3eSearchField({
-    required this.initialQuery,
-    required this.onChanged,
-    super.key,
-  });
-
-  final String initialQuery;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final String hint = context.l10n.metadataSearchNameHint;
-    return Md3eOutlinedTextField(
-      label: hint,
-      hintText: hint,
-      initialValue: initialQuery,
-      leading: const Icon(Symbols.search),
-      onChanged: onChanged,
     );
   }
 }
