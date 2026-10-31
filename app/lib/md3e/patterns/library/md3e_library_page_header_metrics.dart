@@ -19,7 +19,7 @@ abstract final class Md3eLibraryPageHeaderMetrics {
   static const double browsePinnedHeaderBottomPadding = 4;
   static const double actionIconSize = 20;
 
-  /// 与生产 [LibraryDisplayTargetTabs] 一致的两 tab 间距。
+  /// 与旧 Baseline 库页 display target tabs 一致的两 tab 间距。
   static const double displayTargetTabGap = 16;
 
   static const double displayTargetIndicatorHeight = 2;

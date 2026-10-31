@@ -9,7 +9,7 @@ const double kMd3eLibraryFilterSortDrawerContentInset = 16;
 /// 筛选抽屉 scrim：32% 黑，不绑 token（MASTER §9 第 50 条）。
 const Color kMd3eLibraryFilterSortDrawerScrimColor = Color(0x52000000);
 
-/// 与生产 [LibraryLayoutTier] 一致的三档，用于抽屉宽度（600 / 1024 阈值）。
+/// 与旧 Baseline 库页布局档位一致的三档，用于抽屉宽度（600 / 1024 阈值）。
 enum Md3eLibraryFilterSortLayoutTier { compact, medium, expanded }
 
 Md3eLibraryFilterSortLayoutTier md3eLibraryFilterSortLayoutTierForWidth(
@@ -24,7 +24,7 @@ Md3eLibraryFilterSortLayoutTier md3eLibraryFilterSortLayoutTierForWidth(
   return Md3eLibraryFilterSortLayoutTier.expanded;
 }
 
-/// 筛选排序 end drawer 宽度（对齐 `libraryFilterSortDrawerWidth`）。
+/// 筛选排序 end drawer 宽度（沿用旧 Baseline 库页的断点策略）。
 double md3eLibraryFilterSortDrawerWidth(
   Md3eLibraryFilterSortLayoutTier tier,
   double viewportWidth,
