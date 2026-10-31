@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_open_error_message.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/reader_open_error_message.dart';
 
 /// Read session 打开失败：分类文案 + 返回详情 + 可选重试。
 class ReaderOpenErrorPanel extends StatelessWidget {

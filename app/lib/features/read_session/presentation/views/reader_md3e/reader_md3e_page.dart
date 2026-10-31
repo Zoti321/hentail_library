@@ -12,10 +12,10 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_cover_editor_notifier.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_series_navigation.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_content.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_open_error_panel.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_settings_dialog.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/reader_content.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/reader_open_error_panel.dart';
+import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_md3e_settings_sheet.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/reader_auto_play_binder.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
@@ -300,7 +300,7 @@ class ReaderMd3ePage extends HookConsumerWidget {
                           ? controller.setAutoPlayEnabled
                           : null,
                       onOpenSettings: () {
-                        showReaderSettingsDialog(context);
+                        unawaited(ReaderMd3eSettingsSheet.show(context));
                       },
                       onOpenSeriesCatalog: seriesNavContext == null
                           ? null

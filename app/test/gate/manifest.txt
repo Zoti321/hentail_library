@@ -34,7 +34,7 @@ test/features/library_browse/presentation/views/author_detail_md3e/author_detail
 test/features/library_browse/presentation/views/author_detail_md3e/author_image_view_test.dart
 test/features/read_session/presentation/reader_viewport_pages_test.dart
 test/features/read_session/presentation/reader_open_error_message_test.dart
-test/features/read_session/presentation/views/reader_page/reader_chrome_layout_test.dart
+test/features/read_session/presentation/views/reader_md3e/reader_md3e_settings_sheet_test.dart
 test/features/library_admin/presentation/views/library_md3e/library_md3e_form_dialog_test.dart
 test/features/library_browse/presentation/views/metadata_edit_md3e/series_metadata_edit_md3e_view_test.dart
 

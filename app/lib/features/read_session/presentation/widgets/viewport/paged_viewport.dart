@@ -12,7 +12,7 @@ import 'package:hentai_library/features/read_session/presentation/widgets/viewpo
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_pages.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/resume_visible_sync_gate.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_image_item.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PagedViewport extends HookConsumerWidget {

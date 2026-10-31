@@ -10,7 +10,7 @@ import 'package:hentai_library/features/read_session/domain/reader_session_snaps
 import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/read_session/presentation/reader_exit_location.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';

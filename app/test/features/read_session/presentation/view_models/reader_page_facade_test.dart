@@ -6,7 +6,7 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
