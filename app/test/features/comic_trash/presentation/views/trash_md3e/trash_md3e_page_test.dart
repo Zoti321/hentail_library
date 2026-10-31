@@ -2,23 +2,22 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_page.dart';
+import 'package:hentai_library/shared/di/comic_cover_providers.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
+import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/features/comic_trash/presentation/views/trash_page/trash_page.dart';
-import 'package:hentai_library/shared/di/comic_cover_providers.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-import '../../../../support/pump_localized_app.dart';
-
-import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
+import '../../../../../support/pump_localized_app.dart';
 
 class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   final StreamController<void> events = StreamController<void>.broadcast();
@@ -91,7 +90,7 @@ Future<void> _pumpTrash(WidgetTester tester, List<TrashedComic> items) async {
   addTearDown(revision.events.close);
   await pumpLocalizedApp(
     tester,
-    home: const Scaffold(body: TrashPage()),
+    home: const Scaffold(body: TrashMd3ePage()),
     overrides: <Override>[
       libraryRevisionPortProvider.overrideWithValue(revision),
       comicTrashRepositoryProvider.overrideWithValue(_TrashComicRepo(items)),
@@ -132,18 +131,17 @@ void main() {
     expect(find.text('全部删除'), findsOneWidget);
   });
 
-  testWidgets('starts in selection mode and uses cover corner badges', (
+  testWidgets('tapping a row toggles selection and switches header actions', (
     WidgetTester tester,
   ) async {
     await _pumpTrash(tester, <TrashedComic>[_trashed('a'), _trashed('b')]);
 
-    expect(find.byType(Checkbox), findsNothing);
-    expect(find.byIcon(LucideIcons.check), findsNothing);
+    expect(find.byIcon(Symbols.check_circle), findsNothing);
 
     await tester.tap(find.text('Title a'));
     await tester.pumpAndSettle();
     expect(find.text('已选 1 本'), findsOneWidget);
-    expect(find.byIcon(LucideIcons.check), findsOneWidget);
+    expect(find.byIcon(Symbols.check_circle), findsOneWidget);
     expect(find.text('恢复选中'), findsOneWidget);
     expect(find.text('删除选中'), findsOneWidget);
   });

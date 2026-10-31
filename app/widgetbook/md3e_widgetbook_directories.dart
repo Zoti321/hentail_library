@@ -9,6 +9,7 @@ import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
 import 'package:hentai_library/md3e/pages/md3e_home_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
+import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page_lab_host.dart';
 import 'package:hentai_library/md3e/pages/md3e_history_browse_page_preview_data.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
@@ -315,6 +316,32 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: Md3eHistoryBrowsePageLabHost(
                       clock: DateTime(2026, 6, 15, 14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eTrashPurgeConfirmDialog',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Single local',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Center(
+                      child: Md3eTrashPurgeConfirmDialog(
+                        title: '只有神知道的世界',
+                        counts: (local: 1, remote: 0),
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Mixed batch',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Center(
+                      child: Md3eTrashPurgeConfirmDialog(
+                        counts: (local: 2, remote: 3),
+                      ),
                     ),
                   ),
                 ),
