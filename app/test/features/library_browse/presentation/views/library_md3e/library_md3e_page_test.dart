@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -9,12 +10,15 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_page.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_selection_header.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/di/series_cover_providers.dart';
 import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -108,11 +112,21 @@ LibraryPageFacadeState _facade(LibraryDisplayTarget target) {
   );
 }
 
+class _FixedCatalogSelection extends CatalogSelectionNotifier {
+  _FixedCatalogSelection(this._state);
+
+  final CatalogSelectionState _state;
+
+  @override
+  CatalogSelectionState build() => _state;
+}
+
 Future<void> _pumpLibraryMd3ePage(
   WidgetTester tester, {
   required LibraryDisplayTarget target,
   required List<Comic> comics,
   List<Series> series = const <Series>[],
+  CatalogSelectionState? selection,
 }) async {
   tester.view.physicalSize = const Size(900, 800);
   tester.view.devicePixelRatio = 1.0;
@@ -155,6 +169,14 @@ Future<void> _pumpLibraryMd3ePage(
           ),
         ),
         currentLibraryStateProvider.overrideWithValue(_currentLibrary),
+        libraryScanActivityStateProvider.overrideWithValue((
+          running: false,
+          scanMode: ScanMode.incremental,
+        )),
+        if (selection != null)
+          catalogSelectionProvider.overrideWith(
+            () => _FixedCatalogSelection(selection),
+          ),
         ...coverOverrides,
       ],
       child: MaterialApp(
@@ -232,5 +254,24 @@ void main() {
     );
 
     expect(find.text(l10n.libraryEmptyTitle), findsOneWidget);
+  });
+
+  testWidgets('selection mode swaps the page header for the selection header', (
+    WidgetTester tester,
+  ) async {
+    await _pumpLibraryMd3ePage(
+      tester,
+      target: LibraryDisplayTarget.comics,
+      comics: <Comic>[_comic('c1', 'Comic One'), _comic('c2', 'Comic Two')],
+      selection: const CatalogSelectionState(
+        active: true,
+        selectedIds: <String>{'c1'},
+      ),
+    );
+
+    expect(find.byType(Md3eLibrarySelectionHeader), findsOneWidget);
+    expect(find.byType(Md3eLibraryPageHeader), findsNothing);
+    expect(find.text(l10n.catalogSelectionSelectedCount(1)), findsOneWidget);
+    expect(find.byType(Md3eComicCard), findsNWidgets(2));
   });
 }

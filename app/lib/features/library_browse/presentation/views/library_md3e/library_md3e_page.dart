@@ -10,7 +10,10 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_series_catalog_controller.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_filter_sort_drawer.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_overflow_entries.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_selection_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/md3e_comic_card_actions.dart';
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid.dart';
@@ -25,6 +28,7 @@ import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
+import 'package:hentai_library/shared/domain/library/library_scan_activity_state.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -130,6 +134,12 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     final String? libraryName = ref.watch(
       currentLibraryStateProvider.select(_currentLibraryDisplayName),
     );
+    final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
+    final bool scanning = ref.watch(
+      libraryScanActivityStateProvider.select(
+        (LibraryScanActivityState state) => state.running,
+      ),
+    );
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
       MediaQuery.sizeOf(context).width,
     );
@@ -161,17 +171,33 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 0),
                   sliver: SliverToBoxAdapter(
-                    child: Md3eLibraryPageHeader(
-                      title: libraryName,
-                      filterSortActive: facade.isFilterSortCustomized,
-                      pageSize: target == LibraryDisplayTarget.comics
-                          ? facade.comicsPageSize
-                          : facade.seriesPageSize,
-                      onPageSizeChanged: (int size) {
-                        facadeNotifier.setPageSize(size);
-                      },
-                      onFilterSort: _openFilterSortDrawer,
-                    ),
+                    child: selection.active
+                        ? Md3eLibrarySelectionHeader(
+                            pageComicIds: <String>[
+                              for (final Comic comic
+                                  in comicsCatalog?.items ?? const <Comic>[])
+                                comic.comicId,
+                            ],
+                          )
+                        : Md3eLibraryPageHeader(
+                            title: libraryName,
+                            filterSortActive: facade.isFilterSortCustomized,
+                            pageSize: target == LibraryDisplayTarget.comics
+                                ? facade.comicsPageSize
+                                : facade.seriesPageSize,
+                            onPageSizeChanged: (int size) {
+                              facadeNotifier.setPageSize(size);
+                            },
+                            onFilterSort: _openFilterSortDrawer,
+                            overflowMenuEntries:
+                                buildLibraryMd3eOverflowEntries(
+                                  context: context,
+                                  ref: ref,
+                                  scanning: scanning,
+                                  showSelectionEntry:
+                                      target == LibraryDisplayTarget.comics,
+                                ),
+                          ),
                   ),
                 ),
                 SliverPadding(
@@ -203,6 +229,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                   horizontal: horizontal,
                   comicsCatalog: comicsCatalog,
                   seriesCatalog: seriesCatalog,
+                  selection: selection,
                 ),
                 if (pagination != null && pagination.totalPages > 1)
                   SliverPadding(
@@ -242,6 +269,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     required double horizontal,
     required LibraryComicsCatalogState? comicsCatalog,
     required LibrarySeriesCatalogState? seriesCatalog,
+    required CatalogSelectionState selection,
   }) {
     final AppLocalizations l10n = context.l10n;
     switch (target) {
@@ -271,11 +299,17 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                 return Md3eComicCardActions(
                   key: ValueKey<String>(comic.comicId),
                   comic: comic,
+                  enabled: !selection.active,
                   child: Md3eComicCard(
                     title: comic.title,
                     subtitle: l10n.comicDetailPageCount(comic.pageCount),
                     cover: ComicCoverContent(comicId: comic.comicId),
+                    selectionMode: selection.active,
+                    selected: selection.selectedIds.contains(comic.comicId),
                     onTap: () => _openComicDetail(comic.comicId),
+                    onSelectionChanged: (_) => ref
+                        .read(catalogSelectionProvider.notifier)
+                        .toggle(comic.comicId),
                   ),
                 );
               },

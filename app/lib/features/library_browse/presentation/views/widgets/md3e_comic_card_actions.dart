@@ -18,13 +18,20 @@ class Md3eComicCardActions extends ConsumerWidget {
     super.key,
     required this.comic,
     required this.child,
+    this.enabled = true,
   });
 
   final Comic comic;
   final Widget child;
 
+  /// 选择模式下设为 false，长按 / 右键不弹出操作菜单。
+  final bool enabled;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (!enabled) {
+      return child;
+    }
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
       onSecondaryTapUp: (TapUpDetails details) {

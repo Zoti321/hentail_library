@@ -12,7 +12,7 @@ part 'library_catalog_cover_viewport_notifier.g.dart';
 /// Content scroll offset of [key]'s render object within its [Scrollable].
 ///
 /// Works for both [RenderBox] and [RenderSliver] (e.g. [SliverMainAxisGroup]
-/// behind [CatalogBlocksSliverGroup]) via [RenderObject.getTransformTo] —
+/// behind a [SliverMainAxisGroup]) via [RenderObject.getTransformTo] —
 /// never cast the keyed render object to [RenderBox].
 double? measureScrollableKeyedContentOffset(GlobalKey key) {
   final BuildContext? targetContext = key.currentContext;
