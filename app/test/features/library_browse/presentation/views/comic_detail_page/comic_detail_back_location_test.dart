@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/comic_detail_back_location.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/comic_detail_back_location.dart';
 
 void main() {
   group('resolveComicDetailBackLocation', () {
