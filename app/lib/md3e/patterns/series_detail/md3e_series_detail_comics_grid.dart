@@ -50,7 +50,7 @@ class Md3eSeriesDetailComicsGrid extends StatelessWidget {
           title: item.title,
           subtitle: subtitle,
           readProgress: item.readProgress,
-          cover: ColoredBox(
+          cover: item.cover ?? ColoredBox(
             color: scheme.surfaceContainerHigh,
             child: Icon(
               Icons.image_outlined,

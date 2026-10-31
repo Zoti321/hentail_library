@@ -21,6 +21,7 @@ import 'package:hentai_library/features/library_browse/presentation/views/widget
 import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
+import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -116,6 +117,8 @@ class _SeriesDetailMd3eContentState
       pageItems: items,
       page: page,
       pageSize: pageSize,
+      comicCoverBuilder: (String comicId) =>
+          ComicCoverContent(comicId: comicId),
     );
     final AppLocalizations l10n = context.l10n;
 

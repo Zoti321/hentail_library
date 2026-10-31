@@ -20,6 +20,7 @@ import 'package:hentai_library/md3e/layout/md3e_catalog_grid.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_catalog_toolbar.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header.dart';
+import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_library_scroll_to_top_button.dart';
@@ -52,6 +53,20 @@ class LibraryMd3ePage extends ConsumerStatefulWidget {
 
 class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _headerMeasureKey = GlobalKey();
+  double? _headerExtent;
+
+  void _measureHeaderExtent(Duration _) {
+    final RenderBox? box =
+        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
+    if (!mounted || box == null) {
+      return;
+    }
+    final double height = box.size.height;
+    if (_headerExtent != height) {
+      setState(() => _headerExtent = height);
+    }
+  }
 
   @override
   void dispose() {
@@ -136,6 +151,39 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       LibraryDisplayTarget.series => seriesCatalog?.pagination,
     };
 
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+    final Widget header = KeyedSubtree(
+      key: _headerMeasureKey,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 0),
+        child: selection.active
+            ? Md3eLibrarySelectionHeader(
+                pageComicIds: <String>[
+                  for (final Comic comic
+                      in comicsCatalog?.items ?? const <Comic>[])
+                    comic.comicId,
+                ],
+              )
+            : Md3eLibraryPageHeader(
+                title: libraryName,
+                filterSortActive: facade.isFilterSortCustomized,
+                pageSize: target == LibraryDisplayTarget.comics
+                    ? facade.comicsPageSize
+                    : facade.seriesPageSize,
+                onPageSizeChanged: (int size) {
+                  facadeNotifier.setPageSize(size);
+                },
+                onFilterSort: _openFilterSortSheet,
+                overflowMenuEntries: buildLibraryMd3eOverflowEntries(
+                  context: context,
+                  ref: ref,
+                  scanning: scanning,
+                  showSelectionEntry: target == LibraryDisplayTarget.comics,
+                ),
+              ),
+      ),
+    );
+
     // 生产路径无 Md3eThemeScope，补上应用字体（同首页 HomeMd3ePage）。
     return M3ETheme(
       data: md3eWithAppFontFamily(M3ETheme.of(context)),
@@ -146,38 +194,16 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: <Widget>[
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 0),
-                  sliver: SliverToBoxAdapter(
-                    child: selection.active
-                        ? Md3eLibrarySelectionHeader(
-                            pageComicIds: <String>[
-                              for (final Comic comic
-                                  in comicsCatalog?.items ?? const <Comic>[])
-                                comic.comicId,
-                            ],
-                          )
-                        : Md3eLibraryPageHeader(
-                            title: libraryName,
-                            filterSortActive: facade.isFilterSortCustomized,
-                            pageSize: target == LibraryDisplayTarget.comics
-                                ? facade.comicsPageSize
-                                : facade.seriesPageSize,
-                            onPageSizeChanged: (int size) {
-                              facadeNotifier.setPageSize(size);
-                            },
-                            onFilterSort: _openFilterSortSheet,
-                            overflowMenuEntries:
-                                buildLibraryMd3eOverflowEntries(
-                                  context: context,
-                                  ref: ref,
-                                  scanning: scanning,
-                                  showSelectionEntry:
-                                      target == LibraryDisplayTarget.comics,
-                                ),
-                          ),
+                if (_headerExtent == null)
+                  SliverToBoxAdapter(child: header)
+                else
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: Md3eLibraryPinnedHeaderDelegate(
+                      extent: _headerExtent!,
+                      child: header,
+                    ),
                   ),
-                ),
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 0),
                   sliver: SliverToBoxAdapter(
@@ -312,13 +338,14 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
               0,
             ),
             sliver: Md3eCatalogGridSliver(
-              hasSubtitle: false,
+              hasSubtitle: true,
               itemCount: series.length,
               itemBuilder: (BuildContext context, int index, _) {
                 final Series s = series[index];
                 return Md3eComicCard(
                   key: ValueKey<String>('library-series-${s.id}'),
                   title: s.name,
+                  subtitle: context.l10n.seriesVolumeCountLabel(s.items.length),
                   cover: SeriesCoverContent(seriesId: s.id),
                   onTap: () => _openSeriesDetail(s.id),
                 );

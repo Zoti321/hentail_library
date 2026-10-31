@@ -15,6 +15,7 @@ Md3eSeriesDetailEntry seriesDetailMd3eEntry({
   required List<SeriesComicPageItem> pageItems,
   required int page,
   required int pageSize,
+  Widget Function(String comicId)? comicCoverBuilder,
 }) {
   final bool hasMetadata =
       metadata != null &&
@@ -40,6 +41,7 @@ Md3eSeriesDetailEntry seriesDetailMd3eEntry({
         Md3eSeriesDetailComicItem(
           title: item.comic.title,
           pageCount: item.comic.pageCount,
+          cover: comicCoverBuilder?.call(item.comic.comicId),
         ),
     ],
     initialPage: page,

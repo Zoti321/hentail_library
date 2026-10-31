@@ -14,11 +14,15 @@ class Md3eSeriesDetailComicItem {
     required this.title,
     this.pageCount,
     this.readProgress,
+    this.cover,
   });
 
   final String title;
   final int? pageCount;
   final double? readProgress;
+
+  /// 单册封面；为空时网格显示占位图标。
+  final Widget? cover;
 }
 
 /// Lab 系列详情数据。
