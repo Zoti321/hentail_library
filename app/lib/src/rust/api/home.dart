@@ -8,7 +8,7 @@ import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Stream<HomePageCountsDto> watchHomePageCountsFrb({required bool excludeR18}) =>
     RustLib.instance.api.crateApiHomeWatchHomePageCountsFrb(
@@ -23,6 +23,12 @@ Stream<List<HomeContinueReadingDto>> watchContinueReadingTop5Frb({
 
 Stream<List<HomeLibraryAlertDto>> watchHomeLibraryAlertsFrb() =>
     RustLib.instance.api.crateApiHomeWatchHomeLibraryAlertsFrb();
+
+Stream<List<LibraryHomeStatDto>> watchLibraryHomeStatsFrb({
+  required bool excludeR18,
+}) => RustLib.instance.api.crateApiHomeWatchLibraryHomeStatsFrb(
+  excludeR18: excludeR18,
+);
 
 Stream<List<HomeRecentlyAddedDto>> watchRecentlyAddedOnHomeFrb({
   required bool excludeR18,
@@ -179,4 +185,35 @@ class HomeRecentlyAddedDto {
           libraryId == other.libraryId &&
           libraryDisplayName == other.libraryDisplayName &&
           createdAtMs == other.createdAtMs;
+}
+
+class LibraryHomeStatDto {
+  final String libraryId;
+  final int comicCount;
+  final int seriesCount;
+  final PlatformInt64? lastSuccessfulSyncAtMs;
+
+  const LibraryHomeStatDto({
+    required this.libraryId,
+    required this.comicCount,
+    required this.seriesCount,
+    this.lastSuccessfulSyncAtMs,
+  });
+
+  @override
+  int get hashCode =>
+      libraryId.hashCode ^
+      comicCount.hashCode ^
+      seriesCount.hashCode ^
+      lastSuccessfulSyncAtMs.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LibraryHomeStatDto &&
+          runtimeType == other.runtimeType &&
+          libraryId == other.libraryId &&
+          comicCount == other.comicCount &&
+          seriesCount == other.seriesCount &&
+          lastSuccessfulSyncAtMs == other.lastSuccessfulSyncAtMs;
 }

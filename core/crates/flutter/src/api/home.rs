@@ -1,10 +1,11 @@
 use hentai_core::{
     watch_continue_reading_top5 as core_watch_top5, watch_home_library_alerts as core_watch_alerts,
     watch_home_page_counts as core_watch_counts,
+    watch_library_home_stats as core_watch_library_stats,
     watch_recently_added_on_home as core_watch_recently_added,
     HomeContinueReadingDto as CoreContinue, HomeLibraryAlertDto as CoreAlert,
     HomeLibraryAlertKindDto as CoreAlertKind, HomePageCountsDto as CoreCounts,
-    HomeRecentlyAddedDto as CoreRecentlyAdded,
+    HomeRecentlyAddedDto as CoreRecentlyAdded, LibraryHomeStatDto as CoreLibraryStat,
 };
 
 use super::init::HentaiErrorDto;
@@ -53,6 +54,25 @@ pub struct HomeRecentlyAddedDto {
     pub library_id: String,
     pub library_display_name: String,
     pub created_at_ms: i64,
+}
+
+#[derive(Debug, Clone)]
+pub struct LibraryHomeStatDto {
+    pub library_id: String,
+    pub comic_count: i32,
+    pub series_count: i32,
+    pub last_successful_sync_at_ms: Option<i64>,
+}
+
+impl From<CoreLibraryStat> for LibraryHomeStatDto {
+    fn from(v: CoreLibraryStat) -> Self {
+        Self {
+            library_id: v.library_id,
+            comic_count: v.comic_count,
+            series_count: v.series_count,
+            last_successful_sync_at_ms: v.last_successful_sync_at_ms,
+        }
+    }
 }
 
 impl From<CoreCounts> for HomePageCountsDto {
@@ -148,6 +168,20 @@ pub async fn watch_home_library_alerts_frb(
     normalize_watch_result(
         core_watch_alerts(|rows| {
             let mapped = rows.into_iter().map(HomeLibraryAlertDto::from).collect();
+            emit_or_closed(&sink, mapped)
+        })
+        .await,
+    )
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn watch_library_home_stats_frb(
+    exclude_r18: bool,
+    sink: crate::frb_generated::StreamSink<Vec<LibraryHomeStatDto>>,
+) -> Result<(), HentaiErrorDto> {
+    normalize_watch_result(
+        core_watch_library_stats(exclude_r18, |rows| {
+            let mapped = rows.into_iter().map(LibraryHomeStatDto::from).collect();
             emit_or_closed(&sink, mapped)
         })
         .await,

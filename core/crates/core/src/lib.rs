@@ -61,8 +61,9 @@ pub use history::{
 };
 pub use home::{
     watch_continue_reading_top5, watch_home_library_alerts, watch_home_page_counts,
-    watch_recently_added_on_home, HomeContinueReadingDto, HomeLibraryAlertDto,
-    HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
+    watch_library_home_stats, watch_recently_added_on_home, HomeContinueReadingDto,
+    HomeLibraryAlertDto, HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
+    LibraryHomeStatDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,

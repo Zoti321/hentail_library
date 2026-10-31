@@ -94,6 +94,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_StreamSink_list_home_recently_added_dto_Sse(dynamic raw);
 
   @protected
+  RustStreamSink<List<LibraryHomeStatDto>>
+  dco_decode_StreamSink_list_library_home_stat_dto_Sse(dynamic raw);
+
+  @protected
   RustStreamSink<List<ReadingHistoryDto>>
   dco_decode_StreamSink_list_reading_history_dto_Sse(dynamic raw);
 
@@ -319,6 +323,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LibraryDto dco_decode_library_dto(dynamic raw);
 
   @protected
+  LibraryHomeStatDto dco_decode_library_home_stat_dto(dynamic raw);
+
+  @protected
   LibraryProbeResultDto dco_decode_library_probe_result_dto(dynamic raw);
 
   @protected
@@ -371,6 +378,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<LibraryDto> dco_decode_list_library_dto(dynamic raw);
+
+  @protected
+  List<LibraryHomeStatDto> dco_decode_list_library_home_stat_dto(dynamic raw);
 
   @protected
   List<LibrarySidebarPlacementDto>
@@ -744,6 +754,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<List<LibraryHomeStatDto>>
+  sse_decode_StreamSink_list_library_home_stat_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   RustStreamSink<List<ReadingHistoryDto>>
   sse_decode_StreamSink_list_reading_history_dto_Sse(
     SseDeserializer deserializer,
@@ -1045,6 +1061,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LibraryDto sse_decode_library_dto(SseDeserializer deserializer);
 
   @protected
+  LibraryHomeStatDto sse_decode_library_home_stat_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LibraryProbeResultDto sse_decode_library_probe_result_dto(
     SseDeserializer deserializer,
   );
@@ -1107,6 +1128,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<LibraryDto> sse_decode_list_library_dto(SseDeserializer deserializer);
+
+  @protected
+  List<LibraryHomeStatDto> sse_decode_list_library_home_stat_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<LibrarySidebarPlacementDto>
@@ -1572,6 +1598,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_list_library_home_stat_dto_Sse(
+    RustStreamSink<List<LibraryHomeStatDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_list_reading_history_dto_Sse(
     RustStreamSink<List<ReadingHistoryDto>> self,
     SseSerializer serializer,
@@ -1941,6 +1973,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_library_dto(LibraryDto self, SseSerializer serializer);
 
   @protected
+  void sse_encode_library_home_stat_dto(
+    LibraryHomeStatDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_library_probe_result_dto(
     LibraryProbeResultDto self,
     SseSerializer serializer,
@@ -2015,6 +2053,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_library_dto(
     List<LibraryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_library_home_stat_dto(
+    List<LibraryHomeStatDto> self,
     SseSerializer serializer,
   );
 

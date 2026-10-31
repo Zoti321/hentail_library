@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 479003567;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -579125041;
 
 // Section: executor
 
@@ -4802,6 +4802,50 @@ fn wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
         },
     )
 }
+fn wire__crate__api__home__watch_library_home_stats_frb_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "watch_library_home_stats_frb",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_exclude_r18 = <bool>::sse_decode(&mut deserializer);
+            let api_sink = <StreamSink<
+                Vec<crate::api::home::LibraryHomeStatDto>,
+                flutter_rust_bridge::for_generated::SseCodec,
+            >>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
+                    (move || async move {
+                        let output_ok = crate::api::home::watch_library_home_stats_frb(
+                            api_exclude_r18,
+                            api_sink,
+                        )
+                        .await?;
+                        std::result::Result::Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__history__watch_reading_histories_frb_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -5073,6 +5117,19 @@ impl SseDecode
 impl SseDecode
     for StreamSink<
         Vec<crate::api::home::HomeRecentlyAddedDto>,
+        flutter_rust_bridge::for_generated::SseCodec,
+    >
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <String>::sse_decode(deserializer);
+        return StreamSink::deserialize(inner);
+    }
+}
+
+impl SseDecode
+    for StreamSink<
+        Vec<crate::api::home::LibraryHomeStatDto>,
         flutter_rust_bridge::for_generated::SseCodec,
     >
 {
@@ -5761,6 +5818,22 @@ impl SseDecode for crate::api::library::LibraryDto {
     }
 }
 
+impl SseDecode for crate::api::home::LibraryHomeStatDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_libraryId = <String>::sse_decode(deserializer);
+        let mut var_comicCount = <i32>::sse_decode(deserializer);
+        let mut var_seriesCount = <i32>::sse_decode(deserializer);
+        let mut var_lastSuccessfulSyncAtMs = <Option<i64>>::sse_decode(deserializer);
+        return crate::api::home::LibraryHomeStatDto {
+            library_id: var_libraryId,
+            comic_count: var_comicCount,
+            series_count: var_seriesCount,
+            last_successful_sync_at_ms: var_lastSuccessfulSyncAtMs,
+        };
+    }
+}
+
 impl SseDecode for crate::api::probe::LibraryProbeResultDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5966,6 +6039,20 @@ impl SseDecode for Vec<crate::api::library::LibraryDto> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::api::library::LibraryDto>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::home::LibraryHomeStatDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::home::LibraryHomeStatDto>::sse_decode(
+                deserializer,
+            ));
         }
         return ans_;
     }
@@ -7629,20 +7716,26 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        131 => wire__crate__api__history__watch_reading_histories_frb_impl(
+        131 => wire__crate__api__home__watch_library_home_stats_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        132 => wire__crate__api__home__watch_recently_added_on_home_frb_impl(
+        132 => wire__crate__api__history__watch_reading_histories_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        133 => wire__crate__api__tag__watch_tags_frb_impl(port, ptr, rust_vec_len, data_len),
-        134 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
+        133 => wire__crate__api__home__watch_recently_added_on_home_frb_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        134 => wire__crate__api__tag__watch_tags_frb_impl(port, ptr, rust_vec_len, data_len),
+        135 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -8582,6 +8675,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::library::LibraryDto>
     for crate::api::library::LibraryDto
 {
     fn into_into_dart(self) -> crate::api::library::LibraryDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::home::LibraryHomeStatDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.library_id.into_into_dart().into_dart(),
+            self.comic_count.into_into_dart().into_dart(),
+            self.series_count.into_into_dart().into_dart(),
+            self.last_successful_sync_at_ms.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::home::LibraryHomeStatDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::home::LibraryHomeStatDto>
+    for crate::api::home::LibraryHomeStatDto
+{
+    fn into_into_dart(self) -> crate::api::home::LibraryHomeStatDto {
         self
     }
 }
@@ -9974,6 +10090,18 @@ impl SseEncode
 
 impl SseEncode
     for StreamSink<
+        Vec<crate::api::home::LibraryHomeStatDto>,
+        flutter_rust_bridge::for_generated::SseCodec,
+    >
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        unimplemented!("")
+    }
+}
+
+impl SseEncode
+    for StreamSink<
         Vec<crate::api::history::ReadingHistoryDto>,
         flutter_rust_bridge::for_generated::SseCodec,
     >
@@ -10473,6 +10601,16 @@ impl SseEncode for crate::api::library::LibraryDto {
     }
 }
 
+impl SseEncode for crate::api::home::LibraryHomeStatDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.library_id, serializer);
+        <i32>::sse_encode(self.comic_count, serializer);
+        <i32>::sse_encode(self.series_count, serializer);
+        <Option<i64>>::sse_encode(self.last_successful_sync_at_ms, serializer);
+    }
+}
+
 impl SseEncode for crate::api::probe::LibraryProbeResultDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -10617,6 +10755,16 @@ impl SseEncode for Vec<crate::api::library::LibraryDto> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::api::library::LibraryDto>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::home::LibraryHomeStatDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::home::LibraryHomeStatDto>::sse_encode(item, serializer);
         }
     }
 }

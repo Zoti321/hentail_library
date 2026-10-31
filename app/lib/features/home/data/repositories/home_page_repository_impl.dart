@@ -42,6 +42,19 @@ class HomePageRepositoryImpl implements HomePageRepository {
   }
 
   @override
+  Stream<List<HomeLibraryStat>> watchLibraryStats({required bool excludeR18}) {
+    return guardFrbStream(
+      () => rust
+          .watchLibraryHomeStatsFrb(excludeR18: excludeR18)
+          .map(
+            (List<rust.LibraryHomeStatDto> rows) =>
+                rows.map(_mapLibraryStat).toList(growable: false),
+          ),
+      fallbackMessage: '读取库统计失败',
+    );
+  }
+
+  @override
   Stream<List<HomeRecentlyAddedEntry>> watchRecentlyAddedOnHome({
     required bool excludeR18,
   }) {
@@ -92,6 +105,19 @@ class HomePageRepositoryImpl implements HomePageRepository {
         dto.lastReadTimeMs.toInt(),
       ),
       pageIndex: dto.pageIndex,
+    );
+  }
+
+  HomeLibraryStat _mapLibraryStat(rust.LibraryHomeStatDto dto) {
+    return HomeLibraryStat(
+      libraryId: dto.libraryId,
+      comicCount: dto.comicCount,
+      seriesCount: dto.seriesCount,
+      lastSuccessfulSyncAt: dto.lastSuccessfulSyncAtMs == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(
+              dto.lastSuccessfulSyncAtMs!.toInt(),
+            ),
     );
   }
 

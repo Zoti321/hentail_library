@@ -68,6 +68,21 @@ class HomeLibraryAlert {
   }
 }
 
+/// 首页库列表的每库统计（漫画数、系列数、上次成功同步时间）。
+class HomeLibraryStat {
+  const HomeLibraryStat({
+    required this.libraryId,
+    required this.comicCount,
+    required this.seriesCount,
+    this.lastSuccessfulSyncAt,
+  });
+
+  final String libraryId;
+  final int comicCount;
+  final int seriesCount;
+  final DateTime? lastSuccessfulSyncAt;
+}
+
 class HomeRecentlyAddedEntry {
   const HomeRecentlyAddedEntry({
     required this.comicId,

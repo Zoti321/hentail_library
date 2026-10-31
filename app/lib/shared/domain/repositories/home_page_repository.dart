@@ -9,6 +9,8 @@ abstract class HomePageRepository {
 
   Stream<List<HomeLibraryAlert>> watchHomeLibraryAlerts();
 
+  Stream<List<HomeLibraryStat>> watchLibraryStats({required bool excludeR18});
+
   Stream<List<HomeRecentlyAddedEntry>> watchRecentlyAddedOnHome({
     required bool excludeR18,
   });

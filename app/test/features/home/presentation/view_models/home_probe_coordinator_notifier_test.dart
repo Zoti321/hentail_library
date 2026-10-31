@@ -64,6 +64,10 @@ class _RecordingHomePageRepository implements HomePageRepository {
       const Stream<List<HomeLibraryAlert>>.empty();
 
   @override
+  Stream<List<HomeLibraryStat>> watchLibraryStats({required bool excludeR18}) =>
+      const Stream<List<HomeLibraryStat>>.empty();
+
+  @override
   Stream<List<HomeRecentlyAddedEntry>> watchRecentlyAddedOnHome({
     required bool excludeR18,
   }) => const Stream<List<HomeRecentlyAddedEntry>>.empty();
