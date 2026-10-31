@@ -1,5 +1,5 @@
-/// Lab 阅读画布状态（对应生产 read_session 的打开中 / 打开失败；静态预览用）。
-enum Md3eReaderViewportStatus { ready, loading, error }
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_volume.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
 
 /// Lab 阅读页预览态（非 FRB Read session）。
 class Md3eReaderPagePreviewData {
@@ -18,7 +18,7 @@ class Md3eReaderPagePreviewData {
   final int totalPages;
   final int initialPage;
   final String currentVolumeId;
-  final List<Md3eReaderSeriesVolumePreview> seriesVolumes;
+  final List<Md3eReaderSeriesVolume> seriesVolumes;
   final Md3eReaderViewportStatus viewportStatus;
 
   static Md3eReaderPagePreviewData sample() => const Md3eReaderPagePreviewData(
@@ -29,19 +29,9 @@ class Md3eReaderPagePreviewData {
       );
 }
 
-class Md3eReaderSeriesVolumePreview {
-  const Md3eReaderSeriesVolumePreview({
-    required this.id,
-    required this.title,
-  });
-
-  final String id;
-  final String title;
-}
-
-const List<Md3eReaderSeriesVolumePreview> kMd3eReaderPreviewSeriesVolumes =
-    <Md3eReaderSeriesVolumePreview>[
-  Md3eReaderSeriesVolumePreview(id: 'vol-01', title: '第 01 卷'),
-  Md3eReaderSeriesVolumePreview(id: 'vol-02', title: '第 02 卷'),
-  Md3eReaderSeriesVolumePreview(id: 'vol-03', title: '第 03 卷'),
+const List<Md3eReaderSeriesVolume> kMd3eReaderPreviewSeriesVolumes =
+    <Md3eReaderSeriesVolume>[
+  Md3eReaderSeriesVolume(id: 'vol-01', title: '第 01 卷'),
+  Md3eReaderSeriesVolume(id: 'vol-02', title: '第 02 卷'),
+  Md3eReaderSeriesVolume(id: 'vol-03', title: '第 03 卷'),
 ];

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_adaptive_panel.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_volume.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -12,7 +12,7 @@ abstract final class Md3eReaderSeriesCatalogSheet {
 
   static Future<void> show(
     BuildContext context, {
-    required List<Md3eReaderSeriesVolumePreview> volumes,
+    required List<Md3eReaderSeriesVolume> volumes,
     required String currentVolumeId,
     required ValueChanged<String> onVolumeSelected,
     bool useRootNavigator = false,
@@ -38,7 +38,7 @@ class _Md3eReaderSeriesCatalogBody extends StatelessWidget {
     required this.onVolumeSelected,
   });
 
-  final List<Md3eReaderSeriesVolumePreview> volumes;
+  final List<Md3eReaderSeriesVolume> volumes;
   final String currentVolumeId;
   final ValueChanged<String> onVolumeSelected;
 

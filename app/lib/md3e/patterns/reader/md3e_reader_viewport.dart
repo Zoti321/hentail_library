@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_placeholder.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status_panel.dart';

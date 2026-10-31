@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/pages/md3e_reader_page_lab_host.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_copy.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';

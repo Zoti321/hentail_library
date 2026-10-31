@@ -51,6 +51,8 @@ export 'patterns/reader/md3e_reader_chrome_scope.dart';
 export 'patterns/reader/md3e_reader_floating_panel.dart';
 export 'patterns/reader/md3e_reader_page_copy.dart';
 export 'patterns/reader/md3e_reader_page_preview_data.dart';
+export 'patterns/reader/md3e_reader_series_volume.dart';
+export 'patterns/reader/md3e_reader_viewport_status.dart';
 export 'patterns/reader/md3e_reader_page_progress.dart';
 export 'patterns/reader/md3e_reader_interaction_scope.dart';
 export 'patterns/reader/md3e_reader_keyboard.dart';

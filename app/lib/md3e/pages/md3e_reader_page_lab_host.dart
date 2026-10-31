@@ -5,8 +5,10 @@ import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_boundary_snackbar.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_page_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_catalog_sheet.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_volume.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_settings_side_sheet.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列边界提示方向（与生产 `SeriesBoundaryPrompt` 语义一致，Lab 不依赖 read_session）。
@@ -56,7 +58,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
       widget.preview.totalPages < 1 ? 1 : widget.preview.totalPages;
 
   int get _volumeIndex => widget.preview.seriesVolumes.indexWhere(
-    (Md3eReaderSeriesVolumePreview volume) => volume.id == _volumeId,
+    (Md3eReaderSeriesVolume volume) => volume.id == _volumeId,
   );
 
   void _showBoundaryMessage(String message) {
@@ -113,7 +115,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
   }
 
   void _requestSeriesBoundary(_SeriesBoundaryPrompt direction) {
-    final List<Md3eReaderSeriesVolumePreview> volumes =
+    final List<Md3eReaderSeriesVolume> volumes =
         widget.preview.seriesVolumes;
     final int current = _volumeIndex;
     final int neighbor =
@@ -135,7 +137,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
       return;
     }
 
-    final Md3eReaderSeriesVolumePreview target = volumes[neighbor];
+    final Md3eReaderSeriesVolume target = volumes[neighbor];
     setState(() {
       _volumeId = target.id;
       _volumeTitle = target.title;
@@ -187,7 +189,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
       currentVolumeId: _volumeId,
       useRootNavigator: widget.useRootNavigator,
       onVolumeSelected: (String id) {
-        for (final Md3eReaderSeriesVolumePreview volume
+        for (final Md3eReaderSeriesVolume volume
             in widget.preview.seriesVolumes) {
           if (volume.id != id) {
             continue;
