@@ -1,0 +1,365 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/read_session/di/session_providers.dart';
+import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
+import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_content.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_open_error_panel.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
+import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
+import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+
+/// 阅读页（MD3E 生产实现，#393 第一批）：会话 / 翻页 / 续读 / 退出 / 全屏 / 键盘。
+///
+/// 外壳为 [Md3eReaderPage]；页图由 Baseline [ReaderContent] 提供（三种视口保留）。
+/// 设置面板、系列导航、自动播放、页图复制留待后续批次。
+class ReaderMd3ePage extends HookConsumerWidget {
+  const ReaderMd3ePage({
+    super.key,
+    required this.comicId,
+    this.keepControlsOpen = false,
+    this.incognito = false,
+    this.startFromFirstPage = false,
+  });
+
+  final String comicId;
+  final bool keepControlsOpen;
+  final bool incognito;
+  final bool startFromFirstPage;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ReaderRouteContext routeContext = ReaderRouteContext.normalize(
+      comicId: comicId,
+      incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
+    );
+    final ThemeData theme = buildAppTheme(Brightness.dark);
+
+    if (routeContext.comicId.isEmpty) {
+      return Theme(
+        data: theme,
+        child: Scaffold(
+          body: Center(child: Text(context.l10n.readerInvalidParams)),
+        ),
+      );
+    }
+
+    final ReaderPageFacadeState facade = ref.watch(
+      readerPageFacadeProvider(
+        comicId: routeContext.comicId,
+        incognito: routeContext.incognito,
+        startFromFirstPage: routeContext.startFromFirstPage,
+      ),
+    );
+    final ReaderControllerKey viewKey = facade.viewKey;
+    final AsyncValue<ReaderPageShellData> shellAsync = facade.shellAsync;
+    final bool readerFullscreen = facade.readerFullscreen;
+    final SeriesBoundaryPrompt seriesBoundaryPrompt =
+        facade.seriesBoundaryPrompt;
+
+    final bool readerReady = shellAsync.hasValue;
+    final ReaderPageShellData? loadedShell = shellAsync.asData?.value;
+    final ObjectRef<int?> frozenOpenIndex = useRef<int?>(null);
+    final ObjectRef<int?> frozenInitialPage = useRef<int?>(null);
+    final ObjectRef<String?> frozenSessionKey = useRef<String?>(null);
+    final String sessionKey =
+        '${routeContext.comicId}|${routeContext.incognito}|${routeContext.startFromFirstPage}';
+    if (frozenSessionKey.value != sessionKey) {
+      frozenSessionKey.value = sessionKey;
+      frozenOpenIndex.value = null;
+      frozenInitialPage.value = null;
+    }
+
+    // 首个就绪帧冻结续读位置（与 Baseline 一致，避免内容构建前索引漂移）。
+    if (loadedShell != null && frozenInitialPage.value == null) {
+      final int openIndex =
+          ref
+              .read(readerControllerProvider(viewKey))
+              .asData
+              ?.value
+              .currentIndex ??
+          1;
+      frozenOpenIndex.value = openIndex;
+      frozenInitialPage.value = openIndex - 1;
+    }
+
+    useEffect(
+      () {
+        if (!readerReady ||
+            loadedShell == null ||
+            frozenOpenIndex.value == null) {
+          return null;
+        }
+        unawaited(
+          ref
+              .read(readSessionCoordinatorProvider)
+              .beginReadSession(
+                comic: loadedShell.comic,
+                incognito: routeContext.incognito,
+                initialPageIndex: frozenOpenIndex.value!,
+              ),
+        );
+        return null;
+      },
+      <Object?>[
+        routeContext.comicId,
+        routeContext.incognito,
+        routeContext.startFromFirstPage,
+        readerReady,
+      ],
+    );
+
+    final ReaderController controller = ref.read(
+      readerControllerProvider(viewKey).notifier,
+    );
+    final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
+
+    useEffect(() {
+      if (!keepControlsOpen || hasAppliedKeepControls.value) {
+        return null;
+      }
+      if (!readerReady) {
+        return null;
+      }
+      hasAppliedKeepControls.value = true;
+      final bool showControls =
+          ref
+              .read(readerControllerProvider(viewKey))
+              .asData
+              ?.value
+              .showControls ??
+          false;
+      if (showControls) {
+        return null;
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.setShowControls(true);
+      });
+      return null;
+    }, <Object?>[keepControlsOpen, readerReady, controller]);
+
+    useEffect(() {
+      if (seriesBoundaryPrompt == SeriesBoundaryPrompt.none) {
+        return null;
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) {
+          return;
+        }
+        final String message = switch (seriesBoundaryPrompt) {
+          SeriesBoundaryPrompt.advance =>
+            context.l10n.readerSeriesAdvancePrompt,
+          SeriesBoundaryPrompt.retreat =>
+            context.l10n.readerSeriesRetreatPrompt,
+          SeriesBoundaryPrompt.none => '',
+        };
+        if (message.isEmpty) {
+          return;
+        }
+        showInfoToast(context, message);
+      });
+      return null;
+    }, <Object?>[seriesBoundaryPrompt, context]);
+
+    final ({bool showControls, int currentIndex}) chrome = ref.watch(
+      readerControllerProvider(viewKey).select((
+        AsyncValue<ReaderState> asyncState,
+      ) {
+        final ReaderState? state = asyncState.asData?.value;
+        return (
+          showControls: state?.showControls ?? false,
+          currentIndex: state?.currentIndex ?? 1,
+        );
+      }),
+    );
+
+    Future<void> exitReader() => controller.executeExitReader(
+      context: context,
+      routeContext: routeContext,
+    );
+
+    return Theme(
+      data: theme,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, dynamic result) async {
+          if (didPop) {
+            return;
+          }
+          await exitReader();
+        },
+        child: M3ETheme(
+          data: md3eWithAppFontFamily(M3ETheme.of(context)),
+          child: Scaffold(
+            backgroundColor: theme.hentai.readerBackground,
+            body: shellAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (Object e, StackTrace st) => ReaderOpenErrorPanel(
+                error: e,
+                onBackToDetail: () {
+                  unawaited(exitReader());
+                },
+                onRetry: () {
+                  ref.invalidate(
+                    readerSessionOpenProvider(
+                      comicId: routeContext.comicId,
+                      incognito: routeContext.incognito,
+                      startFromFirstPage: routeContext.startFromFirstPage,
+                    ),
+                  );
+                  ref.invalidate(readerControllerProvider(viewKey));
+                  ref.invalidate(
+                    comicImagesProvider(comicId: routeContext.comicId),
+                  );
+                },
+              ),
+              data: (ReaderPageShellData shell) {
+                if (shell.totalPages == 0) {
+                  return Center(child: Text(context.l10n.readerNoImages));
+                }
+                final ReaderNavContextData? seriesNavContext =
+                    shell.sessionContext.hasSeriesContext
+                    ? shell.sessionContext.navContext
+                    : null;
+
+                Future<void> requestNextPage() => controller.requestNextPage(
+                  navContext: seriesNavContext,
+                  session: routeContext.session,
+                  router: GoRouter.of(context),
+                );
+                Future<void> requestPrevPage() => controller.requestPrevPage(
+                  navContext: seriesNavContext,
+                  session: routeContext.session,
+                  router: GoRouter.of(context),
+                );
+
+                return Md3eReaderPage(
+                  title: shell.comic.title,
+                  currentPage: chrome.currentIndex,
+                  totalPages: shell.totalPages,
+                  chromeVisible: chrome.showControls,
+                  isFullscreen: readerFullscreen,
+                  // 内容层（_ReaderMd3eContent）自行处理点击分区，此回调不使用。
+                  onTapZone: (Md3eReaderTapZone _) {},
+                  viewportStatus: Md3eReaderViewportStatus.ready,
+                  onBack: () {
+                    unawaited(exitReader());
+                  },
+                  onToggleFullscreen: () {
+                    unawaited(controller.toggleFullscreen());
+                  },
+                  onPageChanged: controller.setIndex,
+                  onPreviousPage: () {
+                    unawaited(requestPrevPage());
+                  },
+                  onNextPage: () {
+                    unawaited(requestNextPage());
+                  },
+                  onToggleChromeFromKeyboard: controller.toggleShowControls,
+                  contentBuilder: (FocusNode focusNode) => _ReaderMd3eContent(
+                    viewKey: viewKey,
+                    routeContext: routeContext,
+                    focusNode: focusNode,
+                    initialPage: frozenInitialPage.value ?? 0,
+                    preferredPageIndex:
+                        shell.sessionContext.preferredPageIndex,
+                    seriesNavContext: seriesNavContext,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 页图内容层：真实视口 + 点击分区翻页（与 Baseline `_ReaderContentSlot` 行为一致）。
+class _ReaderMd3eContent extends ConsumerWidget {
+  const _ReaderMd3eContent({
+    required this.viewKey,
+    required this.routeContext,
+    required this.focusNode,
+    required this.initialPage,
+    required this.preferredPageIndex,
+    required this.seriesNavContext,
+  });
+
+  final ReaderControllerKey viewKey;
+  final ReaderRouteContext routeContext;
+  final FocusNode focusNode;
+  final int initialPage;
+  final int? preferredPageIndex;
+  final ReaderNavContextData? seriesNavContext;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ReadingMode readingMode = ref.watch(
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> asyncState) =>
+            asyncState.asData?.value.readingMode ?? ReadingMode.paged,
+      ),
+    );
+    final ReaderController controller = ref.read(
+      readerControllerProvider(viewKey).notifier,
+    );
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapUp: (TapUpDetails details) {
+        focusNode.requestFocus();
+        if (readingMode.isWebtoon) {
+          controller.toggleShowControls();
+          return;
+        }
+        final ReaderTapZone zone = resolveReaderTapZone(
+          globalX: details.globalPosition.dx,
+          width: MediaQuery.sizeOf(context).width,
+        );
+        unawaited(
+          controller.handleTapZone(
+            zone,
+            navContext: seriesNavContext,
+            session: routeContext.session,
+            router: GoRouter.of(context),
+          ),
+        );
+      },
+      child: ReaderContent(
+        key: ValueKey<String>(routeContext.comicId),
+        comicId: routeContext.comicId,
+        incognito: routeContext.incognito,
+        startFromFirstPage: routeContext.startFromFirstPage,
+        initialPage: initialPage,
+        preferredPageIndex: preferredPageIndex,
+        readingMode: readingMode,
+        onRequestNextPage: () => controller.requestNextPage(
+          navContext: seriesNavContext,
+          session: routeContext.session,
+          router: GoRouter.of(context),
+        ),
+        onRequestPrevPage: () => controller.requestPrevPage(
+          navContext: seriesNavContext,
+          session: routeContext.session,
+          router: GoRouter.of(context),
+        ),
+      ),
+    );
+  }
+}

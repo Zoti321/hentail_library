@@ -124,7 +124,7 @@ List<RouteBase> buildSharedContentRoutes({
         );
         return buildDesktopFadeThroughPage(
           state: state,
-          child: ReaderPage(
+          child: ReaderMd3ePage(
             comicId: args.comicId,
             keepControlsOpen: args.keepControlsOpen,
             incognito: args.incognito,

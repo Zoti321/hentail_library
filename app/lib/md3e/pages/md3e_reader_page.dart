@@ -31,7 +31,11 @@ class Md3eReaderPage extends StatefulWidget {
     this.moreMenuEntries = const <M3EMenuNode>[],
     this.viewportStatus = Md3eReaderViewportStatus.ready,
     this.onViewportRetry,
+    this.contentBuilder,
   });
+
+  /// 生产页注入真实页图内容；为空时使用 Lab 占位视口。
+  final Widget Function(FocusNode focusNode)? contentBuilder;
 
   final String title;
   final String? subtitle;
@@ -85,14 +89,17 @@ class _Md3eReaderPageState extends State<Md3eReaderPage> {
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            Md3eReaderViewport(
-              currentPage: widget.currentPage,
-              focusNode: _focusNode,
-              onTapZone: widget.onTapZone,
-              status: widget.viewportStatus,
-              onBack: widget.onBack,
-              onRetry: widget.onViewportRetry,
-            ),
+            if (widget.contentBuilder != null)
+              widget.contentBuilder!(_focusNode)
+            else
+              Md3eReaderViewport(
+                currentPage: widget.currentPage,
+                focusNode: _focusNode,
+                onTapZone: widget.onTapZone,
+                status: widget.viewportStatus,
+                onBack: widget.onBack,
+                onRetry: widget.onViewportRetry,
+              ),
             Md3eReaderChrome(
               visible: widget.chromeVisible,
               title: widget.title,

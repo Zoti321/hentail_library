@@ -4,6 +4,7 @@ export 'view_models/reader_prefetch_logic.dart';
 export 'view_models/reader_controller.dart';
 export 'view_models/reader_series_navigation.dart';
 export 'view_models/reader_fullscreen_controller.dart';
+export 'views/reader_md3e/reader_md3e_page.dart';
 export 'views/reader_page/reader_page.dart';
 export 'view_models/read_session_page_data.dart';
 export 'view_models/read_session_providers.dart';
