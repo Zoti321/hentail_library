@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
-import 'package:hentai_library/md3e/pages/md3e_library_edit_page_lab_host.dart';
+import '../../../widgetbook/md3e_library_edit_page_lab_host.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
 import '../../support/pump_md3e_app.dart';

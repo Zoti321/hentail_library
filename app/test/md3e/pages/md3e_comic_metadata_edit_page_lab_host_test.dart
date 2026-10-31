@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
-import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page_lab_host.dart';
+import '../../../widgetbook/md3e_comic_metadata_edit_page_lab_host.dart';
 import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:material_symbols_icons/symbols.dart';
