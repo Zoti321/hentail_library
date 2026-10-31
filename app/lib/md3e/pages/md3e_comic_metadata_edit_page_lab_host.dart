@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/pages/md3e_comic_detail_page_preview_data.dart';
 import 'package:hentai_library/md3e/pages/md3e_comic_metadata_edit_page.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
@@ -24,7 +25,10 @@ class Md3eComicMetadataEditPageLabHost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Md3eComicMetadataEditPage(
-      initialDraft: initialDraft,
+      initialDraft: initialDraft ??
+          Md3eComicMetadataEditDraft.fromEntry(
+            Md3eComicDetailPagePreviewData.sample(),
+          ),
       initialLocks:
           initialLocks ?? Md3eComicMetadataEditPreviewData.sampleLocks,
       presentation: presentation,

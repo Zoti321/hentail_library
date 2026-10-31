@@ -8,7 +8,6 @@ import 'package:hentai_library/md3e/patterns/history/md3e_history_time_grouping.
 import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
 
 export 'package:hentai_library/md3e/pages/md3e_history_browse_entry.dart';
-export 'package:hentai_library/md3e/pages/md3e_history_browse_page_preview_data.dart';
 
 /// 阅读历史页 Lab 壳层：粘滞页头 + [Md3eHistoryBrowseContent]。
 class Md3eHistoryBrowsePage extends StatefulWidget {

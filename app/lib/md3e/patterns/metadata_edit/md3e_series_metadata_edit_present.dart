@@ -8,7 +8,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// 打开系列元数据编辑。
 Future<Md3eSeriesMetadataEditDraft?> showMd3eSeriesMetadataEdit({
   required BuildContext context,
-  Md3eSeriesMetadataEditDraft? initialDraft,
+  required Md3eSeriesMetadataEditDraft initialDraft,
 }) {
   final GlobalKey pageKey = GlobalKey();
   final AppLocalizations l10n = context.l10n;

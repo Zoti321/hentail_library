@@ -12,7 +12,6 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 export 'package:hentai_library/md3e/pages/md3e_comic_detail_entry.dart';
-export 'package:hentai_library/md3e/pages/md3e_comic_detail_page_preview_data.dart';
 
 /// 漫画详情页 Lab：粘滞页头 + 可滚动正文。
 class Md3eComicDetailPage extends StatefulWidget {

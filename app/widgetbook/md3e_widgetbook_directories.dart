@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/md3e/pages/md3e_comic_detail_page_preview_data.dart';
+import 'package:hentai_library/md3e/pages/md3e_series_detail_page_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
 import 'package:hentai_library/md3e/widgets/actions/md3e_catalog_view_mode_button_group.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
@@ -250,8 +252,10 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Tag section',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eComicDetailMetadataTagsSection(),
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Md3eComicDetailMetadataTagsSection(
+                      entry: Md3eComicDetailPagePreviewData.sample(),
+                    ),
                   ),
                 ),
               ],
@@ -449,8 +453,12 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eSeriesMetadataEditPage(),
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Md3eSeriesMetadataEditPage(
+                      initialDraft: Md3eSeriesMetadataEditDraft.fromEntry(
+                        Md3eSeriesDetailPagePreviewData.sample(),
+                      ),
+                    ),
                   ),
                 ),
               ],

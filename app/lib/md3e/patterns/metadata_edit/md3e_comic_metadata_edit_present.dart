@@ -8,7 +8,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// 打开漫画元数据编辑：compact / medium M3E 全屏；expanded+ M3EDialog basic。
 Future<Md3eComicMetadataEditDraft?> showMd3eComicMetadataEdit({
   required BuildContext context,
-  Md3eComicMetadataEditDraft? initialDraft,
+  required Md3eComicMetadataEditDraft initialDraft,
 }) {
   final GlobalKey pageKey = GlobalKey();
   final AppLocalizations l10n = context.l10n;

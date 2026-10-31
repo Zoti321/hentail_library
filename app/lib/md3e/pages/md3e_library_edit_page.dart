@@ -3,7 +3,6 @@ import 'package:hentai_library/md3e/layout/md3e_library_edit_form_metrics.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
 import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_form.dart';
-import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
@@ -20,14 +19,14 @@ class Md3eLibraryEditPage extends StatefulWidget {
   const Md3eLibraryEditPage({
     super.key,
     this.intent = Md3eLibraryEditPageIntent.editLocal,
-    this.initialForm,
+    required this.initialForm,
     this.presentation = Md3eMetadataEditPresentation.embedded,
     this.onSaved,
     this.onCancel,
   });
 
   final Md3eLibraryEditPageIntent intent;
-  final LibraryForm? initialForm;
+  final LibraryForm initialForm;
   final Md3eMetadataEditPresentation presentation;
   final ValueChanged<LibraryForm>? onSaved;
   final VoidCallback? onCancel;
@@ -37,7 +36,7 @@ class Md3eLibraryEditPage extends StatefulWidget {
 }
 
 class _Md3eLibraryEditPageState extends State<Md3eLibraryEditPage> {
-  late LibraryForm _form = widget.initialForm ?? _formForIntent(widget.intent);
+  late LibraryForm _form = widget.initialForm;
   LibraryFormValidation? _validation;
   bool _saving = false;
 
@@ -49,17 +48,6 @@ class _Md3eLibraryEditPageState extends State<Md3eLibraryEditPage> {
         Md3eLibraryEditPageIntent.editRemote =>
           false,
       };
-
-  static LibraryForm _formForIntent(Md3eLibraryEditPageIntent intent) {
-    return switch (intent) {
-      Md3eLibraryEditPageIntent.editLocal =>
-        Md3eLibraryEditPreviewData.editLocalForm(),
-      Md3eLibraryEditPageIntent.editRemote =>
-        Md3eLibraryEditPreviewData.editRemoteForm(),
-      Md3eLibraryEditPageIntent.createLocal => LibraryForm.createLocal(),
-      Md3eLibraryEditPageIntent.createRemote => LibraryForm.createRemote(),
-    };
-  }
 
   String _title(AppLocalizations l10n) {
     return switch (widget.intent) {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
 import 'package:hentai_library/md3e/layout/md3e_metadata_edit_form_metrics.dart';
 import 'package:hentai_library/md3e/motion/md3e_motion.dart';
-import 'package:hentai_library/md3e/pages/md3e_series_detail_page_preview_data.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_draft.dart';
 import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_form.dart';
@@ -14,13 +13,13 @@ export 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_
 class Md3eSeriesMetadataEditPage extends StatefulWidget {
   const Md3eSeriesMetadataEditPage({
     super.key,
-    this.initialDraft,
+    required this.initialDraft,
     this.presentation = Md3eMetadataEditPresentation.embedded,
     this.onSaved,
     this.onCancel,
   });
 
-  final Md3eSeriesMetadataEditDraft? initialDraft;
+  final Md3eSeriesMetadataEditDraft initialDraft;
   final Md3eMetadataEditPresentation presentation;
   final ValueChanged<Md3eSeriesMetadataEditDraft>? onSaved;
   final VoidCallback? onCancel;
@@ -31,10 +30,7 @@ class Md3eSeriesMetadataEditPage extends StatefulWidget {
 }
 
 class _Md3eSeriesMetadataEditPageState extends State<Md3eSeriesMetadataEditPage> {
-  late Md3eSeriesMetadataEditDraft _draft = widget.initialDraft ??
-      Md3eSeriesMetadataEditDraft.fromEntry(
-        Md3eSeriesDetailPagePreviewData.sample(),
-      );
+  late Md3eSeriesMetadataEditDraft _draft = widget.initialDraft;
   String? _nameError;
   String? _totalCountError;
   bool _saving = false;
