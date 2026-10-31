@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/library_page.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/searched_page.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/searched_md3e/searched_md3e_page.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_page.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
@@ -93,7 +93,7 @@ final GoRouter appRouter = GoRouter(
             final String query = state.uri.queryParameters['q'] ?? '';
             return buildShellNavPage(
               state: state,
-              child: SearchedPage(query: query),
+              child: SearchedMd3ePage(query: query),
             );
           },
         ),

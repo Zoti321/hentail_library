@@ -23,9 +23,8 @@ import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary
 import 'package:hentai_library/shared/domain/repositories/tag_repository.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/element/card/comic_card.dart';
-import 'package:hentai_library/shared/ui/widgets/element/chip/meta_chip.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/searched_page.dart';
+import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/searched_md3e/searched_md3e_page.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
@@ -192,16 +191,21 @@ void main() {
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: buildAppTheme(Brightness.light),
-            home: const Scaffold(body: SearchedPage(query: 'foo')),
+            home: const Scaffold(body: SearchedMd3ePage(query: 'foo')),
           ),
         ),
       );
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(ComicCard), findsNWidgets(2));
+      expect(find.byType(Md3eComicCard), findsNWidgets(2));
       expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(tester.widget<MetaChip>(find.byType(MetaChip)).label, '2');
+      expect(
+        tester
+            .widget<Text>(find.byKey(const Key('searched-result-count')))
+            .data,
+        '2',
+      );
       final int searchesAfterFirstLoad = comics.keywordSearchCalls;
       expect(searchesAfterFirstLoad, greaterThan(0));
 
@@ -217,9 +221,12 @@ void main() {
           .byType(CircularProgressIndicator)
           .evaluate()
           .isNotEmpty;
-      final bool lostCards = find.byType(ComicCard).evaluate().length < 2;
+      final bool lostCards = find.byType(Md3eComicCard).evaluate().length < 2;
       final bool countChurned =
-          tester.widget<MetaChip>(find.byType(MetaChip)).label != '2';
+          tester
+              .widget<Text>(find.byKey(const Key('searched-result-count')))
+              .data !=
+          '2';
       final bool refetched = comics.keywordSearchCalls > searchesAfterFirstLoad;
 
       comics.releaseGate();
