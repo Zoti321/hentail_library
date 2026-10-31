@@ -37,7 +37,10 @@ import 'package:hentai_library/shared/ui/widgets/element/image/series_cover_cont
 import 'package:hentai_library/shared/ui/widgets/navigation/library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 搜索入口 + 网格 + 分页。
+/// 工具栏与网格之间的顶部间距。
+const double _gridTopGap = 24;
+
+/// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 网格 + 分页。
 ///
 /// 数据来自库目录控制器（真实 provider）。筛选排序面板为 [Md3eLibraryFilterSortSheet]。
 class LibraryMd3ePage extends ConsumerStatefulWidget {
@@ -254,7 +257,12 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
         final List<Comic> comics = comicsCatalog.items;
         return <Widget>[
           SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: horizontal),
+            padding: EdgeInsets.fromLTRB(
+              horizontal,
+              _gridTopGap,
+              horizontal,
+              0,
+            ),
             sliver: Md3eCatalogGridSliver(
               itemCount: comics.length,
               itemBuilder: (BuildContext context, int index, _) {
@@ -297,7 +305,12 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
         final List<Series> series = seriesCatalog.items;
         return <Widget>[
           SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: horizontal),
+            padding: EdgeInsets.fromLTRB(
+              horizontal,
+              _gridTopGap,
+              horizontal,
+              0,
+            ),
             sliver: Md3eCatalogGridSliver(
               hasSubtitle: false,
               itemCount: series.length,
