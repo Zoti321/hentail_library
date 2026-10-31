@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_page/widgets/comic_detail_info_sections.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_sheet.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 休刊状态 chip 描边/文字色（仅系列详情页使用）。
@@ -148,7 +148,7 @@ class SeriesDetailMetadataBlock extends ConsumerWidget {
           rowHeight: kSeriesDetailMetaChipRowHeight,
           chipCompact: true,
           onItemTap: (String name) {
-            showAuthorDetailMd3eByName(context: context, ref: ref, name: name);
+            openAuthorDetailByName(context: context, ref: ref, name: name);
           },
         ),
       );

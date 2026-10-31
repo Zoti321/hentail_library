@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/author_detail_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_sheet.dart';
 import 'package:hentai_library/shared/application/ports/author_detail_port.dart';
 
 /// library_browse 对 [AuthorDetailPort] 的实现（#292）。
@@ -20,7 +20,7 @@ class _AuthorDetailAdapter implements AuthorDetailPort {
     if (authorId == null || !context.mounted) {
       return;
     }
-    await showAuthorDetailMd3e(context: context, authorId: authorId);
+    GoRouter.of(context).push('/author/$authorId');
   }
 }
 

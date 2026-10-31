@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_md3e_page.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_page.dart';
@@ -78,6 +79,19 @@ List<RouteBase> buildSharedContentRoutes({
       path: '/characters',
       redirect: (BuildContext context, GoRouterState state) =>
           '/metadata?tab=characters',
+    ),
+    GoRoute(
+      path: '/author/:id',
+      name: '作者详情',
+      pageBuilder: (BuildContext context, GoRouterState state) {
+        final int? authorId = int.tryParse(state.pathParameters['id'] ?? '');
+        return buildDesktopFadeThroughPage(
+          state: state,
+          child: authorId == null
+              ? const RouteNotFoundPage()
+              : AuthorDetailMd3ePage(authorId: authorId),
+        );
+      },
     ),
     GoRoute(
       path: '/series/:id',

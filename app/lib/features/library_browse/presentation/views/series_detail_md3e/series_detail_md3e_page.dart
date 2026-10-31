@@ -5,7 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/features/library_browse/presentation/content_breadcrumb_labels.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_sheet.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_return_series_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_search_query_parser.dart';
@@ -152,7 +152,7 @@ class _SeriesDetailMd3eContentState
         final String query = formatLibrarySearchExactMetaQuery(value);
         context.push('/searched?q=${Uri.encodeQueryComponent(query)}');
       },
-      onAuthorTap: (String name) => showAuthorDetailMd3eByName(
+      onAuthorTap: (String name) => openAuthorDetailByName(
         context: context,
         ref: ref,
         name: name,

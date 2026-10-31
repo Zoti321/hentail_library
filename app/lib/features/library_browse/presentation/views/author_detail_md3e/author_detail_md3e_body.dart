@@ -52,7 +52,6 @@ class AuthorDetailMd3eBody extends ConsumerWidget {
 void _openSearch(BuildContext context, Iterable<String> names) {
   final String query = formatLibrarySearchAndExactMetaQuery(names);
   final String encoded = Uri.encodeQueryComponent(query);
-  Navigator.of(context).maybePop();
   GoRouter.of(context).push('/searched?q=$encoded');
 }
 
@@ -152,7 +151,6 @@ class _AuthorComicCoverCard extends StatelessWidget {
               type: MaterialType.transparency,
               child: InkWell(
                 onTap: () {
-                  Navigator.of(context).maybePop();
                   GoRouter.of(
                     context,
                   ).push('/comic/${Uri.encodeComponent(comic.comicId)}');
