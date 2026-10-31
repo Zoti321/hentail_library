@@ -4,12 +4,10 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_facade_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_expand_by_series_controls.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_sort_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_filter_controls.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_metadata_filter_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_layout_constants.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_prefer_library_root_series_controls.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/widgets/library_sort_controls.dart';
 
 /// 抽屉分区标题等内容相对左缘的内边距。
 const double kLibraryFilterSortDrawerContentInset = 16;
@@ -105,9 +103,7 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: tokens.spacing.sm),
-              const LibraryExpandBySeriesControls(),
-              const LibraryPreferLibraryRootSeriesControls(),
-              const LibrarySortControls(),
+              const Md3eLibrarySortSection(),
             ],
           ),
         ),
