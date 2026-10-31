@@ -11,7 +11,7 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_filter_sort_drawer.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_filter_sort_sheet.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_overflow_entries.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_selection_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/md3e_comic_card_actions.dart';
@@ -22,7 +22,6 @@ import 'package:hentai_library/md3e/patterns/library/md3e_library_catalog_toolba
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
-import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_library_scroll_to_top_button.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
@@ -40,7 +39,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 搜索入口 + 网格 + 分页。
 ///
-/// 数据来自库目录控制器（真实 provider）。筛选排序抽屉为 [Md3eLibraryFilterSortDrawer]。
+/// 数据来自库目录控制器（真实 provider）。筛选排序面板为 [Md3eLibraryFilterSortSheet]。
 class LibraryMd3ePage extends ConsumerStatefulWidget {
   const LibraryMd3ePage({super.key});
 
@@ -49,15 +48,11 @@ class LibraryMd3ePage extends ConsumerStatefulWidget {
 }
 
 class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController();
-  bool _isEndDrawerOpen = false;
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -72,18 +67,8 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     );
   }
 
-  void _openFilterSortDrawer() {
-    _scaffoldKey.currentState?.openEndDrawer();
-  }
-
-  void _submitSearch(String value) {
-    final String query = value.trim();
-    if (query.isEmpty) {
-      return;
-    }
-    ref
-        .read(appRouterProvider)
-        .push('/searched?q=${Uri.encodeQueryComponent(query)}');
+  void _openFilterSortSheet() {
+    Md3eLibraryFilterSortSheet.show(context);
   }
 
   void _openComicDetail(String comicId) {
@@ -114,9 +99,6 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
         return;
       }
       _scrollToContentTop();
-      if (_isEndDrawerOpen && previous?.displayTarget != next.displayTarget) {
-        _scaffoldKey.currentState?.closeEndDrawer();
-      }
     });
 
     final LibraryPageFacadeState facade = ref.watch(libraryPageFacadeProvider);
@@ -155,13 +137,6 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     return M3ETheme(
       data: md3eWithAppFontFamily(M3ETheme.of(context)),
       child: Scaffold(
-        key: _scaffoldKey,
-        endDrawer: const Md3eLibraryFilterSortDrawer(),
-        onEndDrawerChanged: (bool isOpen) {
-          if (_isEndDrawerOpen != isOpen) {
-            setState(() => _isEndDrawerOpen = isOpen);
-          }
-        },
         body: Stack(
           children: <Widget>[
             CustomScrollView(
@@ -188,7 +163,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                             onPageSizeChanged: (int size) {
                               facadeNotifier.setPageSize(size);
                             },
-                            onFilterSort: _openFilterSortDrawer,
+                            onFilterSort: _openFilterSortSheet,
                             overflowMenuEntries:
                                 buildLibraryMd3eOverflowEntries(
                                   context: context,
@@ -209,17 +184,6 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                       seriesCount: seriesCatalog?.pagination.totalCount ?? 0,
                       onDisplayTargetChanged:
                           facadeNotifier.selectDisplayTarget,
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(horizontal, 12, horizontal, 0),
-                  sliver: SliverToBoxAdapter(
-                    child: Md3eOutlinedTextField(
-                      label: context.l10n.librarySearchHint,
-                      controller: _searchController,
-                      onSubmitted: _submitSearch,
-                      leading: const Icon(Icons.search),
                     ),
                   ),
                 ),
@@ -255,7 +219,6 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
             Md3eLibraryScrollToTopButton(
               scrollController: _scrollController,
               horizontalPadding: horizontal,
-              hidden: _isEndDrawerOpen,
             ),
           ],
         ),

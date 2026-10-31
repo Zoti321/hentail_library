@@ -32,11 +32,11 @@ abstract final class Md3eCatalogGridMetrics {
   /// Max cross-axis extent per M3 window class (wider on large / XL).
   static double maxCrossAxisExtent(Md3eWindowSizeClass window) {
     return switch (window) {
-      Md3eWindowSizeClass.compact => 168,
-      Md3eWindowSizeClass.medium => 188,
-      Md3eWindowSizeClass.expanded => 200,
-      Md3eWindowSizeClass.large => 220,
-      Md3eWindowSizeClass.extraLarge => 240,
+      Md3eWindowSizeClass.compact => 132,
+      Md3eWindowSizeClass.medium => 148,
+      Md3eWindowSizeClass.expanded => 160,
+      Md3eWindowSizeClass.large => 172,
+      Md3eWindowSizeClass.extraLarge => 184,
     };
   }
 
@@ -54,10 +54,7 @@ abstract final class Md3eCatalogGridMetrics {
   static int crossAxisCount(double viewportWidth, Md3eWindowSizeClass window) {
     final double horizontalMargin =
         Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(window);
-    final double innerWidth = math.max(
-      0,
-      viewportWidth - horizontalMargin * 2,
-    );
+    final double innerWidth = math.max(0, viewportWidth - horizontalMargin * 2);
     return _crossAxisCountForInnerWidth(
       innerWidth,
       window,
@@ -98,14 +95,13 @@ abstract final class Md3eCatalogGridMetrics {
     double viewportWidth, {
     double? horizontalMargin,
   }) {
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
-    final double margin = horizontalMargin ??
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
-    final double innerWidth = math.max(
-      0,
-      viewportWidth - margin * 2,
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      viewportWidth,
     );
+    final double margin =
+        horizontalMargin ??
+        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+    final double innerWidth = math.max(0, viewportWidth - margin * 2);
     final double gutter = gridSpacing(sizeClass);
     final int count = _crossAxisCountForInnerWidth(
       innerWidth,
@@ -134,10 +130,7 @@ abstract final class Md3eCatalogGridMetrics {
       return 1;
     }
     final double maxExtent = maxCrossAxisExtent(window);
-    return math.max(
-      1,
-      ((innerWidth + gutter) / (maxExtent + gutter)).floor(),
-    );
+    return math.max(1, ((innerWidth + gutter) / (maxExtent + gutter)).floor());
   }
 
   /// Grid row height from the **actual** cell width (not [maxCrossAxisExtent]).
@@ -150,11 +143,11 @@ abstract final class Md3eCatalogGridMetrics {
     bool hasSubtitle = true,
   }) {
     return Md3eComicCard.layoutMainAxisExtent(
-      cardWidth: cellWidth,
-      coverToInfoGap: spacing.md,
-      infoBottomPadding: spacing.sm,
-      hasSubtitle: hasSubtitle,
-    ) +
+          cardWidth: cellWidth,
+          coverToInfoGap: spacing.md,
+          infoBottomPadding: spacing.sm,
+          hasSubtitle: hasSubtitle,
+        ) +
         mainAxisSlack;
   }
 }

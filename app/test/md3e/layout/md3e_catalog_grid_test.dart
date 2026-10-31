@@ -38,8 +38,7 @@ void main() {
     expect(grid, findsOneWidget);
     final SliverGrid sliverGrid = tester.widget<SliverGrid>(grid);
     final SliverGridDelegateWithFixedCrossAxisCount delegate =
-        sliverGrid.gridDelegate
-            as SliverGridDelegateWithFixedCrossAxisCount;
+        sliverGrid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
     expect(delegate.crossAxisCount, greaterThan(1));
     expect(delegate.mainAxisExtent, greaterThan(200));
   });
