@@ -22,11 +22,22 @@ M3EColorScheme _md3eColorSchemeFor({
   return M3EColorScheme.fromSeed(kMd3eLabSeedColor, brightness: brightness);
 }
 
-M3EThemeData _applyMd3eLabOverrides(M3EThemeData base) {
-  final M3EColorScheme colors = base.colorScheme;
+/// 把应用字体同时挂到 [M3EThemeData.fontFamily] 与 [M3EThemeData.typography]
+/// （baseline + emphasized），使 `typeScale.*` 带上 [kMd3eAppFontFamily]。
+///
+/// 仅设置 fontFamily 不够：`M3ETypeScale` 的各角色样式不继承该值。
+M3EThemeData md3eWithAppFontFamily(M3EThemeData base) {
   return base.copyWith(
     fontFamily: kMd3eAppFontFamily,
-    navigationRailTheme: base.navigationRailTheme.copyWith(
+    typography: base.typography.apply(fontFamily: kMd3eAppFontFamily),
+  );
+}
+
+M3EThemeData _applyMd3eLabOverrides(M3EThemeData base) {
+  final M3EThemeData withFont = md3eWithAppFontFamily(base);
+  final M3EColorScheme colors = withFont.colorScheme;
+  return withFont.copyWith(
+    navigationRailTheme: withFont.navigationRailTheme.copyWith(
       collapsedWidth: 80,
       narrowCollapsedWidth: 80,
       expandedMinWidth: 256,

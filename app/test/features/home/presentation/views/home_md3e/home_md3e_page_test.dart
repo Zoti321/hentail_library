@@ -8,6 +8,7 @@ import 'package:hentai_library/features/home/presentation/view_models/home_page_
 import 'package:hentai_library/features/home/presentation/views/home_md3e/home_md3e_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
@@ -15,6 +16,7 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
@@ -61,6 +63,12 @@ void main() {
       expect(page.onAddLocalLibrary, isNull);
       expect(page.onLibraryAction, isNull);
       expect(page.libraries.map((row) => row.comicCount), <int>[3, 1]);
+      // 生产路径无 Md3eThemeScope，M3ETheme 回退到 Material 主题；排版必须仍带应用字体。
+      final M3EThemeData theme = M3ETheme.of(
+        tester.element(find.byType(Md3eHomePage)),
+      );
+      expect(theme.typeScale.titleMedium.fontFamily, kMd3eAppFontFamily);
+      expect(theme.typeScale.bodyMedium.fontFamily, kMd3eAppFontFamily);
     },
   );
 }
