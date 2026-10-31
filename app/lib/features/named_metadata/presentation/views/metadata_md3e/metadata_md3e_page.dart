@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_dialogs.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_facet_list.dart';
@@ -22,7 +21,6 @@ import 'package:hentai_library/md3e/widgets/navigation/md3e_management_create_en
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -123,14 +121,14 @@ class _MetadataManagementPageState
     final int count = state.hasSearchQuery
         ? state.items.length
         : state.totalCount;
-    final bool compact = sizeClass.isCompact;
     final double horizontal =
         Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
     final bool mergeMode = _mergeTarget != null;
     final bool useMobileCreateDialog =
         md3eManagementCreateInteractionOf(context) ==
         Md3eManagementCreateInteraction.mobileDialog;
-    final bool showInlineCreate = !useMobileCreateDialog && _showInlineCreateField;
+    final bool showInlineCreate =
+        !useMobileCreateDialog && _showInlineCreateField;
 
     final Widget body = Stack(
       children: <Widget>[
@@ -145,8 +143,6 @@ class _MetadataManagementPageState
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: horizontal),
                   child: MetadataMd3eHeader(
-                    compact: compact,
-                    totalCount: count,
                     onOpenNavigation: appShellPageNavigationOpener(context),
                     mergeSelectionCount: mergeMode
                         ? 1 + _mergeSources.length
@@ -167,17 +163,15 @@ class _MetadataManagementPageState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    if (!compact) ...<Widget>[
-                      Md3eManagementCatalogToolbar(
-                        facet: kind,
-                        facetCount: count,
-                        onFacetChanged: (ManagedNamedFacetKind value) =>
-                            _handleTabSelected(
-                              kManagedNamedFacetTabOrder.indexOf(value),
-                            ),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                    Md3eManagementCatalogToolbar(
+                      facet: kind,
+                      facetCount: count,
+                      onFacetChanged: (ManagedNamedFacetKind value) =>
+                          _handleTabSelected(
+                            kManagedNamedFacetTabOrder.indexOf(value),
+                          ),
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -214,26 +208,7 @@ class _MetadataManagementPageState
       ],
     );
 
-    if (!compact) {
-      return body;
-    }
-
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    return Scaffold(
-      body: body,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: _handleTabSelected,
-        indicatorColor: scheme.secondaryContainer,
-        destinations: <NavigationDestination>[
-          for (final ManagedNamedFacetKind facet in kManagedNamedFacetTabOrder)
-            NavigationDestination(
-              icon: Icon(_iconForFacet(facet)),
-              label: context.l10n.metadataTabLabel(facet),
-            ),
-        ],
-      ),
-    );
+    return body;
   }
 
   void _handleTabSelected(int index) {
@@ -342,9 +317,7 @@ class _MetadataManagementPageState
 
   void _addEntity(ManagedNamedFacetKind kind, String name) {
     unawaited(
-      ref
-          .read(namedFacetManagementControllerProvider(kind).notifier)
-          .add(name),
+      ref.read(namedFacetManagementControllerProvider(kind).notifier).add(name),
     );
   }
 
@@ -413,13 +386,6 @@ ManagedNamedFacetKind metadataTabKind(int index) {
   }
   return kManagedNamedFacetTabOrder[index];
 }
-
-IconData _iconForFacet(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => LucideIcons.penLine,
-  ManagedNamedFacetKind.tag => LucideIcons.tags,
-  ManagedNamedFacetKind.parody => LucideIcons.clapperboard,
-  ManagedNamedFacetKind.character => LucideIcons.userRound,
-};
 
 bool _isTextInputFocused() {
   final FocusNode? node = FocusManager.instance.primaryFocus;

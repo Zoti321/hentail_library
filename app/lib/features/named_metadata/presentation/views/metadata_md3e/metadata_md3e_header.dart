@@ -15,8 +15,6 @@ const double kMetadataMd3eHeaderExtent =
 /// 粘滞头：普通模式为标题 + 数量 + 操作；合并模式为取消 + 「合并 N 个 tags」。
 class MetadataMd3eHeader extends StatelessWidget {
   const MetadataMd3eHeader({
-    required this.compact,
-    required this.totalCount,
     this.onOpenNavigation,
     this.mergeSelectionCount = 0,
     this.onExitMergeSelection,
@@ -24,8 +22,6 @@ class MetadataMd3eHeader extends StatelessWidget {
     super.key,
   });
 
-  final bool compact;
-  final int totalCount;
   final VoidCallback? onOpenNavigation;
   final int mergeSelectionCount;
   final VoidCallback? onExitMergeSelection;
@@ -83,13 +79,6 @@ class MetadataMd3eHeader extends StatelessWidget {
               ),
             ),
           ),
-          if (compact) ...<Widget>[
-            const SizedBox(width: 12),
-            Text(
-              '$totalCount',
-              style: type.labelLarge.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ],
           const Spacer(),
         ],
       );

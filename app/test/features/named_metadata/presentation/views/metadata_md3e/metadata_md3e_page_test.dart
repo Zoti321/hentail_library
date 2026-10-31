@@ -8,18 +8,20 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/md3e/widgets/selection/md3e_segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   group('MetadataManagementPage (MD3E)', () {
-    testWidgets('compact width shows bottom navigation bar and author chips', (
+    testWidgets('compact width shows capsule toolbar without bottom bar', (
       WidgetTester tester,
     ) async {
       await _pumpPage(tester, viewportWidth: 360);
 
       expect(tester.takeException(), isNull);
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(Md3eSegmentedCapsuleBar), findsOneWidget);
       expect(find.text('作者 A'), findsOneWidget);
     });
 
