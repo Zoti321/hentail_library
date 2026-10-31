@@ -16,12 +16,18 @@ class Md3eSettingsDetailPane extends StatelessWidget {
     required this.showTitle,
     required this.labState,
     required this.onLabStateChanged,
+    this.optionLabels = const Md3eSettingsOptionLabels(),
+    this.showUnwiredTiles = true,
   });
 
   final Md3eSettingsCategory category;
   final bool showTitle;
   final Md3eSettingsLabState labState;
   final ValueChanged<Md3eSettingsLabState> onLabStateChanged;
+  final Md3eSettingsOptionLabels optionLabels;
+
+  /// 为 false 时隐藏尚未接入业务的 tile（Pilot 页面使用）。
+  final bool showUnwiredTiles;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +42,8 @@ class Md3eSettingsDetailPane extends StatelessWidget {
         category,
         labState,
         onLabStateChanged,
+        optionLabels,
+        showUnwiredTiles,
       ),
     );
 
@@ -67,6 +75,8 @@ List<Widget> _sectionsForCategory(
   Md3eSettingsCategory category,
   Md3eSettingsLabState labState,
   ValueChanged<Md3eSettingsLabState> onChanged,
+  Md3eSettingsOptionLabels optionLabels,
+  bool showUnwiredTiles,
 ) {
   final AppLocalizations l10n = context.l10n;
   return switch (category) {
@@ -80,7 +90,10 @@ List<Widget> _sectionsForCategory(
             onTap: () {
               onChanged(
                 labState.copyWith(
-                  themeLabel: labState.themeLabel == '深色' ? '浅色' : '深色',
+                  themeLabel: nextMd3eOption(
+                    labState.themeLabel,
+                    optionLabels.themeOptions,
+                  ),
                 ),
               );
             },
@@ -92,9 +105,10 @@ List<Widget> _sectionsForCategory(
             onTap: () {
               onChanged(
                 labState.copyWith(
-                  localeLabel: labState.localeLabel == '简体中文'
-                      ? 'English'
-                      : '简体中文',
+                  localeLabel: nextMd3eOption(
+                    labState.localeLabel,
+                    optionLabels.localeOptions,
+                  ),
                 ),
               );
             },
@@ -111,8 +125,9 @@ List<Widget> _sectionsForCategory(
             onTap: () {
               onChanged(
                 labState.copyWith(
-                  readingModeLabel: _nextReadingModeLabel(
+                  readingModeLabel: nextMd3eOption(
                     labState.readingModeLabel,
+                    optionLabels.readingModeOptions,
                   ),
                 ),
               );
@@ -120,20 +135,21 @@ List<Widget> _sectionsForCategory(
           ),
         ],
       ),
-      Md3eSettingsSection(
-        title: const Text('内容浏览'),
-        tiles: <Widget>[
-          Md3eSettingsSwitchTile(
-            leading: Symbols.shield,
-            title: const Text('Healthy mode'),
-            description: const Text('库、搜索与历史中隐藏 R18 Comic，不修改分级'),
-            value: labState.healthyMode,
-            onChanged: (bool value) {
-              onChanged(labState.copyWith(healthyMode: value));
-            },
-          ),
-        ],
-      ),
+      if (showUnwiredTiles)
+        Md3eSettingsSection(
+          title: const Text('内容浏览'),
+          tiles: <Widget>[
+            Md3eSettingsSwitchTile(
+              leading: Symbols.shield,
+              title: const Text('Healthy mode'),
+              description: const Text('库、搜索与历史中隐藏 R18 Comic，不修改分级'),
+              value: labState.healthyMode,
+              onChanged: (bool value) {
+                onChanged(labState.copyWith(healthyMode: value));
+              },
+            ),
+          ],
+        ),
     ],
     Md3eSettingsCategory.metadataBackup => <Widget>[
       Md3eSettingsSection(
@@ -190,11 +206,12 @@ List<Widget> _sectionsForCategory(
               onChanged(labState.copyWith(diagnosticMode: value));
             },
           ),
-          Md3eSettingsNavigationTile(
-            leading: Symbols.article,
-            title: Text(l10n.settingsExportLogsLabel),
-            onTap: () {},
-          ),
+          if (showUnwiredTiles)
+            Md3eSettingsNavigationTile(
+              leading: Symbols.article,
+              title: Text(l10n.settingsExportLogsLabel),
+              onTap: () {},
+            ),
         ],
       ),
     ],
@@ -209,12 +226,13 @@ List<Widget> _sectionsForCategory(
               onChanged(labState.copyWith(autoUpdate: value));
             },
           ),
-          Md3eSettingsNavigationTile(
-            leading: Symbols.info,
-            title: Text(l10n.settingsCheckForUpdatesLabel),
-            value: Text(l10n.settingsCurrentVersion('0.0.0-lab')),
-            onTap: () {},
-          ),
+          if (showUnwiredTiles)
+            Md3eSettingsNavigationTile(
+              leading: Symbols.info,
+              title: Text(l10n.settingsCheckForUpdatesLabel),
+              value: Text(l10n.settingsCurrentVersion('0.0.0-lab')),
+              onTap: () {},
+            ),
         ],
       ),
     ],
@@ -229,10 +247,23 @@ const List<String> kMd3eSettingsReadingModeLabels = <String>[
   'Webtoon',
 ];
 
-String _nextReadingModeLabel(String current) {
-  final int index = kMd3eSettingsReadingModeLabels.indexOf(current);
-  return kMd3eSettingsReadingModeLabels[(index + 1) %
-      kMd3eSettingsReadingModeLabels.length];
+/// 设置页可选项文案：Lab 使用默认值，生产 Pilot 注入 l10n 文案（顺序与枚举 `values` 一致）。
+class Md3eSettingsOptionLabels {
+  const Md3eSettingsOptionLabels({
+    this.themeOptions = const <String>['深色', '浅色'],
+    this.localeOptions = const <String>['简体中文', 'English'],
+    this.readingModeOptions = kMd3eSettingsReadingModeLabels,
+  });
+
+  final List<String> themeOptions;
+  final List<String> localeOptions;
+  final List<String> readingModeOptions;
+}
+
+/// 循环切换到下一个可选项；当前值不在列表中时从第一项开始。
+String nextMd3eOption(String current, List<String> options) {
+  final int index = options.indexOf(current);
+  return options[(index + 1) % options.length];
 }
 
 class Md3eSettingsLabState {

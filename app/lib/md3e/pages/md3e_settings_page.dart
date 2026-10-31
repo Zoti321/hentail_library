@@ -21,12 +21,24 @@ class Md3eSettingsPage extends StatefulWidget {
     this.labState = const Md3eSettingsLabState(),
     this.onLabStateChanged,
     this.onBack,
+    this.optionLabels = const Md3eSettingsOptionLabels(),
+    this.showUnwiredTiles = true,
+    this.visibleCategories,
   });
 
   final Md3eSettingsCategory initialCategory;
   final String? masterGroupTitle;
   final Md3eSettingsLabState labState;
   final ValueChanged<Md3eSettingsLabState>? onLabStateChanged;
+
+  /// 可选项文案（生产 Pilot 注入 l10n；Lab 使用默认值）。
+  final Md3eSettingsOptionLabels optionLabels;
+
+  /// 为 false 时隐藏尚未接入业务的 tile。
+  final bool showUnwiredTiles;
+
+  /// 为 null 时显示全部分类；否则只显示列表中的分类。
+  final Set<Md3eSettingsCategory>? visibleCategories;
 
   /// 列表页（非 list-detail）返回：由外层决定回到哪里（壳层上一目的地 / 路由）。
   final VoidCallback? onBack;
@@ -150,6 +162,7 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
                     wide: wide,
                     selected: _selected,
                     masterGroupTitle: widget.masterGroupTitle,
+                    visibleCategories: widget.visibleCategories,
                     onSelect: (Md3eSettingsCategory category) {
                       _selectCategory(category, wide: wide);
                     },
@@ -161,6 +174,8 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
                     showTitle: wide,
                     labState: _labState,
                     onLabStateChanged: _updateLabState,
+                    optionLabels: widget.optionLabels,
+                    showUnwiredTiles: widget.showUnwiredTiles,
                   );
 
                   if (wide) {

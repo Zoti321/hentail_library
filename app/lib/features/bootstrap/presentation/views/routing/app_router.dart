@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_page/library_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_page.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page.dart';
+import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_pilot_page.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_page/home_page.dart';
@@ -107,7 +107,10 @@ final GoRouter appRouter = GoRouter(
           path: '/settings',
           name: '设置',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const SettingsPage()),
+              buildShellNavPage(
+                state: state,
+                child: const SettingsMd3ePilotPage(),
+              ),
         ),
         ...buildSharedContentRoutes(),
       ],

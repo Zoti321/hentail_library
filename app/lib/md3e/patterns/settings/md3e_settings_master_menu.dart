@@ -13,6 +13,7 @@ class Md3eSettingsMasterMenu extends StatelessWidget {
     required this.selected,
     required this.onSelect,
     this.masterGroupTitle,
+    this.visibleCategories,
   });
 
   final bool wide;
@@ -22,9 +23,19 @@ class Md3eSettingsMasterMenu extends StatelessWidget {
   /// Shown above rail items on wide layouts (e.g. 「应用」).
   final String? masterGroupTitle;
 
+  /// 为 null 时显示全部分类。
+  final Set<Md3eSettingsCategory>? visibleCategories;
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
+    final List<Md3eSettingsCategoryInfo> categories =
+        <Md3eSettingsCategoryInfo>[
+          for (final Md3eSettingsCategoryInfo info in kMd3eSettingsCategories)
+            if (visibleCategories == null ||
+                visibleCategories!.contains(info.category))
+              info,
+        ];
 
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
@@ -37,9 +48,11 @@ class Md3eSettingsMasterMenu extends StatelessWidget {
             if (masterGroupTitle != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(28, 16, 28, 8),
-                child: Md3eSettingsSectionHeader(title: Text(masterGroupTitle!)),
+                child: Md3eSettingsSectionHeader(
+                  title: Text(masterGroupTitle!),
+                ),
               ),
-            for (final Md3eSettingsCategoryInfo info in kMd3eSettingsCategories)
+            for (final Md3eSettingsCategoryInfo info in categories)
               Md3eSettingsRailDestination(
                 icon: info.icon,
                 label: info.label(l10n),
@@ -50,7 +63,7 @@ class Md3eSettingsMasterMenu extends StatelessWidget {
             Md3eContentSection.group(
               title: masterGroupTitle ?? l10n.navSettings,
               children: <Widget>[
-                for (final Md3eSettingsCategoryInfo info in kMd3eSettingsCategories)
+                for (final Md3eSettingsCategoryInfo info in categories)
                   Md3eSettingsCategoryTile(
                     icon: info.icon,
                     title: info.label(l10n),
