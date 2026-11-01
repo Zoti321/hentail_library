@@ -13,11 +13,13 @@ class Md3eHistoryPageHeader extends StatelessWidget {
     this.title,
     this.clearEnabled = true,
     this.onClearAll,
+    this.onOpenNavigation,
   });
 
   final String? title;
   final bool clearEnabled;
   final VoidCallback? onClearAll;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,7 @@ class Md3eHistoryPageHeader extends StatelessWidget {
         sizeClass: sizeClass,
         clearEnabled: clearEnabled,
         onClearAll: onClearAll,
+        onOpenNavigation: onOpenNavigation,
       ),
     );
   }
@@ -46,12 +49,14 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
     required this.sizeClass,
     required this.clearEnabled,
     this.onClearAll,
+    this.onOpenNavigation,
   });
 
   final String? title;
   final Md3eWindowSizeClass sizeClass;
   final bool clearEnabled;
   final VoidCallback? onClearAll;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -60,11 +65,29 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
 
+    final bool showMenu =
+        sizeClass.isCompact && onOpenNavigation != null;
+
     return SizedBox(
       height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          if (showMenu) ...<Widget>[
+            M3EIconButton(
+              icon: Icon(
+                Symbols.menu,
+                size: Md3eLibraryPageHeaderMetrics.actionIconSize,
+                color: scheme.onSurfaceVariant,
+              ),
+              variant: M3EIconButtonVariant.standard,
+              size: M3EIconButtonSize.sm,
+              tooltip: l10n.shellOpenNavMenu,
+              semanticLabel: l10n.shellOpenNavMenu,
+              onPressed: onOpenNavigation,
+            ),
+            const SizedBox(width: 4),
+          ],
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,

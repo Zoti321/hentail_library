@@ -2,63 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_browse_page.dart';
+import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_page.dart';
+import 'package:hentai_library/md3e/patterns/history/md3e_history_page_header.dart';
+import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page.dart';
-import 'package:hentai_library/shared/ui/layout/page_header_layout.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page/widgets/history_page_header.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
-  group('History responsive layout', () {
-    testWidgets('compact page uses icon clear and compact title', (
+  group('History MD3E production page', () {
+    testWidgets('compact page shows nav menu and MD3E header', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 360);
 
       expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('阅读历史'));
-      expect(title.style?.fontSize, 18);
-      expect(find.text('清空'), findsNothing);
-      expect(find.byTooltip('清空阅读历史'), findsOneWidget);
-      expect(find.byType(HistoryPageHeaderSection), findsOneWidget);
-      _expectMenuIcon(tester, findsOneWidget);
+      expect(find.byType(HistoryMd3eBrowsePage), findsOneWidget);
+      expect(find.byType(Md3eHistoryPageHeader), findsOneWidget);
+      expect(find.text('阅读历史'), findsOneWidget);
+      expect(find.byIcon(Symbols.menu), findsOneWidget);
     });
 
-    testWidgets('medium page keeps icon clear and medium title', (
+    testWidgets('medium page hides nav menu', (WidgetTester tester) async {
+      await _pumpHistoryPage(tester, viewportWidth: 700);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Symbols.menu), findsNothing);
+    });
+
+    testWidgets('places summary and search below header', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 700);
-
-      expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('阅读历史'));
-      expect(title.style?.fontSize, 22);
-      expect(find.text('清空'), findsNothing);
-      expect(find.byTooltip('清空阅读历史'), findsOneWidget);
-      _expectMenuIcon(tester, findsNothing);
-    });
-
-    testWidgets('expanded page uses expanded title size', (
-      WidgetTester tester,
-    ) async {
-      await _pumpHistoryPage(tester, viewportWidth: 1200);
-
-      expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('阅读历史'));
-      expect(title.style?.fontSize, 26);
-    });
-
-    testWidgets('places subtitle and search in body below header', (
-      WidgetTester tester,
-    ) async {
-      await _pumpHistoryPage(tester, viewportWidth: 700);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(tester.takeException(), isNull);
       expect(find.textContaining('条记录'), findsOneWidget);
@@ -68,19 +55,28 @@ void main() {
       expect(subtitle.dy, greaterThan(title.dy));
     });
 
-    testWidgets('compact grid renders a single column of history cards', (
+    testWidgets('renders grouped history list items', (
       WidgetTester tester,
     ) async {
-      await _pumpHistoryPage(tester, viewportWidth: 360);
-      await tester.pumpAndSettle();
+      await _pumpHistoryPage(tester, viewportWidth: 700);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
-      final PageHeaderGridMetrics metrics = pageHeaderGridMetrics(
-        PageHeaderLayoutTier.compact,
-        360,
-      );
-      expect(metrics.crossAxisCount, 1);
       expect(find.text('Alpha'), findsOneWidget);
       expect(find.text('Beta'), findsOneWidget);
+    });
+
+    testWidgets('production path applies app font on M3E theme', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHistoryPage(tester, viewportWidth: 700);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      final M3EThemeData theme = M3ETheme.of(
+        tester.element(find.byType(Md3eHistoryPageHeader)),
+      );
+      expect(theme.typeScale.titleMedium.fontFamily, kMd3eAppFontFamily);
     });
   });
 }
@@ -101,20 +97,12 @@ Future<void> _pumpHistoryPage(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(body: HistoryPage()),
+        home: const Scaffold(body: HistoryMd3ePage()),
       ),
     ),
   );
   await tester.pump();
-}
-
-void _expectMenuIcon(WidgetTester tester, Matcher matcher) {
-  expect(
-    find.byWidgetPredicate(
-      (Widget widget) => widget is Icon && widget.icon == LucideIcons.menu,
-    ),
-    matcher,
-  );
+  await tester.pump(const Duration(milliseconds: 300));
 }
 
 List<Override> _historyPageTestOverrides() {
