@@ -4,6 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_clear_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -25,21 +26,16 @@ class Md3eHistoryPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(windowWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      windowWidth,
+    );
 
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: Md3eLibraryPageHeaderMetrics.verticalPadding,
-        bottom: Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding,
-      ),
-      child: _Md3eHistoryPageHeaderToolbar(
-        title: title,
-        sizeClass: sizeClass,
-        clearEnabled: clearEnabled,
-        onClearAll: onClearAll,
-        onOpenNavigation: onOpenNavigation,
-      ),
+    return _Md3eHistoryPageHeaderToolbar(
+      title: title,
+      sizeClass: sizeClass,
+      clearEnabled: clearEnabled,
+      onClearAll: onClearAll,
+      onOpenNavigation: onOpenNavigation,
     );
   }
 }
@@ -66,11 +62,9 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
 
-    final bool showMenu =
-        sizeClass.isCompact && onOpenNavigation != null;
+    final bool showMenu = sizeClass.isCompact && onOpenNavigation != null;
 
-    return SizedBox(
-      height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
+    return Md3ePinnedToolbarChrome(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[

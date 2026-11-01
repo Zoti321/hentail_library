@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/ui/patterns/shared/detail_header_toolbar.d
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 系列详情工具栏内容（粘滞阴影由 [Md3eLibraryPinnedHeaderDelegate] 绘制）。
+/// 系列详情工具栏内容（粘滞阴影由 [Md3ePageHeaderDelegate] 绘制）。
 class Md3eSeriesDetailPageHeader extends StatelessWidget {
   const Md3eSeriesDetailPageHeader({
     super.key,

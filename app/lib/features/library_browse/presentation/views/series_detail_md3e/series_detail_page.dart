@@ -5,7 +5,7 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/series_detail_page_metrics.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/series_detail/series_detail_comics_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/series_detail/series_detail_intro_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/series_detail/series_detail_page_header.dart';
@@ -58,9 +58,7 @@ class Md3eSeriesDetailPage extends StatefulWidget {
 }
 
 class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
-  final GlobalKey _headerMeasureKey = GlobalKey();
   final GlobalKey _comicsSectionKey = GlobalKey();
-  double? _headerExtent;
   late int _pageSize = widget.entry.initialPageSize;
   late int _page = widget.entry.initialPage.clamp(
     1,
@@ -110,7 +108,6 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
     super.initState();
     _ownsScrollController = widget.scrollController == null;
     _scrollController = widget.scrollController ?? ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -120,7 +117,6 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
       _pageSize = widget.entry.initialPageSize;
       _page = widget.entry.initialPage.clamp(1, _totalPages);
     }
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -129,18 +125,6 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
       _scrollController.dispose();
     }
     super.dispose();
-  }
-
-  void _measureHeaderExtent(Duration _) {
-    final RenderBox? box =
-        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
-    if (!mounted || box == null) {
-      return;
-    }
-    final double height = box.size.height;
-    if (_headerExtent != height) {
-      setState(() => _headerExtent = height);
-    }
   }
 
   VoidCallback _resolveVoid(VoidCallback? handler) => handler ?? () {};
@@ -218,18 +202,12 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
       sizeClass,
     );
 
-    final Widget header = KeyedSubtree(
-      key: _headerMeasureKey,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: Md3eSeriesDetailPageHeader(
-          onBack: _resolveVoid(widget.onBack),
-          onEdit: _resolveVoid(widget.onEdit),
-          moreMenuEntries: _resolveMoreMenu(l10n),
-          pageSize: _currentPageSize,
-          onPageSizeChanged: _setPageSize,
-        ),
-      ),
+    final Widget header = Md3eSeriesDetailPageHeader(
+      onBack: _resolveVoid(widget.onBack),
+      onEdit: _resolveVoid(widget.onEdit),
+      moreMenuEntries: _resolveMoreMenu(l10n),
+      pageSize: _currentPageSize,
+      onPageSizeChanged: _setPageSize,
     );
 
     return ColoredBox(
@@ -240,16 +218,13 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
-              if (_headerExtent == null)
-                SliverToBoxAdapter(child: header)
-              else
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: Md3eLibraryPinnedHeaderDelegate(
-                    extent: _headerExtent!,
-                    child: header,
-                  ),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: Md3ePageHeaderDelegate(
+                  pageHorizontal: horizontalPadding,
+                  child: header,
                 ),
+              ),
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(
                   horizontalPadding,

@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/lab_catalog_item_preview.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_page_header.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
@@ -73,29 +73,24 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
 }
 
 class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
-  final GlobalKey _headerMeasureKey = GlobalKey();
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
-  double? _headerExtent;
 
   @override
   void initState() {
     super.initState();
     _ownsScrollController = widget.scrollController == null;
     _scrollController = widget.scrollController ?? ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
   void didUpdateWidget(covariant Md3eLibraryBrowsePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -106,39 +101,22 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
     super.dispose();
   }
 
-  void _measureHeaderExtent(Duration _) {
-    final RenderBox? box =
-        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
-    if (!mounted || box == null) {
-      return;
-    }
-    final double height = box.size.height;
-    if (_headerExtent != height) {
-      setState(() => _headerExtent = height);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      viewportWidth,
+    );
     final double horizontal =
         Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
 
-    final Widget header = KeyedSubtree(
-      key: _headerMeasureKey,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontal),
-        child: Md3eLibraryPageHeader(
-          title: widget.libraryDisplayName,
-          filterSortActive: widget.filterSortActive,
-          pageSize: widget.pageSize,
-          onPageSizeChanged: widget.onPageSizeChanged,
-          overflowMenuEntries: widget.overflowMenuEntries,
-          onFilterSort: widget.onFilterSort,
-        ),
-      ),
+    final Widget header = Md3eLibraryPageHeader(
+      title: widget.libraryDisplayName,
+      filterSortActive: widget.filterSortActive,
+      pageSize: widget.pageSize,
+      onPageSizeChanged: widget.onPageSizeChanged,
+      overflowMenuEntries: widget.overflowMenuEntries,
+      onFilterSort: widget.onFilterSort,
     );
 
     return Stack(
@@ -147,16 +125,13 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
           controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[
-            if (_headerExtent == null)
-              SliverToBoxAdapter(child: header)
-            else
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: Md3eLibraryPinnedHeaderDelegate(
-                  extent: _headerExtent!,
-                  child: header,
-                ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: Md3ePageHeaderDelegate(
+                pageHorizontal: horizontal,
+                child: header,
               ),
+            ),
             if (widget.onDisplayTargetChanged != null)
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(
@@ -252,8 +227,8 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
     Md3eCatalogGridLayout _,
   ) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    final double? readProgress = widget.displayTarget ==
-            LibraryDisplayTarget.comics && index.isEven
+    final double? readProgress =
+        widget.displayTarget == LibraryDisplayTarget.comics && index.isEven
         ? ((index % 9) + 1) / 10
         : null;
     final _Md3eLibraryBrowseCatalogItemCopy copy =
@@ -270,10 +245,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
       cover: ColoredBox(
         color: scheme.surfaceContainerHigh,
         child: Center(
-          child: Icon(
-            Icons.image_outlined,
-            color: scheme.onSurfaceVariant,
-          ),
+          child: Icon(Icons.image_outlined, color: scheme.onSurfaceVariant),
         ),
       ),
       onTap: () => widget.onCatalogItemTap?.call(index),
@@ -339,36 +311,36 @@ class _Md3eLibraryBrowseListSliver extends StatelessWidget {
           ),
         ),
         _ => SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int rowIndex) {
-              final int leftIndex = rowIndex * 2;
-              final int rightIndex = leftIndex + 1;
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    child: _Md3eLibraryBrowseListItem(
-                      scheme: scheme,
-                      index: leftIndex,
-                      displayTarget: displayTarget,
-                      onCatalogItemTap: onCatalogItemTap,
-                    ),
+          delegate: SliverChildBuilderDelegate((
+            BuildContext context,
+            int rowIndex,
+          ) {
+            final int leftIndex = rowIndex * 2;
+            final int rightIndex = leftIndex + 1;
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: _Md3eLibraryBrowseListItem(
+                    scheme: scheme,
+                    index: leftIndex,
+                    displayTarget: displayTarget,
+                    onCatalogItemTap: onCatalogItemTap,
                   ),
-                  Expanded(
-                    child: rightIndex < itemCount
-                        ? _Md3eLibraryBrowseListItem(
-                            scheme: scheme,
-                            index: rightIndex,
-                            displayTarget: displayTarget,
-                            onCatalogItemTap: onCatalogItemTap,
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              );
-            },
-            childCount: (itemCount + 1) ~/ 2,
-          ),
+                ),
+                Expanded(
+                  child: rightIndex < itemCount
+                      ? _Md3eLibraryBrowseListItem(
+                          scheme: scheme,
+                          index: rightIndex,
+                          displayTarget: displayTarget,
+                          onCatalogItemTap: onCatalogItemTap,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            );
+          }, childCount: (itemCount + 1) ~/ 2),
         ),
       },
     );
@@ -397,8 +369,8 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
             index: index,
           ),
         );
-    final double? readProgress = displayTarget == LibraryDisplayTarget.comics &&
-            index.isEven
+    final double? readProgress =
+        displayTarget == LibraryDisplayTarget.comics && index.isEven
         ? ((index % 9) + 1) / 10
         : null;
     return Padding(

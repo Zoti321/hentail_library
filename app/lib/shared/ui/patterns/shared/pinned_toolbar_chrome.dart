@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/pinned_toolbar_chrome_metrics.dart';
 
-/// 粘滞顶栏内工具行容器（内边距与行高；阴影由 [Md3eLibraryPinnedHeaderDelegate] 绘制）。
+/// 粘滞页头内工具行（固定行高；内边距与背景由 [Md3ePageHeaderDelegate] 提供）。
 class Md3ePinnedToolbarChrome extends StatelessWidget {
   const Md3ePinnedToolbarChrome({super.key, required this.child});
 
@@ -10,21 +9,9 @@ class Md3ePinnedToolbarChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    return Padding(
-      padding: EdgeInsets.only(
-        top: Md3ePinnedToolbarChromeMetrics.topPadding(sizeClass),
-        bottom: Md3ePinnedToolbarChromeMetrics.bottomPadding(sizeClass),
-      ),
-      child: SizedBox(
-        height: Md3ePinnedToolbarChromeMetrics.toolbarRowHeight,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: Md3ePinnedToolbarChromeMetrics.innerHorizontalInset,
-          ),
-          child: child,
-        ),
-      ),
+    return SizedBox(
+      height: Md3ePinnedToolbarChromeMetrics.toolbarRowHeight,
+      child: child,
     );
   }
 }

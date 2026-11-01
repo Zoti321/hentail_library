@@ -20,7 +20,8 @@ import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_page_header.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
@@ -52,35 +53,6 @@ class LibraryMd3ePage extends ConsumerStatefulWidget {
 
 class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
   final ScrollController _scrollController = ScrollController();
-  final GlobalKey _headerMeasureKey = GlobalKey();
-  double? _headerExtent;
-  bool _measureScheduled = false;
-
-  void _scheduleHeaderMeasure() {
-    if (_measureScheduled) {
-      return;
-    }
-    _measureScheduled = true;
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
-  }
-
-  void _measureHeaderExtent(Duration _) {
-    _measureScheduled = false;
-    if (!mounted) {
-      return;
-    }
-    final RenderObject? object =
-        _headerMeasureKey.currentContext?.findRenderObject();
-    // 页头可能在本帧之后仍需布局（如 sliver 类型切换），未就绪则下一帧重试。
-    if (object is! RenderBox || !object.hasSize) {
-      _scheduleHeaderMeasure();
-      return;
-    }
-    final double height = object.size.height;
-    if (_headerExtent != height) {
-      setState(() => _headerExtent = height);
-    }
-  }
 
   @override
   void dispose() {
@@ -165,103 +137,94 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       LibraryDisplayTarget.series => seriesCatalog?.pagination,
     };
 
-    _scheduleHeaderMeasure();
-    final Widget header = KeyedSubtree(
-      key: _headerMeasureKey,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 0),
-        child: selection.active
-            ? Md3eLibrarySelectionHeader(
-                pageComicIds: <String>[
-                  for (final Comic comic
-                      in comicsCatalog?.items ?? const <Comic>[])
-                    comic.comicId,
-                ],
-              )
-            : Md3eLibraryPageHeader(
-                title: libraryName,
-                filterSortActive: facade.isFilterSortCustomized,
-                pageSize: target == LibraryDisplayTarget.comics
-                    ? facade.comicsPageSize
-                    : facade.seriesPageSize,
-                onPageSizeChanged: (int size) {
-                  facadeNotifier.setPageSize(size);
-                },
-                onFilterSort: _openFilterSortSheet,
-                overflowMenuEntries: buildLibraryMd3eOverflowEntries(
-                  context: context,
-                  ref: ref,
-                  scanning: scanning,
-                  showSelectionEntry: target == LibraryDisplayTarget.comics,
-                ),
-              ),
-      ),
-    );
+    final Widget header = selection.active
+        ? Md3eLibrarySelectionHeader(
+            pageComicIds: <String>[
+              for (final Comic comic in comicsCatalog?.items ?? const <Comic>[])
+                comic.comicId,
+            ],
+          )
+        : Md3eLibraryPageHeader(
+            title: libraryName,
+            filterSortActive: facade.isFilterSortCustomized,
+            pageSize: target == LibraryDisplayTarget.comics
+                ? facade.comicsPageSize
+                : facade.seriesPageSize,
+            onPageSizeChanged: (int size) {
+              facadeNotifier.setPageSize(size);
+            },
+            onFilterSort: _openFilterSortSheet,
+            overflowMenuEntries: buildLibraryMd3eOverflowEntries(
+              context: context,
+              ref: ref,
+              scanning: scanning,
+              showSelectionEntry: target == LibraryDisplayTarget.comics,
+            ),
+          );
 
     return Scaffold(
-        body: Stack(
-          children: <Widget>[
-            CustomScrollView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: <Widget>[
-                if (_headerExtent == null)
-                  SliverToBoxAdapter(child: header)
-                else
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: Md3eLibraryPinnedHeaderDelegate(
-                      extent: _headerExtent!,
-                      child: header,
-                    ),
+      backgroundColor: md3eLabBrowseCanvasColor(
+        M3ETheme.of(context).colorScheme,
+      ),
+      body: Stack(
+        children: <Widget>[
+          CustomScrollView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: Md3ePageHeaderDelegate(
+                  pageHorizontal: horizontal,
+                  child: header,
+                ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Md3eLibraryCatalogToolbar(
+                    displayTarget: target,
+                    comicCount: comicsCatalog?.pagination.totalCount ?? 0,
+                    seriesCount: seriesCatalog?.pagination.totalCount ?? 0,
+                    onDisplayTargetChanged: facadeNotifier.selectDisplayTarget,
                   ),
+                ),
+              ),
+              ..._buildCatalog(
+                context,
+                target: target,
+                horizontal: horizontal,
+                comicsCatalog: comicsCatalog,
+                seriesCatalog: seriesCatalog,
+                selection: selection,
+              ),
+              if (pagination != null && pagination.totalPages > 1)
                 SliverPadding(
-                  padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 0),
+                  padding: EdgeInsets.fromLTRB(
+                    horizontal,
+                    16,
+                    horizontal,
+                    Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
+                  ),
                   sliver: SliverToBoxAdapter(
-                    child: Md3eLibraryCatalogToolbar(
-                      displayTarget: target,
-                      comicCount: comicsCatalog?.pagination.totalCount ?? 0,
-                      seriesCount: seriesCatalog?.pagination.totalCount ?? 0,
-                      onDisplayTargetChanged:
-                          facadeNotifier.selectDisplayTarget,
+                    child: Md3ePagination(
+                      page: pagination.page,
+                      totalPages: pagination.totalPages,
+                      totalItems: pagination.totalCount,
+                      onPageChanged: (int page) {
+                        facadeNotifier.setPage(target, page);
+                      },
                     ),
                   ),
                 ),
-                ..._buildCatalog(
-                  context,
-                  target: target,
-                  horizontal: horizontal,
-                  comicsCatalog: comicsCatalog,
-                  seriesCatalog: seriesCatalog,
-                  selection: selection,
-                ),
-                if (pagination != null && pagination.totalPages > 1)
-                  SliverPadding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontal,
-                      16,
-                      horizontal,
-                      Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
-                    ),
-                    sliver: SliverToBoxAdapter(
-                      child: Md3ePagination(
-                        page: pagination.page,
-                        totalPages: pagination.totalPages,
-                        totalItems: pagination.totalCount,
-                        onPageChanged: (int page) {
-                          facadeNotifier.setPage(target, page);
-                        },
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            Md3eLibraryScrollToTopButton(
-              scrollController: _scrollController,
-              horizontalPadding: horizontal,
-            ),
-          ],
-        ),
+            ],
+          ),
+          Md3eLibraryScrollToTopButton(
+            scrollController: _scrollController,
+            horizontalPadding: horizontal,
+          ),
+        ],
+      ),
     );
   }
 

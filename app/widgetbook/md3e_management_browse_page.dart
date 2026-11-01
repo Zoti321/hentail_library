@@ -8,7 +8,7 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_draft_entity_chip.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_page_header.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 
 /// 管理页 Lab 壳层：粘滞标题 + 胶囊维度条 + 流式 chip 列表。
@@ -42,10 +42,8 @@ class Md3eManagementBrowsePage extends StatefulWidget {
 }
 
 class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
-  final GlobalKey _headerMeasureKey = GlobalKey();
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
-  double? _headerExtent;
   bool _showInlineCreateField = false;
 
   @override
@@ -53,7 +51,6 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
     super.initState();
     _ownsScrollController = widget.scrollController == null;
     _scrollController = widget.scrollController ?? ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -62,13 +59,11 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
     if (oldWidget.facet != widget.facet) {
       _showInlineCreateField = false;
     }
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -77,18 +72,6 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
       _scrollController.dispose();
     }
     super.dispose();
-  }
-
-  void _measureHeaderExtent(Duration _) {
-    final RenderBox? box =
-        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
-    if (!mounted || box == null) {
-      return;
-    }
-    final double height = box.size.height;
-    if (_headerExtent != height) {
-      setState(() => _headerExtent = height);
-    }
   }
 
   void _handleEntityCreated(String name) {
@@ -131,13 +114,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
     final bool showInlineCreate =
         createEnabled && !useMobileCreateDialog && _showInlineCreateField;
 
-    final Widget header = KeyedSubtree(
-      key: _headerMeasureKey,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontal),
-        child: Md3eManagementPageHeader(title: widget.title),
-      ),
-    );
+    final Widget header = Md3eManagementPageHeader(title: widget.title);
 
     final double scrollBottomPadding = createEnabled
         ? Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass)
@@ -149,16 +126,13 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
           controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[
-            if (_headerExtent == null)
-              SliverToBoxAdapter(child: header)
-            else
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: Md3eLibraryPinnedHeaderDelegate(
-                  extent: _headerExtent!,
-                  child: header,
-                ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: Md3ePageHeaderDelegate(
+                pageHorizontal: horizontal,
+                child: header,
               ),
+            ),
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 horizontal,

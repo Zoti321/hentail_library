@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
+
 import 'history_browse_entry.dart';
+
 import 'package:hentai_library/features/home/presentation/patterns/history/history_browse_content.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 
 export 'history_browse_entry.dart';
 
@@ -21,10 +23,8 @@ class Md3eHistoryBrowsePage extends StatefulWidget {
   });
 
   final List<Md3eHistoryBrowseEntry> entries;
-  final Widget Function(
-    BuildContext context,
-    Md3eHistoryBrowseEntry entry,
-  ) itemBuilder;
+  final Widget Function(BuildContext context, Md3eHistoryBrowseEntry entry)
+  itemBuilder;
   final VoidCallback? onClearAll;
   final ScrollController? scrollController;
 
@@ -38,29 +38,24 @@ class Md3eHistoryBrowsePage extends StatefulWidget {
 }
 
 class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
-  final GlobalKey _headerMeasureKey = GlobalKey();
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
-  double? _headerExtent;
 
   @override
   void initState() {
     super.initState();
     _ownsScrollController = widget.scrollController == null;
     _scrollController = widget.scrollController ?? ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
   void didUpdateWidget(covariant Md3eHistoryBrowsePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -71,23 +66,12 @@ class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
     super.dispose();
   }
 
-  void _measureHeaderExtent(Duration _) {
-    final RenderBox? box =
-        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
-    if (!mounted || box == null) {
-      return;
-    }
-    final double height = box.size.height;
-    if (_headerExtent != height) {
-      setState(() => _headerExtent = height);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      viewportWidth,
+    );
     final double horizontal =
         Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
 
@@ -98,31 +82,22 @@ class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
           clock: widget.clock,
         );
 
-    final Widget header = KeyedSubtree(
-      key: _headerMeasureKey,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontal),
-        child: Md3eHistoryPageHeader(
-          clearEnabled: widget.totalCount > 0,
-          onClearAll: widget.onClearAll,
-        ),
-      ),
+    final Widget header = Md3eHistoryPageHeader(
+      clearEnabled: widget.totalCount > 0,
+      onClearAll: widget.onClearAll,
     );
 
     return CustomScrollView(
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: <Widget>[
-        if (_headerExtent == null)
-          SliverToBoxAdapter(child: header)
-        else
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: Md3eLibraryPinnedHeaderDelegate(
-              extent: _headerExtent!,
-              child: header,
-            ),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: Md3ePageHeaderDelegate(
+            pageHorizontal: horizontal,
+            child: header,
           ),
+        ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
             horizontal,

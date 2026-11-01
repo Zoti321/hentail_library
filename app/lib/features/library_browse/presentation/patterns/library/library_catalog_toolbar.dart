@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_display_target_tabs.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Body-top catalog row: display-target tabs (start) + active count (end).
+/// Body-top catalog row: 漫画 / 系列 胶囊切换（与管理页同款 [Md3eSegmentedCapsuleBar]）+ 当前数量（末端）。
 ///
 /// Scrolls with the grid/list; the pinned header is title + actions only.
 class Md3eLibraryCatalogToolbar extends StatelessWidget {
@@ -26,10 +25,6 @@ class Md3eLibraryCatalogToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      windowWidth,
-    );
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
@@ -42,11 +37,27 @@ class Md3eLibraryCatalogToolbar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(
-          child: Md3eLibraryDisplayTargetTabs(
-            displayTarget: displayTarget,
-            sizeClass: sizeClass,
-            centered: false,
-            onChanged: onDisplayTargetChanged,
+          child: Md3eSegmentedCapsuleBar(
+            segments: <Md3eSegmentedCapsuleSegment>[
+              Md3eSegmentedCapsuleSegment(
+                label: l10n.libraryDisplayTargetTabLabel(
+                  LibraryDisplayTarget.comics,
+                ),
+              ),
+              Md3eSegmentedCapsuleSegment(
+                label: l10n.libraryDisplayTargetTabLabel(
+                  LibraryDisplayTarget.series,
+                ),
+              ),
+            ],
+            selectedIndex: displayTarget == LibraryDisplayTarget.comics ? 0 : 1,
+            onSelected: (int index) {
+              onDisplayTargetChanged(
+                index == 0
+                    ? LibraryDisplayTarget.comics
+                    : LibraryDisplayTarget.series,
+              );
+            },
           ),
         ),
         const SizedBox(width: 12),

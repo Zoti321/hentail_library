@@ -9,7 +9,9 @@ import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -28,48 +30,38 @@ class TrashMd3ePage extends ConsumerWidget {
     );
     final double horizontal =
         Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
-    final double headerExtent =
-        Md3eLibraryPageHeaderMetrics.verticalPadding +
-        Md3eLibraryPageHeaderMetrics.toolbarHeight +
-        Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding;
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
 
-    return NotificationListener<ScrollUpdateNotification>(
-      onNotification: (ScrollUpdateNotification notification) {
-        final ScrollMetrics metrics = notification.metrics;
-        if (metrics.maxScrollExtent > 0 &&
-            metrics.pixels >=
-                metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
-          ref.read(trashPageControllerProvider.notifier).loadMore();
-        }
-        return false;
-      },
-      child: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: <Widget>[
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: Md3eLibraryPinnedHeaderDelegate(
-              extent: headerExtent,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontal),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: Md3eLibraryPageHeaderMetrics.verticalPadding,
-                    bottom: Md3eLibraryPageHeaderMetrics
-                        .browsePinnedHeaderBottomPadding,
-                  ),
-                  child: _TrashHeader(
-                    onOpenNavigation: appShellPageNavigationOpener(context),
-                  ),
+    return ColoredBox(
+      color: md3eLabBrowseCanvasColor(scheme),
+      child: NotificationListener<ScrollUpdateNotification>(
+        onNotification: (ScrollUpdateNotification notification) {
+          final ScrollMetrics metrics = notification.metrics;
+          if (metrics.maxScrollExtent > 0 &&
+              metrics.pixels >=
+                  metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
+            ref.read(trashPageControllerProvider.notifier).loadMore();
+          }
+          return false;
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: <Widget>[
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: Md3ePageHeaderDelegate(
+                pageHorizontal: horizontal,
+                child: _TrashHeader(
+                  onOpenNavigation: appShellPageNavigationOpener(context),
                 ),
               ),
             ),
-          ),
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 24),
-            sliver: const SliverToBoxAdapter(child: _TrashBody()),
-          ),
-        ],
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 24),
+              sliver: const SliverToBoxAdapter(child: _TrashBody()),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -92,8 +84,7 @@ class _TrashHeader extends ConsumerWidget {
     final int selectedCount = state?.selectedIds.length ?? 0;
     final bool hasSelection = selectedCount > 0;
 
-    return SizedBox(
-      height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
+    return Md3ePinnedToolbarChrome(
       child: Row(
         children: <Widget>[
           if (onOpenNavigation != null) ...<Widget>[

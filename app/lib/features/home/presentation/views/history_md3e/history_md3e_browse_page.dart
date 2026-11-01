@@ -5,7 +5,9 @@ import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart
 import 'package:hentai_library/features/home/presentation/patterns/history/history_browse_content.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 生产阅读历史页壳层：粘滞页头 + 正文（Lab 仍用 [Md3eHistoryBrowsePage]）。
 class HistoryMd3eBrowsePage extends StatefulWidget {
@@ -40,29 +42,24 @@ class HistoryMd3eBrowsePage extends StatefulWidget {
 }
 
 class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
-  final GlobalKey _headerMeasureKey = GlobalKey();
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
-  double? _headerExtent;
 
   @override
   void initState() {
     super.initState();
     _ownsScrollController = widget.scrollController == null;
     _scrollController = widget.scrollController ?? ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
   void didUpdateWidget(covariant HistoryMd3eBrowsePage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
@@ -71,18 +68,6 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
       _scrollController.dispose();
     }
     super.dispose();
-  }
-
-  void _measureHeaderExtent(Duration _) {
-    final RenderBox? box =
-        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
-    if (!mounted || box == null) {
-      return;
-    }
-    final double height = box.size.height;
-    if (_headerExtent != height) {
-      setState(() => _headerExtent = height);
-    }
   }
 
   @override
@@ -101,57 +86,51 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
           clock: widget.clock,
         );
 
-    final Widget header = KeyedSubtree(
-      key: _headerMeasureKey,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontal),
-        child: Md3eHistoryPageHeader(
-          clearEnabled: widget.totalCount > 0,
-          onClearAll: widget.onClearAll,
-          onOpenNavigation: widget.onOpenNavigation,
-        ),
-      ),
+    final Widget header = Md3eHistoryPageHeader(
+      clearEnabled: widget.totalCount > 0,
+      onClearAll: widget.onClearAll,
+      onOpenNavigation: widget.onOpenNavigation,
     );
 
-    return CustomScrollView(
-      controller: _scrollController,
-      physics: const AlwaysScrollableScrollPhysics(),
-      slivers: <Widget>[
-        if (_headerExtent == null)
-          SliverToBoxAdapter(child: header)
-        else
+    return ColoredBox(
+      color: md3eLabBrowseCanvasColor(M3ETheme.of(context).colorScheme),
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: <Widget>[
           SliverPersistentHeader(
             pinned: true,
-            delegate: Md3eLibraryPinnedHeaderDelegate(
-              extent: _headerExtent!,
+            delegate: Md3ePageHeaderDelegate(
+              pageHorizontal: horizontal,
               child: header,
             ),
           ),
-        SliverPadding(
-          padding: EdgeInsets.fromLTRB(
-            horizontal,
-            Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(sizeClass),
-            horizontal,
-            Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
-          ),
-          sliver: SliverToBoxAdapter(
-            child: Md3eHistoryBrowseContent<HistoryMd3eBrowseEntry>(
-              totalCount: widget.totalCount,
-              groups: groups,
-              searchField: widget.searchField,
-              emptyMessage: widget.emptyMessage,
-              itemBuilder: widget.itemBuilder,
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              horizontal,
+              Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(sizeClass),
+              horizontal,
+              Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
+            ),
+            sliver: SliverToBoxAdapter(
+              child: Md3eHistoryBrowseContent<HistoryMd3eBrowseEntry>(
+                totalCount: widget.totalCount,
+                groups: groups,
+                searchField: widget.searchField,
+                emptyMessage: widget.emptyMessage,
+                itemBuilder: widget.itemBuilder,
+              ),
             ),
           ),
-        ),
-        if (widget.isLoadingMore)
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          if (widget.isLoadingMore)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
