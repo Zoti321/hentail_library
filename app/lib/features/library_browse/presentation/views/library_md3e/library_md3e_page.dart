@@ -260,7 +260,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     );
   }
 
-  /// 列表模式：单列（compact / medium）或双列（expanded 及以上），与 Widgetbook Lab 一致。
+  /// 列表模式：列数由窗口尺寸与平台决定（见 [md3eComicListColumnCount]），与 Widgetbook Lab 一致。
   Widget _buildCatalogListSliver(
     BuildContext context, {
     required double horizontal,
@@ -287,24 +287,28 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                 BuildContext context,
                 int rowIndex,
               ) {
-                final int leftIndex = rowIndex * 2;
-                final int rightIndex = leftIndex + 1;
+                final int firstIndex = rowIndex * columns;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: _listItemGap),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Expanded(child: itemBuilder(context, leftIndex)),
-                      const SizedBox(width: _listItemGap),
-                      Expanded(
-                        child: rightIndex < itemCount
-                            ? itemBuilder(context, rightIndex)
-                            : const SizedBox.shrink(),
-                      ),
+                      for (
+                        int column = 0;
+                        column < columns;
+                        column++
+                      ) ...<Widget>[
+                        if (column > 0) const SizedBox(width: _listItemGap),
+                        Expanded(
+                          child: firstIndex + column < itemCount
+                              ? itemBuilder(context, firstIndex + column)
+                              : const SizedBox.shrink(),
+                        ),
+                      ],
                     ],
                   ),
                 );
-              }, childCount: (itemCount + 1) ~/ 2),
+              }, childCount: (itemCount + columns - 1) ~/ columns),
             ),
     );
   }

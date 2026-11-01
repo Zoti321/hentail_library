@@ -11,14 +11,14 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 const String kMd3eComicListItemMetaSeparator = ' · ';
 
 /// List-row cover width (2:3, same media treatment as [Md3eComicCard]).
-const double kMd3eComicListItemCoverWidth = 56;
+const double kMd3eComicListItemCoverWidth = 80;
 
 /// Derived list cover height.
 double get kMd3eComicListItemCoverHeight =>
     kMd3eComicListItemCoverWidth * 3 / 2;
 
 /// Vertical padding inside the shared catalog card shell.
-const double kMd3eComicListItemVerticalPadding = 12;
+const double kMd3eComicListItemVerticalPadding = 10;
 
 /// Minimum row height (cover + vertical insets).
 double get kMd3eComicListItemMinHeight =>

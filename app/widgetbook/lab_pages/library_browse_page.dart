@@ -315,32 +315,25 @@ class _Md3eLibraryBrowseListSliver extends StatelessWidget {
             BuildContext context,
             int rowIndex,
           ) {
-            final int leftIndex = rowIndex * 2;
-            final int rightIndex = leftIndex + 1;
+            final int firstIndex = rowIndex * columns;
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Expanded(
-                  child: _Md3eLibraryBrowseListItem(
-                    scheme: scheme,
-                    index: leftIndex,
-                    displayTarget: displayTarget,
-                    onCatalogItemTap: onCatalogItemTap,
+                for (int column = 0; column < columns; column++) ...<Widget>[
+                  Expanded(
+                    child: firstIndex + column < itemCount
+                        ? _Md3eLibraryBrowseListItem(
+                            scheme: scheme,
+                            index: firstIndex + column,
+                            displayTarget: displayTarget,
+                            onCatalogItemTap: onCatalogItemTap,
+                          )
+                        : const SizedBox.shrink(),
                   ),
-                ),
-                Expanded(
-                  child: rightIndex < itemCount
-                      ? _Md3eLibraryBrowseListItem(
-                          scheme: scheme,
-                          index: rightIndex,
-                          displayTarget: displayTarget,
-                          onCatalogItemTap: onCatalogItemTap,
-                        )
-                      : const SizedBox.shrink(),
-                ),
+                ],
               ],
             );
-          }, childCount: (itemCount + 1) ~/ 2),
+          }, childCount: (itemCount + columns - 1) ~/ columns),
         ),
       },
     );
