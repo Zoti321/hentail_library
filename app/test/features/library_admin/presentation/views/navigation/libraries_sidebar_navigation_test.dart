@@ -17,6 +17,7 @@ import 'package:hentai_library/features/bootstrap/presentation/views/all_librari
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -133,43 +134,35 @@ void main() {
     },
   );
 
-  testWidgets(
-    'compact drawer closes when tapping library section or library row',
-    (WidgetTester tester) async {
-      final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
-        libraries: <LocalLibrary>[_lib('a', 'Alpha'), _lib('b', 'Beta')],
-        currentId: 'a',
-      );
-      late GoRouter router;
-      await _pumpLibrariesShell(
-        tester,
-        fake,
-        (GoRouter r) => router = r,
-        viewportSize: const Size(400, 800),
-      );
+  testWidgets('compact modal navigation closes after picking a library', (
+    WidgetTester tester,
+  ) async {
+    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+      libraries: <LocalLibrary>[_lib('a', 'Alpha'), _lib('b', 'Beta')],
+      currentId: 'a',
+    );
+    late GoRouter router;
+    await _pumpLibrariesShell(
+      tester,
+      fake,
+      (GoRouter r) => router = r,
+      viewportSize: const Size(400, 800),
+    );
 
-      openAppShellNavigationDrawer();
-      await tester.pumpAndSettle();
-      expect(appShellScaffoldKey.currentState?.isDrawerOpen, isTrue);
-      expect(find.text('Beta'), findsOneWidget);
+    openAppShellNavigationDrawer();
+    await tester.pumpAndSettle();
+    expect(find.byType(Md3eNavigationRail), findsOneWidget);
 
-      await tester.tap(find.text('Beta'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('漫画库').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Beta'), findsOneWidget);
 
-      expect(router.state.uri.path, '/libraries/b');
-      expect(appShellScaffoldKey.currentState?.isDrawerOpen, isFalse);
+    await tester.tap(find.text('Beta'));
+    await tester.pumpAndSettle();
 
-      openAppShellNavigationDrawer();
-      await tester.pumpAndSettle();
-      expect(appShellScaffoldKey.currentState?.isDrawerOpen, isTrue);
-
-      await tester.tap(find.text('漫画库').first);
-      await tester.pumpAndSettle();
-
-      expect(router.state.uri.path, LibrariesRoutes.all);
-      expect(appShellScaffoldKey.currentState?.isDrawerOpen, isFalse);
-    },
-  );
+    expect(router.state.uri.path, '/libraries/b');
+    expect(find.byType(Md3eNavigationRail), findsNothing);
+  });
 
   testWidgets('unpinned libraries stay behind 更多 until expanded', (
     WidgetTester tester,

@@ -61,6 +61,7 @@ class Md3eDesktopShell extends StatefulWidget {
     this.belowTitleBar = const <Widget>[],
     this.showNavigationMenu = false,
     this.onNavigationMenuPressed,
+    this.compactShowsWindowControls = false,
   }) : libraries = libraries ?? Md3eLabLibraryCatalog.libraries(),
        initialLibraryId =
            initialLibraryId ?? Md3eLabLibraryCatalog.defaultLibraryId,
@@ -96,11 +97,15 @@ class Md3eDesktopShell extends StatefulWidget {
   final bool showNavigationMenu;
   final VoidCallback? onNavigationMenuPressed;
 
+  /// 紧凑 / 中屏（< expanded）且运行在桌面窗口时，顶部改用带窗口控件的标题栏（☰ 打开 modal 导航）。
+  final bool compactShowsWindowControls;
+
   @override
-  State<Md3eDesktopShell> createState() => _Md3eDesktopShellState();
+  State<Md3eDesktopShell> createState() => Md3eDesktopShellState();
 }
 
-class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
+/// [Md3eDesktopShell] 的状态；外部通过 [GlobalKey] 调用 [openNavigationRail]。
+class Md3eDesktopShellState extends State<Md3eDesktopShell> {
   late bool _railExtended = widget.initialRailExtended;
   int _selectedIndex = Md3eShellNavigation.homeDestinationIndex;
   late String _selectedLibraryId = widget.initialLibraryId;
@@ -357,6 +362,14 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     });
   }
 
+  /// 壳层外部（页头菜单等）打开紧凑 modal 导航；展开态下无操作。
+  void openNavigationRail() {
+    if (!mounted || (_usesExpandedNavigation ?? false)) {
+      return;
+    }
+    _openCompactModalRail();
+  }
+
   Widget _buildCompactContentColumn({
     required BuildContext context,
     required List<Md3eShellRailDestination> specs,
@@ -369,14 +382,25 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       showDecoration: false,
       child: pane,
     );
+    // 桌面窗口需要窗口控件（关闭 / 最小化）；移动端保持纯菜单栏。
+    // 设置页自带返回/标题工具栏，不再显示壳层左上角菜单按钮。
+    final Widget? topBar = widget.compactShowsWindowControls
+        ? Md3eDesktopTitleBar(
+            showWindowControls: true,
+            backgroundColor: Colors.transparent,
+            showNavigationMenu: !isSettings,
+            onNavigationMenuPressed: _openCompactModalRail,
+          )
+        : (isSettings
+              ? null
+              : Md3eShellCompactAppBar(onMenuPressed: _openCompactModalRail));
     return ColoredBox(
       color: surfaces.contentPaneBackground,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // 设置页自带返回/标题工具栏，不再显示壳层左上角菜单按钮。
-          if (!isSettings)
-            Md3eShellCompactAppBar(onMenuPressed: _openCompactModalRail),
+          ?topBar,
+          ...widget.belowTitleBar,
           Expanded(
             child: isSettings
                 ? SafeArea(bottom: false, child: paneWithChrome)

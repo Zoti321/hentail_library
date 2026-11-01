@@ -7,8 +7,6 @@ import 'package:hentai_library/features/app_settings/presentation/views/widgets/
 import 'package:hentai_library/features/library_admin/presentation/views/comic_metadata_bulk_patch_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_scan_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_app_sidebar.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_sidebar_reorder_pane.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/md3e_production_shell_adapters.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
@@ -30,7 +28,7 @@ export 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart'
         Md3eAppShellNavigationSlot,
         Md3eAppShellNavigationSlotBuilder,
         openAppShellNavigationDrawer,
-        appShellScaffoldKey;
+        appShellDesktopShellKey;
 
 /// Composition root: binds app preferences, navigation, and feature shell slots.
 class ApplicationShell extends ConsumerWidget {
@@ -50,10 +48,6 @@ class ApplicationShell extends ConsumerWidget {
 
     return ResponsiveAppShell(
       routeChild: routeChild,
-      activeNavIdForPath: AppNavigation.activeNavIdForPath,
-      onNavDestinationSelected: (BuildContext ctx, String id) {
-        AppNavigation.goToNavId(ctx, id, ref: ref);
-      },
       isDesktopSidebarExpanded: isSidebarExpandedPref,
       onToggleDesktopSidebarExpanded: () {
         ref
@@ -66,10 +60,6 @@ class ApplicationShell extends ConsumerWidget {
         LibraryScanShellFeedback(),
         ComicMetadataBulkPatchShellFeedback(),
       ],
-      sidebarBuilder: (AppShellSidebarSlot slot) => LibrariesAppSidebar(
-        slot: slot,
-        librariesReorderPaneBuilder: (_) => const LibrariesSidebarReorderPane(),
-      ),
       md3eNavigationSlotBuilder: (BuildContext ctx) =>
           _buildMd3eNavigationSlot(context: ctx, ref: ref),
     );
