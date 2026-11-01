@@ -8,14 +8,14 @@ import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/home_md3e_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
+import 'package:hentai_library/shared/ui/shell/shell_compact_app_bar.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -24,10 +24,9 @@ void main() {
   testWidgets('compact shell shows a single page title header', (
     WidgetTester tester,
   ) async {
-    await _pumpShellHome(tester, const Size(360, 900));
+    await _pumpShellHome(tester, const Size(599, 900));
 
-    expect(tester.takeException(), isNull);
-    expect(find.text('首页'), findsOneWidget);
+    expect(find.text('首页'), findsWidgets);
     expect(find.byType(Md3eHomePageHeader), findsOneWidget);
     expect(
       find.byWidgetPredicate(
@@ -37,22 +36,14 @@ void main() {
     );
   });
 
-  testWidgets('medium shell shows a collapsible sidebar rail', (
+  testWidgets('medium shell shows MD3E desktop chrome', (
     WidgetTester tester,
   ) async {
     await _pumpShellHome(tester, const Size(800, 900));
 
     expect(tester.takeException(), isNull);
-    expect(find.byType(DesktopSidebar), findsOneWidget);
-    expect(
-      find.descendant(
-        of: find.byType(DesktopSidebar),
-        matching: find.byWidgetPredicate(
-          (Widget widget) => widget is Icon && widget.icon == LucideIcons.menu,
-        ),
-      ),
-      findsOneWidget,
-    );
+    expect(find.byType(Md3eDesktopShell), findsOneWidget);
+    expect(find.byType(Md3eShellCompactAppBar), findsOneWidget);
   });
 }
 

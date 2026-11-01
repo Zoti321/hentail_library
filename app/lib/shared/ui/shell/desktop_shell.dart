@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
@@ -25,7 +24,9 @@ abstract final class Md3eDesktopShellMetrics {
   static const double paneCornerRadius = 20;
 
   /// Content card: rounded on the leading edge only (rail side).
-  static BorderRadius contentCardLeadingRadius([double radius = paneCornerRadius]) {
+  static BorderRadius contentCardLeadingRadius([
+    double radius = paneCornerRadius,
+  ]) {
     return BorderRadius.only(
       topLeft: Radius.circular(radius),
       bottomLeft: Radius.circular(radius),
@@ -45,27 +46,60 @@ class Md3eDesktopShell extends StatefulWidget {
     super.key,
     this.width,
     this.height = 768,
+    this.fillHeight = false,
     this.initialRailExtended = false,
+    this.railExtended,
+    this.onRailExtendedToggle,
     this.destinations,
+    this.railDestinations,
     this.paneChild,
     this.paneBuilder,
     this.surfaceRoles,
     List<Md3eHomeLibraryDashboardRow>? libraries,
     String? initialLibraryId,
+    this.selectedNavId,
+    this.selectedLibraryId,
+    this.onNavIdSelected,
+    this.onLibrarySelected,
+    this.belowTitleBar = const <Widget>[],
+    this.onSearchSubmitted,
+    this.showNavigationMenu = false,
+    this.onNavigationMenuPressed,
   }) : libraries = libraries ?? Md3eLabLibraryCatalog.libraries(),
        initialLibraryId =
-           initialLibraryId ?? Md3eLabLibraryCatalog.defaultLibraryId;
+           initialLibraryId ?? Md3eLabLibraryCatalog.defaultLibraryId,
+       assert(
+         selectedNavId == null ||
+             (onNavIdSelected != null &&
+                 onLibrarySelected != null &&
+                 selectedLibraryId != null),
+         'Controlled shell requires nav/library selection callbacks and ids.',
+       );
 
   final double? width;
   final double height;
+  final bool fillHeight;
   final bool initialRailExtended;
+  final bool? railExtended;
+  final VoidCallback? onRailExtendedToggle;
   final List<Md3eNavigationRailDestination>? destinations;
+  final List<Md3eShellRailDestination>? railDestinations;
   final Widget? paneChild;
 
   final Md3eDesktopShellPaneBuilder? paneBuilder;
   final Md3eDesktopShellSurfaceRoles? surfaceRoles;
   final List<Md3eHomeLibraryDashboardRow> libraries;
   final String initialLibraryId;
+
+  final String? selectedNavId;
+  final String? selectedLibraryId;
+  final ValueChanged<String>? onNavIdSelected;
+  final ValueChanged<String>? onLibrarySelected;
+
+  final List<Widget> belowTitleBar;
+  final ValueChanged<String>? onSearchSubmitted;
+  final bool showNavigationMenu;
+  final VoidCallback? onNavigationMenuPressed;
 
   @override
   State<Md3eDesktopShell> createState() => _Md3eDesktopShellState();
@@ -83,8 +117,63 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   Timer? _secondaryCloseTimer;
   bool? _usesExpandedNavigation;
 
-  static const Duration _librarySecondaryOpenDelay = Duration(milliseconds: 320);
-  static const Duration _librarySecondaryCloseDelay = Duration(milliseconds: 240);
+  bool get _isControlled => widget.selectedNavId != null;
+
+  bool get _effectiveRailExtended => widget.railExtended ?? _railExtended;
+
+  List<Md3eShellRailDestination> _railSpecs(BuildContext context) {
+    return widget.railDestinations ??
+        md3eLabDefaultShellRailDestinations(context.l10n);
+  }
+
+  List<Md3eNavigationRailDestination> _presentationDestinations(
+    BuildContext context,
+    List<Md3eShellRailDestination> specs,
+  ) {
+    return widget.destinations ?? md3eNavigationDestinationsFromShell(specs);
+  }
+
+  int _libraryAnchorIndex(List<Md3eShellRailDestination> specs) {
+    final int index = md3eShellLibraryAnchorIndex(specs);
+    assert(index >= 0, 'Shell rail must include a library flyout anchor.');
+    return index;
+  }
+
+  int _effectiveSelectedIndex(BuildContext context) {
+    if (_isControlled) {
+      return md3eShellDestinationIndexForNavId(
+        _railSpecs(context),
+        widget.selectedNavId!,
+      );
+    }
+    return _selectedIndex;
+  }
+
+  String get _effectiveSelectedLibraryId {
+    if (_isControlled && widget.selectedLibraryId != null) {
+      return widget.selectedLibraryId!;
+    }
+    return _selectedLibraryId;
+  }
+
+  String _libraryDisplayNameForId(String libraryId) {
+    for (final Md3eHomeLibraryDashboardRow row in widget.libraries) {
+      if (row.libraryId == libraryId) {
+        return row.displayName;
+      }
+    }
+    return Md3eLabLibraryCatalog.displayNameForId(libraryId);
+  }
+
+  String get _selectedLibraryDisplayName =>
+      _libraryDisplayNameForId(_effectiveSelectedLibraryId);
+
+  static const Duration _librarySecondaryOpenDelay = Duration(
+    milliseconds: 320,
+  );
+  static const Duration _librarySecondaryCloseDelay = Duration(
+    milliseconds: 240,
+  );
 
   @override
   void dispose() {
@@ -93,13 +182,10 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     super.dispose();
   }
 
-  String get _selectedLibraryDisplayName =>
-      Md3eLabLibraryCatalog.displayNameForId(_selectedLibraryId);
-
-  Md3eShellNavigationSnapshot get _navigationSnapshot {
+  Md3eShellNavigationSnapshot _navigationSnapshot(BuildContext context) {
     return Md3eShellNavigationSnapshot(
-      destinationIndex: _selectedIndex,
-      selectedLibraryId: _selectedLibraryId,
+      destinationIndex: _effectiveSelectedIndex(context),
+      selectedLibraryId: _effectiveSelectedLibraryId,
       selectedLibraryDisplayName: _selectedLibraryDisplayName,
       onBackToPreviousDestination: _canBackToPreviousCompactDestination
           ? _onBackToPreviousCompactDestination
@@ -179,8 +265,19 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     _secondaryCloseTimer = null;
   }
 
-  void _onRailDestinationSelected(int index) {
-    if (index == Md3eShellNavigation.libraryDestinationIndex) {
+  void _onRailDestinationSelected(
+    BuildContext context,
+    List<Md3eShellRailDestination> specs,
+    int index,
+  ) {
+    final int libraryIndex = _libraryAnchorIndex(specs);
+    if (index == libraryIndex) {
+      return;
+    }
+    if (_isControlled) {
+      widget.onNavIdSelected!(md3eShellNavIdForDestinationIndex(specs, index));
+      setState(() => _librarySecondaryOpen = false);
+      _cancelLibrarySecondaryTimers();
       return;
     }
     setState(() {
@@ -191,6 +288,16 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   }
 
   void _onLibrarySelected(String libraryId) {
+    if (_isControlled) {
+      widget.onLibrarySelected!(libraryId);
+      setState(() {
+        _librarySecondaryOpen = false;
+        _compactModalRailOpen = false;
+        _compactModalLibrarySecondaryOpen = false;
+      });
+      _cancelLibrarySecondaryTimers();
+      return;
+    }
     setState(() {
       _selectedLibraryId = libraryId;
       _selectedIndex = Md3eShellNavigation.libraryDestinationIndex;
@@ -201,9 +308,22 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     _cancelLibrarySecondaryTimers();
   }
 
-  void _onCompactRailDestinationSelected(int index) {
-    if (index == Md3eShellNavigation.libraryDestinationIndex) {
+  void _onCompactRailDestinationSelected(
+    BuildContext context,
+    List<Md3eShellRailDestination> specs,
+    int index,
+  ) {
+    final int libraryIndex = _libraryAnchorIndex(specs);
+    if (index == libraryIndex) {
       setState(() => _compactModalLibrarySecondaryOpen = true);
+      return;
+    }
+    if (_isControlled) {
+      widget.onNavIdSelected!(md3eShellNavIdForDestinationIndex(specs, index));
+      setState(() {
+        _compactModalRailOpen = false;
+        _compactModalLibrarySecondaryOpen = false;
+      });
       return;
     }
     setState(() {
@@ -214,6 +334,14 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       _compactModalRailOpen = false;
       _compactModalLibrarySecondaryOpen = false;
     });
+  }
+
+  void _toggleRailExtended() {
+    if (widget.onRailExtendedToggle != null) {
+      widget.onRailExtendedToggle!();
+      return;
+    }
+    setState(() => _railExtended = !_railExtended);
   }
 
   void _onCompactLibrarySecondaryBack() {
@@ -235,11 +363,13 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   }
 
   Widget _buildCompactContentColumn({
+    required BuildContext context,
+    required List<Md3eShellRailDestination> specs,
     required Md3eDesktopShellSurfaceRoles surfaces,
     required Widget pane,
   }) {
-    final bool isSettings =
-        _selectedIndex == Md3eShellNavigation.settingsDestinationIndex;
+    final int settingsIndex = md3eShellSettingsDestinationIndex(specs);
+    final bool isSettings = _effectiveSelectedIndex(context) == settingsIndex;
     final Widget paneWithChrome = Md3eDesktopShellPane(
       showDecoration: false,
       child: pane,
@@ -251,9 +381,7 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
         children: <Widget>[
           // 设置页自带返回/标题工具栏，不再显示壳层左上角菜单按钮。
           if (!isSettings)
-            Md3eShellCompactAppBar(
-              onMenuPressed: _openCompactModalRail,
-            ),
+            Md3eShellCompactAppBar(onMenuPressed: _openCompactModalRail),
           Expanded(
             child: isSettings
                 ? SafeArea(bottom: false, child: paneWithChrome)
@@ -283,12 +411,13 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
               searchLeadingInset:
                   Md3eDesktopShellMetrics.titleBarContentPadding,
               backgroundColor: Colors.transparent,
+              onSearchSubmitted: widget.onSearchSubmitted,
+              showNavigationMenu: widget.showNavigationMenu,
+              onNavigationMenuPressed: widget.onNavigationMenuPressed,
             ),
+            ...widget.belowTitleBar,
             Expanded(
-              child: Md3eDesktopShellPane(
-                showDecoration: false,
-                child: pane,
-              ),
+              child: Md3eDesktopShellPane(showDecoration: false, child: pane),
             ),
           ],
         ),
@@ -298,31 +427,35 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
 
   Widget _buildPane(BuildContext context) {
     if (widget.paneBuilder != null) {
-      return widget.paneBuilder!(context, _navigationSnapshot);
+      return widget.paneBuilder!(context, _navigationSnapshot(context));
     }
     return widget.paneChild ?? const SizedBox.expand();
   }
 
   Widget _buildRailColumn({
+    required BuildContext context,
+    required List<Md3eShellRailDestination> specs,
     required M3EThemeData railTheme,
     required List<Md3eNavigationRailDestination> destinations,
     required M3ENavigationRailTheme navTheme,
+    required double shellHeight,
   }) {
+    final int libraryIndex = _libraryAnchorIndex(specs);
     final double libraryTop = Md3eShellRailLibraryHoverMetrics.destinationTop(
       theme: navTheme,
-      railExtended: _railExtended,
-      destinationIndex: Md3eShellNavigation.libraryDestinationIndex,
+      railExtended: _effectiveRailExtended,
+      destinationIndex: libraryIndex,
     );
     final double libraryHeight =
         Md3eShellRailLibraryHoverMetrics.destinationHeight(
           theme: navTheme,
-          railExtended: _railExtended,
+          railExtended: _effectiveRailExtended,
         );
 
     return MouseRegion(
       cursor: Md3eShellNavigationCursor.chrome,
       child: SizedBox(
-        height: widget.height,
+        height: shellHeight,
         child: Stack(
           clipBehavior: Clip.none,
           children: <Widget>[
@@ -330,11 +463,11 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
               data: railTheme,
               child: Md3eNavigationRail(
                 destinations: destinations,
-                selectedIndex: _selectedIndex,
-                extended: _railExtended,
-                onMenuPressed: () =>
-                    setState(() => _railExtended = !_railExtended),
-                onDestinationSelected: _onRailDestinationSelected,
+                selectedIndex: _effectiveSelectedIndex(context),
+                extended: _effectiveRailExtended,
+                onMenuPressed: _toggleRailExtended,
+                onDestinationSelected: (int index) =>
+                    _onRailDestinationSelected(context, specs, index),
               ),
             ),
             Positioned(
@@ -359,14 +492,15 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   Widget _buildLibrarySecondaryFlyout({
     required Md3eDesktopShellSurfaceRoles surfaces,
     required M3EColorScheme scheme,
+    required double shellHeight,
   }) {
     return Md3eShellLibrarySecondaryColumn(
       open: _librarySecondaryOpen,
-      height: widget.height,
+      height: shellHeight,
       backgroundColor: surfaces.navigationRailBackground,
       dividerColor: scheme.outlineVariant,
       libraries: widget.libraries,
-      selectedLibraryId: _selectedLibraryId,
+      selectedLibraryId: _effectiveSelectedLibraryId,
       onLibrarySelected: _onLibrarySelected,
       onPointerEnter: _cancelCloseLibrarySecondary,
       onPointerExit: _scheduleCloseLibrarySecondary,
@@ -374,22 +508,29 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
   }
 
   Widget _buildExpandedNavigation({
+    required BuildContext context,
+    required List<Md3eShellRailDestination> specs,
     required M3EThemeData railTheme,
     required Md3eDesktopShellSurfaceRoles surfaces,
     required List<Md3eNavigationRailDestination> destinations,
     required M3ENavigationRailTheme navTheme,
     required M3EColorScheme scheme,
     required Widget contentColumn,
+    required double shellHeight,
   }) {
     final Widget rail = _buildRailColumn(
+      context: context,
+      specs: specs,
       railTheme: railTheme,
       destinations: destinations,
       navTheme: navTheme,
+      shellHeight: shellHeight,
     );
 
     final Widget flyout = _buildLibrarySecondaryFlyout(
       surfaces: surfaces,
       scheme: scheme,
+      shellHeight: shellHeight,
     );
 
     return Row(
@@ -401,11 +542,7 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
             clipBehavior: Clip.none,
             children: <Widget>[
               contentColumn,
-              Positioned(
-                left: 0,
-                top: 0,
-                child: flyout,
-              ),
+              Positioned(left: 0, top: 0, child: flyout),
             ],
           ),
         ),
@@ -417,7 +554,9 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     BuildContext context,
     BoxConstraints constraints,
     Md3eDesktopShellSurfaceRoles surfaces,
+    List<Md3eShellRailDestination> specs,
     List<Md3eNavigationRailDestination> destinations,
+    double shellHeight,
   ) {
     final double shellWidth = constraints.maxWidth;
     _syncShellLayout(shellWidth);
@@ -439,18 +578,26 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
             pane: pane,
             cornerRadius: cornerRadius,
           )
-        : _buildCompactContentColumn(surfaces: surfaces, pane: pane);
+        : _buildCompactContentColumn(
+            context: context,
+            specs: specs,
+            surfaces: surfaces,
+            pane: pane,
+          );
 
     final Widget chrome = ColoredBox(
       color: surfaces.shellBackground,
       child: usesExpandedNav
           ? _buildExpandedNavigation(
+              context: context,
+              specs: specs,
               railTheme: railTheme,
               surfaces: surfaces,
               destinations: destinations,
               navTheme: navTheme,
               scheme: scheme,
               contentColumn: contentColumn,
+              shellHeight: shellHeight,
             )
           : contentColumn,
     );
@@ -461,17 +608,20 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
         if (!usesExpandedNav) ...<Widget>[
           Md3eShellCompactModalRailOverlay(
             open: _compactModalRailOpen,
-            height: widget.height,
+            height: shellHeight,
             m3eTheme: m3e,
             surfaceBackground: surfaces.navigationRailBackground,
             destinations: destinations,
-            selectedIndex: _selectedIndex,
+            selectedIndex: _effectiveSelectedIndex(context),
             onDismiss: _dismissCompactModalRail,
-            onDestinationSelected: _onCompactRailDestinationSelected,
-            libraryDrillInEnabled: _modalLibraryDrillInEnabledForWidth(shellWidth),
+            onDestinationSelected: (int index) =>
+                _onCompactRailDestinationSelected(context, specs, index),
+            libraryDrillInEnabled: _modalLibraryDrillInEnabledForWidth(
+              shellWidth,
+            ),
             librarySecondaryOpen: _compactModalLibrarySecondaryOpen,
             libraries: widget.libraries,
-            selectedLibraryId: _selectedLibraryId,
+            selectedLibraryId: _effectiveSelectedLibraryId,
             onLibrarySecondaryBack: _onCompactLibrarySecondaryBack,
             onLibrarySelected: _onLibrarySelected,
           ),
@@ -485,19 +635,37 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final Md3eDesktopShellSurfaceRoles surfaces =
         widget.surfaceRoles ?? Md3eDesktopShellSurfaceRoles.lab(scheme);
+    final List<Md3eShellRailDestination> specs = _railSpecs(context);
     final List<Md3eNavigationRailDestination> destinations =
-        widget.destinations ??
-        md3eDefaultNavigationRailDestinations(context.l10n);
+        _presentationDestinations(context, specs);
 
     final Widget shell = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final BoxConstraints resolved = widget.width != null
             ? constraints.copyWith(maxWidth: widget.width!)
             : constraints;
+        final double shellHeight = widget.fillHeight
+            ? resolved.maxHeight
+            : widget.height;
+        final Widget body = _buildShellBody(
+          context,
+          resolved,
+          surfaces,
+          specs,
+          destinations,
+          shellHeight,
+        );
+        if (widget.fillHeight) {
+          return SizedBox(
+            width: widget.width,
+            height: shellHeight,
+            child: body,
+          );
+        }
         return SizedBox(
           height: widget.height,
           width: widget.width,
-          child: _buildShellBody(context, resolved, surfaces, destinations),
+          child: body,
         );
       },
     );
@@ -507,6 +675,9 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
       child: shell,
     );
 
+    if (widget.fillHeight) {
+      return wrappedShell;
+    }
     if (widget.width != null) {
       return SizedBox(
         width: widget.width,
@@ -541,16 +712,13 @@ class Md3eDesktopShellPane extends StatelessWidget {
     }
 
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final Color fill =
-        backgroundColor ?? scheme.surfaceContainerLowest;
-    final BorderRadius radius = borderRadius ??
+    final Color fill = backgroundColor ?? scheme.surfaceContainerLowest;
+    final BorderRadius radius =
+        borderRadius ??
         BorderRadius.circular(Md3eDesktopShellMetrics.paneCornerRadius);
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: fill,
-        borderRadius: radius,
-      ),
+      decoration: BoxDecoration(color: fill, borderRadius: radius),
       child: content,
     );
   }

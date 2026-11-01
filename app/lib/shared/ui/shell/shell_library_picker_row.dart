@@ -57,8 +57,9 @@ class Md3eShellLibraryPickerRow extends StatelessWidget {
                         color: selected
                             ? scheme.onSecondaryContainer
                             : scheme.onSurface,
-                        fontWeight:
-                            selected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: selected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                       ),
                     ),
                   ),

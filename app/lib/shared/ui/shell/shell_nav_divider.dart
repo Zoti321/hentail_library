@@ -3,11 +3,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Vertical rule between rail and library secondary pane (M3 nav chrome).
 class Md3eShellNavVerticalDivider extends StatelessWidget {
-  const Md3eShellNavVerticalDivider({
-    super.key,
-    this.color,
-    this.height,
-  });
+  const Md3eShellNavVerticalDivider({super.key, this.color, this.height});
 
   final Color? color;
   final double? height;

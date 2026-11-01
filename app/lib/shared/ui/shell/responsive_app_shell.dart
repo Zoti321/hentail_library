@@ -3,13 +3,18 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar_metrics.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/window_close_listener.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/shell/app_shell_sidebar_slot.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:hentai_library/shared/ui/shell/md3e_app_shell_slot.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 export 'package:hentai_library/shared/ui/shell/app_shell_sidebar_slot.dart';
+export 'package:hentai_library/shared/ui/shell/md3e_app_shell_slot.dart';
 
 enum _ShellLayoutMode { compact, medium, expanded }
 
@@ -33,6 +38,7 @@ class ResponsiveAppShell extends StatelessWidget {
     required this.isDesktopSidebarExpanded,
     required this.onToggleDesktopSidebarExpanded,
     required this.isReaderFullscreen,
+    required this.md3eNavigationSlotBuilder,
     this.shellFeedbackBelowTitleBar = const <Widget>[],
   });
 
@@ -44,6 +50,7 @@ class ResponsiveAppShell extends StatelessWidget {
   final bool isDesktopSidebarExpanded;
   final VoidCallback onToggleDesktopSidebarExpanded;
   final bool isReaderFullscreen;
+  final Md3eAppShellNavigationSlotBuilder md3eNavigationSlotBuilder;
   final List<Widget> shellFeedbackBelowTitleBar;
 
   _ShellLayoutMode _layoutModeForWidth(double width) {
@@ -79,6 +86,31 @@ class ResponsiveAppShell extends StatelessWidget {
     return sidebarBuilder(slot);
   }
 
+  Widget _buildMd3eDesktopShell(
+    BuildContext context,
+    Md3eAppShellNavigationSlot slot,
+  ) {
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final Md3eDesktopShellSurfaceRoles surfaces =
+        slot.surfaceRoles ?? Md3eDesktopShellSurfaceRoles.toneBased(scheme);
+
+    return Md3eDesktopShell(
+      fillHeight: true,
+      railDestinations: slot.railDestinations,
+      libraries: slot.libraries,
+      selectedNavId: slot.selectedNavId,
+      selectedLibraryId: slot.selectedLibraryId,
+      onNavIdSelected: slot.onNavIdSelected,
+      onLibrarySelected: slot.onLibrarySelected,
+      railExtended: isDesktopSidebarExpanded,
+      onRailExtendedToggle: onToggleDesktopSidebarExpanded,
+      surfaceRoles: surfaces,
+      belowTitleBar: shellFeedbackBelowTitleBar,
+      onSearchSubmitted: (String query) => _submitSearch(context, query),
+      paneChild: routeChild,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String path = GoRouterState.of(context).uri.path;
@@ -92,83 +124,92 @@ class ResponsiveAppShell extends StatelessWidget {
           constraints.maxWidth,
         );
         final bool useDrawer = layoutMode == _ShellLayoutMode.compact;
+        final bool useMd3eDesktopChrome = !useDrawer && !hideAppSidebar;
         final bool sidebarExpanded = switch (layoutMode) {
           _ShellLayoutMode.compact => true,
           _ShellLayoutMode.medium ||
           _ShellLayoutMode.expanded => isDesktopSidebarExpanded,
         };
-        final bool showSidebarRail = !hideAppSidebar && !useDrawer;
         final bool showShellChrome =
             constraints.maxHeight >= Md3eDesktopTitleBarMetrics.height;
 
-        final double sidebarRailWidth = showSidebarRail
-            ? (sidebarExpanded
+        final double sidebarRailWidth = useDrawer || useMd3eDesktopChrome
+            ? 0
+            : (sidebarExpanded
                   ? DesktopSidebar.expandedWidth
-                  : DesktopSidebar.collapsedWidth)
-            : 0;
+                  : DesktopSidebar.collapsedWidth);
 
-        return Scaffold(
-          key: appShellScaffoldKey,
-          backgroundColor: M3ETheme.of(context).colorScheme.surfaceContainerLow,
-          drawer: useDrawer && !hideAppSidebar
-              ? Drawer(
-                  width: DesktopSidebar.expandedWidth,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: _buildSidebar(
+        final Widget body = hideAppSidebar
+            ? routeChild
+            : useMd3eDesktopChrome
+            ? _buildMd3eDesktopShell(
+                context,
+                md3eNavigationSlotBuilder(context),
+              )
+            : Row(
+                children: <Widget>[
+                  _buildSidebar(
                     activeNavId: sidebarActiveId,
-                    isExpanded: true,
-                    showCollapseToggle: false,
-                    applyDrawerTopInset: true,
-                    allowLibraryReorder: false,
-                    onLibrariesNavigate: () {
-                      appShellScaffoldKey.currentState?.closeDrawer();
+                    isExpanded: sidebarExpanded,
+                    showCollapseToggle: !useDrawer,
+                    allowLibraryReorder: !useDrawer && sidebarExpanded,
+                    onToggleExpanded: () {
+                      if (!useDrawer) {
+                        onToggleDesktopSidebarExpanded();
+                      }
                     },
-                    onToggleExpanded: () => Navigator.of(context).pop(),
                     onDestinationSelected: (String id) {
-                      Navigator.of(context).pop();
                       onNavDestinationSelected(context, id);
                     },
                   ),
-                )
-              : null,
-          body: Column(
-            children: <Widget>[
-              if (showShellChrome)
-                _ShellTitleBar(
-                  isReaderRoute: isReaderRoute,
-                  isReaderFullscreen: isReaderFullscreen,
-                  showNavigationMenu: useDrawer && !hideAppSidebar,
-                  sidebarRailWidth: sidebarRailWidth,
-                ),
-              if (showShellChrome) ...shellFeedbackBelowTitleBar,
-              Expanded(
-                child: hideAppSidebar
-                    ? routeChild
-                    : Row(
-                        children: <Widget>[
-                          if (showSidebarRail)
-                            _buildSidebar(
-                              activeNavId: sidebarActiveId,
-                              isExpanded: sidebarExpanded,
-                              showCollapseToggle: !useDrawer,
-                              allowLibraryReorder:
-                                  !useDrawer && sidebarExpanded,
-                              onToggleExpanded: () {
-                                if (!useDrawer) {
-                                  onToggleDesktopSidebarExpanded();
-                                }
-                              },
-                              onDestinationSelected: (String id) {
-                                onNavDestinationSelected(context, id);
-                              },
-                            ),
-                          Expanded(child: routeChild),
-                        ],
-                      ),
-              ),
-            ],
+                  Expanded(child: routeChild),
+                ],
+              );
+
+        return Md3eWindowCloseListener(
+          child: Scaffold(
+            key: appShellScaffoldKey,
+            backgroundColor: M3ETheme.of(context)
+                .colorScheme
+                .surfaceContainerLow,
+            drawer: useDrawer && !hideAppSidebar
+                ? Drawer(
+                    width: DesktopSidebar.expandedWidth,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: _buildSidebar(
+                      activeNavId: sidebarActiveId,
+                      isExpanded: true,
+                      showCollapseToggle: false,
+                      applyDrawerTopInset: true,
+                      allowLibraryReorder: false,
+                      onLibrariesNavigate: () {
+                        appShellScaffoldKey.currentState?.closeDrawer();
+                      },
+                      onToggleExpanded: () => Navigator.of(context).pop(),
+                      onDestinationSelected: (String id) {
+                        Navigator.of(context).pop();
+                        onNavDestinationSelected(context, id);
+                      },
+                    ),
+                  )
+                : null,
+            body: useMd3eDesktopChrome
+                ? body
+                : Column(
+                    children: <Widget>[
+                      if (showShellChrome)
+                        _ShellTitleBar(
+                          isReaderRoute: isReaderRoute,
+                          isReaderFullscreen: isReaderFullscreen,
+                          showNavigationMenu: useDrawer && !hideAppSidebar,
+                          sidebarRailWidth: sidebarRailWidth,
+                        ),
+                      if (showShellChrome) ...shellFeedbackBelowTitleBar,
+                      Expanded(child: body),
+                    ],
+                  ),
           ),
         );
       },
@@ -215,7 +256,9 @@ class _ShellTitleBar extends StatelessWidget {
         searchWidth: isReaderRoute
             ? 0
             : Md3eDesktopTitleBarMetrics.defaultSearchWidth,
-        onSearchSubmitted: isReaderRoute ? null : (String query) => _submitSearch(context, query),
+        onSearchSubmitted: isReaderRoute
+            ? null
+            : (String query) => _submitSearch(context, query),
       );
     }
 

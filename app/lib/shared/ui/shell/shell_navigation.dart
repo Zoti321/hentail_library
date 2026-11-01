@@ -1,6 +1,9 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 
-/// Primary shell destination indices (aligned with [md3eDefaultNavigationRailDestinations]).
+/// Primary shell destination indices for the **Lab default** rail
+/// ([md3eLabDefaultShellRailDestinations]).
 abstract final class Md3eShellNavigation {
   static const int homeDestinationIndex = 0;
   static const int libraryDestinationIndex = 1;
@@ -9,6 +12,77 @@ abstract final class Md3eShellNavigation {
   static const int settingsDestinationIndex = 4;
 
   static const double librarySecondaryPanelWidth = 280;
+}
+
+/// One shell rail slot with stable [navId] for production routing.
+class Md3eShellRailDestination {
+  const Md3eShellRailDestination({
+    required this.navId,
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+    this.isLibraryFlyoutAnchor = false,
+  });
+
+  final String navId;
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+  final bool isLibraryFlyoutAnchor;
+
+  Md3eNavigationRailDestination toNavigationDestination() {
+    return Md3eNavigationRailDestination(
+      label: label,
+      icon: icon,
+      selectedIcon: selectedIcon,
+    );
+  }
+}
+
+int md3eShellLibraryAnchorIndex(List<Md3eShellRailDestination> destinations) {
+  return destinations.indexWhere(
+    (Md3eShellRailDestination destination) => destination.isLibraryFlyoutAnchor,
+  );
+}
+
+int md3eShellDestinationIndexForNavId(
+  List<Md3eShellRailDestination> destinations,
+  String navId,
+) {
+  final int index = destinations.indexWhere(
+    (Md3eShellRailDestination destination) => destination.navId == navId,
+  );
+  return index >= 0 ? index : 0;
+}
+
+String md3eShellNavIdForDestinationIndex(
+  List<Md3eShellRailDestination> destinations,
+  int index,
+) {
+  if (index < 0 || index >= destinations.length) {
+    return destinations.first.navId;
+  }
+  return destinations[index].navId;
+}
+
+int md3eShellSettingsDestinationIndex(
+  List<Md3eShellRailDestination> destinations,
+) {
+  final int index = destinations.indexWhere(
+    (Md3eShellRailDestination destination) => destination.navId == 'settings',
+  );
+  return index >= 0 ? index : destinations.length - 1;
+}
+
+List<Md3eNavigationRailDestination> md3eNavigationDestinationsFromShell(
+  List<Md3eShellRailDestination> destinations,
+) {
+  return destinations
+      .map(
+        (Md3eShellRailDestination destination) =>
+            destination.toNavigationDestination(),
+      )
+      .toList(growable: false);
 }
 
 /// Navigation inputs passed to [Md3eDesktopShellPaneBuilder].
@@ -33,3 +107,51 @@ typedef Md3eDesktopShellPaneBuilder = Widget Function(
   BuildContext context,
   Md3eShellNavigationSnapshot navigation,
 );
+
+/// Lab / Widgetbook shell rail specs (no 回收站).
+List<Md3eShellRailDestination> md3eLabDefaultShellRailDestinations(
+  AppLocalizations l10n,
+) {
+  return <Md3eShellRailDestination>[
+    Md3eShellRailDestination(
+      navId: 'home',
+      label: l10n.navHome,
+      icon: Icons.home_outlined,
+      selectedIcon: Icons.home,
+    ),
+    Md3eShellRailDestination(
+      navId: 'library',
+      label: l10n.libraryTitle,
+      icon: Icons.auto_stories_outlined,
+      selectedIcon: Icons.auto_stories,
+      isLibraryFlyoutAnchor: true,
+    ),
+    Md3eShellRailDestination(
+      navId: 'metadata',
+      label: l10n.navMetadata,
+      icon: Icons.layers_outlined,
+      selectedIcon: Icons.layers,
+    ),
+    Md3eShellRailDestination(
+      navId: 'history',
+      label: l10n.navHistory,
+      icon: Icons.history_outlined,
+      selectedIcon: Icons.history,
+    ),
+    Md3eShellRailDestination(
+      navId: 'settings',
+      label: l10n.navSettings,
+      icon: Icons.settings_outlined,
+      selectedIcon: Icons.settings,
+    ),
+  ];
+}
+
+/// Default shell destinations aligned with production nav labels ([AppNavigation]).
+List<Md3eNavigationRailDestination> md3eDefaultNavigationRailDestinations(
+  AppLocalizations l10n,
+) {
+  return md3eNavigationDestinationsFromShell(
+    md3eLabDefaultShellRailDestinations(l10n),
+  );
+}

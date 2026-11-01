@@ -7,7 +7,6 @@ export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart'
     show
         buildAppM3eThemeData,
         flutterColorSchemeFromM3e,
-        kAppBrandSeedColor,
         kMd3eAppFontFamily,
         kMd3eLabSeedColor,
         md3eWithAppFontFamily;
@@ -19,8 +18,7 @@ M3EColorScheme _md3eColorSchemeFor({
   if (dynamicSource != null) {
     final dynamic scheme = dynamicSource;
     final Color seed = scheme.primary as Color;
-    final Brightness resolved =
-        scheme.brightness as Brightness? ?? brightness;
+    final Brightness resolved = scheme.brightness as Brightness? ?? brightness;
     return M3EColorScheme.fromSeed(seed, brightness: resolved);
   }
   return m3eColorSchemeForBrightness(brightness);
@@ -36,7 +34,10 @@ M3EThemeData buildMd3eThemeData({
   Brightness brightness = Brightness.light,
 }) {
   final M3EColorScheme scheme = brightness == Brightness.dark
-      ? _md3eColorSchemeFor(dynamicSource: darkDynamic, brightness: Brightness.dark)
+      ? _md3eColorSchemeFor(
+          dynamicSource: darkDynamic,
+          brightness: Brightness.dark,
+        )
       : _md3eColorSchemeFor(
           dynamicSource: lightDynamic,
           brightness: Brightness.light,
@@ -46,10 +47,7 @@ M3EThemeData buildMd3eThemeData({
 }
 
 /// Flutter [ThemeData] for [MaterialApp] / legacy widgets alongside [M3ETheme].
-ThemeData buildMd3eMaterialTheme(
-  Brightness brightness, {
-  M3EThemeData? m3e,
-}) {
+ThemeData buildMd3eMaterialTheme(Brightness brightness, {M3EThemeData? m3e}) {
   final M3EThemeData resolved =
       m3e ?? buildMd3eThemeData(brightness: brightness);
   return ThemeData(
@@ -68,7 +66,8 @@ class Md3eDynamicTheme extends StatelessWidget {
     M3EThemeData m3e,
     ThemeData theme,
     ThemeData darkTheme,
-  ) builder;
+  )
+  builder;
 
   @override
   Widget build(BuildContext context) {

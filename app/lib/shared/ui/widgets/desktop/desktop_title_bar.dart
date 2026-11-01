@@ -3,6 +3,7 @@ import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar_metri
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_window_controls.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:window_manager/window_manager.dart';
 
 /// Desktop window title strip: global search aligned to the pane + window controls.
 ///
@@ -58,75 +59,90 @@ class Md3eDesktopTitleBar extends StatelessWidget {
       width: double.infinity,
       child: ColoredBox(
         color: backgroundColor ?? scheme.surfaceContainerLow,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final double controlsWidth = showWindowControls
-                ? Md3eDesktopTitleBarMetrics.windowControlsWidth +
-                    Md3eDesktopTitleBarMetrics.windowControlsTrailing
-                : 0;
-            final double menuWidth = showNavigationMenu
-                ? Md3eDesktopTitleBarMetrics.navigationMenuWidth
-                : 0;
-            final double leadingWidth =
-                searchLeadingInset ?? (railWidth + paneGutter);
-            final double availableSearch =
-                constraints.maxWidth -
-                leadingWidth -
-                menuWidth -
-                controlsWidth;
-            final double searchMax =
-                availableSearch < 0 ? 0.0 : availableSearch;
-            final double resolvedSearchWidth = searchWidth.clamp(0, searchMax);
+        child: Stack(
+          children: <Widget>[
+            // Bottom layer: empty title-bar area drags the window; interactive
+            // children above (search, menu, window buttons) receive their own taps.
+            const Positioned.fill(
+              child: DragToMoveArea(child: SizedBox.expand()),
+            ),
+            Positioned.fill(
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final double controlsWidth = showWindowControls
+                      ? Md3eDesktopTitleBarMetrics.windowControlsWidth +
+                            Md3eDesktopTitleBarMetrics.windowControlsTrailing
+                      : 0;
+                  final double menuWidth = showNavigationMenu
+                      ? Md3eDesktopTitleBarMetrics.navigationMenuWidth
+                      : 0;
+                  final double leadingWidth =
+                      searchLeadingInset ?? (railWidth + paneGutter);
+                  final double availableSearch =
+                      constraints.maxWidth -
+                      leadingWidth -
+                      menuWidth -
+                      controlsWidth;
+                  final double searchMax = availableSearch < 0
+                      ? 0.0
+                      : availableSearch;
+                  final double resolvedSearchWidth = searchWidth.clamp(
+                    0,
+                    searchMax,
+                  );
 
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                if (leadingWidth > 0) SizedBox(width: leadingWidth),
-                if (showNavigationMenu)
-                  SizedBox(
-                    width: menuWidth,
-                    height: Md3eDesktopTitleBarMetrics.height,
-                    child: Center(
-                      child: M3EIconButton(
-                        icon: const Icon(Icons.menu),
-                        onPressed: onNavigationMenuPressed,
-                        variant: M3EIconButtonVariant.standard,
-                        size: M3EIconButtonSize.md,
-                      ),
-                    ),
-                  ),
-                if (resolvedSearchWidth > 0)
-                  Expanded(
-                    child: Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: SizedBox(
-                        width: resolvedSearchWidth,
-                        height: Md3eDesktopTitleBarMetrics.searchHeight,
-                        child: _Md3eTitleBarSearchField(
-                          hintText: searchHint,
-                          controller: searchController,
-                          onSubmitted: onSearchSubmitted,
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      if (leadingWidth > 0) SizedBox(width: leadingWidth),
+                      if (showNavigationMenu)
+                        SizedBox(
+                          width: menuWidth,
+                          height: Md3eDesktopTitleBarMetrics.height,
+                          child: Center(
+                            child: M3EIconButton(
+                              icon: const Icon(Icons.menu),
+                              onPressed: onNavigationMenuPressed,
+                              variant: M3EIconButtonVariant.standard,
+                              size: M3EIconButtonSize.md,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
-                else
-                  const Spacer(),
-                if (showWindowControls)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right:
-                          Md3eDesktopTitleBarMetrics.windowControlsTrailing,
-                    ),
-                    child: Md3eDesktopWindowControls(
-                      onMinimize: onWindowMinimize,
-                      onMaximize: onWindowMaximize,
-                      onClose: onWindowClose,
-                    ),
-                  ),
-              ],
-            );
-          },
+                      if (resolvedSearchWidth > 0)
+                        Expanded(
+                          child: Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: SizedBox(
+                              width: resolvedSearchWidth,
+                              height: Md3eDesktopTitleBarMetrics.searchHeight,
+                              child: _Md3eTitleBarSearchField(
+                                hintText: searchHint,
+                                controller: searchController,
+                                onSubmitted: onSearchSubmitted,
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        const Spacer(),
+                      if (showWindowControls)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            right: Md3eDesktopTitleBarMetrics
+                                .windowControlsTrailing,
+                          ),
+                          child: Md3eDesktopWindowControls(
+                            onMinimize: onWindowMinimize,
+                            onMaximize: onWindowMaximize,
+                            onClose: onWindowClose,
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -166,20 +182,14 @@ class _Md3eTitleBarSearchField extends StatelessWidget {
         onSubmitted: onSubmitted,
         margin: 0,
         expandOnFocus: false,
-        leading: Icon(
-          Icons.search,
-          size: 20,
-          color: scheme.onSurfaceVariant,
-        ),
+        leading: Icon(Icons.search, size: 20, color: scheme.onSurfaceVariant),
         constraints: const BoxConstraints(
           minHeight: Md3eDesktopTitleBarMetrics.searchHeight,
           maxHeight: Md3eDesktopTitleBarMetrics.searchHeight,
         ),
         backgroundColor: WidgetStatePropertyAll(scheme.surfaceContainerHigh),
         shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         ),
       ),
     );

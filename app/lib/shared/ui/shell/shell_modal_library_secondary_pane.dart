@@ -25,7 +25,9 @@ class Md3eShellModalLibrarySecondaryPane extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
-    final MaterialLocalizations materialL10n = MaterialLocalizations.of(context);
+    final MaterialLocalizations materialL10n = MaterialLocalizations.of(
+      context,
+    );
 
     return ColoredBox(
       color: backgroundColor ?? scheme.surface,

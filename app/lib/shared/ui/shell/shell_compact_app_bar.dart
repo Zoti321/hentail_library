@@ -9,10 +9,7 @@ abstract final class Md3eShellCompactAppBarMetrics {
 }
 
 class Md3eShellCompactAppBar extends StatelessWidget {
-  const Md3eShellCompactAppBar({
-    super.key,
-    required this.onMenuPressed,
-  });
+  const Md3eShellCompactAppBar({super.key, required this.onMenuPressed});
 
   final VoidCallback onMenuPressed;
 

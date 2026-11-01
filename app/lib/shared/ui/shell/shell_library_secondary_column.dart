@@ -157,10 +157,7 @@ class _Md3eShellLibrarySecondaryColumnState
               textDirection,
             ),
           ),
-          child: ClipRRect(
-            borderRadius: flyoutRadius,
-            child: panelChrome,
-          ),
+          child: ClipRRect(borderRadius: flyoutRadius, child: panelChrome),
         );
 
         final Widget interactivePane = MouseRegion(
@@ -171,7 +168,8 @@ class _Md3eShellLibrarySecondaryColumnState
         );
 
         final double revealedWidth = panelWidth * reveal;
-        final double layoutWidth = revealedWidth +
+        final double layoutWidth =
+            revealedWidth +
             Md3eShellLibrarySecondaryPanelMetrics.trailingShadowMargin;
 
         return SizedBox(

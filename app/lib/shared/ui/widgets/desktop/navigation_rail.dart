@@ -3,6 +3,9 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
+export 'package:hentai_library/shared/ui/shell/shell_navigation.dart'
+    show md3eDefaultNavigationRailDestinations;
+
 /// Layout metrics from Figma `NavigationRail` `41:1577` (MASTER §5.6).
 abstract final class Md3eNavigationRailMetrics {
   static const double collapsedWidth = 80;
@@ -80,35 +83,3 @@ class Md3eNavigationRail extends StatelessWidget {
   }
 }
 
-/// Default shell destinations aligned with production nav labels ([AppNavigation]).
-List<Md3eNavigationRailDestination> md3eDefaultNavigationRailDestinations(
-  AppLocalizations l10n,
-) {
-  return <Md3eNavigationRailDestination>[
-    Md3eNavigationRailDestination(
-      label: l10n.navHome,
-      icon: Icons.home_outlined,
-      selectedIcon: Icons.home,
-    ),
-    Md3eNavigationRailDestination(
-      label: l10n.libraryTitle,
-      icon: Icons.auto_stories_outlined,
-      selectedIcon: Icons.auto_stories,
-    ),
-    Md3eNavigationRailDestination(
-      label: l10n.navMetadata,
-      icon: Icons.layers_outlined,
-      selectedIcon: Icons.layers,
-    ),
-    Md3eNavigationRailDestination(
-      label: l10n.navHistory,
-      icon: Icons.history_outlined,
-      selectedIcon: Icons.history,
-    ),
-    Md3eNavigationRailDestination(
-      label: l10n.navSettings,
-      icon: Icons.settings_outlined,
-      selectedIcon: Icons.settings,
-    ),
-  ];
-}

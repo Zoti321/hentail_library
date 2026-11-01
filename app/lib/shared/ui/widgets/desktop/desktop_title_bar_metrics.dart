@@ -2,6 +2,7 @@
 abstract final class Md3eDesktopTitleBarMetrics {
   static const double height = 64;
   static const double searchHeight = 40;
+
   /// Nominal inset when search is not vertically centered in the 64dp band.
   static const double searchTopInset = 12;
   static const double defaultSearchWidth = 720;

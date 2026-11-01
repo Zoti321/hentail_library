@@ -4,12 +4,9 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:window_manager/window_manager.dart';
 
-bool _md3eWindowManagerInitialized = false;
-
-/// Whether [window_manager] was initialized via [initMd3eWindowManager].
-bool get isMd3eWindowManagerInitialized => _md3eWindowManagerInitialized;
-
-/// Initializes desktop window controls (no-op on web / mobile).
+/// Initializes [windowManager] for desktop platforms (no-op on web / mobile).
+///
+/// Idempotent: [WindowManager.ensureInitialized] may be called more than once.
 Future<void> initMd3eWindowManager() async {
   if (kIsWeb) {
     return;
@@ -18,20 +15,13 @@ Future<void> initMd3eWindowManager() async {
     return;
   }
   await windowManager.ensureInitialized();
-  _md3eWindowManagerInitialized = true;
 }
 
 void md3eWindowManagerMinimize() {
-  if (!_md3eWindowManagerInitialized) {
-    return;
-  }
   unawaited(windowManager.minimize());
 }
 
 void md3eWindowManagerToggleMaximize() {
-  if (!_md3eWindowManagerInitialized) {
-    return;
-  }
   unawaited(() async {
     if (await windowManager.isMaximized()) {
       await windowManager.unmaximize();
@@ -41,9 +31,13 @@ void md3eWindowManagerToggleMaximize() {
   }());
 }
 
+/// Closes the window. Clears `preventClose` first so the close is not swallowed
+/// by the guard in [Md3eWindowCloseListener].
 void md3eWindowManagerClose() {
-  if (!_md3eWindowManagerInitialized) {
-    return;
-  }
-  unawaited(windowManager.close());
+  unawaited(md3eWindowManagerCloseNow());
+}
+
+Future<void> md3eWindowManagerCloseNow() async {
+  await windowManager.setPreventClose(false);
+  await windowManager.close();
 }
