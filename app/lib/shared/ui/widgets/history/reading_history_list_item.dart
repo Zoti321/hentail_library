@@ -210,7 +210,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
       width: double.infinity,
       child: M3ECard(
         variant: M3ECardVariant.filled,
-        color: scheme.surfaceContainerLow,
+        color: scheme.surfaceContainer,
         elevation: 0,
         padding: EdgeInsets.zero,
         borderRadius: radius,

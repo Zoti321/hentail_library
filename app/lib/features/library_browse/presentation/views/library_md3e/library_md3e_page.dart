@@ -17,6 +17,9 @@ import 'package:hentai_library/features/library_browse/presentation/views/librar
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/md3e_comic_card_actions.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
+import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_page_header.dart';
@@ -41,6 +44,9 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// 工具栏与网格之间的顶部间距。
 const double _gridTopGap = 24;
 
+/// 列表行之间（及双列之间）的间距。
+const double _listItemGap = 8;
+
 /// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 网格 + 分页。
 ///
 /// 数据来自库目录控制器（真实 provider）。筛选排序面板为 [Md3eLibraryFilterSortSheet]。
@@ -53,6 +59,7 @@ class LibraryMd3ePage extends ConsumerStatefulWidget {
 
 class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
   final ScrollController _scrollController = ScrollController();
+  Md3eCatalogViewMode _viewMode = Md3eCatalogViewMode.grid;
 
   @override
   void dispose() {
@@ -190,6 +197,29 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                   ),
                 ),
               ),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontal,
+                  Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
+                    Md3eWindowSizeClass.fromWidth(
+                      MediaQuery.sizeOf(context).width,
+                    ),
+                  ),
+                  horizontal,
+                  0,
+                ),
+                sliver: SliverToBoxAdapter(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Md3eCatalogViewModeButtonGroup(
+                      mode: _viewMode,
+                      onModeChanged: (Md3eCatalogViewMode mode) {
+                        setState(() => _viewMode = mode);
+                      },
+                    ),
+                  ),
+                ),
+              ),
               ..._buildCatalog(
                 context,
                 target: target,
@@ -197,6 +227,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                 comicsCatalog: comicsCatalog,
                 seriesCatalog: seriesCatalog,
                 selection: selection,
+                viewMode: _viewMode,
               ),
               if (pagination != null && pagination.totalPages > 1)
                 SliverPadding(
@@ -228,10 +259,60 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     );
   }
 
+  /// 列表模式：单列（compact / medium）或双列（expanded 及以上），与 Widgetbook Lab 一致。
+  Widget _buildCatalogListSliver(
+    BuildContext context, {
+    required double horizontal,
+    required int itemCount,
+    required Widget Function(BuildContext context, int index) itemBuilder,
+  }) {
+    final int columns = md3eComicListColumnCount(
+      Md3eWindowSizeClass.fromWidth(MediaQuery.sizeOf(context).width),
+    );
+    return SliverPadding(
+      padding: EdgeInsets.fromLTRB(horizontal, _gridTopGap, horizontal, 0),
+      sliver: columns == 1
+          ? SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) => Padding(
+                  padding: const EdgeInsets.only(bottom: _listItemGap),
+                  child: itemBuilder(context, index),
+                ),
+                childCount: itemCount,
+              ),
+            )
+          : SliverList(
+              delegate: SliverChildBuilderDelegate((
+                BuildContext context,
+                int rowIndex,
+              ) {
+                final int leftIndex = rowIndex * 2;
+                final int rightIndex = leftIndex + 1;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: _listItemGap),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(child: itemBuilder(context, leftIndex)),
+                      const SizedBox(width: _listItemGap),
+                      Expanded(
+                        child: rightIndex < itemCount
+                            ? itemBuilder(context, rightIndex)
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ),
+                );
+              }, childCount: (itemCount + 1) ~/ 2),
+            ),
+    );
+  }
+
   List<Widget> _buildCatalog(
     BuildContext context, {
     required LibraryDisplayTarget target,
     required double horizontal,
+    required Md3eCatalogViewMode viewMode,
     required LibraryComicsCatalogState? comicsCatalog,
     required LibrarySeriesCatalogState? seriesCatalog,
     required CatalogSelectionState selection,
@@ -254,6 +335,33 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
           ];
         }
         final List<Comic> comics = comicsCatalog.items;
+        if (viewMode == Md3eCatalogViewMode.list) {
+          return <Widget>[
+            _buildCatalogListSliver(
+              context,
+              horizontal: horizontal,
+              itemCount: comics.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Comic comic = comics[index];
+                return Md3eComicCardActions(
+                  comic: comic,
+                  enabled: !selection.active,
+                  child: Md3eComicListItem(
+                    title: comic.title,
+                    pageLabel: l10n.comicDetailPageCount(comic.pageCount),
+                    cover: ComicCoverContent(comicId: comic.comicId),
+                    selectionMode: selection.active,
+                    selected: selection.selectedIds.contains(comic.comicId),
+                    onTap: () => _openComicDetail(comic.comicId),
+                    onSelectionChanged: (_) => ref
+                        .read(catalogSelectionProvider.notifier)
+                        .toggle(comic.comicId),
+                  ),
+                );
+              },
+            ),
+          ];
+        }
         return <Widget>[
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
@@ -302,6 +410,26 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
           ];
         }
         final List<Series> series = seriesCatalog.items;
+        if (viewMode == Md3eCatalogViewMode.list) {
+          return <Widget>[
+            _buildCatalogListSliver(
+              context,
+              horizontal: horizontal,
+              itemCount: series.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Series s = series[index];
+                return Md3eComicListItem(
+                  title: s.name,
+                  pageLabel: context.l10n.seriesVolumeCountLabel(
+                    s.items.length,
+                  ),
+                  cover: SeriesCoverContent(seriesId: s.id),
+                  onTap: () => _openSeriesDetail(s.id),
+                );
+              },
+            ),
+          ];
+        }
         return <Widget>[
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
