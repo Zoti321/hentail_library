@@ -7,7 +7,7 @@ import 'package:hentai_library/features/library_admin/data/local_library_root_ac
 import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_md3e_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
+import 'package:hentai_library/shared/ui/patterns/dialog/md3e_adaptive_form_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -21,7 +21,7 @@ import 'package:path/path.dart' as p;
 
 enum LibraryFormMode { createLocal, createRemote, edit }
 
-/// 打开 Library 创建 / 编辑：compact / medium 全屏；expanded+ M3E basic dialog。
+/// 打开 Library 创建 / 编辑：[M3EDialog.showAdaptive]（宽 < 840 全屏，否则基础弹窗）。
 Future<void> showLibraryMd3eFormDialog({
   required BuildContext context,
   required LibraryFormMode mode,
@@ -39,42 +39,22 @@ Future<void> showLibraryMd3eFormDialog({
   // 侧栏等非 MD3E 页面发起时，路由内同样需要 M3E 主题与应用字体。
   final M3EThemeData m3e = md3eWithAppFontFamily(M3ETheme.of(context));
 
-  if (Md3eLabDialogPresenter.usesFullScreenPresentation(context)) {
-    return Md3eLabDialogPresenter.showFullScreen<void>(
-      context,
-      title: title,
-      body: M3ETheme(
-        data: m3e,
-        child: _LibraryMd3eForm(
-          key: formKey,
-          mode: mode,
-          library: library,
-          formOnly: true,
-        ),
-      ),
-      confirmLabel: isCreate ? l10n.commonAdd : l10n.commonSaveChanges,
-      onConfirm: () => formKey.currentState?._save(),
-      bottomActions: <Widget>[
-        M3EButton(
-          onPressed: () => Navigator.of(context).pop(),
-          style: M3EButtonStyle.text,
-          label: Text(l10n.commonCancel),
-        ),
-      ],
-    );
-  }
-
-  return Md3eLabDialogPresenter.showBasic<void>(
+  return showMd3eAdaptiveFormDialog<void>(
     context,
-    dialog: M3ETheme(
+    title: title,
+    form: M3ETheme(
       data: m3e,
       child: _LibraryMd3eForm(
         key: formKey,
         mode: mode,
         library: library,
-        formOnly: false,
+        formOnly: true,
       ),
     ),
+    confirmLabel: isCreate ? l10n.commonAdd : l10n.commonSaveChanges,
+    dismissLabel: l10n.commonCancel,
+    onConfirm: () => formKey.currentState?._save(),
+    basicMaxWidth: Md3eLibraryEditFormMetrics.maxWidth,
   );
 }
 

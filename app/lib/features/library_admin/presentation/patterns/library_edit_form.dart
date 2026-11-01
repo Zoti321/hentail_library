@@ -9,6 +9,7 @@ import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart
 import 'package:hentai_library/shared/ui/widgets/inputs/scan_interval_dropdown.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
@@ -58,7 +59,9 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
   List<ResourceFormatCategory> get _selectableResourceFormatCategories {
     if (_isRemote) {
       return ResourceFormatCategory.all
-          .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
+          .where(
+            (ResourceFormatCategory g) => g != ResourceFormatCategory.folder,
+          )
           .toList(growable: false);
     }
     return ResourceFormatCategory.all;
@@ -78,7 +81,9 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
       return _Md3eLibraryEditTab.general;
     }
     if (validation.rootError != null) {
-      return _isRemote ? _Md3eLibraryEditTab.webDav : _Md3eLibraryEditTab.general;
+      return _isRemote
+          ? _Md3eLibraryEditTab.webDav
+          : _Md3eLibraryEditTab.general;
     }
     if (validation.passwordError != null) {
       return _Md3eLibraryEditTab.webDav;
@@ -97,7 +102,10 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
   }
 
   void _setResourceFormatCategory(ResourceFormatCategory group, bool enabled) {
-    final Set<ResourceFormatCategory> next = widget.form.enabledResourceFormatCategories.toSet();
+    final Set<ResourceFormatCategory> next = widget
+        .form
+        .enabledResourceFormatCategories
+        .toSet();
     if (enabled) {
       next.add(group);
     } else {
@@ -170,7 +178,8 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
       _Md3eLibraryEditTab.scanner => _ScannerTab(
         scanOnStartup: form.scanOnStartup,
         scanInterval: form.scanInterval,
-        enabledResourceFormatCategories: form.enabledResourceFormatCategories.toSet(),
+        enabledResourceFormatCategories: form.enabledResourceFormatCategories
+            .toSet(),
         selectableResourceFormatCategories: _selectableResourceFormatCategories,
         enabled: widget.enabled,
         onScanOnStartupChanged: (bool value) {
@@ -251,9 +260,8 @@ class _TopTabBar extends StatelessWidget {
     return Md3eSegmentedCapsuleBar(
       segments: tabs
           .map(
-            (_Md3eLibraryEditTab tab) => Md3eSegmentedCapsuleSegment(
-              label: _tabLabel(l10n, tab),
-            ),
+            (_Md3eLibraryEditTab tab) =>
+                Md3eSegmentedCapsuleSegment(label: _tabLabel(l10n, tab)),
           )
           .toList(growable: false),
       selectedIndex: tabs.indexOf(selected),
@@ -277,31 +285,17 @@ class _SideTabList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final M3EThemeData theme = M3ETheme.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: tabs.map((_Md3eLibraryEditTab tab) {
-        final bool isSelected = tab == selected;
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: M3EButton(
-            onPressed: () => onSelected(tabs.indexOf(tab)),
-            style: isSelected ? M3EButtonStyle.tonal : M3EButtonStyle.text,
-            label: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                _tabLabel(l10n, tab),
-                style: theme.typeScale.labelLarge.copyWith(
-                  color: isSelected
-                      ? theme.colorScheme.onSecondaryContainer
-                      : theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
+      children: <Widget>[
+        for (final _Md3eLibraryEditTab tab in tabs)
+          Md3eListDetailNavItem(
+            key: ValueKey<_Md3eLibraryEditTab>(tab),
+            label: _tabLabel(l10n, tab),
+            selected: tab == selected,
+            onTap: () => onSelected(tabs.indexOf(tab)),
           ),
-        );
-      }).toList(),
+      ],
     );
   }
 }
@@ -483,7 +477,8 @@ class _ScannerTab extends StatelessWidget {
   final bool enabled;
   final ValueChanged<bool> onScanOnStartupChanged;
   final ValueChanged<ScanInterval> onScanIntervalChanged;
-  final void Function(ResourceFormatCategory group, bool enabled) onResourceFormatCategoryChanged;
+  final void Function(ResourceFormatCategory group, bool enabled)
+  onResourceFormatCategoryChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -517,9 +512,7 @@ class _ScannerTab extends StatelessWidget {
         SizedBox(height: spacing.lg),
         Text(
           l10n.settingsSupportedFormatsGroupTitle,
-          style: theme.typeScale.titleSmall.copyWith(
-            color: scheme.onSurface,
-          ),
+          style: theme.typeScale.titleSmall.copyWith(color: scheme.onSurface),
         ),
         SizedBox(height: spacing.sm),
         Text(
@@ -529,12 +522,14 @@ class _ScannerTab extends StatelessWidget {
           ),
         ),
         SizedBox(height: spacing.sm),
-        for (final ResourceFormatCategory group in selectableResourceFormatCategories)
+        for (final ResourceFormatCategory group
+            in selectableResourceFormatCategories)
           _ResourceFormatCategoryRow(
             label: l10n.resourceFormatCategoryLabel(group),
             selected: enabledResourceFormatCategories.contains(group),
             enabled: enabled,
-            onChanged: (bool value) => onResourceFormatCategoryChanged(group, value),
+            onChanged: (bool value) =>
+                onResourceFormatCategoryChanged(group, value),
           ),
       ],
     );

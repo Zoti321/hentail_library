@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// App UI font ([pubspec.yaml] `MI_Sans_Regular`); aligned with production shell.
@@ -42,8 +43,16 @@ M3EThemeData applyMd3eShellNavRailOverrides(M3EThemeData base) {
 
 /// Expressive theme for app shell and MD3E widgets (brand seed, nav-rail metrics).
 M3EThemeData buildAppM3eThemeData(Brightness brightness) {
+  final M3EThemeData base = M3EThemeData(
+    colorScheme: m3eColorSchemeForBrightness(brightness),
+  );
   return applyMd3eShellNavRailOverrides(
-    M3EThemeData(colorScheme: m3eColorSchemeForBrightness(brightness)),
+    base.copyWith(
+      // 与 [Md3eBreakpoints.expanded] 对齐：宽度 < 840 时 M3EDialog.showAdaptive 全屏，否则基础弹窗。
+      dialogTheme: base.dialogTheme.copyWith(
+        compactBreakpoint: Md3eBreakpoints.expanded,
+      ),
+    ),
   );
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -42,9 +43,8 @@ class Md3eSettingsNavigationTile extends StatelessWidget {
           if (value != null) ...<Widget>[
             const SizedBox(width: 12),
             DefaultTextStyle.merge(
-              style: M3ETheme.of(context).typeScale.bodyMedium.copyWith(
-                color: _secondaryColor(context, enabled),
-              ),
+              style: M3ETheme.of(context).typeScale.bodyMedium
+                  .copyWith(color: _secondaryColor(context, enabled)),
               child: value!,
             ),
           ],
@@ -144,11 +144,7 @@ class Md3eSettingsCategoryTile extends StatelessWidget {
                 color: scheme.secondaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 18,
-                color: scheme.onSecondaryContainer,
-              ),
+              child: Icon(icon, size: 18, color: scheme.onSecondaryContainer),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -168,10 +164,7 @@ class Md3eSettingsCategoryTile extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Symbols.chevron_right,
-              color: scheme.onSurfaceVariant,
-            ),
+            Icon(Symbols.chevron_right, color: scheme.onSurfaceVariant),
           ],
         ),
       ),
@@ -179,7 +172,7 @@ class Md3eSettingsCategoryTile extends StatelessWidget {
   }
 }
 
-/// Wide list–detail rail capsule item.
+/// Wide list–detail rail capsule item（视觉由 [Md3eListDetailNavItem] 统一提供）。
 class Md3eSettingsRailDestination extends StatelessWidget {
   const Md3eSettingsRailDestination({
     super.key,
@@ -196,40 +189,13 @@ class Md3eSettingsRailDestination extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final M3ETypeScale type = M3ETheme.of(context).typeScale;
-    final Color foreground = selected
-        ? scheme.onSecondaryContainer
-        : scheme.onSurfaceVariant;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Material(
-        color: selected ? scheme.secondaryContainer : Colors.transparent,
-        borderRadius: BorderRadius.circular(28),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox(
-            height: 56,
-            child: Row(
-              children: <Widget>[
-                const SizedBox(width: 16),
-                Icon(icon, size: 24, color: foreground),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: type.labelLarge.copyWith(color: foreground),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 12),
-              ],
-            ),
-          ),
-        ),
+      child: Md3eListDetailNavItem(
+        icon: icon,
+        label: label,
+        selected: selected,
+        onTap: onTap,
       ),
     );
   }
