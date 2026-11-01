@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import '../../../widgetbook/md3e_history_browse_page_lab_host.dart';
 import '../../../widgetbook/md3e_reader_page_lab_host.dart';
-import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item.dart';
+import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';

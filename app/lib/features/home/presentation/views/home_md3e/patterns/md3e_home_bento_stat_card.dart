@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page_metrics.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
-import 'package:hentai_library/md3e/widgets/settings/md3e_tonal_surface.dart';
+import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
 import 'package:material_3_expressive/components/lists/components/m3e_card_radius_motion.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

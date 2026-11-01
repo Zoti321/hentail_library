@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/patterns/home/md3e_home_library_dashboard_models.dart';
+import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 
 void main() {
   test('Md3eHomeLibraryDashboardRow copyWith updates busy flags', () {

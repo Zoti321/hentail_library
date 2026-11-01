@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
-import 'package:hentai_library/md3e/patterns/library_admin/md3e_library_edit_form.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
+import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
 import '../../../../widgetbook/md3e_library_edit_navigation.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

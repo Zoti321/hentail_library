@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/catalog_selection_actions.dart';
-import 'package:hentai_library/md3e/patterns/shared/md3e_pinned_toolbar_chrome.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 
 /// 库页选择模式页头（MD3E）：替换普通页头；退出 / 全选本页 / 清空 / 批量编辑元数据 / 已选数量。
 ///

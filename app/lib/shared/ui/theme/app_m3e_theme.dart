@@ -102,3 +102,16 @@ ColorScheme flutterColorSchemeFromM3e(M3EColorScheme scheme) {
     surfaceBright: scheme.surfaceBright,
   );
 }
+
+/// Flutter [ThemeData] for legacy widgets alongside [M3ETheme] (overlays, dialogs).
+ThemeData buildMd3eMaterialTheme(
+  Brightness brightness, {
+  M3EThemeData? m3e,
+}) {
+  final M3EThemeData resolved = m3e ?? buildAppM3eThemeData(brightness);
+  return ThemeData(
+    useMaterial3: true,
+    fontFamily: kMd3eAppFontFamily,
+    colorScheme: flutterColorSchemeFromM3e(resolved.colorScheme),
+  );
+}

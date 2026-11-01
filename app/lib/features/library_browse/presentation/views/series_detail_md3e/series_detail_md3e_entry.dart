@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/md3e/pages/md3e_series_detail_entry.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';

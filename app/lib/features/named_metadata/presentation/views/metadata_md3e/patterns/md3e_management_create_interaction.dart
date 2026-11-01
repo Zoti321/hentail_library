@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 
 /// 管理页「新建实体」交互：移动端 Dialog、桌面端 chip 流末尾内联字段。
 enum Md3eManagementCreateInteraction { mobileDialog, desktopInline }

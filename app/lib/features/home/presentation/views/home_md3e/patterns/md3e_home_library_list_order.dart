@@ -1,4 +1,4 @@
-import 'package:hentai_library/md3e/widgets/lists/md3e_reorder_index.dart';
+import 'package:hentai_library/shared/ui/widgets/lists/reorder_index.dart';
 
 /// 首页库列表顺序变换（纯函数；UI 只负责触发索引，持久化由上层处理）。
 List<T> applyMd3eHomeLibraryListReorder<T>(

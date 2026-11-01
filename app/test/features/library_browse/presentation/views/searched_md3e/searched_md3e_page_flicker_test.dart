@@ -23,7 +23,7 @@ import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary
 import 'package:hentai_library/shared/domain/repositories/tag_repository.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/searched_md3e/searched_md3e_page.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';

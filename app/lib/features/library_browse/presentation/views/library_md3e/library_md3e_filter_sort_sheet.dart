@@ -5,9 +5,9 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_filter_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_sort_section.dart';
-import 'package:hentai_library/md3e/patterns/library/md3e_library_filter_sort_metrics.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
-import 'package:hentai_library/md3e/widgets/sheets/md3e_overlay_route_scope.dart';
+import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
+import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 库页筛选排序面板（MD3E）：compact / medium 为底部 sheet（全屏展开），expanded+ 为侧边 sheet。

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'lab_theme/md3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Viewport chrome for MD3E Widgetbook use cases (theme comes from [md3eWidgetbookAppBuilder]).

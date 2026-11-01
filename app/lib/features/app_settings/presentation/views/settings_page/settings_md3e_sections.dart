@@ -7,9 +7,9 @@ import 'package:hentai_library/features/app_settings/presentation/log_export_flo
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_controller.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
-import 'package:hentai_library/md3e/patterns/settings/md3e_settings_catalog.dart';
-import 'package:hentai_library/md3e/widgets/settings/md3e_settings_list.dart';
-import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
+import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';

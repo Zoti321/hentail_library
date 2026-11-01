@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/motion/md3e_motion.dart';
+import 'package:hentai_library/shared/ui/motion/motion.dart';
 
 void main() {
   test('Md3eMotion exposes non-zero standard durations', () {

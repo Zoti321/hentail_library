@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/motion/md3e_spring_value.dart';
-import 'package:hentai_library/md3e/widgets/catalog/md3e_cover_read_progress_strip.dart';
+import 'package:hentai_library/shared/ui/motion/spring_value.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/cover_read_progress_strip.dart';
 
 import '../../support/pump_md3e_app.dart';
 

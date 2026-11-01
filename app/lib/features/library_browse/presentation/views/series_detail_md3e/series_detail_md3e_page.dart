@@ -18,8 +18,8 @@ import 'package:hentai_library/features/library_browse/presentation/views/series
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_md3e_entry.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_status_scaffold.dart';
-import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page.dart';
+import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';

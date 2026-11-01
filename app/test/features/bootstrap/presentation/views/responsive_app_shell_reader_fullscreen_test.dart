@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/motion/md3e_spring_reveal.dart';
-import 'package:hentai_library/md3e/widgets/navigation/md3e_library_scroll_to_top_button.dart';
+import 'package:hentai_library/shared/ui/motion/spring_reveal.dart';
+import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
 
 import '../../support/pump_md3e_app.dart';
 

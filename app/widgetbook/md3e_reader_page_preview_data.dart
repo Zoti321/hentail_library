@@ -1,5 +1,5 @@
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_volume.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_volume.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
 
 /// Lab 阅读页预览态（非 FRB Read session）。
 class Md3eReaderPagePreviewData {

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_boundary_snackbar.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_page.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_boundary_snackbar.dart';
 import 'md3e_reader_page_preview_data.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_catalog_sheet.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_volume.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_settings_side_sheet.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_catalog_sheet.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_volume.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_settings_side_sheet.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_tap_zone.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列边界提示方向（与生产 `SeriesBoundaryPrompt` 语义一致，Lab 不依赖 read_session）。

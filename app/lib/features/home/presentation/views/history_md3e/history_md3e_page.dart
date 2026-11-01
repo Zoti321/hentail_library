@@ -9,8 +9,8 @@ import 'package:hentai_library/features/home/presentation/views/history_md3e/his
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_browse_entry.dart';
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_browse_page.dart';
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_list_item.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
-import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field.dart';
+import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

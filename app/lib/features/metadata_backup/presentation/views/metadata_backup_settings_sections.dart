@@ -10,8 +10,8 @@ import 'package:hentai_library/features/metadata_backup/presentation/metadata_im
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
-import 'package:hentai_library/md3e/widgets/settings/md3e_settings_list.dart';
-import 'package:hentai_library/md3e/widgets/settings/md3e_settings_tile.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:intl/intl.dart';

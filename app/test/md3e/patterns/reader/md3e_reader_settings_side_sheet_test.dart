@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_settings_side_sheet.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_settings_side_sheet.dart';
 import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
 
 import '../../../support/pump_md3e_app.dart';

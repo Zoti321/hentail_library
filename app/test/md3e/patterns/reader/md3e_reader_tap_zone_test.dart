@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_tap_zone.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_tap_zone.dart';
 
 void main() {
   test('edge fifths flip pages, center toggles chrome', () {

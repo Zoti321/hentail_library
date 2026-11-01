@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/layout/md3e_catalog_list_layout.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
 
 void main() {
   test('md3eComicListColumnCount uses two columns from expanded up', () {

@@ -19,12 +19,13 @@ List<String> readSharedUiFeatureImportAllowlist() {
 
 List<String> collectSharedUiFeatureImportViolations(Directory libDir) {
   final List<String> roots = <String>[
-    'md3e',
     'shared/ui/widgets',
     'shared/ui/layout',
     'shared/ui/shell',
     'shared/ui/motion',
     'shared/ui/theme',
+    'shared/ui/patterns',
+    'shared/ui/lab',
   ];
   final List<String> violations = <String>[];
   for (final String root in roots) {
@@ -60,7 +61,7 @@ void main() {
     libDir = Directory(p.join(Directory.current.path, 'lib'));
   });
 
-  test('shared UI and md3e do not import features (allowlist contract)', () {
+  test('shared UI does not import features (allowlist contract)', () {
     final List<String> violations = collectSharedUiFeatureImportViolations(
       libDir,
     );

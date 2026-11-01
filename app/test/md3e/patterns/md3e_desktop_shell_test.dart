@@ -1,13 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/data/md3e_lab_library_catalog.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_compact_app_bar.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_navigation.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_shell_rail_library_hover_metrics.dart';
-import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
-import 'package:hentai_library/md3e/widgets/desktop/md3e_navigation_rail.dart';
+import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
+import 'package:hentai_library/shared/ui/shell/shell_compact_app_bar.dart';
+import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
+import 'package:hentai_library/shared/ui/shell/shell_rail_library_hover_metrics.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_md3e_app.dart';

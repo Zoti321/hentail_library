@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/data/md3e_lab_library_catalog.dart';
+import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
 
 import '../../../widgetbook/md3e_home_page_preview_data.dart';
 

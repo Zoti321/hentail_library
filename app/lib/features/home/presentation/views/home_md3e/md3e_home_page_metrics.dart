@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/layout/md3e_spacing.dart';
-import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/spacing.dart';
+import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 
 /// [Md3eHomePage] 间距与内容宽度（对齐生产 Home 与 M3 边距）。
 abstract final class Md3eHomePageMetrics {

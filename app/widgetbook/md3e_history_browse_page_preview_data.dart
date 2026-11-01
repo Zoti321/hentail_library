@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:hentai_library/md3e/pages/md3e_history_browse_entry.dart';
-import 'package:hentai_library/md3e/widgets/history/md3e_reading_history_list_item.dart';
+import 'lab_pages/history_browse_entry.dart';
+import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 
 /// Widgetbook / 预览用阅读历史示例数据。
 abstract final class Md3eHistoryBrowsePagePreviewData {

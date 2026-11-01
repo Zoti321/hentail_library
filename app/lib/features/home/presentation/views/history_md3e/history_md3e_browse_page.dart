@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_browse_entry.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
-import 'package:hentai_library/md3e/patterns/history/md3e_history_browse_content.dart';
-import 'package:hentai_library/md3e/patterns/history/md3e_history_page_header.dart';
-import 'package:hentai_library/md3e/patterns/history/md3e_history_time_grouping.dart';
-import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
+import 'package:hentai_library/features/home/presentation/patterns/history/history_browse_content.dart';
+import 'package:hentai_library/features/home/presentation/patterns/history/history_page_header.dart';
+import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
+import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
 
 /// 生产阅读历史页壳层：粘滞页头 + 正文（Lab 仍用 [Md3eHistoryBrowsePage]）。
 class HistoryMd3eBrowsePage extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/layout/md3e_list_detail_adaptive_layout.dart';
+import 'package:hentai_library/shared/ui/layout/list_detail_adaptive_layout.dart';
 
 import '../../support/pump_md3e_app.dart';
 

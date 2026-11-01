@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/pages/md3e_library_browse_page.dart';
+import '../../../widgetbook/lab_pages/library_browse_page.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/md3e/widgets/actions/md3e_catalog_view_mode_button_group.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 
 import '../../support/pump_md3e_app.dart';
 

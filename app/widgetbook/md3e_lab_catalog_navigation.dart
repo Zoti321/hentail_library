@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/pages/md3e_comic_detail_page.dart';
-import 'package:hentai_library/md3e/pages/md3e_series_detail_page.dart';
-import 'package:hentai_library/md3e/motion/md3e_shared_axis_route.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page.dart';
+import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
 import 'md3e_lab_catalog_detail_preview_data.dart';
-import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_comic_metadata_edit_draft.dart';
-import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_navigation.dart';
-import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_series_metadata_edit_draft.dart';
+import 'package:hentai_library/features/library_browse/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
+import 'package:hentai_library/features/library_browse/presentation/patterns/metadata_edit/metadata_edit_navigation.dart';
+import 'package:hentai_library/features/library_browse/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'md3e_lab_reader_navigation.dart';
-import 'package:hentai_library/md3e/widgets/sheets/md3e_overlay_route_scope.dart';
+import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

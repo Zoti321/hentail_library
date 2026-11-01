@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
-import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar_metrics.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar_metrics.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/shared/ui/shell/app_shell_sidebar_slot.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';

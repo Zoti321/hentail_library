@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
 import '../../../widgetbook/md3e_library_edit_preview_data.dart';
 
 import '../../support/pump_md3e_app.dart';

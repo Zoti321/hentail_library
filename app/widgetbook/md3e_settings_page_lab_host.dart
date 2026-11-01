@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
-import 'package:hentai_library/md3e/patterns/settings/md3e_settings_catalog.dart';
+import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page_body.dart';
+import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 
 /// Lab / Widgetbook：设置页 preview 状态由 Host 持有（阅读偏好、Healthy mode 等 tile 仅内存，不写 AppSetting）。
 class Md3eSettingsPageLabHost extends StatefulWidget {

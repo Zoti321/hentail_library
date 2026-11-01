@@ -1,4 +1,4 @@
-import 'package:hentai_library/md3e/pages/md3e_series_detail_entry.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
 
 /// Widgetbook / 预览用示例系列详情。
 abstract final class Md3eSeriesDetailPagePreviewData {

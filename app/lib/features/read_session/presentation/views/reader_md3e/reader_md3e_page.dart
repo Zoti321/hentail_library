@@ -18,11 +18,11 @@ import 'package:hentai_library/features/read_session/presentation/views/reader_m
 import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_md3e_settings_sheet.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/reader_auto_play_binder.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/md3e/pages/md3e_reader_page.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_catalog_sheet.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_series_volume.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_viewport_status.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_page.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_catalog_sheet.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_volume.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';

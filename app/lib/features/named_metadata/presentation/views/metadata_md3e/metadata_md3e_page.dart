@@ -13,10 +13,10 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_entity_dialog.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_interaction.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_draft_entity_chip.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
-import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
-import 'package:hentai_library/md3e/widgets/navigation/md3e_management_create_entity_fab.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';

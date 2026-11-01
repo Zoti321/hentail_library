@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
-import 'package:hentai_library/md3e/patterns/reader/md3e_reader_adaptive_panel.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_adaptive_panel.dart';
 
 void main() {
   test('compact and medium use bottom sheet, expanded+ uses side sheet', () {

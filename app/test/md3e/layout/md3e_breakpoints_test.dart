@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 
 void main() {
   group('Md3eWindowSizeClass.fromWidth (M3 five tiers)', () {

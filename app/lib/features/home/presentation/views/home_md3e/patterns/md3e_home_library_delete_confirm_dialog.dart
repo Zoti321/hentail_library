@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/l10n/md3e_l10n.dart';
-import 'package:hentai_library/md3e/patterns/dialog/md3e_lab_dialog_presenter.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
-import 'package:hentai_library/md3e/theme/md3e_lab_text.dart';
+import 'package:hentai_library/shared/ui/theme/lab_text.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab：从 Home 预览列表移除 Library 的确认（不写 FRB / 不删 Resource）。

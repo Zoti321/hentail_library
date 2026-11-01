@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/pages/md3e_library_edit_page.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
 import 'md3e_library_edit_preview_data.dart';
-import 'package:hentai_library/md3e/patterns/metadata_edit/md3e_metadata_edit_surface.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
 /// Lab / Widgetbook：Library 表单 preview；远程 WebDAV 凭证可编辑内存，不写 secure storage / 无真实连接。

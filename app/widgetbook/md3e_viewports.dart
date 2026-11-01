@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 /// M3 five-tier [ViewportAddon] presets for Widgetbook (whole catalog).
