@@ -98,7 +98,7 @@ class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
 
     return Md3eEffectsDecoratedBox(
       decoration: BoxDecoration(
-        color: drag?.color ?? colors.surfaceContainerLow,
+        color: drag?.color ?? colors.surfaceContainer,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(topRadius),
           bottom: Radius.circular(bottomRadius),

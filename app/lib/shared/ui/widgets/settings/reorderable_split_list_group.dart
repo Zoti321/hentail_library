@@ -35,7 +35,7 @@ const double _kDragElevation = 8;
 /// 交互与视觉（自实现，手感对齐 M3E 列表拖拽）：
 /// - 长按 [kLongPressTimeout] 开始拖拽，移动超过 [kTouchSlop] 则取消；开始时触发中等震动；
 /// - 源行原位保留高度但隐藏；浮层跟随指针，抬起时向右下偏移 12dp 并投影；
-/// - 占位块（[M3ETheme] 的 surfaceContainerLow）以弹簧跟随目标槽位；
+/// - 占位块（[M3ETheme] 的 surfaceContainer）以弹簧跟随目标槽位；
 /// - 相邻行以弹簧让位，目标变化时触发选择震动；
 /// - 松手时浮层以弹簧回落到目标槽位，回落完成后才回调重排。
 ///
@@ -507,7 +507,7 @@ class _Md3eReorderableSplitListGroupState
     final Widget fill = IgnorePointer(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: scheme.surfaceContainerLow,
+          color: scheme.surfaceContainer,
           borderRadius: BorderRadius.circular(widget.outerRadius),
         ),
       ),
