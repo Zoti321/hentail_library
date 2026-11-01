@@ -35,6 +35,13 @@ void main() {
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             theme: buildAppTheme(Brightness.light),
+            builder: (BuildContext context, Widget? child) {
+              final Brightness brightness = Theme.of(context).brightness;
+              return M3ETheme(
+                data: buildAppM3eThemeData(brightness),
+                child: child ?? const SizedBox.shrink(),
+              );
+            },
             routerConfig: GoRouter(
               routes: <RouteBase>[
                 GoRoute(
@@ -63,7 +70,7 @@ void main() {
       expect(page.onAddLocalLibrary, isNull);
       expect(page.onLibraryAction, isNull);
       expect(page.libraries.map((row) => row.comicCount), <int>[3, 1]);
-      // 生产路径无 Md3eThemeScope，M3ETheme 回退到 Material 主题；排版必须仍带应用字体。
+      // 根 M3ETheme 提供应用字体。
       final M3EThemeData theme = M3ETheme.of(
         tester.element(find.byType(Md3eHomePage)),
       );

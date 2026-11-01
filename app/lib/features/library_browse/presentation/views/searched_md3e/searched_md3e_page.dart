@@ -10,7 +10,6 @@ import 'package:hentai_library/features/library_browse/presentation/view_models/
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/md3e_comic_card_actions.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid.dart';
 import 'package:hentai_library/md3e/layout/md3e_catalog_grid_metrics.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/inputs/md3e_outlined_text_field.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
@@ -114,10 +113,7 @@ class _SearchedMd3ePageState extends ConsumerState<SearchedMd3ePage> {
     final List<Comic> comics = resolved?.items ?? const <Comic>[];
     final int resultCount = resolved?.totalCount ?? comics.length;
 
-    // 生产路径无 Md3eThemeScope，补上应用字体（同首页 HomeMd3ePage）。
-    return M3ETheme(
-      data: md3eWithAppFontFamily(M3ETheme.of(context)),
-      child: NotificationListener<ScrollNotification>(
+    return NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification notification) =>
             _onScrollNotification(notification, trimmedQuery),
         child: CustomScrollView(
@@ -151,7 +147,6 @@ class _SearchedMd3ePageState extends ConsumerState<SearchedMd3ePage> {
             ),
           ],
         ),
-      ),
     );
   }
 

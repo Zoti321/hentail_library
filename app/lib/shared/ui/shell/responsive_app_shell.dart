@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
+import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar_metrics.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/shared/ui/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/shared/ui/shell/app_shell_sidebar_slot.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 export 'package:hentai_library/shared/ui/shell/app_shell_sidebar_slot.dart';
@@ -97,10 +99,17 @@ class ResponsiveAppShell extends StatelessWidget {
         };
         final bool showSidebarRail = !hideAppSidebar && !useDrawer;
         final bool showShellChrome =
-            constraints.maxHeight >= AppTitleBar.height;
+            constraints.maxHeight >= Md3eDesktopTitleBarMetrics.height;
+
+        final double sidebarRailWidth = showSidebarRail
+            ? (sidebarExpanded
+                  ? DesktopSidebar.expandedWidth
+                  : DesktopSidebar.collapsedWidth)
+            : 0;
 
         return Scaffold(
           key: appShellScaffoldKey,
+          backgroundColor: M3ETheme.of(context).colorScheme.surfaceContainerLow,
           drawer: useDrawer && !hideAppSidebar
               ? Drawer(
                   width: DesktopSidebar.expandedWidth,
@@ -130,6 +139,8 @@ class ResponsiveAppShell extends StatelessWidget {
                 _ShellTitleBar(
                   isReaderRoute: isReaderRoute,
                   isReaderFullscreen: isReaderFullscreen,
+                  showNavigationMenu: useDrawer && !hideAppSidebar,
+                  sidebarRailWidth: sidebarRailWidth,
                 ),
               if (showShellChrome) ...shellFeedbackBelowTitleBar,
               Expanded(
@@ -171,10 +182,14 @@ class _ShellTitleBar extends StatelessWidget {
   const _ShellTitleBar({
     required this.isReaderRoute,
     required this.isReaderFullscreen,
+    required this.showNavigationMenu,
+    required this.sidebarRailWidth,
   });
 
   final bool isReaderRoute;
   final bool isReaderFullscreen;
+  final bool showNavigationMenu;
+  final double sidebarRailWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -183,13 +198,25 @@ class _ShellTitleBar extends StatelessWidget {
         return const SizedBox.shrink();
       }
       if (supportsDesktopWindowChrome) {
-        return const AppTitleBar();
+        return const Md3eDesktopTitleBar(
+          railWidth: 0,
+          searchWidth: 0,
+          showNavigationMenu: false,
+        );
       }
       return const SizedBox.shrink();
     }
 
     if (supportsDesktopWindowChrome) {
-      return const AppTitleBar();
+      return Md3eDesktopTitleBar(
+        railWidth: sidebarRailWidth,
+        showNavigationMenu: showNavigationMenu,
+        onNavigationMenuPressed: openAppShellNavigationDrawer,
+        searchWidth: isReaderRoute
+            ? 0
+            : Md3eDesktopTitleBarMetrics.defaultSearchWidth,
+        onSearchSubmitted: isReaderRoute ? null : (String query) => _submitSearch(context, query),
+      );
     }
 
     return ColoredBox(
@@ -197,4 +224,12 @@ class _ShellTitleBar extends StatelessWidget {
       child: const SafeArea(bottom: false, child: SizedBox.shrink()),
     );
   }
+}
+
+void _submitSearch(BuildContext context, String query) {
+  final String trimmed = query.trim();
+  if (trimmed.isEmpty) {
+    return;
+  }
+  context.go('/searched?q=${Uri.encodeQueryComponent(trimmed)}');
 }

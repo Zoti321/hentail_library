@@ -21,7 +21,6 @@ import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart
 import 'package:hentai_library/md3e/patterns/library/md3e_library_catalog_toolbar.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/catalog/md3e_comic_card.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_library_scroll_to_top_button.dart';
 import 'package:hentai_library/md3e/widgets/pagination/md3e_pagination.dart';
@@ -199,10 +198,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       ),
     );
 
-    // 生产路径无 Md3eThemeScope，补上应用字体（同首页 HomeMd3ePage）。
-    return M3ETheme(
-      data: md3eWithAppFontFamily(M3ETheme.of(context)),
-      child: Scaffold(
+    return Scaffold(
         body: Stack(
           children: <Widget>[
             CustomScrollView(
@@ -266,7 +262,6 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
             ),
           ],
         ),
-      ),
     );
   }
 

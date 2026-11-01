@@ -10,7 +10,6 @@ import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_page_header_metrics.dart';
 import 'package:hentai_library/md3e/patterns/library/md3e_library_pinned_header_delegate.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/actions/md3e_filled_button.dart';
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
@@ -35,8 +34,7 @@ class TrashMd3ePage extends ConsumerWidget {
         Md3eLibraryPageHeaderMetrics.toolbarHeight +
         Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding;
 
-    return Md3eThemeScope(
-      child: NotificationListener<ScrollUpdateNotification>(
+    return NotificationListener<ScrollUpdateNotification>(
         onNotification: (ScrollUpdateNotification notification) {
           final ScrollMetrics metrics = notification.metrics;
           if (metrics.maxScrollExtent > 0 &&
@@ -74,7 +72,6 @@ class TrashMd3ePage extends ConsumerWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }

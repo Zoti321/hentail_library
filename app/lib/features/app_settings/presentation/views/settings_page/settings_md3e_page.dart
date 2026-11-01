@@ -4,7 +4,6 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/se
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_sections.dart';
 import 'package:hentai_library/md3e/pages/md3e_settings_page.dart';
 import 'package:hentai_library/md3e/patterns/settings/md3e_settings_catalog.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 
 /// 设置页（MD3E Cutover）：生产 `/settings` 路由入口。
@@ -27,13 +26,11 @@ class SettingsMd3ePage extends ConsumerWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Md3eThemeScope(
-      child: Md3eSettingsPage(
+    return Md3eSettingsPage(
         key: const Key('settings_md3e'),
         sectionsBuilder: (BuildContext context, Md3eSettingsCategory category) {
           return settingsMd3eSectionsFor(category);
         },
-      ),
-    );
+      );
   }
 }

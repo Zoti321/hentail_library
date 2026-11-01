@@ -7,6 +7,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
@@ -68,6 +69,13 @@ Future<void> _pumpShellHome(WidgetTester tester, Size viewportSize) async {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: buildAppTheme(Brightness.light),
+        builder: (BuildContext context, Widget? child) {
+          final Brightness brightness = Theme.of(context).brightness;
+          return M3ETheme(
+            data: buildAppM3eThemeData(brightness),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         routerConfig: GoRouter(
           initialLocation: '/home',
           routes: <RouteBase>[

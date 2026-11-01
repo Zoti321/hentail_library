@@ -16,7 +16,6 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/md3e/layout/md3e_breakpoints.dart';
 import 'package:hentai_library/md3e/layout/md3e_library_browse_page_metrics.dart';
 import 'package:hentai_library/md3e/patterns/desktop/md3e_desktop_shell_surfaces.dart';
-import 'package:hentai_library/md3e/theme/md3e_theme.dart';
 import 'package:hentai_library/md3e/widgets/navigation/md3e_management_create_entity_fab.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
@@ -91,18 +90,16 @@ class _MetadataManagementPageState
         },
         child: Focus(
           autofocus: true,
-          child: Md3eThemeScope(
-            child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                final Md3eWindowSizeClass sizeClass =
-                    Md3eWindowSizeClass.fromWidth(constraints.maxWidth);
-                return _buildPage(
-                  context: context,
-                  sizeClass: sizeClass,
-                  selectedIndex: selectedIndex,
-                );
-              },
-            ),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final Md3eWindowSizeClass sizeClass =
+                  Md3eWindowSizeClass.fromWidth(constraints.maxWidth);
+              return _buildPage(
+                context: context,
+                sizeClass: sizeClass,
+                selectedIndex: selectedIndex,
+              );
+            },
           ),
         ),
       ),

@@ -7,7 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/chrome/app_title_bar.dart';
+import 'package:hentai_library/md3e/widgets/desktop/md3e_desktop_title_bar.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
@@ -28,7 +29,7 @@ void main() {
         );
 
         expect(tester.takeException(), isNull);
-        expect(find.byType(AppTitleBar), findsNothing);
+        expect(find.byType(Md3eDesktopTitleBar), findsNothing);
         expect(find.text('reader'), findsOneWidget);
       } finally {
         debugDefaultTargetPlatformOverride = null;
@@ -82,6 +83,13 @@ Future<void> _pumpReaderShell(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: buildAppTheme(Brightness.light),
+        builder: (BuildContext context, Widget? child) {
+          final Brightness brightness = Theme.of(context).brightness;
+          return M3ETheme(
+            data: buildAppM3eThemeData(brightness),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         routerConfig: GoRouter(
           initialLocation: '/reader/c1',
           routes: <RouteBase>[

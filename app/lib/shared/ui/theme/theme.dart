@@ -1,14 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
-import 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
 import 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
 import 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_motion_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_shadow_tokens.dart';
+import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
 
+export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 export 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
 export 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
 export 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
@@ -37,7 +39,8 @@ SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
 
 /// Single assembly entry for app [ThemeData] (light/dark).
 ThemeData buildAppTheme(Brightness brightness) {
-  final ColorScheme colorScheme = buildBaseColorScheme(brightness);
+  final M3EThemeData m3e = buildAppM3eThemeData(brightness);
+  final ColorScheme colorScheme = flutterColorSchemeFromM3e(m3e.colorScheme);
   final HentaiColorScheme semantic = HentaiColorScheme.forBrightness(
     brightness,
   );

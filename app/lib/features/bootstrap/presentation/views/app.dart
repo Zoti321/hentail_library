@@ -8,6 +8,7 @@ import 'package:hentai_library/core/util/app_window_title.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/app_settings/presentation/settings.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
@@ -72,9 +73,14 @@ class _AppRootState extends ConsumerState<_AppRoot> {
       themeMode: themeMode,
       routerConfig: appRouter,
       builder: (BuildContext context, Widget? child) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: appSystemUiOverlayStyle(Theme.of(context).colorScheme),
-          child: child ?? const SizedBox.shrink(),
+        final Brightness brightness = Theme.of(context).brightness;
+        final M3EThemeData m3e = buildAppM3eThemeData(brightness);
+        return M3ETheme(
+          data: m3e,
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: appSystemUiOverlayStyle(Theme.of(context).colorScheme),
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );

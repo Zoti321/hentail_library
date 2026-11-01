@@ -1,12 +1,16 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
-/// Lab default seed (M3 baseline purple); not MASTER brand color yet.
-const Color kMd3eLabSeedColor = Color(0xFF6750A4);
-
-/// App UI font ([pubspec.yaml] `MI_Sans_Regular`); aligned with production shell.
-const String kMd3eAppFontFamily = 'MI_Sans_Regular';
+export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart'
+    show
+        buildAppM3eThemeData,
+        flutterColorSchemeFromM3e,
+        kAppBrandSeedColor,
+        kMd3eAppFontFamily,
+        kMd3eLabSeedColor,
+        md3eWithAppFontFamily;
 
 M3EColorScheme _md3eColorSchemeFor({
   Object? dynamicSource,
@@ -19,41 +23,11 @@ M3EColorScheme _md3eColorSchemeFor({
         scheme.brightness as Brightness? ?? brightness;
     return M3EColorScheme.fromSeed(seed, brightness: resolved);
   }
-  return M3EColorScheme.fromSeed(kMd3eLabSeedColor, brightness: brightness);
+  return m3eColorSchemeForBrightness(brightness);
 }
 
-/// 把应用字体同时挂到 [M3EThemeData.fontFamily] 与 [M3EThemeData.typography]
-/// （baseline + emphasized），使 `typeScale.*` 带上 [kMd3eAppFontFamily]。
-///
-/// 仅设置 fontFamily 不够：`M3ETypeScale` 的各角色样式不继承该值。
-M3EThemeData md3eWithAppFontFamily(M3EThemeData base) {
-  return base.copyWith(
-    fontFamily: kMd3eAppFontFamily,
-    typography: base.typography.apply(fontFamily: kMd3eAppFontFamily),
-  );
-}
-
-M3EThemeData _applyMd3eLabOverrides(M3EThemeData base) {
-  final M3EThemeData withFont = md3eWithAppFontFamily(base);
-  final M3EColorScheme colors = withFont.colorScheme;
-  return withFont.copyWith(
-    navigationRailTheme: withFont.navigationRailTheme.copyWith(
-      collapsedWidth: 80,
-      narrowCollapsedWidth: 80,
-      expandedMinWidth: 256,
-      expandedMaxWidth: 256,
-      containerColor: colors.surfaceContainerLow,
-      // MASTER §5.1: menu icon vertical center on 64dp title band (y=32).
-      // M3E menu uses 48dp target below [topSpace]; 8 + 24 = 32.
-      topSpace: 8,
-      // Keep first destination icon ~y=104 when [topSpace] is tightened vs M3E default.
-      destinationTopPadding: 24,
-      // Default M3E gap is 4dp; MASTER shell needs visible separation between rows.
-      itemVerticalGap: 8,
-      expandedItemGap: 8,
-    ),
-  );
-}
+M3EThemeData _applyMd3eLabOverrides(M3EThemeData base) =>
+    applyMd3eShellNavRailOverrides(base);
 
 /// Builds [M3EThemeData] for the MD3E lab (seed + optional OS dynamic color).
 M3EThemeData buildMd3eThemeData({
@@ -71,46 +45,6 @@ M3EThemeData buildMd3eThemeData({
   return _applyMd3eLabOverrides(M3EThemeData(colorScheme: scheme));
 }
 
-ColorScheme _md3eFlutterColorScheme(M3EColorScheme scheme) {
-  return ColorScheme(
-    brightness: scheme.brightness,
-    primary: scheme.primary,
-    onPrimary: scheme.onPrimary,
-    primaryContainer: scheme.primaryContainer,
-    onPrimaryContainer: scheme.onPrimaryContainer,
-    secondary: scheme.secondary,
-    onSecondary: scheme.onSecondary,
-    secondaryContainer: scheme.secondaryContainer,
-    onSecondaryContainer: scheme.onSecondaryContainer,
-    tertiary: scheme.tertiary,
-    onTertiary: scheme.onTertiary,
-    tertiaryContainer: scheme.tertiaryContainer,
-    onTertiaryContainer: scheme.onTertiaryContainer,
-    error: scheme.error,
-    onError: scheme.onError,
-    errorContainer: scheme.errorContainer,
-    onErrorContainer: scheme.onErrorContainer,
-    surface: scheme.surface,
-    onSurface: scheme.onSurface,
-    onSurfaceVariant: scheme.onSurfaceVariant,
-    outline: scheme.outline,
-    outlineVariant: scheme.outlineVariant,
-    shadow: scheme.shadow,
-    scrim: scheme.scrim,
-    inverseSurface: scheme.inverseSurface,
-    onInverseSurface: scheme.onInverseSurface,
-    inversePrimary: scheme.inversePrimary,
-    surfaceTint: scheme.surfaceTint,
-    surfaceContainerHighest: scheme.surfaceContainerHighest,
-    surfaceContainerHigh: scheme.surfaceContainerHigh,
-    surfaceContainer: scheme.surfaceContainer,
-    surfaceContainerLow: scheme.surfaceContainerLow,
-    surfaceContainerLowest: scheme.surfaceContainerLowest,
-    surfaceDim: scheme.surfaceDim,
-    surfaceBright: scheme.surfaceBright,
-  );
-}
-
 /// Flutter [ThemeData] for [MaterialApp] / legacy widgets alongside [M3ETheme].
 ThemeData buildMd3eMaterialTheme(
   Brightness brightness, {
@@ -121,7 +55,7 @@ ThemeData buildMd3eMaterialTheme(
   return ThemeData(
     useMaterial3: true,
     fontFamily: kMd3eAppFontFamily,
-    colorScheme: _md3eFlutterColorScheme(resolved.colorScheme),
+    colorScheme: flutterColorSchemeFromM3e(resolved.colorScheme),
   );
 }
 

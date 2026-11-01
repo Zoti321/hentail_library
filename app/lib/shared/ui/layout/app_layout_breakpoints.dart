@@ -9,8 +9,8 @@ abstract final class AppLayoutBreakpoints {
   /// 窄屏：抽屉导航、单列布局。
   static const double compact = 600;
 
-  /// 中屏：折叠侧栏图标轨。
-  static const double medium = 1024;
+  /// 中屏：折叠侧栏图标轨（M3 expanded 下限 840）。
+  static const double medium = 840;
 
   static bool isCompact(double width) => width < compact;
 
