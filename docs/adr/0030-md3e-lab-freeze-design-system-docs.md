@@ -4,6 +4,8 @@
 
 Accepted
 
+> **后续（2026-11-01）**：`design-system/` 已清空，仅保留 `.gitkeep` 与示例参考图；`hentai-library/`（MASTER、pages）与 `research/` 已从工作树移除，可从 git 历史恢复。本 ADR 的冻结结论仍成立，但「保留在仓库内的只读归档」已不再适用。
+
 ## Context
 
 `design-system/hentai-library/`（含 `MASTER.md`、`pages/*` 与 Figma 对齐帧说明）与 ADR-0029 曾作为 Agent 与贡献者的 **UI 规范入口**。`integrate/md3e` 分支上，漫画库等壳层在 **MD3E Lab**（`app/lib/md3e/`）快速迭代：粘滞页头、分页、目录 Tabs/数量布局等与 MASTER §5.1 书库页头已明显分叉。

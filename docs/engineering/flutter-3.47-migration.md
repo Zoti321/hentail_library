@@ -29,8 +29,8 @@
 | --- | --- |
 | `README.md` | §工具链：3.47.8 / lock 下限 |
 | `docs/engineering/gate.md` | 工具链与 `CI=true` analyze |
-| `design-system/.../03-flutter-implementation.md` | §2 基线 3.47 + MCU 0.13 |
-| `design-system/hentai-library/MASTER.md` | MCU 0.13.0 文案；色板数值待 MD3E 迁移时统一 |
+| ~~`design-system/.../03-flutter-implementation.md`~~ | 已于 2026-11-01 随 design-system 清理移除（历史见 git） |
+| ~~`design-system/hentai-library/MASTER.md`~~ | 已于 2026-11-01 移除（历史见 git） |
 | `scripts/setup-dev.sh` | 打印 `flutter --version` 与迁移文档链 |
 
 ## 4. 平台 / 构建（升级后验证）

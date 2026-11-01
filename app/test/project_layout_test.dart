@@ -33,18 +33,13 @@ void main() {
       expect(Directory(p.join(repoRoot.path, '.github')).existsSync(), isTrue);
     });
 
-    test('design-system MASTER declares directory charter (ADR-0029)', () {
-      final File master = File(
-        p.join(repoRoot.path, 'design-system', 'hentai-library', 'MASTER.md'),
+    test('design-system/ keeps placeholder only (archive cleared 2026-11-01)', () {
+      final Directory designSystem = Directory(
+        p.join(repoRoot.path, 'design-system'),
       );
-      expect(master.existsSync(), isTrue);
-      final String content = master.readAsStringSync();
-      expect(content, contains('## Directory charter'));
-      expect(content, contains('pages/[page-name].md'));
+      expect(designSystem.existsSync(), isTrue);
       expect(
-        Directory(
-          p.join(repoRoot.path, 'design-system', 'hentai-library', 'pages'),
-        ).existsSync(),
+        File(p.join(designSystem.path, '.gitkeep')).existsSync(),
         isTrue,
       );
     });

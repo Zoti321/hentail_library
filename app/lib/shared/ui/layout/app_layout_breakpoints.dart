@@ -1,4 +1,4 @@
-/// 响应式布局断点（与 [design-system/hentai-library/MASTER.md] 一致）。
+/// 响应式布局断点（原与 design-system MASTER 对齐，该文档已于 2026-11-01 移除）。
 abstract final class AppLayoutBreakpoints {
   /// 桌面窗口最小宽度（逻辑像素），对齐常见小屏手机 viewport，且低于 [compact]。
   static const double minWindowWidth = 360;

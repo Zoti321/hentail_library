@@ -7,8 +7,8 @@ Color md3eLabBrowseCanvasColor(M3EColorScheme scheme) =>
 
 /// Region fills for [Md3eDesktopShell] (decoupled from MASTER product mapping).
 ///
-/// **Tone-based preview (A)** follows the roles-page pairing cited in
-/// `design-system/research/material-design-3/08-tone-based-surfaces.md` §1.1:
+/// **Tone-based preview (A)** follows the Material 3 tone-based surface pairing
+/// (research notes archived in git history before 2026-11-01):
 /// **content / header / body / title bar → [md3eLabBrowseCanvasColor]
 /// (`surfaceContainerLow`)**, **navigation → [M3EColorScheme.surfaceContainerHigh]**
 /// (same mapping across breakpoints).

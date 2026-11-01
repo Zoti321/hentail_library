@@ -12,7 +12,7 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **Flutter UI — MD3E Lab** (`app/lib/md3e/`, `integrate/md3e`) → **Widgetbook** (`app/widgetbook/`, `flutter run -t widgetbook/main.dart`) + `material_3_expressive` official docs; patterns/pages live in `md3e/`. Visual acceptance for Lab is Widgetbook, not Figma frames.
 
-**design-system/** (`design-system/hentai-library/MASTER.md`, `pages/*`, `research/`) → **frozen** for active MD3E work (read-only archive; no sync with Lab PRs). Agent UI entry for new Lab UI is not MASTER; see ADR-0030. ADR-0029 charter still applies if the tree is thawed for a future production visual refresh.
+**design-system/** → **cleared** (2026-11-01): only `.gitkeep` and `example.png` remain; `hentai-library/MASTER.md`, `pages/*`, `research/` were removed (recoverable from git history). No UI spec lives here; see ADR-0030. ADR-0029 charter is superseded for any future visual refresh unless a new ADR reintroduces a doc source.
 
 **Dart layout & imports** (features/shared/core, MVVM) → ADR-0017, ADR-0027; Wayfinder 终态以 `app/test/gate/` + ADR-0027 为准，并由 `project_layout_test.dart` 等门禁强制执行。
 

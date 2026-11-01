@@ -15,7 +15,7 @@
 | 始终加载的 brief | `AGENTS.md` |
 | 领域词汇 | `GLOSSARY.md` |
 | 架构决策 | `docs/adr/` |
-| UI 规范与规划（含 Agent / ui-ux-pro-max 持久化） | `design-system/hentai-library/`（章程见 MASTER § Directory charter；ADR-0029） |
+| UI 规范与规划 | `design-system/` 已清空（仅保留占位与示例参考图，2026-11-01）；现行 UI 真源见 `AGENTS.md` 与 ADR-0027/0028/0030 |
 | Gate、测试缝 | `docs/engineering/gate.md` |
 | `gh`、日志、标签字典 | `docs/engineering/maintainer.md` |
 
