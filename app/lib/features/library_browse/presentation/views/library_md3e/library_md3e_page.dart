@@ -6,6 +6,7 @@ import 'package:hentai_library/features/library_browse/presentation/content_brea
 import 'package:hentai_library/features/library_browse/presentation/view_models/comic_detail_return_series_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_catalog_state.dart';
+import 'package:hentai_library/features/library_browse/presentation/view_models/comic_read_progress.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_page_snapshot.dart';
@@ -335,6 +336,9 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
           ];
         }
         final List<Comic> comics = comicsCatalog.items;
+        final Map<String, int> readPages =
+            ref.watch(comicReadPageIndexByIdProvider).value ??
+            const <String, int>{};
         if (viewMode == Md3eCatalogViewMode.list) {
           return <Widget>[
             _buildCatalogListSliver(
@@ -350,6 +354,10 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                     title: comic.title,
                     pageLabel: l10n.comicDetailPageCount(comic.pageCount),
                     cover: ComicCoverContent(comicId: comic.comicId),
+                    readProgress: comicReadProgressFor(
+                      pageIndex: readPages[comic.comicId],
+                      pageCount: comic.pageCount,
+                    ),
                     selectionMode: selection.active,
                     selected: selection.selectedIds.contains(comic.comicId),
                     onTap: () => _openComicDetail(comic.comicId),
@@ -382,6 +390,10 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                     title: comic.title,
                     subtitle: l10n.comicDetailPageCount(comic.pageCount),
                     cover: ComicCoverContent(comicId: comic.comicId),
+                    readProgress: comicReadProgressFor(
+                      pageIndex: readPages[comic.comicId],
+                      pageCount: comic.pageCount,
+                    ),
                     selectionMode: selection.active,
                     selected: selection.selectedIds.contains(comic.comicId),
                     onTap: () => _openComicDetail(comic.comicId),

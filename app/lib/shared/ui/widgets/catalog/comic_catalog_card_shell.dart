@@ -14,10 +14,7 @@ const double kMd3eComicCatalogPinnedOverlayAlphaStrong = 0.12;
 /// Widgetbook pinned overlay alpha (hover / drag).
 const double kMd3eComicCatalogPinnedOverlayAlphaLight = 0.08;
 
-/// Resting shadow for catalog tiles ([M3EElevation.level1], aligned with design-system Card).
-const double kMd3eComicCatalogCardRestingElevation = M3EElevation.level1;
-
-/// Catalog comic surface: elevated tonal [M3ECard] shared by card and list layouts.
+/// Catalog comic surface: flat filled [M3ECard] (`surfaceContainer`, no shadow) shared by card and list layouts.
 class Md3eComicCatalogCardShell extends StatelessWidget {
   const Md3eComicCatalogCardShell({
     super.key,
@@ -72,8 +69,9 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
     );
 
     final Widget card = M3ECard(
-      variant: M3ECardVariant.elevated,
-      color: scheme.surfaceContainerLow,
+      variant: M3ECardVariant.filled,
+      color: scheme.surfaceContainer,
+      elevation: M3EElevation.level0,
       padding: EdgeInsets.zero,
       borderRadius: radius,
       clipBehavior: Clip.antiAlias,
