@@ -10,7 +10,7 @@ Color md3eLabBrowseCanvasColor(M3EColorScheme scheme) =>
 /// **Tone-based preview (A)** follows the roles-page pairing cited in
 /// `design-system/research/material-design-3/08-tone-based-surfaces.md` §1.1:
 /// **content / header / body / title bar → [md3eLabBrowseCanvasColor]
-/// (`surfaceContainerLow`)**, **navigation → [M3EColorScheme.surfaceContainer]**
+/// (`surfaceContainerLow`)**, **navigation → [M3EColorScheme.surfaceContainerHigh]**
 /// (same mapping across breakpoints).
 ///
 /// **Lab** keeps the MASTER-aligned product preview (chrome
@@ -44,9 +44,9 @@ class Md3eDesktopShellSurfaceRoles {
     );
   }
 
-  /// Tone-based: canvas (content, title bar) = surfaceContainerLow; navigation = surfaceContainer.
+  /// Tone-based: canvas (content, title bar) = surfaceContainerLow; navigation = surfaceContainerHigh.
   factory Md3eDesktopShellSurfaceRoles.toneBased(M3EColorScheme scheme) {
-    final Color rail = scheme.surfaceContainer;
+    final Color rail = scheme.surfaceContainerHigh;
     final Color content = md3eLabBrowseCanvasColor(scheme);
     return Md3eDesktopShellSurfaceRoles(
       shellBackground: rail,
