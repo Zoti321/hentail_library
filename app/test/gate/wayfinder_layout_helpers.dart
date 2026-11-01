@@ -8,11 +8,10 @@ const bool kEnforceWayfinderPhaseBLayout = true;
 /// Phase A allow-list; legacy `data/` `domain/` `ui/` roots were removed in #258.
 /// `core/` is the app cross-cutting kernel (l10n, logging, util), moved back to
 /// `lib/core` on 2026-10-18 (layout rules: `docs/engineering/gate.md` § App lib 顶层布局).
-/// `md3e/` — parallel Material 3 Expressive design system (#332 / integrate/md3e).
+/// `md3e/` was removed at MD3E Cutover shell终态 (#414 / ADR-0031).
 const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
   'core',
   'features',
-  'md3e',
   'shared',
   'src',
 };
@@ -20,7 +19,6 @@ const Set<String> kWayfinderPhaseATopLevelLibDirs = <String>{
 const Set<String> kWayfinderPhaseBTopLevelLibDirs = <String>{
   'core',
   'features',
-  'md3e',
   'shared',
   'src',
 };
@@ -50,7 +48,6 @@ const Set<String> kWayfinderFeatureLayerDirs = <String>{
 bool isCanonicalLibRelativePath(String rel) {
   final String path = rel.replaceAll(r'\', '/');
   return path.startsWith('features/') ||
-      path.startsWith('md3e/') ||
       path.startsWith('shared/') ||
       path.startsWith('src/');
 }
@@ -73,7 +70,7 @@ final RegExp _packageExport = RegExp(
   r"^export\s+'package:hentai_library/([^']+)'\s*;\s*$",
 );
 
-/// Strangler shims re-export only `features/`, `shared/`, or `md3e/` canonical URIs (#219).
+/// Strangler shims re-export only `features/` or `shared/` canonical URIs (#219).
 /// Legacy barrels (relative or package `ui/` / `domain/` re-exports) are not shims.
 bool isStranglerShimSource(String source) {
   final List<String> lines = source.split('\n');
@@ -94,9 +91,7 @@ bool isStranglerShimSource(String source) {
       return false;
     }
     final String uriPath = match.group(1)!;
-    if (!uriPath.startsWith('features/') &&
-        !uriPath.startsWith('shared/') &&
-        !uriPath.startsWith('md3e/')) {
+    if (!uriPath.startsWith('features/') && !uriPath.startsWith('shared/')) {
       return false;
     }
     sawExport = true;

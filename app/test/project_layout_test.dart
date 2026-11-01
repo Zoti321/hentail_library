@@ -163,8 +163,7 @@ void main() {
             final bool isView =
                 rel.startsWith('features/') && rel.split('/').contains('views');
             final bool isSharedUi = rel.startsWith('shared/ui/');
-            final bool isMd3e = rel.startsWith('md3e/');
-            return isView || isSharedUi || isMd3e;
+            return isView || isSharedUi;
           })
           .where((File file) => repoProvider.hasMatch(file.readAsStringSync()))
           .map((File file) => p.posix.joinAll(p.split(file.path)))
