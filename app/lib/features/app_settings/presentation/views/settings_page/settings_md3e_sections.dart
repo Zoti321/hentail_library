@@ -8,12 +8,14 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/ap
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
+import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -32,9 +34,33 @@ List<Widget> settingsMd3eSectionsFor(Md3eSettingsCategory category) {
   };
 }
 
-/// 枚举循环：返回 [values] 中 [current] 之后的下一项（末尾回到首项）。
-T _nextEnumValue<T>(List<T> values, T current) {
-  return values[(values.indexOf(current) + 1) % values.length];
+/// 弹出 M3E 选择菜单（锚定在触发行上），选中项回传给 [onSelected]。
+Future<void> _pickSettingOption<T extends Object>(
+  BuildContext context, {
+  required List<T> options,
+  required T selected,
+  required String Function(T option) labelOf,
+  required ValueChanged<T> onSelected,
+}) async {
+  final Rect? anchor = md3eMenuAnchorRectFor(context);
+  if (anchor == null) {
+    return;
+  }
+  final Object? picked = await md3eShowAnchoredMenu<Object>(
+    context: context,
+    anchor: anchor,
+    children: <M3EMenuNode>[
+      for (final T option in options)
+        M3EMenuSelectable(
+          label: labelOf(option),
+          value: option,
+          selected: option == selected,
+        ),
+    ],
+  );
+  if (picked is T) {
+    onSelected(picked);
+  }
 }
 
 List<Widget> _personalizationSections() {
@@ -81,11 +107,13 @@ class _ThemeTile extends ConsumerWidget {
       leading: Symbols.dark_mode,
       title: Text(l10n.settingsThemeLabel),
       value: Text(l10n.themePreferenceLabel(preference)),
-      onTap: () => ref
-          .read(settingsProvider.notifier)
-          .setThemePreference(
-            _nextEnumValue(AppThemePreference.values, preference),
-          ),
+      onTap: () => _pickSettingOption<AppThemePreference>(
+        context,
+        options: AppThemePreference.values,
+        selected: preference,
+        labelOf: l10n.themePreferenceLabel,
+        onSelected: ref.read(settingsProvider.notifier).setThemePreference,
+      ),
     );
   }
 }
@@ -106,11 +134,13 @@ class _LocaleTile extends ConsumerWidget {
       leading: Symbols.language,
       title: Text(l10n.settingsLanguageLabel),
       value: Text(l10n.localePreferenceLabel(preference)),
-      onTap: () => ref
-          .read(settingsProvider.notifier)
-          .setLocalePreference(
-            _nextEnumValue(AppLocalePreference.values, preference),
-          ),
+      onTap: () => _pickSettingOption<AppLocalePreference>(
+        context,
+        options: AppLocalePreference.values,
+        selected: preference,
+        labelOf: l10n.localePreferenceLabel,
+        onSelected: ref.read(settingsProvider.notifier).setLocalePreference,
+      ),
     );
   }
 }
@@ -131,9 +161,13 @@ class _ReadingModeTile extends ConsumerWidget {
       leading: Symbols.menu_book,
       title: Text(l10n.readerSettingsReadingMode),
       value: Text(l10n.readingModeLabel(mode)),
-      onTap: () => ref
-          .read(settingsProvider.notifier)
-          .setReadingMode(_nextEnumValue(ReadingMode.values, mode)),
+      onTap: () => _pickSettingOption<ReadingMode>(
+        context,
+        options: ReadingMode.values,
+        selected: mode,
+        labelOf: l10n.readingModeLabel,
+        onSelected: ref.read(settingsProvider.notifier).setReadingMode,
+      ),
     );
   }
 }

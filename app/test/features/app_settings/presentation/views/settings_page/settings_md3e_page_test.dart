@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_page.dart';
 import 'package:hentai_library/shared/domain/models/app_setting.dart';
@@ -52,18 +53,27 @@ Future<_RecordingSettingsNotifier> _pumpPage(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('tapping theme tile persists the next preference', (
-    WidgetTester tester,
-  ) async {
-    final _RecordingSettingsNotifier notifier = await _pumpPage(tester);
-    final AppLocalizations l10n = lookupAppLocalizations(const Locale('zh'));
-    expect(find.byKey(const Key('settings_md3e')), findsOneWidget);
+  testWidgets(
+    'tapping theme tile opens a menu and persists the chosen preference',
+    (WidgetTester tester) async {
+      final _RecordingSettingsNotifier notifier = await _pumpPage(tester);
+      final AppLocalizations l10n = lookupAppLocalizations(const Locale('zh'));
+      expect(find.byKey(const Key('settings_md3e')), findsOneWidget);
 
-    await tester.tap(find.text(l10n.settingsThemeLabel));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text(l10n.settingsThemeLabel));
+      await tester.pumpAndSettle();
+      expect(notifier.themeCalls, isEmpty);
 
-    expect(notifier.themeCalls, <AppThemePreference>[AppThemePreference.light]);
-  });
+      await tester.tap(
+        find.text(l10n.themePreferenceLabel(AppThemePreference.light)).last,
+      );
+      await tester.pumpAndSettle();
+
+      expect(notifier.themeCalls, <AppThemePreference>[
+        AppThemePreference.light,
+      ]);
+    },
+  );
 
   testWidgets('toggling healthy mode persists through SettingsNotifier', (
     WidgetTester tester,

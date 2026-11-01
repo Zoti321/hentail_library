@@ -24,6 +24,10 @@ class Md3eComicDetailTitle extends StatelessWidget {
       child: SelectableText(
         title,
         maxLines: maxLines,
+        // 多行 SelectableText 内部是 EditableText 的 Scrollable，会强制开启滚动条；
+        // 标题不需要滚动，这里关闭其滚动条与过度滚动指示。
+        scrollBehavior: ScrollConfiguration.of(context)
+            .copyWith(scrollbars: false, overscroll: false),
         style: Md3eComicDetailPageMetrics.titleTextStyle(
           sizeClass: sizeClass,
           typeScale: theme.typeScale,
