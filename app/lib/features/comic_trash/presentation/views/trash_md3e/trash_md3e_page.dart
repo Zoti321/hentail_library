@@ -10,7 +10,6 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_pinned_header_delegate.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/filled_button.dart';
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -35,43 +34,43 @@ class TrashMd3ePage extends ConsumerWidget {
         Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding;
 
     return NotificationListener<ScrollUpdateNotification>(
-        onNotification: (ScrollUpdateNotification notification) {
-          final ScrollMetrics metrics = notification.metrics;
-          if (metrics.maxScrollExtent > 0 &&
-              metrics.pixels >=
-                  metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
-            ref.read(trashPageControllerProvider.notifier).loadMore();
-          }
-          return false;
-        },
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: <Widget>[
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: Md3eLibraryPinnedHeaderDelegate(
-                extent: headerExtent,
+      onNotification: (ScrollUpdateNotification notification) {
+        final ScrollMetrics metrics = notification.metrics;
+        if (metrics.maxScrollExtent > 0 &&
+            metrics.pixels >=
+                metrics.maxScrollExtent - _kTrashLoadMoreThreshold) {
+          ref.read(trashPageControllerProvider.notifier).loadMore();
+        }
+        return false;
+      },
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: <Widget>[
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: Md3eLibraryPinnedHeaderDelegate(
+              extent: headerExtent,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontal),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontal),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: Md3eLibraryPageHeaderMetrics.verticalPadding,
-                      bottom: Md3eLibraryPageHeaderMetrics
-                          .browsePinnedHeaderBottomPadding,
-                    ),
-                    child: _TrashHeader(
-                      onOpenNavigation: appShellPageNavigationOpener(context),
-                    ),
+                  padding: const EdgeInsets.only(
+                    top: Md3eLibraryPageHeaderMetrics.verticalPadding,
+                    bottom: Md3eLibraryPageHeaderMetrics
+                        .browsePinnedHeaderBottomPadding,
+                  ),
+                  child: _TrashHeader(
+                    onOpenNavigation: appShellPageNavigationOpener(context),
                   ),
                 ),
               ),
             ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 24),
-              sliver: const SliverToBoxAdapter(child: _TrashBody()),
-            ),
-          ],
-        ),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 24),
+            sliver: const SliverToBoxAdapter(child: _TrashBody()),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -127,11 +126,20 @@ class _TrashHeader extends ConsumerWidget {
                     ?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ),
-          Md3eFilledButton(
-            label: hasSelection
+          M3EIconButton(
+            icon: Icon(
+              Symbols.restore,
+              size: Md3eLibraryPageHeaderMetrics.actionIconSize,
+              color: scheme.onSurfaceVariant,
+            ),
+            variant: M3EIconButtonVariant.standard,
+            size: M3EIconButtonSize.sm,
+            tooltip: hasSelection
                 ? l10n.trashRestoreSelected
                 : l10n.trashRestoreAll,
-            icon: Symbols.restore,
+            semanticLabel: hasSelection
+                ? l10n.trashRestoreSelected
+                : l10n.trashRestoreAll,
             onPressed: hasItems
                 ? hasSelection
                       ? () => restoreTrashedComics(
@@ -144,10 +152,21 @@ class _TrashHeader extends ConsumerWidget {
                       : () => restoreAllTrashedComics(context, ref)
                 : null,
           ),
-          const SizedBox(width: 8),
-          Md3eFilledButton(
-            label: hasSelection ? l10n.trashPurgeSelected : l10n.trashPurgeAll,
-            icon: Symbols.delete_forever,
+          const SizedBox(width: 4),
+          M3EIconButton(
+            icon: Icon(
+              Symbols.delete_forever,
+              size: Md3eLibraryPageHeaderMetrics.actionIconSize,
+              color: hasItems ? scheme.error : scheme.onSurfaceVariant,
+            ),
+            variant: M3EIconButtonVariant.standard,
+            size: M3EIconButtonSize.sm,
+            tooltip: hasSelection
+                ? l10n.trashPurgeSelected
+                : l10n.trashPurgeAll,
+            semanticLabel: hasSelection
+                ? l10n.trashPurgeSelected
+                : l10n.trashPurgeAll,
             onPressed: hasItems
                 ? hasSelection
                       ? () => purgeTrashedComics(

@@ -40,7 +40,7 @@ void main() {
       expect(find.byIcon(Symbols.menu), findsNothing);
     });
 
-    testWidgets('places summary and search below header', (
+    testWidgets('places summary below header without search field', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 700);
@@ -49,7 +49,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.textContaining('条记录'), findsOneWidget);
-      expect(find.text('搜索历史记录...'), findsOneWidget);
+      expect(find.text('搜索历史记录...'), findsNothing);
       final Offset title = tester.getTopLeft(find.text('阅读历史'));
       final Offset subtitle = tester.getTopLeft(find.textContaining('条记录'));
       expect(subtitle.dy, greaterThan(title.dy));

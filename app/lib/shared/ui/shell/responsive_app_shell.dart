@@ -116,7 +116,8 @@ class ResponsiveAppShell extends StatelessWidget {
     final String path = GoRouterState.of(context).uri.path;
     final String sidebarActiveId = activeNavIdForPath(path);
     final bool isReaderRoute = path.startsWith('/reader');
-    final bool hideAppSidebar = isReaderRoute || _isSettingsRoute(path);
+    // 设置页与其他目的地一样运行在壳内（rail 选中“设置”，内容为圆角 pane）。
+    final bool hideAppSidebar = isReaderRoute;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -216,8 +217,6 @@ class ResponsiveAppShell extends StatelessWidget {
     );
   }
 }
-
-bool _isSettingsRoute(String path) => path == '/settings';
 
 class _ShellTitleBar extends StatelessWidget {
   const _ShellTitleBar({

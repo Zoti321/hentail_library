@@ -10,7 +10,6 @@ import 'package:hentai_library/features/home/presentation/views/history_md3e/his
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_browse_page.dart';
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_list_item.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -25,14 +24,7 @@ class HistoryMd3ePage extends ConsumerStatefulWidget {
 }
 
 class _HistoryMd3ePageState extends ConsumerState<HistoryMd3ePage> {
-  late final TextEditingController _searchController = TextEditingController();
   DateTime? _lastLoadMoreAttemptAt;
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
 
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is! ScrollUpdateNotification &&
@@ -80,60 +72,29 @@ class _HistoryMd3ePageState extends ConsumerState<HistoryMd3ePage> {
           ),
         ),
         data: (HistoryPagedFeedState feed) {
-        if (_searchController.text != feed.keyword) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) {
-              return;
-            }
-            if (_searchController.text != feed.keyword) {
-              _searchController.value = TextEditingValue(
-                text: feed.keyword,
-                selection: TextSelection.collapsed(offset: feed.keyword.length),
-              );
-            }
-          });
-        }
-
           final List<HistoryMd3eBrowseEntry> entries = feed.items
-              .map(
-                (HistoryCardItem item) =>
-                    HistoryMd3eBrowseEntry(item: item),
-              )
+              .map((HistoryCardItem item) => HistoryMd3eBrowseEntry(item: item))
               .toList(growable: false);
-
-          final String? emptyMessage = feed.items.isEmpty
-              ? (feed.keyword.isEmpty
-                    ? null
-                    : context.l10n.historyNoMatch)
-              : null;
 
           return NotificationListener<ScrollNotification>(
             onNotification: _onScrollNotification,
             child: HistoryMd3eBrowsePage(
               entries: entries,
               totalCount: feed.totalCount,
-              emptyMessage: emptyMessage,
               isLoadingMore: feed.isLoadingMore,
               onOpenNavigation: appShellPageNavigationOpener(context),
               onClearAll: () => clearAllReadingHistory(context, ref),
-              searchField: Md3eOutlinedTextField(
-                label: context.l10n.historySearchHint,
-                controller: _searchController,
-                onChanged: (String value) => ref
-                    .read(historyPagedFeedControllerProvider.notifier)
-                    .setKeyword(value),
-                leading: const Icon(Icons.search),
-              ),
-              itemBuilder: (BuildContext context, HistoryMd3eBrowseEntry entry) {
-                return HistoryMd3eListItem(
-                  entry: entry,
-                  onDeleteRecord: () => deleteReadingHistoryRecord(
-                    context: context,
-                    ref: ref,
-                    comicId: entry.item.comicId,
-                  ),
-                );
-              },
+              itemBuilder:
+                  (BuildContext context, HistoryMd3eBrowseEntry entry) {
+                    return HistoryMd3eListItem(
+                      entry: entry,
+                      onDeleteRecord: () => deleteReadingHistoryRecord(
+                        context: context,
+                        ref: ref,
+                        comicId: entry.item.comicId,
+                      ),
+                    );
+                  },
             ),
           );
         },

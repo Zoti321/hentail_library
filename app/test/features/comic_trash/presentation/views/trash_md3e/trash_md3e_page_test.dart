@@ -127,8 +127,8 @@ void main() {
     expect(find.text('WebDAV'), findsOneWidget);
     expect(find.text('本地'), findsOneWidget);
     expect(find.text('远程'), findsOneWidget);
-    expect(find.text('全部恢复'), findsOneWidget);
-    expect(find.text('全部删除'), findsOneWidget);
+    expect(find.byIcon(Symbols.restore), findsOneWidget);
+    expect(find.byIcon(Symbols.delete_forever), findsOneWidget);
   });
 
   testWidgets('tapping a row toggles selection and switches header actions', (
@@ -142,7 +142,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('已选 1 本'), findsOneWidget);
     expect(find.byIcon(Symbols.check_circle), findsOneWidget);
-    expect(find.text('恢复选中'), findsOneWidget);
-    expect(find.text('删除选中'), findsOneWidget);
+    expect(find.byIcon(Symbols.restore), findsOneWidget);
+    expect(find.byIcon(Symbols.delete_forever), findsOneWidget);
   });
 }

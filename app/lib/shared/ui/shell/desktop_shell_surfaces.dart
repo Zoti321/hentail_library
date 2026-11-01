@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
-/// Catalog / browse 页画布色，与 [Md3eDesktopShellSurfaceRoles.lab] 主区一致。
+/// 壳层统一画布色：自定义标题栏背景、内容区背景、各页 header 与 body 均使用此色。
 Color md3eLabBrowseCanvasColor(M3EColorScheme scheme) =>
-    scheme.surfaceContainerLowest;
+    scheme.surfaceContainerLow;
 
 /// Region fills for [Md3eDesktopShell] (decoupled from MASTER product mapping).
 ///
@@ -46,7 +46,7 @@ class Md3eDesktopShellSurfaceRoles {
   /// M3 roles-page default: surface (background) + surfaceContainer (navigation).
   factory Md3eDesktopShellSurfaceRoles.toneBased(M3EColorScheme scheme) {
     final Color rail = scheme.surfaceContainer;
-    final Color content = scheme.surfaceBright;
+    final Color content = md3eLabBrowseCanvasColor(scheme);
     return Md3eDesktopShellSurfaceRoles(
       shellBackground: rail,
       titleBarBackground: content,
