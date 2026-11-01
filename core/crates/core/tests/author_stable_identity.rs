@@ -5,11 +5,13 @@ mod common;
 use hentai_core::image_cache::{ImageCache, PlatformImageKey};
 use hentai_core::ComicGrouping;
 use hentai_core::{
-    add_author, add_author_link, connection, create_local_library, delete_author_link,
-    delete_authors_by_names, fetch_comics_page, get_author_detail, init_db_at_path,
-    list_author_links, rename_author, replace_comic_authors, resolve_author_image, trash_comics,
-    update_author_link, AuthorImageSource, AuthorLinkPlatform, ComicFilterDto, ComicSortOptionDto,
-    PageRequestDto,
+    add_author, add_author_link, author_merge_unsupported_error, connection, count_all_authors,
+    count_author_attachments, create_local_library, delete_author_link, delete_authors_by_names,
+    fetch_author_name_page, fetch_comics_page, get_author_detail, init_db_at_path,
+    list_all_author_names, list_author_links, list_author_names_for_form,
+    list_distinct_author_names, rename_author, replace_comic_authors, replace_comic_named_facet,
+    resolve_author_image, trash_comics, update_author_link, AuthorImageSource, AuthorLinkPlatform,
+    ComicFilterDto, ComicSortOptionDto, JunctionNamedFacet, PageRequestDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -553,6 +555,125 @@ fn link_update_invalidates_both_slots_while_author_rename_keeps_cache() {
                     })
                     .is_none());
             }
+        });
+    });
+}
+
+async fn junction_tag_names(db: &impl ConnectionTrait, comic_id: &str) -> Vec<String> {
+    let rows = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            "SELECT tag_name FROM comic_tags WHERE comic_id = ? ORDER BY tag_name",
+            [comic_id.into()],
+        ))
+        .await
+        .expect("query tags");
+    rows.into_iter()
+        .map(|row| row.try_get_by_index::<String>(0).expect("tag"))
+        .collect()
+}
+
+#[test]
+fn author_entry_points_cover_listing_counts_and_rename_without_facet_dispatch() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let root = temp.path().join("lib");
+        std::fs::create_dir_all(&root).expect("mkdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let lib = create_local_library(&root.to_string_lossy(), None)
+                .await
+                .expect("library");
+            let db = connection().expect("connection");
+            for table in [
+                "author_links",
+                "comic_authors",
+                "comic_tags",
+                "comic_meta",
+                "comics",
+                "authors",
+                "tags",
+            ] {
+                db.execute(Statement::from_string(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    format!("DELETE FROM {table}"),
+                ))
+                .await
+                .expect("clear");
+            }
+            seed_comic(&db, "c1", &lib.library_id, "E:/lib/a.cbz", "Alpha", "safe").await;
+            seed_comic(&db, "c2", &lib.library_id, "E:/lib/b.cbz", "Beta", "safe").await;
+
+            // Same display string as an author lives in the tag dictionary too: the
+            // author replace must not touch the Tag junction.
+            replace_comic_named_facet(&db, JunctionNamedFacet::Tag, "c1", &["Alice".to_string()])
+                .await
+                .expect("tag attach");
+            replace_comic_authors(&db, "c1", &["Alice".to_string(), "Carol".to_string()])
+                .await
+                .expect("attach c1");
+            replace_comic_authors(&db, "c2", &["Alice".to_string()])
+                .await
+                .expect("attach c2");
+            assert_eq!(
+                junction_tag_names(&db, "c1").await,
+                vec!["Alice".to_string()]
+            );
+
+            assert_eq!(
+                list_all_author_names().await.expect("list all"),
+                vec!["Alice".to_string(), "Carol".to_string()]
+            );
+            assert_eq!(count_all_authors().await.expect("count"), 2);
+            assert_eq!(
+                fetch_author_name_page(1, 0).await.expect("page 0"),
+                vec!["Alice".to_string()]
+            );
+            assert_eq!(
+                fetch_author_name_page(1, 1).await.expect("page 1"),
+                vec!["Carol".to_string()]
+            );
+            assert_eq!(
+                list_distinct_author_names(Some(lib.library_id.clone()))
+                    .await
+                    .expect("distinct"),
+                vec!["Alice".to_string(), "Carol".to_string()]
+            );
+
+            let form: Vec<(String, i64)> = list_author_names_for_form()
+                .await
+                .expect("form")
+                .into_iter()
+                .map(|e| (e.name, e.attachment_count))
+                .collect();
+            assert_eq!(
+                form,
+                vec![("Alice".to_string(), 2), ("Carol".to_string(), 1)]
+            );
+            assert_eq!(count_author_attachments("Alice").await.expect("count"), 2);
+
+            let alice_id = author_id_named(&db, "Alice").await;
+            rename_author("Alice", "Alicia").await.expect("rename");
+            assert_eq!(author_id_named(&db, "Alicia").await, alice_id);
+            assert_eq!(count_author_attachments("Alicia").await.expect("count"), 2);
+            assert_eq!(count_author_attachments("Alice").await.expect("count"), 0);
+
+            let merge_err = author_merge_unsupported_error();
+            assert_eq!(merge_err.message, "作者暂不支持合并");
+
+            delete_authors_by_names(vec!["Carol".to_string()])
+                .await
+                .expect("delete");
+            assert_eq!(
+                list_all_author_names().await.expect("list after delete"),
+                vec!["Alicia".to_string()]
+            );
+            assert_eq!(
+                junction_tag_names(&db, "c1").await,
+                vec!["Alice".to_string()]
+            );
         });
     });
 }

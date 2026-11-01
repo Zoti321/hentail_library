@@ -221,7 +221,7 @@ Comic 中出场人物名（可多值）；用于展示与筛选，与 Tag / Auth
 _Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
 
 **Named metadata facet**:
-Comic 上可筛选的元数据面：Tag / Parody / Character 以「名称字符串」字典 + junction 全量 replace；Author 为稳定身份实体 + junction（显示名可变），管理入口仍与其它 facet 并列；Language 为 `comic_meta.languages` JSON 闭集特例。新增与 Tag 同类的名字字典 facet 应扩展 `JunctionNamedFacet`；Author 身份管线单独演进，不强迫塞回纯名字字典模型。
+Comic 上可筛选的元数据面：Tag / Parody / Character 以「名称字符串」字典 + junction 全量 replace；Author 为稳定身份实体 + junction（显示名可变），管理入口仍与其它 facet 并列；Language 为 `comic_meta.languages` JSON 闭集特例。名字字典类 facet（Tag / Parody / Character）与 Author 稳定身份管线分开实现、各自演进，不强迫 Author 塞回纯名字字典模型。
 _Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
 
 **Named facet attachment count**:

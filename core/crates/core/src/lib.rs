@@ -31,11 +31,14 @@ pub mod thumbnail;
 pub mod util;
 
 pub use author::{
-    add_author, add_author_link, count_all_authors, delete_author_link, delete_authors_by_names,
-    fetch_authors_page, get_author_detail, list_all_authors, list_author_links, load_author_image,
-    rename_author, replace_comic_authors, resolve_author_image, update_author_link, watch_authors,
-    AuthorDetailDto, AuthorFacetCountDto, AuthorIdentity, AuthorImageRef, AuthorImageSlot,
-    AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform, AuthorTopComicDto,
+    add_author, add_author_link, author_merge_unsupported_error, count_all_authors,
+    count_author_attachments, delete_author_link, delete_authors_by_names, fetch_author_name_page,
+    fetch_authors_page, get_author_detail, list_all_author_names, list_all_authors,
+    list_author_links, list_author_names_for_form, list_distinct_author_names, load_author_image,
+    reject_author_merge, rename_author, replace_comic_authors, resolve_author_image,
+    update_author_link, watch_authors, AuthorDetailDto, AuthorFacetCountDto, AuthorIdentity,
+    AuthorImageRef, AuthorImageSlot, AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform,
+    AuthorTopComicDto,
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
