@@ -28,7 +28,7 @@ class Md3eManagementBrowsePageLabHost extends StatefulWidget {
 class _Md3eManagementBrowsePageLabHostState
     extends State<Md3eManagementBrowsePageLabHost> {
   late ManagedNamedFacetKind _facet = widget.initialFacet;
-  late Map<ManagedNamedFacetKind, List<String>> _labelsByFacet =
+  late final Map<ManagedNamedFacetKind, List<String>> _labelsByFacet =
       _copyLabelsByFacet(widget.initialLabelsByFacet);
 
   static Map<ManagedNamedFacetKind, List<String>> _copyLabelsByFacet(

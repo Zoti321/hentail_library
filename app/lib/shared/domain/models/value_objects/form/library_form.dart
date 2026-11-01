@@ -26,7 +26,9 @@ abstract class LibraryForm with _$LibraryForm {
       isRemote: false,
       name: '',
       rootPath: '',
-      enabledResourceFormatCategories: List<ResourceFormatCategory>.from(ResourceFormatCategory.all),
+      enabledResourceFormatCategories: List<ResourceFormatCategory>.from(
+        ResourceFormatCategory.all,
+      ),
       scanOnStartup: false,
       scanInterval: ScanInterval.disabled,
     );
@@ -38,7 +40,9 @@ abstract class LibraryForm with _$LibraryForm {
       name: '',
       rootPath: '',
       enabledResourceFormatCategories: ResourceFormatCategory.all
-          .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
+          .where(
+            (ResourceFormatCategory g) => g != ResourceFormatCategory.folder,
+          )
           .toList(growable: false),
       scanOnStartup: false,
       scanInterval: ScanInterval.disabled,
@@ -52,7 +56,9 @@ abstract class LibraryForm with _$LibraryForm {
     );
     if (remote) {
       groups = groups
-          .where((ResourceFormatCategory g) => g != ResourceFormatCategory.folder)
+          .where(
+            (ResourceFormatCategory g) => g != ResourceFormatCategory.folder,
+          )
           .toList(growable: false);
     }
     return LibraryForm(
@@ -127,7 +133,8 @@ extension LibraryFormOps on LibraryForm {
   }
 
   LibraryForm get normalized {
-    final Set<ResourceFormatCategory> unique = enabledResourceFormatCategories.toSet();
+    final Set<ResourceFormatCategory> unique = enabledResourceFormatCategories
+        .toSet();
     if (isRemote) {
       unique.remove(ResourceFormatCategory.folder);
     }
@@ -248,7 +255,10 @@ Future<void> _writeSettingsIfNeeded(
   );
 }
 
-bool _sameOrderedGroups(List<ResourceFormatCategory> a, List<ResourceFormatCategory> b) {
+bool _sameOrderedGroups(
+  List<ResourceFormatCategory> a,
+  List<ResourceFormatCategory> b,
+) {
   if (a.length != b.length) {
     return false;
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../../../widgetbook/lab_theme/md3e_theme.dart';
+
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -70,8 +72,9 @@ void main() {
       ),
     );
     expect(find.byType(M3ECheckbox), findsOneWidget);
-    final M3ECheckbox checkbox =
-        tester.widget<M3ECheckbox>(find.byType(M3ECheckbox));
+    final M3ECheckbox checkbox = tester.widget<M3ECheckbox>(
+      find.byType(M3ECheckbox),
+    );
     expect(checkbox.value, isTrue);
   });
 
@@ -82,8 +85,9 @@ void main() {
     expect(Md3eComicCard.showsCoverReadProgress(0.01), isTrue);
   });
 
-  testWidgets('Md3eComicCard hides cover progress when readProgress is null',
-      (WidgetTester tester) async {
+  testWidgets('Md3eComicCard hides cover progress when readProgress is null', (
+    WidgetTester tester,
+  ) async {
     await pumpMd3eApp(
       tester,
       home: Center(
@@ -99,8 +103,9 @@ void main() {
     expect(find.byKey(kMd3eComicCardCoverProgressKey), findsNothing);
   });
 
-  testWidgets('Md3eComicCard hides cover progress when readProgress is 0',
-      (WidgetTester tester) async {
+  testWidgets('Md3eComicCard hides cover progress when readProgress is 0', (
+    WidgetTester tester,
+  ) async {
     await pumpMd3eApp(
       tester,
       home: Center(
@@ -117,23 +122,25 @@ void main() {
     expect(find.byKey(kMd3eComicCardCoverProgressKey), findsNothing);
   });
 
-  testWidgets('Md3eComicCard shows cover progress strip when readProgress > 0',
-      (WidgetTester tester) async {
-    await pumpMd3eApp(
-      tester,
-      home: Center(
-        child: SizedBox(
-          width: 160,
-          child: Md3eComicCard(
-            title: '在读',
-            readProgress: 0.5,
-            cover: const ColoredBox(color: Color(0xFFE0E0E0)),
+  testWidgets(
+    'Md3eComicCard shows cover progress strip when readProgress > 0',
+    (WidgetTester tester) async {
+      await pumpMd3eApp(
+        tester,
+        home: Center(
+          child: SizedBox(
+            width: 160,
+            child: Md3eComicCard(
+              title: '在读',
+              readProgress: 0.5,
+              cover: const ColoredBox(color: Color(0xFFE0E0E0)),
+            ),
           ),
         ),
-      ),
-    );
-    expect(find.byKey(kMd3eComicCardCoverProgressKey), findsOneWidget);
-  });
+      );
+      expect(find.byKey(kMd3eComicCardCoverProgressKey), findsOneWidget);
+    },
+  );
 
   testWidgets('Md3eComicCard does not tap when disabled', (
     WidgetTester tester,

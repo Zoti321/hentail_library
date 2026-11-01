@@ -110,9 +110,8 @@ class _AuthorComicsSection extends StatelessWidget {
         if (detail.topComics.isEmpty)
           Text(
             l10n.authorDetailComicsEmpty,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: cs.onSurfaceVariant),
           )
         else
           Wrap(
@@ -151,9 +150,8 @@ class _AuthorComicCoverCard extends StatelessWidget {
               type: MaterialType.transparency,
               child: InkWell(
                 onTap: () {
-                  GoRouter.of(
-                    context,
-                  ).push('/comic/${Uri.encodeComponent(comic.comicId)}');
+                  GoRouter.of(context)
+                      .push('/comic/${Uri.encodeComponent(comic.comicId)}');
                 },
                 child: ComicCoverContent(comicId: comic.comicId),
               ),

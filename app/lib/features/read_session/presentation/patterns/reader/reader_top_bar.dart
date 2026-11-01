@@ -36,8 +36,8 @@ class Md3eReaderTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final bool compactChrome =
-        Md3eWindowSizeClass.fromWidth(viewportWidth).isCompact;
+    final bool compactChrome = Md3eWindowSizeClass.fromWidth(viewportWidth)
+        .isCompact;
     final EdgeInsets horizontalInsets = EdgeInsets.symmetric(
       horizontal: Md3eReaderChromeMetrics.chromeContentHorizontalPadding(
         viewportWidth,
@@ -113,10 +113,7 @@ class Md3eReaderTopBar extends StatelessWidget {
         elevation: 0,
         safeArea: true,
         centerTitle: false,
-        title: _ReaderAppBarTitleBlock(
-          title: title,
-          subtitle: subtitle,
-        ),
+        title: _ReaderAppBarTitleBlock(title: title, subtitle: subtitle),
         leading: _iconButton(
           context: context,
           icon: Symbols.arrow_back,
@@ -148,10 +145,7 @@ class Md3eReaderTopBar extends StatelessWidget {
 }
 
 class _ReaderAppBarTitleBlock extends StatelessWidget {
-  const _ReaderAppBarTitleBlock({
-    required this.title,
-    this.subtitle,
-  });
+  const _ReaderAppBarTitleBlock({required this.title, this.subtitle});
 
   final String title;
   final String? subtitle;

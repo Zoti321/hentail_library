@@ -50,13 +50,14 @@ class Md3eSeriesSerializationDropdown extends StatelessWidget {
           color: theme.colorScheme.onSurface,
         ),
       ),
-      onSelectionChanged: (List<M3EDropdownItem<Md3eSeriesSerializationStatus>> items) {
-        if (items.isEmpty) {
-          onChanged(Md3eSeriesSerializationStatus.unknown);
-          return;
-        }
-        onChanged(items.first.value);
-      },
+      onSelectionChanged:
+          (List<M3EDropdownItem<Md3eSeriesSerializationStatus>> items) {
+            if (items.isEmpty) {
+              onChanged(Md3eSeriesSerializationStatus.unknown);
+              return;
+            }
+            onChanged(items.first.value);
+          },
     );
   }
 

@@ -19,15 +19,11 @@ final class Md3eReaderToggleChromeIntent extends Intent {
 }
 
 abstract final class Md3eReaderKeyboard {
-  static const Map<ShortcutActivator, Intent> shortcuts =
-      <ShortcutActivator, Intent>{
-        SingleActivator(LogicalKeyboardKey.arrowLeft):
-            Md3eReaderPrevPageIntent(),
-        SingleActivator(LogicalKeyboardKey.arrowRight):
-            Md3eReaderNextPageIntent(),
-        SingleActivator(LogicalKeyboardKey.space):
-            Md3eReaderToggleAutoPlayIntent(),
-        SingleActivator(LogicalKeyboardKey.escape):
-            Md3eReaderToggleChromeIntent(),
-      };
+  static const Map<ShortcutActivator, Intent>
+  shortcuts = <ShortcutActivator, Intent>{
+    SingleActivator(LogicalKeyboardKey.arrowLeft): Md3eReaderPrevPageIntent(),
+    SingleActivator(LogicalKeyboardKey.arrowRight): Md3eReaderNextPageIntent(),
+    SingleActivator(LogicalKeyboardKey.space): Md3eReaderToggleAutoPlayIntent(),
+    SingleActivator(LogicalKeyboardKey.escape): Md3eReaderToggleChromeIntent(),
+  };
 }

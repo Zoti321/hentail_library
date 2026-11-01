@@ -150,7 +150,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
       () => _mapLibrary(
         rust.updateLibraryResourceFormatCategoriesFrb(
           libraryId: libraryId,
-          groups: groups.map(_mapResourceFormatCategory).toList(growable: false),
+          groups: groups
+              .map(_mapResourceFormatCategory)
+              .toList(growable: false),
         ),
       ),
       fallbackMessage: '更新库格式失败',
@@ -170,7 +172,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
         rust.updateLibrarySettingsFrb(
           libraryId: libraryId,
           name: name,
-          groups: groups.map(_mapResourceFormatCategory).toList(growable: false),
+          groups: groups
+              .map(_mapResourceFormatCategory)
+              .toList(growable: false),
           scanOnStartup: scanOnStartup,
           scanInterval: _mapScanInterval(scanInterval),
         ),
@@ -235,21 +239,27 @@ LocalLibrary _mapLibrary(rust.LibraryDto dto) {
   );
 }
 
-rust_sync.ResourceFormatCategoryDto _mapResourceFormatCategory(ResourceFormatCategory group) {
+rust_sync.ResourceFormatCategoryDto _mapResourceFormatCategory(
+  ResourceFormatCategory group,
+) {
   return switch (group) {
     ResourceFormatCategory.folder => rust_sync.ResourceFormatCategoryDto.folder,
     ResourceFormatCategory.pdf => rust_sync.ResourceFormatCategoryDto.pdf,
     ResourceFormatCategory.epub => rust_sync.ResourceFormatCategoryDto.epub,
-    ResourceFormatCategory.archive => rust_sync.ResourceFormatCategoryDto.archive,
+    ResourceFormatCategory.archive =>
+      rust_sync.ResourceFormatCategoryDto.archive,
   };
 }
 
-ResourceFormatCategory _mapResourceFormatCategoryFromRust(rust_sync.ResourceFormatCategoryDto group) {
+ResourceFormatCategory _mapResourceFormatCategoryFromRust(
+  rust_sync.ResourceFormatCategoryDto group,
+) {
   return switch (group) {
     rust_sync.ResourceFormatCategoryDto.folder => ResourceFormatCategory.folder,
     rust_sync.ResourceFormatCategoryDto.pdf => ResourceFormatCategory.pdf,
     rust_sync.ResourceFormatCategoryDto.epub => ResourceFormatCategory.epub,
-    rust_sync.ResourceFormatCategoryDto.archive => ResourceFormatCategory.archive,
+    rust_sync.ResourceFormatCategoryDto.archive =>
+      ResourceFormatCategory.archive,
   };
 }
 

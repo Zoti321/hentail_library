@@ -36,18 +36,25 @@ void main() {
     WidgetTester tester,
   ) async {
     Md3eReaderSettingsLabState latest = const Md3eReaderSettingsLabState();
-    await _openSheet(tester, (Md3eReaderSettingsLabState next) => latest = next);
+    await _openSheet(
+      tester,
+      (Md3eReaderSettingsLabState next) => latest = next,
+    );
 
     final BuildContext context = tester.element(find.byType(Scaffold));
     final l10n = context.l10n;
-    expect(find.text(l10n.autoPlayModeLabel(AutoPlayMode.comicOnce)),
-        findsOneWidget);
+    expect(
+      find.text(l10n.autoPlayModeLabel(AutoPlayMode.comicOnce)),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text(l10n.readerSettingsAutoPlayMode));
     await tester.pumpAndSettle();
     expect(latest.autoPlayMode, AutoPlayMode.comicLoop);
-    expect(find.text(l10n.autoPlayModeLabel(AutoPlayMode.comicLoop)),
-        findsOneWidget);
+    expect(
+      find.text(l10n.autoPlayModeLabel(AutoPlayMode.comicLoop)),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text(l10n.readerSettingsAutoPlayMode));
     await tester.pumpAndSettle();
@@ -67,7 +74,10 @@ void main() {
     WidgetTester tester,
   ) async {
     Md3eReaderSettingsLabState latest = const Md3eReaderSettingsLabState();
-    await _openSheet(tester, (Md3eReaderSettingsLabState next) => latest = next);
+    await _openSheet(
+      tester,
+      (Md3eReaderSettingsLabState next) => latest = next,
+    );
 
     expect(latest.autoPlayIntervalSeconds, 5);
     await tester.tap(find.byKey(const Key('reader_settings_interval_plus')));

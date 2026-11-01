@@ -44,9 +44,11 @@ List<ResourceFormatCategory> resourceFormatCategoriesFromStorage(Object? raw) {
   return ResourceFormatCategory.all.where(unique.contains).toList();
 }
 
-List<String> resourceFormatCategoriesToStorage(List<ResourceFormatCategory> groups) =>
-    groups.map((ResourceFormatCategory g) => g.name).toList();
+List<String> resourceFormatCategoriesToStorage(
+  List<ResourceFormatCategory> groups,
+) => groups.map((ResourceFormatCategory g) => g.name).toList();
 
 /// 保存全关启用分组前是否需要强确认。
-bool requiresDisableAllResourceFormatCategoriesConfirm(Iterable<ResourceFormatCategory> enabled) =>
-    enabled.isEmpty;
+bool requiresDisableAllResourceFormatCategoriesConfirm(
+  Iterable<ResourceFormatCategory> enabled,
+) => enabled.isEmpty;

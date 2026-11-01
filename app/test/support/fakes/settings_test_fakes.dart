@@ -71,7 +71,8 @@ class MemoryAppSettingRepository implements AppSettingRepository {
   Future<bool?> peekLegacyAutoScan() async => legacyAutoScan;
 
   @override
-  Future<List<ResourceFormatCategory>?> peekLegacyEnabledResourceFormatCategories() async =>
+  Future<List<ResourceFormatCategory>?>
+  peekLegacyEnabledResourceFormatCategories() async =>
       legacyEnabledResourceFormatCategories;
 
   @override

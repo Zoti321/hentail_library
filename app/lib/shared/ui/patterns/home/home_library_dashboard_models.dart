@@ -1,8 +1,5 @@
 /// Lab 首页「管库」列表行（预览 / 将来接生产 read model）。
-enum Md3eHomeLibraryKind {
-  local,
-  remote,
-}
+enum Md3eHomeLibraryKind { local, remote }
 
 /// 与侧栏 overflow 顺序一致的操作项。
 enum Md3eHomeLibraryManagementAction {
@@ -13,11 +10,7 @@ enum Md3eHomeLibraryManagementAction {
   delete,
 }
 
-enum Md3eHomeLibraryRowHint {
-  none,
-  syncWarning,
-  unreachable,
-}
+enum Md3eHomeLibraryRowHint { none, syncWarning, unreachable }
 
 class Md3eHomeLibraryDashboardRow {
   const Md3eHomeLibraryDashboardRow({

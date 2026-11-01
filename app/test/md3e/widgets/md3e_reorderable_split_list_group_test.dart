@@ -179,9 +179,7 @@ void main() {
       expect(find.byType(Md3eSplitDragScope), findsNothing);
     });
 
-    testWidgets('拖拽松手后被拖的行圆角恢复为其槽位圆角（不残留按压圆角）', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('拖拽松手后被拖的行圆角恢复为其槽位圆角（不残留按压圆角）', (WidgetTester tester) async {
       List<String> items = List<String>.of(_items);
       await pumpMd3eApp(
         tester,

@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -85,10 +84,7 @@ class _StubAuthorRepository extends EmptyAuthorRepository {
   }
 }
 
-Future<void> _pumpBody(
-  WidgetTester tester,
-  _StubAuthorRepository repo,
-) async {
+Future<void> _pumpBody(WidgetTester tester, _StubAuthorRepository repo) async {
   SharedPreferences.setMockInitialValues(<String, Object>{});
   tester.view.physicalSize = const Size(800, 900);
   tester.view.devicePixelRatio = 1.0;
@@ -102,9 +98,7 @@ Future<void> _pumpBody(
     overrides: overrides,
     theme: buildAppTheme(Brightness.light),
     home: const Scaffold(
-      body: SingleChildScrollView(
-        child: AuthorDetailMd3eBody(authorId: 1),
-      ),
+      body: SingleChildScrollView(child: AuthorDetailMd3eBody(authorId: 1)),
     ),
   );
   await tester.pumpAndSettle();
@@ -113,9 +107,7 @@ Future<void> _pumpBody(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('shows author name and comic count', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('shows author name and comic count', (WidgetTester tester) async {
     await _pumpBody(tester, _StubAuthorRepository());
 
     expect(find.text('Alice'), findsWidgets);
@@ -184,9 +176,7 @@ void main() {
     expect(repo.deletedLinks, <(int, int)>[(1, 7)]);
   });
 
-  testWidgets('verified badge uses primary color', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('verified badge uses primary color', (WidgetTester tester) async {
     await _pumpBody(tester, _StubAuthorRepository());
 
     final Icon badge = tester.widget<Icon>(find.byIcon(LucideIcons.badgeCheck));

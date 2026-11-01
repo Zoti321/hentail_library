@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../../../widgetbook/md3e_reader_page_lab_host.dart';
+
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_page_copy.dart';
+
 import '../../../widgetbook/md3e_reader_page_preview_data.dart';
+
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -31,7 +35,9 @@ void main() {
     await tester.binding.setSurfaceSize(null);
   });
 
-  testWidgets('tap zones paginate when chrome hidden', (WidgetTester tester) async {
+  testWidgets('tap zones paginate when chrome hidden', (
+    WidgetTester tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(1024, 800));
     await pumpMd3eApp(
       tester,
@@ -43,15 +49,24 @@ void main() {
     );
     await tester.tapAt(const Offset(512, 400));
     await tester.pumpAndSettle();
-    expect(find.text(Md3eReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
+    expect(
+      find.text(Md3eReaderPageCopy.viewportPlaceholder(3)),
+      findsOneWidget,
+    );
 
     await tester.tapAt(const Offset(900, 400));
     await tester.pumpAndSettle();
-    expect(find.text(Md3eReaderPageCopy.viewportPlaceholder(4)), findsOneWidget);
+    expect(
+      find.text(Md3eReaderPageCopy.viewportPlaceholder(4)),
+      findsOneWidget,
+    );
 
     await tester.tapAt(const Offset(100, 400));
     await tester.pumpAndSettle();
-    expect(find.text(Md3eReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
+    expect(
+      find.text(Md3eReaderPageCopy.viewportPlaceholder(3)),
+      findsOneWidget,
+    );
 
     await tester.binding.setSurfaceSize(null);
   });
@@ -77,18 +92,12 @@ void main() {
     );
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.text(Md3eReaderPageCopy.viewportLoading), findsOneWidget);
-    expect(
-      find.text(Md3eReaderPageCopy.viewportPlaceholder(3)),
-      findsNothing,
-    );
+    expect(find.text(Md3eReaderPageCopy.viewportPlaceholder(3)), findsNothing);
 
     // 加载指示器持续动画，不能用 pumpAndSettle。
     await tester.tapAt(const Offset(900, 400));
     await tester.pump();
-    expect(
-      find.text(Md3eReaderPageCopy.viewportPlaceholder(3)),
-      findsNothing,
-    );
+    expect(find.text(Md3eReaderPageCopy.viewportPlaceholder(3)), findsNothing);
     await tester.binding.setSurfaceSize(null);
   });
 

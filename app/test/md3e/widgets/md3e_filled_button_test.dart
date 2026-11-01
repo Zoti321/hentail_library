@@ -12,10 +12,7 @@ void main() {
     await pumpMd3eApp(
       tester,
       home: Center(
-        child: Md3eFilledButton(
-          label: '继续',
-          onPressed: () => tapped = true,
-        ),
+        child: Md3eFilledButton(label: '继续', onPressed: () => tapped = true),
       ),
     );
     expect(find.text('继续'), findsOneWidget);

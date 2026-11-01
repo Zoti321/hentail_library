@@ -4,6 +4,7 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/comic_detail/comic_detail_metadata_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/comic_detail/comic_detail_primary_block.dart';
+
 /// 详情正文块（无滚动容器，供 [CustomScrollView] sliver 使用）。
 class Md3eComicDetailScrollContent extends StatelessWidget {
   const Md3eComicDetailScrollContent({

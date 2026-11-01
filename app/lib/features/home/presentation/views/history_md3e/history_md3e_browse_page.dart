@@ -95,10 +95,7 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
         slivers: <Widget>[
           SliverPersistentHeader(
             pinned: true,
-            delegate: Md3ePageHeaderDelegate(
-              layout: layout,
-              child: header,
-            ),
+            delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
           ),
           SliverPadding(
             padding: EdgeInsets.fromLTRB(

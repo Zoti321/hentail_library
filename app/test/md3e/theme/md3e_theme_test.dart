@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../../../widgetbook/lab_theme/md3e_theme.dart';
+
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 import '../../support/pump_md3e_app.dart';
@@ -22,10 +24,10 @@ void main() {
     final M3EThemeData m3e = buildMd3eThemeData();
     expect(m3e.colorScheme.brightness, Brightness.light);
     expect(
-      buildMd3eMaterialTheme(Brightness.light, m3e: m3e)
-          .textTheme
-          .bodyLarge
-          ?.fontFamily,
+      buildMd3eMaterialTheme(
+        Brightness.light,
+        m3e: m3e,
+      ).textTheme.bodyLarge?.fontFamily,
       kMd3eAppFontFamily,
     );
     expect(m3e.typeScale.bodyLarge.fontFamily, kMd3eAppFontFamily);

@@ -11,7 +11,8 @@ abstract class AppSettingRepository {
   Future<bool?> peekLegacyAutoScan();
 
   /// Legacy app-global format groups before per-library SQLite migration.
-  Future<List<ResourceFormatCategory>?> peekLegacyEnabledResourceFormatCategories();
+  Future<List<ResourceFormatCategory>?>
+  peekLegacyEnabledResourceFormatCategories();
 
   /// Clears staged legacy import keys after one-shot library migrations.
   Future<void> clearLegacyImportPayload();

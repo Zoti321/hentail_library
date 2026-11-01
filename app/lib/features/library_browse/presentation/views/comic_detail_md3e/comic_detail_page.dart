@@ -155,10 +155,7 @@ class _Md3eComicDetailPageState extends State<Md3eComicDetailPage> {
             slivers: <Widget>[
               SliverPersistentHeader(
                 pinned: true,
-                delegate: Md3ePageHeaderDelegate(
-                  layout: layout,
-                  child: header,
-                ),
+                delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
               ),
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),

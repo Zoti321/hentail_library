@@ -65,7 +65,8 @@ class _Md3eOutlinedTextFieldState extends State<Md3eOutlinedTextField> {
     super.initState();
     _ownsController = widget.controller == null;
     _ownsFocusNode = widget.focusNode == null;
-    _controller = widget.controller ??
+    _controller =
+        widget.controller ??
         TextEditingController(text: widget.initialValue ?? '');
     _focusNode = widget.focusNode ?? FocusNode();
     if (widget.autofocus) {

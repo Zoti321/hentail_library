@@ -18,17 +18,13 @@ void main() {
       home: Center(
         child: SizedBox(
           width: Md3eBreakpoints.previewWidthExpanded,
-          child: Md3eLibraryPageHeader(
-            onFilterSort: () {},
-          ),
+          child: Md3eLibraryPageHeader(onFilterSort: () {}),
         ),
       ),
     );
 
     expect(
-      Md3eLibraryPageHeaderMetrics.layoutFor(
-        Md3eWindowSizeClass.expanded,
-      ),
+      Md3eLibraryPageHeaderMetrics.layoutFor(Md3eWindowSizeClass.expanded),
       Md3eLibraryPageHeaderLayout.titleAndActionsOnly,
     );
     expect(find.text('漫画库'), findsOneWidget);

@@ -13,7 +13,9 @@ const double kMd3eComicCardSelectionInset = 8;
 const double kMd3eComicCardCoverProgressHeight = kMd3eCoverReadProgressHeight;
 
 /// Key for the cover progress strip (tests / semantics tooling).
-const Key kMd3eComicCardCoverProgressKey = Key('md3e_comic_card_cover_progress');
+const Key kMd3eComicCardCoverProgressKey = Key(
+  'md3e_comic_card_cover_progress',
+);
 
 /// Pins M3 elevated-card visuals for catalogs (e.g. Widgetbook); not for production grids.
 enum Md3eComicCardVisualState {
@@ -42,7 +44,8 @@ class Md3eComicCard extends StatelessWidget {
     const double titleLineHeight = 20;
     const double titleSubtitleGap = 6;
     const double subtitleLineHeight = 16;
-    final double infoBlock = titleLineHeight +
+    final double infoBlock =
+        titleLineHeight +
         (hasSubtitle ? titleSubtitleGap + subtitleLineHeight : 0) +
         infoBottomPadding;
     return coverHeight + coverToInfoGap + infoBlock;
@@ -81,8 +84,7 @@ class Md3eComicCard extends StatelessWidget {
     this.onSelectionChanged,
     this.readProgress,
   }) : assert(
-         readProgress == null ||
-             (readProgress >= 0 && readProgress <= 1),
+         readProgress == null || (readProgress >= 0 && readProgress <= 1),
          'readProgress must be between 0 and 1',
        );
 
@@ -115,7 +117,6 @@ class Md3eComicCard extends StatelessWidget {
     final bool cardEnabled =
         enabled && visualState != Md3eComicCardVisualState.disabled;
     final bool dragged = visualState == Md3eComicCardVisualState.dragged;
-
 
     const double titleSubtitleGap = 6;
 
@@ -202,10 +203,7 @@ class Md3eComicCard extends StatelessWidget {
       trackHover: visualState == null,
       onPressed: interactive ? _handleTap : null,
       pinnedOverlayAlpha: _pinnedOverlayAlphaFor(visualState),
-      semanticLabel: _semanticsLabel(
-        title: title,
-        readProgress: coverProgress,
-      ),
+      semanticLabel: _semanticsLabel(title: title, readProgress: coverProgress),
       child: body,
     );
   }

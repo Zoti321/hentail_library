@@ -40,7 +40,8 @@ class Md3eSeriesMetadataEditForm extends StatefulWidget {
       _Md3eSeriesMetadataEditFormState();
 }
 
-class _Md3eSeriesMetadataEditFormState extends State<Md3eSeriesMetadataEditForm> {
+class _Md3eSeriesMetadataEditFormState
+    extends State<Md3eSeriesMetadataEditForm> {
   _Md3eSeriesMetadataEditTab _tab = _Md3eSeriesMetadataEditTab.content;
 
   @override
@@ -69,8 +70,12 @@ class _Md3eSeriesMetadataEditFormState extends State<Md3eSeriesMetadataEditForm>
       children: <Widget>[
         Md3eSegmentedCapsuleBar(
           segments: <Md3eSegmentedCapsuleSegment>[
-            Md3eSegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabContent),
-            Md3eSegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabFieldLocks),
+            Md3eSegmentedCapsuleSegment(
+              label: l10n.dialogEditMetadataTabContent,
+            ),
+            Md3eSegmentedCapsuleSegment(
+              label: l10n.dialogEditMetadataTabFieldLocks,
+            ),
           ],
           selectedIndex: _tab.index,
           onSelected: (int index) {

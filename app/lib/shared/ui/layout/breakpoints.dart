@@ -62,8 +62,7 @@ enum Md3eWindowSizeClass {
 
   /// compact / medium：元数据与库表单走全屏壳；expanded+ 走 Modal Dialog。
   bool get usesMetadataEditFullScreenRoute =>
-      this == Md3eWindowSizeClass.compact ||
-      this == Md3eWindowSizeClass.medium;
+      this == Md3eWindowSizeClass.compact || this == Md3eWindowSizeClass.medium;
 }
 
 /// Resolves the current window size class from [MediaQuery] width.

@@ -18,16 +18,9 @@ class Md3ePointerTarget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget aligned = Align(
-      widthFactor: 1,
-      heightFactor: 1,
-      child: child,
-    );
+    final Widget aligned = Align(widthFactor: 1, heightFactor: 1, child: child);
     final Widget sized = ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: minSize,
-        minHeight: minSize,
-      ),
+      constraints: BoxConstraints(minWidth: minSize, minHeight: minSize),
       child: aligned,
     );
     if (onTap == null) {

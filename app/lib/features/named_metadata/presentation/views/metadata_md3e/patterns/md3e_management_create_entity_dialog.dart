@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
 import 'package:flutter/material.dart';
@@ -66,7 +67,8 @@ class _Md3eManagementCreateEntityDialogState
       M3EButtonSize.sm,
     );
     final Size size = MediaQuery.sizeOf(context);
-    final double horizontalInset = Md3ePageLayoutSpec.of(context).horizontalInset;
+    final double horizontalInset = Md3ePageLayoutSpec.of(context)
+        .horizontalInset;
     final double contentWidth = math.min(
       _kMd3eManagementCreateDialogMaxWidth,
       size.width - horizontalInset * 2,

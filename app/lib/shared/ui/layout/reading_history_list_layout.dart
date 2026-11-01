@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item_metrics.dart';
 
 /// 阅读历史列表（sliver）：按视口宽度决定 1–3 列，按行懒构建。

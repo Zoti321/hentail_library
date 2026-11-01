@@ -34,15 +34,18 @@ void main() {
     libDir = Directory(p.join(Directory.current.path, 'lib'));
   });
 
-  test('features/ and shared/ must not import package:hentai_library/md3e/', () {
-    expect(Directory(p.join(libDir.path, 'md3e')).existsSync(), isFalse);
-    final List<String> violations = collectForbiddenMd3eImports(libDir);
-    expect(
-      violations,
-      isEmpty,
-      reason:
-          'MD3E Cutover 终态禁止生产代码引用 md3e/（#414 / ADR-0031）:\n'
-          '${violations.join('\n')}',
-    );
-  });
+  test(
+    'features/ and shared/ must not import package:hentai_library/md3e/',
+    () {
+      expect(Directory(p.join(libDir.path, 'md3e')).existsSync(), isFalse);
+      final List<String> violations = collectForbiddenMd3eImports(libDir);
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'MD3E Cutover 终态禁止生产代码引用 md3e/（#414 / ADR-0031）:\n'
+            '${violations.join('\n')}',
+      );
+    },
+  );
 }

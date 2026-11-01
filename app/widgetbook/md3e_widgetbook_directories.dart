@@ -11,7 +11,6 @@ import 'package:hentai_library/features/library_browse/presentation/patterns/com
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'md3e_home_page_lab_host.dart';
-import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
 import 'md3e_history_browse_page_lab_host.dart';
 import 'md3e_history_browse_page_preview_data.dart';
@@ -437,7 +436,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: const Md3eComicMetadataEditPageLabHost(),
+                    child: Md3eComicMetadataEditPageLabHost(),
                   ),
                 ),
               ],
@@ -463,7 +462,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Edit local · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: const Md3eLibraryEditPageLabHost(
+                    child: Md3eLibraryEditPageLabHost(
                       intent: Md3eLibraryEditPageIntent.editLocal,
                     ),
                   ),
@@ -471,7 +470,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Edit remote · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: const Md3eLibraryEditPageLabHost(
+                    child: Md3eLibraryEditPageLabHost(
                       intent: Md3eLibraryEditPageIntent.editRemote,
                     ),
                   ),
@@ -498,8 +497,7 @@ class _Md3eReadingHistoryListItemPreview extends StatelessWidget {
   const _Md3eReadingHistoryListItemPreview({
     required this.cover,
     this.title = '只有神知道的世界',
-    this.lastReadTime,
-  });
+  }) : lastReadTime = null;
 
   final Widget cover;
   final String title;

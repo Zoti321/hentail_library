@@ -30,7 +30,8 @@ class Md3eSeriesMetadataEditPage extends StatefulWidget {
       _Md3eSeriesMetadataEditPageState();
 }
 
-class _Md3eSeriesMetadataEditPageState extends State<Md3eSeriesMetadataEditPage> {
+class _Md3eSeriesMetadataEditPageState
+    extends State<Md3eSeriesMetadataEditPage> {
   late Md3eSeriesMetadataEditDraft _draft = widget.initialDraft;
   String? _nameError;
   String? _totalCountError;
@@ -105,7 +106,8 @@ class _Md3eSeriesMetadataEditPageState extends State<Md3eSeriesMetadataEditPage>
             if (_nameError != null && value.validateName() == null) {
               _nameError = null;
             }
-            if (_totalCountError != null && value.validateTotalCount() == null) {
+            if (_totalCountError != null &&
+                value.validateTotalCount() == null) {
               _totalCountError = null;
             }
           });

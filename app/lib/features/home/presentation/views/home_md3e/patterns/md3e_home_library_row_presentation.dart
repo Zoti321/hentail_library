@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
 import 'package:intl/intl.dart';

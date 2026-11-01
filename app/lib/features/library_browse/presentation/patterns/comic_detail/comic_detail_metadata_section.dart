@@ -64,7 +64,8 @@ class Md3eComicDetailMetadataSection extends StatelessWidget {
 
     final double tagsToResourceGap =
         Md3eComicDetailPageMetrics.metadataTagsToResourceSpacing(sizeClass);
-    final bool hasChips = entry.parodies.isNotEmpty ||
+    final bool hasChips =
+        entry.parodies.isNotEmpty ||
         entry.authors.isNotEmpty ||
         entry.characters.isNotEmpty ||
         entry.tags.isNotEmpty;
@@ -73,7 +74,8 @@ class Md3eComicDetailMetadataSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         chipBlock,
-        if (hasChips && infoRows.isNotEmpty) SizedBox(height: tagsToResourceGap),
+        if (hasChips && infoRows.isNotEmpty)
+          SizedBox(height: tagsToResourceGap),
         if (infoRows.isNotEmpty)
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

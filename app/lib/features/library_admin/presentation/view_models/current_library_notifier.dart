@@ -113,7 +113,8 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
           .read(appSettingRepoProvider)
           .peekLegacyEnabledResourceFormatCategories();
       final List<ResourceFormatCategory> groups =
-          legacyGroups ?? List<ResourceFormatCategory>.from(ResourceFormatCategory.all);
+          legacyGroups ??
+          List<ResourceFormatCategory>.from(ResourceFormatCategory.all);
       for (final LocalLibrary library in libraries) {
         await _repo.updateResourceFormatCategories(
           libraryId: library.libraryId,

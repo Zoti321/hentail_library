@@ -53,7 +53,8 @@ class _Md3eSeriesDetailSummaryMetaRowState
         l10n.seriesVolumeCountLabel(widget.entry.volumeCurrent);
 
     final bool showSerialization =
-        widget.entry.serializationStatus != Md3eSeriesSerializationStatus.unknown;
+        widget.entry.serializationStatus !=
+        Md3eSeriesSerializationStatus.unknown;
 
     final List<Widget> chipChildren = <Widget>[];
     if (showSerialization) {

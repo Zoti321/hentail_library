@@ -114,8 +114,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     super.dispose();
   }
 
-  bool get _floating =>
-      ((_focused && widget.enabled) || widget.isPopulated);
+  bool get _floating => ((_focused && widget.enabled) || widget.isPopulated);
 
   M3ETextFieldColors get _currentColors {
     final M3ETextFieldColors to = _toColors!;
@@ -130,11 +129,11 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
       widget.fieldTheme ?? theme.textFieldTheme;
 
   M3ETextFieldStates get _states => M3ETextFieldStates(
-        enabled: widget.enabled,
-        hovered: _hovered,
-        focused: _focused,
-        error: false,
-      );
+    enabled: widget.enabled,
+    hovered: _hovered,
+    focused: _focused,
+    error: false,
+  );
 
   void _syncVisuals({bool animate = true}) {
     final M3EThemeData theme = M3ETheme.of(context);
@@ -325,13 +324,13 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
 
     final Widget interactive = Listener(
       behavior: HitTestBehavior.translucent,
-      onPointerDown: (_) => M3EFocusInteraction.instance
-          .notePointerInteraction(immediate: true),
+      onPointerDown: (_) =>
+          M3EFocusInteraction.instance.notePointerInteraction(immediate: true),
       child: focusRingChild,
     );
 
-    final bool useSelectionGestures = widget.selectionController != null &&
-        widget.editableTextKey != null;
+    final bool useSelectionGestures =
+        widget.selectionController != null && widget.editableTextKey != null;
 
     return TextFieldTapRegion(
       enabled: widget.enabled,
@@ -392,8 +391,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     );
     final double restingTop =
         (height - M3ETextFieldTheme.lineHeightOf(resting)) / 2;
-    final double floatingTop =
-        -M3ETextFieldTheme.lineHeightOf(floating) / 2;
+    final double floatingTop = -M3ETextFieldTheme.lineHeightOf(floating) / 2;
     return PositionedDirectional(
       start: start,
       end: end,

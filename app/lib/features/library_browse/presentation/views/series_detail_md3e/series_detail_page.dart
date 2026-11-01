@@ -216,10 +216,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
             slivers: <Widget>[
               SliverPersistentHeader(
                 pinned: true,
-                delegate: Md3ePageHeaderDelegate(
-                  layout: layout,
-                  child: header,
-                ),
+                delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
               ),
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(

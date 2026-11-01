@@ -30,9 +30,8 @@ class Md3eSeriesDetailComicsGrid extends StatelessWidget {
           child: Center(
             child: Text(
               l10n.seriesDetailNoComics,
-              style: M3ETheme.of(context).typeScale.bodySmall.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
+              style: M3ETheme.of(context).typeScale.bodySmall
+                  .copyWith(color: scheme.onSurfaceVariant),
             ),
           ),
         ),
@@ -51,13 +50,15 @@ class Md3eSeriesDetailComicsGrid extends StatelessWidget {
           title: item.title,
           subtitle: subtitle,
           readProgress: item.readProgress,
-          cover: item.cover ?? ColoredBox(
-            color: scheme.surfaceContainerHigh,
-            child: Icon(
-              Icons.image_outlined,
-              color: scheme.onSurfaceVariant,
-            ),
-          ),
+          cover:
+              item.cover ??
+              ColoredBox(
+                color: scheme.surfaceContainerHigh,
+                child: Icon(
+                  Icons.image_outlined,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
           onTap: () => onComicTap?.call(index),
         );
       },

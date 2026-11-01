@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../../../widgetbook/lab_theme/md3e_theme.dart';
+
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -56,8 +58,9 @@ void main() {
     expect(tapped, isTrue);
   });
 
-  testWidgets('Md3eComicListItem hides info progress when readProgress is 0',
-      (WidgetTester tester) async {
+  testWidgets('Md3eComicListItem hides info progress when readProgress is 0', (
+    WidgetTester tester,
+  ) async {
     await pumpMd3eApp(
       tester,
       home: Md3eComicListItem(
@@ -69,8 +72,9 @@ void main() {
     expect(find.byKey(kMd3eComicListItemInfoProgressKey), findsNothing);
   });
 
-  testWidgets('Md3eComicListItem shows info progress when readProgress > 0',
-      (WidgetTester tester) async {
+  testWidgets('Md3eComicListItem shows info progress when readProgress > 0', (
+    WidgetTester tester,
+  ) async {
     await pumpMd3eApp(
       tester,
       home: Md3eComicListItem(

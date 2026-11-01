@@ -33,11 +33,7 @@ class Md3eReaderViewportLoading extends StatelessWidget {
 
 /// Lab 阅读画布：打开失败（静态；与生产 ReaderOpenErrorPanel 操作项对齐）。
 class Md3eReaderViewportErrorPanel extends StatelessWidget {
-  const Md3eReaderViewportErrorPanel({
-    super.key,
-    this.onBack,
-    this.onRetry,
-  });
+  const Md3eReaderViewportErrorPanel({super.key, this.onBack, this.onRetry});
 
   final VoidCallback? onBack;
   final VoidCallback? onRetry;
@@ -45,8 +41,10 @@ class Md3eReaderViewportErrorPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle =
-        md3eLabButtonLabelStyle(theme, M3EButtonSize.sm);
+    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+      theme,
+      M3EButtonSize.sm,
+    );
     return ColoredBox(
       color: theme.colorScheme.surfaceBright,
       child: Center(

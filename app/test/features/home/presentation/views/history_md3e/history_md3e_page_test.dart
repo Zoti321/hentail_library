@@ -6,7 +6,7 @@ import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart'
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_browse_page.dart';
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_page.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_page_header.dart';
-import '../../../../../../widgetbook/lab_theme/md3e_theme.dart';
+
 import 'package:hentai_library/shared/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';

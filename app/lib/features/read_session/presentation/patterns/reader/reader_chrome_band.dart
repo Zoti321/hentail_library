@@ -83,7 +83,9 @@ class Md3eReaderChromeBand extends StatelessWidget {
       alignment: top ? Alignment.topCenter : Alignment.bottomCenter,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: Md3eReaderChromeMetrics.chromeContentMaxWidth(viewportWidth),
+          maxWidth: Md3eReaderChromeMetrics.chromeContentMaxWidth(
+            viewportWidth,
+          ),
         ),
         child: child,
       ),

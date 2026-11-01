@@ -31,9 +31,6 @@ void main() {
     await tester.tap(find.text('标签'));
     await tester.pumpAndSettle();
 
-    expect(
-      index,
-      Md3eManagedNamedFacetUi.indexOf(ManagedNamedFacetKind.tag),
-    );
+    expect(index, Md3eManagedNamedFacetUi.indexOf(ManagedNamedFacetKind.tag));
   });
 }

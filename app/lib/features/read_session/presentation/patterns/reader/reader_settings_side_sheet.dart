@@ -36,8 +36,10 @@ class Md3eReaderSettingsLabState {
       pagedLayoutLabel: pagedLayoutLabel ?? this.pagedLayoutLabel,
       autoPlayMode: autoPlayMode ?? this.autoPlayMode,
       autoPlayIntervalSeconds:
-          (autoPlayIntervalSeconds ?? this.autoPlayIntervalSeconds)
-              .clamp(autoPlayIntervalMin, autoPlayIntervalMax),
+          (autoPlayIntervalSeconds ?? this.autoPlayIntervalSeconds).clamp(
+            autoPlayIntervalMin,
+            autoPlayIntervalMax,
+          ),
     );
   }
 }

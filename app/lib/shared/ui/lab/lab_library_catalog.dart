@@ -7,9 +7,7 @@ abstract final class Md3eLabLibraryCatalog {
 
   static final DateTime referenceNow = DateTime(2026, 10, 28, 14, 30);
 
-  static List<Md3eHomeLibraryDashboardRow> libraries({
-    DateTime? referenceNow,
-  }) {
+  static List<Md3eHomeLibraryDashboardRow> libraries({DateTime? referenceNow}) {
     final DateTime now = referenceNow ?? Md3eLabLibraryCatalog.referenceNow;
     return <Md3eHomeLibraryDashboardRow>[
       Md3eHomeLibraryDashboardRow(
@@ -59,9 +57,7 @@ abstract final class Md3eLabLibraryCatalog {
   static String displayNameForId(String libraryId) =>
       rowForId(libraryId).displayName;
 
-  static Md3eHomeAggregateCounts aggregateCounts({
-    DateTime? referenceNow,
-  }) {
+  static Md3eHomeAggregateCounts aggregateCounts({DateTime? referenceNow}) {
     final List<Md3eHomeLibraryDashboardRow> rows = libraries(
       referenceNow: referenceNow,
     );

@@ -26,10 +26,7 @@ class Md3eDetailMetadataChipRows extends StatelessWidget {
   final ValueChanged<String>? onAuthorTap;
 
   bool get isEmpty =>
-      parodies.isEmpty &&
-      authors.isEmpty &&
-      characters.isEmpty &&
-      tags.isEmpty;
+      parodies.isEmpty && authors.isEmpty && characters.isEmpty && tags.isEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +55,7 @@ class Md3eDetailMetadataChipRows extends StatelessWidget {
     }
 
     addRow(l10n.comicDetailParodies, parodies);
-    addRow(
-      l10n.comicDetailAuthors,
-      authors,
-      onTap: onAuthorTap ?? onChipTap,
-    );
+    addRow(l10n.comicDetailAuthors, authors, onTap: onAuthorTap ?? onChipTap);
     addRow(l10n.comicDetailCharacters, characters);
     addRow(l10n.comicDetailTags, tags);
 

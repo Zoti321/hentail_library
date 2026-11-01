@@ -27,9 +27,8 @@ class Md3eHistoryPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(
-      context,
-    ).sizeClass;
+    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(context)
+        .sizeClass;
 
     return _Md3eHistoryPageHeaderToolbar(
       title: title,

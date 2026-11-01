@@ -59,11 +59,7 @@ class _Md3eReaderSeriesCatalogBody extends StatelessWidget {
               Navigator.of(context).maybePop();
             },
             value: volumes[i].id == currentVolumeId
-                ? Icon(
-                    Symbols.check,
-                    size: 20,
-                    color: scheme.primary,
-                  )
+                ? Icon(Symbols.check, size: 20, color: scheme.primary)
                 : null,
           ),
       ],

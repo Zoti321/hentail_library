@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'lab_pages/history_browse_entry.dart';
 import 'lab_pages/history_browse_page.dart';
 import 'md3e_history_browse_page_preview_data.dart';
 import 'md3e_lab_reader_navigation.dart';

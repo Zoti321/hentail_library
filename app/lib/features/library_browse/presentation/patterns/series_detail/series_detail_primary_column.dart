@@ -14,8 +14,9 @@ class Md3eSeriesDetailPrimaryColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final double columnGap =
-        Md3eSeriesDetailPageMetrics.primaryColumnSpacing(sizeClass);
+    final double columnGap = Md3eSeriesDetailPageMetrics.primaryColumnSpacing(
+      sizeClass,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

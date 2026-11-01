@@ -33,10 +33,12 @@ class Md3ePublishedDateTextField extends StatefulWidget {
       _Md3ePublishedDateTextFieldState();
 }
 
-class _Md3ePublishedDateTextFieldState extends State<Md3ePublishedDateTextField> {
+class _Md3ePublishedDateTextFieldState
+    extends State<Md3ePublishedDateTextField> {
   final LayerLink _layerLink = LayerLink();
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.value);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.value,
+  );
   bool _pickerOpen = false;
 
   @override

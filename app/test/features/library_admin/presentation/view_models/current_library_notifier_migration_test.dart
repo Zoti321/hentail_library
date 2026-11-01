@@ -32,8 +32,8 @@ class _FakeLibraryRepository implements LibraryRepository {
 
   final List<LocalLibrary> _libraries;
   bool allScanOnStartup = false;
-  final Map<String, List<ResourceFormatCategory>> resourceFormatCategoriesByLibrary =
-      <String, List<ResourceFormatCategory>>{};
+  final Map<String, List<ResourceFormatCategory>>
+  resourceFormatCategoriesByLibrary = <String, List<ResourceFormatCategory>>{};
 
   @override
   Future<List<LocalLibrary>> list() async =>
@@ -56,7 +56,8 @@ class _FakeLibraryRepository implements LibraryRepository {
     required String libraryId,
     required List<ResourceFormatCategory> groups,
   }) async {
-    resourceFormatCategoriesByLibrary[libraryId] = List<ResourceFormatCategory>.from(groups);
+    resourceFormatCategoriesByLibrary[libraryId] =
+        List<ResourceFormatCategory>.from(groups);
     for (final LocalLibrary library in _libraries) {
       if (library.libraryId == libraryId) {
         return (
@@ -64,7 +65,9 @@ class _FakeLibraryRepository implements LibraryRepository {
           kind: library.kind,
           rootPath: library.rootPath,
           name: library.name,
-          enabledResourceFormatCategories: List<ResourceFormatCategory>.from(groups),
+          enabledResourceFormatCategories: List<ResourceFormatCategory>.from(
+            groups,
+          ),
           username: library.username,
           allowHttp: library.allowHttp,
           scanOnStartup: library.scanOnStartup,
@@ -92,7 +95,9 @@ void main() {
       final MemoryAppSettingRepository appSettingRepo =
           MemoryAppSettingRepository(
             legacyAutoScan: true,
-            legacyEnabledResourceFormatCategories: <ResourceFormatCategory>[ResourceFormatCategory.pdf],
+            legacyEnabledResourceFormatCategories: <ResourceFormatCategory>[
+              ResourceFormatCategory.pdf,
+            ],
           );
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
@@ -106,12 +111,14 @@ void main() {
       await container.read(currentLibraryProvider.future);
 
       expect(libraryRepo.allScanOnStartup, isTrue);
-      expect(libraryRepo.resourceFormatCategoriesByLibrary['lib-a'], <ResourceFormatCategory>[
-        ResourceFormatCategory.pdf,
-      ]);
-      expect(libraryRepo.resourceFormatCategoriesByLibrary['lib-b'], <ResourceFormatCategory>[
-        ResourceFormatCategory.pdf,
-      ]);
+      expect(
+        libraryRepo.resourceFormatCategoriesByLibrary['lib-a'],
+        <ResourceFormatCategory>[ResourceFormatCategory.pdf],
+      );
+      expect(
+        libraryRepo.resourceFormatCategoriesByLibrary['lib-b'],
+        <ResourceFormatCategory>[ResourceFormatCategory.pdf],
+      );
       expect(appSettingRepo.clearLegacyImportPayloadCalls, 1);
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       expect(

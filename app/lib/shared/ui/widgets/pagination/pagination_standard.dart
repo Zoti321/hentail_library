@@ -69,11 +69,7 @@ class Md3ePaginationStandard extends StatelessWidget {
 }
 
 class _NavIcon extends StatelessWidget {
-  const _NavIcon({
-    required this.icon,
-    required this.tooltip,
-    this.onPressed,
-  });
+  const _NavIcon({required this.icon, required this.tooltip, this.onPressed});
 
   final IconData icon;
   final String tooltip;

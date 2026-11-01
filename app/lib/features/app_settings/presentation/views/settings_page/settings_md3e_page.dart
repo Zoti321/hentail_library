@@ -27,10 +27,10 @@ class SettingsMd3ePage extends ConsumerWidget {
     }
 
     return Md3eSettingsPage(
-        key: const Key('settings_md3e'),
-        sectionsBuilder: (BuildContext context, Md3eSettingsCategory category) {
-          return settingsMd3eSectionsFor(category);
-        },
-      );
+      key: const Key('settings_md3e'),
+      sectionsBuilder: (BuildContext context, Md3eSettingsCategory category) {
+        return settingsMd3eSectionsFor(category);
+      },
+    );
   }
 }

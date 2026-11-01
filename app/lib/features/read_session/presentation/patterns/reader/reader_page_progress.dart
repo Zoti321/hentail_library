@@ -25,64 +25,63 @@ class _Md3eReaderPageProgressState extends State<Md3eReaderPageProgress> {
 
   int get _safeTotal => widget.totalPages < 1 ? 1 : widget.totalPages;
 
-  int get _displayPage =>
-      (_dragValue ?? widget.currentPage.toDouble()).round().clamp(1, _safeTotal);
+  int get _displayPage => (_dragValue ?? widget.currentPage.toDouble())
+      .round()
+      .clamp(1, _safeTotal);
 
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
-    final Md3eReaderChromeScope? chrome = Md3eReaderChromeScope.maybeOf(context);
+    final Md3eReaderChromeScope? chrome = Md3eReaderChromeScope.maybeOf(
+      context,
+    );
     final Color pageNumberColor = chrome?.onChrome ?? scheme.onSurface;
     final TextStyle pageNumberStyle = type.labelLarge.copyWith(
       fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
       color: pageNumberColor,
     );
-    final double sliderValue =
-        (_dragValue ?? widget.currentPage.toDouble())
-            .clamp(1.0, _safeTotal.toDouble());
+    final double sliderValue = (_dragValue ?? widget.currentPage.toDouble())
+        .clamp(1.0, _safeTotal.toDouble());
 
     return Semantics(
       label: Md3eReaderPageCopy.pageProgressLabel(_displayPage, _safeTotal),
       child: Row(
         children: <Widget>[
-        SizedBox(
-          width: 40,
-          child: Text(
-            '$_displayPage',
-            style: pageNumberStyle,
+          SizedBox(
+            width: 40,
+            child: Text('$_displayPage', style: pageNumberStyle),
           ),
-        ),
-        Expanded(
-          child: M3ESlider(
-            value: sliderValue,
-            min: 1,
-            max: _safeTotal.toDouble(),
-            size: M3ESliderSize.xs,
-            haptic: M3EHapticFeedback.light,
-            semanticFormatterCallback: (double value) =>
-                Md3eReaderPageCopy.pageProgressLabel(
-                  value.round().clamp(1, _safeTotal),
-                  _safeTotal,
-                ),
-            onChanged: (double value) => setState(() => _dragValue = value),
-            onChangeEnd: (double value) {
-              setState(() => _dragValue = null);
-              widget.onPageChanged(value.round());
-            },
+          Expanded(
+            child: M3ESlider(
+              value: sliderValue,
+              min: 1,
+              max: _safeTotal.toDouble(),
+              size: M3ESliderSize.xs,
+              haptic: M3EHapticFeedback.light,
+              semanticFormatterCallback: (double value) =>
+                  Md3eReaderPageCopy.pageProgressLabel(
+                    value.round().clamp(1, _safeTotal),
+                    _safeTotal,
+                  ),
+              onChanged: (double value) => setState(() => _dragValue = value),
+              onChangeEnd: (double value) {
+                setState(() => _dragValue = null);
+                widget.onPageChanged(value.round());
+              },
+            ),
           ),
-        ),
-        SizedBox(
-          width: 40,
-          child: Text(
-            '$_safeTotal',
-            textAlign: TextAlign.end,
-            style: pageNumberStyle,
+          SizedBox(
+            width: 40,
+            child: Text(
+              '$_safeTotal',
+              textAlign: TextAlign.end,
+              style: pageNumberStyle,
+            ),
           ),
-        ),
-      ],
-    ),
+        ],
+      ),
     );
   }
 }

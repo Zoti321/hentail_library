@@ -113,11 +113,13 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
               TextStyle inputStyle,
             ) {
               final double inlineWidth = _inlineWidth(inputStyle);
-              final double inputLine =
-                  M3ETextFieldTheme.lineHeightOf(inputStyle);
+              final double inputLine = M3ETextFieldTheme.lineHeightOf(
+                inputStyle,
+              );
               final bool alignWithChips = widget.tags.isNotEmpty;
-              final double slotHeight =
-                  alignWithChips ? chipTheme.height : inputLine;
+              final double slotHeight = alignWithChips
+                  ? chipTheme.height
+                  : inputLine;
               final double textTopInset = alignWithChips
                   ? (chipTheme.height - inputLine) / 2
                   : 0;
@@ -145,8 +147,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                       child: Padding(
                         padding: EdgeInsets.only(top: textTopInset),
                         child: CallbackShortcuts(
-                          bindings:
-                              M3EFocus.editableInputShortcuts(_focusNode),
+                          bindings: M3EFocus.editableInputShortcuts(_focusNode),
                           child: EditableText(
                             key: _editableKey,
                             controller: _controller,
@@ -159,9 +160,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                             selectionColor: M3ETheme.of(context)
                                 .colorScheme
                                 .primary
-                                .withValues(
-                                  alpha: fieldTheme.selectionOpacity,
-                                ),
+                                .withValues(alpha: fieldTheme.selectionOpacity),
                             textCapitalization: TextCapitalization.none,
                             textInputAction: TextInputAction.done,
                             onSubmitted: (_) => _commitTag(),

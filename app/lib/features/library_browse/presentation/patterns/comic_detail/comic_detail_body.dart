@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/comic_detail/comic_detail_scroll_content.dart';
+
 /// 详情滚动正文（独立 [SingleChildScrollView] 场景）。
 class Md3eComicDetailBody extends StatelessWidget {
   const Md3eComicDetailBody({
@@ -19,8 +20,8 @@ class Md3eComicDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double horizontalPadding =
-        Md3ePageLayoutSpec.of(context).horizontalInset;
+    final double horizontalPadding = Md3ePageLayoutSpec.of(context)
+        .horizontalInset;
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),

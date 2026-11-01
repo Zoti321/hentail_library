@@ -17,7 +17,8 @@ class Md3eAgeRestrictionChipMount extends StatefulWidget {
       _Md3eAgeRestrictionChipMountState();
 }
 
-class _Md3eAgeRestrictionChipMountState extends State<Md3eAgeRestrictionChipMount> {
+class _Md3eAgeRestrictionChipMountState
+    extends State<Md3eAgeRestrictionChipMount> {
   bool _mounted = false;
 
   @override

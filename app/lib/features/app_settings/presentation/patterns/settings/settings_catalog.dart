@@ -12,10 +12,7 @@ enum Md3eSettingsCategory {
 
 /// Master list metadata for [Md3eSettingsCategory].
 class Md3eSettingsCategoryInfo {
-  const Md3eSettingsCategoryInfo({
-    required this.category,
-    required this.icon,
-  });
+  const Md3eSettingsCategoryInfo({required this.category, required this.icon});
 
   final Md3eSettingsCategory category;
   final IconData icon;

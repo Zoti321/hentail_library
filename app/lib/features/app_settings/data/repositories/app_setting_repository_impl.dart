@@ -108,7 +108,8 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   }
 
   @override
-  Future<List<ResourceFormatCategory>?> peekLegacyEnabledResourceFormatCategories() async {
+  Future<List<ResourceFormatCategory>?>
+  peekLegacyEnabledResourceFormatCategories() async {
     try {
       final Map<String, dynamic>? raw = await _readLegacyJsonMap();
       if (raw != null) {
@@ -132,7 +133,9 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   Future<void> clearLegacyImportPayload() async {
     final SharedPreferences prefs = await _prefs();
     await prefs.remove(AppSettingStorageKeys.legacyImportAutoScan);
-    await prefs.remove(AppSettingStorageKeys.legacyImportResourceFormatCategories);
+    await prefs.remove(
+      AppSettingStorageKeys.legacyImportResourceFormatCategories,
+    );
   }
 
   Future<void> _importLegacySettingsJsonIfPresent(
@@ -153,9 +156,8 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
         legacyAutoScan,
       );
     }
-    final List<ResourceFormatCategory> legacyGroups = legacyEnabledResourceFormatCategoriesFromJson(
-      raw,
-    );
+    final List<ResourceFormatCategory> legacyGroups =
+        legacyEnabledResourceFormatCategoriesFromJson(raw);
     await prefs.setString(
       AppSettingStorageKeys.legacyImportResourceFormatCategories,
       jsonEncode(resourceFormatCategoriesToStorage(legacyGroups)),

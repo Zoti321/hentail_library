@@ -134,8 +134,9 @@ class _Md3ePaginationSelectionStripState
                           ? () => widget.onPageChanged(page)
                           : null,
                     ),
-                  Md3ePaginationWindowEllipsis() =>
-                    Md3ePaginationEllipsisSlot(style: ellipsisStyle),
+                  Md3ePaginationWindowEllipsis() => Md3ePaginationEllipsisSlot(
+                    style: ellipsisStyle,
+                  ),
                   Md3ePaginationWindowEmpty() =>
                     const Md3ePaginationEmptySlot(),
                 },

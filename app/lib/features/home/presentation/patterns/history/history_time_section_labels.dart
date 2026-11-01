@@ -1,5 +1,4 @@
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
 
 /// 分桶标题（今天 / 昨天 / …）。

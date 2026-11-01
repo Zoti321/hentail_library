@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+
 import '../../../widgetbook/md3e_history_browse_page_lab_host.dart';
 import '../../../widgetbook/md3e_reader_page_lab_host.dart';
+
 import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -44,10 +45,7 @@ void main() {
   testWidgets('LabHost 确认清空后 preview 列表为空', (WidgetTester tester) async {
     final DateTime clock = DateTime(2026, 6, 15, 14);
 
-    await pumpMd3eApp(
-      tester,
-      home: Md3eHistoryBrowsePageLabHost(clock: clock),
-    );
+    await pumpMd3eApp(tester, home: Md3eHistoryBrowsePageLabHost(clock: clock));
 
     final AppLocalizations l10n = AppLocalizations.of(
       tester.element(find.byType(Md3eHistoryBrowsePageLabHost)),

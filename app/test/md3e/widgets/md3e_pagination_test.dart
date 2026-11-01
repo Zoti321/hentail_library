@@ -24,16 +24,9 @@ void main() {
   ) async {
     await _pumpWithWindowSize(
       tester,
-      windowSize: Size(
-        Md3eBreakpoints.previewWidthExpanded,
-        800,
-      ),
+      windowSize: Size(Md3eBreakpoints.previewWidthExpanded, 800),
       home: Center(
-        child: Md3ePagination(
-          page: 1,
-          totalPages: 1,
-          onPageChanged: (_) {},
-        ),
+        child: Md3ePagination(page: 1, totalPages: 1, onPageChanged: (_) {}),
       ),
     );
     expect(find.byType(Md3ePagination), findsOneWidget);
@@ -72,16 +65,9 @@ void main() {
   ) async {
     await _pumpWithWindowSize(
       tester,
-      windowSize: Size(
-        Md3eBreakpoints.previewWidthExpanded,
-        800,
-      ),
+      windowSize: Size(Md3eBreakpoints.previewWidthExpanded, 800),
       home: Center(
-        child: Md3ePagination(
-          page: 2,
-          totalPages: 12,
-          onPageChanged: (_) {},
-        ),
+        child: Md3ePagination(page: 2, totalPages: 12, onPageChanged: (_) {}),
       ),
     );
     expect(find.text('2'), findsOneWidget);

@@ -8,8 +8,7 @@ sealed class Md3ePaginationWindowItem {
   const factory Md3ePaginationWindowItem.ellipsis() =
       Md3ePaginationWindowEllipsis._;
 
-  const factory Md3ePaginationWindowItem.empty() =
-      Md3ePaginationWindowEmpty._;
+  const factory Md3ePaginationWindowItem.empty() = Md3ePaginationWindowEmpty._;
 }
 
 final class Md3ePaginationWindowPage extends Md3ePaginationWindowItem {
@@ -76,18 +75,12 @@ List<Md3ePaginationWindowItem> md3eBuildPaginationPageWindow({
   );
 
   final int siblingsStart = _max(
-    _min(
-      page - siblingCount,
-      count - boundaryCount - siblingCount * 2 - 1,
-    ),
+    _min(page - siblingCount, count - boundaryCount - siblingCount * 2 - 1),
     boundaryCount + 2,
   );
 
   final int siblingsEnd = _min(
-    _max(
-      page + siblingCount,
-      boundaryCount + siblingCount * 2 + 2,
-    ),
+    _max(page + siblingCount, boundaryCount + siblingCount * 2 + 2),
     count - boundaryCount - 1,
   );
 
@@ -103,7 +96,10 @@ List<Md3ePaginationWindowItem> md3eBuildPaginationPageWindow({
     items.add(Md3ePaginationWindowItem.page(boundaryCount + 1));
   }
 
-  for (final int siblingPage in _md3ePaginationRange(siblingsStart, siblingsEnd)) {
+  for (final int siblingPage in _md3ePaginationRange(
+    siblingsStart,
+    siblingsEnd,
+  )) {
     items.add(Md3ePaginationWindowItem.page(siblingPage));
   }
 

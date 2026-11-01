@@ -6,31 +6,19 @@ void main() {
 
   test('md3eHistoryTimeSectionFor maps four buckets', () {
     expect(
-      md3eHistoryTimeSectionFor(
-        DateTime(2026, 3, 11, 9),
-        clock,
-      ),
+      md3eHistoryTimeSectionFor(DateTime(2026, 3, 11, 9), clock),
       Md3eHistoryTimeSection.today,
     );
     expect(
-      md3eHistoryTimeSectionFor(
-        DateTime(2026, 3, 10, 20),
-        clock,
-      ),
+      md3eHistoryTimeSectionFor(DateTime(2026, 3, 10, 20), clock),
       Md3eHistoryTimeSection.yesterday,
     );
     expect(
-      md3eHistoryTimeSectionFor(
-        DateTime(2026, 3, 9, 12),
-        clock,
-      ),
+      md3eHistoryTimeSectionFor(DateTime(2026, 3, 9, 12), clock),
       Md3eHistoryTimeSection.thisWeek,
     );
     expect(
-      md3eHistoryTimeSectionFor(
-        DateTime(2026, 2, 20),
-        clock,
-      ),
+      md3eHistoryTimeSectionFor(DateTime(2026, 2, 20), clock),
       Md3eHistoryTimeSection.earlier,
     );
   });
@@ -43,7 +31,7 @@ void main() {
     ];
     final List<Md3eHistoryTimeGroup<_Item>> groups = groupHistoryByTimeSection(
       items,
-      ( _Item i) => i.at,
+      (_Item i) => i.at,
       clock: clock,
     );
     expect(groups.length, 3);

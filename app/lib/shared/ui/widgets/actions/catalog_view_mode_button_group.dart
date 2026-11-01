@@ -6,10 +6,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 const double kMd3eCatalogViewModeButtonGroupIconSize = 20;
 
 /// 漫画库目录展示：竖向标准卡片 vs 横向圆角矩形卡片（同一套元数据，仅容器形态不同）。
-enum Md3eCatalogViewMode {
-  grid,
-  list,
-}
+enum Md3eCatalogViewMode { grid, list }
 
 /// Kazumi / M3E：connected tonal 双图标按钮组（卡片 · 列表）。
 ///

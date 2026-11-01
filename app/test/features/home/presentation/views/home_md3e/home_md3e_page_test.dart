@@ -9,8 +9,6 @@ import 'package:hentai_library/features/home/presentation/views/home_md3e/home_m
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
 
-import '../../../../../../widgetbook/lab_theme/md3e_theme.dart';
-
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';

@@ -23,8 +23,10 @@ class _Md3eClearReadingHistoryConfirmDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle =
-        md3eLabButtonLabelStyle(theme, M3EButtonSize.sm);
+    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+      theme,
+      M3EButtonSize.sm,
+    );
 
     return M3EDialog(
       title: l10n.confirmClearHistoryTitle,
@@ -39,17 +41,13 @@ class _Md3eClearReadingHistoryConfirmDialog extends StatelessWidget {
         M3EButton(
           onPressed: () => Navigator.of(context).pop(false),
           style: M3EButtonStyle.text,
-          decoration: M3EButtonDecoration(
-            textStyle: actionLabelStyle,
-          ),
+          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
           label: Text(l10n.commonCancel),
         ),
         M3EButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: M3EButtonStyle.filled,
-          decoration: M3EButtonDecoration(
-            textStyle: actionLabelStyle,
-          ),
+          decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
           label: Text(l10n.commonClear),
         ),
       ],

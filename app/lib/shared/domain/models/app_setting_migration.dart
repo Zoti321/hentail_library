@@ -34,7 +34,9 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
 }
 
 /// Reads legacy app-global format groups before they are dropped from AppSetting.
-List<ResourceFormatCategory> legacyEnabledResourceFormatCategoriesFromJson(Map<String, dynamic> json) {
+List<ResourceFormatCategory> legacyEnabledResourceFormatCategoriesFromJson(
+  Map<String, dynamic> json,
+) {
   if (json.containsKey('enabledFormatGroups')) {
     return resourceFormatCategoriesFromStorage(json['enabledFormatGroups']);
   }

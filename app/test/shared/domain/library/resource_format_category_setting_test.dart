@@ -16,8 +16,18 @@ void main() {
     });
 
     test('requires confirm only when saving with no groups enabled', () {
-      expect(requiresDisableAllResourceFormatCategoriesConfirm(ResourceFormatCategory.all), isFalse);
-      expect(requiresDisableAllResourceFormatCategoriesConfirm(<ResourceFormatCategory>[]), isTrue);
+      expect(
+        requiresDisableAllResourceFormatCategoriesConfirm(
+          ResourceFormatCategory.all,
+        ),
+        isFalse,
+      );
+      expect(
+        requiresDisableAllResourceFormatCategoriesConfirm(
+          <ResourceFormatCategory>[],
+        ),
+        isTrue,
+      );
     });
   });
 }

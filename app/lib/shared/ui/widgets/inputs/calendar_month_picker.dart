@@ -39,7 +39,8 @@ class Md3eCalendarMonthPicker extends StatefulWidget {
   final ValueChanged<M3EDatePickerMode>? onModeChanged;
 
   @override
-  State<Md3eCalendarMonthPicker> createState() => _Md3eCalendarMonthPickerState();
+  State<Md3eCalendarMonthPicker> createState() =>
+      _Md3eCalendarMonthPickerState();
 }
 
 class _Md3eCalendarMonthPickerState extends State<Md3eCalendarMonthPicker> {
@@ -364,9 +365,7 @@ Widget _navLabelWithState({
   return DecoratedBox(
     decoration: BoxDecoration(
       borderRadius: borderRadius ?? BorderRadius.circular(8),
-      color: stateAlpha > 0
-          ? stateColor.withValues(alpha: stateAlpha)
-          : null,
+      color: stateAlpha > 0 ? stateColor.withValues(alpha: stateAlpha) : null,
     ),
     child: child,
   );

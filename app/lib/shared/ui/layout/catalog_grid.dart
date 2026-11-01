@@ -57,8 +57,7 @@ class Md3eCatalogGridSliver extends StatelessWidget {
     return SliverLayoutBuilder(
       builder: (BuildContext context, constraints) {
         final M3ESpacing spacing = M3ETheme.of(context).spacing;
-        final Md3eCatalogGridLayout layout =
-            Md3eCatalogGridMetrics.resolve(
+        final Md3eCatalogGridLayout layout = Md3eCatalogGridMetrics.resolve(
           viewportWidth: constraints.crossAxisExtent,
           spacing: spacing,
           horizontalMargin: horizontalMargin,
@@ -69,14 +68,14 @@ class Md3eCatalogGridSliver extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: layout.horizontalMargin),
           sliver: SliverGrid(
             gridDelegate: md3eCatalogGridDelegate(layout),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return Md3eCatalogGridCell(
-                  child: itemBuilder(context, index, layout),
-                );
-              },
-              childCount: itemCount,
-            ),
+            delegate: SliverChildBuilderDelegate((
+              BuildContext context,
+              int index,
+            ) {
+              return Md3eCatalogGridCell(
+                child: itemBuilder(context, index, layout),
+              );
+            }, childCount: itemCount),
           ),
         );
       },

@@ -50,10 +50,7 @@ class Md3eManagementCreateEntityFab extends StatelessWidget {
           size: fabSize,
           color: M3EFabColor.primary,
           cornerRadius: Md3eLibraryBrowsePageMetrics.scrollToTopCornerRadius,
-          icon: Icon(
-            Icons.add,
-            size: metrics.iconSize,
-          ),
+          icon: Icon(Icons.add, size: metrics.iconSize),
           onPressed: onPressed,
         ),
       ),

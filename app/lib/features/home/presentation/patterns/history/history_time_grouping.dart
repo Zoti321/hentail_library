@@ -1,10 +1,5 @@
 /// 阅读历史四档时间分桶（纯逻辑，无 UI / l10n）。
-enum Md3eHistoryTimeSection {
-  today,
-  yesterday,
-  thisWeek,
-  earlier,
-}
+enum Md3eHistoryTimeSection { today, yesterday, thisWeek, earlier }
 
 /// 展示顺序（仅渲染非空分组）。
 const List<Md3eHistoryTimeSection> kMd3eHistoryTimeSectionOrder =
@@ -17,10 +12,7 @@ const List<Md3eHistoryTimeSection> kMd3eHistoryTimeSectionOrder =
 
 /// 同一分桶内的一条记录（泛型承载业务/预览模型）。
 class Md3eHistoryTimeGroup<T> {
-  const Md3eHistoryTimeGroup({
-    required this.section,
-    required this.items,
-  });
+  const Md3eHistoryTimeGroup({required this.section, required this.items});
 
   final Md3eHistoryTimeSection section;
   final List<T> items;
@@ -65,7 +57,8 @@ List<Md3eHistoryTimeGroup<T>> groupHistoryByTimeSection<T>(
   final DateTime now = clock ?? DateTime.now();
   final Map<Md3eHistoryTimeSection, List<T>> buckets =
       <Md3eHistoryTimeSection, List<T>>{
-        for (final Md3eHistoryTimeSection section in kMd3eHistoryTimeSectionOrder)
+        for (final Md3eHistoryTimeSection section
+            in kMd3eHistoryTimeSectionOrder)
           section: <T>[],
       };
   for (final T item in items) {

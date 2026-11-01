@@ -117,8 +117,7 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
     return Md3eComicDetailPage(
       entry: entry,
       onBack: () => DetailBackHeader.popOrGoLibrary(context),
-      onEdit: () =>
-          showComicMetadataEditMd3e(context: context, comic: comic),
+      onEdit: () => showComicMetadataEditMd3e(context: context, comic: comic),
       moreMenuEntries: <M3EMenuNode>[
         M3EMenuEntry(
           label: l10n.refreshMetadata,

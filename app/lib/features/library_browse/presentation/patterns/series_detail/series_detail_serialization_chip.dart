@@ -6,10 +6,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列详情连载状态（MD3E 描边胶囊，非生产 [SeriesSerializationChip]）。
 class Md3eSeriesDetailSerializationChip extends StatelessWidget {
-  const Md3eSeriesDetailSerializationChip({
-    super.key,
-    required this.status,
-  });
+  const Md3eSeriesDetailSerializationChip({super.key, required this.status});
 
   final Md3eSeriesSerializationStatus status;
 
@@ -47,7 +44,10 @@ class Md3eSeriesDetailSerializationChip extends StatelessWidget {
     );
   }
 
-  static Color _accentColor(M3EColorScheme scheme, Md3eSeriesSerializationStatus status) {
+  static Color _accentColor(
+    M3EColorScheme scheme,
+    Md3eSeriesSerializationStatus status,
+  ) {
     return switch (status) {
       Md3eSeriesSerializationStatus.ongoing => scheme.primary,
       Md3eSeriesSerializationStatus.ended => scheme.onSurfaceVariant,
@@ -56,7 +56,10 @@ class Md3eSeriesDetailSerializationChip extends StatelessWidget {
     };
   }
 
-  static String _label(AppLocalizations l10n, Md3eSeriesSerializationStatus status) {
+  static String _label(
+    AppLocalizations l10n,
+    Md3eSeriesSerializationStatus status,
+  ) {
     return switch (status) {
       Md3eSeriesSerializationStatus.ongoing => l10n.serializationStatusOngoing,
       Md3eSeriesSerializationStatus.ended => l10n.serializationStatusEnded,

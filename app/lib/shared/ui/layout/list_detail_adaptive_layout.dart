@@ -54,11 +54,7 @@ class Md3eListDetailAdaptiveLayout extends StatelessWidget {
                 child: listPane,
               )
             else
-              Expanded(
-                key: listPaneKey,
-                flex: 2,
-                child: listPane,
-              ),
+              Expanded(key: listPaneKey, flex: 2, child: listPane),
             if (paneGap > 0) SizedBox(width: paneGap),
             if (showPaneDivider && listPaneFixedWidth == null)
               const VerticalDivider(width: 1),

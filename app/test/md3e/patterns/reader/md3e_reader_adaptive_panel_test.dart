@@ -5,15 +5,11 @@ import 'package:hentai_library/features/read_session/presentation/patterns/reade
 void main() {
   test('compact and medium use bottom sheet, expanded+ uses side sheet', () {
     expect(
-      Md3eReaderAdaptivePanel.preferBottomSheet(
-        Md3eBreakpoints.medium - 1,
-      ),
+      Md3eReaderAdaptivePanel.preferBottomSheet(Md3eBreakpoints.medium - 1),
       isTrue,
     );
     expect(
-      Md3eReaderAdaptivePanel.preferBottomSheet(
-        Md3eBreakpoints.expanded - 1,
-      ),
+      Md3eReaderAdaptivePanel.preferBottomSheet(Md3eBreakpoints.expanded - 1),
       isTrue,
     );
     expect(

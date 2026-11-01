@@ -262,7 +262,8 @@ class _LibraryMd3eFormState extends ConsumerState<_LibraryMd3eForm> {
       return SingleChildScrollView(child: form);
     }
 
-    final double horizontalInset = Md3ePageLayoutSpec.of(context).horizontalInset;
+    final double horizontalInset = Md3ePageLayoutSpec.of(context)
+        .horizontalInset;
 
     return M3EDialog(
       title: _titleFor(l10n, widget.mode),

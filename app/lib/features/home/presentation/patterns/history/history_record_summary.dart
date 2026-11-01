@@ -5,10 +5,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Body 顶部的记录总数与最长保留说明（[AppLocalizations.historyRecordSummary]）。
 class Md3eHistoryRecordSummary extends StatelessWidget {
-  const Md3eHistoryRecordSummary({
-    super.key,
-    required this.totalCount,
-  });
+  const Md3eHistoryRecordSummary({super.key, required this.totalCount});
 
   final int totalCount;
 
@@ -20,9 +17,7 @@ class Md3eHistoryRecordSummary extends StatelessWidget {
 
     return Text(
       l10n.historyRecordSummary(totalCount),
-      style: theme.typeScale.bodySmall.copyWith(
-        color: scheme.onSurfaceVariant,
-      ),
+      style: theme.typeScale.bodySmall.copyWith(color: scheme.onSurfaceVariant),
     );
   }
 }

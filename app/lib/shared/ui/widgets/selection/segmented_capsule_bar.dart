@@ -5,10 +5,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// One mutually exclusive segment in [Md3eSegmentedCapsuleBar].
 class Md3eSegmentedCapsuleSegment {
-  const Md3eSegmentedCapsuleSegment({
-    required this.label,
-    this.semanticLabel,
-  });
+  const Md3eSegmentedCapsuleSegment({required this.label, this.semanticLabel});
 
   final String label;
   final String? semanticLabel;
@@ -30,7 +27,8 @@ class Md3eSegmentedCapsuleBar extends StatefulWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  State<Md3eSegmentedCapsuleBar> createState() => _Md3eSegmentedCapsuleBarState();
+  State<Md3eSegmentedCapsuleBar> createState() =>
+      _Md3eSegmentedCapsuleBarState();
 }
 
 class _Md3eSegmentedCapsuleBarState extends State<Md3eSegmentedCapsuleBar> {
@@ -196,7 +194,9 @@ class _SegmentTapTarget extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           customBorder: const StadiumBorder(),
-          overlayColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+          overlayColor: WidgetStateProperty.resolveWith((
+            Set<WidgetState> states,
+          ) {
             if (states.contains(WidgetState.pressed)) {
               return scheme.onSurface.withValues(alpha: 0.08);
             }

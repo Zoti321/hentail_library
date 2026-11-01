@@ -32,8 +32,8 @@ class Md3eReaderChromeScope extends InheritedWidget {
   final Color onChromeVariant;
 
   static Md3eReaderChromeScope of(BuildContext context) {
-    final Md3eReaderChromeScope? scope =
-        context.dependOnInheritedWidgetOfExactType<Md3eReaderChromeScope>();
+    final Md3eReaderChromeScope? scope = context
+        .dependOnInheritedWidgetOfExactType<Md3eReaderChromeScope>();
     assert(scope != null, 'Md3eReaderChromeScope not found');
     return scope!;
   }

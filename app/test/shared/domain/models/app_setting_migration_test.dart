@@ -43,15 +43,12 @@ void main() {
       );
     });
 
-    test(
-      'legacyEnabledResourceFormatCategoriesFromJson defaults to all groups when absent',
-      () {
-        expect(
-          legacyEnabledResourceFormatCategoriesFromJson(<String, dynamic>{}),
-          ResourceFormatCategory.all,
-        );
-      },
-    );
+    test('legacyEnabledResourceFormatCategoriesFromJson defaults to all groups when absent', () {
+      expect(
+        legacyEnabledResourceFormatCategoriesFromJson(<String, dynamic>{}),
+        ResourceFormatCategory.all,
+      );
+    });
 
     test('legacyAutoScanFromJson returns null when absent', () {
       expect(legacyAutoScanFromJson(<String, dynamic>{}), isNull);

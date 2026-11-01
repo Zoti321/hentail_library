@@ -36,8 +36,9 @@ abstract final class Md3eReaderChromeMetrics {
 
   /// 超大屏（≥1600）时顶/底控件行的最大宽度；其余宽度铺满。
   static double chromeContentMaxWidth(double viewportWidth) {
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      viewportWidth,
+    );
     if (sizeClass != Md3eWindowSizeClass.extraLarge) {
       return viewportWidth;
     }
@@ -49,8 +50,9 @@ abstract final class Md3eReaderChromeMetrics {
     double viewportWidth, {
     double horizontalSafePadding = 0,
   }) {
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      viewportWidth,
+    );
     if (sizeClass.isCompact) {
       return math.max(0, viewportWidth - horizontalSafePadding);
     }

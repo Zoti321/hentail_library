@@ -32,14 +32,8 @@ class Md3eSeriesDetailComicsSection extends StatelessWidget {
 
     return SliverMainAxisGroup(
       slivers: <Widget>[
-        SliverToBoxAdapter(
-          key: gridSectionKey,
-          child: const SizedBox.shrink(),
-        ),
-        Md3eSeriesDetailComicsGrid(
-          items: pageItems,
-          onComicTap: onComicTap,
-        ),
+        SliverToBoxAdapter(key: gridSectionKey, child: const SizedBox.shrink()),
+        Md3eSeriesDetailComicsGrid(items: pageItems, onComicTap: onComicTap),
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.only(top: paginationGap),

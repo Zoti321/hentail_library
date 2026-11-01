@@ -103,15 +103,16 @@ class _Md3eAnchoredCalendarDatePickerLayerState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _resolveVerticalPlacement());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _resolveVerticalPlacement(),
+    );
   }
 
   void _resolveVerticalPlacement() {
     if (!mounted) {
       return;
     }
-    final RenderObject? object =
-        widget.placementContext.findRenderObject();
+    final RenderObject? object = widget.placementContext.findRenderObject();
     if (object is! RenderBox || !object.hasSize || !object.attached) {
       return;
     }

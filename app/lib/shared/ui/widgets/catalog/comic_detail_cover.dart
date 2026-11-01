@@ -5,11 +5,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 详情页封面占位（2:3，轻阴影）。
 class Md3eComicDetailCover extends StatelessWidget {
-  const Md3eComicDetailCover({
-    super.key,
-    this.child,
-    this.width,
-  });
+  const Md3eComicDetailCover({super.key, this.child, this.width});
 
   final Widget? child;
   final double? width;
@@ -35,7 +31,8 @@ class Md3eComicDetailCover extends StatelessWidget {
       child: SizedBox(
         width: resolvedWidth,
         height: height,
-        child: child ??
+        child:
+            child ??
             Icon(
               Icons.image_outlined,
               size: 48,

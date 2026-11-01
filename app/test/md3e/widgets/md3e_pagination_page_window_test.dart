@@ -5,26 +5,14 @@ void main() {
   group('md3eBuildPaginationPageWindow (MUI usePagination)', () {
     test('page 1 of 10 matches MUI default window', () {
       final List<Md3ePaginationWindowItem> items =
-          md3eBuildPaginationPageWindow(
-            currentPage: 1,
-            totalPages: 10,
-          );
-      expect(
-        _pageTokens(items),
-        <int>[1, 2, 3, 4, 5, -1, 10],
-      );
+          md3eBuildPaginationPageWindow(currentPage: 1, totalPages: 10);
+      expect(_pageTokens(items), <int>[1, 2, 3, 4, 5, -1, 10]);
     });
 
     test('middle page uses both ellipses', () {
       final List<Md3ePaginationWindowItem> items =
-          md3eBuildPaginationPageWindow(
-            currentPage: 6,
-            totalPages: 10,
-          );
-      expect(
-        _pageTokens(items),
-        <int>[1, -1, 5, 6, 7, -1, 10],
-      );
+          md3eBuildPaginationPageWindow(currentPage: 6, totalPages: 10);
+      expect(_pageTokens(items), <int>[1, -1, 5, 6, 7, -1, 10]);
     });
 
     test('padding fixes strip length', () {
@@ -35,10 +23,7 @@ void main() {
         slotCount: 7,
       );
       expect(padded.length, 7);
-      expect(
-        padded.whereType<Md3ePaginationWindowEmpty>().length,
-        3,
-      );
+      expect(padded.whereType<Md3ePaginationWindowEmpty>().length, 3);
     });
   });
 }

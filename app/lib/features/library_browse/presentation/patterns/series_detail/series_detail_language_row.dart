@@ -23,10 +23,12 @@ class Md3eSeriesDetailLanguageRow extends StatelessWidget {
     final List<Widget> children = <Widget>[];
     for (int i = 0; i < languages.length; i++) {
       if (i > 0) {
-        children.add(Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: Text('|', style: separatorStyle),
-        ));
+        children.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Text('|', style: separatorStyle),
+          ),
+        );
       }
       children.add(Text(languages[i], style: style));
     }

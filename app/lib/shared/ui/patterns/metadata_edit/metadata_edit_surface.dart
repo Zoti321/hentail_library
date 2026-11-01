@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
 import 'package:flutter/material.dart';
@@ -49,7 +50,8 @@ class Md3eMetadataEditSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final bool useFullPage = presentation == Md3eMetadataEditPresentation.embedded &&
+    final bool useFullPage =
+        presentation == Md3eMetadataEditPresentation.embedded &&
         sizeClass.usesMetadataEditFullScreenRoute;
 
     if (presentation == Md3eMetadataEditPresentation.labFormBody) {
@@ -98,7 +100,9 @@ class Md3eMetadataEditSurface extends StatelessWidget {
       color: md3eLabBrowseCanvasColor(M3ETheme.of(context).colorScheme),
       child: Center(
         child: Padding(
-          padding: EdgeInsets.all(Md3ePageLayoutSpec.of(context).horizontalInset),
+          padding: EdgeInsets.all(
+            Md3ePageLayoutSpec.of(context).horizontalInset,
+          ),
           child: _DialogCard(
             maxWidth: maxWidth,
             title: title,
@@ -138,7 +142,8 @@ class _DialogCard extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
     final Size size = MediaQuery.sizeOf(context);
-    final double horizontalInset = Md3ePageLayoutSpec.of(context).horizontalInset;
+    final double horizontalInset = Md3ePageLayoutSpec.of(context)
+        .horizontalInset;
     final double width = math.min(maxWidth, size.width - horizontalInset * 2);
     final double maxHeight = size.height * 0.88;
 
@@ -156,7 +161,12 @@ class _DialogCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.fromLTRB(spacing.lg, spacing.lg, spacing.lg, spacing.sm),
+                padding: EdgeInsets.fromLTRB(
+                  spacing.lg,
+                  spacing.lg,
+                  spacing.lg,
+                  spacing.sm,
+                ),
                 child: Text(
                   title,
                   style: theme.typeScale.titleLarge.copyWith(
@@ -166,7 +176,12 @@ class _DialogCard extends StatelessWidget {
               ),
               Flexible(
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(spacing.lg, spacing.sm, spacing.lg, spacing.lg),
+                  padding: EdgeInsets.fromLTRB(
+                    spacing.lg,
+                    spacing.sm,
+                    spacing.lg,
+                    spacing.lg,
+                  ),
                   child: body,
                 ),
               ),
@@ -176,7 +191,12 @@ class _DialogCard extends StatelessWidget {
                 onSave: onSave,
                 saving: saving,
                 saveEnabled: saveEnabled,
-                padding: EdgeInsets.fromLTRB(spacing.lg, spacing.md, spacing.lg, spacing.md),
+                padding: EdgeInsets.fromLTRB(
+                  spacing.lg,
+                  spacing.md,
+                  spacing.lg,
+                  spacing.md,
+                ),
               ),
             ],
           ),

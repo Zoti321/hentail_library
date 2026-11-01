@@ -49,7 +49,9 @@ void main() {
       expect(prefs.containsKey(AppSettingStorageKeys.aggregateJson), isTrue);
       expect(prefs.getBool(AppSettingStorageKeys.legacyImportAutoScan), isTrue);
       expect(
-        prefs.getString(AppSettingStorageKeys.legacyImportResourceFormatCategories),
+        prefs.getString(
+          AppSettingStorageKeys.legacyImportResourceFormatCategories,
+        ),
         jsonEncode(<String>['pdf']),
       );
     });
@@ -114,10 +116,13 @@ void main() {
       await repo.load();
 
       expect(await repo.peekLegacyAutoScan(), isTrue);
-      expect(await repo.peekLegacyEnabledResourceFormatCategories(), <ResourceFormatCategory>[
-        ResourceFormatCategory.epub,
-        ResourceFormatCategory.archive,
-      ]);
+      expect(
+        await repo.peekLegacyEnabledResourceFormatCategories(),
+        <ResourceFormatCategory>[
+          ResourceFormatCategory.epub,
+          ResourceFormatCategory.archive,
+        ],
+      );
     });
   });
 }

@@ -6,7 +6,9 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import '../../support/pump_md3e_app.dart';
 
 void main() {
-  testWidgets('toggles between grid and list modes', (WidgetTester tester) async {
+  testWidgets('toggles between grid and list modes', (
+    WidgetTester tester,
+  ) async {
     Md3eCatalogViewMode mode = Md3eCatalogViewMode.grid;
 
     await pumpMd3eApp(
@@ -20,18 +22,12 @@ void main() {
     );
 
     expect(find.byType(M3EButtonGroup), findsOneWidget);
-    expect(
-      Md3eCatalogViewModeButtonGroup.indexForMode(mode),
-      0,
-    );
+    expect(Md3eCatalogViewModeButtonGroup.indexForMode(mode), 0);
 
     await tester.tap(find.bySemanticsLabel('列表视图'));
     await tester.pumpAndSettle();
 
     expect(mode, Md3eCatalogViewMode.list);
-    expect(
-      Md3eCatalogViewModeButtonGroup.indexForMode(mode),
-      1,
-    );
+    expect(Md3eCatalogViewModeButtonGroup.indexForMode(mode), 1);
   });
 }

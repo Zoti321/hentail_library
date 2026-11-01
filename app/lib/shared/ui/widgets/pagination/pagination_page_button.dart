@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/motion/effects_decorated_box.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination_metrics.dart';

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page.dart';
+
 import '../../../widgetbook/md3e_series_detail_page_preview_data.dart';
 
 import '../../support/pump_md3e_app.dart';
 
 void main() {
-  testWidgets('shows series title and first comic card', (WidgetTester tester) async {
+  testWidgets('shows series title and first comic card', (
+    WidgetTester tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(1024, 900));
     await pumpMd3eApp(
       tester,

@@ -42,8 +42,7 @@ class Md3ePaginationCompact extends StatelessWidget {
               child: _CompactNavIcon(
                 icon: Icons.chevron_left,
                 tooltip: '上一页',
-                onPressed:
-                    canGoPrevious ? () => onPageChanged(page - 1) : null,
+                onPressed: canGoPrevious ? () => onPageChanged(page - 1) : null,
               ),
             ),
           ),
@@ -92,10 +91,7 @@ class _CompactNavIcon extends StatelessWidget {
       height: Md3ePaginationMetrics.compactNavIconSlot,
       child: Center(
         child: M3EIconButton(
-          icon: Icon(
-            icon,
-            size: Md3ePaginationMetrics.compactNavIconSize,
-          ),
+          icon: Icon(icon, size: Md3ePaginationMetrics.compactNavIconSize),
           variant: M3EIconButtonVariant.standard,
           size: M3EIconButtonSize.md,
           tooltip: tooltip,

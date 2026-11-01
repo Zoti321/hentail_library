@@ -42,13 +42,11 @@ class _Md3eLibraryEditPageState extends State<Md3eLibraryEditPage> {
   bool _saving = false;
 
   bool get _isCreate => switch (widget.intent) {
-        Md3eLibraryEditPageIntent.createLocal ||
-        Md3eLibraryEditPageIntent.createRemote =>
-          true,
-        Md3eLibraryEditPageIntent.editLocal ||
-        Md3eLibraryEditPageIntent.editRemote =>
-          false,
-      };
+    Md3eLibraryEditPageIntent.createLocal ||
+    Md3eLibraryEditPageIntent.createRemote => true,
+    Md3eLibraryEditPageIntent.editLocal ||
+    Md3eLibraryEditPageIntent.editRemote => false,
+  };
 
   String _title(AppLocalizations l10n) {
     return switch (widget.intent) {
@@ -57,8 +55,7 @@ class _Md3eLibraryEditPageState extends State<Md3eLibraryEditPage> {
       Md3eLibraryEditPageIntent.createRemote =>
         l10n.dialogCreateRemoteLibraryTitle,
       Md3eLibraryEditPageIntent.editLocal ||
-      Md3eLibraryEditPageIntent.editRemote =>
-        l10n.dialogEditLibraryTitle,
+      Md3eLibraryEditPageIntent.editRemote => l10n.dialogEditLibraryTitle,
     };
   }
 
@@ -70,7 +67,9 @@ class _Md3eLibraryEditPageState extends State<Md3eLibraryEditPage> {
   }
 
   Future<void> _handleSave() async {
-    final LibraryFormValidation validation = _form.validate(isCreate: _isCreate);
+    final LibraryFormValidation validation = _form.validate(
+      isCreate: _isCreate,
+    );
     if (!validation.isValid) {
       setState(() => _validation = validation);
       return;

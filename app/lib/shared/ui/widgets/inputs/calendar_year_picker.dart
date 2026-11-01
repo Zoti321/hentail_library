@@ -18,13 +18,11 @@ double md3eCalendarYearViewHeight(
 }) {
   final int yearCount = lastDate.year - firstDate.year + 1;
   final int rows = M3EDatePickerUtils.yearPickerRowCount(yearCount);
-  final double natural = M3EDatePickerConstants.yearPickerPadding * 2 +
+  final double natural =
+      M3EDatePickerConstants.yearPickerPadding * 2 +
       rows * kMd3eCalendarYearPickerRowHeight +
       (rows - 1) * M3EDatePickerConstants.yearPickerRowSpacing;
-  var height = math.min(
-    natural,
-    M3EDatePickerConstants.maxDayPickerHeight,
-  );
+  var height = math.min(natural, M3EDatePickerConstants.maxDayPickerHeight);
   if (includeSubHeader) {
     height += M3EDatePickerConstants.subHeaderHeight;
   }
@@ -62,13 +60,9 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
   @override
   void initState() {
     super.initState();
-    final int selectedYear =
-        widget.selectedDate?.year ?? widget.firstDate.year;
+    final int selectedYear = widget.selectedDate?.year ?? widget.firstDate.year;
     _controller = ScrollController(
-      initialScrollOffset: _initialOffset(
-        selectedYear,
-        widget.firstDate.year,
-      ),
+      initialScrollOffset: _initialOffset(selectedYear, widget.firstDate.year),
     );
   }
 
@@ -82,7 +76,9 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
-    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+    final MaterialLocalizations localizations = MaterialLocalizations.of(
+      context,
+    );
     final int firstYear = widget.firstDate.year;
     final int lastYear = widget.lastDate.year;
     final int yearCount = lastYear - firstYear + 1;
@@ -158,8 +154,9 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
           semanticLabel: localizations.formatYear(DateTime(year)),
           builder: (BuildContext context, M3EInteractionState state) {
             final M3EColorScheme scheme = theme.colorScheme;
-            final Color stateBase =
-                selected ? scheme.onPrimary : scheme.onSurface;
+            final Color stateBase = selected
+                ? scheme.onPrimary
+                : scheme.onSurface;
             final double stateAlpha = enabled ? state.opacity : 0;
             return SizedBox(
               height: _kYearChipHeight,
@@ -185,12 +182,11 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
                   localizations.formatYear(DateTime(year)),
                   maxLines: 1,
                   textAlign: TextAlign.center,
-                  style: (selected
-                          ? dateTheme.selectedYearStyle
-                          : dateTheme.yearStyle)(
-                        theme.typeScale,
-                        scheme,
-                      ).copyWith(color: foreground),
+                  style:
+                      (selected
+                              ? dateTheme.selectedYearStyle
+                              : dateTheme.yearStyle)(theme.typeScale, scheme)
+                          .copyWith(color: foreground),
                 ),
               ),
             );

@@ -64,11 +64,7 @@ class MetadataMd3eFacetSliver extends ConsumerWidget {
             onCreate: onCreatePressed,
           ),
           if (draftChip != null)
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: <Widget>[draftChip!],
-            ),
+            Wrap(spacing: 8, runSpacing: 8, children: <Widget>[draftChip!]),
         ],
       );
     } else {
@@ -88,7 +84,6 @@ class MetadataMd3eFacetSliver extends ConsumerWidget {
       sliver: SliverToBoxAdapter(child: child),
     );
   }
-
 }
 
 class _FacetList extends ConsumerWidget {

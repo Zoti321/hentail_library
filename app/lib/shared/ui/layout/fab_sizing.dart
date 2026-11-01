@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, TargetPlatform;
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -21,8 +22,8 @@ abstract final class Md3eFabSizing {
       Md3eWindowSizeClass.compact ||
       Md3eWindowSizeClass.medium => M3EFabSize.regular,
       Md3eWindowSizeClass.expanded => M3EFabSize.medium,
-      Md3eWindowSizeClass.large || Md3eWindowSizeClass.extraLarge =>
-        M3EFabSize.large,
+      Md3eWindowSizeClass.large ||
+      Md3eWindowSizeClass.extraLarge => M3EFabSize.large,
     };
   }
 

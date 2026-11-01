@@ -116,44 +116,44 @@ class _SearchedMd3ePageState extends ConsumerState<SearchedMd3ePage> {
     final int resultCount = resolved?.totalCount ?? comics.length;
 
     return NotificationListener<ScrollNotification>(
-        onNotification: (ScrollNotification notification) =>
-            _onScrollNotification(notification, trimmedQuery),
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: _SearchedHeader(
-                title: trimmedQuery.isEmpty
-                    ? context.l10n.searchResultsTitle
-                    : unwrapFullyQuotedLibrarySearchQuery(trimmedQuery) ??
-                          trimmedQuery,
-                resultCount: resultCount,
+      onNotification: (ScrollNotification notification) =>
+          _onScrollNotification(notification, trimmedQuery),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: _SearchedHeader(
+              title: trimmedQuery.isEmpty
+                  ? context.l10n.searchResultsTitle
+                  : unwrapFullyQuotedLibrarySearchQuery(trimmedQuery) ??
+                        trimmedQuery,
+              resultCount: resultCount,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                layout.horizontalInset,
+                0,
+                layout.horizontalInset,
+                layout.headerToBodyGap,
+              ),
+              child: Md3eOutlinedTextField(
+                label: context.l10n.librarySearchHint,
+                controller: _searchController,
+                onSubmitted: _submitSearch,
+                leading: const Icon(Icons.search),
               ),
             ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  layout.horizontalInset,
-                  0,
-                  layout.horizontalInset,
-                  layout.headerToBodyGap,
-                ),
-                child: Md3eOutlinedTextField(
-                  label: context.l10n.librarySearchHint,
-                  controller: _searchController,
-                  onSubmitted: _submitSearch,
-                  leading: const Icon(Icons.search),
-                ),
-              ),
-            ),
-            ..._buildBody(
-              context,
-              trimmedQuery: trimmedQuery,
-              searched: searched,
-              comics: comics,
-            ),
-          ],
-        ),
+          ),
+          ..._buildBody(
+            context,
+            trimmedQuery: trimmedQuery,
+            searched: searched,
+            comics: comics,
+          ),
+        ],
+      ),
     );
   }
 

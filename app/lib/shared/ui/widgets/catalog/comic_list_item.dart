@@ -31,15 +31,13 @@ const double kMd3eComicListItemProgressMaxWidth = 160;
 const double kMd3eComicListItemProgressTopGap = 6;
 
 /// Key for list-row progress strip in tests (under title/meta, not on cover).
-const Key kMd3eComicListItemInfoProgressKey =
-    Key('md3e_comic_list_item_info_progress');
+const Key kMd3eComicListItemInfoProgressKey = Key(
+  'md3e_comic_list_item_info_progress',
+);
 
 /// One action in the trailing overflow ([Icons.more_vert]) menu.
 class Md3eComicListMoreMenuEntry {
-  const Md3eComicListMoreMenuEntry({
-    required this.label,
-    this.onSelected,
-  });
+  const Md3eComicListMoreMenuEntry({required this.label, this.onSelected});
 
   final String label;
   final VoidCallback? onSelected;
@@ -74,8 +72,7 @@ class Md3eComicListItem extends StatelessWidget {
     this.readProgress,
     this.moreMenuEntries = const <Md3eComicListMoreMenuEntry>[],
   }) : assert(
-         readProgress == null ||
-             (readProgress >= 0 && readProgress <= 1),
+         readProgress == null || (readProgress >= 0 && readProgress <= 1),
          'readProgress must be between 0 and 1',
        );
 
@@ -147,22 +144,22 @@ class Md3eComicListItem extends StatelessWidget {
           fit: StackFit.expand,
           children: <Widget>[
             cover,
-          if (effectiveSelectionMode)
-            Positioned(
-              left: kMd3eComicCardSelectionInset,
-              top: kMd3eComicCardSelectionInset,
-              child: M3ECheckbox(
-                value: effectiveSelected,
-                onChanged: rowEnabled && onSelectionChanged != null
-                    ? (bool? value) {
-                        if (value == null) {
-                          return;
+            if (effectiveSelectionMode)
+              Positioned(
+                left: kMd3eComicCardSelectionInset,
+                top: kMd3eComicCardSelectionInset,
+                child: M3ECheckbox(
+                  value: effectiveSelected,
+                  onChanged: rowEnabled && onSelectionChanged != null
+                      ? (bool? value) {
+                          if (value == null) {
+                            return;
+                          }
+                          onSelectionChanged!.call(value);
                         }
-                        onSelectionChanged!.call(value);
-                      }
-                    : null,
+                      : null,
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -183,10 +180,7 @@ class Md3eComicListItem extends StatelessWidget {
         ],
         anchorBuilder: (BuildContext context, VoidCallback open) {
           return M3EIconButton(
-            icon: Icon(
-              Icons.more_vert,
-              color: scheme.onSurfaceVariant,
-            ),
+            icon: Icon(Icons.more_vert, color: scheme.onSurfaceVariant),
             variant: M3EIconButtonVariant.standard,
             size: M3EIconButtonSize.md,
             tooltip: '更多',

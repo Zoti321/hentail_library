@@ -42,24 +42,20 @@ class Md3eReaderInteractionScope extends StatelessWidget {
           ),
           Md3eReaderToggleAutoPlayIntent:
               CallbackAction<Md3eReaderToggleAutoPlayIntent>(
-            onInvoke: (_) {
-              onToggleAutoPlay?.call();
-              return null;
-            },
-          ),
+                onInvoke: (_) {
+                  onToggleAutoPlay?.call();
+                  return null;
+                },
+              ),
           Md3eReaderToggleChromeIntent:
               CallbackAction<Md3eReaderToggleChromeIntent>(
-            onInvoke: (_) {
-              onToggleChromeFromKeyboard?.call();
-              return null;
-            },
-          ),
+                onInvoke: (_) {
+                  onToggleChromeFromKeyboard?.call();
+                  return null;
+                },
+              ),
         },
-        child: Focus(
-          autofocus: true,
-          focusNode: focusNode,
-          child: child,
-        ),
+        child: Focus(autofocus: true, focusNode: focusNode, child: child),
       ),
     );
   }

@@ -14,8 +14,8 @@ class Md3eContentSection extends StatelessWidget {
     this.titleTrailing,
     // Single-field ctor: public `child` maps to private storage (API stays `child:`).
     // ignore: prefer_initializing_formals
-  })  : _child = child,
-        _children = null;
+  }) : _child = child,
+       _children = null;
 
   const Md3eContentSection.group({
     super.key,
@@ -24,9 +24,9 @@ class Md3eContentSection extends StatelessWidget {
     this.description,
     this.titleTrailing,
     // ignore: prefer_initializing_formals
-  })  : _children = children,
-        _child = null,
-        padding = EdgeInsets.zero;
+  }) : _children = children,
+       _child = null,
+       padding = EdgeInsets.zero;
 
   final String title;
   final String? description;
