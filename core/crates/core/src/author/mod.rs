@@ -8,7 +8,7 @@ use std::collections::HashSet;
 
 use sea_orm::{
     ColumnTrait, ConnectionTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder,
-    QuerySelect, Set, Statement, TransactionTrait, Value,
+    QueryResult, QuerySelect, Set, Statement, TransactionTrait, Value,
 };
 
 use crate::comic::visibility::{visible_comic_id_sql, visible_comic_sql};
@@ -345,12 +345,8 @@ pub async fn load_author_names_for_comics<C: ConnectionTrait>(
         .await
         .map_err(map_db_err)?;
     for row in rows {
-        let comic_id = row
-            .try_get_by_index::<String>(0)
-            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
-        let name = row
-            .try_get_by_index::<String>(1)
-            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        let comic_id = string_column(&row, 0)?;
+        let name = string_column(&row, 1)?;
         map.entry(comic_id).or_default().push(name);
     }
     Ok(map)
@@ -584,18 +580,12 @@ pub async fn list_all_author_links_for_export(
         .map_err(map_db_err)?;
     let mut out = Vec::new();
     for row in rows {
-        let name = row
-            .try_get_by_index::<String>(0)
-            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        let name = string_column(&row, 0)?;
         let id = row
             .try_get_by_index::<i64>(1)
             .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
-        let platform = row
-            .try_get_by_index::<String>(2)
-            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
-        let url = row
-            .try_get_by_index::<String>(3)
-            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        let platform = string_column(&row, 2)?;
+        let url = string_column(&row, 3)?;
         let display = row.try_get_by_index::<Option<String>>(4).unwrap_or(None);
         let sort_key = row
             .try_get_by_index::<i64>(5)
@@ -869,9 +859,7 @@ async fn facet_counts_for_author<C: ConnectionTrait>(
     rows.into_iter()
         .map(|row| {
             Ok(AuthorFacetCountDto {
-                name: row
-                    .try_get_by_index::<String>(0)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+                name: string_column(&row, 0)?,
                 attachment_count: row
                     .try_get_by_index::<i64>(1)
                     .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
@@ -904,12 +892,8 @@ async fn top_comics_for_author<C: ConnectionTrait>(
     rows.into_iter()
         .map(|row| {
             Ok(AuthorTopComicDto {
-                comic_id: row
-                    .try_get_by_index::<String>(0)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
-                title: row
-                    .try_get_by_index::<String>(1)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+                comic_id: string_column(&row, 0)?,
+                title: string_column(&row, 1)?,
             })
         })
         .collect()
@@ -957,12 +941,7 @@ pub async fn list_all_author_names() -> Result<Vec<String>, HentaiError> {
         ))
         .await
         .map_err(map_db_err)?;
-    rows.into_iter()
-        .map(|row| {
-            row.try_get_by_index::<String>(0)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
-        })
-        .collect()
+    rows.into_iter().map(|row| string_column(&row, 0)).collect()
 }
 
 pub async fn fetch_author_name_page(limit: i32, offset: i32) -> Result<Vec<String>, HentaiError> {
@@ -975,12 +954,7 @@ pub async fn fetch_author_name_page(limit: i32, offset: i32) -> Result<Vec<Strin
         ))
         .await
         .map_err(map_db_err)?;
-    rows.into_iter()
-        .map(|row| {
-            row.try_get_by_index::<String>(0)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
-        })
-        .collect()
+    rows.into_iter().map(|row| string_column(&row, 0)).collect()
 }
 
 /// 当前 Library 内已附着的 Author 显示名（去重，name ASC）。
@@ -1003,12 +977,7 @@ pub async fn list_distinct_author_names(
         ))
         .await
         .map_err(map_db_err)?;
-    rows.into_iter()
-        .map(|row| {
-            row.try_get_by_index::<String>(0)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
-        })
-        .collect()
+    rows.into_iter().map(|row| string_column(&row, 0)).collect()
 }
 
 /// Comic metadata form 候选：显示名 + 全库可见附着计数（count DESC, name ASC）。
@@ -1027,9 +996,7 @@ pub async fn list_author_names_for_form() -> Result<Vec<NamedFacetFormEntry>, He
         .map_err(map_db_err)?;
     rows.into_iter()
         .map(|row| {
-            let name = row
-                .try_get_by_index::<String>(0)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            let name = string_column(&row, 0)?;
             let attachment_count = row
                 .try_get_by_index::<i64>(1)
                 .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
@@ -1066,6 +1033,17 @@ pub fn author_merge_unsupported_error() -> HentaiError {
     HentaiError::validation("作者暂不支持合并")
 }
 
+/// Author 合并入口：与名字字典合并相同，先取库写锁（忙则返回忙错误），再返回不支持错误。
+pub async fn reject_author_merge() -> Result<(), HentaiError> {
+    with_library_write(|| async { Err(author_merge_unsupported_error()) }).await
+}
+
+/// 读取结果行的第 `index` 列为 `String`；读取失败统一映射为 `db_query_failed`。
+fn string_column(row: &QueryResult, index: usize) -> Result<String, HentaiError> {
+    row.try_get_by_index::<String>(index)
+        .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+}
+
 /// 数据备份导出：未被任何 Comic 附着的 Author 显示名（name COLLATE NOCASE ASC）。
 pub async fn list_orphan_author_names<C: ConnectionTrait>(
     db: &C,
@@ -1078,12 +1056,7 @@ pub async fn list_orphan_author_names<C: ConnectionTrait>(
         ))
         .await
         .map_err(map_db_err)?;
-    rows.into_iter()
-        .map(|row| {
-            row.try_get_by_index::<String>(0)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
-        })
-        .collect()
+    rows.into_iter().map(|row| string_column(&row, 0)).collect()
 }
 
 /// 数据备份导入：统计会新增的 Author 显示名数量（与写路径相同的名字规则）。

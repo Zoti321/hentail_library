@@ -7,10 +7,11 @@ use hentai_core::ComicGrouping;
 use hentai_core::{
     add_author, add_tag, clear_all_reading, count_trashed_comics, create_sync_handle,
     delete_authors_by_names, delete_named_facet_by_names, delete_tags_by_names, fetch_comics_page,
-    import_comic_metadata, merge_named_facet_name, rename_author, rename_named_facet_name,
-    rename_tag, set_comic_meta_locks, sync_library, update_comic_user_meta, ComicFilterDto,
-    ComicSortOptionDto, HentaiError, HentaiErrorCode, JunctionNamedFacet, LibraryDto,
-    PageRequestDto, SetComicMetaLocksDto, SyncScanMode, UpdateComicUserMetaDto,
+    import_comic_metadata, merge_named_facet_name, reject_author_merge, rename_author,
+    rename_named_facet_name, rename_tag, set_comic_meta_locks, sync_library,
+    update_comic_user_meta, ComicFilterDto, ComicSortOptionDto, HentaiError, HentaiErrorCode,
+    JunctionNamedFacet, LibraryDto, PageRequestDto, SetComicMetaLocksDto, SyncScanMode,
+    UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseBackend, Statement};
 
@@ -80,6 +81,7 @@ fn cross_comic_writes_fail_fast_while_library_write_lock_held() {
             assert_busy(rename_named_facet_name(Tag, "old", "new").await);
             assert_busy(delete_named_facet_by_names(Tag, vec!["old".to_string()]).await);
             assert_busy(merge_named_facet_name(Tag, "old", "new").await);
+            assert_busy(reject_author_merge().await);
             assert_busy(clear_all_reading().await);
         });
 
@@ -136,6 +138,11 @@ fn failed_entry_points_do_not_leak_the_lock() {
                 .await
                 .expect_err("invalid backup");
             assert!(!err.message.contains(BUSY_MESSAGE), "{}", err.message);
+            let err = reject_author_merge()
+                .await
+                .expect_err("author merge unsupported");
+            assert!(!err.message.contains(BUSY_MESSAGE), "{}", err.message);
+            assert_eq!(err.message, "作者暂不支持合并");
             let err = merge_named_facet_name(Tag, "same", "same")
                 .await
                 .expect_err("merge source equals target");

@@ -1,9 +1,9 @@
 use hentai_core::{
-    add_author, add_named_facet_name, author_merge_unsupported_error, count_all_authors,
-    count_all_named_facet_names, count_author_attachments, count_named_facet_attachments,
-    delete_authors_by_names, delete_named_facet_by_names, fetch_author_name_page,
-    fetch_named_facet_page, list_all_author_names, list_all_named_facet_names,
-    list_author_names_for_form, list_named_facet_for_form, merge_named_facet_name, paginate,
+    add_author, add_named_facet_name, count_all_authors, count_all_named_facet_names,
+    count_author_attachments, count_named_facet_attachments, delete_authors_by_names,
+    delete_named_facet_by_names, fetch_author_name_page, fetch_named_facet_page,
+    list_all_author_names, list_all_named_facet_names, list_author_names_for_form,
+    list_named_facet_for_form, merge_named_facet_name, paginate, reject_author_merge,
     rename_author, rename_named_facet_name, NamedFacetFormEntry,
 };
 
@@ -148,8 +148,8 @@ pub fn merge_named_facet_name_frb(
         NamedFacetRoute::Dictionary(facet) => hentai_core::runtime::block_on(
             merge_named_facet_name(facet, &source_name, &target_name),
         ),
-        // Author has no merge entry point; the refusal text lives in the Author module.
-        NamedFacetRoute::Author => Err(author_merge_unsupported_error()),
+        // Author has no merge; refused under the library write lock, as before the split.
+        NamedFacetRoute::Author => hentai_core::runtime::block_on(reject_author_merge()),
     }
     .map_err(HentaiErrorDto::from)
 }
@@ -196,5 +196,18 @@ mod tests {
         )
         .expect_err("author merge refused");
         assert!(err.message.contains("作者暂不支持合并"), "{}", err.message);
+
+        // The library write lock is process-wide, so the busy case lives in this same
+        // test rather than a parallel one: while held, Author merge must return busy.
+        let guard = hentai_core::library_write::try_acquire_library_write_lock()
+            .expect("hold library write lock");
+        let err = merge_named_facet_name_frb(
+            JunctionNamedFacetFrb::Author,
+            "one".to_string(),
+            "two".to_string(),
+        )
+        .expect_err("author merge refused while busy");
+        assert!(err.message.contains("库写入操作进行中"), "{}", err.message);
+        drop(guard);
     }
 }
