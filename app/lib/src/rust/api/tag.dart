@@ -4,38 +4,17 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
-import 'comic.dart';
 import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
 
 TagDictionaryImportResultDto importTagDictionaryFrb({
   required List<int> jsonBytes,
 }) => RustLib.instance.api.crateApiTagImportTagDictionaryFrb(
   jsonBytes: jsonBytes,
 );
-
-List<String> listAllTagsFrb() =>
-    RustLib.instance.api.crateApiTagListAllTagsFrb();
-
-TagPagedNamesDto fetchTagsPageFrb({required PageRequestDto request}) =>
-    RustLib.instance.api.crateApiTagFetchTagsPageFrb(request: request);
-
-void addTagFrb({required String name}) =>
-    RustLib.instance.api.crateApiTagAddTagFrb(name: name);
-
-void deleteTagsByNamesFrb({required List<String> names}) =>
-    RustLib.instance.api.crateApiTagDeleteTagsByNamesFrb(names: names);
-
-void renameTagFrb({required String oldName, required String newName}) => RustLib
-    .instance
-    .api
-    .crateApiTagRenameTagFrb(oldName: oldName, newName: newName);
-
-Stream<List<String>> watchTagsFrb() =>
-    RustLib.instance.api.crateApiTagWatchTagsFrb();
 
 class TagDictionaryImportResultDto {
   final int added;
@@ -63,32 +42,4 @@ class TagDictionaryImportResultDto {
           skippedExisting == other.skippedExisting &&
           skippedFilteredOrEmptyOrDedupe ==
               other.skippedFilteredOrEmptyOrDedupe;
-}
-
-class TagPagedNamesDto {
-  final List<String> items;
-  final PlatformInt64 totalCount;
-  final int page;
-  final int pageSize;
-
-  const TagPagedNamesDto({
-    required this.items,
-    required this.totalCount,
-    required this.page,
-    required this.pageSize,
-  });
-
-  @override
-  int get hashCode =>
-      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is TagPagedNamesDto &&
-          runtimeType == other.runtimeType &&
-          items == other.items &&
-          totalCount == other.totalCount &&
-          page == other.page &&
-          pageSize == other.pageSize;
 }

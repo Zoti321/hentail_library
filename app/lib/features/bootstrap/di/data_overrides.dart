@@ -37,7 +37,11 @@ List<Override> dataProviderOverrides() => <Override>[
     (Ref ref) => const ComicRepositoryImpl(),
   ),
   seriesRepoProvider.overrideWith((Ref ref) => const SeriesRepositoryImpl()),
-  tagRepoProvider.overrideWith((Ref ref) => const TagRepositoryImpl()),
+  tagRepoProvider.overrideWith(
+    (Ref ref) => TagRepositoryImpl(
+      namedFacets: ref.read(namedFacetManagementRepoProvider),
+    ),
+  ),
   authorRepoProvider.overrideWith((Ref ref) => const AuthorRepositoryImpl()),
   namedFacetManagementRepoProvider.overrideWith(
     (Ref ref) => const NamedFacetManagementRepositoryImpl(),

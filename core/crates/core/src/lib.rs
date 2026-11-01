@@ -119,10 +119,7 @@ pub use sync::{
     RefreshSeriesProgressDto, RefreshSeriesResultDto, RemoteScanOutcome, ResourceFormatCategory,
     SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
 };
-pub use tag::{
-    add_tag, count_all_tags, delete_tags_by_names, fetch_tags_page, import_tag_dictionary,
-    list_all_tags, rename_tag, watch_tags, TagDictionaryImportResult,
-};
+pub use tag::{import_tag_dictionary, TagDictionaryImportResult};
 pub use thumbnail::{
     delete_thumbnails_by_comic_ids, enqueue_thumbnails_low, ensure_thumbnail,
     find_series_thumbnail_by_series_id, find_thumbnail_by_comic_id, resolve_series_cover,

@@ -71,11 +71,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw);
 
   @protected
-  RustStreamSink<List<String>> dco_decode_StreamSink_list_String_Sse(
-    dynamic raw,
-  );
-
-  @protected
   RustStreamSink<List<AuthorIdentityFrbDto>>
   dco_decode_StreamSink_list_author_identity_frb_dto_Sse(dynamic raw);
 
@@ -655,9 +650,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw);
-
-  @protected
   ThumbnailEventDto dco_decode_thumbnail_event_dto(dynamic raw);
 
   @protected
@@ -719,11 +711,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  RustStreamSink<List<String>> sse_decode_StreamSink_list_String_Sse(
     SseDeserializer deserializer,
   );
 
@@ -1477,9 +1464,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  TagPagedNamesDto sse_decode_tag_paged_names_dto(SseDeserializer deserializer);
-
-  @protected
   ThumbnailEventDto sse_decode_thumbnail_event_dto(
     SseDeserializer deserializer,
   );
@@ -1562,12 +1546,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_StreamSink_i_32_Sse(
     RustStreamSink<int> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_list_String_Sse(
-    RustStreamSink<List<String>> self,
     SseSerializer serializer,
   );
 
@@ -2492,12 +2470,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_tag_dictionary_import_result_dto(
     TagDictionaryImportResultDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_tag_paged_names_dto(
-    TagPagedNamesDto self,
     SseSerializer serializer,
   );
 

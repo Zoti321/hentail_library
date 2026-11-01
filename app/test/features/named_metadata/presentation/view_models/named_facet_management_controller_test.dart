@@ -86,26 +86,6 @@ class _FakeTagRepository implements TagRepository {
   }
 
   @override
-  Future<PagedResult<Tag>> fetchPage(PageRequest request) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> add(Tag tag) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteByNames(List<String> names) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> rename(String oldName, String newName) {
-    throw UnimplementedError();
-  }
-
-  @override
   Future<TagDictionaryImportResult> importTagDictionary(
     List<int> jsonBytes,
   ) async {

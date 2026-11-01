@@ -5,13 +5,12 @@ mod common;
 use hentai_core::library_write::{begin_library_write_txn, try_acquire_library_write_lock};
 use hentai_core::ComicGrouping;
 use hentai_core::{
-    add_author, add_tag, clear_all_reading, count_trashed_comics, create_sync_handle,
-    delete_authors_by_names, delete_named_facet_by_names, delete_tags_by_names, fetch_comics_page,
-    import_comic_metadata, merge_named_facet_name, reject_author_merge, rename_author,
-    rename_named_facet_name, rename_tag, set_comic_meta_locks, sync_library,
-    update_comic_user_meta, ComicFilterDto, ComicSortOptionDto, HentaiError, HentaiErrorCode,
-    JunctionNamedFacet, LibraryDto, PageRequestDto, SetComicMetaLocksDto, SyncScanMode,
-    UpdateComicUserMetaDto,
+    add_author, add_named_facet_name, clear_all_reading, count_trashed_comics, create_sync_handle,
+    delete_authors_by_names, delete_named_facet_by_names, fetch_comics_page, import_comic_metadata,
+    merge_named_facet_name, reject_author_merge, rename_author, rename_named_facet_name,
+    set_comic_meta_locks, sync_library, update_comic_user_meta, ComicFilterDto, ComicSortOptionDto,
+    HentaiError, HentaiErrorCode, JunctionNamedFacet, LibraryDto, PageRequestDto,
+    SetComicMetaLocksDto, SyncScanMode, UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseBackend, Statement};
 
@@ -74,8 +73,6 @@ fn cross_comic_writes_fail_fast_while_library_write_lock_held() {
             );
             // Import must refuse before parsing the payload.
             assert_busy(import_comic_metadata(b"not-a-backup").await);
-            assert_busy(rename_tag("old", "new").await);
-            assert_busy(delete_tags_by_names(vec!["old".to_string()]).await);
             assert_busy(rename_author("old", "new").await);
             assert_busy(delete_authors_by_names(vec!["old".to_string()]).await);
             assert_busy(rename_named_facet_name(Tag, "old", "new").await);
@@ -87,8 +84,10 @@ fn cross_comic_writes_fail_fast_while_library_write_lock_held() {
 
         // Lock is released: the same writes now reach their real logic.
         runtime.block_on(async {
-            rename_tag("old", "new").await.expect("tag rename");
-            add_tag("new").await.expect("add tag");
+            rename_named_facet_name(Tag, "old", "new")
+                .await
+                .expect("tag rename");
+            add_named_facet_name(Tag, "new").await.expect("add tag");
             clear_all_reading().await.expect("clear reading");
         });
         sync(&library, runtime);
@@ -102,7 +101,9 @@ fn author_entry_points_do_not_double_acquire_the_lock() {
     with_solo_library(|_library, runtime| {
         runtime.block_on(async {
             add_author("Some Author").await.expect("add author");
-            add_tag("Some Tag").await.expect("add tag");
+            add_named_facet_name(Tag, "Some Tag")
+                .await
+                .expect("add tag");
 
             // Author entry points own their write lock: they must not error busy
             // and must release the guard for the next writer.

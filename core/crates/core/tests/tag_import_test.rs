@@ -1,7 +1,8 @@
 mod common;
 
 use hentai_core::{
-    add_tag, import_tag_dictionary, init_db_at_path, list_all_tags, TagDictionaryImportResult,
+    add_named_facet_name, import_tag_dictionary, init_db_at_path, list_all_named_facet_names,
+    JunctionNamedFacet, TagDictionaryImportResult,
 };
 use tempfile::TempDir;
 
@@ -31,7 +32,9 @@ fn import_tag_dictionary_adds_names_from_wrapped_payload() {
             }
         );
 
-        let tags = runtime.block_on(list_all_tags()).expect("list");
+        let tags = runtime
+            .block_on(list_all_named_facet_names(JunctionNamedFacet::Tag))
+            .expect("list");
         assert!(tags.contains(&"巨乳".to_string()));
         assert!(tags.contains(&"肌肉".to_string()));
 
@@ -82,7 +85,9 @@ fn import_tag_dictionary_respects_existing_tags() {
         runtime
             .block_on(init_db_at_path(&db_path))
             .expect("init db");
-        runtime.block_on(add_tag("巨乳")).expect("seed tag");
+        runtime
+            .block_on(add_named_facet_name(JunctionNamedFacet::Tag, "巨乳"))
+            .expect("seed tag");
 
         let result = runtime
             .block_on(import_tag_dictionary(FIXTURE_JSON.as_bytes()))
@@ -138,7 +143,9 @@ fn import_tag_dictionary_batch_inserts_more_than_one_chunk() {
         assert_eq!(result.skipped_existing, 0);
         assert_eq!(result.skipped_filtered_or_empty_or_dedupe, 0);
 
-        let tags = runtime.block_on(list_all_tags()).expect("list");
+        let tags = runtime
+            .block_on(list_all_named_facet_names(JunctionNamedFacet::Tag))
+            .expect("list");
         assert!(tags.contains(&"标签0".to_string()));
         assert!(tags.contains(&"标签599".to_string()));
     });

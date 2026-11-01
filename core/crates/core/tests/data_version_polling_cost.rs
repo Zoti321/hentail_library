@@ -15,7 +15,7 @@
 //! - 访问历史页后 +1：`watch_reading_histories`（`readingHistoryChangesStream`
 //!   keepAlive）
 //! - 访问作者管理页后 +1：`watch_authors`（`allAuthorsProvider` 非 autoDispose）
-//! - 无消费方、不计入：`watch_tags`、`watch_home_series_comic_order_map`
+//! - 无消费方、不计入：`watch_home_series_comic_order_map`
 //!
 //! 即逛过一圈的用户稳定在 **5 条循环 × 2.5 次/秒 = 12.5 次/秒**。
 

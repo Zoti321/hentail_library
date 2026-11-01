@@ -1,9 +1,8 @@
 //! `read_data_version` 作为库变更检测手段的契约。
 //!
-//! 6 条 watch 循环（`watch_comic_changes` / `watch_home_page_counts` /
-//! `watch_continue_reading` / `watch_tags` / `watch_authors` /
-//! `watch_reading_histories`）都以「相邻两次 `read_data_version` 不相等」判定
-//! 库已变更，因此契约是两条：**写入必须被观测到，且无写入时观测值必须稳定。**
+//! 5 条 watch 循环（`watch_comic_changes` / `watch_home_page_counts` /
+//! `watch_continue_reading` / `watch_authors` / `watch_reading_histories`）
+//! 都以「相邻两次 `read_data_version` 不相等」判定库已变更，因此契约是两条：**写入必须被观测到，且无写入时观测值必须稳定。**
 //!
 //! 独立事实源（SQLite 官方文档 pragma.html#pragma_data_version）：
 //! - 「The `PRAGMA data_version` value is unchanged for commits made on the
@@ -93,7 +92,7 @@ fn read_data_version_is_stable_without_any_write() {
 /// 库扫描从多条池化连接交错提交，会让各连接的计数器发生分歧。回归防护：改回
 /// 共享池读取时本测失败（实测形如 `[5, 7, 5, 8, 5, 5, 7, 5]`），即一次扫描会
 /// **永久污染** revision 流——此后即使完全空闲，每次轮询都判定库已变更，
-/// 6 条 watch 循环持续全量重载直到进程退出。
+/// 5 条 watch 循环持续全量重载直到进程退出。
 #[test]
 fn read_data_version_is_stable_after_a_concurrent_write_burst() {
     common::with_global_db(|| {
