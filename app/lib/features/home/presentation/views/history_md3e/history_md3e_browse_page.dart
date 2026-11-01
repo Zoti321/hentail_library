@@ -71,20 +71,7 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
 
   @override
   Widget build(BuildContext context) {
-    // 按页面真实视口宽度解析（shell 侧栏会压缩内容区），与管理页保持同一来源。
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return _buildContent(
-          context,
-          Md3ePageLayoutSpec.resolve(
-            Md3eLayoutContext.fromPlatform(viewportWidth: constraints.maxWidth),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildContent(BuildContext context, Md3ePageLayoutSpec layout) {
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 
     final List<Md3eHistoryTimeGroup<HistoryMd3eBrowseEntry>> groups =
@@ -120,14 +107,12 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
               horizontal,
               layout.bodyBottomInset,
             ),
-            sliver: SliverToBoxAdapter(
-              child: Md3eHistoryBrowseContent<HistoryMd3eBrowseEntry>(
-                totalCount: widget.totalCount,
-                groups: groups,
-                searchField: widget.searchField,
-                emptyMessage: widget.emptyMessage,
-                itemBuilder: widget.itemBuilder,
-              ),
+            sliver: Md3eHistoryBrowseContent<HistoryMd3eBrowseEntry>(
+              totalCount: widget.totalCount,
+              groups: groups,
+              searchField: widget.searchField,
+              emptyMessage: widget.emptyMessage,
+              itemBuilder: widget.itemBuilder,
             ),
           ),
           if (widget.isLoadingMore)

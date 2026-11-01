@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_clear_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
@@ -26,10 +27,9 @@ class Md3eHistoryPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      windowWidth,
-    );
+    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(
+      context,
+    ).sizeClass;
 
     return _Md3eHistoryPageHeaderToolbar(
       title: title,

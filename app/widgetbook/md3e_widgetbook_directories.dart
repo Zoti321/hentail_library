@@ -126,14 +126,19 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                       alignment: Alignment.topCenter,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Md3eReadingHistoryListLayout(
-                          itemCount: 6,
-                          itemBuilder: (BuildContext context, int index) {
-                            return _Md3eReadingHistoryListItemPreview(
-                              title: _demoReadingHistoryTitles[index % 3],
-                              cover: _demoCover(context),
-                            );
-                          },
+                        child: CustomScrollView(
+                          shrinkWrap: true,
+                          slivers: <Widget>[
+                            Md3eReadingHistoryListLayout(
+                              itemCount: 6,
+                              itemBuilder: (BuildContext context, int index) {
+                                return _Md3eReadingHistoryListItemPreview(
+                                  title: _demoReadingHistoryTitles[index % 3],
+                                  cover: _demoCover(context),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),

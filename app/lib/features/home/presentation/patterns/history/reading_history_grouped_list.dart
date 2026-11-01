@@ -3,18 +3,16 @@ import 'package:hentai_library/features/home/presentation/patterns/history/histo
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 四档时间分组 + 可折叠组标题 + 组内 [Md3eReadingHistoryListLayout]。
+/// 四档时间分组 + 可折叠组标题（sliver）+ 组内懒加载列表。
 class Md3eReadingHistoryGroupedList<T> extends StatefulWidget {
   const Md3eReadingHistoryGroupedList({
     super.key,
     required this.groups,
     required this.itemBuilder,
-    this.horizontalInset,
   });
 
   final List<Md3eHistoryTimeGroup<T>> groups;
   final Widget Function(BuildContext context, T item) itemBuilder;
-  final double? horizontalInset;
 
   @override
   State<Md3eReadingHistoryGroupedList<T>> createState() =>
@@ -43,17 +41,16 @@ class _Md3eReadingHistoryGroupedListState<T>
   Widget build(BuildContext context) {
     final M3ESpacing spacing = M3ETheme.of(context).spacing;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
+    return SliverMainAxisGroup(
+      slivers: <Widget>[
         for (int index = 0; index < widget.groups.length; index++) ...<Widget>[
-          if (index > 0) SizedBox(height: spacing.md),
+          if (index > 0)
+            SliverToBoxAdapter(child: SizedBox(height: spacing.md)),
           Md3eHistoryGroupSection<T>(
             group: widget.groups[index],
             expanded: _isExpanded(widget.groups[index].section),
             onHeaderPressed: () => _toggle(widget.groups[index].section),
             itemBuilder: widget.itemBuilder,
-            horizontalInset: widget.horizontalInset,
           ),
         ],
       ],

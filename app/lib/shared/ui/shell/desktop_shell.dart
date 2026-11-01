@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
@@ -586,7 +587,8 @@ class Md3eDesktopShellState extends State<Md3eDesktopShell> {
       ),
     );
     final double cornerRadius = Md3eDesktopShellMetrics.paneCornerRadius;
-    final Widget pane = _buildPane(context);
+    // 页面视口：内容区真实宽度（已扣除侧栏），页面内 Md3ePageLayoutSpec.of 据此解析。
+    final Widget pane = Md3ePageViewport(child: _buildPane(context));
 
     final Widget contentColumn = usesExpandedNav
         ? _buildDesktopContentColumn(

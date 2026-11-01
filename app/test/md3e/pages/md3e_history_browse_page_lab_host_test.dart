@@ -23,6 +23,9 @@ void main() {
   });
 
   testWidgets('LabHost 删除记录会移除对应假数据', (WidgetTester tester) async {
+    // 列表已懒加载：加高画布，让全部假数据行进入视口后再断言数量。
+    await tester.binding.setSurfaceSize(const Size(800, 4000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
     await pumpMd3eApp(
       tester,
       home: Md3eHistoryBrowsePageLabHost(clock: DateTime(2026, 6, 15, 14)),

@@ -53,8 +53,16 @@ final class Md3ePageLayoutSpec {
     required this.titleFontWeight,
   });
 
-  /// 从 [BuildContext] 解析：窗口宽度取 [MediaQuery]，输入形态取当前平台。
+  /// 从 [BuildContext] 解析。
+  ///
+  /// 优先取最近的 [Md3ePageViewport]（即页面真实视口宽度，已扣除 shell 侧栏）；
+  /// 不在页面视口内（如根 Navigator 上的对话框、Widgetbook 独立页）时回退到整窗宽度。
   factory Md3ePageLayoutSpec.of(BuildContext context) {
+    final Md3ePageLayoutScope? scope = context
+        .dependOnInheritedWidgetOfExactType<Md3ePageLayoutScope>();
+    if (scope != null) {
+      return scope.layout;
+    }
     return Md3ePageLayoutSpec.resolve(
       Md3eLayoutContext.fromPlatform(
         viewportWidth: MediaQuery.sizeOf(context).width,
@@ -209,5 +217,45 @@ final class Md3ePageLayoutSpec {
       Md3eWindowSizeClass.large => 32,
       Md3eWindowSizeClass.extraLarge => 32,
     };
+  }
+}
+
+/// 页面视口：用 [LayoutBuilder] 量出 [child] 实际可用宽度（shell 内容区，已扣除侧栏），
+/// 并把解析好的 [Md3ePageLayoutSpec] 通过 [Md3ePageLayoutScope] 下发给子树。
+///
+/// 只需在 shell 内容区包一次；其下所有 [Md3ePageLayoutSpec.of] 自动取视口宽度。
+class Md3ePageViewport extends StatelessWidget {
+  const Md3ePageViewport({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return Md3ePageLayoutScope(
+          layout: Md3ePageLayoutSpec.resolve(
+            Md3eLayoutContext.fromPlatform(viewportWidth: constraints.maxWidth),
+          ),
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+/// 布局规格的继承作用域，由 [Md3ePageViewport] 提供，读取方使用 [Md3ePageLayoutSpec.of]。
+final class Md3ePageLayoutScope extends InheritedWidget {
+  const Md3ePageLayoutScope({
+    super.key,
+    required this.layout,
+    required super.child,
+  });
+
+  final Md3ePageLayoutSpec layout;
+
+  @override
+  bool updateShouldNotify(Md3ePageLayoutScope oldWidget) {
+    return oldWidget.layout != layout;
   }
 }

@@ -100,12 +100,10 @@ class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
             horizontal,
             layout.bodyBottomInset,
           ),
-          sliver: SliverToBoxAdapter(
-            child: Md3eHistoryBrowseContent<Md3eHistoryBrowseEntry>(
-              totalCount: widget.totalCount,
-              groups: groups,
-              itemBuilder: widget.itemBuilder,
-            ),
+          sliver: Md3eHistoryBrowseContent<Md3eHistoryBrowseEntry>(
+            totalCount: widget.totalCount,
+            groups: groups,
+            itemBuilder: widget.itemBuilder,
           ),
         ),
       ],
