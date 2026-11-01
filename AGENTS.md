@@ -22,6 +22,8 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **Issues** · **logs export** · **tag dictionary JSON** → `docs/engineering/maintainer.md`.
 
+**Git workspace (agents)** — 未经用户明确允许，不要为改代码而新建 `git worktree` 或额外分支；在当前 clone 与用户指定的分支上工作即可。
+
 ## Agent skills
 
 ### Issue tracker
