@@ -13,11 +13,11 @@ pub use bulk_patch::{
     apply_comic_metadata_bulk_patch, BulkPatchResultDto, ComicMetadataBulkPatch, MultiValueOp,
     MultiValuePatch, PublishedAtPatch, ScalarPatch, BULK_PATCH_MAX_IDS,
 };
-pub use grouping::ComicGrouping;
 pub use dto::{
     now_ms, parse_languages_json, serialize_languages, ComicDto, ComicFilterDto, ComicMetaLocks,
     ComicSortFieldDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
+pub use grouping::ComicGrouping;
 pub use pagination::{paginate, PageWindow};
 pub use repository::{
     count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, load_comics_ordered,

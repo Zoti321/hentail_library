@@ -2,8 +2,8 @@
 
 mod common;
 
-use hentai_core::ComicGrouping;
 use hentai_core::image_cache::{ImageCache, PlatformImageKey};
+use hentai_core::ComicGrouping;
 use hentai_core::{
     add_author, add_author_link, connection, create_local_library, delete_author_link,
     delete_authors_by_names, fetch_comics_page, get_author_detail, init_db_at_path,

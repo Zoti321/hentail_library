@@ -12,9 +12,13 @@ use crate::sync::resource_format_category::ResourceFormatCategory;
 pub(crate) const PREF_CURRENT_LIBRARY_ID: &str = "current_library_id";
 pub(crate) const KIND_LOCAL: &str = "local";
 pub(crate) const KIND_REMOTE: &str = "remote";
-pub(crate) const DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 4] = ResourceFormatCategory::ALL;
-pub(crate) const REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 3] =
-    [ResourceFormatCategory::Pdf, ResourceFormatCategory::Epub, ResourceFormatCategory::Archive];
+pub(crate) const DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 4] =
+    ResourceFormatCategory::ALL;
+pub(crate) const REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 3] = [
+    ResourceFormatCategory::Pdf,
+    ResourceFormatCategory::Epub,
+    ResourceFormatCategory::Archive,
+];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScanInterval {
@@ -184,7 +188,9 @@ pub(crate) fn model_to_dto(model: libraries::Model) -> LibraryDto {
         kind: model.kind,
         root_path: model.root_path,
         name: model.name,
-        enabled_resource_format_categories: parse_resource_format_categories_json(&model.enabled_resource_format_categories),
+        enabled_resource_format_categories: parse_resource_format_categories_json(
+            &model.enabled_resource_format_categories,
+        ),
         created_at: model.created_at,
         username: model.username,
         allow_http: model.allow_http != 0,

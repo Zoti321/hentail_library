@@ -6,8 +6,8 @@ use rayon::prelude::*;
 use crate::comic::ComicDto;
 use crate::error::HentaiError;
 
-use super::resource_format_category::{resource_type_enabled, ResourceFormatCategory};
 use super::handle::SyncHandle;
+use super::resource_format_category::{resource_type_enabled, ResourceFormatCategory};
 use std::path::Path;
 
 use crate::resource::{
@@ -440,7 +440,8 @@ mod tests {
         };
 
         let handle = create_sync_handle();
-        let items = scan_roots(&[path], &ctx, &handle, false, &ResourceFormatCategory::ALL).expect("scan");
+        let items =
+            scan_roots(&[path], &ctx, &handle, false, &ResourceFormatCategory::ALL).expect("scan");
         assert_eq!(items.len(), 1);
         assert!(
             items[0].comic.resource_size > 0,
@@ -507,7 +508,10 @@ mod tests {
             &ctx,
             &handle,
             true,
-            &[ResourceFormatCategory::Folder, ResourceFormatCategory::Archive],
+            &[
+                ResourceFormatCategory::Folder,
+                ResourceFormatCategory::Archive,
+            ],
         )
         .expect("scan");
         let mut paths: Vec<_> = items.iter().map(|i| i.path.as_str()).collect();

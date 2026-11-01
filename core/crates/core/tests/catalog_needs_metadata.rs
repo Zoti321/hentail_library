@@ -1,8 +1,8 @@
 mod common;
 
-use hentai_core::ComicGrouping;
 use hentai_core::sync::writer::replace_comic_authors;
 use hentai_core::util::compute_sort_key;
+use hentai_core::ComicGrouping;
 use hentai_core::{
     connection, create_local_library, fetch_comics_page, init_db_at_path, set_comic_meta_locks,
     set_current_library_id, update_comic_user_meta, ComicFilterDto, ComicSortFieldDto,

@@ -25,7 +25,10 @@ impl ResourceFormatCategory {
     }
 }
 
-pub fn resource_type_enabled(resource_type: &str, enabled_groups: &[ResourceFormatCategory]) -> bool {
+pub fn resource_type_enabled(
+    resource_type: &str,
+    enabled_groups: &[ResourceFormatCategory],
+) -> bool {
     enabled_groups
         .iter()
         .any(|group| group.resource_types().contains(&resource_type))

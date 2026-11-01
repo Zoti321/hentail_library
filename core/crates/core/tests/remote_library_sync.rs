@@ -1,12 +1,12 @@
 mod common;
 
 use hentai_core::resource::{FakeResourceAccess, ResourceAccess};
-use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
 use hentai_core::sync::remote::{
     comic_id_for_remote_location, scan_remote_lightweight, RemoteScanOutcome,
 };
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::scanner::ScanContext;
 use hentai_core::{connection, create_remote_library, find_comic_by_id, init_db_at_path};
 use std::collections::HashMap;
@@ -38,7 +38,11 @@ fn remote_lightweight_scan_registers_files_by_extension_not_folders() {
             thumbnail_stats: HashMap::new(),
         },
         &handle,
-        &[ResourceFormatCategory::Archive, ResourceFormatCategory::Pdf, ResourceFormatCategory::Epub],
+        &[
+            ResourceFormatCategory::Archive,
+            ResourceFormatCategory::Pdf,
+            ResourceFormatCategory::Epub,
+        ],
     )
     .expect("scan");
 

@@ -5,9 +5,9 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::scanner::{scan_roots, ScanContext};
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{

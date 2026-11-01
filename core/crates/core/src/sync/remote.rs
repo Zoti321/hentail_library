@@ -8,8 +8,8 @@ use crate::error::HentaiError;
 use crate::library::normalize_webdav_root;
 use crate::resource::{basename_without_extension, extension_lower, ResourceAccess, ResourceKind};
 
-use super::resource_format_category::{resource_type_enabled, ResourceFormatCategory};
 use super::handle::SyncHandle;
+use super::resource_format_category::{resource_type_enabled, ResourceFormatCategory};
 use super::scanner::{ScanContext, ScanItem};
 
 pub enum RemoteScanOutcome {

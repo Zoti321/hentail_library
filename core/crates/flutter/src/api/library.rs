@@ -7,9 +7,9 @@ use hentai_core::{
     update_library_settings as core_update_settings,
     update_library_sidebar_layout as core_update_sidebar,
     update_local_library_root as core_update_local_root,
-    update_remote_library as core_update_remote, ResourceFormatCategory as CoreResourceFormatCategory,
-    LibraryDto as CoreLibrary, LibrarySidebarPlacement as CoreSidebarPlacement,
-    ScanInterval as CoreScanInterval,
+    update_remote_library as core_update_remote, LibraryDto as CoreLibrary,
+    LibrarySidebarPlacement as CoreSidebarPlacement,
+    ResourceFormatCategory as CoreResourceFormatCategory, ScanInterval as CoreScanInterval,
 };
 
 use super::init::HentaiErrorDto;
@@ -80,7 +80,9 @@ fn map_resource_format_category(group: CoreResourceFormatCategory) -> ResourceFo
     }
 }
 
-fn map_resource_format_category_core(group: ResourceFormatCategoryDto) -> CoreResourceFormatCategory {
+fn map_resource_format_category_core(
+    group: ResourceFormatCategoryDto,
+) -> CoreResourceFormatCategory {
     match group {
         ResourceFormatCategoryDto::Folder => CoreResourceFormatCategory::Folder,
         ResourceFormatCategoryDto::Pdf => CoreResourceFormatCategory::Pdf,
@@ -195,7 +197,10 @@ pub fn update_library_resource_format_categories_frb(
     library_id: String,
     groups: Vec<ResourceFormatCategoryDto>,
 ) -> Result<LibraryDto, HentaiErrorDto> {
-    let core_groups = groups.into_iter().map(map_resource_format_category_core).collect();
+    let core_groups = groups
+        .into_iter()
+        .map(map_resource_format_category_core)
+        .collect();
     hentai_core::runtime::block_on(core_update_formats(&library_id, core_groups))
         .map(LibraryDto::from)
         .map_err(HentaiErrorDto::from)
@@ -209,7 +214,10 @@ pub fn update_library_settings_frb(
     scan_on_startup: bool,
     scan_interval: ScanIntervalDto,
 ) -> Result<LibraryDto, HentaiErrorDto> {
-    let core_groups = groups.into_iter().map(map_resource_format_category_core).collect();
+    let core_groups = groups
+        .into_iter()
+        .map(map_resource_format_category_core)
+        .collect();
     hentai_core::runtime::block_on(core_update_settings(
         &library_id,
         &name,

@@ -44,12 +44,11 @@ pub use comic::{
     list_trashed_comic_ids, paginate, purge_comics, read_data_version, restore_comics,
     search_by_keyword, search_by_keyword_page, search_by_tag_expression,
     search_by_tag_expression_page, set_comic_meta_locks, trash_comics, update_comic_user_meta,
-    BulkPatchResultDto, ComicDto, ComicFilterDto, ComicMetaLocks, ComicMetadataBulkPatch,
-    ComicGrouping, ComicPurgeResultDto, ComicSortFieldDto, ComicSortOptionDto, MultiValueOp,
-    MultiValuePatch,
-    PageRequestDto, PageWindow, PagedComicResultDto, PagedTrashedComicResultDto, PublishedAtPatch,
-    ScalarPatch, SetComicMetaLocksDto, TrashedComicCountsDto, TrashedComicDto,
-    UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
+    BulkPatchResultDto, ComicDto, ComicFilterDto, ComicGrouping, ComicMetaLocks,
+    ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto, ComicSortOptionDto,
+    MultiValueOp, MultiValuePatch, PageRequestDto, PageWindow, PagedComicResultDto,
+    PagedTrashedComicResultDto, PublishedAtPatch, ScalarPatch, SetComicMetaLocksDto,
+    TrashedComicCountsDto, TrashedComicDto, UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
@@ -70,11 +69,11 @@ pub use library::{
     get_current_library_id, library_id_from_root, library_id_from_webdav_root, list_libraries,
     normalize_webdav_root, parse_resource_format_categories_json, parse_scan_interval,
     record_library_sync_failure, record_library_sync_success, resolve_access_for_comic,
-    resolve_browse_library_id, serialize_resource_format_categories, set_all_libraries_scan_on_startup,
-    set_current_library_id, set_remote_library_credentials, update_library_resource_format_categories,
-    update_library_settings, update_library_sidebar_layout, update_local_library_root,
-    update_remote_library, LibraryDto, LibrarySidebarPlacement, RemoteLibraryCredential,
-    ResolvedAccess, ScanInterval,
+    resolve_browse_library_id, serialize_resource_format_categories,
+    set_all_libraries_scan_on_startup, set_current_library_id, set_remote_library_credentials,
+    update_library_resource_format_categories, update_library_settings,
+    update_library_sidebar_layout, update_local_library_root, update_remote_library, LibraryDto,
+    LibrarySidebarPlacement, RemoteLibraryCredential, ResolvedAccess, ScanInterval,
 };
 pub use metadata_backup::{
     export_comic_metadata, import_comic_metadata, peek_metadata_backup_manifest,
@@ -113,9 +112,9 @@ pub use series_id::{
 pub use sync::{
     cancel_sync, comic_id_for_remote_location, create_sync_handle, refresh_comic_metadata,
     refresh_library_metadata, refresh_series_metadata, scan_remote_lightweight, sync_library,
-    try_acquire_library_write_lock, ResourceFormatCategory, LibrarySyncCountsDto, RefreshLibraryResultDto,
-    RefreshSeriesProgressDto, RefreshSeriesResultDto, RemoteScanOutcome, SyncHandle,
-    SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
+    try_acquire_library_write_lock, LibrarySyncCountsDto, RefreshLibraryResultDto,
+    RefreshSeriesProgressDto, RefreshSeriesResultDto, RemoteScanOutcome, ResourceFormatCategory,
+    SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
 };
 pub use tag::{
     add_tag, count_all_tags, delete_tags_by_names, fetch_tags_page, import_tag_dictionary,

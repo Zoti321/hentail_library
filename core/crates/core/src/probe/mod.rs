@@ -10,11 +10,11 @@ use crate::resource::{
     local_access, normalize_roots, read_source_stat_with, ResourceAccess, ResourceKind,
     WebDavResourceAccess,
 };
-use crate::sync::resource_format_category::resource_type_enabled;
 use crate::sync::handle::create_sync_handle;
 use crate::sync::remote::{
     collect_remote_files, normalize_remote_location_key, remote_resource_type_from_location,
 };
+use crate::sync::resource_format_category::resource_type_enabled;
 use crate::sync::scanner::{enumerate_local_resources, EnumeratedResource, ScanItem};
 
 pub use snapshot::{

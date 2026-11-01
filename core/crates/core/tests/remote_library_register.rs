@@ -27,7 +27,11 @@ fn create_remote_library_defaults_https_and_remote_resource_format_categories() 
             assert!(!lib.allow_http);
             assert_eq!(
                 lib.enabled_resource_format_categories,
-                vec![ResourceFormatCategory::Pdf, ResourceFormatCategory::Epub, ResourceFormatCategory::Archive]
+                vec![
+                    ResourceFormatCategory::Pdf,
+                    ResourceFormatCategory::Epub,
+                    ResourceFormatCategory::Archive
+                ]
             );
 
             let db = connection().expect("db");

@@ -8,8 +8,8 @@ use hentai_core::probe::{
     diff_enumerated, load_snapshot_map, probe_library, rebuild_snapshot_from_scan_items,
 };
 use hentai_core::resource::FakeResourceAccess;
-use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::handle::create_sync_handle;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::scanner::{enumerate_resources_with, ScanItem};
 use hentai_core::{
     comic::ComicDto, connection, create_local_library, init_db_at_path, record_library_sync_success,

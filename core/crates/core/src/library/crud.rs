@@ -149,7 +149,9 @@ pub async fn create_local_library(
         kind: Set(dto.kind.clone()),
         root_path: Set(dto.root_path.clone()),
         name: Set(dto.name.clone()),
-        enabled_resource_format_categories: Set(serialize_resource_format_categories(&dto.enabled_resource_format_categories)),
+        enabled_resource_format_categories: Set(serialize_resource_format_categories(
+            &dto.enabled_resource_format_categories,
+        )),
         created_at: Set(dto.created_at),
         username: Set(String::new()),
         allow_http: Set(0),
@@ -219,7 +221,9 @@ pub async fn create_remote_library(
         kind: Set(dto.kind.clone()),
         root_path: Set(dto.root_path.clone()),
         name: Set(dto.name.clone()),
-        enabled_resource_format_categories: Set(serialize_resource_format_categories(&dto.enabled_resource_format_categories)),
+        enabled_resource_format_categories: Set(serialize_resource_format_categories(
+            &dto.enabled_resource_format_categories,
+        )),
         created_at: Set(dto.created_at),
         username: Set(user),
         allow_http: Set(if allow_http { 1 } else { 0 }),
