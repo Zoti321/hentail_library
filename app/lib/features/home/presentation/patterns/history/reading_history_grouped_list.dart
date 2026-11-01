@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_group_section.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -24,8 +23,7 @@ class Md3eReadingHistoryGroupedList<T> extends StatefulWidget {
 
 class _Md3eReadingHistoryGroupedListState<T>
     extends State<Md3eReadingHistoryGroupedList<T>> {
-  final Set<Md3eHistoryTimeSection> _collapsed =
-      <Md3eHistoryTimeSection>{};
+  final Set<Md3eHistoryTimeSection> _collapsed = <Md3eHistoryTimeSection>{};
 
   bool _isExpanded(Md3eHistoryTimeSection section) {
     return !_collapsed.contains(section);
@@ -44,14 +42,6 @@ class _Md3eReadingHistoryGroupedListState<T>
   @override
   Widget build(BuildContext context) {
     final M3ESpacing spacing = M3ETheme.of(context).spacing;
-    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-    final Duration duration = Md3eMotion.motionDurationOf(
-      context,
-      Md3eMotion.durationShort,
-    );
-    final Curve curve = Md3eMotion.curveForStateEnter(
-      reduceMotion: reduceMotion,
-    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -64,8 +54,6 @@ class _Md3eReadingHistoryGroupedListState<T>
             onHeaderPressed: () => _toggle(widget.groups[index].section),
             itemBuilder: widget.itemBuilder,
             horizontalInset: widget.horizontalInset,
-            duration: duration,
-            curve: curve,
           ),
         ],
       ],

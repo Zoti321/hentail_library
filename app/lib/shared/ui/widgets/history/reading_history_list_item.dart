@@ -181,7 +181,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
       children: <Widget>[
         ?continueButton,
         if (continueButton != null && moreButton != null)
-          const SizedBox(width: 4),
+          SizedBox(width: spec.actionGap),
         ?moreButton,
       ],
     );

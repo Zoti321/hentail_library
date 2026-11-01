@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/reading_history_list_layout.dart';
+import 'package:hentai_library/shared/ui/motion/spring_size.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_section_header.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 单个时间分桶：可折叠标题 + 组内响应式列表。
+///
+/// 展开 / 收起由 M3E 空间弹簧（[Md3eSpringSize]）驱动，与 M3E 展开列表同款手感。
 class Md3eHistoryGroupSection<T> extends StatelessWidget {
   const Md3eHistoryGroupSection({
     super.key,
@@ -12,8 +15,6 @@ class Md3eHistoryGroupSection<T> extends StatelessWidget {
     required this.expanded,
     required this.onHeaderPressed,
     required this.itemBuilder,
-    required this.duration,
-    required this.curve,
     this.horizontalInset,
   });
 
@@ -21,8 +22,6 @@ class Md3eHistoryGroupSection<T> extends StatelessWidget {
   final bool expanded;
   final VoidCallback onHeaderPressed;
   final Widget Function(BuildContext context, T item) itemBuilder;
-  final Duration duration;
-  final Curve curve;
   final double? horizontalInset;
 
   @override
@@ -38,8 +37,9 @@ class Md3eHistoryGroupSection<T> extends StatelessWidget {
           expanded: expanded,
           onPressed: onHeaderPressed,
         ),
-        AnimatedCrossFade(
-          firstChild: Column(
+        Md3eSpringSize(
+          expanded: expanded,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               SizedBox(height: spacing.xs),
@@ -52,12 +52,6 @@ class Md3eHistoryGroupSection<T> extends StatelessWidget {
               ),
             ],
           ),
-          secondChild: const SizedBox.shrink(),
-          crossFadeState: expanded
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          duration: duration,
-          sizeCurve: curve,
         ),
       ],
     );

@@ -1,7 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/shared/ui/motion/spring_value.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_section_labels.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -30,8 +32,6 @@ class Md3eHistorySectionHeader extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
-    final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-
     final String bucketLabel = md3eHistoryTimeSectionLabel(l10n, section);
     final String countLabel = l10n.historySectionItemCount(itemCount);
     final String titleText = '$bucketLabel$_separator$countLabel';
@@ -61,20 +61,15 @@ class Md3eHistorySectionHeader extends StatelessWidget {
                     ),
                   ),
                 ),
-                AnimatedRotation(
-                  turns: expanded ? 0.5 : 0,
-                  duration: Md3eMotion.motionDurationOf(
-                    context,
-                    Md3eMotion.durationShort,
-                  ),
-                  curve: Md3eMotion.curveForStateEnter(
-                    reduceMotion: reduceMotion,
-                  ),
-                  child: Icon(
-                    Symbols.expand_more,
-                    size: 24,
-                    color: foreground,
-                  ),
+                Md3eSpringValue(
+                  value: expanded ? 0.5 : 0,
+                  builder: (BuildContext context, double turns, Widget? child) {
+                    return Transform.rotate(
+                      angle: turns * 2 * math.pi,
+                      child: child,
+                    );
+                  },
+                  child: Icon(Symbols.expand_more, size: 24, color: foreground),
                 ),
               ],
             ),

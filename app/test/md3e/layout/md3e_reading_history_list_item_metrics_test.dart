@@ -5,12 +5,32 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 void main() {
   group('Md3eReadingHistoryListItemMetrics.specFor', () {
-    test('uses matching action button sizes', () {
-      final spec = Md3eReadingHistoryListItemMetrics.specFor(
+    test('mobile keeps md action buttons for touch targets', () {
+      for (final window in Md3eWindowSizeClass.values) {
+        final spec = Md3eReadingHistoryListItemMetrics.specFor(
+          window,
+          desktop: false,
+        );
+        expect(spec.actionButtonSize, M3EIconButtonSize.md);
+        expect(spec.actionGap, 8);
+      }
+    });
+
+    test('desktop shrinks action buttons on narrow windows', () {
+      final compact = Md3eReadingHistoryListItemMetrics.specFor(
         Md3eWindowSizeClass.compact,
+        desktop: true,
       );
-      expect(spec.actionButtonSize, M3EIconButtonSize.md);
-      expect(spec.containerRadius, greaterThanOrEqualTo(16));
+      expect(compact.actionButtonSize, M3EIconButtonSize.sm);
+      expect(compact.actionGap, 4);
+      expect(compact.containerRadius, greaterThanOrEqualTo(16));
+
+      final wide = Md3eReadingHistoryListItemMetrics.specFor(
+        Md3eWindowSizeClass.extraLarge,
+        desktop: true,
+      );
+      expect(wide.actionButtonSize, M3EIconButtonSize.md);
+      expect(wide.actionGap, 8);
     });
   });
 
