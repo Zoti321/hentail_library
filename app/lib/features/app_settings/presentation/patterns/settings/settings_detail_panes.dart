@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/settings_page_metrics.dart';
+import 'package:hentai_library/shared/ui/layout/spacing.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/metadata_backup_import_lab_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 生产或 Lab 注入某分类的 section 列表（每项为 [Md3eSettingsSection] 等组件）。
@@ -65,18 +66,13 @@ class Md3eSettingsDetailPane extends StatelessWidget {
       return body;
     }
 
-    final M3EThemeData theme = M3ETheme.of(context);
+    // 与页面标题同源字阶，左缘对齐页面留白（不再额外叠加水平内边距）。
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: Text(
-            info.label(l10n),
-            style: theme.typeScale.headlineSmall.copyWith(
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
+          padding: const EdgeInsets.only(bottom: Md3eSpacing.space8),
+          child: Md3ePageTitle(info.label(l10n)),
         ),
         Expanded(child: body),
       ],

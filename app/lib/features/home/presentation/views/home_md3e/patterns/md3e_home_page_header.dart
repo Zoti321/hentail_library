@@ -18,32 +18,31 @@ class Md3eHomePageHeader extends StatelessWidget {
     final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final bool showMenu = layout.sizeClass.isCompact && onOpenNavigation != null;
+    final bool showMenu =
+        layout.sizeClass.isCompact && onOpenNavigation != null;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: layout.headerVerticalInset),
-      child: SizedBox(
-        height: Md3ePageLayoutSpec.toolbarRowHeight,
-        child: Row(
-          children: <Widget>[
-            if (showMenu) ...<Widget>[
-              M3EIconButton(
-                icon: Icon(
-                  Symbols.menu,
-                  size: Md3eLibraryPageHeaderMetrics.actionIconSize,
-                  color: scheme.onSurfaceVariant,
-                ),
-                variant: M3EIconButtonVariant.standard,
-                size: M3EIconButtonSize.sm,
-                tooltip: l10n.shellOpenNavMenu,
-                semanticLabel: l10n.shellOpenNavMenu,
-                onPressed: onOpenNavigation,
+    // 上下内边距与水平留白由外层 Md3ePageHeaderDelegate 提供，这里只负责工具行。
+    return SizedBox(
+      height: Md3ePageLayoutSpec.toolbarRowHeight,
+      child: Row(
+        children: <Widget>[
+          if (showMenu) ...<Widget>[
+            M3EIconButton(
+              icon: Icon(
+                Symbols.menu,
+                size: Md3eLibraryPageHeaderMetrics.actionIconSize,
+                color: scheme.onSurfaceVariant,
               ),
-              const SizedBox(width: 4),
-            ],
-            Expanded(child: Md3ePageTitle(l10n.navHome)),
+              variant: M3EIconButtonVariant.standard,
+              size: M3EIconButtonSize.sm,
+              tooltip: l10n.shellOpenNavMenu,
+              semanticLabel: l10n.shellOpenNavMenu,
+              onPressed: onOpenNavigation,
+            ),
+            const SizedBox(width: 4),
           ],
-        ),
+          Expanded(child: Md3ePageTitle(l10n.navHome)),
+        ],
       ),
     );
   }

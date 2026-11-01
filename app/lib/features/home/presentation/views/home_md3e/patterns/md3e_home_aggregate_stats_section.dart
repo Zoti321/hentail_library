@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_bento_stat_card.dart';
@@ -18,9 +19,8 @@ class Md3eHomeAggregateStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      MediaQuery.sizeOf(context).width,
-    );
+    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(context)
+        .sizeClass;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;

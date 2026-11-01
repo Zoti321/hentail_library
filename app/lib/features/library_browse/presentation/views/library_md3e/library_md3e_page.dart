@@ -23,6 +23,7 @@ import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
+import 'package:hentai_library/shared/ui/layout/spacing.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_page_header.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
@@ -135,10 +136,8 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
         (LibraryScanActivityState state) => state.running,
       ),
     );
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      MediaQuery.sizeOf(context).width,
-    );
     final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final Md3eWindowSizeClass sizeClass = layout.sizeClass;
     final double horizontal = layout.horizontalInset;
     final LibraryDisplayTarget target = facade.displayTarget;
     final LibraryPagination? pagination = switch (target) {
@@ -183,10 +182,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
             slivers: <Widget>[
               SliverPersistentHeader(
                 pinned: true,
-                delegate: Md3ePageHeaderDelegate(
-                  layout: layout,
-                  child: header,
-                ),
+                delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
               ),
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(
@@ -208,9 +204,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                 padding: EdgeInsets.fromLTRB(
                   horizontal,
                   Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
-                    Md3eWindowSizeClass.fromWidth(
-                      MediaQuery.sizeOf(context).width,
-                    ),
+                    sizeClass,
                   ),
                   horizontal,
                   0,
@@ -240,7 +234,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(
                     horizontal,
-                    16,
+                    Md3eSpacing.space16,
                     horizontal,
                     Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
                   ),
@@ -274,7 +268,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     required Widget Function(BuildContext context, int index) itemBuilder,
   }) {
     final int columns = md3eComicListColumnCount(
-      Md3eWindowSizeClass.fromWidth(MediaQuery.sizeOf(context).width),
+      Md3ePageLayoutSpec.of(context).sizeClass,
     );
     return SliverPadding(
       padding: EdgeInsets.fromLTRB(horizontal, _gridTopGap, horizontal, 0),

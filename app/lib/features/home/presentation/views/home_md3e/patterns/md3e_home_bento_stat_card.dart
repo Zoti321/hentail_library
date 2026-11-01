@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page_metrics.dart';
 import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
@@ -57,9 +58,8 @@ class _Md3eHomeBentoStatCardState extends State<Md3eHomeBentoStatCard> {
       Md3eHomeBentoStatEmphasis.compact => 24,
     };
     final bool reduceMotion = Md3eMotion.reduceMotionOf(context);
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      MediaQuery.sizeOf(context).width,
-    );
+    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(context)
+        .sizeClass;
     final EdgeInsets padding =
         widget.contentPadding ??
         Md3eHomePageMetrics.statCardContentPadding(sizeClass);

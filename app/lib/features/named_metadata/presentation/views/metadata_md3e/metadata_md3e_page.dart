@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
@@ -88,18 +89,10 @@ class _MetadataManagementPageState
         },
         child: Focus(
           autofocus: true,
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              return _buildPage(
-                context: context,
-                layout: Md3ePageLayoutSpec.resolve(
-                  Md3eLayoutContext.fromPlatform(
-                    viewportWidth: constraints.maxWidth,
-                  ),
-                ),
-                selectedIndex: selectedIndex,
-              );
-            },
+          child: _buildPage(
+            context: context,
+            layout: Md3ePageLayoutSpec.of(context),
+            selectedIndex: selectedIndex,
           ),
         ),
       ),

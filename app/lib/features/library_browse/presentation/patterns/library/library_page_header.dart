@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
@@ -37,11 +38,9 @@ class Md3eLibraryPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 断点跟窗口宽（与 M3 / Viewport addon 一致），不用扣掉水平 padding 后的内容宽。
-    final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      windowWidth,
-    );
+    // 断点取页面视口宽度（已扣除 shell 侧栏），与其他页面的 Md3ePageLayoutSpec 保持一致。
+    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(context)
+        .sizeClass;
 
     return Md3ePinnedToolbarChrome(
       child: _Md3eLibraryPageHeaderToolbar(
