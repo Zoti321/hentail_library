@@ -202,6 +202,7 @@ class Md3eComicCard extends StatelessWidget {
       dragged: dragged,
       trackHover: visualState == null,
       onPressed: interactive ? _handleTap : null,
+      selected: effectiveSelectionMode && effectiveSelected,
       pinnedOverlayAlpha: _pinnedOverlayAlphaFor(visualState),
       semanticLabel: _semanticsLabel(title: title, readProgress: coverProgress),
       child: body,

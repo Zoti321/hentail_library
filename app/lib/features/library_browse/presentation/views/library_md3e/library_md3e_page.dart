@@ -139,7 +139,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       LibraryDisplayTarget.series => seriesCatalog?.pagination,
     };
 
-    final Widget header = selection.active
+    final Widget modeHeader = selection.active
         ? Md3eLibrarySelectionHeader(
             pageComicIds: <String>[
               for (final Comic comic in comicsCatalog?.items ?? const <Comic>[])
@@ -164,92 +164,124 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
             ),
           );
 
-    return Scaffold(
-      backgroundColor: md3eLabBrowseCanvasColor(
-        M3ETheme.of(context).colorScheme,
+    final Widget header = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 220),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        final Animation<Offset> slide = Tween<Offset>(
+          begin: const Offset(0, -0.12),
+          end: Offset.zero,
+        ).animate(animation);
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(position: slide, child: child),
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey<bool>(selection.active),
+        child: modeHeader,
       ),
-      body: Stack(
-        children: <Widget>[
-          CustomScrollView(
-            controller: _scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
-              ),
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontal,
-                  layout.headerToBodyGap,
-                  horizontal,
-                  0,
-                ),
-                sliver: SliverToBoxAdapter(
-                  child: Md3eLibraryCatalogToolbar(
-                    displayTarget: target,
-                    comicCount: comicsCatalog?.pagination.totalCount ?? 0,
-                    seriesCount: seriesCatalog?.pagination.totalCount ?? 0,
-                    onDisplayTargetChanged: facadeNotifier.selectDisplayTarget,
+    );
+
+    return PopScope(
+      canPop: !selection.active,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop && selection.active) {
+          ref.read(catalogSelectionProvider.notifier).exit();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: md3eLabBrowseCanvasColor(
+          M3ETheme.of(context).colorScheme,
+        ),
+        body: Stack(
+          children: <Widget>[
+            CustomScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: <Widget>[
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: Md3ePageHeaderDelegate(
+                    layout: layout,
+                    child: header,
                   ),
                 ),
-              ),
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontal,
-                  Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
-                    sizeClass,
-                  ),
-                  horizontal,
-                  0,
-                ),
-                sliver: SliverToBoxAdapter(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Md3eCatalogViewModeButtonGroup(
-                      mode: _viewMode,
-                      onModeChanged: (Md3eCatalogViewMode mode) {
-                        setState(() => _viewMode = mode);
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              ..._buildCatalog(
-                context,
-                target: target,
-                horizontal: horizontal,
-                comicsCatalog: comicsCatalog,
-                seriesCatalog: seriesCatalog,
-                selection: selection,
-                viewMode: _viewMode,
-              ),
-              if (pagination != null && pagination.totalPages > 1)
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(
                     horizontal,
-                    Md3eSpacing.space16,
+                    layout.headerToBodyGap,
                     horizontal,
-                    Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
+                    0,
                   ),
                   sliver: SliverToBoxAdapter(
-                    child: Md3ePagination(
-                      page: pagination.page,
-                      totalPages: pagination.totalPages,
-                      totalItems: pagination.totalCount,
-                      onPageChanged: (int page) {
-                        facadeNotifier.setPage(target, page);
-                      },
+                    child: Md3eLibraryCatalogToolbar(
+                      displayTarget: target,
+                      comicCount: comicsCatalog?.pagination.totalCount ?? 0,
+                      seriesCount: seriesCatalog?.pagination.totalCount ?? 0,
+                      onDisplayTargetChanged:
+                          facadeNotifier.selectDisplayTarget,
                     ),
                   ),
                 ),
-            ],
-          ),
-          Md3eLibraryScrollToTopButton(
-            scrollController: _scrollController,
-            horizontalPadding: horizontal,
-          ),
-        ],
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(
+                    horizontal,
+                    Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
+                      sizeClass,
+                    ),
+                    horizontal,
+                    0,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Md3eCatalogViewModeButtonGroup(
+                        mode: _viewMode,
+                        onModeChanged: (Md3eCatalogViewMode mode) {
+                          setState(() => _viewMode = mode);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                ..._buildCatalog(
+                  context,
+                  target: target,
+                  horizontal: horizontal,
+                  comicsCatalog: comicsCatalog,
+                  seriesCatalog: seriesCatalog,
+                  selection: selection,
+                  viewMode: _viewMode,
+                ),
+                if (pagination != null && pagination.totalPages > 1)
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(
+                      horizontal,
+                      Md3eSpacing.space16,
+                      horizontal,
+                      Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
+                    ),
+                    sliver: SliverToBoxAdapter(
+                      child: Md3ePagination(
+                        page: pagination.page,
+                        totalPages: pagination.totalPages,
+                        totalItems: pagination.totalCount,
+                        onPageChanged: (int page) {
+                          facadeNotifier.setPage(target, page);
+                        },
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            Md3eLibraryScrollToTopButton(
+              scrollController: _scrollController,
+              horizontalPadding: horizontal,
+            ),
+          ],
+        ),
       ),
     );
   }

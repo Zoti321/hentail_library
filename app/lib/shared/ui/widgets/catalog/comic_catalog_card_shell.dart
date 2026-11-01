@@ -24,6 +24,7 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
     this.onPressed,
     this.semanticLabel,
     this.dragged = false,
+    this.selected = false,
     this.pinnedOverlayAlpha = 0,
     this.height,
     this.width,
@@ -35,6 +36,9 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
   final VoidCallback? onPressed;
   final String? semanticLabel;
   final bool dragged;
+
+  /// 选择模式下已选中：卡片底色切换为 primaryContainer。
+  final bool selected;
   final double pinnedOverlayAlpha;
   final double? height;
   final double? width;
@@ -70,7 +74,7 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
 
     final Widget card = M3ECard(
       variant: M3ECardVariant.filled,
-      color: scheme.surfaceContainer,
+      color: selected ? scheme.primaryContainer : scheme.surfaceContainer,
       elevation: M3EElevation.level0,
       padding: EdgeInsets.zero,
       borderRadius: radius,

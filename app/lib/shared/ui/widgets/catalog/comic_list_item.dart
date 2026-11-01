@@ -259,6 +259,7 @@ class Md3eComicListItem extends StatelessWidget {
       enabled: rowEnabled,
       trackHover: visualState == null,
       onPressed: interactive ? _handleTap : null,
+      selected: effectiveSelectionMode && effectiveSelected,
       pinnedOverlayAlpha: _pinnedOverlayAlphaFor(visualState),
       semanticLabel: Md3eComicCard.showsCoverReadProgress(readProgress)
           ? '$title，已读 ${(readProgress!.clamp(0.0, 1.0) * 100).round()}%'
