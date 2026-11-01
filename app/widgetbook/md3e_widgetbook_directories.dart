@@ -145,22 +145,10 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               name: 'Md3eDesktopTitleBar',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
-                  name: 'Collapsed rail · 1024',
+                  name: 'Desktop · 1024',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: Md3eWidgetbookDesktopExpandedGate(
-                      child: Md3eDesktopTitleBar(
-                        railWidth: Md3eNavigationRailMetrics.collapsedWidth,
-                      ),
-                    ),
-                  ),
-                ),
-                WidgetbookUseCase(
-                  name: 'Expanded rail · 1440',
-                  builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Md3eWidgetbookDesktopExpandedGate(
-                      child: Md3eDesktopTitleBar(
-                        railWidth: Md3eNavigationRailMetrics.expandedWidth,
-                      ),
+                      child: const Md3eDesktopTitleBar(),
                     ),
                   ),
                 ),

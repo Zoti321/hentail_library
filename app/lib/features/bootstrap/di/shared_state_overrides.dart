@@ -129,4 +129,14 @@ List<Override> sharedLibraryStateOverrides() => <Override>[
     (Ref ref) =>
         ref.watch(metadataRefreshControllerProvider.select((s) => s.running)),
   ),
+  libraryMetadataRefreshTargetLibraryIdStateProvider.overrideWith(
+    (Ref ref) => ref.watch(
+      metadataRefreshControllerProvider.select(
+        (MetadataRefreshState s) =>
+            s.running && s.targetKind == MetadataRefreshTargetKind.library
+            ? s.targetId
+            : null,
+      ),
+    ),
+  ),
 ];

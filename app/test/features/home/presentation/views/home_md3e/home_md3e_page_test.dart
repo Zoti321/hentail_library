@@ -8,13 +8,16 @@ import 'package:hentai_library/features/home/presentation/view_models/home_page_
 import 'package:hentai_library/features/home/presentation/views/home_md3e/home_md3e_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
+
 import '../../../../../../widgetbook/lab_theme/md3e_theme.dart';
+
 import 'package:hentai_library/shared/domain/library/current_library_state.dart';
 import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -63,12 +66,13 @@ void main() {
       expect(find.byType(Md3eHomePageHeader), findsOneWidget);
       expect(find.text('Local Lib'), findsOneWidget);
       expect(find.text('Remote Lib'), findsOneWidget);
-      // 库列表本票只读：添加入口禁用，不出现可用的新增按钮回调。
+      // 库管理已接入共享端口：新增 / 行操作 / 拖拽排序回调均存在。
       final Md3eHomePage page = tester.widget<Md3eHomePage>(
         find.byType(Md3eHomePage),
       );
-      expect(page.onAddLocalLibrary, isNull);
-      expect(page.onLibraryAction, isNull);
+      expect(page.onAddLocalLibrary, isNotNull);
+      expect(page.onLibraryAction, isNotNull);
+      expect(page.onLibrariesReorder, isNotNull);
       expect(page.libraries.map((row) => row.comicCount), <int>[3, 1]);
       // 根 M3ETheme 提供应用字体。
       final M3EThemeData theme = M3ETheme.of(
@@ -109,6 +113,11 @@ List<Override> _overrides() {
       ]),
     ),
     currentLibraryStateProvider.overrideWithValue(AsyncValue.data(state)),
+    libraryScanActivityStateProvider.overrideWithValue((
+      running: false,
+      scanMode: ScanMode.incremental,
+    )),
+    libraryMetadataRefreshTargetLibraryIdStateProvider.overrideWithValue(null),
   ];
 }
 

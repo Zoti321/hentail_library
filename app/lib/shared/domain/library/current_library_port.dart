@@ -1,3 +1,4 @@
+import 'package:hentai_library/shared/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
@@ -15,6 +16,9 @@ abstract class CurrentLibraryPort {
 
   /// 删除 Library（不删盘，ADR-0012）。
   Future<void> deleteLibrary(String libraryId);
+
+  /// 持久化侧栏 / 首页共用的库顺序与置顶布局（[LibrarySidebarPlacement]）。
+  Future<void> updateSidebarLayout(List<LibrarySidebarPlacement> placements);
 
   /// 提交 Library 表单：[original] 为空时新建，否则编辑。成功后重载列表并通知 revision。
   Future<LibraryFormApplyResult> submitLibraryForm(

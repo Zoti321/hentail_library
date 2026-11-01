@@ -32,9 +32,6 @@ abstract final class Md3eDesktopShellMetrics {
       bottomLeft: Radius.circular(radius),
     );
   }
-
-  /// Horizontal inset for title-bar search beside the leading curve.
-  static const double titleBarContentPadding = 24;
 }
 
 /// Lab shell: navigation + content pane.
@@ -62,7 +59,6 @@ class Md3eDesktopShell extends StatefulWidget {
     this.onNavIdSelected,
     this.onLibrarySelected,
     this.belowTitleBar = const <Widget>[],
-    this.onSearchSubmitted,
     this.showNavigationMenu = false,
     this.onNavigationMenuPressed,
   }) : libraries = libraries ?? Md3eLabLibraryCatalog.libraries(),
@@ -97,7 +93,6 @@ class Md3eDesktopShell extends StatefulWidget {
   final ValueChanged<String>? onLibrarySelected;
 
   final List<Widget> belowTitleBar;
-  final ValueChanged<String>? onSearchSubmitted;
   final bool showNavigationMenu;
   final VoidCallback? onNavigationMenuPressed;
 
@@ -408,10 +403,7 @@ class _Md3eDesktopShellState extends State<Md3eDesktopShell> {
           children: <Widget>[
             Md3eDesktopTitleBar(
               showWindowControls: true,
-              searchLeadingInset:
-                  Md3eDesktopShellMetrics.titleBarContentPadding,
               backgroundColor: Colors.transparent,
-              onSearchSubmitted: widget.onSearchSubmitted,
               showNavigationMenu: widget.showNavigationMenu,
               onNavigationMenuPressed: widget.onNavigationMenuPressed,
             ),

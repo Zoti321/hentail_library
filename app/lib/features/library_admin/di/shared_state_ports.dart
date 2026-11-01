@@ -4,6 +4,7 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/s
 import 'package:hentai_library/shared/domain/library/library_metadata_refresh_command_port.dart';
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/domain/library/library_scan_command_port.dart';
+import 'package:hentai_library/shared/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
@@ -43,6 +44,12 @@ class _CurrentLibraryAdapter implements CurrentLibraryPort {
   @override
   Future<void> deleteLibrary(String libraryId) =>
       _ref.read(currentLibraryProvider.notifier).deleteLibrary(libraryId);
+
+  @override
+  Future<void> updateSidebarLayout(List<LibrarySidebarPlacement> placements) =>
+      _ref
+          .read(currentLibraryProvider.notifier)
+          .updateSidebarLayout(placements);
 
   @override
   Future<LibraryFormApplyResult> submitLibraryForm(
@@ -104,6 +111,12 @@ class _LibraryMetadataRefreshCommandAdapter
     required String seriesId,
     required String name,
   }) => _controller.refreshSeries(seriesId: seriesId, name: name);
+
+  @override
+  Future<MetadataRefreshBatchResult> refreshLibrary({
+    required String libraryId,
+    required String name,
+  }) => _controller.refreshLibrary(libraryId: libraryId, name: name);
 
   @override
   void cancel() => _controller.cancel();

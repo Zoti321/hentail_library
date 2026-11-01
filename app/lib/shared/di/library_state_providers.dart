@@ -126,6 +126,14 @@ libraryMetadataRefreshRunningStateProvider = Provider<bool>(
   ),
 );
 
+/// 正在做「单库」元数据刷新时该库的 libraryId；否则为 null（列表行 busy 态用）。
+final Provider<String?> libraryMetadataRefreshTargetLibraryIdStateProvider =
+    Provider<String?>(
+      (Ref ref) => throw UnimplementedError(
+        'libraryMetadataRefreshTargetLibraryIdStateProvider 未注入，请在 bootstrap 中 override',
+      ),
+    );
+
 /// 书库是否处于变更型后台任务中（扫描 / 元数据刷新 / 批量编辑任一运行），供 trash 等命令门控。
 final Provider<bool> libraryMutationBusyStateProvider = Provider<bool>(
   (Ref ref) => throw UnimplementedError(

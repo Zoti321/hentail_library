@@ -52,11 +52,17 @@ class _Md3eLibraryScrollToTopButtonState
   }
 
   void _onScrollOffset() {
-    if (!widget.scrollController.hasClients) {
+    if (!mounted || !widget.scrollController.hasClients) {
       return;
     }
-    final double offset = widget.scrollController.offset;
-    final double viewport = widget.scrollController.position.viewportDimension;
+    // hasClients 为真时 position 可能尚未完成布局（pixels / viewportDimension 未就绪），
+    // 直接读取会触发 Null check；此时等待下一次滚动或布局回调再判定。
+    final ScrollPosition position = widget.scrollController.position;
+    if (!position.hasPixels || !position.hasViewportDimension) {
+      return;
+    }
+    final double offset = position.pixels;
+    final double viewport = position.viewportDimension;
     final double showThreshold =
         viewport * Md3eLibraryBrowsePageMetrics.scrollToTopShowViewportRatio;
     final double hideThreshold =

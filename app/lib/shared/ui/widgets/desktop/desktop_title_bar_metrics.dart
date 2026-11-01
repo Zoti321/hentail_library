@@ -1,14 +1,10 @@
-/// Layout metrics from Figma desktop frames (MASTER §5.1).
+/// Desktop title bar metrics (Cursor-like compact chrome, no global search).
 abstract final class Md3eDesktopTitleBarMetrics {
-  static const double height = 64;
-  static const double searchHeight = 40;
-
-  /// Nominal inset when search is not vertically centered in the 64dp band.
-  static const double searchTopInset = 12;
-  static const double defaultSearchWidth = 720;
+  /// Compact band height, aligned with Cursor / VS Code custom title bars.
+  static const double height = 36;
   static const double windowButtonSize = 36;
-  static const double windowButtonIconSize = 18;
-  static const double windowControlsTrailing = 8;
+  static const double windowButtonIconSize = 16;
+  static const double windowControlsTrailing = 0;
   static const double windowControlsWidth = 144;
 
   /// Leading ☰ when shell uses modal drawer (&lt; expanded breakpoint).

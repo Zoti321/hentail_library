@@ -106,7 +106,6 @@ class ResponsiveAppShell extends StatelessWidget {
       onRailExtendedToggle: onToggleDesktopSidebarExpanded,
       surfaceRoles: surfaces,
       belowTitleBar: shellFeedbackBelowTitleBar,
-      onSearchSubmitted: (String query) => _submitSearch(context, query),
       paneChild: routeChild,
     );
   }
@@ -133,12 +132,6 @@ class ResponsiveAppShell extends StatelessWidget {
         };
         final bool showShellChrome =
             constraints.maxHeight >= Md3eDesktopTitleBarMetrics.height;
-
-        final double sidebarRailWidth = useDrawer || useMd3eDesktopChrome
-            ? 0
-            : (sidebarExpanded
-                  ? DesktopSidebar.expandedWidth
-                  : DesktopSidebar.collapsedWidth);
 
         final Widget body = hideAppSidebar
             ? routeChild
@@ -205,7 +198,6 @@ class ResponsiveAppShell extends StatelessWidget {
                           isReaderRoute: isReaderRoute,
                           isReaderFullscreen: isReaderFullscreen,
                           showNavigationMenu: useDrawer && !hideAppSidebar,
-                          sidebarRailWidth: sidebarRailWidth,
                         ),
                       if (showShellChrome) ...shellFeedbackBelowTitleBar,
                       Expanded(child: body),
@@ -223,13 +215,11 @@ class _ShellTitleBar extends StatelessWidget {
     required this.isReaderRoute,
     required this.isReaderFullscreen,
     required this.showNavigationMenu,
-    required this.sidebarRailWidth,
   });
 
   final bool isReaderRoute;
   final bool isReaderFullscreen;
   final bool showNavigationMenu;
-  final double sidebarRailWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -238,26 +228,15 @@ class _ShellTitleBar extends StatelessWidget {
         return const SizedBox.shrink();
       }
       if (supportsDesktopWindowChrome) {
-        return const Md3eDesktopTitleBar(
-          railWidth: 0,
-          searchWidth: 0,
-          showNavigationMenu: false,
-        );
+        return const Md3eDesktopTitleBar(showNavigationMenu: false);
       }
       return const SizedBox.shrink();
     }
 
     if (supportsDesktopWindowChrome) {
       return Md3eDesktopTitleBar(
-        railWidth: sidebarRailWidth,
         showNavigationMenu: showNavigationMenu,
         onNavigationMenuPressed: openAppShellNavigationDrawer,
-        searchWidth: isReaderRoute
-            ? 0
-            : Md3eDesktopTitleBarMetrics.defaultSearchWidth,
-        onSearchSubmitted: isReaderRoute
-            ? null
-            : (String query) => _submitSearch(context, query),
       );
     }
 
@@ -266,12 +245,4 @@ class _ShellTitleBar extends StatelessWidget {
       child: const SafeArea(bottom: false, child: SizedBox.shrink()),
     );
   }
-}
-
-void _submitSearch(BuildContext context, String query) {
-  final String trimmed = query.trim();
-  if (trimmed.isEmpty) {
-    return;
-  }
-  context.go('/searched?q=${Uri.encodeQueryComponent(trimmed)}');
 }

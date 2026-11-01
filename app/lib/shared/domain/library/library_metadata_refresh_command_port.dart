@@ -8,6 +8,12 @@ abstract class LibraryMetadataRefreshCommandPort {
     required String name,
   });
 
+  /// 刷新单个库的元数据（批量，结果经 [MetadataRefreshBatchResult] 返回）。
+  Future<MetadataRefreshBatchResult> refreshLibrary({
+    required String libraryId,
+    required String name,
+  });
+
   void cancel();
 
   bool isRefreshingSeries(String seriesId);

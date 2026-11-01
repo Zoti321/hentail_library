@@ -60,11 +60,10 @@ void main() {
     expect(find.byType(Md3eNavigationRail), findsOneWidget);
     expect(find.byType(Md3eDesktopTitleBar), findsOneWidget);
     expect(find.byType(Md3eDesktopShellPane), findsOneWidget);
-    expect(find.byType(M3ESearchBar), findsOneWidget);
   });
 
   testWidgets(
-    'below expanded breakpoint uses compact app bar not desktop search',
+    'below expanded breakpoint uses compact app bar without desktop title bar',
     (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(600, 768));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -76,7 +75,6 @@ void main() {
 
       expect(find.byType(Md3eShellCompactAppBar), findsOneWidget);
       expect(find.byType(Md3eNavigationRail), findsNothing);
-      expect(find.byType(M3ESearchBar), findsNothing);
       expect(find.byIcon(Icons.menu), findsOneWidget);
     },
   );
@@ -93,7 +91,7 @@ void main() {
     expect(find.byIcon(Icons.close), findsNothing);
   });
 
-  testWidgets('title bar search leading inset is flush with pane column', (
+  testWidgets('title bar is flush with pane column', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(1024, 768));
@@ -108,33 +106,6 @@ void main() {
     final Rect paneRect = tester.getRect(pane);
 
     expect(titleBarRect.left, paneRect.left);
-  });
-
-  testWidgets('search field is inset from content card leading edge', (
-    WidgetTester tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(1024, 768));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-
-    await pumpMd3eApp(tester, home: Md3eDesktopShell(width: 1024, height: 768));
-    await tester.pumpAndSettle();
-
-    final Rect searchRect = tester.getRect(find.byType(M3ESearchBar));
-    final Finder shellClip = find.descendant(
-      of: find.byType(Md3eDesktopShell),
-      matching: find.byWidgetPredicate(
-        (Widget widget) =>
-            widget is ClipRRect &&
-            widget.borderRadius ==
-                Md3eDesktopShellMetrics.contentCardLeadingRadius(),
-      ),
-    );
-    final Rect clipRect = tester.getRect(shellClip);
-
-    expect(
-      searchRect.left,
-      clipRect.left + Md3eDesktopShellMetrics.titleBarContentPadding,
-    );
   });
 
   testWidgets(
@@ -284,7 +255,7 @@ void main() {
     );
   });
 
-  testWidgets('title band search aligns at 32dp on expanded shell', (
+  testWidgets('title bar window controls center in 36dp band', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(1024, 768));
@@ -293,19 +264,12 @@ void main() {
     await pumpMd3eApp(tester, home: Md3eDesktopShell(width: 1024, height: 768));
     await tester.pumpAndSettle();
 
-    const double titleBandCenter = 32;
-
-    expect(
-      tester.getRect(find.byIcon(Icons.search)).center.dy,
-      titleBandCenter,
-    );
-    expect(
-      tester.getRect(find.byIcon(M3EIcons.menu)).center.dy,
-      titleBandCenter,
-    );
+    const double titleBandCenter = 18;
     expect(
       tester.getRect(find.byIcon(Icons.remove)).center.dy,
       titleBandCenter,
     );
+    // 导航栏菜单仍位于 rail 顶部（非标题栏），保持 32dp 中心。
+    expect(tester.getRect(find.byIcon(M3EIcons.menu)).center.dy, 32);
   });
 }
