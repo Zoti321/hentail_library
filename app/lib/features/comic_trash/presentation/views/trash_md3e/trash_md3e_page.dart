@@ -178,16 +178,17 @@ class _TrashBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final AsyncValue<TrashPageState> async = ref.watch(
       trashPageControllerProvider,
     );
     return async.when(
-      loading: () => const Padding(
-        padding: EdgeInsets.only(top: 48),
+      loading: () => Padding(
+        padding: EdgeInsets.only(top: layout.stateTopInset),
         child: Center(child: CircularProgressIndicator()),
       ),
       error: (Object _, StackTrace _) => Padding(
-        padding: const EdgeInsets.only(top: 48),
+        padding: EdgeInsets.only(top: layout.stateTopInset),
         child: Center(
           child: Text(
             l10n.shellLoadFailed,
@@ -210,7 +211,7 @@ class _TrashBody extends ConsumerWidget {
               style: Theme.of(context).textTheme.bodySmall
                   ?.copyWith(color: scheme.onSurfaceVariant),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: layout.listItemGap),
             for (final TrashedComic item in state.items)
               TrashMd3eListItem(
                 key: ValueKey<String>(item.comic.comicId),
@@ -240,7 +241,9 @@ class _TrashEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     return Padding(
-      padding: const EdgeInsets.only(top: 48),
+      padding: EdgeInsets.only(
+        top: Md3ePageLayoutSpec.of(context).stateTopInset,
+      ),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

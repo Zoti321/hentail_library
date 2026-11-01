@@ -44,12 +44,6 @@ import 'package:hentai_library/shared/ui/widgets/element/image/series_cover_cont
 import 'package:hentai_library/shared/ui/widgets/navigation/library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 工具栏与网格之间的顶部间距。
-const double _gridTopGap = 24;
-
-/// 列表行之间（及双列之间）的间距。
-const double _listItemGap = 8;
-
 /// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 网格 + 分页。
 ///
 /// 数据来自库目录控制器（真实 provider）。筛选排序面板为 [Md3eLibraryFilterSortSheet]。
@@ -267,16 +261,20 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     required int itemCount,
     required Widget Function(BuildContext context, int index) itemBuilder,
   }) {
-    final int columns = md3eComicListColumnCount(
-      Md3ePageLayoutSpec.of(context).sizeClass,
-    );
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final int columns = md3eComicListColumnCount(layout.sizeClass);
     return SliverPadding(
-      padding: EdgeInsets.fromLTRB(horizontal, _gridTopGap, horizontal, 0),
+      padding: EdgeInsets.fromLTRB(
+        horizontal,
+        layout.headerToBodyGap,
+        horizontal,
+        0,
+      ),
       sliver: columns == 1
           ? SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) => Padding(
-                  padding: const EdgeInsets.only(bottom: _listItemGap),
+                  padding: EdgeInsets.only(bottom: layout.listItemGap),
                   child: itemBuilder(context, index),
                 ),
                 childCount: itemCount,
@@ -289,7 +287,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
               ) {
                 final int firstIndex = rowIndex * columns;
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: _listItemGap),
+                  padding: EdgeInsets.only(bottom: layout.listItemGap),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -298,7 +296,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                         column < columns;
                         column++
                       ) ...<Widget>[
-                        if (column > 0) const SizedBox(width: _listItemGap),
+                        if (column > 0) SizedBox(width: layout.listItemGap),
                         Expanded(
                           child: firstIndex + column < itemCount
                               ? itemBuilder(context, firstIndex + column)
@@ -323,6 +321,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     required CatalogSelectionState selection,
   }) {
     final AppLocalizations l10n = context.l10n;
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     switch (target) {
       case LibraryDisplayTarget.comics:
         if (comicsCatalog == null) {
@@ -378,7 +377,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               horizontal,
-              _gridTopGap,
+              layout.headerToBodyGap,
               horizontal,
               0,
             ),
@@ -450,7 +449,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               horizontal,
-              _gridTopGap,
+              layout.headerToBodyGap,
               horizontal,
               0,
             ),

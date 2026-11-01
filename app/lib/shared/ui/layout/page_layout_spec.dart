@@ -49,6 +49,8 @@ final class Md3ePageLayoutSpec {
     required this.headerVerticalInset,
     required this.headerToBodyGap,
     required this.bodyBottomInset,
+    required this.listItemGap,
+    required this.stateTopInset,
     required this.titleFontSize,
     required this.titleFontWeight,
   });
@@ -89,6 +91,8 @@ final class Md3ePageLayoutSpec {
       headerVerticalInset: _headerVerticalInset(mode),
       headerToBodyGap: _headerToBodyGap(sizeClass, mode),
       bodyBottomInset: _bodyBottomInset(sizeClass, mode),
+      listItemGap: _listItemGap(sizeClass, mode),
+      stateTopInset: _stateTopInset(mode),
       titleFontSize: _titleFontSize(sizeClass),
       titleFontWeight: sizeClass.isCompact ? FontWeight.w700 : FontWeight.w600,
     );
@@ -109,6 +113,12 @@ final class Md3ePageLayoutSpec {
   /// 正文滚动区底部留白（分页条等与视口底边之间）。
   final double bodyBottomInset;
 
+  /// 同一列表内相邻条目之间的间距（触控需要更大的触达间隔；鼠标列表可更紧凑）。
+  final double listItemGap;
+
+  /// 空状态 / 加载占位距离正文顶部的留白（与页头拉开距离，避免贴在工具行下）。
+  final double stateTopInset;
+
   final double titleFontSize;
   final FontWeight titleFontWeight;
 
@@ -119,8 +129,7 @@ final class Md3ePageLayoutSpec {
   static const double titleHeight = 1.25;
 
   /// 粘滞页头总高度 = 上下内边距 + 工具行。
-  double get pinnedHeaderExtent =>
-      headerVerticalInset * 2 + toolbarRowHeight;
+  double get pinnedHeaderExtent => headerVerticalInset * 2 + toolbarRowHeight;
 
   @override
   bool operator ==(Object other) {
@@ -131,6 +140,8 @@ final class Md3ePageLayoutSpec {
         other.headerVerticalInset == headerVerticalInset &&
         other.headerToBodyGap == headerToBodyGap &&
         other.bodyBottomInset == bodyBottomInset &&
+        other.listItemGap == listItemGap &&
+        other.stateTopInset == stateTopInset &&
         other.titleFontSize == titleFontSize &&
         other.titleFontWeight == titleFontWeight;
   }
@@ -143,6 +154,8 @@ final class Md3ePageLayoutSpec {
     headerVerticalInset,
     headerToBodyGap,
     bodyBottomInset,
+    listItemGap,
+    stateTopInset,
     titleFontSize,
     titleFontWeight,
   );
@@ -206,6 +219,24 @@ final class Md3ePageLayoutSpec {
       (LayoutInputMode.touch, _) => 32,
       (LayoutInputMode.pointer, Md3eWindowSizeClass.compact) => 16,
       (LayoutInputMode.pointer, _) => 24,
+    };
+  }
+
+  static double _listItemGap(
+    Md3eWindowSizeClass sizeClass,
+    LayoutInputMode mode,
+  ) {
+    return switch ((mode, sizeClass)) {
+      (LayoutInputMode.touch, Md3eWindowSizeClass.compact) => 12,
+      (LayoutInputMode.touch, _) => 16,
+      (LayoutInputMode.pointer, _) => 8,
+    };
+  }
+
+  static double _stateTopInset(LayoutInputMode mode) {
+    return switch (mode) {
+      LayoutInputMode.touch => 48,
+      LayoutInputMode.pointer => 32,
     };
   }
 

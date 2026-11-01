@@ -21,13 +21,17 @@ void main() {
   group('Md3eLayoutContext', () {
     test('fromPlatform maps desktop to pointer and mobile to touch', () {
       expect(
-        Md3eLayoutContext.fromPlatform(viewportWidth: 800, desktop: true)
-            .inputMode,
+        Md3eLayoutContext.fromPlatform(
+          viewportWidth: 800,
+          desktop: true,
+        ).inputMode,
         LayoutInputMode.pointer,
       );
       expect(
-        Md3eLayoutContext.fromPlatform(viewportWidth: 800, desktop: false)
-            .inputMode,
+        Md3eLayoutContext.fromPlatform(
+          viewportWidth: 800,
+          desktop: false,
+        ).inputMode,
         LayoutInputMode.touch,
       );
     });
@@ -99,10 +103,7 @@ void main() {
         _resolve(_compactWidth, LayoutInputMode.touch).headerToBodyGap,
         16,
       );
-      expect(
-        _resolve(_mediumWidth, LayoutInputMode.touch).headerToBodyGap,
-        20,
-      );
+      expect(_resolve(_mediumWidth, LayoutInputMode.touch).headerToBodyGap, 20);
       expect(
         _resolve(_expandedWidth, LayoutInputMode.touch).headerToBodyGap,
         24,
@@ -140,6 +141,30 @@ void main() {
     });
   });
 
+  group('list and state spacing', () {
+    test('list item gap is roomier on touch than pointer', () {
+      expect(_resolve(_compactWidth, LayoutInputMode.touch).listItemGap, 12);
+      expect(_resolve(_expandedWidth, LayoutInputMode.touch).listItemGap, 16);
+      for (final double width in <double>[
+        _compactWidth,
+        _mediumWidth,
+        _expandedWidth,
+        _largeWidth,
+        _extraLargeWidth,
+      ]) {
+        expect(_resolve(width, LayoutInputMode.pointer).listItemGap, 8);
+      }
+    });
+
+    test('state top inset is 48 on touch and 32 on pointer', () {
+      for (final Md3eWindowSizeClass cls in _allClasses) {
+        final double width = _widthFor(cls);
+        expect(_resolve(width, LayoutInputMode.touch).stateTopInset, 48);
+        expect(_resolve(width, LayoutInputMode.pointer).stateTopInset, 32);
+      }
+    });
+  });
+
   group('title typography', () {
     test('font size follows window class and is shared across inputs', () {
       for (final LayoutInputMode mode in LayoutInputMode.values) {
@@ -174,15 +199,15 @@ void main() {
 
     test('pointer spacing never exceeds touch spacing', () {
       for (final double width in widths) {
-        final Md3ePageLayoutSpec touch = _resolve(
-          width,
-          LayoutInputMode.touch,
-        );
+        final Md3ePageLayoutSpec touch = _resolve(width, LayoutInputMode.touch);
         final Md3ePageLayoutSpec pointer = _resolve(
           width,
           LayoutInputMode.pointer,
         );
-        expect(pointer.horizontalInset, lessThanOrEqualTo(touch.horizontalInset));
+        expect(
+          pointer.horizontalInset,
+          lessThanOrEqualTo(touch.horizontalInset),
+        );
         expect(
           pointer.headerVerticalInset,
           lessThanOrEqualTo(touch.headerVerticalInset),
@@ -195,6 +220,8 @@ void main() {
           pointer.bodyBottomInset,
           lessThanOrEqualTo(touch.bodyBottomInset),
         );
+        expect(pointer.listItemGap, lessThanOrEqualTo(touch.listItemGap));
+        expect(pointer.stateTopInset, lessThanOrEqualTo(touch.stateTopInset));
       }
     });
 
