@@ -52,7 +52,7 @@ fn assert_busy(result: Result<impl std::fmt::Debug, HentaiError>) {
 
 #[test]
 fn cross_comic_writes_fail_fast_while_library_write_lock_held() {
-    use JunctionNamedFacet::{Author, Tag};
+    use JunctionNamedFacet::Tag;
 
     with_solo_library(|library, runtime| {
         runtime.block_on(async {
@@ -80,8 +80,6 @@ fn cross_comic_writes_fail_fast_while_library_write_lock_held() {
             assert_busy(rename_named_facet_name(Tag, "old", "new").await);
             assert_busy(delete_named_facet_by_names(Tag, vec!["old".to_string()]).await);
             assert_busy(merge_named_facet_name(Tag, "old", "new").await);
-            assert_busy(rename_named_facet_name(Author, "old", "new").await);
-            assert_busy(delete_named_facet_by_names(Author, vec!["old".to_string()]).await);
             assert_busy(clear_all_reading().await);
         });
 
@@ -96,22 +94,22 @@ fn cross_comic_writes_fail_fast_while_library_write_lock_held() {
 }
 
 #[test]
-fn named_facet_author_branch_does_not_double_acquire_the_lock() {
-    use JunctionNamedFacet::{Author, Tag};
+fn author_entry_points_do_not_double_acquire_the_lock() {
+    use JunctionNamedFacet::Tag;
 
     with_solo_library(|_library, runtime| {
         runtime.block_on(async {
             add_author("Some Author").await.expect("add author");
             add_tag("Some Tag").await.expect("add tag");
 
-            // The Author branch delegates to the author module: it must reuse the
-            // guard taken by the named-facet entry point instead of erroring busy.
-            rename_named_facet_name(Author, "Some Author", "Renamed Author")
+            // Author entry points own their write lock: they must not error busy
+            // and must release the guard for the next writer.
+            rename_author("Some Author", "Renamed Author")
                 .await
-                .expect("author facet rename");
-            delete_named_facet_by_names(Author, vec!["Renamed Author".to_string()])
+                .expect("author rename");
+            delete_authors_by_names(vec!["Renamed Author".to_string()])
                 .await
-                .expect("author facet delete");
+                .expect("author delete");
 
             rename_named_facet_name(Tag, "Some Tag", "Renamed Tag")
                 .await
@@ -125,7 +123,7 @@ fn named_facet_author_branch_does_not_double_acquire_the_lock() {
 
 #[test]
 fn failed_entry_points_do_not_leak_the_lock() {
-    use JunctionNamedFacet::{Author, Tag};
+    use JunctionNamedFacet::Tag;
 
     with_solo_library(|_library, runtime| {
         runtime.block_on(async {
@@ -137,10 +135,6 @@ fn failed_entry_points_do_not_leak_the_lock() {
             let err = import_comic_metadata(b"not-a-backup")
                 .await
                 .expect_err("invalid backup");
-            assert!(!err.message.contains(BUSY_MESSAGE), "{}", err.message);
-            let err = merge_named_facet_name(Author, "one", "two")
-                .await
-                .expect_err("author merge unsupported");
             assert!(!err.message.contains(BUSY_MESSAGE), "{}", err.message);
             let err = merge_named_facet_name(Tag, "same", "same")
                 .await

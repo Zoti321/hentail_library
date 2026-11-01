@@ -353,7 +353,7 @@ async fn count_would_upsert_orphan_facets(
 ) -> Result<u32, HentaiError> {
     let mut total = 0u32;
     total += count_new_orphan_names(db, JunctionNamedFacet::Tag, &orphans.tags).await?;
-    total += count_new_orphan_names(db, JunctionNamedFacet::Author, &orphans.authors).await?;
+    total += crate::author::count_new_author_names(db, &orphans.authors).await?;
     total += count_new_orphan_names(db, JunctionNamedFacet::Parody, &orphans.parodies).await?;
     total += count_new_orphan_names(db, JunctionNamedFacet::Character, &orphans.characters).await?;
     Ok(total)
@@ -426,7 +426,7 @@ async fn upsert_orphan_facets(
     orphans: &OrphanFacetsRecord,
 ) -> Result<(), HentaiError> {
     upsert_orphan_names(db, JunctionNamedFacet::Tag, &orphans.tags).await?;
-    upsert_orphan_names(db, JunctionNamedFacet::Author, &orphans.authors).await?;
+    crate::author::upsert_author_names(db, &orphans.authors).await?;
     upsert_orphan_names(db, JunctionNamedFacet::Parody, &orphans.parodies).await?;
     upsert_orphan_names(db, JunctionNamedFacet::Character, &orphans.characters).await?;
     Ok(())

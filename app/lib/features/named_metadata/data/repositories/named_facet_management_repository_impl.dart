@@ -14,7 +14,7 @@ class NamedFacetManagementRepositoryImpl
   Future<List<String>> listAll(ManagedNamedFacetKind kind) async {
     return guardFrb(
       () => rust_named_facet.listAllNamedFacetNamesFrb(facet: kind.toFrb()),
-      fallbackMessage: _listFallbackMessage(kind),
+      fallbackMessage: namedFacetFallbackCopyOf(kind).list,
     );
   }
 
@@ -31,7 +31,7 @@ class NamedFacetManagementRepositoryImpl
           pageSize: request.pageSize,
         ),
       ),
-      fallbackMessage: _pageFallbackMessage(kind),
+      fallbackMessage: namedFacetFallbackCopyOf(kind).page,
     );
     return PagedResult<String>(
       items: page.items,
@@ -48,7 +48,7 @@ class NamedFacetManagementRepositoryImpl
         facet: kind.toFrb(),
         name: name,
       ),
-      fallbackMessage: _addFallbackMessage(kind),
+      fallbackMessage: namedFacetFallbackCopyOf(kind).add,
     );
   }
 
@@ -62,7 +62,7 @@ class NamedFacetManagementRepositoryImpl
         facet: kind.toFrb(),
         names: names,
       ),
-      fallbackMessage: _deleteFallbackMessage(kind),
+      fallbackMessage: namedFacetFallbackCopyOf(kind).delete,
     );
   }
 
@@ -78,7 +78,7 @@ class NamedFacetManagementRepositoryImpl
         oldName: oldName,
         newName: newName,
       ),
-      fallbackMessage: _renameFallbackMessage(kind),
+      fallbackMessage: namedFacetFallbackCopyOf(kind).rename,
     );
   }
 
@@ -94,7 +94,7 @@ class NamedFacetManagementRepositoryImpl
         sourceName: sourceName,
         targetName: targetName,
       ),
-      fallbackMessage: _mergeFallbackMessage(kind),
+      fallbackMessage: namedFacetFallbackCopyOf(kind).merge,
     );
   }
 
@@ -105,7 +105,7 @@ class NamedFacetManagementRepositoryImpl
         facet: kind.toFrb(),
         name: name,
       ),
-      fallbackMessage: _countFallbackMessage(kind),
+      fallbackMessage: namedFacetFallbackCopyOf(kind).count,
     );
     return result.toInt();
   }
@@ -123,51 +123,63 @@ extension on ManagedNamedFacetKind {
   };
 }
 
-String _listFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => '读取作者列表失败',
-  ManagedNamedFacetKind.tag => '读取标签列表失败',
-  ManagedNamedFacetKind.parody => '读取原作列表失败',
-  ManagedNamedFacetKind.character => '读取角色列表失败',
-};
+/// 管理页 FRB 失败提示文案；每类 facet 的全部文案只在 [namedFacetFallbackCopyOf] 一处维护。
+class NamedFacetFallbackCopy {
+  const NamedFacetFallbackCopy({
+    required this.list,
+    required this.page,
+    required this.add,
+    required this.delete,
+    required this.rename,
+    required this.count,
+    required this.merge,
+  });
 
-String _pageFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => '读取作者分页失败',
-  ManagedNamedFacetKind.tag => '读取标签分页失败',
-  ManagedNamedFacetKind.parody => '读取原作分页失败',
-  ManagedNamedFacetKind.character => '读取角色分页失败',
-};
+  final String list;
+  final String page;
+  final String add;
+  final String delete;
+  final String rename;
+  final String count;
+  final String merge;
+}
 
-String _addFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => '添加作者失败',
-  ManagedNamedFacetKind.tag => '添加标签失败',
-  ManagedNamedFacetKind.parody => '添加原作失败',
-  ManagedNamedFacetKind.character => '添加角色失败',
-};
-
-String _deleteFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => '删除作者失败',
-  ManagedNamedFacetKind.tag => '删除标签失败',
-  ManagedNamedFacetKind.parody => '删除原作失败',
-  ManagedNamedFacetKind.character => '删除角色失败',
-};
-
-String _renameFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => '重命名作者失败',
-  ManagedNamedFacetKind.tag => '重命名标签失败',
-  ManagedNamedFacetKind.parody => '重命名原作失败',
-  ManagedNamedFacetKind.character => '重命名角色失败',
-};
-
-String _countFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => '读取作者 Named facet attachment count 失败',
-  ManagedNamedFacetKind.tag => '读取标签 Named facet attachment count 失败',
-  ManagedNamedFacetKind.parody => '读取原作 Named facet attachment count 失败',
-  ManagedNamedFacetKind.character => '读取角色 Named facet attachment count 失败',
-};
-
-String _mergeFallbackMessage(ManagedNamedFacetKind kind) => switch (kind) {
-  ManagedNamedFacetKind.author => '作者暂不支持合并',
-  ManagedNamedFacetKind.tag => '合并标签失败',
-  ManagedNamedFacetKind.parody => '合并原作失败',
-  ManagedNamedFacetKind.character => '合并角色失败',
-};
+NamedFacetFallbackCopy namedFacetFallbackCopyOf(ManagedNamedFacetKind kind) =>
+    switch (kind) {
+      ManagedNamedFacetKind.author => const NamedFacetFallbackCopy(
+        list: '读取作者列表失败',
+        page: '读取作者分页失败',
+        add: '添加作者失败',
+        delete: '删除作者失败',
+        rename: '重命名作者失败',
+        count: '读取作者 Named facet attachment count 失败',
+        merge: '作者暂不支持合并',
+      ),
+      ManagedNamedFacetKind.tag => const NamedFacetFallbackCopy(
+        list: '读取标签列表失败',
+        page: '读取标签分页失败',
+        add: '添加标签失败',
+        delete: '删除标签失败',
+        rename: '重命名标签失败',
+        count: '读取标签 Named facet attachment count 失败',
+        merge: '合并标签失败',
+      ),
+      ManagedNamedFacetKind.parody => const NamedFacetFallbackCopy(
+        list: '读取原作列表失败',
+        page: '读取原作分页失败',
+        add: '添加原作失败',
+        delete: '删除原作失败',
+        rename: '重命名原作失败',
+        count: '读取原作 Named facet attachment count 失败',
+        merge: '合并原作失败',
+      ),
+      ManagedNamedFacetKind.character => const NamedFacetFallbackCopy(
+        list: '读取角色列表失败',
+        page: '读取角色分页失败',
+        add: '添加角色失败',
+        delete: '删除角色失败',
+        rename: '重命名角色失败',
+        count: '读取角色 Named facet attachment count 失败',
+        merge: '合并角色失败',
+      ),
+    };
