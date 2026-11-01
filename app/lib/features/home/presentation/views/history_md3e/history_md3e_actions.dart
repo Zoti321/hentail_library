@@ -8,7 +8,9 @@ import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 Future<void> clearAllReadingHistory(BuildContext context, WidgetRef ref) async {
   final AppLocalizations l10n = context.l10n;
   try {
-    await ref.read(historyPagedFeedControllerProvider.notifier).clearAllHistory();
+    await ref
+        .read(historyPagedFeedControllerProvider.notifier)
+        .clearAllHistory();
     if (context.mounted) {
       showSuccessToast(context, l10n.historyClearedToast);
     }

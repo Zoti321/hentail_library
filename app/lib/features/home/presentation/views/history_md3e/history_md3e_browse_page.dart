@@ -25,10 +25,8 @@ class HistoryMd3eBrowsePage extends StatefulWidget {
 
   final List<HistoryMd3eBrowseEntry> entries;
   final int totalCount;
-  final Widget Function(
-    BuildContext context,
-    HistoryMd3eBrowseEntry entry,
-  ) itemBuilder;
+  final Widget Function(BuildContext context, HistoryMd3eBrowseEntry entry)
+  itemBuilder;
   final VoidCallback? onClearAll;
   final VoidCallback? onOpenNavigation;
   final ScrollController? scrollController;
@@ -90,8 +88,9 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass =
-        Md3eWindowSizeClass.fromWidth(viewportWidth);
+    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+      viewportWidth,
+    );
     final double horizontal =
         Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
 
@@ -149,9 +148,7 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
           const SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
             ),
           ),
       ],
