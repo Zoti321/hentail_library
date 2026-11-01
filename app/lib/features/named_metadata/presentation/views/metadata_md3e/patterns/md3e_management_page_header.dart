@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
 
-/// 管理页粘滞头：仅左侧标题（与 [Md3eLibraryPageHeader] 同款间距与字阶）。
+/// 管理页粘滞头：仅左侧标题（间距与字阶来自 [Md3ePageLayoutSpec]）。
 class Md3eManagementPageHeader extends StatelessWidget {
   const Md3eManagementPageHeader({super.key, this.title});
 
@@ -14,35 +13,16 @@ class Md3eManagementPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      windowWidth,
-    );
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EColorScheme scheme = theme.colorScheme;
-    final M3ETypeScale type = theme.typeScale;
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
 
     return Padding(
-      padding: const EdgeInsets.only(
-        top: Md3eLibraryPageHeaderMetrics.verticalPadding,
-        bottom: Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding,
-      ),
+      padding: EdgeInsets.symmetric(vertical: layout.headerVerticalInset),
       child: SizedBox(
-        height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
+        height: Md3ePageLayoutSpec.toolbarRowHeight,
         child: Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            title ?? l10n.navMetadata,
-            style: type.headlineSmall.copyWith(
-              fontSize: Md3eLibraryPageHeaderMetrics.titleFontSize(sizeClass),
-              fontWeight: Md3eLibraryPageHeaderMetrics.titleFontWeight(
-                sizeClass,
-              ),
-              color: scheme.onSurface,
-              letterSpacing: -0.4,
-            ),
-          ),
+          child: Md3ePageTitle(title ?? l10n.navMetadata),
         ),
       ),
     );

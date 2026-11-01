@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -6,8 +8,6 @@ import 'package:hentai_library/features/comic_trash/presentation/view_models/tra
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_state.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_actions.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/widgets/trash_md3e_list_item.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
@@ -25,11 +25,8 @@ class TrashMd3ePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      MediaQuery.sizeOf(context).width,
-    );
-    final double horizontal =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double horizontal = layout.horizontalInset;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
 
     return ColoredBox(
@@ -50,14 +47,19 @@ class TrashMd3ePage extends ConsumerWidget {
             SliverPersistentHeader(
               pinned: true,
               delegate: Md3ePageHeaderDelegate(
-                pageHorizontal: horizontal,
+                layout: layout,
                 child: _TrashHeader(
                   onOpenNavigation: appShellPageNavigationOpener(context),
                 ),
               ),
             ),
             SliverPadding(
-              padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 24),
+              padding: EdgeInsets.fromLTRB(
+                horizontal,
+                layout.headerToBodyGap,
+                horizontal,
+                layout.bodyBottomInset,
+              ),
               sliver: const SliverToBoxAdapter(child: _TrashBody()),
             ),
           ],
@@ -98,16 +100,7 @@ class _TrashHeader extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
           ],
-          Expanded(
-            child: Text(
-              l10n.navTrash,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: scheme.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+          Expanded(child: Md3ePageTitle(l10n.navTrash)),
           if (hasSelection)
             Padding(
               padding: const EdgeInsets.only(right: 8),

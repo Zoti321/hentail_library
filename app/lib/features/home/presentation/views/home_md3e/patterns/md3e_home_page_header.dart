@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 首页粘滞顶栏：compact 可打开导航；标题为 [AppLocalizations.navHome]。
+/// 首页顶栏：compact 可打开导航；标题为 [AppLocalizations.navHome]。
 class Md3eHomePageHeader extends StatelessWidget {
   const Md3eHomePageHeader({super.key, this.onOpenNavigation});
 
@@ -14,22 +15,15 @@ class Md3eHomePageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      windowWidth,
-    );
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EColorScheme scheme = theme.colorScheme;
-    final M3ETypeScale type = theme.typeScale;
-    final bool showMenu = sizeClass.isCompact && onOpenNavigation != null;
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final bool showMenu = layout.sizeClass.isCompact && onOpenNavigation != null;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: Md3eLibraryPageHeaderMetrics.verticalPadding,
-      ),
+      padding: EdgeInsets.symmetric(vertical: layout.headerVerticalInset),
       child: SizedBox(
-        height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
+        height: Md3ePageLayoutSpec.toolbarRowHeight,
         child: Row(
           children: <Widget>[
             if (showMenu) ...<Widget>[
@@ -47,21 +41,7 @@ class Md3eHomePageHeader extends StatelessWidget {
               ),
               const SizedBox(width: 4),
             ],
-            Expanded(
-              child: Text(
-                l10n.navHome,
-                style: type.headlineSmall.copyWith(
-                  fontSize: Md3eLibraryPageHeaderMetrics.titleFontSize(
-                    sizeClass,
-                  ),
-                  fontWeight: Md3eLibraryPageHeaderMetrics.titleFontWeight(
-                    sizeClass,
-                  ),
-                  color: scheme.onSurface,
-                  letterSpacing: -0.4,
-                ),
-              ),
-            ),
+            Expanded(child: Md3ePageTitle(l10n.navHome)),
           ],
         ),
       ),

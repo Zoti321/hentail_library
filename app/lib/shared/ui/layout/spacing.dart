@@ -24,19 +24,6 @@ abstract final class Md3eSpacing {
   static const double space40 = M3EDimensions.space40;
   static const double space48 = M3EDimensions.space48;
 
-  /// 粘滞顶栏 / 工具行与下方主内容区之间的纵向间距。
-  static double majorSectionBelowHeader(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => space16,
-      Md3eWindowSizeClass.medium => space20,
-      _ => space24,
-    };
-  }
-
-  /// 书库：视图模式行与目录网格之间的间距（与 [majorSectionBelowHeader] 同档）。
-  static double catalogBodyBelowToolbar(Md3eWindowSizeClass sizeClass) =>
-      majorSectionBelowHeader(sizeClass);
-
   /// 分页条与相邻区块的纵向间距。
   static double paginationVertical(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {

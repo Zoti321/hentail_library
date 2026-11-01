@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/comic_detail_page_metrics.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/comic_detail/comic_detail_page_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/comic_detail/comic_detail_scroll_content.dart';
@@ -131,9 +130,8 @@ class _Md3eComicDetailPageState extends State<Md3eComicDetailPage> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final double horizontalPadding =
-        Md3eComicDetailPageMetrics.contentHorizontalPadding(sizeClass);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double horizontalPadding = layout.horizontalInset;
 
     final Widget header = Md3eComicDetailPageHeader(
       onBack: _resolveVoid(widget.onBack),
@@ -158,7 +156,7 @@ class _Md3eComicDetailPageState extends State<Md3eComicDetailPage> {
               SliverPersistentHeader(
                 pinned: true,
                 delegate: Md3ePageHeaderDelegate(
-                  pageHorizontal: horizontalPadding,
+                  layout: layout,
                   child: header,
                 ),
               ),

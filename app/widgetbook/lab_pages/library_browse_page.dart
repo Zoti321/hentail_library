@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
@@ -107,8 +108,8 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
       viewportWidth,
     );
-    final double horizontal =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double horizontal = layout.horizontalInset;
 
     final Widget header = Md3eLibraryPageHeader(
       title: widget.libraryDisplayName,
@@ -128,7 +129,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
             SliverPersistentHeader(
               pinned: true,
               delegate: Md3ePageHeaderDelegate(
-                pageHorizontal: horizontal,
+                layout: layout,
                 child: header,
               ),
             ),
@@ -136,9 +137,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(
                   horizontal,
-                  Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(
-                    sizeClass,
-                  ),
+                  layout.headerToBodyGap,
                   horizontal,
                   0,
                 ),
@@ -158,9 +157,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
                     ? Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
                         sizeClass,
                       )
-                    : Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(
-                        sizeClass,
-                      ),
+                    : layout.headerToBodyGap,
                 horizontal,
                 0,
               ),
@@ -176,9 +173,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
             ),
             SliverPadding(
               padding: EdgeInsets.only(
-                top: Md3eLibraryBrowsePageMetrics.catalogBodyTopSpacing(
-                  sizeClass,
-                ),
+                top: layout.headerToBodyGap,
               ),
               sliver: switch (widget.viewMode) {
                 Md3eCatalogViewMode.grid => Md3eCatalogGridSliver(

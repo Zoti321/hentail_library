@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -17,7 +19,6 @@ import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kSearchLoadMoreThreshold = 400;
 const Duration _kLoadMoreMinInterval = Duration(milliseconds: 400);
@@ -105,6 +106,7 @@ class _SearchedMd3ePageState extends ConsumerState<SearchedMd3ePage> {
   @override
   Widget build(BuildContext context) {
     final String trimmedQuery = widget.query.trim();
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final AsyncValue<LibrarySearchComicsPage> searched = ref.watch(
       librarySearchPageComicsControllerProvider(trimmedQuery),
     );
@@ -130,7 +132,12 @@ class _SearchedMd3ePageState extends ConsumerState<SearchedMd3ePage> {
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                padding: EdgeInsets.fromLTRB(
+                  layout.horizontalInset,
+                  0,
+                  layout.horizontalInset,
+                  layout.headerToBodyGap,
+                ),
                 child: Md3eOutlinedTextField(
                   label: context.l10n.librarySearchHint,
                   controller: _searchController,
@@ -199,7 +206,9 @@ class _SearchedMd3ePageState extends ConsumerState<SearchedMd3ePage> {
     }
     return <Widget>[
       SliverPadding(
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: EdgeInsets.only(
+          bottom: Md3ePageLayoutSpec.of(context).bodyBottomInset,
+        ),
         sliver: Md3eCatalogGridSliver(
           itemCount: comics.length,
           itemBuilder:
@@ -231,8 +240,12 @@ class _SearchedHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 16, 16, 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: layout.horizontalInset,
+        vertical: layout.headerVerticalInset,
+      ),
       child: Row(
         children: <Widget>[
           IconButton(
@@ -246,14 +259,7 @@ class _SearchedHeader extends StatelessWidget {
               goCurrentLibraryBrowseFromContext(context);
             },
           ),
-          Flexible(
-            child: Text(
-              title,
-              style: theme.textTheme.titleLarge,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
+          Flexible(child: Md3ePageTitle(title)),
           const SizedBox(width: 12),
           Text(
             '$resultCount',

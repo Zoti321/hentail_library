@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -21,16 +22,12 @@ class Md3eSettingsPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
 
     return Padding(
-      padding: const EdgeInsets.only(
-        top: Md3eLibraryPageHeaderMetrics.verticalPadding,
-        bottom: Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding,
-      ),
+      padding: EdgeInsets.symmetric(vertical: layout.headerVerticalInset),
       child: _Md3eSettingsPageHeaderToolbar(
         title: title,
-        sizeClass: sizeClass,
         onBack: onBack,
         showBack: showBack,
       ),
@@ -41,26 +38,22 @@ class Md3eSettingsPageHeader extends StatelessWidget {
 class _Md3eSettingsPageHeaderToolbar extends StatelessWidget {
   const _Md3eSettingsPageHeaderToolbar({
     required this.title,
-    required this.sizeClass,
     this.onBack,
     required this.showBack,
   });
 
   final String? title;
-  final Md3eWindowSizeClass sizeClass;
   final VoidCallback? onBack;
   final bool showBack;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EColorScheme scheme = theme.colorScheme;
-    final M3ETypeScale type = theme.typeScale;
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final String resolvedTitle = title ?? l10n.navSettings;
 
     return SizedBox(
-      height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
+      height: Md3ePageLayoutSpec.toolbarRowHeight,
       child: Row(
         children: <Widget>[
           if (showBack)
@@ -79,18 +72,7 @@ class _Md3eSettingsPageHeaderToolbar extends StatelessWidget {
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                resolvedTitle,
-                style: type.headlineSmall.copyWith(
-                  fontSize: Md3eLibraryPageHeaderMetrics.titleFontSize(
-                    sizeClass,
-                  ),
-                  fontWeight: Md3eLibraryPageHeaderMetrics.titleFontWeight(
-                    sizeClass,
-                  ),
-                  color: scheme.onSurface,
-                ),
-              ),
+              child: Md3ePageTitle(resolvedTitle),
             ),
           ),
         ],

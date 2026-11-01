@@ -4,6 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_clear_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -60,7 +61,6 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
-    final M3ETypeScale type = theme.typeScale;
 
     final bool showMenu = sizeClass.isCompact && onOpenNavigation != null;
 
@@ -86,19 +86,7 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                title ?? l10n.historyTitle,
-                style: type.headlineSmall.copyWith(
-                  fontSize: Md3eLibraryPageHeaderMetrics.titleFontSize(
-                    sizeClass,
-                  ),
-                  fontWeight: Md3eLibraryPageHeaderMetrics.titleFontWeight(
-                    sizeClass,
-                  ),
-                  color: scheme.onSurface,
-                  letterSpacing: -0.4,
-                ),
-              ),
+              child: Md3ePageTitle(title ?? l10n.historyTitle),
             ),
           ),
           M3EIconButton(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page_metrics.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -37,57 +38,46 @@ class Md3eHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      windowWidth,
-    );
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final Md3eWindowSizeClass sizeClass = layout.sizeClass;
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
-    final double horizontalPadding =
-        Md3eHomePageMetrics.contentHorizontalPadding(sizeClass);
-    final double maxWidth = Md3eHomePageMetrics.contentMaxWidth(sizeClass);
     final String greeting = l10n.homeGreetingReader(
       l10n.homeGreetingPhraseForHour(DateTime.now().hour),
     );
 
-    final Widget body = Align(
-      alignment: Alignment.topCenter,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Md3eHomePageHeader(onOpenNavigation: onOpenNavigation),
-              Text(
-                greeting,
-                style: theme.typeScale.titleMedium.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-              SizedBox(
-                height: Md3eHomePageMetrics.greetingToSectionSpacing(sizeClass),
-              ),
-              Md3eHomeAggregateStatsSection(counts: aggregateCounts),
-              SizedBox(
-                height: Md3eHomePageMetrics.sectionVerticalSpacing(sizeClass),
-              ),
-              Md3eHomeLibraryManagementSection(
-                libraries: libraries,
-                onLibraryOpen: onLibraryOpen,
-                onLibraryAction: onLibraryAction,
-                onAddLocalLibrary: onAddLocalLibrary,
-                onAddRemoteLibrary: onAddRemoteLibrary,
-                onLibrariesReorder: onLibrariesReorder,
-              ),
-              SizedBox(
-                height: Md3eHomePageMetrics.sectionVerticalSpacing(sizeClass),
-              ),
-            ],
+    final Widget body = Padding(
+      padding: EdgeInsets.symmetric(horizontal: layout.horizontalInset),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Md3eHomePageHeader(onOpenNavigation: onOpenNavigation),
+          Text(
+            greeting,
+            style: theme.typeScale.titleMedium.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
           ),
-        ),
+          SizedBox(
+            height: Md3eHomePageMetrics.greetingToSectionSpacing(sizeClass),
+          ),
+          Md3eHomeAggregateStatsSection(counts: aggregateCounts),
+          SizedBox(
+            height: Md3eHomePageMetrics.sectionVerticalSpacing(sizeClass),
+          ),
+          Md3eHomeLibraryManagementSection(
+            libraries: libraries,
+            onLibraryOpen: onLibraryOpen,
+            onLibraryAction: onLibraryAction,
+            onAddLocalLibrary: onAddLocalLibrary,
+            onAddRemoteLibrary: onAddRemoteLibrary,
+            onLibrariesReorder: onLibrariesReorder,
+          ),
+          SizedBox(
+            height: Md3eHomePageMetrics.sectionVerticalSpacing(sizeClass),
+          ),
+        ],
       ),
     );
 

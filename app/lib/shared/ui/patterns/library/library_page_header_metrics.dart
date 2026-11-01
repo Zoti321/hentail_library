@@ -10,13 +10,6 @@ enum Md3eLibraryPageHeaderLayout {
 
 /// MASTER §5.1 漫画库页内头部尺寸。
 abstract final class Md3eLibraryPageHeaderMetrics {
-  static const double toolbarHeight = 44;
-
-  /// 与生产 `kLibraryHeaderVerticalPadding` 一致；页顶不再额外叠一层 browse 外边距。
-  static const double verticalPadding = 10;
-
-  /// Browse 粘滞头无内嵌 tabs 时，缩小底距以免与 [Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing] 叠成过大空隙。
-  static const double browsePinnedHeaderBottomPadding = 4;
   static const double actionIconSize = 20;
 
   /// 与旧 Baseline 库页 display target tabs 一致的两 tab 间距。
@@ -71,26 +64,6 @@ abstract final class Md3eLibraryPageHeaderMetrics {
 
   static Md3eLibraryPageHeaderLayout layoutFor(Md3eWindowSizeClass sizeClass) {
     return Md3eLibraryPageHeaderLayout.titleAndActionsOnly;
-  }
-
-  static double contentHorizontalPadding(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 16,
-      Md3eWindowSizeClass.medium => 28,
-      _ => 48,
-    };
-  }
-
-  static double titleFontSize(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.extraLarge || Md3eWindowSizeClass.large => 32,
-      Md3eWindowSizeClass.expanded => 28,
-      Md3eWindowSizeClass.medium || Md3eWindowSizeClass.compact => 24,
-    };
-  }
-
-  static FontWeight titleFontWeight(Md3eWindowSizeClass sizeClass) {
-    return sizeClass.isCompact ? FontWeight.w700 : FontWeight.w600;
   }
 
   static double actionSpacing(Md3eWindowSizeClass sizeClass) {

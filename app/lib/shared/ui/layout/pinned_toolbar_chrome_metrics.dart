@@ -1,30 +1,12 @@
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/spacing.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 漫画库 / 漫画详情 / 系列详情粘滞顶栏共用尺寸与 elevation。
+/// 粘滞顶栏的共享 chrome 常量（工具行高度、抬起阴影、内嵌水平内边距）。
+/// 上下留白与页头到正文间距已统一到 Md3ePageLayoutSpec。
 abstract final class Md3ePinnedToolbarChromeMetrics {
-  static const double toolbarRowHeight = 48;
+  static const double toolbarRowHeight = Md3ePageLayoutSpec.toolbarRowHeight;
   static const double innerHorizontalInset = 4;
 
   /// 内容在 [SliverPersistentHeader] 下滚动时抬起阴影（顶栏静止时为 level0）。
   static const double pinnedHeaderElevation = M3EElevation.level1;
-
-  static double topPadding(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 6,
-      _ => 8,
-    };
-  }
-
-  static double bottomPadding(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 0,
-      _ => 2,
-    };
-  }
-
-  /// 粘滞顶栏与首屏正文之间的间距（漫画 / 系列详情共用）。
-  static double bodyBelowHeaderSpacing(Md3eWindowSizeClass sizeClass) =>
-      Md3eSpacing.majorSectionBelowHeader(sizeClass);
 }

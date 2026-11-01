@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -29,6 +29,13 @@ class Md3eCatalogGridLayout {
 
 /// Responsive catalog grid cell metrics (aligned with production library tiers).
 abstract final class Md3eCatalogGridMetrics {
+  /// 书库网格左右留白：与页面正文共用 [Md3ePageLayoutSpec]（含超宽窗口的居中偏移）。
+  static double _horizontalInsetFor(double viewportWidth) {
+    return Md3ePageLayoutSpec.resolve(
+      Md3eLayoutContext.fromPlatform(viewportWidth: viewportWidth),
+    ).horizontalInset;
+  }
+
   /// Max cross-axis extent per M3 window class (wider on large / XL).
   static double maxCrossAxisExtent(Md3eWindowSizeClass window) {
     return switch (window) {
@@ -52,8 +59,7 @@ abstract final class Md3eCatalogGridMetrics {
   }
 
   static int crossAxisCount(double viewportWidth, Md3eWindowSizeClass window) {
-    final double horizontalMargin =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(window);
+    final double horizontalMargin = _horizontalInsetFor(viewportWidth);
     final double innerWidth = math.max(0, viewportWidth - horizontalMargin * 2);
     return _crossAxisCountForInnerWidth(
       innerWidth,
@@ -99,8 +105,7 @@ abstract final class Md3eCatalogGridMetrics {
       viewportWidth,
     );
     final double margin =
-        horizontalMargin ??
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+        horizontalMargin ?? _horizontalInsetFor(viewportWidth);
     final double innerWidth = math.max(0, viewportWidth - margin * 2);
     final double gutter = gridSpacing(sizeClass);
     final int count = _crossAxisCountForInnerWidth(

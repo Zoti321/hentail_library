@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -170,9 +170,8 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
     }
 
     final AppLocalizations l10n = context.l10n;
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
     final double horizontalInset =
-        Md3eLibraryEditFormMetrics.contentHorizontalPadding(sizeClass);
+        Md3ePageLayoutSpec.of(context).horizontalInset;
 
     return M3EDialog(
       title: _Md3eLibraryEditDialog._titleForIntent(l10n, widget.intent),

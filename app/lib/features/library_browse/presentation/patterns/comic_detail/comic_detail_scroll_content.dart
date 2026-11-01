@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/comic_detail_page_metrics.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/comic_detail/comic_detail_metadata_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/comic_detail/comic_detail_primary_block.dart';
@@ -23,11 +23,10 @@ class Md3eComicDetailScrollContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final double topSpacing =
-        Md3eComicDetailPageMetrics.catalogBodyTopSpacing(sizeClass);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double topSpacing = layout.headerToBodyGap;
     final double primaryToMetadata =
-        Md3eComicDetailPageMetrics.primaryToMetadataSpacing(sizeClass);
+        Md3eComicDetailPageMetrics.primaryToMetadataSpacing(layout.sizeClass);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/filled_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 元数据页粘滞头高度（与 Md3eLibraryPageHeaderMetrics 同款留白）。
-const double kMetadataMd3eHeaderExtent =
-    Md3eLibraryPageHeaderMetrics.verticalPadding +
-    Md3eLibraryPageHeaderMetrics.toolbarHeight +
-    Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding;
-
-/// 粘滞头：普通模式为标题 + 数量 + 操作；合并模式为取消 + 「合并 N 个 tags」。
+/// 粘滞头：普通模式为标题 + 操作；合并模式为取消 + 「合并 N 个 tags」。
+///
+/// 上下留白与水平留白由外层 [Md3ePageHeaderDelegate] 提供，本组件只负责工具行。
 class MetadataMd3eHeader extends StatelessWidget {
   const MetadataMd3eHeader({
     this.onOpenNavigation,
@@ -30,9 +27,6 @@ class MetadataMd3eHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EColorScheme scheme = theme.colorScheme;
-    final M3ETypeScale type = theme.typeScale;
 
     final Widget content;
     if (onExitMergeSelection != null) {
@@ -68,31 +62,15 @@ class MetadataMd3eHeader extends StatelessWidget {
             ),
             const SizedBox(width: 8),
           ],
-          Flexible(
-            child: Text(
-              l10n.navMetadata,
-              overflow: TextOverflow.ellipsis,
-              style: type.headlineSmall.copyWith(
-                color: scheme.onSurface,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.4,
-              ),
-            ),
-          ),
+          Flexible(child: Md3ePageTitle(l10n.navMetadata)),
           const Spacer(),
         ],
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: Md3eLibraryPageHeaderMetrics.verticalPadding,
-        bottom: Md3eLibraryPageHeaderMetrics.browsePinnedHeaderBottomPadding,
-      ),
-      child: SizedBox(
-        height: Md3eLibraryPageHeaderMetrics.toolbarHeight,
-        child: content,
-      ),
+    return SizedBox(
+      height: Md3ePageLayoutSpec.toolbarRowHeight,
+      child: content,
     );
   }
 }

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,14 +15,10 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_entity_dialog.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_interaction.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_draft_entity_chip.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kMergeConfirmSkipKey = 'metadata_merge_confirm_skip';
@@ -92,11 +90,13 @@ class _MetadataManagementPageState
           autofocus: true,
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              final Md3eWindowSizeClass sizeClass =
-                  Md3eWindowSizeClass.fromWidth(constraints.maxWidth);
               return _buildPage(
                 context: context,
-                sizeClass: sizeClass,
+                layout: Md3ePageLayoutSpec.resolve(
+                  Md3eLayoutContext.fromPlatform(
+                    viewportWidth: constraints.maxWidth,
+                  ),
+                ),
                 selectedIndex: selectedIndex,
               );
             },
@@ -108,7 +108,7 @@ class _MetadataManagementPageState
 
   Widget _buildPage({
     required BuildContext context,
-    required Md3eWindowSizeClass sizeClass,
+    required Md3ePageLayoutSpec layout,
     required int selectedIndex,
   }) {
     final ManagedNamedFacetKind kind = metadataTabKind(selectedIndex);
@@ -118,8 +118,7 @@ class _MetadataManagementPageState
     final int count = state.hasSearchQuery
         ? state.items.length
         : state.totalCount;
-    final double horizontal =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+    final double horizontal = layout.horizontalInset;
     final bool mergeMode = _mergeTarget != null;
     final bool useMobileCreateDialog =
         md3eManagementCreateInteractionOf(context) ==
@@ -135,27 +134,25 @@ class _MetadataManagementPageState
           slivers: <Widget>[
             SliverPersistentHeader(
               pinned: true,
-              delegate: _MetadataHeaderDelegate(
-                extent: kMetadataMd3eHeaderExtent,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontal),
-                  child: MetadataMd3eHeader(
-                    onOpenNavigation: appShellPageNavigationOpener(context),
-                    mergeSelectionCount: mergeMode
-                        ? 1 + _mergeSources.length
-                        : 0,
-                    onExitMergeSelection: mergeMode
-                        ? _exitMergeSelection
-                        : null,
-                    onMergeSelection: mergeMode
-                        ? () => unawaited(_mergeSelectedNames())
-                        : null,
-                  ),
+              delegate: Md3ePageHeaderDelegate(
+                layout: layout,
+                child: MetadataMd3eHeader(
+                  onOpenNavigation: appShellPageNavigationOpener(context),
+                  mergeSelectionCount: mergeMode ? 1 + _mergeSources.length : 0,
+                  onExitMergeSelection: mergeMode ? _exitMergeSelection : null,
+                  onMergeSelection: mergeMode
+                      ? () => unawaited(_mergeSelectedNames())
+                      : null,
                 ),
               ),
             ),
             SliverPadding(
-              padding: EdgeInsets.fromLTRB(horizontal, 12, horizontal, 0),
+              padding: EdgeInsets.fromLTRB(
+                horizontal,
+                layout.headerToBodyGap,
+                horizontal,
+                0,
+              ),
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -339,40 +336,6 @@ class _MetadataManagementPageState
       return;
     }
     ref.read(namedFacetManagementControllerProvider(kind).notifier).loadMore();
-  }
-}
-
-class _MetadataHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _MetadataHeaderDelegate({required this.extent, required this.child});
-
-  final double extent;
-  final Widget child;
-
-  @override
-  double get minExtent => extent;
-
-  @override
-  double get maxExtent => extent;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    return Material(
-      color: md3eLabBrowseCanvasColor(scheme),
-      elevation: shrinkOffset > 0 || overlapsContent ? 2 : 0,
-      shadowColor: scheme.shadow,
-      surfaceTintColor: Colors.transparent,
-      child: Align(alignment: Alignment.topCenter, child: child),
-    );
-  }
-
-  @override
-  bool shouldRebuild(covariant _MetadataHeaderDelegate oldDelegate) {
-    return oldDelegate.extent != extent || oldDelegate.child != child;
   }
 }
 

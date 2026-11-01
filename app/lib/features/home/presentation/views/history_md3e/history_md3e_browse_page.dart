@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_browse_entry.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_browse_content.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
@@ -72,12 +71,21 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
 
   @override
   Widget build(BuildContext context) {
-    final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      viewportWidth,
+    // 按页面真实视口宽度解析（shell 侧栏会压缩内容区），与管理页保持同一来源。
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return _buildContent(
+          context,
+          Md3ePageLayoutSpec.resolve(
+            Md3eLayoutContext.fromPlatform(viewportWidth: constraints.maxWidth),
+          ),
+        );
+      },
     );
-    final double horizontal =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+  }
+
+  Widget _buildContent(BuildContext context, Md3ePageLayoutSpec layout) {
+    final double horizontal = layout.horizontalInset;
 
     final List<Md3eHistoryTimeGroup<HistoryMd3eBrowseEntry>> groups =
         groupHistoryByTimeSection<HistoryMd3eBrowseEntry>(
@@ -101,16 +109,16 @@ class _HistoryMd3eBrowsePageState extends State<HistoryMd3eBrowsePage> {
           SliverPersistentHeader(
             pinned: true,
             delegate: Md3ePageHeaderDelegate(
-              pageHorizontal: horizontal,
+              layout: layout,
               child: header,
             ),
           ),
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               horizontal,
-              Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(sizeClass),
+              layout.headerToBodyGap,
               horizontal,
-              Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
+              layout.bodyBottomInset,
             ),
             sliver: SliverToBoxAdapter(
               child: Md3eHistoryBrowseContent<HistoryMd3eBrowseEntry>(

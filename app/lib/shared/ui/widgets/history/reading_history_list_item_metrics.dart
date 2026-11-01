@@ -1,8 +1,8 @@
 import 'dart:math' as math;
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
 import 'package:hentai_library/core/util/platform_desktop.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Resolved geometry for one [Md3eReadingHistoryListItem] at a window class.
@@ -153,7 +153,9 @@ abstract final class Md3eReadingHistoryListItemMetrics {
     final Md3eReadingHistoryListItemSpec itemSpec = specFor(window);
     final double inset =
         horizontalInset ??
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(window);
+        Md3ePageLayoutSpec.resolve(
+          Md3eLayoutContext.fromPlatform(viewportWidth: viewportWidth),
+        ).horizontalInset;
     final double innerWidth = math.max(0, viewportWidth - inset * 2);
     final double gap = _gap(window);
     final int columnCap = _columnCap(window);

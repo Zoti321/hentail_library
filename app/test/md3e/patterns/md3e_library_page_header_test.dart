@@ -4,6 +4,7 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_display_target_tabs.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 
 import '../../support/pump_md3e_app.dart';
@@ -59,10 +60,12 @@ void main() {
     WidgetTester tester,
   ) async {
     const double windowWidth = Md3eBreakpoints.previewWidthMedium;
-    final double horizontal =
-        Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(
-          Md3eWindowSizeClass.medium,
-        );
+    final double horizontal = Md3ePageLayoutSpec.resolve(
+      const Md3eLayoutContext(
+        viewportWidth: windowWidth,
+        inputMode: LayoutInputMode.touch,
+      ),
+    ).horizontalInset;
     final double contentWidth = windowWidth - horizontal * 2;
 
     await pumpMd3eApp(

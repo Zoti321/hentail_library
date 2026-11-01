@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_empty_body.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_record_summary.dart';
 import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
@@ -28,7 +27,7 @@ class Md3eHistoryBrowseContent<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final M3ESpacing spacing = M3ETheme.of(context).spacing;
 
     return Column(
@@ -39,9 +38,7 @@ class Md3eHistoryBrowseContent<T> extends StatelessWidget {
           SizedBox(height: spacing.sm),
           searchField!,
         ],
-        SizedBox(
-          height: Md3eLibraryBrowsePageMetrics.catalogBodyTopSpacing(sizeClass),
-        ),
+        SizedBox(height: layout.headerToBodyGap),
         if (groups.isEmpty)
           Md3eHistoryEmptyBody(message: emptyMessage)
         else

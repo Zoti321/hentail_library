@@ -3,6 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -82,19 +83,7 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
-    final M3EColorScheme scheme = theme.colorScheme;
-    final M3ETypeScale type = theme.typeScale;
-
-    final Widget leading = Text(
-      title ?? l10n.libraryTitle,
-      style: type.headlineSmall.copyWith(
-        fontSize: Md3eLibraryPageHeaderMetrics.titleFontSize(sizeClass),
-        fontWeight: Md3eLibraryPageHeaderMetrics.titleFontWeight(sizeClass),
-        color: scheme.onSurface,
-        letterSpacing: -0.4,
-      ),
-    );
+    final Widget leading = Md3ePageTitle(title ?? l10n.libraryTitle);
 
     final Widget actions = _Md3eLibraryHeaderActions(
       sizeClass: sizeClass,

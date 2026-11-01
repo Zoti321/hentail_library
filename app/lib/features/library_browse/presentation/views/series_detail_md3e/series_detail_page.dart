@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/series_detail_page_metrics.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
@@ -195,12 +194,9 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final double horizontalPadding =
-        Md3eSeriesDetailPageMetrics.contentHorizontalPadding(sizeClass);
-    final double introTop = Md3eSeriesDetailPageMetrics.introTopSpacing(
-      sizeClass,
-    );
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double horizontalPadding = layout.horizontalInset;
+    final double introTop = layout.headerToBodyGap;
 
     final Widget header = Md3eSeriesDetailPageHeader(
       onBack: _resolveVoid(widget.onBack),
@@ -221,7 +217,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
               SliverPersistentHeader(
                 pinned: true,
                 delegate: Md3ePageHeaderDelegate(
-                  pageHorizontal: horizontalPadding,
+                  layout: layout,
                   child: header,
                 ),
               ),

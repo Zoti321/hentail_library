@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/list_detail_adaptive_layout.dart';
 import 'package:hentai_library/shared/ui/layout/settings_page_metrics.dart';
 import 'package:hentai_library/shared/ui/motion/motion.dart';
@@ -109,13 +109,9 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
   }
 
   Widget _buildPage(BuildContext context, {required bool listDetailWide}) {
-    final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      windowWidth,
-    );
     final AppLocalizations l10n = context.l10n;
-    final double horizontalPadding =
-        Md3eSettingsPageMetrics.contentHorizontalPadding(sizeClass);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double horizontalPadding = layout.horizontalInset;
 
     return PopScope<Object?>(
       canPop:
@@ -152,9 +148,10 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
             child: Padding(
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding,
-                0,
+                layout.headerToBodyGap,
                 horizontalPadding,
-                MediaQuery.viewPaddingOf(context).bottom + 16,
+                MediaQuery.viewPaddingOf(context).bottom +
+                    layout.bodyBottomInset,
               ),
               child: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {

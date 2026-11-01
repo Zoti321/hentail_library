@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
 import 'history_browse_entry.dart';
 
@@ -68,12 +67,8 @@ class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
 
   @override
   Widget build(BuildContext context) {
-    final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      viewportWidth,
-    );
-    final double horizontal =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double horizontal = layout.horizontalInset;
 
     final List<Md3eHistoryTimeGroup<Md3eHistoryBrowseEntry>> groups =
         groupHistoryByTimeSection<Md3eHistoryBrowseEntry>(
@@ -94,16 +89,16 @@ class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
         SliverPersistentHeader(
           pinned: true,
           delegate: Md3ePageHeaderDelegate(
-            pageHorizontal: horizontal,
+            layout: layout,
             child: header,
           ),
         ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
             horizontal,
-            Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(sizeClass),
+            layout.headerToBodyGap,
             horizontal,
-            Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
+            layout.bodyBottomInset,
           ),
           sliver: SliverToBoxAdapter(
             child: Md3eHistoryBrowseContent<Md3eHistoryBrowseEntry>(

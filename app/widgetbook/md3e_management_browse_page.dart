@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_catalog_toolbar.dart';
@@ -99,8 +100,8 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
       viewportWidth,
     );
-    final double horizontal =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double horizontal = layout.horizontalInset;
 
     final Md3eManagementCreateInteraction interaction =
         md3eManagementCreateInteractionOf(
@@ -118,7 +119,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
 
     final double scrollBottomPadding = createEnabled
         ? Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass)
-        : Md3eLibraryBrowsePageMetrics.catalogBodyTopSpacing(sizeClass);
+        : layout.headerToBodyGap;
 
     return Stack(
       children: <Widget>[
@@ -129,16 +130,14 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
             SliverPersistentHeader(
               pinned: true,
               delegate: Md3ePageHeaderDelegate(
-                pageHorizontal: horizontal,
+                layout: layout,
                 child: header,
               ),
             ),
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 horizontal,
-                Md3eLibraryBrowsePageMetrics.catalogToolbarTopSpacing(
-                  sizeClass,
-                ),
+                layout.headerToBodyGap,
                 horizontal,
                 scrollBottomPadding,
               ),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/author_detail_md3e/author_detail_md3e_body.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/detail_status/detail_back_header.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
 /// 作者资料页（独立路由 `/author/:id`）。
 class AuthorDetailMd3ePage extends StatelessWidget {
@@ -13,6 +14,7 @@ class AuthorDetailMd3ePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     return PopScope(
       canPop: context.canPop(),
       onPopInvokedWithResult: (bool didPop, Object? result) {
@@ -29,13 +31,13 @@ class AuthorDetailMd3ePage extends StatelessWidget {
             const DetailBackHeader(),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 960),
-                    child: AuthorDetailMd3eBody(authorId: authorId),
-                  ),
+                padding: EdgeInsets.fromLTRB(
+                  layout.horizontalInset,
+                  layout.headerToBodyGap,
+                  layout.horizontalInset,
+                  layout.bodyBottomInset,
                 ),
+                child: AuthorDetailMd3eBody(authorId: authorId),
               ),
             ),
           ],

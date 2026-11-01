@@ -1,9 +1,6 @@
-import 'package:flutter/painting.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/pinned_toolbar_chrome_metrics.dart';
 import 'package:hentai_library/shared/ui/layout/spacing.dart';
-import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Layout tokens for [Md3eComicDetailPage] (Lab; spacing tuned for sticky header + scroll body).
 abstract final class Md3eComicDetailPageMetrics {
@@ -17,26 +14,6 @@ abstract final class Md3eComicDetailPageMetrics {
 
   static const double seriesMenuWidth = 320;
   static const double seriesMenuMaxHeight = 360;
-
-  static double contentHorizontalPadding(Md3eWindowSizeClass sizeClass) {
-    return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => Md3eSpacing.space16,
-      Md3eWindowSizeClass.medium => Md3eSpacing.space24,
-      Md3eWindowSizeClass.expanded => Md3eSpacing.space32,
-      Md3eWindowSizeClass.large => Md3eSpacing.space40,
-      Md3eWindowSizeClass.extraLarge =>
-        Md3eLibraryPageHeaderMetrics.contentHorizontalPadding(sizeClass),
-    };
-  }
-
-  static double headerTopPadding(Md3eWindowSizeClass sizeClass) =>
-      Md3ePinnedToolbarChromeMetrics.topPadding(sizeClass);
-
-  static double headerBottomPadding(Md3eWindowSizeClass sizeClass) =>
-      Md3ePinnedToolbarChromeMetrics.bottomPadding(sizeClass);
-
-  static double catalogBodyTopSpacing(Md3eWindowSizeClass sizeClass) =>
-      Md3ePinnedToolbarChromeMetrics.bodyBelowHeaderSpacing(sizeClass);
 
   static double primaryToMetadataSpacing(Md3eWindowSizeClass sizeClass) {
     return switch (sizeClass) {
@@ -77,25 +54,6 @@ abstract final class Md3eComicDetailPageMetrics {
       Md3eWindowSizeClass.compact => Md3eSpacing.space12,
       _ => Md3eSpacing.space16,
     };
-  }
-
-  static TextStyle titleTextStyle({
-    required Md3eWindowSizeClass sizeClass,
-    required M3ETypeScale typeScale,
-    required Color color,
-  }) {
-    final TextStyle base = switch (sizeClass) {
-      Md3eWindowSizeClass.compact => typeScale.titleLarge,
-      Md3eWindowSizeClass.medium => typeScale.headlineSmall,
-      Md3eWindowSizeClass.expanded => typeScale.headlineSmall,
-      _ => typeScale.headlineMedium,
-    };
-    return base.copyWith(
-      fontWeight: FontWeight.w600,
-      letterSpacing: -0.4,
-      color: color,
-      height: 1.25,
-    );
   }
 
   static const double scrollBottomInset = Md3eSpacing.space24;

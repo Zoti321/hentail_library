@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -137,8 +138,8 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
       MediaQuery.sizeOf(context).width,
     );
-    final double horizontal =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final double horizontal = layout.horizontalInset;
     final LibraryDisplayTarget target = facade.displayTarget;
     final LibraryPagination? pagination = switch (target) {
       LibraryDisplayTarget.comics => comicsCatalog?.pagination,
@@ -183,12 +184,17 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
               SliverPersistentHeader(
                 pinned: true,
                 delegate: Md3ePageHeaderDelegate(
-                  pageHorizontal: horizontal,
+                  layout: layout,
                   child: header,
                 ),
               ),
               SliverPadding(
-                padding: EdgeInsets.fromLTRB(horizontal, 16, horizontal, 0),
+                padding: EdgeInsets.fromLTRB(
+                  horizontal,
+                  layout.headerToBodyGap,
+                  horizontal,
+                  0,
+                ),
                 sliver: SliverToBoxAdapter(
                   child: Md3eLibraryCatalogToolbar(
                     displayTarget: target,

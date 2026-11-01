@@ -1,8 +1,7 @@
 import 'dart:math' as math;
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
-import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
@@ -67,11 +66,7 @@ class _Md3eManagementCreateEntityDialogState
       M3EButtonSize.sm,
     );
     final Size size = MediaQuery.sizeOf(context);
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      size.width,
-    );
-    final double horizontalInset =
-        Md3eLibraryBrowsePageMetrics.contentHorizontalPadding(sizeClass);
+    final double horizontalInset = Md3ePageLayoutSpec.of(context).horizontalInset;
     final double contentWidth = math.min(
       _kMd3eManagementCreateDialogMaxWidth,
       size.width - horizontalInset * 2,
