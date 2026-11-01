@@ -163,9 +163,9 @@ class ResponsiveAppShell extends StatelessWidget {
         return Md3eWindowCloseListener(
           child: Scaffold(
             key: appShellScaffoldKey,
-            backgroundColor: M3ETheme.of(context)
-                .colorScheme
-                .surfaceContainerLow,
+            backgroundColor: md3eLabBrowseCanvasColor(
+              M3ETheme.of(context).colorScheme,
+            ),
             drawer: useDrawer && !hideAppSidebar
                 ? Drawer(
                     width: DesktopSidebar.expandedWidth,
@@ -241,7 +241,7 @@ class _ShellTitleBar extends StatelessWidget {
     }
 
     return ColoredBox(
-      color: Theme.of(context).colorScheme.surface,
+      color: md3eLabBrowseCanvasColor(M3ETheme.of(context).colorScheme),
       child: const SafeArea(bottom: false, child: SizedBox.shrink()),
     );
   }

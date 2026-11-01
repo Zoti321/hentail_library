@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar_metrics.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_window_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -27,7 +28,7 @@ class Md3eDesktopTitleBar extends StatelessWidget {
   final VoidCallback? onWindowMaximize;
   final VoidCallback? onWindowClose;
 
-  /// Defaults to [M3EColorScheme.surfaceContainerLow] (lab chrome).
+  /// Defaults to [md3eLabBrowseCanvasColor] (`surfaceContainerLow`).
   final Color? backgroundColor;
 
   @override
@@ -38,7 +39,7 @@ class Md3eDesktopTitleBar extends StatelessWidget {
       height: Md3eDesktopTitleBarMetrics.height,
       width: double.infinity,
       child: ColoredBox(
-        color: backgroundColor ?? scheme.surfaceContainerLow,
+        color: backgroundColor ?? md3eLabBrowseCanvasColor(scheme),
         child: Stack(
           children: <Widget>[
             // Bottom layer: empty title-bar area drags the window; buttons above
