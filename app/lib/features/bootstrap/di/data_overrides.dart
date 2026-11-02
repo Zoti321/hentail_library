@@ -4,7 +4,7 @@ import 'package:hentai_library/features/read_session/data/adapters/reader_sessio
 import 'package:hentai_library/features/library_admin/data/adapters/library_revision_frb_adapter.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_repository_impl.dart';
 import 'package:hentai_library/features/named_metadata/data/repositories/author_repository_impl.dart';
-import 'package:hentai_library/features/library_browse/data/repositories/comic_repository_impl.dart';
+import 'package:hentai_library/features/library_browse/data/comic/comic_repository_impl.dart';
 import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
 import 'package:hentai_library/shared/data/repositories/comic_thumbnail_repository_impl.dart';
 import 'package:hentai_library/features/home/data/repositories/home_page_repository_impl.dart';
@@ -12,7 +12,7 @@ import 'package:hentai_library/features/library_admin/data/repositories/library_
 import 'package:hentai_library/features/named_metadata/data/repositories/named_facet_dictionary_repository_impl.dart';
 import 'package:hentai_library/features/named_metadata/data/repositories/named_facet_management_repository_impl.dart';
 import 'package:hentai_library/features/reading_history/data/repositories/reading_history_repository_impl.dart';
-import 'package:hentai_library/features/library_browse/data/repositories/series_repository_impl.dart';
+import 'package:hentai_library/features/library_browse/data/series/series_repository_impl.dart';
 import 'package:hentai_library/features/named_metadata/data/repositories/tag_repository_impl.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary_repository.dart';

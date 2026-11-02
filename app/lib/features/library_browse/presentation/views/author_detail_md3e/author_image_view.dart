@@ -5,7 +5,7 @@ import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/shared/ui/motion/app_motion.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
-import 'package:hentai_library/features/library_browse/presentation/view_models/author_detail_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Author image：底层先显示库缩略图，高清图就绪后淡入覆盖；高清不可用时停留在缩略图。

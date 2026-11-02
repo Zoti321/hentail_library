@@ -23,12 +23,23 @@
 **已完成（2026-11-02）**：原 `domain/*.dart` 已迁入 `comic/`、`series/`、`browse/`。  
 `shared/domain/**` strangler export 路径已同步；feature 内请 import **`features/library_browse/domain/<zone>/...`** 或继续经 shared shim（过渡期）。
 
-## 迁移阶段（presentation / data）
+## `data/` 与 `presentation/view_models/` 状态
 
-1. **Phase 1 — domain** ✅（本目录文档 + 物理子目录 + import 全库更新）
-2. **Phase 2 — data**：`data/repositories/*` 与 impl 按 comic/series/browse 分子目录（impl 仍实现同 zone 的 domain 契约）
-3. **Phase 3 — presentation**：按上表 `git mv` views / patterns / view_models；路由与 Widgetbook import 批量改；`app/test/gate/manifest.txt` 路径更新
-4. **Phase 4 — 命名**：Cutover 完成后可去文件名中的冗余前缀（非必须）
+**已完成（2026-11-02）**：
+
+| 路径 | 内容 |
+| --- | --- |
+| `data/comic/` | `comic_repository_impl`、`comic_frb_mapper` |
+| `data/series/` | `series_repository_impl` |
+| `presentation/comic/view_models/` | 漫画 metadata、详情导航、smart facet 等 |
+| `presentation/series/view_models/` | 系列详情、metadata editor、成员 catalog |
+| `presentation/browse/view_models/` | 库页 Tab、筛选、搜索、双 catalog controller |
+| `presentation/catalog/view_models/` | `catalog_pagination_engine`、`catalog_selection_notifier` |
+| `presentation/author/view_models/` | `author_detail_notifier` |
+
+内部聚合 export：`presentation/library.dart`（相对路径已指向各 zone）。
+
+## 迁移阶段（presentation views / patterns）
 
 新功能：**先选分区再建文件**；禁止在 `domain/` 根再堆平铺文件。
 

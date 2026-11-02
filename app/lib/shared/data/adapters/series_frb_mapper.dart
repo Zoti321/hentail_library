@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_browse/data/repositories/comic_frb_mapper.dart';
+import 'package:hentai_library/features/library_browse/data/comic/comic_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/library/library_series_projection.dart';
 import 'package:hentai_library/shared/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
