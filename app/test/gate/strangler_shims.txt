@@ -36,3 +36,4 @@ shared/domain/library/current_library_port.dart
 shared/domain/library/comic_metadata_bulk_patch_types.dart
 shared/domain/library/comic_metadata_bulk_patch_port.dart
 shared/domain/library/comic_metadata_bulk_edit_command_port.dart
+shared/domain/comic/comic_display_title.dart

@@ -1,6 +1,4 @@
-import 'package:hentai_library/shared/domain/comic/comic_display_title.dart';
-
-export 'package:hentai_library/shared/domain/comic/comic_display_title.dart';
+import 'package:hentai_library/features/library_browse/domain/comic_display_title.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
