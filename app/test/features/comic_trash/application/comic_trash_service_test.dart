@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/comic_trash/application/comic_trash_service.dart';
-import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
 import 'package:test/test.dart';

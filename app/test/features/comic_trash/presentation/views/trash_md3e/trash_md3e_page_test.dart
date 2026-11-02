@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';

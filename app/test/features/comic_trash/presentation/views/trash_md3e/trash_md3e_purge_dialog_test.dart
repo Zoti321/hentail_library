@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
-import 'package:hentai_library/shared/domain/comic_trash/comic_purge_policy.dart';
+import 'package:hentai_library/features/comic_trash/domain/comic_purge_policy.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../../../../support/pump_md3e_app.dart';

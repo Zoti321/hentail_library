@@ -1,6 +1,6 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/features/comic_trash/application/comic_trash_service.dart';
-import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/features/comic_trash/di/comic_trash.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';

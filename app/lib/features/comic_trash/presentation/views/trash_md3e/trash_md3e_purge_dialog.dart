@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/shared/ui/theme/lab_text.dart';
-import 'package:hentai_library/shared/domain/comic_trash/comic_purge_policy.dart';
+import 'package:hentai_library/features/comic_trash/domain/comic_purge_policy.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 永久删除（Comic purge）前的危险确认框：MD3E 壳 + 勾选闸门（ADR-0023）。

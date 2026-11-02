@@ -12,7 +12,7 @@ import 'package:hentai_library/shared/ui/patterns/library/library_page_header_me
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
-import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
