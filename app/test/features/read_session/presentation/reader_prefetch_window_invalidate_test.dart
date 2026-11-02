@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/domain/repositories/comic_lookup_repositor
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/shared/domain/reading/read_session_page.dart';
 import 'package:hentai_library/shared/domain/reading/reader_page_payload.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_service.dart';
+import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;

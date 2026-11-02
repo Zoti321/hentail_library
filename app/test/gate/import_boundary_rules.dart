@@ -125,6 +125,31 @@ bool isDomainLayerPath(String libRelativePosix) {
   return path.contains('/domain/');
 }
 
+bool isApplicationLayerPath(String libRelativePosix) {
+  final String path = libRelativePosix.replaceAll(r'\', '/');
+  return path.startsWith('features/') && path.contains('/application/');
+}
+
+bool _importTargetsFeatureApplication(String importPath) {
+  return importPath.startsWith('features/') &&
+      importPath.contains('/application/');
+}
+
+bool _importTargetsDataLayer(String importPath) {
+  if (importPath.startsWith('shared/data/')) {
+    return true;
+  }
+  return importPath.startsWith('features/') && importPath.contains('/data/');
+}
+
+bool _importTargetsPresentationLayer(String importPath) {
+  if (isPresentationLayerPath(importPath)) {
+    return true;
+  }
+  return importPath.startsWith('features/') &&
+      importPath.contains('/presentation/');
+}
+
 bool isFrbImportAllowedSource(String libRelativePosix) {
   final String path = libRelativePosix.replaceAll(r'\', '/');
   if (path == 'main.dart') {
@@ -244,6 +269,54 @@ void _checkStructuralRules({
         ),
       );
     }
+    if (_importTargetsFeatureApplication(importPath)) {
+      found.add(
+        violation(
+          ruleId: 'R6',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+    }
+  }
+
+  if (isApplicationLayerPath(sourceRel)) {
+    if (_importTargetsDataLayer(importPath)) {
+      found.add(
+        violation(
+          ruleId: 'R7',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+    }
+    if (_importTargetsPresentationLayer(importPath)) {
+      found.add(
+        violation(
+          ruleId: 'R8',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+    }
+    if (importPath.startsWith('flutter/') ||
+        importPath.startsWith('flutter_')) {
+      found.add(
+        violation(
+          ruleId: 'R9',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+    }
   }
 
   if (targetModule == 'frb_generated' && !isFrbImportAllowedSource(sourceRel)) {
@@ -251,6 +324,18 @@ void _checkStructuralRules({
       found.add(
         violation(
           ruleId: 'R3',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+      return;
+    }
+    if (isApplicationLayerPath(sourceRel)) {
+      found.add(
+        violation(
+          ruleId: 'R10',
           sourceModule: sourceModule,
           targetModule: targetModule,
           sourceFile: sourceRel,

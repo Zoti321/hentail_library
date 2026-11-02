@@ -28,6 +28,12 @@ void main() {
       isFrbImportAllowedSource('features/library_admin/domain/foo.dart'),
       isFalse,
     );
+    expect(
+      isFrbImportAllowedSource(
+        'features/read_session/application/reader_session_service.dart',
+      ),
+      isFalse,
+    );
     expect(isFrbImportAllowedSource('shared/data/adapters/foo.dart'), isTrue);
   });
 
@@ -36,7 +42,7 @@ void main() {
     final List<ImportViolation> structural = structuralViolations(all);
     if (structural.isNotEmpty) {
       fail(
-        'Structural import violations (R1–R5):\n'
+        'Structural import violations (R1–R10):\n'
         '${_formatViolations(structural)}',
       );
     }

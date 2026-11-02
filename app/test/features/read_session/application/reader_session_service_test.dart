@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/domain/repositories/reading_history_reposi
 import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
 import 'package:hentai_library/shared/domain/reading/read_session_page.dart';
 import 'package:hentai_library/shared/domain/reading/reader_page_payload.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_service.dart';
+import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 import 'package:test/test.dart';
 

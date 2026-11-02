@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_service.dart';
+import 'package:hentai_library/features/read_session/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 
 final Provider<ReaderSessionService> readerSessionServiceProvider =

@@ -37,6 +37,7 @@ const Set<String> kWayfinderFeatureModuleIds = <String>{
 };
 
 const Set<String> kWayfinderFeatureLayerDirs = <String>{
+  'application',
   'data',
   'di',
   'domain',

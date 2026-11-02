@@ -44,7 +44,7 @@
 
 |  concern | 测试 / 文件 |
 |----------|-------------|
-| L1 domain↔data、FRB 面 | `import_boundary_test.dart` |
+| L1 domain↔data、FRB 面、application 依赖 | `import_boundary_test.dart` |
 | L2 product 图 ratchet | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
 | L3a shared/ui → features | `shared_ui_no_feature_import_test.dart` |
 | L3b shared/domain → features ratchet | `shared_domain_no_feature_import_test.dart` + baseline 生成器 |
