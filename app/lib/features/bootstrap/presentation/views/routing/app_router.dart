@@ -8,7 +8,7 @@ import 'package:hentai_library/features/app_settings/presentation/views/settings
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/home_md3e_page.dart';
-import 'package:hentai_library/features/reading_history/presentation/views/history_md3e/history_md3e_page.dart';
+import 'package:hentai_library/features/reading_history/presentation/views/history_page.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
@@ -83,7 +83,7 @@ final GoRouter appRouter = GoRouter(
           path: '/history',
           name: '历史记录',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const HistoryMd3ePage()),
+              buildShellNavPage(state: state, child: const HistoryPage()),
         ),
         GoRoute(
           path: '/searched',

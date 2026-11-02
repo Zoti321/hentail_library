@@ -1,42 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-
-import 'history_browse_entry.dart';
-
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_content.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
-export 'history_browse_entry.dart';
-
-/// 阅读历史页 Lab 壳层：粘滞页头 + [Md3eHistoryBrowseContent]。
-class Md3eHistoryBrowsePage extends StatefulWidget {
-  const Md3eHistoryBrowsePage({
+/// 阅读历史 browse 壳：粘滞页头 + 分桶列表（生产 / Widgetbook 共用）。
+class HistoryBrowsePage<T> extends StatefulWidget {
+  const HistoryBrowsePage({
     super.key,
-    required this.entries,
+    required this.items,
+    required this.totalCount,
+    required this.lastReadTimeOf,
     required this.itemBuilder,
     this.onClearAll,
+    this.onOpenNavigation,
     this.scrollController,
     this.clock,
+    this.searchField,
+    this.emptyMessage,
+    this.isLoadingMore = false,
+    this.useLabBrowseCanvas = false,
   });
 
-  final List<Md3eHistoryBrowseEntry> entries;
-  final Widget Function(BuildContext context, Md3eHistoryBrowseEntry entry)
-  itemBuilder;
+  final List<T> items;
+  final int totalCount;
+  final DateTime Function(T item) lastReadTimeOf;
+  final Widget Function(BuildContext context, T item) itemBuilder;
   final VoidCallback? onClearAll;
+  final VoidCallback? onOpenNavigation;
   final ScrollController? scrollController;
-
-  /// 分桶参照时间（测试 / Widgetbook 可注入）。
   final DateTime? clock;
+  final Widget? searchField;
+  final String? emptyMessage;
+  final bool isLoadingMore;
 
-  int get totalCount => entries.length;
+  /// 生产 `/history` 使用 lab browse 画布色；Widgetbook 预览可设为 false。
+  final bool useLabBrowseCanvas;
 
   @override
-  State<Md3eHistoryBrowsePage> createState() => _Md3eHistoryBrowsePageState();
+  State<HistoryBrowsePage<T>> createState() => _HistoryBrowsePageState<T>();
 }
 
-class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
+class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
 
@@ -45,16 +53,6 @@ class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
     super.initState();
     _ownsScrollController = widget.scrollController == null;
     _scrollController = widget.scrollController ?? ScrollController();
-  }
-
-  @override
-  void didUpdateWidget(covariant Md3eHistoryBrowsePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
   }
 
   @override
@@ -70,19 +68,19 @@ class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
     final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 
-    final List<Md3eHistoryTimeGroup<Md3eHistoryBrowseEntry>> groups =
-        groupHistoryByTimeSection<Md3eHistoryBrowseEntry>(
-          widget.entries,
-          (Md3eHistoryBrowseEntry entry) => entry.lastReadTime,
-          clock: widget.clock,
-        );
+    final List<Md3eHistoryTimeGroup<T>> groups = groupHistoryByTimeSection<T>(
+      widget.items,
+      widget.lastReadTimeOf,
+      clock: widget.clock,
+    );
 
     final Widget header = Md3eHistoryPageHeader(
       clearEnabled: widget.totalCount > 0,
       onClearAll: widget.onClearAll,
+      onOpenNavigation: widget.onOpenNavigation,
     );
 
-    return CustomScrollView(
+    final Widget scrollView = CustomScrollView(
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: <Widget>[
@@ -97,13 +95,31 @@ class _Md3eHistoryBrowsePageState extends State<Md3eHistoryBrowsePage> {
             horizontal,
             layout.bodyBottomInset,
           ),
-          sliver: Md3eHistoryBrowseContent<Md3eHistoryBrowseEntry>(
+          sliver: Md3eHistoryBrowseContent<T>(
             totalCount: widget.totalCount,
             groups: groups,
+            searchField: widget.searchField,
+            emptyMessage: widget.emptyMessage,
             itemBuilder: widget.itemBuilder,
           ),
         ),
+        if (widget.isLoadingMore)
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            ),
+          ),
       ],
+    );
+
+    if (!widget.useLabBrowseCanvas) {
+      return scrollView;
+    }
+
+    return ColoredBox(
+      color: md3eLabBrowseCanvasColor(M3ETheme.of(context).colorScheme),
+      child: scrollView,
     );
   }
 }

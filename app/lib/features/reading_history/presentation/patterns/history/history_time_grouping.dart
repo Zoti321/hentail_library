@@ -1,4 +1,6 @@
-/// 阅读历史四档时间分桶（纯逻辑，无 UI / l10n）。
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+
+/// 阅读历史四档时间分桶（纯逻辑 + 分桶标题文案）。
 enum Md3eHistoryTimeSection { today, yesterday, thisWeek, earlier }
 
 /// 展示顺序（仅渲染非空分组）。
@@ -73,4 +75,17 @@ List<Md3eHistoryTimeGroup<T>> groupHistoryByTimeSection<T>(
       if (buckets[section]!.isNotEmpty)
         Md3eHistoryTimeGroup<T>(section: section, items: buckets[section]!),
   ];
+}
+
+/// 分桶标题（今天 / 昨天 / …）。
+String md3eHistoryTimeSectionLabel(
+  AppLocalizations l10n,
+  Md3eHistoryTimeSection section,
+) {
+  return switch (section) {
+    Md3eHistoryTimeSection.today => l10n.historySectionToday,
+    Md3eHistoryTimeSection.yesterday => l10n.historySectionYesterday,
+    Md3eHistoryTimeSection.thisWeek => l10n.historySectionThisWeek,
+    Md3eHistoryTimeSection.earlier => l10n.historySectionEarlier,
+  };
 }

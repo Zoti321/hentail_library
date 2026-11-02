@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/features/reading_history/presentation/views/history_md3e/history_md3e_browse_page.dart';
-import 'package:hentai_library/features/reading_history/presentation/views/history_md3e/history_md3e_page.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
-
+import 'package:hentai_library/features/reading_history/presentation/views/history_page.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
@@ -18,14 +17,14 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
-  group('History MD3E production page', () {
+  group('History production page', () {
     testWidgets('compact page shows nav menu and MD3E header', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 360);
 
       expect(tester.takeException(), isNull);
-      expect(find.byType(HistoryMd3eBrowsePage), findsOneWidget);
+      expect(find.byType(HistoryBrowsePage<HistoryCardItem>), findsOneWidget);
       expect(find.byType(Md3eHistoryPageHeader), findsOneWidget);
       expect(find.text('阅读历史'), findsOneWidget);
       expect(find.byIcon(Symbols.menu), findsOneWidget);
@@ -97,7 +96,7 @@ Future<void> _pumpHistoryPage(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(body: HistoryMd3ePage()),
+        home: const Scaffold(body: HistoryPage()),
       ),
     ),
   );

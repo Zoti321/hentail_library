@@ -7,4 +7,5 @@ List<LocalizationsDelegate<dynamic>> get md3eMaterialLocalizationsDelegates =>
     <LocalizationsDelegate<dynamic>>[
       AppLocalizations.delegate,
       GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
     ];
