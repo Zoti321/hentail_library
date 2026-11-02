@@ -3,8 +3,8 @@ import 'dart:ui' as ui;
 
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/ports/clipboard_image_port.dart';
-import 'package:hentai_library/shared/domain/ports/comic_page_source_port.dart';
+import 'package:hentai_library/features/read_session/domain/clipboard_image_port.dart';
+import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
 
 typedef PageImagePngEncoder = Future<Uint8List> Function(Uint8List imageBytes);
 

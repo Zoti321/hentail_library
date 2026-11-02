@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/shared/data/adapters/remote_credentials_frb.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
+import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
 import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/reader.dart' as rust;
