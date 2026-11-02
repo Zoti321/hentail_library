@@ -24,13 +24,11 @@ rust.ReadingHistoryDto toReadingHistoryDto(entity.ReadingHistory history) {
 
 PagedResult<entity.ReadingHistory> mapPagedReadingHistory(
   rust.PagedReadingHistoryDto dto,
-  int page,
-  int pageSize,
 ) {
   return PagedResult<entity.ReadingHistory>(
     items: dto.items.map(mapReadingHistoryDto).toList(growable: false),
     totalCount: dto.totalCount.toInt(),
-    page: page,
-    pageSize: pageSize,
+    page: dto.page,
+    pageSize: dto.pageSize,
   );
 }

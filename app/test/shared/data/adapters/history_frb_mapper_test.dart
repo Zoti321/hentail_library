@@ -51,7 +51,7 @@ void main() {
     expect(again.lastReadTime, history.lastReadTime);
   });
 
-  test('mapPagedReadingHistory uses caller page and pageSize', () {
+  test('mapPagedReadingHistory uses dto page and pageSize', () {
     final rust.PagedReadingHistoryDto dto = rust.PagedReadingHistoryDto(
       items: <rust.ReadingHistoryDto>[
         rust.ReadingHistoryDto(
@@ -61,9 +61,11 @@ void main() {
         ),
       ],
       totalCount: PlatformInt64Util.from(9),
+      page: 2,
+      pageSize: 5,
     );
 
-    final result = mapPagedReadingHistory(dto, 2, 5);
+    final result = mapPagedReadingHistory(dto);
 
     expect(result.items, hasLength(1));
     expect(result.items.single.comicId, 'c1');

@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/domain/models/models.dart' as entity;
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
+import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
 import 'package:hentai_library/src/rust/api/history.dart' as rust;
 
 class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
@@ -60,37 +61,15 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
     final String? normalizedKeyword = _normalizeKeyword(keyword);
     final rust.PagedReadingHistoryDto page = await guardFrb(
       () => rust.fetchReadingPageFrb(
-        page: request.page,
-        pageSize: request.pageSize,
+        request: rust_comic.PageRequestDto(
+          page: request.page,
+          pageSize: request.pageSize,
+        ),
         keyword: normalizedKeyword,
       ),
       fallbackMessage: '读取阅读历史失败',
     );
-    if (page.totalCount.toInt() <= 0) {
-      return PagedResult<entity.ReadingHistory>(
-        items: const <entity.ReadingHistory>[],
-        totalCount: 0,
-        page: 1,
-        pageSize: request.pageSize,
-      );
-    }
-    final int totalPages =
-        (page.totalCount.toInt() + request.pageSize - 1) ~/ request.pageSize;
-    final int effectivePage = request.page > totalPages
-        ? totalPages
-        : request.page;
-    if (effectivePage != request.page) {
-      final rust.PagedReadingHistoryDto adjusted = await guardFrb(
-        () => rust.fetchReadingPageFrb(
-          page: effectivePage,
-          pageSize: request.pageSize,
-          keyword: normalizedKeyword,
-        ),
-        fallbackMessage: '读取阅读历史失败',
-      );
-      return mapPagedReadingHistory(adjusted, effectivePage, request.pageSize);
-    }
-    return mapPagedReadingHistory(page, effectivePage, request.pageSize);
+    return mapPagedReadingHistory(page);
   }
 
   String? _normalizeKeyword(String? keyword) {

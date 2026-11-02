@@ -152,23 +152,32 @@ async fn series_page_ids(library: &LibraryDto) -> Vec<String> {
 }
 
 async fn history_ids() -> Vec<String> {
-    fetch_reading_page(1, 100, None)
-        .await
-        .expect("history")
-        .items
-        .into_iter()
-        .map(|h| h.comic_id)
-        .collect()
+    fetch_reading_page(
+        PageRequestDto {
+            page: 1,
+            page_size: 100,
+        },
+        None,
+    )
+    .await
+    .expect("history")
+    .items
+    .into_iter()
+    .map(|h| h.comic_id)
+    .collect()
 }
 
 async fn trashed_ids() -> Vec<String> {
-    fetch_trashed_comics_page(1, 100)
-        .await
-        .expect("trashed page")
-        .items
-        .into_iter()
-        .map(|t| t.comic.comic_id)
-        .collect()
+    fetch_trashed_comics_page(PageRequestDto {
+        page: 1,
+        page_size: 100,
+    })
+    .await
+    .expect("trashed page")
+    .items
+    .into_iter()
+    .map(|t| t.comic.comic_id)
+    .collect()
 }
 
 /// Home 的 watch 接口先推一次快照；回调返回 Err 让其立即退出。
@@ -212,7 +221,15 @@ fn trash_hides_comic_from_browse_surfaces_and_keeps_record() {
 
             assert!(!catalog_ids(&library).await.contains(&solo));
             assert_eq!(count_all().await.expect("count"), count_before - 1);
-            let search = search_by_keyword_page("solo", 1, 50).await.expect("search");
+            let search = search_by_keyword_page(
+                "solo",
+                PageRequestDto {
+                    page: 1,
+                    page_size: 50,
+                },
+            )
+            .await
+            .expect("search");
             assert_eq!(search.total_count, 0);
             let by_tag = search_by_tag_expression(vec!["trash-tag".to_string()], vec![], vec![])
                 .await
@@ -589,7 +606,12 @@ fn purge_remote_only_clears_record() {
             .expect("insert meta");
 
             trash_comics(vec![comic_id.clone()]).await.expect("trash");
-            let page = fetch_trashed_comics_page(1, 10).await.expect("page");
+            let page = fetch_trashed_comics_page(PageRequestDto {
+                page: 1,
+                page_size: 10,
+            })
+            .await
+            .expect("page");
             assert_eq!(page.items[0].library_kind, "remote");
             assert_eq!(page.items[0].library_name, "Remote");
             let counts = count_trashed_comics().await.expect("counts");
@@ -613,7 +635,12 @@ fn trashed_list_orders_by_deleted_at_desc_with_library_info() {
             tokio::time::sleep(std::time::Duration::from_millis(5)).await;
             trash_comics(vec![solo.clone()]).await.expect("trash solo");
 
-            let page = fetch_trashed_comics_page(1, 10).await.expect("page");
+            let page = fetch_trashed_comics_page(PageRequestDto {
+                page: 1,
+                page_size: 10,
+            })
+            .await
+            .expect("page");
             assert_eq!(page.total_count, 2);
             let ids: Vec<String> = page
                 .items
@@ -627,7 +654,12 @@ fn trashed_list_orders_by_deleted_at_desc_with_library_info() {
             let counts = count_trashed_comics().await.expect("counts");
             assert_eq!((counts.total, counts.local, counts.remote), (2, 2, 0));
 
-            let second = fetch_trashed_comics_page(2, 1).await.expect("page 2");
+            let second = fetch_trashed_comics_page(PageRequestDto {
+                page: 2,
+                page_size: 1,
+            })
+            .await
+            .expect("page 2");
             assert_eq!(second.items[0].comic.comic_id, a);
         });
     });

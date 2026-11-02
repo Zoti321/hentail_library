@@ -218,8 +218,7 @@ abstract class RustLibApi extends BaseApi {
   });
 
   Future<PagedReadingHistoryDto> crateApiHistoryFetchReadingPageFrb({
-    required int page,
-    required int pageSize,
+    required PageRequestDto request,
     String? keyword,
   });
 
@@ -239,8 +238,7 @@ abstract class RustLibApi extends BaseApi {
   });
 
   Future<PagedTrashedComicResultFrbDto> crateApiComicFetchTrashedComicsPageFrb({
-    required int page,
-    required int pageSize,
+    required PageRequestDto request,
   });
 
   Future<ComicDto?> crateApiComicFindComicByIdFrb({required String comicId});
@@ -435,8 +433,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<PagedComicResultDto> crateApiComicSearchByKeywordPageFrb({
     required String keyword,
-    required int page,
-    required int pageSize,
+    required PageRequestDto request,
   });
 
   Future<List<ComicDto>> crateApiComicSearchByTagExpressionFrb({
@@ -449,8 +446,7 @@ abstract class RustLibApi extends BaseApi {
     required List<String> mustInclude,
     required List<String> optionalOr,
     required List<String> mustExclude,
-    required int page,
-    required int pageSize,
+    required PageRequestDto request,
   });
 
   Future<List<SeriesDto>> crateApiSeriesSearchSeriesByKeywordFrb({
@@ -1630,16 +1626,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<PagedReadingHistoryDto> crateApiHistoryFetchReadingPageFrb({
-    required int page,
-    required int pageSize,
+    required PageRequestDto request,
     String? keyword,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_32(page, serializer);
-          sse_encode_i_32(pageSize, serializer);
+          sse_encode_box_autoadd_page_request_dto(request, serializer);
           sse_encode_opt_String(keyword, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
@@ -1653,7 +1647,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiHistoryFetchReadingPageFrbConstMeta,
-        argValues: [page, pageSize, keyword],
+        argValues: [request, keyword],
         apiImpl: this,
       ),
     );
@@ -1662,7 +1656,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiHistoryFetchReadingPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_reading_page_frb",
-        argNames: ["page", "pageSize", "keyword"],
+        argNames: ["request", "keyword"],
       );
 
   @override
@@ -1772,15 +1766,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<PagedTrashedComicResultFrbDto> crateApiComicFetchTrashedComicsPageFrb({
-    required int page,
-    required int pageSize,
+    required PageRequestDto request,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_i_32(page, serializer);
-          sse_encode_i_32(pageSize, serializer);
+          sse_encode_box_autoadd_page_request_dto(request, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -1793,7 +1785,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiComicFetchTrashedComicsPageFrbConstMeta,
-        argValues: [page, pageSize],
+        argValues: [request],
         apiImpl: this,
       ),
     );
@@ -1802,7 +1794,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicFetchTrashedComicsPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_trashed_comics_page_frb",
-        argNames: ["page", "pageSize"],
+        argNames: ["request"],
       );
 
   @override
@@ -3336,16 +3328,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<PagedComicResultDto> crateApiComicSearchByKeywordPageFrb({
     required String keyword,
-    required int page,
-    required int pageSize,
+    required PageRequestDto request,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(keyword, serializer);
-          sse_encode_i_32(page, serializer);
-          sse_encode_i_32(pageSize, serializer);
+          sse_encode_box_autoadd_page_request_dto(request, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3358,7 +3348,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiComicSearchByKeywordPageFrbConstMeta,
-        argValues: [keyword, page, pageSize],
+        argValues: [keyword, request],
         apiImpl: this,
       ),
     );
@@ -3367,7 +3357,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicSearchByKeywordPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "search_by_keyword_page_frb",
-        argNames: ["keyword", "page", "pageSize"],
+        argNames: ["keyword", "request"],
       );
 
   @override
@@ -3412,8 +3402,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required List<String> mustInclude,
     required List<String> optionalOr,
     required List<String> mustExclude,
-    required int page,
-    required int pageSize,
+    required PageRequestDto request,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -3422,8 +3411,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_String(mustInclude, serializer);
           sse_encode_list_String(optionalOr, serializer);
           sse_encode_list_String(mustExclude, serializer);
-          sse_encode_i_32(page, serializer);
-          sse_encode_i_32(pageSize, serializer);
+          sse_encode_box_autoadd_page_request_dto(request, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3436,7 +3424,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiComicSearchByTagExpressionPageFrbConstMeta,
-        argValues: [mustInclude, optionalOr, mustExclude, page, pageSize],
+        argValues: [mustInclude, optionalOr, mustExclude, request],
         apiImpl: this,
       ),
     );
@@ -3445,13 +3433,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicSearchByTagExpressionPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "search_by_tag_expression_page_frb",
-        argNames: [
-          "mustInclude",
-          "optionalOr",
-          "mustExclude",
-          "page",
-          "pageSize",
-        ],
+        argNames: ["mustInclude", "optionalOr", "mustExclude", "request"],
       );
 
   @override
@@ -6190,11 +6172,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return PagedReadingHistoryDto(
       items: dco_decode_list_reading_history_dto(arr[0]),
       totalCount: dco_decode_i_64(arr[1]),
+      page: dco_decode_i_32(arr[2]),
+      pageSize: dco_decode_i_32(arr[3]),
     );
   }
 
@@ -8489,7 +8473,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_items = sse_decode_list_reading_history_dto(deserializer);
     var var_totalCount = sse_decode_i_64(deserializer);
-    return PagedReadingHistoryDto(items: var_items, totalCount: var_totalCount);
+    var var_page = sse_decode_i_32(deserializer);
+    var var_pageSize = sse_decode_i_32(deserializer);
+    return PagedReadingHistoryDto(
+      items: var_items,
+      totalCount: var_totalCount,
+      page: var_page,
+      pageSize: var_pageSize,
+    );
   }
 
   @protected
@@ -10799,6 +10790,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_reading_history_dto(self.items, serializer);
     sse_encode_i_64(self.totalCount, serializer);
+    sse_encode_i_32(self.page, serializer);
+    sse_encode_i_32(self.pageSize, serializer);
   }
 
   @protected

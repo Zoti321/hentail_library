@@ -55,19 +55,33 @@ fn metadata_expression_page_uses_sql_window() {
                     .expect("tag comic");
                 }
 
-                let page1 =
-                    search_by_tag_expression_page(vec!["shared".to_string()], vec![], vec![], 1, 1)
-                        .await
-                        .expect("page 1");
+                let page1 = search_by_tag_expression_page(
+                    vec!["shared".to_string()],
+                    vec![],
+                    vec![],
+                    PageRequestDto {
+                        page: 1,
+                        page_size: 1,
+                    },
+                )
+                .await
+                .expect("page 1");
                 assert_eq!(page1.total_count, 3);
                 assert_eq!(page1.items.len(), 1);
                 assert_eq!(page1.page, 1);
                 assert_eq!(page1.page_size, 1);
 
-                let page3 =
-                    search_by_tag_expression_page(vec!["shared".to_string()], vec![], vec![], 3, 1)
-                        .await
-                        .expect("page 3");
+                let page3 = search_by_tag_expression_page(
+                    vec!["shared".to_string()],
+                    vec![],
+                    vec![],
+                    PageRequestDto {
+                        page: 3,
+                        page_size: 1,
+                    },
+                )
+                .await
+                .expect("page 3");
                 assert_eq!(page3.total_count, 3);
                 assert_eq!(page3.items.len(), 1);
                 assert_eq!(page3.page, 3);
@@ -78,9 +92,17 @@ fn metadata_expression_page_uses_sql_window() {
                     page3.items.iter().map(|c| c.comic_id.clone()).collect();
                 assert_ne!(page1_ids, page3_ids);
 
-                let empty = search_by_tag_expression_page(vec![], vec![], vec![], 1, 10)
-                    .await
-                    .expect("empty expression");
+                let empty = search_by_tag_expression_page(
+                    vec![],
+                    vec![],
+                    vec![],
+                    PageRequestDto {
+                        page: 1,
+                        page_size: 10,
+                    },
+                )
+                .await
+                .expect("empty expression");
                 assert_eq!(empty.total_count, 0);
                 assert!(empty.items.is_empty());
             });

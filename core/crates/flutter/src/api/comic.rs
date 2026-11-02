@@ -254,10 +254,9 @@ pub async fn search_by_keyword_frb(keyword: String) -> Result<Vec<ComicDto>, Hen
 #[flutter_rust_bridge::frb]
 pub async fn search_by_keyword_page_frb(
     keyword: String,
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
 ) -> Result<PagedComicResultDto, HentaiErrorDto> {
-    search_by_keyword_page(&keyword, page, page_size)
+    search_by_keyword_page(&keyword, request.into())
         .await
         .map(PagedComicResultDto::from)
         .map_err(HentaiErrorDto::from)
@@ -336,10 +335,9 @@ pub async fn purge_comics_frb(
 
 #[flutter_rust_bridge::frb]
 pub async fn fetch_trashed_comics_page_frb(
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
 ) -> Result<PagedTrashedComicResultFrbDto, HentaiErrorDto> {
-    let result = hentai_core::fetch_trashed_comics_page(page, page_size)
+    let result = hentai_core::fetch_trashed_comics_page(request.into())
         .await
         .map_err(HentaiErrorDto::from)?;
     Ok(PagedTrashedComicResultFrbDto {
@@ -569,10 +567,9 @@ pub async fn search_by_tag_expression_page_frb(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
 ) -> Result<PagedComicResultDto, HentaiErrorDto> {
-    search_by_tag_expression_page(must_include, optional_or, must_exclude, page, page_size)
+    search_by_tag_expression_page(must_include, optional_or, must_exclude, request.into())
         .await
         .map(PagedComicResultDto::from)
         .map_err(HentaiErrorDto::from)

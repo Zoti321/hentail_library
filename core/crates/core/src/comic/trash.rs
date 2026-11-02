@@ -179,13 +179,12 @@ async fn purge_one(db: &DatabaseConnection, target: &PurgeTarget) -> Result<(), 
 
 /// 「已删除」列表：跨全部 Library，按删除时间倒序。
 pub async fn fetch_trashed_comics_page(
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
 ) -> Result<PagedTrashedComicResultDto, HentaiError> {
     let db = connection()?;
     let total_count = count_trashed_comics().await?.total;
     // 越界页保持原样：本路径是顺序翻页，不钳到末页。
-    let window = paginate(PageRequestDto { page, page_size }, total_count);
+    let window = paginate(request, total_count);
     let page = window.page;
     let page_size = window.page_size;
     let offset = window.offset;

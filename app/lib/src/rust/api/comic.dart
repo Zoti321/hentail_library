@@ -47,12 +47,10 @@ Future<List<ComicDto>> searchByKeywordFrb({required String keyword}) =>
 
 Future<PagedComicResultDto> searchByKeywordPageFrb({
   required String keyword,
-  required int page,
-  required int pageSize,
+  required PageRequestDto request,
 }) => RustLib.instance.api.crateApiComicSearchByKeywordPageFrb(
   keyword: keyword,
-  page: page,
-  pageSize: pageSize,
+  request: request,
 );
 
 Future<void> trashComicsFrb({required List<String> comicIds}) =>
@@ -66,11 +64,9 @@ Future<ComicPurgeResultFrbDto> purgeComicsFrb({
 }) => RustLib.instance.api.crateApiComicPurgeComicsFrb(comicIds: comicIds);
 
 Future<PagedTrashedComicResultFrbDto> fetchTrashedComicsPageFrb({
-  required int page,
-  required int pageSize,
+  required PageRequestDto request,
 }) => RustLib.instance.api.crateApiComicFetchTrashedComicsPageFrb(
-  page: page,
-  pageSize: pageSize,
+  request: request,
 );
 
 Future<TrashedComicCountsFrbDto> countTrashedComicsFrb() =>
@@ -122,14 +118,12 @@ Future<PagedComicResultDto> searchByTagExpressionPageFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
   required List<String> mustExclude,
-  required int page,
-  required int pageSize,
+  required PageRequestDto request,
 }) => RustLib.instance.api.crateApiComicSearchByTagExpressionPageFrb(
   mustInclude: mustInclude,
   optionalOr: optionalOr,
   mustExclude: mustExclude,
-  page: page,
-  pageSize: pageSize,
+  request: request,
 );
 
 Future<PlatformInt64> countAllComicsFrb() =>

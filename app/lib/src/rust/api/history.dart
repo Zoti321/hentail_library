@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'comic.dart';
 import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -19,12 +20,10 @@ Future<ReadingHistoryDto?> getReadingByComicIdFrb({required String comicId}) =>
     );
 
 Future<PagedReadingHistoryDto> fetchReadingPageFrb({
-  required int page,
-  required int pageSize,
+  required PageRequestDto request,
   String? keyword,
 }) => RustLib.instance.api.crateApiHistoryFetchReadingPageFrb(
-  page: page,
-  pageSize: pageSize,
+  request: request,
   keyword: keyword,
 );
 
@@ -45,11 +44,19 @@ Stream<List<ReadingHistoryDto>> watchReadingHistoriesFrb() =>
 class PagedReadingHistoryDto {
   final List<ReadingHistoryDto> items;
   final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
 
-  const PagedReadingHistoryDto({required this.items, required this.totalCount});
+  const PagedReadingHistoryDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
 
   @override
-  int get hashCode => items.hashCode ^ totalCount.hashCode;
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -57,7 +64,9 @@ class PagedReadingHistoryDto {
       other is PagedReadingHistoryDto &&
           runtimeType == other.runtimeType &&
           items == other.items &&
-          totalCount == other.totalCount;
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
 }
 
 class ReadingHistoryDto {

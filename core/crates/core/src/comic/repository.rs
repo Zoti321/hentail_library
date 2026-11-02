@@ -120,32 +120,38 @@ pub async fn find_comics_by_ids(comic_ids: Vec<String>) -> Result<Vec<ComicDto>,
 }
 
 pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiError> {
-    let page = search_by_keyword_page(keyword, 1, i32::MAX).await?;
+    let page = search_by_keyword_page(
+        keyword,
+        PageRequestDto {
+            page: 1,
+            page_size: i32::MAX,
+        },
+    )
+    .await?;
     Ok(page.items)
 }
 
 pub async fn search_by_keyword_page(
     keyword: &str,
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
 ) -> Result<PagedComicResultDto, HentaiError> {
     let q = keyword.trim().to_lowercase();
-    let page = page.max(1);
-    let page_size = page_size.max(1);
     if q.is_empty() {
+        let window = paginate(request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
-            page,
-            page_size,
+            page: window.page,
+            page_size: window.page_size,
         });
     }
     let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
+        let window = paginate(request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
-            page,
-            page_size,
+            page: window.page,
+            page_size: window.page_size,
         });
     };
     let db = connection()?;
@@ -170,7 +176,7 @@ pub async fn search_by_keyword_page(
         .try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
     // 越界页保持原样：本路径是顺序翻页（由 `has_next` 驱动），不钳到末页。
-    let window = paginate(PageRequestDto { page, page_size }, total_count);
+    let window = paginate(request, total_count);
     let offset = window.offset;
     let page = window.page;
     let page_size = window.page_size;
@@ -311,8 +317,16 @@ pub async fn search_by_tag_expression(
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
 ) -> Result<Vec<ComicDto>, HentaiError> {
-    let page =
-        search_by_tag_expression_page(must_include, optional_or, must_exclude, 1, i32::MAX).await?;
+    let page = search_by_tag_expression_page(
+        must_include,
+        optional_or,
+        must_exclude,
+        PageRequestDto {
+            page: 1,
+            page_size: i32::MAX,
+        },
+    )
+    .await?;
     Ok(page.items)
 }
 
@@ -320,33 +334,32 @@ pub async fn search_by_tag_expression_page(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
 ) -> Result<PagedComicResultDto, HentaiError> {
-    let page = page.max(1);
-    let page_size = page_size.max(1);
     let Some(terms) =
         resolve_metadata_expression_terms(must_include, optional_or, must_exclude).await?
     else {
+        let window = paginate(request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
-            page,
-            page_size,
+            page: window.page,
+            page_size: window.page_size,
         });
     };
     let db = connection()?;
     let total_count = count_metadata_expression_comics(&db, &terms).await?;
     if total_count <= 0 {
+        let window = paginate(request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
-            page,
-            page_size,
+            page: window.page,
+            page_size: window.page_size,
         });
     }
     // 越界页保持原样，只把窗口按总行数截断（与关键字搜索同属顺序翻页路径）。
-    let window = paginate(PageRequestDto { page, page_size }, total_count);
+    let window = paginate(request, total_count);
     let comic_ids = query_metadata_expression_comic_ids(
         &db,
         &terms,

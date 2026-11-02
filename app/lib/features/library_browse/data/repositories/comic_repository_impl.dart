@@ -114,8 +114,10 @@ class ComicRepositoryImpl
   ) async {
     final rust.PagedTrashedComicResultFrbDto page = await guardFrb(
       () => rust.fetchTrashedComicsPageFrb(
-        page: request.page,
-        pageSize: request.pageSize,
+        request: rust.PageRequestDto(
+          page: request.page,
+          pageSize: request.pageSize,
+        ),
       ),
       fallbackMessage: '读取已删除漫画失败',
     );
@@ -221,8 +223,10 @@ class ComicRepositoryImpl
     final rust.PagedComicResultDto page = await guardFrb(
       () => rust.searchByKeywordPageFrb(
         keyword: keyword,
-        page: request.page,
-        pageSize: request.pageSize,
+        request: rust.PageRequestDto(
+          page: request.page,
+          pageSize: request.pageSize,
+        ),
       ),
       fallbackMessage: '搜索漫画失败',
     );
@@ -258,8 +262,10 @@ class ComicRepositoryImpl
         mustInclude: mustInclude.toList(),
         optionalOr: optionalOr.toList(),
         mustExclude: mustExclude.toList(),
-        page: request.page,
-        pageSize: request.pageSize,
+        request: rust.PageRequestDto(
+          page: request.page,
+          pageSize: request.pageSize,
+        ),
       ),
       fallbackMessage: '按元数据搜索漫画失败',
     );

@@ -1243,19 +1243,15 @@ fn wire__crate__api__history__fetch_reading_page_frb_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_page = <i32>::sse_decode(&mut deserializer);
-            let api_page_size = <i32>::sse_decode(&mut deserializer);
+            let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
             let api_keyword = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::history::fetch_reading_page_frb(
-                            api_page,
-                            api_page_size,
-                            api_keyword,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::history::fetch_reading_page_frb(api_request, api_keyword)
+                                .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -1408,17 +1404,13 @@ fn wire__crate__api__comic__fetch_trashed_comics_page_frb_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_page = <i32>::sse_decode(&mut deserializer);
-            let api_page_size = <i32>::sse_decode(&mut deserializer);
+            let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::comic::fetch_trashed_comics_page_frb(
-                            api_page,
-                            api_page_size,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::comic::fetch_trashed_comics_page_frb(api_request).await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -3190,18 +3182,14 @@ fn wire__crate__api__comic__search_by_keyword_page_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_keyword = <String>::sse_decode(&mut deserializer);
-            let api_page = <i32>::sse_decode(&mut deserializer);
-            let api_page_size = <i32>::sse_decode(&mut deserializer);
+            let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::comic::search_by_keyword_page_frb(
-                            api_keyword,
-                            api_page,
-                            api_page_size,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::comic::search_by_keyword_page_frb(api_keyword, api_request)
+                                .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -3278,8 +3266,7 @@ fn wire__crate__api__comic__search_by_tag_expression_page_frb_impl(
             let api_must_include = <Vec<String>>::sse_decode(&mut deserializer);
             let api_optional_or = <Vec<String>>::sse_decode(&mut deserializer);
             let api_must_exclude = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_page = <i32>::sse_decode(&mut deserializer);
-            let api_page_size = <i32>::sse_decode(&mut deserializer);
+            let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
@@ -3288,8 +3275,7 @@ fn wire__crate__api__comic__search_by_tag_expression_page_frb_impl(
                             api_must_include,
                             api_optional_or,
                             api_must_exclude,
-                            api_page,
-                            api_page_size,
+                            api_request,
                         )
                         .await?;
                         std::result::Result::Ok(output_ok)
@@ -6395,9 +6381,13 @@ impl SseDecode for crate::api::history::PagedReadingHistoryDto {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_items = <Vec<crate::api::history::ReadingHistoryDto>>::sse_decode(deserializer);
         let mut var_totalCount = <i64>::sse_decode(deserializer);
+        let mut var_page = <i32>::sse_decode(deserializer);
+        let mut var_pageSize = <i32>::sse_decode(deserializer);
         return crate::api::history::PagedReadingHistoryDto {
             items: var_items,
             total_count: var_totalCount,
+            page: var_page,
+            page_size: var_pageSize,
         };
     }
 }
@@ -8764,6 +8754,8 @@ impl flutter_rust_bridge::IntoDart for crate::api::history::PagedReadingHistoryD
         [
             self.items.into_into_dart().into_dart(),
             self.total_count.into_into_dart().into_dart(),
+            self.page.into_into_dart().into_dart(),
+            self.page_size.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -10943,6 +10935,8 @@ impl SseEncode for crate::api::history::PagedReadingHistoryDto {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Vec<crate::api::history::ReadingHistoryDto>>::sse_encode(self.items, serializer);
         <i64>::sse_encode(self.total_count, serializer);
+        <i32>::sse_encode(self.page, serializer);
+        <i32>::sse_encode(self.page_size, serializer);
     }
 }
 
