@@ -22,10 +22,9 @@
 | 子目录 | 内容 |
 | --- | --- |
 | `shared/data/frb/` | `frb_call_guard`、`frb_error_mapper`、`frb_zone_guard`（全 app） |
-| `shared/data/adapters/` | 预留；跨 feature 进程级 FRB 已迁入 owner `public` + port |
 | `shared/data/repositories/` | 非 owner 仓储接缝（如 `named_facet_form_listing`，#295） |
 
-新 FRB 映射 **默认进 owner `features/<id>/data/mappers/`**；仅当 ≥2 个 feature 依赖且短期无法抽 port 时，才放 `shared/data/mappers/`。
+新 FRB 映射 **默认进 owner `features/<id>/data/mappers/`**；跨 feature 协作经 owner **`public/` + port**（如 [RemoteLibraryCredentialsPort]），勿再在 `shared/data/` 新增 mapper/adapter 目录。
 
 ## 迁移 backlog（FRB 深模块）
 
