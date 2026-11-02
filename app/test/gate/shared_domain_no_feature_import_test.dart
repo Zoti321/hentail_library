@@ -20,13 +20,7 @@ void main() {
   test('shared/data intentional feature-import exemptions stay documented', () {
     expect(
       isSharedDataFeatureImportExempt(
-        'shared/data/mappers/reader_frb_mapper.dart',
-      ),
-      isTrue,
-    );
-    expect(
-      isSharedDataFeatureImportExempt(
-        'shared/data/mappers/series_frb_mapper.dart',
+        'shared/data/mappers/thumbnail_frb_mapper.dart',
       ),
       isTrue,
     );

@@ -30,5 +30,6 @@
 
 ## 迁移 backlog（FRB 深模块）
 
-- **第二批**：`series_frb_mapper` → `library_browse/data/series/`；`reader_frb_mapper` → `read_session/data/mappers/` + 拆分 `mapResourceType`。
 - **第三批**：`remote_credentials_frb_adapter` → `library_admin` + public port；`thumbnail_frb_mapper` 随缩略图归属定稿。
+
+**已完成**：第一批单域 adapter/mapper；第二批 `series_frb_mapper` @ `library_browse/data/series/`、`reader_frb_mapper` @ `read_session/data/mappers/`，`mapResourceType` @ `shared/domain/models/resource_type_frb_wire.dart`。

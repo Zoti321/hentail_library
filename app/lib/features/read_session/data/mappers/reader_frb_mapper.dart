@@ -1,4 +1,3 @@
-import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
@@ -20,7 +19,6 @@ ReadSessionFailureKind mapReaderErrorKind(String code) {
 
 Never throwReaderException(
   HentaiErrorDto error, {
-  ResourceType? resourceType,
   String? path,
   String? comicId,
 }) {
@@ -30,18 +28,4 @@ Never throwReaderException(
     cause: error,
     kind: mapReaderErrorKind(error.code),
   );
-}
-
-String mapResourceType(ResourceType type) {
-  return switch (type) {
-    ResourceType.dir => 'dir',
-    ResourceType.zip => 'zip',
-    ResourceType.cbz => 'cbz',
-    ResourceType.epub => 'epub',
-    ResourceType.cbr => 'cbr',
-    ResourceType.rar => 'rar',
-    ResourceType.cb7 => 'cb7',
-    ResourceType.sevenZ => 'sevenz',
-    ResourceType.pdf => 'pdf',
-  };
 }

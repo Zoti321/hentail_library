@@ -1,6 +1,6 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/data/mappers/series_frb_mapper.dart';
+import 'package:hentai_library/features/library_browse/data/series/series_frb_mapper.dart';
 import 'package:hentai_library/features/library_browse/domain/series/library_series_projection.dart';
 import 'package:hentai_library/features/library_browse/domain/series/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';

@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:hentai_library/shared/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/features/read_session/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
@@ -44,7 +45,6 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
     } on HentaiErrorDto catch (error) {
       throwReaderException(
         error,
-        resourceType: comic.resourceType,
         path: comic.path,
         comicId: comic.comicId,
       );
@@ -80,7 +80,6 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
     } on HentaiErrorDto catch (error) {
       throwReaderException(
         error,
-        resourceType: comic.resourceType,
         path: comic.path,
         comicId: comic.comicId,
       );
@@ -110,7 +109,6 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
     } on HentaiErrorDto catch (error) {
       throwReaderException(
         error,
-        resourceType: comic.resourceType,
         path: comic.path,
         comicId: comic.comicId,
       );
@@ -137,7 +135,6 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
     } on HentaiErrorDto catch (error) {
       throwReaderException(
         error,
-        resourceType: comic.resourceType,
         path: comic.path,
         comicId: comic.comicId,
       );

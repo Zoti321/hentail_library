@@ -7,8 +7,6 @@ import 'package:path/path.dart' as p;
 /// Phase C (#256): FRB thin edges; keep in sync with
 /// [docs/engineering/gate.md] and `import_boundary_rules.dart` FRB allowlist.
 const Set<String> kSharedDataExplicitFeatureImportAllowlist = <String>{
-  'shared/data/mappers/reader_frb_mapper.dart',
-  'shared/data/mappers/series_frb_mapper.dart',
   // Repositories layer; documented cross-feature seam (#295), not feature-import today.
   'shared/data/repositories/named_facet_form_listing.dart',
 };

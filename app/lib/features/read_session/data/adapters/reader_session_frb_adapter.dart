@@ -1,4 +1,5 @@
-import 'package:hentai_library/shared/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/features/read_session/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/data/adapters/remote_credentials_frb_adapter.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
@@ -24,7 +25,6 @@ class ReaderSessionFrbAdapter implements ReaderSessionPort {
     } on HentaiErrorDto catch (error) {
       throwReaderException(
         error,
-        resourceType: comic.resourceType,
         path: comic.path,
         comicId: comic.comicId,
       );

@@ -1,22 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/data/mappers/reader_frb_mapper.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/features/read_session/data/mappers/reader_frb_mapper.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
 void main() {
-  test('mapResourceType covers every ResourceType wire token', () {
-    expect(mapResourceType(ResourceType.dir), 'dir');
-    expect(mapResourceType(ResourceType.zip), 'zip');
-    expect(mapResourceType(ResourceType.cbz), 'cbz');
-    expect(mapResourceType(ResourceType.epub), 'epub');
-    expect(mapResourceType(ResourceType.cbr), 'cbr');
-    expect(mapResourceType(ResourceType.rar), 'rar');
-    expect(mapResourceType(ResourceType.cb7), 'cb7');
-    expect(mapResourceType(ResourceType.sevenZ), 'sevenz');
-    expect(mapResourceType(ResourceType.pdf), 'pdf');
-  });
-
   test('throwReaderException wraps HentaiErrorDto as page load failure', () {
     const HentaiErrorDto error = HentaiErrorDto(
       code: 'Validation',
