@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/home/presentation/models/history_card_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 
 /// 生产阅读历史行数据（分桶用 [lastReadTime]）。
 class HistoryMd3eBrowseEntry {

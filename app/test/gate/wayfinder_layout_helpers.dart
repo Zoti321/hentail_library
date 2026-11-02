@@ -34,6 +34,7 @@ const Set<String> kWayfinderFeatureModuleIds = <String>{
   'metadata_backup',
   'named_metadata',
   'read_session',
+  'reading_history',
 };
 
 const Set<String> kWayfinderFeatureLayerDirs = <String>{

@@ -16,21 +16,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
   }
 
   @override
-  Stream<List<HomeContinueReadingEntry>> watchContinueReadingTop5({
-    required bool excludeR18,
-  }) {
-    return guardFrbStream(
-      () => rust
-          .watchContinueReadingTop5Frb(excludeR18: excludeR18)
-          .map(
-            (List<rust.HomeContinueReadingDto> rows) =>
-                rows.map(_mapContinueReading).toList(),
-          ),
-      fallbackMessage: '读取继续阅读失败',
-    );
-  }
-
-  @override
   Stream<List<HomeLibraryAlert>> watchHomeLibraryAlerts() {
     return guardFrbStream(
       () => rust.watchHomeLibraryAlertsFrb().map(
@@ -51,21 +36,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
                 rows.map(_mapLibraryStat).toList(growable: false),
           ),
       fallbackMessage: '读取库统计失败',
-    );
-  }
-
-  @override
-  Stream<List<HomeRecentlyAddedEntry>> watchRecentlyAddedOnHome({
-    required bool excludeR18,
-  }) {
-    return guardFrbStream(
-      () => rust
-          .watchRecentlyAddedOnHomeFrb(excludeR18: excludeR18)
-          .map(
-            (List<rust.HomeRecentlyAddedDto> rows) =>
-                rows.map(_mapRecentlyAdded).toList(growable: false),
-          ),
-      fallbackMessage: '读取最近入库失败',
     );
   }
 
@@ -92,19 +62,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
       seriesCount: dto.seriesCount,
       authorCount: dto.authorCount,
       libraryCount: dto.libraryCount,
-    );
-  }
-
-  HomeContinueReadingEntry _mapContinueReading(
-    rust.HomeContinueReadingDto dto,
-  ) {
-    return HomeContinueReadingEntry(
-      comicId: dto.comicId,
-      title: dto.title,
-      lastReadTime: DateTime.fromMillisecondsSinceEpoch(
-        dto.lastReadTimeMs.toInt(),
-      ),
-      pageIndex: dto.pageIndex,
     );
   }
 
@@ -145,16 +102,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
       rust.HomeLibraryAlertKindDto.pendingResourcesDetected =>
         HomeLibraryAlertKind.pendingResourcesDetected,
     };
-  }
-
-  HomeRecentlyAddedEntry _mapRecentlyAdded(rust.HomeRecentlyAddedDto dto) {
-    return HomeRecentlyAddedEntry(
-      comicId: dto.comicId,
-      title: dto.title,
-      libraryId: dto.libraryId,
-      libraryDisplayName: dto.libraryDisplayName,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(dto.createdAtMs.toInt()),
-    );
   }
 
   LibraryProbeResult _mapProbeResult(rust_probe.LibraryProbeResultDto dto) {

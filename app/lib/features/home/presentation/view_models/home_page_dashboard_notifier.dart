@@ -5,7 +5,6 @@ import 'package:hentai_library/features/home/presentation/view_models/home_probe
 import 'package:hentai_library/core/util/stream_throttle.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/domain/home_page_repository.dart';
-import 'package:hentai_library/features/home/presentation/models/history_card_item.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -36,36 +35,12 @@ Stream<HomePageCounts> homePageCountsStream(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-Stream<List<HomeContinueReadingEntry>> homeContinueReadingTop5Stream(Ref ref) {
-  final HomePageRepository repository = ref.watch(homePageRepoProvider);
-  final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
-  ref.watch(libraryRevisionThrottleBusyStateProvider);
-  return throttleWhile(
-    repository.watchContinueReadingTop5(excludeR18: excludeR18),
-    shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
-    interval: _kHomeScanThrottleInterval,
-  );
-}
-
-@Riverpod(keepAlive: true)
 Stream<List<HomeLibraryStat>> homeLibraryStatsStream(Ref ref) {
   final HomePageRepository repository = ref.watch(homePageRepoProvider);
   final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
   ref.watch(libraryRevisionThrottleBusyStateProvider);
   return throttleWhile(
     repository.watchLibraryStats(excludeR18: excludeR18),
-    shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
-    interval: _kHomeScanThrottleInterval,
-  );
-}
-
-@Riverpod(keepAlive: true)
-Stream<List<HomeRecentlyAddedEntry>> homeRecentlyAddedStream(Ref ref) {
-  final HomePageRepository repository = ref.watch(homePageRepoProvider);
-  final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
-  ref.watch(libraryRevisionThrottleBusyStateProvider);
-  return throttleWhile(
-    repository.watchRecentlyAddedOnHome(excludeR18: excludeR18),
     shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
     interval: _kHomeScanThrottleInterval,
   );
@@ -149,26 +124,4 @@ List<HomeLibraryAlert> _mergeProbeAlerts(
     merged.add(pendingAlert);
   }
   return merged;
-}
-
-@Riverpod(keepAlive: true)
-List<HistoryCardItem> homeContinueReadingTop5GridItems(Ref ref) {
-  final List<HomeContinueReadingEntry> entries = ref
-      .watch(homeContinueReadingTop5StreamProvider)
-      .maybeWhen(
-        data: (List<HomeContinueReadingEntry> data) => data,
-        orElse: () => const <HomeContinueReadingEntry>[],
-      );
-  return entries
-      .map(
-        (HomeContinueReadingEntry e) => historyCardItem(
-          id: 'comic:${e.comicId}',
-          title: e.title,
-          lastReadTime: e.lastReadTime,
-          coverComicId: e.comicId,
-          comicId: e.comicId,
-          pageIndex: e.pageIndex,
-        ),
-      )
-      .toList(growable: false);
 }

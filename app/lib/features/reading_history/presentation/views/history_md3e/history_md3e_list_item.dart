@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_browse_entry.dart';
-import 'package:hentai_library/features/home/presentation/views/history_md3e/history_md3e_list_item_cover.dart';
+import 'package:hentai_library/features/reading_history/presentation/views/history_md3e/history_md3e_browse_entry.dart';
+import 'package:hentai_library/features/reading_history/presentation/views/history_md3e/history_md3e_list_item_cover.dart';
 import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 

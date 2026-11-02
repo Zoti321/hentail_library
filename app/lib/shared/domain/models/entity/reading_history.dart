@@ -1,1 +1,1 @@
-export 'package:hentai_library/features/home/domain/reading_history.dart';
+export 'package:hentai_library/features/reading_history/domain/reading_history.dart';

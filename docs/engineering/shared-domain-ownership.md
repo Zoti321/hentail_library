@@ -13,8 +13,10 @@
 | `comic/comic_display_title.dart` | `features/library_browse/domain/` |
 | `ports/reader_session_port.dart`、`comic_page_source_port.dart`、`clipboard_image_port.dart` | `features/read_session/domain/` |
 | `ports/reader_settings_command_port.dart` | `features/app_settings/domain/` |
-| `repositories/*` | 各 owner `features/*/domain/`（与 data 实现同 feature） |
-| `models/app_setting*.dart`、`models/entity/reading_history.dart` | `features/app_settings/domain/` |
+| `repositories/*`（除 reading_history） | 各 owner `features/*/domain/`（与 data 实现同 feature） |
+| **reading_history feature** | `features/reading_history/`（domain、data、`/history` 全套 presentation）；`public.dart` export 实体与 `HistoryCardItem` 供 home「继续阅读」网格 |
+| `models/app_setting*.dart` | `features/app_settings/domain/` |
+| `models/entity/reading_history.dart`、`repositories/reading_history_repository.dart` | `features/reading_history/domain/` |
 | `models/read_models/home_page_read_models.dart` | `features/home/domain/` |
 | `models/named_facet_form_candidate.dart`、`models/tag_dictionary_import_result.dart` | `features/named_metadata/domain/` |
 

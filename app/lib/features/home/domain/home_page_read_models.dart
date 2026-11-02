@@ -14,20 +14,6 @@ class HomePageCounts {
   final int libraryCount;
 }
 
-/// 继续阅读单条候选项（从漫画阅读历史取 Top N）。
-class HomeContinueReadingEntry {
-  const HomeContinueReadingEntry({
-    required this.comicId,
-    required this.title,
-    required this.lastReadTime,
-    required this.pageIndex,
-  });
-  final String comicId;
-  final String title;
-  final DateTime lastReadTime;
-  final int? pageIndex;
-}
-
 enum HomeLibraryAlertKind {
   remoteUnreachable,
   syncFailed,
@@ -81,22 +67,6 @@ class HomeLibraryStat {
   final int comicCount;
   final int seriesCount;
   final DateTime? lastSuccessfulSyncAt;
-}
-
-class HomeRecentlyAddedEntry {
-  const HomeRecentlyAddedEntry({
-    required this.comicId,
-    required this.title,
-    required this.libraryId,
-    required this.libraryDisplayName,
-    required this.createdAt,
-  });
-
-  final String comicId;
-  final String title;
-  final String libraryId;
-  final String libraryDisplayName;
-  final DateTime createdAt;
 }
 
 class LibraryProbeResult {

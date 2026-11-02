@@ -33,3 +33,5 @@ Accepted
 - 需扩展 `libraries` 表或等价持久化 **上次 sync 结果**，供 Home library alert 读取。
 - 现有首页 widget/统计测试与 l10n（`homeScanLibrary` 等）需迁移或退役顶栏用法。
 - ADR-0014 中「空库 Hero 主行动扫描」被本决策 supersede（建库为主，扫描不再在 Hero 常驻）。
+
+> **实现修订（2026-11-02）**：生产 MD3E 首页（`Md3eHomePage`）已移除 **继续阅读 Top N** 与 **Recently added** 区块；继续阅读走 **`/history`**（`reading_history` feature）。Dart 侧已删除对应 Riverpod / `HomePageRepository` 方法与 read model；Rust `watch_continue_reading_top5` / `watch_recently_added_on_home` FRB 暂保留供 core 测试与后续收口。

@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/home/domain/reading_history.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 

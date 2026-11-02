@@ -3,9 +3,9 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 
 import 'history_browse_entry.dart';
 
-import 'package:hentai_library/features/home/presentation/patterns/history/history_browse_content.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_page_header.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_content.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 
 export 'history_browse_entry.dart';

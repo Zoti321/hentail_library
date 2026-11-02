@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/reading_history_list_layout.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_section_header.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_section_header.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 单个时间分桶（sliver）：可折叠标题 + 组内懒加载的 [Md3eReadingHistoryListLayout]。

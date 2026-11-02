@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_empty_body.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_record_summary.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/reading_history_grouped_list.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_empty_body.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_record_summary.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/reading_history_grouped_list.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 阅读历史页滚动区正文（sliver）：摘要 + 搜索 + 分组列表或空状态。

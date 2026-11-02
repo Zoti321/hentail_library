@@ -106,16 +106,6 @@ List<Override> _shellHomeOverrides() {
     homePageCountsStreamProvider.overrideWith(
       (Ref ref) => Stream<HomePageCounts>.value(counts),
     ),
-    homeContinueReadingTop5StreamProvider.overrideWith(
-      (Ref ref) => Stream<List<HomeContinueReadingEntry>>.value(
-        const <HomeContinueReadingEntry>[],
-      ),
-    ),
-    homeRecentlyAddedStreamProvider.overrideWith(
-      (Ref ref) => Stream<List<HomeRecentlyAddedEntry>>.value(
-        const <HomeRecentlyAddedEntry>[],
-      ),
-    ),
     homeLibraryAlertsStreamProvider.overrideWith(
       (Ref ref) =>
           Stream<List<HomeLibraryAlert>>.value(const <HomeLibraryAlert>[]),

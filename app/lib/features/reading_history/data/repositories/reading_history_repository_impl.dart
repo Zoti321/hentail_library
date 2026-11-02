@@ -2,10 +2,10 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/shared/data/adapters/history_frb_mapper.dart';
-import 'package:hentai_library/shared/domain/models/models.dart' as entity;
+import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/home/domain/reading_history_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
 import 'package:hentai_library/src/rust/api/history.dart' as rust;
 
@@ -13,7 +13,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   const ReadingHistoryRepositoryImpl();
 
   @override
-  Future<void> recordReading(entity.ReadingHistory history) async {
+  Future<void> recordReading(ReadingHistory history) async {
     try {
       guardFrbSync(
         () => rust.recordReadingFrb(history: toReadingHistoryDto(history)),
@@ -34,7 +34,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
-  Future<entity.ReadingHistory?> getByComicId(String comicId) async {
+  Future<ReadingHistory?> getByComicId(String comicId) async {
     final rust.ReadingHistoryDto? row = await guardFrb(
       () => rust.getReadingByComicIdFrb(comicId: comicId),
       fallbackMessage: '读取阅读进度失败',
@@ -43,7 +43,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
-  Stream<List<entity.ReadingHistory>> watchAllHistory() {
+  Stream<List<ReadingHistory>> watchAllHistory() {
     return guardFrbStream(
       () => rust.watchReadingHistoriesFrb().map(
         (List<rust.ReadingHistoryDto> rows) =>
@@ -54,7 +54,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
-  Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
+  Future<PagedResult<ReadingHistory>> fetchHistoryPage(
     PageRequest request, {
     String? keyword,
   }) async {

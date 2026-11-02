@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_group_section.dart';
-import 'package:hentai_library/features/home/presentation/patterns/history/history_time_grouping.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_group_section.dart';
+import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 四档时间分组 + 可折叠组标题（sliver）+ 组内懒加载列表。

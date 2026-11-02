@@ -3,13 +3,12 @@ import 'dart:async';
 import 'package:hentai_library/core/util/debouncer.dart';
 
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/features/home/domain/reading_history.dart'
-    as entity;
+import 'package:hentai_library/features/reading_history/public.dart' as entity;
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/home/presentation/models/history_card_item.dart';
+import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/features/home/presentation/view_models/history_paged_feed_state.dart';
+import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history_paged_feed_controller.g.dart';
