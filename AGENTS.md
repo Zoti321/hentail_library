@@ -14,7 +14,7 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **design-system/** → **cleared** (2026-11-01): only `.gitkeep` and `example.png` remain; `hentai-library/MASTER.md`, `pages/*`, `research/` were removed (recoverable from git history). No UI spec lives here; see ADR-0030. ADR-0029 charter is superseded for any future visual refresh unless a new ADR reintroduces a doc source.
 
-**Dart layout & imports** (features/shared/core, MVVM) → ADR-0017、ADR-0027、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature 仅 `features/*/public/**`）；Wayfinder 终态以 `app/test/gate/` 为准，并由 `project_layout_test.dart` 等门禁强制执行。
+**Dart layout & imports** (features/shared/core, MVVM) → ADR-0017、ADR-0027、**ADR-0033**（feature `application/`）、**ADR-0034**（cross-feature 仅 `features/*/public/**`）、**ADR-0035**（Catalog Shared Kernel 留 `shared/domain`）；Wayfinder 终态以 `app/test/gate/` 为准，并由 `project_layout_test.dart` 等门禁强制执行。
 
 **Rust** (sync, read, DB) → `core/`; see `docs/adr/README.md` (ADR-0002 and related).
 

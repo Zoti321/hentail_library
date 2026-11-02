@@ -113,3 +113,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0032](./0032-single-theme-source-after-md3e-cutover.md) | MD3E Cutover 后 `shared/ui/theme` 只保留一套主题 | Accepted |
 | [0033](./0033-flutter-feature-application-layer.md) | Flutter feature Application 层（Wayfinder） | Accepted |
 | [0034](./0034-feature-public-api-only-cross-imports.md) | Cross-feature 协作 — public API only | Accepted |
+| [0035](./0035-catalog-shared-kernel.md) | Catalog Shared Kernel 保留于 `shared/domain` | Accepted |
