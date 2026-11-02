@@ -21,7 +21,8 @@ pub use grouping::ComicGrouping;
 pub use pagination::{paginate, PageWindow};
 pub use repository::{
     count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, load_comics_ordered,
-    read_data_version, search_by_keyword, search_by_keyword_page,
+    read_data_version, search_by_keyword, search_by_keyword_page, search_by_tag_expression,
+    search_by_tag_expression_page, search_comic_ids_by_tag_expression,
 };
 pub use trash::{
     count_trashed_comics, fetch_trashed_comics_page, is_comic_trashed, list_trashed_comic_ids,
@@ -29,6 +30,5 @@ pub use trash::{
     TrashedComicCountsDto, TrashedComicDto,
 };
 pub use write::{
-    search_by_tag_expression, search_by_tag_expression_page, search_comic_ids_by_tag_expression,
     set_comic_meta_locks, update_comic_user_meta, SetComicMetaLocksDto, UpdateComicUserMetaDto,
 };
