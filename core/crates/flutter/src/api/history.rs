@@ -7,6 +7,7 @@ use hentai_core::{
     ReadingHistoryDto as CoreReading,
 };
 
+use super::comic::PageRequestDto;
 use super::init::HentaiErrorDto;
 use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
@@ -22,6 +23,8 @@ pub struct ReadingHistoryDto {
 pub struct PagedReadingHistoryDto {
     pub items: Vec<ReadingHistoryDto>,
     pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
 }
 
 impl From<CoreReading> for ReadingHistoryDto {
@@ -40,6 +43,8 @@ impl From<CorePagedReading> for PagedReadingHistoryDto {
         Self {
             items: v.items.into_iter().map(ReadingHistoryDto::from).collect(),
             total_count: v.total_count,
+            page: v.page,
+            page_size: v.page_size,
         }
     }
 }
@@ -73,11 +78,10 @@ pub async fn get_reading_by_comic_id_frb(
 
 #[flutter_rust_bridge::frb]
 pub async fn fetch_reading_page_frb(
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
     keyword: Option<String>,
 ) -> Result<PagedReadingHistoryDto, HentaiErrorDto> {
-    core_fetch_reading_page(page, page_size, keyword)
+    core_fetch_reading_page(request.into(), keyword)
         .await
         .map(PagedReadingHistoryDto::from)
         .map_err(HentaiErrorDto::from)

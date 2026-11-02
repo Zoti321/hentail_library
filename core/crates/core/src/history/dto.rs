@@ -10,4 +10,6 @@ pub struct ReadingHistoryDto {
 pub struct PagedReadingHistoryDto {
     pub items: Vec<ReadingHistoryDto>,
     pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
 }

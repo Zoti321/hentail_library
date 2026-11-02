@@ -82,30 +82,35 @@ pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
 }
 
 pub async fn fetch_reading_page(
-    page: i32,
-    page_size: i32,
+    request: crate::comic::PageRequestDto,
     keyword: Option<String>,
 ) -> Result<PagedReadingHistoryDto, HentaiError> {
+    use crate::comic::pagination::paginate;
+
     let db = connection()?;
-    if page_size <= 0 {
-        return Ok(PagedReadingHistoryDto {
-            items: vec![],
-            total_count: 0,
-        });
-    }
     let query = reading_history_list_query(keyword.as_deref());
     let paginator = query
         .order_by_desc(comic_reading_histories::Column::LastReadTime)
-        .paginate(&db, page_size as u64);
+        .paginate(&db, request.page_size.max(1) as u64);
     let total_count = paginator.num_items().await.map_err(map_db_err)? as i64;
-    let page_index = if page <= 0 { 1 } else { page } as u64;
+    let window = paginate(request, total_count).clamped();
+    if total_count <= 0 {
+        return Ok(PagedReadingHistoryDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size: window.page_size,
+        });
+    }
     let rows = paginator
-        .fetch_page(page_index - 1)
+        .fetch_page(window.page as u64 - 1)
         .await
         .map_err(map_db_err)?;
     Ok(PagedReadingHistoryDto {
         items: rows.into_iter().map(map_reading_row).collect(),
         total_count,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 

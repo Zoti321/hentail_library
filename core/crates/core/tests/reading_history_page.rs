@@ -4,7 +4,7 @@ use std::path::Path;
 
 use hentai_core::{
     connection, fetch_reading_page, get_reading_by_comic_id, init_db_at_path, record_reading,
-    ReadingHistoryDto,
+    PageRequestDto, ReadingHistoryDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -62,18 +62,44 @@ fn fetch_reading_page_returns_descending_pages() {
         runtime.block_on(async {
             seed_histories().await;
 
-            let page1 = fetch_reading_page(1, 2, None).await.expect("page1");
+            let page1 = fetch_reading_page(
+                PageRequestDto {
+                    page: 1,
+                    page_size: 2,
+                },
+                None,
+            )
+            .await
+            .expect("page1");
             assert_eq!(page1.total_count, 5);
+            assert_eq!(page1.page, 1);
+            assert_eq!(page1.page_size, 2);
             assert_eq!(page1.items.len(), 2);
             assert_eq!(page1.items[0].comic_id, "c1");
             assert_eq!(page1.items[1].comic_id, "c2");
 
-            let page2 = fetch_reading_page(2, 2, None).await.expect("page2");
+            let page2 = fetch_reading_page(
+                PageRequestDto {
+                    page: 2,
+                    page_size: 2,
+                },
+                None,
+            )
+            .await
+            .expect("page2");
             assert_eq!(page2.items.len(), 2);
             assert_eq!(page2.items[0].comic_id, "c3");
             assert_eq!(page2.items[1].comic_id, "c4");
 
-            let page3 = fetch_reading_page(3, 2, None).await.expect("page3");
+            let page3 = fetch_reading_page(
+                PageRequestDto {
+                    page: 3,
+                    page_size: 2,
+                },
+                None,
+            )
+            .await
+            .expect("page3");
             assert_eq!(page3.items.len(), 1);
             assert_eq!(page3.items[0].comic_id, "c5");
         });
@@ -89,9 +115,15 @@ fn fetch_reading_page_filters_by_keyword_case_insensitively() {
         runtime.block_on(async {
             seed_histories().await;
 
-            let filtered = fetch_reading_page(1, 50, Some("ALPHA".to_string()))
-                .await
-                .expect("filtered");
+            let filtered = fetch_reading_page(
+                PageRequestDto {
+                    page: 1,
+                    page_size: 50,
+                },
+                Some("ALPHA".to_string()),
+            )
+            .await
+            .expect("filtered");
             assert_eq!(filtered.total_count, 2);
             assert_eq!(filtered.items.len(), 2);
             let comic_ids: Vec<String> = filtered
@@ -114,11 +146,43 @@ fn fetch_reading_page_treats_blank_keyword_as_unfiltered() {
         runtime.block_on(async {
             seed_histories().await;
 
-            let page = fetch_reading_page(1, 50, Some("   ".to_string()))
-                .await
-                .expect("page");
+            let page = fetch_reading_page(
+                PageRequestDto {
+                    page: 1,
+                    page_size: 50,
+                },
+                Some("   ".to_string()),
+            )
+            .await
+            .expect("page");
             assert_eq!(page.total_count, 5);
             assert_eq!(page.items.len(), 5);
+        });
+    });
+}
+
+#[test]
+fn fetch_reading_page_clamps_out_of_range_page_to_last() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        create_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            seed_histories().await;
+
+            let page = fetch_reading_page(
+                PageRequestDto {
+                    page: 99,
+                    page_size: 2,
+                },
+                None,
+            )
+            .await
+            .expect("page");
+            assert_eq!(page.page, 3);
+            assert_eq!(page.page_size, 2);
+            assert_eq!(page.items.len(), 1);
+            assert_eq!(page.items[0].comic_id, "c5");
         });
     });
 }
