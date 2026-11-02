@@ -14,9 +14,8 @@ import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.
 
 /// 跨 feature 共享的库状态与端口 Provider 声明（#261a）。
 ///
-/// 这里只声明、不实现：默认值抛 [UnimplementedError]，
-/// 由 bootstrap 的 `ProviderScope(overrides: ...)` 注入 library_admin 的实现。
-/// 消费方在后续 slice（261e）中改为依赖这些 Provider。
+/// 实现与 `createX…Port` 工厂见 owner
+/// `features/library_admin/public.dart`（bootstrap override 注入）。
 
 final Provider<CurrentLibraryPort> currentLibraryPortProvider =
     Provider<CurrentLibraryPort>(
