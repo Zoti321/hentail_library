@@ -11,7 +11,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 ///
 /// 形状与动效：通过 [Md3eLibraryPageHeaderMetrics.displayTargetTabThemeFor] 注入
 /// （divider、indicator 尺寸/圆角/inset、spring、state opacity）。SDK 不提供圆角
-/// state layer 槽形；需要胶囊形态可参考生产 [CapsuleTabBar] 或 M3E Segmented Button。
+/// state layer 槽形；需要胶囊形态可参考 M3E Segmented Button。
 class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
   const Md3eLibraryDisplayTargetTabs({
     super.key,

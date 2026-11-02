@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 详情摘要区年龄限制标记（Lab MD3E 风，非生产 [R18RatingChip]）。
+/// 详情摘要区年龄限制标记（Lab MD3E 风）。
 class Md3eComicDetailAgeRestrictionChip extends StatelessWidget {
   const Md3eComicDetailAgeRestrictionChip({super.key});
 

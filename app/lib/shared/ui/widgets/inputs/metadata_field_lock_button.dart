@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Komga 式元数据字段锁（Lab / M3E 主题；对齐生产 [MetadataLockButton] 语义）。
+/// Komga 式元数据字段锁（Lab / M3E 主题）。
 class Md3eMetadataFieldLockButton extends StatelessWidget {
   const Md3eMetadataFieldLockButton({
     super.key,

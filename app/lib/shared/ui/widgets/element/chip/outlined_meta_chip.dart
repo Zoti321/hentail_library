@@ -36,7 +36,7 @@ class OutlinedMetaChip extends HookWidget {
   final Color? backgroundColor;
   final Color? textColor;
 
-  /// 为 true 时使用更紧的 padding（`10×4`，对齐 [R18RatingChip]）。
+  /// 为 true 时使用更紧的 padding（`10×4`）。
   final bool compact;
   final bool verified;
   final IconData? icon;
