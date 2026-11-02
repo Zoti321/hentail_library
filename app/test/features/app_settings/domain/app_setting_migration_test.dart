@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
-import 'package:hentai_library/shared/domain/models/app_setting_migration.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
 
 void main() {

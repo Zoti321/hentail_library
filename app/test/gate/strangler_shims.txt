@@ -54,3 +54,10 @@ shared/domain/repositories/reading_history_repository.dart
 shared/domain/repositories/remote_library_credential_store.dart
 shared/domain/repositories/series_repository.dart
 shared/domain/repositories/tag_repository.dart
+shared/domain/models/app_release_info.dart
+shared/domain/models/app_setting.dart
+shared/domain/models/app_setting_migration.dart
+shared/domain/models/entity/reading_history.dart
+shared/domain/models/named_facet_form_candidate.dart
+shared/domain/models/read_models/home_page_read_models.dart
+shared/domain/models/tag_dictionary_import_result.dart

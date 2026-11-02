@@ -5,7 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_page.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
 class _RecordingSettingsNotifier extends SettingsNotifier {
   final List<AppThemePreference> themeCalls = <AppThemePreference>[];

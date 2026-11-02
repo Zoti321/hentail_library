@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
 import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
-import 'package:hentai_library/shared/domain/models/app_setting_migration.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';

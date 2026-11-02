@@ -13,7 +13,7 @@ import 'package:hentai_library/shared/domain/library/library_sidebar_layout.dart
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
+import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';

@@ -7,7 +7,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/util/app_root_navigator.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
-import 'package:hentai_library/shared/domain/models/app_release_info.dart';
+import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';

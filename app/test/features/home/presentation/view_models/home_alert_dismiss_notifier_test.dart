@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
+import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

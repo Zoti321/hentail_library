@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
 void main() {
   test('fromJson drops legacy readerAutoPlayEnabled and keeps interval', () {

@@ -1,9 +1,1 @@
-typedef AppReleaseAsset = ({String name, String downloadUrl, int size});
-
-typedef AppReleaseInfo = ({
-  String version,
-  DateTime publishedAt,
-  List<String> releaseNotes,
-  String htmlUrl,
-  List<AppReleaseAsset> assets,
-});
+export 'package:hentai_library/features/app_settings/domain/app_release_info.dart';

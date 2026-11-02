@@ -4,7 +4,7 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/se
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_sections.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page_body.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
 /// 设置页（MD3E Cutover）：生产 `/settings` 路由入口。
 class SettingsMd3ePage extends ConsumerWidget {

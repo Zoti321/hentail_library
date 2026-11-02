@@ -1,15 +1,15 @@
-import 'package:hentai_library/shared/domain/models/models.dart' as entity;
+import 'package:hentai_library/features/home/domain/reading_history.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 
 abstract class ReadingHistoryRepository {
-  Future<void> recordReading(entity.ReadingHistory history);
+  Future<void> recordReading(ReadingHistory history);
 
-  Future<entity.ReadingHistory?> getByComicId(String comicId);
+  Future<ReadingHistory?> getByComicId(String comicId);
 
-  Stream<List<entity.ReadingHistory>> watchAllHistory();
+  Stream<List<ReadingHistory>> watchAllHistory();
 
-  Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
+  Future<PagedResult<ReadingHistory>> fetchHistoryPage(
     PageRequest request, {
     String? keyword,
   });

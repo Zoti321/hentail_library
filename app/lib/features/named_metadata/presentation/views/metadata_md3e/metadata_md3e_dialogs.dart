@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/shared/ui/theme/lab_text.dart';
-import 'package:hentai_library/shared/domain/models/tag_dictionary_import_result.dart';
+import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 合并确认：目标与来源列表摘要 + 「以后不再提示」。返回是否确认。

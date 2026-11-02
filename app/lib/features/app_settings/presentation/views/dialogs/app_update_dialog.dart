@@ -6,7 +6,7 @@ import 'package:hentai_library/core/util/open_downloaded_file.dart';
 import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_download_dialog.dart';
-import 'package:hentai_library/shared/domain/models/app_release_info.dart';
+import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/theme/lab_text.dart';

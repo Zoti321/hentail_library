@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/domain/models/entity/reading_history.dart';
+import 'package:hentai_library/features/home/domain/reading_history.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/home/domain/reading_history_repository.dart';

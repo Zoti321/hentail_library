@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_repository_impl.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
 import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _MemoryLegacySettingsJsonFile implements LegacySettingsJsonFile {
