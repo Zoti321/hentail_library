@@ -1,0 +1,138 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
+import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_edit_draft.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_edit_form.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
+
+export 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_edit_draft.dart';
+
+/// 漫画元数据编辑 Lab 页（Widgetbook / 路由）。
+class Md3eComicMetadataEditPage extends StatefulWidget {
+  const Md3eComicMetadataEditPage({
+    super.key,
+    required this.initialDraft,
+    this.initialLocks,
+    this.presentation = Md3eMetadataEditPresentation.embedded,
+    this.onSaved,
+    this.onCancel,
+  });
+
+  final Md3eComicMetadataEditDraft initialDraft;
+  final ComicMetaLocks? initialLocks;
+  final Md3eMetadataEditPresentation presentation;
+  final ValueChanged<Md3eComicMetadataEditDraft>? onSaved;
+  final VoidCallback? onCancel;
+
+  @override
+  State<Md3eComicMetadataEditPage> createState() =>
+      _Md3eComicMetadataEditPageState();
+}
+
+class _Md3eComicMetadataEditPageState extends State<Md3eComicMetadataEditPage> {
+  late Md3eComicMetadataEditDraft _draft = widget.initialDraft;
+  String? _titleError;
+  bool _saving = false;
+  ComicMetaLocks _locks = ComicMetaLocks.unlocked;
+
+  @override
+  void initState() {
+    super.initState();
+    _locks = widget.initialLocks ?? ComicMetaLocks.unlocked;
+  }
+
+  @override
+  void didUpdateWidget(covariant Md3eComicMetadataEditPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialLocks != null &&
+        widget.initialLocks != oldWidget.initialLocks) {
+      _locks = widget.initialLocks!;
+    }
+  }
+
+  void _onLockChanged({
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
+    bool? languages,
+    bool? parodies,
+    bool? characters,
+  }) {
+    setState(
+      () => _locks = _locks.copyWith(
+        title: title,
+        description: description,
+        publishedAt: publishedAt,
+        contentRating: contentRating,
+        authors: authors,
+        tags: tags,
+        languages: languages,
+        parodies: parodies,
+        characters: characters,
+      ),
+    );
+  }
+
+  void _handleCancel() {
+    widget.onCancel?.call();
+    if (widget.onCancel == null && Navigator.canPop(context)) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> saveAndPop() => _handleSave();
+
+  Future<void> _handleSave() async {
+    final String? error = _draft.validateTitle();
+    if (error != null) {
+      setState(() {
+        _titleError = error;
+      });
+      return;
+    }
+    setState(() => _saving = true);
+    await Future<void>.delayed(Md3eMotion.labSimulatedSaveDuration);
+    if (!mounted) {
+      return;
+    }
+    widget.onSaved?.call(_draft);
+    setState(() => _saving = false);
+    if (widget.onSaved == null && Navigator.canPop(context)) {
+      Navigator.of(context).pop(_draft);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+
+    return Md3eMetadataEditSurface(
+      presentation: widget.presentation,
+      maxWidth: Md3eMetadataEditFormMetrics.comicMaxWidth,
+      title: l10n.dialogEditMetadataTitle,
+      onCancel: _handleCancel,
+      onSave: _handleSave,
+      saving: _saving,
+      body: Md3eComicMetadataEditForm(
+        draft: _draft,
+        locks: _locks,
+        onLockChanged: _onLockChanged,
+        titleError: _titleError,
+        onDraftChanged: (Md3eComicMetadataEditDraft value) {
+          setState(() {
+            _draft = value;
+            if (_titleError != null && value.validateTitle() == null) {
+              _titleError = null;
+            }
+          });
+        },
+      ),
+    );
+  }
+}

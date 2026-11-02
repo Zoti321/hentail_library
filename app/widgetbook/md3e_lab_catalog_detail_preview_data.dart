@@ -1,6 +1,6 @@
-import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
-import 'package:hentai_library/features/library_browse/presentation/patterns/library/lab_catalog_item_preview.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/views/comic_detail_md3e/comic_detail_page_entry.dart';
+import 'package:hentai_library/features/library_browse/presentation/series/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/lab_catalog_item_preview.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// 由目录 index 生成 Lab 详情 preview（与 [Md3eLabCatalogItemPreview] 标题一致）。

@@ -11,7 +11,7 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_selection_header.dart';
-import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_page_header.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/di/series_cover_providers.dart';

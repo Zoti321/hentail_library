@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_catalog_toolbar.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 import '../../support/pump_md3e_app.dart';
