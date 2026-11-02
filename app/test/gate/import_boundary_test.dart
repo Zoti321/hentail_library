@@ -37,15 +37,52 @@ void main() {
     expect(isFrbImportAllowedSource('shared/data/adapters/foo.dart'), isTrue);
   });
 
+  test('M1 public path allowlist (ADR-0034 / #429)', () {
+    expect(
+      isFeaturePublicPath('features/library_admin/public/library_admin.dart'),
+      isTrue,
+    );
+    expect(
+      isFeaturePublicPath('features/library_admin/public.dart'),
+      isTrue,
+    );
+    expect(
+      isFeaturePublicPath('features/library_admin/public/ui/commands.dart'),
+      isTrue,
+    );
+    expect(
+      isFeaturePublicPath('features/library_admin/application/foo.dart'),
+      isFalse,
+    );
+    expect(
+      isFeaturePublicPath('features/library_admin/presentation/bar.dart'),
+      isFalse,
+    );
+    expect(isFeaturePublicPath('shared/domain/foo.dart'), isFalse);
+  });
+
   test('import boundaries: L1 structural rules are zero-tolerance', () {
     final List<ImportViolation> all = collectImportViolations(libDir);
     final List<ImportViolation> structural = structuralViolations(all);
     if (structural.isNotEmpty) {
       fail(
-        'Structural import violations (R1–R10):\n'
+        'Structural import violations (R1–R12):\n'
         '${_formatViolations(structural)}',
       );
     }
+  });
+
+  test('import boundaries: no cycles in public cross-feature graph', () {
+    final Map<String, Set<String>> adjacency =
+        collectPublicCrossFeatureAdjacency(libDir);
+    final List<String>? cycle = findPublicCrossFeatureCycle(adjacency);
+    expect(
+      cycle,
+      isNull,
+      reason: cycle == null
+          ? null
+          : 'Public API dependency cycle: ${cycle.join(' -> ')}',
+    );
   });
 
   test('import boundaries: L2 product graph ratchet vs baseline', () {

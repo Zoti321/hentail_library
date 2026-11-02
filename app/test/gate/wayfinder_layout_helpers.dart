@@ -42,6 +42,7 @@ const Set<String> kWayfinderFeatureLayerDirs = <String>{
   'di',
   'domain',
   'presentation',
+  'public',
 };
 
 /// Canonical lib-relative roots. Only files *outside* these roots can be

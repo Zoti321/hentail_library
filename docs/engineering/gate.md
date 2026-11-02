@@ -44,8 +44,9 @@
 
 |  concern | 测试 / 文件 |
 |----------|-------------|
-| L1 domain↔data、FRB 面、application 依赖 | `import_boundary_test.dart` |
-| L2 product 图 ratchet | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
+| L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation | `import_boundary_test.dart`（R1–R12） |
+| L2 product 图 ratchet（M1 非 public 边、M2/M3） | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
+| public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |
 | L3a shared/ui → features | `shared_ui_no_feature_import_test.dart` |
 | L3b shared/domain → features ratchet | `shared_domain_no_feature_import_test.dart` + baseline 生成器 |
 | FRB allowlist | `import_boundary_rules.dart`、`shared_feature_import_rules.dart` |

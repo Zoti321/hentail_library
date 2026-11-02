@@ -112,3 +112,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0031](./0031-md3e-production-cutover-by-feature.md) | MD3E 生产迁移按 feature Cutover，完成后收缩 Lab 目录 | Accepted |
 | [0032](./0032-single-theme-source-after-md3e-cutover.md) | MD3E Cutover 后 `shared/ui/theme` 只保留一套主题 | Accepted |
 | [0033](./0033-flutter-feature-application-layer.md) | Flutter feature Application 层（Wayfinder） | Accepted |
+| [0034](./0034-feature-public-api-only-cross-imports.md) | Cross-feature 协作 — public API only | Accepted |

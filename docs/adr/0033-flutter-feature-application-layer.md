@@ -26,7 +26,7 @@ Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Servic
 - `application` → `data` / `presentation` / `frb_generated` / `package:flutter*`：禁止。
 - `domain` → `application`：禁止。
 - `presentation/view_models` → `application`：允许（推荐）。
-- 产品 feature 间 import：仍禁止（import boundary ratchet）；跨模块经 shared 契约 + bootstrap。
+- 产品 feature 间 import：**仅** `features/<owner>/public/**`（ADR-0034）；deep import 仍禁止；跨模块契约仍经 shared + bootstrap，逐步迁入 owner public。
 
 ### 3. 与 MVVM、Rust
 

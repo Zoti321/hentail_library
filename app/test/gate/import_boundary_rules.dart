@@ -130,6 +130,27 @@ bool isApplicationLayerPath(String libRelativePosix) {
   return path.startsWith('features/') && path.contains('/application/');
 }
 
+/// Cross-feature allowlist (#427 / ADR-0034): `features/<owner>/public/**` only.
+bool isFeaturePublicPath(String importPath) {
+  final String path = importPath.replaceAll(r'\', '/');
+  if (!path.startsWith('features/')) {
+    return false;
+  }
+  final List<String> parts = path.split('/');
+  if (parts.length < 3) {
+    return false;
+  }
+  if (parts[2] == 'public') {
+    return true;
+  }
+  return parts.length == 3 && parts[2] == 'public.dart';
+}
+
+bool isFeaturePublicLayerPath(String libRelativePosix) {
+  final String path = libRelativePosix.replaceAll(r'\', '/');
+  return path.startsWith('features/') && path.contains('/public/');
+}
+
 bool _importTargetsFeatureApplication(String importPath) {
   return importPath.startsWith('features/') &&
       importPath.contains('/application/');
@@ -381,6 +402,34 @@ void _checkStructuralRules({
       );
     }
   }
+
+  if (sourceModule == 'shared' &&
+      importPath.startsWith('features/') &&
+      isFeaturePublicPath(importPath)) {
+    found.add(
+      violation(
+        ruleId: 'R11',
+        sourceModule: sourceModule,
+        targetModule: targetModule,
+        sourceFile: sourceRel,
+        importUri: importUri,
+      ),
+    );
+  }
+
+  if (isFeaturePublicLayerPath(sourceRel) &&
+      isProductModule(sourceModule) &&
+      importPath.startsWith('features/$sourceModule/presentation/')) {
+    found.add(
+      violation(
+        ruleId: 'R12',
+        sourceModule: sourceModule,
+        targetModule: targetModule,
+        sourceFile: sourceRel,
+        importUri: importUri,
+      ),
+    );
+  }
 }
 
 void _checkModuleGraphRules({
@@ -422,15 +471,17 @@ void _checkModuleGraphRules({
     return;
   }
 
-  found.add(
-    violation(
-      ruleId: 'M1',
-      sourceModule: sourceModule,
-      targetModule: targetModule,
-      sourceFile: sourceRel,
-      importUri: importUri,
-    ),
-  );
+  if (!isFeaturePublicPath(importPath)) {
+    found.add(
+      violation(
+        ruleId: 'M1',
+        sourceModule: sourceModule,
+        targetModule: targetModule,
+        sourceFile: sourceRel,
+        importUri: importUri,
+      ),
+    );
+  }
 
   final bool targetIsPresentation =
       isPresentationLayerPath(importPath) ||
@@ -464,4 +515,89 @@ List<ImportViolation> ratchetViolations(List<ImportViolation> all) {
 
 Set<String> violationKeySet(List<ImportViolation> violations) {
   return violations.map(violationKey).toSet();
+}
+
+/// Directed edges `sourceModule -> targetModule` for public-only cross-feature imports.
+Map<String, Set<String>> collectPublicCrossFeatureAdjacency(Directory libDir) {
+  final Map<String, Set<String>> adjacency = <String, Set<String>>{};
+  final Iterable<File> dartFiles = libDir
+      .listSync(recursive: true)
+      .whereType<File>()
+      .where((File f) => f.path.endsWith('.dart'));
+
+  for (final File file in dartFiles) {
+    final String rel = p.posix.normalize(
+      p.relative(file.path, from: libDir.path).replaceAll(r'\', '/'),
+    );
+    if (isGeneratedDartFile(rel)) {
+      continue;
+    }
+    final String contents = file.readAsStringSync();
+    if (!isCanonicalLibRelativePath(rel) &&
+        isStranglerExportOnlyShim(contents)) {
+      continue;
+    }
+    final String sourceModule = classifyLibPath(rel);
+    if (!isProductModule(sourceModule)) {
+      continue;
+    }
+    for (final RegExpMatch match in _importUriRe.allMatches(contents)) {
+      final String importPath = match.group(1)!;
+      if (!isFeaturePublicPath(importPath)) {
+        continue;
+      }
+      final String? targetModule = resolveImportTargetModule(
+        importPath,
+        libDir,
+      );
+      if (targetModule == null ||
+          !isProductModule(targetModule) ||
+          sourceModule == targetModule) {
+        continue;
+      }
+      adjacency.putIfAbsent(sourceModule, () => <String>{}).add(targetModule);
+    }
+  }
+  return adjacency;
+}
+
+/// Returns one cycle as module ids, or null if acyclic.
+List<String>? findPublicCrossFeatureCycle(Map<String, Set<String>> adjacency) {
+  final Set<String> allNodes = <String>{
+    ...adjacency.keys,
+    for (final Set<String> targets in adjacency.values) ...targets,
+  };
+  final Set<String> visited = <String>{};
+  final Set<String> inStack = <String>{};
+  List<String>? cycle;
+
+  void dfs(String node, List<String> path) {
+    if (cycle != null) {
+      return;
+    }
+    if (inStack.contains(node)) {
+      final int start = path.indexOf(node);
+      cycle = <String>[...path.sublist(start), node];
+      return;
+    }
+    if (visited.contains(node)) {
+      return;
+    }
+    visited.add(node);
+    inStack.add(node);
+    path.add(node);
+    for (final String next in adjacency[node] ?? const <String>{}) {
+      dfs(next, path);
+    }
+    path.removeLast();
+    inStack.remove(node);
+  }
+
+  for (final String node in allNodes) {
+    dfs(node, <String>[]);
+    if (cycle != null) {
+      break;
+    }
+  }
+  return cycle;
 }
