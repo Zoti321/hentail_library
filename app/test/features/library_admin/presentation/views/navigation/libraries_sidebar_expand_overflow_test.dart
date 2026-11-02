@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';

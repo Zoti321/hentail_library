@@ -9,11 +9,11 @@ import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
+import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
+import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
 /// Sentinel passed to Rust when the user clears published date.

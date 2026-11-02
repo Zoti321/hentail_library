@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/shared/domain/ports/clipboard_image_port.dart';
+import 'package:hentai_library/features/read_session/domain/clipboard_image_port.dart';
 import 'package:super_clipboard/super_clipboard.dart';
 
 class SystemClipboardImageAdapter implements ClipboardImagePort {

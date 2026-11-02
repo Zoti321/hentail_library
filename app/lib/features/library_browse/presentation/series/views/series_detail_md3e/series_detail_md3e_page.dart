@@ -22,7 +22,7 @@ import 'package:hentai_library/features/library_browse/presentation/series/views
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
-import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
+import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';

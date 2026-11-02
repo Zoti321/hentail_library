@@ -1,11 +1,4 @@
-/// Comic metadata bulk patch batch outcome from Rust core.
-typedef ComicMetadataBulkPatchResult = ({
-  int succeeded,
-  int failed,
-  int unchanged,
-  bool cancelled,
-  List<String> errorSamples,
-});
+export 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_result.dart';
 
 enum ComicMetadataBulkMultiValueOp { add, remove, replace }
 

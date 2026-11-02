@@ -1,26 +1,29 @@
 # `shared/domain` 归属表（Epic #436 收尾）
 
 **决策索引**：ADR-0033（Application 层）、ADR-0034（public only）、**ADR-0035**（Catalog Shared Kernel）。  
-**门禁**：L3b `shared_domain_feature_import_baseline.json`（当前应为 `[]`）；strangler 仅 `app/test/gate/strangler_shims.txt` 列出的 export-only 路径。
+**门禁**：L3b `shared_domain_feature_import_baseline.json`（当前应为 `[]`）；**2026-11-02** 起 owner 域 strangler re-export 已全部移除（`strangler_shims.txt` 为空），请直接 import **`features/<owner>/domain/...`**。
 
-## 真源在 owner feature（shared 仅为 strangler re-export）
+## 真源在 owner feature（已从 shared 移除 strangler）
 
-| shared 路径（薄 shim） | Owner 真源 |
+下列类型 **仅** 存在于各 feature `domain/`；`shared/domain/repositories/`、`shared/domain/reading/`、多数 `shared/domain/library/` shim 文件已删除：
+
+| 语义 | Owner 真源 |
 | --- | --- |
-| `comic_trash/*`、`models/read_models/trashed_comic.dart` | `features/comic_trash/domain/` |
+| `comic_trash/*`、`TrashedComic` read model | `features/comic_trash/domain/` |
 | `reading/*` | `features/read_session/domain/` |
-| `library/*`（除下表「仍 @ shared」） | `library_browse/domain/` 或 `library_admin/domain/`（见各文件 `export` 目标） |
-| `comic/comic_display_title.dart` | `features/library_browse/domain/` |
-| `ports/reader_session_port.dart`、`comic_page_source_port.dart`、`clipboard_image_port.dart` | `features/read_session/domain/` |
-| `ports/reader_settings_command_port.dart` | `features/app_settings/domain/` |
-| `repositories/*`（除 reading_history） | 各 owner `features/*/domain/`（与 data 实现同 feature） |
-| **reading_history feature** | `features/reading_history/`（domain、data、`/history` 全套 presentation）；`public.dart` export 实体与 `HistoryCardItem` 供 home「继续阅读」网格 |
-| `models/app_setting*.dart` | `features/app_settings/domain/` |
-| `models/entity/reading_history.dart`、`repositories/reading_history_repository.dart` | `features/reading_history/domain/` |
-| `models/read_models/home_page_read_models.dart` | `features/home/domain/` |
-| `models/named_facet_form_candidate.dart`、`models/tag_dictionary_import_result.dart` | `features/named_metadata/domain/` |
+| 库 browse 规则（筛选/排序/投影等） | `features/library_browse/domain/{browse,series,comic}/` |
+| 库 admin（扫描、revision、current library 等） | `features/library_admin/domain/` |
+| `comic_display_title` 等 | `features/library_browse/domain/comic/` |
+| read_session / app_settings 端口实现类型 | 各 owner `domain/` |
+| `repositories/*` 契约 | 各 owner `features/*/domain/` |
+| **reading_history** | `features/reading_history/domain/` |
+| `app_setting*` | `features/app_settings/domain/` |
+| home read models | `features/home/domain/` |
+| named metadata 表单/字典 | `features/named_metadata/domain/` |
 
-Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。过渡期仍可从 `shared/domain/...` import，但新代码勿增 shared 路径依赖。
+Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。**勿**再新增对已删除 shared shim 路径的依赖。
+
+`models/models.dart` 仍 re-export `reading_history` 与 `app_setting` 的 **feature URI**（便捷 barrel，非 strangler 文件）。
 
 ## Catalog Shared Kernel（真源 @ shared，ADR-0035）
 
@@ -29,6 +32,9 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 - `models/entity/comic/**`、`models/enums.dart`
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
 - 与 catalog 强绑定的 form / pick / meta VO（见 `models/models.dart` barrel）
+- `reading/series_reading_context.dart`（library_browse ↔ read_session 共用，避免 R5）
+- `library/scan_interval.dart`、`library/metadata_refresh_types.dart`、`library/comic_metadata_bulk_patch_result.dart`（库扫描/批量结果；shared UI toast 与 `LocalLibrary` 共用）
+- `models/managed_named_facet_kind.dart`（metadata 管理 Tab 枚举）
 - `thumbnail/**`
 
 ## 契约仍定义在 `shared/domain`（未 owner 化）

@@ -1,8 +1,1 @@
-/// Batch Metadata refresh outcome (Series or Library).
-typedef MetadataRefreshBatchResult = ({
-  int succeeded,
-  int failed,
-  bool cancelled,
-  bool skipped,
-  String? skipMessage,
-});
+export 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';

@@ -1,16 +1,7 @@
+import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
+export 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-
-enum ManagedNamedFacetKind { author, tag, parody, character }
-
-/// Metadata management UI tab order (authors → tags → parodies → characters).
-const List<ManagedNamedFacetKind> kManagedNamedFacetTabOrder =
-    <ManagedNamedFacetKind>[
-      ManagedNamedFacetKind.author,
-      ManagedNamedFacetKind.tag,
-      ManagedNamedFacetKind.parody,
-      ManagedNamedFacetKind.character,
-    ];
 
 abstract class NamedFacetManagementRepository {
   Future<List<String>> listAll(ManagedNamedFacetKind kind);

@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
+import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 
 /// 将安全存储中的 Remote 密码推入 Rust 进程内存，供阅读/缩略图/refresh 使用。

@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/shared/domain/models/named_facet_form_candidate.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/src/rust/api/named_facet.dart' as rust;
 
 /// Loads Comic metadata form candidates (attachment count DESC, name ASC).

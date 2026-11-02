@@ -5,7 +5,7 @@ import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart'
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/read_session/domain/reading_mode.dart';

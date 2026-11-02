@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:hentai_library/shared/domain/models/entity/reading_history.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';

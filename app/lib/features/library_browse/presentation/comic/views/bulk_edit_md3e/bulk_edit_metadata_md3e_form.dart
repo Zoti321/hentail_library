@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/draft/bulk_metadata_edit_session.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
-import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_types.dart';
+import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/md3e_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';

@@ -5,8 +5,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/domain/library/current_library_state.dart';
-import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
+import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
+import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_catalog_revision_coordinator.g.dart';

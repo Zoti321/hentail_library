@@ -7,7 +7,7 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_facet_chip_wrap.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_entity_dialog.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_draft_entity_chip.dart';
-import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_page_header.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';

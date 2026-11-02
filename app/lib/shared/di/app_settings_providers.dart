@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
-import 'package:hentai_library/shared/domain/ports/reader_settings_command_port.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart';
 
 /// 应用设置的共享状态与端口 Provider 声明（#265）。
 ///
