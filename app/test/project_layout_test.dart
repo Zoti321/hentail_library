@@ -126,6 +126,49 @@ void main() {
       expect(badLayerDirs, isEmpty);
     });
 
+    test('feature public/ layer requires a single barrel when present (#430)', () {
+      final Directory featuresDir = Directory(p.join(libDir.path, 'features'));
+      if (!featuresDir.existsSync()) {
+        return;
+      }
+      final List<String> missingBarrels = <String>[];
+      for (final FileSystemEntity entity in featuresDir.listSync()) {
+        if (entity is! Directory) {
+          continue;
+        }
+        final String moduleId = p.basename(entity.path);
+        if (!kWayfinderFeatureModuleIds.contains(moduleId)) {
+          continue;
+        }
+        final Directory publicDir = Directory(
+          p.join(entity.path, 'public'),
+        );
+        if (!publicDir.existsSync()) {
+          continue;
+        }
+        final bool hasPublicDart = dartFilesUnder(publicDir).isNotEmpty;
+        if (!hasPublicDart) {
+          continue;
+        }
+        final File featureBarrel = File(
+          p.join(entity.path, 'public.dart'),
+        );
+        final File nestedBarrel = File(
+          p.join(publicDir.path, 'public.dart'),
+        );
+        if (!featureBarrel.existsSync() && !nestedBarrel.existsSync()) {
+          missingBarrels.add('features/$moduleId/public/');
+        }
+      }
+      expect(
+        missingBarrels,
+        isEmpty,
+        reason:
+            'Add features/<id>/public.dart (or public/public.dart) exporting '
+            'the module public API:\n${missingBarrels.join('\n')}',
+      );
+    });
+
     test('no presentation/state/ directories under lib/', () {
       expect(findPresentationStateDirs(libDir), isEmpty);
     });
