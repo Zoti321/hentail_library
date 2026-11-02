@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_browse/domain/smart_facet_match_preference.dart';
+import 'package:hentai_library/features/library_browse/domain/comic/smart_facet_match_preference.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

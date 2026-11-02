@@ -1,10 +1,10 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/features/library_browse/data/repositories/comic_frb_mapper.dart';
-import 'package:hentai_library/features/library_browse/domain/comic_catalog_repository.dart';
-import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
-import 'package:hentai_library/features/library_browse/domain/comic_user_metadata_repository.dart';
-import 'package:hentai_library/features/library_browse/domain/library_comic_filter.dart';
-import 'package:hentai_library/features/library_browse/domain/library_comic_sort_option.dart';
+import 'package:hentai_library/features/library_browse/domain/comic/comic_catalog_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_grouping.dart';
+import 'package:hentai_library/features/library_browse/domain/comic/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
@@ -12,7 +12,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/read_models/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/library_browse/domain/comic_lookup_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 

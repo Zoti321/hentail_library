@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/shared/data/adapters/series_frb_mapper.dart';
-import 'package:hentai_library/features/library_browse/domain/library_series_projection.dart';
-import 'package:hentai_library/features/library_browse/domain/library_series_sort_option.dart';
+import 'package:hentai_library/features/library_browse/domain/series/library_series_projection.dart';
+import 'package:hentai_library/features/library_browse/domain/series/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/domain/models/value_objects/series_comic_p
 import 'package:hentai_library/shared/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
-import 'package:hentai_library/features/library_browse/domain/series_repository.dart';
+import 'package:hentai_library/features/library_browse/domain/series/series_repository.dart';
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 class SeriesRepositoryImpl implements SeriesRepository {

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_browse/domain/library_comic_grouping.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_comic_grouping.dart';
 import 'package:hentai_library/features/library_browse/presentation/view_models/library_comic_filters_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

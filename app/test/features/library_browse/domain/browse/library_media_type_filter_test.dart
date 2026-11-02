@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_browse/domain/library_media_type_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:test/test.dart';
 

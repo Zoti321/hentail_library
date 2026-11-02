@@ -20,7 +20,7 @@
 | `models/read_models/home_page_read_models.dart` | `features/home/domain/` |
 | `models/named_facet_form_candidate.dart`、`models/tag_dictionary_import_result.dart` | `features/named_metadata/domain/` |
 
-Feature 内代码应 **import owner `domain/`**；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。过渡期仍可从 `shared/domain/...` import，但新代码勿增 shared 路径依赖。
+Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`library-browse-zones.md`](library-browse-zones.md) 分子目录）；跨 feature 经 **`features/<owner>/public/**`**（ADR-0034）。过渡期仍可从 `shared/domain/...` import，但新代码勿增 shared 路径依赖。
 
 ## Catalog Shared Kernel（真源 @ shared，ADR-0035）
 

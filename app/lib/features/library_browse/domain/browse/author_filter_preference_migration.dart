@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_browse/domain/library_metadata_filter_selection.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_metadata_filter_selection.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 
 /// 把旧版按显示名持久化的 Author 筛选迁到 id；匹配失败的项丢弃。
