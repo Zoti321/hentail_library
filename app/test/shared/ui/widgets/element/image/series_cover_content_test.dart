@@ -7,7 +7,6 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
-import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
