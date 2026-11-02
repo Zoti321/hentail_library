@@ -35,18 +35,6 @@ Stream<HomePageCounts> homePageCountsStream(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-Stream<List<HomeLibraryStat>> homeLibraryStatsStream(Ref ref) {
-  final HomePageRepository repository = ref.watch(homePageRepoProvider);
-  final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
-  ref.watch(libraryRevisionThrottleBusyStateProvider);
-  return throttleWhile(
-    repository.watchLibraryStats(excludeR18: excludeR18),
-    shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
-    interval: _kHomeScanThrottleInterval,
-  );
-}
-
-@Riverpod(keepAlive: true)
 Stream<List<HomeLibraryAlert>> homeLibraryAlertsStream(Ref ref) {
   final HomePageRepository repository = ref.watch(homePageRepoProvider);
   ref.watch(libraryRevisionThrottleBusyStateProvider);

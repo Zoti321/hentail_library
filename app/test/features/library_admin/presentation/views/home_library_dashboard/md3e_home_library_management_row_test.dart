@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
-import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_section.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_section.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/reorderable_split_list_group.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
 
-import '../../../../../../support/pump_md3e_app.dart';
+import '../../../../../support/pump_md3e_app.dart';
 
 const List<Md3eHomeLibraryDashboardRow> _rows = <Md3eHomeLibraryDashboardRow>[
   Md3eHomeLibraryDashboardRow(

@@ -7,7 +7,7 @@ import 'package:hentai_library/features/app_settings/presentation/views/widgets/
 import 'package:hentai_library/features/library_admin/presentation/views/comic_metadata_bulk_patch_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_scan_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
-import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/library_dashboard_stats_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/md3e_production_shell_adapters.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
@@ -80,7 +80,7 @@ Md3eAppShellNavigationSlot _buildMd3eNavigationSlot({
       .watch(currentLibraryStateProvider)
       .maybeWhen(data: (state) => state.currentId, orElse: () => null);
   final List<HomeLibraryStat> stats = ref
-      .watch(homeLibraryStatsStreamProvider)
+      .watch(libraryDashboardStatsStreamProvider)
       .maybeWhen(
         data: (List<HomeLibraryStat> data) => data,
         orElse: () => const <HomeLibraryStat>[],

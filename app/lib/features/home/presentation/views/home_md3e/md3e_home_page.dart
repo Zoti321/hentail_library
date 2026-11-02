@@ -7,35 +7,22 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_aggregate_stats_section.dart';
-import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
-import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_section.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 生产首页（MD3E）：问候 + 页头 + 聚合统计 + 库列表（本票只读）。
+/// 生产首页（MD3E）：问候 + 页头 + 聚合统计 + 库列表（由 [libraryManagementSection] 注入）。
 class Md3eHomePage extends StatelessWidget {
   const Md3eHomePage({
     super.key,
-    required this.libraries,
     required this.aggregateCounts,
+    required this.libraryManagementSection,
     this.onOpenNavigation,
-    this.onLibraryOpen,
-    this.onLibraryAction,
-    this.onAddLocalLibrary,
-    this.onAddRemoteLibrary,
-    this.onLibrariesReorder,
   });
 
-  final List<Md3eHomeLibraryDashboardRow> libraries;
   final Md3eHomeAggregateCounts aggregateCounts;
+  final Widget libraryManagementSection;
   final VoidCallback? onOpenNavigation;
-  final ValueChanged<String>? onLibraryOpen;
-  final void Function(String libraryId, Md3eHomeLibraryManagementAction action)?
-  onLibraryAction;
-  final VoidCallback? onAddLocalLibrary;
-  final VoidCallback? onAddRemoteLibrary;
-  final void Function(int oldIndex, int newIndex)? onLibrariesReorder;
 
   @override
   Widget build(BuildContext context) {
@@ -87,14 +74,7 @@ class Md3eHomePage extends StatelessWidget {
                       sizeClass,
                     ),
                   ),
-                  Md3eHomeLibraryManagementSection(
-                    libraries: libraries,
-                    onLibraryOpen: onLibraryOpen,
-                    onLibraryAction: onLibraryAction,
-                    onAddLocalLibrary: onAddLocalLibrary,
-                    onAddRemoteLibrary: onAddRemoteLibrary,
-                    onLibrariesReorder: onLibrariesReorder,
-                  ),
+                  libraryManagementSection,
                 ],
               ),
             ),

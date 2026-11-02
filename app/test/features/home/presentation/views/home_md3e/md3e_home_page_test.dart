@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_copy.dart';
-import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_copy.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_section.dart';
 
 import '../../../../../../widgetbook/md3e_home_page_preview_data.dart';
 import '../../../../../support/pump_md3e_app.dart';
@@ -18,10 +19,12 @@ void main() {
         width: 900,
         height: 900,
         child: Md3eHomePage(
-          libraries: Md3eHomePagePreviewData.sampleLibraries(),
           aggregateCounts: Md3eHomePagePreviewData.sampleAggregateCounts(),
-          onAddLocalLibrary: () {},
-          onAddRemoteLibrary: () {},
+          libraryManagementSection: Md3eHomeLibraryManagementSection(
+            libraries: Md3eHomePagePreviewData.sampleLibraries(),
+            onAddLocalLibrary: () {},
+            onAddRemoteLibrary: () {},
+          ),
         ),
       ),
     );

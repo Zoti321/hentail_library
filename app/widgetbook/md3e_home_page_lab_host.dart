@@ -7,9 +7,10 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import 'md3e_library_edit_navigation.dart';
 
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
-import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_management_copy.dart';
-import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_delete_confirm_dialog.dart';
-import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_library_list_order.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_copy.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_section.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_delete_confirm_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_list_order.dart';
 
 import 'md3e_home_page_preview_data.dart';
 
@@ -203,14 +204,18 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
   @override
   Widget build(BuildContext context) {
     return Md3eHomePage(
-      libraries: _libraries,
       aggregateCounts: Md3eHomePagePreviewData.sampleAggregateCounts(),
       onOpenNavigation: widget.onOpenNavigation,
-      onLibraryOpen: widget.onLibraryOpen,
-      onLibraryAction: _handleLibraryAction,
-      onAddLocalLibrary: widget.onAddLocalLibrary ?? _defaultAddLocalLibrary,
-      onAddRemoteLibrary: widget.onAddRemoteLibrary ?? _defaultAddRemoteLibrary,
-      onLibrariesReorder: widget.enableReorder ? _handleReorder : null,
+      libraryManagementSection: Md3eHomeLibraryManagementSection(
+        libraries: _libraries,
+        onLibraryOpen: widget.onLibraryOpen,
+        onLibraryAction: _handleLibraryAction,
+        onAddLocalLibrary:
+            widget.onAddLocalLibrary ?? _defaultAddLocalLibrary,
+        onAddRemoteLibrary:
+            widget.onAddRemoteLibrary ?? _defaultAddRemoteLibrary,
+        onLibrariesReorder: widget.enableReorder ? _handleReorder : null,
+      ),
     );
   }
 }
