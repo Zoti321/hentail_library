@@ -22,14 +22,11 @@
 | 子目录 | 内容 |
 | --- | --- |
 | `shared/data/frb/` | `frb_call_guard`、`frb_error_mapper`、`frb_zone_guard`（全 app） |
-| `shared/data/mappers/` | 多 feature 共用的 DTO 映射（迁出前的 `series_*`、`reader_*`、`thumbnail_*`） |
-| `shared/data/adapters/` | 跨 feature 进程级 FRB 辅助（如 `remote_credentials_frb_adapter`） |
-| `shared/data/repositories/` | Catalog 内核仓储（如缩略图） |
+| `shared/data/adapters/` | 预留；跨 feature 进程级 FRB 已迁入 owner `public` + port |
+| `shared/data/repositories/` | 非 owner 仓储接缝（如 `named_facet_form_listing`，#295） |
 
 新 FRB 映射 **默认进 owner `features/<id>/data/mappers/`**；仅当 ≥2 个 feature 依赖且短期无法抽 port 时，才放 `shared/data/mappers/`。
 
 ## 迁移 backlog（FRB 深模块）
 
-- **第三批**：`remote_credentials_frb_adapter` → `library_admin` + public port；`thumbnail_frb_mapper` 随缩略图归属定稿。
-
-**已完成**：第一批单域 adapter/mapper；第二批 `series_frb_mapper` @ `library_browse/data/series/`、`reader_frb_mapper` @ `read_session/data/mappers/`，`mapResourceType` @ `shared/domain/models/resource_type_frb_wire.dart`。
+**已完成**：第一～三批（单域 mapper/adapter、`series`/`reader` 迁出 shared、`remote_credentials` @ library_admin + [RemoteLibraryCredentialsPort]、缩略图 FRB @ `library_browse/data/comic/`）。

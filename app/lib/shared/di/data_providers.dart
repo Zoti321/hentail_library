@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
@@ -66,6 +67,11 @@ final Provider<LibraryRepository> libraryRepoProvider =
     Provider<LibraryRepository>(
       (Ref ref) => _unimplemented('libraryRepoProvider'),
     );
+
+final Provider<RemoteLibraryCredentialsPort>
+remoteLibraryCredentialsPortProvider = Provider<RemoteLibraryCredentialsPort>(
+  (Ref ref) => _unimplemented('remoteLibraryCredentialsPortProvider'),
+);
 
 final Provider<ReadingHistoryRepository> readingHistoryRepoProvider =
     Provider<ReadingHistoryRepository>(

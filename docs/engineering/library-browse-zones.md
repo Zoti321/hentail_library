@@ -29,7 +29,7 @@
 
 | 路径 | 内容 |
 | --- | --- |
-| `data/comic/` | `comic_repository_impl`、`comic_frb_mapper` |
+| `data/comic/` | `comic_repository_impl`、`comic_frb_mapper`、`comic_thumbnail_repository_impl`、`thumbnail_frb_mapper` |
 | `data/series/` | `series_repository_impl` |
 | `presentation/comic/view_models/` | 漫画 metadata、详情导航、smart facet 等 |
 | `presentation/series/view_models/` | 系列详情、metadata editor、成员 catalog |

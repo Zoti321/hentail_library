@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/data/mappers/thumbnail_frb_mapper.dart';
+import 'package:hentai_library/features/library_browse/data/comic/thumbnail_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;

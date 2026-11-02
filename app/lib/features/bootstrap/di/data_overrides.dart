@@ -6,7 +6,8 @@ import 'package:hentai_library/features/app_settings/data/repositories/app_setti
 import 'package:hentai_library/features/named_metadata/data/repositories/author_repository_impl.dart';
 import 'package:hentai_library/features/library_browse/data/comic/comic_repository_impl.dart';
 import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
-import 'package:hentai_library/shared/data/repositories/comic_thumbnail_repository_impl.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/library_browse/data/comic/comic_thumbnail_repository_impl.dart';
 import 'package:hentai_library/features/home/data/repositories/home_page_repository_impl.dart';
 import 'package:hentai_library/features/library_admin/data/repositories/library_repository_impl.dart';
 import 'package:hentai_library/features/named_metadata/data/repositories/named_facet_dictionary_repository_impl.dart';
@@ -19,9 +20,14 @@ import 'package:hentai_library/features/named_metadata/domain/named_facet_dictio
 import 'package:riverpod/misc.dart' show Override;
 
 List<Override> dataProviderOverrides() => <Override>[
+  remoteLibraryCredentialsPortProvider.overrideWith(
+    (Ref ref) => createRemoteLibraryCredentialsPort(
+      ref.read(libraryRepoProvider),
+    ),
+  ),
   comicThumbnailRepoProvider.overrideWith(
     (Ref ref) => ComicThumbnailRepositoryImpl(
-      libraryRepository: ref.read(libraryRepoProvider),
+      remoteCredentials: ref.read(remoteLibraryCredentialsPortProvider),
     ),
   ),
   comicLookupRepositoryProvider.overrideWith(
@@ -64,7 +70,7 @@ List<Override> dataProviderOverrides() => <Override>[
   ),
   readerSessionPortProvider.overrideWith(
     (Ref ref) => ReaderSessionFrbAdapter(
-      libraryRepository: ref.read(libraryRepoProvider),
+      remoteCredentials: ref.read(remoteLibraryCredentialsPortProvider),
     ),
   ),
   comicPageSourcePortProvider.overrideWith(

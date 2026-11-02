@@ -20,12 +20,6 @@ void main() {
   test('shared/data intentional feature-import exemptions stay documented', () {
     expect(
       isSharedDataFeatureImportExempt(
-        'shared/data/mappers/thumbnail_frb_mapper.dart',
-      ),
-      isTrue,
-    );
-    expect(
-      isSharedDataFeatureImportExempt(
         'shared/data/repositories/named_facet_form_listing.dart',
       ),
       isTrue,

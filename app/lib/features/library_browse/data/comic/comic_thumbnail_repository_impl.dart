@@ -1,19 +1,20 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
-import 'package:hentai_library/shared/data/adapters/remote_credentials_frb_adapter.dart';
-import 'package:hentai_library/shared/data/mappers/thumbnail_frb_mapper.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/features/library_browse/data/comic/thumbnail_frb_mapper.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_thumbnail_repository.dart';
-import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
 class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
-  const ComicThumbnailRepositoryImpl({required this._libraryRepository});
+  const ComicThumbnailRepositoryImpl({
+    required RemoteLibraryCredentialsPort this._remoteCredentials,
+  });
 
-  final LibraryRepository _libraryRepository;
+  final RemoteLibraryCredentialsPort _remoteCredentials;
 
   @override
   Future<ComicThumbnailRecord?> findByComicId(String comicId) async {
@@ -37,7 +38,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     required String comicId,
     required ThumbnailPriority priority,
   }) async {
-    await pushRemoteLibraryCredentials(_libraryRepository);
+    await _remoteCredentials.pushStoredRemoteCredentialsToRust();
     final rust.ComicThumbnailDto? row = await guardFrb(
       () => rust.ensureThumbnailByComicIdFrb(
         comicId: comicId,
@@ -63,7 +64,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     required String resourceType,
     required int pageIndex,
   }) async {
-    await pushRemoteLibraryCredentials(_libraryRepository);
+    await _remoteCredentials.pushStoredRemoteCredentialsToRust();
     guardFrbSync(
       () => rust.setComicThumbnailFromPageFrb(
         comicId: comicId,
@@ -83,7 +84,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     required String resourceType,
     required int pageIndex,
   }) async {
-    await pushRemoteLibraryCredentials(_libraryRepository);
+    await _remoteCredentials.pushStoredRemoteCredentialsToRust();
     guardFrbSync(
       () => rust.setSeriesThumbnailFromPageFrb(
         seriesId: seriesId,
