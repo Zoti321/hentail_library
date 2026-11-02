@@ -5,7 +5,7 @@ import 'package:hentai_library/shared/data/adapters/history_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/models.dart' as entity;
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
+import 'package:hentai_library/features/home/domain/reading_history_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
 import 'package:hentai_library/src/rust/api/history.dart' as rust;
 

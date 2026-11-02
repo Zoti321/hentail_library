@@ -4,7 +4,7 @@ import 'package:hentai_library/features/library_admin/domain/resource_format_cat
 import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
+import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 import 'package:test/test.dart';
 

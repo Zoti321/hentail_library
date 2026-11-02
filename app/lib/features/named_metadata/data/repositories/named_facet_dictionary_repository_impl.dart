@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
 import 'package:hentai_library/src/rust/api/character.dart' as rust_character;
 import 'package:hentai_library/src/rust/api/parody.dart' as rust_parody;
 

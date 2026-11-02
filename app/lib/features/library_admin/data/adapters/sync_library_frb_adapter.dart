@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
+import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 

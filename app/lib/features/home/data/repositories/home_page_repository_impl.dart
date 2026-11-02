@@ -1,6 +1,6 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
-import 'package:hentai_library/shared/domain/repositories/home_page_repository.dart';
+import 'package:hentai_library/features/home/domain/home_page_repository.dart';
 import 'package:hentai_library/src/rust/api/home.dart' as rust;
 import 'package:hentai_library/src/rust/api/probe.dart' as rust_probe;
 

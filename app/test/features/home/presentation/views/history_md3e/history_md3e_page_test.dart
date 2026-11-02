@@ -10,7 +10,7 @@ import 'package:hentai_library/features/home/presentation/patterns/history/histo
 import 'package:hentai_library/shared/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
+import 'package:hentai_library/features/home/domain/reading_history_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

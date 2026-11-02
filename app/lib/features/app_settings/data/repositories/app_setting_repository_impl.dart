@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/domain/library/resource_format_category.da
 import 'package:hentai_library/shared/domain/models/app_setting_migration.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_dictionary_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
