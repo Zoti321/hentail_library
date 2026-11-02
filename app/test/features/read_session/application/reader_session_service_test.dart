@@ -2,12 +2,11 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
+import 'package:hentai_library/features/library_browse/public/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
-import 'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
+import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
@@ -27,23 +26,13 @@ class _FakeComicRepository implements ComicLookupRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeReadingHistoryRepository implements ReadingHistoryRepository {
-  _FakeReadingHistoryRepository({this.pageIndex});
+class _FakeReadingHistoryCommands implements ReadingHistoryCommandPort {
+  _FakeReadingHistoryCommands({this.pageIndex});
 
   final int? pageIndex;
 
   @override
-  Future<ReadingHistory?> getByComicId(String comicId) async {
-    if (pageIndex == null) {
-      return null;
-    }
-    return ReadingHistory(
-      comicId: comicId,
-      title: 'Test',
-      lastReadTime: DateTime.utc(2026, 1, 1),
-      pageIndex: pageIndex,
-    );
-  }
+  Future<int?> readResumePageIndex(String comicId) async => pageIndex;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -164,7 +153,7 @@ ReaderSessionService _service({
           pages: pages ?? <ReadSessionPage>[],
           error: loadError,
         ),
-    readingHistoryRepo: _FakeReadingHistoryRepository(
+    readingHistoryCommands: _FakeReadingHistoryCommands(
       pageIndex: storedPageIndex,
     ),
     sessionPort: _FakeReaderSessionPort(),
@@ -200,7 +189,7 @@ void main() {
             ReadSessionArchivePage(comicId: 'c1', pageIndex: 2),
           ],
         ),
-        readingHistoryRepo: _FakeReadingHistoryRepository(pageIndex: 99),
+        readingHistoryCommands: _FakeReadingHistoryCommands(pageIndex: 99),
         sessionPort: sessionPort,
       );
 
@@ -265,7 +254,7 @@ void main() {
             ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
           ],
         ),
-        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        readingHistoryCommands: _FakeReadingHistoryCommands(),
         sessionPort: sessionPort,
         openTimeout: const Duration(milliseconds: 40),
       );
@@ -301,7 +290,7 @@ void main() {
       final ReaderSessionService service = ReaderSessionService(
         comicRepo: _FakeComicRepository(comic: null),
         pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
-        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        readingHistoryCommands: _FakeReadingHistoryCommands(),
         sessionPort: _FakeReaderSessionPort(),
       );
       await expectLater(
@@ -321,7 +310,7 @@ void main() {
       final ReaderSessionService service = ReaderSessionService(
         comicRepo: _FakeComicRepository(comic: _inputComic()),
         pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
-        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        readingHistoryCommands: _FakeReadingHistoryCommands(),
         sessionPort: sessionPort,
       );
 
@@ -341,7 +330,7 @@ void main() {
       final ReaderSessionService service = ReaderSessionService(
         comicRepo: _FakeComicRepository(comic: _inputComic()),
         pageSource: pageSource,
-        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        readingHistoryCommands: _FakeReadingHistoryCommands(),
         sessionPort: sessionPort,
       );
 
@@ -392,7 +381,7 @@ void main() {
       final ReaderSessionService service = ReaderSessionService(
         comicRepo: _FakeComicRepository(comic: null),
         pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
-        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        readingHistoryCommands: _FakeReadingHistoryCommands(),
         sessionPort: _FakeReaderSessionPort(),
       );
 
@@ -411,7 +400,7 @@ void main() {
           comic: _inputComic().copyWith(resourceType: ResourceType.dir),
         ),
         pageSource: pageSource,
-        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        readingHistoryCommands: _FakeReadingHistoryCommands(),
         sessionPort: _FakeReaderSessionPort(),
       );
 

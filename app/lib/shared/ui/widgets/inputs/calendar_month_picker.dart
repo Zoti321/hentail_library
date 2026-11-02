@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/shared/ui/motion/spring_curve.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/calendar_day_picker.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 月历翻页（使用 [Md3eCalendarDayPicker]）。
 class Md3eCalendarMonthPicker extends StatefulWidget {

@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/ui/motion/spring_value.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/embeddable_calendar_date_picker.dart';
 import 'package:material_3_expressive/components/date_pickers/components/m3e_date_picker_mode_toggle.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_ui/material_ui.dart' as mui;
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> _pumpCalendar(WidgetTester tester) async {
   await tester.binding.setSurfaceSize(const Size(400, 900));
@@ -12,8 +12,8 @@ Future<void> _pumpCalendar(WidgetTester tester) async {
   await tester.pumpWidget(
     M3ETheme(
       data: M3EThemeData.light(),
-      child: mui.MaterialApp(
-        localizationsDelegates: mui.GlobalMaterialLocalizations.delegates,
+      child: MaterialApp(
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: const <Locale>[Locale('en'), Locale('zh')],
         home: Scaffold(
           body: SingleChildScrollView(

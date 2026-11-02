@@ -12,7 +12,7 @@ import 'package:hentai_library/features/home/data/repositories/home_page_reposit
 import 'package:hentai_library/features/library_admin/data/repositories/library_repository_impl.dart';
 import 'package:hentai_library/features/named_metadata/data/repositories/named_facet_dictionary_repository_impl.dart';
 import 'package:hentai_library/features/named_metadata/data/repositories/named_facet_management_repository_impl.dart';
-import 'package:hentai_library/features/reading_history/data/repositories/reading_history_repository_impl.dart';
+import 'package:hentai_library/features/reading_history/di/reading_history_repository_provider.dart';
 import 'package:hentai_library/features/library_browse/data/series/series_repository_impl.dart';
 import 'package:hentai_library/features/named_metadata/data/repositories/tag_repository_impl.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
@@ -62,7 +62,7 @@ List<Override> dataProviderOverrides() => <Override>[
   ),
   libraryRepoProvider.overrideWith((Ref ref) => const LibraryRepositoryImpl()),
   readingHistoryRepoProvider.overrideWith(
-    (Ref ref) => const ReadingHistoryRepositoryImpl(),
+    (Ref ref) => createReadingHistoryRepository(),
   ),
   appSettingRepoProvider.overrideWith((Ref ref) => AppSettingRepositoryImpl()),
   homePageRepoProvider.overrideWith(

@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/ui/widgets/inputs/calendar_month_picker.da
 import 'package:hentai_library/shared/ui/widgets/inputs/calendar_year_picker.dart';
 import 'package:material_3_expressive/components/date_pickers/components/m3e_date_picker_mode_toggle.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 可嵌入表单的日历（与 [M3ECalendarDatePicker] 一致，年份模式使用 [Md3eCalendarYearPicker]）。
 class Md3eEmbeddableCalendarDatePicker extends StatefulWidget {

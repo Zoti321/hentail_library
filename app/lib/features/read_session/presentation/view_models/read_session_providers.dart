@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
+import 'package:hentai_library/shared/di/reading_history_providers.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
@@ -61,9 +61,11 @@ Future<ReaderPagePayload> comicReaderPage(
 }
 
 @Riverpod()
-Future<ReadingHistory?> readingProgress(
+Future<int?> readingProgress(
   Ref ref, {
   required String comicId,
 }) async {
-  return ref.watch(readingHistoryRepoProvider).getByComicId(comicId);
+  return ref
+      .read(readingHistoryCommandPortProvider)
+      .readResumePageIndex(comicId);
 }

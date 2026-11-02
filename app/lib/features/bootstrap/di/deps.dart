@@ -12,6 +12,5 @@ export 'package:hentai_library/features/named_metadata/presentation/metadata.dar
 export 'package:hentai_library/features/read_session/presentation/reader.dart';
 export 'package:hentai_library/features/app_settings/presentation/settings.dart';
 export 'package:hentai_library/features/bootstrap/presentation/view_models/aggregates.dart';
-export 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_controller.dart';
 export 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
 export 'package:hentai_library/shared/di/library_state_providers.dart';

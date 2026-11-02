@@ -241,14 +241,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  cupertino_ui:
-    dependency: transitive
-    description:
-      name: cupertino_ui
-      sha256: a47c4e7c66fd7444a063a602597fceb238f705c3f6b1322bc0053d0a2638ee6e
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.4"
   custom_pop_up_menu:
     dependency: "direct main"
     description:
@@ -563,10 +555,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: "07089be6dc124eb9596a51b5e359c657f30a59929287f11b126c2cd13eaaece0"
+      sha256: c92d18e1fe994cb06d48aa786c46b142a5633067e8297cff6b5a3ac742620104
       url: "https://pub.dev"
     source: hosted
-    version: "18.1.1"
+    version: "17.0.0"
   google_fonts:
     dependency: "direct main"
     description:
@@ -836,12 +828,11 @@ packages:
     source: hosted
     version: "4.2960.0"
   material_ui:
-    dependency: "direct main"
+    dependency: "direct overridden"
     description:
-      name: material_ui
-      sha256: e4031746f96c8316864d9b92bce375f1320a36ed56e166307e1e1bda9d90b4ab
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/material_ui_compat"
+      relative: true
+    source: path
     version: "1.8.0"
   meta:
     dependency: transitive

@@ -57,7 +57,7 @@ dependencies:
   riverpod_annotation: ^4.0.7
 
   # --- 路由（共 1）---
-  go_router: ^18.1.1
+  go_router: 17.0.0
 
   # --- 桌面窗口（共 1）---
   window_manager: ^0.5.1
@@ -79,7 +79,6 @@ dependencies:
   shared_preferences: ^2.5.3
   super_clipboard: 0.9.1
   material_3_expressive: ^1.2.0
-  material_ui: ^1.8.0
 dev_dependencies:
   # --- Flutter SDK 测试 ---
   flutter_test:
@@ -104,6 +103,10 @@ dev_dependencies:
 
   # --- 组件目录 / 预览（共 1）---
   widgetbook: ^3.25.0
+
+dependency_overrides:
+  material_ui:
+    path: packages/material_ui_compat
 
 flutter:
   generate: true

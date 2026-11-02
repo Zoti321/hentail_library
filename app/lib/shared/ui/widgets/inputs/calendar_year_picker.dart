@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 与 [Md3eCalendarYearPicker] 网格行高一致（略高于 M3E 默认 52，便于胶囊选中态留白）。
 const double kMd3eCalendarYearPickerRowHeight = 56;

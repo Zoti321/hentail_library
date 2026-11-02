@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
+import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
@@ -126,7 +126,7 @@ void main() {
       final ReaderSessionService session = ReaderSessionService(
         comicRepo: _FakeComicRepo(comic),
         pageSource: _FakePageSource(),
-        readingHistoryRepo: _FakeHistoryRepo(),
+        readingHistoryCommands: _FakeHistoryCommands(),
         sessionPort: _FakeSessionPort(),
       );
 
@@ -306,7 +306,7 @@ class _FakeComicRepo implements ComicLookupRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeHistoryRepo implements ReadingHistoryRepository {
+class _FakeHistoryCommands implements ReadingHistoryCommandPort {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

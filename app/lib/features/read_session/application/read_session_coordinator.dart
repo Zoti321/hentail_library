@@ -1,8 +1,7 @@
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
+import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 
 class _ActiveReadingSession {
   _ActiveReadingSession({required this.comic, required this.pageIndex});
@@ -21,12 +20,12 @@ typedef SeriesSwitchPlan = ({
 /// 窄协调：open → 翻页进度 → 写历史 → close / 系列切卷。
 class ReadSessionCoordinator {
   ReadSessionCoordinator({
-    required this._sessionService,
-    required this._readingHistoryRepo,
+    required this.sessionService,
+    required this.readingHistoryCommands,
   });
 
-  final ReaderSessionService _sessionService;
-  final ReadingHistoryRepository _readingHistoryRepo;
+  final ReaderSessionService sessionService;
+  final ReadingHistoryCommandPort readingHistoryCommands;
 
   _ActiveReadingSession? _session;
   Future<void>? _flushInFlight;
@@ -87,7 +86,7 @@ class ReadSessionCoordinator {
       }
       await endSession();
     }
-    await _sessionService.close(comicId);
+    await sessionService.close(comicId);
   }
 
   Future<SeriesSwitchPlan> prepareSeriesSwitch({
@@ -108,7 +107,7 @@ class ReadSessionCoordinator {
       }
       await endSession();
     }
-    await _sessionService.close(currentSession.comicId);
+    await sessionService.close(currentSession.comicId);
     return (
       closeComicId: currentSession.comicId,
       targetComicId: targetComicId,
@@ -138,13 +137,11 @@ class ReadSessionCoordinator {
 
   Future<void> _persistSession(_ActiveReadingSession session) async {
     final DateTime now = DateTime.now();
-    await _readingHistoryRepo.recordReading(
-      ReadingHistory(
-        comicId: session.comic.comicId,
-        title: session.comic.title,
-        lastReadTime: now,
-        pageIndex: session.pageIndex,
-      ),
+    await readingHistoryCommands.recordReading(
+      comicId: session.comic.comicId,
+      title: session.comic.title,
+      lastReadTime: now,
+      pageIndex: session.pageIndex,
     );
   }
 }

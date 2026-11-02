@@ -13,6 +13,7 @@ const Set<String> kImportBoundaryModules = <String>{
   'library_admin',
   'library_browse',
   'read_session',
+  'reading_history',
   'comic_trash',
   'named_metadata',
   'app_settings',

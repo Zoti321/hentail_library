@@ -1,6 +1,6 @@
 import 'package:hentai_library/shared/ui/widgets/inputs/calendar_day_cell.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 
 /// 月历日网格（使用 [Md3eCalendarDayCell]）。
 class Md3eCalendarDayPicker extends StatelessWidget {

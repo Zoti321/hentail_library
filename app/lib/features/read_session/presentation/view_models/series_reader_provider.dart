@@ -1,6 +1,7 @@
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/reading_history_providers.dart';
 import 'package:hentai_library/features/library_browse/public/comic_display_title.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -25,10 +26,9 @@ Future<int?> comicReadingPageIndexForReader(Ref ref, String comicId) async {
   if (comicId.isEmpty) {
     return null;
   }
-  final history = await ref
-      .read(readingHistoryRepoProvider)
-      .getByComicId(comicId);
-  return history?.pageIndex;
+  return ref
+      .read(readingHistoryCommandPortProvider)
+      .readResumePageIndex(comicId);
 }
 
 Future<List<ReaderComicListItem>> _buildNavItemsFromContext(

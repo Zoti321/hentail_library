@@ -1,6 +1,6 @@
 /// reading_history 模块 public API（ADR-0034）。
 ///
-/// Repository 契约经 [shared/di] token + bootstrap 注入；不在 public export。
+/// Repository 实现经 [shared/di] token + bootstrap 注入；跨 feature 类型用本 barrel。
 library;
 
 export 'domain/reading_history.dart';

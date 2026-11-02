@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
+import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
+import 'package:hentai_library/shared/di/reading_history_providers.dart';
 import 'package:hentai_library/features/library_browse/domain/series/series_repository.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/features/library_browse/public/comic_display_title.dart';
@@ -81,9 +81,9 @@ class _FakeSeriesRepo implements SeriesRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeHistoryRepo implements ReadingHistoryRepository {
+class _FakeHistoryCommands implements ReadingHistoryCommandPort {
   @override
-  Future<ReadingHistory?> getByComicId(String comicId) async => null;
+  Future<int?> readResumePageIndex(String comicId) async => null;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -112,8 +112,8 @@ void main() {
         seriesRepoProvider.overrideWith(
           (Ref ref) => _FakeSeriesRepo(seriesContext),
         ),
-        readingHistoryRepoProvider.overrideWith(
-          (Ref ref) => _FakeHistoryRepo(),
+        readingHistoryCommandPortProvider.overrideWith(
+          (Ref ref) => _FakeHistoryCommands(),
         ),
       ],
     );
@@ -156,8 +156,8 @@ void main() {
         seriesRepoProvider.overrideWith(
           (Ref ref) => _FakeSeriesRepo(seriesContext),
         ),
-        readingHistoryRepoProvider.overrideWith(
-          (Ref ref) => _FakeHistoryRepo(),
+        readingHistoryCommandPortProvider.overrideWith(
+          (Ref ref) => _FakeHistoryCommands(),
         ),
       ],
     );
@@ -184,8 +184,8 @@ void main() {
         overrides: <Override>[
           comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
           seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo(null)),
-          readingHistoryRepoProvider.overrideWith(
-            (Ref ref) => _FakeHistoryRepo(),
+          readingHistoryCommandPortProvider.overrideWith(
+            (Ref ref) => _FakeHistoryCommands(),
           ),
         ],
       );
