@@ -12,7 +12,7 @@ import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/app_settings/di/settings_slot_providers.dart';
+import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/read_session/public/reading_preference_types.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

@@ -48,6 +48,7 @@
 |----------|-------------|
 | L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation | `import_boundary_test.dart`（R1–R12） |
 | L2 product 图 ratchet（M1 非 public 边、M2/M3） | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
+| Cross-feature 协作约定 | [`cross-feature-collaboration.md`](cross-feature-collaboration.md) |
 | public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |
 | bootstrap shared 注入 | `features/bootstrap/di/overrides/*` + `shared_state_overrides.dart`（#435） |
 | L3a shared/ui → features | `shared_ui_no_feature_import_test.dart` |

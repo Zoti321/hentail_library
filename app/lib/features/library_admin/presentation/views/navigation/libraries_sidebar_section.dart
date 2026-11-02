@@ -1,3 +1,4 @@
+import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_text_item.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,6 @@ import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
-import 'package:hentai_library/features/library_admin/di/library_management_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/library_sidebar_overflow_actions.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';

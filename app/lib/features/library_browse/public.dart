@@ -8,7 +8,5 @@ export 'public/di/comic_detail_return_series_factory.dart';
 export 'public/ui/author_detail_port.dart';
 export 'public/ui/comic_cover_content.dart';
 export 'public/ui/series_cover_content.dart';
-export 'di/author_detail_providers.dart';
 export 'di/comic_cover_providers.dart';
-export 'di/comic_detail_providers.dart';
 export 'di/series_cover_providers.dart';

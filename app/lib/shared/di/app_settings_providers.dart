@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart';
 
-/// 应用设置的共享状态与端口 Provider 声明（#265）。
+/// 应用设置的共享状态与端口 Provider 声明（#265 / ADR-0034 #426）。
 ///
 /// 只声明、不实现；默认抛 [UnimplementedError]，由 bootstrap 注入 app_settings 的实现。
 

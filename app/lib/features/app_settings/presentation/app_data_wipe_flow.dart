@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/data/adapters/app_shutdown_frb_adapter.dart';
-import 'package:hentai_library/features/app_settings/di/settings_slot_providers.dart';
+import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/clear_application_data_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:intl/intl.dart';

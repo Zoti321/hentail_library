@@ -48,7 +48,7 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 - `ports/read_session_launch_port.dart`
 - `library/comic_detail_return_series_port.dart`
 
-`shared/di` 仍保留跨 feature 基础设施 token（如 `data_providers.dart`）；owner 侧 Provider 在 `features/<id>/di/`，跨 module 经 **`features/<id>/public.dart`** export。bootstrap 组合根可直接 import owner `di/`。
+`shared/di` 声明跨 feature 协作用的 Riverpod token（#426）；实现与 `createXxx()` 在 owner `di/` / `public/di/`，由 `features/bootstrap/di/overrides/` 注入。类型与 UI 命令经 owner `public.dart` 或 `shared/domain/ports/`。封面等 codegen Provider 实现仅在 owner `di/`，跨 feature UI 用 `library_browse/public.dart`。
 
 ## 测试目录约定
 

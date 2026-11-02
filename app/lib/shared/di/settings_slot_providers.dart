@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// 设置页「元数据备份」板块的组装槽位（#264）。
 ///
 /// app_settings 不直接依赖 metadata_backup；实现由 bootstrap 通过 `overrideWithValue` 注入。
-/// 返回的 Widget 为 MD3E 设置分类内容（由 metadata_backup 构造）。
 typedef MetadataBackupSettingsSectionBuilder = Widget Function(
   BuildContext context,
 );
