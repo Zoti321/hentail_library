@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-import 'wayfinder_layout_helpers.dart';
+import 'lib_layout_scan_helpers.dart';
 
 /// Module ids for Wayfinder import-boundary Gate (#220).
 ///

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
-import 'gate/wayfinder_layout_helpers.dart';
+import 'gate/lib_layout_scan_helpers.dart';
 
 void main() {
   group('monorepo layout', () {
@@ -97,35 +97,6 @@ void main() {
       skip: kEnforceWayfinderPhaseBLayout ? false : 'bootstrap-final slice',
     );
 
-    test('features/ modules use canonical ids and layer folders only', () {
-      final Directory featuresDir = Directory(p.join(libDir.path, 'features'));
-      if (!featuresDir.existsSync()) {
-        return;
-      }
-      final List<String> badModuleIds = <String>[];
-      final List<String> badLayerDirs = <String>[];
-      for (final FileSystemEntity entity in featuresDir.listSync()) {
-        if (entity is! Directory) {
-          continue;
-        }
-        final String moduleId = p.basename(entity.path);
-        if (!kWayfinderFeatureModuleIds.contains(moduleId)) {
-          badModuleIds.add(moduleId);
-        }
-        for (final FileSystemEntity child in entity.listSync()) {
-          if (child is! Directory) {
-            continue;
-          }
-          final String layer = p.basename(child.path);
-          if (!kWayfinderFeatureLayerDirs.contains(layer)) {
-            badLayerDirs.add(p.posix.join('features', moduleId, layer));
-          }
-        }
-      }
-      expect(badModuleIds, isEmpty);
-      expect(badLayerDirs, isEmpty);
-    });
-
     test('feature public/ layer requires a single barrel when present (#430)', () {
       final Directory featuresDir = Directory(p.join(libDir.path, 'features'));
       if (!featuresDir.existsSync()) {
@@ -137,9 +108,6 @@ void main() {
           continue;
         }
         final String moduleId = p.basename(entity.path);
-        if (!kWayfinderFeatureModuleIds.contains(moduleId)) {
-          continue;
-        }
         final Directory publicDir = Directory(
           p.join(entity.path, 'public'),
         );

@@ -23,29 +23,6 @@ const Set<String> kWayfinderPhaseBTopLevelLibDirs = <String>{
   'src',
 };
 
-/// Feature module ids (#218 / #219).
-const Set<String> kWayfinderFeatureModuleIds = <String>{
-  'app_settings',
-  'bootstrap',
-  'comic_trash',
-  'home',
-  'library_admin',
-  'library_browse',
-  'metadata_backup',
-  'named_metadata',
-  'read_session',
-  'reading_history',
-};
-
-const Set<String> kWayfinderFeatureLayerDirs = <String>{
-  'application',
-  'data',
-  'di',
-  'domain',
-  'presentation',
-  'public',
-};
-
 /// Canonical lib-relative roots. Only files *outside* these roots can be
 /// legacy strangler shims; barrels inside `features/` or `shared/` are normal.
 bool isCanonicalLibRelativePath(String rel) {

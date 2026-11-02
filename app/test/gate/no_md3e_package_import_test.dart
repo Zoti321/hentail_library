@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
-import 'wayfinder_layout_helpers.dart';
+import 'lib_layout_scan_helpers.dart';
 
 /// ADR-0031 终态：生产 `lib/features` 与 `lib/shared` 不得再 import 已删除的 `md3e/`。
 const String _forbiddenUriFragment = 'package:hentai_library/md3e/';

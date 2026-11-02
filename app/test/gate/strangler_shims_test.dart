@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
-import 'wayfinder_layout_helpers.dart';
+import 'lib_layout_scan_helpers.dart';
 
 void main() {
   late Directory libDir;
