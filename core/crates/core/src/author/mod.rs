@@ -176,6 +176,72 @@ pub async fn fetch_authors_page(
         .collect())
 }
 
+/// Paged Author identity list (Author management grid).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PagedAuthorIdentitiesDto {
+    pub items: Vec<AuthorIdentity>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
+pub async fn fetch_authors_page_result(
+    request: crate::comic::PageRequestDto,
+) -> Result<PagedAuthorIdentitiesDto, HentaiError> {
+    use crate::comic::pagination::paginate;
+
+    let total = count_all_authors().await?;
+    let window = paginate(request, total).clamped();
+    if total <= 0 {
+        return Ok(PagedAuthorIdentitiesDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size: window.page_size,
+        });
+    }
+    let items = fetch_authors_page(window.page_size, window.offset as i32).await?;
+    Ok(PagedAuthorIdentitiesDto {
+        items,
+        total_count: total,
+        page: window.page,
+        page_size: window.page_size,
+    })
+}
+
+/// Paged Author display names (Named facet management tab).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PagedAuthorNamesDto {
+    pub items: Vec<String>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
+pub async fn fetch_author_names_page_result(
+    request: crate::comic::PageRequestDto,
+) -> Result<PagedAuthorNamesDto, HentaiError> {
+    use crate::comic::pagination::paginate;
+
+    let total = count_all_authors().await?;
+    let window = paginate(request, total).clamped();
+    if total <= 0 {
+        return Ok(PagedAuthorNamesDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size: window.page_size,
+        });
+    }
+    let items = fetch_author_name_page(window.page_size, window.offset as i32).await?;
+    Ok(PagedAuthorNamesDto {
+        items,
+        total_count: total,
+        page: window.page,
+        page_size: window.page_size,
+    })
+}
+
 pub async fn add_author(name: &str) -> Result<AuthorIdentity, HentaiError> {
     let trimmed = validate_author_name(name)?;
     let db = connection()?;

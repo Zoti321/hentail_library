@@ -15,10 +15,16 @@ import 'package:material_symbols_icons/symbols.dart';
 export 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
 
 /// 系列详情页 Lab：粘滞页头 + 可滚动简介与漫画网格。
+///
+/// [entry.comics] 仅为当前页；页码、页大小与总页数由调用方通过受控参数提供。
 class Md3eSeriesDetailPage extends StatefulWidget {
   const Md3eSeriesDetailPage({
     super.key,
     required this.entry,
+    required this.page,
+    required this.pageSize,
+    required this.totalPages,
+    required this.onPageChanged,
     this.onBack,
     this.onEdit,
     this.moreMenuEntries,
@@ -26,10 +32,6 @@ class Md3eSeriesDetailPage extends StatefulWidget {
     this.onComicTap,
     this.onAuthorTap,
     this.scrollController,
-    this.page,
-    this.pageSize,
-    this.totalPages,
-    this.onPageChanged,
     this.onPageSizeChanged,
   });
 
@@ -44,12 +46,10 @@ class Md3eSeriesDetailPage extends StatefulWidget {
   final ValueChanged<String>? onAuthorTap;
   final ScrollController? scrollController;
 
-  /// 外部分页（生产：服务端分页）。传入 [onPageChanged] 时，[entry.comics] 仅为当前页，
-  /// 页码、页大小与总页数由调用方提供；为空时使用页内分页（Lab）。
-  final int? page;
-  final int? pageSize;
-  final int? totalPages;
-  final ValueChanged<int>? onPageChanged;
+  final int page;
+  final int pageSize;
+  final int totalPages;
+  final ValueChanged<int> onPageChanged;
   final ValueChanged<int>? onPageSizeChanged;
 
   @override
@@ -58,64 +58,14 @@ class Md3eSeriesDetailPage extends StatefulWidget {
 
 class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
   final GlobalKey _comicsSectionKey = GlobalKey();
-  late int _pageSize = widget.entry.initialPageSize;
-  late int _page = widget.entry.initialPage.clamp(
-    1,
-    _totalPagesFor(widget.entry, widget.entry.initialPageSize),
-  );
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
-
-  static int _totalPagesFor(Md3eSeriesDetailEntry entry, int pageSize) {
-    final int count = entry.comics.length;
-    if (count == 0) {
-      return 1;
-    }
-    return (count / pageSize).ceil();
-  }
-
-  bool get _isExternalPaging => widget.onPageChanged != null;
-
-  int get _currentPage => _isExternalPaging ? (widget.page ?? 1) : _page;
-
-  int get _currentPageSize => _isExternalPaging
-      ? (widget.pageSize ?? widget.entry.initialPageSize)
-      : _pageSize;
-
-  int get _totalPages => _isExternalPaging
-      ? (widget.totalPages ?? 1)
-      : _totalPagesFor(widget.entry, _pageSize);
-
-  List<Md3eSeriesDetailComicItem> get _pageItems {
-    final List<Md3eSeriesDetailComicItem> comics = widget.entry.comics;
-    if (_isExternalPaging) {
-      return comics;
-    }
-    if (comics.isEmpty) {
-      return const <Md3eSeriesDetailComicItem>[];
-    }
-    final int start = (_page - 1) * _pageSize;
-    if (start >= comics.length) {
-      return const <Md3eSeriesDetailComicItem>[];
-    }
-    final int end = (start + _pageSize).clamp(0, comics.length);
-    return comics.sublist(start, end);
-  }
 
   @override
   void initState() {
     super.initState();
     _ownsScrollController = widget.scrollController == null;
     _scrollController = widget.scrollController ?? ScrollController();
-  }
-
-  @override
-  void didUpdateWidget(covariant Md3eSeriesDetailPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.entry != widget.entry) {
-      _pageSize = widget.entry.initialPageSize;
-      _page = widget.entry.initialPage.clamp(1, _totalPages);
-    }
   }
 
   @override
@@ -167,26 +117,13 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
   }
 
   void _setPage(int page) {
-    final int target = page.clamp(1, _totalPages);
-    final ValueChanged<int>? onPageChanged = widget.onPageChanged;
-    if (onPageChanged != null) {
-      onPageChanged(target);
-    } else {
-      setState(() => _page = target);
-    }
+    final int target = page.clamp(1, widget.totalPages);
+    widget.onPageChanged(target);
     _scrollToComicsSection();
   }
 
   void _setPageSize(int size) {
-    final ValueChanged<int>? onPageSizeChanged = widget.onPageSizeChanged;
-    if (_isExternalPaging) {
-      onPageSizeChanged?.call(size);
-    } else {
-      setState(() {
-        _pageSize = size;
-        _page = _page.clamp(1, _totalPages);
-      });
-    }
+    widget.onPageSizeChanged?.call(size);
     _scrollToComicsSection();
   }
 
@@ -202,7 +139,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
       onBack: _resolveVoid(widget.onBack),
       onEdit: _resolveVoid(widget.onEdit),
       moreMenuEntries: _resolveMoreMenu(l10n),
-      pageSize: _currentPageSize,
+      pageSize: widget.pageSize,
       onPageSizeChanged: _setPageSize,
     );
 
@@ -237,16 +174,15 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 sliver: Md3eSeriesDetailComicsSection(
                   gridSectionKey: _comicsSectionKey,
-                  pageItems: _pageItems,
-                  page: _currentPage,
-                  totalPages: _totalPages,
+                  pageItems: widget.entry.comics,
+                  page: widget.page,
+                  totalPages: widget.totalPages,
                   onPageChanged: _setPage,
                   onComicTap: widget.onComicTap == null
                       ? null
                       : (int localIndex) {
                           final int globalIndex =
-                              (_currentPage - 1) * _currentPageSize +
-                              localIndex;
+                              (widget.page - 1) * widget.pageSize + localIndex;
                           widget.onComicTap!(globalIndex);
                         },
                 ),

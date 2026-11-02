@@ -188,6 +188,40 @@ pub async fn fetch_named_facet_page(
         .collect()
 }
 
+/// Paged dictionary name list (Tag / Parody / Character management).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PagedStringNamesDto {
+    pub items: Vec<String>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
+pub async fn fetch_named_facet_names_page(
+    facet: JunctionNamedFacet,
+    request: crate::comic::PageRequestDto,
+) -> Result<PagedStringNamesDto, HentaiError> {
+    use crate::comic::pagination::paginate;
+
+    let total = count_all_named_facet_names(facet).await?;
+    let window = paginate(request, total).clamped();
+    if total <= 0 {
+        return Ok(PagedStringNamesDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size: window.page_size,
+        });
+    }
+    let items = fetch_named_facet_page(facet, window.page_size, window.offset as i32).await?;
+    Ok(PagedStringNamesDto {
+        items,
+        total_count: total,
+        page: window.page,
+        page_size: window.page_size,
+    })
+}
+
 pub async fn list_distinct_named_facet_names(
     facet: JunctionNamedFacet,
     library_id: Option<String>,

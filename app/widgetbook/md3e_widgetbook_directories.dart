@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'md3e_comic_detail_page_preview_data.dart';
 import 'md3e_series_detail_page_preview_data.dart';
+
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
@@ -10,24 +12,37 @@ import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_it
 import 'package:hentai_library/features/library_browse/presentation/patterns/comic_detail/comic_detail_metadata_tags_section.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+
 import 'md3e_home_page_lab_host.dart';
+
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
+
 import 'md3e_history_browse_page_lab_host.dart';
 import 'md3e_history_browse_page_preview_data.dart';
 import 'lab_pages/library_browse_page.dart';
 import 'md3e_management_browse_page_lab_host.dart';
 import 'md3e_settings_page_lab_host.dart';
+
 import 'package:hentai_library/features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page.dart';
+
 import 'md3e_reader_page_lab_host.dart';
 import 'md3e_reader_page_preview_data.dart';
+
 import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/comic_metadata_edit_page.dart';
+
 import 'md3e_comic_metadata_edit_page_lab_host.dart';
+
 import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
+
 import 'md3e_library_edit_page_lab_host.dart';
+
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page.dart';
+import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page_lab_host.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/metadata_edit_md3e/series_metadata_edit_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/patterns/metadata_edit/metadata_edit_navigation.dart';
+
 import 'md3e_lab_catalog_navigation.dart';
+
 import 'package:hentai_library/features/library_browse/presentation/patterns/library/library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_interaction.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -90,7 +105,9 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Grid · List toggle',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Center(child: _Md3eCatalogViewModeButtonGroupPreview()),
+                    child: Center(
+                      child: _Md3eCatalogViewModeButtonGroupPreview(),
+                    ),
                   ),
                 ),
               ],
@@ -181,9 +198,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Interactive',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Center(
-                      child: _md3ePaginationKnobsPreview(context),
-                    ),
+                    child: Center(child: _md3ePaginationKnobsPreview(context)),
                   ),
                 ),
               ],
@@ -210,18 +225,20 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) {
-                    final M3EColorScheme scheme =
-                        M3ETheme.of(context).colorScheme;
-                    final double viewportHeight =
-                        MediaQuery.sizeOf(context).height;
-                    final double shellHeight =
-                        viewportHeight >= 560 ? viewportHeight : 768;
+                    final M3EColorScheme scheme = M3ETheme.of(context)
+                        .colorScheme;
+                    final double viewportHeight = MediaQuery.sizeOf(context)
+                        .height;
+                    final double shellHeight = viewportHeight >= 560
+                        ? viewportHeight
+                        : 768;
                     return Md3eWidgetbookScope(
                       child: Md3eDesktopShell(
                         height: shellHeight,
                         initialRailExtended: false,
-                        surfaceRoles:
-                            Md3eDesktopShellSurfaceRoles.toneBased(scheme),
+                        surfaceRoles: Md3eDesktopShellSurfaceRoles.toneBased(
+                          scheme,
+                        ),
                       ),
                     );
                   },
@@ -233,8 +250,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Adaptive modal · bottom (<840) / side (≥840)',
-                  builder: (BuildContext context) =>
-                      const Md3eWidgetbookScope(
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
                     child: _Md3eLibraryFilterSortSideSheetPreview(),
                   ),
                 ),
@@ -278,9 +294,8 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eHomePageLabHost(),
-                  ),
+                  builder: (BuildContext context) =>
+                      const Md3eWidgetbookScope(child: Md3eHomePageLabHost()),
                 ),
               ],
             ),
@@ -361,9 +376,8 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
-                  builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eReaderPageLabHost(),
-                  ),
+                  builder: (BuildContext context) =>
+                      const Md3eWidgetbookScope(child: Md3eReaderPageLabHost()),
                 ),
                 WidgetbookUseCase(
                   name: 'Series boundary · last page',
@@ -505,8 +519,8 @@ class _Md3eReadingHistoryListItemPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime resolvedLastReadTime = lastReadTime ??
-        DateTime.now().subtract(const Duration(hours: 2));
+    final DateTime resolvedLastReadTime =
+        lastReadTime ?? DateTime.now().subtract(const Duration(hours: 2));
     return Md3eReadingHistoryListItem(
       title: title,
       cover: cover,
@@ -549,7 +563,8 @@ Widget _md3eComicDetailPageKnobsPreview(BuildContext context) {
       .copyWith(showAgeRestrictionChip: showAgeRestriction);
   return Md3eComicDetailPage(
     entry: entry,
-    onEdit: () => _md3eWidgetbookOpenLabComicMetadataEdit(context, entry: entry),
+    onEdit: () =>
+        _md3eWidgetbookOpenLabComicMetadataEdit(context, entry: entry),
   );
 }
 
@@ -569,9 +584,10 @@ Widget _md3eSeriesDetailPageKnobsPreview(BuildContext context) {
         showAgeRestrictionChip: showAgeRestriction,
         showMetadataBlock: showMetadata,
       );
-  return Md3eSeriesDetailPage(
+  return Md3eSeriesDetailPageLabHost(
     entry: entry,
-    onEdit: () => _md3eWidgetbookOpenLabSeriesMetadataEdit(context, entry: entry),
+    onEdit: () =>
+        _md3eWidgetbookOpenLabSeriesMetadataEdit(context, entry: entry),
     onComicTap: (_) => md3eWidgetbookPushLabComicDetail(context),
   );
 }
@@ -580,10 +596,7 @@ Widget _md3eComicCardKnobsPreview(
   BuildContext context, {
   required Widget cover,
 }) {
-  final bool disabled = context.knobs.boolean(
-    label: '禁用',
-    initialValue: false,
-  );
+  final bool disabled = context.knobs.boolean(label: '禁用', initialValue: false);
   final bool selectionMode = disabled
       ? false
       : context.knobs.boolean(
@@ -611,7 +624,8 @@ class _Md3eComicCardKnobsHost extends StatefulWidget {
   final bool selectionMode;
 
   @override
-  State<_Md3eComicCardKnobsHost> createState() => _Md3eComicCardKnobsHostState();
+  State<_Md3eComicCardKnobsHost> createState() =>
+      _Md3eComicCardKnobsHostState();
 }
 
 class _Md3eComicCardKnobsHostState extends State<_Md3eComicCardKnobsHost> {
@@ -650,10 +664,7 @@ Widget _md3eComicListItemKnobsPreview(
   BuildContext context, {
   required Widget cover,
 }) {
-  final bool disabled = context.knobs.boolean(
-    label: '禁用',
-    initialValue: false,
-  );
+  final bool disabled = context.knobs.boolean(label: '禁用', initialValue: false);
   final bool selectionMode = disabled
       ? false
       : context.knobs.boolean(
@@ -685,7 +696,8 @@ class _Md3eComicListItemKnobsHost extends StatefulWidget {
       _Md3eComicListItemKnobsHostState();
 }
 
-class _Md3eComicListItemKnobsHostState extends State<_Md3eComicListItemKnobsHost> {
+class _Md3eComicListItemKnobsHostState
+    extends State<_Md3eComicListItemKnobsHost> {
   bool _selected = false;
 
   @override
@@ -926,7 +938,8 @@ class _Md3eNavigationRailPreview extends StatefulWidget {
       _Md3eNavigationRailPreviewState();
 }
 
-class _Md3eNavigationRailPreviewState extends State<_Md3eNavigationRailPreview> {
+class _Md3eNavigationRailPreviewState
+    extends State<_Md3eNavigationRailPreview> {
   bool _extended = false;
   int _selectedIndex = 0;
 
