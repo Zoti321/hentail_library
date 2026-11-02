@@ -194,6 +194,7 @@ async fn read(comic_id: &str) {
         title: "read".to_string(),
         last_read_time_ms: 1_000,
         page_index: Some(0),
+        page_count: None,
     })
     .await
     .expect("record reading");

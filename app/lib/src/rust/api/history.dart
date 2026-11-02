@@ -74,12 +74,14 @@ class ReadingHistoryDto {
   final String title;
   final PlatformInt64 lastReadTimeMs;
   final int? pageIndex;
+  final int? pageCount;
 
   const ReadingHistoryDto({
     required this.comicId,
     required this.title,
     required this.lastReadTimeMs,
     this.pageIndex,
+    this.pageCount,
   });
 
   @override
@@ -87,7 +89,8 @@ class ReadingHistoryDto {
       comicId.hashCode ^
       title.hashCode ^
       lastReadTimeMs.hashCode ^
-      pageIndex.hashCode;
+      pageIndex.hashCode ^
+      pageCount.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -97,5 +100,6 @@ class ReadingHistoryDto {
           comicId == other.comicId &&
           title == other.title &&
           lastReadTimeMs == other.lastReadTimeMs &&
-          pageIndex == other.pageIndex;
+          pageIndex == other.pageIndex &&
+          pageCount == other.pageCount;
 }

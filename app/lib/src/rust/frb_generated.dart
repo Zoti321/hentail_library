@@ -6291,13 +6291,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return ReadingHistoryDto(
       comicId: dco_decode_String(arr[0]),
       title: dco_decode_String(arr[1]),
       lastReadTimeMs: dco_decode_i_64(arr[2]),
       pageIndex: dco_decode_opt_box_autoadd_i_32(arr[3]),
+      pageCount: dco_decode_opt_box_autoadd_i_32(arr[4]),
     );
   }
 
@@ -8623,11 +8624,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_title = sse_decode_String(deserializer);
     var var_lastReadTimeMs = sse_decode_i_64(deserializer);
     var var_pageIndex = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_pageCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     return ReadingHistoryDto(
       comicId: var_comicId,
       title: var_title,
       lastReadTimeMs: var_lastReadTimeMs,
       pageIndex: var_pageIndex,
+      pageCount: var_pageCount,
     );
   }
 
@@ -10897,6 +10900,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.title, serializer);
     sse_encode_i_64(self.lastReadTimeMs, serializer);
     sse_encode_opt_box_autoadd_i_32(self.pageIndex, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.pageCount, serializer);
   }
 
   @protected

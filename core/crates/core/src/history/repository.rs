@@ -6,10 +6,11 @@ use sea_orm::{
 
 use crate::comic::visibility::comic_id_not_trashed_sql;
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_reading_histories, prelude::*};
+use crate::entity::{comic_meta, comic_reading_histories, prelude::*};
 use crate::error::HentaiError;
 use crate::library_write::with_library_write;
 use crate::util::decode_basic_html_entities;
+use std::collections::HashMap;
 
 use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto};
 
@@ -67,7 +68,12 @@ pub async fn get_reading_by_comic_id(
         .one(&db)
         .await
         .map_err(map_db_err)?;
-    Ok(row.map(map_reading_row))
+    let Some(row) = row else {
+        return Ok(None);
+    };
+    let item = map_reading_row(row);
+    let mut items = enrich_page_counts(&db, vec![item]).await?;
+    Ok(items.pop())
 }
 
 pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
@@ -78,7 +84,8 @@ pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
         .all(&db)
         .await
         .map_err(map_db_err)?;
-    Ok(rows.into_iter().map(map_reading_row).collect())
+    let items: Vec<ReadingHistoryDto> = rows.into_iter().map(map_reading_row).collect();
+    enrich_page_counts(&db, items).await
 }
 
 pub async fn fetch_reading_page(
@@ -106,8 +113,10 @@ pub async fn fetch_reading_page(
         .fetch_page(window.page as u64 - 1)
         .await
         .map_err(map_db_err)?;
+    let items: Vec<ReadingHistoryDto> = rows.into_iter().map(map_reading_row).collect();
+    let items = enrich_page_counts(&db, items).await?;
     Ok(PagedReadingHistoryDto {
-        items: rows.into_iter().map(map_reading_row).collect(),
+        items,
         total_count,
         page: window.page,
         page_size: window.page_size,
@@ -185,5 +194,32 @@ fn map_reading_row(row: comic_reading_histories::Model) -> ReadingHistoryDto {
         title: row.title,
         last_read_time_ms: row.last_read_time,
         page_index: row.page_index,
+        page_count: None,
     }
+}
+
+async fn enrich_page_counts<C: ConnectionTrait>(
+    db: &C,
+    items: Vec<ReadingHistoryDto>,
+) -> Result<Vec<ReadingHistoryDto>, HentaiError> {
+    if items.is_empty() {
+        return Ok(items);
+    }
+    let comic_ids: Vec<String> = items.iter().map(|item| item.comic_id.clone()).collect();
+    let metas = ComicMeta::find()
+        .filter(comic_meta::Column::ComicId.is_in(comic_ids))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let counts: HashMap<String, i32> = metas
+        .into_iter()
+        .map(|meta| (meta.comic_id, meta.page_count))
+        .collect();
+    Ok(items
+        .into_iter()
+        .map(|mut item| {
+            item.page_count = counts.get(&item.comic_id).copied();
+            item
+        })
+        .collect())
 }

@@ -6,6 +6,7 @@ typedef HistoryCardItem = ({
   String coverComicId,
   String comicId,
   int? pageIndex,
+  int? pageCount,
 });
 
 HistoryCardItem historyCardItem({
@@ -15,6 +16,7 @@ HistoryCardItem historyCardItem({
   required String coverComicId,
   required String comicId,
   required int? pageIndex,
+  int? pageCount,
 }) {
   return (
     id: id,
@@ -23,5 +25,6 @@ HistoryCardItem historyCardItem({
     coverComicId: coverComicId,
     comicId: comicId,
     pageIndex: pageIndex,
+    pageCount: pageCount,
   );
 }

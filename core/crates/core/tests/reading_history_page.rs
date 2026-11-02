@@ -47,6 +47,7 @@ async fn seed_histories() {
             title: title.to_string(),
             last_read_time_ms,
             page_index: Some(1),
+            page_count: None,
         })
         .await
         .expect("record reading");
@@ -199,6 +200,7 @@ fn record_reading_decodes_html_entities_in_title() {
                 title: "Heaven&#039;s Feel".to_string(),
                 last_read_time_ms: 9_000,
                 page_index: Some(2),
+                page_count: None,
             })
             .await
             .expect("record reading");

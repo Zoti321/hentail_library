@@ -162,6 +162,7 @@ fn update_local_library_root_remaps_comics_series_and_user_state_when_readable()
                 title: "用户标题".to_string(),
                 last_read_time_ms: 42,
                 page_index: Some(3),
+                page_count: None,
             })
             .await
             .expect("record reading");

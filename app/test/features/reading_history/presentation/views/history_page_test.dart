@@ -63,6 +63,8 @@ void main() {
 
       expect(find.text('Alpha'), findsOneWidget);
       expect(find.text('Beta'), findsOneWidget);
+      expect(find.textContaining('3/20'), findsOneWidget);
+      expect(find.textContaining('2/10'), findsOneWidget);
     });
 
     testWidgets('production path applies app font on M3E theme', (
@@ -128,13 +130,15 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
           comicId: 'c1',
           title: 'Alpha',
           lastReadTime: DateTime.fromMillisecondsSinceEpoch(3000),
-          pageIndex: 1,
+          pageIndex: 3,
+          pageCount: 20,
         ),
         ReadingHistory(
           comicId: 'c2',
           title: 'Beta',
           lastReadTime: DateTime.fromMillisecondsSinceEpoch(2000),
           pageIndex: 2,
+          pageCount: 10,
         ),
       ],
       totalCount: 2,

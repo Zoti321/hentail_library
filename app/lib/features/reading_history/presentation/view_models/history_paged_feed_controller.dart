@@ -254,6 +254,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       coverComicId: history.comicId,
       comicId: history.comicId,
       pageIndex: history.pageIndex,
+      pageCount: history.pageCount,
     );
   }
 }

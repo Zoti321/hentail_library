@@ -11,6 +11,7 @@ void main() {
       title: 'Title A',
       lastReadTimeMs: PlatformInt64Util.from(1_700_000_000_000),
       pageIndex: 3,
+      pageCount: 20,
     );
 
     final ReadingHistory mapped = mapReadingHistoryDto(dto);
@@ -18,6 +19,7 @@ void main() {
     expect(mapped.comicId, 'c1');
     expect(mapped.title, 'Title A');
     expect(mapped.pageIndex, 3);
+    expect(mapped.pageCount, 20);
     expect(
       mapped.lastReadTime,
       DateTime.fromMillisecondsSinceEpoch(1_700_000_000_000),

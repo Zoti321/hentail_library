@@ -6526,11 +6526,13 @@ impl SseDecode for crate::api::history::ReadingHistoryDto {
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_lastReadTimeMs = <i64>::sse_decode(deserializer);
         let mut var_pageIndex = <Option<i32>>::sse_decode(deserializer);
+        let mut var_pageCount = <Option<i32>>::sse_decode(deserializer);
         return crate::api::history::ReadingHistoryDto {
             comic_id: var_comicId,
             title: var_title,
             last_read_time_ms: var_lastReadTimeMs,
             page_index: var_pageIndex,
+            page_count: var_pageCount,
         };
     }
 }
@@ -8954,6 +8956,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::history::ReadingHistoryDto {
             self.title.into_into_dart().into_dart(),
             self.last_read_time_ms.into_into_dart().into_dart(),
             self.page_index.into_into_dart().into_dart(),
+            self.page_count.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -11045,6 +11048,7 @@ impl SseEncode for crate::api::history::ReadingHistoryDto {
         <String>::sse_encode(self.title, serializer);
         <i64>::sse_encode(self.last_read_time_ms, serializer);
         <Option<i32>>::sse_encode(self.page_index, serializer);
+        <Option<i32>>::sse_encode(self.page_count, serializer);
     }
 }
 

@@ -10,6 +10,7 @@ ReadingHistory mapReadingHistoryDto(rust.ReadingHistoryDto dto) {
       dto.lastReadTimeMs.toInt(),
     ),
     pageIndex: dto.pageIndex,
+    pageCount: dto.pageCount,
   );
 }
 

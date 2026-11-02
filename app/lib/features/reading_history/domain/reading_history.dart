@@ -9,5 +9,6 @@ abstract class ReadingHistory with _$ReadingHistory {
     required String title,
     required DateTime lastReadTime,
     int? pageIndex,
+    int? pageCount,
   }) = _ReadingHistory;
 }

@@ -50,6 +50,7 @@ fn find_comic_by_id_includes_last_read_time_when_history_exists() {
                 title: "Title read-comic".to_string(),
                 last_read_time_ms: 9_000,
                 page_index: Some(2),
+                page_count: None,
             })
             .await
             .expect("record reading");

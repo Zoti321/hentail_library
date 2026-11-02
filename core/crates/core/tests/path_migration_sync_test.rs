@@ -81,6 +81,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 title: "用户标题".to_string(),
                 last_read_time_ms: 42,
                 page_index: Some(3),
+                page_count: None,
             })
             .await
             .expect("record reading");

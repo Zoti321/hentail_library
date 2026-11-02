@@ -17,6 +17,7 @@ pub struct ReadingHistoryDto {
     pub title: String,
     pub last_read_time_ms: i64,
     pub page_index: Option<i32>,
+    pub page_count: Option<i32>,
 }
 
 #[derive(Debug, Clone)]
@@ -34,6 +35,7 @@ impl From<CoreReading> for ReadingHistoryDto {
             title: v.title,
             last_read_time_ms: v.last_read_time_ms,
             page_index: v.page_index,
+            page_count: v.page_count,
         }
     }
 }
@@ -56,6 +58,7 @@ impl From<&ReadingHistoryDto> for CoreReading {
             title: v.title.clone(),
             last_read_time_ms: v.last_read_time_ms,
             page_index: v.page_index,
+            page_count: None,
         }
     }
 }

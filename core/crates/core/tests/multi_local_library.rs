@@ -282,6 +282,7 @@ fn delete_library_clears_only_that_library_comics_and_series() {
                 title: "keep".into(),
                 last_read_time_ms: 100,
                 page_index: Some(0),
+                page_count: None,
             })
             .await
             .expect("history b");

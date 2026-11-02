@@ -348,6 +348,10 @@ _Avoid_: 系列阅读模式、Series read、系列会话
 用户对某 Comic 最近一次阅读的时间与页码记录；跨 Library 全局保留与展示。从库/详情/历史等重新打开该 Comic 时恢复页码；阅读器内切到同系列另一卷时，先落盘当前 Comic 进度（无痕除外），目标卷从第 1 页打开。无痕 Read session 不读写 Reading history。
 _Avoid_: 阅读记录、系列进度、Series reading history
 
+**Reading progress (history list)**:
+历史列表等界面展示的「当前页 / 总页数」。当前页来自 Reading history；总页数对应该 Comic 的编目页数，不是 Reading history 的持久化字段。
+_Avoid_: 进度条数据、page count 字段（口语）
+
 **Scroll layout**:
 阅读器纵向连续滚动的版式；适用于长条阅读体验。
 _Avoid_: Webtoon 模式（易与作品类型混淆）、卷轴模式
