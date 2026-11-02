@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
+import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/continuous_vertical_viewport.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/dual_page_viewport.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/paged_viewport.dart';

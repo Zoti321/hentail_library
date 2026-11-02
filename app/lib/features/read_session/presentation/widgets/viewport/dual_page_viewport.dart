@@ -9,7 +9,7 @@ import 'package:hentai_library/features/read_session/presentation/widgets/viewpo
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_pages.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/resume_visible_sync_gate.dart';
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
+import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/spread_index.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/session/reader_session_bindings.dart';

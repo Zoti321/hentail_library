@@ -3,3 +3,4 @@ library;
 
 export 'public/di/read_session_launch_factory.dart';
 export 'public/read_session_launch_port.dart';
+export 'public/reading_preference_types.dart';

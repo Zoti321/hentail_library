@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_adaptive_panel.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Lab 阅读设置（自适应 bottom / side sheet；不绑 Riverpod / FRB）。

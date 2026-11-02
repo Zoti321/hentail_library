@@ -3,3 +3,9 @@
 # Only export-only re-export shims may exist during migration; unlisted shims fail Gate.
 shared/domain/comic_trash/comic_purge_policy.dart
 shared/domain/models/read_models/trashed_comic.dart
+shared/domain/reading/auto_play_interval.dart
+shared/domain/reading/auto_play_mode.dart
+shared/domain/reading/read_session_page.dart
+shared/domain/reading/reader_page_payload.dart
+shared/domain/reading/reading_mode.dart
+shared/domain/reading/series_reading_context.dart

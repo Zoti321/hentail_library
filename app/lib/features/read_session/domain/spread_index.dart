@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
+import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 
 /// Spread 索引与页码映射（页码均为 1-based）。
 class SpreadIndex {
