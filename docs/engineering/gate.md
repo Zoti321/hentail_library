@@ -51,7 +51,7 @@
 | public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |
 | bootstrap shared 注入 | `features/bootstrap/di/overrides/*` + `shared_state_overrides.dart`（#435） |
 | L3a shared/ui → features | `shared_ui_no_feature_import_test.dart` |
-| L3b shared/domain → features ratchet | `shared_domain_no_feature_import_test.dart` + baseline 生成器 |
+| L3b shared/domain → features ratchet | `shared_domain_no_feature_import_test.dart` + baseline 生成器；归属见 [`shared-domain-ownership.md`](./shared-domain-ownership.md) |
 | FRB allowlist | `import_boundary_rules.dart`、`shared_feature_import_rules.dart` |
 | `lib/` 顶层与 feature 目录 | `project_layout_test.dart`、`wayfinder_layout_helpers.dart` |
 | Strangler export shim | `strangler_shims.txt` + `strangler_shims_test.dart` |

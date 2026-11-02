@@ -76,9 +76,11 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 
 > **实现修订（2026-11-02）**：移除 `shared/application/ports/`；UI 命令契约在 `shared/domain/ports/`（如 `AuthorDetailPort`、`LibraryManagementPort`）。跨 feature **import 类型**请用 owner `public.dart`；`shared/di` 仍自 shared 层 import 契约（R11 禁止 shared→feature public）。
 
+> **实现修订（2026-11-02，#436 收尾）**：Repository 与多数 port/库规则类型真源在 owner **`features/<id>/domain/`**；shared 同名路径为 strangler re-export，**禁止**在 `public/` 复制第二套 DTO。仍 @ shared 的 UI 命令与 **Catalog Shared Kernel** 见 **ADR-0035** 与 [`docs/engineering/shared-domain-ownership.md`](../engineering/shared-domain-ownership.md)。L3b baseline 维持零条 `shared/domain`→`features/` 边。
+
 ### Negative
 
-- 每个对外能力需维护 public barrel；契约真值仍在 shared/domain，与 public re-export 需同步 review。
+- 每个对外能力需维护 public barrel；部分契约真值仍在 shared/domain（UI 命令 + kernel），与 public re-export 需同步 review。
 
 ## References
 
