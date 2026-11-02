@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/library_browse/di/series_cover_providers.dart';
+import 'package:hentai_library/features/library_browse/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
-import 'package:hentai_library/shared/di/series_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 系列封面：优先自定义系列缩略图，否则回退到成员漫画封面。

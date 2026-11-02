@@ -6,8 +6,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/element/card/reading_history_card.dart';
-import 'package:hentai_library/shared/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/reading_history/public.dart';
+import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 

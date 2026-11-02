@@ -5,3 +5,4 @@ library;
 
 export 'domain/reading_history.dart';
 export 'presentation/models/history_card_item.dart';
+export 'presentation/widgets/reading_history_card.dart';

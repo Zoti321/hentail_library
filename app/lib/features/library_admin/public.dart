@@ -6,3 +6,5 @@ export 'public/di/port_factories.dart';
 export 'public/library_admin_command_ports.dart';
 export 'public/ui/home_library_management_panel.dart';
 export 'public/ui/library_management_port.dart';
+export 'di/library_command_providers.dart';
+export 'di/library_management_providers.dart';

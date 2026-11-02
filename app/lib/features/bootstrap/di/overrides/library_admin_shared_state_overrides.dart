@@ -8,8 +8,8 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_series_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
-import 'package:hentai_library/shared/di/library_management_providers.dart';
+import 'package:hentai_library/features/library_admin/di/library_command_providers.dart';
+import 'package:hentai_library/features/library_admin/di/library_management_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 

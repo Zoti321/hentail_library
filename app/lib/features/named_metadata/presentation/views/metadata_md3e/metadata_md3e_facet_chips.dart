@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_actions.dart';
-import 'package:hentai_library/shared/di/author_detail_providers.dart';
+import 'package:hentai_library/features/library_browse/di/author_detail_providers.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/named_facet_context_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

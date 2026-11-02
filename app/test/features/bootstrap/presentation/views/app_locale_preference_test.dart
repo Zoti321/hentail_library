@@ -7,7 +7,7 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/se
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
-import 'package:hentai_library/shared/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart' show AsyncData;
 

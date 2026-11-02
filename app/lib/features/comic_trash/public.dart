@@ -3,3 +3,4 @@ library;
 
 export 'public/comic_trash_command_port.dart';
 export 'public/di/comic_trash_command_factory.dart';
+export 'di/comic_trash_command_providers.dart';

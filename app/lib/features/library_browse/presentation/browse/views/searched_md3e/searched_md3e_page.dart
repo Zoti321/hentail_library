@@ -15,9 +15,9 @@ import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
-import 'package:hentai_library/shared/di/library_management_providers.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_content.dart';
+import 'package:hentai_library/features/library_browse/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 
 const double _kSearchLoadMoreThreshold = 400;

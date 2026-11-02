@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/di/comic_cover_providers.dart';
-import 'package:hentai_library/shared/di/series_cover_providers.dart';
+import 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/library_browse/di/series_cover_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';

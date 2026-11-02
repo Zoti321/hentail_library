@@ -48,7 +48,7 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 - `ports/read_session_launch_port.dart`
 - `library/comic_detail_return_series_port.dart`
 
-`shared/di` 与 bootstrap 仍从此处 import 类型（R11：shared 不得 import feature public）。
+`shared/di` 仍保留跨 feature 基础设施 token（如 `data_providers.dart`）；owner 侧 Provider 在 `features/<id>/di/`，跨 module 经 **`features/<id>/public.dart`** export。bootstrap 组合根可直接 import owner `di/`。
 
 ## 测试目录约定
 

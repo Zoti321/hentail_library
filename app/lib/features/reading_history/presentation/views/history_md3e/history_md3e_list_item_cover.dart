@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';

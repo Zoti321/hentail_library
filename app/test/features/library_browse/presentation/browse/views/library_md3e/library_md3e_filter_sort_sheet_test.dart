@@ -8,7 +8,7 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_nee
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_filter_sort_sheet.dart';
-import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
+import 'package:hentai_library/features/named_metadata/di/library_dictionary_providers.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_comic_sort_option.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';

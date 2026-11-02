@@ -13,8 +13,8 @@ import 'package:hentai_library/features/library_browse/presentation/browse/views
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_selection_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
-import 'package:hentai_library/shared/di/comic_cover_providers.dart';
-import 'package:hentai_library/shared/di/series_cover_providers.dart';
+import 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/library_browse/di/series_cover_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';

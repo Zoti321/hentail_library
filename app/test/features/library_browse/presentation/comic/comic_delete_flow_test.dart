@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/comic_delete_flow.dart';
-import 'package:hentai_library/shared/di/library_command_providers.dart';
+import 'package:hentai_library/features/comic_trash/di/comic_trash_command_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/comic_trash/public.dart';
+import 'package:hentai_library/shared/domain/ports/comic_trash_command_port.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/pump_localized_app.dart';
