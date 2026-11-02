@@ -27,19 +27,20 @@ dependencies:
   material_new_shapes: ^1.0.0
   material_symbols_icons: ^4.2960.0
   motor: ^1.1.0
+  material_ui: ^1.8.0
   scrollable_positioned_list: ^0.3.8
 
   # --- 基础工具库（共 7）---
   async: ^2.11.0
   collection: ^1.0.8
-  crypto: ^3.0.3
+  crypto: ^3.0.8
   intl: ^0.20.2
   logging: ^1.3.0
   path: ^1.9.1
   path_provider: ^2.1.5
 
   # --- 文件 / 媒体 / 权限（共 5）---
-  archive: ^4.0.9
+  archive: ^4.6.0
   extended_image: ^10.0.1
   file_picker: ^11.0.3
   open_filex: ^5.0.0
@@ -57,7 +58,7 @@ dependencies:
   riverpod_annotation: ^4.0.7
 
   # --- 路由（共 1）---
-  go_router: 17.0.0
+  go_router: ^18.1.1
 
   # --- 桌面窗口（共 1）---
   window_manager: ^0.5.1
@@ -103,10 +104,6 @@ dev_dependencies:
 
   # --- 组件目录 / 预览（共 1）---
   widgetbook: ^3.25.0
-
-dependency_overrides:
-  material_ui:
-    path: packages/material_ui_compat
 
 flutter:
   generate: true
