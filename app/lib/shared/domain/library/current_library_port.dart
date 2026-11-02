@@ -4,8 +4,8 @@ import 'package:hentai_library/shared/domain/models/value_objects/form/library_f
 
 /// 当前库选择与生命周期的命令端口（#260 步骤0；#261b 增加表单提交）。
 ///
-/// 实现位于 `features/library_admin/di/shared_state_ports.dart`，
-/// 由 library_admin 的 `CurrentLibraryNotifier` 承接。
+/// 跨 feature 类型请 import `features/library_admin/public.dart`；
+/// [currentLibraryPortProvider] 在 shared/di 声明，工厂见 owner public/di。
 abstract class CurrentLibraryPort {
   /// 当前选中的 libraryId；未选中时为 null。
   Future<String?> currentId();

@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
-import 'package:hentai_library/shared/application/ports/library_management_port.dart';
+import 'package:hentai_library/shared/domain/ports/library_management_port.dart';
 
 /// 库管理 UI 命令；实现与工厂见 `features/library_admin/public.dart`。
 

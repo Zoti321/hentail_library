@@ -74,6 +74,8 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 已闭合 exp
 - Cross-feature 边界可扫描、可文档化；与模块 export 心智一致。
 - Spec 3–7 可在不 reopen Wayfinder 决策票的前提下迁移 Port。
 
+> **实现修订（2026-11-02）**：#434 移除 `shared/application/ports/`；UI 命令契约迁入 `shared/domain/ports/`，跨 feature 类型经 owner `public.dart` re-export。`shared/di` 仍自 shared 层 import 契约类型（R11 禁止 shared→feature public import）。
+
 ### Negative
 
 - 每个对外能力需显式 public 面；短期与 shared Port 并存。

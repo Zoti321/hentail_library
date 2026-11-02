@@ -2,10 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 
-/// 库管理命令（新建 / 编辑 / 删除 / 扫描 / 切换与导航）的跨模块端口（#292）。
+/// 库管理 UI 命令契约（#292）。
 ///
-/// **迁移**：新代码请 import `features/library_admin/public.dart`（ADR-0034 / #434）。
-/// 实现位于 library_admin，由 bootstrap 注入；library_browse、home 等只依赖本接口。
+/// 跨 feature 请 import `features/library_admin/public.dart`（ADR-0034）。
+/// 实现位于 library_admin；[libraryManagementPortProvider] 在 shared/di 声明。
 abstract interface class LibraryManagementPort {
   Future<void> addLocalLibrary(BuildContext context);
 

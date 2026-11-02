@@ -5,7 +5,7 @@ import 'package:hentai_library/features/library_browse/presentation/comic_delete
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/ports/comic_trash_command_port.dart';
+import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../support/pump_localized_app.dart';
