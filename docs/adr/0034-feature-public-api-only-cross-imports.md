@@ -8,7 +8,7 @@ Accepted
 
 Wayfinder 落地后，产品 feature 之间仍采用「零 cross-feature import + `shared/application/ports` + bootstrap override」协作（ADR-0027、import boundary M1）。该模式可行但编排面分散，与 NestJS 式「模块只 export public」心智不一致。
 
-Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 已闭合 export 边界（#426）、Gate 语义（#427）、Port 迁移波次（#428）。本 ADR 将 **import 规则** 与 **物理 `public/` 目录** 写死，作为后续迁移 spec 的共同前提。
+Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implementation spec **#429–#435 已关闭**（决策 #426–#428）。本 ADR 记录现行 import 规则与 `public/` 物理布局。
 
 ### 术语（勿混）
 
@@ -25,7 +25,7 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 已闭合 exp
 - 产品 feature A 仅允许 `import` 产品 feature B 的 **`features/<b>/public/**`**（含 `public/ui/`）。
 - import **`presentation/`、`data/`、`domain/`、`application/`（非 public）、`di/`（非 public）** 等 deep 路径：仍违规（M1）。
 - **bootstrap** 作为组合根，不受 M1 约束（与现 M3 ratchet 并存）。
-- **`shared/**` 不得** import 任意 `features/*/public/**`（R11）；跨模块契约仍经 `shared/domain` / `shared/application/ports` 等，consumer 为 **其他 product feature** 或 **bootstrap**。
+- **`shared/**` 不得** import 任意 `features/*/public/**`（R11）。契约类型定义在 **`shared/domain`**；`shared/di` 只声明 Provider token。产品 feature 与 bootstrap **消费** owner `public.dart`；实现与 `createXxx()` 工厂在 owner `public/di` 或 `di/`，由 `features/bootstrap/di/overrides/` 注入。
 
 ### 2. 与 ADR-0033 Application 层
 
@@ -34,8 +34,8 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 已闭合 exp
 
 ### 3. Riverpod 与 DI
 
-- Consumer 仍可 `ref.read` **`shared/di`** 声明的 Provider token（#426）。
-- 实现与工厂逐步迁入 owner **`public/di`**；bootstrap override **逐步收缩**（Spec 7 / #435）。
+- Consumer 仍 `ref.read` **`shared/di`** 声明的 Provider token（#426）。
+- 工厂经 owner **`public/di`** 暴露；bootstrap 在 `features/bootstrap/di/overrides/` 按 owner 拆分 override（#435）。
 
 ### 4. Wayfinder 布局
 
@@ -72,16 +72,17 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 已闭合 exp
 ### Positive
 
 - Cross-feature 边界可扫描、可文档化；与模块 export 心智一致。
-- Spec 3–7 可在不 reopen Wayfinder 决策票的前提下迁移 Port。
+- #429–#435 已落地：admin / browse / read_session / comic_trash 等 owner `public/` 与 Gate 同步。
 
-> **实现修订（2026-11-02）**：#434 移除 `shared/application/ports/`；UI 命令契约迁入 `shared/domain/ports/`，跨 feature 类型经 owner `public.dart` re-export。`shared/di` 仍自 shared 层 import 契约类型（R11 禁止 shared→feature public import）。
+> **实现修订（2026-11-02）**：移除 `shared/application/ports/`；UI 命令契约在 `shared/domain/ports/`（如 `AuthorDetailPort`、`LibraryManagementPort`）。跨 feature **import 类型**请用 owner `public.dart`；`shared/di` 仍自 shared 层 import 契约（R11 禁止 shared→feature public）。
 
 ### Negative
 
-- 每个对外能力需显式 public 面；短期与 shared Port 并存。
+- 每个对外能力需维护 public barrel；契约真值仍在 shared/domain，与 public re-export 需同步 review。
 
 ## References
 
 - ADR-0017、ADR-0027、ADR-0033
-- #425–#428、#429（Gate + ADR 落地）
+- #425–#435（epic + implementation spec，已关闭）
 - `app/test/gate/import_boundary_rules.dart`、`docs/engineering/gate.md`
+- Owner public 示例：`features/library_admin/public.dart`、`library_browse/public.dart`、`read_session/public.dart`、`comic_trash/public.dart`

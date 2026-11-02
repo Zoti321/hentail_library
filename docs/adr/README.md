@@ -45,7 +45,7 @@
 ### 避免过期快照
 
 - Consequences 与「已实现」列表写**稳定事实**（删了哪些模块、用户可见行为），勿写会随 FRB codegen 变化的 **sync/async 入口计数** 等瞬时数字。
-- 物理路径、目录分层以 `app/test/gate/` 与 ADR-0027 为准；勿保留 Wayfinder 迁移前的 `ui/features` 用语。
+- 物理路径、目录分层以 `app/test/gate/` 与 ADR-0027、**ADR-0033**、**ADR-0034** 为准；勿保留 Wayfinder 迁移前的 `ui/features` 用语或已删除的 `shared/application/ports/` 路径。
 
 ## 模板
 

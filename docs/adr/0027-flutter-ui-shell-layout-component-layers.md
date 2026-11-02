@@ -30,7 +30,7 @@ MVVM 规则不变：View 不直接调 Repository。Shell/Layout/纯 Component **
 - **UI models**：`app/lib/shared/ui/models/` — 组件入参/展示用纯值（封面图源、封面 UI 状态等），**不是** FRB 或 domain 的 DTO
 - **Motion（实现）**：`app/lib/shared/ui/motion/` — 路由过渡、reduced-motion 运行时辅助；**时长/曲线 token** 仍在 `shared/ui/theme/tokens`（`AppMotionTokens`、`context.motion`，ADR-0028）
 - **Foundation pointer**：`app/lib/shared/ui/widgets/foundation/` — 最小点击区域、tooltip 等待、指针激活后 unfocus 等，**不属于** motion
-- **Application UI ports**：`app/lib/shared/application/ports/` — 跨 feature 的 UI 编排契约（可含 `BuildContext`、路由与对话框）；与 `shared/domain/ports`（无 Flutter、对接能力/FRB）区分
+- **跨 feature UI 命令类型**：`shared/domain/ports/`（含 `BuildContext` 的契约，如 `AuthorDetailPort`）及 `shared/domain/library/*_port.dart`；**不再**使用 `shared/application/ports/`（#434）。其他 feature **import** owner `features/<id>/public.dart`；`shared/di` 声明 Provider token，bootstrap 注入实现（ADR-0034）
 - **Component**：`app/lib/shared/ui/widgets/`（按类目）
 - **bootstrap**：应用入口、路由表、将 feature 实现注入 Shell 插槽的**组合根**（composition root）
 - **Libraries 分区 UI** 留在 **library_admin**（`LibrariesAppSidebar`）；经 `AppShellSidebarSlot` + `AppShellSidebarBuilder` 注入 `ResponsiveAppShell`，不迁入 shared Shell 实现。
@@ -56,9 +56,11 @@ Settings list–detail 与 Reader 路由仍隐藏 App sidebar/drawer（现有行
 - bootstrap 组合根略增（`ApplicationShell` + `AppShellSidebarSlot` 显式契约）。
 - 卡片、对话框等需逐步改为 callback 或 feature 包装，短期 allowlist 维护成本。
 
+> **实现修订（2026-11-02）**：跨 feature UI 命令契约目录由 `shared/application/ports/` 收敛至 `shared/domain/ports/` + owner `public/`（ADR-0034）；本节 Shell/Layout 禁止 feature import 不变。
+
 ## References
 
 - ADR-0017 — MVVM 与 View/Repository 边界
 - ADR-0018 — Gate 测试缝
 - ADR-0020 — shell 级调度与侧栏 Libraries
-- `design-system/hentai-library/MASTER.md`
+- ADR-0034 — feature public API 与 cross-import

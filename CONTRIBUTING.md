@@ -15,6 +15,7 @@
 | 始终加载的 brief | `AGENTS.md` |
 | 领域词汇 | `GLOSSARY.md` |
 | 架构决策 | `docs/adr/` |
+| Feature 用例层 / public API | ADR-0033、ADR-0034；bootstrap 注入见 `features/bootstrap/di/overrides/` |
 | UI 规范与规划 | `design-system/` 已清空（仅保留占位与示例参考图，2026-11-01）；现行 UI 真源见 `AGENTS.md` 与 ADR-0027/0028/0030 |
 | Gate、测试缝 | `docs/engineering/gate.md` |
 | `gh`、日志、标签字典 | `docs/engineering/maintainer.md` |

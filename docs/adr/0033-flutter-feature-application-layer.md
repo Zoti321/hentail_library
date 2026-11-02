@@ -8,7 +8,7 @@ Accepted
 
 Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Service`、`*Coordinator` 与交互草稿混在 `domain/`，ViewModel 又承担过多用例编排。ADR-0002 将业务真值放在 Rust；Dart 侧需要一层 **无 Flutter、无 FRB** 的用例编排，且与 glossary 中的 **Application data**（应用数据目录）术语区分。
 
-`shared/application/ports/`（ADR-0027）已承载跨 feature 的 UI 编排契约；feature 内仍缺同级命名层。
+`shared/domain/ports/` 与 `shared/domain/library/` 中的跨 feature **命令契约**（含部分含 `BuildContext` 的 UI 命令类型；#434 起不再使用 `shared/application/ports/`）；消费方 **import owner** `features/<id>/public.dart`（ADR-0034）。feature 内仍缺同级 **用例编排** 命名层。
 
 ## Decision
 
@@ -16,7 +16,7 @@ Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Servic
 
 - **`features/<feature>/application/`**（**可选**）：用例编排（Service、Coordinator）；可 `async`；禁止 Flutter、Riverpod、FRB。
 - **`features/<feature>/domain/`**：纯规则、值对象、本 feature 专用 Repository **契约**。
-- **`shared/application/ports/`**：跨 feature UI 命令（可含 `BuildContext`）；与 feature `application` **并存**，职责不同。
+- **跨 feature 命令类型**：定义在 `shared/domain`（ports / library）；**发现面**在 owner `features/<id>/public/`（re-export）；与 feature `application` **并存**，职责不同。
 
 术语 **Application 应用层** 指本节 Dart 用例层，**不是** ADR-0019 / glossary 的 Application data。
 
@@ -35,7 +35,7 @@ Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Servic
 
 ### 4. 迁移
 
-按 #419 子票渐进搬迁既有 Service/Coordinator；交互草稿归 `presentation/`。
+#419 / #420–#424 已落地：read_session、comic_trash、library_admin application 迁移与 library_browse 草稿归位。新用例编排仍按本节落 `application/`。
 
 ## Consequences
 
@@ -49,5 +49,5 @@ Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Servic
 
 ## References
 
-- ADR-0002、ADR-0017、ADR-0027、ADR-0018
-- #419 — spec
+- ADR-0002、ADR-0017、ADR-0027、ADR-0018、**ADR-0034**
+- #419 — spec（已关闭）
