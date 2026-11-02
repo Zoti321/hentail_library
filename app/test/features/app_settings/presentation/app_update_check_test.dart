@@ -10,8 +10,12 @@ import 'package:hentai_library/features/app_settings/di/app_update_providers.dar
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod/misc.dart' show Override;
 
+import 'package:material_3_expressive/material_3_expressive.dart';
+
 import '../../../support/fakes/settings_test_fakes.dart';
-import '../../../support/pump_localized_app.dart';
+import '../../../support/localized_test_app.dart';
+import '../../../../widgetbook/lab_theme/md3e_theme.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 
 class MockAppUpdateService extends Mock implements AppUpdateService {}
 
@@ -53,6 +57,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.byType(AppUpdateDialog), findsOneWidget);
+      expect(find.byType(M3EDialog), findsOneWidget);
       expect(find.text('发现新版本 v1.0.1'), findsOneWidget);
     });
 
@@ -118,7 +123,7 @@ void main() {
         when(() => mockService.fetchLatestStableRelease())
             .thenAnswer((_) async => newerRelease);
 
-        await pumpLocalizedApp(
+        await pumpMd3eUpdateHarness(
           tester,
           home: const SizedBox.shrink(),
           overrides: _overrides(mockService),
@@ -143,7 +148,7 @@ Future<void> _pumpHarness(
   WidgetTester tester, {
   required MockAppUpdateService mockService,
 }) {
-  return pumpLocalizedApp(
+  return pumpMd3eUpdateHarness(
     tester,
     overrides: _overrides(mockService),
     home: Builder(
@@ -157,6 +162,30 @@ Future<void> _pumpHarness(
           child: const Text('检查更新'),
         );
       },
+    ),
+  );
+}
+
+Future<void> pumpMd3eUpdateHarness(
+  WidgetTester tester, {
+  required Widget home,
+  List<Override> overrides = const <Override>[],
+}) async {
+  final M3EThemeData m3e = buildAppM3eThemeData(Brightness.light);
+  final localized = localizedTestAppConfig(locale: const Locale('zh'));
+  await tester.pumpWidget(
+    Md3eThemeScope(
+      m3e: m3e,
+      child: ProviderScope(
+        overrides: overrides,
+        child: MaterialApp(
+          locale: localized.locale,
+          localizationsDelegates: localized.delegates,
+          supportedLocales: localized.locales,
+          theme: buildAppTheme(Brightness.light),
+          home: home,
+        ),
+      ),
     ),
   );
 }

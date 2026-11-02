@@ -1944,13 +1944,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get updateRemindLater => '稍后提醒';
+  String get updateRemindLater => '稍后';
 
   @override
   String get updateViewDetails => '查看详情';
 
   @override
-  String get updateNow => '立即更新';
+  String get updateNow => '更新';
 
   @override
   String get updateManualDownloadToast => '请手动下载适合您系统的安装包';

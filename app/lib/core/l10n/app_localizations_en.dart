@@ -2011,13 +2011,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get updateRemindLater => 'Remind me later';
+  String get updateRemindLater => 'Later';
 
   @override
   String get updateViewDetails => 'View details';
 
   @override
-  String get updateNow => 'Update now';
+  String get updateNow => 'Update';
 
   @override
   String get updateManualDownloadToast =>

@@ -949,9 +949,9 @@
       "date": {"type": "String"}
     }
   },
-  "updateRemindLater": "Remind me later",
+  "updateRemindLater": "Later",
   "updateViewDetails": "View details",
-  "updateNow": "Update now",
+  "updateNow": "Update",
   "updateManualDownloadToast": "Download the installer for your system manually",
   "updateDownloadingTitle": "Downloading update",
   "updateDownloadFailed": "Download failed. Please retry.",

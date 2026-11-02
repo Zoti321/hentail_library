@@ -3573,7 +3573,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateRemindLater.
   ///
   /// In zh, this message translates to:
-  /// **'稍后提醒'**
+  /// **'稍后'**
   String get updateRemindLater;
 
   /// No description provided for @updateViewDetails.
@@ -3585,7 +3585,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateNow.
   ///
   /// In zh, this message translates to:
-  /// **'立即更新'**
+  /// **'更新'**
   String get updateNow;
 
   /// No description provided for @updateManualDownloadToast.

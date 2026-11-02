@@ -949,9 +949,9 @@
       "date": {"type": "String"}
     }
   },
-  "updateRemindLater": "稍后提醒",
+  "updateRemindLater": "稍后",
   "updateViewDetails": "查看详情",
-  "updateNow": "立即更新",
+  "updateNow": "更新",
   "updateManualDownloadToast": "请手动下载适合您系统的安装包",
   "updateDownloadingTitle": "正在下载更新",
   "updateDownloadFailed": "下载失败，请重试",
