@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/shared/data/adapters/remote_credentials_frb.dart';
-import 'package:hentai_library/shared/domain/library/metadata_refresh_port.dart';
-import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
+import 'package:hentai_library/features/library_admin/domain/metadata_refresh_port.dart';
+import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as comic_rust;
 import 'package:hentai_library/src/rust/api/series.dart' as series_rust;

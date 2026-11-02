@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/library_admin/data/adapters/sync_library_frb_adapter.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_port.dart';
+import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

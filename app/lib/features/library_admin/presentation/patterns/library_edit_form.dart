@@ -10,8 +10,8 @@ import 'package:hentai_library/shared/ui/widgets/inputs/scan_interval_dropdown.d
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
-import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
+import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 

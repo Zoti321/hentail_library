@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/ui/patterns/dialog/md3e_adaptive_form_dial
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/domain/library/resource_format_category.dart';
+import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';

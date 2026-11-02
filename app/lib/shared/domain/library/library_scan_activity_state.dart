@@ -1,3 +1,1 @@
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
-
-typedef LibraryScanActivityState = ({bool running, ScanMode scanMode});
+export 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';

@@ -1,5 +1,5 @@
-import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_port.dart';
-import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_types.dart';
+import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_port.dart';
+import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
 
 /// UI-side helper: FRB bulk patch + catalog revision bump.
 class ComicMetadataBulkPatchCoordinator {

@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
+import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:riverpod/misc.dart' show Override, ProviderException;
 

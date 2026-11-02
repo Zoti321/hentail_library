@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
+import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 
 /// Decides which Library ids need incremental sync at startup / on an interval tick.
