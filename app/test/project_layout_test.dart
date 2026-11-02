@@ -33,16 +33,19 @@ void main() {
       expect(Directory(p.join(repoRoot.path, '.github')).existsSync(), isTrue);
     });
 
-    test('design-system/ keeps placeholder only (archive cleared 2026-11-01)', () {
-      final Directory designSystem = Directory(
-        p.join(repoRoot.path, 'design-system'),
-      );
-      expect(designSystem.existsSync(), isTrue);
-      expect(
-        File(p.join(designSystem.path, '.gitkeep')).existsSync(),
-        isTrue,
-      );
-    });
+    test(
+      'design-system/ keeps placeholder only (archive cleared 2026-11-01)',
+      () {
+        final Directory designSystem = Directory(
+          p.join(repoRoot.path, 'design-system'),
+        );
+        expect(designSystem.existsSync(), isTrue);
+        expect(
+          File(p.join(designSystem.path, '.gitkeep')).existsSync(),
+          isTrue,
+        );
+      },
+    );
 
     test('core/ Rust workspace exists', () {
       expect(Directory(p.join(repoRoot.path, 'core')).existsSync(), isTrue);

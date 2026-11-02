@@ -129,10 +129,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
           slivers: <Widget>[
             SliverPersistentHeader(
               pinned: true,
-              delegate: Md3ePageHeaderDelegate(
-                layout: layout,
-                child: header,
-              ),
+              delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
             ),
             SliverPadding(
               padding: EdgeInsets.fromLTRB(

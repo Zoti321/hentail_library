@@ -10,7 +10,9 @@ abstract final class Md3eLibraryEditPreviewData {
     kind: 'local',
     rootPath: r'D:\library\NAS 漫画库',
     name: 'NAS 漫画库',
-    enabledResourceFormatCategories: List<ResourceFormatCategory>.from(ResourceFormatCategory.all),
+    enabledResourceFormatCategories: List<ResourceFormatCategory>.from(
+      ResourceFormatCategory.all,
+    ),
     username: '',
     allowHttp: false,
     scanOnStartup: true,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
+
 import 'lab_theme/md3e_theme.dart';
+
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 import 'md3e_widgetbook_l10n_scope.dart';
@@ -8,7 +10,9 @@ import 'md3e_widgetbook_localizations.dart';
 
 /// Wraps each Widgetbook use-case preview in [M3EMaterialApp] + lab theme.
 Widget md3eWidgetbookAppBuilder(BuildContext context, Widget child) {
-  final M3EThemeData lightM3e = buildMd3eThemeData(brightness: Brightness.light);
+  final M3EThemeData lightM3e = buildMd3eThemeData(
+    brightness: Brightness.light,
+  );
 
   // Brightness is driven by [buildMd3eWidgetbookThemeAddon]; [M3EMaterialApp]
   // `theme` / `darkTheme` expect material_ui [ThemeData], not Flutter's.

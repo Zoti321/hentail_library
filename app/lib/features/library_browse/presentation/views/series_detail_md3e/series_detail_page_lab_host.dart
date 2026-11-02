@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab / Widgetbook 宿主：在调用方切片并维护页码；[Md3eSeriesDetailPage] 只渲染当前页。

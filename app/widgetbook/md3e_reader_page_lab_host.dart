@@ -3,7 +3,9 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_page.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_boundary_snackbar.dart';
+
 import 'md3e_reader_page_preview_data.dart';
+
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_catalog_sheet.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_volume.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_settings_side_sheet.dart';
@@ -115,8 +117,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
   }
 
   void _requestSeriesBoundary(_SeriesBoundaryPrompt direction) {
-    final List<Md3eReaderSeriesVolume> volumes =
-        widget.preview.seriesVolumes;
+    final List<Md3eReaderSeriesVolume> volumes = widget.preview.seriesVolumes;
     final int current = _volumeIndex;
     final int neighbor =
         current + (direction == _SeriesBoundaryPrompt.advance ? 1 : -1);

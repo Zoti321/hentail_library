@@ -7,7 +7,9 @@ import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
+
 import 'md3e_library_edit_preview_data.dart';
+
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -90,8 +92,7 @@ class _Md3eLibraryEditDialog extends StatefulWidget {
       Md3eLibraryEditPageIntent.createRemote =>
         l10n.dialogCreateRemoteLibraryTitle,
       Md3eLibraryEditPageIntent.editLocal ||
-      Md3eLibraryEditPageIntent.editRemote =>
-        l10n.dialogEditLibraryTitle,
+      Md3eLibraryEditPageIntent.editRemote => l10n.dialogEditLibraryTitle,
     };
   }
 
@@ -100,19 +101,16 @@ class _Md3eLibraryEditDialog extends StatefulWidget {
 }
 
 class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
-  late LibraryForm _form =
-      widget.initialForm ?? _formForIntent(widget.intent);
+  late LibraryForm _form = widget.initialForm ?? _formForIntent(widget.intent);
   LibraryFormValidation? _validation;
   bool _saving = false;
 
   bool get _isCreate => switch (widget.intent) {
-        Md3eLibraryEditPageIntent.createLocal ||
-        Md3eLibraryEditPageIntent.createRemote =>
-          true,
-        Md3eLibraryEditPageIntent.editLocal ||
-        Md3eLibraryEditPageIntent.editRemote =>
-          false,
-      };
+    Md3eLibraryEditPageIntent.createLocal ||
+    Md3eLibraryEditPageIntent.createRemote => true,
+    Md3eLibraryEditPageIntent.editLocal ||
+    Md3eLibraryEditPageIntent.editRemote => false,
+  };
 
   static LibraryForm _formForIntent(Md3eLibraryEditPageIntent intent) {
     return switch (intent) {
@@ -126,7 +124,9 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
   }
 
   Future<void> _saveAndPop() async {
-    final LibraryFormValidation validation = _form.validate(isCreate: _isCreate);
+    final LibraryFormValidation validation = _form.validate(
+      isCreate: _isCreate,
+    );
     if (!validation.isValid) {
       setState(() => _validation = validation);
       return;
@@ -164,14 +164,12 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
   @override
   Widget build(BuildContext context) {
     if (widget.formOnly) {
-      return SingleChildScrollView(
-        child: _buildForm(),
-      );
+      return SingleChildScrollView(child: _buildForm());
     }
 
     final AppLocalizations l10n = context.l10n;
-    final double horizontalInset =
-        Md3ePageLayoutSpec.of(context).horizontalInset;
+    final double horizontalInset = Md3ePageLayoutSpec.of(context)
+        .horizontalInset;
 
     return M3EDialog(
       title: _Md3eLibraryEditDialog._titleForIntent(l10n, widget.intent),

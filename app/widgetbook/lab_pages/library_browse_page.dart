@@ -128,10 +128,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
           slivers: <Widget>[
             SliverPersistentHeader(
               pinned: true,
-              delegate: Md3ePageHeaderDelegate(
-                layout: layout,
-                child: header,
-              ),
+              delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
             ),
             if (widget.onDisplayTargetChanged != null)
               SliverPadding(
@@ -172,9 +169,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
               ),
             ),
             SliverPadding(
-              padding: EdgeInsets.only(
-                top: layout.headerToBodyGap,
-              ),
+              padding: EdgeInsets.only(top: layout.headerToBodyGap),
               sliver: switch (widget.viewMode) {
                 Md3eCatalogViewMode.grid => Md3eCatalogGridSliver(
                   itemCount: widget.itemCount,

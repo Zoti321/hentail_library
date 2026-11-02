@@ -22,16 +22,16 @@ class Md3eReaderPagePreviewData {
   final Md3eReaderViewportStatus viewportStatus;
 
   static Md3eReaderPagePreviewData sample() => const Md3eReaderPagePreviewData(
-        title: '第 01 卷',
-        subtitle: '葬送的芙莉莲',
-        totalPages: 24,
-        initialPage: 3,
-      );
+    title: '第 01 卷',
+    subtitle: '葬送的芙莉莲',
+    totalPages: 24,
+    initialPage: 3,
+  );
 }
 
 const List<Md3eReaderSeriesVolume> kMd3eReaderPreviewSeriesVolumes =
     <Md3eReaderSeriesVolume>[
-  Md3eReaderSeriesVolume(id: 'vol-01', title: '第 01 卷'),
-  Md3eReaderSeriesVolume(id: 'vol-02', title: '第 02 卷'),
-  Md3eReaderSeriesVolume(id: 'vol-03', title: '第 03 卷'),
-];
+      Md3eReaderSeriesVolume(id: 'vol-01', title: '第 01 卷'),
+      Md3eReaderSeriesVolume(id: 'vol-02', title: '第 02 卷'),
+      Md3eReaderSeriesVolume(id: 'vol-03', title: '第 03 卷'),
+    ];

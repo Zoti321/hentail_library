@@ -1,4 +1,3 @@
-
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -78,8 +77,10 @@ void _printSummary(String label, List<FrameTiming> frames) {
   final int janky = frames
       .where((FrameTiming f) => f.totalSpan.inMilliseconds > 16)
       .length;
-  double avg(List<double> xs) => xs.reduce((double a, double b) => a + b) / xs.length;
-  double maxOf(List<double> xs) => xs.reduce((double a, double b) => a > b ? a : b);
+  double avg(List<double> xs) =>
+      xs.reduce((double a, double b) => a + b) / xs.length;
+  double maxOf(List<double> xs) =>
+      xs.reduce((double a, double b) => a > b ? a : b);
 
   // ignore: avoid_print
   print(
