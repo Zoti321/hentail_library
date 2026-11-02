@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/library/library_serialization_status_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/library_serialization_status_filter.dart';
 import 'package:test/test.dart';
 
 void main() {

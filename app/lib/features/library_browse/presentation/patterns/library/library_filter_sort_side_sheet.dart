@@ -8,9 +8,9 @@ import 'package:hentai_library/shared/ui/motion/spring_size.dart';
 import 'package:hentai_library/shared/ui/motion/spring_value.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
-import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
-import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/library_age_restriction_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/library_comic_sort_option.dart';
+import 'package:hentai_library/features/library_browse/domain/library_media_type_filter.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
