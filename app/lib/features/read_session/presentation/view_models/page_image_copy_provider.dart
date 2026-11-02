@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/data/adapters/system_clipboard_image_adapter.dart';
+import 'package:hentai_library/features/read_session/data/adapters/system_clipboard_image_adapter.dart';
 import 'package:hentai_library/features/read_session/domain/clipboard_image_port.dart';
 import 'package:hentai_library/features/read_session/domain/page_image_copy.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
