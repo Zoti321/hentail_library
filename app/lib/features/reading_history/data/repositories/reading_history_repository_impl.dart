@@ -1,7 +1,7 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/features/reading_history/data/history_frb_mapper.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
+import 'package:hentai_library/features/reading_history/data/mappers/history_frb_mapper.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';

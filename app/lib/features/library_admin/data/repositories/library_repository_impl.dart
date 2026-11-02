@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/library_admin/data/repositories/flutter_secure_remote_library_credential_store.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';

@@ -24,7 +24,7 @@
 |----|------|
 | Rust 业务 | `core/` + `tests/common/` harness → `gate-rust-test` |
 | FRB 线缝 | `app/test/frb_wire/`（`frb_wire_harness.dart`）→ manifest |
-| Dart 薄边 | mapper/guard/adapters → `app/test/shared/{data,domain}/`、`test/core/` |
+| Dart 薄边 | mapper/guard/adapters → `app/test/shared/data/{frb,mappers}/`、`test/features/*/data/` · 见 [`feature-data-layout.md`](./feature-data-layout.md) |
 | UI 快轨 | 列入 `app/test/gate/manifest.txt` 的 UI/逻辑 |
 | UI 慢轨 | `test/shared/ui`、`test/features` 未进 manifest 部分 → `nightly-dart-ui` |
 

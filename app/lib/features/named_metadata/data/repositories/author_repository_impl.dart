@@ -1,6 +1,6 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:hentai_library/features/named_metadata/data/author_frb_mapper.dart';
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/features/named_metadata/data/mappers/author_frb_mapper.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';

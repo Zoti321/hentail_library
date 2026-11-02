@@ -1,5 +1,5 @@
-import 'package:hentai_library/shared/data/adapters/reader_frb_mapper.dart';
-import 'package:hentai_library/shared/data/adapters/remote_credentials_frb.dart';
+import 'package:hentai_library/shared/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/shared/data/adapters/remote_credentials_frb_adapter.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';

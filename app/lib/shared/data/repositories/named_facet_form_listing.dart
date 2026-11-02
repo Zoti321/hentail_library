@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/src/rust/api/named_facet.dart' as rust;
 

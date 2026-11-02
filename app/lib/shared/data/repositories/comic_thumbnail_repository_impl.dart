@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/shared/data/adapters/remote_credentials_frb.dart';
-import 'package:hentai_library/shared/data/adapters/thumbnail_frb_mapper.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/adapters/remote_credentials_frb_adapter.dart';
+import 'package:hentai_library/shared/data/mappers/thumbnail_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_thumbnail_repository.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';

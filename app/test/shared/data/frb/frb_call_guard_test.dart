@@ -1,5 +1,5 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:test/test.dart';
 

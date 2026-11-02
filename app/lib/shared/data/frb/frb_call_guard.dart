@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
+import 'package:hentai_library/shared/data/frb/frb_error_mapper.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
 Never _rethrowFrb(

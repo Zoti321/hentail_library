@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/features/library_admin/data/local_library_root_access.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
+import 'package:hentai_library/shared/data/frb/frb_error_mapper.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/di/library_sync.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
+import 'package:hentai_library/shared/data/frb/frb_error_mapper.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
 /// FRB 流式 API 在绑定阶段通过 unawaited Future 抛出的错误兜底处理。
