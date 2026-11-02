@@ -13,9 +13,9 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_filter_sort_sheet.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_overflow_entries.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_selection_header.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_filter_sort_sheet.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_overflow_entries.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_selection_header.dart';
 import 'package:hentai_library/features/library_browse/presentation/views/widgets/md3e_comic_card_actions.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';

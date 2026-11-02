@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
+import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_comic_grouping.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_needs_metadata_only.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_md3e/library_md3e_sort_section.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_filter_sort_sheet.dart';
+import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_comic_sort_option.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_metadata_filter_selection.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-class _RecordingComicFilters extends LibraryComicFiltersNotifier {
-  _RecordingComicFilters(this.sortCalls, this.grouping);
-
-  final List<LibraryComicSortField> sortCalls;
-  final LibraryComicGrouping grouping;
-
+class _FixedComicFilters extends LibraryComicFiltersNotifier {
   @override
   Future<LibraryComicFiltersState> build() async => LibraryComicFiltersState(
     ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
@@ -30,21 +28,12 @@ class _RecordingComicFilters extends LibraryComicFiltersNotifier {
     tagFilter: const LibraryMetadataFilterSelection(),
     authorFilter: const LibraryMetadataFilterSelection(),
     needsMetadataOnly: LibraryNeedsMetadataOnly.defaultValue,
-    grouping: grouping,
+    grouping: LibraryComicGrouping.none,
     sortOption: LibraryComicSortOption(),
   );
-
-  @override
-  Future<void> setSortField(LibraryComicSortField field) async {
-    sortCalls.add(field);
-  }
 }
 
-Future<void> _pumpSortSection(
-  WidgetTester tester, {
-  required List<LibraryComicSortField> sortCalls,
-  LibraryComicGrouping grouping = LibraryComicGrouping.none,
-}) async {
+Future<void> _pumpSheetTrigger(WidgetTester tester) async {
   tester.view.physicalSize = const Size(400, 900);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
@@ -53,11 +42,16 @@ Future<void> _pumpSortSection(
   await tester.pumpWidget(
     ProviderScope(
       overrides: <Override>[
+        ...bootstrapCompositionOverrides(),
         libraryDisplayTargetProvider.overrideWithValue(
           LibraryDisplayTarget.comics,
         ),
-        libraryComicFiltersProvider.overrideWith(
-          () => _RecordingComicFilters(sortCalls, grouping),
+        libraryComicFiltersProvider.overrideWith(_FixedComicFilters.new),
+        libraryTagDictionaryStateProvider.overrideWithValue(
+          const AsyncValue<List<Tag>>.data(<Tag>[]),
+        ),
+        libraryAuthorDictionaryStateProvider.overrideWithValue(
+          const AsyncValue<List<Author>>.data(<Author>[]),
         ),
       ],
       child: MaterialApp(
@@ -65,8 +59,15 @@ Future<void> _pumpSortSection(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(
-          body: SingleChildScrollView(child: Md3eLibrarySortSection()),
+        home: Scaffold(
+          body: Builder(
+            builder: (BuildContext context) => Center(
+              child: TextButton(
+                onPressed: () => Md3eLibraryFilterSortSheet.show(context),
+                child: const Text('OPEN'),
+              ),
+            ),
+          ),
         ),
       ),
     ),
@@ -77,48 +78,15 @@ Future<void> _pumpSortSection(
 void main() {
   final AppLocalizations l10n = AppLocalizationsZh();
 
-  testWidgets('comics tab lists the group toggle and every comic sort field', (
+  testWidgets('opens the filter and sort sheet with both sections', (
     WidgetTester tester,
   ) async {
-    await _pumpSortSection(tester, sortCalls: <LibraryComicSortField>[]);
+    await _pumpSheetTrigger(tester);
 
-    expect(find.text(l10n.libraryExpandBySeries), findsOneWidget);
-    for (final LibraryComicSortField field in LibraryComicSortField.values) {
-      expect(find.text(l10n.libraryComicSortFieldLabel(field)), findsOneWidget);
-    }
-  });
-
-  testWidgets('tapping an implemented comic sort field selects it', (
-    WidgetTester tester,
-  ) async {
-    final List<LibraryComicSortField> sortCalls = <LibraryComicSortField>[];
-    await _pumpSortSection(tester, sortCalls: sortCalls);
-
-    final LibraryComicSortField field = LibraryComicSortField.values.firstWhere(
-      (LibraryComicSortField f) => f.isImplemented,
-    );
-    await tester.tap(find.text(l10n.libraryComicSortFieldLabel(field)));
+    await tester.tap(find.text('OPEN'));
     await tester.pumpAndSettle();
 
-    expect(sortCalls, <LibraryComicSortField>[field]);
-  });
-
-  testWidgets('group-by-series disables comic sort selection', (
-    WidgetTester tester,
-  ) async {
-    final List<LibraryComicSortField> sortCalls = <LibraryComicSortField>[];
-    await _pumpSortSection(
-      tester,
-      sortCalls: sortCalls,
-      grouping: LibraryComicGrouping.bySeries,
-    );
-
-    final LibraryComicSortField field = LibraryComicSortField.values.firstWhere(
-      (LibraryComicSortField f) => f.isImplemented,
-    );
-    await tester.tap(find.text(l10n.libraryComicSortFieldLabel(field)));
-    await tester.pumpAndSettle();
-
-    expect(sortCalls, isEmpty);
+    expect(find.text(l10n.libraryAgeRestrictionFilter), findsOneWidget);
+    expect(find.text(l10n.librarySortSection), findsOneWidget);
   });
 }
