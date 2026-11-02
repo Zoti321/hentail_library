@@ -18,6 +18,26 @@ pub enum JunctionNamedFacet {
     Character,
 }
 
+/// Metadata management UI facet (authors + dictionary facets).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ManagementFacetKind {
+    Author,
+    Tag,
+    Parody,
+    Character,
+}
+
+impl ManagementFacetKind {
+    pub fn junction(self) -> Option<JunctionNamedFacet> {
+        match self {
+            Self::Author => None,
+            Self::Tag => Some(JunctionNamedFacet::Tag),
+            Self::Parody => Some(JunctionNamedFacet::Parody),
+            Self::Character => Some(JunctionNamedFacet::Character),
+        }
+    }
+}
+
 impl JunctionNamedFacet {
     pub fn dict_table(self) -> &'static str {
         match self {
@@ -220,6 +240,27 @@ pub async fn fetch_named_facet_names_page(
         page: window.page,
         page_size: window.page_size,
     })
+}
+
+/// Paged management-tab names (Author display names or dictionary facet names).
+pub async fn fetch_management_facet_names_page(
+    facet: ManagementFacetKind,
+    request: crate::comic::PageRequestDto,
+) -> Result<PagedStringNamesDto, HentaiError> {
+    match facet {
+        ManagementFacetKind::Author => {
+            let page = crate::author::fetch_author_names_page_result(request).await?;
+            Ok(PagedStringNamesDto {
+                items: page.items,
+                total_count: page.total_count,
+                page: page.page,
+                page_size: page.page_size,
+            })
+        }
+        ManagementFacetKind::Tag | ManagementFacetKind::Parody | ManagementFacetKind::Character => {
+            fetch_named_facet_names_page(facet.junction().expect("dictionary facet"), request).await
+        }
+    }
 }
 
 pub async fn list_distinct_named_facet_names(

@@ -1,9 +1,9 @@
 use hentai_core::{
     add_author, add_named_facet_name, count_author_attachments, count_named_facet_attachments,
-    delete_authors_by_names, delete_named_facet_by_names, fetch_author_names_page_result,
-    fetch_named_facet_names_page, list_all_author_names, list_all_named_facet_names,
-    list_author_names_for_form, list_named_facet_for_form, merge_named_facet_name,
-    reject_author_merge, rename_author, rename_named_facet_name, NamedFacetFormEntry,
+    delete_authors_by_names, delete_named_facet_by_names, fetch_management_facet_names_page,
+    list_all_author_names, list_all_named_facet_names, list_author_names_for_form,
+    list_named_facet_for_form, merge_named_facet_name, reject_author_merge, rename_author,
+    rename_named_facet_name, ManagementFacetKind, NamedFacetFormEntry,
 };
 
 use super::comic::PageRequestDto;
@@ -19,6 +19,15 @@ pub enum JunctionNamedFacetFrb {
     Author,
     Parody,
     Character,
+}
+
+fn management_facet_kind(facet: JunctionNamedFacetFrb) -> ManagementFacetKind {
+    match facet {
+        JunctionNamedFacetFrb::Author => ManagementFacetKind::Author,
+        JunctionNamedFacetFrb::Tag => ManagementFacetKind::Tag,
+        JunctionNamedFacetFrb::Parody => ManagementFacetKind::Parody,
+        JunctionNamedFacetFrb::Character => ManagementFacetKind::Character,
+    }
 }
 
 /// Form picker candidate: name + Named facet attachment count.
@@ -61,22 +70,9 @@ pub async fn fetch_named_facet_page_frb(
     facet: JunctionNamedFacetFrb,
     request: PageRequestDto,
 ) -> Result<NamedFacetPagedNamesDto, HentaiErrorDto> {
-    let page = match route(facet) {
-        NamedFacetRoute::Dictionary(facet) => {
-            fetch_named_facet_names_page(facet, request.into()).await
-        }
-        NamedFacetRoute::Author => {
-            fetch_author_names_page_result(request.into())
-                .await
-                .map(|author_page| hentai_core::PagedStringNamesDto {
-                    items: author_page.items,
-                    total_count: author_page.total_count,
-                    page: author_page.page,
-                    page_size: author_page.page_size,
-                })
-        }
-    }
-    .map_err(HentaiErrorDto::from)?;
+    let page = fetch_management_facet_names_page(management_facet_kind(facet), request.into())
+        .await
+        .map_err(HentaiErrorDto::from)?;
     Ok(NamedFacetPagedNamesDto {
         items: page.items,
         total_count: page.total_count,
