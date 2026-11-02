@@ -43,7 +43,16 @@
 
 **已完成（2026-11-02，Phase 4）**：原 `presentation/views/**`、`presentation/patterns/**` 已按上表迁入各 zone 的 `views/`、`patterns/`；对应 `test/features/library_browse/presentation/<zone>/views/**` 与 `manifest.txt` 已同步。
 
-新功能：**先选分区再建文件**；禁止在 `presentation/` 根再堆平铺 views/patterns（零散 port/flow 文件可后续小步归入 zone）。
+**presentation 根（2026-11-02 收尾）**：仅保留内部 barrel `library.dart`；其余已归入 zone：
+
+| 原路径 | 现路径 |
+| --- | --- |
+| `author_detail_port.dart` | `author/author_detail_port.dart` |
+| `comic_delete_flow.dart`、`comic_card_host.dart` | `comic/` |
+| `draft/bulk_metadata_edit_session.dart` | `comic/draft/` |
+| `content_breadcrumb_labels.dart` | `catalog/content_breadcrumb_labels.dart` |
+
+新功能：**先选分区再建文件**；禁止在 `presentation/` 根再堆平铺 Dart 源文件（`library.dart` 除外）。
 
 ## 与 owner 表关系
 

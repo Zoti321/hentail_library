@@ -44,7 +44,7 @@ test/shared/ui/motion/desktop_page_transition_test.dart
 test/shared/ui/widgets/foundation/pointer_target_test.dart
 test/features/read_session/presentation/reader_input_test.dart
 test/shared/ui/theme/hentai_color_scheme_tokens_test.dart
-test/features/library_browse/presentation/stable_page_count_test.dart
+test/features/library_browse/presentation/browse/view_models/stable_page_count_test.dart
 test/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine_test.dart
 test/features/library_browse/presentation/comic/view_models/comic_detail_return_series_notifier_test.dart
 test/features/library_browse/presentation/comic/view_models/comic_metadata_apply_test.dart
@@ -83,7 +83,7 @@ test/features/library_admin/domain/library_scan_scheduler_test.dart
 test/features/library_admin/domain/library_sidebar_layout_test.dart
 test/features/library_admin/domain/resource_format_category_setting_test.dart
 test/features/library_admin/presentation/view_models/scan_library_controller_sync_test.dart
-test/features/library_browse/presentation/draft/bulk_metadata_edit_session_test.dart
+test/features/library_browse/presentation/comic/draft/bulk_metadata_edit_session_test.dart
 test/shared/util/name_pinyin_assisted_filter_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_controller_revision_test.dart
 test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart

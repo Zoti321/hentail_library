@@ -4,7 +4,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/features/library_browse/presentation/content_breadcrumb_labels.dart';
+import 'package:hentai_library/features/library_browse/presentation/catalog/content_breadcrumb_labels.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail_md3e/author_detail_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/view_models/comic_detail_return_series_notifier.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/library_browse/presentation/comic_delete_flow.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/comic_delete_flow.dart';
 import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

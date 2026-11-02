@@ -23,8 +23,8 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../support/fakes/author_repository_test_fakes.dart';
-import '../../../support/fakes/revision_throttle_test_fakes.dart';
+import '../../../../../support/fakes/author_repository_test_fakes.dart';
+import '../../../../../support/fakes/revision_throttle_test_fakes.dart';
 
 class _FakeLibraryRevision extends LibraryRevisionNotifier {
   @override
