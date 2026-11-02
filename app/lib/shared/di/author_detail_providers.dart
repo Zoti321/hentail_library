@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/application/ports/author_detail_port.dart';
 
+/// 按作者名打开作者详情；实现与工厂见 `features/library_browse/public.dart`。
+
 /// 按作者名打开作者详情的端口（#292）：由 bootstrap 通过 `overrideWith` 注入。
 final Provider<AuthorDetailPort> authorDetailPortProvider =
     Provider<AuthorDetailPort>(

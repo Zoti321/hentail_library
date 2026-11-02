@@ -4,6 +4,7 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 
 /// 库管理命令（新建 / 编辑 / 删除 / 扫描 / 切换与导航）的跨模块端口（#292）。
 ///
+/// **迁移**：新代码请 import `features/library_admin/public.dart`（ADR-0034 / #434）。
 /// 实现位于 library_admin，由 bootstrap 注入；library_browse、home 等只依赖本接口。
 abstract interface class LibraryManagementPort {
   Future<void> addLocalLibrary(BuildContext context);
