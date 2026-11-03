@@ -9,8 +9,13 @@ part 'app_setting.g.dart';
 @freezed
 abstract class AppSetting with _$AppSetting {
   factory AppSetting({
-    @Default(3) int version,
+    @Default(4) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
+    @Default(AppColorSchemePreference.brand)
+    AppColorSchemePreference colorSchemePreference,
+
+    /// 预留：Material 动态取色；本迭代不实现运行时取色（ADR-0032）。
+    @Default(false) bool useDynamicColor,
     @Default(AppLocalePreference.system) AppLocalePreference localePreference,
     @Default(kDefaultReadingMode) ReadingMode readingMode,
     @Default(kDefaultWebtoonMarginPercent) int webtoonMarginPercent,
@@ -45,6 +50,13 @@ enum AppThemePreference {
   light,
   @JsonValue('dark')
   dark,
+}
+
+/// 固定配色方案 id（非 Material Dynamic Color 运行时）；与 [AppThemePreference] 正交。
+@JsonEnum(alwaysCreate: true)
+enum AppColorSchemePreference {
+  @JsonValue('brand')
+  brand,
 }
 
 /// 应用语言：中文 / English / 跟随系统。

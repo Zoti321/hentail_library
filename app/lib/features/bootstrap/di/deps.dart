@@ -10,7 +10,7 @@ export 'services.dart';
 export 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
 export 'package:hentai_library/features/named_metadata/public.dart';
 export 'package:hentai_library/features/read_session/presentation/reader.dart';
-export 'package:hentai_library/features/app_settings/presentation/settings.dart';
+export 'package:hentai_library/features/app_settings/public.dart';
 export 'package:hentai_library/features/bootstrap/presentation/view_models/aggregates.dart';
 export 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
 export 'package:hentai_library/shared/di/library_state_providers.dart';

@@ -3,7 +3,7 @@ import 'package:hentai_library/features/bootstrap/di/adapters/comic_trash_reader
 import 'package:hentai_library/features/read_session/data/adapters/comic_page_source_frb_adapter.dart';
 import 'package:hentai_library/features/read_session/data/adapters/reader_session_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/data/adapters/library_revision_frb_adapter.dart';
-import 'package:hentai_library/features/app_settings/data/repositories/app_setting_repository_impl.dart';
+import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/library_browse/data/comic/comic_repository_impl.dart';
@@ -59,7 +59,9 @@ List<Override> dataProviderOverrides() => <Override>[
   readingHistoryRepoProvider.overrideWith(
     (Ref ref) => createReadingHistoryRepository(),
   ),
-  appSettingRepoProvider.overrideWith((Ref ref) => AppSettingRepositoryImpl()),
+  appSettingRepoProvider.overrideWith(
+    (Ref ref) => createAppSettingRepository(),
+  ),
   homePageRepoProvider.overrideWith(
     (Ref ref) => const HomePageRepositoryImpl(),
   ),

@@ -30,6 +30,11 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
       autoPlayModeFromJson(migrated['autoPlayMode']),
     );
   }
+  migrated.putIfAbsent('useDynamicColor', () => false);
+  migrated.putIfAbsent('colorSchemePreference', () => 'brand');
+  if (migrated['version'] is int && (migrated['version'] as int) < 4) {
+    migrated['version'] = 4;
+  }
   return migrated;
 }
 

@@ -9,7 +9,7 @@ import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart';
+import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/read_session/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/read_session/domain/reading_mode.dart';

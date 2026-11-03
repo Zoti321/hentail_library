@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart';
-import 'package:hentai_library/features/read_session/public/reading_preference_types.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 
 /// app_settings 对阅读器设置写入端口的实现（#265）。
 class _ReaderSettingsCommandAdapter implements ReaderSettingsCommandPort {
