@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
@@ -21,10 +20,12 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:hentai_library/features/library_admin/public.dart';
+
+import '../../../../../../support/pump_localized_app.dart';
+import '../../../../../../support/test_view.dart';
 
 Comic _comic(String id, String title) {
   final DateTime now = DateTime.utc(2026, 1, 1);
@@ -125,10 +126,7 @@ Future<void> _pumpLibraryMd3ePage(
   List<Series> series = const <Series>[],
   CatalogSelectionState? selection,
 }) async {
-  tester.view.physicalSize = const Size(900, 800);
-  tester.view.devicePixelRatio = 1.0;
-  addTearDown(tester.view.resetPhysicalSize);
-  addTearDown(tester.view.resetDevicePixelRatio);
+  configureTestView(tester, const Size(900, 800));
 
   final List<Override> coverOverrides = <Override>[
     for (final Comic comic in comics)
@@ -138,9 +136,10 @@ Future<void> _pumpLibraryMd3ePage(
           .overrideWith((Ref ref) async => const SeriesCoverMissing()),
   ];
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: <Override>[
+  await pumpLocalizedApp(
+    tester,
+    home: const Scaffold(body: LibraryMd3ePage()),
+    overrides: <Override>[
         libraryPageFacadeProvider.overrideWith(
           () => _FakeFacade(_facade(target)),
         ),
@@ -176,14 +175,6 @@ Future<void> _pumpLibraryMd3ePage(
           ),
         ...coverOverrides,
       ],
-      child: MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(body: LibraryMd3ePage()),
-      ),
-    ),
   );
   await tester.pump();
   await tester.pump();

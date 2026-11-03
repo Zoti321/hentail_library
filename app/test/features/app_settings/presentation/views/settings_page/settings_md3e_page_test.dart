@@ -7,6 +7,9 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/se
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_page.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
+import '../../../../../support/pump_localized_app.dart';
+import '../../../../../support/test_view.dart';
+
 class _RecordingSettingsNotifier extends SettingsNotifier {
   final List<AppThemePreference> themeCalls = <AppThemePreference>[];
   final List<bool> healthyCalls = <bool>[];
@@ -26,9 +29,7 @@ class _RecordingSettingsNotifier extends SettingsNotifier {
 }
 
 Future<_RecordingSettingsNotifier> _pumpPage(WidgetTester tester) async {
-  tester.view.physicalSize = const Size(1200, 900);
-  tester.view.devicePixelRatio = 1;
-  addTearDown(tester.view.reset);
+  configureTestView(tester, const Size(1200, 900));
 
   final _RecordingSettingsNotifier notifier = _RecordingSettingsNotifier();
   final ProviderContainer container = ProviderContainer(
@@ -40,11 +41,8 @@ Future<_RecordingSettingsNotifier> _pumpPage(WidgetTester tester) async {
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
-      child: const MaterialApp(
-        locale: Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(body: SettingsMd3ePage()),
+      child: buildLocalizedTestMaterialApp(
+        home: const Scaffold(body: SettingsMd3ePage()),
       ),
     ),
   );

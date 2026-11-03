@@ -4,6 +4,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 
+import '../../../support/pump_localized_app.dart';
+
 SyncLibraryProgress _doneWithRoots({
   required int added,
   required int removed,
@@ -34,10 +36,8 @@ void main() {
   }) async {
     late AppLocalizations l10n;
     await tester.pumpWidget(
-      MaterialApp(
+      buildLocalizedTestMaterialApp(
         locale: locale,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
         home: Builder(
           builder: (BuildContext context) {
             l10n = context.l10n;

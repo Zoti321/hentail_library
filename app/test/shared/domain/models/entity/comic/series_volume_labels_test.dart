@@ -5,6 +5,8 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 
+import '../../../../../support/pump_localized_app.dart';
+
 Series _series({int itemCount = 3, int? totalCount}) {
   return Series(
     id: 'series-1',
@@ -23,17 +25,13 @@ void main() {
   group('Series volume labels', () {
     testWidgets('volume count label uses l10n', (WidgetTester tester) async {
       late AppLocalizations l10n;
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: const Locale('zh'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Builder(
-            builder: (BuildContext context) {
-              l10n = context.l10n;
-              return const SizedBox.shrink();
-            },
-          ),
+      await pumpLocalizedApp(
+        tester,
+        home: Builder(
+          builder: (BuildContext context) {
+            l10n = context.l10n;
+            return const SizedBox.shrink();
+          },
         ),
       );
       await tester.pumpAndSettle();

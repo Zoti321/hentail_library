@@ -65,6 +65,18 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | **gate-fast** | 路径落在 `manifest.txt` 展开集合内 | `gate-dart-test` |
 | **slow-track** | `app/test/**/*_test.dart` 中未进 manifest 的文件 | `nightly-dart-ui` 扫描 `test/shared/ui` + `test/features`（与 manifest 互补；盘存脚本的慢轨计数 = 全树减 manifest） |
 
+**Epic #447 清理后基线（2026-11-03，`python scripts/audit_dart_tests.py`）**：共 **253** 个 `*_test.dart`；manifest 展开 **175**；慢轨 **78**。典型慢轨分桶：`library_browse` 26、`read_session` 11、`shared/ui` 2（主题装配契约）、其余 feature 见盘存 JSON。
+
+### nightly-dart-ui（`.github/workflows/nightly.yml`）
+
+| 项 | 说明 |
+|----|------|
+| 命令 | `cd app && flutter test test/shared/ui test/features` |
+| 与 manifest 关系 | 与 gate-fast **互补**，非子集相等；大量 presentation 测已删除，nightly 失败应优先查 **仍存在的 MD3E 页级 / data·domain 薄边** |
+| 失败 triage | ① 对照 `gate.md` 降级/删除表是否预期移除 ② 时序/动画 → 移出 manifest 或删 ③ 业务断言 → 改 Rust 缝 ④ `frb_wire`/gate 失败 → 另开 issue，不算 nightly 债 |
+
+盘存脚本输出与上表不一致时，以脚本为准并更新本段（#456）。
+
 ### rubric 四层（启发式，供审计 #450–#454；非 gate 断言）
 
 脚本对每个测试文件打 **一个主标签**（优先级自上而下）：
@@ -167,5 +179,20 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 
 | 侧 | 入口 |
 |----|------|
-| Flutter | `app/test/support/` |
+| Flutter | `app/test/support/`（见下表） |
 | Rust DB 集成 | `core/crates/core/tests/common/` |
+
+### Flutter widget / 页级测试入口（#455）
+
+| API | 文件 | 何时用 |
+|-----|------|--------|
+| `pumpLocalizedApp` | `pump_localized_app.dart` | 产品主题 + zh/en l10n + 可选 `ProviderScope` overrides（**默认首选**） |
+| `pumpMd3eApp` | `pump_md3e_app.dart` | MD3E lab 主题 + `Md3eThemeScope`；可选 overrides |
+| `buildLocalizedTestMaterialApp` | `pump_localized_app.dart` | 自定义外壳（`UncontrolledProviderScope`、GoRouter）内嵌 MaterialApp |
+| `localizedTestAppConfig` | `localized_test_app.dart` | 仅 delegates/locale 元组（少见） |
+| `configureTestView` | `test_view.dart` | 统一 viewport physicalSize / DPR |
+| Fakes | `support/fakes/*` | 覆盖/仓库/port 复用（author、cover、settings、revision throttle） |
+
+**例外**：需 `GlobalMaterialLocalizations` 的日历类 widget 测（如 `md3e_docked_calendar_date_picker_test`）仍自建 `M3ETheme` + `MaterialApp`；新测勿复制该模式除非测 Material 日历本地化。
+
+新 widget 测 **禁止** 复制 `MaterialApp` + `AppLocalizations` 样板；晋升快轨前须用上表 harness（`gate.md` 快轨清单第 3 条）。

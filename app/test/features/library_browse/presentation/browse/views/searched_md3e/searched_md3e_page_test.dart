@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_search_page_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/searched_md3e/searched_md3e_page.dart';
@@ -9,9 +8,11 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
+
+import '../../../../../../support/pump_localized_app.dart';
+import '../../../../../../support/test_view.dart';
 
 Comic _comic(String id, String title) {
   final DateTime now = DateTime.utc(2026, 1, 1);
@@ -49,10 +50,7 @@ Future<void> _pumpSearchedMd3ePage(
   required String query,
   required LibrarySearchComicsPage comicsPage,
 }) async {
-  tester.view.physicalSize = const Size(900, 800);
-  tester.view.devicePixelRatio = 1.0;
-  addTearDown(tester.view.resetPhysicalSize);
-  addTearDown(tester.view.resetDevicePixelRatio);
+  configureTestView(tester, const Size(900, 800));
 
   final List<Override> coverOverrides = comicsPage.items
       .map(
@@ -62,21 +60,14 @@ Future<void> _pumpSearchedMd3ePage(
       )
       .toList();
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: <Override>[
-        librarySearchPageComicsControllerProvider(query)
-            .overrideWith(() => _FixedComicsController(comicsPage)),
-        ...coverOverrides,
-      ],
-      child: MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: buildAppTheme(Brightness.light),
-        home: Scaffold(body: SearchedMd3ePage(query: query)),
-      ),
-    ),
+  await pumpLocalizedApp(
+    tester,
+    home: Scaffold(body: SearchedMd3ePage(query: query)),
+    overrides: <Override>[
+      librarySearchPageComicsControllerProvider(query)
+          .overrideWith(() => _FixedComicsController(comicsPage)),
+      ...coverOverrides,
+    ],
   );
   await tester.pump();
   await tester.pump();

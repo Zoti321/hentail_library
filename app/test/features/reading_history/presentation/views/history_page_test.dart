@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
@@ -11,10 +9,13 @@ import 'package:hentai_library/shared/domain/models/value_objects/page_request.d
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
+
+import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import '../../../../support/pump_localized_app.dart';
+import '../../../../support/test_view.dart';
 
 void main() {
   group('History production page', () {
@@ -86,21 +87,12 @@ Future<void> _pumpHistoryPage(
   WidgetTester tester, {
   required double viewportWidth,
 }) async {
-  tester.view.physicalSize = Size(viewportWidth, 800);
-  tester.view.devicePixelRatio = 1.0;
-  addTearDown(tester.view.resetPhysicalSize);
+  configureTestView(tester, Size(viewportWidth, 800));
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: _historyPageTestOverrides(),
-      child: MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(body: HistoryPage()),
-      ),
-    ),
+  await pumpLocalizedApp(
+    tester,
+    home: const Scaffold(body: HistoryPage()),
+    overrides: _historyPageTestOverrides(),
   );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 300));
