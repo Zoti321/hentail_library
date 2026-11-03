@@ -3,6 +3,7 @@ library;
 
 export 'public/comic_detail_return_series_port.dart';
 export 'public/comic_display_title.dart';
+export 'public/library_age_restriction_filter.dart';
 export 'public/comic_lookup_repository.dart';
 export 'public/di/author_detail_port_factory.dart';
 export 'public/di/comic_detail_return_series_factory.dart';
