@@ -176,7 +176,7 @@ async fn trashed_ids() -> Vec<String> {
     .expect("trashed page")
     .items
     .into_iter()
-    .map(|t| t.comic.comic_id)
+    .map(|t| t.comic_id)
     .collect()
 }
 
@@ -646,7 +646,7 @@ fn trashed_list_orders_by_deleted_at_desc_with_library_info() {
             let ids: Vec<String> = page
                 .items
                 .iter()
-                .map(|t| t.comic.comic_id.clone())
+                .map(|t| t.comic_id.clone())
                 .collect();
             assert_eq!(ids, vec![solo.clone(), a.clone()]);
             assert!(page.items[0].deleted_at >= page.items[1].deleted_at);
@@ -661,7 +661,7 @@ fn trashed_list_orders_by_deleted_at_desc_with_library_info() {
             })
             .await
             .expect("page 2");
-            assert_eq!(second.items[0].comic.comic_id, a);
+            assert_eq!(second.items[0].comic_id, a);
         });
     });
 }

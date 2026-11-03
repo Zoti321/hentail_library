@@ -7024,12 +7024,26 @@ impl SseDecode for crate::api::comic_trash::TrashedComicCountsFrbDto {
 impl SseDecode for crate::api::comic_trash::TrashedComicFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_comic = <crate::api::comic::ComicDto>::sse_decode(deserializer);
+        let mut var_comicId = <String>::sse_decode(deserializer);
+        let mut var_path = <String>::sse_decode(deserializer);
+        let mut var_resourceType = <String>::sse_decode(deserializer);
+        let mut var_resourceSize = <i64>::sse_decode(deserializer);
+        let mut var_createdAt = <i64>::sse_decode(deserializer);
+        let mut var_lastUpdatedAt = <i64>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        let mut var_pageCount = <i32>::sse_decode(deserializer);
         let mut var_deletedAt = <i64>::sse_decode(deserializer);
         let mut var_libraryName = <String>::sse_decode(deserializer);
         let mut var_libraryKind = <String>::sse_decode(deserializer);
         return crate::api::comic_trash::TrashedComicFrbDto {
-            comic: var_comic,
+            comic_id: var_comicId,
+            path: var_path,
+            resource_type: var_resourceType,
+            resource_size: var_resourceSize,
+            created_at: var_createdAt,
+            last_updated_at: var_lastUpdatedAt,
+            title: var_title,
+            page_count: var_pageCount,
             deleted_at: var_deletedAt,
             library_name: var_libraryName,
             library_kind: var_libraryKind,
@@ -9661,7 +9675,14 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::comic_trash::TrashedComicCoun
 impl flutter_rust_bridge::IntoDart for crate::api::comic_trash::TrashedComicFrbDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.comic.into_into_dart().into_dart(),
+            self.comic_id.into_into_dart().into_dart(),
+            self.path.into_into_dart().into_dart(),
+            self.resource_type.into_into_dart().into_dart(),
+            self.resource_size.into_into_dart().into_dart(),
+            self.created_at.into_into_dart().into_dart(),
+            self.last_updated_at.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+            self.page_count.into_into_dart().into_dart(),
             self.deleted_at.into_into_dart().into_dart(),
             self.library_name.into_into_dart().into_dart(),
             self.library_kind.into_into_dart().into_dart(),
@@ -11449,7 +11470,14 @@ impl SseEncode for crate::api::comic_trash::TrashedComicCountsFrbDto {
 impl SseEncode for crate::api::comic_trash::TrashedComicFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::api::comic::ComicDto>::sse_encode(self.comic, serializer);
+        <String>::sse_encode(self.comic_id, serializer);
+        <String>::sse_encode(self.path, serializer);
+        <String>::sse_encode(self.resource_type, serializer);
+        <i64>::sse_encode(self.resource_size, serializer);
+        <i64>::sse_encode(self.created_at, serializer);
+        <i64>::sse_encode(self.last_updated_at, serializer);
+        <String>::sse_encode(self.title, serializer);
+        <i32>::sse_encode(self.page_count, serializer);
         <i64>::sse_encode(self.deleted_at, serializer);
         <String>::sse_encode(self.library_name, serializer);
         <String>::sse_encode(self.library_kind, serializer);

@@ -3,12 +3,20 @@ use hentai_core::{
     restore_comics, trash_comics,
 };
 
-use super::comic::{ComicDto, PageRequestDto};
+use super::comic::PageRequestDto;
 use super::init::HentaiErrorDto;
 
+/// 回收站列表行（Summary；不含 facet 与完整 Catalog DTO）。
 #[derive(Debug, Clone)]
 pub struct TrashedComicFrbDto {
-    pub comic: ComicDto,
+    pub comic_id: String,
+    pub path: String,
+    pub resource_type: String,
+    pub resource_size: i64,
+    pub created_at: i64,
+    pub last_updated_at: i64,
+    pub title: String,
+    pub page_count: i32,
     pub deleted_at: i64,
     pub library_name: String,
     pub library_kind: String,
@@ -76,7 +84,14 @@ pub async fn fetch_trashed_comics_page_frb(
             .items
             .into_iter()
             .map(|item| TrashedComicFrbDto {
-                comic: ComicDto::from(item.comic),
+                comic_id: item.comic_id,
+                path: item.path,
+                resource_type: item.resource_type,
+                resource_size: item.resource_size,
+                created_at: item.created_at,
+                last_updated_at: item.last_updated_at,
+                title: item.title,
+                page_count: item.page_count,
                 deleted_at: item.deleted_at,
                 library_name: item.library_name,
                 library_kind: item.library_kind,

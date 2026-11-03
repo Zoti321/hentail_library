@@ -167,7 +167,7 @@ pub struct TrashedComicRowFrbDto {
 - [x] `ComicTrashFrbAdapter` + 可注入 `ComicTrashRepositoryImpl`（对齐 metadata_backup）。
 - [x] `createComicTrashRepository()` 经 `public/di` 导出；bootstrap 经 `comic_trash/public.dart` 接线。
 
-**未做（可选）**：档 2 Summary DTO（列表 FRB 瘦身）。
+**未做（可选）**：~~档 2 Summary DTO~~ **已完成**（2026-11-03）：core 列表单次 JOIN + FRB 扁平 DTO；Dart 仍映射为带默认 facet 的 [Comic]。
 
 ---
 

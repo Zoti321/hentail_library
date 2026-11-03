@@ -110,14 +110,29 @@ class TrashedComicCountsFrbDto {
           remote == other.remote;
 }
 
+/// 回收站列表行（Summary；不含 facet 与完整 Catalog DTO）。
 class TrashedComicFrbDto {
-  final ComicDto comic;
+  final String comicId;
+  final String path;
+  final String resourceType;
+  final PlatformInt64 resourceSize;
+  final PlatformInt64 createdAt;
+  final PlatformInt64 lastUpdatedAt;
+  final String title;
+  final int pageCount;
   final PlatformInt64 deletedAt;
   final String libraryName;
   final String libraryKind;
 
   const TrashedComicFrbDto({
-    required this.comic,
+    required this.comicId,
+    required this.path,
+    required this.resourceType,
+    required this.resourceSize,
+    required this.createdAt,
+    required this.lastUpdatedAt,
+    required this.title,
+    required this.pageCount,
     required this.deletedAt,
     required this.libraryName,
     required this.libraryKind,
@@ -125,7 +140,14 @@ class TrashedComicFrbDto {
 
   @override
   int get hashCode =>
-      comic.hashCode ^
+      comicId.hashCode ^
+      path.hashCode ^
+      resourceType.hashCode ^
+      resourceSize.hashCode ^
+      createdAt.hashCode ^
+      lastUpdatedAt.hashCode ^
+      title.hashCode ^
+      pageCount.hashCode ^
       deletedAt.hashCode ^
       libraryName.hashCode ^
       libraryKind.hashCode;
@@ -135,7 +157,14 @@ class TrashedComicFrbDto {
       identical(this, other) ||
       other is TrashedComicFrbDto &&
           runtimeType == other.runtimeType &&
-          comic == other.comic &&
+          comicId == other.comicId &&
+          path == other.path &&
+          resourceType == other.resourceType &&
+          resourceSize == other.resourceSize &&
+          createdAt == other.createdAt &&
+          lastUpdatedAt == other.lastUpdatedAt &&
+          title == other.title &&
+          pageCount == other.pageCount &&
           deletedAt == other.deletedAt &&
           libraryName == other.libraryName &&
           libraryKind == other.libraryKind;
