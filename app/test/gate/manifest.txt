@@ -56,9 +56,7 @@ test/features/library_browse/presentation/browse/view_models/library_series_filt
 test/features/library_browse/presentation/series/view_models/series_item_sort_persist_test.dart
 test/features/library_browse/presentation/series/view_models/series_metadata_editor_notifier_test.dart
 test/features/read_session/presentation/reader_exit_location_test.dart
-test/features/read_session/presentation/reader_image_cache_test.dart
 test/features/read_session/presentation/reader_page_crossfade_policy_test.dart
-test/features/read_session/presentation/reader_prefetch_generation_test.dart
 test/features/read_session/presentation/resume_visible_sync_gate_test.dart
 test/features/read_session/presentation/view_models/reader_cover_editor_notifier_test.dart
 test/features/app_settings/presentation/view_models/locale_preference_persist_test.dart
@@ -70,7 +68,6 @@ test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dar
 test/features/home/presentation/view_models/home_probe_coordinator_notifier_test.dart
 test/shared/ui/layout/md3e_page_layout_spec_test.dart
 test/shared/ui/layout/md3e_page_viewport_test.dart
-test/shared/ui/layout/reading_history_list_layout_lazy_test.dart
 test/features/reading_history/presentation/views/history_page_test.dart
 test/features/home/presentation/views/home_md3e/md3e_home_page_test.dart
 test/features/library_admin/presentation/views/home_library_dashboard/md3e_home_library_management_row_test.dart

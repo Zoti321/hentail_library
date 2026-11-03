@@ -76,7 +76,49 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | **ui-contract** | manifest 内其余项（MD3E entry、confirm 对话框、ViewModel persist/policy、motion/theme 等） | manifest 反向审计 (#450)；不合格则降级 |
 | **candidate-retire** | 慢轨下的 `shared/ui`、feature `presentation/` 等 | 优先删/改 (#451–#454)；与 #447 决策一致：MD3E entry + 可观察结果为主缝 |
 
-降级流程（manifest → nightly 至少一轮 → 再删）见子 issue #449（将写入本节「退役」段落）。
+降级流程见下节 **[测试退役与 manifest 降级 / 晋升](#测试退役与-manifest-降级--晋升)**。
+
+## 测试退役与 manifest 降级 / 晋升
+
+与 ADR-0018、Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 一致：**业务真值在 Rust**；Dart gate 只挡 **架构护栏、薄边、可观察 UI 契约**。盘存用 `python scripts/audit_dart_tests.py`；降级/晋升只改 `app/test/gate/manifest.txt`（+ 本段记录），**不要**新 workflow。
+
+### Protected 路径（禁止批量删除）
+
+以下目录/条目是架构或线缝护栏，清理 epic 中 **不得** 整目录删除或移出 manifest（除非配套 ADR + 规则迁移）：
+
+| 类别 | manifest / 路径 |
+|------|-----------------|
+| Gate 自检 | `test/gate/**`（import boundary、L3、strangler、manifest 自检） |
+| 布局 ratchet | `test/project_layout_test.dart` |
+| FRB 线缝 | `test/frb_wire/**` |
+| Dart 薄边（目录级） | `test/shared/domain`、`test/shared/data`、`test/core`、`test/shared/di` |
+| App / Lab 最小冒烟 | `test/widget_test.dart`、`test/md3e/**`（Lab 契约，非 Figma CI） |
+
+单文件是否 protected 以盘存 rubric **`architecture-guard`** / **`thin-edge`** 为准；**`ui-contract`** 在 manifest 内仍可 **降级**（移出 manifest，非立即删文件）。
+
+### 降级（manifest → nightly）
+
+适用：晋升清单未通过、绑定私有实现、与 Rust Reader/sync 重复、或时序不稳定。
+
+1. **PR 必须**在描述中列出每个路径、**rubric 标签**、一句话理由（可参考下表模板）。
+2. 从 `manifest.txt` **删除对应行**（目录展开条目删单行即可）；**不要**删 `test/gate/manifest_test.dart` 对固定 seam 的 `containsAll` 断言，除非同步改该测试。
+3. 测试文件 **保留**在树中 → 进入 **slow-track**，由 `nightly-dart-ui`（`test/shared/ui` + `test/features`）覆盖。
+4. **至少一轮 nightly 绿**（或 maintainer 本地 `cd app && flutter test <path>`）后，才可在后续 PR（#451–#454）中 **删除文件**。
+5. 不得无声消失：降级 PR 引用 #447；删除 PR 引用原降级 PR 或 issue。
+
+### 晋升（slow-track / 新建 → manifest）
+
+1. 满足上文 **快轨晋升检查清单** 全部 4 条。
+2. 本地 **连续 3 遍** `flutter test <path>` 稳定；含时钟逻辑则注入 fake clock。
+3. PR 说明列出新增 manifest 路径；合并前 `./scripts/run-gate.sh dart-test` 绿。
+
+### Manifest 降级记录
+
+| 日期 | 路径（相对 `app/`） | rubric | 理由 |
+|------|---------------------|--------|------|
+| 2026-11-03 | `test/features/read_session/presentation/reader_image_cache_test.dart` | candidate-retire | 断言 `ResizeImage`/命名缓存等解码实现细节，非 MD3E/用户可观察契约（#450） |
+| 2026-11-03 | `test/features/read_session/presentation/reader_prefetch_generation_test.dart` | candidate-retire | 预取 generation 窗口纯算法，与 Reader 性能策略强耦合，留 nightly/#452 审计（#450） |
+| 2026-11-03 | `test/shared/ui/layout/reading_history_list_layout_lazy_test.dart` | candidate-retire | 断言 sliver 构建条数等布局实现，未用 `test/support/` harness（#450） |
 
 ## Import / 布局（规范在测试里）
 
