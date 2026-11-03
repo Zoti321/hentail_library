@@ -1,7 +1,7 @@
 # comic_trash 数据层归属规划
 
-**状态**：Phase R-FRB + Dart Phase A/B 已实施（2026-11-03）  
-**背景**：回收站读写与 FRB 映射仍落在 `library_browse/data/comic/comic_repository_impl.dart` + `comic_frb_mapper.dart`；`ComicRepositoryImpl` 同时实现 `ComicTrashRepository` 与 catalog/lookup 等接口。  
+**状态**：Phase R-FRB + Dart Phase A/B/C 已实施（2026-11-03）  
+**背景**：回收站 FRB 已迁至 `api/comic_trash.rs`；`ComicTrashRepositoryImpl` 在 owner `data/`，browse 不再实现 trash。  
 **参照**：`metadata_backup`（`data/repositories` + `data/adapters` + `data/mappers` + feature `di`）、ADR-0034、ADR-0023、ADR-0026、`docs/engineering/cross-feature-collaboration.md`。
 
 ---
@@ -164,7 +164,10 @@ pub struct TrashedComicRowFrbDto {
 
 ### Phase C — adapter 规范化
 
-- `ComicTrashFrbAdapter` 与 `MetadataBackupFrbAdapter` 同形（可选）。
+- [x] `ComicTrashFrbAdapter` + 可注入 `ComicTrashRepositoryImpl`（对齐 metadata_backup）。
+- [x] `createComicTrashRepository()` 经 `public/di` 导出；bootstrap 经 `comic_trash/public.dart` 接线。
+
+**未做（可选）**：档 2 Summary DTO（列表 FRB 瘦身）。
 
 ---
 

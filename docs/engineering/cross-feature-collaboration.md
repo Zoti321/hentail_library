@@ -16,7 +16,7 @@ Consumer **不要** deep import 邻居的 `features/<other>/di/`，除非 baseli
 ## 典型用法
 
 - 打开作者详情：`import shared/di/author_detail_providers.dart` → `ref.read(authorDetailPortProvider)`.
-- 库管理 / 删进回收站 / 元数据刷新：`shared/di/library_management_providers.dart`、`library_command_providers.dart`.
+- 库管理 / 删进回收站 / 元数据刷新：`shared/di/library_management_providers.dart`、`library_command_providers.dart`；回收站列表与 purge 持久化经 `shared/di/data_providers.dart` → `comicTrashRepositoryProvider`（bootstrap `createComicTrashRepository()`，FRB `src/rust/api/comic_trash.dart`，仅 owner `features/comic_trash/data/` import）。
 - 应用设置态：`shared/di/app_settings_providers.dart`.
 - 阅读进度写入/恢复（read_session）：`shared/di/reading_history_providers.dart` → `readingHistoryCommandPortProvider`；完整历史列表仍 `readingHistoryRepoProvider`（history / browse 封面进度）。
 - 元数据备份槽（设置板块 / 库页导出 / 最近备份时间）：`shared/di/settings_slot_providers.dart`、`library_state_providers.dart` → owner `features/metadata_backup/public.dart` + `metadata_backup/di/metadata_backup_shared_state_overrides.dart`（bootstrap）。

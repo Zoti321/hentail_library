@@ -35,6 +35,18 @@ void main() {
       isFalse,
     );
     expect(isFrbImportAllowedSource('shared/data/adapters/foo.dart'), isTrue);
+    expect(
+      isFrbImportAllowedSource(
+        'features/comic_trash/data/adapters/comic_trash_frb_adapter.dart',
+      ),
+      isTrue,
+    );
+    expect(
+      isFrbImportAllowedSource(
+        'features/comic_trash/presentation/views/trash_md3e/trash_md3e_page.dart',
+      ),
+      isFalse,
+    );
   });
 
   test('M1 public path allowlist (ADR-0034 / #429)', () {

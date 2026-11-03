@@ -6,6 +6,7 @@ void main() {
       () {
     expect(ComicTrashCommandPort, isNotNull);
     expect(createComicTrashCommandPort, isNotNull);
+    expect(createComicTrashRepository, isNotNull);
     expect(TrashedComic, isNotNull);
     expect(ComicTrashRepository, isNotNull);
     expect(PurgeConfirmCopy, isNotNull);
