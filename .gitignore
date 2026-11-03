@@ -68,7 +68,8 @@ core/vendor/**/libpdfium.so
 core/vendor/**/libpdfium.dylib
 
 development.md
-.cursor
+.cursor/*
+!.cursor/mcp.json
 .codex/
 .agents/
 .claude/
