@@ -19,6 +19,7 @@ Consumer **不要** deep import 邻居的 `features/<other>/di/`，除非 baseli
 - 库管理 / 删进回收站 / 元数据刷新：`shared/di/library_management_providers.dart`、`library_command_providers.dart`.
 - 应用设置态：`shared/di/app_settings_providers.dart`.
 - 阅读进度写入/恢复（read_session）：`shared/di/reading_history_providers.dart` → `readingHistoryCommandPortProvider`；完整历史列表仍 `readingHistoryRepoProvider`（history / browse 封面进度）。
+- 元数据备份槽（设置板块 / 库页导出 / 最近备份时间）：`shared/di/settings_slot_providers.dart`、`library_state_providers.dart` → owner `features/metadata_backup/public.dart` + `metadata_backup/di/metadata_backup_shared_state_overrides.dart`（bootstrap）。
 - 标签/作者字典投影：`shared/di/library_dictionary_providers.dart`.
 - 漫画页数（bootstrap 注入）：`shared/di/comic_detail_providers.dart`.
 - 封面 **Widget**：`import features/library_browse/public.dart` → `ComicCoverContent` / `seriesCoverSourceProvider`（public export owner `di/` 中的 codegen）.

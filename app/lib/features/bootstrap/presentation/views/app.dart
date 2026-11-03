@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/domain/models/models.dart'
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/app_settings/presentation/settings.dart';
-import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
+import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';

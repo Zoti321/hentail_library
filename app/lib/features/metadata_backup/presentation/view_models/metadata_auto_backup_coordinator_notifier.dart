@@ -5,8 +5,9 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
-import 'package:hentai_library/features/metadata_backup/data/metadata_auto_backup_service.dart';
-import 'package:hentai_library/features/metadata_backup/data/adapters/metadata_backup_frb_adapter.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_repository.dart';
+import 'package:hentai_library/features/metadata_backup/data/services/metadata_auto_backup_service.dart';
+import 'package:hentai_library/features/metadata_backup/di/metadata_backup_repository_provider.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
 import 'package:hentai_library/core/util/debouncer.dart';
@@ -103,9 +104,13 @@ class MetadataAutoBackupCoordinatorNotifier
 
     _backupInFlight = true;
     try {
+      final MetadataBackupRepository repo = ref.read(
+        metadataBackupRepositoryProvider,
+      );
       final MetadataAutoBackupRunResult result = await runMetadataAutoBackup(
-        export: (options) =>
-            const MetadataBackupFrbAdapter().export(options: options),
+        export: () => repo.exportComicMetadata(
+          includeOrphanFacets: false,
+        ),
         now: _now,
       );
       await ref

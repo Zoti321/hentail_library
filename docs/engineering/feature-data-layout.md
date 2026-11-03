@@ -11,7 +11,7 @@
 | `data/adapters/` | 调用 FRB API、Stream、或实现 domain **Port** | `*_frb_adapter.dart`、非 FRB 的 `*_adapter.dart` |
 | `data/services/` | 下载、更新等 Dart 侧服务（可选） | `*_service.dart` |
 
-**禁止**在 `data/` 根目录新增 FRB mapper/adapter（`metadata_backup` 等历史路径逐步对齐）。纯路径/常量 helper 可暂留 `data/` 根（如 `metadata_backup_paths.dart`）。
+**禁止**在 `data/` 根目录新增 FRB mapper/adapter（`metadata_backup` 等历史路径逐步对齐）。纯路径/常量 helper 可暂留 `data/` 根（如 `metadata_backup_paths.dart`）；Dart 侧 I/O 服务放 `data/services/`（如 `metadata_auto_backup_service.dart`）。
 
 ## `library_browse` 例外（方案 A）
 
