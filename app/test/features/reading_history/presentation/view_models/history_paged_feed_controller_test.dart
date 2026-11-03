@@ -17,19 +17,20 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
   final Map<String, List<PagedResult<ReadingHistory>>> pagesByKey;
   final List<PageRequest> requests = <PageRequest>[];
   final List<String?> keywords = <String?>[];
-  final StreamController<List<ReadingHistory>> _changesController =
-      StreamController<List<ReadingHistory>>.broadcast();
+  final StreamController<void> _changesController =
+      StreamController<void>.broadcast();
   bool failNextFetch = false;
   Completer<PagedResult<ReadingHistory>>? pageTwoCompleter;
 
-  void emitHistoryChange([
-    List<ReadingHistory> histories = const <ReadingHistory>[],
-  ]) {
-    _changesController.add(histories);
+  void emitHistoryChange() {
+    _changesController.add(null);
   }
 
   @override
-  Stream<List<ReadingHistory>> watchAllHistory() => _changesController.stream;
+  Stream<void> watchHistoryChanges() => _changesController.stream;
+
+  @override
+  Future<Map<String, int>> listReadPageIndexes() async => const <String, int>{};
 
   @override
   Future<PagedResult<ReadingHistory>> fetchHistoryPage(

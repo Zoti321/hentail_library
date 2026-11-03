@@ -107,9 +107,12 @@ List<Override> _historyPageTestOverrides() {
 
 class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
   @override
-  Stream<List<ReadingHistory>> watchAllHistory() {
-    return Stream<List<ReadingHistory>>.value(const <ReadingHistory>[]);
+  Stream<void> watchHistoryChanges() {
+    return const Stream<void>.empty();
   }
+
+  @override
+  Future<Map<String, int>> listReadPageIndexes() async => const <String, int>{};
 
   @override
   Future<PagedResult<ReadingHistory>> fetchHistoryPage(

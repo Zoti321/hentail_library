@@ -2,14 +2,13 @@ use hentai_core::{
     self, clear_all_reading as core_clear_all, delete_reading_by_comic_id as core_delete_reading,
     delete_reading_by_comic_ids as core_delete_readings,
     fetch_reading_page as core_fetch_reading_page, get_reading_by_comic_id as core_get_reading,
-    list_all_reading, record_reading as core_record_reading,
-    watch_reading_histories as core_watch_reading, PagedReadingHistoryDto as CorePagedReading,
+    list_read_page_indexes as core_list_read_page_indexes,
+    record_reading as core_record_reading, PagedReadingHistoryDto as CorePagedReading, ReadPageIndexDto as CoreReadPageIndex,
     ReadingHistoryDto as CoreReading,
 };
 
 use super::comic::PageRequestDto;
 use super::init::HentaiErrorDto;
-use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
 #[derive(Debug, Clone)]
 pub struct ReadingHistoryDto {
@@ -18,6 +17,12 @@ pub struct ReadingHistoryDto {
     pub last_read_time_ms: i64,
     pub page_index: Option<i32>,
     pub page_count: Option<i32>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ReadPageIndexDto {
+    pub comic_id: String,
+    pub page_index: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -36,6 +41,15 @@ impl From<CoreReading> for ReadingHistoryDto {
             last_read_time_ms: v.last_read_time_ms,
             page_index: v.page_index,
             page_count: v.page_count,
+        }
+    }
+}
+
+impl From<CoreReadPageIndex> for ReadPageIndexDto {
+    fn from(v: CoreReadPageIndex) -> Self {
+        Self {
+            comic_id: v.comic_id,
+            page_index: v.page_index,
         }
     }
 }
@@ -90,6 +104,14 @@ pub async fn fetch_reading_page_frb(
         .map_err(HentaiErrorDto::from)
 }
 
+#[flutter_rust_bridge::frb]
+pub async fn list_read_page_indexes_frb() -> Result<Vec<ReadPageIndexDto>, HentaiErrorDto> {
+    core_list_read_page_indexes()
+        .await
+        .map(|rows| rows.into_iter().map(ReadPageIndexDto::from).collect())
+        .map_err(HentaiErrorDto::from)
+}
+
 #[flutter_rust_bridge::frb(sync)]
 pub fn delete_reading_by_comic_id_frb(comic_id: String) -> Result<i32, HentaiErrorDto> {
     hentai_core::runtime::block_on(core_delete_reading(&comic_id)).map_err(HentaiErrorDto::from)
@@ -106,24 +128,15 @@ pub fn clear_all_reading_frb() -> Result<i32, HentaiErrorDto> {
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn watch_reading_histories_frb(
-    sink: crate::frb_generated::StreamSink<Vec<ReadingHistoryDto>>,
+pub async fn watch_reading_history_changes_frb(
+    sink: crate::frb_generated::StreamSink<i32>,
 ) -> Result<(), HentaiErrorDto> {
-    let initial = list_all_reading()
-        .await
-        .map_err(HentaiErrorDto::from)?
-        .into_iter()
-        .map(ReadingHistoryDto::from)
-        .collect();
-    if emit_or_closed(&sink, initial).is_err() {
-        return Ok(());
+    let mut changes = hentai_core::revision::subscribe();
+    while changes.changed().await.is_ok() {
+        let generation = *changes.borrow_and_update();
+        if sink.add((generation & 0x7fff_ffff) as i32).is_err() {
+            break;
+        }
     }
-    normalize_watch_result(
-        core_watch_reading(|items| {
-            let mapped: Vec<ReadingHistoryDto> =
-                items.into_iter().map(ReadingHistoryDto::from).collect();
-            emit_or_closed(&sink, mapped)
-        })
-        .await,
-    )
+    Ok(())
 }

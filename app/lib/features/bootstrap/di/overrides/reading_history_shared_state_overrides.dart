@@ -6,4 +6,7 @@ List<Override> readingHistorySharedStateOverrides() => <Override>[
   readingHistoryCommandPortProvider.overrideWith(
     createReadingHistoryCommandPort,
   ),
+  readingHistoryProgressPortProvider.overrideWith(
+    createReadingHistoryProgressPort,
+  ),
 ];

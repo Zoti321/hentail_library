@@ -1,7 +1,7 @@
 //! `read_data_version` 作为库变更检测手段的契约。
 //!
 //! 5 条 watch 循环（`watch_comic_changes` / `watch_home_page_counts` /
-//! `watch_continue_reading` / `watch_authors` / `watch_reading_histories`）
+//! `watch_continue_reading` / `watch_authors` / `watch_reading_history_changes`）
 //! 都以「相邻两次 `read_data_version` 不相等」判定库已变更，因此契约是两条：**写入必须被观测到，且无写入时观测值必须稳定。**
 //!
 //! 独立事实源（SQLite 官方文档 pragma.html#pragma_data_version）：

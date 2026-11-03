@@ -7,7 +7,11 @@ abstract class ReadingHistoryRepository {
 
   Future<ReadingHistory?> getByComicId(String comicId);
 
-  Stream<List<ReadingHistory>> watchAllHistory();
+  /// 库 revision 变更通知；不携带全表数据。
+  Stream<void> watchHistoryChanges();
+
+  /// 封面进度条等轻量读侧：comicId → 1-based pageIndex。
+  Future<Map<String, int>> listReadPageIndexes();
 
   Future<PagedResult<ReadingHistory>> fetchHistoryPage(
     PageRequest request, {
@@ -20,6 +24,4 @@ abstract class ReadingHistoryRepository {
   Future<void> deleteByComicIds(Iterable<String> comicIds);
 
   Future<void> clearAllHistory();
-
-  Future<void> clearExpiredHistory();
 }

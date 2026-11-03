@@ -9,7 +9,7 @@ import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
 
 void recordReadingFrb({required ReadingHistoryDto history}) =>
     RustLib.instance.api.crateApiHistoryRecordReadingFrb(history: history);
@@ -27,6 +27,9 @@ Future<PagedReadingHistoryDto> fetchReadingPageFrb({
   keyword: keyword,
 );
 
+Future<List<ReadPageIndexDto>> listReadPageIndexesFrb() =>
+    RustLib.instance.api.crateApiHistoryListReadPageIndexesFrb();
+
 int deleteReadingByComicIdFrb({required String comicId}) => RustLib.instance.api
     .crateApiHistoryDeleteReadingByComicIdFrb(comicId: comicId);
 
@@ -38,8 +41,8 @@ int deleteReadingByComicIdsFrb({required List<String> comicIds}) => RustLib
 int clearAllReadingFrb() =>
     RustLib.instance.api.crateApiHistoryClearAllReadingFrb();
 
-Stream<List<ReadingHistoryDto>> watchReadingHistoriesFrb() =>
-    RustLib.instance.api.crateApiHistoryWatchReadingHistoriesFrb();
+Stream<int> watchReadingHistoryChangesFrb() =>
+    RustLib.instance.api.crateApiHistoryWatchReadingHistoryChangesFrb();
 
 class PagedReadingHistoryDto {
   final List<ReadingHistoryDto> items;
@@ -67,6 +70,24 @@ class PagedReadingHistoryDto {
           totalCount == other.totalCount &&
           page == other.page &&
           pageSize == other.pageSize;
+}
+
+class ReadPageIndexDto {
+  final String comicId;
+  final int pageIndex;
+
+  const ReadPageIndexDto({required this.comicId, required this.pageIndex});
+
+  @override
+  int get hashCode => comicId.hashCode ^ pageIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReadPageIndexDto &&
+          runtimeType == other.runtimeType &&
+          comicId == other.comicId &&
+          pageIndex == other.pageIndex;
 }
 
 class ReadingHistoryDto {

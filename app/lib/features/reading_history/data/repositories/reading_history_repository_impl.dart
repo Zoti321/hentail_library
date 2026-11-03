@@ -43,14 +43,22 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
-  Stream<List<ReadingHistory>> watchAllHistory() {
+  Stream<void> watchHistoryChanges() {
     return guardFrbStream(
-      () => rust.watchReadingHistoriesFrb().map(
-        (List<rust.ReadingHistoryDto> rows) =>
-            rows.map(mapReadingHistoryDto).toList(growable: false),
-      ),
-      fallbackMessage: '监听阅读历史失败',
+      () => rust.watchReadingHistoryChangesFrb().map((int _) {}),
+      fallbackMessage: '监听阅读历史变更失败',
     );
+  }
+
+  @override
+  Future<Map<String, int>> listReadPageIndexes() async {
+    final List<rust.ReadPageIndexDto> rows = await guardFrb(
+      rust.listReadPageIndexesFrb,
+      fallbackMessage: '读取阅读进度索引失败',
+    );
+    return <String, int>{
+      for (final rust.ReadPageIndexDto row in rows) row.comicId: row.pageIndex,
+    };
   }
 
   @override
@@ -135,10 +143,5 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
       }
       throw AppException('清空阅读历史失败', cause: e, stackTrace: st);
     }
-  }
-
-  @override
-  Future<void> clearExpiredHistory() async {
-    // 365 天清理：暂由 Rust 侧与 Drift 行为对齐的 SQL 在后续 slice 补齐；当前无 UI 调用。
   }
 }

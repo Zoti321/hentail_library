@@ -76,6 +76,26 @@ pub async fn get_reading_by_comic_id(
     Ok(items.pop())
 }
 
+/// 库浏览封面进度条：仅 comic_id + page_index，不含标题 enrich。
+pub async fn list_read_page_indexes() -> Result<Vec<super::dto::ReadPageIndexDto>, HentaiError> {
+    let db = connection()?;
+    let rows = ComicReadingHistories::find()
+        .filter(not_trashed_history_expr())
+        .filter(comic_reading_histories::Column::PageIndex.is_not_null())
+        .all(&db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(rows
+        .into_iter()
+        .filter_map(|row| {
+            row.page_index.map(|page_index| super::dto::ReadPageIndexDto {
+                comic_id: row.comic_id,
+                page_index,
+            })
+        })
+        .collect())
+}
+
 pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
     let db = connection()?;
     let rows = ComicReadingHistories::find()
@@ -178,12 +198,13 @@ async fn clear_all_reading_locked() -> Result<i32, HentaiError> {
     Ok(res.rows_affected as i32)
 }
 
-pub async fn watch_reading_histories(
-    mut emit: impl FnMut(Vec<ReadingHistoryDto>) -> Result<(), HentaiError>,
+/// 库 revision 变更通知；不拉全表（Dart 侧自行分页或轻量 list）。
+pub async fn watch_reading_history_changes(
+    mut emit: impl FnMut(()) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
     let mut changes = crate::revision::subscribe();
     while changes.changed().await.is_ok() {
-        emit(list_all_reading().await?)?;
+        emit(())?;
     }
     Ok(())
 }

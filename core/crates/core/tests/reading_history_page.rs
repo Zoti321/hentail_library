@@ -3,8 +3,8 @@ mod common;
 use std::path::Path;
 
 use hentai_core::{
-    connection, fetch_reading_page, get_reading_by_comic_id, init_db_at_path, record_reading,
-    PageRequestDto, ReadingHistoryDto,
+    connection, fetch_reading_page, get_reading_by_comic_id, init_db_at_path,
+    list_read_page_indexes, record_reading, PageRequestDto, ReadingHistoryDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -210,6 +210,32 @@ fn record_reading_decodes_html_entities_in_title() {
                 .expect("load")
                 .expect("row");
             assert_eq!(row.title, "Heaven's Feel");
+        });
+    });
+}
+
+#[test]
+fn list_read_page_indexes_returns_comic_id_and_page_index_only() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        create_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            seed_histories().await;
+            record_reading(&ReadingHistoryDto {
+                comic_id: "no-page".to_string(),
+                title: "No Page".to_string(),
+                last_read_time_ms: 100,
+                page_index: None,
+                page_count: None,
+            })
+            .await
+            .expect("record without page");
+
+            let indexes = list_read_page_indexes().await.expect("list indexes");
+            assert_eq!(indexes.len(), 5);
+            assert!(indexes.iter().all(|row| row.page_index >= 1));
+            assert!(!indexes.iter().any(|row| row.comic_id == "no-page"));
         });
     });
 }

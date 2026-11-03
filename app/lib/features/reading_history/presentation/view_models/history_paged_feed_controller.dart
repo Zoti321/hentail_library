@@ -17,8 +17,8 @@ const Duration _kHistoryKeywordDebounce = Duration(milliseconds: 300);
 const Duration _kHistoryRefreshDebounce = Duration(milliseconds: 200);
 
 @Riverpod(keepAlive: true)
-Stream<List<entity.ReadingHistory>> readingHistoryChangesStream(Ref ref) {
-  return ref.watch(readingHistoryRepoProvider).watchAllHistory();
+Stream<void> readingHistoryChangesStream(Ref ref) {
+  return ref.watch(readingHistoryRepoProvider).watchHistoryChanges();
 }
 
 @Riverpod(keepAlive: true)
@@ -32,7 +32,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
   bool _isRefreshing = false;
   bool _refreshPending = false;
   int _fetchGeneration = 0;
-  StreamSubscription<List<entity.ReadingHistory>>? _historyChangesSubscription;
+  StreamSubscription<void>? _historyChangesSubscription;
 
   @override
   Future<HistoryPagedFeedState> build() async {
@@ -40,7 +40,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     _refreshDebounce ??= Debouncer(duration: _kHistoryRefreshDebounce);
     _historyChangesSubscription ??= ref
         .read(readingHistoryRepoProvider)
-        .watchAllHistory()
+        .watchHistoryChanges()
         .listen((_) => _scheduleSilentRefresh());
     ref.onDispose(() {
       _keywordDebounce?.dispose();

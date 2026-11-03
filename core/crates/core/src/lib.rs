@@ -59,8 +59,8 @@ pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
 pub use error::{HentaiError, HentaiErrorCode};
 pub use history::{
     clear_all_reading, delete_reading_by_comic_id, delete_reading_by_comic_ids, fetch_reading_page,
-    get_reading_by_comic_id, list_all_reading, record_reading, watch_reading_histories,
-    PagedReadingHistoryDto, ReadingHistoryDto,
+    get_reading_by_comic_id, list_all_reading, list_read_page_indexes, record_reading,
+    watch_reading_history_changes, PagedReadingHistoryDto, ReadPageIndexDto, ReadingHistoryDto,
 };
 pub use home::{
     watch_continue_reading_top5, watch_home_library_alerts, watch_home_page_counts,

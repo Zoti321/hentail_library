@@ -12,7 +12,7 @@
 //!   `build()` 内订阅）
 //! - 访问首页后 +2：`watch_home_page_counts` / `watch_continue_reading`
 //!   （均 keepAlive）
-//! - 访问历史页后 +1：`watch_reading_histories`（`readingHistoryChangesStream`
+//! - 访问历史页后 +1：`watch_reading_history_changes`（`readingHistoryChangesStream`
 //!   keepAlive）
 //! - 访问作者管理页后 +1：`watch_authors`（`allAuthorsProvider` 非 autoDispose）
 //! - 无消费方、不计入：`watch_home_series_comic_order_map`

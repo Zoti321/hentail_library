@@ -9,6 +9,12 @@ pub struct ReadingHistoryDto {
 }
 
 #[derive(Debug, Clone)]
+pub struct ReadPageIndexDto {
+    pub comic_id: String,
+    pub page_index: i32,
+}
+
+#[derive(Debug, Clone)]
 pub struct PagedReadingHistoryDto {
     pub items: Vec<ReadingHistoryDto>,
     pub total_count: i64,
