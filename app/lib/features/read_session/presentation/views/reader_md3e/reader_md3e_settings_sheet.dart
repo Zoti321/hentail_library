@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/read_session/public/reading_preference_l10n.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_adaptive_panel.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'

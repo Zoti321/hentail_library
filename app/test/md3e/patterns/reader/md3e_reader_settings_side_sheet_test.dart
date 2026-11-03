@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/read_session/public/reading_preference_l10n.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_settings_side_sheet.dart';
 import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
 

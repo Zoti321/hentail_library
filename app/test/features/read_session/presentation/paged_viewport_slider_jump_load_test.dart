@@ -15,6 +15,7 @@ import 'package:hentai_library/features/read_session/domain/read_session_page.da
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/reader_image_item.dart';
+import 'package:hentai_library/features/read_session/presentation/reader.dart';
 import 'package:hentai_library/features/bootstrap/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;

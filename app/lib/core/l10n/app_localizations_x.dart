@@ -26,10 +26,6 @@ import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dar
 
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
-
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
-
 import 'package:intl/intl.dart';
 
 extension AppLocalizationsContextX on BuildContext {
@@ -303,61 +299,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
                 progress.migratedCount ?? 0,
               ),
     };
-  }
-
-  String readerModeCategoryLabel(ReaderModeCategory category) {
-    return switch (category) {
-      ReaderModeCategory.paged => readingModeCategoryPaged,
-
-      ReaderModeCategory.webtoon => readingModeCategoryWebtoon,
-    };
-  }
-
-  String autoPlayModeLabel(AutoPlayMode mode) {
-    return switch (mode) {
-      AutoPlayMode.comicOnce => autoPlayModeComicOnce,
-      AutoPlayMode.comicLoop => autoPlayModeComicLoop,
-      AutoPlayMode.seriesOnce => autoPlayModeSeriesOnce,
-      AutoPlayMode.seriesLoop => autoPlayModeSeriesLoop,
-    };
-  }
-
-  String pagedLayoutLabel(PagedLayout layout) {
-    return switch (layout) {
-      PagedLayout.single => readingModePagedSingle,
-
-      PagedLayout.dual => readingModePagedDual,
-
-      PagedLayout.dualNoCover => readingModePagedDualNoCover,
-    };
-  }
-
-  String webtoonZoomModeLabel(WebtoonZoomMode mode) {
-    return switch (mode) {
-      WebtoonZoomMode.fitWidth => readingModeWebtoonFitWidth,
-
-      WebtoonZoomMode.originalSize => readingModeWebtoonOriginalSize,
-    };
-  }
-
-  String readingModeLabel(ReadingMode mode) {
-    return switch (mode) {
-      ReadingMode.paged => readingModePaged,
-
-      ReadingMode.webtoon => readingModeWebtoon,
-
-      ReadingMode.dualPage => readingModeDualPage,
-
-      ReadingMode.dualPageNoCover => readingModeDualPageNoCover,
-    };
-  }
-
-  String readerWebtoonMarginLabel(int percent) {
-    if (percent == 0) {
-      return readerSettingsMarginNone;
-    }
-
-    return readerSettingsMarginPercent(percent);
   }
 
   String metadataAddEntityTooltip(int tabIndex) {
