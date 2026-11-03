@@ -3,6 +3,10 @@
     "dart": {
       "command": "dart",
       "args": ["mcp-server"]
+    },
+    "flutter_agent_lens": {
+      "command": "dart",
+      "args": ["pub", "global", "run", "flutter_agent_lens:main"]
     }
   }
 }
