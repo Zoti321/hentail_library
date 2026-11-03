@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 
-import '../../../widgetbook/md3e_settings_page_lab_host.dart';
+import '../../../widgetbook/hosts/md3e_settings_page_lab_host.dart';
 import '../../support/pump_md3e_app.dart';
 
 void main() {

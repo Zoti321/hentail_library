@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_page.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_boundary_snackbar.dart';
 
-import 'md3e_reader_page_preview_data.dart';
+import '../preview/md3e_reader_page_preview_data.dart';
 
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_catalog_sheet.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_volume.dart';

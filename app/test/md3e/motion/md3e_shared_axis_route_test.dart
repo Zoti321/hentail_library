@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../widgetbook/md3e_lab_reader_navigation.dart';
-import '../../../widgetbook/md3e_reader_page_lab_host.dart';
+import '../../../widgetbook/lab/navigation/md3e_lab_reader_navigation.dart';
+import '../../../widgetbook/hosts/md3e_reader_page_lab_host.dart';
 
 import '../../support/pump_md3e_app.dart';
 

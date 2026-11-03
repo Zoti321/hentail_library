@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 
-import 'lab_theme/md3e_theme.dart';
+import '../lab/theme/md3e_theme.dart';
 
 import 'package:material_3_expressive/material_3_expressive.dart';
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/views/comic_detail_md3e/comic_detail_page_entry.dart';
 
-import 'md3e_reader_page_lab_host.dart';
+import '../../hosts/md3e_reader_page_lab_host.dart';
 
 import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
 
-import 'md3e_reader_page_preview_data.dart';
+import '../../preview/md3e_reader_page_preview_data.dart';
 
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 

@@ -33,7 +33,7 @@ PAGE_DEST: dict[str, str] = {
     "pages/md3e_library_edit_page.dart": "features/library_admin/presentation/views/library_md3e/library_edit_page.dart",
     "pages/md3e_comic_detail_entry.dart": "features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart",
     "pages/md3e_series_detail_entry.dart": "features/library_browse/presentation/views/series_detail_md3e/series_detail_page_entry.dart",
-    "pages/md3e_history_browse_entry.dart": "widgetbook/lab_pages/history_browse_entry.dart",
+    "pages/md3e_history_browse_entry.dart": "widgetbook/lab/pages/history_browse_entry.dart",
 }
 
 # md3e package URI → path under app/widgetbook/ (for relative import rewrite).
@@ -67,14 +67,14 @@ def lib_dest_for(rel: str) -> str | None:
         return f"widgetbook/lab_data/{stripped}"
 
     if rel in LAB_PAGES:
-        return f"widgetbook/lab_pages/{stripped}"
+        return f"widgetbook/lab/pages/{stripped}"
 
     if rel in PAGE_DEST:
         return PAGE_DEST[rel]
 
     if rel.startswith("theme/"):
         if rel == "theme/md3e_theme.dart":
-            return "widgetbook/lab_theme/md3e_theme.dart"
+            return "widgetbook/lab/theme/md3e_theme.dart"
         return f"shared/ui/theme/{stripped}"
 
     if rel.startswith("layout/"):

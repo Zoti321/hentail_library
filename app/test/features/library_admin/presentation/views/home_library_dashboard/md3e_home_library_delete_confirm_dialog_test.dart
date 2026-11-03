@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_copy.dart';
 
-import '../../../../../../widgetbook/lab_theme/md3e_theme.dart';
+import '../../../../../../widgetbook/lab/theme/md3e_theme.dart';
 
 import 'package:material_3_expressive/material_3_expressive.dart';
 

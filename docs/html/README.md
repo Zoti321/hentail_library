@@ -14,6 +14,6 @@
 | [reader-signoff.html](./reader-signoff.html) | 重定向至 `signoff.html#sec-reader` |
 | [assets/site.css](./assets/site.css) | 共享样式 |
 
-改 `app/widgetbook/md3e_widgetbook_directories.dart` 时请同步更新 `widgetbook.html` 与 `pages.html`。
+改 `app/widgetbook/catalog/md3e_widgetbook_directories.dart` 时请同步更新 `widgetbook.html` 与 `pages.html`。
 
 工程规范仍以 `docs/engineering/`、`docs/adr/` 为准。

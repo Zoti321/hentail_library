@@ -8,7 +8,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
 
-import 'md3e_library_edit_preview_data.dart';
+import '../../preview/md3e_library_edit_preview_data.dart';
 
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';

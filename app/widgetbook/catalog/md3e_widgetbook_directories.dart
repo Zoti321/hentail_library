@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'md3e_comic_detail_page_preview_data.dart';
-import 'md3e_series_detail_page_preview_data.dart';
+import '../preview/md3e_comic_detail_page_preview_data.dart';
+import '../preview/md3e_series_detail_page_preview_data.dart';
 
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
@@ -13,35 +13,35 @@ import 'package:hentai_library/features/library_browse/presentation/comic/patter
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 
-import 'md3e_home_page_lab_host.dart';
+import '../hosts/md3e_home_page_lab_host.dart';
 
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
 
-import 'md3e_history_browse_page_lab_host.dart';
-import 'md3e_history_browse_page_preview_data.dart';
-import 'lab_pages/library_browse_page.dart';
-import 'md3e_management_browse_page_lab_host.dart';
-import 'md3e_settings_page_lab_host.dart';
+import '../hosts/md3e_history_browse_page_lab_host.dart';
+import '../preview/md3e_history_browse_page_preview_data.dart';
+import '../lab/pages/library_browse_page.dart';
+import '../hosts/md3e_management_browse_page_lab_host.dart';
+import '../hosts/md3e_settings_page_lab_host.dart';
 
 import 'package:hentai_library/features/library_browse/presentation/comic/views/comic_detail_md3e/comic_detail_page.dart';
 
-import 'md3e_reader_page_lab_host.dart';
-import 'md3e_reader_page_preview_data.dart';
+import '../hosts/md3e_reader_page_lab_host.dart';
+import '../preview/md3e_reader_page_preview_data.dart';
 
 import 'package:hentai_library/features/library_browse/presentation/comic/views/metadata_edit_md3e/comic_metadata_edit_page.dart';
 
-import 'md3e_comic_metadata_edit_page_lab_host.dart';
+import '../hosts/md3e_comic_metadata_edit_page_lab_host.dart';
 
 import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
 
-import 'md3e_library_edit_page_lab_host.dart';
+import '../hosts/md3e_library_edit_page_lab_host.dart';
 
 import 'package:hentai_library/features/library_browse/presentation/series/views/series_detail_md3e/series_detail_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/series/views/series_detail_md3e/series_detail_page_lab_host.dart';
 import 'package:hentai_library/features/library_browse/presentation/series/views/metadata_edit_md3e/series_metadata_edit_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_edit_navigation.dart';
 
-import 'md3e_lab_catalog_navigation.dart';
+import '../lab/navigation/md3e_lab_catalog_navigation.dart';
 
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_filter_sort_side_sheet.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
@@ -51,12 +51,13 @@ import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar
 import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import 'md3e_widgetbook_desktop_gate.dart';
-import 'md3e_widgetbook_scope.dart';
+import '../shell/md3e_widgetbook_desktop_gate.dart';
+import '../shell/md3e_widgetbook_scope.dart';
 
 part 'md3e_widgetbook_desktop_app_prototype.dart';
 part 'md3e_widgetbook_lab_catalog_navigation.dart';

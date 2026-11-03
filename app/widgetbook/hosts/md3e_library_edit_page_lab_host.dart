@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
 
-import 'md3e_library_edit_preview_data.dart';
+import '../preview/md3e_library_edit_preview_data.dart';
 
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';

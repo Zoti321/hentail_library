@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/window_manager_bindings.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import 'md3e_viewports.dart';
-import 'md3e_widgetbook_app.dart';
-import 'md3e_widgetbook_theme_addon.dart';
-import 'widgetbook_directories.dart';
+import 'catalog/widgetbook_directories.dart';
+import 'shell/md3e_viewports.dart';
+import 'shell/md3e_widgetbook_app.dart';
+import 'shell/md3e_widgetbook_theme_addon.dart';
 
 /// Dev-only MD3E Lab catalog (not wired to production [go_router]).
 ///

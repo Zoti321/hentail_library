@@ -5,7 +5,7 @@ import 'package:hentai_library/features/app_settings/presentation/patterns/setti
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/metadata_backup_import_lab_flow.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-import '../../../../widgetbook/md3e_settings_page_lab_host.dart';
+import '../../../../widgetbook/hosts/md3e_settings_page_lab_host.dart';
 
 import '../../../support/pump_md3e_app.dart';
 

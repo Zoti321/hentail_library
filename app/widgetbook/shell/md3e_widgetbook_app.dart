@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
-import 'lab_theme/md3e_theme.dart';
+import '../lab/theme/md3e_theme.dart';
 
 import 'package:material_3_expressive/foundations/foundations.dart';
 

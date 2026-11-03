@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'lab_theme/md3e_theme.dart';
+import '../lab/theme/md3e_theme.dart';
 
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:widgetbook/widgetbook.dart';

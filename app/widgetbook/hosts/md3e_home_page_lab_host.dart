@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
 
-import 'md3e_library_edit_navigation.dart';
+import '../lab/navigation/md3e_library_edit_navigation.dart';
 
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_copy.dart';
@@ -12,7 +12,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/home_li
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_list_order.dart';
 
-import 'md3e_home_page_preview_data.dart';
+import '../preview/md3e_home_page_preview_data.dart';
 
 /// Widgetbook / Lab：在本地维护库列表顺序；生产侧由 notifier + repository 接同样回调形状。
 ///

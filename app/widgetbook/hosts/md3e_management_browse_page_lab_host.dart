@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'md3e_management_browse_page.dart';
+import '../lab/pages/md3e_management_browse_page.dart';
 
 import 'package:hentai_library/features/named_metadata/public.dart';
 

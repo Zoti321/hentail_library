@@ -4,9 +4,9 @@ import 'package:hentai_library/features/reading_history/presentation/patterns/hi
 import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-import 'md3e_history_browse_page_preview_data.dart';
-import 'md3e_lab_reader_navigation.dart';
-import 'md3e_reader_page_preview_data.dart';
+import '../preview/md3e_history_browse_page_preview_data.dart';
+import '../lab/navigation/md3e_lab_reader_navigation.dart';
+import '../preview/md3e_reader_page_preview_data.dart';
 
 /// Lab / Widgetbook：preview 阅读历史 + 清空全部（M3E 确认 → 清内存列表，不写 FRB）。
 class Md3eHistoryBrowsePageLabHost extends StatefulWidget {
