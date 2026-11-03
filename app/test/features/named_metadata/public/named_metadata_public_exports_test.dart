@@ -15,6 +15,8 @@ void main() {
       expect(createTagRepository, isNotNull);
       expect(createNamedFacetManagementRepository, isNotNull);
       expect(createNamedFacetDictionaryRepository, isNotNull);
+      expect(allTagsProvider, isNotNull);
+      expect(allAuthorsProvider, isNotNull);
       expect(MetadataManagementPage, isNotNull);
     },
   );

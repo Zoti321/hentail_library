@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/named_metadata/data/repositories/named_facet_management_repository_impl.dart';
+import 'package:hentai_library/features/named_metadata/data/mappers/named_facet_frb_mapper.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 
 void main() {
