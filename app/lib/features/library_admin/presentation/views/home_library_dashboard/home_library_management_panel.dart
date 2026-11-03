@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_list_order.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_section.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_dashboard_stats_notifier.dart';
+import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/domain/ports/library_management_port.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -16,7 +16,7 @@ import 'package:hentai_library/features/library_admin/domain/library_metadata_re
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
+import 'package:hentai_library/shared/domain/library/home_library_stat.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
@@ -29,7 +29,7 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<HomeLibraryStat> stats = ref
-        .watch(libraryDashboardStatsStreamProvider)
+        .watch(homeLibraryStatsStreamProvider)
         .maybeWhen(
           data: (List<HomeLibraryStat> data) => data,
           orElse: () => const <HomeLibraryStat>[],

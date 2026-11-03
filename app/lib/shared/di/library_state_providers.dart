@@ -7,7 +7,7 @@ import 'package:hentai_library/features/library_admin/domain/current_library_sta
 import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
-import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.dart';

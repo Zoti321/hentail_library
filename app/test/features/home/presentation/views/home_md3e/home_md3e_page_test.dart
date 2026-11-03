@@ -8,7 +8,7 @@ import 'package:hentai_library/features/home/presentation/view_models/home_page_
 import 'package:hentai_library/features/home/presentation/views/home_md3e/home_md3e_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_dashboard_stats_notifier.dart';
+import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
@@ -98,7 +98,7 @@ List<Override> _overrides() {
     homeFacetCountsProvider.overrideWith(
       (Ref ref) async => (parodyCount: 7, characterCount: 8),
     ),
-    libraryDashboardStatsStreamProvider.overrideWith(
+    homeLibraryStatsStreamProvider.overrideWith(
       (Ref ref) => Stream<List<HomeLibraryStat>>.value(const <HomeLibraryStat>[
         HomeLibraryStat(libraryId: 'local', comicCount: 3, seriesCount: 1),
         HomeLibraryStat(libraryId: 'remote', comicCount: 1, seriesCount: 1),

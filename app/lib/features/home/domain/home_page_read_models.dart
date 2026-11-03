@@ -1,3 +1,5 @@
+export 'package:hentai_library/shared/domain/library/home_library_stat.dart';
+
 /// 首页仪表盘聚合统计（行数/记录数，非业务字段）。
 class HomePageCounts {
   const HomePageCounts({
@@ -52,21 +54,6 @@ class HomeLibraryAlert {
         'sync:${lastSuccessAt?.millisecondsSinceEpoch ?? 0}:${lastErrorMessage ?? ''}',
     };
   }
-}
-
-/// 首页库列表的每库统计（漫画数、系列数、上次成功同步时间）。
-class HomeLibraryStat {
-  const HomeLibraryStat({
-    required this.libraryId,
-    required this.comicCount,
-    required this.seriesCount,
-    this.lastSuccessfulSyncAt,
-  });
-
-  final String libraryId;
-  final int comicCount;
-  final int seriesCount;
-  final DateTime? lastSuccessfulSyncAt;
 }
 
 class LibraryProbeResult {
