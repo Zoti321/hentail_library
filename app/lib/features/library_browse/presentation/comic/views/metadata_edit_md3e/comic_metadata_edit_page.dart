@@ -4,6 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
 import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_edit_draft.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_edit_form.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
@@ -124,6 +125,7 @@ class _Md3eComicMetadataEditPageState extends State<Md3eComicMetadataEditPage> {
         locks: _locks,
         onLockChanged: _onLockChanged,
         titleError: _titleError,
+        smartFacetScope: labComicMetadataSmartFacetScope(title: _draft.title),
         onDraftChanged: (Md3eComicMetadataEditDraft value) {
           setState(() {
             _draft = value;

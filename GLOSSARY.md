@@ -173,11 +173,11 @@ Library browse preference（分组方式 `bySeries`）：Comics 浏览列表保�
 _Avoid_: 按系列展开、expand by series、按系列折叠、系列模式列表
 
 **App preference**:
-应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
+应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Smart facet match（Comic metadata form 候选排序，默认开启）等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
 _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
 
 **Library browse preference**:
-库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Group by series、Prefer library root series、Smart facet match、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
+库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Group by series、Prefer library root series、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
 _Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
 
 **Library property**:
@@ -241,7 +241,7 @@ _Avoid_: 引用次数、usage count、ref_count、热度
 _Avoid_: 拼音搜索引擎、fuzzy search、拼音索引、全文检索
 
 **Smart facet match**:
-Comic metadata form 候选列表的排序增强：在对应 Named metadata facet 全局字典内，将信号命中的名字排在 Named facet attachment count 之前，并在下拉候选行提示来源；不自动写入表单已选值，不从信号发明典外新名。Author 信号为三个独立来源的字典名 whole-string、大小写不敏感 substring 命中：Comic 标题、Resource 文件名（去扩展名）、相对 Library root 的 Resource 路径中全部父目录段；三源各自独立计分，同一名字命中源越多排序越靠前（标题与文件名相同时只计一次）；不解析方括号等命名惯例、不拆分括号内子串。Tag / Parody / Character 信号为同一非根 Folder series 内其它成员已附着的名字。可由应用级偏好开关，默认开启。
+Comic metadata form 候选列表的排序增强：在对应 Named metadata facet 全局字典内，将信号命中的名字排在 Named facet attachment count 之前，并在下拉候选行提示来源；不自动写入表单已选值，不从信号发明典外新名。Author 信号为三个独立来源的字典名 whole-string、大小写不敏感 substring 命中：Comic 标题、Resource 文件名（去扩展名）、相对 Library root 的 Resource 路径中全部父目录段；三源各自独立计分，同一名字命中源越多排序越靠前（标题与文件名相同时只计一次）；不解析方括号等命名惯例、不拆分括号内子串。Tag / Parody / Character 信号为同一非根 Folder series 内其它成员已附着的名字。是否启用由 **App preference** 在 MD3E 设置页开关（`smart_facet_match_enabled`，默认开启）；不在 Comic metadata form 内重复提供开关。
 _Avoid_: 智能匹配、自动打标、建议填充、引用次数排序（后者仅指 attachment count）
 
 **Comic catalog query**:

@@ -21,4 +21,5 @@ export 'public/ui/comic_detail_md3e_page.dart';
 export 'public/ui/library_md3e_page.dart';
 export 'public/ui/searched_md3e_page.dart';
 export 'public/ui/series_cover_content.dart';
+export 'public/smart_facet_match_preference.dart';
 export 'public/ui/series_detail_md3e_page.dart';

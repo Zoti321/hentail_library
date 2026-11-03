@@ -16,6 +16,7 @@ import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/reading_mode_l10n.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
+import 'package:hentai_library/features/library_browse/public/smart_facet_match_preference.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -67,7 +68,12 @@ Future<void> _pickSettingOption<T extends Object>(
 List<Widget> _personalizationSections() {
   return const <Widget>[
     Md3eSettingsSection(
-      tiles: <Widget>[_ThemeTile(), _LocaleTile(), _ReadingModeTile()],
+      tiles: <Widget>[
+        _ThemeTile(),
+        _LocaleTile(),
+        _ReadingModeTile(),
+        _SmartFacetMatchTile(),
+      ],
     ),
     Md3eSettingsSection(tiles: <Widget>[_HealthyModeTile()]),
   ];
@@ -169,6 +175,28 @@ class _ReadingModeTile extends ConsumerWidget {
         labelOf: l10n.readingModeLabel,
         onSelected: ref.read(settingsProvider.notifier).setReadingMode,
       ),
+    );
+  }
+}
+
+class _SmartFacetMatchTile extends ConsumerWidget {
+  const _SmartFacetMatchTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final AsyncValue<bool> preference = ref.watch(
+      smartFacetMatchPreferenceProvider,
+    );
+    final bool enabled = preference.value ?? true;
+    return Md3eSettingsSwitchTile(
+      leading: Symbols.auto_awesome,
+      title: Text(l10n.smartFacetMatchToggleLabel),
+      value: enabled,
+      enabled: !preference.isLoading,
+      onChanged: (bool value) => ref
+          .read(smartFacetMatchPreferenceProvider.notifier)
+          .setEnabled(value),
     );
   }
 }

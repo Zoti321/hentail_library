@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,12 +15,14 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(900, 720));
     await pumpMd3eApp(
       tester,
-      home: SizedBox(
-        width: 900,
-        height: 720,
-        child: Md3eComicMetadataEditPage(
-          initialDraft: Md3eComicMetadataEditDraft.fromEntry(
-            Md3eComicDetailPagePreviewData.sample(),
+      home: ProviderScope(
+        child: SizedBox(
+          width: 900,
+          height: 720,
+          child: Md3eComicMetadataEditPage(
+            initialDraft: Md3eComicMetadataEditDraft.fromEntry(
+              Md3eComicDetailPagePreviewData.sample(),
+            ),
           ),
         ),
       ),

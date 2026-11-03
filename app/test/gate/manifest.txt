@@ -26,6 +26,7 @@ test/widget_test.dart
 
 # Dart hard-manifest UI（已晋升快轨）
 test/shared/ui/widgets/actions/destructive_filled_button_test.dart
+test/shared/ui/widgets/inputs/md3e_named_facet_multi_select_field_test.dart
 test/shared/ui/widgets/overlays/dialog/confirm
 test/features/named_metadata/presentation/views/metadata_md3e/named_facet_fill_viewport_test.dart
 test/features/library_browse/presentation/series/views/series_detail_md3e/series_detail_md3e_entry_test.dart

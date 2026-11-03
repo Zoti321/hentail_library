@@ -5,6 +5,8 @@ import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/view_models/comic_metadata_editor_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit_md3e/metadata_edit_mappers.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_edit_draft.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_edit_form.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
@@ -37,12 +39,14 @@ class ComicMetadataEditMd3eViewState
   SeriesItemMembership? _seed;
   String? _titleError;
   bool _saving = false;
+  late ComicMetadataSmartFacetScope _smartFacetScope;
 
   @override
   void initState() {
     super.initState();
     _draft = comicMetadataDraftFromComic(widget.comic);
     _locks = widget.comic.locks;
+    _smartFacetScope = comicMetadataSmartFacetScopeForComic(widget.comic);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadSeriesSortMembership();
     });
@@ -59,6 +63,10 @@ class ComicMetadataEditMd3eViewState
       setState(() {
         _seed = membership;
         if (membership != null) {
+          _smartFacetScope = comicMetadataSmartFacetScopeForComic(
+            widget.comic,
+            seriesId: membership.seriesId,
+          );
           _draft = _draft.copyWith(
             seriesSortOrderText: _formatSortOrder(membership.sortOrder),
           );
@@ -212,9 +220,16 @@ class ComicMetadataEditMd3eViewState
         locks: _locks,
         onLockChanged: _setLock,
         titleError: _titleError,
+        smartFacetScope: _smartFacetScope,
         onDraftChanged: (Md3eComicMetadataEditDraft value) {
           setState(() {
             _draft = value;
+            _smartFacetScope = (
+              comicId: _smartFacetScope.comicId,
+              title: value.title,
+              resourcePath: _smartFacetScope.resourcePath,
+              seriesId: _smartFacetScope.seriesId,
+            );
             if (_titleError != null && value.validateTitle() == null) {
               _titleError = null;
             }

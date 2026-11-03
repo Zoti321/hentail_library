@@ -49,6 +49,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
+import '../preview/md3e_named_facet_multi_select_preview.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_field.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -208,6 +210,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   name: 'Default',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
                     child: Md3eTagInputFieldPreview(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eNamedFacetMultiSelectField',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Authors · smart hint',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eNamedFacetMultiSelectFieldPreview(),
                   ),
                 ),
               ],

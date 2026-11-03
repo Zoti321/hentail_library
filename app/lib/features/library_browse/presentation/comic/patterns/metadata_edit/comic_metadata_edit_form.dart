@@ -12,10 +12,17 @@ import 'package:hentai_library/shared/ui/widgets/inputs/comic_language_quick_pic
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/published_date_text_field.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/view_models/comic_metadata_smart_facet_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/views/widgets/form/author_library_multi_select_field.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/views/widgets/form/character_library_multi_select_field.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/views/widgets/form/parody_library_multi_select_field.dart';
+import 'package:hentai_library/features/library_browse/presentation/comic/views/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -40,6 +47,7 @@ class Md3eComicMetadataEditForm extends StatefulWidget {
     required this.onDraftChanged,
     required this.locks,
     required this.onLockChanged,
+    required this.smartFacetScope,
     this.titleError,
   });
 
@@ -47,6 +55,7 @@ class Md3eComicMetadataEditForm extends StatefulWidget {
   final ValueChanged<Md3eComicMetadataEditDraft> onDraftChanged;
   final ComicMetaLocks locks;
   final Md3eComicMetadataLockChanged onLockChanged;
+  final ComicMetadataSmartFacetScope smartFacetScope;
   final String? titleError;
 
   @override
@@ -94,6 +103,7 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
         draft: draft,
         gap: gap,
         l10n: l10n,
+        scope: widget.smartFacetScope,
         onParodiesChanged: (List<String> v) =>
             _update((d) => d.copyWith(parodies: v)),
         onAuthorsChanged: (List<String> v) =>
@@ -330,11 +340,12 @@ class _GeneralFields extends StatelessWidget {
   }
 }
 
-class _AuthorsTagsFields extends StatelessWidget {
+class _AuthorsTagsFields extends ConsumerWidget {
   const _AuthorsTagsFields({
     required this.draft,
     required this.gap,
     required this.l10n,
+    required this.scope,
     required this.onParodiesChanged,
     required this.onAuthorsChanged,
     required this.onCharactersChanged,
@@ -344,67 +355,61 @@ class _AuthorsTagsFields extends StatelessWidget {
   final Md3eComicMetadataEditDraft draft;
   final double gap;
   final AppLocalizations l10n;
+  final ComicMetadataSmartFacetScope scope;
   final ValueChanged<List<String>> onParodiesChanged;
   final ValueChanged<List<String>> onAuthorsChanged;
   final ValueChanged<List<String>> onCharactersChanged;
   final ValueChanged<List<String>> onTagsChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _tagField(
+        ParodyLibraryMultiSelectField(
           label: l10n.comicDetailParodies,
-          tags: draft.parodies,
+          icon: Symbols.category,
+          scope: scope,
+          selectedNames: draft.parodies,
           onAdd: (String v) =>
               onParodiesChanged(_md3eTagListWithAdded(draft.parodies, v)),
           onRemove: (String v) =>
               onParodiesChanged(_md3eTagListWithRemoved(draft.parodies, v)),
         ),
         SizedBox(height: gap),
-        _tagField(
+        AuthorLibraryMultiSelectField(
           label: l10n.comicDetailAuthors,
-          tags: draft.authors,
+          icon: Symbols.person,
+          scope: scope,
+          selectedNames: draft.authors,
           onAdd: (String v) =>
               onAuthorsChanged(_md3eTagListWithAdded(draft.authors, v)),
           onRemove: (String v) =>
               onAuthorsChanged(_md3eTagListWithRemoved(draft.authors, v)),
         ),
         SizedBox(height: gap),
-        _tagField(
+        CharacterLibraryMultiSelectField(
           label: l10n.comicDetailCharacters,
-          tags: draft.characters,
+          icon: Symbols.groups,
+          scope: scope,
+          selectedNames: draft.characters,
           onAdd: (String v) =>
               onCharactersChanged(_md3eTagListWithAdded(draft.characters, v)),
           onRemove: (String v) =>
               onCharactersChanged(_md3eTagListWithRemoved(draft.characters, v)),
         ),
         SizedBox(height: gap),
-        _tagField(
+        TagLibraryMultiSelectField(
           label: l10n.comicDetailTags,
-          tags: draft.tags,
+          icon: Symbols.label,
+          scope: scope,
+          selectedNames: draft.tags,
           onAdd: (String v) =>
               onTagsChanged(_md3eTagListWithAdded(draft.tags, v)),
           onRemove: (String v) =>
               onTagsChanged(_md3eTagListWithRemoved(draft.tags, v)),
         ),
       ],
-    );
-  }
-
-  Widget _tagField({
-    required String label,
-    required List<String> tags,
-    required ValueChanged<String> onAdd,
-    required ValueChanged<String> onRemove,
-  }) {
-    return Md3eTagInputField(
-      label: label,
-      tags: tags,
-      onTagCommitted: onAdd,
-      onTagRemoved: onRemove,
-      maxWidth: double.infinity,
     );
   }
 }

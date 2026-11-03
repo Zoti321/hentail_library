@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/widgets/form/multi_select.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_copy.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/views/widgets/form/named_facet_multi_select_field.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -36,7 +36,6 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
     return NamedFacetMultiSelectField(
       label: label,
       labelTrailing: labelTrailing,
-      icon: icon,
       selectedNames: selectedNames,
       onAdd: onAdd,
       onRemove: onRemove,
@@ -44,8 +43,7 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
       itemsProvider: authorsSmartForComicMetadataFormProvider(scope),
       onRetry: () =>
           ref.invalidate(authorsSmartForComicMetadataFormProvider(scope)),
-      copy: MultiSelectCopy(
-        inputPlaceholder: l10n.formAuthorSelectPlaceholder,
+      copy: Md3eNamedFacetMultiSelectCopy(
         listLoadFailed: l10n.formAuthorListLoadFailed,
         emptyCatalog: l10n.formAuthorEmptyCatalog,
         emptyRemaining: l10n.formAuthorEmptyRemaining,
