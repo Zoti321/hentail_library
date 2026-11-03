@@ -106,7 +106,9 @@ List<Override> _overrides() {
       scanMode: ScanMode.incremental,
     )),
     libraryMetadataRefreshTargetLibraryIdStateProvider.overrideWithValue(null),
-    libraryManagementPortProvider.overrideWithValue(_NoopLibraryManagementPort()),
+    libraryManagementPortProvider.overrideWithValue(
+      _NoopLibraryManagementPort(),
+    ),
   ];
 }
 

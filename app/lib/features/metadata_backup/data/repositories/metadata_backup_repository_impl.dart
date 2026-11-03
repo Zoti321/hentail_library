@@ -29,22 +29,16 @@ class MetadataBackupRepositoryImpl implements MetadataBackupRepository {
 
   @override
   MetadataBackupManifest peekManifest(Uint8List jsonBytes) {
-    return mapMetadataBackupManifestDto(
-      _adapter.peek(bytes: jsonBytes),
-    );
+    return mapMetadataBackupManifestDto(_adapter.peek(bytes: jsonBytes));
   }
 
   @override
   MetadataImportPreview previewImport(Uint8List jsonBytes) {
-    return mapMetadataImportPreviewDto(
-      _adapter.preview(bytes: jsonBytes),
-    );
+    return mapMetadataImportPreviewDto(_adapter.preview(bytes: jsonBytes));
   }
 
   @override
   MetadataImportResult importMetadata(Uint8List jsonBytes) {
-    return mapMetadataImportResultDto(
-      _adapter.import(bytes: jsonBytes),
-    );
+    return mapMetadataImportResultDto(_adapter.import(bytes: jsonBytes));
   }
 }

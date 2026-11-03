@@ -61,8 +61,7 @@ class _FakeRepo implements MetadataBackupRepository {
   Uint8List exportComicMetadata({
     String? libraryId,
     required bool includeOrphanFacets,
-  }) =>
-      throw UnimplementedError();
+  }) => throw UnimplementedError();
 
   @override
   MetadataBackupManifest peekManifest(Uint8List jsonBytes) => manifest;

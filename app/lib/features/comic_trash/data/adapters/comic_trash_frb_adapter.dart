@@ -7,14 +7,14 @@ class ComicTrashFrbAdapter {
   const ComicTrashFrbAdapter();
 
   Future<void> trashByIds(List<String> comicIds) => guardFrb(
-        () => rust.trashComicsFrb(comicIds: comicIds),
-        fallbackMessage: '移入已删除失败',
-      );
+    () => rust.trashComicsFrb(comicIds: comicIds),
+    fallbackMessage: '移入已删除失败',
+  );
 
   Future<void> restoreByIds(List<String> comicIds) => guardFrb(
-        () => rust.restoreComicsFrb(comicIds: comicIds),
-        fallbackMessage: '恢复漫画失败',
-      );
+    () => rust.restoreComicsFrb(comicIds: comicIds),
+    fallbackMessage: '恢复漫画失败',
+  );
 
   Future<rust.ComicPurgeResultFrbDto> purgeByIds(List<String> comicIds) =>
       guardFrb(
@@ -24,19 +24,14 @@ class ComicTrashFrbAdapter {
 
   Future<rust.PagedTrashedComicResultFrbDto> fetchTrashedPage(
     comic_rust.PageRequestDto request,
-  ) =>
-      guardFrb(
-        () => rust.fetchTrashedComicsPageFrb(request: request),
-        fallbackMessage: '读取已删除漫画失败',
-      );
+  ) => guardFrb(
+    () => rust.fetchTrashedComicsPageFrb(request: request),
+    fallbackMessage: '读取已删除漫画失败',
+  );
 
-  Future<rust.TrashedComicCountsFrbDto> countTrashed() => guardFrb(
-        rust.countTrashedComicsFrb,
-        fallbackMessage: '统计已删除漫画失败',
-      );
+  Future<rust.TrashedComicCountsFrbDto> countTrashed() =>
+      guardFrb(rust.countTrashedComicsFrb, fallbackMessage: '统计已删除漫画失败');
 
-  Future<List<String>> listTrashedIds() => guardFrb(
-        rust.listTrashedComicIdsFrb,
-        fallbackMessage: '读取已删除漫画失败',
-      );
+  Future<List<String>> listTrashedIds() =>
+      guardFrb(rust.listTrashedComicIdsFrb, fallbackMessage: '读取已删除漫画失败');
 }

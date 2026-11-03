@@ -15,6 +15,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import '../../../support/fakes/settings_test_fakes.dart';
 import '../../../support/localized_test_app.dart';
 import '../../../../widgetbook/lab_theme/md3e_theme.dart';
+
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 
 class MockAppUpdateService extends Mock implements AppUpdateService {}

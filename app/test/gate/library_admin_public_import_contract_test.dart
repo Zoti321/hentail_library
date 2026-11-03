@@ -11,10 +11,7 @@ void main() {
     const String deniedUri =
         'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
 
-    expect(
-      isFeaturePublicPath('features/library_admin/public.dart'),
-      isTrue,
-    );
+    expect(isFeaturePublicPath('features/library_admin/public.dart'), isTrue);
     expect(
       isFeaturePublicPath(
         'features/library_admin/public/library_admin_command_ports.dart',

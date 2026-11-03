@@ -1,4 +1,5 @@
 import 'package:hentai_library/shared/di/library_management_providers.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -115,10 +116,8 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
       onLibraryOpen: (String libraryId) =>
           unawaited(management.openLibrary(context, libraryId)),
       onLibraryAction: handleAction,
-      onAddLocalLibrary: () =>
-          unawaited(management.addLocalLibrary(context)),
-      onAddRemoteLibrary: () =>
-          unawaited(management.addRemoteLibrary(context)),
+      onAddLocalLibrary: () => unawaited(management.addLocalLibrary(context)),
+      onAddRemoteLibrary: () => unawaited(management.addRemoteLibrary(context)),
       onLibrariesReorder: handleReorder,
     );
   }

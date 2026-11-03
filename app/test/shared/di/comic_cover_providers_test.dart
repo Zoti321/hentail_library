@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_thumbnail_repository.dart';
 import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';

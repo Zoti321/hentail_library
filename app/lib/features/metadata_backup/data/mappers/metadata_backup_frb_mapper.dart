@@ -76,7 +76,8 @@ MetadataImportMatchTier? mapMetadataImportMatchTierDto(rust.MatchTierDto? dto) {
   }
   return switch (dto) {
     rust.MatchTierDto.path => MetadataImportMatchTier.path,
-    rust.MatchTierDto.libraryRelative => MetadataImportMatchTier.libraryRelative,
+    rust.MatchTierDto.libraryRelative =>
+      MetadataImportMatchTier.libraryRelative,
   };
 }
 

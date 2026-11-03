@@ -1,3 +1,4 @@
+import 'package:hentai_library/shared/data/frb/comic_entity_mapper.dart';
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/library_browse/data/comic/comic_frb_mapper.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_catalog_repository.dart';

@@ -28,9 +28,7 @@ class HistoryListItem extends ConsumerWidget {
       currentPage: currentPage,
     );
     void openReader() {
-      ref
-          .read(readSessionLaunchPortProvider)
-          .openComic(comicId: item.comicId);
+      ref.read(readSessionLaunchPortProvider).openComic(comicId: item.comicId);
     }
 
     return Md3eReadingHistoryListItem(

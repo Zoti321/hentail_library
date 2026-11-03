@@ -8,9 +8,7 @@ import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 
 /// [ReaderSessionPort] 委托 Rust 阅读会话 open/close/clear。
 class ReaderSessionFrbAdapter implements ReaderSessionPort {
-  const ReaderSessionFrbAdapter({
-    required RemoteLibraryCredentialsPort this._remoteCredentials,
-  });
+  const ReaderSessionFrbAdapter({required this._remoteCredentials});
 
   final RemoteLibraryCredentialsPort _remoteCredentials;
 
@@ -24,11 +22,7 @@ class ReaderSessionFrbAdapter implements ReaderSessionPort {
         resourceType: mapResourceType(comic.resourceType),
       );
     } on HentaiErrorDto catch (error) {
-      throwReaderException(
-        error,
-        path: comic.path,
-        comicId: comic.comicId,
-      );
+      throwReaderException(error, path: comic.path, comicId: comic.comicId);
     }
   }
 

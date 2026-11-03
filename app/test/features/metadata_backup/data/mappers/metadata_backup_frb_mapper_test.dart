@@ -28,7 +28,9 @@ void main() {
     final MetadataImportPreview preview = mapMetadataImportPreviewDto(dto);
 
     expect(preview.wouldApply, 1);
-    expect(preview.samplesWouldApply.single.matchTier,
-        MetadataImportMatchTier.libraryRelative);
+    expect(
+      preview.samplesWouldApply.single.matchTier,
+      MetadataImportMatchTier.libraryRelative,
+    );
   });
 }

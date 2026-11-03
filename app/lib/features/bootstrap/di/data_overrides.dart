@@ -23,9 +23,8 @@ import 'package:riverpod/misc.dart' show Override;
 
 List<Override> dataProviderOverrides() => <Override>[
   remoteLibraryCredentialsPortProvider.overrideWith(
-    (Ref ref) => createRemoteLibraryCredentialsPort(
-      ref.read(libraryRepoProvider),
-    ),
+    (Ref ref) =>
+        createRemoteLibraryCredentialsPort(ref.read(libraryRepoProvider)),
   ),
   comicThumbnailRepoProvider.overrideWith(
     (Ref ref) => ComicThumbnailRepositoryImpl(
@@ -76,9 +75,8 @@ List<Override> dataProviderOverrides() => <Override>[
     ),
   ),
   comicTrashReaderSessionPortProvider.overrideWith(
-    (Ref ref) => ComicTrashReaderSessionAdapter(
-      ref.read(readerSessionPortProvider),
-    ),
+    (Ref ref) =>
+        ComicTrashReaderSessionAdapter(ref.read(readerSessionPortProvider)),
   ),
   comicPageSourcePortProvider.overrideWith(
     (Ref ref) => const ComicPageSourceFrbAdapter(),

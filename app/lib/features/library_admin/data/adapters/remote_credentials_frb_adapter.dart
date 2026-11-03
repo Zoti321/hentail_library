@@ -3,7 +3,8 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 
-class RemoteLibraryCredentialsFrbAdapter implements RemoteLibraryCredentialsPort {
+class RemoteLibraryCredentialsFrbAdapter
+    implements RemoteLibraryCredentialsPort {
   const RemoteLibraryCredentialsFrbAdapter(this._libraryRepository);
 
   final LibraryRepository _libraryRepository;
@@ -35,10 +36,7 @@ class RemoteLibraryCredentialsFrbAdapter implements RemoteLibraryCredentialsPort
 }
 
 /// library_admin 内部 FRB adapter 共用（不经过 [RemoteLibraryCredentialsPort]）。
-Future<void> pushRemoteLibraryCredentials(
-  LibraryRepository libraryRepository,
-) {
-  return RemoteLibraryCredentialsFrbAdapter(
-    libraryRepository,
-  ).pushStoredRemoteCredentialsToRust();
+Future<void> pushRemoteLibraryCredentials(LibraryRepository libraryRepository) {
+  return RemoteLibraryCredentialsFrbAdapter(libraryRepository)
+      .pushStoredRemoteCredentialsToRust();
 }

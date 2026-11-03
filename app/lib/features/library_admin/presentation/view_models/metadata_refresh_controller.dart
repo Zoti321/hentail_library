@@ -31,7 +31,8 @@ class MetadataRefreshController extends _$MetadataRefreshController {
   @override
   MetadataRefreshState build() => const MetadataRefreshState();
 
-  MetadataRefreshUseCase get _useCase => ref.read(metadataRefreshUseCaseProvider);
+  MetadataRefreshUseCase get _useCase =>
+      ref.read(metadataRefreshUseCaseProvider);
 
   Future<void> refreshComic({
     required String comicId,

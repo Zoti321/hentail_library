@@ -23,23 +23,25 @@ void main() {
     );
   }
 
-  test('mapTrashedComic maps summary comic, UTC deletedAt, library and kind',
-      () {
-    final TrashedComic local = mapTrashedComic(trashed(kind: 'local'));
+  test(
+    'mapTrashedComic maps summary comic, UTC deletedAt, library and kind',
+    () {
+      final TrashedComic local = mapTrashedComic(trashed(kind: 'local'));
 
-    expect(local.comic.comicId, 'c1');
-    expect(local.comic.title, 'Title');
-    expect(local.comic.pageCount, 12);
-    expect(local.comic.resourceType, ResourceType.cbz);
-    expect(local.comic.authors, isEmpty);
-    expect(
-      local.deletedAt,
-      DateTime.fromMillisecondsSinceEpoch(1700001000000, isUtc: true),
-    );
-    expect(local.libraryName, 'My Lib');
-    expect(local.isRemote, isFalse);
-    expect(mapTrashedComic(trashed(kind: 'remote')).isRemote, isTrue);
-  });
+      expect(local.comic.comicId, 'c1');
+      expect(local.comic.title, 'Title');
+      expect(local.comic.pageCount, 12);
+      expect(local.comic.resourceType, ResourceType.cbz);
+      expect(local.comic.authors, isEmpty);
+      expect(
+        local.deletedAt,
+        DateTime.fromMillisecondsSinceEpoch(1700001000000, isUtc: true),
+      );
+      expect(local.libraryName, 'My Lib');
+      expect(local.isRemote, isFalse);
+      expect(mapTrashedComic(trashed(kind: 'remote')).isRemote, isTrue);
+    },
+  );
 
   test('mapTrashedComicsPage maps page envelope', () {
     final PagedResult<TrashedComic> page = mapTrashedComicsPage(

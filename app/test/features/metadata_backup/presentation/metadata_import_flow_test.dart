@@ -126,14 +126,15 @@ void main() {
               importCalls += 1;
               await showDialog<void>(
                 context: context,
-                builder: (BuildContext context) => const MetadataImportResultDialog(
-                  result: MetadataImportResult(
-                    applied: 2,
-                    skippedNotFound: 0,
-                    skippedAmbiguous: 0,
-                    errors: <String>[],
-                  ),
-                ),
+                builder: (BuildContext context) =>
+                    const MetadataImportResultDialog(
+                      result: MetadataImportResult(
+                        applied: 2,
+                        skippedNotFound: 0,
+                        skippedAmbiguous: 0,
+                        errors: <String>[],
+                      ),
+                    ),
               );
             },
             child: const Text('open'),

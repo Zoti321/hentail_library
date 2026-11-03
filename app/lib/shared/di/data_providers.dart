@@ -94,10 +94,10 @@ final Provider<ReaderSessionPort> readerSessionPortProvider =
       (Ref ref) => _unimplemented('readerSessionPortProvider'),
     );
 
-final Provider<ComicTrashReaderSessionPort> comicTrashReaderSessionPortProvider =
-    Provider<ComicTrashReaderSessionPort>(
-      (Ref ref) => _unimplemented('comicTrashReaderSessionPortProvider'),
-    );
+final Provider<ComicTrashReaderSessionPort>
+comicTrashReaderSessionPortProvider = Provider<ComicTrashReaderSessionPort>(
+  (Ref ref) => _unimplemented('comicTrashReaderSessionPortProvider'),
+);
 
 final Provider<ComicPageSourcePort> comicPageSourcePortProvider =
     Provider<ComicPageSourcePort>(

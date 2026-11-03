@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 Future<void> main() async {
-  final Directory appRoot = Directory.current;
   final File allowlist = File(p.join('test', 'gate', 'strangler_shims.txt'));
   if (!allowlist.existsSync()) {
     stderr.writeln('Run from app/');

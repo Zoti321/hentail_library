@@ -108,9 +108,7 @@ class MetadataAutoBackupCoordinatorNotifier
         metadataBackupRepositoryProvider,
       );
       final MetadataAutoBackupRunResult result = await runMetadataAutoBackup(
-        export: () => repo.exportComicMetadata(
-          includeOrphanFacets: false,
-        ),
+        export: () => repo.exportComicMetadata(includeOrphanFacets: false),
         now: _now,
       );
       await ref

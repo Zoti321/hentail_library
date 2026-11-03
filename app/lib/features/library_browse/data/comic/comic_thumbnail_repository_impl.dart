@@ -10,9 +10,7 @@ import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
 class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
-  const ComicThumbnailRepositoryImpl({
-    required RemoteLibraryCredentialsPort this._remoteCredentials,
-  });
+  const ComicThumbnailRepositoryImpl({required this._remoteCredentials});
 
   final RemoteLibraryCredentialsPort _remoteCredentials;
 

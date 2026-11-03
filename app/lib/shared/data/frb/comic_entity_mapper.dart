@@ -1,4 +1,3 @@
-import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';

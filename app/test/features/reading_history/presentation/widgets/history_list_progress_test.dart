@@ -16,17 +16,11 @@ void main() {
 
   group('historyListTotalPages', () {
     test('uses comic page count when available', () {
-      expect(
-        historyListTotalPages(pageCount: 40, currentPage: 10),
-        40,
-      );
+      expect(historyListTotalPages(pageCount: 40, currentPage: 10), 40);
     });
 
     test('falls back to current page when page count missing', () {
-      expect(
-        historyListTotalPages(pageCount: null, currentPage: 10),
-        10,
-      );
+      expect(historyListTotalPages(pageCount: null, currentPage: 10), 10);
     });
   });
 }

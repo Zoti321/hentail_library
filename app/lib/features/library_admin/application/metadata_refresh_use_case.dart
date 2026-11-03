@@ -4,10 +4,9 @@ import 'package:hentai_library/features/library_admin/domain/metadata_refresh_ty
 /// 元数据刷新编排：经 [MetadataRefreshPort] 调用 Rust，并在需要时 bump catalog revision。
 class MetadataRefreshUseCase {
   const MetadataRefreshUseCase({
-    required MetadataRefreshPort port,
-    required void Function() onCatalogRevision,
-  }) : _port = port,
-       _onCatalogRevision = onCatalogRevision;
+    required this._port,
+    required this._onCatalogRevision,
+  });
 
   final MetadataRefreshPort _port;
   final void Function() _onCatalogRevision;
@@ -18,7 +17,9 @@ class MetadataRefreshUseCase {
   }
 
   Future<MetadataRefreshBatchResult> refreshSeries(String seriesId) async {
-    final MetadataRefreshBatchResult batch = await _port.refreshSeries(seriesId);
+    final MetadataRefreshBatchResult batch = await _port.refreshSeries(
+      seriesId,
+    );
     _onCatalogRevision();
     return batch;
   }

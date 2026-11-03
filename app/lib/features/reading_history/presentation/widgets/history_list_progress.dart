@@ -7,10 +7,7 @@ int historyListCurrentPage(int? pageIndex) {
 }
 
 /// 总页数优先用 Comic 编目页数；缺失时回退为 [currentPage] 以满足进度条约束。
-int historyListTotalPages({
-  required int? pageCount,
-  required int currentPage,
-}) {
+int historyListTotalPages({required int? pageCount, required int currentPage}) {
   if (pageCount != null && pageCount > 0) {
     return pageCount;
   }

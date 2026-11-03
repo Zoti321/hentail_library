@@ -54,10 +54,7 @@ void main() {
       isFeaturePublicPath('features/library_admin/public/library_admin.dart'),
       isTrue,
     );
-    expect(
-      isFeaturePublicPath('features/library_admin/public.dart'),
-      isTrue,
-    );
+    expect(isFeaturePublicPath('features/library_admin/public.dart'), isTrue);
     expect(
       isFeaturePublicPath('features/library_admin/public/ui/commands.dart'),
       isTrue,

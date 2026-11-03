@@ -6,7 +6,6 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 import 'package:hentai_library/features/read_session/di/session_providers.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'read_session_providers.g.dart';
@@ -61,10 +60,7 @@ Future<ReaderPagePayload> comicReaderPage(
 }
 
 @Riverpod()
-Future<int?> readingProgress(
-  Ref ref, {
-  required String comicId,
-}) async {
+Future<int?> readingProgress(Ref ref, {required String comicId}) async {
   return ref
       .read(readingHistoryCommandPortProvider)
       .readResumePageIndex(comicId);

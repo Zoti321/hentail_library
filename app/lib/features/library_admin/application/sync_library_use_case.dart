@@ -4,12 +4,10 @@ import 'package:hentai_library/features/library_admin/domain/sync_library_types.
 /// Library sync 编排：可选本地存储授权 → FRB sync → 成功且未取消时 bump catalog revision。
 class SyncLibraryUseCase {
   const SyncLibraryUseCase({
-    required SyncLibraryPort port,
-    required Future<void> Function() ensureLocalFilesystemAccess,
-    required void Function() onCatalogRevision,
-  }) : _port = port,
-       _ensureLocalFilesystemAccess = ensureLocalFilesystemAccess,
-       _onCatalogRevision = onCatalogRevision;
+    required this._port,
+    required this._ensureLocalFilesystemAccess,
+    required this._onCatalogRevision,
+  });
 
   final SyncLibraryPort _port;
   final Future<void> Function() _ensureLocalFilesystemAccess;
