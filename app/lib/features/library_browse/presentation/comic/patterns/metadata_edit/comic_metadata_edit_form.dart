@@ -6,6 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_locks_pane.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_lock_callbacks.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/comic_language_quick_pick.dart';
@@ -72,6 +73,60 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
     widget.onDraftChanged(fn(widget.draft));
   }
 
+  Widget _scrollPane(Widget child) {
+    return ScrollConfiguration(
+      behavior: Md3eMetadataEditScrollBehavior(),
+      child: SingleChildScrollView(primary: false, child: child),
+    );
+  }
+
+  Widget _sideTabLayout({
+    required double viewportHeight,
+    required double gap,
+    required AppLocalizations l10n,
+    required Widget tabBody,
+  }) {
+    return SizedBox(
+      height: viewportHeight,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          SizedBox(
+            width: Md3eMetadataEditFormMetrics.sideTabColumnWidth,
+            child: _scrollPane(
+              _SideTabList(
+                l10n: l10n,
+                tab: _tab,
+                onSelected: _selectTab,
+              ),
+            ),
+          ),
+          SizedBox(width: gap),
+          Expanded(child: _scrollPane(tabBody)),
+        ],
+      ),
+    );
+  }
+
+  Widget _topTabLayout({
+    required double viewportHeight,
+    required double gap,
+    required AppLocalizations l10n,
+    required Widget tabBody,
+  }) {
+    return SizedBox(
+      height: viewportHeight,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          _TopTabBar(l10n: l10n, tab: _tab, onSelected: _selectTab),
+          SizedBox(height: gap),
+          Expanded(child: _scrollPane(tabBody)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -123,39 +178,26 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final bool boundedHeight = constraints.maxHeight.isFinite;
-        final Widget scrollableTabBody = boundedHeight
-            ? SingleChildScrollView(child: tabBody)
-            : tabBody;
+        final double viewportHeight =
+            Md3eMetadataEditFormMetrics.resolveTabbedViewportHeight(
+              context,
+              constraints,
+            );
 
-        if (!useSideTabs) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _TopTabBar(l10n: l10n, tab: _tab, onSelected: _selectTab),
-              SizedBox(height: gap),
-              if (boundedHeight)
-                Flexible(child: scrollableTabBody)
-              else
-                tabBody,
-            ],
+        if (useSideTabs) {
+          return _sideTabLayout(
+            viewportHeight: viewportHeight,
+            gap: gap,
+            l10n: l10n,
+            tabBody: tabBody,
           );
         }
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              width: 168,
-              child: _SideTabList(
-                l10n: l10n,
-                tab: _tab,
-                onSelected: _selectTab,
-              ),
-            ),
-            SizedBox(width: gap),
-            Expanded(child: scrollableTabBody),
-          ],
+        return _topTabLayout(
+          viewportHeight: viewportHeight,
+          gap: gap,
+          l10n: l10n,
+          tabBody: tabBody,
         );
       },
     );
@@ -375,6 +417,7 @@ class _AuthorsTagsFields extends ConsumerWidget {
               onParodiesChanged(_md3eTagListWithAdded(draft.parodies, v)),
           onRemove: (String v) =>
               onParodiesChanged(_md3eTagListWithRemoved(draft.parodies, v)),
+          onClearAll: () => onParodiesChanged(const <String>[]),
         ),
         SizedBox(height: gap),
         AuthorLibraryMultiSelectField(
@@ -386,6 +429,7 @@ class _AuthorsTagsFields extends ConsumerWidget {
               onAuthorsChanged(_md3eTagListWithAdded(draft.authors, v)),
           onRemove: (String v) =>
               onAuthorsChanged(_md3eTagListWithRemoved(draft.authors, v)),
+          onClearAll: () => onAuthorsChanged(const <String>[]),
         ),
         SizedBox(height: gap),
         CharacterLibraryMultiSelectField(
@@ -397,6 +441,7 @@ class _AuthorsTagsFields extends ConsumerWidget {
               onCharactersChanged(_md3eTagListWithAdded(draft.characters, v)),
           onRemove: (String v) =>
               onCharactersChanged(_md3eTagListWithRemoved(draft.characters, v)),
+          onClearAll: () => onCharactersChanged(const <String>[]),
         ),
         SizedBox(height: gap),
         TagLibraryMultiSelectField(
@@ -408,6 +453,7 @@ class _AuthorsTagsFields extends ConsumerWidget {
               onTagsChanged(_md3eTagListWithAdded(draft.tags, v)),
           onRemove: (String v) =>
               onTagsChanged(_md3eTagListWithRemoved(draft.tags, v)),
+          onClearAll: () => onTagsChanged(const <String>[]),
         ),
       ],
     );

@@ -14,6 +14,7 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
     required this.selectedNames,
     required this.onAdd,
     required this.onRemove,
+    this.onClearAll,
     required this.scope,
     this.labelTrailing,
     this.compactTrigger = false,
@@ -25,6 +26,7 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
+  final VoidCallback? onClearAll;
   final ComicMetadataSmartFacetScope scope;
   final bool compactTrigger;
 
@@ -37,6 +39,7 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
       selectedNames: selectedNames,
       onAdd: onAdd,
       onRemove: onRemove,
+      onClearAll: onClearAll,
       compactTrigger: compactTrigger,
       itemsProvider: tagsSmartForComicMetadataFormProvider(scope),
       onRetry: () =>

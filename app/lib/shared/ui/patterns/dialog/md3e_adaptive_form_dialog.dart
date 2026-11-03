@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 表单类弹窗统一入口：基于 [M3EDialog.showAdaptive]。
@@ -18,22 +20,44 @@ Future<T?> showMd3eAdaptiveFormDialog<T>(
 }) {
   final bool fullScreen = md3eWindowSizeClassOf(context)
       .usesMetadataEditFullScreenRoute;
-  // 表单内含 InkWell（设置式开关行等），需要 Material 祖先；透明 Material 不绘制任何颜色。
+  final M3EThemeData theme = M3ETheme.of(context);
+  final double contentWidth = fullScreen
+      ? basicMaxWidth
+      : Md3eMetadataEditFormMetrics.dialogContentMaxWidth(context);
+  final double contentHeight = Md3eMetadataEditFormMetrics.dialogContentMaxHeight(
+    context,
+  );
+  // 表单主体由 Md3eComicMetadataEditForm 自行分区滚动，避免对话框双层滚动与滚动条。
   final Widget material = Material(
     type: MaterialType.transparency,
-    child: form,
+    child: ScrollConfiguration(
+      behavior: Md3eMetadataEditScrollBehavior(),
+      child: SizedBox(
+        height: contentHeight,
+        width: double.infinity,
+        child: form,
+      ),
+    ),
   );
-  return M3EDialog.showAdaptive<T>(
-    context,
-    title: title,
-    content: fullScreen
-        ? material
-        : ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: basicMaxWidth),
-            child: material,
-          ),
-    confirmLabel: confirmLabel,
-    dismissLabel: dismissLabel,
-    onConfirm: onConfirm,
+  final Widget content = fullScreen
+      ? material
+      : ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: contentWidth),
+          child: material,
+        );
+  return M3ETheme(
+    data: theme.copyWith(
+      dialogTheme: theme.dialogTheme.copyWith(
+        maxWidth: Md3eMetadataEditFormMetrics.dialogShellMaxWidth(context),
+      ),
+    ),
+    child: M3EDialog.showAdaptive<T>(
+      context,
+      title: title,
+      content: content,
+      confirmLabel: confirmLabel,
+      dismissLabel: dismissLabel,
+      onConfirm: onConfirm,
+    ),
   );
 }

@@ -50,6 +50,7 @@ class _Md3eNamedFacetMultiSelectFieldPreviewState
           onRemove: (String name) {
             setState(() => _selected.remove(name));
           },
+          onClearAll: () => setState(() => _selected.clear()),
           itemsProvider: md3eNamedFacetMultiSelectPreviewProvider,
           onRetry: () =>
               ref.invalidate(md3eNamedFacetMultiSelectPreviewProvider),

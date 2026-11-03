@@ -14,6 +14,7 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
     required this.selectedNames,
     required this.onAdd,
     required this.onRemove,
+    this.onClearAll,
     required this.itemsProvider,
     required this.onRetry,
     required this.copy,
@@ -26,6 +27,7 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
+  final VoidCallback? onClearAll;
   final ProviderListenable<AsyncValue<List<SmartFacetMatchCandidate>>>
   itemsProvider;
   final VoidCallback onRetry;
@@ -40,6 +42,7 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
       selectedNames: selectedNames,
       onAdd: onAdd,
       onRemove: onRemove,
+      onClearAll: onClearAll,
       itemsProvider: itemsProvider,
       onRetry: onRetry,
       resolveName: (SmartFacetMatchCandidate item) => item.name,

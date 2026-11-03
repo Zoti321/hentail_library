@@ -79,6 +79,47 @@ void main() {
     expect(find.byIcon(Symbols.auto_awesome), findsOneWidget);
   });
 
+  testWidgets('clear all trailing button removes every chip', (
+    WidgetTester tester,
+  ) async {
+    await pumpMd3eApp(
+      tester,
+      overrides: <Override>[
+        _testItemsProvider.overrideWith(
+          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(<
+            SmartFacetMatchCandidate
+          >[
+            (name: '深海', attachmentCount: 2, smartMatched: true),
+          ]),
+        ),
+      ],
+      home: Center(
+        child: SizedBox(
+          width: 360,
+          child: _Md3eNamedFacetMultiSelectTestHarness(
+            initialSelected: const <String>['已有', '第二个'],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(Md3eNamedFacetMultiSelectField.clearAllButtonKey),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(Md3eNamedFacetMultiSelectField.clearAllButtonKey),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(Md3eNamedFacetMultiSelectField.clearAllButtonKey),
+      findsNothing,
+    );
+  });
+
   testWidgets('Enter commits free-text name', (WidgetTester tester) async {
     final List<String> selected = <String>[];
 
@@ -124,4 +165,46 @@ void main() {
 
     expect(selected, <String>['新标签']);
   });
+}
+
+class _Md3eNamedFacetMultiSelectTestHarness extends StatefulWidget {
+  const _Md3eNamedFacetMultiSelectTestHarness({
+    required this.initialSelected,
+  });
+
+  final List<String> initialSelected;
+
+  @override
+  State<_Md3eNamedFacetMultiSelectTestHarness> createState() =>
+      _Md3eNamedFacetMultiSelectTestHarnessState();
+}
+
+class _Md3eNamedFacetMultiSelectTestHarnessState
+    extends State<_Md3eNamedFacetMultiSelectTestHarness> {
+  late List<String> _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = List<String>.of(widget.initialSelected);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Md3eNamedFacetMultiSelectField<SmartFacetMatchCandidate>(
+      label: '标签',
+      selectedNames: _selected,
+      onAdd: (String name) => setState(() => _selected.add(name)),
+      onRemove: (String name) => setState(() => _selected.remove(name)),
+      onClearAll: () => setState(() => _selected.clear()),
+      itemsProvider: _testItemsProvider,
+      onRetry: () {},
+      resolveName: (SmartFacetMatchCandidate c) => c.name,
+      copy: const Md3eNamedFacetMultiSelectCopy(
+        listLoadFailed: '加载失败',
+        emptyCatalog: '目录为空',
+        emptyRemaining: '无剩余',
+      ),
+    );
+  }
 }

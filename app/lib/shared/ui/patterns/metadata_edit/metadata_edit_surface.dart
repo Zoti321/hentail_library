@@ -9,6 +9,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_actions.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 元数据编辑壳：compact / medium 用 M3E 全屏 dialog；expanded+ 用 M3EDialog basic。
@@ -59,22 +60,40 @@ class Md3eMetadataEditSurface extends StatelessWidget {
     }
 
     if (presentation == Md3eMetadataEditPresentation.modal) {
-      return M3EDialog(
-        title: title,
-        content: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: maxWidth,
-            maxHeight: MediaQuery.sizeOf(context).height * 0.55,
+      final M3EThemeData theme = M3ETheme.of(context);
+      return M3ETheme(
+        data: theme.copyWith(
+          dialogTheme: theme.dialogTheme.copyWith(
+            maxWidth: Md3eMetadataEditFormMetrics.dialogShellMaxWidth(context),
           ),
-          child: SingleChildScrollView(child: body),
         ),
-        bottomDivider: true,
-        actions: md3eMetadataEditDialogActions(
-          context,
-          onCancel: onCancel,
-          onSave: onSave,
-          saving: saving,
-          saveEnabled: saveEnabled,
+        child: M3EDialog(
+          title: title,
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: Md3eMetadataEditFormMetrics.dialogContentMaxWidth(
+                context,
+              ),
+            ),
+            child: SizedBox(
+              height: Md3eMetadataEditFormMetrics.dialogContentMaxHeight(
+                context,
+              ),
+              width: double.infinity,
+              child: ScrollConfiguration(
+                behavior: Md3eMetadataEditScrollBehavior(),
+                child: body,
+              ),
+            ),
+          ),
+          bottomDivider: true,
+          actions: md3eMetadataEditDialogActions(
+            context,
+            onCancel: onCancel,
+            onSave: onSave,
+            saving: saving,
+            saveEnabled: saveEnabled,
+          ),
         ),
       );
     }
@@ -82,7 +101,10 @@ class Md3eMetadataEditSurface extends StatelessWidget {
     if (useFullPage) {
       return M3EFullScreenDialog(
         title: title,
-        body: SingleChildScrollView(child: body),
+        body: ScrollConfiguration(
+          behavior: Md3eMetadataEditScrollBehavior(),
+          child: body,
+        ),
         confirmLabel: context.l10n.commonSave,
         onConfirm: saving || !saveEnabled ? null : onSave,
         bottomActions: <Widget>[
@@ -175,14 +197,19 @@ class _DialogCard extends StatelessWidget {
                 ),
               ),
               Flexible(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                    spacing.lg,
-                    spacing.sm,
-                    spacing.lg,
-                    spacing.lg,
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    scrollbars: false,
                   ),
-                  child: body,
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      spacing.lg,
+                      spacing.sm,
+                      spacing.lg,
+                      spacing.lg,
+                    ),
+                    child: body,
+                  ),
                 ),
               ),
               const Divider(height: 1),

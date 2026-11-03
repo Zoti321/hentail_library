@@ -38,6 +38,8 @@ class Md3eNamedFacetMultiSelectField<T> extends ConsumerStatefulWidget {
     this.maxWidth = double.infinity,
     this.resolveSmartMatched,
     this.smartMatchedTooltip,
+    this.onClearAll,
+    this.clearAllTooltip,
   });
 
   static const Key fieldSurfaceKey = Key(
@@ -48,6 +50,9 @@ class Md3eNamedFacetMultiSelectField<T> extends ConsumerStatefulWidget {
   );
   static const Key smartMatchedHintKey = Key(
     'md3e_named_facet_multi_select_smart_matched_hint',
+  );
+  static const Key clearAllButtonKey = Key(
+    'md3e_named_facet_multi_select_clear_all_button',
   );
 
   final String label;
@@ -61,6 +66,8 @@ class Md3eNamedFacetMultiSelectField<T> extends ConsumerStatefulWidget {
   final double maxWidth;
   final bool Function(T item)? resolveSmartMatched;
   final String? smartMatchedTooltip;
+  final VoidCallback? onClearAll;
+  final String? clearAllTooltip;
 
   @override
   ConsumerState<Md3eNamedFacetMultiSelectField<T>> createState() =>
@@ -71,6 +78,7 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
     extends ConsumerState<Md3eNamedFacetMultiSelectField<T>>
     with TickerProviderStateMixin {
   final LayerLink _layerLink = LayerLink();
+  final GlobalKey _fieldAnchorKey = GlobalKey();
   final TextEditingController _inputController = TextEditingController();
   late final FocusNode _inputFocusNode;
   final GlobalKey<EditableTextState> _editableKey =
@@ -88,6 +96,7 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   double _fieldWidth = 0;
   List<String> _visibleRemainingNames = const <String>[];
   bool _menuSessionActive = false;
+  bool _menuOpensAbove = false;
   late final SingleMotionController _panelExpandCtrl;
 
   SpringMotion _menuPanelSpring(M3ESpring spring) {
@@ -189,6 +198,7 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
 
   void _openMenu() {
     _menuSessionActive = true;
+    _resolveMenuOpensAbove();
     final M3EDropdownMenuTheme menuTheme = M3ETheme.of(context).dropdownMenuTheme;
     _panelExpandCtrl.motion = _menuPanelSpring(menuTheme.openSpring);
     if (_overlayEntry == null) {
@@ -220,6 +230,45 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
     }
   }
 
+  void _resolveMenuOpensAbove() {
+    final BuildContext? anchorContext = _fieldAnchorKey.currentContext;
+    if (anchorContext == null) {
+      _menuOpensAbove = false;
+      return;
+    }
+    final RenderObject? renderObject = anchorContext.findRenderObject();
+    if (renderObject is! RenderBox || !renderObject.hasSize) {
+      _menuOpensAbove = false;
+      return;
+    }
+    final RenderBox box = renderObject;
+    if (!box.attached) {
+      _menuOpensAbove = false;
+      return;
+    }
+    final Offset globalTopLeft = box.localToGlobal(Offset.zero);
+    final double screenHeight = MediaQuery.sizeOf(context).height;
+    final double spaceBelow =
+        screenHeight - globalTopLeft.dy - box.size.height;
+    final double spaceAbove = globalTopLeft.dy;
+    final M3EDropdownMenuTheme menuTheme = M3ETheme.of(context).dropdownMenuTheme;
+    final double panelMaxHeight = math.min(
+      _kMd3eNamedFacetMultiSelectMenuMaxHeight,
+      math.min(
+        menuTheme.panelMaxHeight,
+        MediaQuery.sizeOf(context).height * 0.45,
+      ),
+    );
+    _menuOpensAbove = spaceBelow < panelMaxHeight && spaceAbove > spaceBelow;
+  }
+
+  Offset _menuFollowerOffset(M3EDropdownMenuTheme menuTheme) {
+    final double gap = M3ETheme.of(context).spacing.xs;
+    final double margin = menuTheme.panelMarginTop;
+    final double magnitude = margin > 0 ? margin : gap;
+    return _menuOpensAbove ? Offset(0, -magnitude) : Offset(0, magnitude);
+  }
+
   void _removeOverlay({bool immediate = false}) {
     if (!immediate && _panelExpandCtrl.value > 0.01) {
       return;
@@ -239,7 +288,8 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
     return Opacity(
       opacity: progress.clamp(0.0, 1.0),
       child: Transform.scale(
-        alignment: Alignment.topCenter,
+        alignment:
+            _menuOpensAbove ? Alignment.bottomCenter : Alignment.topCenter,
         scaleY: clampedScale,
         child: child,
       ),
@@ -249,6 +299,9 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   OverlayEntry _buildOverlayEntry() {
     return OverlayEntry(
       builder: (BuildContext overlayContext) {
+        final M3EDropdownMenuTheme menuTheme =
+            M3ETheme.of(context).dropdownMenuTheme;
+        final Offset followerOffset = _menuFollowerOffset(menuTheme);
         return Stack(
           children: <Widget>[
             Positioned.fill(
@@ -267,9 +320,11 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
             CompositedTransformFollower(
               link: _layerLink,
               showWhenUnlinked: false,
-              targetAnchor: Alignment.bottomLeft,
-              followerAnchor: Alignment.topLeft,
-              offset: Offset(0, M3ETheme.of(context).spacing.xs),
+              targetAnchor:
+                  _menuOpensAbove ? Alignment.topLeft : Alignment.bottomLeft,
+              followerAnchor:
+                  _menuOpensAbove ? Alignment.bottomLeft : Alignment.topLeft,
+              offset: followerOffset,
               child: AnimatedBuilder(
                 animation: _panelExpandCtrl,
                 builder: (BuildContext context, Widget? _) {
@@ -464,6 +519,20 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
     _openMenu();
   }
 
+  void _clearAllSelected() {
+    if (widget.selectedNames.isEmpty) {
+      return;
+    }
+    final VoidCallback? clearAll = widget.onClearAll;
+    if (clearAll == null) {
+      return;
+    }
+    clearAll();
+    _inputController.clear();
+    _closeMenu();
+    _inputFocusNode.requestFocus();
+  }
+
   double _inlineWidth(TextStyle style) {
     if (_inputController.text.isEmpty) {
       return _kMd3eNamedFacetMultiSelectInlineMinWidth;
@@ -479,6 +548,10 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   @override
   Widget build(BuildContext context) {
     final M3EChipTheme chipTheme = M3ETheme.of(context).chipTheme;
+    final AppLocalizations l10n = context.l10n;
+    final bool hasSelectedTags = widget.selectedNames.isNotEmpty;
+    final bool showClearAll =
+        hasSelectedTags && widget.onClearAll != null;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -486,6 +559,7 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
         return CompositedTransformTarget(
+          key: _fieldAnchorKey,
           link: _layerLink,
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: widget.maxWidth),
@@ -517,63 +591,92 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
                       final double textTopInset = alignWithChips
                           ? (chipTheme.height - inputLine) / 2
                           : 0;
+                      final double clearTrailingInset = showClearAll
+                          ? fieldTheme.iconSlotWidth +
+                                fieldTheme.iconSlotTextPadding
+                          : 0;
 
-                      return GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: _focusInput,
-                        child: Wrap(
-                          spacing: _kMd3eNamedFacetMultiSelectChipGap,
-                          runSpacing: _kMd3eNamedFacetMultiSelectChipGap,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: <Widget>[
-                            for (final String name in widget.selectedNames)
-                              M3EChip(
-                                label: name,
-                                type: M3EChipType.input,
-                                onPressed: _focusInput,
-                                onDeleted: () => widget.onRemove(name),
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: <Widget>[
+                          GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: _focusInput,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: clearTrailingInset),
+                              child: Wrap(
+                                spacing: _kMd3eNamedFacetMultiSelectChipGap,
+                                runSpacing: _kMd3eNamedFacetMultiSelectChipGap,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: <Widget>[
+                                  for (final String name in widget.selectedNames)
+                                    M3EChip(
+                                      label: name,
+                                      type: M3EChipType.input,
+                                      onPressed: _focusInput,
+                                      onDeleted: () => widget.onRemove(name),
+                                    ),
+                                  SizedBox(
+                                    width: inlineWidth,
+                                    height: slotHeight,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(top: textTopInset),
+                                      child: CallbackShortcuts(
+                                        bindings: M3EFocus.editableInputShortcuts(
+                                          _inputFocusNode,
+                                        ),
+                                        child: EditableText(
+                                          key: _editableKey,
+                                          controller: _inputController,
+                                          focusNode: _inputFocusNode,
+                                          style: inputStyle,
+                                          cursorColor: colors.caret,
+                                          backgroundCursorColor: M3ETheme.of(
+                                            context,
+                                          ).colorScheme.outlineVariant,
+                                          selectionColor: M3ETheme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withValues(
+                                                alpha: fieldTheme.selectionOpacity,
+                                              ),
+                                          textCapitalization:
+                                              TextCapitalization.none,
+                                          textInputAction: TextInputAction.done,
+                                          onSubmitted: (_) => _submitInput(),
+                                          maxLines: 1,
+                                          scrollPadding: EdgeInsets.zero,
+                                          rendererIgnoresPointer: true,
+                                          selectionControls:
+                                              m3eTextFieldSelectionControls(
+                                                defaultTargetPlatform,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            SizedBox(
-                              width: inlineWidth,
-                              height: slotHeight,
-                              child: Padding(
-                                padding: EdgeInsets.only(top: textTopInset),
-                                child: CallbackShortcuts(
-                                  bindings: M3EFocus.editableInputShortcuts(
-                                    _inputFocusNode,
-                                  ),
-                                  child: EditableText(
-                                    key: _editableKey,
-                                    controller: _inputController,
-                                    focusNode: _inputFocusNode,
-                                    style: inputStyle,
-                                    cursorColor: colors.caret,
-                                    backgroundCursorColor: M3ETheme.of(context)
-                                        .colorScheme
-                                        .outlineVariant,
-                                    selectionColor: M3ETheme.of(context)
-                                        .colorScheme
-                                        .primary
-                                        .withValues(
-                                          alpha: fieldTheme.selectionOpacity,
-                                        ),
-                                    textCapitalization:
-                                        TextCapitalization.none,
-                                    textInputAction: TextInputAction.done,
-                                    onSubmitted: (_) => _submitInput(),
-                                    maxLines: 1,
-                                    scrollPadding: EdgeInsets.zero,
-                                    rendererIgnoresPointer: true,
-                                    selectionControls:
-                                        m3eTextFieldSelectionControls(
-                                          defaultTargetPlatform,
-                                        ),
-                                  ),
+                            ),
+                          ),
+                          if (showClearAll)
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: M3ETooltip(
+                                message:
+                                    widget.clearAllTooltip ?? l10n.commonClear,
+                                child: M3EIconButton(
+                                  key: Md3eNamedFacetMultiSelectField
+                                      .clearAllButtonKey,
+                                  icon: const Icon(Symbols.close),
+                                  onPressed: _clearAllSelected,
+                                  variant: M3EIconButtonVariant.standard,
+                                  size: M3EIconButtonSize.sm,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                        ],
                       );
                     },
               ),
