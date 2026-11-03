@@ -8,5 +8,7 @@ void main() {
     expect(ResourceFormatCategory, isNotNull);
     expect(createCurrentLibraryPort, isNotNull);
     expect(createLibraryScanCommandPort, isNotNull);
+    expect(buildLibraryAdminMd3eAppShellNavigationSlot, isNotNull);
+    expect(libraryAdminShellFeedbackBelowTitleBar, isNotNull);
   });
 }

@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/di/library_management_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
-import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/read_session/public.dart';
-import 'package:hentai_library/shared/domain/models/models.dart'
-    show AppSetting;
-import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/features/home/public/home_cross_feature_types.dart';
-import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
-import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:hentai_library/shared/di/app_shell_providers.dart';
 import 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart';
-import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart'
     show
@@ -42,6 +30,12 @@ class ApplicationShell extends ConsumerWidget {
       ),
     );
     final bool readerFullscreen = ref.watch(readerFullscreenControllerProvider);
+    final AppShellFeedbackBelowTitleBarFactory feedbackFactory = ref.watch(
+      appShellFeedbackBelowTitleBarFactoryProvider,
+    );
+    final Md3eAppShellNavigationSlotAssembly navigationAssembly = ref.watch(
+      md3eAppShellNavigationSlotAssemblyProvider,
+    );
 
     return ResponsiveAppShell(
       routeChild: routeChild,
@@ -52,59 +46,9 @@ class ApplicationShell extends ConsumerWidget {
             .setDesktopSidebarExpanded(!isSidebarExpandedPref);
       },
       isReaderFullscreen: readerFullscreen,
-      shellFeedbackBelowTitleBar: const <Widget>[
-        DiagnosticModeBanner(),
-        LibraryScanShellFeedback(),
-        ComicMetadataBulkPatchShellFeedback(),
-      ],
+      shellFeedbackBelowTitleBar: feedbackFactory(),
       md3eNavigationSlotBuilder: (BuildContext ctx) =>
-          _buildMd3eNavigationSlot(context: ctx, ref: ref),
+          navigationAssembly(ctx, ref),
     );
   }
-}
-
-Md3eAppShellNavigationSlot _buildMd3eNavigationSlot({
-  required BuildContext context,
-  required WidgetRef ref,
-}) {
-  final String path = GoRouterState.of(context).uri.path;
-  final List<LocalLibrary> libraries = ref
-      .watch(currentLibraryStateProvider)
-      .maybeWhen(
-        data: (state) => state.libraries,
-        orElse: () => const <LocalLibrary>[],
-      );
-  final String? currentLibraryId = ref
-      .watch(currentLibraryStateProvider)
-      .maybeWhen(data: (state) => state.currentId, orElse: () => null);
-  final List<HomeLibraryStat> stats = ref
-      .watch(homeLibraryStatsStreamProvider)
-      .maybeWhen(
-        data: (List<HomeLibraryStat> data) => data,
-        orElse: () => const <HomeLibraryStat>[],
-      );
-  final List<Md3eHomeLibraryDashboardRow> libraryRows =
-      md3eDashboardRowsForLibraries(libraries: libraries, stats: stats);
-  final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-
-  return (
-    railDestinations: productionMd3eShellRailDestinations(context.l10n),
-    libraries: libraryRows,
-    selectedNavId: productionMd3eSelectedNavId(
-      path: path,
-      currentLibraryId: currentLibraryId,
-    ),
-    selectedLibraryId: productionMd3eSelectedLibraryId(
-      path: path,
-      currentLibraryId: currentLibraryId,
-      libraries: libraryRows,
-    ),
-    onNavIdSelected: (String navId) {
-      AppNavigation.goToNavId(context, navId, ref: ref);
-    },
-    onLibrarySelected: (String libraryId) {
-      ref.read(libraryManagementPortProvider).openLibrary(context, libraryId);
-    },
-    surfaceRoles: Md3eDesktopShellSurfaceRoles.toneBased(scheme),
-  );
 }
