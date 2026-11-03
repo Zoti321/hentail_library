@@ -69,7 +69,7 @@ _Avoid_: 云库、网盘库、在线书架（无官方云账号语义）
 _Avoid_: 扫描路径、挂载点；Saved path（旧称，仅指 Local 根）
 
 **Saved path**:
-Local library 的 Library root 之旧称。UI 与 FRB 的 Path 面已按 ADR-0014 退役（`/paths` 现重定向至 Home，`PathRepository` 与 Rust `path` 模块已删除）；仅 `saved_paths` 表与迁移代码保留该名。新表述一律用 Library root / Local library。用户侧创建与管理 Library 仅经 Library form 与侧栏入口。
+Local library 的 Library root 之旧称。UI 与 FRB 的 Path 面已按 ADR-0014 退役（`/paths` 现重定向至 Home，`PathRepository` 与 Rust `path` 模块已删除）；仅 `saved_paths` 表与迁移代码保留该名。新表述一律用 Library root / Local library。用户侧创建与管理 Library 仅经 Library form 与 **Home「我的漫画库」**（及 shell 库 flyout 建库快捷方式）。
 _Avoid_: 在新设计中把 Saved path 扩成远程 URI；选中路径页、Selected Paths、路径管理页
 
 **Comic**:
@@ -135,11 +135,11 @@ _Avoid_: 自动扫描（易与全局旧设置或间隔扫混淆）、autoScan（
 _Avoid_: 自动扫描间隔（口语可用）、cron、全局扫描周期
 
 **Pinned library**:
-用户选择在侧栏 Libraries 分区直接列出的 Library；Library 列表的全局顺序中 Pinned 一组排在 Unpinned 之前。新建 Library 默认为 Pinned，并排在已固定组末尾。详见 ADR-0009。
+Pinned 组在 **Home 库列表**与 shell 库 flyout 中排在 Unpinned 之前；新建 Library 默认为 Pinned，并排在已固定组末尾。详见 ADR-0009。
 _Avoid_: 置顶库、收藏库、固定库（易与 sticky header 的 pinned 混淆）；文档用 Pinned library，UI 文案可用「已固定」
 
 **Unpinned library**:
-用户选择不在侧栏直接列出的 Library；平时藏在「更多」展开后渲染，未固定组为空时不显示「更多」。排序模式里出现在「未固定」段。
+`pinned = false` 的 Library；在 Home 库列表中位于已固定组之后（无 legacy 侧栏「更多」折叠）。拖拽排序时仍可跨组改变 Pinned/Unpinned。
 _Avoid_: 隐藏库、折叠库、次要库
 
 **Library sidebar order**:
@@ -147,7 +147,7 @@ Pinned 组内与 Unpinned 组内各自的用户顺序；与 Series 成员的 `or
 _Avoid_: 库排序（太泛）、sortOrder（Series 用语）
 
 **Library reorder mode**:
-侧栏的短暂状态：整栏换成「重新排序」顶栏与已固定/未固定两段，靠跨段拖拽同时改 Pinned/Unpinned 与 Library sidebar order；退出后恢复普通侧栏。不是 Library 上的持久字段。
+历史侧栏「重新排序」全栏模式的领域名；**生产 UI 已退役**（2026-11-03）。Home 库列表支持长按拖拽排序（无需单独模式）。`LibraryReorderModePort` 仍供 browse 多选与排序态互斥（`exit()`）。
 _Avoid_: 编辑模式、排序页、固定开关（pin 只能在此模式用拖拽改，没有单独菜单项）
 
 ### Organization & metadata
@@ -277,7 +277,7 @@ _Avoid_: 批量编辑（口语可用）、批量刷新、批量表单
 _Avoid_: 系列表单、SeriesForm、编辑系列 DTO
 
 **Library form**:
-创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 Local root 时保留 `libraryId`；若新根可读则按相对路径做 Path migration（含 Series），否则只写新根、不立刻迁移。不自动触发 Library sync。无变化则不写库。用户侧新建 Local / Remote library 均经此草稿（及侧栏入口），不以裸选目录或路径页捷径代替。详见 ADR-0014。
+创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 Local root 时保留 `libraryId`；若新根可读则按相对路径做 Path migration（含 Series），否则只写新根、不立刻迁移。不自动触发 Library sync。无变化则不写库。用户侧新建 Local / Remote library 均经此草稿（及 **Home / flyout 入口**），不以裸选目录或路径页捷径代替。详见 ADR-0014。
 _Avoid_: 库表单、LibraryForm DTO、Library settings form（旧称）、编辑库元数据；选中路径页作为建库入口
 
 **Metadata field lock**:
@@ -285,7 +285,7 @@ Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Libr
 _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
 
 **Metadata refresh**:
-从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」），作用对象可为单个 Comic、单个 Series，或指定 Library（侧栏该库的 `libraryId`，可非 Current library，且不切换 Current）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图。Library：对该库全部 Comic 执行 Comic 刷新，并对该库 Series 在 `name` 未锁定时用文件夹名覆盖（其余 Series 字段规则同 Series 级）。部分成员失败则跳过并汇总；可取消（已写回保留、不回滚）。Remote library 根不可达时跳过该库且不改已有数据。与 Library sync 共用 core 库级写锁（全局单飞，占用则立即失败不排队）；互斥不在 Flutter 编排层重复实现。UI 不展示实时进度，仅 busy 态与结束汇总。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync（不 orphan 删除、不重建成员排序、不再生缩略图）。
+从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」），作用对象可为单个 Comic、单个 Series，或指定 Library（**Home 库列表行内**对该库 `libraryId`，可非 Current library，且不切换 Current）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图。Library：对该库全部 Comic 执行 Comic 刷新，并对该库 Series 在 `name` 未锁定时用文件夹名覆盖（其余 Series 字段规则同 Series 级）。部分成员失败则跳过并汇总；可取消（已写回保留、不回滚）。Remote library 根不可达时跳过该库且不改已有数据。与 Library sync 共用 core 库级写锁（全局单飞，占用则立即失败不排队）；互斥不在 Flutter 编排层重复实现。UI 不展示实时进度，仅 busy 态与结束汇总。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync（不 orphan 删除、不重建成员排序、不再生缩略图）。
 _Avoid_: 刷新、重新扫描、同步（易与 UI catalog refresh / Library sync 混淆）
 
 **Metadata backup**:

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,7 +14,6 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/se
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
@@ -21,8 +21,9 @@ import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 
+/// MD3E shell：库 flyout / compact sheet 选库导航（非 legacy Libraries 侧栏分区）。
 void main() {
-  testWidgets('tapping library row selects current library and opens browse', (
+  testWidgets('library flyout selects current library and opens browse', (
     WidgetTester tester,
   ) async {
     final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
@@ -32,32 +33,16 @@ void main() {
     late GoRouter router;
     await _pumpLibrariesShell(tester, fake, (GoRouter r) => router = r);
 
-    expect(find.text('Alpha'), findsOneWidget);
-    expect(find.text('Beta'), findsOneWidget);
+    await _openLibraryFlyout(tester);
 
-    await tester.tap(find.text('Beta'));
+    expect(find.text('Alpha'), findsWidgets);
+    expect(find.text('Beta'), findsWidgets);
+
+    await tester.tap(find.text('Beta').last);
     await tester.pumpAndSettle();
 
     expect(fake.selectedIds, <String>['b']);
     expect(router.state.uri.path, '/libraries/b');
-  });
-
-  testWidgets('tapping libraries section opens all-libraries placeholder', (
-    WidgetTester tester,
-  ) async {
-    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
-      libraries: <LocalLibrary>[_lib('a', 'Alpha')],
-      currentId: 'a',
-    );
-    late GoRouter router;
-    await _pumpLibrariesShell(tester, fake, (GoRouter r) => router = r);
-
-    await tester.tap(find.text('漫画库').first);
-    await tester.pumpAndSettle();
-
-    expect(router.state.uri.path, LibrariesRoutes.all);
-    expect(find.byType(AllLibrariesBrowsePage), findsOneWidget);
-    expect(find.textContaining('后续实现'), findsOneWidget);
   });
 
   testWidgets('/local redirects to current library browse', (
@@ -78,61 +63,33 @@ void main() {
     expect(router.state.uri.path, '/libraries/a');
   });
 
-  testWidgets(
-    'collapsed rail popup shows create actions then libraries and switches',
-    (WidgetTester tester) async {
-      final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
-        libraries: <LocalLibrary>[_lib('a', 'Alpha'), _lib('b', 'Beta')],
-        currentId: 'a',
-      );
-      late GoRouter router;
-      await _pumpLibrariesShell(
-        tester,
-        fake,
-        (GoRouter r) => router = r,
-        viewportSize: const Size(900, 900),
-        setting: AppSetting(desktopSidebarExpanded: false),
-      );
+  testWidgets('collapsed rail flyout lists libraries for browse switch', (
+    WidgetTester tester,
+  ) async {
+    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+      libraries: <LocalLibrary>[_lib('a', 'Alpha'), _lib('b', 'Beta')],
+      currentId: 'a',
+    );
+    late GoRouter router;
+    await _pumpLibrariesShell(
+      tester,
+      fake,
+      (GoRouter r) => router = r,
+      viewportSize: const Size(900, 900),
+      setting: AppSetting(desktopSidebarExpanded: false),
+    );
 
-      await tester.tap(_librariesRailIcon());
-      await tester.pumpAndSettle();
+    await _openLibraryFlyout(tester);
 
-      expect(find.text('添加本地库'), findsOneWidget);
-      expect(find.text('添加远程库'), findsOneWidget);
-      expect(find.text('Alpha'), findsWidgets);
-      expect(find.text('Beta'), findsWidgets);
+    expect(find.text('Alpha'), findsWidgets);
+    expect(find.text('Beta'), findsWidgets);
 
-      await tester.tap(find.text('Beta').last);
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Beta').last);
+    await tester.pumpAndSettle();
 
-      expect(fake.selectedIds, <String>['b']);
-      expect(router.state.uri.path, '/libraries/b');
-    },
-  );
-
-  testWidgets(
-    'collapsed rail popup with no libraries shows only create actions',
-    (WidgetTester tester) async {
-      final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
-        libraries: const <LocalLibrary>[],
-        currentId: null,
-      );
-      await _pumpLibrariesShell(
-        tester,
-        fake,
-        (_) {},
-        viewportSize: const Size(900, 900),
-        setting: AppSetting(desktopSidebarExpanded: false),
-      );
-
-      await tester.tap(_librariesRailIcon());
-      await tester.pumpAndSettle();
-
-      expect(find.text('添加本地库'), findsOneWidget);
-      expect(find.text('添加远程库'), findsOneWidget);
-      expect(find.text('Alpha'), findsNothing);
-    },
-  );
+    expect(fake.selectedIds, <String>['b']);
+    expect(router.state.uri.path, '/libraries/b');
+  });
 
   testWidgets('compact modal navigation closes after picking a library', (
     WidgetTester tester,
@@ -163,113 +120,26 @@ void main() {
     expect(router.state.uri.path, '/libraries/b');
     expect(find.byType(Md3eNavigationRail), findsNothing);
   });
-
-  testWidgets('unpinned libraries stay behind 更多 until expanded', (
-    WidgetTester tester,
-  ) async {
-    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
-      libraries: <LocalLibrary>[
-        _lib('a', 'Alpha'),
-        _lib('b', 'Beta', pinned: false),
-      ],
-      currentId: 'a',
-    );
-    await _pumpLibrariesShell(tester, fake, (_) {});
-
-    expect(find.text('Alpha'), findsOneWidget);
-    expect(find.text('Beta'), findsNothing);
-    expect(find.text('更多'), findsOneWidget);
-
-    await tester.tap(find.text('更多'));
-    await tester.pump();
-
-    expect(find.text('Beta'), findsOneWidget);
-  });
-
-  testWidgets('更多 is hidden when every library is pinned', (
-    WidgetTester tester,
-  ) async {
-    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
-      libraries: <LocalLibrary>[_lib('a', 'Alpha'), _lib('b', 'Beta')],
-      currentId: 'a',
-    );
-    await _pumpLibrariesShell(tester, fake, (_) {});
-
-    expect(find.text('更多'), findsNothing);
-    expect(find.text('Alpha'), findsOneWidget);
-    expect(find.text('Beta'), findsOneWidget);
-  });
-
-  testWidgets('expanded unpinned libraries indent text under 更多', (
-    WidgetTester tester,
-  ) async {
-    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
-      libraries: <LocalLibrary>[
-        _lib('a', 'Alpha'),
-        _lib('b', 'Beta', pinned: false),
-      ],
-      currentId: 'a',
-    );
-    await _pumpLibrariesShell(tester, fake, (_) {});
-
-    await tester.tap(find.text('更多'));
-    await tester.pump();
-
-    final double alphaLeft = tester.getTopLeft(find.text('Alpha')).dx;
-    final double betaLeft = tester.getTopLeft(find.text('Beta')).dx;
-    expect(betaLeft - alphaLeft, 8);
-  });
-
-  testWidgets('更多 chevron aligns with unpinned library overflow actions', (
-    WidgetTester tester,
-  ) async {
-    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
-      libraries: <LocalLibrary>[
-        _lib('a', 'Alpha'),
-        _lib('b', 'Beta', pinned: false),
-      ],
-      currentId: 'a',
-    );
-    await _pumpLibrariesShell(tester, fake, (_) {});
-
-    await tester.tap(find.text('更多'));
-    await tester.pump();
-
-    final Finder moreRow = find
-        .ancestor(of: find.text('更多'), matching: find.byType(GestureDetector))
-        .first;
-    final Finder betaRow = find
-        .ancestor(of: find.text('Beta'), matching: find.byType(GestureDetector))
-        .first;
-
-    final RenderBox moreChevron = tester.renderObject<RenderBox>(
-      find.descendant(
-        of: moreRow,
-        matching: find.byIcon(LucideIcons.chevronDown),
-      ),
-    );
-    final RenderBox betaOverflow = tester.renderObject<RenderBox>(
-      find.descendant(
-        of: betaRow,
-        matching: find.byIcon(LucideIcons.ellipsisVertical),
-      ),
-    );
-
-    expect(
-      moreChevron.localToGlobal(Offset.zero).dx + moreChevron.size.width / 2,
-      closeTo(
-        betaOverflow.localToGlobal(Offset.zero).dx +
-            betaOverflow.size.width / 2,
-        0.5,
-      ),
-    );
-  });
 }
 
 Finder _librariesRailIcon() {
   return find.byWidgetPredicate(
     (Widget widget) => widget is Icon && widget.icon == LucideIcons.library,
   );
+}
+
+Future<void> _openLibraryFlyout(WidgetTester tester) async {
+  final Finder libraryLabel = find.text('漫画库');
+  final Finder target = libraryLabel.evaluate().isNotEmpty
+      ? libraryLabel.first
+      : _librariesRailIcon().first;
+  final Offset location = tester.getCenter(target);
+  final TestGesture gesture = await tester.createGesture(
+    kind: PointerDeviceKind.mouse,
+  );
+  await gesture.moveTo(location);
+  await tester.pump(const Duration(milliseconds: 400));
+  await tester.pumpAndSettle();
 }
 
 LocalLibrary _lib(
@@ -328,7 +198,7 @@ Future<void> _pumpLibrariesShell(
               GoRoute(
                 path: LibrariesRoutes.allSegment,
                 builder: (BuildContext context, GoRouterState state) =>
-                    const AllLibrariesBrowsePage(),
+                    const Scaffold(body: Text('all-libraries')),
               ),
               GoRoute(
                 path: ':libraryId',

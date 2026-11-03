@@ -31,8 +31,7 @@ abstract final class AppNavigation {
     (id: navIdSettings, label: l10n.navSettings, icon: LucideIcons.settings),
   ];
 
-  /// 与 [DesktopSidebar] 扁平菜单 id 对应；Libraries 分区用
-  /// [librariesSidebarSelection]，不经此函数。
+  /// 与 MD3E rail 导航 id 对应；库 flyout 选库不经此函数。
   static String activeNavIdForPath(String path) {
     if (LibrariesRoutes.isAllLibrariesPath(path) ||
         LibrariesRoutes.libraryIdFromPath(path) != null) {
