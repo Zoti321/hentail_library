@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/adapters/comic_trash_reader_session_adapter.dart';
-import 'package:hentai_library/features/read_session/data/adapters/comic_page_source_frb_adapter.dart';
-import 'package:hentai_library/features/read_session/data/adapters/reader_session_frb_adapter.dart';
+import 'package:hentai_library/features/read_session/public.dart';
 import 'package:hentai_library/features/library_admin/data/adapters/library_revision_frb_adapter.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
@@ -63,18 +62,12 @@ List<Override> dataProviderOverrides() => <Override>[
     (Ref ref) => createAppSettingRepository(),
   ),
   homePageRepoProvider.overrideWith((Ref ref) => createHomePageRepository()),
-  readerSessionPortProvider.overrideWith(
-    (Ref ref) => ReaderSessionFrbAdapter(
-      remoteCredentials: ref.read(remoteLibraryCredentialsPortProvider),
-    ),
-  ),
+  readerSessionPortProvider.overrideWith(createReaderSessionPort),
   comicTrashReaderSessionPortProvider.overrideWith(
     (Ref ref) =>
         ComicTrashReaderSessionAdapter(ref.read(readerSessionPortProvider)),
   ),
-  comicPageSourcePortProvider.overrideWith(
-    (Ref ref) => const ComicPageSourceFrbAdapter(),
-  ),
+  comicPageSourcePortProvider.overrideWith(createComicPageSourcePort),
   libraryRevisionPortProvider.overrideWith(
     (Ref ref) => const LibraryRevisionFrbAdapter(),
   ),

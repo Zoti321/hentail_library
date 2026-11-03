@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/responsive_app_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:hentai_library/features/read_session/public.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';

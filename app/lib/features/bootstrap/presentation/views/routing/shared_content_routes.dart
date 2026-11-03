@@ -5,8 +5,8 @@ import 'package:hentai_library/features/library_browse/presentation/author/views
 import 'package:hentai_library/features/library_browse/presentation/comic/views/comic_detail_md3e/comic_detail_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/series/views/series_detail_md3e/series_detail_md3e_page.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
-import 'package:hentai_library/features/read_session/presentation/reader.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/routing/reader_route_args.dart';
+import 'package:hentai_library/features/read_session/public/presentation/reader_route_args.dart';
+import 'package:hentai_library/features/read_session/public/ui/reader_md3e_page.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_not_found_page.dart';
 
 typedef ComicDetailBuilder = Widget Function(
