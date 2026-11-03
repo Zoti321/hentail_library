@@ -1,13 +1,11 @@
 import 'package:hentai_library/features/library_browse/public/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
-import 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
 import 'package:hentai_library/core/util/stream_throttle.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/domain/home_page_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 
 part 'home_page_dashboard_notifier.g.dart';
 
@@ -38,78 +36,16 @@ Stream<HomePageCounts> homePageCountsStream(Ref ref) {
 Stream<List<HomeLibraryAlert>> homeLibraryAlertsStream(Ref ref) {
   final HomePageRepository repository = ref.watch(homePageRepoProvider);
   ref.watch(libraryRevisionThrottleBusyStateProvider);
-  ref.watch(homeProbeResultsProvider);
   final AsyncValue<Map<String, HomeAlertDismissEntry>> dismissedAsync = ref
       .watch(homeAlertDismissStoreProvider);
-  final Map<String, LibraryProbeResult> probeResults = ref.watch(
-    homeProbeResultsProvider,
-  );
-  final Map<String, String> libraryDisplayNames = ref
-      .watch(currentLibraryStateProvider)
-      .maybeWhen(
-        data: (CurrentLibraryState state) => Map<String, String>.fromEntries(
-          state.libraries.map(
-            (lib) => MapEntry<String, String>(lib.libraryId, lib.name),
-          ),
-        ),
-        orElse: () => const <String, String>{},
-      );
   return throttleWhile(
     repository.watchHomeLibraryAlerts().map((List<HomeLibraryAlert> alerts) {
-      final List<HomeLibraryAlert> merged = _mergeProbeAlerts(
-        alerts,
-        probeResults,
-        libraryDisplayNames,
-      );
       final Map<String, HomeAlertDismissEntry> dismissed =
           dismissedAsync.asData?.value ??
           const <String, HomeAlertDismissEntry>{};
-      return filterDismissedHomeAlerts(alerts: merged, dismissed: dismissed);
+      return filterDismissedHomeAlerts(alerts: alerts, dismissed: dismissed);
     }),
     shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
     interval: _kHomeScanThrottleInterval,
   );
-}
-
-List<HomeLibraryAlert> _mergeProbeAlerts(
-  List<HomeLibraryAlert> base,
-  Map<String, LibraryProbeResult> probeResults,
-  Map<String, String> libraryDisplayNames,
-) {
-  if (probeResults.isEmpty) {
-    return base;
-  }
-  final List<HomeLibraryAlert> merged = List<HomeLibraryAlert>.from(base);
-  for (final LibraryProbeResult result in probeResults.values) {
-    if (result.baselineMissing || result.unreachable) {
-      continue;
-    }
-    final int pending = result.pendingCount;
-    if (pending <= 0) {
-      merged.removeWhere(
-        (HomeLibraryAlert alert) =>
-            alert.libraryId == result.libraryId &&
-            alert.kind == HomeLibraryAlertKind.pendingResourcesDetected,
-      );
-      continue;
-    }
-    final int existingIndex = merged.indexWhere(
-      (HomeLibraryAlert alert) => alert.libraryId == result.libraryId,
-    );
-    final HomeLibraryAlert pendingAlert = HomeLibraryAlert(
-      libraryId: result.libraryId,
-      displayName: existingIndex >= 0
-          ? merged[existingIndex].displayName
-          : libraryDisplayNames[result.libraryId] ?? result.libraryId,
-      kind: HomeLibraryAlertKind.pendingResourcesDetected,
-      pendingResourceCount: pending,
-    );
-    merged.removeWhere(
-      (HomeLibraryAlert alert) =>
-          alert.libraryId == result.libraryId &&
-          alert.kind == HomeLibraryAlertKind.pendingResourcesDetected,
-    );
-    merged.add(pendingAlert);
-  }
-  return merged;
 }

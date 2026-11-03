@@ -20,10 +20,9 @@ enum HomeLibraryAlertKind {
   remoteUnreachable,
   syncFailed,
   staleSync,
-  pendingResourcesDetected,
 }
 
-/// Home library alert（sync 态 + probe 合并后）。
+/// Home library alert（sync 健康摘要）。
 class HomeLibraryAlert {
   const HomeLibraryAlert({
     required this.libraryId,
@@ -32,7 +31,6 @@ class HomeLibraryAlert {
     this.lastSuccessAt,
     this.lastErrorMessage,
     this.staleDays,
-    this.pendingResourceCount,
   });
 
   final String libraryId;
@@ -41,41 +39,11 @@ class HomeLibraryAlert {
   final DateTime? lastSuccessAt;
   final String? lastErrorMessage;
   final int? staleDays;
-  final int? pendingResourceCount;
 
   String dismissKey() => '$libraryId:${kind.name}';
 
   /// Fingerprint of alert payload; dismiss is ignored when this changes.
   String dismissFingerprint() {
-    return switch (kind) {
-      HomeLibraryAlertKind.pendingResourcesDetected =>
-        'probe:${pendingResourceCount ?? 0}',
-      _ =>
-        'sync:${lastSuccessAt?.millisecondsSinceEpoch ?? 0}:${lastErrorMessage ?? ''}',
-    };
+    return 'sync:${lastSuccessAt?.millisecondsSinceEpoch ?? 0}:${lastErrorMessage ?? ''}';
   }
-}
-
-class LibraryProbeResult {
-  const LibraryProbeResult({
-    required this.libraryId,
-    required this.addedCount,
-    required this.changedCount,
-    required this.removedCount,
-    required this.unreachable,
-    this.errorMessage,
-    required this.probedAt,
-    required this.baselineMissing,
-  });
-
-  final String libraryId;
-  final int addedCount;
-  final int changedCount;
-  final int removedCount;
-  final bool unreachable;
-  final String? errorMessage;
-  final DateTime probedAt;
-  final bool baselineMissing;
-
-  int get pendingCount => addedCount + changedCount;
 }

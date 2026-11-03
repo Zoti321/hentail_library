@@ -668,12 +668,6 @@ abstract class AppLocalizations {
   /// **'{libraryName} 距上次同步已 {days} 天，建议同步'**
   String homeAlertStaleSync(String libraryName, int days);
 
-  /// No description provided for @homeAlertPendingResources.
-  ///
-  /// In zh, this message translates to:
-  /// **'{libraryName} 发现 {count} 个新/变更 Resource，建议同步'**
-  String homeAlertPendingResources(String libraryName, int count);
-
   /// No description provided for @homeStatSeries.
   ///
   /// In zh, this message translates to:

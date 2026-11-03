@@ -323,11 +323,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String homeAlertPendingResources(String libraryName, int count) {
-    return '$libraryName: $count new/changed Resources detected — sync recommended';
-  }
-
-  @override
   String get homeStatSeries => 'Series';
 
   @override

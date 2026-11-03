@@ -11,9 +11,16 @@ use crate::error::HentaiError;
 use crate::library::LibraryDto;
 use crate::resource::read_source_stat_with;
 use crate::resource::{local_access, ResourceAccess};
+use crate::sync::remote::normalize_remote_location_key;
 use crate::sync::scanner::ScanItem;
 
-use super::scan_item_location_key;
+fn scan_item_location_key(library: &LibraryDto, item: &ScanItem) -> String {
+    if library.kind == "remote" {
+        normalize_remote_location_key(&item.path)
+    } else {
+        crate::comic_id::normalize_path_for_key(&item.path)
+    }
+}
 
 pub async fn load_snapshot_map(
     db: &DatabaseConnection,

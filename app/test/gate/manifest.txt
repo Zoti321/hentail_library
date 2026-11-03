@@ -65,7 +65,6 @@ test/features/library_admin/presentation/view_models/current_library_notifier_co
 test/features/reading_history/presentation/view_models/history_load_more_throttle_test.dart
 test/features/reading_history/presentation/view_models/history_paged_feed_controller_test.dart
 test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dart
-test/features/home/presentation/view_models/home_probe_coordinator_notifier_test.dart
 test/shared/ui/layout/md3e_page_layout_spec_test.dart
 test/shared/ui/layout/md3e_page_viewport_test.dart
 test/features/reading_history/presentation/views/history_page_test.dart

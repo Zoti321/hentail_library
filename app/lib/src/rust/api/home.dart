@@ -74,7 +74,6 @@ class HomeLibraryAlertDto {
   final PlatformInt64? lastSuccessAtMs;
   final String? lastErrorMessage;
   final int? staleDays;
-  final int? pendingResourceCount;
 
   const HomeLibraryAlertDto({
     required this.libraryId,
@@ -83,7 +82,6 @@ class HomeLibraryAlertDto {
     this.lastSuccessAtMs,
     this.lastErrorMessage,
     this.staleDays,
-    this.pendingResourceCount,
   });
 
   @override
@@ -93,8 +91,7 @@ class HomeLibraryAlertDto {
       kind.hashCode ^
       lastSuccessAtMs.hashCode ^
       lastErrorMessage.hashCode ^
-      staleDays.hashCode ^
-      pendingResourceCount.hashCode;
+      staleDays.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -106,16 +103,10 @@ class HomeLibraryAlertDto {
           kind == other.kind &&
           lastSuccessAtMs == other.lastSuccessAtMs &&
           lastErrorMessage == other.lastErrorMessage &&
-          staleDays == other.staleDays &&
-          pendingResourceCount == other.pendingResourceCount;
+          staleDays == other.staleDays;
 }
 
-enum HomeLibraryAlertKindDto {
-  remoteUnreachable,
-  syncFailed,
-  staleSync,
-  pendingResourcesDetected,
-}
+enum HomeLibraryAlertKindDto { remoteUnreachable, syncFailed, staleSync }
 
 class HomePageCountsDto {
   final int comicCount;

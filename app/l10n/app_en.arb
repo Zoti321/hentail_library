@@ -137,13 +137,6 @@
       "days": { "type": "int" }
     }
   },
-  "homeAlertPendingResources": "{libraryName}: {count} new/changed Resources detected — sync recommended",
-  "@homeAlertPendingResources": {
-    "placeholders": {
-      "libraryName": { "type": "String" },
-      "count": { "type": "int" }
-    }
-  },
   "homeStatSeries": "Series",
   "homeStatTags": "Tags",
   "homeStatAuthors": "Authors",

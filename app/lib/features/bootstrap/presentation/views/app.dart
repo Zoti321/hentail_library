@@ -13,7 +13,6 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
-import 'package:hentai_library/features/home/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -39,7 +38,6 @@ class _AppRootState extends ConsumerState<_AppRoot> {
   @override
   Widget build(BuildContext context) {
     ref.watch(appStartupCoordinatorProvider);
-    ref.watch(homeProbeCoordinatorProvider);
     ref.watch(metadataAutoBackupCoordinatorProvider);
     ref.watch(appUpdateCoordinatorProvider);
 

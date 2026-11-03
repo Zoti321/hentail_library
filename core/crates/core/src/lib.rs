@@ -95,7 +95,7 @@ pub use named_facet::{
     PagedStringNamesDto,
 };
 pub use parody::{list_all_parodies, list_distinct_parodies};
-pub use probe::{probe_library, rebuild_snapshot_from_scan_items, LibraryProbeResultDto};
+pub use probe::rebuild_snapshot_from_scan_items;
 pub use reader::{
     clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
     load_reader_page, open_reader, open_reader_with, prefetch_reader_pages, writeback_after_open,

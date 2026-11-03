@@ -33,7 +33,6 @@ pub enum HomeLibraryAlertKindDto {
     RemoteUnreachable,
     SyncFailed,
     StaleSync,
-    PendingResourcesDetected,
 }
 
 #[derive(Debug, Clone)]
@@ -44,7 +43,6 @@ pub struct HomeLibraryAlertDto {
     pub last_success_at_ms: Option<i64>,
     pub last_error_message: Option<String>,
     pub stale_days: Option<i32>,
-    pub pending_resource_count: Option<i32>,
 }
 
 #[derive(Debug, Clone)]
@@ -117,7 +115,6 @@ impl From<CoreAlert> for HomeLibraryAlertDto {
             last_success_at_ms: v.last_success_at_ms,
             last_error_message: v.last_error_message,
             stale_days: v.stale_days,
-            pending_resource_count: None,
         }
     }
 }

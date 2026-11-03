@@ -2,7 +2,6 @@ import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/domain/home_page_repository.dart';
 import 'package:hentai_library/src/rust/api/home.dart' as rust;
-import 'package:hentai_library/src/rust/api/probe.dart' as rust_probe;
 
 class HomePageRepositoryImpl implements HomePageRepository {
   const HomePageRepositoryImpl();
@@ -39,22 +38,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
     );
   }
 
-  @override
-  Future<LibraryProbeResult> probeLibrary({
-    required String libraryId,
-    String? password,
-  }) {
-    return guardFrb(
-      () async => _mapProbeResult(
-        await rust_probe.probeLibraryFrb(
-          libraryId: libraryId,
-          password: password,
-        ),
-      ),
-      fallbackMessage: '探测库资源失败',
-    );
-  }
-
   HomePageCounts _mapCounts(rust.HomePageCountsDto dto) {
     return HomePageCounts(
       comicCount: dto.comicCount,
@@ -88,7 +71,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
           : DateTime.fromMillisecondsSinceEpoch(dto.lastSuccessAtMs!.toInt()),
       lastErrorMessage: dto.lastErrorMessage,
       staleDays: dto.staleDays,
-      pendingResourceCount: dto.pendingResourceCount,
     );
   }
 
@@ -99,21 +81,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
       rust.HomeLibraryAlertKindDto.syncFailed =>
         HomeLibraryAlertKind.syncFailed,
       rust.HomeLibraryAlertKindDto.staleSync => HomeLibraryAlertKind.staleSync,
-      rust.HomeLibraryAlertKindDto.pendingResourcesDetected =>
-        HomeLibraryAlertKind.pendingResourcesDetected,
     };
-  }
-
-  LibraryProbeResult _mapProbeResult(rust_probe.LibraryProbeResultDto dto) {
-    return LibraryProbeResult(
-      libraryId: dto.libraryId,
-      addedCount: dto.addedCount,
-      changedCount: dto.changedCount,
-      removedCount: dto.removedCount,
-      unreachable: dto.unreachable,
-      errorMessage: dto.errorMessage,
-      probedAt: DateTime.fromMillisecondsSinceEpoch(dto.probedAtMs.toInt()),
-      baselineMissing: dto.baselineMissing,
-    );
   }
 }

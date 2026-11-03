@@ -16,7 +16,6 @@ import 'api/named_facet/form.dart';
 import 'api/named_facet/management.dart';
 import 'api/named_facet/types.dart';
 import 'api/named_facet_dictionary.dart';
-import 'api/probe.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
 import 'api/shutdown.dart';
@@ -319,9 +318,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LibraryHomeStatDto dco_decode_library_home_stat_dto(dynamic raw);
-
-  @protected
-  LibraryProbeResultDto dco_decode_library_probe_result_dto(dynamic raw);
 
   @protected
   LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(
@@ -1049,11 +1045,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LibraryHomeStatDto sse_decode_library_home_stat_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  LibraryProbeResultDto sse_decode_library_probe_result_dto(
     SseDeserializer deserializer,
   );
 
@@ -1953,12 +1944,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_library_home_stat_dto(
     LibraryHomeStatDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_library_probe_result_dto(
-    LibraryProbeResultDto self,
     SseSerializer serializer,
   );
 

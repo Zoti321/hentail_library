@@ -9,7 +9,5 @@ void main() {
     expect(createHomePageRepository, isNotNull);
     expect(homeLibraryStatsStreamProvider, isNotNull);
     expect(HomeMd3ePage, isNotNull);
-    expect(homeProbeCoordinatorProvider, isNotNull);
-    expect(homePageVisibleProvider, isNotNull);
   });
 }

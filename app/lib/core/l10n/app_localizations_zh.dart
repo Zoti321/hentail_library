@@ -316,11 +316,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String homeAlertPendingResources(String libraryName, int count) {
-    return '$libraryName 发现 $count 个新/变更 Resource，建议同步';
-  }
-
-  @override
   String get homeStatSeries => '系列';
 
   @override

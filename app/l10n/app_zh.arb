@@ -137,13 +137,6 @@
       "days": { "type": "int" }
     }
   },
-  "homeAlertPendingResources": "{libraryName} 发现 {count} 个新/变更 Resource，建议同步",
-  "@homeAlertPendingResources": {
-    "placeholders": {
-      "libraryName": { "type": "String" },
-      "count": { "type": "int" }
-    }
-  },
   "homeStatSeries": "系列",
   "homeStatTags": "标签",
   "homeStatAuthors": "作者",
