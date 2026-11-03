@@ -27,6 +27,17 @@ final class Md3eOverlayRouteScopeSnapshot {
     );
   }
 
+  Md3eOverlayRouteScopeSnapshot withM3e(M3EThemeData m3e) {
+    return Md3eOverlayRouteScopeSnapshot._(
+      locale: locale,
+      m3e: m3e,
+      materialTheme: buildMd3eMaterialTheme(
+        m3e.colorScheme.brightness,
+        m3e: m3e,
+      ),
+    );
+  }
+
   final Locale locale;
   final M3EThemeData m3e;
   final ThemeData materialTheme;

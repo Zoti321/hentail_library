@@ -1,9 +1,10 @@
 import 'package:flutter/services.dart';
+import 'package:hentai_library/shared/ui/l10n/m3e_material_localizations.dart';
 import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/shared/ui/motion/spring_curve.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/calendar_day_picker.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide MaterialLocalizations;
 
 /// 月历翻页（使用 [Md3eCalendarDayPicker]）。
 class Md3eCalendarMonthPicker extends StatefulWidget {
@@ -224,7 +225,7 @@ class _MonthNavRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
-    final MaterialLocalizations localizations = MaterialLocalizations.of(
+    final MaterialLocalizations localizations = md3eMaterialLocalizationsOf(
       context,
     );
     final String label = localizations.formatMonthYear(month);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
+import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 表单类弹窗统一入口：基于 [M3EDialog.showAdaptive]。
@@ -45,19 +46,38 @@ Future<T?> showMd3eAdaptiveFormDialog<T>(
           constraints: BoxConstraints(maxWidth: contentWidth),
           child: material,
         );
-  return M3ETheme(
-    data: theme.copyWith(
-      dialogTheme: theme.dialogTheme.copyWith(
-        maxWidth: Md3eMetadataEditFormMetrics.dialogShellMaxWidth(context),
-      ),
+  final M3EThemeData themed = theme.copyWith(
+    dialogTheme: theme.dialogTheme.copyWith(
+      maxWidth: Md3eMetadataEditFormMetrics.dialogShellMaxWidth(context),
     ),
-    child: M3EDialog.showAdaptive<T>(
+  );
+  final M3EAdaptiveDialog adaptiveDialog = M3EAdaptiveDialog(
+    title: title,
+    content: content,
+    confirmLabel: confirmLabel,
+    onConfirm: onConfirm,
+    dismissLabel: dismissLabel,
+  );
+
+  if (fullScreen) {
+    return M3EDialog.showAdaptive<T>(
       context,
       title: title,
       content: content,
       confirmLabel: confirmLabel,
       dismissLabel: dismissLabel,
       onConfirm: onConfirm,
+    );
+  }
+
+  final Md3eOverlayRouteScopeSnapshot scope =
+      Md3eOverlayRouteScopeSnapshot.capture(context);
+
+  return M3EDialog.show<T>(
+    context,
+    dialog: md3eOverlayRouteScope(
+      scope: scope.withM3e(themed),
+      child: adaptiveDialog,
     ),
   );
 }

@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:hentai_library/shared/ui/l10n/m3e_material_localizations.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide MaterialLocalizations;
 
 /// 与 [Md3eCalendarYearPicker] 网格行高一致（略高于 M3E 默认 52，便于胶囊选中态留白）。
 const double kMd3eCalendarYearPickerRowHeight = 56;
@@ -76,7 +77,7 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
-    final MaterialLocalizations localizations = MaterialLocalizations.of(
+    final MaterialLocalizations localizations = md3eMaterialLocalizationsOf(
       context,
     );
     final int firstYear = widget.firstDate.year;

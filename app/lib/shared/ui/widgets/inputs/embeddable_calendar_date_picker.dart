@@ -1,10 +1,11 @@
 import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/shared/ui/motion/spring_value.dart';
+import 'package:hentai_library/shared/ui/l10n/m3e_material_localizations.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/calendar_month_picker.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/calendar_year_picker.dart';
 import 'package:material_3_expressive/components/date_pickers/components/m3e_date_picker_mode_toggle.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide MaterialLocalizations;
 
 /// 可嵌入表单的日历（与 [M3ECalendarDatePicker] 一致，年份模式使用 [Md3eCalendarYearPicker]）。
 class Md3eEmbeddableCalendarDatePicker extends StatefulWidget {
@@ -117,7 +118,7 @@ class _Md3eEmbeddableCalendarDatePickerState
   }
 
   double _inlinePickerBodyHeight(BuildContext context) {
-    final int firstDayOfWeekIndex = MaterialLocalizations.of(context)
+    final int firstDayOfWeekIndex = md3eMaterialLocalizationsOf(context)
         .firstDayOfWeekIndex;
     return switch (_mode) {
       M3EDatePickerMode.day => M3EDatePickerUtils.calendarDayViewHeight(
@@ -147,73 +148,14 @@ class _Md3eEmbeddableCalendarDatePickerState
   Widget build(BuildContext context) {
     return M3EComponentTheme(
       builder: (BuildContext context) {
-        final M3EThemeData theme = M3ETheme.of(context);
-        final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
+        return md3eMaterialUiLocalizationsScope(
+          child: Builder(
+            builder: (BuildContext scopedContext) {
+              final M3EThemeData theme = M3ETheme.of(scopedContext);
+              final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
 
-        if (widget.expandToFit) {
-          final Widget picker = switch (_mode) {
-            M3EDatePickerMode.day => Md3eCalendarMonthPicker(
-              initialMonth: _displayedMonth,
-              firstDate: _firstDate,
-              lastDate: _lastDate,
-              selectedDate: _selectedDate,
-              currentDate: _currentDate,
-              onChanged: _handleDayChanged,
-              onMonthChanged: _handleMonthChanged,
-              selectableDayPredicate: widget.selectableDayPredicate,
-              expandToFit: true,
-              mode: _mode,
-              onModeChanged: _handleModeChanged,
-            ),
-            M3EDatePickerMode.year => Padding(
-              padding: const EdgeInsets.only(
-                top: M3EDatePickerConstants.subHeaderHeight,
-              ),
-              child: _yearPicker(),
-            ),
-          };
-          return Stack(
-            children: <Widget>[
-              Positioned.fill(child: picker),
-              if (_mode == M3EDatePickerMode.year)
-                M3EDatePickerModeToggle(
-                  mode: _mode,
-                  monthDate: _displayedMonth,
-                  onChanged: _handleModeChanged,
-                ),
-            ],
-          );
-        }
-
-        // 展开 / 收起（日视图 ↔ 年视图）的高度变化：M3E 空间弹簧，允许回弹。
-        final double bodyHeight = _inlinePickerBodyHeight(context);
-        final Widget content = Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            M3EDatePickerModeToggle(
-              mode: _mode,
-              monthDate: _displayedMonth,
-              onChanged: _handleModeChanged,
-            ),
-            Md3eSpringValue(
-              value: bodyHeight,
-              motion: Md3eMotion.spatialReveal,
-              builder: (BuildContext context, double height, Widget? child) {
-                return SizedBox(
-                  height: height,
-                  child: ClipRect(
-                    child: OverflowBox(
-                      alignment: Alignment.topCenter,
-                      minHeight: bodyHeight,
-                      maxHeight: bodyHeight,
-                      child: child,
-                    ),
-                  ),
-                );
-              },
-              child: SizedBox(
-                height: bodyHeight,
-                child: switch (_mode) {
+              if (widget.expandToFit) {
+                final Widget picker = switch (_mode) {
                   M3EDatePickerMode.day => Md3eCalendarMonthPicker(
                     initialMonth: _displayedMonth,
                     firstDate: _firstDate,
@@ -223,22 +165,89 @@ class _Md3eEmbeddableCalendarDatePickerState
                     onChanged: _handleDayChanged,
                     onMonthChanged: _handleMonthChanged,
                     selectableDayPredicate: widget.selectableDayPredicate,
+                    expandToFit: true,
+                    mode: _mode,
+                    onModeChanged: _handleModeChanged,
                   ),
-                  M3EDatePickerMode.year => _yearPicker(),
-                },
-              ),
-            ),
-          ],
-        );
+                  M3EDatePickerMode.year => Padding(
+                    padding: const EdgeInsets.only(
+                      top: M3EDatePickerConstants.subHeaderHeight,
+                    ),
+                    child: _yearPicker(),
+                  ),
+                };
+                return Stack(
+                  children: <Widget>[
+                    Positioned.fill(child: picker),
+                    if (_mode == M3EDatePickerMode.year)
+                      M3EDatePickerModeToggle(
+                        mode: _mode,
+                        monthDate: _displayedMonth,
+                        onChanged: _handleModeChanged,
+                      ),
+                  ],
+                );
+              }
 
-        return Container(
-          width: dateTheme.width,
-          padding: dateTheme.padding,
-          decoration: BoxDecoration(
-            color: dateTheme.containerColor(theme.colorScheme),
-            borderRadius: dateTheme.borderRadius,
+              final double bodyHeight =
+                  _inlinePickerBodyHeight(scopedContext);
+              final Widget content = Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  M3EDatePickerModeToggle(
+                    mode: _mode,
+                    monthDate: _displayedMonth,
+                    onChanged: _handleModeChanged,
+                  ),
+                  Md3eSpringValue(
+                    value: bodyHeight,
+                    motion: Md3eMotion.spatialReveal,
+                    builder:
+                        (BuildContext context, double height, Widget? child) {
+                      return SizedBox(
+                        height: height,
+                        child: ClipRect(
+                          child: OverflowBox(
+                            alignment: Alignment.topCenter,
+                            minHeight: bodyHeight,
+                            maxHeight: bodyHeight,
+                            child: child,
+                          ),
+                        ),
+                      );
+                    },
+                    child: SizedBox(
+                      height: bodyHeight,
+                      child: switch (_mode) {
+                        M3EDatePickerMode.day => Md3eCalendarMonthPicker(
+                          initialMonth: _displayedMonth,
+                          firstDate: _firstDate,
+                          lastDate: _lastDate,
+                          selectedDate: _selectedDate,
+                          currentDate: _currentDate,
+                          onChanged: _handleDayChanged,
+                          onMonthChanged: _handleMonthChanged,
+                          selectableDayPredicate:
+                              widget.selectableDayPredicate,
+                        ),
+                        M3EDatePickerMode.year => _yearPicker(),
+                      },
+                    ),
+                  ),
+                ],
+              );
+
+              return Container(
+                width: dateTheme.width,
+                padding: dateTheme.padding,
+                decoration: BoxDecoration(
+                  color: dateTheme.containerColor(theme.colorScheme),
+                  borderRadius: dateTheme.borderRadius,
+                ),
+                child: content,
+              );
+            },
           ),
-          child: content,
         );
       },
     );

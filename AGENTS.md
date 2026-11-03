@@ -10,7 +10,7 @@ Setup: `./scripts/setup-dev.sh` · PR gate: `./scripts/run-gate.sh` · Human onb
 
 **Flutter UI — production** (shell, tokens, components) → `app/lib/shared/ui/theme/` + `shared/ui/widgets/`; structure ADR-0027, theme ADR-0028. Do not treat Figma or `design-system/` as the live spec for shipping routes unless an ADR says otherwise.
 
-**Flutter UI — MD3E Lab** (`app/lib/md3e/`, `integrate/md3e`) → **Widgetbook** (`app/widgetbook/`, `flutter run -t widgetbook/main.dart`) + `material_3_expressive` official docs; patterns/pages live in `md3e/`. Visual acceptance for Lab is Widgetbook, not Figma frames.
+**Flutter UI — MD3E Lab** (`app/lib/md3e/`, `integrate/md3e`) → **Widgetbook** (`app/widgetbook/`, `flutter run -t widgetbook/main.dart`) + `material_3_expressive` official docs; patterns/pages live in `md3e/`. Visual acceptance for Lab is Widgetbook, not Figma frames. **New MD3E widgets** → material_ui `MaterialLocalizations` via `app/lib/shared/ui/l10n/m3e_material_localizations.dart` (`md3eMaterialLocalizationsOf` / `md3eMaterialUiLocalizationsScope`); do not use Flutter `material.dart` `MaterialLocalizations` in new code.
 
 **design-system/** → **cleared** (2026-11-01): only `.gitkeep` and `example.png` remain; `hentai-library/MASTER.md`, `pages/*`, `research/` were removed (recoverable from git history). No UI spec lives here; see ADR-0030. ADR-0029 charter is superseded for any future visual refresh unless a new ADR reintroduces a doc source.
 
