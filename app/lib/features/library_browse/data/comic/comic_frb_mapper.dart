@@ -1,54 +1,14 @@
 import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_comic_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_comic_sort_option.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/shared/data/frb/comic_entity_mapper.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/comic_trash/public.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/library_author_pick.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
-
-Comic mapRustComic(rust.ComicDto dto) {
-  return Comic(
-    comicId: dto.comicId,
-    path: dto.path,
-    resourceType: ResourceType.values.byName(dto.resourceType),
-    resourceSize: dto.resourceSize.toInt(),
-    createdAt: comicTimestampFromMs(dto.createdAt.toInt()),
-    lastUpdatedAt: comicTimestampFromMs(dto.lastUpdatedAt.toInt()),
-    title: dto.title,
-    authors: dto.authors.map((String n) => Author(name: n)).toList(),
-    contentRating: ContentRating.values.byName(dto.contentRating),
-    tags: dto.tags.map((String n) => Tag(name: n)).toList(),
-    languages: List<String>.from(dto.languages),
-    parodies: List<String>.from(dto.parodies),
-    characters: List<String>.from(dto.characters),
-    pageCount: dto.pageCount,
-    description: dto.description,
-    publishedAt: dto.publishedAt == null
-        ? null
-        : comicTimestampFromMs(dto.publishedAt!.toInt()),
-    lastReadTime: dto.lastReadTimeMs == null
-        ? null
-        : comicTimestampFromMs(dto.lastReadTimeMs!.toInt()),
-    locks: ComicMetaLocks(
-      title: dto.locks.title,
-      description: dto.locks.description,
-      publishedAt: dto.locks.publishedAt,
-      contentRating: dto.locks.contentRating,
-      authors: dto.locks.authors,
-      tags: dto.locks.tags,
-      languages: dto.locks.languages,
-      parodies: dto.locks.parodies,
-      characters: dto.locks.characters,
-    ),
-  );
-}
 
 rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
   return rust.ComicFilterDto(
@@ -128,44 +88,6 @@ PagedResult<Comic> mapPagedResult(rust.PagedComicResultDto page) {
     totalCount: page.totalCount.toInt(),
     page: page.page,
     pageSize: page.pageSize,
-  );
-}
-
-const String _kRemoteLibraryKind = 'remote';
-
-TrashedComic mapTrashedComic(rust.TrashedComicFrbDto dto) {
-  return (
-    comic: mapRustComic(dto.comic),
-    deletedAt: comicTimestampFromMs(dto.deletedAt.toInt()),
-    libraryName: dto.libraryName,
-    isRemote: dto.libraryKind == _kRemoteLibraryKind,
-  );
-}
-
-PagedResult<TrashedComic> mapTrashedComicsPage(
-  rust.PagedTrashedComicResultFrbDto page,
-) {
-  return PagedResult<TrashedComic>(
-    items: page.items.map(mapTrashedComic).toList(),
-    totalCount: page.totalCount.toInt(),
-    page: page.page,
-    pageSize: page.pageSize,
-  );
-}
-
-TrashedComicCounts mapTrashedComicCounts(rust.TrashedComicCountsFrbDto dto) {
-  return (
-    total: dto.total.toInt(),
-    local: dto.local.toInt(),
-    remote: dto.remote.toInt(),
-  );
-}
-
-ComicPurgeResult mapComicPurgeResult(rust.ComicPurgeResultFrbDto dto) {
-  return (
-    succeeded: dto.succeeded,
-    failed: dto.failed,
-    errorSamples: List<String>.unmodifiable(dto.errorSamples),
   );
 }
 

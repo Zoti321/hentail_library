@@ -1,6 +1,7 @@
 pub mod author;
 pub mod character;
 pub mod comic;
+pub mod comic_trash;
 pub mod history;
 pub mod home;
 pub mod init;
@@ -21,6 +22,7 @@ pub mod thumbnail;
 pub use author::*;
 pub use character::*;
 pub use comic::*;
+pub use comic_trash::*;
 pub use history::*;
 pub use home::*;
 pub use init::HentaiErrorDto;

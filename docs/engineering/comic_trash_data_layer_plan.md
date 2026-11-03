@@ -1,6 +1,6 @@
 # comic_trash 数据层归属规划
 
-**状态**：规划（未实施）  
+**状态**：Phase R-FRB + Dart Phase A/B 已实施（2026-11-03）  
 **背景**：回收站读写与 FRB 映射仍落在 `library_browse/data/comic/comic_repository_impl.dart` + `comic_frb_mapper.dart`；`ComicRepositoryImpl` 同时实现 `ComicTrashRepository` 与 catalog/lookup 等接口。  
 **参照**：`metadata_backup`（`data/repositories` + `data/adapters` + `data/mappers` + feature `di`）、ADR-0034、ADR-0023、ADR-0026、`docs/engineering/cross-feature-collaboration.md`。
 

@@ -5,6 +5,7 @@ import 'package:hentai_library/features/read_session/data/adapters/reader_sessio
 import 'package:hentai_library/features/library_admin/data/adapters/library_revision_frb_adapter.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_repository_impl.dart';
 import 'package:hentai_library/features/named_metadata/data/repositories/author_repository_impl.dart';
+import 'package:hentai_library/features/comic_trash/data/repositories/comic_trash_repository_impl.dart';
 import 'package:hentai_library/features/library_browse/data/comic/comic_repository_impl.dart';
 import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -35,7 +36,7 @@ List<Override> dataProviderOverrides() => <Override>[
     (Ref ref) => const ComicRepositoryImpl(),
   ),
   comicTrashRepositoryProvider.overrideWith(
-    (Ref ref) => const ComicRepositoryImpl(),
+    (Ref ref) => const ComicTrashRepositoryImpl(),
   ),
   comicCatalogRepositoryProvider.overrideWith(
     (Ref ref) => const ComicRepositoryImpl(),

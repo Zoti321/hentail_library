@@ -9,6 +9,7 @@
 import 'api/author.dart';
 import 'api/character.dart';
 import 'api/comic.dart';
+import 'api/comic_trash.dart';
 import 'api/history.dart';
 import 'api/home.dart';
 import 'api/init.dart';

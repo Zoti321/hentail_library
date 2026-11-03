@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -169973018;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1440026720;
 
 // Section: executor
 
@@ -656,7 +656,7 @@ fn wire__crate__api__named_facet__count_named_facet_attachments_frb_impl(
         },
     )
 }
-fn wire__crate__api__comic__count_trashed_comics_frb_impl(
+fn wire__crate__api__comic_trash__count_trashed_comics_frb_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -682,7 +682,7 @@ fn wire__crate__api__comic__count_trashed_comics_frb_impl(
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::comic::count_trashed_comics_frb().await?;
+                        let output_ok = crate::api::comic_trash::count_trashed_comics_frb().await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -1382,7 +1382,7 @@ fn wire__crate__api__series__fetch_series_page_frb_impl(
         },
     )
 }
-fn wire__crate__api__comic__fetch_trashed_comics_page_frb_impl(
+fn wire__crate__api__comic_trash__fetch_trashed_comics_page_frb_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1410,7 +1410,8 @@ fn wire__crate__api__comic__fetch_trashed_comics_page_frb_impl(
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
                         let output_ok =
-                            crate::api::comic::fetch_trashed_comics_page_frb(api_request).await?;
+                            crate::api::comic_trash::fetch_trashed_comics_page_frb(api_request)
+                                .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -2284,7 +2285,7 @@ fn wire__crate__api__named_facet__list_named_facet_for_form_frb_impl(
         },
     )
 }
-fn wire__crate__api__comic__list_trashed_comic_ids_frb_impl(
+fn wire__crate__api__comic_trash__list_trashed_comic_ids_frb_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2310,7 +2311,8 @@ fn wire__crate__api__comic__list_trashed_comic_ids_frb_impl(
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::comic::list_trashed_comic_ids_frb().await?;
+                        let output_ok =
+                            crate::api::comic_trash::list_trashed_comic_ids_frb().await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -2745,7 +2747,7 @@ fn wire__crate__api__probe__probe_library_frb_impl(
         },
     )
 }
-fn wire__crate__api__comic__purge_comics_frb_impl(
+fn wire__crate__api__comic_trash__purge_comics_frb_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2772,7 +2774,8 @@ fn wire__crate__api__comic__purge_comics_frb_impl(
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::comic::purge_comics_frb(api_comic_ids).await?;
+                        let output_ok =
+                            crate::api::comic_trash::purge_comics_frb(api_comic_ids).await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -3085,7 +3088,7 @@ fn wire__crate__api__thumbnail__resolve_series_cover_frb_impl(
         },
     )
 }
-fn wire__crate__api__comic__restore_comics_frb_impl(
+fn wire__crate__api__comic_trash__restore_comics_frb_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -3113,7 +3116,7 @@ fn wire__crate__api__comic__restore_comics_frb_impl(
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
                         let output_ok =
-                            crate::api::comic::restore_comics_frb(api_comic_ids).await?;
+                            crate::api::comic_trash::restore_comics_frb(api_comic_ids).await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -3961,7 +3964,7 @@ fn wire__crate__api__sync__sync_library_frb_impl(
         },
     )
 }
-fn wire__crate__api__comic__trash_comics_frb_impl(
+fn wire__crate__api__comic_trash__trash_comics_frb_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -3988,7 +3991,8 @@ fn wire__crate__api__comic__trash_comics_frb_impl(
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::comic::trash_comics_frb(api_comic_ids).await?;
+                        let output_ok =
+                            crate::api::comic_trash::trash_comics_frb(api_comic_ids).await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -5350,13 +5354,13 @@ impl SseDecode for crate::api::comic::ComicMetadataBulkPatchFrbDto {
     }
 }
 
-impl SseDecode for crate::api::comic::ComicPurgeResultFrbDto {
+impl SseDecode for crate::api::comic_trash::ComicPurgeResultFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_succeeded = <i32>::sse_decode(deserializer);
         let mut var_failed = <i32>::sse_decode(deserializer);
         let mut var_errorSamples = <Vec<String>>::sse_decode(deserializer);
-        return crate::api::comic::ComicPurgeResultFrbDto {
+        return crate::api::comic_trash::ComicPurgeResultFrbDto {
             succeeded: var_succeeded,
             failed: var_failed,
             error_samples: var_errorSamples,
@@ -6005,13 +6009,13 @@ impl SseDecode for Vec<crate::api::series::SeriesItemDto> {
     }
 }
 
-impl SseDecode for Vec<crate::api::comic::TrashedComicFrbDto> {
+impl SseDecode for Vec<crate::api::comic_trash::TrashedComicFrbDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
-            ans_.push(<crate::api::comic::TrashedComicFrbDto>::sse_decode(
+            ans_.push(<crate::api::comic_trash::TrashedComicFrbDto>::sse_decode(
                 deserializer,
             ));
         }
@@ -6425,14 +6429,15 @@ impl SseDecode for crate::api::series::PagedSeriesResultDto {
     }
 }
 
-impl SseDecode for crate::api::comic::PagedTrashedComicResultFrbDto {
+impl SseDecode for crate::api::comic_trash::PagedTrashedComicResultFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_items = <Vec<crate::api::comic::TrashedComicFrbDto>>::sse_decode(deserializer);
+        let mut var_items =
+            <Vec<crate::api::comic_trash::TrashedComicFrbDto>>::sse_decode(deserializer);
         let mut var_totalCount = <i64>::sse_decode(deserializer);
         let mut var_page = <i32>::sse_decode(deserializer);
         let mut var_pageSize = <i32>::sse_decode(deserializer);
-        return crate::api::comic::PagedTrashedComicResultFrbDto {
+        return crate::api::comic_trash::PagedTrashedComicResultFrbDto {
             items: var_items,
             total_count: var_totalCount,
             page: var_page,
@@ -7002,13 +7007,13 @@ impl SseDecode for crate::api::thumbnail::ThumbnailPriorityDto {
     }
 }
 
-impl SseDecode for crate::api::comic::TrashedComicCountsFrbDto {
+impl SseDecode for crate::api::comic_trash::TrashedComicCountsFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_total = <i64>::sse_decode(deserializer);
         let mut var_local = <i64>::sse_decode(deserializer);
         let mut var_remote = <i64>::sse_decode(deserializer);
-        return crate::api::comic::TrashedComicCountsFrbDto {
+        return crate::api::comic_trash::TrashedComicCountsFrbDto {
             total: var_total,
             local: var_local,
             remote: var_remote,
@@ -7016,14 +7021,14 @@ impl SseDecode for crate::api::comic::TrashedComicCountsFrbDto {
     }
 }
 
-impl SseDecode for crate::api::comic::TrashedComicFrbDto {
+impl SseDecode for crate::api::comic_trash::TrashedComicFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_comic = <crate::api::comic::ComicDto>::sse_decode(deserializer);
         let mut var_deletedAt = <i64>::sse_decode(deserializer);
         let mut var_libraryName = <String>::sse_decode(deserializer);
         let mut var_libraryKind = <String>::sse_decode(deserializer);
-        return crate::api::comic::TrashedComicFrbDto {
+        return crate::api::comic_trash::TrashedComicFrbDto {
             comic: var_comic,
             deleted_at: var_deletedAt,
             library_name: var_libraryName,
@@ -7170,7 +7175,7 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        18 => wire__crate__api__comic__count_trashed_comics_frb_impl(
+        18 => wire__crate__api__comic_trash__count_trashed_comics_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -7224,7 +7229,7 @@ fn pde_ffi_dispatcher_primary_impl(
         37 => {
             wire__crate__api__series__fetch_series_page_frb_impl(port, ptr, rust_vec_len, data_len)
         }
-        38 => wire__crate__api__comic__fetch_trashed_comics_page_frb_impl(
+        38 => wire__crate__api__comic_trash__fetch_trashed_comics_page_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -7323,7 +7328,7 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        63 => wire__crate__api__comic__list_trashed_comic_ids_frb_impl(
+        63 => wire__crate__api__comic_trash__list_trashed_comic_ids_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -7344,7 +7349,9 @@ fn pde_ffi_dispatcher_primary_impl(
             data_len,
         ),
         74 => wire__crate__api__probe__probe_library_frb_impl(port, ptr, rust_vec_len, data_len),
-        75 => wire__crate__api__comic__purge_comics_frb_impl(port, ptr, rust_vec_len, data_len),
+        75 => {
+            wire__crate__api__comic_trash__purge_comics_frb_impl(port, ptr, rust_vec_len, data_len)
+        }
         77 => wire__crate__api__comic__refresh_comic_metadata_frb_impl(
             port,
             ptr,
@@ -7376,7 +7383,12 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        84 => wire__crate__api__comic__restore_comics_frb_impl(port, ptr, rust_vec_len, data_len),
+        84 => wire__crate__api__comic_trash__restore_comics_frb_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
         85 => {
             wire__crate__api__comic__search_by_keyword_frb_impl(port, ptr, rust_vec_len, data_len)
         }
@@ -7453,7 +7465,9 @@ fn pde_ffi_dispatcher_primary_impl(
             data_len,
         ),
         107 => wire__crate__api__sync__sync_library_frb_impl(port, ptr, rust_vec_len, data_len),
-        108 => wire__crate__api__comic__trash_comics_frb_impl(port, ptr, rust_vec_len, data_len),
+        108 => {
+            wire__crate__api__comic_trash__trash_comics_frb_impl(port, ptr, rust_vec_len, data_len)
+        }
         109 => {
             wire__crate__api__author__update_author_link_frb_impl(port, ptr, rust_vec_len, data_len)
         }
@@ -8118,7 +8132,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicMetadataBulkPatch
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicPurgeResultFrbDto {
+impl flutter_rust_bridge::IntoDart for crate::api::comic_trash::ComicPurgeResultFrbDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.succeeded.into_into_dart().into_dart(),
@@ -8129,13 +8143,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicPurgeResultFrbDto
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::comic::ComicPurgeResultFrbDto
+    for crate::api::comic_trash::ComicPurgeResultFrbDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicPurgeResultFrbDto>
-    for crate::api::comic::ComicPurgeResultFrbDto
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic_trash::ComicPurgeResultFrbDto>
+    for crate::api::comic_trash::ComicPurgeResultFrbDto
 {
-    fn into_into_dart(self) -> crate::api::comic::ComicPurgeResultFrbDto {
+    fn into_into_dart(self) -> crate::api::comic_trash::ComicPurgeResultFrbDto {
         self
     }
 }
@@ -8820,7 +8834,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::series::PagedSeriesResultDto>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::PagedTrashedComicResultFrbDto {
+impl flutter_rust_bridge::IntoDart for crate::api::comic_trash::PagedTrashedComicResultFrbDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.items.into_into_dart().into_dart(),
@@ -8832,13 +8846,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::PagedTrashedComicResul
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::comic::PagedTrashedComicResultFrbDto
+    for crate::api::comic_trash::PagedTrashedComicResultFrbDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::PagedTrashedComicResultFrbDto>
-    for crate::api::comic::PagedTrashedComicResultFrbDto
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic_trash::PagedTrashedComicResultFrbDto>
+    for crate::api::comic_trash::PagedTrashedComicResultFrbDto
 {
-    fn into_into_dart(self) -> crate::api::comic::PagedTrashedComicResultFrbDto {
+    fn into_into_dart(self) -> crate::api::comic_trash::PagedTrashedComicResultFrbDto {
         self
     }
 }
@@ -9622,7 +9636,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::thumbnail::ThumbnailPriorityD
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::TrashedComicCountsFrbDto {
+impl flutter_rust_bridge::IntoDart for crate::api::comic_trash::TrashedComicCountsFrbDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.total.into_into_dart().into_dart(),
@@ -9633,18 +9647,18 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::TrashedComicCountsFrbD
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::comic::TrashedComicCountsFrbDto
+    for crate::api::comic_trash::TrashedComicCountsFrbDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::TrashedComicCountsFrbDto>
-    for crate::api::comic::TrashedComicCountsFrbDto
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic_trash::TrashedComicCountsFrbDto>
+    for crate::api::comic_trash::TrashedComicCountsFrbDto
 {
-    fn into_into_dart(self) -> crate::api::comic::TrashedComicCountsFrbDto {
+    fn into_into_dart(self) -> crate::api::comic_trash::TrashedComicCountsFrbDto {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::TrashedComicFrbDto {
+impl flutter_rust_bridge::IntoDart for crate::api::comic_trash::TrashedComicFrbDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.comic.into_into_dart().into_dart(),
@@ -9656,13 +9670,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::TrashedComicFrbDto {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::comic::TrashedComicFrbDto
+    for crate::api::comic_trash::TrashedComicFrbDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::TrashedComicFrbDto>
-    for crate::api::comic::TrashedComicFrbDto
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic_trash::TrashedComicFrbDto>
+    for crate::api::comic_trash::TrashedComicFrbDto
 {
-    fn into_into_dart(self) -> crate::api::comic::TrashedComicFrbDto {
+    fn into_into_dart(self) -> crate::api::comic_trash::TrashedComicFrbDto {
         self
     }
 }
@@ -10149,7 +10163,7 @@ impl SseEncode for crate::api::comic::ComicMetadataBulkPatchFrbDto {
     }
 }
 
-impl SseEncode for crate::api::comic::ComicPurgeResultFrbDto {
+impl SseEncode for crate::api::comic_trash::ComicPurgeResultFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.succeeded, serializer);
@@ -10635,12 +10649,12 @@ impl SseEncode for Vec<crate::api::series::SeriesItemDto> {
     }
 }
 
-impl SseEncode for Vec<crate::api::comic::TrashedComicFrbDto> {
+impl SseEncode for Vec<crate::api::comic_trash::TrashedComicFrbDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::api::comic::TrashedComicFrbDto>::sse_encode(item, serializer);
+            <crate::api::comic_trash::TrashedComicFrbDto>::sse_encode(item, serializer);
         }
     }
 }
@@ -10963,10 +10977,10 @@ impl SseEncode for crate::api::series::PagedSeriesResultDto {
     }
 }
 
-impl SseEncode for crate::api::comic::PagedTrashedComicResultFrbDto {
+impl SseEncode for crate::api::comic_trash::PagedTrashedComicResultFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::api::comic::TrashedComicFrbDto>>::sse_encode(self.items, serializer);
+        <Vec<crate::api::comic_trash::TrashedComicFrbDto>>::sse_encode(self.items, serializer);
         <i64>::sse_encode(self.total_count, serializer);
         <i32>::sse_encode(self.page, serializer);
         <i32>::sse_encode(self.page_size, serializer);
@@ -11423,7 +11437,7 @@ impl SseEncode for crate::api::thumbnail::ThumbnailPriorityDto {
     }
 }
 
-impl SseEncode for crate::api::comic::TrashedComicCountsFrbDto {
+impl SseEncode for crate::api::comic_trash::TrashedComicCountsFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i64>::sse_encode(self.total, serializer);
@@ -11432,7 +11446,7 @@ impl SseEncode for crate::api::comic::TrashedComicCountsFrbDto {
     }
 }
 
-impl SseEncode for crate::api::comic::TrashedComicFrbDto {
+impl SseEncode for crate::api::comic_trash::TrashedComicFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <crate::api::comic::ComicDto>::sse_encode(self.comic, serializer);
