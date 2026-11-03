@@ -204,6 +204,7 @@ pub struct TrashedComicRowFrbDto {
 
 - 产品行为不变：**不必**改 GLOSSARY。
 - FRB 模块拆分若合并进主 PR：在 **本文件** 记「已实施」；跨 feature 边界若需正式记录，可增 **ADR 附录**（引用 ADR-0034 owner + ADR-0023 不变）。
+- **`named_metadata` 数据层**：不另建 `named_metadata_data_layer_plan.md`；2026-11-03 落地摘要见 [`cross-feature-collaboration.md`](cross-feature-collaboration.md) 与 [`feature-data-layout.md`](feature-data-layout.md) 迁移 backlog。
 
 ---
 
