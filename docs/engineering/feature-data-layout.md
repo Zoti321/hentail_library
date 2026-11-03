@@ -22,7 +22,7 @@
 | 子目录 | 内容 |
 | --- | --- |
 | `shared/data/frb/` | `frb_call_guard`、`frb_error_mapper`、`frb_zone_guard`（全 app） |
-| `shared/data/repositories/` | 非 owner 仓储接缝（如 `named_facet_form_listing`，#295） |
+| `shared/data/repositories/` | 非 owner 仓储接缝（逐步迁回 owner feature `data/`） |
 
 新 FRB 映射 **默认进 owner `features/<id>/data/mappers/`**；跨 feature 协作经 owner **`public/` + port**（如 [RemoteLibraryCredentialsPort]），勿再在 `shared/data/` 新增 mapper/adapter 目录。
 

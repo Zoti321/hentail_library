@@ -1,5 +1,5 @@
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
-import 'package:hentai_library/src/rust/api/named_facet.dart'
+import 'package:hentai_library/src/rust/api/named_facet/types.dart'
     as rust_named_facet;
 
 extension ManagedNamedFacetKindFrb on ManagedNamedFacetKind {

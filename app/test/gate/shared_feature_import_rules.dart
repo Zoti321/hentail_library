@@ -6,10 +6,11 @@ import 'package:path/path.dart' as p;
 ///
 /// Phase C (#256): FRB thin edges; keep in sync with
 /// [docs/engineering/gate.md] and `import_boundary_rules.dart` FRB allowlist.
-const Set<String> kSharedDataExplicitFeatureImportAllowlist = <String>{
-  // Repositories layer; documented cross-feature seam (#295), not feature-import today.
-  'shared/data/repositories/named_facet_form_listing.dart',
-};
+/// `shared/data` paths that may import `features/` outside the adapters tree.
+///
+/// Phase C (#256): FRB thin edges; keep in sync with
+/// [docs/engineering/gate.md] and `import_boundary_rules.dart` FRB allowlist.
+const Set<String> kSharedDataExplicitFeatureImportAllowlist = <String>{};
 
 final RegExp _featureImportUriRe = RegExp(
   "package:hentai_library/features/([^'\"]+)",

@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
-import 'package:hentai_library/src/rust/api/character.dart' as rust_character;
-import 'package:hentai_library/src/rust/api/parody.dart' as rust_parody;
+import 'package:hentai_library/src/rust/api/named_facet_dictionary.dart'
+    as rust_dictionary;
 
 /// Parody / character 字典 FRB 薄封装。
 class NamedFacetDictionaryFrbAdapter {
@@ -23,15 +23,15 @@ class NamedFacetDictionaryFrbAdapter {
   };
 
   Future<List<String>> _listAllFrb() => switch (kind) {
-    NamedFacetKind.parody => rust_parody.listAllParodiesFrb(),
-    NamedFacetKind.character => rust_character.listAllCharactersFrb(),
+    NamedFacetKind.parody => rust_dictionary.listAllParodiesFrb(),
+    NamedFacetKind.character => rust_dictionary.listAllCharactersFrb(),
   };
 
   Future<List<String>> _listDistinctFrb(String? libraryId) => switch (kind) {
-    NamedFacetKind.parody => rust_parody.listDistinctParodiesFrb(
+    NamedFacetKind.parody => rust_dictionary.listDistinctParodiesFrb(
       libraryId: libraryId,
     ),
-    NamedFacetKind.character => rust_character.listDistinctCharactersFrb(
+    NamedFacetKind.character => rust_dictionary.listDistinctCharactersFrb(
       libraryId: libraryId,
     ),
   };

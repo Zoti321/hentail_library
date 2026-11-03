@@ -4,7 +4,6 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/author.dart';
-import 'api/character.dart';
 import 'api/comic.dart';
 import 'api/comic_trash.dart';
 import 'api/history.dart';
@@ -13,8 +12,10 @@ import 'api/init.dart';
 import 'api/library.dart';
 import 'api/logging.dart';
 import 'api/metadata_backup.dart';
-import 'api/named_facet.dart';
-import 'api/parody.dart';
+import 'api/named_facet/form.dart';
+import 'api/named_facet/management.dart';
+import 'api/named_facet/types.dart';
+import 'api/named_facet_dictionary.dart';
 import 'api/probe.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
@@ -87,7 +88,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -1440026720;
+  int get rustContentHash => 1670568499;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -110,7 +111,7 @@ abstract class RustLibApi extends BaseApi {
     String? platformDisplayName,
   });
 
-  void crateApiNamedFacetAddNamedFacetNameFrb({
+  void crateApiNamedFacetManagementAddNamedFacetNameFrb({
     required JunctionNamedFacetFrb facet,
     required String name,
   });
@@ -146,7 +147,8 @@ abstract class RustLibApi extends BaseApi {
 
   Future<PlatformInt64> crateApiSeriesCountAllSeriesFrb();
 
-  Future<PlatformInt64> crateApiNamedFacetCountNamedFacetAttachmentsFrb({
+  Future<PlatformInt64>
+  crateApiNamedFacetManagementCountNamedFacetAttachmentsFrb({
     required JunctionNamedFacetFrb facet,
     required String name,
   });
@@ -178,7 +180,7 @@ abstract class RustLibApi extends BaseApi {
 
   void crateApiLibraryDeleteLibraryFrb({required String libraryId});
 
-  void crateApiNamedFacetDeleteNamedFacetByNamesFrb({
+  void crateApiNamedFacetManagementDeleteNamedFacetByNamesFrb({
     required JunctionNamedFacetFrb facet,
     required List<String> names,
   });
@@ -213,7 +215,8 @@ abstract class RustLibApi extends BaseApi {
     required ComicSortOptionDto sort,
   });
 
-  Future<NamedFacetPagedNamesDto> crateApiNamedFacetFetchNamedFacetPageFrb({
+  Future<NamedFacetPagedNamesDto>
+  crateApiNamedFacetManagementFetchNamedFacetPageFrb({
     required JunctionNamedFacetFrb facet,
     required PageRequestDto request,
   });
@@ -297,30 +300,30 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<AuthorIdentityFrbDto>> crateApiAuthorListAllAuthorsFrb();
 
-  Future<List<String>> crateApiCharacterListAllCharactersFrb();
+  Future<List<String>> crateApiNamedFacetDictionaryListAllCharactersFrb();
 
-  Future<List<String>> crateApiNamedFacetListAllNamedFacetNamesFrb({
+  Future<List<String>> crateApiNamedFacetManagementListAllNamedFacetNamesFrb({
     required JunctionNamedFacetFrb facet,
   });
 
-  Future<List<String>> crateApiParodyListAllParodiesFrb();
+  Future<List<String>> crateApiNamedFacetDictionaryListAllParodiesFrb();
 
   Future<List<AuthorLinkFrbDto>> crateApiAuthorListAuthorLinksFrb({
     required PlatformInt64 authorId,
   });
 
-  Future<List<String>> crateApiCharacterListDistinctCharactersFrb({
+  Future<List<String>> crateApiNamedFacetDictionaryListDistinctCharactersFrb({
     String? libraryId,
   });
 
-  Future<List<String>> crateApiParodyListDistinctParodiesFrb({
+  Future<List<String>> crateApiNamedFacetDictionaryListDistinctParodiesFrb({
     String? libraryId,
   });
 
   Future<List<LibraryDto>> crateApiLibraryListLibrariesFrb();
 
   Future<List<NamedFacetFormEntryFrbDto>>
-  crateApiNamedFacetListNamedFacetForFormFrb({
+  crateApiNamedFacetFormListNamedFacetForFormFrb({
     required JunctionNamedFacetFrb facet,
   });
 
@@ -354,7 +357,7 @@ abstract class RustLibApi extends BaseApi {
     required int pageIndex,
   });
 
-  void crateApiNamedFacetMergeNamedFacetNameFrb({
+  void crateApiNamedFacetManagementMergeNamedFacetNameFrb({
     required JunctionNamedFacetFrb facet,
     required String sourceName,
     required String targetName,
@@ -412,7 +415,7 @@ abstract class RustLibApi extends BaseApi {
     required String newName,
   });
 
-  void crateApiNamedFacetRenameNamedFacetNameFrb({
+  void crateApiNamedFacetManagementRenameNamedFacetNameFrb({
     required JunctionNamedFacetFrb facet,
     required String oldName,
     required String newName,
@@ -706,7 +709,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiNamedFacetAddNamedFacetNameFrb({
+  void crateApiNamedFacetManagementAddNamedFacetNameFrb({
     required JunctionNamedFacetFrb facet,
     required String name,
   }) {
@@ -722,14 +725,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiNamedFacetAddNamedFacetNameFrbConstMeta,
+        constMeta: kCrateApiNamedFacetManagementAddNamedFacetNameFrbConstMeta,
         argValues: [facet, name],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiNamedFacetAddNamedFacetNameFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetManagementAddNamedFacetNameFrbConstMeta =>
       const TaskConstMeta(
         debugName: "add_named_facet_name_frb",
         argNames: ["facet", "name"],
@@ -1103,7 +1107,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "count_all_series_frb", argNames: []);
 
   @override
-  Future<PlatformInt64> crateApiNamedFacetCountNamedFacetAttachmentsFrb({
+  Future<PlatformInt64>
+  crateApiNamedFacetManagementCountNamedFacetAttachmentsFrb({
     required JunctionNamedFacetFrb facet,
     required String name,
   }) {
@@ -1124,14 +1129,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_i_64,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiNamedFacetCountNamedFacetAttachmentsFrbConstMeta,
+        constMeta:
+            kCrateApiNamedFacetManagementCountNamedFacetAttachmentsFrbConstMeta,
         argValues: [facet, name],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiNamedFacetCountNamedFacetAttachmentsFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetManagementCountNamedFacetAttachmentsFrbConstMeta =>
       const TaskConstMeta(
         debugName: "count_named_facet_attachments_frb",
         argNames: ["facet", "name"],
@@ -1346,7 +1353,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiNamedFacetDeleteNamedFacetByNamesFrb({
+  void crateApiNamedFacetManagementDeleteNamedFacetByNamesFrb({
     required JunctionNamedFacetFrb facet,
     required List<String> names,
   }) {
@@ -1362,14 +1369,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiNamedFacetDeleteNamedFacetByNamesFrbConstMeta,
+        constMeta:
+            kCrateApiNamedFacetManagementDeleteNamedFacetByNamesFrbConstMeta,
         argValues: [facet, names],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiNamedFacetDeleteNamedFacetByNamesFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetManagementDeleteNamedFacetByNamesFrbConstMeta =>
       const TaskConstMeta(
         debugName: "delete_named_facet_by_names_frb",
         argNames: ["facet", "names"],
@@ -1596,7 +1605,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<NamedFacetPagedNamesDto> crateApiNamedFacetFetchNamedFacetPageFrb({
+  Future<NamedFacetPagedNamesDto>
+  crateApiNamedFacetManagementFetchNamedFacetPageFrb({
     required JunctionNamedFacetFrb facet,
     required PageRequestDto request,
   }) {
@@ -1617,14 +1627,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_named_facet_paged_names_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiNamedFacetFetchNamedFacetPageFrbConstMeta,
+        constMeta: kCrateApiNamedFacetManagementFetchNamedFacetPageFrbConstMeta,
         argValues: [facet, request],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiNamedFacetFetchNamedFacetPageFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetManagementFetchNamedFacetPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_named_facet_page_frb",
         argNames: ["facet", "request"],
@@ -2304,7 +2315,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "list_all_authors_frb", argNames: []);
 
   @override
-  Future<List<String>> crateApiCharacterListAllCharactersFrb() {
+  Future<List<String>> crateApiNamedFacetDictionaryListAllCharactersFrb() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2320,18 +2331,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiCharacterListAllCharactersFrbConstMeta,
+        constMeta: kCrateApiNamedFacetDictionaryListAllCharactersFrbConstMeta,
         argValues: [],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiCharacterListAllCharactersFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetDictionaryListAllCharactersFrbConstMeta =>
       const TaskConstMeta(debugName: "list_all_characters_frb", argNames: []);
 
   @override
-  Future<List<String>> crateApiNamedFacetListAllNamedFacetNamesFrb({
+  Future<List<String>> crateApiNamedFacetManagementListAllNamedFacetNamesFrb({
     required JunctionNamedFacetFrb facet,
   }) {
     return handler.executeNormal(
@@ -2350,21 +2362,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiNamedFacetListAllNamedFacetNamesFrbConstMeta,
+        constMeta:
+            kCrateApiNamedFacetManagementListAllNamedFacetNamesFrbConstMeta,
         argValues: [facet],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiNamedFacetListAllNamedFacetNamesFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetManagementListAllNamedFacetNamesFrbConstMeta =>
       const TaskConstMeta(
         debugName: "list_all_named_facet_names_frb",
         argNames: ["facet"],
       );
 
   @override
-  Future<List<String>> crateApiParodyListAllParodiesFrb() {
+  Future<List<String>> crateApiNamedFacetDictionaryListAllParodiesFrb() {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -2380,14 +2394,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiParodyListAllParodiesFrbConstMeta,
+        constMeta: kCrateApiNamedFacetDictionaryListAllParodiesFrbConstMeta,
         argValues: [],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiParodyListAllParodiesFrbConstMeta =>
+  TaskConstMeta get kCrateApiNamedFacetDictionaryListAllParodiesFrbConstMeta =>
       const TaskConstMeta(debugName: "list_all_parodies_frb", argNames: []);
 
   @override
@@ -2424,7 +2438,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<String>> crateApiCharacterListDistinctCharactersFrb({
+  Future<List<String>> crateApiNamedFacetDictionaryListDistinctCharactersFrb({
     String? libraryId,
   }) {
     return handler.executeNormal(
@@ -2443,21 +2457,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiCharacterListDistinctCharactersFrbConstMeta,
+        constMeta:
+            kCrateApiNamedFacetDictionaryListDistinctCharactersFrbConstMeta,
         argValues: [libraryId],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiCharacterListDistinctCharactersFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetDictionaryListDistinctCharactersFrbConstMeta =>
       const TaskConstMeta(
         debugName: "list_distinct_characters_frb",
         argNames: ["libraryId"],
       );
 
   @override
-  Future<List<String>> crateApiParodyListDistinctParodiesFrb({
+  Future<List<String>> crateApiNamedFacetDictionaryListDistinctParodiesFrb({
     String? libraryId,
   }) {
     return handler.executeNormal(
@@ -2476,14 +2492,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_String,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiParodyListDistinctParodiesFrbConstMeta,
+        constMeta:
+            kCrateApiNamedFacetDictionaryListDistinctParodiesFrbConstMeta,
         argValues: [libraryId],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiParodyListDistinctParodiesFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetDictionaryListDistinctParodiesFrbConstMeta =>
       const TaskConstMeta(
         debugName: "list_distinct_parodies_frb",
         argNames: ["libraryId"],
@@ -2518,7 +2536,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<List<NamedFacetFormEntryFrbDto>>
-  crateApiNamedFacetListNamedFacetForFormFrb({
+  crateApiNamedFacetFormListNamedFacetForFormFrb({
     required JunctionNamedFacetFrb facet,
   }) {
     return handler.executeNormal(
@@ -2537,14 +2555,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_named_facet_form_entry_frb_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiNamedFacetListNamedFacetForFormFrbConstMeta,
+        constMeta: kCrateApiNamedFacetFormListNamedFacetForFormFrbConstMeta,
         argValues: [facet],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiNamedFacetListNamedFacetForFormFrbConstMeta =>
+  TaskConstMeta get kCrateApiNamedFacetFormListNamedFacetForFormFrbConstMeta =>
       const TaskConstMeta(
         debugName: "list_named_facet_for_form_frb",
         argNames: ["facet"],
@@ -2754,7 +2772,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiNamedFacetMergeNamedFacetNameFrb({
+  void crateApiNamedFacetManagementMergeNamedFacetNameFrb({
     required JunctionNamedFacetFrb facet,
     required String sourceName,
     required String targetName,
@@ -2772,14 +2790,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiNamedFacetMergeNamedFacetNameFrbConstMeta,
+        constMeta: kCrateApiNamedFacetManagementMergeNamedFacetNameFrbConstMeta,
         argValues: [facet, sourceName, targetName],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiNamedFacetMergeNamedFacetNameFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetManagementMergeNamedFacetNameFrbConstMeta =>
       const TaskConstMeta(
         debugName: "merge_named_facet_name_frb",
         argNames: ["facet", "sourceName", "targetName"],
@@ -3169,7 +3188,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiNamedFacetRenameNamedFacetNameFrb({
+  void crateApiNamedFacetManagementRenameNamedFacetNameFrb({
     required JunctionNamedFacetFrb facet,
     required String oldName,
     required String newName,
@@ -3187,14 +3206,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_unit,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiNamedFacetRenameNamedFacetNameFrbConstMeta,
+        constMeta:
+            kCrateApiNamedFacetManagementRenameNamedFacetNameFrbConstMeta,
         argValues: [facet, oldName, newName],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiNamedFacetRenameNamedFacetNameFrbConstMeta =>
+  TaskConstMeta
+  get kCrateApiNamedFacetManagementRenameNamedFacetNameFrbConstMeta =>
       const TaskConstMeta(
         debugName: "rename_named_facet_name_frb",
         argNames: ["facet", "oldName", "newName"],

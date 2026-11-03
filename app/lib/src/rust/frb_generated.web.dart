@@ -3,11 +3,11 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
 import 'api/author.dart';
-import 'api/character.dart';
 import 'api/comic.dart';
 import 'api/comic_trash.dart';
 import 'api/history.dart';
@@ -16,8 +16,10 @@ import 'api/init.dart';
 import 'api/library.dart';
 import 'api/logging.dart';
 import 'api/metadata_backup.dart';
-import 'api/named_facet.dart';
-import 'api/parody.dart';
+import 'api/named_facet/form.dart';
+import 'api/named_facet/management.dart';
+import 'api/named_facet/types.dart';
+import 'api/named_facet_dictionary.dart';
 import 'api/probe.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
@@ -25,2547 +27,1129 @@ import 'api/shutdown.dart';
 import 'api/sync.dart';
 import 'api/tag.dart';
 import 'api/thumbnail.dart';
-
 import 'dart:async';
 import 'dart:convert';
-
 import 'frb_generated.dart';
-
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
-abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
-  RustLibApiImplPlatform({
-    required super.handler,
-    required super.wire,
-    required super.generalizedFrbRustBinding,
-    required super.portManager,
-  });
 
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_SyncHandleDtoPtr => wire
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
 
-  @protected
-  AnyhowException dco_decode_AnyhowException(dynamic raw);
 
-  @protected
-  SyncHandleDto
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    dynamic raw,
-  );
+                abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
+                  RustLibApiImplPlatform({
+                    required super.handler,
+                    required super.wire,
+                    required super.generalizedFrbRustBinding,
+                    required super.portManager,
+                  });
 
-  @protected
-  SyncHandleDto
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    dynamic raw,
-  );
+                  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_SyncHandleDtoPtr => wire.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
 
-  @protected
-  SyncHandleDto
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    dynamic raw,
-  );
 
-  @protected
-  RustStreamSink<HomePageCountsDto>
-  dco_decode_StreamSink_home_page_counts_dto_Sse(dynamic raw);
 
-  @protected
-  RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw);
+                  @protected AnyhowException dco_decode_AnyhowException(dynamic raw);
 
-  @protected
-  RustStreamSink<List<AuthorIdentityFrbDto>>
-  dco_decode_StreamSink_list_author_identity_frb_dto_Sse(dynamic raw);
+@protected SyncHandleDto dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(dynamic raw);
 
-  @protected
-  RustStreamSink<List<HomeContinueReadingDto>>
-  dco_decode_StreamSink_list_home_continue_reading_dto_Sse(dynamic raw);
+@protected SyncHandleDto dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(dynamic raw);
 
-  @protected
-  RustStreamSink<List<HomeLibraryAlertDto>>
-  dco_decode_StreamSink_list_home_library_alert_dto_Sse(dynamic raw);
+@protected SyncHandleDto dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(dynamic raw);
 
-  @protected
-  RustStreamSink<List<HomeRecentlyAddedDto>>
-  dco_decode_StreamSink_list_home_recently_added_dto_Sse(dynamic raw);
+@protected RustStreamSink<HomePageCountsDto> dco_decode_StreamSink_home_page_counts_dto_Sse(dynamic raw);
 
-  @protected
-  RustStreamSink<List<LibraryHomeStatDto>>
-  dco_decode_StreamSink_list_library_home_stat_dto_Sse(dynamic raw);
+@protected RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw);
 
-  @protected
-  RustStreamSink<List<ReadingHistoryDto>>
-  dco_decode_StreamSink_list_reading_history_dto_Sse(dynamic raw);
+@protected RustStreamSink<List<AuthorIdentityFrbDto>> dco_decode_StreamSink_list_author_identity_frb_dto_Sse(dynamic raw);
 
-  @protected
-  RustStreamSink<List<SeriesComicOrderEntryDto>>
-  dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw);
+@protected RustStreamSink<List<HomeContinueReadingDto>> dco_decode_StreamSink_list_home_continue_reading_dto_Sse(dynamic raw);
 
-  @protected
-  RustStreamSink<SyncLibraryProgressDto>
-  dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw);
+@protected RustStreamSink<List<HomeLibraryAlertDto>> dco_decode_StreamSink_list_home_library_alert_dto_Sse(dynamic raw);
 
-  @protected
-  RustStreamSink<ThumbnailEventDto>
-  dco_decode_StreamSink_thumbnail_event_dto_Sse(dynamic raw);
+@protected RustStreamSink<List<HomeRecentlyAddedDto>> dco_decode_StreamSink_list_home_recently_added_dto_Sse(dynamic raw);
 
-  @protected
-  String dco_decode_String(dynamic raw);
+@protected RustStreamSink<List<LibraryHomeStatDto>> dco_decode_StreamSink_list_library_home_stat_dto_Sse(dynamic raw);
 
-  @protected
-  AmbiguousSampleDto dco_decode_ambiguous_sample_dto(dynamic raw);
+@protected RustStreamSink<List<ReadingHistoryDto>> dco_decode_StreamSink_list_reading_history_dto_Sse(dynamic raw);
 
-  @protected
-  AuthorDetailFrbDto dco_decode_author_detail_frb_dto(dynamic raw);
+@protected RustStreamSink<List<SeriesComicOrderEntryDto>> dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw);
 
-  @protected
-  AuthorFacetCountFrbDto dco_decode_author_facet_count_frb_dto(dynamic raw);
+@protected RustStreamSink<SyncLibraryProgressDto> dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw);
 
-  @protected
-  AuthorIdentityFrbDto dco_decode_author_identity_frb_dto(dynamic raw);
+@protected RustStreamSink<ThumbnailEventDto> dco_decode_StreamSink_thumbnail_event_dto_Sse(dynamic raw);
 
-  @protected
-  AuthorImageRefFrbDto dco_decode_author_image_ref_frb_dto(dynamic raw);
+@protected String dco_decode_String(dynamic raw);
 
-  @protected
-  AuthorImageSlotFrb dco_decode_author_image_slot_frb(dynamic raw);
+@protected AmbiguousSampleDto dco_decode_ambiguous_sample_dto(dynamic raw);
 
-  @protected
-  AuthorImageSourceFrb dco_decode_author_image_source_frb(dynamic raw);
+@protected AuthorDetailFrbDto dco_decode_author_detail_frb_dto(dynamic raw);
 
-  @protected
-  AuthorLinkFrbDto dco_decode_author_link_frb_dto(dynamic raw);
+@protected AuthorFacetCountFrbDto dco_decode_author_facet_count_frb_dto(dynamic raw);
 
-  @protected
-  AuthorLinkPlatformFrb dco_decode_author_link_platform_frb(dynamic raw);
+@protected AuthorIdentityFrbDto dco_decode_author_identity_frb_dto(dynamic raw);
 
-  @protected
-  AuthorPagedDto dco_decode_author_paged_dto(dynamic raw);
+@protected AuthorImageRefFrbDto dco_decode_author_image_ref_frb_dto(dynamic raw);
 
-  @protected
-  AuthorTopComicFrbDto dco_decode_author_top_comic_frb_dto(dynamic raw);
+@protected AuthorImageSlotFrb dco_decode_author_image_slot_frb(dynamic raw);
 
-  @protected
-  bool dco_decode_bool(dynamic raw);
+@protected AuthorImageSourceFrb dco_decode_author_image_source_frb(dynamic raw);
 
-  @protected
-  AuthorDetailFrbDto dco_decode_box_autoadd_author_detail_frb_dto(dynamic raw);
+@protected AuthorLinkFrbDto dco_decode_author_link_frb_dto(dynamic raw);
 
-  @protected
-  bool dco_decode_box_autoadd_bool(dynamic raw);
+@protected AuthorLinkPlatformFrb dco_decode_author_link_platform_frb(dynamic raw);
 
-  @protected
-  ComicDto dco_decode_box_autoadd_comic_dto(dynamic raw);
+@protected AuthorPagedDto dco_decode_author_paged_dto(dynamic raw);
 
-  @protected
-  ComicFilterDto dco_decode_box_autoadd_comic_filter_dto(dynamic raw);
+@protected AuthorTopComicFrbDto dco_decode_author_top_comic_frb_dto(dynamic raw);
 
-  @protected
-  ComicMetadataBulkPatchFrbDto
-  dco_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(dynamic raw);
+@protected bool dco_decode_bool(dynamic raw);
 
-  @protected
-  ComicSortOptionDto dco_decode_box_autoadd_comic_sort_option_dto(dynamic raw);
+@protected AuthorDetailFrbDto dco_decode_box_autoadd_author_detail_frb_dto(dynamic raw);
 
-  @protected
-  ComicThumbnailDto dco_decode_box_autoadd_comic_thumbnail_dto(dynamic raw);
+@protected bool dco_decode_box_autoadd_bool(dynamic raw);
 
-  @protected
-  ExportComicMetadataOptionsDto
-  dco_decode_box_autoadd_export_comic_metadata_options_dto(dynamic raw);
+@protected ComicDto dco_decode_box_autoadd_comic_dto(dynamic raw);
 
-  @protected
-  int dco_decode_box_autoadd_i_32(dynamic raw);
+@protected ComicFilterDto dco_decode_box_autoadd_comic_filter_dto(dynamic raw);
 
-  @protected
-  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
+@protected ComicMetadataBulkPatchFrbDto dco_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(dynamic raw);
 
-  @protected
-  MatchTierDto dco_decode_box_autoadd_match_tier_dto(dynamic raw);
+@protected ComicSortOptionDto dco_decode_box_autoadd_comic_sort_option_dto(dynamic raw);
 
-  @protected
-  MultiValuePatchFrbDto dco_decode_box_autoadd_multi_value_patch_frb_dto(
-    dynamic raw,
-  );
+@protected ComicThumbnailDto dco_decode_box_autoadd_comic_thumbnail_dto(dynamic raw);
 
-  @protected
-  PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw);
+@protected ExportComicMetadataOptionsDto dco_decode_box_autoadd_export_comic_metadata_options_dto(dynamic raw);
 
-  @protected
-  PublishedAtPatchFrbDto dco_decode_box_autoadd_published_at_patch_frb_dto(
-    dynamic raw,
-  );
+@protected int dco_decode_box_autoadd_i_32(dynamic raw);
 
-  @protected
-  ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw);
+@protected PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
-  @protected
-  ScalarPatchFrbDto dco_decode_box_autoadd_scalar_patch_frb_dto(dynamic raw);
+@protected MatchTierDto dco_decode_box_autoadd_match_tier_dto(dynamic raw);
 
-  @protected
-  SeriesDto dco_decode_box_autoadd_series_dto(dynamic raw);
+@protected MultiValuePatchFrbDto dco_decode_box_autoadd_multi_value_patch_frb_dto(dynamic raw);
 
-  @protected
-  SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw);
+@protected PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw);
 
-  @protected
-  SeriesItemDto dco_decode_box_autoadd_series_item_dto(dynamic raw);
+@protected PublishedAtPatchFrbDto dco_decode_box_autoadd_published_at_patch_frb_dto(dynamic raw);
 
-  @protected
-  SeriesReadingContextDto dco_decode_box_autoadd_series_reading_context_dto(
-    dynamic raw,
-  );
+@protected ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw);
 
-  @protected
-  SeriesSortOptionDto dco_decode_box_autoadd_series_sort_option_dto(
-    dynamic raw,
-  );
+@protected ScalarPatchFrbDto dco_decode_box_autoadd_scalar_patch_frb_dto(dynamic raw);
 
-  @protected
-  SeriesThumbnailDto dco_decode_box_autoadd_series_thumbnail_dto(dynamic raw);
+@protected SeriesDto dco_decode_box_autoadd_series_dto(dynamic raw);
 
-  @protected
-  SetComicMetaLocksFrbDto dco_decode_box_autoadd_set_comic_meta_locks_frb_dto(
-    dynamic raw,
-  );
+@protected SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw);
 
-  @protected
-  SetSeriesMetaLocksDto dco_decode_box_autoadd_set_series_meta_locks_dto(
-    dynamic raw,
-  );
+@protected SeriesItemDto dco_decode_box_autoadd_series_item_dto(dynamic raw);
 
-  @protected
-  UpdateComicUserMetaFrbDto
-  dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
+@protected SeriesReadingContextDto dco_decode_box_autoadd_series_reading_context_dto(dynamic raw);
 
-  @protected
-  UpdateSeriesUserMetaDto dco_decode_box_autoadd_update_series_user_meta_dto(
-    dynamic raw,
-  );
+@protected SeriesSortOptionDto dco_decode_box_autoadd_series_sort_option_dto(dynamic raw);
 
-  @protected
-  BulkPatchResultFrbDto dco_decode_bulk_patch_result_frb_dto(dynamic raw);
+@protected SeriesThumbnailDto dco_decode_box_autoadd_series_thumbnail_dto(dynamic raw);
 
-  @protected
-  ComicDto dco_decode_comic_dto(dynamic raw);
+@protected SetComicMetaLocksFrbDto dco_decode_box_autoadd_set_comic_meta_locks_frb_dto(dynamic raw);
 
-  @protected
-  ComicFilterDto dco_decode_comic_filter_dto(dynamic raw);
+@protected SetSeriesMetaLocksDto dco_decode_box_autoadd_set_series_meta_locks_dto(dynamic raw);
 
-  @protected
-  ComicGroupingDto dco_decode_comic_grouping_dto(dynamic raw);
+@protected UpdateComicUserMetaFrbDto dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
 
-  @protected
-  ComicMetaLocksDto dco_decode_comic_meta_locks_dto(dynamic raw);
+@protected UpdateSeriesUserMetaDto dco_decode_box_autoadd_update_series_user_meta_dto(dynamic raw);
 
-  @protected
-  ComicMetadataBulkPatchFrbDto dco_decode_comic_metadata_bulk_patch_frb_dto(
-    dynamic raw,
-  );
+@protected BulkPatchResultFrbDto dco_decode_bulk_patch_result_frb_dto(dynamic raw);
 
-  @protected
-  ComicPurgeResultFrbDto dco_decode_comic_purge_result_frb_dto(dynamic raw);
+@protected ComicDto dco_decode_comic_dto(dynamic raw);
 
-  @protected
-  ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw);
+@protected ComicFilterDto dco_decode_comic_filter_dto(dynamic raw);
 
-  @protected
-  ComicSortOptionDto dco_decode_comic_sort_option_dto(dynamic raw);
+@protected ComicGroupingDto dco_decode_comic_grouping_dto(dynamic raw);
 
-  @protected
-  ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw);
+@protected ComicMetaLocksDto dco_decode_comic_meta_locks_dto(dynamic raw);
 
-  @protected
-  ExportComicMetadataOptionsDto dco_decode_export_comic_metadata_options_dto(
-    dynamic raw,
-  );
+@protected ComicMetadataBulkPatchFrbDto dco_decode_comic_metadata_bulk_patch_frb_dto(dynamic raw);
 
-  @protected
-  double dco_decode_f_64(dynamic raw);
+@protected ComicPurgeResultFrbDto dco_decode_comic_purge_result_frb_dto(dynamic raw);
 
-  @protected
-  HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw);
+@protected ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw);
 
-  @protected
-  HomeContinueReadingDto dco_decode_home_continue_reading_dto(dynamic raw);
+@protected ComicSortOptionDto dco_decode_comic_sort_option_dto(dynamic raw);
 
-  @protected
-  HomeLibraryAlertDto dco_decode_home_library_alert_dto(dynamic raw);
+@protected ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw);
 
-  @protected
-  HomeLibraryAlertKindDto dco_decode_home_library_alert_kind_dto(dynamic raw);
+@protected ExportComicMetadataOptionsDto dco_decode_export_comic_metadata_options_dto(dynamic raw);
 
-  @protected
-  HomePageCountsDto dco_decode_home_page_counts_dto(dynamic raw);
+@protected double dco_decode_f_64(dynamic raw);
 
-  @protected
-  HomeRecentlyAddedDto dco_decode_home_recently_added_dto(dynamic raw);
+@protected HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw);
 
-  @protected
-  int dco_decode_i_32(dynamic raw);
+@protected HomeContinueReadingDto dco_decode_home_continue_reading_dto(dynamic raw);
 
-  @protected
-  PlatformInt64 dco_decode_i_64(dynamic raw);
+@protected HomeLibraryAlertDto dco_decode_home_library_alert_dto(dynamic raw);
 
-  @protected
-  ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(
-    dynamic raw,
-  );
+@protected HomeLibraryAlertKindDto dco_decode_home_library_alert_kind_dto(dynamic raw);
 
-  @protected
-  JunctionNamedFacetFrb dco_decode_junction_named_facet_frb(dynamic raw);
+@protected HomePageCountsDto dco_decode_home_page_counts_dto(dynamic raw);
 
-  @protected
-  LibraryDto dco_decode_library_dto(dynamic raw);
+@protected HomeRecentlyAddedDto dco_decode_home_recently_added_dto(dynamic raw);
 
-  @protected
-  LibraryHomeStatDto dco_decode_library_home_stat_dto(dynamic raw);
+@protected int dco_decode_i_32(dynamic raw);
 
-  @protected
-  LibraryProbeResultDto dco_decode_library_probe_result_dto(dynamic raw);
+@protected PlatformInt64 dco_decode_i_64(dynamic raw);
 
-  @protected
-  LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(
-    dynamic raw,
-  );
+@protected ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(dynamic raw);
 
-  @protected
-  LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
+@protected JunctionNamedFacetFrb dco_decode_junction_named_facet_frb(dynamic raw);
 
-  @protected
-  List<String> dco_decode_list_String(dynamic raw);
+@protected LibraryDto dco_decode_library_dto(dynamic raw);
 
-  @protected
-  List<AmbiguousSampleDto> dco_decode_list_ambiguous_sample_dto(dynamic raw);
+@protected LibraryHomeStatDto dco_decode_library_home_stat_dto(dynamic raw);
 
-  @protected
-  List<AuthorFacetCountFrbDto> dco_decode_list_author_facet_count_frb_dto(
-    dynamic raw,
-  );
+@protected LibraryProbeResultDto dco_decode_library_probe_result_dto(dynamic raw);
 
-  @protected
-  List<AuthorIdentityFrbDto> dco_decode_list_author_identity_frb_dto(
-    dynamic raw,
-  );
+@protected LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(dynamic raw);
 
-  @protected
-  List<AuthorLinkFrbDto> dco_decode_list_author_link_frb_dto(dynamic raw);
+@protected LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
 
-  @protected
-  List<AuthorTopComicFrbDto> dco_decode_list_author_top_comic_frb_dto(
-    dynamic raw,
-  );
+@protected List<String> dco_decode_list_String(dynamic raw);
 
-  @protected
-  List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
+@protected List<AmbiguousSampleDto> dco_decode_list_ambiguous_sample_dto(dynamic raw);
 
-  @protected
-  List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
-    dynamic raw,
-  );
+@protected List<AuthorFacetCountFrbDto> dco_decode_list_author_facet_count_frb_dto(dynamic raw);
 
-  @protected
-  List<HomeLibraryAlertDto> dco_decode_list_home_library_alert_dto(dynamic raw);
+@protected List<AuthorIdentityFrbDto> dco_decode_list_author_identity_frb_dto(dynamic raw);
 
-  @protected
-  List<HomeRecentlyAddedDto> dco_decode_list_home_recently_added_dto(
-    dynamic raw,
-  );
+@protected List<AuthorLinkFrbDto> dco_decode_list_author_link_frb_dto(dynamic raw);
 
-  @protected
-  List<LibraryDto> dco_decode_list_library_dto(dynamic raw);
+@protected List<AuthorTopComicFrbDto> dco_decode_list_author_top_comic_frb_dto(dynamic raw);
 
-  @protected
-  List<LibraryHomeStatDto> dco_decode_list_library_home_stat_dto(dynamic raw);
+@protected List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
 
-  @protected
-  List<LibrarySidebarPlacementDto>
-  dco_decode_list_library_sidebar_placement_dto(dynamic raw);
+@protected List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(dynamic raw);
 
-  @protected
-  List<NamedFacetFormEntryFrbDto>
-  dco_decode_list_named_facet_form_entry_frb_dto(dynamic raw);
+@protected List<HomeLibraryAlertDto> dco_decode_list_home_library_alert_dto(dynamic raw);
 
-  @protected
-  List<NotFoundSampleDto> dco_decode_list_not_found_sample_dto(dynamic raw);
+@protected List<HomeRecentlyAddedDto> dco_decode_list_home_recently_added_dto(dynamic raw);
 
-  @protected
-  List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
+@protected List<LibraryDto> dco_decode_list_library_dto(dynamic raw);
 
-  @protected
-  Int32List dco_decode_list_prim_i_32_strict(dynamic raw);
+@protected List<LibraryHomeStatDto> dco_decode_list_library_home_stat_dto(dynamic raw);
 
-  @protected
-  List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
+@protected List<LibrarySidebarPlacementDto> dco_decode_list_library_sidebar_placement_dto(dynamic raw);
 
-  @protected
-  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+@protected List<NamedFacetFormEntryFrbDto> dco_decode_list_named_facet_form_entry_frb_dto(dynamic raw);
 
-  @protected
-  List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw);
+@protected List<NotFoundSampleDto> dco_decode_list_not_found_sample_dto(dynamic raw);
 
-  @protected
-  List<RemoteLibraryCredentialDto>
-  dco_decode_list_remote_library_credential_dto(dynamic raw);
+@protected List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
 
-  @protected
-  List<ResourceFormatCategoryDto> dco_decode_list_resource_format_category_dto(
-    dynamic raw,
-  );
+@protected Int32List dco_decode_list_prim_i_32_strict(dynamic raw);
 
-  @protected
-  List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
-    dynamic raw,
-  );
+@protected List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
 
-  @protected
-  List<SeriesComicPageItemDto> dco_decode_list_series_comic_page_item_dto(
-    dynamic raw,
-  );
+@protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
-  @protected
-  List<SeriesDto> dco_decode_list_series_dto(dynamic raw);
+@protected List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw);
 
-  @protected
-  List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw);
+@protected List<RemoteLibraryCredentialDto> dco_decode_list_remote_library_credential_dto(dynamic raw);
 
-  @protected
-  List<TrashedComicFrbDto> dco_decode_list_trashed_comic_frb_dto(dynamic raw);
+@protected List<ResourceFormatCategoryDto> dco_decode_list_resource_format_category_dto(dynamic raw);
 
-  @protected
-  List<WouldApplySampleDto> dco_decode_list_would_apply_sample_dto(dynamic raw);
+@protected List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(dynamic raw);
 
-  @protected
-  MatchTierDto dco_decode_match_tier_dto(dynamic raw);
+@protected List<SeriesComicPageItemDto> dco_decode_list_series_comic_page_item_dto(dynamic raw);
 
-  @protected
-  MetadataBackupManifestDto dco_decode_metadata_backup_manifest_dto(
-    dynamic raw,
-  );
+@protected List<SeriesDto> dco_decode_list_series_dto(dynamic raw);
 
-  @protected
-  MultiValueOpFrbDto dco_decode_multi_value_op_frb_dto(dynamic raw);
+@protected List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw);
 
-  @protected
-  MultiValuePatchFrbDto dco_decode_multi_value_patch_frb_dto(dynamic raw);
+@protected List<TrashedComicFrbDto> dco_decode_list_trashed_comic_frb_dto(dynamic raw);
 
-  @protected
-  NamedFacetFormEntryFrbDto dco_decode_named_facet_form_entry_frb_dto(
-    dynamic raw,
-  );
+@protected List<WouldApplySampleDto> dco_decode_list_would_apply_sample_dto(dynamic raw);
 
-  @protected
-  NamedFacetPagedNamesDto dco_decode_named_facet_paged_names_dto(dynamic raw);
+@protected MatchTierDto dco_decode_match_tier_dto(dynamic raw);
 
-  @protected
-  NotFoundSampleDto dco_decode_not_found_sample_dto(dynamic raw);
+@protected MetadataBackupManifestDto dco_decode_metadata_backup_manifest_dto(dynamic raw);
 
-  @protected
-  String? dco_decode_opt_String(dynamic raw);
+@protected MultiValueOpFrbDto dco_decode_multi_value_op_frb_dto(dynamic raw);
 
-  @protected
-  AuthorDetailFrbDto? dco_decode_opt_box_autoadd_author_detail_frb_dto(
-    dynamic raw,
-  );
+@protected MultiValuePatchFrbDto dco_decode_multi_value_patch_frb_dto(dynamic raw);
 
-  @protected
-  bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
+@protected NamedFacetFormEntryFrbDto dco_decode_named_facet_form_entry_frb_dto(dynamic raw);
 
-  @protected
-  ComicDto? dco_decode_opt_box_autoadd_comic_dto(dynamic raw);
+@protected NamedFacetPagedNamesDto dco_decode_named_facet_paged_names_dto(dynamic raw);
 
-  @protected
-  ComicThumbnailDto? dco_decode_opt_box_autoadd_comic_thumbnail_dto(
-    dynamic raw,
-  );
+@protected NotFoundSampleDto dco_decode_not_found_sample_dto(dynamic raw);
 
-  @protected
-  int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
+@protected String? dco_decode_opt_String(dynamic raw);
 
-  @protected
-  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
+@protected AuthorDetailFrbDto? dco_decode_opt_box_autoadd_author_detail_frb_dto(dynamic raw);
 
-  @protected
-  MatchTierDto? dco_decode_opt_box_autoadd_match_tier_dto(dynamic raw);
+@protected bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
 
-  @protected
-  MultiValuePatchFrbDto? dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-    dynamic raw,
-  );
+@protected ComicDto? dco_decode_opt_box_autoadd_comic_dto(dynamic raw);
 
-  @protected
-  PublishedAtPatchFrbDto? dco_decode_opt_box_autoadd_published_at_patch_frb_dto(
-    dynamic raw,
-  );
+@protected ComicThumbnailDto? dco_decode_opt_box_autoadd_comic_thumbnail_dto(dynamic raw);
 
-  @protected
-  ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(
-    dynamic raw,
-  );
+@protected int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
 
-  @protected
-  ScalarPatchFrbDto? dco_decode_opt_box_autoadd_scalar_patch_frb_dto(
-    dynamic raw,
-  );
+@protected PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
 
-  @protected
-  SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw);
+@protected MatchTierDto? dco_decode_opt_box_autoadd_match_tier_dto(dynamic raw);
 
-  @protected
-  SeriesItemDto? dco_decode_opt_box_autoadd_series_item_dto(dynamic raw);
+@protected MultiValuePatchFrbDto? dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(dynamic raw);
 
-  @protected
-  SeriesReadingContextDto?
-  dco_decode_opt_box_autoadd_series_reading_context_dto(dynamic raw);
+@protected PublishedAtPatchFrbDto? dco_decode_opt_box_autoadd_published_at_patch_frb_dto(dynamic raw);
 
-  @protected
-  SeriesThumbnailDto? dco_decode_opt_box_autoadd_series_thumbnail_dto(
-    dynamic raw,
-  );
+@protected ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(dynamic raw);
 
-  @protected
-  List<String>? dco_decode_opt_list_String(dynamic raw);
+@protected ScalarPatchFrbDto? dco_decode_opt_box_autoadd_scalar_patch_frb_dto(dynamic raw);
 
-  @protected
-  Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
+@protected SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw);
 
-  @protected
-  PageRequestDto dco_decode_page_request_dto(dynamic raw);
+@protected SeriesItemDto? dco_decode_opt_box_autoadd_series_item_dto(dynamic raw);
 
-  @protected
-  PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw);
+@protected SeriesReadingContextDto? dco_decode_opt_box_autoadd_series_reading_context_dto(dynamic raw);
 
-  @protected
-  PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw);
+@protected SeriesThumbnailDto? dco_decode_opt_box_autoadd_series_thumbnail_dto(dynamic raw);
 
-  @protected
-  PagedSeriesComicsResultDto dco_decode_paged_series_comics_result_dto(
-    dynamic raw,
-  );
+@protected List<String>? dco_decode_opt_list_String(dynamic raw);
 
-  @protected
-  PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw);
+@protected Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
 
-  @protected
-  PagedTrashedComicResultFrbDto dco_decode_paged_trashed_comic_result_frb_dto(
-    dynamic raw,
-  );
+@protected PageRequestDto dco_decode_page_request_dto(dynamic raw);
 
-  @protected
-  PreviewImportComicMetadataResultDto
-  dco_decode_preview_import_comic_metadata_result_dto(dynamic raw);
+@protected PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw);
 
-  @protected
-  PublishedAtPatchFrbDto dco_decode_published_at_patch_frb_dto(dynamic raw);
+@protected PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw);
 
-  @protected
-  ReaderPageDto dco_decode_reader_page_dto(dynamic raw);
+@protected PagedSeriesComicsResultDto dco_decode_paged_series_comics_result_dto(dynamic raw);
 
-  @protected
-  ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw);
+@protected PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw);
 
-  @protected
-  ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw);
+@protected PagedTrashedComicResultFrbDto dco_decode_paged_trashed_comic_result_frb_dto(dynamic raw);
 
-  @protected
-  RefreshLibraryResultFrbDto dco_decode_refresh_library_result_frb_dto(
-    dynamic raw,
-  );
+@protected PreviewImportComicMetadataResultDto dco_decode_preview_import_comic_metadata_result_dto(dynamic raw);
 
-  @protected
-  RefreshSeriesResultFrbDto dco_decode_refresh_series_result_frb_dto(
-    dynamic raw,
-  );
+@protected PublishedAtPatchFrbDto dco_decode_published_at_patch_frb_dto(dynamic raw);
 
-  @protected
-  RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(
-    dynamic raw,
-  );
+@protected ReaderPageDto dco_decode_reader_page_dto(dynamic raw);
 
-  @protected
-  ResourceFormatCategoryDto dco_decode_resource_format_category_dto(
-    dynamic raw,
-  );
+@protected ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw);
 
-  @protected
-  ScalarPatchFrbDto dco_decode_scalar_patch_frb_dto(dynamic raw);
+@protected ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw);
 
-  @protected
-  ScanIntervalDto dco_decode_scan_interval_dto(dynamic raw);
+@protected RefreshLibraryResultFrbDto dco_decode_refresh_library_result_frb_dto(dynamic raw);
 
-  @protected
-  SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw);
+@protected RefreshSeriesResultFrbDto dco_decode_refresh_series_result_frb_dto(dynamic raw);
 
-  @protected
-  SeriesComicPageItemDto dco_decode_series_comic_page_item_dto(dynamic raw);
+@protected RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(dynamic raw);
 
-  @protected
-  SeriesComicsMetadataDto dco_decode_series_comics_metadata_dto(dynamic raw);
+@protected ResourceFormatCategoryDto dco_decode_resource_format_category_dto(dynamic raw);
 
-  @protected
-  SeriesCoverSourceDto dco_decode_series_cover_source_dto(dynamic raw);
+@protected ScalarPatchFrbDto dco_decode_scalar_patch_frb_dto(dynamic raw);
 
-  @protected
-  SeriesDto dco_decode_series_dto(dynamic raw);
+@protected ScanIntervalDto dco_decode_scan_interval_dto(dynamic raw);
 
-  @protected
-  SeriesFilterDto dco_decode_series_filter_dto(dynamic raw);
+@protected SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw);
 
-  @protected
-  SeriesItemDto dco_decode_series_item_dto(dynamic raw);
+@protected SeriesComicPageItemDto dco_decode_series_comic_page_item_dto(dynamic raw);
 
-  @protected
-  SeriesMetaLocksDto dco_decode_series_meta_locks_dto(dynamic raw);
+@protected SeriesComicsMetadataDto dco_decode_series_comics_metadata_dto(dynamic raw);
 
-  @protected
-  SeriesReadingContextDto dco_decode_series_reading_context_dto(dynamic raw);
+@protected SeriesCoverSourceDto dco_decode_series_cover_source_dto(dynamic raw);
 
-  @protected
-  SeriesSortFieldDto dco_decode_series_sort_field_dto(dynamic raw);
+@protected SeriesDto dco_decode_series_dto(dynamic raw);
 
-  @protected
-  SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw);
+@protected SeriesFilterDto dco_decode_series_filter_dto(dynamic raw);
 
-  @protected
-  SeriesThumbnailDto dco_decode_series_thumbnail_dto(dynamic raw);
+@protected SeriesItemDto dco_decode_series_item_dto(dynamic raw);
 
-  @protected
-  SetComicMetaLocksFrbDto dco_decode_set_comic_meta_locks_frb_dto(dynamic raw);
+@protected SeriesMetaLocksDto dco_decode_series_meta_locks_dto(dynamic raw);
 
-  @protected
-  SetSeriesMetaLocksDto dco_decode_set_series_meta_locks_dto(dynamic raw);
+@protected SeriesReadingContextDto dco_decode_series_reading_context_dto(dynamic raw);
 
-  @protected
-  SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw);
+@protected SeriesSortFieldDto dco_decode_series_sort_field_dto(dynamic raw);
 
-  @protected
-  SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw);
+@protected SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw);
 
-  @protected
-  SyncLibraryRouteDto dco_decode_sync_library_route_dto(dynamic raw);
+@protected SeriesThumbnailDto dco_decode_series_thumbnail_dto(dynamic raw);
 
-  @protected
-  SyncScanModeDto dco_decode_sync_scan_mode_dto(dynamic raw);
+@protected SetComicMetaLocksFrbDto dco_decode_set_comic_meta_locks_frb_dto(dynamic raw);
 
-  @protected
-  TagDictionaryImportResultDto dco_decode_tag_dictionary_import_result_dto(
-    dynamic raw,
-  );
+@protected SetSeriesMetaLocksDto dco_decode_set_series_meta_locks_dto(dynamic raw);
 
-  @protected
-  ThumbnailEventDto dco_decode_thumbnail_event_dto(dynamic raw);
+@protected SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw);
 
-  @protected
-  ThumbnailPriorityDto dco_decode_thumbnail_priority_dto(dynamic raw);
+@protected SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw);
 
-  @protected
-  TrashedComicCountsFrbDto dco_decode_trashed_comic_counts_frb_dto(dynamic raw);
+@protected SyncLibraryRouteDto dco_decode_sync_library_route_dto(dynamic raw);
 
-  @protected
-  TrashedComicFrbDto dco_decode_trashed_comic_frb_dto(dynamic raw);
+@protected SyncScanModeDto dco_decode_sync_scan_mode_dto(dynamic raw);
 
-  @protected
-  BigInt dco_decode_u_64(dynamic raw);
+@protected TagDictionaryImportResultDto dco_decode_tag_dictionary_import_result_dto(dynamic raw);
 
-  @protected
-  int dco_decode_u_8(dynamic raw);
+@protected ThumbnailEventDto dco_decode_thumbnail_event_dto(dynamic raw);
 
-  @protected
-  void dco_decode_unit(dynamic raw);
+@protected ThumbnailPriorityDto dco_decode_thumbnail_priority_dto(dynamic raw);
 
-  @protected
-  UpdateComicUserMetaFrbDto dco_decode_update_comic_user_meta_frb_dto(
-    dynamic raw,
-  );
+@protected TrashedComicCountsFrbDto dco_decode_trashed_comic_counts_frb_dto(dynamic raw);
 
-  @protected
-  UpdateSeriesUserMetaDto dco_decode_update_series_user_meta_dto(dynamic raw);
+@protected TrashedComicFrbDto dco_decode_trashed_comic_frb_dto(dynamic raw);
 
-  @protected
-  BigInt dco_decode_usize(dynamic raw);
+@protected BigInt dco_decode_u_64(dynamic raw);
 
-  @protected
-  WouldApplySampleDto dco_decode_would_apply_sample_dto(dynamic raw);
+@protected int dco_decode_u_8(dynamic raw);
 
-  @protected
-  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+@protected void dco_decode_unit(dynamic raw);
 
-  @protected
-  SyncHandleDto
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SseDeserializer deserializer,
-  );
+@protected UpdateComicUserMetaFrbDto dco_decode_update_comic_user_meta_frb_dto(dynamic raw);
 
-  @protected
-  SyncHandleDto
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SseDeserializer deserializer,
-  );
+@protected UpdateSeriesUserMetaDto dco_decode_update_series_user_meta_dto(dynamic raw);
 
-  @protected
-  SyncHandleDto
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SseDeserializer deserializer,
-  );
+@protected BigInt dco_decode_usize(dynamic raw);
 
-  @protected
-  RustStreamSink<HomePageCountsDto>
-  sse_decode_StreamSink_home_page_counts_dto_Sse(SseDeserializer deserializer);
+@protected WouldApplySampleDto dco_decode_would_apply_sample_dto(dynamic raw);
 
-  @protected
-  RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(
-    SseDeserializer deserializer,
-  );
+@protected AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<List<AuthorIdentityFrbDto>>
-  sse_decode_StreamSink_list_author_identity_frb_dto_Sse(
-    SseDeserializer deserializer,
-  );
+@protected SyncHandleDto sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<List<HomeContinueReadingDto>>
-  sse_decode_StreamSink_list_home_continue_reading_dto_Sse(
-    SseDeserializer deserializer,
-  );
+@protected SyncHandleDto sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<List<HomeLibraryAlertDto>>
-  sse_decode_StreamSink_list_home_library_alert_dto_Sse(
-    SseDeserializer deserializer,
-  );
+@protected SyncHandleDto sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<List<HomeRecentlyAddedDto>>
-  sse_decode_StreamSink_list_home_recently_added_dto_Sse(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<HomePageCountsDto> sse_decode_StreamSink_home_page_counts_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<List<LibraryHomeStatDto>>
-  sse_decode_StreamSink_list_library_home_stat_dto_Sse(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<List<ReadingHistoryDto>>
-  sse_decode_StreamSink_list_reading_history_dto_Sse(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<List<AuthorIdentityFrbDto>> sse_decode_StreamSink_list_author_identity_frb_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<List<SeriesComicOrderEntryDto>>
-  sse_decode_StreamSink_list_series_comic_order_entry_dto_Sse(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<List<HomeContinueReadingDto>> sse_decode_StreamSink_list_home_continue_reading_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<SyncLibraryProgressDto>
-  sse_decode_StreamSink_sync_library_progress_dto_Sse(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<List<HomeLibraryAlertDto>> sse_decode_StreamSink_list_home_library_alert_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  RustStreamSink<ThumbnailEventDto>
-  sse_decode_StreamSink_thumbnail_event_dto_Sse(SseDeserializer deserializer);
+@protected RustStreamSink<List<HomeRecentlyAddedDto>> sse_decode_StreamSink_list_home_recently_added_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  String sse_decode_String(SseDeserializer deserializer);
+@protected RustStreamSink<List<LibraryHomeStatDto>> sse_decode_StreamSink_list_library_home_stat_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  AmbiguousSampleDto sse_decode_ambiguous_sample_dto(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<List<ReadingHistoryDto>> sse_decode_StreamSink_list_reading_history_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  AuthorDetailFrbDto sse_decode_author_detail_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<List<SeriesComicOrderEntryDto>> sse_decode_StreamSink_list_series_comic_order_entry_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  AuthorFacetCountFrbDto sse_decode_author_facet_count_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<SyncLibraryProgressDto> sse_decode_StreamSink_sync_library_progress_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  AuthorIdentityFrbDto sse_decode_author_identity_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected RustStreamSink<ThumbnailEventDto> sse_decode_StreamSink_thumbnail_event_dto_Sse(SseDeserializer deserializer);
 
-  @protected
-  AuthorImageRefFrbDto sse_decode_author_image_ref_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected String sse_decode_String(SseDeserializer deserializer);
 
-  @protected
-  AuthorImageSlotFrb sse_decode_author_image_slot_frb(
-    SseDeserializer deserializer,
-  );
+@protected AmbiguousSampleDto sse_decode_ambiguous_sample_dto(SseDeserializer deserializer);
 
-  @protected
-  AuthorImageSourceFrb sse_decode_author_image_source_frb(
-    SseDeserializer deserializer,
-  );
+@protected AuthorDetailFrbDto sse_decode_author_detail_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  AuthorLinkFrbDto sse_decode_author_link_frb_dto(SseDeserializer deserializer);
+@protected AuthorFacetCountFrbDto sse_decode_author_facet_count_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  AuthorLinkPlatformFrb sse_decode_author_link_platform_frb(
-    SseDeserializer deserializer,
-  );
+@protected AuthorIdentityFrbDto sse_decode_author_identity_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  AuthorPagedDto sse_decode_author_paged_dto(SseDeserializer deserializer);
+@protected AuthorImageRefFrbDto sse_decode_author_image_ref_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  AuthorTopComicFrbDto sse_decode_author_top_comic_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected AuthorImageSlotFrb sse_decode_author_image_slot_frb(SseDeserializer deserializer);
 
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
+@protected AuthorImageSourceFrb sse_decode_author_image_source_frb(SseDeserializer deserializer);
 
-  @protected
-  AuthorDetailFrbDto sse_decode_box_autoadd_author_detail_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected AuthorLinkFrbDto sse_decode_author_link_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
+@protected AuthorLinkPlatformFrb sse_decode_author_link_platform_frb(SseDeserializer deserializer);
 
-  @protected
-  ComicDto sse_decode_box_autoadd_comic_dto(SseDeserializer deserializer);
+@protected AuthorPagedDto sse_decode_author_paged_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicFilterDto sse_decode_box_autoadd_comic_filter_dto(
-    SseDeserializer deserializer,
-  );
+@protected AuthorTopComicFrbDto sse_decode_author_top_comic_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicMetadataBulkPatchFrbDto
-  sse_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected bool sse_decode_bool(SseDeserializer deserializer);
 
-  @protected
-  ComicSortOptionDto sse_decode_box_autoadd_comic_sort_option_dto(
-    SseDeserializer deserializer,
-  );
+@protected AuthorDetailFrbDto sse_decode_box_autoadd_author_detail_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicThumbnailDto sse_decode_box_autoadd_comic_thumbnail_dto(
-    SseDeserializer deserializer,
-  );
+@protected bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
-  @protected
-  ExportComicMetadataOptionsDto
-  sse_decode_box_autoadd_export_comic_metadata_options_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicDto sse_decode_box_autoadd_comic_dto(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
+@protected ComicFilterDto sse_decode_box_autoadd_comic_filter_dto(SseDeserializer deserializer);
 
-  @protected
-  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
+@protected ComicMetadataBulkPatchFrbDto sse_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  MatchTierDto sse_decode_box_autoadd_match_tier_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicSortOptionDto sse_decode_box_autoadd_comic_sort_option_dto(SseDeserializer deserializer);
 
-  @protected
-  MultiValuePatchFrbDto sse_decode_box_autoadd_multi_value_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicThumbnailDto sse_decode_box_autoadd_comic_thumbnail_dto(SseDeserializer deserializer);
 
-  @protected
-  PageRequestDto sse_decode_box_autoadd_page_request_dto(
-    SseDeserializer deserializer,
-  );
+@protected ExportComicMetadataOptionsDto sse_decode_box_autoadd_export_comic_metadata_options_dto(SseDeserializer deserializer);
 
-  @protected
-  PublishedAtPatchFrbDto sse_decode_box_autoadd_published_at_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
 
-  @protected
-  ReadingHistoryDto sse_decode_box_autoadd_reading_history_dto(
-    SseDeserializer deserializer,
-  );
+@protected PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
-  @protected
-  ScalarPatchFrbDto sse_decode_box_autoadd_scalar_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected MatchTierDto sse_decode_box_autoadd_match_tier_dto(SseDeserializer deserializer);
 
-  @protected
-  SeriesDto sse_decode_box_autoadd_series_dto(SseDeserializer deserializer);
+@protected MultiValuePatchFrbDto sse_decode_box_autoadd_multi_value_patch_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  SeriesFilterDto sse_decode_box_autoadd_series_filter_dto(
-    SseDeserializer deserializer,
-  );
+@protected PageRequestDto sse_decode_box_autoadd_page_request_dto(SseDeserializer deserializer);
 
-  @protected
-  SeriesItemDto sse_decode_box_autoadd_series_item_dto(
-    SseDeserializer deserializer,
-  );
+@protected PublishedAtPatchFrbDto sse_decode_box_autoadd_published_at_patch_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  SeriesReadingContextDto sse_decode_box_autoadd_series_reading_context_dto(
-    SseDeserializer deserializer,
-  );
+@protected ReadingHistoryDto sse_decode_box_autoadd_reading_history_dto(SseDeserializer deserializer);
 
-  @protected
-  SeriesSortOptionDto sse_decode_box_autoadd_series_sort_option_dto(
-    SseDeserializer deserializer,
-  );
+@protected ScalarPatchFrbDto sse_decode_box_autoadd_scalar_patch_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  SeriesThumbnailDto sse_decode_box_autoadd_series_thumbnail_dto(
-    SseDeserializer deserializer,
-  );
+@protected SeriesDto sse_decode_box_autoadd_series_dto(SseDeserializer deserializer);
 
-  @protected
-  SetComicMetaLocksFrbDto sse_decode_box_autoadd_set_comic_meta_locks_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected SeriesFilterDto sse_decode_box_autoadd_series_filter_dto(SseDeserializer deserializer);
 
-  @protected
-  SetSeriesMetaLocksDto sse_decode_box_autoadd_set_series_meta_locks_dto(
-    SseDeserializer deserializer,
-  );
+@protected SeriesItemDto sse_decode_box_autoadd_series_item_dto(SseDeserializer deserializer);
 
-  @protected
-  UpdateComicUserMetaFrbDto
-  sse_decode_box_autoadd_update_comic_user_meta_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected SeriesReadingContextDto sse_decode_box_autoadd_series_reading_context_dto(SseDeserializer deserializer);
 
-  @protected
-  UpdateSeriesUserMetaDto sse_decode_box_autoadd_update_series_user_meta_dto(
-    SseDeserializer deserializer,
-  );
+@protected SeriesSortOptionDto sse_decode_box_autoadd_series_sort_option_dto(SseDeserializer deserializer);
 
-  @protected
-  BulkPatchResultFrbDto sse_decode_bulk_patch_result_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected SeriesThumbnailDto sse_decode_box_autoadd_series_thumbnail_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicDto sse_decode_comic_dto(SseDeserializer deserializer);
+@protected SetComicMetaLocksFrbDto sse_decode_box_autoadd_set_comic_meta_locks_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer);
+@protected SetSeriesMetaLocksDto sse_decode_box_autoadd_set_series_meta_locks_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicGroupingDto sse_decode_comic_grouping_dto(SseDeserializer deserializer);
+@protected UpdateComicUserMetaFrbDto sse_decode_box_autoadd_update_comic_user_meta_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicMetaLocksDto sse_decode_comic_meta_locks_dto(
-    SseDeserializer deserializer,
-  );
+@protected UpdateSeriesUserMetaDto sse_decode_box_autoadd_update_series_user_meta_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicMetadataBulkPatchFrbDto sse_decode_comic_metadata_bulk_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected BulkPatchResultFrbDto sse_decode_bulk_patch_result_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicPurgeResultFrbDto sse_decode_comic_purge_result_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicDto sse_decode_comic_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicSortFieldDto sse_decode_comic_sort_field_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicSortOptionDto sse_decode_comic_sort_option_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicGroupingDto sse_decode_comic_grouping_dto(SseDeserializer deserializer);
 
-  @protected
-  ComicThumbnailDto sse_decode_comic_thumbnail_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicMetaLocksDto sse_decode_comic_meta_locks_dto(SseDeserializer deserializer);
 
-  @protected
-  ExportComicMetadataOptionsDto sse_decode_export_comic_metadata_options_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicMetadataBulkPatchFrbDto sse_decode_comic_metadata_bulk_patch_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  double sse_decode_f_64(SseDeserializer deserializer);
+@protected ComicPurgeResultFrbDto sse_decode_comic_purge_result_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer);
+@protected ComicSortFieldDto sse_decode_comic_sort_field_dto(SseDeserializer deserializer);
 
-  @protected
-  HomeContinueReadingDto sse_decode_home_continue_reading_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicSortOptionDto sse_decode_comic_sort_option_dto(SseDeserializer deserializer);
 
-  @protected
-  HomeLibraryAlertDto sse_decode_home_library_alert_dto(
-    SseDeserializer deserializer,
-  );
+@protected ComicThumbnailDto sse_decode_comic_thumbnail_dto(SseDeserializer deserializer);
 
-  @protected
-  HomeLibraryAlertKindDto sse_decode_home_library_alert_kind_dto(
-    SseDeserializer deserializer,
-  );
+@protected ExportComicMetadataOptionsDto sse_decode_export_comic_metadata_options_dto(SseDeserializer deserializer);
 
-  @protected
-  HomePageCountsDto sse_decode_home_page_counts_dto(
-    SseDeserializer deserializer,
-  );
+@protected double sse_decode_f_64(SseDeserializer deserializer);
 
-  @protected
-  HomeRecentlyAddedDto sse_decode_home_recently_added_dto(
-    SseDeserializer deserializer,
-  );
+@protected HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
+@protected HomeContinueReadingDto sse_decode_home_continue_reading_dto(SseDeserializer deserializer);
 
-  @protected
-  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+@protected HomeLibraryAlertDto sse_decode_home_library_alert_dto(SseDeserializer deserializer);
 
-  @protected
-  ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(
-    SseDeserializer deserializer,
-  );
+@protected HomeLibraryAlertKindDto sse_decode_home_library_alert_kind_dto(SseDeserializer deserializer);
 
-  @protected
-  JunctionNamedFacetFrb sse_decode_junction_named_facet_frb(
-    SseDeserializer deserializer,
-  );
+@protected HomePageCountsDto sse_decode_home_page_counts_dto(SseDeserializer deserializer);
 
-  @protected
-  LibraryDto sse_decode_library_dto(SseDeserializer deserializer);
+@protected HomeRecentlyAddedDto sse_decode_home_recently_added_dto(SseDeserializer deserializer);
 
-  @protected
-  LibraryHomeStatDto sse_decode_library_home_stat_dto(
-    SseDeserializer deserializer,
-  );
+@protected int sse_decode_i_32(SseDeserializer deserializer);
 
-  @protected
-  LibraryProbeResultDto sse_decode_library_probe_result_dto(
-    SseDeserializer deserializer,
-  );
+@protected PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
-  @protected
-  LibrarySidebarPlacementDto sse_decode_library_sidebar_placement_dto(
-    SseDeserializer deserializer,
-  );
+@protected ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(SseDeserializer deserializer);
 
-  @protected
-  LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
-    SseDeserializer deserializer,
-  );
+@protected JunctionNamedFacetFrb sse_decode_junction_named_facet_frb(SseDeserializer deserializer);
 
-  @protected
-  List<String> sse_decode_list_String(SseDeserializer deserializer);
+@protected LibraryDto sse_decode_library_dto(SseDeserializer deserializer);
 
-  @protected
-  List<AmbiguousSampleDto> sse_decode_list_ambiguous_sample_dto(
-    SseDeserializer deserializer,
-  );
+@protected LibraryHomeStatDto sse_decode_library_home_stat_dto(SseDeserializer deserializer);
 
-  @protected
-  List<AuthorFacetCountFrbDto> sse_decode_list_author_facet_count_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected LibraryProbeResultDto sse_decode_library_probe_result_dto(SseDeserializer deserializer);
 
-  @protected
-  List<AuthorIdentityFrbDto> sse_decode_list_author_identity_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected LibrarySidebarPlacementDto sse_decode_library_sidebar_placement_dto(SseDeserializer deserializer);
 
-  @protected
-  List<AuthorLinkFrbDto> sse_decode_list_author_link_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected LibrarySyncCountsDto sse_decode_library_sync_counts_dto(SseDeserializer deserializer);
 
-  @protected
-  List<AuthorTopComicFrbDto> sse_decode_list_author_top_comic_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<String> sse_decode_list_String(SseDeserializer deserializer);
 
-  @protected
-  List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
+@protected List<AmbiguousSampleDto> sse_decode_list_ambiguous_sample_dto(SseDeserializer deserializer);
 
-  @protected
-  List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<AuthorFacetCountFrbDto> sse_decode_list_author_facet_count_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  List<HomeLibraryAlertDto> sse_decode_list_home_library_alert_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<AuthorIdentityFrbDto> sse_decode_list_author_identity_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  List<HomeRecentlyAddedDto> sse_decode_list_home_recently_added_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<AuthorLinkFrbDto> sse_decode_list_author_link_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  List<LibraryDto> sse_decode_list_library_dto(SseDeserializer deserializer);
+@protected List<AuthorTopComicFrbDto> sse_decode_list_author_top_comic_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  List<LibraryHomeStatDto> sse_decode_list_library_home_stat_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
 
-  @protected
-  List<LibrarySidebarPlacementDto>
-  sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer);
+@protected List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(SseDeserializer deserializer);
 
-  @protected
-  List<NamedFacetFormEntryFrbDto>
-  sse_decode_list_named_facet_form_entry_frb_dto(SseDeserializer deserializer);
+@protected List<HomeLibraryAlertDto> sse_decode_list_home_library_alert_dto(SseDeserializer deserializer);
 
-  @protected
-  List<NotFoundSampleDto> sse_decode_list_not_found_sample_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<HomeRecentlyAddedDto> sse_decode_list_home_recently_added_dto(SseDeserializer deserializer);
 
-  @protected
-  List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
+@protected List<LibraryDto> sse_decode_list_library_dto(SseDeserializer deserializer);
 
-  @protected
-  Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer);
+@protected List<LibraryHomeStatDto> sse_decode_list_library_home_stat_dto(SseDeserializer deserializer);
 
-  @protected
-  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
+@protected List<LibrarySidebarPlacementDto> sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer);
 
-  @protected
-  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+@protected List<NamedFacetFormEntryFrbDto> sse_decode_list_named_facet_form_entry_frb_dto(SseDeserializer deserializer);
 
-  @protected
-  List<ReadingHistoryDto> sse_decode_list_reading_history_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<NotFoundSampleDto> sse_decode_list_not_found_sample_dto(SseDeserializer deserializer);
 
-  @protected
-  List<RemoteLibraryCredentialDto>
-  sse_decode_list_remote_library_credential_dto(SseDeserializer deserializer);
+@protected List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
 
-  @protected
-  List<ResourceFormatCategoryDto> sse_decode_list_resource_format_category_dto(
-    SseDeserializer deserializer,
-  );
+@protected Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer);
 
-  @protected
-  List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
 
-  @protected
-  List<SeriesComicPageItemDto> sse_decode_list_series_comic_page_item_dto(
-    SseDeserializer deserializer,
-  );
+@protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
-  @protected
-  List<SeriesDto> sse_decode_list_series_dto(SseDeserializer deserializer);
+@protected List<ReadingHistoryDto> sse_decode_list_reading_history_dto(SseDeserializer deserializer);
 
-  @protected
-  List<SeriesItemDto> sse_decode_list_series_item_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<RemoteLibraryCredentialDto> sse_decode_list_remote_library_credential_dto(SseDeserializer deserializer);
 
-  @protected
-  List<TrashedComicFrbDto> sse_decode_list_trashed_comic_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<ResourceFormatCategoryDto> sse_decode_list_resource_format_category_dto(SseDeserializer deserializer);
 
-  @protected
-  List<WouldApplySampleDto> sse_decode_list_would_apply_sample_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(SseDeserializer deserializer);
 
-  @protected
-  MatchTierDto sse_decode_match_tier_dto(SseDeserializer deserializer);
-
-  @protected
-  MetadataBackupManifestDto sse_decode_metadata_backup_manifest_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<SeriesComicPageItemDto> sse_decode_list_series_comic_page_item_dto(SseDeserializer deserializer);
 
-  @protected
-  MultiValueOpFrbDto sse_decode_multi_value_op_frb_dto(
-    SseDeserializer deserializer,
-  );
+@protected List<SeriesDto> sse_decode_list_series_dto(SseDeserializer deserializer);
 
-  @protected
-  MultiValuePatchFrbDto sse_decode_multi_value_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  NamedFacetFormEntryFrbDto sse_decode_named_facet_form_entry_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  NamedFacetPagedNamesDto sse_decode_named_facet_paged_names_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  NotFoundSampleDto sse_decode_not_found_sample_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  String? sse_decode_opt_String(SseDeserializer deserializer);
-
-  @protected
-  AuthorDetailFrbDto? sse_decode_opt_box_autoadd_author_detail_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
-
-  @protected
-  ComicDto? sse_decode_opt_box_autoadd_comic_dto(SseDeserializer deserializer);
-
-  @protected
-  ComicThumbnailDto? sse_decode_opt_box_autoadd_comic_thumbnail_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
-
-  @protected
-  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
-
-  @protected
-  MatchTierDto? sse_decode_opt_box_autoadd_match_tier_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  MultiValuePatchFrbDto? sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  PublishedAtPatchFrbDto? sse_decode_opt_box_autoadd_published_at_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ScalarPatchFrbDto? sse_decode_opt_box_autoadd_scalar_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesDto? sse_decode_opt_box_autoadd_series_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesItemDto? sse_decode_opt_box_autoadd_series_item_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesReadingContextDto?
-  sse_decode_opt_box_autoadd_series_reading_context_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesThumbnailDto? sse_decode_opt_box_autoadd_series_thumbnail_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
-
-  @protected
-  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
-
-  @protected
-  PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer);
-
-  @protected
-  PagedComicResultDto sse_decode_paged_comic_result_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  PagedReadingHistoryDto sse_decode_paged_reading_history_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  PagedSeriesComicsResultDto sse_decode_paged_series_comics_result_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  PagedSeriesResultDto sse_decode_paged_series_result_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  PagedTrashedComicResultFrbDto sse_decode_paged_trashed_comic_result_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  PreviewImportComicMetadataResultDto
-  sse_decode_preview_import_comic_metadata_result_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  PublishedAtPatchFrbDto sse_decode_published_at_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ReaderPageDto sse_decode_reader_page_dto(SseDeserializer deserializer);
-
-  @protected
-  ReaderPageListDto sse_decode_reader_page_list_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ReadingHistoryDto sse_decode_reading_history_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  RefreshLibraryResultFrbDto sse_decode_refresh_library_result_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  RefreshSeriesResultFrbDto sse_decode_refresh_series_result_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ResourceFormatCategoryDto sse_decode_resource_format_category_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ScalarPatchFrbDto sse_decode_scalar_patch_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ScanIntervalDto sse_decode_scan_interval_dto(SseDeserializer deserializer);
-
-  @protected
-  SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesComicPageItemDto sse_decode_series_comic_page_item_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesComicsMetadataDto sse_decode_series_comics_metadata_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesCoverSourceDto sse_decode_series_cover_source_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesDto sse_decode_series_dto(SseDeserializer deserializer);
-
-  @protected
-  SeriesFilterDto sse_decode_series_filter_dto(SseDeserializer deserializer);
-
-  @protected
-  SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer);
-
-  @protected
-  SeriesMetaLocksDto sse_decode_series_meta_locks_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesReadingContextDto sse_decode_series_reading_context_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesSortFieldDto sse_decode_series_sort_field_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesSortOptionDto sse_decode_series_sort_option_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SeriesThumbnailDto sse_decode_series_thumbnail_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SetComicMetaLocksFrbDto sse_decode_set_comic_meta_locks_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SetSeriesMetaLocksDto sse_decode_set_series_meta_locks_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SyncLibraryPhaseDto sse_decode_sync_library_phase_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SyncLibraryProgressDto sse_decode_sync_library_progress_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SyncLibraryRouteDto sse_decode_sync_library_route_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  SyncScanModeDto sse_decode_sync_scan_mode_dto(SseDeserializer deserializer);
-
-  @protected
-  TagDictionaryImportResultDto sse_decode_tag_dictionary_import_result_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ThumbnailEventDto sse_decode_thumbnail_event_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  ThumbnailPriorityDto sse_decode_thumbnail_priority_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  TrashedComicCountsFrbDto sse_decode_trashed_comic_counts_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  TrashedComicFrbDto sse_decode_trashed_comic_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  BigInt sse_decode_u_64(SseDeserializer deserializer);
-
-  @protected
-  int sse_decode_u_8(SseDeserializer deserializer);
-
-  @protected
-  void sse_decode_unit(SseDeserializer deserializer);
-
-  @protected
-  UpdateComicUserMetaFrbDto sse_decode_update_comic_user_meta_frb_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  UpdateSeriesUserMetaDto sse_decode_update_series_user_meta_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  BigInt sse_decode_usize(SseDeserializer deserializer);
-
-  @protected
-  WouldApplySampleDto sse_decode_would_apply_sample_dto(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  void sse_encode_AnyhowException(
-    AnyhowException self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SyncHandleDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SyncHandleDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    SyncHandleDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_home_page_counts_dto_Sse(
-    RustStreamSink<HomePageCountsDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_i_32_Sse(
-    RustStreamSink<int> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_list_author_identity_frb_dto_Sse(
-    RustStreamSink<List<AuthorIdentityFrbDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_list_home_continue_reading_dto_Sse(
-    RustStreamSink<List<HomeContinueReadingDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_list_home_library_alert_dto_Sse(
-    RustStreamSink<List<HomeLibraryAlertDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_list_home_recently_added_dto_Sse(
-    RustStreamSink<List<HomeRecentlyAddedDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_list_library_home_stat_dto_Sse(
-    RustStreamSink<List<LibraryHomeStatDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_list_reading_history_dto_Sse(
-    RustStreamSink<List<ReadingHistoryDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(
-    RustStreamSink<List<SeriesComicOrderEntryDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_sync_library_progress_dto_Sse(
-    RustStreamSink<SyncLibraryProgressDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_thumbnail_event_dto_Sse(
-    RustStreamSink<ThumbnailEventDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_String(String self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ambiguous_sample_dto(
-    AmbiguousSampleDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_detail_frb_dto(
-    AuthorDetailFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_facet_count_frb_dto(
-    AuthorFacetCountFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_identity_frb_dto(
-    AuthorIdentityFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_image_ref_frb_dto(
-    AuthorImageRefFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_image_slot_frb(
-    AuthorImageSlotFrb self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_image_source_frb(
-    AuthorImageSourceFrb self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_link_frb_dto(
-    AuthorLinkFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_link_platform_frb(
-    AuthorLinkPlatformFrb self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_paged_dto(
-    AuthorPagedDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_author_top_comic_frb_dto(
-    AuthorTopComicFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_author_detail_frb_dto(
-    AuthorDetailFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_comic_dto(
-    ComicDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_comic_filter_dto(
-    ComicFilterDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_comic_metadata_bulk_patch_frb_dto(
-    ComicMetadataBulkPatchFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_comic_sort_option_dto(
-    ComicSortOptionDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_comic_thumbnail_dto(
-    ComicThumbnailDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_export_comic_metadata_options_dto(
-    ExportComicMetadataOptionsDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_i_64(
-    PlatformInt64 self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_match_tier_dto(
-    MatchTierDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_multi_value_patch_frb_dto(
-    MultiValuePatchFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_page_request_dto(
-    PageRequestDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_published_at_patch_frb_dto(
-    PublishedAtPatchFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_reading_history_dto(
-    ReadingHistoryDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_scalar_patch_frb_dto(
-    ScalarPatchFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_series_dto(
-    SeriesDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_series_filter_dto(
-    SeriesFilterDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_series_item_dto(
-    SeriesItemDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_series_reading_context_dto(
-    SeriesReadingContextDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_series_sort_option_dto(
-    SeriesSortOptionDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_series_thumbnail_dto(
-    SeriesThumbnailDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_set_comic_meta_locks_frb_dto(
-    SetComicMetaLocksFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_set_series_meta_locks_dto(
-    SetSeriesMetaLocksDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
-    UpdateComicUserMetaFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_box_autoadd_update_series_user_meta_dto(
-    UpdateSeriesUserMetaDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_bulk_patch_result_frb_dto(
-    BulkPatchResultFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_comic_dto(ComicDto self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_comic_filter_dto(
-    ComicFilterDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_comic_grouping_dto(
-    ComicGroupingDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_comic_meta_locks_dto(
-    ComicMetaLocksDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_comic_metadata_bulk_patch_frb_dto(
-    ComicMetadataBulkPatchFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_comic_purge_result_frb_dto(
-    ComicPurgeResultFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_comic_sort_field_dto(
-    ComicSortFieldDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_comic_sort_option_dto(
-    ComicSortOptionDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_comic_thumbnail_dto(
-    ComicThumbnailDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_export_comic_metadata_options_dto(
-    ExportComicMetadataOptionsDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_f_64(double self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_hentai_error_dto(
-    HentaiErrorDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_home_continue_reading_dto(
-    HomeContinueReadingDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_home_library_alert_dto(
-    HomeLibraryAlertDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_home_library_alert_kind_dto(
-    HomeLibraryAlertKindDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_home_page_counts_dto(
-    HomePageCountsDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_home_recently_added_dto(
-    HomeRecentlyAddedDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_import_comic_metadata_result_dto(
-    ImportComicMetadataResultDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_junction_named_facet_frb(
-    JunctionNamedFacetFrb self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_library_dto(LibraryDto self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_library_home_stat_dto(
-    LibraryHomeStatDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_library_probe_result_dto(
-    LibraryProbeResultDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_library_sidebar_placement_dto(
-    LibrarySidebarPlacementDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_library_sync_counts_dto(
-    LibrarySyncCountsDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_String(List<String> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_ambiguous_sample_dto(
-    List<AmbiguousSampleDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_author_facet_count_frb_dto(
-    List<AuthorFacetCountFrbDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_author_identity_frb_dto(
-    List<AuthorIdentityFrbDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_author_link_frb_dto(
-    List<AuthorLinkFrbDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_author_top_comic_frb_dto(
-    List<AuthorTopComicFrbDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_home_continue_reading_dto(
-    List<HomeContinueReadingDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_home_library_alert_dto(
-    List<HomeLibraryAlertDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_home_recently_added_dto(
-    List<HomeRecentlyAddedDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_library_dto(
-    List<LibraryDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_library_home_stat_dto(
-    List<LibraryHomeStatDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_library_sidebar_placement_dto(
-    List<LibrarySidebarPlacementDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_named_facet_form_entry_frb_dto(
-    List<NamedFacetFormEntryFrbDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_not_found_sample_dto(
-    List<NotFoundSampleDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_prim_i_32_loose(
-    List<int> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_prim_i_32_strict(
-    Int32List self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_prim_u_8_strict(
-    Uint8List self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_reading_history_dto(
-    List<ReadingHistoryDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_remote_library_credential_dto(
-    List<RemoteLibraryCredentialDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_resource_format_category_dto(
-    List<ResourceFormatCategoryDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_series_comic_order_entry_dto(
-    List<SeriesComicOrderEntryDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_series_comic_page_item_dto(
-    List<SeriesComicPageItemDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_series_dto(
-    List<SeriesDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_series_item_dto(
-    List<SeriesItemDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_trashed_comic_frb_dto(
-    List<TrashedComicFrbDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_would_apply_sample_dto(
-    List<WouldApplySampleDto> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_match_tier_dto(MatchTierDto self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_metadata_backup_manifest_dto(
-    MetadataBackupManifestDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_multi_value_op_frb_dto(
-    MultiValueOpFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_multi_value_patch_frb_dto(
-    MultiValuePatchFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_named_facet_form_entry_frb_dto(
-    NamedFacetFormEntryFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_named_facet_paged_names_dto(
-    NamedFacetPagedNamesDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_not_found_sample_dto(
-    NotFoundSampleDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_String(String? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_author_detail_frb_dto(
-    AuthorDetailFrbDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_comic_dto(
-    ComicDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_comic_thumbnail_dto(
-    ComicThumbnailDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_i_64(
-    PlatformInt64? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_match_tier_dto(
-    MatchTierDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
-    MultiValuePatchFrbDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_published_at_patch_frb_dto(
-    PublishedAtPatchFrbDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_reading_history_dto(
-    ReadingHistoryDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_scalar_patch_frb_dto(
-    ScalarPatchFrbDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_series_dto(
-    SeriesDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_series_item_dto(
-    SeriesItemDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_series_reading_context_dto(
-    SeriesReadingContextDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_series_thumbnail_dto(
-    SeriesThumbnailDto? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_list_prim_u_8_strict(
-    Uint8List? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_page_request_dto(
-    PageRequestDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_paged_comic_result_dto(
-    PagedComicResultDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_paged_reading_history_dto(
-    PagedReadingHistoryDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_paged_series_comics_result_dto(
-    PagedSeriesComicsResultDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_paged_series_result_dto(
-    PagedSeriesResultDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_paged_trashed_comic_result_frb_dto(
-    PagedTrashedComicResultFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_preview_import_comic_metadata_result_dto(
-    PreviewImportComicMetadataResultDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_published_at_patch_frb_dto(
-    PublishedAtPatchFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_reader_page_dto(ReaderPageDto self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_reader_page_list_dto(
-    ReaderPageListDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_reading_history_dto(
-    ReadingHistoryDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_refresh_library_result_frb_dto(
-    RefreshLibraryResultFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_refresh_series_result_frb_dto(
-    RefreshSeriesResultFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_remote_library_credential_dto(
-    RemoteLibraryCredentialDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_resource_format_category_dto(
-    ResourceFormatCategoryDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_scalar_patch_frb_dto(
-    ScalarPatchFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_scan_interval_dto(
-    ScanIntervalDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_comic_order_entry_dto(
-    SeriesComicOrderEntryDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_comic_page_item_dto(
-    SeriesComicPageItemDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_comics_metadata_dto(
-    SeriesComicsMetadataDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_cover_source_dto(
-    SeriesCoverSourceDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_dto(SeriesDto self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_series_filter_dto(
-    SeriesFilterDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_item_dto(SeriesItemDto self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_series_meta_locks_dto(
-    SeriesMetaLocksDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_reading_context_dto(
-    SeriesReadingContextDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_sort_field_dto(
-    SeriesSortFieldDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_sort_option_dto(
-    SeriesSortOptionDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_series_thumbnail_dto(
-    SeriesThumbnailDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_set_comic_meta_locks_frb_dto(
-    SetComicMetaLocksFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_set_series_meta_locks_dto(
-    SetSeriesMetaLocksDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_sync_library_phase_dto(
-    SyncLibraryPhaseDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_sync_library_progress_dto(
-    SyncLibraryProgressDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_sync_library_route_dto(
-    SyncLibraryRouteDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_sync_scan_mode_dto(
-    SyncScanModeDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_tag_dictionary_import_result_dto(
-    TagDictionaryImportResultDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_thumbnail_event_dto(
-    ThumbnailEventDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_thumbnail_priority_dto(
-    ThumbnailPriorityDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_trashed_comic_counts_frb_dto(
-    TrashedComicCountsFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_trashed_comic_frb_dto(
-    TrashedComicFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_u_64(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_u_8(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_unit(void self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_update_comic_user_meta_frb_dto(
-    UpdateComicUserMetaFrbDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_update_series_user_meta_dto(
-    UpdateSeriesUserMetaDto self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_would_apply_sample_dto(
-    WouldApplySampleDto self,
-    SseSerializer serializer,
-  );
-}
+@protected List<SeriesItemDto> sse_decode_list_series_item_dto(SseDeserializer deserializer);
+
+@protected List<TrashedComicFrbDto> sse_decode_list_trashed_comic_frb_dto(SseDeserializer deserializer);
+
+@protected List<WouldApplySampleDto> sse_decode_list_would_apply_sample_dto(SseDeserializer deserializer);
+
+@protected MatchTierDto sse_decode_match_tier_dto(SseDeserializer deserializer);
+
+@protected MetadataBackupManifestDto sse_decode_metadata_backup_manifest_dto(SseDeserializer deserializer);
+
+@protected MultiValueOpFrbDto sse_decode_multi_value_op_frb_dto(SseDeserializer deserializer);
+
+@protected MultiValuePatchFrbDto sse_decode_multi_value_patch_frb_dto(SseDeserializer deserializer);
+
+@protected NamedFacetFormEntryFrbDto sse_decode_named_facet_form_entry_frb_dto(SseDeserializer deserializer);
+
+@protected NamedFacetPagedNamesDto sse_decode_named_facet_paged_names_dto(SseDeserializer deserializer);
+
+@protected NotFoundSampleDto sse_decode_not_found_sample_dto(SseDeserializer deserializer);
+
+@protected String? sse_decode_opt_String(SseDeserializer deserializer);
+
+@protected AuthorDetailFrbDto? sse_decode_opt_box_autoadd_author_detail_frb_dto(SseDeserializer deserializer);
+
+@protected bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
+
+@protected ComicDto? sse_decode_opt_box_autoadd_comic_dto(SseDeserializer deserializer);
+
+@protected ComicThumbnailDto? sse_decode_opt_box_autoadd_comic_thumbnail_dto(SseDeserializer deserializer);
+
+@protected int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
+
+@protected PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
+
+@protected MatchTierDto? sse_decode_opt_box_autoadd_match_tier_dto(SseDeserializer deserializer);
+
+@protected MultiValuePatchFrbDto? sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(SseDeserializer deserializer);
+
+@protected PublishedAtPatchFrbDto? sse_decode_opt_box_autoadd_published_at_patch_frb_dto(SseDeserializer deserializer);
+
+@protected ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(SseDeserializer deserializer);
+
+@protected ScalarPatchFrbDto? sse_decode_opt_box_autoadd_scalar_patch_frb_dto(SseDeserializer deserializer);
+
+@protected SeriesDto? sse_decode_opt_box_autoadd_series_dto(SseDeserializer deserializer);
+
+@protected SeriesItemDto? sse_decode_opt_box_autoadd_series_item_dto(SseDeserializer deserializer);
+
+@protected SeriesReadingContextDto? sse_decode_opt_box_autoadd_series_reading_context_dto(SseDeserializer deserializer);
+
+@protected SeriesThumbnailDto? sse_decode_opt_box_autoadd_series_thumbnail_dto(SseDeserializer deserializer);
+
+@protected List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
+
+@protected Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
+
+@protected PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer);
+
+@protected PagedComicResultDto sse_decode_paged_comic_result_dto(SseDeserializer deserializer);
+
+@protected PagedReadingHistoryDto sse_decode_paged_reading_history_dto(SseDeserializer deserializer);
+
+@protected PagedSeriesComicsResultDto sse_decode_paged_series_comics_result_dto(SseDeserializer deserializer);
+
+@protected PagedSeriesResultDto sse_decode_paged_series_result_dto(SseDeserializer deserializer);
+
+@protected PagedTrashedComicResultFrbDto sse_decode_paged_trashed_comic_result_frb_dto(SseDeserializer deserializer);
+
+@protected PreviewImportComicMetadataResultDto sse_decode_preview_import_comic_metadata_result_dto(SseDeserializer deserializer);
+
+@protected PublishedAtPatchFrbDto sse_decode_published_at_patch_frb_dto(SseDeserializer deserializer);
+
+@protected ReaderPageDto sse_decode_reader_page_dto(SseDeserializer deserializer);
+
+@protected ReaderPageListDto sse_decode_reader_page_list_dto(SseDeserializer deserializer);
+
+@protected ReadingHistoryDto sse_decode_reading_history_dto(SseDeserializer deserializer);
+
+@protected RefreshLibraryResultFrbDto sse_decode_refresh_library_result_frb_dto(SseDeserializer deserializer);
+
+@protected RefreshSeriesResultFrbDto sse_decode_refresh_series_result_frb_dto(SseDeserializer deserializer);
+
+@protected RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(SseDeserializer deserializer);
+
+@protected ResourceFormatCategoryDto sse_decode_resource_format_category_dto(SseDeserializer deserializer);
+
+@protected ScalarPatchFrbDto sse_decode_scalar_patch_frb_dto(SseDeserializer deserializer);
+
+@protected ScanIntervalDto sse_decode_scan_interval_dto(SseDeserializer deserializer);
+
+@protected SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(SseDeserializer deserializer);
+
+@protected SeriesComicPageItemDto sse_decode_series_comic_page_item_dto(SseDeserializer deserializer);
+
+@protected SeriesComicsMetadataDto sse_decode_series_comics_metadata_dto(SseDeserializer deserializer);
+
+@protected SeriesCoverSourceDto sse_decode_series_cover_source_dto(SseDeserializer deserializer);
+
+@protected SeriesDto sse_decode_series_dto(SseDeserializer deserializer);
+
+@protected SeriesFilterDto sse_decode_series_filter_dto(SseDeserializer deserializer);
+
+@protected SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer);
+
+@protected SeriesMetaLocksDto sse_decode_series_meta_locks_dto(SseDeserializer deserializer);
+
+@protected SeriesReadingContextDto sse_decode_series_reading_context_dto(SseDeserializer deserializer);
+
+@protected SeriesSortFieldDto sse_decode_series_sort_field_dto(SseDeserializer deserializer);
+
+@protected SeriesSortOptionDto sse_decode_series_sort_option_dto(SseDeserializer deserializer);
+
+@protected SeriesThumbnailDto sse_decode_series_thumbnail_dto(SseDeserializer deserializer);
+
+@protected SetComicMetaLocksFrbDto sse_decode_set_comic_meta_locks_frb_dto(SseDeserializer deserializer);
+
+@protected SetSeriesMetaLocksDto sse_decode_set_series_meta_locks_dto(SseDeserializer deserializer);
+
+@protected SyncLibraryPhaseDto sse_decode_sync_library_phase_dto(SseDeserializer deserializer);
+
+@protected SyncLibraryProgressDto sse_decode_sync_library_progress_dto(SseDeserializer deserializer);
+
+@protected SyncLibraryRouteDto sse_decode_sync_library_route_dto(SseDeserializer deserializer);
+
+@protected SyncScanModeDto sse_decode_sync_scan_mode_dto(SseDeserializer deserializer);
+
+@protected TagDictionaryImportResultDto sse_decode_tag_dictionary_import_result_dto(SseDeserializer deserializer);
+
+@protected ThumbnailEventDto sse_decode_thumbnail_event_dto(SseDeserializer deserializer);
+
+@protected ThumbnailPriorityDto sse_decode_thumbnail_priority_dto(SseDeserializer deserializer);
+
+@protected TrashedComicCountsFrbDto sse_decode_trashed_comic_counts_frb_dto(SseDeserializer deserializer);
+
+@protected TrashedComicFrbDto sse_decode_trashed_comic_frb_dto(SseDeserializer deserializer);
+
+@protected BigInt sse_decode_u_64(SseDeserializer deserializer);
+
+@protected int sse_decode_u_8(SseDeserializer deserializer);
+
+@protected void sse_decode_unit(SseDeserializer deserializer);
+
+@protected UpdateComicUserMetaFrbDto sse_decode_update_comic_user_meta_frb_dto(SseDeserializer deserializer);
+
+@protected UpdateSeriesUserMetaDto sse_decode_update_series_user_meta_dto(SseDeserializer deserializer);
+
+@protected BigInt sse_decode_usize(SseDeserializer deserializer);
+
+@protected WouldApplySampleDto sse_decode_would_apply_sample_dto(SseDeserializer deserializer);
+
+@protected void sse_encode_AnyhowException(AnyhowException self, SseSerializer serializer);
+
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SyncHandleDto self, SseSerializer serializer);
+
+@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SyncHandleDto self, SseSerializer serializer);
+
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(SyncHandleDto self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_home_page_counts_dto_Sse(RustStreamSink<HomePageCountsDto> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_i_32_Sse(RustStreamSink<int> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_list_author_identity_frb_dto_Sse(RustStreamSink<List<AuthorIdentityFrbDto>> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_list_home_continue_reading_dto_Sse(RustStreamSink<List<HomeContinueReadingDto>> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_list_home_library_alert_dto_Sse(RustStreamSink<List<HomeLibraryAlertDto>> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_list_home_recently_added_dto_Sse(RustStreamSink<List<HomeRecentlyAddedDto>> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_list_library_home_stat_dto_Sse(RustStreamSink<List<LibraryHomeStatDto>> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_list_reading_history_dto_Sse(RustStreamSink<List<ReadingHistoryDto>> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(RustStreamSink<List<SeriesComicOrderEntryDto>> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_sync_library_progress_dto_Sse(RustStreamSink<SyncLibraryProgressDto> self, SseSerializer serializer);
+
+@protected void sse_encode_StreamSink_thumbnail_event_dto_Sse(RustStreamSink<ThumbnailEventDto> self, SseSerializer serializer);
+
+@protected void sse_encode_String(String self, SseSerializer serializer);
+
+@protected void sse_encode_ambiguous_sample_dto(AmbiguousSampleDto self, SseSerializer serializer);
+
+@protected void sse_encode_author_detail_frb_dto(AuthorDetailFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_author_facet_count_frb_dto(AuthorFacetCountFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_author_identity_frb_dto(AuthorIdentityFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_author_image_ref_frb_dto(AuthorImageRefFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_author_image_slot_frb(AuthorImageSlotFrb self, SseSerializer serializer);
+
+@protected void sse_encode_author_image_source_frb(AuthorImageSourceFrb self, SseSerializer serializer);
+
+@protected void sse_encode_author_link_frb_dto(AuthorLinkFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_author_link_platform_frb(AuthorLinkPlatformFrb self, SseSerializer serializer);
+
+@protected void sse_encode_author_paged_dto(AuthorPagedDto self, SseSerializer serializer);
+
+@protected void sse_encode_author_top_comic_frb_dto(AuthorTopComicFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_bool(bool self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_author_detail_frb_dto(AuthorDetailFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_comic_dto(ComicDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_comic_filter_dto(ComicFilterDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_comic_metadata_bulk_patch_frb_dto(ComicMetadataBulkPatchFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_comic_sort_option_dto(ComicSortOptionDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_comic_thumbnail_dto(ComicThumbnailDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_export_comic_metadata_options_dto(ExportComicMetadataOptionsDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_i_64(PlatformInt64 self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_match_tier_dto(MatchTierDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_multi_value_patch_frb_dto(MultiValuePatchFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_page_request_dto(PageRequestDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_published_at_patch_frb_dto(PublishedAtPatchFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_reading_history_dto(ReadingHistoryDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_scalar_patch_frb_dto(ScalarPatchFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_series_dto(SeriesDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_series_filter_dto(SeriesFilterDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_series_item_dto(SeriesItemDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_series_reading_context_dto(SeriesReadingContextDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_series_sort_option_dto(SeriesSortOptionDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_series_thumbnail_dto(SeriesThumbnailDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_set_comic_meta_locks_frb_dto(SetComicMetaLocksFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_set_series_meta_locks_dto(SetSeriesMetaLocksDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(UpdateComicUserMetaFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_update_series_user_meta_dto(UpdateSeriesUserMetaDto self, SseSerializer serializer);
+
+@protected void sse_encode_bulk_patch_result_frb_dto(BulkPatchResultFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_dto(ComicDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_filter_dto(ComicFilterDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_grouping_dto(ComicGroupingDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_meta_locks_dto(ComicMetaLocksDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_metadata_bulk_patch_frb_dto(ComicMetadataBulkPatchFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_purge_result_frb_dto(ComicPurgeResultFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_sort_field_dto(ComicSortFieldDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_sort_option_dto(ComicSortOptionDto self, SseSerializer serializer);
+
+@protected void sse_encode_comic_thumbnail_dto(ComicThumbnailDto self, SseSerializer serializer);
+
+@protected void sse_encode_export_comic_metadata_options_dto(ExportComicMetadataOptionsDto self, SseSerializer serializer);
+
+@protected void sse_encode_f_64(double self, SseSerializer serializer);
+
+@protected void sse_encode_hentai_error_dto(HentaiErrorDto self, SseSerializer serializer);
+
+@protected void sse_encode_home_continue_reading_dto(HomeContinueReadingDto self, SseSerializer serializer);
+
+@protected void sse_encode_home_library_alert_dto(HomeLibraryAlertDto self, SseSerializer serializer);
+
+@protected void sse_encode_home_library_alert_kind_dto(HomeLibraryAlertKindDto self, SseSerializer serializer);
+
+@protected void sse_encode_home_page_counts_dto(HomePageCountsDto self, SseSerializer serializer);
+
+@protected void sse_encode_home_recently_added_dto(HomeRecentlyAddedDto self, SseSerializer serializer);
+
+@protected void sse_encode_i_32(int self, SseSerializer serializer);
+
+@protected void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
+
+@protected void sse_encode_import_comic_metadata_result_dto(ImportComicMetadataResultDto self, SseSerializer serializer);
+
+@protected void sse_encode_junction_named_facet_frb(JunctionNamedFacetFrb self, SseSerializer serializer);
+
+@protected void sse_encode_library_dto(LibraryDto self, SseSerializer serializer);
+
+@protected void sse_encode_library_home_stat_dto(LibraryHomeStatDto self, SseSerializer serializer);
+
+@protected void sse_encode_library_probe_result_dto(LibraryProbeResultDto self, SseSerializer serializer);
+
+@protected void sse_encode_library_sidebar_placement_dto(LibrarySidebarPlacementDto self, SseSerializer serializer);
+
+@protected void sse_encode_library_sync_counts_dto(LibrarySyncCountsDto self, SseSerializer serializer);
+
+@protected void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+@protected void sse_encode_list_ambiguous_sample_dto(List<AmbiguousSampleDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_author_facet_count_frb_dto(List<AuthorFacetCountFrbDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_author_identity_frb_dto(List<AuthorIdentityFrbDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_author_link_frb_dto(List<AuthorLinkFrbDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_author_top_comic_frb_dto(List<AuthorTopComicFrbDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_home_continue_reading_dto(List<HomeContinueReadingDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_home_library_alert_dto(List<HomeLibraryAlertDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_home_recently_added_dto(List<HomeRecentlyAddedDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_library_dto(List<LibraryDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_library_home_stat_dto(List<LibraryHomeStatDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_library_sidebar_placement_dto(List<LibrarySidebarPlacementDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_named_facet_form_entry_frb_dto(List<NamedFacetFormEntryFrbDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_not_found_sample_dto(List<NotFoundSampleDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_i_32_loose(List<int> self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_i_32_strict(Int32List self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer);
+
+@protected void sse_encode_list_reading_history_dto(List<ReadingHistoryDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_remote_library_credential_dto(List<RemoteLibraryCredentialDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_resource_format_category_dto(List<ResourceFormatCategoryDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_series_comic_order_entry_dto(List<SeriesComicOrderEntryDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_series_comic_page_item_dto(List<SeriesComicPageItemDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_series_dto(List<SeriesDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_series_item_dto(List<SeriesItemDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_trashed_comic_frb_dto(List<TrashedComicFrbDto> self, SseSerializer serializer);
+
+@protected void sse_encode_list_would_apply_sample_dto(List<WouldApplySampleDto> self, SseSerializer serializer);
+
+@protected void sse_encode_match_tier_dto(MatchTierDto self, SseSerializer serializer);
+
+@protected void sse_encode_metadata_backup_manifest_dto(MetadataBackupManifestDto self, SseSerializer serializer);
+
+@protected void sse_encode_multi_value_op_frb_dto(MultiValueOpFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_multi_value_patch_frb_dto(MultiValuePatchFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_named_facet_form_entry_frb_dto(NamedFacetFormEntryFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_named_facet_paged_names_dto(NamedFacetPagedNamesDto self, SseSerializer serializer);
+
+@protected void sse_encode_not_found_sample_dto(NotFoundSampleDto self, SseSerializer serializer);
+
+@protected void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_author_detail_frb_dto(AuthorDetailFrbDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_comic_dto(ComicDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_comic_thumbnail_dto(ComicThumbnailDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_i_64(PlatformInt64? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_match_tier_dto(MatchTierDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(MultiValuePatchFrbDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_published_at_patch_frb_dto(PublishedAtPatchFrbDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_reading_history_dto(ReadingHistoryDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_scalar_patch_frb_dto(ScalarPatchFrbDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_series_dto(SeriesDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_series_item_dto(SeriesItemDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_series_reading_context_dto(SeriesReadingContextDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_series_thumbnail_dto(SeriesThumbnailDto? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_prim_u_8_strict(Uint8List? self, SseSerializer serializer);
+
+@protected void sse_encode_page_request_dto(PageRequestDto self, SseSerializer serializer);
+
+@protected void sse_encode_paged_comic_result_dto(PagedComicResultDto self, SseSerializer serializer);
+
+@protected void sse_encode_paged_reading_history_dto(PagedReadingHistoryDto self, SseSerializer serializer);
+
+@protected void sse_encode_paged_series_comics_result_dto(PagedSeriesComicsResultDto self, SseSerializer serializer);
+
+@protected void sse_encode_paged_series_result_dto(PagedSeriesResultDto self, SseSerializer serializer);
+
+@protected void sse_encode_paged_trashed_comic_result_frb_dto(PagedTrashedComicResultFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_preview_import_comic_metadata_result_dto(PreviewImportComicMetadataResultDto self, SseSerializer serializer);
+
+@protected void sse_encode_published_at_patch_frb_dto(PublishedAtPatchFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_reader_page_dto(ReaderPageDto self, SseSerializer serializer);
+
+@protected void sse_encode_reader_page_list_dto(ReaderPageListDto self, SseSerializer serializer);
+
+@protected void sse_encode_reading_history_dto(ReadingHistoryDto self, SseSerializer serializer);
+
+@protected void sse_encode_refresh_library_result_frb_dto(RefreshLibraryResultFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_refresh_series_result_frb_dto(RefreshSeriesResultFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_remote_library_credential_dto(RemoteLibraryCredentialDto self, SseSerializer serializer);
+
+@protected void sse_encode_resource_format_category_dto(ResourceFormatCategoryDto self, SseSerializer serializer);
+
+@protected void sse_encode_scalar_patch_frb_dto(ScalarPatchFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_scan_interval_dto(ScanIntervalDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_comic_order_entry_dto(SeriesComicOrderEntryDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_comic_page_item_dto(SeriesComicPageItemDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_comics_metadata_dto(SeriesComicsMetadataDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_cover_source_dto(SeriesCoverSourceDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_dto(SeriesDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_filter_dto(SeriesFilterDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_item_dto(SeriesItemDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_meta_locks_dto(SeriesMetaLocksDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_reading_context_dto(SeriesReadingContextDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_sort_field_dto(SeriesSortFieldDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_sort_option_dto(SeriesSortOptionDto self, SseSerializer serializer);
+
+@protected void sse_encode_series_thumbnail_dto(SeriesThumbnailDto self, SseSerializer serializer);
+
+@protected void sse_encode_set_comic_meta_locks_frb_dto(SetComicMetaLocksFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_set_series_meta_locks_dto(SetSeriesMetaLocksDto self, SseSerializer serializer);
+
+@protected void sse_encode_sync_library_phase_dto(SyncLibraryPhaseDto self, SseSerializer serializer);
+
+@protected void sse_encode_sync_library_progress_dto(SyncLibraryProgressDto self, SseSerializer serializer);
+
+@protected void sse_encode_sync_library_route_dto(SyncLibraryRouteDto self, SseSerializer serializer);
+
+@protected void sse_encode_sync_scan_mode_dto(SyncScanModeDto self, SseSerializer serializer);
+
+@protected void sse_encode_tag_dictionary_import_result_dto(TagDictionaryImportResultDto self, SseSerializer serializer);
+
+@protected void sse_encode_thumbnail_event_dto(ThumbnailEventDto self, SseSerializer serializer);
+
+@protected void sse_encode_thumbnail_priority_dto(ThumbnailPriorityDto self, SseSerializer serializer);
+
+@protected void sse_encode_trashed_comic_counts_frb_dto(TrashedComicCountsFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_trashed_comic_frb_dto(TrashedComicFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_u_64(BigInt self, SseSerializer serializer);
+
+@protected void sse_encode_u_8(int self, SseSerializer serializer);
+
+@protected void sse_encode_unit(void self, SseSerializer serializer);
+
+@protected void sse_encode_update_comic_user_meta_frb_dto(UpdateComicUserMetaFrbDto self, SseSerializer serializer);
+
+@protected void sse_encode_update_series_user_meta_dto(UpdateSeriesUserMetaDto self, SseSerializer serializer);
+
+@protected void sse_encode_usize(BigInt self, SseSerializer serializer);
+
+@protected void sse_encode_would_apply_sample_dto(WouldApplySampleDto self, SseSerializer serializer);
+                }
+                
+
 
 // Section: wire_class
 
 class RustLibWire implements BaseWire {
-  RustLibWire.fromExternalLibrary(ExternalLibrary lib);
+            RustLibWire.fromExternalLibrary(ExternalLibrary lib);
 
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-        ptr,
-      );
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(int ptr) => wasmModule.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(ptr);
 
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    int ptr,
-  ) => wasmModule
-      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-        ptr,
-      );
-}
+void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(int ptr) => wasmModule.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(ptr);
+        }
+        @JS('wasm_bindgen') external RustLibWasmModule get wasmModule;
 
-@JS('wasm_bindgen')
-external RustLibWasmModule get wasmModule;
+        @JS() @anonymous extension type RustLibWasmModule._(JSObject _) implements JSObject {
+            external void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(int ptr);
 
-@JS()
-@anonymous
-extension type RustLibWasmModule._(JSObject _) implements JSObject {
-  external void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    int ptr,
-  );
-
-  external void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-    int ptr,
-  );
-}
+external void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(int ptr);
+        }
+        

@@ -1,25 +1,14 @@
 use hentai_core::{
     add_author, add_named_facet_name, count_author_attachments, count_named_facet_attachments,
     delete_authors_by_names, delete_named_facet_by_names, fetch_management_facet_names_page,
-    list_all_author_names, list_all_named_facet_names, list_author_names_for_form,
-    list_named_facet_for_form, merge_named_facet_name, reject_author_merge, rename_author,
-    rename_named_facet_name, ManagementFacetKind, NamedFacetFormEntry,
+    list_all_author_names, list_all_named_facet_names, merge_named_facet_name, reject_author_merge,
+    rename_author, rename_named_facet_name, ManagementFacetKind,
 };
 
-use super::comic::PageRequestDto;
-use super::init::HentaiErrorDto;
+use super::types::{JunctionNamedFacetFrb, NamedFacetPagedNamesDto};
+use crate::api::comic::PageRequestDto;
+use crate::api::init::HentaiErrorDto;
 use crate::named_facet_route::{route, NamedFacetRoute};
-
-// Author is routed to the Author entry points in `named_facet_route`; the core
-// named-facet module only sees dictionary facets (Tag / Parody / Character).
-/// Junction Named metadata facet kind for Comic metadata form listing.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum JunctionNamedFacetFrb {
-    Tag,
-    Author,
-    Parody,
-    Character,
-}
 
 fn management_facet_kind(facet: JunctionNamedFacetFrb) -> ManagementFacetKind {
     match facet {
@@ -28,30 +17,6 @@ fn management_facet_kind(facet: JunctionNamedFacetFrb) -> ManagementFacetKind {
         JunctionNamedFacetFrb::Parody => ManagementFacetKind::Parody,
         JunctionNamedFacetFrb::Character => ManagementFacetKind::Character,
     }
-}
-
-/// Form picker candidate: name + Named facet attachment count.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NamedFacetFormEntryFrbDto {
-    pub name: String,
-    pub attachment_count: i64,
-}
-
-impl From<NamedFacetFormEntry> for NamedFacetFormEntryFrbDto {
-    fn from(value: NamedFacetFormEntry) -> Self {
-        Self {
-            name: value.name,
-            attachment_count: value.attachment_count,
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NamedFacetPagedNamesDto {
-    pub items: Vec<String>,
-    pub total_count: i64,
-    pub page: i32,
-    pub page_size: i32,
 }
 
 #[flutter_rust_bridge::frb]
@@ -136,7 +101,6 @@ pub fn merge_named_facet_name_frb(
         NamedFacetRoute::Dictionary(facet) => hentai_core::runtime::block_on(
             merge_named_facet_name(facet, &source_name, &target_name),
         ),
-        // Author has no merge; refused under the library write lock, as before the split.
         NamedFacetRoute::Author => hentai_core::runtime::block_on(reject_author_merge()),
     }
     .map_err(HentaiErrorDto::from)
@@ -154,23 +118,6 @@ pub async fn count_named_facet_attachments_frb(
     .map_err(HentaiErrorDto::from)
 }
 
-/// Comic metadata form candidates sorted by attachment count DESC, name ASC.
-#[flutter_rust_bridge::frb]
-pub async fn list_named_facet_for_form_frb(
-    facet: JunctionNamedFacetFrb,
-) -> Result<Vec<NamedFacetFormEntryFrbDto>, HentaiErrorDto> {
-    match route(facet) {
-        NamedFacetRoute::Dictionary(facet) => list_named_facet_for_form(facet).await,
-        NamedFacetRoute::Author => list_author_names_for_form().await,
-    }
-    .map(|rows| {
-        rows.into_iter()
-            .map(NamedFacetFormEntryFrbDto::from)
-            .collect()
-    })
-    .map_err(HentaiErrorDto::from)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -185,8 +132,6 @@ mod tests {
         .expect_err("author merge refused");
         assert!(err.message.contains("作者暂不支持合并"), "{}", err.message);
 
-        // The library write lock is process-wide, so the busy case lives in this same
-        // test rather than a parallel one: while held, Author merge must return busy.
         let guard = hentai_core::library_write::try_acquire_library_write_lock()
             .expect("hold library write lock");
         let err = merge_named_facet_name_frb(

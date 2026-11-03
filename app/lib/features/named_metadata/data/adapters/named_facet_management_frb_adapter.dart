@@ -3,8 +3,10 @@ import 'package:hentai_library/shared/domain/models/value_objects/page_request.d
 import 'package:hentai_library/features/named_metadata/data/mappers/named_facet_frb_mapper.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
-import 'package:hentai_library/src/rust/api/named_facet.dart'
+import 'package:hentai_library/src/rust/api/named_facet/management.dart'
     as rust_named_facet;
+import 'package:hentai_library/src/rust/api/named_facet/types.dart'
+    as rust_named_facet_types;
 
 /// Named facet 管理页 FRB 薄封装（owner：`src/rust/api/named_facet.dart`）。
 class NamedFacetManagementFrbAdapter {
@@ -15,7 +17,7 @@ class NamedFacetManagementFrbAdapter {
     fallbackMessage: namedFacetFallbackCopyOf(kind).list,
   );
 
-  Future<rust_named_facet.NamedFacetPagedNamesDto> fetchPage(
+  Future<rust_named_facet_types.NamedFacetPagedNamesDto> fetchPage(
     ManagedNamedFacetKind kind,
     PageRequest request,
   ) => guardFrb(

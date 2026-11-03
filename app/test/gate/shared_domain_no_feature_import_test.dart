@@ -18,12 +18,7 @@ void main() {
   });
 
   test('shared/data intentional feature-import exemptions stay documented', () {
-    expect(
-      isSharedDataFeatureImportExempt(
-        'shared/data/repositories/named_facet_form_listing.dart',
-      ),
-      isTrue,
-    );
+    expect(kSharedDataExplicitFeatureImportAllowlist, isEmpty);
   });
 
   test('shared/domain -> features import ratchet vs baseline (L3)', () {

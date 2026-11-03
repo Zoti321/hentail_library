@@ -8,7 +8,7 @@ export 'package:hentai_library/shared/di/data_providers.dart';
 export 'services.dart';
 
 export 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
-export 'package:hentai_library/features/named_metadata/presentation/metadata.dart';
+export 'package:hentai_library/features/named_metadata/public.dart';
 export 'package:hentai_library/features/read_session/presentation/reader.dart';
 export 'package:hentai_library/features/app_settings/presentation/settings.dart';
 export 'package:hentai_library/features/bootstrap/presentation/view_models/aggregates.dart';

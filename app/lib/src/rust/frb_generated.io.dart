@@ -4,7 +4,6 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/author.dart';
-import 'api/character.dart';
 import 'api/comic.dart';
 import 'api/comic_trash.dart';
 import 'api/history.dart';
@@ -13,8 +12,10 @@ import 'api/init.dart';
 import 'api/library.dart';
 import 'api/logging.dart';
 import 'api/metadata_backup.dart';
-import 'api/named_facet.dart';
-import 'api/parody.dart';
+import 'api/named_facet/form.dart';
+import 'api/named_facet/management.dart';
+import 'api/named_facet/types.dart';
+import 'api/named_facet_dictionary.dart';
 import 'api/probe.dart';
 import 'api/reader.dart';
 import 'api/series.dart';

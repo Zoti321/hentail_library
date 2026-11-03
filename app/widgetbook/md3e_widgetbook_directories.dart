@@ -44,12 +44,9 @@ import 'package:hentai_library/features/library_browse/presentation/catalog/patt
 import 'md3e_lab_catalog_navigation.dart';
 
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_filter_sort_side_sheet.dart';
-import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_management_create_interaction.dart';
+import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/patterns/md3e_managed_named_facet_ui.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';

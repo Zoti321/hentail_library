@@ -1,10 +1,9 @@
-import 'package:hentai_library/shared/data/repositories/named_facet_form_listing.dart';
+import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/smart_facet_match.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
 import 'package:hentai_library/features/library_browse/domain/series/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/view_models/smart_facet_match_preference_notifier.dart';

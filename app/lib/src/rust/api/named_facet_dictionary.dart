@@ -9,9 +9,17 @@ import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<List<String>> listAllParodiesFrb() =>
-    RustLib.instance.api.crateApiParodyListAllParodiesFrb();
+    RustLib.instance.api.crateApiNamedFacetDictionaryListAllParodiesFrb();
 
 Future<List<String>> listDistinctParodiesFrb({String? libraryId}) => RustLib
     .instance
     .api
-    .crateApiParodyListDistinctParodiesFrb(libraryId: libraryId);
+    .crateApiNamedFacetDictionaryListDistinctParodiesFrb(libraryId: libraryId);
+
+Future<List<String>> listAllCharactersFrb() =>
+    RustLib.instance.api.crateApiNamedFacetDictionaryListAllCharactersFrb();
+
+Future<List<String>> listDistinctCharactersFrb({String? libraryId}) =>
+    RustLib.instance.api.crateApiNamedFacetDictionaryListDistinctCharactersFrb(
+      libraryId: libraryId,
+    );
