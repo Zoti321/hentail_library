@@ -1,30 +1,49 @@
 {
   "schemaVersion": 1,
-  "ok": true,
+  "ok": false,
   "command": "finalize",
-  "status": "pass",
+  "status": "fail",
   "type": "architecture",
   "quality": "showcase",
   "specification": {
     "path": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\candidate.json",
-    "sha256": "0059ad52d2ce894c8a6bab9814977138963abbdf95934333d7eaef1731273b3c",
-    "bytes": 5653
+    "sha256": "5234c7905a9fa4d790ed531f764f457e251721953609d27e768a808f23665c5b",
+    "bytes": 5983
   },
   "artifact": {
     "path": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
-    "sha256": "7242d3e6ce7a99ffdecc46c38ddb6cb37c3ee50255f1f666388c5f841e18807e",
-    "bytes": 826166
+    "sha256": "44010d935b235d0016dc87593ba13c50116328d9f05992f5e1ee1057baced3e4",
+    "bytes": 826683
   },
   "gates": {
     "validate": "pass",
     "deliver": "pass",
     "check": "pass",
-    "browser-check": "pass"
+    "browser-check": "fail"
   },
-  "diagnostics": [],
+  "failedStage": "browser-check",
+  "diagnostics": [
+    {
+      "code": "viewer/evidence-path-conflict",
+      "severity": "error",
+      "message": "browser-check will not replace the existing unowned evidence path \"E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json\".",
+      "subject": {
+        "artifact": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
+        "evidencePath": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json"
+      },
+      "evidence": {
+        "reason": {
+          "code": "ownership-artifact-mismatch"
+        }
+      },
+      "supportedFixes": [
+        "move the conflicting file aside, or choose a separate --out-dir, then rerun browser-check"
+      ]
+    }
+  ],
   "diagnosticSummary": {
-    "total": 0,
-    "shown": 0,
+    "total": 1,
+    "shown": 1,
     "truncated": false
   },
   "evidence": {
@@ -33,57 +52,17 @@
     "browserCheckReceipt": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json"
   },
   "update": {
-    "status": "current",
+    "status": "update_available",
     "installedVersion": "3.1.0",
-    "availableVersion": "3.1.0",
-    "releaseNotes": null,
-    "checkedAt": "2026-10-18T10:01:35.680Z",
+    "availableVersion": "3.2.0",
+    "releaseNotes": "https://github.com/tt-a1i/archify/releases/tag/v3.2.0",
+    "severity": "normal",
+    "checkedAt": "2026-11-03T05:00:46.373Z",
     "source": "cache",
-    "noticeRequired": false,
-    "noticeText": null
+    "noticeRequired": true,
+    "noticeText": "Archify update: 3.1.0 → 3.2.0. A previous check at 2026-11-03T05:00:46.373Z found a newer release. Release notes: https://github.com/tt-a1i/archify/releases/tag/v3.2.0. The installed Skill has not changed; ask to snooze or ignore this reminder.",
+    "eventKey": "archify@sha256:70e210265c59f24dcbdf2a502ff671104b5454e7ee7d3554aecd86bad32384f5"
   },
   "visualReview": "not-requested",
-  "durationMs": 10741,
-  "visualReviewRecommendation": {
-    "action": "inspect-route-readability",
-    "signals": {
-      "routesOverSuggestedBends": 2
-    },
-    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
-    "affectedRoutes": {
-      "crossings": [],
-      "detours": [
-        {
-          "relationship": {
-            "id": "core-sync-local",
-            "from": "hentai-core",
-            "to": "local-root",
-            "label": "Library sync / 解码",
-            "collectionIndex": 6,
-            "artifactIndex": 7
-          },
-          "bends": 4,
-          "stretch": 1
-        },
-        {
-          "relationship": {
-            "id": "core-read-remote",
-            "from": "hentai-core",
-            "to": "webdav-root",
-            "label": "流式读取",
-            "collectionIndex": 7,
-            "artifactIndex": 8
-          },
-          "bends": 3,
-          "stretch": 1.08
-        }
-      ],
-      "truncated": false
-    },
-    "hints": [
-      "hentai-core → local-root needs 4 bends: move node hentai-core or local-root so they share a row or column with matching centers, or sit diagonally with a clear corner.",
-      "hentai-core → webdav-root needs 3 bends: move node hentai-core or webdav-root so they share a row or column with matching centers, or sit diagonally with a clear corner."
-    ],
-    "repair": "Trace these relationships at the desktop viewport. For Architecture, use references/architecture-layout-repair.md: reflow a blocked main path or tangled connected scene, and repair an isolated defect locally only when the surrounding composition is accepted. Preserve all semantic content and user-fixed geometry. Rerun finalize once after the edit."
-  }
+  "durationMs": 3090
 }

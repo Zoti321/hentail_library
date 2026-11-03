@@ -3,13 +3,14 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Hentai Library 系统架构",
+    "subtitle": "Monorepo 架构索引 · 侧栏 Feature 专图",
     "locale": "zh-CN",
     "output": ".archify/architecture-hentai-library-20251018-180000/hentai-library.html",
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/Zoti321/hentail_library.git",
       "provider": "github",
-      "revision": "a62c3d1293f91ec392bc0555bd089e1bd6314f87"
+      "revision": "791c1fae952a5b8b2aa5c129dc236852d74be189"
     }
   },
   "components": [
@@ -41,7 +42,7 @@
       "pos": [390, 120],
       "size": [150, 64],
       "sources": [
-        { "path": "app/lib/features/library_browse/data/repositories/comic_repository_impl.dart", "line": 18, "end_line": 44 }
+        { "path": "app/lib/features/library_browse/data/comic/comic_repository_impl.dart", "line": 1, "end_line": 40 }
       ]
     },
     {
@@ -87,7 +88,7 @@
       "pos": [200, 280],
       "size": [150, 60],
       "sources": [
-        { "path": "docs/agents/rust-core.md", "line": 25, "end_line": 25 }
+        { "path": "app/lib/features/app_settings/data/repositories/app_setting_repository_impl.dart", "line": 51, "end_line": 54 }
       ]
     },
     {
@@ -202,6 +203,14 @@
       "items": [
         "open_reader_frb / load_page_* 在 Rust 解码页图像",
         "本地可走文件路径；远程经 WebDAV 在线流式"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Feature 专图",
+      "items": [
+        "首页模块 → home-feature.html（同目录）",
+        "更多 Feature 图可继续在此列出"
       ]
     }
   ]
