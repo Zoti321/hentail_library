@@ -5,14 +5,11 @@ import 'package:hentai_library/features/library_admin/data/adapters/library_revi
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
-import 'package:hentai_library/features/library_browse/data/comic/comic_repository_impl.dart';
-import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/data/comic/comic_thumbnail_repository_impl.dart';
 import 'package:hentai_library/features/home/public.dart';
 import 'package:hentai_library/features/library_admin/data/repositories/library_repository_impl.dart';
 import 'package:hentai_library/features/reading_history/di/reading_history_repository_provider.dart';
-import 'package:hentai_library/features/library_browse/data/series/series_repository_impl.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -21,24 +18,20 @@ List<Override> dataProviderOverrides() => <Override>[
     (Ref ref) =>
         createRemoteLibraryCredentialsPort(ref.read(libraryRepoProvider)),
   ),
-  comicThumbnailRepoProvider.overrideWith(
-    (Ref ref) => ComicThumbnailRepositoryImpl(
-      remoteCredentials: ref.read(remoteLibraryCredentialsPortProvider),
-    ),
-  ),
+  comicThumbnailRepoProvider.overrideWith(createComicThumbnailRepository),
   comicLookupRepositoryProvider.overrideWith(
-    (Ref ref) => const ComicRepositoryImpl(),
+    (Ref ref) => createComicRepository(),
   ),
   comicTrashRepositoryProvider.overrideWith(
     (Ref ref) => createComicTrashRepository(),
   ),
   comicCatalogRepositoryProvider.overrideWith(
-    (Ref ref) => const ComicRepositoryImpl(),
+    (Ref ref) => createComicCatalogRepository(),
   ),
   comicUserMetadataRepositoryProvider.overrideWith(
-    (Ref ref) => const ComicRepositoryImpl(),
+    (Ref ref) => createComicUserMetadataRepository(),
   ),
-  seriesRepoProvider.overrideWith((Ref ref) => const SeriesRepositoryImpl()),
+  seriesRepoProvider.overrideWith((Ref ref) => createSeriesRepository()),
   tagRepoProvider.overrideWith(
     (Ref ref) => createTagRepository(
       namedFacets: ref.read(namedFacetManagementRepoProvider),
