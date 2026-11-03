@@ -128,6 +128,20 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 
 **#451 library_browse（−7）** — rubric `candidate-retire`：MD3E 子块测（filter/sort/header/sheet）由 `library_md3e_page_test` 覆盖；flicker 时序测；`detail_status` 私有 scaffold。保留：`data/**`、`domain/**`、VM 薄边、`library_md3e_page_test`、`searched_md3e_page_test`、删除/批量/元数据 MD3E 流、`public/**`。
 
+**#453 shared/ui（−26）** — rubric `candidate-retire`：叶子 widget / form / 封面 / 分页 / context menu 等；`reading_history_list_layout_lazy`（#450 降级后删除）。**保留（thin-edge）**：`theme/build_app_theme_md3e_test.dart`、`theme/build_app_theme_preferences_contract_test.dart`（ADR-0032 主题装配契约）。快轨仍覆盖 `destructive_filled_button`、`dialog/confirm`、motion、token、md3e layout spec。
+
+**#454 其余 feature（−13）** — rubric `candidate-retire`  unless noted:
+
+| Feature | 删除 | 保留要点 |
+|---------|------|----------|
+| bootstrap | `responsive_app_shell*`×2、`app_locale_preference`、`series_detail_route_page` | `di/**` override 装配、`application_shell_import_contract`、`retired_paths_route`（ADR-0014）、`app_startup_coordinator` |
+| home | `home_md3e_page_test`（与快轨 `md3e_home_page_test` 重复） | `public/**` |
+| reading_history | `history_list_progress_test` | `data/mappers`；快轨 `history_page_test` |
+| library_admin | `libraries_sidebar_navigation`、`library_management_port_delete`（大壳路由） | `data/`、`di/` 契约、`domain/`、`public/**`；快轨 dashboard/dialog |
+| app_settings | `app_update_check`、`theme_preference_l10n` | `domain/**`、`data/`、`public/**`；快轨 settings MD3E / persist VM |
+| named_metadata | `metadata_md3e_page_test` | mappers、controller、`public/**`；快轨 `named_facet_fill_viewport` |
+| comic_trash / metadata_backup | — | 慢轨全保留（application / data / flow 薄边） |
+
 ## Import / 布局（规范在测试里）
 
 |  concern | 测试 / 文件 |
