@@ -8,8 +8,9 @@ import 'package:hentai_library/core/util/app_window_title.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/shared/ui/theme/theme.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:hentai_library/features/app_settings/presentation/settings.dart';
+import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
@@ -42,14 +43,11 @@ class _AppRootState extends ConsumerState<_AppRoot> {
     ref.watch(metadataAutoBackupCoordinatorProvider);
     ref.watch(appUpdateCoordinatorProvider);
 
-    final ThemeMode themeMode = ref.watch(
-      settingsProvider.select((AsyncValue<AppSetting> async) {
-        final AsyncData<AppSetting>? data = async.asData;
-        if (data == null) {
-          return ThemeMode.system;
-        }
-        return themeModeFromPreference(data.value.themePreference);
-      }),
+    final AppThemePreferencesPort themePrefs = ref.watch(
+      appThemePreferencesPortProvider,
+    );
+    final ThemeMode themeMode = themeModeFromPreference(
+      themePrefs.themePreference,
     );
     final Locale? locale = ref.watch(
       settingsProvider.select((AsyncValue<AppSetting> async) {
@@ -68,8 +66,16 @@ class _AppRootState extends ConsumerState<_AppRoot> {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       title: appWindowTitle(),
       debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(Brightness.light),
-      darkTheme: buildAppTheme(Brightness.dark),
+      theme: buildAppTheme(
+        Brightness.light,
+        colorSchemeId: _colorSchemeId(themePrefs.colorSchemePreference),
+        useDynamicColor: themePrefs.useDynamicColor,
+      ),
+      darkTheme: buildAppTheme(
+        Brightness.dark,
+        colorSchemeId: _colorSchemeId(themePrefs.colorSchemePreference),
+        useDynamicColor: themePrefs.useDynamicColor,
+      ),
       themeMode: themeMode,
       routerConfig: appRouter,
       builder: (BuildContext context, Widget? child) {
@@ -84,5 +90,12 @@ class _AppRootState extends ConsumerState<_AppRoot> {
         );
       },
     );
+  }
+}
+
+String _colorSchemeId(AppColorSchemePreference preference) {
+  switch (preference) {
+    case AppColorSchemePreference.brand:
+      return 'brand';
   }
 }

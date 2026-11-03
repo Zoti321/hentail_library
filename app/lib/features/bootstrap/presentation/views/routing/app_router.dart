@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/searched_md3e/searched_md3e_page.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_md3e_page.dart';
+import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/home_md3e_page.dart';

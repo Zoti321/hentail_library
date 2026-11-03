@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/app_theme_preferences_port.dart';
+import 'package:hentai_library/features/app_settings/domain/reader_display_preferences_port.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart';
 
 /// 应用设置的共享状态与端口 Provider 声明（#265 / ADR-0034 #426）。
@@ -38,3 +39,11 @@ final Provider<AppThemePreferencesPort> appThemePreferencesPortProvider =
         'appThemePreferencesPortProvider 未注入，请在 bootstrap 中 override',
       ),
     );
+
+/// 阅读器展示偏好（webtoon 边距/缩放等）。
+final Provider<ReaderDisplayPreferencesPort>
+readerDisplayPreferencesPortProvider = Provider<ReaderDisplayPreferencesPort>(
+  (Ref ref) => throw UnimplementedError(
+    'readerDisplayPreferencesPortProvider 未注入，请在 bootstrap 中 override',
+  ),
+);

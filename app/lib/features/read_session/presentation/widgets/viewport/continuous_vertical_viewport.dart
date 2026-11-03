@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_prefetch_hook.dart';
@@ -89,14 +88,9 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final int initialScrollIndex = frozenInitialScrollIndex.value ?? 0;
     final Size viewportSize = MediaQuery.sizeOf(context);
     final int totalPages = imageList.length;
-    final AppSetting? settings = ref
-        .watch(appSettingsStateProvider)
-        .asData
-        ?.value;
-    final int marginPercent =
-        settings?.webtoonMarginPercent ?? kDefaultWebtoonMarginPercent;
-    final WebtoonZoomMode zoomMode =
-        settings?.webtoonZoomMode ?? kDefaultWebtoonZoomMode;
+    final displayPrefs = ref.watch(readerDisplayPreferencesPortProvider);
+    final int marginPercent = displayPrefs.webtoonMarginPercent;
+    final WebtoonZoomMode zoomMode = displayPrefs.webtoonZoomMode;
     final double slotLogicalWidth = zoomMode == WebtoonZoomMode.fitWidth
         ? readerContinuousSlotLogicalWidth(
             viewportSize.width,

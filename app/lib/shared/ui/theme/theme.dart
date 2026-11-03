@@ -38,7 +38,18 @@ SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
 }
 
 /// Single assembly entry for app [ThemeData] (light/dark).
-ThemeData buildAppTheme(Brightness brightness) {
+///
+/// [colorSchemeId] / [useDynamicColor] 为设置契约预留；动态色与多 palette 尚未改变色值（ADR-0032）。
+ThemeData buildAppTheme(
+  Brightness brightness, {
+  String colorSchemeId = 'brand',
+  bool useDynamicColor = false,
+}) {
+  assert(
+    !useDynamicColor || colorSchemeId == 'brand',
+    'useDynamicColor 尚未实现；仅 brand palette 可用',
+  );
+  assert(colorSchemeId == 'brand', '未知 colorSchemeId: $colorSchemeId');
   final M3EThemeData m3e = buildAppM3eThemeData(brightness);
   final ColorScheme colorScheme = flutterColorSchemeFromM3e(m3e.colorScheme);
   final HentaiColorScheme semantic = HentaiColorScheme.forBrightness(

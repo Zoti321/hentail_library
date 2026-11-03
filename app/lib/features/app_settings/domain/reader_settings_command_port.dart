@@ -1,5 +1,4 @@
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
+import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
 
 /// 阅读器相关设置的写入命令端口（#265）。
 ///

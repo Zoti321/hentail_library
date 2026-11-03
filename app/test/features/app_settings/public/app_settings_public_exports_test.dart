@@ -14,6 +14,10 @@ void main() {
       expect(AppThemePreferencesPort, isNotNull);
       expect(createAppSettingRepository, isNotNull);
       expect(createAppThemePreferencesPort, isNotNull);
+      expect(createReaderDisplayPreferencesPort, isNotNull);
+      expect(createReaderSettingsCommandPort, isNotNull);
+      expect(SettingsMd3ePage, isNotNull);
+      expect(DiagnosticModeBanner, isNotNull);
       expect(settingsProvider, isNotNull);
     },
   );
