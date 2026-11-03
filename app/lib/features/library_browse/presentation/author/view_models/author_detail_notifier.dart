@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
-import 'package:hentai_library/features/named_metadata/domain/author_repository.dart';
+import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
