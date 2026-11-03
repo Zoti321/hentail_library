@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_copy.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field_shell.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
@@ -13,6 +14,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:motor/motor.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
 
 part 'md3e_named_facet_multi_select_menu.dart';
@@ -66,7 +68,8 @@ class Md3eNamedFacetMultiSelectField<T> extends ConsumerStatefulWidget {
 }
 
 class _Md3eNamedFacetMultiSelectFieldState<T>
-    extends ConsumerState<Md3eNamedFacetMultiSelectField<T>> {
+    extends ConsumerState<Md3eNamedFacetMultiSelectField<T>>
+    with TickerProviderStateMixin {
   final LayerLink _layerLink = LayerLink();
   final TextEditingController _inputController = TextEditingController();
   late final FocusNode _inputFocusNode;
@@ -85,10 +88,24 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   double _fieldWidth = 0;
   List<String> _visibleRemainingNames = const <String>[];
   bool _menuSessionActive = false;
+  late final SingleMotionController _panelExpandCtrl;
+
+  SpringMotion _menuPanelSpring(M3ESpring spring) {
+    return MaterialSpringMotion.expressiveSpatialDefault().copyWith(
+      stiffness: spring.stiffness,
+      damping: spring.damping,
+    );
+  }
 
   @override
   void initState() {
     super.initState();
+    _panelExpandCtrl = SingleMotionController(
+      motion: Md3eMotion.spatialReveal,
+      vsync: this,
+      initialValue: 0,
+    );
+    _panelExpandCtrl.addListener(_onPanelExpandTick);
     _inputFocusNode = FocusNode(onKeyEvent: _handleInputKeyEvent);
     _selectedNamesNotifier.value = List<String>.of(widget.selectedNames);
     _inputController.addListener(_syncFilterQuery);
@@ -98,14 +115,29 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   @override
   void didUpdateWidget(covariant Md3eNamedFacetMultiSelectField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!listEquals(_selectedNamesNotifier.value, widget.selectedNames)) {
-      _selectedNamesNotifier.value = List<String>.of(widget.selectedNames);
+    _syncSelectedNamesNotifier();
+  }
+
+  void _syncSelectedNamesNotifier() {
+    if (listEquals(_selectedNamesNotifier.value, widget.selectedNames)) {
+      return;
     }
+    final List<String> next = List<String>.of(widget.selectedNames);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      if (!listEquals(_selectedNamesNotifier.value, next)) {
+        _selectedNamesNotifier.value = next;
+      }
+    });
   }
 
   @override
   void dispose() {
-    _removeOverlay();
+    _panelExpandCtrl.removeListener(_onPanelExpandTick);
+    _panelExpandCtrl.dispose();
+    _removeOverlay(immediate: true);
     _inputController.removeListener(_syncFilterQuery);
     _inputFocusNode.removeListener(_handleInputFocusChange);
     _inputController.dispose();
@@ -123,7 +155,9 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
       return;
     }
     _filterQueryNotifier.value = next;
-    _menuScrollController.jumpTo(0);
+    if (_menuScrollController.hasClients) {
+      _menuScrollController.jumpTo(0);
+    }
     _markOverlayNeedsBuild();
   }
 
@@ -140,30 +174,76 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
     M3EFocus.tapOutsideHandler(_inputFocusNode)(event);
   }
 
+  void _onPanelExpandTick() {
+    _markOverlayNeedsBuild();
+    if (!_menuSessionActive &&
+        _panelExpandCtrl.value <= 0.01 &&
+        _overlayEntry != null) {
+      _removeOverlay(immediate: true);
+    }
+  }
+
   void _markOverlayNeedsBuild() {
     _overlayEntry?.markNeedsBuild();
   }
 
   void _openMenu() {
     _menuSessionActive = true;
-    if (_overlayEntry != null) {
-      _markOverlayNeedsBuild();
-      return;
+    final M3EDropdownMenuTheme menuTheme = M3ETheme.of(context).dropdownMenuTheme;
+    _panelExpandCtrl.motion = _menuPanelSpring(menuTheme.openSpring);
+    if (_overlayEntry == null) {
+      _panelExpandCtrl.value = 0;
+      _overlayEntry = _buildOverlayEntry();
+      Overlay.of(context, rootOverlay: true).insert(_overlayEntry!);
     }
-    _overlayEntry = _buildOverlayEntry();
-    Overlay.of(context, rootOverlay: true).insert(_overlayEntry!);
+    _markOverlayNeedsBuild();
+    if (Md3eMotion.reduceMotionOf(context)) {
+      _panelExpandCtrl.value = 1;
+    } else {
+      _panelExpandCtrl.animateTo(1);
+    }
   }
 
   void _closeMenu() {
+    if (_overlayEntry == null && _panelExpandCtrl.value <= 0.01) {
+      return;
+    }
     _menuSessionActive = false;
     _highlightedIndexNotifier.value = null;
-    _removeOverlay();
+    final M3EDropdownMenuTheme menuTheme = M3ETheme.of(context).dropdownMenuTheme;
+    _panelExpandCtrl.motion = _menuPanelSpring(menuTheme.closeSpring);
+    if (Md3eMotion.reduceMotionOf(context)) {
+      _panelExpandCtrl.value = 0;
+      _removeOverlay(immediate: true);
+    } else {
+      _panelExpandCtrl.animateTo(0);
+    }
   }
 
-  void _removeOverlay() {
+  void _removeOverlay({bool immediate = false}) {
+    if (!immediate && _panelExpandCtrl.value > 0.01) {
+      return;
+    }
     _overlayEntry?.remove();
     _overlayEntry?.dispose();
     _overlayEntry = null;
+    _panelExpandCtrl.value = 0;
+  }
+
+  Widget _wrapPanelExpandAnimation(Widget? child) {
+    final double progress = _panelExpandCtrl.value.clamp(0.0, 1.5);
+    final double clampedScale = progress.clamp(0.0, 1.2);
+    if (progress <= 0.01) {
+      return const SizedBox.shrink();
+    }
+    return Opacity(
+      opacity: progress.clamp(0.0, 1.0),
+      child: Transform.scale(
+        alignment: Alignment.topCenter,
+        scaleY: clampedScale,
+        child: child,
+      ),
+    );
   }
 
   OverlayEntry _buildOverlayEntry() {
@@ -190,45 +270,54 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
               targetAnchor: Alignment.bottomLeft,
               followerAnchor: Alignment.topLeft,
               offset: Offset(0, M3ETheme.of(context).spacing.xs),
-              child: ValueListenableBuilder<List<String>>(
-                valueListenable: _selectedNamesNotifier,
-                builder:
-                    (
-                      BuildContext context,
-                      List<String> selectedNames,
-                      Widget? _,
-                    ) {
-                      return ValueListenableBuilder<String>(
-                        valueListenable: _filterQueryNotifier,
-                        builder:
-                            (
-                              BuildContext context,
-                              String filterQuery,
-                              Widget? _,
-                            ) {
-                              return _Md3eNamedFacetMultiSelectMenuPanel<T>(
-                                key: ValueKey<String>(filterQuery),
-                                width: _fieldWidth,
-                                itemsProvider: widget.itemsProvider,
-                                selectedNames: selectedNames,
-                                filterQuery: filterQuery,
-                                scrollController: _menuScrollController,
-                                highlightedIndexListenable:
-                                    _highlightedIndexNotifier,
-                                highlightedRowKey: _highlightedRowKey,
-                                onVisibleRemainingChanged:
-                                    _reportVisibleRemaining,
-                                onHighlightIndex: _highlightAt,
-                                onAdd: _addFromMenu,
-                                onRetry: widget.onRetry,
-                                resolveName: widget.resolveName,
-                                resolveSmartMatched: widget.resolveSmartMatched,
-                                smartMatchedTooltip: widget.smartMatchedTooltip,
-                                copy: widget.copy,
-                              );
-                            },
-                      );
-                    },
+              child: AnimatedBuilder(
+                animation: _panelExpandCtrl,
+                builder: (BuildContext context, Widget? _) {
+                  return _wrapPanelExpandAnimation(
+                    ValueListenableBuilder<List<String>>(
+                      valueListenable: _selectedNamesNotifier,
+                      builder:
+                          (
+                            BuildContext context,
+                            List<String> selectedNames,
+                            Widget? _,
+                          ) {
+                            return ValueListenableBuilder<String>(
+                              valueListenable: _filterQueryNotifier,
+                              builder:
+                                  (
+                                    BuildContext context,
+                                    String filterQuery,
+                                    Widget? _,
+                                  ) {
+                                    return _Md3eNamedFacetMultiSelectMenuPanel<T>(
+                                      key: ValueKey<String>(filterQuery),
+                                      width: _fieldWidth,
+                                      itemsProvider: widget.itemsProvider,
+                                      selectedNames: selectedNames,
+                                      filterQuery: filterQuery,
+                                      scrollController: _menuScrollController,
+                                      highlightedIndexListenable:
+                                          _highlightedIndexNotifier,
+                                      highlightedRowKey: _highlightedRowKey,
+                                      onVisibleRemainingChanged:
+                                          _reportVisibleRemaining,
+                                      onHighlightIndex: _highlightAt,
+                                      onAdd: _addFromMenu,
+                                      onRetry: widget.onRetry,
+                                      resolveName: widget.resolveName,
+                                      resolveSmartMatched:
+                                          widget.resolveSmartMatched,
+                                      smartMatchedTooltip:
+                                          widget.smartMatchedTooltip,
+                                      copy: widget.copy,
+                                    );
+                                  },
+                            );
+                          },
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -389,7 +478,6 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
 
   @override
   Widget build(BuildContext context) {
-    _selectedNamesNotifier.value = List<String>.of(widget.selectedNames);
     final M3EChipTheme chipTheme = M3ETheme.of(context).chipTheme;
 
     return LayoutBuilder(
