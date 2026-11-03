@@ -12,7 +12,7 @@ import 'package:hentai_library/features/reading_history/presentation/views/histo
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
-import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_page.dart';
+import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final GlobalKey<NavigatorState> appRootNavigatorKey =

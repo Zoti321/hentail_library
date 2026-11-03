@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
@@ -91,6 +92,11 @@ final Provider<HomePageRepository> homePageRepoProvider =
 final Provider<ReaderSessionPort> readerSessionPortProvider =
     Provider<ReaderSessionPort>(
       (Ref ref) => _unimplemented('readerSessionPortProvider'),
+    );
+
+final Provider<ComicTrashReaderSessionPort> comicTrashReaderSessionPortProvider =
+    Provider<ComicTrashReaderSessionPort>(
+      (Ref ref) => _unimplemented('comicTrashReaderSessionPortProvider'),
     );
 
 final Provider<ComicPageSourcePort> comicPageSourcePortProvider =

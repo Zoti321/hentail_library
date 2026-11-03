@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/comic_trash/application/comic_trash_service.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
-import 'package:hentai_library/features/read_session/public/reader_session_port.dart';
+import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
 import 'package:test/test.dart';
 
@@ -35,7 +35,7 @@ class _RecordingComicRepository implements ComicTrashRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _RecordingReaderSessionPort implements ReaderSessionPort {
+class _RecordingReaderSessionPort implements ComicTrashReaderSessionPort {
   _RecordingReaderSessionPort(this.calls);
 
   final List<String> calls;
