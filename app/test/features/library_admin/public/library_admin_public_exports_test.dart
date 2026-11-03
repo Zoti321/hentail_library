@@ -5,6 +5,7 @@ void main() {
   test('public barrel exports command ports and bootstrap factories', () {
     expect(CurrentLibraryPort, isNotNull);
     expect(LibraryScanCommandPort, isNotNull);
+    expect(ResourceFormatCategory, isNotNull);
     expect(createCurrentLibraryPort, isNotNull);
     expect(createLibraryScanCommandPort, isNotNull);
   });

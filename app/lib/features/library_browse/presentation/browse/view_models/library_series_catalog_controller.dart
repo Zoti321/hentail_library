@@ -16,8 +16,8 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 part 'library_series_catalog_controller.g.dart';
 

@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -20,6 +18,7 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   _FakeLibraryRevisionPort(this._events);

@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_repository_impl.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 class _MemoryLegacySettingsJsonFile implements LegacySettingsJsonFile {
   _MemoryLegacySettingsJsonFile([this._content]);

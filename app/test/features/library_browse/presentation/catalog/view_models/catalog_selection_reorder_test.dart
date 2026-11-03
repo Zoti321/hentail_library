@@ -2,10 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
-import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 class _NoopReorderModePort implements LibraryReorderModePort {
   @override

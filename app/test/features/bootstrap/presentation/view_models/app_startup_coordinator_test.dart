@@ -1,9 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
-import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
@@ -13,6 +10,7 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 LocalLibrary _lib({required String id, bool scanOnStartup = false}) {
   return (

@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
@@ -31,6 +29,7 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/library_admin/public.dart';
 
 Comic _comic(String id) {
   final DateTime now = DateTime.utc(2026, 1, 1);

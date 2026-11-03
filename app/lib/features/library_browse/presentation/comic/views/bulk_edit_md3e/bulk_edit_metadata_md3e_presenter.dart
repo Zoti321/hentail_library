@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/views/bulk_edit_md3e/bulk_edit_metadata_md3e_form.dart';
-import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/md3e_adaptive_form_dialog.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 /// 批量编辑入口（MD3E 面板）：返回用户确认后的 patch，取消则为 `null`。
 Future<ComicMetadataBulkPatch?> showBulkEditMetadataMd3e({

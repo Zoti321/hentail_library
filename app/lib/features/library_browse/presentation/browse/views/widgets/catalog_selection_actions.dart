@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit_md3e/metadata_edit_presenters.dart';
-import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
@@ -10,6 +9,7 @@ import 'package:hentai_library/features/library_browse/presentation/comic/views/
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/comic_metadata_bulk_patch_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 Future<void> openCatalogSelectionMetadataEditor(
   BuildContext context,

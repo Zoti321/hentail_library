@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_alert_dismiss_notifier.dart';
 
 import 'package:flutter/scheduler.dart';
@@ -12,6 +11,7 @@ import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 part 'home_probe_coordinator_notifier.g.dart';
 

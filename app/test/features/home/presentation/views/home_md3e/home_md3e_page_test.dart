@@ -9,10 +9,6 @@ import 'package:hentai_library/features/home/presentation/views/home_md3e/home_m
 import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
 import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
-import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';

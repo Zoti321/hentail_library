@@ -33,8 +33,6 @@ import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_s
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
-import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -43,6 +41,7 @@ import 'package:hentai_library/features/library_browse/public/ui/comic_cover_con
 import 'package:hentai_library/features/library_browse/public/ui/series_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 /// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 网格 + 分页。
 ///

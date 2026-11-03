@@ -1,7 +1,7 @@
-import 'package:hentai_library/features/library_admin/domain/library_change.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/comic_user_metadata_repository.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 /// 浏览侧保存 Comic 元数据草稿的结果。仓储异常仍向上抛，由 UI toast。
 sealed class ComicMetadataApplyResult {

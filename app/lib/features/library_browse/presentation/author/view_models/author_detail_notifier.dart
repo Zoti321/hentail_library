@@ -6,9 +6,9 @@ import 'package:hentai_library/features/named_metadata/domain/author_repository.
 import 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 final authorDetailProvider = FutureProvider.autoDispose
     .family<AuthorDetail?, int>((Ref ref, int authorId) async {

@@ -5,8 +5,8 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 /// 库页页头「更多」菜单条目（MD3E）：刷新、选择漫画、扫描、深度扫描、导出当前库元数据；
 /// 扫描进行中仅显示取消扫描。

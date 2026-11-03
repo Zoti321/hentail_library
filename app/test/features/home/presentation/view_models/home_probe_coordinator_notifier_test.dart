@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/domain/home_page_repository.dart';
@@ -16,6 +14,7 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/s
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 LocalLibrary _lib(String id) {
   return (

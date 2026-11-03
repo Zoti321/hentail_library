@@ -10,8 +10,8 @@ import 'package:hentai_library/features/library_browse/domain/series/series_repo
 import 'package:hentai_library/features/library_browse/presentation/comic/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 /// Scope for Smart facet match on Comic metadata form.
 typedef ComicMetadataSmartFacetScope = ({

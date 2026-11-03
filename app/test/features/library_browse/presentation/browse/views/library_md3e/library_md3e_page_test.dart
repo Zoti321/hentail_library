@@ -15,10 +15,6 @@ import 'package:hentai_library/features/library_browse/presentation/browse/patte
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/features/library_browse/di/comic_cover_providers.dart';
 import 'package:hentai_library/features/library_browse/di/series_cover_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
-import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -28,6 +24,7 @@ import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/library_admin/public.dart';
 
 Comic _comic(String id, String title) {
   final DateTime now = DateTime.utc(2026, 1, 1);

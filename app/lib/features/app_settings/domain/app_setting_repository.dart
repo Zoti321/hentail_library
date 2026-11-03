@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 

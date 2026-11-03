@@ -22,7 +22,6 @@ import 'package:hentai_library/features/library_browse/presentation/series/views
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/features/library_browse/public/ui/comic_cover_content.dart';
-import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
@@ -33,6 +32,7 @@ import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toast
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 /// 生产系列详情页（MD3E）：服务端分页的漫画网格经映射层渲染 [Md3eSeriesDetailPage]。
 class SeriesDetailMd3ePage extends ConsumerWidget {
