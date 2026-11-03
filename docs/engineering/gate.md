@@ -120,6 +120,14 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 | 2026-11-03 | `test/features/read_session/presentation/reader_prefetch_generation_test.dart` | candidate-retire | 预取 generation 窗口纯算法，与 Reader 性能策略强耦合，留 nightly/#452 审计（#450） |
 | 2026-11-03 | `test/shared/ui/layout/reading_history_list_layout_lazy_test.dart` | candidate-retire | 断言 sliver 构建条数等布局实现，未用 `test/support/` harness（#450） |
 
+### 慢轨删除记录（#451 / #452）
+
+在 #450 降级后，按 #447 决策删除以下慢轨文件（不再参与 nightly；薄边与 MD3E 页级契约保留）。
+
+**#452 read_session（−14）** — rubric `candidate-retire`：视口/图片管线/预取 widget 或实现细节；`reader_page_shell_select_test` 仅测文件内重复 helper。保留：`data/`、`domain/**`、`public/**`、`reader_controller_test`、`reader_page_facade_test`、`series_reader_provider_test`（thin-edge / 编排薄边）。
+
+**#451 library_browse（−7）** — rubric `candidate-retire`：MD3E 子块测（filter/sort/header/sheet）由 `library_md3e_page_test` 覆盖；flicker 时序测；`detail_status` 私有 scaffold。保留：`data/**`、`domain/**`、VM 薄边、`library_md3e_page_test`、`searched_md3e_page_test`、删除/批量/元数据 MD3E 流、`public/**`。
+
 ## Import / 布局（规范在测试里）
 
 |  concern | 测试 / 文件 |
