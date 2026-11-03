@@ -4,6 +4,7 @@
 library;
 
 export 'data/services/recent_metadata_backup_at.dart';
+export 'public/di/metadata_backup_shared_state_overrides.dart';
 export 'domain/metadata_export_options.dart';
 export 'presentation/metadata_export_flow.dart';
 export 'presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';

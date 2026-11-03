@@ -1,15 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/adapters/comic_trash_reader_session_adapter.dart';
 import 'package:hentai_library/features/read_session/public.dart';
-import 'package:hentai_library/features/library_admin/data/adapters/library_revision_frb_adapter.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/home/public.dart';
-import 'package:hentai_library/features/library_admin/data/repositories/library_repository_impl.dart';
-import 'package:hentai_library/features/reading_history/di/reading_history_repository_provider.dart';
+import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -47,7 +45,7 @@ List<Override> dataProviderOverrides() => <Override>[
   characterRepoProvider.overrideWith(
     (Ref ref) => createNamedFacetDictionaryRepository(NamedFacetKind.character),
   ),
-  libraryRepoProvider.overrideWith((Ref ref) => const LibraryRepositoryImpl()),
+  libraryRepoProvider.overrideWith((Ref ref) => createLibraryRepository()),
   readingHistoryRepoProvider.overrideWith(
     (Ref ref) => createReadingHistoryRepository(),
   ),
@@ -62,6 +60,6 @@ List<Override> dataProviderOverrides() => <Override>[
   ),
   comicPageSourcePortProvider.overrideWith(createComicPageSourcePort),
   libraryRevisionPortProvider.overrideWith(
-    (Ref ref) => const LibraryRevisionFrbAdapter(),
+    (Ref ref) => createLibraryRevisionPort(),
   ),
 ];

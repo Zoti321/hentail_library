@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/metadata_backup/di/metadata_backup_shared_state_overrides.dart';
+import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
