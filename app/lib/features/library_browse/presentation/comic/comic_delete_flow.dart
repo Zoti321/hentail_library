@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/ui/patterns/dialog/md3e_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/confirm/comic_confirm_trash_dialog.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 删除入口：轻量确认 → Comic trash（可在「已删除」页恢复）。封面缓存不清。
 Future<void> confirmAndTrashComic(
@@ -15,15 +16,26 @@ Future<void> confirmAndTrashComic(
   Comic comic, {
   FutureOr<void> Function()? onTrashed,
 }) async {
-  final bool? confirmed = await showDialog<bool>(
-    context: context,
-    builder: (BuildContext dialogContext) =>
-        ComicConfirmTrashDialog(title: comic.title),
+  final l10n = context.l10n;
+  final bool confirmed = await showMd3eConfirmDialog(
+    context,
+    title: l10n.comicDetailDeleteTitle,
+    content: Builder(
+      builder: (BuildContext dialogContext) {
+        final M3EThemeData theme = M3ETheme.of(dialogContext);
+        return Text(
+          l10n.comicTrashConfirmContent(comic.title),
+          style: theme.typeScale.bodyMedium.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        );
+      },
+    ),
+    confirmLabel: l10n.commonDelete,
   );
-  if (confirmed != true || !context.mounted) {
+  if (!confirmed || !context.mounted) {
     return;
   }
-  final l10n = context.l10n;
   try {
     await ref.read(comicTrashCommandPortProvider).trash(<String>[
       comic.comicId,
@@ -31,7 +43,7 @@ Future<void> confirmAndTrashComic(
     if (!context.mounted) {
       return;
     }
-    showSuccessToast(context, l10n.comicTrashedToast);
+    M3ESnackbar.show(context, message: l10n.comicTrashedToast);
     await onTrashed?.call();
   } catch (err) {
     if (context.mounted) {
