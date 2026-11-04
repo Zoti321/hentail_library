@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/features/library_browse/public/ui/comic_cover_content.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/comic_catalog_card_shell.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
-const double _kCoverWidth = 48;
-const double _kCoverHeight = 72;
+/// 列表项内复选框列宽（与 M3E 触控目标对齐）。
+const double kTrashMd3eListCheckboxColumnWidth = 48;
 
-/// 「已删除」列表行（MD3E）：选中指示、封面、标题、Local / Remote、所属 Library、删除时间。
+/// 「已删除」列表行：catalog 卡片内左侧 [M3ECheckbox] 列 + 封面与文案。
 class TrashMd3eListItem extends StatelessWidget {
   const TrashMd3eListItem({
     super.key,
@@ -28,114 +31,155 @@ class TrashMd3eListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
+    final M3ETypeScale type = theme.typeScale;
+    final M3ESpacing spacing = theme.spacing;
     final AppLocalizations l10n = context.l10n;
     final String locale = Localizations.localeOf(context).toString();
     final String deletedAt = DateFormat.yMMMd(locale)
         .add_Hm()
         .format(item.deletedAt.toLocal());
-    final TextTheme text = Theme.of(context).textTheme;
+    final String badge = item.isRemote
+        ? l10n.trashBadgeRemote
+        : l10n.trashBadgeLocal;
+    final String? metaLine = Md3eComicListItem.metaLine(
+      author: badge,
+      pageLabel: item.libraryName,
+    );
 
-    return Material(
-      color: selected ? scheme.secondaryContainer : Colors.transparent,
-      borderRadius: BorderRadius.circular(16),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onToggleSelected,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                selected
-                    ? Symbols.check_circle
-                    : Symbols.radio_button_unchecked,
-                color: selected ? scheme.primary : scheme.outline,
-              ),
-              const SizedBox(width: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: _kCoverWidth,
-                  height: _kCoverHeight,
-                  child: ComicCoverContent(
-                    comicId: item.comic.comicId,
-                    priority: ThumbnailPriority.low,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 4,
-                  children: <Widget>[
-                    Text(
-                      item.comic.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: text.titleSmall?.copyWith(
-                        color: scheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Row(
-                      spacing: 8,
-                      children: <Widget>[
-                        _Md3eTrashBadge(
-                          text: item.isRemote
-                              ? l10n.trashBadgeRemote
-                              : l10n.trashBadgeLocal,
-                        ),
-                        Flexible(
-                          child: Text(
-                            item.libraryName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: text.bodySmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      l10n.trashDeletedAt(deletedAt),
-                      style: text.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+    final Widget cover = ClipRRect(
+      borderRadius: BorderRadius.circular(kMd3eComicCardRadius),
+      child: SizedBox(
+        width: kMd3eComicListItemCoverWidth,
+        height: kMd3eComicListItemCoverHeight,
+        child: ComicCoverContent(
+          comicId: item.comic.comicId,
+          priority: ThumbnailPriority.low,
+        ),
+      ),
+    );
+
+    final Widget infoColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          item.comic.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: md3eComicCatalogTitleStyle(type, scheme),
+        ),
+        if (metaLine != null) ...<Widget>[
+          const SizedBox(height: 4),
+          Text(
+            metaLine,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: md3eComicCatalogSubtitleStyle(type, scheme),
           ),
+        ],
+        const SizedBox(height: 4),
+        Text(
+          l10n.trashDeletedAt(deletedAt),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: md3eComicCatalogSubtitleStyle(type, scheme),
+        ),
+      ],
+    );
+
+    return Md3eComicCatalogCardShell(
+      height: kMd3eComicListItemMinHeight,
+      width: double.infinity,
+      enabled: true,
+      trackHover: true,
+      onPressed: onToggleSelected,
+      selected: selected,
+      semanticLabel: item.comic.title,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          spacing.sm,
+          kMd3eComicListItemVerticalPadding,
+          kMd3eComicCatalogContentHorizontalPadding,
+          kMd3eComicListItemVerticalPadding,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: kTrashMd3eListCheckboxColumnWidth,
+              child: Center(
+                child: M3ECheckbox(
+                  value: selected,
+                  onChanged: (_) => onToggleSelected(),
+                ),
+              ),
+            ),
+            SizedBox(width: spacing.sm),
+            cover,
+            SizedBox(width: spacing.md),
+            Expanded(child: infoColumn),
+          ],
         ),
       ),
     );
   }
 }
 
-class _Md3eTrashBadge extends StatelessWidget {
-  const _Md3eTrashBadge({required this.text});
+/// 已删除列表 sliver：列数与库页列表视图一致（expanded 桌面端 3 列）。
+class TrashMd3eListSliver extends StatelessWidget {
+  const TrashMd3eListSliver({
+    super.key,
+    required this.itemCount,
+    required this.itemBuilder,
+  });
 
-  final String text;
+  final int itemCount;
+  final Widget Function(BuildContext context, int index) itemBuilder;
 
   @override
   Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.labelSmall
-              ?.copyWith(color: scheme.onSurfaceVariant),
-        ),
-      ),
+    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final int columns = md3eComicListColumnCount(layout.sizeClass);
+    final double gap = layout.listItemGap;
+
+    if (itemCount <= 0) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+
+    if (columns == 1) {
+      return SliverList.builder(
+        itemCount: itemCount,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: gap),
+            child: itemBuilder(context, index),
+          );
+        },
+      );
+    }
+
+    final int rowCount = (itemCount + columns - 1) ~/ columns;
+    return SliverList.builder(
+      itemCount: rowCount,
+      itemBuilder: (BuildContext context, int rowIndex) {
+        final int firstIndex = rowIndex * columns;
+        return Padding(
+          padding: EdgeInsets.only(bottom: gap),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              for (int column = 0; column < columns; column++) ...<Widget>[
+                if (column > 0) SizedBox(width: gap),
+                Expanded(
+                  child: firstIndex + column < itemCount
+                      ? itemBuilder(context, firstIndex + column)
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }

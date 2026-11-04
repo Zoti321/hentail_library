@@ -28,6 +28,9 @@ class TrashMd3ePage extends ConsumerWidget {
     final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final AsyncValue<TrashPageState> async = ref.watch(
+      trashPageControllerProvider,
+    );
 
     return ColoredBox(
       color: md3eLabBrowseCanvasColor(scheme),
@@ -53,20 +56,111 @@ class TrashMd3ePage extends ConsumerWidget {
                 ),
               ),
             ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                horizontal,
-                layout.headerToBodyGap,
-                horizontal,
-                layout.bodyBottomInset,
-              ),
-              sliver: const SliverToBoxAdapter(child: _TrashBody()),
-            ),
+            ..._trashBodySlivers(context, ref, layout, horizontal, async),
           ],
         ),
       ),
     );
   }
+}
+
+List<Widget> _trashBodySlivers(
+  BuildContext context,
+  WidgetRef ref,
+  Md3ePageLayoutSpec layout,
+  double horizontal,
+  AsyncValue<TrashPageState> async,
+) {
+  final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+  final AppLocalizations l10n = context.l10n;
+  final EdgeInsets padding = EdgeInsets.fromLTRB(
+    horizontal,
+    layout.headerToBodyGap,
+    horizontal,
+    layout.bodyBottomInset,
+  );
+
+  return async.when(
+    loading: () => <Widget>[
+      SliverPadding(
+        padding: padding,
+        sliver: SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.only(top: layout.stateTopInset),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+        ),
+      ),
+    ],
+    error: (Object _, StackTrace _) => <Widget>[
+      SliverPadding(
+        padding: padding,
+        sliver: SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.only(top: layout.stateTopInset),
+            child: Center(
+              child: Text(
+                l10n.shellLoadFailed,
+                style: TextStyle(color: scheme.onSurfaceVariant),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+    data: (TrashPageState state) {
+      if (state.isEmpty) {
+        return <Widget>[
+          SliverPadding(
+            padding: padding,
+            sliver: SliverToBoxAdapter(child: _TrashEmptyState(scheme: scheme)),
+          ),
+        ];
+      }
+      final TrashPageController controller = ref.read(
+        trashPageControllerProvider.notifier,
+      );
+      return <Widget>[
+        SliverPadding(
+          padding: padding,
+          sliver: SliverMainAxisGroup(
+            slivers: <Widget>[
+              SliverToBoxAdapter(
+                child: Text(
+                  l10n.trashPageSummary(state.totalCount),
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+              ),
+              SliverToBoxAdapter(child: SizedBox(height: layout.listItemGap)),
+              TrashMd3eListSliver(
+                itemCount: state.items.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final TrashedComic item = state.items[index];
+                  return TrashMd3eListItem(
+                    key: ValueKey<String>(item.comic.comicId),
+                    item: item,
+                    selected: state.selectedIds.contains(item.comic.comicId),
+                    onToggleSelected: () =>
+                        controller.toggleSelected(item.comic.comicId),
+                  );
+                },
+              ),
+              if (state.isLoadingMore)
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ];
+    },
+  );
 }
 
 class _TrashHeader extends ConsumerWidget {
@@ -167,67 +261,6 @@ class _TrashHeader extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _TrashBody extends ConsumerWidget {
-  const _TrashBody();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final AppLocalizations l10n = context.l10n;
-    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
-    final AsyncValue<TrashPageState> async = ref.watch(
-      trashPageControllerProvider,
-    );
-    return async.when(
-      loading: () => Padding(
-        padding: EdgeInsets.only(top: layout.stateTopInset),
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (Object _, StackTrace _) => Padding(
-        padding: EdgeInsets.only(top: layout.stateTopInset),
-        child: Center(
-          child: Text(
-            l10n.shellLoadFailed,
-            style: TextStyle(color: scheme.onSurfaceVariant),
-          ),
-        ),
-      ),
-      data: (TrashPageState state) {
-        if (state.isEmpty) {
-          return _TrashEmptyState(scheme: scheme);
-        }
-        final TrashPageController controller = ref.read(
-          trashPageControllerProvider.notifier,
-        );
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(
-              l10n.trashPageSummary(state.totalCount),
-              style: Theme.of(context).textTheme.bodySmall
-                  ?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-            SizedBox(height: layout.listItemGap),
-            for (final TrashedComic item in state.items)
-              TrashMd3eListItem(
-                key: ValueKey<String>(item.comic.comicId),
-                item: item,
-                selected: state.selectedIds.contains(item.comic.comicId),
-                onToggleSelected: () =>
-                    controller.toggleSelected(item.comic.comicId),
-              ),
-            if (state.isLoadingMore)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-              ),
-          ],
-        );
-      },
     );
   }
 }

@@ -14,6 +14,7 @@ import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_po
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -125,10 +126,10 @@ void main() {
 
     expect(find.text('Title a'), findsOneWidget);
     expect(find.text('Title b'), findsOneWidget);
-    expect(find.text('Disk'), findsOneWidget);
-    expect(find.text('WebDAV'), findsOneWidget);
-    expect(find.text('本地'), findsOneWidget);
-    expect(find.text('远程'), findsOneWidget);
+    expect(find.textContaining('Disk'), findsOneWidget);
+    expect(find.textContaining('WebDAV'), findsOneWidget);
+    expect(find.textContaining('本地'), findsOneWidget);
+    expect(find.textContaining('远程'), findsOneWidget);
     expect(find.byIcon(Symbols.restore), findsOneWidget);
     expect(find.byIcon(Symbols.delete_forever), findsOneWidget);
   });
@@ -138,12 +139,12 @@ void main() {
   ) async {
     await _pumpTrash(tester, <TrashedComic>[_trashed('a'), _trashed('b')]);
 
-    expect(find.byIcon(Symbols.check_circle), findsNothing);
+    expect(find.byType(M3ECheckbox), findsNWidgets(2));
 
     await tester.tap(find.text('Title a'));
     await tester.pumpAndSettle();
     expect(find.text('已选 1 本'), findsOneWidget);
-    expect(find.byIcon(Symbols.check_circle), findsOneWidget);
+    expect(find.byType(M3ECheckbox), findsNWidgets(2));
     expect(find.byIcon(Symbols.restore), findsOneWidget);
     expect(find.byIcon(Symbols.delete_forever), findsOneWidget);
   });
