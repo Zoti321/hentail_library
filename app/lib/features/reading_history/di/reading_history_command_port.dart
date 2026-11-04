@@ -16,14 +16,13 @@ class _ReadingHistoryCommandAdapter implements ReadingHistoryCommandPort {
     required DateTime lastReadTime,
     required int pageIndex,
   }) {
-    return _repo.recordReading(
-      ReadingHistory(
-        comicId: comicId,
-        title: title,
-        lastReadTime: lastReadTime,
-        pageIndex: pageIndex,
-      ),
+    final record = ReadingHistory.recordSessionProgress(
+      comicId: comicId,
+      title: title,
+      lastReadTime: lastReadTime,
+      pageIndex: pageIndex,
     );
+    return _repo.recordReading(record.snapshot);
   }
 
   @override
