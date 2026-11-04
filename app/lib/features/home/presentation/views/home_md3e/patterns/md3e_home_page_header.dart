@@ -21,7 +21,7 @@ class Md3eHomePageHeader extends StatelessWidget {
     final bool showMenu =
         layout.sizeClass.isCompact && onOpenNavigation != null;
 
-    // 上下内边距与水平留白由外层 Md3ePageHeaderDelegate 提供，这里只负责工具行。
+    // 上下内边距与水平留白由外层 Md3ePageHeaderSliver / Chrome 提供，这里只负责工具行。
     return SizedBox(
       height: Md3ePageLayoutSpec.toolbarRowHeight,
       child: Row(

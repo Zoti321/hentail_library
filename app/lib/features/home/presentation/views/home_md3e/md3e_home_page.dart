@@ -39,12 +39,10 @@ class Md3eHomePage extends StatelessWidget {
       color: md3eLabBrowseCanvasColor(scheme),
       child: CustomScrollView(
         slivers: <Widget>[
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: Md3ePageHeaderDelegate(
-              layout: layout,
-              child: Md3eHomePageHeader(onOpenNavigation: onOpenNavigation),
-            ),
+          Md3ePageHeaderSliver(
+            layout: layout,
+            pinned: false,
+            child: Md3eHomePageHeader(onOpenNavigation: onOpenNavigation),
           ),
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
