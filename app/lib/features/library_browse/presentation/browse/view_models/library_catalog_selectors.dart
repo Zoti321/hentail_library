@@ -6,6 +6,17 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 
+/// 重载期间保留上一次 catalog 快照（库页网格/列表等 UI 使用）。
+T? stableCatalogSnapshot<T>(AsyncValue<T> catalogAsync) {
+  return catalogAsync.when(
+    data: (T state) => state,
+    loading: () => catalogAsync.value,
+    error: (Object _, StackTrace _) => catalogAsync.value,
+    skipLoadingOnReload: true,
+    skipLoadingOnRefresh: true,
+  );
+}
+
 /// 重载期间保留上一次 catalog 中的展示计数（分页栏等 UI 使用）。
 int stableCatalogDisplayedCount<T>(
   AsyncValue<T> catalogAsync, {

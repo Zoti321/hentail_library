@@ -23,6 +23,29 @@ LibraryComicsCatalogState _catalog({int comicCount = 42}) {
 int _readComicCount(LibraryComicsCatalogState state) => state.displayedCount;
 
 void main() {
+  test('stableCatalogSnapshot keeps previous catalog during reload', () {
+    final LibraryComicsCatalogState loaded = _catalog();
+
+    expect(
+      stableCatalogSnapshot(AsyncData<LibraryComicsCatalogState>(loaded)),
+      loaded,
+    );
+    expect(
+      stableCatalogSnapshot(
+        AsyncLoading<LibraryComicsCatalogState>().copyWithPrevious(
+          AsyncData<LibraryComicsCatalogState>(loaded),
+        ),
+      ),
+      loaded,
+    );
+    expect(
+      stableCatalogSnapshot(
+        const AsyncLoading<LibraryComicsCatalogState>(),
+      ),
+      isNull,
+    );
+  });
+
   test('stableCatalogDisplayedCount keeps previous total during reload', () {
     final LibraryComicsCatalogState loaded = _catalog();
 

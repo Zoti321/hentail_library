@@ -6,6 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/content_breadcrumb_labels.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/view_models/comic_detail_return_series_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_inactive_subscription.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/view_models/comic_read_progress.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
@@ -112,14 +113,12 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     final LibraryPageFacadeNotifier facadeNotifier = ref.read(
       libraryPageFacadeProvider.notifier,
     );
-    final LibraryComicsCatalogState? comicsCatalog = ref
-        .watch(libraryComicsCatalogControllerProvider)
-        .asData
-        ?.value;
-    final LibrarySeriesCatalogState? seriesCatalog = ref
-        .watch(librarySeriesCatalogControllerProvider)
-        .asData
-        ?.value;
+    final LibraryComicsCatalogState? comicsCatalog = stableCatalogSnapshot(
+      ref.watch(libraryComicsCatalogControllerProvider),
+    );
+    final LibrarySeriesCatalogState? seriesCatalog = stableCatalogSnapshot(
+      ref.watch(librarySeriesCatalogControllerProvider),
+    );
     final String? libraryName = ref.watch(
       currentLibraryStateProvider.select(_currentLibraryDisplayName),
     );
