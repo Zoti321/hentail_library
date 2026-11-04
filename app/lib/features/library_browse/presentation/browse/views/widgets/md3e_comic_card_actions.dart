@@ -9,10 +9,11 @@ import 'package:hentai_library/features/library_browse/presentation/catalog/view
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 包裹 MD3E 漫画卡片：右键 / 长按弹出与 Baseline 卡片一致的操作菜单
-/// （阅读、编辑元数据、在资源管理器中显示、删除）。
+/// 包裹 MD3E 漫画卡片：仅桌面端鼠标右键弹出 [M3EMenu]（与详情页顶栏 ⋮ 同款
+/// 宽度与样式：阅读、编辑元数据、在资源管理器中显示、删除）；移动端无上下文菜单。
 class Md3eComicCardActions extends ConsumerWidget {
   const Md3eComicCardActions({
     super.key,
@@ -24,20 +25,28 @@ class Md3eComicCardActions extends ConsumerWidget {
   final Comic comic;
   final Widget child;
 
-  /// 选择模式下设为 false，长按 / 右键不弹出操作菜单。
+  /// 选择模式下设为 false，桌面端右键不弹出操作菜单。
   final bool enabled;
+
+  static bool _isDesktop(BuildContext context) {
+    return switch (Theme.of(context).platform) {
+      TargetPlatform.windows ||
+      TargetPlatform.linux ||
+      TargetPlatform.macOS => true,
+      TargetPlatform.android ||
+      TargetPlatform.iOS ||
+      TargetPlatform.fuchsia => false,
+    };
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (!enabled) {
+    if (!enabled || !_isDesktop(context)) {
       return child;
     }
     return GestureDetector(
       behavior: HitTestBehavior.deferToChild,
       onSecondaryTapUp: (TapUpDetails details) {
-        _showMenu(context, ref, details.globalPosition);
-      },
-      onLongPressStart: (LongPressStartDetails details) {
         _showMenu(context, ref, details.globalPosition);
       },
       child: child,
@@ -46,25 +55,31 @@ class Md3eComicCardActions extends ConsumerWidget {
 
   void _showMenu(BuildContext context, WidgetRef ref, Offset globalPosition) {
     final AppLocalizations l10n = context.l10n;
-    md3eShowAnchoredMenu<void>(
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    md3eShowPointerContextMenu<void>(
       context: context,
-      anchor: Rect.fromLTWH(globalPosition.dx, globalPosition.dy, 0, 0),
+      globalPosition: globalPosition,
       children: <M3EMenuNode>[
         M3EMenuEntry(
           label: l10n.comicDetailRead,
+          leading: const Icon(LucideIcons.bookOpen),
           onPressed: () => ComicCardHost.openReader(ref, comic.comicId),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailEditMetadata,
+          leading: const Icon(LucideIcons.squarePen),
           onPressed: () =>
               showComicMetadataEditMd3e(context: context, comic: comic),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailShowInExplorer,
+          leading: const Icon(LucideIcons.folderOpen),
           onPressed: () => _showInExplorer(context, comic),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailDelete,
+          leading: Icon(LucideIcons.trash2, color: scheme.error),
+          isDestructive: true,
           onPressed: () => ComicCardHost.confirmTrash(context, ref, comic),
         ),
       ],

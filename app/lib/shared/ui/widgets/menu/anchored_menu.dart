@@ -21,6 +21,41 @@ Rect? md3eMenuAnchorRectFor(BuildContext context) {
   );
 }
 
+/// Maps [globalPosition] into the same coordinate space as [md3eMenuAnchorRectFor]
+/// / [showM3EMenu] (root overlay).
+Offset md3eMenuGlobalToRootOverlayLocal(
+  BuildContext context,
+  Offset globalPosition,
+) {
+  final OverlayState overlay = Overlay.of(context, rootOverlay: true);
+  final RenderBox overlayBox =
+      overlay.context.findRenderObject()! as RenderBox;
+  return overlayBox.globalToLocal(globalPosition);
+}
+
+/// Width of [M3EIconButtonSize.sm] default target ([Md3eDetailHeaderToolbar] ⋮).
+///
+/// [M3EMenuPlacer] menu width = `anchor.width + 176`; toolbar overflow uses the
+/// full icon-button anchor rect — pointer context menus use the same width basis.
+const double kMd3eToolbarIconMenuAnchorWidth = 48;
+
+/// Anchor for a desktop pointer context menu: menu top-start flush with [overlayLocal].
+///
+/// Uses [M3EMenuAnchorPosition.bottomStart] with [M3EMenuPlacer] collision logic.
+/// [overlayLocal] must be in root-overlay space ([md3eMenuGlobalToRootOverlayLocal]).
+/// [kMd3eToolbarIconMenuAnchorWidth] matches detail-header [Md3eAnchoredMenu] width.
+Rect md3ePointerContextMenuAnchor(
+  Offset overlayLocal,
+  M3EMenuTheme menuTheme,
+) {
+  return Rect.fromLTWH(
+    overlayLocal.dx,
+    overlayLocal.dy - menuTheme.anchorOffset,
+    kMd3eToolbarIconMenuAnchorWidth,
+    0,
+  );
+}
+
 /// Like [showM3EMenu], but re-attaches [M3ETheme] on the overlay route.
 ///
 /// Root [OverlayEntry] builders (Widgetbook shell) can sit above the
@@ -31,6 +66,7 @@ Future<T?> md3eShowAnchoredMenu<T>({
   required Rect anchor,
   required List<M3EMenuNode> children,
   M3EMenuAnchorPosition position = M3EMenuAnchorPosition.bottomEnd,
+  double? preferredWidth,
   FocusNode? callerFocusNode,
 }) {
   final M3EThemeData themeData = M3ETheme.of(context);
@@ -45,6 +81,7 @@ Future<T?> md3eShowAnchoredMenu<T>({
           anchor: anchor,
           children: children,
           position: position,
+          preferredWidth: preferredWidth,
           historyRoute: historyRoute,
           callerFocusNode: callerFocusNode,
           onSelected: (Object? value) {
@@ -64,6 +101,31 @@ Future<T?> md3eShowAnchoredMenu<T>({
   );
   Overlay.of(context, rootOverlay: true).insert(entry);
   return completer.future;
+}
+
+/// Desktop context menu: [M3EMenu] top-start at [globalPosition], m3e collision placement.
+///
+/// Width and row styling match [Md3eAnchoredMenu] on the detail header ⋮ button
+/// ([M3EMenuPlacer] `anchor.width + 176`, [M3EMenuAnchorPosition.bottomStart]).
+Future<T?> md3eShowPointerContextMenu<T>({
+  required BuildContext context,
+  required Offset globalPosition,
+  required List<M3EMenuNode> children,
+  FocusNode? callerFocusNode,
+}) {
+  final M3EMenuTheme menuTheme =
+      M3ETheme.of(context).menuTheme.metricsFor(M3EMenuVariant.vertical);
+  final Offset overlayLocal = md3eMenuGlobalToRootOverlayLocal(
+    context,
+    globalPosition,
+  );
+  return md3eShowAnchoredMenu<T>(
+    context: context,
+    anchor: md3ePointerContextMenuAnchor(overlayLocal, menuTheme),
+    children: children,
+    position: M3EMenuAnchorPosition.bottomStart,
+    callerFocusNode: callerFocusNode,
+  );
 }
 
 /// [M3EMenu] with root-overlay anchor math (nested navigators / Widgetbook).
