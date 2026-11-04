@@ -56,7 +56,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> setDismissedUpdateVersion(String value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    await updateSettings(current.copyWith(dismissedUpdateVersion: value));
+    await updateSettings(current.withDismissedUpdateVersion(value));
   }
 
   Future<void> setReadingMode(ReadingMode value) async {
@@ -74,9 +74,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> setWebtoonMarginPercent(int value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    final AppSetting newSetting = current.copyWith(
-      webtoonMarginPercent: normalizeWebtoonMarginPercent(value),
-    );
+    final AppSetting newSetting = current.withWebtoonMarginPercent(value);
     state = AsyncData(newSetting);
     try {
       await ref.read(appSettingRepoProvider).save(newSetting);
@@ -100,10 +98,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> setReaderAutoPlayIntervalSeconds(int value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    final int normalizedValue = clampReaderAutoPlayInterval(value);
-    final AppSetting newSetting = current.copyWith(
-      readerAutoPlayIntervalSeconds: normalizedValue,
-    );
+    final AppSetting newSetting = current.withReaderAutoPlayIntervalSeconds(value);
     state = AsyncData(newSetting);
     try {
       await ref.read(appSettingRepoProvider).save(newSetting);
