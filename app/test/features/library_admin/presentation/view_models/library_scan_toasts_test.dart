@@ -1,6 +1,5 @@
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_scan_toasts.dart';
 import 'package:test/test.dart';
 
@@ -117,21 +116,22 @@ void main() {
       );
     });
 
-    test('remote skip warning stays informational', () {
-      final LibraryScanCompletion completion = (
-        cancelled: false,
-        error: null,
-        scanMode: ScanMode.incremental,
-        progress: _withRoots(
-          added: 0,
-          removed: 0,
-          migrated: 0,
-          errorMessage: '已跳过远程库',
-        ),
-        fromStartup: true,
+    test('remote skip warning uses progress error message', () {
+      expect(
+        libraryScanCompletionMessage(l10n, (
+          cancelled: false,
+          error: null,
+          scanMode: ScanMode.incremental,
+          progress: _withRoots(
+            added: 0,
+            removed: 0,
+            migrated: 0,
+            errorMessage: '已跳过远程库',
+          ),
+          fromStartup: true,
+        )),
+        '已跳过远程库',
       );
-      expect(libraryScanCompletionMessage(l10n, completion), '已跳过远程库');
-      expect(libraryScanCompletionToastType(completion), AppToastType.info);
     });
   });
 }

@@ -19,7 +19,7 @@ import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/shell/md3e_app_shell_slot.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Shell 标题栏下方、library_admin 负责的反馈条（扫描 / 批量元数据）。
+/// Shell 标题栏下方、library_admin 负责的反馈插槽（批量元数据条；静默扫描完成 snackbar 监听）。
 List<Widget> libraryAdminShellFeedbackBelowTitleBar() {
   return const <Widget>[
     LibraryScanShellFeedback(),
