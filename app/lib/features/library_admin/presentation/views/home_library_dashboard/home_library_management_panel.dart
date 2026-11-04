@@ -19,7 +19,7 @@ import 'package:hentai_library/features/library_admin/domain/sync_library_types.
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/library/home_library_stat.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/metadata_refresh_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -159,7 +159,7 @@ Future<void> _persistOrder(
   } catch (err) {
     pendingOrder.value = null;
     if (context.mounted) {
-      showErrorToast(context, err);
+      showErrorSnackbar(context, err);
     }
   }
 }
@@ -198,7 +198,7 @@ Future<void> _runLibraryAction(
         }
       } catch (err) {
         if (context.mounted) {
-          showErrorToast(context, err);
+          showErrorSnackbar(context, err);
         }
       }
     case Md3eHomeLibraryManagementAction.edit:

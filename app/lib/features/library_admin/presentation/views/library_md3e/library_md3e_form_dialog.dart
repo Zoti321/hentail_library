@@ -14,7 +14,7 @@ import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:path/path.dart' as p;
@@ -183,17 +183,13 @@ class _LibraryMd3eFormState extends ConsumerState<_LibraryMd3eForm> {
             LibraryFormMode.createRemote => l10n.remoteLibraryAddedToast,
             LibraryFormMode.edit => l10n.commonSavedToast,
           };
-          showSuccessToast(context, toast);
+          showSuccessSnackbar(context, toast);
           Navigator.of(context).pop();
       }
     } catch (error, stackTrace) {
       logError(AppLog.ui('libraryForm'), '提交库表单失败', error, stackTrace);
       if (mounted) {
-        showCustomToast(
-          context,
-          message: l10n.commonSaveFailedToast,
-          type: AppToastType.error,
-        );
+        showErrorSnackbar(context, l10n.commonSaveFailedToast);
       }
     } finally {
       if (mounted) {

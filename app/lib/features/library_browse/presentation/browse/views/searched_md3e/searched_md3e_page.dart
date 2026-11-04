@@ -18,7 +18,7 @@ import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/library_browse/public/ui/comic_cover_content.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 const double _kSearchLoadMoreThreshold = 400;
 const Duration _kLoadMoreMinInterval = Duration(milliseconds: 400);
@@ -85,7 +85,7 @@ class _SearchedMd3ePageState extends ConsumerState<SearchedMd3ePage> {
   void _submitSearch(String value) {
     final String query = value.trim();
     if (query.isEmpty) {
-      showInfoToast(context, context.l10n.librarySearchKeywordEmpty);
+      showInfoSnackbar(context, context.l10n.librarySearchKeywordEmpty);
       return;
     }
     ref

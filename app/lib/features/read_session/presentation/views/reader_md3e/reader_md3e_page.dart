@@ -24,7 +24,7 @@ import 'package:hentai_library/features/read_session/presentation/patterns/reade
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -176,7 +176,7 @@ class ReaderMd3ePage extends HookConsumerWidget {
         if (message.isEmpty) {
           return;
         }
-        showInfoToast(context, message);
+        showInfoSnackbar(context, message);
       });
       return null;
     }, <Object?>[seriesBoundaryPrompt, context]);

@@ -6,7 +6,7 @@ import 'package:hentai_library/features/named_metadata/presentation/view_models/
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata_md3e/metadata_md3e_dialogs.dart';
 import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 
 /// 重命名（沿用共享的名称编辑框）。
@@ -48,7 +48,7 @@ Future<void> deleteNamedFacet(
         .countAttachments(name);
   } catch (error) {
     if (context.mounted) {
-      showErrorToast(context, error);
+      showErrorSnackbar(context, error);
     }
     return;
   }
@@ -68,11 +68,11 @@ Future<void> deleteNamedFacet(
         .read(namedFacetManagementControllerProvider(kind).notifier)
         .delete(name);
     if (context.mounted) {
-      showSuccessToast(context, context.l10n.metadataDeletedToast(kind));
+      showSuccessSnackbar(context, context.l10n.metadataDeletedToast(kind));
     }
   } catch (error) {
     if (context.mounted) {
-      showErrorToast(context, error);
+      showErrorSnackbar(context, error);
     }
   }
 }

@@ -8,7 +8,7 @@ import 'package:hentai_library/features/library_browse/presentation/comic/comic_
 import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -101,7 +101,7 @@ class Md3eComicCardActions extends ConsumerWidget {
               cause: error,
               stackTrace: stackTrace,
             );
-      showErrorToast(context, failure);
+      showErrorSnackbar(context, failure);
     }
   }
 }

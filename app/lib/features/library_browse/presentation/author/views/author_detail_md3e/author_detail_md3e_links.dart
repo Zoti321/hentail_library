@@ -6,7 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,7 +28,7 @@ class AuthorDetailMd3eLinks extends HookConsumerWidget {
       if (!context.mounted) {
         return;
       }
-      showErrorToast(context, context.l10n.authorDetailOpenLinkFailed);
+      showErrorSnackbar(context, context.l10n.authorDetailOpenLinkFailed);
     }
   }
 
@@ -43,7 +43,7 @@ class AuthorDetailMd3eLinks extends HookConsumerWidget {
           .deleteLink(authorId: detail.id, linkId: link.id);
     } catch (error) {
       if (context.mounted) {
-        showErrorToast(context, error);
+        showErrorSnackbar(context, error);
       }
     }
   }
@@ -68,7 +68,7 @@ class AuthorDetailMd3eLinks extends HookConsumerWidget {
       }
       final String lower = url.toLowerCase();
       if (!(lower.startsWith('http://') || lower.startsWith('https://'))) {
-        showErrorToast(context, l10n.authorDetailInvalidUrl);
+        showErrorSnackbar(context, l10n.authorDetailInvalidUrl);
         return;
       }
       busy.value = true;
@@ -86,7 +86,7 @@ class AuthorDetailMd3eLinks extends HookConsumerWidget {
         }
       } catch (error) {
         if (context.mounted) {
-          showErrorToast(context, error);
+          showErrorSnackbar(context, error);
         }
       } finally {
         busy.value = false;

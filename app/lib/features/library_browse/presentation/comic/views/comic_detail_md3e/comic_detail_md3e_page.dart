@@ -23,7 +23,7 @@ import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -184,10 +184,10 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
       if (!context.mounted) {
         return;
       }
-      showSuccessToast(context, l10n.refreshMetadataComicSuccess);
+      showSuccessSnackbar(context, l10n.refreshMetadataComicSuccess);
     } catch (err) {
       if (context.mounted) {
-        showErrorToast(context, err);
+        showErrorSnackbar(context, err);
       }
     }
   }
@@ -200,10 +200,10 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
             return;
           }
           if (error is AppException) {
-            showErrorToast(context, error);
+            showErrorSnackbar(context, error);
             return;
           }
-          showErrorToast(
+          showErrorSnackbar(
             context,
             AppException(
               l10n.comicDetailShowInExplorerFailed,

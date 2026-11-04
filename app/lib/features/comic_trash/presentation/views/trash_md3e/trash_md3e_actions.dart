@@ -6,7 +6,7 @@ import 'package:hentai_library/features/comic_trash/presentation/view_models/tra
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 /// 「已删除」页的恢复 / 永久删除入口（MD3E 页面共用，业务经 [trashPageControllerProvider]）。
 Future<void> restoreTrashedComics(
@@ -20,11 +20,11 @@ Future<void> restoreTrashedComics(
         .read(trashPageControllerProvider.notifier)
         .restore(comicIds);
     if (context.mounted) {
-      showSuccessToast(context, l10n.trashRestoredToast(restored));
+      showSuccessSnackbar(context, l10n.trashRestoredToast(restored));
     }
   } catch (err) {
     if (context.mounted) {
-      showErrorToast(context, err);
+      showErrorSnackbar(context, err);
     }
   }
 }
@@ -39,11 +39,11 @@ Future<void> restoreAllTrashedComics(
         .read(trashPageControllerProvider.notifier)
         .restoreAll();
     if (context.mounted && restored > 0) {
-      showSuccessToast(context, l10n.trashRestoredToast(restored));
+      showSuccessSnackbar(context, l10n.trashRestoredToast(restored));
     }
   } catch (err) {
     if (context.mounted) {
-      showErrorToast(context, err);
+      showErrorSnackbar(context, err);
     }
   }
 }
@@ -104,21 +104,21 @@ Future<void> _runPurge(
       case PurgeSummaryKind.nothing:
         break;
       case PurgeSummaryKind.allSucceeded:
-        showSuccessToast(
+        showSuccessSnackbar(
           context,
           l10n.trashPurgeSucceededToast(result.succeeded),
         );
       case PurgeSummaryKind.partial:
-        showInfoToast(
+        showInfoSnackbar(
           context,
           l10n.trashPurgePartialToast(result.succeeded, result.failed),
         );
       case PurgeSummaryKind.allFailed:
-        showErrorToast(context, l10n.trashPurgeFailedToast(result.failed));
+        showErrorSnackbar(context, l10n.trashPurgeFailedToast(result.failed));
     }
   } catch (err) {
     if (context.mounted) {
-      showErrorToast(context, err);
+      showErrorSnackbar(context, err);
     }
   }
 }

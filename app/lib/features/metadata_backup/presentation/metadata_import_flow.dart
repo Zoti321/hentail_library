@@ -12,7 +12,7 @@ import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_m
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_preview.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_import_result.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/widgets/metadata_import_dialogs.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 
 export 'widgets/metadata_import_dialogs.dart';
@@ -40,7 +40,7 @@ Future<void> runMetadataImportFlow(
   final String? path = file.path;
   if (path == null || !isMetadataBackupFilePath(path)) {
     if (context.mounted) {
-      showErrorToast(context, l10n.settingsMetadataBackupImportInvalidFile);
+      showErrorSnackbar(context, l10n.settingsMetadataBackupImportInvalidFile);
     }
     return;
   }
@@ -112,7 +112,7 @@ Future<void> runMetadataImportFlow(
     logError(AppLog.core('metadata_backup'), '导入元数据失败', e, st);
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).maybePop();
-      showErrorToast(context, e);
+      showErrorSnackbar(context, e);
     }
   }
 }

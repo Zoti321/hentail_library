@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/md3e_confirm_dialog.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -43,11 +43,11 @@ Future<void> confirmAndTrashComic(
     if (!context.mounted) {
       return;
     }
-    M3ESnackbar.show(context, message: l10n.comicTrashedToast);
+    showSuccessSnackbar(context, l10n.comicTrashedToast);
     await onTrashed?.call();
   } catch (err) {
     if (context.mounted) {
-      showErrorToast(context, err);
+      showErrorSnackbar(context, err);
     }
   }
 }

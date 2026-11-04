@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/views/bulk_edit_md3e/bulk_edit_metadata_md3e_presenter.dart';
@@ -74,9 +74,9 @@ Future<void> openComicMetadataEditorForIds(
       return;
     }
     if (err is AppException) {
-      showErrorToast(context, err);
+      showErrorSnackbar(context, err);
     } else {
-      showErrorToast(context, AppException(err.toString()));
+      showErrorSnackbar(context, AppException(err.toString()));
     }
   }
 }

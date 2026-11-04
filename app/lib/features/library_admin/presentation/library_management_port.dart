@@ -8,7 +8,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 /// library_admin 对 [LibraryManagementPort] 的实现（#292）。
 ///
@@ -78,7 +78,7 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     if (!context.mounted) {
       return;
     }
-    showSuccessToast(context, context.l10n.libraryRemovedToast);
+    showSuccessSnackbar(context, context.l10n.libraryRemovedToast);
 
     if (!navigateAfter || !wasViewing) {
       return;

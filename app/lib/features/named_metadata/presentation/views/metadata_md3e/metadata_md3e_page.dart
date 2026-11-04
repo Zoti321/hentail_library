@@ -19,7 +19,7 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kMergeConfirmSkipKey = 'metadata_merge_confirm_skip';
@@ -266,10 +266,10 @@ class _MetadataManagementPageState
           .merge(targetName: target, sourceNames: sources);
       if (mounted) {
         _exitMergeSelection();
-        showSuccessToast(context, '合并完成');
+        showSuccessSnackbar(context, '合并完成');
       }
     } catch (error) {
-      if (mounted) showErrorToast(context, error);
+      if (mounted) showErrorSnackbar(context, error);
     }
   }
 

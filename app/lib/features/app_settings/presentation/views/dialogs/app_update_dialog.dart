@@ -10,7 +10,7 @@ import 'package:hentai_library/features/app_settings/domain/app_release_info.dar
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/theme/lab_text.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -101,12 +101,12 @@ class AppUpdateDialog extends ConsumerWidget {
                 await openReleasePage(release.htmlUrl);
               } catch (error) {
                 if (context.mounted) {
-                  showErrorToast(context, error);
+                  showErrorSnackbar(context, error);
                 }
                 return;
               }
               if (context.mounted) {
-                showInfoToast(context, l10n.updateManualDownloadToast);
+                showInfoSnackbar(context, l10n.updateManualDownloadToast);
               }
               return;
             }

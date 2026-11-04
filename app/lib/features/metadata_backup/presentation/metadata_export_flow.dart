@@ -7,7 +7,7 @@ import 'package:hentai_library/features/metadata_backup/application/metadata_exp
 import 'package:hentai_library/features/metadata_backup/data/repositories/metadata_backup_repository_impl.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/widgets/metadata_export_options_dialog.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
@@ -54,7 +54,7 @@ Future<void> runMetadataExportFlow(
     );
 
     if (context.mounted) {
-      showSuccessToast(
+      showSuccessSnackbar(
         context,
         l10n.settingsMetadataBackupExportSuccess(p.basename(outputPath)),
       );
@@ -62,7 +62,7 @@ Future<void> runMetadataExportFlow(
   } catch (e, st) {
     logError(AppLog.core('metadata_backup'), '导出元数据失败', e, st);
     if (context.mounted) {
-      showErrorToast(context, e);
+      showErrorSnackbar(context, e);
     }
   }
 }

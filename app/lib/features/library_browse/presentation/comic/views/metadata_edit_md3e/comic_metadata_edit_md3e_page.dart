@@ -13,7 +13,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 漫画元数据编辑视图（已加载实体）：Lab 表单 + Lab 编辑壳，保存走生产 notifier。
@@ -125,11 +125,7 @@ class ComicMetadataEditMd3eViewState
     } catch (error, stackTrace) {
       logError(AppLog.ui('editMetadata'), '设置元数据字段锁失败', error, stackTrace);
       if (mounted) {
-        showCustomToast(
-          context,
-          message: context.l10n.commonSaveFailedToast,
-          type: AppToastType.error,
-        );
+        showErrorSnackbar(context, context.l10n.commonSaveFailedToast);
       }
     }
   }
@@ -152,11 +148,7 @@ class ComicMetadataEditMd3eViewState
       final String trimmed = sortText.trim();
       final double? parsed = double.tryParse(trimmed);
       if (trimmed.isEmpty || parsed == null || !parsed.isFinite) {
-        showCustomToast(
-          context,
-          message: context.l10n.formSeriesItemSortOrderInvalid,
-          type: AppToastType.error,
-        );
+        showErrorSnackbar(context, context.l10n.formSeriesItemSortOrderInvalid);
         return;
       }
       sortOrder = parsed;
@@ -180,17 +172,13 @@ class ComicMetadataEditMd3eViewState
         );
       }
       if (mounted) {
-        showSuccessToast(context, context.l10n.commonSavedToast);
+        showSuccessSnackbar(context, context.l10n.commonSavedToast);
         _leave();
       }
     } catch (error, stackTrace) {
       logError(AppLog.ui('editMetadata'), '保存漫画元数据失败', error, stackTrace);
       if (mounted) {
-        showCustomToast(
-          context,
-          message: context.l10n.commonSaveFailedToast,
-          type: AppToastType.error,
-        );
+        showErrorSnackbar(context, context.l10n.commonSaveFailedToast);
       }
     } finally {
       if (mounted) {

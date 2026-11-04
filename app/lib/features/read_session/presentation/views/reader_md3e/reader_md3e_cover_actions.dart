@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_cover_editor_notifier.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 以当前阅读页为封面的页码（0 基）。
@@ -71,17 +71,17 @@ Future<void> _runCoverAction(
       .asData
       ?.value;
   if (state == null) {
-    showCustomToast(context, message: notStateReadyMessage);
+    showInfoSnackbar(context, notStateReadyMessage);
     return;
   }
   try {
     await action(state);
     if (context.mounted) {
-      showCustomToast(context, message: successMessage);
+      showSuccessSnackbar(context, successMessage);
     }
   } on Object catch (error) {
     if (context.mounted) {
-      showCustomToast(context, message: failureMessage(error));
+      showErrorSnackbar(context, failureMessage(error));
     }
   }
 }

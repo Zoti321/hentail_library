@@ -6,7 +6,7 @@ import 'package:hentai_library/features/library_browse/presentation/author/view_
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail_md3e/author_detail_md3e_links.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail_md3e/author_image_view.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -130,7 +130,7 @@ class _AuthorNameRow extends HookConsumerWidget {
         }
       } catch (error) {
         if (context.mounted) {
-          showErrorToast(context, error);
+          showErrorSnackbar(context, error);
           editing.value = false;
         }
       } finally {

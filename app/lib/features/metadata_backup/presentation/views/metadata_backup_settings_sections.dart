@@ -13,7 +13,7 @@ import 'package:hentai_library/features/metadata_backup/presentation/view_models
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -83,7 +83,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                         .read(metadataAutoBackupCoordinatorProvider.notifier)
                         .backupNow();
                     if (context.mounted) {
-                      showSuccessToast(
+                      showSuccessSnackbar(
                         context,
                         l10n.settingsMetadataBackupNowSuccess,
                       );
@@ -102,7 +102,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                         await openDirectoryInFileExplorer(storagePath);
                       } catch (e) {
                         if (context.mounted) {
-                          showErrorToast(context, e);
+                          showErrorSnackbar(context, e);
                         }
                       }
                     },

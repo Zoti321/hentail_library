@@ -10,7 +10,7 @@ import 'package:hentai_library/features/library_browse/presentation/series/patte
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 系列元数据编辑视图（已加载实体）：Lab 表单 + Lab 编辑壳，保存走生产 notifier。
@@ -74,11 +74,7 @@ class SeriesMetadataEditMd3eViewState
     } catch (error, stackTrace) {
       logError(AppLog.ui('editSeries'), '设置系列元数据字段锁失败', error, stackTrace);
       if (mounted) {
-        showCustomToast(
-          context,
-          message: context.l10n.commonSaveFailedToast,
-          type: AppToastType.error,
-        );
+        showErrorSnackbar(context, context.l10n.commonSaveFailedToast);
       }
     }
   }
@@ -108,17 +104,13 @@ class SeriesMetadataEditMd3eViewState
             _totalCountError = validation.totalCountError;
           });
         case SeriesMetadataApplySucceeded():
-          showSuccessToast(context, context.l10n.commonSavedToast);
+          showSuccessSnackbar(context, context.l10n.commonSavedToast);
           _leave();
       }
     } catch (error, stackTrace) {
       logError(AppLog.ui('editSeries'), '保存系列元数据失败', error, stackTrace);
       if (mounted) {
-        showCustomToast(
-          context,
-          message: context.l10n.commonSaveFailedToast,
-          type: AppToastType.error,
-        );
+        showErrorSnackbar(context, context.l10n.commonSaveFailedToast);
       }
     } finally {
       if (mounted) {
