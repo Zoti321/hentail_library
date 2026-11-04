@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_domain_exception.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_search_spec.dart';
-import 'package:hentai_library/shared/domain/exceptions/domain_rule_violation.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_exceptions.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_search_specification.dart';
+import 'package:hentai_library/shared/domain/exceptions/domain_exception.dart';
 
 void main() {
   group('ReadingHistory.recordSessionProgress', () {
@@ -17,6 +17,7 @@ void main() {
         pageCount: 10,
       );
       final ReadingHistory snapshot = record.snapshot;
+
       expect(snapshot.comicId, 'c1');
       expect(snapshot.title, 'Title');
       expect(snapshot.pageIndex, 2);
@@ -33,8 +34,8 @@ void main() {
           pageIndex: 1,
         ),
         throwsA(
-          isA<ReadingHistoryDomainException>().having(
-            (ReadingHistoryDomainException e) => e.code,
+          isA<ReadingHistoryException>().having(
+            (ReadingHistoryException e) => e.code,
             'code',
             'reading_history.empty_comic_id',
           ),
@@ -50,7 +51,7 @@ void main() {
           lastReadTime: when,
           pageIndex: 0,
         ),
-        throwsA(isA<DomainRuleViolation>()),
+        throwsA(isA<DomainException>()),
       );
     });
 
@@ -64,8 +65,8 @@ void main() {
           pageCount: 10,
         ),
         throwsA(
-          isA<ReadingHistoryDomainException>().having(
-            (ReadingHistoryDomainException e) => e.code,
+          isA<ReadingHistoryException>().having(
+            (ReadingHistoryException e) => e.code,
             'code',
             'reading_history.page_index_exceeds_count',
           ),
@@ -74,15 +75,18 @@ void main() {
     });
   });
 
-  group('normalizeReadingHistorySearchKeyword', () {
+  group('ReadingHistorySearchSpecification', () {
     test('blank becomes null', () {
-      expect(normalizeReadingHistorySearchKeyword(null), isNull);
-      expect(normalizeReadingHistorySearchKeyword(''), isNull);
-      expect(normalizeReadingHistorySearchKeyword('   '), isNull);
+      expect(ReadingHistorySearchSpecification.normalizeKeyword(null), isNull);
+      expect(ReadingHistorySearchSpecification.normalizeKeyword(''), isNull);
+      expect(ReadingHistorySearchSpecification.normalizeKeyword('   '), isNull);
     });
 
     test('trims non-empty keyword', () {
-      expect(normalizeReadingHistorySearchKeyword('  abc '), 'abc');
+      expect(
+        ReadingHistorySearchSpecification.normalizeKeyword('  abc '),
+        'abc',
+      );
     });
   });
 }

@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/reading_history/data/mappers/history_frb_mapper.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_search_spec.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_search_specification.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
@@ -67,7 +67,8 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
     PageRequest request, {
     String? keyword,
   }) async {
-    final String? normalizedKeyword = normalizeReadingHistorySearchKeyword(keyword);
+    final String? normalizedKeyword =
+        ReadingHistorySearchSpecification.normalizeKeyword(keyword);
     final rust.PagedReadingHistoryDto page = await guardFrb(
       () => rust.fetchReadingPageFrb(
         request: rust_comic.PageRequestDto(

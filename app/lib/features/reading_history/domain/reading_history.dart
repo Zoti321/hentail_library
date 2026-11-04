@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_domain_event.dart';
-import 'package:hentai_library/features/reading_history/domain/reading_history_domain_exception.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_events.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_exceptions.dart';
 
 part 'reading_history.freezed.dart';
 
@@ -30,17 +30,17 @@ abstract class ReadingHistory with _$ReadingHistory {
   }) {
     final String id = comicId.trim();
     if (id.isEmpty) {
-      throw ReadingHistoryDomainException.emptyComicId();
+      throw ReadingHistoryException.emptyComicId();
     }
     final String snapshotTitle = title.trim();
     if (snapshotTitle.isEmpty) {
-      throw ReadingHistoryDomainException.emptyTitle();
+      throw ReadingHistoryException.emptyTitle();
     }
     if (pageIndex < 1) {
-      throw ReadingHistoryDomainException.invalidPageIndex(pageIndex);
+      throw ReadingHistoryException.invalidPageIndex(pageIndex);
     }
     if (pageCount != null && pageCount > 0 && pageIndex > pageCount) {
-      throw ReadingHistoryDomainException.pageIndexExceedsCount(
+      throw ReadingHistoryException.pageIndexExceedsCount(
         pageIndex: pageIndex,
         pageCount: pageCount,
       );

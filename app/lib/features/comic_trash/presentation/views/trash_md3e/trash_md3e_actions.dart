@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic_trash/presentation/view_models/trash_page_controller.dart';
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
-import 'package:hentai_library/features/comic_trash/domain/comic_purge_policy.dart';
+import 'package:hentai_library/features/comic_trash/domain/comic_purge_strategy.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
 

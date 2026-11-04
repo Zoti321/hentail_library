@@ -1,12 +1,12 @@
 /// 阅读进度持久化后的领域事件（不含传输层类型）。
 ///
 /// 订阅方可在应用层桥接为 Riverpod / Stream，本文件仅定义语义。
-sealed class ReadingHistoryDomainEvent {
-  const ReadingHistoryDomainEvent();
+sealed class ReadingHistoryEvent {
+  const ReadingHistoryEvent();
 }
 
 /// 某本漫画的阅读进度快照已更新（upsert）。
-final class ReadingHistoryProgressRecorded extends ReadingHistoryDomainEvent {
+final class ReadingHistoryProgressRecorded extends ReadingHistoryEvent {
   const ReadingHistoryProgressRecorded({
     required this.comicId,
     required this.pageIndex,

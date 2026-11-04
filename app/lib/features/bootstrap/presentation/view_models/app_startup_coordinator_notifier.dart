@@ -10,7 +10,7 @@ part 'app_startup_coordinator_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
-  static const LibraryScanScheduler _scheduler = LibraryScanScheduler();
+  static const LibraryScanDomainService _scheduler = LibraryScanDomainService();
 
   int _startupToken = 0;
   bool _startupScheduled = false;

@@ -1,12 +1,9 @@
 import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 
-/// Decides which Library ids need incremental sync at startup / on an interval tick.
-///
-/// Pure policy — timers and FRB live outside this type so tests can inject a clock
-/// and a sync starter.
-class LibraryScanScheduler {
-  const LibraryScanScheduler();
+/// 决定启动时 / 定时间隔 tick 哪些 Library 需要增量 sync（纯领域服务）。
+class LibraryScanDomainService {
+  const LibraryScanDomainService();
 
   List<String> libraryIdsForStartupScan(Iterable<LocalLibrary> libraries) {
     return libraries

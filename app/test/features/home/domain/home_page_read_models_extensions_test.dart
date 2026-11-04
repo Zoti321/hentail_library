@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/home/domain/home_page_domain.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
+import 'package:hentai_library/features/home/domain/home_page_read_models_extensions.dart';
 
 void main() {
   test('HomePageCounts.isCatalogEmpty', () {
@@ -26,7 +26,7 @@ void main() {
     );
   });
 
-  test('HomeLibraryAlert.shouldResurfaceAfterDismiss', () {
+  test('HomeLibraryAlertDismissSpecification.shouldResurfaceAfterDismiss', () {
     final HomeLibraryAlert alert = HomeLibraryAlert(
       libraryId: 'lib1',
       displayName: 'Lib',
@@ -36,14 +36,16 @@ void main() {
     final String key = alert.dismissKey();
     final String fingerprint = alert.dismissFingerprint();
     expect(
-      alert.shouldResurfaceAfterDismiss(
+      HomeLibraryAlertDismissSpecification.shouldResurfaceAfterDismiss(
+        alert: alert,
         storedDismissKey: key,
         storedFingerprint: fingerprint,
       ),
       isFalse,
     );
     expect(
-      alert.shouldResurfaceAfterDismiss(
+      HomeLibraryAlertDismissSpecification.shouldResurfaceAfterDismiss(
+        alert: alert,
         storedDismissKey: key,
         storedFingerprint: 'other',
       ),

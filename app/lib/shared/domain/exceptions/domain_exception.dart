@@ -1,8 +1,8 @@
 /// 违反领域不变式时抛出；纯 Dart，不含 UI / 基础设施依赖。
 ///
 /// 应用层捕获后可映射为 [ValidationException] 等面向用户的异常。
-class DomainRuleViolation implements Exception {
-  const DomainRuleViolation(this.message, {this.code});
+class DomainException implements Exception {
+  const DomainException(this.message, {this.code});
 
   final String message;
 
@@ -11,5 +11,5 @@ class DomainRuleViolation implements Exception {
 
   @override
   String toString() =>
-      'DomainRuleViolation${code != null ? '($code)' : ''}: $message';
+      'DomainException${code != null ? '($code)' : ''}: $message';
 }

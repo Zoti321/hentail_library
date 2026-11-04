@@ -1,23 +1,26 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_schedule.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_schedule_specification.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 
 void main() {
-  test('shouldRunStartupMetadataAutoBackup', () {
+  test('MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup', () {
     final DateTime now = DateTime.utc(2026, 1, 8);
     expect(
-      shouldRunStartupMetadataAutoBackup(now: now, lastBackupAt: null),
+      MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup(
+        now: now,
+        lastBackupAt: null,
+      ),
       isTrue,
     );
     expect(
-      shouldRunStartupMetadataAutoBackup(
+      MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup(
         now: now,
         lastBackupAt: now.subtract(const Duration(days: 8)),
       ),
       isTrue,
     );
     expect(
-      shouldRunStartupMetadataAutoBackup(
+      MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup(
         now: now,
         lastBackupAt: now.subtract(const Duration(days: 1)),
       ),
