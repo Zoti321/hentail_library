@@ -16,4 +16,16 @@ class LibraryChange {
 
   bool get dictionariesWritten =>
       tagsWritten || authorsWritten || parodiesWritten || charactersWritten;
+
+  bool get isEmpty => !dictionariesWritten && !metadataSaved;
+
+  LibraryChange merge(LibraryChange other) {
+    return LibraryChange(
+      tagsWritten: tagsWritten || other.tagsWritten,
+      authorsWritten: authorsWritten || other.authorsWritten,
+      parodiesWritten: parodiesWritten || other.parodiesWritten,
+      charactersWritten: charactersWritten || other.charactersWritten,
+      metadataSaved: metadataSaved || other.metadataSaved,
+    );
+  }
 }
