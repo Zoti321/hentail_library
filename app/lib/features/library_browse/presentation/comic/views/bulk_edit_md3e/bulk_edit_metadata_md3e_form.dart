@@ -4,12 +4,17 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/draft/bulk_metadata_edit_session.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/md3e_confirm_dialog.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/comic_language_quick_pick.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/published_date_text_field.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,7 +23,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 
-/// 批量编辑表单（MD3E）：分段切换两组字段，每个字段带操作选择（添加/移除/替换 或 替换/清空）。
+/// 批量编辑表单（MD3E）：常规 / 作者&标签 两组字段；expanded+ 为 list-detail（字段列表 + 单字段编辑区），
+/// 较窄宽度为顶部分段 + 纵向滚动。
 ///
 /// 保存时先二次确认，再以 [Navigator.pop] 返回 [ComicMetadataBulkPatch]；
 /// 由外层 [showBulkEditMetadataMd3e] 的确认按钮通过 [BulkEditMetadataMd3eFormState.confirm] 触发。
@@ -55,6 +61,8 @@ class BulkEditMetadataMd3eFormState
     extends ConsumerState<BulkEditMetadataMd3eForm> {
   final BulkMetadataEditSession _session = BulkMetadataEditSession();
   _BulkEditTab _tab = _BulkEditTab.general;
+  BulkMetadataEditFieldKind _selectedField =
+      BulkMetadataEditFieldKind.description;
   bool _loading = true;
 
   @override
@@ -220,6 +228,98 @@ class BulkEditMetadataMd3eFormState
     return _isMixed(kind) ? l10n.bulkEditMetadataMixedValues : null;
   }
 
+  void _selectTab(int index) {
+    final _BulkEditTab tab = _BulkEditTab.values[index];
+    setState(() {
+      _tab = tab;
+      _selectedField = _fieldsFor(tab).first;
+    });
+  }
+
+  void _selectField(BulkMetadataEditFieldKind kind) {
+    setState(() => _selectedField = kind);
+  }
+
+  Widget _scrollPane(Widget child) {
+    return ScrollConfiguration(
+      behavior: Md3eMetadataEditScrollBehavior(),
+      child: SingleChildScrollView(primary: false, child: child),
+    );
+  }
+
+  Widget _buildTabBar(AppLocalizations l10n) {
+    return Md3eSegmentedCapsuleBar(
+      segments: <Md3eSegmentedCapsuleSegment>[
+        Md3eSegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabGeneral),
+        Md3eSegmentedCapsuleSegment(
+          label: l10n.dialogEditMetadataTabAuthorsTags,
+        ),
+      ],
+      selectedIndex: _tab.index,
+      onSelected: _selectTab,
+    );
+  }
+
+  Widget _buildStackedFieldSections(
+    AppLocalizations l10n,
+    List<BulkMetadataEditFieldKind> fields,
+    M3ESpacing spacing,
+  ) {
+    return Expanded(
+      child: _scrollPane(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            for (final BulkMetadataEditFieldKind kind in fields) ...<Widget>[
+              _buildSection(l10n, kind),
+              SizedBox(height: spacing.lg),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListDetailFieldSections(
+    AppLocalizations l10n,
+    List<BulkMetadataEditFieldKind> fields,
+    BulkMetadataEditFieldKind activeField,
+    double paneGap,
+  ) {
+    return Expanded(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          SizedBox(
+            width: Md3eMetadataEditFormMetrics.sideTabColumnWidth,
+            child: _scrollPane(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  for (final BulkMetadataEditFieldKind kind in fields)
+                    Md3eListDetailNavItem(
+                      key: ValueKey<BulkMetadataEditFieldKind>(kind),
+                      label: _fieldLabel(l10n, kind),
+                      selected: activeField == kind,
+                      onTap: () => _selectField(kind),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: paneGap),
+          Expanded(
+            child: Md3eListDetailDetailTransition(
+              switchKey: activeField,
+              child: _scrollPane(_buildSection(l10n, activeField)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -232,30 +332,42 @@ class BulkEditMetadataMd3eFormState
     }
     final AppLocalizations l10n = context.l10n;
     final M3ESpacing spacing = M3ETheme.of(context).spacing;
+    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+    final double paneGap = Md3eMetadataEditFormMetrics.sectionGap(sizeClass);
+    final List<BulkMetadataEditFieldKind> fields = _fieldsFor(_tab);
+    final BulkMetadataEditFieldKind activeField = fields.contains(_selectedField)
+        ? _selectedField
+        : fields.first;
+    final bool useListDetail =
+        sizeClass.index >= Md3eWindowSizeClass.expanded.index;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Md3eSegmentedCapsuleBar(
-          segments: <Md3eSegmentedCapsuleSegment>[
-            Md3eSegmentedCapsuleSegment(
-              label: l10n.dialogEditMetadataTabGeneral,
-            ),
-            Md3eSegmentedCapsuleSegment(
-              label: l10n.dialogEditMetadataTabAuthorsTags,
-            ),
-          ],
-          selectedIndex: _tab.index,
-          onSelected: (int index) {
-            setState(() => _tab = _BulkEditTab.values[index]);
-          },
-        ),
-        SizedBox(height: spacing.lg),
-        for (final BulkMetadataEditFieldKind kind in _fieldsFor(
-          _tab,
-        )) ...<Widget>[_buildSection(l10n, kind), SizedBox(height: spacing.lg)],
-      ],
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double viewportHeight =
+            Md3eMetadataEditFormMetrics.resolveTabbedViewportHeight(
+              context,
+              constraints,
+            );
+        return SizedBox(
+          height: viewportHeight,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              _buildTabBar(l10n),
+              SizedBox(height: spacing.lg),
+              if (useListDetail)
+                _buildListDetailFieldSections(
+                  l10n,
+                  fields,
+                  activeField,
+                  paneGap,
+                )
+              else
+                _buildStackedFieldSections(l10n, fields, spacing),
+            ],
+          ),
+        );
+      },
     );
   }
 

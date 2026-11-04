@@ -38,7 +38,9 @@ Future<void> _pumpForm(WidgetTester tester, List<String> ids) async {
     home: ProviderScope(
       overrides: overrides,
       child: Scaffold(
-        body: SingleChildScrollView(
+        body: SizedBox(
+          height: 480,
+          width: 800,
           child: BulkEditMetadataMd3eForm(comicIds: ids),
         ),
       ),
