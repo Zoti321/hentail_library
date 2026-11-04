@@ -47,6 +47,25 @@ class HistoryBrowsePage<T> extends StatefulWidget {
 class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
+  List<Md3eHistoryTimeGroup<T>>? _cachedGroups;
+  List<T>? _cachedGroupSourceItems;
+  DateTime? _cachedGroupClock;
+
+  List<Md3eHistoryTimeGroup<T>> _resolveGroups() {
+    if (identical(_cachedGroupSourceItems, widget.items) &&
+        _cachedGroupClock == widget.clock &&
+        _cachedGroups != null) {
+      return _cachedGroups!;
+    }
+    _cachedGroupSourceItems = widget.items;
+    _cachedGroupClock = widget.clock;
+    _cachedGroups = groupHistoryByTimeSection<T>(
+      widget.items,
+      widget.lastReadTimeOf,
+      clock: widget.clock,
+    );
+    return _cachedGroups!;
+  }
 
   @override
   void initState() {
@@ -68,11 +87,7 @@ class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
     final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 
-    final List<Md3eHistoryTimeGroup<T>> groups = groupHistoryByTimeSection<T>(
-      widget.items,
-      widget.lastReadTimeOf,
-      clock: widget.clock,
-    );
+    final List<Md3eHistoryTimeGroup<T>> groups = _resolveGroups();
 
     final Widget header = Md3eHistoryPageHeader(
       clearEnabled: widget.totalCount > 0,

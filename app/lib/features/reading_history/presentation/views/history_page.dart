@@ -52,45 +52,82 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<HistoryPagedFeedState> feedAsync = ref.watch(
-      historyPagedFeedControllerProvider,
+    final bool initialLoading = ref.watch(
+      historyPagedFeedControllerProvider.select(
+        (AsyncValue<HistoryPagedFeedState> async) =>
+            async.isLoading && !async.hasValue,
+      ),
+    );
+    final Object? loadError = ref.watch(
+      historyPagedFeedControllerProvider.select(
+        (AsyncValue<HistoryPagedFeedState> async) =>
+            async.hasError ? async.error : null,
+      ),
     );
 
     return M3ETheme(
       data: md3eWithAppFontFamily(M3ETheme.of(context)),
-      child: feedAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (Object _, StackTrace stackTrace) => Center(
-          child: Text(
-            context.l10n.shellLoadFailed,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-        data: (HistoryPagedFeedState feed) {
-          return NotificationListener<ScrollNotification>(
-            onNotification: _onScrollNotification,
-            child: HistoryBrowsePage<HistoryCardItem>(
-              items: feed.items,
-              totalCount: feed.totalCount,
-              lastReadTimeOf: (HistoryCardItem item) => item.lastReadTime,
-              isLoadingMore: feed.isLoadingMore,
-              useLabBrowseCanvas: true,
-              onOpenNavigation: appShellPageNavigationOpener(context),
-              onClearAll: () => clearAllReadingHistory(context, ref),
-              itemBuilder: (BuildContext context, HistoryCardItem item) {
-                return HistoryListItem(
-                  item: item,
-                  onDeleteRecord: () => deleteReadingHistoryRecord(
-                    context: context,
-                    ref: ref,
-                    comicId: item.comicId,
-                  ),
-                );
-              },
+      child: initialLoading
+          ? const Center(child: CircularProgressIndicator())
+          : loadError != null
+          ? Center(
+              child: Text(
+                context.l10n.shellLoadFailed,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            )
+          : NotificationListener<ScrollNotification>(
+              onNotification: _onScrollNotification,
+              child: const _HistoryBrowseFeed(),
             ),
-          );
-        },
+    );
+  }
+}
+
+/// 仅订阅列表与分页 UI 相关字段，避免 `isLoadingMore` 触发整页 rebuild。
+class _HistoryBrowseFeed extends ConsumerWidget {
+  const _HistoryBrowseFeed();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final List<HistoryCardItem> items = ref.watch(
+      historyPagedFeedControllerProvider.select(
+        (AsyncValue<HistoryPagedFeedState> async) =>
+            async.asData?.value.items ?? const <HistoryCardItem>[],
       ),
+    );
+    final int totalCount = ref.watch(
+      historyPagedFeedControllerProvider.select(
+        (AsyncValue<HistoryPagedFeedState> async) =>
+            async.asData?.value.totalCount ?? 0,
+      ),
+    );
+    final bool isLoadingMore = ref.watch(
+      historyPagedFeedControllerProvider.select(
+        (AsyncValue<HistoryPagedFeedState> async) =>
+            async.asData?.value.isLoadingMore ?? false,
+      ),
+    );
+
+    return HistoryBrowsePage<HistoryCardItem>(
+      items: items,
+      totalCount: totalCount,
+      lastReadTimeOf: (HistoryCardItem item) => item.lastReadTime,
+      isLoadingMore: isLoadingMore,
+      useLabBrowseCanvas: true,
+      onOpenNavigation: appShellPageNavigationOpener(context),
+      onClearAll: () => clearAllReadingHistory(context, ref),
+      itemBuilder: (BuildContext context, HistoryCardItem item) {
+        return HistoryListItem(
+          key: ValueKey<String>(item.comicId),
+          item: item,
+          onDeleteRecord: () => deleteReadingHistoryRecord(
+            context: context,
+            ref: ref,
+            comicId: item.comicId,
+          ),
+        );
+      },
     );
   }
 }

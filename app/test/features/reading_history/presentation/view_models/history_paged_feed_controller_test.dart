@@ -120,6 +120,7 @@ PagedResult<ReadingHistory> _page({
 void main() {
   late _FakeReadingHistoryRepo repo;
   late ProviderContainer container;
+  late ProviderSubscription<AsyncValue<HistoryPagedFeedState>> feedSubscription;
 
   setUp(() {
     repo = _FakeReadingHistoryRepo(<String, List<PagedResult<ReadingHistory>>>{
@@ -157,9 +158,14 @@ void main() {
         readingHistoryRepoProvider.overrideWith((Ref ref) => repo),
       ],
     );
+    feedSubscription = container.listen(historyPagedFeedControllerProvider, (
+      _,
+      __,
+    ) {});
   });
 
   tearDown(() {
+    feedSubscription.close();
     container.dispose();
   });
 

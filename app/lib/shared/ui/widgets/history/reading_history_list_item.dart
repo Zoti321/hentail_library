@@ -18,8 +18,12 @@ class Md3eReadingHistoryMoreMenuEntry {
 }
 
 /// 上次阅读日期：`{YYYY}年{MM}月{DD}日`（如 2026年06月15日）。
+final DateFormat _md3eReadingHistoryLastReadDateFormat = DateFormat(
+  'yyyy年MM月dd日',
+);
+
 String md3eReadingHistoryLastReadDateLabel(DateTime lastReadTime) {
-  return DateFormat('yyyy年MM月dd日').format(lastReadTime);
+  return _md3eReadingHistoryLastReadDateFormat.format(lastReadTime);
 }
 
 /// 阅读历史列表行：封面 + 标题 + 进度条与页码 + 上次阅读日期 + 继续阅读 / 更多。

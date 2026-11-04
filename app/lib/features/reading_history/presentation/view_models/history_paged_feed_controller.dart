@@ -16,12 +16,7 @@ part 'history_paged_feed_controller.g.dart';
 const Duration _kHistoryKeywordDebounce = Duration(milliseconds: 300);
 const Duration _kHistoryRefreshDebounce = Duration(milliseconds: 200);
 
-@Riverpod(keepAlive: true)
-Stream<void> readingHistoryChangesStream(Ref ref) {
-  return ref.watch(readingHistoryRepoProvider).watchHistoryChanges();
-}
-
-@Riverpod(keepAlive: true)
+@Riverpod()
 class HistoryPagedFeedController extends _$HistoryPagedFeedController {
   static const int _pageSize = kDefaultPageSize;
 
