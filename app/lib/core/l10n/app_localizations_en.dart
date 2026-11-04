@@ -263,6 +263,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTitle => 'Home';
 
   @override
+  String get homeShortcutsSectionTitle => 'Shortcuts';
+
+  @override
+  String get homeHistoryCardCaption => 'View reading log';
+
+  @override
+  String get homeTrashCardCaption => 'Restore or delete';
+
+  @override
   String get homeScanLibrary => 'Scan library';
 
   @override

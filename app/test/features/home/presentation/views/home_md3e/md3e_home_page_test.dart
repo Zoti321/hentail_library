@@ -20,6 +20,8 @@ void main() {
         height: 900,
         child: Md3eHomePage(
           aggregateCounts: Md3eHomePagePreviewData.sampleAggregateCounts(),
+          onOpenHistory: () {},
+          onOpenTrash: () {},
           libraryManagementSection: Md3eHomeLibraryManagementSection(
             libraries: Md3eHomePagePreviewData.sampleLibraries(),
             onAddLocalLibrary: () {},
@@ -33,6 +35,11 @@ void main() {
       find.text(Md3eHomePageCopy.aggregateStatsSectionTitle),
       findsOneWidget,
     );
+    expect(find.text('阅读历史'), findsOneWidget);
+    expect(find.text('查看阅读记录'), findsOneWidget);
+    expect(find.text('垃圾桶'), findsOneWidget);
+    expect(find.text('可恢复删除'), findsOneWidget);
+    expect(find.text('进入'), findsNothing);
     expect(find.textContaining('2552'), findsOneWidget);
     expect(
       find.text(Md3eHomeLibraryManagementCopy.sectionTitle),

@@ -7,15 +7,27 @@ import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_h
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_bento_stat_card.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_copy.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_nav_shortcut_card.dart';
+import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_shortcut_card_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 首页「全库统计」：Kazumi 风 bento 色块（漫画/系列/作者/原作/角色/标签）。
+/// 首页「全库统计」：Kazumi 风 bento 色块 + 历史 / 垃圾桶入口卡片。
 class Md3eHomeAggregateStatsSection extends StatelessWidget {
-  const Md3eHomeAggregateStatsSection({super.key, required this.counts});
+  const Md3eHomeAggregateStatsSection({
+    super.key,
+    required this.counts,
+    this.onOpenHistory,
+    this.onOpenTrash,
+  });
 
   final Md3eHomeAggregateCounts counts;
+  final VoidCallback? onOpenHistory;
+  final VoidCallback? onOpenTrash;
+
+  bool get _showsShortcutCards =>
+      onOpenHistory != null && onOpenTrash != null;
 
   @override
   Widget build(BuildContext context) {
@@ -130,11 +142,60 @@ class Md3eHomeAggregateStatsSection extends StatelessWidget {
       );
     }
 
+    Widget historyCard() {
+      return Md3eHomeNavShortcutCard(
+        title: l10n.historyTitle,
+        caption: l10n.homeHistoryCardCaption,
+        icon: Symbols.history,
+        backgroundColor: palette.historyBackground,
+        onBackgroundColor: palette.historyForeground,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(20),
+        ),
+        onPressed: onOpenHistory!,
+      );
+    }
+
+    Widget trashCard() {
+      return Md3eHomeNavShortcutCard(
+        title: l10n.navTrash,
+        caption: l10n.homeTrashCardCaption,
+        icon: Symbols.delete_outline,
+        backgroundColor: palette.trashBackground,
+        onBackgroundColor: palette.trashForeground,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(20),
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(8),
+        ),
+        onPressed: onOpenTrash!,
+      );
+    }
+
+    Widget shortcutRow() {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(child: historyCard()),
+          SizedBox(width: gap),
+          Expanded(child: trashCard()),
+        ],
+      );
+    }
+
     final Widget grid = switch (sizeClass) {
       Md3eWindowSizeClass.compact => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           comicCard(emphasis: Md3eHomeBentoStatEmphasis.hero),
+          if (_showsShortcutCards) ...<Widget>[
+            SizedBox(height: gap),
+            shortcutRow(),
+          ],
           SizedBox(height: gap),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,6 +234,10 @@ class Md3eHomeAggregateStatsSection extends StatelessWidget {
               ],
             ),
           ),
+          if (_showsShortcutCards) ...<Widget>[
+            SizedBox(height: gap),
+            shortcutRow(),
+          ],
           SizedBox(height: gap),
           IntrinsicHeight(
             child: Row(
@@ -219,7 +284,11 @@ class _Md3eHomeStatPalette {
       charactersBackground = scheme.emphasis,
       charactersForeground = scheme.onEmphasis,
       tagsBackground = scheme.surfaceContainerHigh,
-      tagsForeground = scheme.onSurface;
+      tagsForeground = scheme.onSurface,
+      historyBackground = Md3eHomeShortcutCardColors.historyBackground(scheme),
+      historyForeground = Md3eHomeShortcutCardColors.historyForeground(scheme),
+      trashBackground = Md3eHomeShortcutCardColors.trashBackground(scheme),
+      trashForeground = Md3eHomeShortcutCardColors.trashForeground(scheme);
 
   final Color comicsBackground;
   final Color comicsForeground;
@@ -233,4 +302,8 @@ class _Md3eHomeStatPalette {
   final Color charactersForeground;
   final Color tagsBackground;
   final Color tagsForeground;
+  final Color historyBackground;
+  final Color historyForeground;
+  final Color trashBackground;
+  final Color trashForeground;
 }

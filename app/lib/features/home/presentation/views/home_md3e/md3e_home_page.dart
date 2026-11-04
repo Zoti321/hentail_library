@@ -11,18 +11,22 @@ import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
 import 'package:hentai_library/features/home/presentation/views/home_md3e/patterns/md3e_home_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 生产首页（MD3E）：问候 + 页头 + 聚合统计 + 库列表（由 [libraryManagementSection] 注入）。
+/// 生产首页（MD3E）：问候 + 页头 + 聚合统计（含快捷 bento）+ 库列表。
 class Md3eHomePage extends StatelessWidget {
   const Md3eHomePage({
     super.key,
     required this.aggregateCounts,
     required this.libraryManagementSection,
     this.onOpenNavigation,
+    this.onOpenHistory,
+    this.onOpenTrash,
   });
 
   final Md3eHomeAggregateCounts aggregateCounts;
   final Widget libraryManagementSection;
   final VoidCallback? onOpenNavigation;
+  final VoidCallback? onOpenHistory;
+  final VoidCallback? onOpenTrash;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +70,11 @@ class Md3eHomePage extends StatelessWidget {
                       sizeClass,
                     ),
                   ),
-                  Md3eHomeAggregateStatsSection(counts: aggregateCounts),
+                  Md3eHomeAggregateStatsSection(
+                    counts: aggregateCounts,
+                    onOpenHistory: onOpenHistory,
+                    onOpenTrash: onOpenTrash,
+                  ),
                   SizedBox(
                     height: Md3eHomePageMetrics.sectionVerticalSpacing(
                       sizeClass,

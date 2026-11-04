@@ -257,6 +257,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeTitle => '首页';
 
   @override
+  String get homeShortcutsSectionTitle => '快捷入口';
+
+  @override
+  String get homeHistoryCardCaption => '查看阅读记录';
+
+  @override
+  String get homeTrashCardCaption => '可恢复删除';
+
+  @override
   String get homeScanLibrary => '扫描漫画库';
 
   @override

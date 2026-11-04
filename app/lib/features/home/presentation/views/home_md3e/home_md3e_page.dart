@@ -6,6 +6,7 @@ import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_h
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 生产首页入口：把 provider 数据组装为 [Md3eHomePage]。
@@ -45,6 +46,8 @@ class HomeMd3ePage extends ConsumerWidget {
         tagCount: counts.tagCount,
       ),
       onOpenNavigation: appShellPageNavigationOpener(context),
+      onOpenHistory: () => context.go('/history'),
+      onOpenTrash: () => context.go('/trash'),
       libraryManagementSection: const HomeLibraryManagementPanel(),
     );
   }

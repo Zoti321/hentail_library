@@ -8,8 +8,7 @@ abstract final class Md3eShellNavigation {
   static const int homeDestinationIndex = 0;
   static const int libraryDestinationIndex = 1;
   static const int managementDestinationIndex = 2;
-  static const int historyDestinationIndex = 3;
-  static const int settingsDestinationIndex = 4;
+  static const int settingsDestinationIndex = 3;
 
   static const double librarySecondaryPanelWidth = 280;
 }
@@ -131,12 +130,6 @@ List<Md3eShellRailDestination> md3eLabDefaultShellRailDestinations(
       label: l10n.navMetadata,
       icon: Icons.layers_outlined,
       selectedIcon: Icons.layers,
-    ),
-    Md3eShellRailDestination(
-      navId: 'history',
-      label: l10n.navHistory,
-      icon: Icons.history_outlined,
-      selectedIcon: Icons.history,
     ),
     Md3eShellRailDestination(
       navId: 'settings',

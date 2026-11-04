@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_mo
 import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// MD3E rail destinations for production (includes 回收站).
+/// MD3E rail destinations for production（历史 / 垃圾桶入口在首页）。
 List<Md3eShellRailDestination> productionMd3eShellRailDestinations(
   AppLocalizations l10n,
 ) {
@@ -30,18 +30,6 @@ List<Md3eShellRailDestination> productionMd3eShellRailDestinations(
       label: l10n.navMetadata,
       icon: LucideIcons.layers,
       selectedIcon: LucideIcons.layers,
-    ),
-    Md3eShellRailDestination(
-      navId: AppNavigation.navIdHistory,
-      label: l10n.navHistory,
-      icon: LucideIcons.history,
-      selectedIcon: LucideIcons.history,
-    ),
-    Md3eShellRailDestination(
-      navId: AppNavigation.navIdTrash,
-      label: l10n.navTrash,
-      icon: LucideIcons.trash2,
-      selectedIcon: LucideIcons.trash2,
     ),
     Md3eShellRailDestination(
       navId: AppNavigation.navIdSettings,
@@ -81,6 +69,10 @@ String productionMd3eSelectedNavId({
   required String? currentLibraryId,
 }) {
   final String flatNavId = AppNavigation.activeNavIdForPath(path);
+  if (flatNavId == AppNavigation.navIdHistory ||
+      flatNavId == AppNavigation.navIdTrash) {
+    return AppNavigation.navIdHome;
+  }
   if (flatNavId.isNotEmpty) {
     return flatNavId;
   }

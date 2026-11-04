@@ -11,8 +11,10 @@ import 'package:hentai_library/features/library_admin/presentation/views/home_li
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_section.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_list_order.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 
 import '../preview/md3e_home_page_preview_data.dart';
+import '../hosts/md3e_history_browse_page_lab_host.dart';
 
 /// Widgetbook / Lab：在本地维护库列表顺序；生产侧由 notifier + repository 接同样回调形状。
 ///
@@ -206,6 +208,27 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
     return Md3eHomePage(
       aggregateCounts: Md3eHomePagePreviewData.sampleAggregateCounts(),
       onOpenNavigation: widget.onOpenNavigation,
+      onOpenHistory: () {
+        unawaited(
+          Navigator.of(context).push<void>(
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) =>
+                  Md3eHistoryBrowsePageLabHost(clock: DateTime(2026, 6, 15, 14)),
+            ),
+          ),
+        );
+      },
+      onOpenTrash: () {
+        unawaited(
+          Navigator.of(context).push<void>(
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => Scaffold(
+                body: Center(child: Text(context.l10n.navTrash)),
+              ),
+            ),
+          ),
+        );
+      },
       libraryManagementSection: Md3eHomeLibraryManagementSection(
         libraries: _libraries,
         onLibraryOpen: widget.onLibraryOpen,

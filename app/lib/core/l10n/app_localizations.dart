@@ -566,6 +566,24 @@ abstract class AppLocalizations {
   /// **'首页'**
   String get homeTitle;
 
+  /// No description provided for @homeShortcutsSectionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'快捷入口'**
+  String get homeShortcutsSectionTitle;
+
+  /// No description provided for @homeHistoryCardCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看阅读记录'**
+  String get homeHistoryCardCaption;
+
+  /// No description provided for @homeTrashCardCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'可恢复删除'**
+  String get homeTrashCardCaption;
+
   /// No description provided for @homeScanLibrary.
   ///
   /// In zh, this message translates to:

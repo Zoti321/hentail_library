@@ -21,6 +21,7 @@ class Md3eHomeBentoStatCard extends StatefulWidget {
     this.minHeight = 96,
     this.emphasis = Md3eHomeBentoStatEmphasis.standard,
     this.contentPadding,
+    this.onPressed,
   });
 
   final String label;
@@ -33,6 +34,7 @@ class Md3eHomeBentoStatCard extends StatefulWidget {
   final double minHeight;
   final Md3eHomeBentoStatEmphasis emphasis;
   final EdgeInsets? contentPadding;
+  final VoidCallback? onPressed;
 
   @override
   State<Md3eHomeBentoStatCard> createState() => _Md3eHomeBentoStatCardState();
@@ -64,20 +66,35 @@ class _Md3eHomeBentoStatCardState extends State<Md3eHomeBentoStatCard> {
         widget.contentPadding ??
         Md3eHomePageMetrics.statCardContentPadding(sizeClass);
 
+    final bool showValue = widget.valueText.trim().isNotEmpty;
+    final bool showCaption = widget.caption.trim().isNotEmpty;
+    final bool compactHeaderOnly = !showValue && !showCaption;
+    final VoidCallback? onPressed = widget.onPressed;
+    final String semanticsLabel = switch ((showValue, showCaption)) {
+      (true, true) => '${widget.label}, ${widget.valueText}, ${widget.caption}',
+      (true, false) => '${widget.label}, ${widget.valueText}',
+      (false, true) => '${widget.label}, ${widget.caption}',
+      (false, false) => widget.label,
+    };
+
     final Widget content = ConstrainedBox(
       constraints: BoxConstraints(minHeight: widget.minHeight),
       child: Padding(
         padding: padding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: compactHeaderOnly
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Row(
               children: <Widget>[
                 _IconBadge(
                   icon: widget.icon,
                   color: widget.onBackgroundColor,
-                  filled: widget.emphasis == Md3eHomeBentoStatEmphasis.hero,
+                  filled:
+                      widget.emphasis == Md3eHomeBentoStatEmphasis.hero ||
+                      compactHeaderOnly,
                 ),
                 const Spacer(),
                 Text(
@@ -88,34 +105,43 @@ class _Md3eHomeBentoStatCardState extends State<Md3eHomeBentoStatCard> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              widget.valueText,
-              style: type.headlineLarge.copyWith(
-                fontSize: valueSize,
-                height: 1.05,
-                fontWeight: FontWeight.w600,
-                color: widget.onBackgroundColor,
-                letterSpacing: -0.5,
+            if (showValue) ...<Widget>[
+              const SizedBox(height: 8),
+              Text(
+                widget.valueText,
+                style: type.headlineLarge.copyWith(
+                  fontSize: valueSize,
+                  height: 1.05,
+                  fontWeight: FontWeight.w600,
+                  color: widget.onBackgroundColor,
+                  letterSpacing: -0.5,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              widget.caption,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: type.bodySmall.copyWith(
-                color: widget.onBackgroundColor.withValues(alpha: 0.72),
+              const SizedBox(height: 4),
+            ] else if (!compactHeaderOnly)
+              const SizedBox(height: 12),
+            if (showCaption)
+              Text(
+                widget.caption,
+                maxLines: showValue ? 1 : 2,
+                overflow: TextOverflow.ellipsis,
+                style: (showValue ? type.bodySmall : type.titleMedium)
+                    .copyWith(
+                      color: showValue
+                          ? widget.onBackgroundColor.withValues(alpha: 0.72)
+                          : widget.onBackgroundColor.withValues(alpha: 0.92),
+                      height: showValue ? null : 1.25,
+                    ),
               ),
-            ),
           ],
         ),
       ),
     );
 
     return Semantics(
-      container: true,
-      label: '${widget.label}, ${widget.valueText}, ${widget.caption}',
+      button: onPressed != null,
+      container: onPressed == null,
+      label: semanticsLabel,
       excludeSemantics: true,
       child: M3ECardRadiusMotion(
         radius: _motionRadius,
@@ -128,11 +154,15 @@ class _Md3eHomeBentoStatCardState extends State<Md3eHomeBentoStatCard> {
               color: widget.backgroundColor,
               borderRadius: animatedRadius,
               elevation: M3EElevation.level0,
-              onPressed: () {},
-              focusable: false,
-              showFocusRing: false,
-              haptic: M3EHapticFeedback.none,
-              mouseCursor: SystemMouseCursors.basic,
+              onPressed: onPressed ?? () {},
+              focusable: onPressed != null,
+              showFocusRing: onPressed != null,
+              haptic: onPressed != null
+                  ? M3EHapticFeedback.light
+                  : M3EHapticFeedback.none,
+              mouseCursor: onPressed != null
+                  ? SystemMouseCursors.click
+                  : SystemMouseCursors.basic,
               padding: EdgeInsets.zero,
               onStateChanged: (M3EInteractionState state) {
                 final bool next = state.pressed;

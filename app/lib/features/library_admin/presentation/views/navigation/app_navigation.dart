@@ -21,13 +21,11 @@ abstract final class AppNavigation {
       <ShellNavItem>[
         (id: navIdHome, label: l10n.navHome, icon: LucideIcons.house),
         (id: navIdMetadata, label: l10n.navMetadata, icon: LucideIcons.layers),
-        (id: navIdHistory, label: l10n.navHistory, icon: LucideIcons.history),
       ];
 
   static List<ShellNavItem> desktopSystemNavItems(
     AppLocalizations l10n,
   ) => <ShellNavItem>[
-    (id: navIdTrash, label: l10n.navTrash, icon: LucideIcons.trash2),
     (id: navIdSettings, label: l10n.navSettings, icon: LucideIcons.settings),
   ];
 
