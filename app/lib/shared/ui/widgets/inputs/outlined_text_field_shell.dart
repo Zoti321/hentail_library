@@ -107,6 +107,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     widget.focusNode.addListener(_handleFocusChange);
     FocusManager.instance.addHighlightModeListener(_handleHighlightModeChange);
     M3EFocusInteraction.instance.addListener(_handleFocusInteractionChanged);
+    _showFocusRing = _resolveShowFocusRing();
   }
 
   @override
@@ -121,8 +122,6 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   void didUpdateWidget(Md3eOutlinedTextFieldShell oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.appearanceFocused != widget.appearanceFocused) {
-      _showFocusRing = M3EFocusRing.shouldShow(widget.focusNode, context) ||
-          widget.appearanceFocused;
       _syncVisuals(animate: false);
     }
     if (oldWidget.enabled != widget.enabled) {
@@ -159,6 +158,14 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
 
   M3ETextFieldTheme _fieldThemeOf(M3EThemeData theme) =>
       widget.fieldTheme ?? theme.textFieldTheme;
+
+  /// Chip 组合字段已有 outlined 聚焦描边；再画 [M3EFocusRing] 会像「双边框」（尤其 ↑/↓ 切到 keyboard highlight 时）。
+  bool _resolveShowFocusRing() {
+    if (widget.chipFirstLineLayout) {
+      return false;
+    }
+    return M3EFocusRing.shouldShow(widget.focusNode, context);
+  }
 
   M3ETextFieldStates get _states => M3ETextFieldStates(
     enabled: widget.enabled,
@@ -214,8 +221,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   void _handleFocusChange() {
     setState(() {
       _focused = widget.focusNode.hasFocus;
-      _showFocusRing = M3EFocusRing.shouldShow(widget.focusNode, context) ||
-          widget.appearanceFocused;
+      _showFocusRing = _resolveShowFocusRing();
       _syncVisuals(animate: !widget.chipFirstLineLayout);
     });
   }
@@ -224,7 +230,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     if (!mounted) {
       return;
     }
-    final bool show = M3EFocusRing.shouldShow(widget.focusNode, context);
+    final bool show = _resolveShowFocusRing();
     if (show != _showFocusRing) {
       setState(() => _showFocusRing = show);
     }
@@ -234,7 +240,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     if (!mounted) {
       return;
     }
-    final bool show = M3EFocusRing.shouldShow(widget.focusNode, context);
+    final bool show = _resolveShowFocusRing();
     if (_showFocusRing != show) {
       setState(() => _showFocusRing = show);
     }
@@ -355,20 +361,22 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
       fieldTheme.resolveFloatingLabelStyle(theme.typeScale),
     );
 
-    final Widget focusRingChild = M3EFocusRing(
-      focused: _showFocusRing,
-      radius: fieldTheme.outlinedShape,
-      color: _toColors?.focusRing,
-      width: fieldTheme.focusRingWidth,
-      gap: fieldTheme.focusRingGap,
-      child: container,
-    );
+    final Widget shellSurface = widget.chipFirstLineLayout
+        ? container
+        : M3EFocusRing(
+            focused: _showFocusRing,
+            radius: fieldTheme.outlinedShape,
+            color: _toColors?.focusRing,
+            width: fieldTheme.focusRingWidth,
+            gap: fieldTheme.focusRingGap,
+            child: container,
+          );
 
     final Widget interactive = Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (_) =>
           M3EFocusInteraction.instance.notePointerInteraction(immediate: true),
-      child: focusRingChild,
+      child: shellSurface,
     );
 
     final bool useSelectionGestures =
