@@ -7,4 +7,13 @@ typedef NamedFacetFormCandidate = ({String name, int attachmentCount});
 NamedFacetFormCandidate namedFacetFormCandidate({
   required String name,
   required int attachmentCount,
-}) => (name: name, attachmentCount: attachmentCount);
+}) => (name: name.trim(), attachmentCount: attachmentCount);
+
+/// 表单候选名非空规约。
+String? validateNamedFacetFormCandidateName(String name) {
+  final String trimmed = name.trim();
+  if (trimmed.isEmpty) {
+    return '名称不能为空';
+  }
+  return null;
+}
