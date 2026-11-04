@@ -11,4 +11,9 @@ class MetadataImportResult {
   final int skippedNotFound;
   final int skippedAmbiguous;
   final List<String> errors;
+
+  bool get hasErrors => errors.isNotEmpty;
+
+  bool get isFullyApplied =>
+      applied > 0 && skippedNotFound == 0 && skippedAmbiguous == 0 && !hasErrors;
 }

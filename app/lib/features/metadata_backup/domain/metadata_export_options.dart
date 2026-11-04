@@ -11,4 +11,22 @@ class MetadataExportOptions {
   final bool includeOrphanFacets;
   final bool currentLibraryOnly;
   final String? libraryId;
+
+  /// 单库导出时必须指定 [libraryId]。
+  bool get isValid =>
+      !currentLibraryOnly ||
+      (libraryId != null && libraryId!.trim().isNotEmpty);
+
+  MetadataExportOptions normalized() {
+    if (!currentLibraryOnly) {
+      return this;
+    }
+    final String? id = libraryId?.trim();
+    return MetadataExportOptions(
+      gzip: gzip,
+      includeOrphanFacets: includeOrphanFacets,
+      currentLibraryOnly: true,
+      libraryId: id,
+    );
+  }
 }

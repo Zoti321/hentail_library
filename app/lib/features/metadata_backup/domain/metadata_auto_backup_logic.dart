@@ -1,22 +1,10 @@
 import 'dart:io';
 
+import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_schedule.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_naming.dart';
 import 'package:path/path.dart' as p;
 
-const Duration metadataAutoBackupStartupInterval = Duration(days: 7);
-const Duration metadataAutoBackupSaveDebounce = Duration(minutes: 5);
-const int metadataAutoBackupMaxFiles = 3;
-
-bool shouldRunStartupMetadataAutoBackup({
-  required DateTime now,
-  DateTime? lastBackupAt,
-}) {
-  if (lastBackupAt == null) {
-    return true;
-  }
-  return now.difference(lastBackupAt) >= metadataAutoBackupStartupInterval;
-}
-
+export 'metadata_auto_backup_schedule.dart';
 List<File> listMetadataBackupFiles(String directoryPath) {
   final Directory directory = Directory(directoryPath);
   if (!directory.existsSync()) {
