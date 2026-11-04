@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic_trash/domain/comic_trash_target_ids.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
@@ -15,7 +16,7 @@ class ComicTrashService {
   final ComicTrashReaderSessionPort _readerSessionPort;
 
   Future<void> trashComics(Iterable<String> comicIds) async {
-    final List<String> ids = comicIds.toSet().toList();
+    final List<String> ids = normalizeComicTrashTargetIds(comicIds);
     if (ids.isEmpty) {
       return;
     }
@@ -24,7 +25,7 @@ class ComicTrashService {
   }
 
   Future<void> restoreComics(Iterable<String> comicIds) async {
-    final List<String> ids = comicIds.toSet().toList();
+    final List<String> ids = normalizeComicTrashTargetIds(comicIds);
     if (ids.isEmpty) {
       return;
     }
@@ -41,7 +42,7 @@ class ComicTrashService {
   }
 
   Future<ComicPurgeResult> purgeComics(Iterable<String> comicIds) async {
-    final List<String> ids = comicIds.toSet().toList();
+    final List<String> ids = normalizeComicTrashTargetIds(comicIds);
     if (ids.isEmpty) {
       return (succeeded: 0, failed: 0, errorSamples: const <String>[]);
     }
