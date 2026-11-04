@@ -177,9 +177,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   void _syncVisuals({bool animate = true}) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ETextFieldTheme fieldTheme = _fieldThemeOf(theme);
-    final bool snapEffects = widget.chipFirstLineLayout;
     final bool instant =
-        snapEffects ||
         !animate ||
         (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
     _labelMotion.motion = _springOf(fieldTheme.labelSpring);
@@ -203,12 +201,6 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     if (colors == _toColors) {
       return;
     }
-    if (snapEffects) {
-      _fromColors = colors;
-      _toColors = colors;
-      _effectsMotion.value = 1;
-      return;
-    }
     _fromColors = _toColors == null ? colors : _currentColors;
     _toColors = colors;
     if (instant) {
@@ -222,7 +214,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     setState(() {
       _focused = widget.focusNode.hasFocus;
       _showFocusRing = _resolveShowFocusRing();
-      _syncVisuals(animate: !widget.chipFirstLineLayout);
+      _syncVisuals();
     });
   }
 
@@ -252,7 +244,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     }
     setState(() {
       _hovered = hovered;
-      _syncVisuals(animate: !widget.chipFirstLineLayout);
+      _syncVisuals();
     });
   }
 

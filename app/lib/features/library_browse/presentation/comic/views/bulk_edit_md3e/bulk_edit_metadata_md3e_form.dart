@@ -3,6 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/comic/draft/bulk_metadata_edit_session.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
@@ -23,7 +24,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 
-/// 批量编辑表单（MD3E）：常规 / 作者&标签 两组字段；expanded+ 为 list-detail（字段列表 + 单字段编辑区），
+/// 批量编辑表单（MD3E）：expanded+ 为 list-detail（常规 / 作者&标签 + 详情区滚动），
 /// 较窄宽度为顶部分段 + 纵向滚动。
 ///
 /// 保存时先二次确认，再以 [Navigator.pop] 返回 [ComicMetadataBulkPatch]；
@@ -61,8 +62,6 @@ class BulkEditMetadataMd3eFormState
     extends ConsumerState<BulkEditMetadataMd3eForm> {
   final BulkMetadataEditSession _session = BulkMetadataEditSession();
   _BulkEditTab _tab = _BulkEditTab.general;
-  BulkMetadataEditFieldKind _selectedField =
-      BulkMetadataEditFieldKind.description;
   bool _loading = true;
 
   @override
@@ -200,44 +199,20 @@ class BulkEditMetadataMd3eFormState
     };
   }
 
-  /// 字段已改动时显示摘要；否则若存在混合值则提示「多个值」。
-  String? _statusText(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
+  /// 多种值提示（操作模式由分段胶囊表达，不在标题行重复）。
+  String? _mixedHint(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
     if (_session.isFieldDirty(kind)) {
-      return switch (kind) {
-        BulkMetadataEditFieldKind.languages ||
-        BulkMetadataEditFieldKind.authors ||
-        BulkMetadataEditFieldKind.tags ||
-        BulkMetadataEditFieldKind.parodies ||
-        BulkMetadataEditFieldKind.characters => () {
-          final BulkMetadataEditMultiValueFieldState state =
-              _session.multiFields[kind]!;
-          return l10n.bulkEditMetadataFieldSummaryCount(
-            _multiOpLabel(l10n, state.op),
-            state.values.length,
-          );
-        }(),
-        BulkMetadataEditFieldKind.description ||
-        BulkMetadataEditFieldKind.publishedAt => _scalarOpLabel(
-          l10n,
-          _scalarState(kind).op,
-        ),
-        BulkMetadataEditFieldKind.contentRating =>
-          _session.contentRatingField.isR18 ? 'R18' : l10n.filterAgeAllAges,
-      };
+      return null;
     }
     return _isMixed(kind) ? l10n.bulkEditMetadataMixedValues : null;
   }
 
-  void _selectTab(int index) {
-    final _BulkEditTab tab = _BulkEditTab.values[index];
-    setState(() {
-      _tab = tab;
-      _selectedField = _fieldsFor(tab).first;
-    });
+  void _selectTabIndex(int index) {
+    setState(() => _tab = _BulkEditTab.values[index]);
   }
 
-  void _selectField(BulkMetadataEditFieldKind kind) {
-    setState(() => _selectedField = kind);
+  void _selectTab(_BulkEditTab tab) {
+    setState(() => _tab = tab);
   }
 
   Widget _scrollPane(Widget child) {
@@ -256,35 +231,31 @@ class BulkEditMetadataMd3eFormState
         ),
       ],
       selectedIndex: _tab.index,
-      onSelected: _selectTab,
+      onSelected: _selectTabIndex,
     );
   }
 
-  Widget _buildStackedFieldSections(
+  Widget _buildTabFieldSections(
     AppLocalizations l10n,
     List<BulkMetadataEditFieldKind> fields,
     M3ESpacing spacing,
   ) {
-    return Expanded(
-      child: _scrollPane(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            for (final BulkMetadataEditFieldKind kind in fields) ...<Widget>[
-              _buildSection(l10n, kind),
-              SizedBox(height: spacing.lg),
-            ],
-          ],
-        ),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (final BulkMetadataEditFieldKind kind in fields) ...<Widget>[
+          _buildSection(l10n, kind),
+          SizedBox(height: spacing.lg),
+        ],
+      ],
     );
   }
 
-  Widget _buildListDetailFieldSections(
+  Widget _buildListDetailTabLayout(
     AppLocalizations l10n,
     List<BulkMetadataEditFieldKind> fields,
-    BulkMetadataEditFieldKind activeField,
+    M3ESpacing spacing,
     double paneGap,
   ) {
     return Expanded(
@@ -293,26 +264,29 @@ class BulkEditMetadataMd3eFormState
         children: <Widget>[
           SizedBox(
             width: Md3eMetadataEditFormMetrics.sideTabColumnWidth,
-            child: _scrollPane(
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  for (final BulkMetadataEditFieldKind kind in fields)
-                    Md3eListDetailNavItem(
-                      key: ValueKey<BulkMetadataEditFieldKind>(kind),
-                      label: _fieldLabel(l10n, kind),
-                      selected: activeField == kind,
-                      onTap: () => _selectField(kind),
-                    ),
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Md3eListDetailNavItem(
+                  label: l10n.dialogEditMetadataTabGeneral,
+                  selected: _tab == _BulkEditTab.general,
+                  onTap: () => _selectTab(_BulkEditTab.general),
+                ),
+                Md3eListDetailNavItem(
+                  label: l10n.dialogEditMetadataTabAuthorsTags,
+                  selected: _tab == _BulkEditTab.authorsAndTags,
+                  onTap: () => _selectTab(_BulkEditTab.authorsAndTags),
+                ),
+              ],
             ),
           ),
           SizedBox(width: paneGap),
           Expanded(
             child: Md3eListDetailDetailTransition(
-              switchKey: activeField,
-              child: _scrollPane(_buildSection(l10n, activeField)),
+              switchKey: _tab,
+              child: _scrollPane(
+                _buildTabFieldSections(l10n, fields, spacing),
+              ),
             ),
           ),
         ],
@@ -335,9 +309,6 @@ class BulkEditMetadataMd3eFormState
     final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
     final double paneGap = Md3eMetadataEditFormMetrics.sectionGap(sizeClass);
     final List<BulkMetadataEditFieldKind> fields = _fieldsFor(_tab);
-    final BulkMetadataEditFieldKind activeField = fields.contains(_selectedField)
-        ? _selectedField
-        : fields.first;
     final bool useListDetail =
         sizeClass.index >= Md3eWindowSizeClass.expanded.index;
 
@@ -353,17 +324,18 @@ class BulkEditMetadataMd3eFormState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _buildTabBar(l10n),
-              SizedBox(height: spacing.lg),
+              if (!useListDetail) ...<Widget>[
+                _buildTabBar(l10n),
+                SizedBox(height: spacing.lg),
+              ],
               if (useListDetail)
-                _buildListDetailFieldSections(
-                  l10n,
-                  fields,
-                  activeField,
-                  paneGap,
-                )
+                _buildListDetailTabLayout(l10n, fields, spacing, paneGap)
               else
-                _buildStackedFieldSections(l10n, fields, spacing),
+                Expanded(
+                  child: _scrollPane(
+                    _buildTabFieldSections(l10n, fields, spacing),
+                  ),
+                ),
             ],
           ),
         );
@@ -374,13 +346,13 @@ class BulkEditMetadataMd3eFormState
   Widget _buildSection(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
     final M3ESpacing spacing = M3ETheme.of(context).spacing;
     final String label = _fieldLabel(l10n, kind);
-    final String? status = _statusText(l10n, kind);
+    final String? mixedHint = _mixedHint(l10n, kind);
 
     if (kind == BulkMetadataEditFieldKind.contentRating) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _SectionHeader(label: label, status: status),
+          _SectionHeader(label: label, hint: mixedHint),
           SizedBox(height: spacing.sm),
           Md3eSettingsSwitchTile(
             leading: Symbols.eighteen_up_rating,
@@ -401,7 +373,7 @@ class BulkEditMetadataMd3eFormState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        _SectionHeader(label: label, status: status),
+        _SectionHeader(label: label, hint: mixedHint),
         SizedBox(height: spacing.sm),
         ..._buildFieldBody(l10n, kind),
       ],
@@ -533,11 +505,24 @@ class BulkEditMetadataMd3eFormState
     );
   }
 
+  String _tagInputLabel(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
+    return switch (kind) {
+      BulkMetadataEditFieldKind.tags => l10n.metadataAddTag,
+      BulkMetadataEditFieldKind.authors => l10n.metadataAddAuthor,
+      BulkMetadataEditFieldKind.parodies => l10n.metadataAddParody,
+      BulkMetadataEditFieldKind.characters => l10n.metadataAddCharacter,
+      BulkMetadataEditFieldKind.languages =>
+        l10n.comicLanguageLabel(ComicLanguageNames.other),
+      BulkMetadataEditFieldKind.description ||
+      BulkMetadataEditFieldKind.publishedAt ||
+      BulkMetadataEditFieldKind.contentRating => l10n.metadataAdd,
+    };
+  }
+
   Widget _buildTagInput(AppLocalizations l10n, BulkMetadataEditFieldKind kind) {
     return Md3eTagInputField(
-      label: l10n.metadataAdd,
+      label: _tagInputLabel(l10n, kind),
       tags: _session.multiFields[kind]!.values,
-      maxWidth: double.infinity,
       onTagCommitted: (String name) => _addMultiValue(kind, name),
       onTagRemoved: (String name) => _removeMultiValue(kind, name),
     );
@@ -545,24 +530,28 @@ class BulkEditMetadataMd3eFormState
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.label, required this.status});
+  const _SectionHeader({required this.label, this.hint});
 
   final String label;
-  final String? status;
+  final String? hint;
 
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
-    return Row(
+    final M3ESpacing spacing = theme.spacing;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Expanded(child: Md3eMetadataFieldLabelRow(label: label)),
-        if (status != null)
+        Md3eMetadataFieldLabelRow(label: label),
+        if (hint != null) ...<Widget>[
+          SizedBox(height: spacing.xs),
           Text(
-            status!,
+            hint!,
             style: theme.typeScale.labelMedium.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
+        ],
       ],
     );
   }
