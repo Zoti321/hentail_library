@@ -9,6 +9,7 @@ import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart
 import 'package:hentai_library/shared/ui/widgets/inputs/scan_interval_dropdown.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/scan_interval.dart';
@@ -214,9 +215,17 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
               ),
               SizedBox(height: gap),
               if (boundedHeight)
-                Flexible(child: scrollableTabBody)
+                Flexible(
+                  child: Md3eListDetailDetailTransition(
+                    switchKey: _tab,
+                    child: scrollableTabBody,
+                  ),
+                )
               else
-                tabBody,
+                Md3eListDetailDetailTransition(
+                  switchKey: _tab,
+                  child: tabBody,
+                ),
             ],
           );
         }
@@ -234,7 +243,12 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
               ),
             ),
             SizedBox(width: gap),
-            Expanded(child: scrollableTabBody),
+            Expanded(
+              child: Md3eListDetailDetailTransition(
+                switchKey: _tab,
+                child: scrollableTabBody,
+              ),
+            ),
           ],
         );
       },

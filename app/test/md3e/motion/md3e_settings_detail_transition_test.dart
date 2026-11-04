@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page_body.dart';
 
 import '../../support/pump_md3e_app.dart';
@@ -93,5 +94,55 @@ void main() {
       ),
       findsNothing,
     );
+  });
+
+  testWidgets('wide layout detail category switch uses spring slide', (
+    WidgetTester tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1280, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await pumpMd3eApp(
+      tester,
+      home: const Center(
+        child: SizedBox(
+          width: 1280,
+          height: 800,
+          child: Md3eSettingsPage(
+            initialCategory: Md3eSettingsCategory.personalization,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(
+      find
+          .descendant(
+            of: find.byKey(const Key('md3e_settings_master')),
+            matching: find.byType(InkWell),
+          )
+          .at(1),
+    );
+
+    for (int i = 0; i < 20 && _detailSlide().evaluate().isEmpty; i++) {
+      await tester.pump(const Duration(milliseconds: 8));
+    }
+    expect(_detailSlide(), findsWidgets);
+
+    double minDx = _detailDx(tester);
+    for (int i = 0; i < 60; i++) {
+      await tester.pump(const Duration(milliseconds: 8));
+      if (_detailSlide().evaluate().isEmpty) {
+        break;
+      }
+      final double dx = _detailDx(tester);
+      if (dx < minDx) {
+        minDx = dx;
+      }
+    }
+
+    expect(minDx, lessThan(-0.001), reason: '宽屏切换分类时详情应有弹簧过冲');
+
+    await tester.pumpAndSettle();
+    expect(_detailDx(tester), closeTo(0, 0.001));
   });
 }

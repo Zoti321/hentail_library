@@ -10,6 +10,7 @@ import 'package:hentai_library/features/app_settings/presentation/patterns/setti
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_master_menu.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_page_header.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 
 export 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart';
 
@@ -188,7 +189,10 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
                           Md3eSettingsPageMetrics.masterPaneWidth,
                       paneGap: Md3eSettingsPageMetrics.paneGap,
                       listPane: master,
-                      detailPane: detail,
+                      detailPane: Md3eListDetailDetailTransition(
+                        switchKey: _selected,
+                        child: detail,
+                      ),
                     );
                   }
                   return Md3eSettingsNarrowPaneSwitcher(

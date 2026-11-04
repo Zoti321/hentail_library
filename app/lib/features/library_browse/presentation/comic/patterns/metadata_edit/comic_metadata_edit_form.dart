@@ -7,6 +7,7 @@ import 'package:hentai_library/features/library_browse/presentation/comic/patter
 import 'package:hentai_library/features/library_browse/presentation/comic/patterns/metadata_edit/comic_metadata_locks_pane.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_lock_callbacks.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/comic_language_quick_pick.dart';
@@ -102,7 +103,12 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
             ),
           ),
           SizedBox(width: gap),
-          Expanded(child: _scrollPane(tabBody)),
+          Expanded(
+            child: Md3eListDetailDetailTransition(
+              switchKey: _tab,
+              child: _scrollPane(tabBody),
+            ),
+          ),
         ],
       ),
     );
@@ -121,7 +127,12 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
         children: <Widget>[
           _TopTabBar(l10n: l10n, tab: _tab, onSelected: _selectTab),
           SizedBox(height: gap),
-          Expanded(child: _scrollPane(tabBody)),
+          Expanded(
+            child: Md3eListDetailDetailTransition(
+              switchKey: _tab,
+              child: _scrollPane(tabBody),
+            ),
+          ),
         ],
       ),
     );
