@@ -1,16 +1,18 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/foundation.dart' show defaultTargetPlatform;
+import 'package:flutter/foundation.dart'
+    show ValueListenable, defaultTargetPlatform, listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/md3e_input_chip_field_layout.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_copy.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field_shell.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_affordance.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -20,8 +22,7 @@ import 'package:riverpod/misc.dart' show ProviderListenable;
 part 'md3e_named_facet_multi_select_menu.dart';
 
 const double _kMd3eNamedFacetMultiSelectMenuMaxHeight = 240;
-const double _kMd3eNamedFacetMultiSelectChipGap = 8;
-const double _kMd3eNamedFacetMultiSelectInlineMinWidth = 48;
+const double _kMd3eNamedFacetMultiSelectMenuEmptyMinHeight = 160;
 
 /// MD3E Named facet 多选：chip + 内联输入 + 自绘候选浮层（非 [M3EDropdownMenu] 底座）。
 class Md3eNamedFacetMultiSelectField<T> extends ConsumerStatefulWidget {
@@ -97,6 +98,8 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   List<String> _visibleRemainingNames = const <String>[];
   bool _menuSessionActive = false;
   bool _menuOpensAbove = false;
+  final Object _tapRegionGroup = Object();
+  bool _highlightMovedByKeyboard = false;
   late final SingleMotionController _panelExpandCtrl;
 
   SpringMotion _menuPanelSpring(M3ESpring spring) {
@@ -164,6 +167,7 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
       return;
     }
     _filterQueryNotifier.value = next;
+    _highlightMovedByKeyboard = false;
     if (_menuScrollController.hasClients) {
       _menuScrollController.jumpTo(0);
     }
@@ -197,7 +201,9 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   }
 
   void _openMenu() {
-    _menuSessionActive = true;
+    if (!_menuSessionActive) {
+      setState(() => _menuSessionActive = true);
+    }
     _resolveMenuOpensAbove();
     final M3EDropdownMenuTheme menuTheme = M3ETheme.of(context).dropdownMenuTheme;
     _panelExpandCtrl.motion = _menuPanelSpring(menuTheme.openSpring);
@@ -217,6 +223,9 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   void _closeMenu() {
     if (_overlayEntry == null && _panelExpandCtrl.value <= 0.01) {
       return;
+    }
+    if (_menuSessionActive) {
+      setState(() => _menuSessionActive = false);
     }
     _menuSessionActive = false;
     _highlightedIndexNotifier.value = null;
@@ -297,16 +306,22 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   }
 
   OverlayEntry _buildOverlayEntry() {
+    final M3EThemeData themeData = M3ETheme.of(context);
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
     return OverlayEntry(
       builder: (BuildContext overlayContext) {
         final M3EDropdownMenuTheme menuTheme =
-            M3ETheme.of(context).dropdownMenuTheme;
+            themeData.dropdownMenuTheme;
         final Offset followerOffset = _menuFollowerOffset(menuTheme);
-        return Stack(
+        return MediaQuery(
+          data: mediaQuery,
+          child: M3ETheme(
+            data: themeData,
+            child: Stack(
           children: <Widget>[
             Positioned.fill(
               child: Listener(
-                behavior: HitTestBehavior.opaque,
+                behavior: HitTestBehavior.translucent,
                 onPointerDown: (_) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (!mounted) {
@@ -345,8 +360,11 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
                                     String filterQuery,
                                     Widget? _,
                                   ) {
-                                    return _Md3eNamedFacetMultiSelectMenuPanel<T>(
-                                      key: ValueKey<String>(filterQuery),
+                                    return TapRegion(
+                                      groupId: _tapRegionGroup,
+                                      child:
+                                          _Md3eNamedFacetMultiSelectMenuPanel<
+                                              T>(
                                       width: _fieldWidth,
                                       itemsProvider: widget.itemsProvider,
                                       selectedNames: selectedNames,
@@ -366,6 +384,7 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
                                       smartMatchedTooltip:
                                           widget.smartMatchedTooltip,
                                       copy: widget.copy,
+                                    ),
                                     );
                                   },
                             );
@@ -376,6 +395,8 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
               ),
             ),
           ],
+            ),
+          ),
         );
       },
     );
@@ -421,6 +442,33 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
     }
   }
 
+  bool _trySelectHighlightedCandidate() {
+    if (_overlayEntry == null || _visibleRemainingNames.isEmpty) {
+      return false;
+    }
+    final int? index = _highlightedIndexNotifier.value;
+    if (index == null || index < 0 || index >= _visibleRemainingNames.length) {
+      return false;
+    }
+    _addFromMenu(_visibleRemainingNames[index]);
+    return true;
+  }
+
+  void _removeSelected(String name) {
+    final bool restoreMenu = _menuSessionActive;
+    widget.onRemove(name);
+    if (!restoreMenu) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _openMenu();
+      _inputFocusNode.requestFocus();
+    });
+  }
+
   void _moveHighlight(int delta) {
     if (_overlayEntry == null) {
       if (delta <= 0) {
@@ -441,6 +489,7 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
       _visibleRemainingNames.length - 1,
     );
     _highlightAt(next, scrollIntoView: true);
+    _highlightMovedByKeyboard = true;
   }
 
   KeyEventResult _handleInputKeyEvent(FocusNode node, KeyEvent event) {
@@ -466,18 +515,24 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
       _closeMenu();
       return KeyEventResult.handled;
     }
+    if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter) {
+      final String trimmed = _inputController.text.trim();
+      if (trimmed.isEmpty || _highlightMovedByKeyboard) {
+        if (_trySelectHighlightedCandidate()) {
+          return KeyEventResult.handled;
+        }
+      }
+      return KeyEventResult.ignored;
+    }
     if (key == LogicalKeyboardKey.tab) {
       if (HardwareKeyboard.instance.isShiftPressed) {
         return KeyEventResult.ignored;
       }
-      final int? index = _highlightedIndexNotifier.value;
-      if (index == null ||
-          index < 0 ||
-          index >= _visibleRemainingNames.length) {
-        return KeyEventResult.ignored;
+      if (_trySelectHighlightedCandidate()) {
+        return KeyEventResult.handled;
       }
-      _addFromMenu(_visibleRemainingNames[index]);
-      return KeyEventResult.handled;
+      return KeyEventResult.ignored;
     }
     if (event is KeyDownEvent &&
         (key == LogicalKeyboardKey.backspace ||
@@ -488,14 +543,30 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
           widget.selectedNames.isEmpty) {
         return KeyEventResult.ignored;
       }
-      widget.onRemove(widget.selectedNames.last);
+      _removeSelected(widget.selectedNames.last);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.home) {
+      if (_overlayEntry == null || _visibleRemainingNames.isEmpty) {
+        return KeyEventResult.ignored;
+      }
+      _highlightAt(0, scrollIntoView: true);
+      _highlightMovedByKeyboard = true;
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.end) {
+      if (_overlayEntry == null || _visibleRemainingNames.isEmpty) {
+        return KeyEventResult.ignored;
+      }
+      _highlightAt(_visibleRemainingNames.length - 1, scrollIntoView: true);
+      _highlightMovedByKeyboard = true;
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
   }
 
   void _submitInput() {
-    final String trimmed = _inputController.text.trim();
+    final String trimmed = md3eInputChipCommitLabel(_inputController.text);
     if (trimmed.isEmpty) {
       return;
     }
@@ -506,10 +577,16 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   }
 
   void _addFromMenu(String name) {
-    widget.onAdd(name);
+    _highlightMovedByKeyboard = false;
+    widget.onAdd(md3eInputChipCommitLabel(name));
     _inputController.clear();
-    _inputFocusNode.requestFocus();
     _openMenu();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _inputFocusNode.requestFocus();
+    });
   }
 
   void _focusInput() {
@@ -534,20 +611,14 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
   }
 
   double _inlineWidth(TextStyle style) {
-    if (_inputController.text.isEmpty) {
-      return _kMd3eNamedFacetMultiSelectInlineMinWidth;
-    }
-    final TextPainter painter = TextPainter(
-      text: TextSpan(text: _inputController.text, style: style),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    )..layout();
-    return math.max(_kMd3eNamedFacetMultiSelectInlineMinWidth, painter.width + 4);
+    return md3eInputChipInlineWidth(
+      style: style,
+      text: _inputController.text,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final M3EChipTheme chipTheme = M3ETheme.of(context).chipTheme;
     final AppLocalizations l10n = context.l10n;
     final bool hasSelectedTags = widget.selectedNames.isNotEmpty;
     final bool showClearAll =
@@ -558,21 +629,54 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
         _fieldWidth = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
-        return CompositedTransformTarget(
+        return ListenableBuilder(
+          listenable: _inputController,
+          builder: (BuildContext context, Widget? _) {
+            return CallbackShortcuts(
+              bindings: <ShortcutActivator, VoidCallback>{
+                const SingleActivator(LogicalKeyboardKey.escape): _closeMenu,
+              },
+              child: CompositedTransformTarget(
           key: _fieldAnchorKey,
           link: _layerLink,
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: widget.maxWidth),
-            child: Md3eOutlinedTextFieldShell(
+            child: RepaintBoundary(
+              child: Md3eOutlinedTextFieldShell(
                 key: Md3eNamedFacetMultiSelectField.fieldSurfaceKey,
                 label: widget.label,
                 focusNode: _inputFocusNode,
                 onTapOutside: _handleTapOutside,
+                iconSlotAlignment: M3ETextFieldSlotAlignment.firstLine,
+                chipFirstLineLayout: true,
+                appearanceFocused: _menuSessionActive,
+                tapRegionGroupId: _tapRegionGroup,
                 isPopulated:
                     widget.selectedNames.isNotEmpty ||
                     _inputController.text.isNotEmpty,
                 selectionController: _inputController,
                 editableTextKey: _editableKey,
+                trailingBuilder: showClearAll
+                    ? (
+                        BuildContext context,
+                        M3ETextFieldColors colors,
+                        M3ETextFieldTheme fieldTheme,
+                      ) =>
+                          M3ETooltip(
+                        message:
+                            widget.clearAllTooltip ?? l10n.commonClear,
+                        child: M3ETextFieldAffordance(
+                          key: Md3eNamedFacetMultiSelectField
+                              .clearAllButtonKey,
+                          icon: M3EIcons.cancel,
+                          color: colors.trailingIcon,
+                          iconSize: fieldTheme.iconSize,
+                          semanticLabel:
+                              widget.clearAllTooltip ?? l10n.commonClear,
+                          onPressed: _clearAllSelected,
+                        ),
+                      )
+                    : null,
                 inputBuilder:
                     (
                       BuildContext context,
@@ -580,107 +684,83 @@ class _Md3eNamedFacetMultiSelectFieldState<T>
                       M3ETextFieldTheme fieldTheme,
                       TextStyle inputStyle,
                     ) {
+                      final M3EChipTheme chipTheme =
+                          M3ETheme.of(context).chipTheme;
                       final double inlineWidth = _inlineWidth(inputStyle);
-                      final double inputLine = M3ETextFieldTheme.lineHeightOf(
-                        inputStyle,
+                      final bool hasChips = widget.selectedNames.isNotEmpty;
+                      final double rowLineHeight = md3eInputChipRowLineHeight(
+                        chipTheme: chipTheme,
+                        inputStyle: inputStyle,
+                        hasChips: hasChips,
                       );
-                      final bool alignWithChips = widget.selectedNames.isNotEmpty;
-                      final double slotHeight = alignWithChips
-                          ? chipTheme.height
-                          : inputLine;
-                      final double textTopInset = alignWithChips
-                          ? (chipTheme.height - inputLine) / 2
-                          : 0;
-                      final double clearTrailingInset = showClearAll
-                          ? fieldTheme.iconSlotWidth +
-                                fieldTheme.iconSlotTextPadding
+                      final double textTopInset = hasChips
+                          ? md3eInputChipInlineTopInset(
+                              rowLineHeight: rowLineHeight,
+                              inputStyle: inputStyle,
+                            )
                           : 0;
 
-                      return Stack(
-                        clipBehavior: Clip.none,
-                        children: <Widget>[
-                          GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: _focusInput,
-                            child: Padding(
-                              padding: EdgeInsets.only(right: clearTrailingInset),
-                              child: Wrap(
-                                spacing: _kMd3eNamedFacetMultiSelectChipGap,
-                                runSpacing: _kMd3eNamedFacetMultiSelectChipGap,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: <Widget>[
-                                  for (final String name in widget.selectedNames)
-                                    M3EChip(
-                                      label: name,
-                                      type: M3EChipType.input,
-                                      onPressed: _focusInput,
-                                      onDeleted: () => widget.onRemove(name),
+                      return Md3eInputChipFieldContent(
+                        fieldTheme: fieldTheme,
+                        inputStyle: inputStyle,
+                        hasChips: hasChips,
+                        onTap: _focusInput,
+                        chips: <Widget>[
+                          for (final String name in widget.selectedNames)
+                            md3eCompactInputChip(
+                              context: context,
+                              label: name,
+                              onPressed: _focusInput,
+                              onDeleted: () => _removeSelected(name),
+                            ),
+                        ],
+                        inlineField: SizedBox(
+                          width: inlineWidth,
+                          height: rowLineHeight,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: textTopInset),
+                            child: CallbackShortcuts(
+                              bindings: M3EFocus.editableInputShortcuts(
+                                _inputFocusNode,
+                              ),
+                              child: EditableText(
+                                key: _editableKey,
+                                controller: _inputController,
+                                focusNode: _inputFocusNode,
+                                style: inputStyle,
+                                cursorColor: colors.caret,
+                                backgroundCursorColor: M3ETheme.of(
+                                  context,
+                                ).colorScheme.outlineVariant,
+                                selectionColor: M3ETheme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(
+                                      alpha: fieldTheme.selectionOpacity,
                                     ),
-                                  SizedBox(
-                                    width: inlineWidth,
-                                    height: slotHeight,
-                                    child: Padding(
-                                      padding: EdgeInsets.only(top: textTopInset),
-                                      child: CallbackShortcuts(
-                                        bindings: M3EFocus.editableInputShortcuts(
-                                          _inputFocusNode,
-                                        ),
-                                        child: EditableText(
-                                          key: _editableKey,
-                                          controller: _inputController,
-                                          focusNode: _inputFocusNode,
-                                          style: inputStyle,
-                                          cursorColor: colors.caret,
-                                          backgroundCursorColor: M3ETheme.of(
-                                            context,
-                                          ).colorScheme.outlineVariant,
-                                          selectionColor: M3ETheme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withValues(
-                                                alpha: fieldTheme.selectionOpacity,
-                                              ),
-                                          textCapitalization:
-                                              TextCapitalization.none,
-                                          textInputAction: TextInputAction.done,
-                                          onSubmitted: (_) => _submitInput(),
-                                          maxLines: 1,
-                                          scrollPadding: EdgeInsets.zero,
-                                          rendererIgnoresPointer: true,
-                                          selectionControls:
-                                              m3eTextFieldSelectionControls(
-                                                defaultTargetPlatform,
-                                              ),
-                                        ),
-                                      ),
+                                textCapitalization:
+                                    TextCapitalization.none,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) => _submitInput(),
+                                maxLines: 1,
+                                scrollPadding: EdgeInsets.zero,
+                                rendererIgnoresPointer: true,
+                                selectionControls:
+                                    m3eTextFieldSelectionControls(
+                                      defaultTargetPlatform,
                                     ),
-                                  ),
-                                ],
                               ),
                             ),
                           ),
-                          if (showClearAll)
-                            Positioned(
-                              right: 0,
-                              bottom: 0,
-                              child: M3ETooltip(
-                                message:
-                                    widget.clearAllTooltip ?? l10n.commonClear,
-                                child: M3EIconButton(
-                                  key: Md3eNamedFacetMultiSelectField
-                                      .clearAllButtonKey,
-                                  icon: const Icon(Symbols.close),
-                                  onPressed: _clearAllSelected,
-                                  variant: M3EIconButtonVariant.standard,
-                                  size: M3EIconButtonSize.sm,
-                                ),
-                              ),
-                            ),
-                        ],
+                        ),
                       );
                     },
               ),
+            ),
           ),
+        ),
+            );
+          },
         );
       },
     );

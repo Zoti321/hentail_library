@@ -1,7 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/md3e_input_chip_field_layout.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field_shell.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -11,10 +10,6 @@ const double kMd3eTagInputFieldMinWidth = 280;
 
 /// Default max width for tag input previews.
 const double kMd3eTagInputFieldMaxWidth = 560;
-
-const double _kMd3eTagInputChipGap = 8;
-
-const double _kMd3eTagInputInlineMinWidth = 48;
 
 /// Tag input: [Md3eOutlinedTextFieldShell] + input chips in a [Wrap].
 class Md3eTagInputField extends StatefulWidget {
@@ -46,25 +41,14 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
       GlobalKey<EditableTextState>();
 
   @override
-  void initState() {
-    super.initState();
-    _controller.addListener(_onTextChange);
-  }
-
-  @override
   void dispose() {
-    _controller.removeListener(_onTextChange);
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
-  void _onTextChange() {
-    setState(() {});
-  }
-
   void _commitTag() {
-    final String tag = _controller.text.trim();
+    final String tag = md3eInputChipCommitLabel(_controller.text);
     if (tag.isEmpty) {
       return;
     }
@@ -78,76 +62,76 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
     }
   }
 
-  double _inlineWidth(TextStyle style) {
-    if (_controller.text.isEmpty) {
-      return _kMd3eTagInputInlineMinWidth;
-    }
-    final TextPainter painter = TextPainter(
-      text: TextSpan(text: _controller.text, style: style),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    )..layout();
-    return math.max(_kMd3eTagInputInlineMinWidth, painter.width + 4);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final M3EChipTheme chipTheme = M3ETheme.of(context).chipTheme;
-
     return ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: widget.minWidth,
         maxWidth: widget.maxWidth,
       ),
-      child: Md3eOutlinedTextFieldShell(
-        label: widget.label,
-        focusNode: _focusNode,
-        isPopulated: widget.tags.isNotEmpty || _controller.text.isNotEmpty,
-        selectionController: _controller,
-        editableTextKey: _editableKey,
-        inputBuilder:
-            (
-              BuildContext context,
-              M3ETextFieldColors colors,
-              M3ETextFieldTheme fieldTheme,
-              TextStyle inputStyle,
-            ) {
-              final double inlineWidth = _inlineWidth(inputStyle);
-              final double inputLine = M3ETextFieldTheme.lineHeightOf(
-                inputStyle,
-              );
-              final bool alignWithChips = widget.tags.isNotEmpty;
-              final double slotHeight = alignWithChips
-                  ? chipTheme.height
-                  : inputLine;
-              final double textTopInset = alignWithChips
-                  ? (chipTheme.height - inputLine) / 2
-                  : 0;
+      child: ListenableBuilder(
+        listenable: _controller,
+        builder: (BuildContext context, Widget? _) {
+          return Md3eOutlinedTextFieldShell(
+            label: widget.label,
+            focusNode: _focusNode,
+            iconSlotAlignment: M3ETextFieldSlotAlignment.firstLine,
+            chipFirstLineLayout: true,
+            isPopulated:
+                widget.tags.isNotEmpty || _controller.text.isNotEmpty,
+            selectionController: _controller,
+            editableTextKey: _editableKey,
+            inputBuilder:
+                (
+                  BuildContext context,
+                  M3ETextFieldColors colors,
+                  M3ETextFieldTheme fieldTheme,
+                  TextStyle inputStyle,
+                ) {
+                  final M3EChipTheme chipTheme =
+                      M3ETheme.of(context).chipTheme;
+                  final double inlineWidth = md3eInputChipInlineWidth(
+                    style: inputStyle,
+                    text: _controller.text,
+                  );
+                  final bool hasChips = widget.tags.isNotEmpty;
+                  final double rowLineHeight = md3eInputChipRowLineHeight(
+                    chipTheme: chipTheme,
+                    inputStyle: inputStyle,
+                    hasChips: hasChips,
+                  );
+                  final double textTopInset = hasChips
+                      ? md3eInputChipInlineTopInset(
+                          rowLineHeight: rowLineHeight,
+                          inputStyle: inputStyle,
+                        )
+                      : 0;
 
-              return GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: _focusInput,
-                child: Wrap(
-                  spacing: _kMd3eTagInputChipGap,
-                  runSpacing: _kMd3eTagInputChipGap,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: <Widget>[
-                    for (final String tag in widget.tags)
-                      M3EChip(
-                        label: tag,
-                        type: M3EChipType.input,
-                        onPressed: _focusInput,
-                        onDeleted: widget.onTagRemoved == null
-                            ? null
-                            : () => widget.onTagRemoved!(tag),
-                      ),
-                    SizedBox(
+                  return Md3eInputChipFieldContent(
+                    fieldTheme: fieldTheme,
+                    inputStyle: inputStyle,
+                    hasChips: hasChips,
+                    onTap: _focusInput,
+                    chips: <Widget>[
+                      for (final String tag in widget.tags)
+                        md3eCompactInputChip(
+                          context: context,
+                          label: tag,
+                          onPressed: _focusInput,
+                          onDeleted: widget.onTagRemoved == null
+                              ? null
+                              : () => widget.onTagRemoved!(tag),
+                        ),
+                    ],
+                    inlineField: SizedBox(
                       width: inlineWidth,
-                      height: slotHeight,
+                      height: rowLineHeight,
                       child: Padding(
                         padding: EdgeInsets.only(top: textTopInset),
                         child: CallbackShortcuts(
-                          bindings: M3EFocus.editableInputShortcuts(_focusNode),
+                          bindings: M3EFocus.editableInputShortcuts(
+                            _focusNode,
+                          ),
                           child: EditableText(
                             key: _editableKey,
                             controller: _controller,
@@ -160,7 +144,9 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                             selectionColor: M3ETheme.of(context)
                                 .colorScheme
                                 .primary
-                                .withValues(alpha: fieldTheme.selectionOpacity),
+                                .withValues(
+                                  alpha: fieldTheme.selectionOpacity,
+                                ),
                             textCapitalization: TextCapitalization.none,
                             textInputAction: TextInputAction.done,
                             onSubmitted: (_) => _commitTag(),
@@ -174,10 +160,10 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                         ),
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
+                  );
+                },
+          );
+        },
       ),
     );
   }

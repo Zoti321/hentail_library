@@ -48,6 +48,7 @@ class ParodyLibraryMultiSelectField extends ConsumerWidget {
         listLoadFailed: l10n.formParodyListLoadFailed,
         emptyCatalog: l10n.formParodyEmptyCatalog,
         emptyRemaining: l10n.formParodyEmptyRemaining,
+        retryLabel: l10n.commonRetry,
       ),
     );
   }

@@ -48,6 +48,7 @@ class CharacterLibraryMultiSelectField extends ConsumerWidget {
         listLoadFailed: l10n.formCharacterListLoadFailed,
         emptyCatalog: l10n.formCharacterEmptyCatalog,
         emptyRemaining: l10n.formCharacterEmptyRemaining,
+        retryLabel: l10n.commonRetry,
       ),
     );
   }

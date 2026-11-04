@@ -15,6 +15,12 @@ typedef Md3eOutlinedTextFieldInputBuilder = Widget Function(
   TextStyle inputStyle,
 );
 
+typedef Md3eOutlinedTextFieldTrailingBuilder = Widget Function(
+  BuildContext context,
+  M3ETextFieldColors colors,
+  M3ETextFieldTheme fieldTheme,
+);
+
 /// Outlined `M3ETextField` shell with a custom input slot.
 ///
 /// Container paint, notch, floating label, hover, and keyboard focus ring follow
@@ -30,10 +36,15 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
     this.isPopulated = false,
     this.leading,
     this.trailing,
+    this.trailingBuilder,
     this.onTapOutside,
     this.fieldTheme,
     this.selectionController,
     this.editableTextKey,
+    this.iconSlotAlignment = M3ETextFieldSlotAlignment.center,
+    this.chipFirstLineLayout = false,
+    this.appearanceFocused = false,
+    this.tapRegionGroupId,
   });
 
   final String label;
@@ -43,10 +54,21 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
   final bool isPopulated;
   final Widget? leading;
   final Widget? trailing;
+  final Md3eOutlinedTextFieldTrailingBuilder? trailingBuilder;
   final TapRegionCallback? onTapOutside;
   final M3ETextFieldTheme? fieldTheme;
   final TextEditingController? selectionController;
   final GlobalKey<EditableTextState>? editableTextKey;
+  final M3ETextFieldSlotAlignment iconSlotAlignment;
+
+  /// Chip + 内联输入：内容区自管 inset，trailing 与 M3E 一致（固定 min 高度槽 + Center）。
+  final bool chipFirstLineLayout;
+
+  /// 为 true 时描边/容器色按 focused 解析（浮层选 chip 时避免失焦闪一下）。
+  final bool appearanceFocused;
+
+  /// 与浮层候选面板共用的 [TapRegion] group，避免点选选项触发 tap-outside 失焦。
+  final Object? tapRegionGroupId;
 
   @override
   State<Md3eOutlinedTextFieldShell> createState() =>
@@ -90,15 +112,25 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _syncVisuals(animate: _toColors != null);
+    if (_toColors == null) {
+      _syncVisuals(animate: false);
+    }
   }
 
   @override
   void didUpdateWidget(Md3eOutlinedTextFieldShell oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.isPopulated != widget.isPopulated ||
-        oldWidget.enabled != widget.enabled) {
+    if (oldWidget.appearanceFocused != widget.appearanceFocused) {
+      _showFocusRing = M3EFocusRing.shouldShow(widget.focusNode, context) ||
+          widget.appearanceFocused;
+      _syncVisuals(animate: false);
+    }
+    if (oldWidget.enabled != widget.enabled) {
       _syncVisuals();
+      return;
+    }
+    if (oldWidget.isPopulated != widget.isPopulated) {
+      _syncVisuals(animate: false);
     }
   }
 
@@ -131,15 +163,18 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   M3ETextFieldStates get _states => M3ETextFieldStates(
     enabled: widget.enabled,
     hovered: _hovered,
-    focused: _focused,
+    focused: _focused || widget.appearanceFocused,
     error: false,
   );
 
   void _syncVisuals({bool animate = true}) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ETextFieldTheme fieldTheme = _fieldThemeOf(theme);
+    final bool snapEffects = widget.chipFirstLineLayout;
     final bool instant =
-        !animate || (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
+        snapEffects ||
+        !animate ||
+        (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
     _labelMotion.motion = _springOf(fieldTheme.labelSpring);
     _effectsMotion.motion = _springOf(fieldTheme.effectsSpring);
 
@@ -161,6 +196,12 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     if (colors == _toColors) {
       return;
     }
+    if (snapEffects) {
+      _fromColors = colors;
+      _toColors = colors;
+      _effectsMotion.value = 1;
+      return;
+    }
     _fromColors = _toColors == null ? colors : _currentColors;
     _toColors = colors;
     if (instant) {
@@ -173,8 +214,9 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   void _handleFocusChange() {
     setState(() {
       _focused = widget.focusNode.hasFocus;
-      _showFocusRing = M3EFocusRing.shouldShow(widget.focusNode, context);
-      _syncVisuals();
+      _showFocusRing = M3EFocusRing.shouldShow(widget.focusNode, context) ||
+          widget.appearanceFocused;
+      _syncVisuals(animate: !widget.chipFirstLineLayout);
     });
   }
 
@@ -204,7 +246,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     }
     setState(() {
       _hovered = hovered;
-      _syncVisuals();
+      _syncVisuals(animate: !widget.chipFirstLineLayout);
     });
   }
 
@@ -241,7 +283,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     final double start = widget.leading == null
         ? fieldTheme.horizontalPadding
         : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding;
-    final double end = (widget.trailing == null
+    final double end = (widget.trailing == null && widget.trailingBuilder == null
         ? fieldTheme.horizontalPadding
         : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding);
 
@@ -278,7 +320,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
               ConstrainedBox(
                 constraints: BoxConstraints(minHeight: height),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: _crossAxisFor(widget.iconSlotAlignment),
                   children: <Widget>[
                     ..._leadingSlot(fieldTheme, colors, height),
                     Expanded(
@@ -334,6 +376,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
 
     return TextFieldTapRegion(
       enabled: widget.enabled,
+      groupId: widget.tapRegionGroupId,
       onTapOutside:
           widget.onTapOutside ?? M3EFocus.tapOutsideHandler(widget.focusNode),
       child: Padding(
@@ -370,10 +413,27 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   ) {
     final double inputLine = M3ETextFieldTheme.lineHeightOf(inputStyle);
     final double centered = (height - inputLine) / 2;
+    final EdgeInsets padding = switch (widget.iconSlotAlignment) {
+      M3ETextFieldSlotAlignment.firstLine when widget.chipFirstLineLayout =>
+        EdgeInsets.zero,
+      M3ETextFieldSlotAlignment.firstLine =>
+        EdgeInsets.symmetric(vertical: centered),
+      M3ETextFieldSlotAlignment.center ||
+      M3ETextFieldSlotAlignment.bottom =>
+        EdgeInsets.symmetric(vertical: centered),
+    };
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: centered),
+      padding: padding,
       child: widget.inputBuilder(context, colors, fieldTheme, inputStyle),
     );
+  }
+
+  static CrossAxisAlignment _crossAxisFor(M3ETextFieldSlotAlignment alignment) {
+    return switch (alignment) {
+      M3ETextFieldSlotAlignment.firstLine => CrossAxisAlignment.start,
+      M3ETextFieldSlotAlignment.center => CrossAxisAlignment.center,
+      M3ETextFieldSlotAlignment.bottom => CrossAxisAlignment.end,
+    };
   }
 
   Widget _buildLabel(
@@ -443,23 +503,24 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     M3ETextFieldColors colors,
     double height,
   ) {
-    if (widget.trailing == null) {
+    final Widget? slot = widget.trailingBuilder?.call(context, colors, fieldTheme) ??
+        widget.trailing;
+    if (slot == null) {
       return <Widget>[SizedBox(width: fieldTheme.horizontalPadding)];
     }
+    final Widget themed = IconTheme.merge(
+      data: IconThemeData(
+        color: colors.trailingIcon,
+        size: fieldTheme.iconSize,
+      ),
+      child: slot,
+    );
     return <Widget>[
       SizedBox(width: fieldTheme.iconSlotTextPadding),
       SizedBox(
         width: fieldTheme.iconSlotWidth,
         height: height,
-        child: Center(
-          child: IconTheme.merge(
-            data: IconThemeData(
-              color: colors.trailingIcon,
-              size: fieldTheme.iconSize,
-            ),
-            child: widget.trailing!,
-          ),
-        ),
+        child: Center(child: themed),
       ),
     ];
   }

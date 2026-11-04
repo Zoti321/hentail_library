@@ -48,6 +48,7 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
         listLoadFailed: l10n.formTagListLoadFailed,
         emptyCatalog: l10n.formTagEmptyCatalog,
         emptyRemaining: l10n.formTagEmptyRemaining,
+        retryLabel: l10n.commonRetry,
       ),
     );
   }

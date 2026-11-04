@@ -29,7 +29,15 @@ class Md3eNamedFacetMultiSelectFieldPreview extends ConsumerStatefulWidget {
 
 class _Md3eNamedFacetMultiSelectFieldPreviewState
     extends ConsumerState<Md3eNamedFacetMultiSelectFieldPreview> {
-  final List<String> _selected = <String>['已有作者'];
+  final List<String> _selected = <String>[
+    '已有作者',
+    '偶像大师',
+    'Clannad',
+    'fate stay night',
+    'コードギアス 反逆のルルーシュ',
+    '刀剑神域',
+    '原神',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +69,7 @@ class _Md3eNamedFacetMultiSelectFieldPreviewState
             listLoadFailed: context.l10n.formAuthorListLoadFailed,
             emptyCatalog: context.l10n.formAuthorEmptyCatalog,
             emptyRemaining: context.l10n.formAuthorEmptyRemaining,
+            retryLabel: context.l10n.commonRetry,
           ),
           maxWidth: 480,
         ),

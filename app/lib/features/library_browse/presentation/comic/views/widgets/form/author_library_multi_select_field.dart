@@ -50,6 +50,7 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
         listLoadFailed: l10n.formAuthorListLoadFailed,
         emptyCatalog: l10n.formAuthorEmptyCatalog,
         emptyRemaining: l10n.formAuthorEmptyRemaining,
+        retryLabel: l10n.commonRetry,
       ),
     );
   }

@@ -1,5 +1,23 @@
 part of 'md3e_named_facet_multi_select_field.dart';
 
+double _md3eNamedFacetMenuPanelMaxHeight(BuildContext context) {
+  final M3EDropdownMenuTheme menuTheme = M3ETheme.of(context).dropdownMenuTheme;
+  return math.min(
+    _kMd3eNamedFacetMultiSelectMenuMaxHeight,
+    math.min(
+      menuTheme.panelMaxHeight,
+      MediaQuery.sizeOf(context).height * 0.45,
+    ),
+  );
+}
+
+double _md3eNamedFacetMenuBodyMinHeight(double panelMaxHeight) {
+  return math.min(
+    panelMaxHeight,
+    _kMd3eNamedFacetMultiSelectMenuEmptyMinHeight,
+  );
+}
+
 class _Md3eNamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
   const _Md3eNamedFacetMultiSelectMenuPanel({
     super.key,
@@ -38,8 +56,10 @@ class _Md3eNamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AppLocalizations l10n = context.l10n;
     final AsyncValue<List<T>> asyncItems = ref.watch(itemsProvider);
+    final double panelMaxHeight = _md3eNamedFacetMenuPanelMaxHeight(context);
+    final double bodyMinHeight =
+        _md3eNamedFacetMenuBodyMinHeight(panelMaxHeight);
     return asyncItems.when(
       loading: () {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -47,10 +67,12 @@ class _Md3eNamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
         });
         return _Md3eNamedFacetMenuShell(
           width: width,
-          maxHeight: 108,
-          child: const Center(
-            child: Padding(
-              padding: EdgeInsets.all(18),
+          maxHeight: panelMaxHeight,
+          minHeight: bodyMinHeight,
+          child: SizedBox(
+            width: double.infinity,
+            height: bodyMinHeight,
+            child: const Center(
               child: SizedBox(
                 width: 22,
                 height: 22,
@@ -66,26 +88,35 @@ class _Md3eNamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
         });
         return _Md3eNamedFacetMenuShell(
           width: width,
-          maxHeight: 148,
-          child: Padding(
-            padding: EdgeInsets.all(M3ETheme.of(context).spacing.lg),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Text(
-                  l10n.commonLoadFailed,
-                  style: M3ETheme.of(context).typeScale.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+          maxHeight: panelMaxHeight,
+          minHeight: bodyMinHeight,
+          child: SizedBox(
+            width: double.infinity,
+            height: bodyMinHeight,
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: M3ETheme.of(context).spacing.lg,
                 ),
-                SizedBox(height: M3ETheme.of(context).spacing.sm),
-                M3EButton(
-                  onPressed: onRetry,
-                  style: M3EButtonStyle.text,
-                  child: Text(l10n.commonRetry),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      copy.listLoadFailed,
+                      textAlign: TextAlign.center,
+                      style: M3ETheme.of(context).typeScale.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: M3ETheme.of(context).spacing.sm),
+                    M3EButton(
+                      onPressed: onRetry,
+                      style: M3EButtonStyle.text,
+                      child: Text(copy.retryLabel),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
@@ -131,10 +162,12 @@ class _Md3eNamedFacetMenuShell extends StatelessWidget {
     required this.width,
     required this.maxHeight,
     required this.child,
+    this.minHeight = 0,
   });
 
   final double width;
   final double maxHeight;
+  final double minHeight;
   final Widget child;
 
   @override
@@ -154,6 +187,7 @@ class _Md3eNamedFacetMenuShell extends StatelessWidget {
           constraints: BoxConstraints(
             maxWidth: width > 0 ? width : 280,
             maxHeight: maxHeight,
+            minHeight: minHeight,
           ),
           child: child,
         ),
@@ -194,21 +228,28 @@ class _Md3eNamedFacetMenuList<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
-    final double panelMaxHeight = math.min(
-      _kMd3eNamedFacetMultiSelectMenuMaxHeight,
-      MediaQuery.sizeOf(context).height * 0.45,
-    );
+    final double panelMaxHeight = _md3eNamedFacetMenuPanelMaxHeight(context);
+    final double bodyMinHeight =
+        _md3eNamedFacetMenuBodyMinHeight(panelMaxHeight);
 
     return _Md3eNamedFacetMenuShell(
       width: width,
       maxHeight: panelMaxHeight,
+      minHeight: items.isEmpty ? bodyMinHeight : 0,
       child: items.isEmpty
-          ? Padding(
-              padding: EdgeInsets.all(theme.spacing.lg),
-              child: Text(
-                allCatalogEmpty ? copy.emptyCatalog : copy.emptyRemaining,
-                style: theme.typeScale.bodyMedium.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ? SizedBox(
+              width: double.infinity,
+              height: bodyMinHeight,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: theme.spacing.lg),
+                  child: Text(
+                    allCatalogEmpty ? copy.emptyCatalog : copy.emptyRemaining,
+                    textAlign: TextAlign.center,
+                    style: theme.typeScale.bodyMedium.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
                 ),
               ),
             )
@@ -220,7 +261,7 @@ class _Md3eNamedFacetMenuList<T> extends StatelessWidget {
                   padding: EdgeInsets.all(theme.spacing.sm),
                   shrinkWrap: true,
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => SizedBox(height: theme.spacing.xs),
+                  separatorBuilder: (_, _) => SizedBox(height: theme.spacing.xs),
                   itemBuilder: (BuildContext context, int index) {
                     final T item = items[index];
                     final String name = resolveName(item);

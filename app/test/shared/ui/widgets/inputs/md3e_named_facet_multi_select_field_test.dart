@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_browse/domain/comic/smart_facet_match.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_copy.dart';
@@ -55,6 +56,7 @@ void main() {
               listLoadFailed: '加载失败',
               emptyCatalog: '目录为空',
               emptyRemaining: '无剩余',
+              retryLabel: '重试',
             ),
           ),
         ),
@@ -151,6 +153,7 @@ void main() {
               listLoadFailed: '加载失败',
               emptyCatalog: '目录为空',
               emptyRemaining: '无剩余',
+              retryLabel: '重试',
             ),
           ),
         ),
@@ -164,6 +167,130 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(selected, <String>['新标签']);
+  });
+
+  testWidgets('arrow down and Enter select highlighted candidate', (
+    WidgetTester tester,
+  ) async {
+    final List<String> selected = <String>[];
+
+    await pumpMd3eApp(
+      tester,
+      home: Center(
+        child: SizedBox(
+          width: 360,
+          child: Md3eNamedFacetMultiSelectField<SmartFacetMatchCandidate>(
+            label: '作者',
+            selectedNames: selected,
+            onAdd: selected.add,
+            onRemove: selected.remove,
+            itemsProvider: _testItemsProvider,
+            onRetry: () {},
+            resolveName: (SmartFacetMatchCandidate c) => c.name,
+            copy: const Md3eNamedFacetMultiSelectCopy(
+              listLoadFailed: '加载失败',
+              emptyCatalog: '目录为空',
+              emptyRemaining: '无剩余',
+              retryLabel: '重试',
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(EditableText));
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+
+    expect(selected, <String>['图书馆']);
+  });
+
+  testWidgets('Escape closes menu overlay', (WidgetTester tester) async {
+    await pumpMd3eApp(
+      tester,
+      home: Center(
+        child: SizedBox(
+          width: 360,
+          child: Md3eNamedFacetMultiSelectField<SmartFacetMatchCandidate>(
+            label: '作者',
+            selectedNames: const <String>[],
+            onAdd: (_) {},
+            onRemove: (_) {},
+            itemsProvider: _testItemsProvider,
+            onRetry: () {},
+            resolveName: (SmartFacetMatchCandidate c) => c.name,
+            copy: const Md3eNamedFacetMultiSelectCopy(
+              listLoadFailed: '加载失败',
+              emptyCatalog: '目录为空',
+              emptyRemaining: '无剩余',
+              retryLabel: '重试',
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(EditableText));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(Md3eNamedFacetMultiSelectField.menuPanelKey),
+      findsOneWidget,
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle(const Duration(milliseconds: 400));
+
+    expect(
+      find.byKey(Md3eNamedFacetMultiSelectField.menuPanelKey),
+      findsNothing,
+    );
+  });
+
+  testWidgets('Backspace on empty input removes last chip', (
+    WidgetTester tester,
+  ) async {
+    final List<String> selected = <String>['第一个', '第二个'];
+
+    await pumpMd3eApp(
+      tester,
+      home: Center(
+        child: SizedBox(
+          width: 360,
+          child: Md3eNamedFacetMultiSelectField<SmartFacetMatchCandidate>(
+            label: '标签',
+            selectedNames: selected,
+            onAdd: selected.add,
+            onRemove: selected.remove,
+            itemsProvider: _testItemsProvider,
+            onRetry: () {},
+            resolveName: (SmartFacetMatchCandidate c) => c.name,
+            copy: const Md3eNamedFacetMultiSelectCopy(
+              listLoadFailed: '加载失败',
+              emptyCatalog: '目录为空',
+              emptyRemaining: '无剩余',
+              retryLabel: '重试',
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(EditableText));
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+    await tester.pumpAndSettle();
+
+    expect(selected, <String>['第一个']);
   });
 }
 
@@ -204,6 +331,7 @@ class _Md3eNamedFacetMultiSelectTestHarnessState
         listLoadFailed: '加载失败',
         emptyCatalog: '目录为空',
         emptyRemaining: '无剩余',
+        retryLabel: '重试',
       ),
     );
   }
