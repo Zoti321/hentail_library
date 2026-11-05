@@ -530,6 +530,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsGroupAbout => '关于';
 
   @override
+  String get settingsMasterMenuGroupTitle => '应用';
+
+  @override
+  String get settingsSectionAppearance => '外观与语言';
+
+  @override
+  String get settingsSectionReading => '阅读';
+
+  @override
+  String get settingsSectionLibraryBrowse => '库与浏览';
+
+  @override
+  String get settingsSectionDiagnostics => '诊断';
+
+  @override
+  String get settingsSectionApplicationData => '应用数据';
+
+  @override
+  String get settingsSectionUpdates => '更新';
+
+  @override
   String get settingsMetadataBackupAutoGroupTitle => '自动备份';
 
   @override

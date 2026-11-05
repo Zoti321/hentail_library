@@ -92,6 +92,7 @@ List<Widget> _sectionsForCategory(
   return switch (category) {
     Md3eSettingsCategory.personalization => <Widget>[
       Md3eSettingsSection(
+        title: Text(l10n.settingsSectionAppearance),
         tiles: <Widget>[
           Md3eSettingsNavigationTile(
             leading: Symbols.dark_mode,
@@ -126,7 +127,7 @@ List<Widget> _sectionsForCategory(
         ],
       ),
       Md3eSettingsSection(
-        title: const Text('阅读相关偏好'),
+        title: Text(l10n.settingsSectionReading),
         tiles: <Widget>[
           Md3eSettingsNavigationTile(
             leading: Symbols.menu_book,
@@ -147,12 +148,12 @@ List<Widget> _sectionsForCategory(
       ),
       if (showUnwiredTiles)
         Md3eSettingsSection(
-          title: const Text('内容浏览'),
+          title: Text(l10n.settingsSectionLibraryBrowse),
           tiles: <Widget>[
             Md3eSettingsSwitchTile(
               leading: Symbols.shield,
-              title: const Text('Healthy mode'),
-              description: const Text('库、搜索与历史中隐藏 R18 Comic，不修改分级'),
+              title: Text(l10n.settingsHealthyModeLabel),
+              description: Text(l10n.settingsHealthyModeDescription),
               value: labState.healthyMode,
               onChanged: (bool value) {
                 onChanged(labState.copyWith(healthyMode: value));
@@ -202,6 +203,7 @@ List<Widget> _sectionsForCategory(
     ],
     Md3eSettingsCategory.diagnostics => <Widget>[
       Md3eSettingsSection(
+        title: Text(l10n.settingsSectionDiagnostics),
         tiles: <Widget>[
           Md3eSettingsSwitchTile(
             leading: Symbols.bug_report,
@@ -227,6 +229,7 @@ List<Widget> _sectionsForCategory(
     ],
     Md3eSettingsCategory.about => <Widget>[
       Md3eSettingsSection(
+        title: Text(l10n.settingsSectionUpdates),
         tiles: <Widget>[
           Md3eSettingsSwitchTile(
             leading: Symbols.download,

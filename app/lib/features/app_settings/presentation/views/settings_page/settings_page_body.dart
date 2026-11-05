@@ -19,7 +19,7 @@ class Md3eSettingsPage extends StatefulWidget {
   const Md3eSettingsPage({
     super.key,
     this.initialCategory = Md3eSettingsCategory.personalization,
-    this.masterGroupTitle = '应用',
+    this.masterGroupTitle,
     this.labState = const Md3eSettingsLabState(),
     this.onLabStateChanged,
     this.onBack,
@@ -160,11 +160,14 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
                     constraints.maxWidth,
                   );
 
+                  final String? masterGroupTitle =
+                      widget.masterGroupTitle ??
+                      l10n.settingsMasterMenuGroupTitle;
                   final Widget master = Md3eSettingsMasterMenu(
                     key: const Key('md3e_settings_master'),
                     wide: wide,
                     selected: _selected,
-                    masterGroupTitle: widget.masterGroupTitle,
+                    masterGroupTitle: masterGroupTitle,
                     visibleCategories: widget.visibleCategories,
                     onSelect: (Md3eSettingsCategory category) {
                       _selectCategory(category, wide: wide);

@@ -1010,6 +1010,48 @@ abstract class AppLocalizations {
   /// **'关于'**
   String get settingsGroupAbout;
 
+  /// No description provided for @settingsMasterMenuGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用'**
+  String get settingsMasterMenuGroupTitle;
+
+  /// No description provided for @settingsSectionAppearance.
+  ///
+  /// In zh, this message translates to:
+  /// **'外观与语言'**
+  String get settingsSectionAppearance;
+
+  /// No description provided for @settingsSectionReading.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读'**
+  String get settingsSectionReading;
+
+  /// No description provided for @settingsSectionLibraryBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'库与浏览'**
+  String get settingsSectionLibraryBrowse;
+
+  /// No description provided for @settingsSectionDiagnostics.
+  ///
+  /// In zh, this message translates to:
+  /// **'诊断'**
+  String get settingsSectionDiagnostics;
+
+  /// No description provided for @settingsSectionApplicationData.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用数据'**
+  String get settingsSectionApplicationData;
+
+  /// No description provided for @settingsSectionUpdates.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新'**
+  String get settingsSectionUpdates;
+
   /// No description provided for @settingsMetadataBackupAutoGroupTitle.
   ///
   /// In zh, this message translates to:

@@ -29,12 +29,13 @@ class Md3eSettingsCategoryInfo {
   String description(AppLocalizations l10n) {
     return switch (category) {
       Md3eSettingsCategory.personalization =>
-        '${l10n.settingsThemeLabel} · ${l10n.settingsLanguageLabel}',
+        '${l10n.settingsThemeLabel} · ${l10n.readerSettingsReadingMode}',
       Md3eSettingsCategory.metadataBackup =>
         l10n.settingsMetadataBackupAutoToggleDescription,
       Md3eSettingsCategory.diagnostics =>
-        l10n.settingsDiagnosticModeDescriptionDisabled,
-      Md3eSettingsCategory.about => l10n.settingsCheckForUpdatesLabel,
+        '${l10n.settingsDiagnosticModeLabel} · ${l10n.settingsExportLogsLabel}',
+      Md3eSettingsCategory.about =>
+        '${l10n.settingsAutoUpdateLabel} · ${l10n.settingsCheckForUpdatesLabel}',
     };
   }
 }

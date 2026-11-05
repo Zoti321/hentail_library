@@ -546,6 +546,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsGroupAbout => 'About';
 
   @override
+  String get settingsMasterMenuGroupTitle => 'App';
+
+  @override
+  String get settingsSectionAppearance => 'Appearance & language';
+
+  @override
+  String get settingsSectionReading => 'Reading';
+
+  @override
+  String get settingsSectionLibraryBrowse => 'Library & browsing';
+
+  @override
+  String get settingsSectionDiagnostics => 'Diagnostics';
+
+  @override
+  String get settingsSectionApplicationData => 'Application data';
+
+  @override
+  String get settingsSectionUpdates => 'Updates';
+
+  @override
   String get settingsMetadataBackupAutoGroupTitle => 'Automatic backup';
 
   @override

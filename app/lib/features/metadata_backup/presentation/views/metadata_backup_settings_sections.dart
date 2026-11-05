@@ -69,6 +69,11 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                           ),
                   ),
                 ),
+              ],
+            ),
+            Md3eSettingsSection(
+              title: Text(l10n.settingsMetadataBackupManualGroupTitle),
+              tiles: <Widget>[
                 Md3eSettingsNavigationTile(
                   leading: Symbols.save,
                   title: Text(l10n.settingsMetadataBackupNowLabel),
@@ -102,11 +107,6 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                       }
                     },
                   ),
-              ],
-            ),
-            Md3eSettingsSection(
-              title: Text(l10n.settingsMetadataBackupManualGroupTitle),
-              tiles: <Widget>[
                 Md3eSettingsNavigationTile(
                   leading: Symbols.upload,
                   title: Text(l10n.settingsMetadataBackupExportLabel),

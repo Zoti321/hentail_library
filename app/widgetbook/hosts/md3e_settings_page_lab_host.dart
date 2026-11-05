@@ -7,7 +7,7 @@ class Md3eSettingsPageLabHost extends StatefulWidget {
   const Md3eSettingsPageLabHost({
     super.key,
     this.initialCategory = Md3eSettingsCategory.personalization,
-    this.masterGroupTitle = '应用',
+    this.masterGroupTitle,
     this.initialLabState = const Md3eSettingsLabState(),
     this.onBack,
   });

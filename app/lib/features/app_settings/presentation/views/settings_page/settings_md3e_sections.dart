@@ -25,14 +25,18 @@ import 'package:package_info_plus/package_info_plus.dart';
 ///
 /// 状态由各 tile（ConsumerWidget）自行 watch，section 本身无状态。
 /// 选项循环使用枚举 `values`，不经过字符串 label 反查。
-List<Widget> settingsMd3eSectionsFor(Md3eSettingsCategory category) {
+List<Widget> settingsMd3eSectionsFor(
+  Md3eSettingsCategory category,
+  BuildContext context,
+) {
+  final AppLocalizations l10n = context.l10n;
   return switch (category) {
-    Md3eSettingsCategory.personalization => _personalizationSections(),
+    Md3eSettingsCategory.personalization => _personalizationSections(l10n),
     Md3eSettingsCategory.metadataBackup => const <Widget>[
       _MetadataBackupCategory(),
     ],
-    Md3eSettingsCategory.diagnostics => _diagnosticsSections(),
-    Md3eSettingsCategory.about => _aboutSections(),
+    Md3eSettingsCategory.diagnostics => _diagnosticsSections(l10n),
+    Md3eSettingsCategory.about => _aboutSections(l10n),
   };
 }
 
@@ -65,27 +69,36 @@ Future<void> _pickSettingOption<T extends Object>(
   }
 }
 
-List<Widget> _personalizationSections() {
-  return const <Widget>[
+List<Widget> _personalizationSections(AppLocalizations l10n) {
+  return <Widget>[
     Md3eSettingsSection(
-      tiles: <Widget>[
-        _ThemeTile(),
-        _LocaleTile(),
-        _ReadingModeTile(),
+      title: Text(l10n.settingsSectionAppearance),
+      tiles: const <Widget>[_ThemeTile(), _LocaleTile()],
+    ),
+    Md3eSettingsSection(
+      title: Text(l10n.settingsSectionReading),
+      tiles: const <Widget>[_ReadingModeTile()],
+    ),
+    Md3eSettingsSection(
+      title: Text(l10n.settingsSectionLibraryBrowse),
+      tiles: const <Widget>[
         _SmartFacetMatchTile(),
+        _HealthyModeTile(),
+        _PreferLibraryRootSeriesTile(),
       ],
     ),
-    Md3eSettingsSection(tiles: <Widget>[_HealthyModeTile()]),
-    Md3eSettingsSection(tiles: <Widget>[_PreferLibraryRootSeriesTile()]),
   ];
 }
 
-List<Widget> _diagnosticsSections() {
-  return const <Widget>[
+List<Widget> _diagnosticsSections(AppLocalizations l10n) {
+  return <Widget>[
     Md3eSettingsSection(
-      tiles: <Widget>[
-        _DiagnosticModeTile(),
-        _ExportLogsTile(),
+      title: Text(l10n.settingsSectionDiagnostics),
+      tiles: const <Widget>[_DiagnosticModeTile(), _ExportLogsTile()],
+    ),
+    Md3eSettingsSection(
+      title: Text(l10n.settingsSectionApplicationData),
+      tiles: const <Widget>[
         _ClearApplicationDataTile(),
         _UninstallDataInfoTile(),
       ],
@@ -93,9 +106,12 @@ List<Widget> _diagnosticsSections() {
   ];
 }
 
-List<Widget> _aboutSections() {
-  return const <Widget>[
-    Md3eSettingsSection(tiles: <Widget>[_AutoUpdateTile(), _CheckUpdateTile()]),
+List<Widget> _aboutSections(AppLocalizations l10n) {
+  return <Widget>[
+    Md3eSettingsSection(
+      title: Text(l10n.settingsSectionUpdates),
+      tiles: const <Widget>[_AutoUpdateTile(), _CheckUpdateTile()],
+    ),
   ];
 }
 
