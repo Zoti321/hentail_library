@@ -182,7 +182,7 @@
   "historyTitle": "Reading history",
   "historyClearAction": "Clear reading history",
   "historyClearedToast": "Reading history cleared",
-  "historyRecordSummary": "{count, plural, one{1 entry · kept for 30 days max} other{{count} entries · kept for 30 days max}}",
+  "historyRecordSummary": "{count, plural, one{1 entry · kept for up to 1 year} other{{count} entries · kept for up to 1 year}}",
   "@historyRecordSummary": {
     "placeholders": {
       "count": {

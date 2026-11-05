@@ -13,7 +13,7 @@ use hentai_core::sync::scanner::{scan_roots, ScanContext};
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{
     comic_id_from_path, connection, find_comic_by_id, get_reading_by_comic_id, init_db_at_path,
-    record_reading, update_comic_user_meta, ReadingHistoryDto,
+    now_ms, record_reading, update_comic_user_meta, ReadingHistoryDto,
 };
 use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
@@ -76,10 +76,11 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
             .await
             .expect("update meta");
 
+            let read_at = now_ms();
             record_reading(&ReadingHistoryDto {
                 comic_id: old_id.clone(),
                 title: "用户标题".to_string(),
-                last_read_time_ms: 42,
+                last_read_time_ms: read_at,
                 page_index: Some(3),
                 page_count: None,
             })
@@ -127,7 +128,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 .expect("history")
                 .expect("reading history");
             assert_eq!(history.page_index, Some(3));
-            assert_eq!(history.last_read_time_ms, 42);
+            assert_eq!(history.last_read_time_ms, read_at);
         });
     });
 }

@@ -4,6 +4,7 @@ use sea_orm::{
     QueryOrder, Set,
 };
 
+use crate::comic::now_ms;
 use crate::comic::visibility::comic_id_not_trashed_sql;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comic_reading_histories, prelude::*};
@@ -13,6 +14,8 @@ use crate::util::decode_basic_html_entities;
 use std::collections::HashMap;
 
 use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto};
+use super::retention::reading_history_retention_cutoff_ms;
+use super::retention::reading_history_within_retention;
 
 pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> {
     let db = connection()?;
@@ -35,7 +38,25 @@ pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> 
         .exec(&db)
         .await
         .map_err(map_db_err)?;
+    purge_expired_reading_histories(&db).await?;
     Ok(())
+}
+
+pub async fn purge_expired_reading_histories<C: ConnectionTrait>(
+    db: &C,
+) -> Result<u64, HentaiError> {
+    let cutoff = reading_history_retention_cutoff_ms(now_ms());
+    let res = ComicReadingHistories::delete_many()
+        .filter(comic_reading_histories::Column::LastReadTime.lt(cutoff))
+        .exec(db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(res.rows_affected)
+}
+
+fn within_retention_expr(now: i64) -> sea_orm::sea_query::SimpleExpr {
+    Expr::col(comic_reading_histories::Column::LastReadTime)
+        .gte(reading_history_retention_cutoff_ms(now))
 }
 
 /// Library sync 时幂等清洗历史标题快照中的 HTML 实体。
@@ -71,6 +92,9 @@ pub async fn get_reading_by_comic_id(
     let Some(row) = row else {
         return Ok(None);
     };
+    if !reading_history_within_retention(row.last_read_time, now_ms()) {
+        return Ok(None);
+    }
     let item = map_reading_row(row);
     let mut items = enrich_page_counts(&db, vec![item]).await?;
     Ok(items.pop())
@@ -81,6 +105,7 @@ pub async fn list_read_page_indexes() -> Result<Vec<super::dto::ReadPageIndexDto
     let db = connection()?;
     let rows = ComicReadingHistories::find()
         .filter(not_trashed_history_expr())
+        .filter(within_retention_expr(now_ms()))
         .filter(comic_reading_histories::Column::PageIndex.is_not_null())
         .all(&db)
         .await
@@ -100,6 +125,7 @@ pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
     let db = connection()?;
     let rows = ComicReadingHistories::find()
         .filter(not_trashed_history_expr())
+        .filter(within_retention_expr(now_ms()))
         .order_by_desc(comic_reading_histories::Column::LastReadTime)
         .all(&db)
         .await
@@ -144,7 +170,9 @@ pub async fn fetch_reading_page(
 }
 
 fn reading_history_list_query(keyword: Option<&str>) -> sea_orm::Select<ComicReadingHistories> {
-    let mut query = ComicReadingHistories::find().filter(not_trashed_history_expr());
+    let mut query = ComicReadingHistories::find()
+        .filter(not_trashed_history_expr())
+        .filter(within_retention_expr(now_ms()));
     let normalized = keyword.map(str::trim).filter(|value| !value.is_empty());
     if let Some(keyword) = normalized {
         let pattern = format!("%{}%", keyword.to_lowercase());

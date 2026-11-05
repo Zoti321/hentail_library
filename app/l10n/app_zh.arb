@@ -182,7 +182,7 @@
   "historyTitle": "阅读历史",
   "historyClearAction": "清空阅读历史",
   "historyClearedToast": "已清空阅读历史",
-  "historyRecordSummary": "{count, plural, other{{count} 条记录 • 最长保留 30 天}}",
+  "historyRecordSummary": "{count, plural, other{{count} 条记录 • 最长保留 1 年}}",
   "@historyRecordSummary": {
     "placeholders": {
       "count": {

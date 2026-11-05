@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use sea_orm::sea_query::Expr;
 use sea_orm::{
-    ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder, Statement, Value,
+    ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder,
+    Statement, Value,
 };
 
 use crate::db::{connection, map_db_err, version_connection};
@@ -11,9 +12,10 @@ use crate::entity::{
     prelude::*,
 };
 use crate::error::HentaiError;
+use crate::history::reading_history_retention_cutoff_ms;
 
 use super::dto::{
-    ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
+    ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto, now_ms,
 };
 use super::filter_predicate;
 use super::grouping::ComicGrouping;
@@ -514,8 +516,10 @@ async fn load_last_read_times(
     if comic_ids.is_empty() {
         return Ok(HashMap::new());
     }
+    let cutoff = reading_history_retention_cutoff_ms(now_ms());
     let rows = ComicReadingHistories::find()
         .filter(Expr::col(comic_reading_histories::Column::ComicId).is_in(comic_ids.to_vec()))
+        .filter(comic_reading_histories::Column::LastReadTime.gte(cutoff))
         .all(db)
         .await
         .map_err(map_db_err)?;

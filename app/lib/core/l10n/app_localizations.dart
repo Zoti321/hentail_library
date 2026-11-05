@@ -773,7 +773,7 @@ abstract class AppLocalizations {
   /// No description provided for @historyRecordSummary.
   ///
   /// In zh, this message translates to:
-  /// **'{count, plural, other{{count} 条记录 • 最长保留 30 天}}'**
+  /// **'{count, plural, other{{count} 条记录 • 最长保留 1 年}}'**
   String historyRecordSummary(int count);
 
   /// No description provided for @historySectionToday.

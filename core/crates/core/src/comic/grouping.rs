@@ -34,10 +34,10 @@ impl ComicGrouping {
     }
 
     /// 额外的关联（JOIN）片段；`None` 时仅由排序字段决定是否需要 JOIN。
-    pub fn join_clause(self, sort_field: ComicSortFieldDto) -> &'static str {
+    pub fn join_clause(self, sort_field: ComicSortFieldDto, retention_cutoff_ms: i64) -> String {
         match self {
-            Self::None => sort_field_join_clause(sort_field),
-            Self::BySeries => SERIES_JOIN_CLAUSE,
+            Self::None => sort_field_join_clause(sort_field, retention_cutoff_ms),
+            Self::BySeries => SERIES_JOIN_CLAUSE.to_string(),
         }
     }
 
@@ -55,12 +55,13 @@ impl ComicGrouping {
     }
 }
 
-fn sort_field_join_clause(field: ComicSortFieldDto) -> &'static str {
+fn sort_field_join_clause(field: ComicSortFieldDto, retention_cutoff_ms: i64) -> String {
     match field {
-        ComicSortFieldDto::ReadAt => {
-            " LEFT JOIN comic_reading_histories rh ON rh.comic_id = c.comic_id"
-        }
-        _ => "",
+        ComicSortFieldDto::ReadAt => format!(
+            " LEFT JOIN comic_reading_histories rh ON rh.comic_id = c.comic_id \
+             AND rh.last_read_time >= {retention_cutoff_ms}"
+        ),
+        _ => String::new(),
     }
 }
 

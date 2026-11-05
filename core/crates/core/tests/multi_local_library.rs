@@ -10,7 +10,7 @@ use hentai_core::ComicGrouping;
 use hentai_core::{
     comic_id_from_path, connection, create_local_library, delete_library, fetch_comics_page,
     find_comic_by_id, get_current_library_id, get_reading_by_comic_id, init_db_at_path,
-    library_id_from_root, list_libraries, record_reading, set_current_library_id, sync_library,
+    library_id_from_root, list_libraries, now_ms, record_reading, set_current_library_id, sync_library,
     update_library_resource_format_categories, ComicFilterDto, PageRequestDto, ReadingHistoryDto,
     SyncScanMode,
 };
@@ -280,7 +280,7 @@ fn delete_library_clears_only_that_library_comics_and_series() {
             record_reading(&ReadingHistoryDto {
                 comic_id: id_b.clone(),
                 title: "keep".into(),
-                last_read_time_ms: 100,
+                last_read_time_ms: now_ms(),
                 page_index: Some(0),
                 page_count: None,
             })

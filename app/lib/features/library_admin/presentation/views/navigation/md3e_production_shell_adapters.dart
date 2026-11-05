@@ -71,7 +71,7 @@ String productionMd3eSelectedNavId({
   final String flatNavId = AppNavigation.activeNavIdForPath(path);
   if (flatNavId == AppNavigation.navIdHistory ||
       flatNavId == AppNavigation.navIdTrash) {
-    return AppNavigation.navIdHome;
+    return '';
   }
   if (flatNavId.isNotEmpty) {
     return flatNavId;

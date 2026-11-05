@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_progress.dart';
-import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item_cover.dart';
 import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 
@@ -33,7 +33,7 @@ class HistoryListItem extends ConsumerWidget {
 
     return Md3eReadingHistoryListItem(
       title: item.title,
-      cover: HistoryListItemCover(comicId: item.comicId),
+      cover: ComicCoverContent(comicId: item.comicId),
       currentPage: currentPage,
       totalPages: totalPages,
       lastReadTime: item.lastReadTime,

@@ -1,8 +1,9 @@
 use sea_orm::Value;
 
-use super::dto::{ComicFilterDto, ComicSortOptionDto};
+use super::dto::{ComicFilterDto, ComicSortOptionDto, now_ms};
 use super::filter_predicate::build_catalog_where_clause;
 use super::grouping::ComicGrouping;
+use crate::history::reading_history_retention_cutoff_ms;
 
 pub struct PageSqlQuery {
     pub sql: String,
@@ -30,7 +31,8 @@ pub fn build_ids_page_query(
 ) -> PageSqlQuery {
     let mut values = Vec::new();
     let where_clause = build_catalog_where_clause(filter, &mut values);
-    let join_clause = grouping.join_clause(sort.field);
+    let retention_cutoff_ms = reading_history_retention_cutoff_ms(now_ms());
+    let join_clause = grouping.join_clause(sort.field, retention_cutoff_ms);
     let order_by = grouping.order_by(sort, library_root_path, &mut values);
     values.push(Value::Int(Some(limit)));
     values.push(Value::Int(Some(offset)));
@@ -61,6 +63,7 @@ mod tests {
             0,
         );
         assert!(sql.sql.contains("LEFT JOIN comic_reading_histories rh"));
+        assert!(sql.sql.contains("rh.last_read_time >="));
         assert!(sql
             .sql
             .contains("ORDER BY rh.last_read_time DESC NULLS LAST"));

@@ -7,6 +7,7 @@ use crate::comic::visibility::{
 };
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
+use crate::history::reading_history_retention_cutoff_ms;
 use crate::library::ScanInterval;
 
 #[derive(Debug, Clone, Default)]
@@ -99,7 +100,7 @@ fn counts_sql(exclude_r18: bool) -> String {
     )
 }
 
-fn continue_reading_sql(exclude_r18: bool) -> String {
+fn continue_reading_sql(exclude_r18: bool, retention_cutoff_ms: i64) -> String {
     let (rating_join, rating_filter) = if exclude_r18 {
         (
             "INNER JOIN comic_meta cm ON cm.comic_id = h.comic_id",
@@ -111,7 +112,7 @@ fn continue_reading_sql(exclude_r18: bool) -> String {
     format!(
         "SELECT h.last_read_time, h.comic_id, h.title, h.page_index \
          FROM comic_reading_histories h {rating_join} \
-         WHERE {rating_filter}{} \
+         WHERE {rating_filter}h.last_read_time >= {retention_cutoff_ms} AND {} \
          ORDER BY h.last_read_time DESC \
          LIMIT 5",
         comic_id_not_trashed_sql("h.comic_id")
@@ -246,7 +247,7 @@ async fn load_continue_reading(
 ) -> Result<Vec<HomeContinueReadingDto>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         db.get_database_backend(),
-        continue_reading_sql(exclude_r18),
+        continue_reading_sql(exclude_r18, reading_history_retention_cutoff_ms(now_ms())),
         r18_values(exclude_r18, 1),
     );
     let rows = db.query_all(stmt).await.map_err(map_db_err)?;

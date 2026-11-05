@@ -7,7 +7,7 @@ use hentai_core::{
     find_series_thumbnail_by_series_id, get_reading_by_comic_id, init_db_at_path, list_libraries,
     record_reading, series_id_from_folder_path, try_acquire_library_write_lock,
     update_comic_user_meta, update_local_library_root, update_series_item_sort_order,
-    update_series_user_meta, ReadingHistoryDto, UpdateComicUserMetaDto, UpdateSeriesUserMetaDto,
+    update_series_user_meta, now_ms, ReadingHistoryDto, UpdateComicUserMetaDto, UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -157,10 +157,11 @@ fn update_local_library_root_remaps_comics_series_and_user_state_when_readable()
             )
             .await
             .expect("update meta");
+            let read_at = now_ms();
             record_reading(&ReadingHistoryDto {
                 comic_id: old_comic_id.clone(),
                 title: "用户标题".to_string(),
-                last_read_time_ms: 42,
+                last_read_time_ms: read_at,
                 page_index: Some(3),
                 page_count: None,
             })
@@ -243,7 +244,7 @@ fn update_local_library_root_remaps_comics_series_and_user_state_when_readable()
                 .await
                 .expect("reading")
                 .expect("migrated reading");
-            assert_eq!(reading.last_read_time_ms, 42);
+            assert_eq!(reading.last_read_time_ms, read_at);
             assert_eq!(reading.page_index, Some(3));
 
             assert!(find_series_by_id(&old_series_id).await.expect("old series").is_none());

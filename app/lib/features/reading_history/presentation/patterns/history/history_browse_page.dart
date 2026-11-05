@@ -17,6 +17,7 @@ class HistoryBrowsePage<T> extends StatefulWidget {
     required this.itemBuilder,
     this.onClearAll,
     this.onOpenNavigation,
+    this.onBack,
     this.scrollController,
     this.clock,
     this.searchField,
@@ -31,6 +32,7 @@ class HistoryBrowsePage<T> extends StatefulWidget {
   final Widget Function(BuildContext context, T item) itemBuilder;
   final VoidCallback? onClearAll;
   final VoidCallback? onOpenNavigation;
+  final VoidCallback? onBack;
   final ScrollController? scrollController;
   final DateTime? clock;
   final Widget? searchField;
@@ -93,6 +95,7 @@ class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
       clearEnabled: widget.totalCount > 0,
       onClearAll: widget.onClearAll,
       onOpenNavigation: widget.onOpenNavigation,
+      onBack: widget.onBack,
     );
 
     final Widget scrollView = CustomScrollView(

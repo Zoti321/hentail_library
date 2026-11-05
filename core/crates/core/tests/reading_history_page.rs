@@ -4,7 +4,7 @@ use std::path::Path;
 
 use hentai_core::{
     connection, fetch_reading_page, get_reading_by_comic_id, init_db_at_path,
-    list_read_page_indexes, record_reading, PageRequestDto, ReadingHistoryDto,
+    list_read_page_indexes, now_ms, record_reading, PageRequestDto, ReadingHistoryDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -35,17 +35,18 @@ fn create_db(dir: &Path) {
 }
 
 async fn seed_histories() {
-    for (comic_id, title, last_read_time_ms) in [
-        ("c1", "Alpha Comic", 5_000_i64),
-        ("c2", "Beta Story", 4_000_i64),
+    let now = now_ms();
+    for (comic_id, title, age_ms) in [
+        ("c1", "Alpha Comic", 1_000_i64),
+        ("c2", "Beta Story", 2_000_i64),
         ("c3", "Gamma alpha", 3_000_i64),
-        ("c4", "Delta", 2_000_i64),
-        ("c5", "Epsilon", 1_000_i64),
+        ("c4", "Delta", 4_000_i64),
+        ("c5", "Epsilon", 5_000_i64),
     ] {
         record_reading(&ReadingHistoryDto {
             comic_id: comic_id.to_string(),
             title: title.to_string(),
-            last_read_time_ms,
+            last_read_time_ms: now - age_ms,
             page_index: Some(1),
             page_count: None,
         })
@@ -195,10 +196,11 @@ fn record_reading_decodes_html_entities_in_title() {
         create_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
+            let read_at = now_ms();
             record_reading(&ReadingHistoryDto {
                 comic_id: "entity-comic".to_string(),
                 title: "Heaven&#039;s Feel".to_string(),
-                last_read_time_ms: 9_000,
+                last_read_time_ms: read_at,
                 page_index: Some(2),
                 page_count: None,
             })
@@ -225,7 +227,7 @@ fn list_read_page_indexes_returns_comic_id_and_page_index_only() {
             record_reading(&ReadingHistoryDto {
                 comic_id: "no-page".to_string(),
                 title: "No Page".to_string(),
-                last_read_time_ms: 100,
+                last_read_time_ms: now_ms(),
                 page_index: None,
                 page_count: None,
             })

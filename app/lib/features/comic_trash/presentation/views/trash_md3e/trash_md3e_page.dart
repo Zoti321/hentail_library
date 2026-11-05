@@ -10,6 +10,7 @@ import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3
 import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/widgets/trash_md3e_list_item.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
@@ -53,6 +54,7 @@ class TrashMd3ePage extends ConsumerWidget {
                 layout: layout,
                 child: _TrashHeader(
                   onOpenNavigation: appShellPageNavigationOpener(context),
+                  onBack: () => md3ePopOrGoHome(context),
                 ),
               ),
             ),
@@ -164,9 +166,10 @@ List<Widget> _trashBodySlivers(
 }
 
 class _TrashHeader extends ConsumerWidget {
-  const _TrashHeader({this.onOpenNavigation});
+  const _TrashHeader({this.onOpenNavigation, this.onBack});
 
   final VoidCallback? onOpenNavigation;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -183,6 +186,10 @@ class _TrashHeader extends ConsumerWidget {
     return Md3ePinnedToolbarChrome(
       child: Row(
         children: <Widget>[
+          if (onBack != null) ...<Widget>[
+            Md3ePageHeaderBackButton(onPressed: onBack!),
+            const SizedBox(width: 4),
+          ],
           if (onOpenNavigation != null) ...<Widget>[
             M3EIconButton(
               icon: const Icon(Symbols.menu),

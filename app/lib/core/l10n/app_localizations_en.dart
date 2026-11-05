@@ -410,8 +410,8 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count entries · kept for 30 days max',
-      one: '1 entry · kept for 30 days max',
+      other: '$count entries · kept for up to 1 year',
+      one: '1 entry · kept for up to 1 year',
     );
     return '$_temp0';
   }

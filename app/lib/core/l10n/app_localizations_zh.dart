@@ -399,7 +399,7 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count 条记录 • 最长保留 30 天',
+      other: '$count 条记录 • 最长保留 1 年',
     );
     return '$_temp0';
   }

@@ -10,6 +10,9 @@ abstract final class Md3eShellNavigation {
   static const int managementDestinationIndex = 2;
   static const int settingsDestinationIndex = 3;
 
+  /// [Md3eNavigationRail.selectedIndex]：无对应 Rail 目的地（如 `/history`）。
+  static const int noDestinationIndex = -1;
+
   static const double librarySecondaryPanelWidth = 280;
 }
 
@@ -48,10 +51,13 @@ int md3eShellDestinationIndexForNavId(
   List<Md3eShellRailDestination> destinations,
   String navId,
 ) {
+  if (navId.isEmpty) {
+    return Md3eShellNavigation.noDestinationIndex;
+  }
   final int index = destinations.indexWhere(
     (Md3eShellRailDestination destination) => destination.navId == navId,
   );
-  return index >= 0 ? index : 0;
+  return index >= 0 ? index : Md3eShellNavigation.noDestinationIndex;
 }
 
 String md3eShellNavIdForDestinationIndex(

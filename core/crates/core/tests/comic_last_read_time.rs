@@ -1,7 +1,7 @@
 mod common;
 
 use hentai_core::{
-    connection, find_comic_by_id, init_db_at_path, record_reading, ReadingHistoryDto,
+    connection, find_comic_by_id, init_db_at_path, now_ms, record_reading, ReadingHistoryDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -45,10 +45,11 @@ fn find_comic_by_id_includes_last_read_time_when_history_exists() {
         seed_comic("unread-comic");
 
         runtime.block_on(async {
+            let read_at = now_ms();
             record_reading(&ReadingHistoryDto {
                 comic_id: "read-comic".to_string(),
                 title: "Title read-comic".to_string(),
-                last_read_time_ms: 9_000,
+                last_read_time_ms: read_at,
                 page_index: Some(2),
                 page_count: None,
             })
@@ -59,7 +60,7 @@ fn find_comic_by_id_includes_last_read_time_when_history_exists() {
                 .await
                 .expect("find read")
                 .expect("read comic present");
-            assert_eq!(read.last_read_time_ms, Some(9_000));
+            assert_eq!(read.last_read_time_ms, Some(read_at));
 
             let unread = find_comic_by_id("unread-comic")
                 .await

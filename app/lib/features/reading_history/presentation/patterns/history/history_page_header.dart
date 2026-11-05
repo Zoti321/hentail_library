@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_clear_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -18,12 +19,14 @@ class Md3eHistoryPageHeader extends StatelessWidget {
     this.clearEnabled = true,
     this.onClearAll,
     this.onOpenNavigation,
+    this.onBack,
   });
 
   final String? title;
   final bool clearEnabled;
   final VoidCallback? onClearAll;
   final VoidCallback? onOpenNavigation;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +39,7 @@ class Md3eHistoryPageHeader extends StatelessWidget {
       clearEnabled: clearEnabled,
       onClearAll: onClearAll,
       onOpenNavigation: onOpenNavigation,
+      onBack: onBack,
     );
   }
 }
@@ -47,6 +51,7 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
     required this.clearEnabled,
     this.onClearAll,
     this.onOpenNavigation,
+    this.onBack,
   });
 
   final String? title;
@@ -54,6 +59,7 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
   final bool clearEnabled;
   final VoidCallback? onClearAll;
   final VoidCallback? onOpenNavigation;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +73,10 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          if (onBack != null) ...<Widget>[
+            Md3ePageHeaderBackButton(onPressed: onBack!),
+            const SizedBox(width: 4),
+          ],
           if (showMenu) ...<Widget>[
             M3EIconButton(
               icon: Icon(

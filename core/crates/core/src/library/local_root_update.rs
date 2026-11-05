@@ -9,10 +9,12 @@ use sea_orm::{
 };
 
 use crate::comic::ComicDto;
+use crate::comic::now_ms;
 use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::entity::{libraries, prelude::*};
 use crate::error::HentaiError;
+use crate::history::reading_history_retention_cutoff_ms;
 use crate::library::dto::{model_to_dto, LibraryDto, KIND_LOCAL};
 use crate::library_write::with_library_write;
 use crate::path_migration::{
@@ -303,16 +305,18 @@ async fn load_last_read_times_for_comics<C: ConnectionTrait>(
         return Ok(HashMap::new());
     }
     let placeholders = comic_ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
-    let values: Vec<sea_orm::Value> = comic_ids
+    let cutoff = reading_history_retention_cutoff_ms(now_ms());
+    let mut values: Vec<sea_orm::Value> = comic_ids
         .iter()
         .map(|id| sea_orm::Value::String(Some(Box::new(id.clone()))))
         .collect();
+    values.push(sea_orm::Value::BigInt(Some(cutoff)));
     let rows = db
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             format!(
                 "SELECT comic_id, last_read_time FROM comic_reading_histories \
-                 WHERE comic_id IN ({placeholders})"
+                 WHERE comic_id IN ({placeholders}) AND last_read_time >= ?"
             ),
             values,
         ))
