@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail_icon.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'package:hentai_library/shared/ui/shell/shell_navigation.dart'
@@ -16,8 +17,8 @@ class Md3eNavigationRailDestination {
   const Md3eNavigationRailDestination({
     required this.label,
     required this.icon,
-    required this.selectedIcon,
-  });
+    IconData? selectedIcon,
+  }) : selectedIcon = selectedIcon ?? icon;
 
   final String label;
   final IconData icon;
@@ -71,8 +72,16 @@ class Md3eNavigationRail extends StatelessWidget {
             for (final Md3eNavigationRailDestination destination
                 in destinations)
               M3ENavigationRailDestination(
-                icon: Icon(destination.icon),
-                selectedIcon: Icon(destination.selectedIcon),
+                icon: md3eNavigationRailIconWidget(
+                  icon: destination.icon,
+                  selectedIcon: destination.selectedIcon,
+                  selected: false,
+                ),
+                selectedIcon: md3eNavigationRailIconWidget(
+                  icon: destination.icon,
+                  selectedIcon: destination.selectedIcon,
+                  selected: true,
+                ),
                 label: destination.label,
               ),
           ],

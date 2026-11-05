@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail_icon.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// list-detail 左侧导航项（胶囊形），与设置页宽屏 rail 同款视觉。
@@ -43,7 +44,12 @@ class Md3eListDetailNavItem extends StatelessWidget {
             children: <Widget>[
               const SizedBox(width: 16),
               if (icon != null) ...<Widget>[
-                Icon(icon, size: 24, color: foreground),
+                md3eNavigationRailIconWidget(
+                  icon: icon!,
+                  selected: selected,
+                  size: 24,
+                  color: foreground,
+                ),
                 const SizedBox(width: 12),
               ],
               Expanded(

@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+/// Shell [Md3eNavigationRail] 主目的地图标（Material Symbols；选中态由 fill=1 呈现）。
+abstract final class Md3eShellRailSymbols {
+  static const IconData home = Symbols.home;
+  static const IconData library = Symbols.auto_stories;
+  static const IconData metadata = Symbols.layers;
+  static const IconData settings = Symbols.settings;
+}
 
 /// Primary shell destination indices for the **Lab default** rail
 /// ([md3eLabDefaultShellRailDestinations]).
@@ -22,9 +31,9 @@ class Md3eShellRailDestination {
     required this.navId,
     required this.label,
     required this.icon,
-    required this.selectedIcon,
+    IconData? selectedIcon,
     this.isLibraryFlyoutAnchor = false,
-  });
+  }) : selectedIcon = selectedIcon ?? icon;
 
   final String navId;
   final String label;
@@ -121,27 +130,23 @@ List<Md3eShellRailDestination> md3eLabDefaultShellRailDestinations(
     Md3eShellRailDestination(
       navId: 'home',
       label: l10n.navHome,
-      icon: Icons.home_outlined,
-      selectedIcon: Icons.home,
+      icon: Md3eShellRailSymbols.home,
     ),
     Md3eShellRailDestination(
       navId: 'library',
       label: l10n.libraryTitle,
-      icon: Icons.auto_stories_outlined,
-      selectedIcon: Icons.auto_stories,
+      icon: Md3eShellRailSymbols.library,
       isLibraryFlyoutAnchor: true,
     ),
     Md3eShellRailDestination(
       navId: 'metadata',
       label: l10n.navMetadata,
-      icon: Icons.layers_outlined,
-      selectedIcon: Icons.layers,
+      icon: Md3eShellRailSymbols.metadata,
     ),
     Md3eShellRailDestination(
       navId: 'settings',
       label: l10n.navSettings,
-      icon: Icons.settings_outlined,
-      selectedIcon: Icons.settings,
+      icon: Md3eShellRailSymbols.settings,
     ),
   ];
 }

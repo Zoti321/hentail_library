@@ -5,7 +5,6 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/library/home_library_stat.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 List<Md3eShellRailDestination> productionMd3eShellRailDestinations(
   AppLocalizations l10n,
@@ -14,27 +13,23 @@ List<Md3eShellRailDestination> productionMd3eShellRailDestinations(
     Md3eShellRailDestination(
       navId: AppNavigation.navIdHome,
       label: l10n.navHome,
-      icon: LucideIcons.house,
-      selectedIcon: LucideIcons.house,
+      icon: Md3eShellRailSymbols.home,
     ),
     Md3eShellRailDestination(
       navId: AppNavigation.navIdLibrary,
       label: l10n.libraryTitle,
-      icon: LucideIcons.library,
-      selectedIcon: LucideIcons.library,
+      icon: Md3eShellRailSymbols.library,
       isLibraryFlyoutAnchor: true,
     ),
     Md3eShellRailDestination(
       navId: AppNavigation.navIdMetadata,
       label: l10n.navMetadata,
-      icon: LucideIcons.layers,
-      selectedIcon: LucideIcons.layers,
+      icon: Md3eShellRailSymbols.metadata,
     ),
     Md3eShellRailDestination(
       navId: AppNavigation.navIdSettings,
       label: l10n.navSettings,
-      icon: LucideIcons.settings,
-      selectedIcon: LucideIcons.settings,
+      icon: Md3eShellRailSymbols.settings,
     ),
   ];
 }
