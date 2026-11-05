@@ -152,19 +152,16 @@ void main() {
     );
 
     test(
-      'browse library scope change flushes inactive catalog revision immediately',
+      'browse library scope change bumps catalog revision for both tabs',
       () {
-        container.read(browseLibraryIdProvider.notifier).setId('lib-a');
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
         expect(
           container.read(
-            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.series),
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
           ),
           0,
         );
 
-        container.read(browseLibraryIdProvider.notifier).setId('lib-b');
-
+        container.read(browseLibraryIdProvider.notifier).setId('lib-a');
         expect(
           container.read(
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
@@ -176,6 +173,29 @@ void main() {
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.series),
           ),
           1,
+        );
+
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          1,
+        );
+
+        container.read(browseLibraryIdProvider.notifier).setId('lib-b');
+
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          2,
+        );
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.series),
+          ),
+          2,
         );
       },
     );

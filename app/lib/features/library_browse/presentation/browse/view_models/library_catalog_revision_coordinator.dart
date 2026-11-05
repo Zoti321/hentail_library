@@ -93,10 +93,10 @@ class LibraryCatalogRevisionCoordinator
     });
 
     ref.listen<String?>(browseLibraryIdProvider, (String? previous, String? next) {
-      if (previous == null || previous == next) {
+      if (previous == next) {
         return;
       }
-      _runAfterBuild(_flushInactiveRevision);
+      _runAfterBuild(_onBrowseLibraryScopeChanged);
     });
 
     final int revision = ref.read(libraryRevisionStateProvider).revision;
@@ -172,6 +172,17 @@ class LibraryCatalogRevisionCoordinator
       return;
     }
     state = state.copyWith(inactiveRevision: state.activeRevision);
+  }
+
+  /// 路由注入 browse 库 id（含 null→有值）时强制两侧 catalog 重载。
+  void _onBrowseLibraryScopeChanged() {
+    _inactiveRefreshTimer?.cancel();
+    _inactiveRefreshTimer = null;
+    final int bumped = state.activeRevision + 1;
+    state = state.copyWith(
+      activeRevision: bumped,
+      inactiveRevision: bumped,
+    );
   }
 }
 

@@ -49,6 +49,19 @@ void main() {
     });
   });
 
+  group('librariesSidebarSelectedLibraryId', () {
+    test('home path does not pre-select a library', () {
+      expect(librariesSidebarSelectedLibraryId(path: '/home'), '');
+    });
+
+    test('library browse path selects that library', () {
+      expect(
+        librariesSidebarSelectedLibraryId(path: '/libraries/lib-a'),
+        'lib-a',
+      );
+    });
+  });
+
   group('afterLibraryDeleteNavigation', () {
     test('goes to all when no libraries remain', () {
       expect(

@@ -109,13 +109,15 @@ class LibraryBrowsePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(() {
-      if (libraryId.isEmpty) {
-        ref.read(browseLibraryIdProvider.notifier).setId(null);
-      } else {
-        ref.read(browseLibraryIdProvider.notifier).setId(libraryId);
-      }
+      final String? scopedId =
+          libraryId.isEmpty ? null : libraryId;
+      Future<void>.microtask(() {
+        ref.read(browseLibraryIdProvider.notifier).setId(scopedId);
+      });
       return () {
-        ref.read(browseLibraryIdProvider.notifier).setId(null);
+        Future<void>.microtask(() {
+          ref.read(browseLibraryIdProvider.notifier).setId(null);
+        });
       };
     }, <Object?>[libraryId]);
 

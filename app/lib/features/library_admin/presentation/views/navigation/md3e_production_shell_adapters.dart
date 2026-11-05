@@ -86,15 +86,5 @@ String productionMd3eSelectedLibraryId({
   required String path,
   required List<Md3eHomeLibraryDashboardRow> libraries,
 }) {
-  final LibrariesSidebarSelection selection = librariesSidebarSelection(
-    path: path,
-  );
-  final String? activeId = selection.activeLibraryId;
-  if (activeId != null && activeId.isNotEmpty) {
-    return activeId;
-  }
-  if (libraries.isEmpty) {
-    return '';
-  }
-  return libraries.first.libraryId;
+  return librariesSidebarSelectedLibraryId(path: path);
 }
