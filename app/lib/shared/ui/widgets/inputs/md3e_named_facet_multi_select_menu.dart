@@ -58,8 +58,9 @@ class _Md3eNamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<T>> asyncItems = ref.watch(itemsProvider);
     final double panelMaxHeight = _md3eNamedFacetMenuPanelMaxHeight(context);
-    final double bodyMinHeight =
-        _md3eNamedFacetMenuBodyMinHeight(panelMaxHeight);
+    final double bodyMinHeight = _md3eNamedFacetMenuBodyMinHeight(
+      panelMaxHeight,
+    );
     return asyncItems.when(
       loading: () {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -104,9 +105,8 @@ class _Md3eNamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
                     Text(
                       copy.listLoadFailed,
                       textAlign: TextAlign.center,
-                      style: M3ETheme.of(context).typeScale.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: M3ETheme.of(context).typeScale.bodyMedium
+                          .copyWith(fontWeight: FontWeight.w600),
                     ),
                     SizedBox(height: M3ETheme.of(context).spacing.sm),
                     M3EButton(
@@ -229,8 +229,9 @@ class _Md3eNamedFacetMenuList<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final double panelMaxHeight = _md3eNamedFacetMenuPanelMaxHeight(context);
-    final double bodyMinHeight =
-        _md3eNamedFacetMenuBodyMinHeight(panelMaxHeight);
+    final double bodyMinHeight = _md3eNamedFacetMenuBodyMinHeight(
+      panelMaxHeight,
+    );
 
     return _Md3eNamedFacetMenuShell(
       width: width,
@@ -255,31 +256,33 @@ class _Md3eNamedFacetMenuList<T> extends StatelessWidget {
             )
           : ValueListenableBuilder<int?>(
               valueListenable: highlightedIndexListenable,
-              builder: (BuildContext context, int? highlightedIndex, Widget? _) {
-                return ListView.separated(
-                  controller: scrollController,
-                  padding: EdgeInsets.all(theme.spacing.sm),
-                  shrinkWrap: true,
-                  itemCount: items.length,
-                  separatorBuilder: (_, _) => SizedBox(height: theme.spacing.xs),
-                  itemBuilder: (BuildContext context, int index) {
-                    final T item = items[index];
-                    final String name = resolveName(item);
-                    final bool highlighted = highlightedIndex == index;
-                    final bool smartMatched =
-                        resolveSmartMatched?.call(item) ?? false;
-                    return _Md3eNamedFacetMenuRow(
-                      key: highlighted ? highlightedRowKey : null,
-                      displayName: name,
-                      isHighlighted: highlighted,
-                      smartMatched: smartMatched,
-                      smartMatchedTooltip: smartMatchedTooltip,
-                      onSelect: () => onAdd(name),
-                      onHover: () => onHighlightIndex(index),
+              builder:
+                  (BuildContext context, int? highlightedIndex, Widget? _) {
+                    return ListView.separated(
+                      controller: scrollController,
+                      padding: EdgeInsets.all(theme.spacing.sm),
+                      shrinkWrap: true,
+                      itemCount: items.length,
+                      separatorBuilder: (_, _) =>
+                          SizedBox(height: theme.spacing.xs),
+                      itemBuilder: (BuildContext context, int index) {
+                        final T item = items[index];
+                        final String name = resolveName(item);
+                        final bool highlighted = highlightedIndex == index;
+                        final bool smartMatched =
+                            resolveSmartMatched?.call(item) ?? false;
+                        return _Md3eNamedFacetMenuRow(
+                          key: highlighted ? highlightedRowKey : null,
+                          displayName: name,
+                          isHighlighted: highlighted,
+                          smartMatched: smartMatched,
+                          smartMatchedTooltip: smartMatchedTooltip,
+                          onSelect: () => onAdd(name),
+                          onHover: () => onHighlightIndex(index),
+                        );
+                      },
                     );
                   },
-                );
-              },
             ),
     );
   }

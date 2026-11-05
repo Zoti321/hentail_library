@@ -30,6 +30,9 @@ ComicMetadataSmartFacetScope labComicMetadataSmartFacetScope({
   );
 }
 
-SmartFacetMatchCandidate facetCandidate(String name, {bool smartMatched = false}) {
+SmartFacetMatchCandidate facetCandidate(
+  String name, {
+  bool smartMatched = false,
+}) {
   return (name: name, attachmentCount: 0, smartMatched: smartMatched);
 }

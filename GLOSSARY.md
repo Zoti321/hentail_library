@@ -169,7 +169,7 @@ Library browse preference：Series 浏览列表中，开启时若 Library root s
 _Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
 
 **Group by series**（按系列分组）:
-Library browse preference（分组方式 `bySeries`）：Comics 浏览列表保持扁平（无分组标题、无折叠），按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」排序；分组开启时忽略 Comics 排序字段。默认开启；不是视觉分组或折叠，也不共用 Prefer library root series 开关。
+Library browse preference（分组方式 `bySeries`）：Comics 浏览列表保持扁平（无分组标题、无折叠），按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 无 Series 归属的 Comic 整块垫底」决定系列块顺序；**块内仍按当前 Comics 排序字段**排列。默认开启；与排序正交，不是视觉分组或折叠，也不共用 Prefer library root series 开关。
 _Avoid_: 按系列展开、expand by series、按系列折叠、系列模式列表
 
 **App preference**:

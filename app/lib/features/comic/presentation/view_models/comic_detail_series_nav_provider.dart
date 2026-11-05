@@ -8,6 +8,8 @@ import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dar
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_detail_series_nav_provider.g.dart';
+
+class ComicDetailSeriesNavItem {
   const ComicDetailSeriesNavItem({
     required this.displayIndex,
     required this.comicId,

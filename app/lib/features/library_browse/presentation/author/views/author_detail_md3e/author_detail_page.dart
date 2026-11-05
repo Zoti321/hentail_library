@@ -77,10 +77,7 @@ class _Md3eAuthorDetailPageState extends State<Md3eAuthorDetailPage> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
               SliverToBoxAdapter(
-                child: Md3ePageHeaderChrome(
-                  layout: layout,
-                  child: header,
-                ),
+                child: Md3ePageHeaderChrome(layout: layout, child: header),
               ),
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(

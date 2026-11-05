@@ -11,13 +11,13 @@ import 'package:riverpod/misc.dart' show Override, ProviderListenable;
 import '../../../../support/pump_md3e_app.dart';
 
 final _testItemsProvider = Provider<AsyncValue<List<SmartFacetMatchCandidate>>>(
-  (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(<
-    SmartFacetMatchCandidate
-  >[
-    (name: '深海', attachmentCount: 2, smartMatched: true),
-    (name: '图书馆', attachmentCount: 5, smartMatched: false),
-    (name: 'Python', attachmentCount: 1, smartMatched: false),
-  ]),
+  (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
+    <SmartFacetMatchCandidate>[
+      (name: '深海', attachmentCount: 2, smartMatched: true),
+      (name: '图书馆', attachmentCount: 5, smartMatched: false),
+      (name: 'Python', attachmentCount: 1, smartMatched: false),
+    ],
+  ),
 );
 
 void main() {
@@ -30,13 +30,13 @@ void main() {
       tester,
       overrides: <Override>[
         _testItemsProvider.overrideWith(
-          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(<
-            SmartFacetMatchCandidate
-          >[
-            (name: '深海', attachmentCount: 2, smartMatched: true),
-            (name: '图书馆', attachmentCount: 5, smartMatched: false),
-            (name: 'Python', attachmentCount: 1, smartMatched: false),
-          ]),
+          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
+            <SmartFacetMatchCandidate>[
+              (name: '深海', attachmentCount: 2, smartMatched: true),
+              (name: '图书馆', attachmentCount: 5, smartMatched: false),
+              (name: 'Python', attachmentCount: 1, smartMatched: false),
+            ],
+          ),
         ),
       ],
       home: Center(
@@ -88,11 +88,11 @@ void main() {
       tester,
       overrides: <Override>[
         _testItemsProvider.overrideWith(
-          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(<
-            SmartFacetMatchCandidate
-          >[
-            (name: '深海', attachmentCount: 2, smartMatched: true),
-          ]),
+          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
+            <SmartFacetMatchCandidate>[
+              (name: '深海', attachmentCount: 2, smartMatched: true),
+            ],
+          ),
         ),
       ],
       home: Center(
@@ -129,13 +129,13 @@ void main() {
       tester,
       overrides: <Override>[
         _testItemsProvider.overrideWith(
-          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(<
-            SmartFacetMatchCandidate
-          >[
-            (name: '深海', attachmentCount: 2, smartMatched: true),
-            (name: '图书馆', attachmentCount: 5, smartMatched: false),
-            (name: 'Python', attachmentCount: 1, smartMatched: false),
-          ]),
+          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
+            <SmartFacetMatchCandidate>[
+              (name: '深海', attachmentCount: 2, smartMatched: true),
+              (name: '图书馆', attachmentCount: 5, smartMatched: false),
+              (name: 'Python', attachmentCount: 1, smartMatched: false),
+            ],
+          ),
         ),
       ],
       home: Center(
@@ -294,9 +294,7 @@ void main() {
 }
 
 class _Md3eNamedFacetMultiSelectTestHarness extends StatefulWidget {
-  const _Md3eNamedFacetMultiSelectTestHarness({
-    required this.initialSelected,
-  });
+  const _Md3eNamedFacetMultiSelectTestHarness({required this.initialSelected});
 
   final List<String> initialSelected;
 

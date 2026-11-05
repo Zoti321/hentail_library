@@ -140,41 +140,41 @@ Future<void> _pumpLibraryMd3ePage(
     tester,
     home: const Scaffold(body: LibraryMd3ePage()),
     overrides: <Override>[
-        libraryPageFacadeProvider.overrideWith(
-          () => _FakeFacade(_facade(target)),
-        ),
-        libraryComicsCatalogControllerProvider.overrideWith(
-          () => _FixedComicsCatalog(
-            LibraryComicsCatalogState(
-              items: comics,
-              pagination: _onePage,
-              filterQuery: '',
-              hasReceivedFirstEmit: true,
-              isComicTableEmpty: comics.isEmpty,
-            ),
+      libraryPageFacadeProvider.overrideWith(
+        () => _FakeFacade(_facade(target)),
+      ),
+      libraryComicsCatalogControllerProvider.overrideWith(
+        () => _FixedComicsCatalog(
+          LibraryComicsCatalogState(
+            items: comics,
+            pagination: _onePage,
+            filterQuery: '',
+            hasReceivedFirstEmit: true,
+            isComicTableEmpty: comics.isEmpty,
           ),
         ),
-        librarySeriesCatalogControllerProvider.overrideWith(
-          () => _FixedSeriesCatalog(
-            LibrarySeriesCatalogState(
-              items: series,
-              pagination: _onePage,
-              filterQuery: '',
-              isSeriesTableEmpty: series.isEmpty,
-            ),
+      ),
+      librarySeriesCatalogControllerProvider.overrideWith(
+        () => _FixedSeriesCatalog(
+          LibrarySeriesCatalogState(
+            items: series,
+            pagination: _onePage,
+            filterQuery: '',
+            isSeriesTableEmpty: series.isEmpty,
           ),
         ),
-        currentLibraryStateProvider.overrideWithValue(_currentLibrary),
-        libraryScanActivityStateProvider.overrideWithValue((
-          running: false,
-          scanMode: ScanMode.incremental,
-        )),
-        if (selection != null)
-          catalogSelectionProvider.overrideWith(
-            () => _FixedCatalogSelection(selection),
-          ),
-        ...coverOverrides,
-      ],
+      ),
+      currentLibraryStateProvider.overrideWithValue(_currentLibrary),
+      libraryScanActivityStateProvider.overrideWithValue((
+        running: false,
+        scanMode: ScanMode.incremental,
+      )),
+      if (selection != null)
+        catalogSelectionProvider.overrideWith(
+          () => _FixedCatalogSelection(selection),
+        ),
+      ...coverOverrides,
+    ],
   );
   await tester.pump();
   await tester.pump();

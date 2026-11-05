@@ -16,7 +16,9 @@ class ComicTrashService {
   final ComicTrashReaderSessionPort _readerSessionPort;
 
   Future<void> trashComics(Iterable<String> comicIds) async {
-    final List<String> ids = ComicTrashTargetIdsSpecification.normalize(comicIds);
+    final List<String> ids = ComicTrashTargetIdsSpecification.normalize(
+      comicIds,
+    );
     if (ids.isEmpty) {
       return;
     }
@@ -25,7 +27,9 @@ class ComicTrashService {
   }
 
   Future<void> restoreComics(Iterable<String> comicIds) async {
-    final List<String> ids = ComicTrashTargetIdsSpecification.normalize(comicIds);
+    final List<String> ids = ComicTrashTargetIdsSpecification.normalize(
+      comicIds,
+    );
     if (ids.isEmpty) {
       return;
     }
@@ -42,7 +46,9 @@ class ComicTrashService {
   }
 
   Future<ComicPurgeResult> purgeComics(Iterable<String> comicIds) async {
-    final List<String> ids = ComicTrashTargetIdsSpecification.normalize(comicIds);
+    final List<String> ids = ComicTrashTargetIdsSpecification.normalize(
+      comicIds,
+    );
     if (ids.isEmpty) {
       return (succeeded: 0, failed: 0, errorSamples: const <String>[]);
     }

@@ -98,7 +98,9 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> setReaderAutoPlayIntervalSeconds(int value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    final AppSetting newSetting = current.withReaderAutoPlayIntervalSeconds(value);
+    final AppSetting newSetting = current.withReaderAutoPlayIntervalSeconds(
+      value,
+    );
     state = AsyncData(newSetting);
     try {
       await ref.read(appSettingRepoProvider).save(newSetting);

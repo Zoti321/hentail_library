@@ -198,9 +198,8 @@ class _DialogCard extends StatelessWidget {
               ),
               Flexible(
                 child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(
-                    scrollbars: false,
-                  ),
+                  behavior: ScrollConfiguration.of(context)
+                      .copyWith(scrollbars: false),
                   child: SingleChildScrollView(
                     padding: EdgeInsets.fromLTRB(
                       spacing.lg,

@@ -95,11 +95,7 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
           SizedBox(
             width: Md3eMetadataEditFormMetrics.sideTabColumnWidth,
             child: _scrollPane(
-              _SideTabList(
-                l10n: l10n,
-                tab: _tab,
-                onSelected: _selectTab,
-              ),
+              _SideTabList(l10n: l10n, tab: _tab, onSelected: _selectTab),
             ),
           ),
           SizedBox(width: gap),

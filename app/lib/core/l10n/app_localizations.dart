@@ -1670,6 +1670,12 @@ abstract class AppLocalizations {
   /// **'筛选'**
   String get libraryFilterSection;
 
+  /// No description provided for @libraryGroupSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'分组'**
+  String get libraryGroupSection;
+
   /// No description provided for @librarySortSection.
   ///
   /// In zh, this message translates to:
@@ -1825,6 +1831,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'按系列展开'**
   String get libraryExpandBySeries;
+
+  /// No description provided for @libraryGroupBySeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'按系列分组'**
+  String get libraryGroupBySeries;
 
   /// No description provided for @librarySeriesSortName.
   ///

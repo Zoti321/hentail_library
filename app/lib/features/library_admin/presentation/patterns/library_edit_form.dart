@@ -222,10 +222,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
                   ),
                 )
               else
-                Md3eListDetailDetailTransition(
-                  switchKey: _tab,
-                  child: tabBody,
-                ),
+                Md3eListDetailDetailTransition(switchKey: _tab, child: tabBody),
             ],
           );
         }

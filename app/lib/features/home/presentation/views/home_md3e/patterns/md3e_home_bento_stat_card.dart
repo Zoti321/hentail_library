@@ -125,13 +125,12 @@ class _Md3eHomeBentoStatCardState extends State<Md3eHomeBentoStatCard> {
                 widget.caption,
                 maxLines: showValue ? 1 : 2,
                 overflow: TextOverflow.ellipsis,
-                style: (showValue ? type.bodySmall : type.titleMedium)
-                    .copyWith(
-                      color: showValue
-                          ? widget.onBackgroundColor.withValues(alpha: 0.72)
-                          : widget.onBackgroundColor.withValues(alpha: 0.92),
-                      height: showValue ? null : 1.25,
-                    ),
+                style: (showValue ? type.bodySmall : type.titleMedium).copyWith(
+                  color: showValue
+                      ? widget.onBackgroundColor.withValues(alpha: 0.72)
+                      : widget.onBackgroundColor.withValues(alpha: 0.92),
+                  height: showValue ? null : 1.25,
+                ),
               ),
           ],
         ),

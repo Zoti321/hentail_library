@@ -20,6 +20,9 @@ void main() {
     );
     expect(settings.shouldPromptForUpdate('1.0.0'), isFalse);
     expect(settings.shouldPromptForUpdate('1.0.1'), isTrue);
-    expect(settings.copyWith(autoUpdate: false).shouldPromptForUpdate('1.0.1'), isFalse);
+    expect(
+      settings.copyWith(autoUpdate: false).shouldPromptForUpdate('1.0.1'),
+      isFalse,
+    );
   });
 }

@@ -16,11 +16,7 @@ class HomePageCounts {
   final int libraryCount;
 }
 
-enum HomeLibraryAlertKind {
-  remoteUnreachable,
-  syncFailed,
-  staleSync,
-}
+enum HomeLibraryAlertKind { remoteUnreachable, syncFailed, staleSync }
 
 /// Home library alert（sync 健康摘要）。
 class HomeLibraryAlert {

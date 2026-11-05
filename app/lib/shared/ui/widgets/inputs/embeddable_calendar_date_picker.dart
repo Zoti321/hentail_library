@@ -189,8 +189,7 @@ class _Md3eEmbeddableCalendarDatePickerState
                 );
               }
 
-              final double bodyHeight =
-                  _inlinePickerBodyHeight(scopedContext);
+              final double bodyHeight = _inlinePickerBodyHeight(scopedContext);
               final Widget content = Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -204,18 +203,18 @@ class _Md3eEmbeddableCalendarDatePickerState
                     motion: Md3eMotion.spatialReveal,
                     builder:
                         (BuildContext context, double height, Widget? child) {
-                      return SizedBox(
-                        height: height,
-                        child: ClipRect(
-                          child: OverflowBox(
-                            alignment: Alignment.topCenter,
-                            minHeight: bodyHeight,
-                            maxHeight: bodyHeight,
-                            child: child,
-                          ),
-                        ),
-                      );
-                    },
+                          return SizedBox(
+                            height: height,
+                            child: ClipRect(
+                              child: OverflowBox(
+                                alignment: Alignment.topCenter,
+                                minHeight: bodyHeight,
+                                maxHeight: bodyHeight,
+                                child: child,
+                              ),
+                            ),
+                          );
+                        },
                     child: SizedBox(
                       height: bodyHeight,
                       child: switch (_mode) {
@@ -227,8 +226,7 @@ class _Md3eEmbeddableCalendarDatePickerState
                           currentDate: _currentDate,
                           onChanged: _handleDayChanged,
                           onMonthChanged: _handleMonthChanged,
-                          selectableDayPredicate:
-                              widget.selectableDayPredicate,
+                          selectableDayPredicate: widget.selectableDayPredicate,
                         ),
                         M3EDatePickerMode.year => _yearPicker(),
                       },

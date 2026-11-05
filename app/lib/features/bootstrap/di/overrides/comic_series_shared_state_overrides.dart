@@ -10,7 +10,5 @@ List<Override> comicSeriesSharedStateOverrides() => <Override>[
   comicDetailReturnSeriesPortProvider.overrideWith(
     createComicDetailReturnSeriesPort,
   ),
-  seriesReadingContextPortProvider.overrideWith(
-    createSeriesReadingContextPort,
-  ),
+  seriesReadingContextPortProvider.overrideWith(createSeriesReadingContextPort),
 ];

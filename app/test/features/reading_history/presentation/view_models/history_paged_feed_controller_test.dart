@@ -158,10 +158,10 @@ void main() {
         readingHistoryRepoProvider.overrideWith((Ref ref) => repo),
       ],
     );
-    feedSubscription = container.listen(historyPagedFeedControllerProvider, (
-      _,
-      __,
-    ) {});
+    feedSubscription = container.listen(
+      historyPagedFeedControllerProvider,
+      (_, __) {},
+    );
   });
 
   tearDown(() {

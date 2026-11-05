@@ -10,9 +10,8 @@ Future<List<NamedFacetFormCandidate>> listNamedFacetForMetadataForm(
 }) async {
   final NamedFacetFormFrbAdapter resolved =
       adapter ?? const NamedFacetFormFrbAdapter();
-  final List<rust_types.NamedFacetFormEntryFrbDto> rows = await resolved.listForForm(
-    facet,
-  );
+  final List<rust_types.NamedFacetFormEntryFrbDto> rows = await resolved
+      .listForForm(facet);
   return rows
       .map(
         (rust_types.NamedFacetFormEntryFrbDto e) => namedFacetFormCandidate(

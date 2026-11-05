@@ -202,7 +202,7 @@ const String _sortStorageKey = 'library_sort_comics';
 
 /// Comics Tab 的 Library browse preference（筛选 + 排序）唯一事实来源。
 ///
-/// 持有持久化偏好（年龄、媒体类型、标签、作者、仅待补元数据、按系列展开、排序）
+/// 持有持久化偏好（年龄、媒体类型、标签、作者、仅待补元数据、按系列分组、排序）
 /// 与会话级 include-set（语言 / parody / character）；命令方法负责写回
 /// SharedPreferences。派生 [libraryComicFilterQueryProvider] 供 Rust 查询消费。
 @Riverpod(keepAlive: true)

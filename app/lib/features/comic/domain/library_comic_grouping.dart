@@ -1,7 +1,8 @@
-/// Comics 列表分组方式：扁平列表上的排序覆盖规则（不展示分组标题、不折叠）。
+/// Comics 列表分组方式（扁平列表，无分组标题、无折叠）。
 ///
-/// 新增分组键时：在此增加枚举值，补全 [overridesSort]，并同步 Rust 侧
-/// `ComicGroupingDto` 映射（见 `comic_repository_impl.dart`）。
+/// 分组只决定系列块之间的顺序；块内仍按库浏览页当前排序字段排列。
+/// 新增分组键时：在此增加枚举值，并同步 Rust 侧 `ComicGroupingDto` 映射
+///（见 `comic_repository_impl.dart`）。
 enum LibraryComicGrouping {
   none,
   bySeries;
@@ -14,12 +15,6 @@ enum LibraryComicGrouping {
 
   static const LibraryComicGrouping defaultValue =
       LibraryComicGrouping.bySeries;
-
-  /// 分组是否覆盖用户选择的排序字段（分组时排序控件禁用）。
-  bool get overridesSort => switch (this) {
-    LibraryComicGrouping.none => false,
-    LibraryComicGrouping.bySeries => true,
-  };
 
   /// 缺失时使用 [defaultValue]；未知名称回退为 [none]。
   static LibraryComicGrouping fromStorage(String? raw) {

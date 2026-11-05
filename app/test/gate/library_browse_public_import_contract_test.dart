@@ -13,15 +13,11 @@ void main() {
 
     expect(isFeaturePublicPath('features/library_browse/public.dart'), isTrue);
     expect(
-      isFeaturePublicPath(
-        'features/comic/public/ui/comic_cover_content.dart',
-      ),
+      isFeaturePublicPath('features/comic/public/ui/comic_cover_content.dart'),
       isTrue,
     );
     expect(
-      isFeaturePublicPath(
-        'features/comic/domain/comic_lookup_repository.dart',
-      ),
+      isFeaturePublicPath('features/comic/domain/comic_lookup_repository.dart'),
       isFalse,
     );
 

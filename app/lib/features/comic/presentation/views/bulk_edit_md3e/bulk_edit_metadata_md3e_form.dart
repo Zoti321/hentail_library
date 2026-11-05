@@ -284,9 +284,7 @@ class BulkEditMetadataMd3eFormState
           Expanded(
             child: Md3eListDetailDetailTransition(
               switchKey: _tab,
-              child: _scrollPane(
-                _buildTabFieldSections(l10n, fields, spacing),
-              ),
+              child: _scrollPane(_buildTabFieldSections(l10n, fields, spacing)),
             ),
           ),
         ],
@@ -511,8 +509,9 @@ class BulkEditMetadataMd3eFormState
       BulkMetadataEditFieldKind.authors => l10n.metadataAddAuthor,
       BulkMetadataEditFieldKind.parodies => l10n.metadataAddParody,
       BulkMetadataEditFieldKind.characters => l10n.metadataAddCharacter,
-      BulkMetadataEditFieldKind.languages =>
-        l10n.comicLanguageLabel(ComicLanguageNames.other),
+      BulkMetadataEditFieldKind.languages => l10n.comicLanguageLabel(
+        ComicLanguageNames.other,
+      ),
       BulkMetadataEditFieldKind.description ||
       BulkMetadataEditFieldKind.publishedAt ||
       BulkMetadataEditFieldKind.contentRating => l10n.metadataAdd,

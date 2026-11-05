@@ -5,7 +5,7 @@ void main() {
   test('public barrel exports ports, factories, pages, cover UI, and bootstrap hooks', () {
     expect(ComicLookupRepository, isNotNull);
     expect(ComicDetailReturnSeriesPort, isNotNull);
-      expect(resolveComicTitleForDisplay, isNotNull);
+    expect(resolveComicTitleForDisplay, isNotNull);
     expect(LibraryAgeRestrictionFilter, isNotNull);
     expect(createAuthorDetailPort, isNotNull);
     expect(createComicDetailReturnSeriesPort, isNotNull);

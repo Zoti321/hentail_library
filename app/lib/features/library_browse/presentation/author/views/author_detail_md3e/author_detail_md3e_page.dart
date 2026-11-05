@@ -37,9 +37,8 @@ class AuthorDetailMd3ePage extends ConsumerWidget {
           color: M3ETheme.of(context).colorScheme.surface,
           child: asyncDetail.when(
             loading: () => const DetailLoadingStatus(),
-            error: (Object error, StackTrace stackTrace) => DetailErrorStatus(
-              label: error.toString(),
-            ),
+            error: (Object error, StackTrace stackTrace) =>
+                DetailErrorStatus(label: error.toString()),
             data: (AuthorDetail? detail) {
               if (detail == null) {
                 return DetailNotFoundStatus(

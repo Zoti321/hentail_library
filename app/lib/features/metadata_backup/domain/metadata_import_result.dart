@@ -15,5 +15,8 @@ class MetadataImportResult {
   bool get hasErrors => errors.isNotEmpty;
 
   bool get isFullyApplied =>
-      applied > 0 && skippedNotFound == 0 && skippedAmbiguous == 0 && !hasErrors;
+      applied > 0 &&
+      skippedNotFound == 0 &&
+      skippedAmbiguous == 0 &&
+      !hasErrors;
 }

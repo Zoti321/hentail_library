@@ -99,7 +99,9 @@ double md3eInputChipInlineWidth({
   required bool multiline,
 }) {
   final double minFieldHeight = md3eOutlinedTextFieldMinHeight(fieldTheme);
-  final double verticalPadding = fieldTheme.verticalPaddingFor(fieldTheme.density);
+  final double verticalPadding = fieldTheme.verticalPaddingFor(
+    fieldTheme.density,
+  );
   final double firstLineInset = (minFieldHeight - rowLineHeight) / 2;
   return (
     top: firstLineInset,
@@ -115,9 +117,7 @@ Widget md3eCompactInputChip({
 }) {
   final M3EThemeData theme = M3ETheme.of(context);
   return M3ETheme(
-    data: theme.copyWith(
-      chipTheme: md3eCompactInputChipTheme(theme.chipTheme),
-    ),
+    data: theme.copyWith(chipTheme: md3eCompactInputChipTheme(theme.chipTheme)),
     child: M3EChip(
       label: md3eInputChipDisplayLabel(label),
       type: M3EChipType.input,
@@ -178,8 +178,8 @@ class _Md3eInputChipFieldContentState extends State<Md3eInputChipFieldContent> {
     if (!mounted) {
       return;
     }
-    final RenderObject? renderObject =
-        _wrapKey.currentContext?.findRenderObject();
+    final RenderObject? renderObject = _wrapKey.currentContext
+        ?.findRenderObject();
     if (renderObject is! RenderBox || !renderObject.hasSize) {
       return;
     }
@@ -203,11 +203,12 @@ class _Md3eInputChipFieldContentState extends State<Md3eInputChipFieldContent> {
       inputStyle: widget.inputStyle,
       hasChips: widget.hasChips,
     );
-    final ({double top, double bottom}) insets = md3eInputChipFieldVerticalInsets(
-      fieldTheme: widget.fieldTheme,
-      rowLineHeight: rowLineHeight,
-      multiline: _multiline,
-    );
+    final ({double top, double bottom}) insets =
+        md3eInputChipFieldVerticalInsets(
+          fieldTheme: widget.fieldTheme,
+          rowLineHeight: rowLineHeight,
+          multiline: _multiline,
+        );
 
     final Widget wrap = Wrap(
       key: _wrapKey,

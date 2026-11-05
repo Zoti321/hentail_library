@@ -178,8 +178,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ETextFieldTheme fieldTheme = _fieldThemeOf(theme);
     final bool instant =
-        !animate ||
-        (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
+        !animate || (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
     _labelMotion.motion = _springOf(fieldTheme.labelSpring);
     _effectsMotion.motion = _springOf(fieldTheme.effectsSpring);
 
@@ -281,7 +280,8 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     final double start = widget.leading == null
         ? fieldTheme.horizontalPadding
         : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding;
-    final double end = (widget.trailing == null && widget.trailingBuilder == null
+    final double end =
+        (widget.trailing == null && widget.trailingBuilder == null
         ? fieldTheme.horizontalPadding
         : fieldTheme.iconSlotWidth + fieldTheme.iconSlotTextPadding);
 
@@ -416,10 +416,10 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     final EdgeInsets padding = switch (widget.iconSlotAlignment) {
       M3ETextFieldSlotAlignment.firstLine when widget.chipFirstLineLayout =>
         EdgeInsets.zero,
-      M3ETextFieldSlotAlignment.firstLine =>
-        EdgeInsets.symmetric(vertical: centered),
-      M3ETextFieldSlotAlignment.center ||
-      M3ETextFieldSlotAlignment.bottom =>
+      M3ETextFieldSlotAlignment.firstLine => EdgeInsets.symmetric(
+        vertical: centered,
+      ),
+      M3ETextFieldSlotAlignment.center || M3ETextFieldSlotAlignment.bottom =>
         EdgeInsets.symmetric(vertical: centered),
     };
     return Padding(
@@ -503,7 +503,8 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     M3ETextFieldColors colors,
     double height,
   ) {
-    final Widget? slot = widget.trailingBuilder?.call(context, colors, fieldTheme) ??
+    final Widget? slot =
+        widget.trailingBuilder?.call(context, colors, fieldTheme) ??
         widget.trailing;
     if (slot == null) {
       return <Widget>[SizedBox(width: fieldTheme.horizontalPadding)];

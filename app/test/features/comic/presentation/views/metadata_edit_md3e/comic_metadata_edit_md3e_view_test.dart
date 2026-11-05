@@ -10,33 +10,32 @@ void main() {
   testWidgets('comic metadata edit view shows comic title field', (
     WidgetTester tester,
   ) async {
-      tester.view.physicalSize = const Size(1200, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    tester.view.physicalSize = const Size(1200, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
-      final DateTime now = DateTime.utc(2026, 1, 1);
-      await pumpLocalizedApp(
-        tester,
-        wrapProviderScope: true,
-        home: Scaffold(
-          body: ComicMetadataEditMd3eView(
-            comic: Comic(
-              comicId: 'c1',
-              path: '/tmp/c1.cbz',
-              resourceType: ResourceType.cbz,
-              resourceSize: 1,
-              createdAt: now,
-              lastUpdatedAt: now,
-              title: 'Title',
-              pageCount: 1,
-            ),
+    final DateTime now = DateTime.utc(2026, 1, 1);
+    await pumpLocalizedApp(
+      tester,
+      wrapProviderScope: true,
+      home: Scaffold(
+        body: ComicMetadataEditMd3eView(
+          comic: Comic(
+            comicId: 'c1',
+            path: '/tmp/c1.cbz',
+            resourceType: ResourceType.cbz,
+            resourceSize: 1,
+            createdAt: now,
+            lastUpdatedAt: now,
+            title: 'Title',
+            pageCount: 1,
           ),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(find.text('Title'), findsOneWidget);
-    },
-  );
+    expect(find.text('Title'), findsOneWidget);
+  });
 }

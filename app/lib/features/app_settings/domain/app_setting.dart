@@ -53,9 +53,7 @@ abstract class AppSetting with _$AppSetting {
   }
 
   AppSetting withWebtoonMarginPercent(int value) {
-    return copyWith(
-      webtoonMarginPercent: normalizeWebtoonMarginPercent(value),
-    );
+    return copyWith(webtoonMarginPercent: normalizeWebtoonMarginPercent(value));
   }
 
   AppSetting withReaderAutoPlayIntervalSeconds(int value) {

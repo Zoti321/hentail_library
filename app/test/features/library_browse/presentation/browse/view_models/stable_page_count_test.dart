@@ -39,9 +39,7 @@ void main() {
       loaded,
     );
     expect(
-      stableCatalogSnapshot(
-        const AsyncLoading<LibraryComicsCatalogState>(),
-      ),
+      stableCatalogSnapshot(const AsyncLoading<LibraryComicsCatalogState>()),
       isNull,
     );
   });

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 
 import 'package:flutter/material.dart';
@@ -21,11 +22,13 @@ class Md3eLibraryFilterSortState {
   Md3eLibraryFilterSortState({
     this.ageRestriction = LibraryAgeRestrictionFilter.unrestricted,
     this.mediaTypeFilter = const LibraryMediaTypeFilterSelection(),
+    this.grouping = LibraryComicGrouping.defaultValue,
     LibraryComicSortOption? sortOption,
   }) : sortOption = sortOption ?? LibraryComicSortOption();
 
   final LibraryAgeRestrictionFilter ageRestriction;
   final LibraryMediaTypeFilterSelection mediaTypeFilter;
+  final LibraryComicGrouping grouping;
   final LibraryComicSortOption sortOption;
 
   static final Md3eLibraryFilterSortState defaults =
@@ -35,6 +38,7 @@ class Md3eLibraryFilterSortState {
     final LibraryComicSortOption defaultSort = LibraryComicSortOption();
     return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
         mediaTypeFilter.isActive ||
+        grouping != LibraryComicGrouping.defaultValue ||
         sortOption.field != defaultSort.field ||
         sortOption.descending != defaultSort.descending;
   }
@@ -42,11 +46,13 @@ class Md3eLibraryFilterSortState {
   Md3eLibraryFilterSortState copyWith({
     LibraryAgeRestrictionFilter? ageRestriction,
     LibraryMediaTypeFilterSelection? mediaTypeFilter,
+    LibraryComicGrouping? grouping,
     LibraryComicSortOption? sortOption,
   }) {
     return Md3eLibraryFilterSortState(
       ageRestriction: ageRestriction ?? this.ageRestriction,
       mediaTypeFilter: mediaTypeFilter ?? this.mediaTypeFilter,
+      grouping: grouping ?? this.grouping,
       sortOption: sortOption ?? this.sortOption,
     );
   }
@@ -75,6 +81,14 @@ class Md3eLibraryFilterSortState {
     }
     return copyWith(
       sortOption: LibraryComicSortOption(field: field, descending: false),
+    );
+  }
+
+  Md3eLibraryFilterSortState setGroupBySeries(bool enabled) {
+    return copyWith(
+      grouping: enabled
+          ? LibraryComicGrouping.bySeries
+          : LibraryComicGrouping.none,
     );
   }
 
@@ -114,7 +128,6 @@ abstract final class Md3eLibraryFilterSortSideSheet {
     bool useRootNavigator = true,
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final String title = AppLocalizations.of(context).libraryFilterSortTooltip;
     final Md3eOverlayRouteScopeSnapshot scope =
         Md3eOverlayRouteScopeSnapshot.capture(context);
     final Widget modalBody = md3eOverlayRouteScope(
@@ -130,7 +143,6 @@ abstract final class Md3eLibraryFilterSortSideSheet {
         context,
         useRootNavigator: useRootNavigator,
         expandToFullScreen: true,
-        fullScreenTitle: title,
         theme: M3ETheme.of(context).bottomSheetTheme,
         builder: (BuildContext sheetContext) {
           return PrimaryScrollController.none(
@@ -142,7 +154,7 @@ abstract final class Md3eLibraryFilterSortSideSheet {
 
     return M3ESideSheet.show<void>(
       context,
-      title: title,
+      title: '',
       width: md3eLibraryFilterSortSideSheetWidthForViewport(viewportWidth),
       detached: md3eLibraryFilterSortSideSheetDetachedForViewport(
         viewportWidth,
@@ -310,6 +322,20 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
                   )
                   .toList(),
             ),
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: kMd3eLibraryFilterSortDrawerContentInset,
+            ),
+            child: Text(l10n.libraryGroupSection, style: sectionTitle),
+          ),
+          const SizedBox(height: 8),
+          _Md3eGroupBySeriesRow(
+            enabled: state.grouping == LibraryComicGrouping.bySeries,
+            metrics: rowMetrics,
+            onChanged: (bool value) =>
+                onStateChanged(state.setGroupBySeries(value)),
           ),
           const SizedBox(height: 24),
           Padding(
@@ -551,6 +577,53 @@ class _Md3eFilterCheckboxRow extends StatelessWidget {
                     style: _md3eLibraryFilterSortOptionLabelStyle(cs, metrics),
                   ),
                 ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Md3eGroupBySeriesRow extends StatelessWidget {
+  const _Md3eGroupBySeriesRow({
+    required this.enabled,
+    required this.metrics,
+    required this.onChanged,
+  });
+
+  final bool enabled;
+  final Md3eLibraryFilterSortRowMetrics metrics;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final AppLocalizations l10n = context.l10n;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => onChanged(!enabled),
+        hoverColor: theme.hoverColor,
+        splashColor: theme.splashColor,
+        child: SizedBox(
+          height: metrics.rowMinHeight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: kMd3eLibraryFilterSortDrawerContentInset,
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    l10n.libraryGroupBySeries,
+                    style: _md3eLibraryFilterSortOptionLabelStyle(cs, metrics),
+                  ),
+                ),
+                Switch(value: enabled, onChanged: onChanged),
               ],
             ),
           ),

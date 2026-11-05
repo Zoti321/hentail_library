@@ -934,6 +934,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryFilterSection => 'Filter';
 
   @override
+  String get libraryGroupSection => 'Group';
+
+  @override
   String get librarySortSection => 'Sort';
 
   @override
@@ -1010,6 +1013,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryExpandBySeries => 'Expand by series';
+
+  @override
+  String get libraryGroupBySeries => 'Group by series';
 
   @override
   String get librarySeriesSortName => 'Name';

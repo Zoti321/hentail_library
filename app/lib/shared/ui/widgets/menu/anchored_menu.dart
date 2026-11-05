@@ -28,8 +28,7 @@ Offset md3eMenuGlobalToRootOverlayLocal(
   Offset globalPosition,
 ) {
   final OverlayState overlay = Overlay.of(context, rootOverlay: true);
-  final RenderBox overlayBox =
-      overlay.context.findRenderObject()! as RenderBox;
+  final RenderBox overlayBox = overlay.context.findRenderObject()! as RenderBox;
   return overlayBox.globalToLocal(globalPosition);
 }
 
@@ -44,10 +43,7 @@ const double kMd3eToolbarIconMenuAnchorWidth = 48;
 /// Uses [M3EMenuAnchorPosition.bottomStart] with [M3EMenuPlacer] collision logic.
 /// [overlayLocal] must be in root-overlay space ([md3eMenuGlobalToRootOverlayLocal]).
 /// [kMd3eToolbarIconMenuAnchorWidth] matches detail-header [Md3eAnchoredMenu] width.
-Rect md3ePointerContextMenuAnchor(
-  Offset overlayLocal,
-  M3EMenuTheme menuTheme,
-) {
+Rect md3ePointerContextMenuAnchor(Offset overlayLocal, M3EMenuTheme menuTheme) {
   return Rect.fromLTWH(
     overlayLocal.dx,
     overlayLocal.dy - menuTheme.anchorOffset,
@@ -113,8 +109,8 @@ Future<T?> md3eShowPointerContextMenu<T>({
   required List<M3EMenuNode> children,
   FocusNode? callerFocusNode,
 }) {
-  final M3EMenuTheme menuTheme =
-      M3ETheme.of(context).menuTheme.metricsFor(M3EMenuVariant.vertical);
+  final M3EMenuTheme menuTheme = M3ETheme.of(context).menuTheme
+      .metricsFor(M3EMenuVariant.vertical);
   final Offset overlayLocal = md3eMenuGlobalToRootOverlayLocal(
     context,
     globalPosition,

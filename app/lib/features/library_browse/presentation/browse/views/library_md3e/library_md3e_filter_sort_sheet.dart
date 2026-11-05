@@ -4,6 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_filter_section.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_grouping_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_sort_section.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
@@ -18,7 +19,6 @@ abstract final class Md3eLibraryFilterSortSheet {
 
   static Future<void> show(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final String title = AppLocalizations.of(context).libraryFilterSortTooltip;
     final Md3eOverlayRouteScopeSnapshot scope =
         Md3eOverlayRouteScopeSnapshot.capture(context);
     final M3EThemeData m3e = md3eWithAppFontFamily(M3ETheme.of(context));
@@ -28,33 +28,6 @@ abstract final class Md3eLibraryFilterSortSheet {
     );
 
     if (md3eLibraryFilterSortPrefersBottomSheetForViewport(viewportWidth)) {
-      // 底部 sheet 的全屏标题由包内 header 读取自身上下文主题，无法注入应用字体；
-      // 因此不传 fullScreenTitle，改在 body 内用已带应用字体的主题绘制标题。
-      final Widget sheetBody = M3ETheme(
-        data: m3e,
-        child: Builder(
-          builder: (BuildContext themed) {
-            final M3EThemeData theme = M3ETheme.of(themed);
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.typeScale.titleLarge.copyWith(
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-                body,
-              ],
-            );
-          },
-        ),
-      );
       return M3EBottomSheet.show<void>(
         context,
         useRootNavigator: true,
@@ -62,7 +35,7 @@ abstract final class Md3eLibraryFilterSortSheet {
         theme: M3ETheme.of(context).bottomSheetTheme,
         builder: (BuildContext sheetContext) {
           return PrimaryScrollController.none(
-            child: SingleChildScrollView(child: sheetBody),
+            child: SingleChildScrollView(child: body),
           );
         },
       );
@@ -70,7 +43,7 @@ abstract final class Md3eLibraryFilterSortSheet {
 
     return M3ESideSheet.show<void>(
       context,
-      title: title,
+      title: '',
       width: md3eLibraryFilterSortSideSheetWidthForViewport(viewportWidth),
       detached: md3eLibraryFilterSortSideSheetDetachedForViewport(
         viewportWidth,
@@ -88,7 +61,7 @@ abstract final class Md3eLibraryFilterSortSheet {
   }
 }
 
-/// 筛选排序面板正文：重置按钮 + 筛选区 + 排序区（不含外层滚动与 Drawer 外壳）。
+/// 筛选排序面板正文：重置按钮 + 筛选 / 分组 / 排序三区（不含外层滚动与 Drawer 外壳）。
 class Md3eLibraryFilterSortContent extends ConsumerWidget {
   const Md3eLibraryFilterSortContent({super.key});
 
@@ -139,6 +112,20 @@ class Md3eLibraryFilterSortContent extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           const Md3eLibraryFilterSection(),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.only(left: kLibraryMd3eSortSectionInset),
+            child: Text(
+              l10n.libraryGroupSection,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Md3eLibraryGroupingSection(),
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.only(left: kLibraryMd3eSortSectionInset),

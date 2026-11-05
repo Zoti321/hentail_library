@@ -247,7 +247,7 @@ mod tests {
             .contains("LEFT JOIN series s ON s.series_id = si.series_id"));
         assert!(sql.sql.contains("WHEN s.folder_path = ? THEN 0"));
         assert!(sql.sql.contains("s.name_sort_key END ASC NULLS LAST"));
-        assert!(sql.sql.contains("si.sort_order END ASC NULLS LAST"));
+        assert!(sql.sql.contains("s.series_id END ASC NULLS LAST"));
         assert!(sql.sql.contains("m.title_sort_key ASC, c.comic_id ASC"));
         assert!(matches!(
             sql.values[0],

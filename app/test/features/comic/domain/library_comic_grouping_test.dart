@@ -30,11 +30,6 @@ void main() {
         LibraryComicGrouping.none,
       );
     });
-
-    test('只有按系列分组覆盖排序', () {
-      expect(LibraryComicGrouping.none.overridesSort, isFalse);
-      expect(LibraryComicGrouping.bySeries.overridesSort, isTrue);
-    });
   });
 
   group('migrateLegacyLibraryComicGrouping', () {

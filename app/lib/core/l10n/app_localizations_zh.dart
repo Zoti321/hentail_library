@@ -891,6 +891,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryFilterSection => '筛选';
 
   @override
+  String get libraryGroupSection => '分组';
+
+  @override
   String get librarySortSection => '排序';
 
   @override
@@ -967,6 +970,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryExpandBySeries => '按系列展开';
+
+  @override
+  String get libraryGroupBySeries => '按系列分组';
 
   @override
   String get librarySeriesSortName => '名称';

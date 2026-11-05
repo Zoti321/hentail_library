@@ -26,8 +26,7 @@ class Md3eHomeAggregateStatsSection extends StatelessWidget {
   final VoidCallback? onOpenHistory;
   final VoidCallback? onOpenTrash;
 
-  bool get _showsShortcutCards =>
-      onOpenHistory != null && onOpenTrash != null;
+  bool get _showsShortcutCards => onOpenHistory != null && onOpenTrash != null;
 
   @override
   Widget build(BuildContext context) {

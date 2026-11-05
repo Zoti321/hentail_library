@@ -77,8 +77,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
             focusNode: _focusNode,
             iconSlotAlignment: M3ETextFieldSlotAlignment.firstLine,
             chipFirstLineLayout: true,
-            isPopulated:
-                widget.tags.isNotEmpty || _controller.text.isNotEmpty,
+            isPopulated: widget.tags.isNotEmpty || _controller.text.isNotEmpty,
             selectionController: _controller,
             editableTextKey: _editableKey,
             inputBuilder:
@@ -88,8 +87,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                   M3ETextFieldTheme fieldTheme,
                   TextStyle inputStyle,
                 ) {
-                  final M3EChipTheme chipTheme =
-                      M3ETheme.of(context).chipTheme;
+                  final M3EChipTheme chipTheme = M3ETheme.of(context).chipTheme;
                   final double inlineWidth = md3eInputChipInlineWidth(
                     style: inputStyle,
                     text: _controller.text,
@@ -129,9 +127,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                       child: Padding(
                         padding: EdgeInsets.only(top: textTopInset),
                         child: CallbackShortcuts(
-                          bindings: M3EFocus.editableInputShortcuts(
-                            _focusNode,
-                          ),
+                          bindings: M3EFocus.editableInputShortcuts(_focusNode),
                           child: EditableText(
                             key: _editableKey,
                             controller: _controller,
@@ -144,9 +140,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                             selectionColor: M3ETheme.of(context)
                                 .colorScheme
                                 .primary
-                                .withValues(
-                                  alpha: fieldTheme.selectionOpacity,
-                                ),
+                                .withValues(alpha: fieldTheme.selectionOpacity),
                             textCapitalization: TextCapitalization.none,
                             textInputAction: TextInputAction.done,
                             onSubmitted: (_) => _commitTag(),

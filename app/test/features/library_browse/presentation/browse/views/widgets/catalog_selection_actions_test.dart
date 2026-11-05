@@ -33,15 +33,13 @@ void main() {
   testWidgets('applyComicMetadataBulkPatchForComicIds invokes command port', (
     WidgetTester tester,
   ) async {
-    final _RecordingBulkEditPort port = _RecordingBulkEditPort(
-      (
-        succeeded: 2,
-        failed: 0,
-        unchanged: 0,
-        cancelled: false,
-        errorSamples: <String>[],
-      ),
-    );
+    final _RecordingBulkEditPort port = _RecordingBulkEditPort((
+      succeeded: 2,
+      failed: 0,
+      unchanged: 0,
+      cancelled: false,
+      errorSamples: <String>[],
+    ));
     const ComicMetadataBulkPatch patch = ComicMetadataBulkPatch(
       tags: ComicMetadataBulkMultiValuePatch(
         op: ComicMetadataBulkMultiValueOp.add,
@@ -83,15 +81,13 @@ void main() {
   testWidgets(
     'applyComicMetadataBulkPatchForComicIds exits catalog selection when asked',
     (WidgetTester tester) async {
-      final _RecordingBulkEditPort port = _RecordingBulkEditPort(
-        (
-          succeeded: 1,
-          failed: 0,
-          unchanged: 0,
-          cancelled: false,
-          errorSamples: <String>[],
-        ),
-      );
+      final _RecordingBulkEditPort port = _RecordingBulkEditPort((
+        succeeded: 1,
+        failed: 0,
+        unchanged: 0,
+        cancelled: false,
+        errorSamples: <String>[],
+      ));
       const ComicMetadataBulkPatch patch = ComicMetadataBulkPatch(
         authors: ComicMetadataBulkMultiValuePatch(
           op: ComicMetadataBulkMultiValueOp.add,

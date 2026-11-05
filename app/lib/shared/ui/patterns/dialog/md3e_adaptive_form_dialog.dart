@@ -25,9 +25,8 @@ Future<T?> showMd3eAdaptiveFormDialog<T>(
   final double contentWidth = fullScreen
       ? basicMaxWidth
       : Md3eMetadataEditFormMetrics.dialogContentMaxWidth(context);
-  final double contentHeight = Md3eMetadataEditFormMetrics.dialogContentMaxHeight(
-    context,
-  );
+  final double contentHeight =
+      Md3eMetadataEditFormMetrics.dialogContentMaxHeight(context);
   // 表单主体由 Md3eComicMetadataEditForm 自行分区滚动，避免对话框双层滚动与滚动条。
   final Widget material = Material(
     type: MaterialType.transparency,
