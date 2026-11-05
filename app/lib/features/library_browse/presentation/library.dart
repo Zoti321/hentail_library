@@ -17,5 +17,5 @@ export 'browse/view_models/library_tab_page_size_notifier.dart';
 export 'browse/view_models/library_tab_page_size_providers.dart';
 export 'browse/view_models/library_tab_page_size_settings.dart';
 export 'catalog/view_models/catalog_selection_notifier.dart';
-export 'package:hentai_library/features/comic/public/shell/library_browse_shell_exports.dart'
+export 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart'
     show comicDetailReturnSeriesProvider, comicDetailSeriesNavProvider;

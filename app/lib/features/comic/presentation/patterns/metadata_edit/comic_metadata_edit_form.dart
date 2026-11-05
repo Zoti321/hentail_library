@@ -9,7 +9,6 @@ import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_l
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_lock_callbacks.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/comic_language_quick_pick.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
@@ -27,6 +26,7 @@ import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 enum _Md3eComicMetadataEditTab { general, authorsTags, fieldLocks }
 

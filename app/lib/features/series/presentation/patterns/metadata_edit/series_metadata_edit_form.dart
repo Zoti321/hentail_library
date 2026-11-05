@@ -5,7 +5,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_lock_callbacks.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_locks_pane.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
@@ -13,6 +12,7 @@ import 'package:hentai_library/shared/ui/widgets/inputs/series_serialization_dro
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 enum _Md3eSeriesMetadataEditTab { content, fieldLocks }
 

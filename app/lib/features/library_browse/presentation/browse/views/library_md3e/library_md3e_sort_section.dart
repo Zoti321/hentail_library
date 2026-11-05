@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/comic/public/library_comic_browse_rules.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
-import 'package:hentai_library/features/comic/public/library_comic_browse_rules.dart';
-import 'package:hentai_library/features/series/public/library_series_browse_rules.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 
 /// 抽屉内容左缘内边距（与 Baseline 抽屉一致）。
 const double kLibraryMd3eSortSectionInset = 16;

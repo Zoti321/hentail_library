@@ -4,20 +4,13 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/content_breadcrumb_labels.dart';
-import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail_md3e/author_detail_md3e_page.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/comic/public/comic_detail_return_series.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_page_size_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit_md3e/metadata_edit_presenters.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_md3e_cover.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_md3e_entry.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/views/widgets/detail_status/detail_back_header.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/views/widgets/detail_status/detail_status_scaffold.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
@@ -33,6 +26,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 /// 生产系列详情页（MD3E）：服务端分页的漫画网格经映射层渲染 [Md3eSeriesDetailPage]。
 class SeriesDetailMd3ePage extends ConsumerWidget {

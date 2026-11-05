@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 /// 系列详情顶栏每页条数（结构对齐漫画库溢出菜单中的 page size 子菜单）。
 class Md3eSeriesDetailPageSizeControl extends StatelessWidget {

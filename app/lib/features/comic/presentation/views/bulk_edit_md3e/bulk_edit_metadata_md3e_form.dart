@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/presentation/draft/bulk_metadata_edit_session.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
@@ -23,6 +22,7 @@ import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 /// 批量编辑表单（MD3E）：expanded+ 为 list-detail（常规 / 作者&标签 + 详情区滚动），
 /// 较窄宽度为顶部分段 + 纵向滚动。

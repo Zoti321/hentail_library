@@ -1,5 +1,5 @@
 import 'package:hentai_library/shared/domain/models/value_objects/series_comic_page_item.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 class SeriesDetailComicsCatalogState {
   const SeriesDetailComicsCatalogState({

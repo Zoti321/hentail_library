@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/content_breadcrumb_labels.dart';
-import 'package:hentai_library/features/comic/public/shell/library_browse_shell_exports.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
-import 'package:hentai_library/features/comic/public/shell/library_browse_shell_exports.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
@@ -38,11 +38,10 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
-import 'package:hentai_library/features/series/public/ui/series_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_scroll_to_top_button.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 
 /// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 网格 + 分页。
 ///

@@ -1,14 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-import 'package:hentai_library/features/comic/public/library_comic_browse_rules.dart';
-import 'package:hentai_library/features/series/public/library_series_browse_rules.dart';
-import 'package:hentai_library/features/series/public/library_series_browse_rules.dart';
-import 'package:hentai_library/features/series/public/library_series_browse_rules.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 
 part 'library_tab_filter_sort_providers.g.dart';
 

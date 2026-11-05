@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -9,7 +10,6 @@ import 'package:hentai_library/shared/ui/motion/spring_value.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_metrics.dart';
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-import 'package:hentai_library/features/comic/public/library_comic_browse_rules.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';

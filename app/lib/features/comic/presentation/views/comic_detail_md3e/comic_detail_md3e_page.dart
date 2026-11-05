@@ -6,15 +6,9 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/features/comic/presentation/comic_delete_flow.dart';
 import 'package:hentai_library/features/comic/presentation/view_models/comic_detail_series_nav_provider.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_search_query_parser.dart';
-import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail_md3e/author_detail_md3e_page.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_format.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_md3e_cover.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_md3e_entry.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit_md3e/metadata_edit_presenters.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/views/widgets/detail_status/detail_back_header.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/views/widgets/detail_status/detail_status_scaffold.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/comic_detail_providers.dart';
@@ -27,6 +21,7 @@ import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 /// 生产漫画详情页（MD3E）：读取领域数据，经映射层渲染 [Md3eComicDetailPage]。
 class ComicDetailMd3ePage extends ConsumerWidget {

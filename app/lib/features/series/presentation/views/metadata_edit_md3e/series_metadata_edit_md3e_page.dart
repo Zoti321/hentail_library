@@ -3,7 +3,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_metadata_editor_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit_md3e/metadata_edit_mappers.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_form.dart';
@@ -12,6 +11,7 @@ import 'package:hentai_library/shared/domain/models/value_objects/form/series_me
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 /// 系列元数据编辑视图（已加载实体）：Lab 表单 + Lab 编辑壳，保存走生产 notifier。
 class SeriesMetadataEditMd3eView extends ConsumerStatefulWidget {
