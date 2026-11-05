@@ -58,10 +58,27 @@ Future<void> openComicMetadataEditorForIds(
     return;
   }
 
+  await applyComicMetadataBulkPatchForComicIds(
+    context,
+    ref,
+    comicIds: ids,
+    patch: patch,
+    exitSelectionOnDone: exitSelectionOnDone,
+  );
+}
+
+/// 批量 patch 写入与结果 toast（由 [openComicMetadataEditorForIds] 在 MD3E 面板确认后调用）。
+Future<void> applyComicMetadataBulkPatchForComicIds(
+  BuildContext context,
+  WidgetRef ref, {
+  required List<String> comicIds,
+  required ComicMetadataBulkPatch patch,
+  bool exitSelectionOnDone = false,
+}) async {
   try {
     final ComicMetadataBulkPatchResult result = await ref
         .read(comicMetadataBulkEditCommandPortProvider)
-        .apply(comicIds: ids, patch: patch);
+        .apply(comicIds: comicIds, patch: patch);
     if (!context.mounted) {
       return;
     }

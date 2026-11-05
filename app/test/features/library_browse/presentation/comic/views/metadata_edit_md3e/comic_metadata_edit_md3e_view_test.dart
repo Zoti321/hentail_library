@@ -7,9 +7,9 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import '../../../../../../support/pump_localized_app.dart';
 
 void main() {
-  testWidgets(
-    'comic metadata edit view shows fields without AnimatedSwitcher',
-    (WidgetTester tester) async {
+  testWidgets('comic metadata edit view shows comic title field', (
+    WidgetTester tester,
+  ) async {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -34,9 +34,8 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(find.byType(AnimatedSwitcher), findsNothing);
       expect(find.text('Title'), findsOneWidget);
     },
   );

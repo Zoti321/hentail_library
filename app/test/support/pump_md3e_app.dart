@@ -30,8 +30,6 @@ Future<void> pumpMd3eApp(
       home: home,
     ),
   );
-  if (overrides.isNotEmpty) {
-    app = ProviderScope(overrides: overrides, child: app);
-  }
+  app = ProviderScope(overrides: overrides, child: app);
   await tester.pumpWidget(app);
 }
