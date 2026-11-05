@@ -29,15 +29,15 @@ test/shared/ui/widgets/actions/destructive_filled_button_test.dart
 test/shared/ui/widgets/inputs/md3e_named_facet_multi_select_field_test.dart
 test/shared/ui/widgets/overlays/dialog/confirm
 test/features/named_metadata/presentation/views/metadata_md3e/named_facet_fill_viewport_test.dart
-test/features/series/presentation/series/views/series_detail_md3e/series_detail_md3e_entry_test.dart
-test/features/comic/presentation/comic/views/comic_detail_md3e/comic_detail_md3e_entry_test.dart
+test/features/series/presentation/views/series_detail_md3e/series_detail_md3e_entry_test.dart
+test/features/comic/presentation/views/comic_detail_md3e/comic_detail_md3e_entry_test.dart
 test/features/library_browse/presentation/author/views/author_detail_md3e/author_detail_md3e_body_test.dart
 test/features/library_browse/presentation/author/views/author_detail_md3e/author_image_view_test.dart
 test/features/read_session/presentation/reader_viewport_pages_test.dart
 test/features/read_session/presentation/reader_open_error_message_test.dart
 test/features/read_session/presentation/views/reader_md3e
 test/features/library_admin/presentation/views/library_md3e/library_md3e_form_dialog_test.dart
-test/features/series/presentation/series/views/metadata_edit_md3e/series_metadata_edit_md3e_view_test.dart
+test/features/series/presentation/views/metadata_edit_md3e/series_metadata_edit_md3e_view_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
 test/shared/ui/motion/app_motion_test.dart
@@ -47,15 +47,15 @@ test/features/read_session/presentation/reader_input_test.dart
 test/shared/ui/theme/hentai_color_scheme_tokens_test.dart
 test/features/library_browse/presentation/browse/view_models/stable_page_count_test.dart
 test/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine_test.dart
-test/features/comic/presentation/comic/view_models/comic_detail_return_series_notifier_test.dart
-test/features/comic/presentation/comic/view_models/comic_metadata_apply_test.dart
-test/features/comic/presentation/comic/view_models/comic_metadata_editor_notifier_test.dart
+test/features/comic/presentation/view_models/comic_detail_return_series_notifier_test.dart
+test/features/comic/presentation/view_models/comic_metadata_apply_test.dart
+test/features/comic/presentation/view_models/comic_metadata_editor_notifier_test.dart
 test/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier_test.dart
 test/features/library_browse/presentation/browse/view_models/library_page_facade_test.dart
 test/features/library_browse/presentation/browse/view_models/library_search_query_parser_test.dart
 test/features/library_browse/presentation/browse/view_models/library_series_filters_notifier_test.dart
-test/features/series/presentation/series/view_models/series_item_sort_persist_test.dart
-test/features/series/presentation/series/view_models/series_metadata_editor_notifier_test.dart
+test/features/series/presentation/view_models/series_item_sort_persist_test.dart
+test/features/series/presentation/view_models/series_metadata_editor_notifier_test.dart
 test/features/read_session/presentation/reader_exit_location_test.dart
 test/features/read_session/presentation/reader_page_crossfade_policy_test.dart
 test/features/read_session/presentation/resume_visible_sync_gate_test.dart
@@ -80,7 +80,7 @@ test/features/library_admin/domain/library_scan_domain_service_test.dart
 test/features/library_admin/domain/library_sidebar_layout_test.dart
 test/features/library_admin/domain/resource_format_category_setting_test.dart
 test/features/library_admin/presentation/view_models/scan_library_controller_sync_test.dart
-test/features/comic/presentation/comic/draft/bulk_metadata_edit_session_test.dart
+test/features/comic/presentation/draft/bulk_metadata_edit_session_test.dart
 test/shared/util/name_pinyin_assisted_filter_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_controller_revision_test.dart
 test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart

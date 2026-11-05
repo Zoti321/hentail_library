@@ -1,6 +1,6 @@
-import 'package:hentai_library/features/series/public/presentation/library_browse_shell_exports.dart';
-import 'package:hentai_library/features/comic/public/presentation/library_browse_shell_exports.dart';
-import 'package:hentai_library/features/series/public/presentation/library_browse_shell_exports.dart';
+import 'package:hentai_library/features/series/public/shell/library_browse_shell_exports.dart';
+import 'package:hentai_library/features/comic/public/shell/library_browse_shell_exports.dart';
+import 'package:hentai_library/features/series/public/shell/library_browse_shell_exports.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
