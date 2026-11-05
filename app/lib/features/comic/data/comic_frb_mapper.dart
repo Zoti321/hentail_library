@@ -29,6 +29,7 @@ rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
     parodies: _mapStringSet(filter.parodies),
     characters: _mapStringSet(filter.characters),
     needsMetadataOnly: filter.needsMetadataOnly,
+    libraryId: filter.libraryId,
   );
 }
 

@@ -57,12 +57,6 @@ LibraryDto updateLocalLibraryRootFrb({
 void deleteLibraryFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiLibraryDeleteLibraryFrb(libraryId: libraryId);
 
-Future<String?> getCurrentLibraryIdFrb() =>
-    RustLib.instance.api.crateApiLibraryGetCurrentLibraryIdFrb();
-
-Future<void> setCurrentLibraryIdFrb({String? libraryId}) => RustLib.instance.api
-    .crateApiLibrarySetCurrentLibraryIdFrb(libraryId: libraryId);
-
 LibraryDto updateLibraryResourceFormatCategoriesFrb({
   required String libraryId,
   required List<ResourceFormatCategoryDto> groups,

@@ -3,7 +3,6 @@ mod common;
 use hentai_core::{
     add_author, add_author_link, create_local_library, export_comic_metadata, find_comic_by_id,
     import_comic_metadata, init_db_at_path, list_author_links, peek_metadata_backup_manifest,
-    preview_import_comic_metadata, set_current_library_id, AuthorLinkPlatform,
     ExportComicMetadataOptions, MatchTier, UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
@@ -50,9 +49,6 @@ fn export_import_round_trip_restores_user_metadata_and_locks() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let lib = create_local_library("E:/lib", None).await.expect("library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
             let db = hentai_core::connection().expect("connection");
             seed_round_trip_fixture(&db, &lib.library_id).await;
 
@@ -120,9 +116,6 @@ fn import_merges_author_links_idempotently_without_dropping_existing() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let lib = create_local_library("E:/lib", None).await.expect("library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
             let db = hentai_core::connection().expect("connection");
             seed_round_trip_fixture(&db, &lib.library_id).await;
             hentai_core::update_comic_user_meta(
@@ -208,9 +201,6 @@ fn import_skips_when_no_match_and_does_not_create_comic() {
             let lib = create_local_library("E:/lib", None)
                 .await
                 .expect("library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
             let db = hentai_core::connection().expect("connection");
             seed_round_trip_fixture(&db, &lib.library_id).await;
 
@@ -259,9 +249,6 @@ fn preview_import_does_not_write_db_including_orphan_facets() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let lib = create_local_library("E:/lib", None).await.expect("library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
             let db = hentai_core::connection().expect("connection");
             seed_round_trip_fixture(&db, &lib.library_id).await;
 
@@ -350,9 +337,6 @@ fn preview_reports_path_tier_when_comic_id_missing() {
             let lib = create_local_library("E:/lib", None)
                 .await
                 .expect("library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
             let db = hentai_core::connection().expect("connection");
             seed_round_trip_fixture(&db, &lib.library_id).await;
 
@@ -403,9 +387,6 @@ fn preview_reports_ambiguous_candidates() {
             let lib = create_local_library("E:/lib", None)
                 .await
                 .expect("library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
             let db = hentai_core::connection().expect("connection");
 
             db.execute(Statement::from_string(

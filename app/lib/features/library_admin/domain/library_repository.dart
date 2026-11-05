@@ -33,10 +33,6 @@ abstract class LibraryRepository {
 
   Future<void> delete(String libraryId);
 
-  Future<String?> getCurrentId();
-
-  Future<void> setCurrentId(String? libraryId);
-
   Future<LocalLibrary> updateResourceFormatCategories({
     required String libraryId,
     required List<ResourceFormatCategory> groups,

@@ -1,4 +1,4 @@
-//! Library CRUD, sidebar layout, and current-library preferences.
+//! Library CRUD and sidebar layout.
 
 use std::collections::HashSet;
 
@@ -9,7 +9,7 @@ use sea_orm::{
 
 use crate::comic::now_ms;
 use crate::db::{connection, map_db_err};
-use crate::entity::{app_prefs, libraries, prelude::*};
+use crate::entity::{libraries, prelude::*};
 use crate::error::HentaiError;
 use crate::sync::resource_format_category::ResourceFormatCategory;
 use crate::sync::writer::delete_comics_side_effects;
@@ -17,7 +17,7 @@ use crate::sync::writer::delete_comics_side_effects;
 use super::dto::{
     library_id_from_root, library_name_from_root, library_name_from_webdav_root, model_to_dto,
     serialize_resource_format_categories, LibraryDto, LibrarySidebarPlacement, ScanInterval,
-    DEFAULT_RESOURCE_FORMAT_CATEGORIES, KIND_LOCAL, KIND_REMOTE, PREF_CURRENT_LIBRARY_ID,
+    DEFAULT_RESOURCE_FORMAT_CATEGORIES, KIND_LOCAL, KIND_REMOTE,
     REMOTE_DEFAULT_RESOURCE_FORMAT_CATEGORIES,
 };
 use super::local_root_update::ensure_local_root_not_nested;
@@ -128,7 +128,6 @@ pub async fn create_local_library(
     let existing_libs = list_libraries().await?;
     ensure_local_root_not_nested(root, None, &existing_libs)?;
 
-    let count = existing_libs.len();
     let sidebar_order = next_pinned_sidebar_order(&existing_libs);
     let dto = LibraryDto {
         library_id: library_id.clone(),
@@ -166,9 +165,6 @@ pub async fn create_local_library(
         .exec(&db)
         .await
         .map_err(map_db_err)?;
-    if count == 0 {
-        set_current_library_id_inner(&db, Some(&dto.library_id)).await?;
-    }
     Ok(dto)
 }
 
@@ -200,7 +196,6 @@ pub async fn create_remote_library(
     }
 
     let existing_libs = list_libraries().await?;
-    let count = existing_libs.len();
     let sidebar_order = next_pinned_sidebar_order(&existing_libs);
     let dto = LibraryDto {
         library_id: library_id.clone(),
@@ -238,9 +233,6 @@ pub async fn create_remote_library(
         .exec(&db)
         .await
         .map_err(map_db_err)?;
-    if count == 0 {
-        set_current_library_id_inner(&db, Some(&dto.library_id)).await?;
-    }
     Ok(dto)
 }
 
@@ -335,41 +327,6 @@ pub async fn delete_library(library_id: &str) -> Result<(), HentaiError> {
         .await
         .map_err(map_db_err)?;
     txn.commit().await.map_err(map_db_err)?;
-
-    let current = get_current_library_id().await?;
-    if current.as_deref() == Some(id) {
-        let remaining = list_libraries().await?;
-        let next = remaining.first().map(|l| l.library_id.clone());
-        set_current_library_id_inner(&db, next.as_deref()).await?;
-    }
-    Ok(())
-}
-
-pub async fn get_current_library_id() -> Result<Option<String>, HentaiError> {
-    let db = connection()?;
-    get_pref(&db, PREF_CURRENT_LIBRARY_ID).await
-}
-
-pub async fn set_current_library_id(library_id: Option<&str>) -> Result<(), HentaiError> {
-    let db = connection()?;
-    if let Some(id) = library_id {
-        let id = id.trim();
-        if id.is_empty() {
-            set_current_library_id_inner(&db, None).await?;
-            return Ok(());
-        }
-        let exists = Libraries::find_by_id(id.to_string())
-            .one(&db)
-            .await
-            .map_err(map_db_err)?
-            .is_some();
-        if !exists {
-            return Err(HentaiError::validation(format!("Library 不存在: {id}")));
-        }
-        set_current_library_id_inner(&db, Some(id)).await?;
-    } else {
-        set_current_library_id_inner(&db, None).await?;
-    }
     Ok(())
 }
 
@@ -451,58 +408,13 @@ pub async fn find_library_by_id(library_id: &str) -> Result<Option<LibraryDto>, 
     Ok(row.map(model_to_dto))
 }
 
-/// Resolve browse/search scope: explicit filter wins; otherwise Current library.
+/// Normalize browse/search scope: only an explicit non-empty library id is in scope.
 pub async fn resolve_browse_library_id(
     filter_library_id: Option<String>,
 ) -> Result<Option<String>, HentaiError> {
-    if let Some(id) = filter_library_id {
-        let trimmed = id.trim().to_string();
-        if !trimmed.is_empty() {
-            return Ok(Some(trimmed));
-        }
-    }
-    get_current_library_id().await
-}
-
-pub(crate) async fn get_pref(
-    db: &sea_orm::DatabaseConnection,
-    key: &str,
-) -> Result<Option<String>, HentaiError> {
-    let row = AppPrefs::find_by_id(key.to_string())
-        .one(db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(row.map(|r| r.value).filter(|v| !v.is_empty()))
-}
-
-pub(crate) async fn set_current_library_id_inner(
-    db: &sea_orm::DatabaseConnection,
-    library_id: Option<&str>,
-) -> Result<(), HentaiError> {
-    match library_id {
-        Some(id) => {
-            let active = app_prefs::ActiveModel {
-                key: Set(PREF_CURRENT_LIBRARY_ID.to_string()),
-                value: Set(id.to_string()),
-            };
-            AppPrefs::insert(active)
-                .on_conflict(
-                    sea_orm::sea_query::OnConflict::column(app_prefs::Column::Key)
-                        .update_column(app_prefs::Column::Value)
-                        .to_owned(),
-                )
-                .exec(db)
-                .await
-                .map_err(map_db_err)?;
-        }
-        None => {
-            AppPrefs::delete_by_id(PREF_CURRENT_LIBRARY_ID.to_string())
-                .exec(db)
-                .await
-                .map_err(map_db_err)?;
-        }
-    }
-    Ok(())
+    Ok(filter_library_id
+        .map(|id| id.trim().to_string())
+        .filter(|id| !id.is_empty()))
 }
 
 pub(crate) async fn load_comic_ids_for_library<C: ConnectionTrait>(

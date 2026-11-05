@@ -91,7 +91,7 @@ class DetailNotFoundStatus extends StatelessWidget {
       leading: Icon(icon, size: 48, color: context.hentai.textTertiary),
       label: label,
       action: TextButton.icon(
-        onPressed: () => goCurrentLibraryBrowseFromContext(context),
+        onPressed: () => goDefaultLibraryBrowseFromContext(context),
         icon: const Icon(LucideIcons.library, size: 16),
         label: Text(context.l10n.comicDetailGoToLibrary),
       ),

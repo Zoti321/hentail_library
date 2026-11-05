@@ -21,9 +21,9 @@ void main() {
   test('entering reorder mode exits catalog multi-select', () {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
-        currentLibraryStateProvider.overrideWithValue(
-          const AsyncValue<CurrentLibraryState>.data(
-            CurrentLibraryState(libraries: [], currentId: null),
+        librariesStateProvider.overrideWithValue(
+          const AsyncValue<LibrariesState>.data(
+            const LibrariesState(libraries: <LocalLibrary>[]),
           ),
         ),
         libraryReorderModePortProvider.overrideWithValue(

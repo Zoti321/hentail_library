@@ -4,7 +4,6 @@ use std::path::Path;
 
 use hentai_core::{
     comic_id_from_path, create_local_library, create_sync_handle, init_db_at_path,
-    set_current_library_id, sync_library, trash_comics, watch_library_home_stats, HentaiError,
     LibraryDto, LibraryHomeStatDto, SyncScanMode,
 };
 use tempfile::TempDir;
@@ -85,9 +84,6 @@ fn library_home_stats_count_visible_comics_series_and_sync_time_per_library() {
             let lib_b = create_local_library(&root_b.to_string_lossy(), Some("B"))
                 .await
                 .expect("create b");
-            set_current_library_id(Some(&lib_a.library_id))
-                .await
-                .expect("current");
             sync(&lib_a).await;
             sync(&lib_b).await;
 

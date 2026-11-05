@@ -2,23 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_meta_chip_row.dart';
-import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 
 const double kMd3eAuthorDetailComicCardWidth = 96;
 const double kMd3eAuthorDetailComicCardHeight = 144;
-
-void openAuthorDetailSearch(BuildContext context, Iterable<String> names) {
-  final String query = formatLibrarySearchAndExactMetaQuery(names);
-  final String encoded = Uri.encodeQueryComponent(query);
-  GoRouter.of(context).push('/searched?q=$encoded');
-}
 
 /// 作者作品区：元数据 chip + 封面网格，包在 tonal 卡片内。
 class Md3eAuthorDetailComicsSection extends StatelessWidget {
@@ -40,19 +31,6 @@ class Md3eAuthorDetailComicsSection extends StatelessWidget {
 
     return Md3eContentSection(
       title: l10n.authorDetailComicsSection(detail.comicCount),
-      titleTrailing: M3EButton(
-        style: M3EButtonStyle.text,
-        size: M3EButtonSize.sm,
-        onPressed: () => openAuthorDetailSearch(context, <String>[detail.name]),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Icon(Symbols.search, size: 16, color: scheme.primary),
-            SizedBox(width: theme.spacing.xs),
-            Text(l10n.authorDetailViewInSearch),
-          ],
-        ),
-      ),
       padding: EdgeInsets.all(theme.spacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -66,10 +44,6 @@ class Md3eAuthorDetailComicsSection extends StatelessWidget {
                   M3EChip(
                     label: '${item.name} ${item.attachmentCount}',
                     type: M3EChipType.suggestion,
-                    onPressed: () => openAuthorDetailSearch(context, <String>[
-                      item.name,
-                      detail.name,
-                    ]),
                   ),
               ],
             ),

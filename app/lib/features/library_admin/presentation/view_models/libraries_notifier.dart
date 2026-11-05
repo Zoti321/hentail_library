@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -9,35 +9,25 @@ import 'package:hentai_library/features/library_admin/presentation/view_models/l
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-export 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
+export 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 
-part 'current_library_notifier.g.dart';
+part 'libraries_notifier.g.dart';
 
 const String _kMigratedResourceFormatCategoriesPref =
     'migrated_enabled_format_groups_to_libraries_v1';
 const String _kMigratedAutoScanPref = 'migrated_auto_scan_to_libraries_v1';
 
 @Riverpod(keepAlive: true)
-class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
+class LibrariesNotifier extends _$LibrariesNotifier {
   LibraryRepository get _repo => ref.read(libraryRepoProvider);
 
   @override
-  Future<CurrentLibraryState> build() async {
+  Future<LibrariesState> build() async {
     return _load();
   }
 
   Future<void> refresh() async {
     state = await AsyncValue.guard(_load);
-  }
-
-  Future<void> select(String libraryId) async {
-    final CurrentLibraryState? previous = state.asData?.value;
-    await _repo.setCurrentId(libraryId);
-    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-    if (previous != null) {
-      state = AsyncData(previous.copyWith(currentId: libraryId));
-    }
-    await refresh();
   }
 
   Future<void> updateSidebarLayout(
@@ -46,13 +36,9 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
     final List<LocalLibrary> libraries = await _repo.updateSidebarLayout(
       placements,
     );
-    final CurrentLibraryState? previous = state.asData?.value;
-    state = AsyncData(
-      CurrentLibraryState(libraries: libraries, currentId: previous?.currentId),
-    );
+    state = AsyncData(LibrariesState(libraries: libraries));
   }
 
-  /// 提交 Library 表单：[original] 为空时新建，否则编辑。成功后重载列表并通知 revision。
   Future<LibraryFormApplyResult> submitLibraryForm(
     LibraryForm form, {
     LocalLibrary? original,
@@ -67,24 +53,13 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
     return result;
   }
 
-  /// 删除 Library（不删盘，ADR-0012）并重载列表；失败时抛出，状态保持不变。
   Future<void> deleteLibrary(String libraryId) async {
     await _repo.delete(libraryId);
     await refresh();
     ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
   }
 
-  Future<void> clear() async {
-    final CurrentLibraryState? previous = state.asData?.value;
-    await _repo.setCurrentId(null);
-    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-    if (previous != null) {
-      state = AsyncData(previous.copyWith(clearCurrentId: true));
-    }
-    await refresh();
-  }
-
-  Future<CurrentLibraryState> _load() async {
+  Future<LibrariesState> _load() async {
     await _migrateResourceFormatCategoriesFromLegacyIfNeeded();
     await _migrateAutoScanFromLegacyIfNeeded();
     try {
@@ -93,11 +68,9 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
       // Best-effort cleanup of staged legacy import keys.
     }
     final List<LocalLibrary> libraries = await _repo.list();
-    final String? currentId = await _repo.getCurrentId();
-    return CurrentLibraryState(libraries: libraries, currentId: currentId);
+    return LibrariesState(libraries: libraries);
   }
 
-  /// One-shot: copy legacy app-global format groups onto each Local library.
   Future<void> _migrateResourceFormatCategoriesFromLegacyIfNeeded() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -127,7 +100,6 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
     }
   }
 
-  /// One-shot: legacy app-level autoScan → all libraries Scan on startup.
   Future<void> _migrateAutoScanFromLegacyIfNeeded() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();

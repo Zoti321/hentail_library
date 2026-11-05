@@ -32,6 +32,7 @@ import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
+import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
@@ -117,9 +118,15 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
     final LibrarySeriesCatalogState? seriesCatalog = stableCatalogSnapshot(
       ref.watch(librarySeriesCatalogControllerProvider),
     );
-    final String? libraryName = ref.watch(
-      currentLibraryStateProvider.select(_currentLibraryDisplayName),
-    );
+    final String? browseLibraryId = ref.watch(browseLibraryIdProvider);
+    final LibrariesState? librariesState =
+        ref.watch(librariesStateProvider).asData?.value;
+    final LocalLibrary? browseLibrary = browseLibraryId == null
+        ? null
+        : librariesState?.findById(browseLibraryId);
+    final String? libraryName = browseLibrary == null
+        ? null
+        : localLibraryDisplayName(browseLibrary);
     final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
     final bool scanning = ref.watch(
       libraryScanActivityStateProvider.select(
@@ -499,20 +506,6 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
         ];
     }
   }
-}
-
-/// 当前库显示名；无当前库时为 null（页头退回默认标题）。
-String? _currentLibraryDisplayName(AsyncValue<CurrentLibraryState> async) {
-  final CurrentLibraryState? state = async.asData?.value;
-  if (state == null) {
-    return null;
-  }
-  for (final LocalLibrary library in state.libraries) {
-    if (library.libraryId == state.currentId) {
-      return localLibraryDisplayName(library);
-    }
-  }
-  return null;
 }
 
 class _LibraryLoadingSliver extends StatelessWidget {

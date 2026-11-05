@@ -35,11 +35,6 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
             .watch(metadataLastAutoBackupProvider)
             .asData
             ?.value;
-        final String? currentLibraryId = ref
-            .watch(currentLibraryStateProvider)
-            .asData
-            ?.value
-            .currentId;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -120,9 +115,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                   ),
                   onTap: () => runMetadataExportFlow(
                     context,
-                    initialOptions: MetadataExportOptions(
-                      libraryId: currentLibraryId,
-                    ),
+                    initialOptions: const MetadataExportOptions(),
                   ),
                 ),
                 Md3eSettingsNavigationTile(

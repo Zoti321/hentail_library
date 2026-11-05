@@ -5,7 +5,6 @@ use hentai_core::sync::writer::clear_all_comics;
 use hentai_core::ComicGrouping;
 use hentai_core::{
     connection, create_local_library, fetch_comics_page, find_comic_by_id, init_db_at_path,
-    set_current_library_id, ComicFilterDto, ComicSortOptionDto, PageRequestDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -14,9 +13,6 @@ async fn stamp_fixture_to_current_library(db: &DatabaseConnection) {
     let lib = create_local_library("C:/漫画", None)
         .await
         .expect("library");
-    set_current_library_id(Some(&lib.library_id))
-        .await
-        .expect("current");
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE comics SET library_id = ?",

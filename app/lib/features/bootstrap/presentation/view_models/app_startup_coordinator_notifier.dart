@@ -43,11 +43,11 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
       _intervalTicker?.cancel();
       _intervalTicker = null;
     });
-    ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryProvider, (
-      AsyncValue<CurrentLibraryState>? previous,
-      AsyncValue<CurrentLibraryState> next,
+    ref.listen<AsyncValue<LibrariesState>>(librariesProvider, (
+      AsyncValue<LibrariesState>? previous,
+      AsyncValue<LibrariesState> next,
     ) {
-      next.whenData((CurrentLibraryState state) {
+      next.whenData((LibrariesState state) {
         _syncIntervalAnchors(state.libraries);
         _ensureIntervalTicker();
         if (!_startupScheduled) {
@@ -88,8 +88,8 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
   }
 
   Future<void> _tickIntervals() async {
-    final CurrentLibraryState? state = ref
-        .read(currentLibraryProvider)
+    final LibrariesState? state = ref
+        .read(librariesProvider)
         .asData
         ?.value;
     if (state == null) {

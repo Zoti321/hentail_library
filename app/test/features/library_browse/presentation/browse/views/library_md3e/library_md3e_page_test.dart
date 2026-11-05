@@ -94,8 +94,8 @@ const LocalLibrary _libraryA = (
   sidebarOrder: 0,
 );
 
-final AsyncValue<CurrentLibraryState> _currentLibrary = AsyncData(
-  CurrentLibraryState(libraries: <LocalLibrary>[_libraryA], currentId: 'lib-a'),
+final AsyncValue<LibrariesState> _currentLibrary = AsyncData(
+  LibrariesState(libraries: <LocalLibrary>[_libraryA]),
 );
 
 LibraryPageFacadeState _facade(LibraryDisplayTarget target) {
@@ -164,7 +164,7 @@ Future<void> _pumpLibraryMd3ePage(
           ),
         ),
       ),
-      currentLibraryStateProvider.overrideWithValue(_currentLibrary),
+      librariesStateProvider.overrideWithValue(_currentLibrary),
       libraryScanActivityStateProvider.overrideWithValue((
         running: false,
         scanMode: ScanMode.incremental,

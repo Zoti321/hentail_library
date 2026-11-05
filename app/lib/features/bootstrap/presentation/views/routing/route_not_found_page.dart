@@ -55,7 +55,7 @@ class RouteNotFoundPage extends StatelessWidget {
                 GhostButton.iconText(
                   icon: LucideIcons.library,
                   text: l10n.notFoundGoLibrary,
-                  onPressed: () => goCurrentLibraryBrowseFromContext(context),
+                  onPressed: () => goDefaultLibraryBrowseFromContext(context),
                 ),
               ],
             ),

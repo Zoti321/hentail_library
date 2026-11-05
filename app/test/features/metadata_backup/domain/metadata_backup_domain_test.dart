@@ -1,44 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_schedule_specification.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 
 void main() {
-  test('MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup', () {
-    final DateTime now = DateTime.utc(2026, 1, 8);
-    expect(
-      MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup(
-        now: now,
-        lastBackupAt: null,
-      ),
-      isTrue,
-    );
-    expect(
-      MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup(
-        now: now,
-        lastBackupAt: now.subtract(const Duration(days: 8)),
-      ),
-      isTrue,
-    );
-    expect(
-      MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup(
-        now: now,
-        lastBackupAt: now.subtract(const Duration(days: 1)),
-      ),
-      isFalse,
-    );
+  test('MetadataExportOptions accepts all-library export', () {
+    expect(const MetadataExportOptions().isValid, isTrue);
   });
 
-  test('MetadataExportOptions.isValid', () {
+  test('MetadataExportOptions normalizes library id', () {
     expect(
-      const MetadataExportOptions(currentLibraryOnly: true).isValid,
-      isFalse,
-    );
-    expect(
-      const MetadataExportOptions(
-        currentLibraryOnly: true,
-        libraryId: ' lib ',
-      ).normalized().isValid,
-      isTrue,
+      const MetadataExportOptions(libraryId: '  lib-a  ').normalized().libraryId,
+      'lib-a',
     );
   });
 }

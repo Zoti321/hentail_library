@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/domain/ports/remote_library_credentials_po
 export 'package:hentai_library/features/library_admin/di/shared_state_ports.dart'
     show
         createComicMetadataBulkEditCommandPort,
-        createCurrentLibraryPort,
+        createLibrariesPort,
         createLibraryMetadataRefreshCommandPort,
         createLibraryReorderModePort,
         createLibraryRevisionSignalPort,

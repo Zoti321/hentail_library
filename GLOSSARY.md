@@ -28,16 +28,12 @@ _Avoid_: deep import 其他 feature 的 presentation / data / di；让 `shared/*
 用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（Supported resource formats、Scan on startup、Scan interval），以及可独立于 Library root 编辑的显示名。应用内可同时存在多个 Library。
 _Avoid_: 书架（UI 可用）；把「全部库合并」称作一个 Library
 
-**Current library**:
-用户当前选中的 Library；浏览与搜索默认作用于此。Reading history 跨 Library 全局可见。
-_Avoid_: 活动库、选中书架
-
 **All libraries browse**:
 跨多个 Library 的聚合浏览面（趋近 Komga「全部库」）；不是一个 Library。路由占位为 `/libraries/all`；本阶段仅占位提示，不实现聚合目录。
 _Avoid_: 全部库（若被理解成一个 Library）、合并库、全局书架
 
 **Home page**:
-应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**展示 Current library 指示，**不**提供常驻 Library sync 入口。详见 ADR-0020。
+应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**提供常驻 Library sync 入口。详见 ADR-0020。
 _Avoid_: 当前库仪表盘、首页扫描、Home dashboard（口语可用；文档与 issue 用 Home page）
 
 **Home library alert**:
@@ -113,7 +109,7 @@ _Avoid_: VFS、存储驱动、网盘 SDK
 _Avoid_: 导入、索引（未体现与根对齐的删除语义）
 
 **Library sync**:
-让某个 Library 与其 Library root 下内容对齐的完整操作：包含 Scan，并写库——新增缺失 Comic、按字段锁合并后更新仍存在的 Comic、对可配对的位置变化执行 Path migration、删除根上已消失且未迁走的 Comic。默认只 sync Current library（可配置为全部 Library）。Remote library 在根不可达（网络/鉴权失败）时跳过该库且不删除其已有 Comic。若某 Library 被移除，则清除该库及其 Comic/Series。元数据合并见 Metadata field lock。写库后由 core 使相关阅读会话失效；与 Metadata refresh、Local 改根（含 Path migration）共用库级写锁。
+让某个 Library 与其 Library root 下内容对齐的完整操作：包含 Scan，并写库——新增缺失 Comic、按字段锁合并后更新仍存在的 Comic、对可配对的位置变化执行 Path migration、删除根上已消失且未迁走的 Comic。UI 触发的单次 sync 需指定目标 Library，或使用 sync all。Remote library 在根不可达（网络/鉴权失败）时跳过该库且不删除其已有 Comic。若某 Library 被移除，则清除该库及其 Comic/Series。元数据合并见 Metadata field lock。写库后由 core 使相关阅读会话失效；与 Metadata refresh、Local 改根（含 Path migration）共用库级写锁。
 _Avoid_: 同步、刷新（太泛，未体现镜像语义）
 
 _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
@@ -185,7 +181,7 @@ _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实�
 _Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
 
 **Library property**:
-绑定某一 Library 实体的配置，由 Library form 或侧栏操作读写，经 FRB 落入 Rust SQLite。包括 Scan on startup、Scan interval、Supported resource formats（per-library）、Pinned、sidebar order、Current library id 等。与 App preference、Library browse preference 区分。
+绑定某一 Library 实体的配置，由 Library form 或侧栏操作读写，经 FRB 落入 Rust SQLite。包括 Scan on startup、Scan interval、Supported resource formats（per-library）、Pinned、sidebar order 等。与 App preference、Library browse preference 区分。
 _Avoid_: 库偏好、Library settings form（旧称）
 
 **Settings list–detail**:
@@ -289,7 +285,7 @@ Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Libr
 _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
 
 **Metadata refresh**:
-从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」），作用对象可为单个 Comic、单个 Series，或指定 Library（**Home 库列表行内**对该库 `libraryId`，可非 Current library，且不切换 Current）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图。Library：对该库全部 Comic 执行 Comic 刷新，并对该库 Series 在 `name` 未锁定时用文件夹名覆盖（其余 Series 字段规则同 Series 级）。部分成员失败则跳过并汇总；可取消（已写回保留、不回滚）。Remote library 根不可达时跳过该库且不改已有数据。与 Library sync 共用 core 库级写锁（全局单飞，占用则立即失败不排队）；互斥不在 Flutter 编排层重复实现。UI 不展示实时进度，仅 busy 态与结束汇总。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync（不 orphan 删除、不重建成员排序、不再生缩略图）。
+从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」），作用对象可为单个 Comic、单个 Series，或指定 Library（**Home 库列表行内**对该库 `libraryId`）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图。Library：对该库全部 Comic 执行 Comic 刷新，并对该库 Series 在 `name` 未锁定时用文件夹名覆盖（其余 Series 字段规则同 Series 级）。部分成员失败则跳过并汇总；可取消（已写回保留、不回滚）。Remote library 根不可达时跳过该库且不改已有数据。与 Library sync 共用 core 库级写锁（全局单飞，占用则立即失败不排队）；互斥不在 Flutter 编排层重复实现。UI 不展示实时进度，仅 busy 态与结束汇总。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync（不 orphan 删除、不重建成员排序、不再生缩略图）。
 _Avoid_: 刷新、重新扫描、同步（易与 UI catalog refresh / Library sync 混淆）
 
 **Metadata backup**:

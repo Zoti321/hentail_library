@@ -6,8 +6,7 @@ mod webdav_root;
 
 pub use crud::{
     create_local_library, create_remote_library, delete_library, find_library_by_id,
-    get_current_library_id, list_libraries, resolve_browse_library_id,
-    set_all_libraries_scan_on_startup, set_current_library_id,
+    list_libraries, resolve_browse_library_id, set_all_libraries_scan_on_startup,
     update_library_resource_format_categories, update_library_settings,
     update_library_sidebar_layout, update_remote_library,
 };

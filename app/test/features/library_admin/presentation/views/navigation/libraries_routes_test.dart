@@ -1,133 +1,68 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 
 void main() {
-  group('LibrariesRoutes.redirectPath', () {
-    test('redirects /local to current library browse', () {
+  group('LibrariesRoutes', () {
+    test('redirects /local to all libraries browse', () {
       expect(
-        LibrariesRoutes.redirectPath(
-          locationPath: '/local',
-          currentLibraryId: 'lib-a',
-        ),
-        '/libraries/lib-a',
-      );
-    });
-
-    test('redirects /local to all when no current library', () {
-      expect(
-        LibrariesRoutes.redirectPath(
-          locationPath: '/local',
-          currentLibraryId: null,
-        ),
-        '/libraries/all',
+        LibrariesRoutes.redirectPath(locationPath: '/local'),
+        LibrariesRoutes.all,
       );
     });
 
     test('redirects bare /libraries to all', () {
       expect(
-        LibrariesRoutes.redirectPath(
-          locationPath: '/libraries',
-          currentLibraryId: 'lib-a',
-        ),
-        '/libraries/all',
+        LibrariesRoutes.redirectPath(locationPath: LibrariesRoutes.root),
+        LibrariesRoutes.all,
       );
     });
 
-    test('leaves other paths alone', () {
+    test('libraryIdFromPath parses single-library browse', () {
       expect(
-        LibrariesRoutes.redirectPath(
-          locationPath: '/libraries/lib-a',
-          currentLibraryId: 'lib-a',
-        ),
-        isNull,
+        LibrariesRoutes.libraryIdFromPath('/libraries/lib-a'),
+        'lib-a',
       );
+      expect(LibrariesRoutes.libraryIdFromPath('/libraries/all'), isNull);
     });
   });
 
   group('librariesSidebarSelection', () {
-    test('all libraries highlights section only', () {
+    test('all libraries path activates section', () {
       expect(
-        librariesSidebarSelection(
-          path: '/libraries/all',
-          currentLibraryId: 'lib-a',
-        ),
+        librariesSidebarSelection(path: LibrariesRoutes.all),
         (sectionActive: true, activeLibraryId: null),
       );
     });
 
-    test('library browse highlights matching child', () {
+    test('library browse path highlights that library', () {
       expect(
-        librariesSidebarSelection(
-          path: '/libraries/lib-b',
-          currentLibraryId: 'lib-a',
-        ),
-        (sectionActive: false, activeLibraryId: 'lib-b'),
-      );
-    });
-
-    test('comic detail highlights current library child', () {
-      expect(
-        librariesSidebarSelection(path: '/comic/c1', currentLibraryId: 'lib-a'),
+        librariesSidebarSelection(path: '/libraries/lib-a'),
         (sectionActive: false, activeLibraryId: 'lib-a'),
       );
     });
 
-    test('home highlights neither libraries section nor child', () {
+    test('comic detail does not imply a library selection', () {
       expect(
-        librariesSidebarSelection(path: '/home', currentLibraryId: 'lib-a'),
+        librariesSidebarSelection(path: '/comic/c1'),
         (sectionActive: false, activeLibraryId: null),
-      );
-    });
-
-    test('series detail highlights current library child', () {
-      expect(
-        librariesSidebarSelection(
-          path: '/series/s1',
-          currentLibraryId: 'lib-a',
-        ),
-        (sectionActive: false, activeLibraryId: 'lib-a'),
-      );
-    });
-  });
-
-  group('librariesRailIconActive', () {
-    test('active for all-libraries section', () {
-      expect(
-        librariesRailIconActive((sectionActive: true, activeLibraryId: null)),
-        isTrue,
-      );
-    });
-
-    test('active when a library child context is selected', () {
-      expect(
-        librariesRailIconActive((
-          sectionActive: false,
-          activeLibraryId: 'lib-a',
-        )),
-        isTrue,
-      );
-    });
-
-    test('inactive on unrelated routes', () {
-      expect(
-        librariesRailIconActive((sectionActive: false, activeLibraryId: null)),
-        isFalse,
       );
     });
   });
 
   group('afterLibraryDeleteNavigation', () {
-    test('selects first remaining library browse path', () {
+    test('goes to all when no libraries remain', () {
       expect(
-        afterLibraryDeleteNavigation(remainingLibraryIds: <String>['b', 'c']),
-        (selectLibraryId: 'b', goPath: '/libraries/b'),
+        afterLibraryDeleteNavigation(remainingLibraryIds: <String>[]).goPath,
+        LibrariesRoutes.all,
       );
     });
 
-    test('goes to all libraries when none remain', () {
+    test('goes to first remaining library', () {
       expect(
-        afterLibraryDeleteNavigation(remainingLibraryIds: const <String>[]),
-        (selectLibraryId: null, goPath: '/libraries/all'),
+        afterLibraryDeleteNavigation(
+          remainingLibraryIds: <String>['lib-b', 'lib-c'],
+        ).goPath,
+        LibrariesRoutes.library('lib-b'),
       );
     });
   });

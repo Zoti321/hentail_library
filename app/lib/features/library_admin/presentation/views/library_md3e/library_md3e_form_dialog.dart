@@ -166,7 +166,7 @@ class _LibraryMd3eFormState extends ConsumerState<_LibraryMd3eForm> {
     });
     try {
       final LibraryFormApplyResult result = await ref
-          .read(currentLibraryPortProvider)
+          .read(librariesPortProvider)
           .submitLibraryForm(
             _form,
             original: _isCreate ? null : widget.library!,

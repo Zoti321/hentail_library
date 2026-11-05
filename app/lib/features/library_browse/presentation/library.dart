@@ -9,7 +9,6 @@ export 'browse/view_models/library_page_comics_providers.dart';
 export 'browse/view_models/library_page_facade_notifier.dart';
 export 'browse/view_models/library_page_series_providers.dart';
 export 'browse/view_models/library_page_snapshot.dart';
-export 'browse/view_models/library_search_page_providers.dart';
 export 'browse/view_models/library_series_filters_notifier.dart';
 export 'browse/view_models/library_series_catalog_controller.dart';
 export 'browse/view_models/library_tab_filter_sort_providers.dart';

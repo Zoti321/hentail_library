@@ -20,14 +20,12 @@ class _MetadataExportOptionsDialogState
     extends State<MetadataExportOptionsDialog> {
   late bool _gzip;
   late bool _includeOrphanFacets;
-  late bool _currentLibraryOnly;
 
   @override
   void initState() {
     super.initState();
     _gzip = widget.initialOptions.gzip;
     _includeOrphanFacets = widget.initialOptions.includeOrphanFacets;
-    _currentLibraryOnly = widget.initialOptions.currentLibraryOnly;
   }
 
   @override
@@ -67,17 +65,6 @@ class _MetadataExportOptionsDialogState
             onChanged: (bool value) =>
                 setState(() => _includeOrphanFacets = value),
           ),
-          if (widget.initialOptions.libraryId != null) ...<Widget>[
-            SizedBox(height: tokens.spacing.lg),
-            FluentToggleField(
-              labelText: l10n.settingsMetadataBackupExportCurrentLibraryLabel,
-              value: _currentLibraryOnly,
-              checkedLabel: l10n.commonToggleOn,
-              uncheckedLabel: l10n.commonToggleOff,
-              onChanged: (bool value) =>
-                  setState(() => _currentLibraryOnly = value),
-            ),
-          ],
         ],
       ),
       actions: <Widget>[
@@ -90,7 +77,6 @@ class _MetadataExportOptionsDialogState
             MetadataExportOptions(
               gzip: _gzip,
               includeOrphanFacets: _includeOrphanFacets,
-              currentLibraryOnly: _currentLibraryOnly,
               libraryId: widget.initialOptions.libraryId,
             ),
           ),

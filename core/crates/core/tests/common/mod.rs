@@ -97,9 +97,6 @@ where
             let library = hentai_core::create_local_library(&root.to_string_lossy(), Some("Lib"))
                 .await
                 .expect("create local library");
-            hentai_core::set_current_library_id(Some(&library.library_id))
-                .await
-                .expect("set current library");
             hentai_core::sync_library(
                 hentai_core::create_sync_handle(),
                 hentai_core::SyncScanMode::Full,

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -91,13 +92,8 @@ class LibraryCatalogRevisionCoordinator
       _runAfterBuild(_flushInactiveRevision);
     });
 
-    ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryStateProvider, (
-      AsyncValue<CurrentLibraryState>? previous,
-      AsyncValue<CurrentLibraryState> next,
-    ) {
-      final String? previousId = previous?.asData?.value.currentId;
-      final String? nextId = next.asData?.value.currentId;
-      if (previousId == null || previousId == nextId) {
+    ref.listen<String?>(browseLibraryIdProvider, (String? previous, String? next) {
+      if (previous == null || previous == next) {
         return;
       }
       _runAfterBuild(_flushInactiveRevision);

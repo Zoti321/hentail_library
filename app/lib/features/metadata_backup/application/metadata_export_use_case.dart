@@ -16,7 +16,7 @@ class MetadataExportUseCase {
   }) async {
     final String extension = options.gzip ? 'hlmeta.json.gz' : 'hlmeta.json';
     final Uint8List raw = _repository.exportComicMetadata(
-      libraryId: options.currentLibraryOnly ? options.libraryId : null,
+      libraryId: options.libraryId,
       includeOrphanFacets: options.includeOrphanFacets,
     );
     final List<int> output = options.gzip ? GZipCodec().encode(raw) : raw;

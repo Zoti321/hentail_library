@@ -11,8 +11,6 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 /// library_admin 对 [LibraryManagementPort] 的实现（#292）。
-///
-/// 由 bootstrap 通过 [libraryManagementPortProvider] 的 `overrideWith` 注入。
 class _LibraryManagementAdapter implements LibraryManagementPort {
   _LibraryManagementAdapter(this._ref);
 
@@ -70,11 +68,9 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     final String deletedId = library.libraryId;
     final String path = GoRouterState.of(context).uri.path;
     final bool wasViewing =
-        LibrariesRoutes.libraryIdFromPath(path) == deletedId ||
-        _ref.read(currentLibraryStateProvider).asData?.value.currentId ==
-            deletedId;
+        LibrariesRoutes.libraryIdFromPath(path) == deletedId;
 
-    await _ref.read(currentLibraryPortProvider).deleteLibrary(deletedId);
+    await _ref.read(librariesPortProvider).deleteLibrary(deletedId);
     if (!context.mounted) {
       return;
     }
@@ -83,14 +79,11 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     if (!navigateAfter || !wasViewing) {
       return;
     }
-    await _navigateAfterLibraryDeleted(context);
+    _navigateAfterLibraryDeleted(context);
   }
 
-  Future<void> _navigateAfterLibraryDeleted(BuildContext context) async {
-    final CurrentLibraryState? state = _ref
-        .read(currentLibraryStateProvider)
-        .asData
-        ?.value;
+  void _navigateAfterLibraryDeleted(BuildContext context) {
+    final LibrariesState? state = _ref.read(librariesStateProvider).asData?.value;
     final List<LocalLibrary> remaining =
         state?.libraries ?? const <LocalLibrary>[];
     final AfterLibraryDeleteNavigation nav = afterLibraryDeleteNavigation(
@@ -98,26 +91,12 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
           .map((LocalLibrary library) => library.libraryId)
           .toList(),
     );
-    final String? selectId = nav.selectLibraryId;
-    if (selectId == null) {
-      await _ref.read(currentLibraryPortProvider).clear();
-      if (!context.mounted) {
-        return;
-      }
-      context.go(nav.goPath);
-      return;
-    }
-    await _ref.read(currentLibraryPortProvider).select(selectId);
-    if (!context.mounted) {
-      return;
-    }
     context.go(nav.goPath);
   }
 
   @override
   Future<void> openLibrary(BuildContext context, String libraryId) async {
     _ref.read(comicDetailReturnSeriesPortProvider).clear();
-    await _ref.read(currentLibraryPortProvider).select(libraryId);
     if (!context.mounted) {
       return;
     }
@@ -131,14 +110,9 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
   }
 
   @override
-  void goCurrentLibraryBrowse(BuildContext context) {
+  void goDefaultLibraryBrowse(BuildContext context) {
     _ref.read(comicDetailReturnSeriesPortProvider).clear();
-    final String? currentId = _ref
-        .read(currentLibraryStateProvider)
-        .asData
-        ?.value
-        .currentId;
-    context.go(LibrariesRoutes.browsePathForCurrent(currentId));
+    context.go(LibrariesRoutes.defaultBrowse);
   }
 
   @override
@@ -148,16 +122,14 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     ScanMode mode = ScanMode.incremental,
     bool navigate = false,
   }) async {
-    await _ref.read(currentLibraryPortProvider).select(libraryId);
-    if (!context.mounted) {
-      return;
-    }
-    if (navigate) {
+    if (navigate && context.mounted) {
       context.go(LibrariesRoutes.library(libraryId));
     }
-    await _ref
-        .read(libraryScanCommandPortProvider)
-        .start(mode: mode, silent: true);
+    await _ref.read(libraryScanCommandPortProvider).start(
+      mode: mode,
+      targetLibraryId: libraryId,
+      silent: true,
+    );
   }
 
   @override

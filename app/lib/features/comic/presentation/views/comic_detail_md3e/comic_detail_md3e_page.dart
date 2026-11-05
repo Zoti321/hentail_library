@@ -140,7 +140,7 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
               if (context.canPop()) {
                 context.pop();
               } else {
-                goCurrentLibraryBrowseFromContext(context);
+                goDefaultLibraryBrowseFromContext(context);
               }
             },
           ),
@@ -148,10 +148,6 @@ class _ComicDetailMd3eContent extends ConsumerWidget {
       ],
       onRead: () => _openReader(ref, incognito: false),
       onReadIncognito: () => _openReader(ref, incognito: true),
-      onMetadataChipTap: (String value) {
-        final String query = formatLibrarySearchExactMetaQuery(value);
-        context.push('/searched?q=${Uri.encodeQueryComponent(query)}');
-      },
       onAuthorTap: (String name) =>
           openAuthorDetailByName(context: context, ref: ref, name: name),
       onSeriesSelect: (int index) {

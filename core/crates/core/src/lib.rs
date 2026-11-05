@@ -71,11 +71,11 @@ pub use home::{
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
-    get_current_library_id, library_id_from_root, library_id_from_webdav_root, list_libraries,
+    library_id_from_root, library_id_from_webdav_root, list_libraries,
     normalize_webdav_root, parse_resource_format_categories_json, parse_scan_interval,
     record_library_sync_failure, record_library_sync_success, resolve_access_for_comic,
     resolve_browse_library_id, serialize_resource_format_categories,
-    set_all_libraries_scan_on_startup, set_current_library_id, set_remote_library_credentials,
+    set_all_libraries_scan_on_startup, set_remote_library_credentials,
     update_library_resource_format_categories, update_library_settings,
     update_library_sidebar_layout, update_local_library_root, update_remote_library, LibraryDto,
     LibrarySidebarPlacement, RemoteLibraryCredential, ResolvedAccess, ScanInterval,

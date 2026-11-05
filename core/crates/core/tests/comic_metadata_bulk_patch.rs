@@ -2,7 +2,6 @@ mod common;
 
 use hentai_core::{
     apply_comic_metadata_bulk_patch, cancel_sync, connection, create_local_library,
-    create_sync_handle, find_comic_by_id, init_db_at_path, set_current_library_id,
     try_acquire_library_write_lock, update_comic_user_meta, ComicMetadataBulkPatch, MultiValueOp,
     MultiValuePatch, PublishedAtPatch, ScalarPatch, UpdateComicUserMetaDto,
 };
@@ -48,9 +47,6 @@ async fn seed_comic(db: &impl ConnectionTrait, library_id: &str, comic_id: &str,
 
 async fn seed_two_comics_in_one_library() -> String {
     let lib = create_local_library("E:/lib", None).await.expect("library");
-    set_current_library_id(Some(&lib.library_id))
-        .await
-        .expect("current");
     let db = connection().expect("connection");
     clear_comics(&db).await;
     seed_comic(&db, &lib.library_id, "c1", "One").await;

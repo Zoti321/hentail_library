@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/library_admin/domain/current_library_port.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart';
 import 'package:hentai_library/shared/domain/library/comic_detail_return_series_port.dart';
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
@@ -17,10 +17,10 @@ import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.
 /// 实现与 `createX…Port` 工厂见 owner
 /// `features/library_admin/public.dart`（bootstrap override 注入）。
 
-final Provider<CurrentLibraryPort> currentLibraryPortProvider =
-    Provider<CurrentLibraryPort>(
+final Provider<LibrariesPort> librariesPortProvider =
+    Provider<LibrariesPort>(
       (Ref ref) => throw UnimplementedError(
-        'currentLibraryPortProvider 未注入，请在 bootstrap 中 override',
+        'librariesPortProvider 未注入，请在 bootstrap 中 override',
       ),
     );
 
@@ -75,10 +75,10 @@ comicDetailReturnSeriesPortProvider = Provider<ComicDetailReturnSeriesPort>(
   ),
 );
 
-final Provider<AsyncValue<CurrentLibraryState>> currentLibraryStateProvider =
-    Provider<AsyncValue<CurrentLibraryState>>(
+final Provider<AsyncValue<LibrariesState>> librariesStateProvider =
+    Provider<AsyncValue<LibrariesState>>(
       (Ref ref) => throw UnimplementedError(
-        'currentLibraryStateProvider 未注入，请在 bootstrap 中 override',
+        'librariesStateProvider 未注入，请在 bootstrap 中 override',
       ),
     );
 

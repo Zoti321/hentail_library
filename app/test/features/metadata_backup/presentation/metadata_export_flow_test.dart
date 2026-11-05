@@ -43,7 +43,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(confirmed?.gzip, isTrue);
-    expect(confirmed?.currentLibraryOnly, isFalse);
+    expect(confirmed?.libraryId, isNull);
     expect(confirmed?.libraryId, 'lib-1');
   });
 }

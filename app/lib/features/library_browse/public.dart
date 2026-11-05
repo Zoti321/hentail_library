@@ -8,4 +8,3 @@ export 'public/presentation/library_browse_bootstrap_exports.dart';
 export 'public/ui/author_detail_md3e_page.dart';
 export 'public/ui/author_detail_port.dart';
 export 'public/ui/library_md3e_page.dart';
-export 'public/ui/searched_md3e_page.dart';

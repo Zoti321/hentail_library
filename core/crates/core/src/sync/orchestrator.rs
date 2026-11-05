@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::db::connection;
 use crate::error::HentaiError;
 use crate::library::{
-    find_library_by_id, get_current_library_id, list_libraries, record_library_sync_failure,
+    find_library_by_id, list_libraries, record_library_sync_failure,
     record_library_sync_success, LibraryDto,
 };
 use crate::probe::rebuild_snapshot_from_scan_items;
@@ -82,13 +82,7 @@ async fn sync_library_locked(
         } else if sync_all {
             list_libraries().await?
         } else {
-            match get_current_library_id().await? {
-                Some(id) => match find_library_by_id(&id).await? {
-                    Some(lib) => vec![lib],
-                    None => Vec::new(),
-                },
-                None => Vec::new(),
-            }
+            Vec::new()
         };
 
     if targets.is_empty() {

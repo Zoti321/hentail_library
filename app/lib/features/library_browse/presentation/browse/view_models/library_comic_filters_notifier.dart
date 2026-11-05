@@ -10,6 +10,7 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
@@ -452,6 +453,7 @@ final Provider<LibraryComicFilter> libraryComicFilterQueryProvider =
           (LibraryQueryIntent intent) => intent.keyword,
         ),
       );
+      final String? libraryId = ref.watch(browseLibraryIdProvider);
       return _comicProjection.buildListFilter(
         ageRestriction: filters.ageRestriction,
         mediaTypeFilter: filters.mediaTypeFilter,
@@ -462,6 +464,7 @@ final Provider<LibraryComicFilter> libraryComicFilterQueryProvider =
         characters: filters.characterFilter,
         needsMetadataOnly: filters.needsMetadataOnly,
         keyword: keyword,
+        libraryId: libraryId,
       );
     });
 

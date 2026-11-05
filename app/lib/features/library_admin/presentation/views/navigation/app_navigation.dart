@@ -40,8 +40,6 @@ abstract final class AppNavigation {
         return navIdHome;
       case '/local':
         return '';
-      case '/searched':
-        return '';
       case '/metadata':
       case '/tags':
       case '/authors':
@@ -72,7 +70,7 @@ abstract final class AppNavigation {
         if (ref != null) {
           ref
               .read(libraryManagementPortProvider)
-              .goCurrentLibraryBrowse(context);
+              .goDefaultLibraryBrowse(context);
         } else {
           context.go(LibrariesRoutes.all);
         }

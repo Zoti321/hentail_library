@@ -129,19 +129,6 @@ class LibraryRepositoryImpl implements LibraryRepository {
   }
 
   @override
-  Future<String?> getCurrentId() async {
-    return guardFrb(rust.getCurrentLibraryIdFrb, fallbackMessage: '读取当前库失败');
-  }
-
-  @override
-  Future<void> setCurrentId(String? libraryId) async {
-    await guardFrb(
-      () => rust.setCurrentLibraryIdFrb(libraryId: libraryId),
-      fallbackMessage: '设置当前库失败',
-    );
-  }
-
-  @override
   Future<LocalLibrary> updateResourceFormatCategories({
     required String libraryId,
     required List<ResourceFormatCategory> groups,

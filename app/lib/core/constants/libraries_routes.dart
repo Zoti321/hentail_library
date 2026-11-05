@@ -6,21 +6,12 @@ abstract final class LibrariesRoutes {
 
   static String library(String libraryId) => '$root/$libraryId';
 
-  /// Single-library browse for [currentId], or All libraries browse when unset.
-  static String browsePathForCurrent(String? currentId) {
-    if (currentId == null || currentId.isEmpty) {
-      return all;
-    }
-    return library(currentId);
-  }
+  static String get defaultBrowse => all;
 
   /// Redirect target for legacy `/local` and bare `/libraries`.
-  static String? redirectPath({
-    required String locationPath,
-    required String? currentLibraryId,
-  }) {
+  static String? redirectPath({required String locationPath}) {
     if (locationPath == '/local') {
-      return browsePathForCurrent(currentLibraryId);
+      return all;
     }
     if (locationPath == root) {
       return all;
@@ -46,7 +37,7 @@ abstract final class LibrariesRoutes {
   }
 }
 
-/// Sidebar selection derived from location + Current library.
+/// Sidebar selection derived from location only.
 typedef LibrariesSidebarSelection = ({
   bool sectionActive,
   String? activeLibraryId,
@@ -57,10 +48,7 @@ bool librariesRailIconActive(LibrariesSidebarSelection selection) {
   return selection.sectionActive || selection.activeLibraryId != null;
 }
 
-LibrariesSidebarSelection librariesSidebarSelection({
-  required String path,
-  required String? currentLibraryId,
-}) {
+LibrariesSidebarSelection librariesSidebarSelection({required String path}) {
   if (LibrariesRoutes.isAllLibrariesPath(path)) {
     return (sectionActive: true, activeLibraryId: null);
   }
@@ -68,24 +56,16 @@ LibrariesSidebarSelection librariesSidebarSelection({
   if (pathLibraryId != null) {
     return (sectionActive: false, activeLibraryId: pathLibraryId);
   }
-  if (path.startsWith('/comic/') || path.startsWith('/series/')) {
-    return (sectionActive: false, activeLibraryId: currentLibraryId);
-  }
   return (sectionActive: false, activeLibraryId: null);
 }
 
-/// Where to go / what to select after deleting the viewed or Current library.
-typedef AfterLibraryDeleteNavigation = ({
-  String? selectLibraryId,
-  String goPath,
-});
+typedef AfterLibraryDeleteNavigation = ({String goPath});
 
 AfterLibraryDeleteNavigation afterLibraryDeleteNavigation({
   required List<String> remainingLibraryIds,
 }) {
   if (remainingLibraryIds.isEmpty) {
-    return (selectLibraryId: null, goPath: LibrariesRoutes.all);
+    return (goPath: LibrariesRoutes.all);
   }
-  final String nextId = remainingLibraryIds.first;
-  return (selectLibraryId: nextId, goPath: LibrariesRoutes.library(nextId));
+  return (goPath: LibrariesRoutes.library(remainingLibraryIds.first));
 }

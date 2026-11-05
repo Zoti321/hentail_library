@@ -1,8 +1,7 @@
 use hentai_core::{
     create_local_library as core_create_local, create_remote_library as core_create_remote,
-    delete_library as core_delete, get_current_library_id as core_get_current,
-    list_libraries as core_list, set_all_libraries_scan_on_startup as core_set_all_scan_on_startup,
-    set_current_library_id as core_set_current,
+    delete_library as core_delete, list_libraries as core_list,
+    set_all_libraries_scan_on_startup as core_set_all_scan_on_startup,
     update_library_resource_format_categories as core_update_formats,
     update_library_settings as core_update_settings,
     update_library_sidebar_layout as core_update_sidebar,
@@ -178,18 +177,6 @@ pub fn update_local_library_root_frb(
 #[flutter_rust_bridge::frb(sync)]
 pub fn delete_library_frb(library_id: String) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(core_delete(&library_id)).map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb]
-pub async fn get_current_library_id_frb() -> Result<Option<String>, HentaiErrorDto> {
-    core_get_current().await.map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb]
-pub async fn set_current_library_id_frb(library_id: Option<String>) -> Result<(), HentaiErrorDto> {
-    core_set_current(library_id.as_deref())
-        .await
-        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

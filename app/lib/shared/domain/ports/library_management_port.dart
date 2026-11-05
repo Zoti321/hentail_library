@@ -25,7 +25,7 @@ abstract interface class LibraryManagementPort {
 
   void goAllLibraries(BuildContext context);
 
-  void goCurrentLibraryBrowse(BuildContext context);
+  void goDefaultLibraryBrowse(BuildContext context);
 
   Future<void> scanLibrary(
     BuildContext context,

@@ -4,6 +4,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
+import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 
 class CatalogSelectionState {
@@ -28,12 +29,9 @@ class CatalogSelectionState {
 class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
   @override
   CatalogSelectionState build() {
-    ref.listen(
-      currentLibraryStateProvider.select((s) => s.asData?.value.currentId),
-      (_, _) {
-        _reset();
-      },
-    );
+    ref.listen(browseLibraryIdProvider, (_, _) {
+      _reset();
+    });
     ref.listen(libraryQueryIntentProvider.select((intent) => intent.keyword), (
       _,
       _,

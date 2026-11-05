@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/library_admin/di/shared_state_ports.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/libraries_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_md3e_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_md3e_form_dialog.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -12,15 +12,14 @@ import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
 
-class _RecordingCurrentLibraryNotifier extends CurrentLibraryNotifier {
+class _RecordingLibrariesNotifier extends LibrariesNotifier {
   final List<({LibraryForm form, LocalLibrary? original})> submitCalls =
       <({LibraryForm form, LocalLibrary? original})>[];
 
   @override
-  Future<CurrentLibraryState> build() async {
-    return const CurrentLibraryState(
+  Future<LibrariesState> build() async {
+    return const LibrariesState(
       libraries: <LocalLibrary>[],
-      currentId: null,
     );
   }
 
@@ -38,7 +37,7 @@ Future<void> _pumpForm(
   WidgetTester tester, {
   required LibraryFormMode mode,
   LocalLibrary? library,
-  required _RecordingCurrentLibraryNotifier notifier,
+  required _RecordingLibrariesNotifier notifier,
 }) async {
   tester.view.physicalSize = const Size(1280, 900);
   tester.view.devicePixelRatio = 1.0;
@@ -48,8 +47,8 @@ Future<void> _pumpForm(
   await pumpLocalizedApp(
     tester,
     overrides: <Override>[
-      currentLibraryProvider.overrideWith(() => notifier),
-      currentLibraryPortProvider.overrideWith(createCurrentLibraryPort),
+      librariesProvider.overrideWith(() => notifier),
+      librariesPortProvider.overrideWith(createLibrariesPort),
     ],
     home: Builder(
       builder: (BuildContext context) => Scaffold(
@@ -85,8 +84,8 @@ void main() {
   testWidgets('empty local create shows field errors and does not submit', (
     WidgetTester tester,
   ) async {
-    final _RecordingCurrentLibraryNotifier notifier =
-        _RecordingCurrentLibraryNotifier();
+    final _RecordingLibrariesNotifier notifier =
+        _RecordingLibrariesNotifier();
     await _pumpForm(
       tester,
       mode: LibraryFormMode.createLocal,
@@ -104,8 +103,8 @@ void main() {
   testWidgets('remote create without password switches to WebDAV tab', (
     WidgetTester tester,
   ) async {
-    final _RecordingCurrentLibraryNotifier notifier =
-        _RecordingCurrentLibraryNotifier();
+    final _RecordingLibrariesNotifier notifier =
+        _RecordingLibrariesNotifier();
     await _pumpForm(
       tester,
       mode: LibraryFormMode.createRemote,
@@ -129,8 +128,8 @@ void main() {
   testWidgets('valid remote create calls submitLibraryForm and closes', (
     WidgetTester tester,
   ) async {
-    final _RecordingCurrentLibraryNotifier notifier =
-        _RecordingCurrentLibraryNotifier();
+    final _RecordingLibrariesNotifier notifier =
+        _RecordingLibrariesNotifier();
     await _pumpForm(
       tester,
       mode: LibraryFormMode.createRemote,

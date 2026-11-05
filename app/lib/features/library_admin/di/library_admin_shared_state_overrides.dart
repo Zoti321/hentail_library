@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/libraries_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_throttle_busy.dart';
@@ -15,7 +15,7 @@ import 'package:riverpod/misc.dart' show Override;
 
 /// library_admin owner：Port 工厂与库状态投影（#435）。
 List<Override> libraryAdminSharedStateOverrides() => <Override>[
-  currentLibraryPortProvider.overrideWith(createCurrentLibraryPort),
+  librariesPortProvider.overrideWith(createLibrariesPort),
   libraryReorderModePortProvider.overrideWith(createLibraryReorderModePort),
   libraryReorderActiveStateProvider.overrideWith(
     (Ref ref) => ref.watch(libraryReorderModeProvider),
@@ -31,8 +31,8 @@ List<Override> libraryAdminSharedStateOverrides() => <Override>[
     createLibraryMetadataRefreshCommandPort,
   ),
   libraryManagementPortProvider.overrideWith(createLibraryManagementPort),
-  currentLibraryStateProvider.overrideWith(
-    (Ref ref) => ref.watch(currentLibraryProvider),
+  librariesStateProvider.overrideWith(
+    (Ref ref) => ref.watch(librariesProvider),
   ),
   libraryRevisionStateProvider.overrideWith(
     (Ref ref) => ref.watch(libraryRevisionProvider),

@@ -1,7 +1,6 @@
 mod common;
 
 use hentai_core::{
-    create_local_library, export_comic_metadata, init_db_at_path, set_current_library_id,
     ExportComicMetadataOptions, MetadataBackupPayload, SCHEMA_VERSION,
 };
 use sea_orm::{ConnectionTrait, Statement};
@@ -65,9 +64,6 @@ fn export_comic_metadata_emits_schema_v1_json() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let lib = create_local_library("E:/lib", None).await.expect("library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
             let db = hentai_core::connection().expect("connection");
             seed_export_fixture(&db, &lib.library_id).await;
 

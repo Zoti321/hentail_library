@@ -11,19 +11,14 @@ import 'package:test/test.dart';
 class _CredRepo implements LibraryRepository {
   _CredRepo({
     required this.libraries,
-    required this.currentId,
     required this.passwords,
   });
 
   final List<LocalLibrary> libraries;
-  final String? currentId;
   final Map<String, String?> passwords;
 
   @override
   Future<List<LocalLibrary>> list() async => libraries;
-
-  @override
-  Future<String?> getCurrentId() async => currentId;
 
   @override
   Future<String?> readRemotePassword(String libraryId) async =>
@@ -48,27 +43,30 @@ LocalLibrary _lib({required String id, required String kind}) => (
 );
 
 void main() {
-  test('loadRemoteCredentialsForSync only includes current remote when not syncAll', () async {
-    final creds = await loadRemoteCredentialsForSync(
-      libraryRepository: _CredRepo(
-        libraries: <LocalLibrary>[
-          _lib(id: 'local1', kind: 'local'),
-          _lib(id: 'remote1', kind: 'remote'),
-          _lib(id: 'remote2', kind: 'remote'),
-        ],
-        currentId: 'remote1',
-        passwords: <String, String?>{
-          'remote1': 'secret1',
-          'remote2': 'secret2',
-        },
-      ),
-      syncAll: false,
-    );
+  test(
+    'loadRemoteCredentialsForSync only includes target remote when not syncAll',
+    () async {
+      final creds = await loadRemoteCredentialsForSync(
+        libraryRepository: _CredRepo(
+          libraries: <LocalLibrary>[
+            _lib(id: 'local1', kind: 'local'),
+            _lib(id: 'remote1', kind: 'remote'),
+            _lib(id: 'remote2', kind: 'remote'),
+          ],
+          passwords: <String, String?>{
+            'remote1': 'secret1',
+            'remote2': 'secret2',
+          },
+        ),
+        syncAll: false,
+        targetLibraryId: 'remote1',
+      );
 
-    expect(creds, hasLength(1));
-    expect(creds.single.libraryId, 'remote1');
-    expect(creds.single.password, 'secret1');
-  });
+      expect(creds, hasLength(1));
+      expect(creds.single.libraryId, 'remote1');
+      expect(creds.single.password, 'secret1');
+    },
+  );
 
   test('loadRemoteCredentialsForSync includes all remotes with passwords when syncAll', () async {
     final creds = await loadRemoteCredentialsForSync(
@@ -77,7 +75,6 @@ void main() {
           _lib(id: 'remote1', kind: 'remote'),
           _lib(id: 'remote2', kind: 'remote'),
         ],
-        currentId: 'remote1',
         passwords: <String, String?>{'remote1': 'secret1', 'remote2': null},
       ),
       syncAll: true,

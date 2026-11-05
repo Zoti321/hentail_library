@@ -52,7 +52,6 @@ test/features/comic/presentation/view_models/comic_metadata_apply_test.dart
 test/features/comic/presentation/view_models/comic_metadata_editor_notifier_test.dart
 test/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier_test.dart
 test/features/library_browse/presentation/browse/view_models/library_page_facade_test.dart
-test/features/library_browse/presentation/browse/view_models/library_search_query_parser_test.dart
 test/features/library_browse/presentation/browse/view_models/library_series_filters_notifier_test.dart
 test/features/series/presentation/view_models/series_item_sort_persist_test.dart
 test/features/series/presentation/view_models/series_metadata_editor_notifier_test.dart
@@ -62,7 +61,6 @@ test/features/read_session/presentation/resume_visible_sync_gate_test.dart
 test/features/read_session/presentation/view_models/reader_cover_editor_notifier_test.dart
 test/features/app_settings/presentation/view_models/locale_preference_persist_test.dart
 test/features/app_settings/presentation/view_models/reading_mode_persist_test.dart
-test/features/library_admin/presentation/view_models/current_library_notifier_commands_test.dart
 test/features/reading_history/presentation/view_models/history_load_more_throttle_test.dart
 test/features/reading_history/presentation/view_models/history_paged_feed_controller_test.dart
 test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dart

@@ -82,6 +82,7 @@ rust_series.SeriesFilterDto mapLibrarySeriesFilter(LibrarySeriesFilter filter) {
     requireItems: filter.requireItems,
     serializationStatus: filter.serializationStatus,
     preferLibraryRootSeries: filter.preferLibraryRootSeries,
+    libraryId: filter.libraryId,
   );
 }
 

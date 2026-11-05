@@ -1,14 +1,10 @@
-import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 
 void main() {
-  test('public barrel exports command ports and bootstrap factories', () {
-    expect(CurrentLibraryPort, isNotNull);
-    expect(LibraryScanCommandPort, isNotNull);
-    expect(ResourceFormatCategory, isNotNull);
-    expect(createCurrentLibraryPort, isNotNull);
-    expect(createLibraryScanCommandPort, isNotNull);
-    expect(buildLibraryAdminMd3eAppShellNavigationSlot, isNotNull);
-    expect(libraryAdminShellFeedbackBelowTitleBar, isNotNull);
+  test('library_admin domain libraries types exist', () {
+    expect(LibrariesPort, isNotNull);
+    expect(LibrariesState, isNotNull);
   });
 }

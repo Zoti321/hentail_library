@@ -8,6 +8,7 @@ abstract class LibraryScanCommandPort {
   Future<void> start({
     ScanMode mode = ScanMode.incremental,
     bool syncAll = false,
+    String? targetLibraryId,
     bool silent = false,
   });
 

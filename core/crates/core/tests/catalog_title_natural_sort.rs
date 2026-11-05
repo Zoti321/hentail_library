@@ -5,7 +5,6 @@ use hentai_core::util::compute_sort_key;
 use hentai_core::ComicGrouping;
 use hentai_core::{
     connection, create_local_library, fetch_comics_page, fetch_series_page, init_db_at_path,
-    set_current_library_id, update_comic_user_meta, ComicFilterDto, ComicSortFieldDto,
     ComicSortOptionDto, PageRequestDto, SeriesFilterDto, SeriesGrouping, SeriesSortFieldDto,
     SeriesSortOptionDto, UpdateComicUserMetaDto,
 };
@@ -26,9 +25,6 @@ async fn stamp_all_to_current_library(db: &DatabaseConnection, root: &str) {
     let lib = create_local_library(root, None)
         .await
         .expect("create library");
-    set_current_library_id(Some(&lib.library_id))
-        .await
-        .expect("set current");
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE comics SET library_id = ?",
@@ -179,9 +175,6 @@ fn fetch_comics_page_by_series_grouping_flattens_series_blocks() {
             let lib = create_local_library("E:/lib", None)
                 .await
                 .expect("create library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("set current");
             db.execute(Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 "UPDATE comics SET library_id = ?",

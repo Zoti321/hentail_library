@@ -4,7 +4,6 @@ use std::path::Path;
 
 use hentai_core::{
     comic_id_from_path, create_local_library, create_sync_handle, find_comic_by_id,
-    init_db_at_path, set_current_library_id, sync_library, SyncLibraryPhaseDto,
     SyncLibraryProgressDto, SyncScanMode,
 };
 use tempfile::TempDir;
@@ -35,9 +34,6 @@ fn local_sync_missing_root_ends_with_warning_not_silent_empty_align() {
             let lib = create_local_library(&missing.to_string_lossy(), Some("Missing"))
                 .await
                 .expect("create");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
 
             let handle = create_sync_handle();
             let mut events = Vec::new();
@@ -80,9 +76,6 @@ fn local_sync_unreadable_root_keeps_existing_comics() {
             let lib = create_local_library(&root.to_string_lossy(), Some("Lib"))
                 .await
                 .expect("create");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
 
             let handle = create_sync_handle();
             sync_library(handle, SyncScanMode::Full, false, None, vec![], |_| {})

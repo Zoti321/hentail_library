@@ -7,7 +7,6 @@ import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_mo
 import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// MD3E rail destinations for production（历史 / 垃圾桶入口在首页）。
 List<Md3eShellRailDestination> productionMd3eShellRailDestinations(
   AppLocalizations l10n,
 ) {
@@ -64,10 +63,7 @@ List<Md3eHomeLibraryDashboardRow> md3eDashboardRowsForLibraries({
       .toList(growable: false);
 }
 
-String productionMd3eSelectedNavId({
-  required String path,
-  required String? currentLibraryId,
-}) {
+String productionMd3eSelectedNavId({required String path}) {
   final String flatNavId = AppNavigation.activeNavIdForPath(path);
   if (flatNavId == AppNavigation.navIdHistory ||
       flatNavId == AppNavigation.navIdTrash) {
@@ -88,19 +84,14 @@ String productionMd3eSelectedNavId({
 
 String productionMd3eSelectedLibraryId({
   required String path,
-  required String? currentLibraryId,
   required List<Md3eHomeLibraryDashboardRow> libraries,
 }) {
   final LibrariesSidebarSelection selection = librariesSidebarSelection(
     path: path,
-    currentLibraryId: currentLibraryId,
   );
   final String? activeId = selection.activeLibraryId;
   if (activeId != null && activeId.isNotEmpty) {
     return activeId;
-  }
-  if (currentLibraryId != null && currentLibraryId.isNotEmpty) {
-    return currentLibraryId;
   }
   if (libraries.isEmpty) {
     return '';

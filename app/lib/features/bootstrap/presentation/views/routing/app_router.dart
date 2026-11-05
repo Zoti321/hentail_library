@@ -12,6 +12,7 @@ import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
+import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final GlobalKey<NavigatorState> appRootNavigatorKey =
@@ -72,28 +73,14 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/local',
           name: '本地漫画',
-          pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(
-                state: state,
-                child: const LegacyLocalLibraryRedirectPage(),
-              ),
+          redirect: (BuildContext context, GoRouterState state) =>
+              LibrariesRoutes.all,
         ),
         GoRoute(
           path: '/history',
           name: '历史记录',
           pageBuilder: (BuildContext context, GoRouterState state) =>
               buildShellNavPage(state: state, child: const HistoryPage()),
-        ),
-        GoRoute(
-          path: '/searched',
-          name: '搜索结果',
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            final String query = state.uri.queryParameters['q'] ?? '';
-            return buildShellNavPage(
-              state: state,
-              child: SearchedMd3ePage(query: query),
-            );
-          },
         ),
         GoRoute(
           path: '/trash',
@@ -113,7 +100,7 @@ final GoRouter appRouter = GoRouter(
   ],
 );
 
-/// Ensures route [libraryId] is selected as Current library, then shows catalog.
+/// 单库浏览页：注入 [browseLibraryIdProvider] 作用域后展示目录。
 class LibraryBrowsePage extends HookConsumerWidget {
   const LibraryBrowsePage({super.key, required this.libraryId});
 
@@ -122,60 +109,16 @@ class LibraryBrowsePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(() {
-      Future<void> sync() async {
-        if (libraryId.isEmpty) {
-          return;
-        }
-        final String? currentId = ref
-            .read(currentLibraryProvider)
-            .asData
-            ?.value
-            .currentId;
-        if (currentId == libraryId) {
-          return;
-        }
-        try {
-          await ref.read(currentLibraryProvider.notifier).select(libraryId);
-        } catch (_) {
-          // Invalid id: leave catalog empty / error surfaces via providers.
-        }
+      if (libraryId.isEmpty) {
+        ref.read(browseLibraryIdProvider.notifier).setId(null);
+      } else {
+        ref.read(browseLibraryIdProvider.notifier).setId(libraryId);
       }
-
-      sync();
-      return null;
+      return () {
+        ref.read(browseLibraryIdProvider.notifier).setId(null);
+      };
     }, <Object?>[libraryId]);
 
     return const LibraryMd3ePage();
-  }
-}
-
-/// Legacy `/local` bookmark: wait for Current library then redirect.
-class LegacyLocalLibraryRedirectPage extends ConsumerWidget {
-  const LegacyLocalLibraryRedirectPage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<CurrentLibraryState> async = ref.watch(
-      currentLibraryProvider,
-    );
-    return async.when(
-      data: (CurrentLibraryState value) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            context.go(LibrariesRoutes.browsePathForCurrent(value.currentId));
-          }
-        });
-        return const Center(child: CircularProgressIndicator());
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (Object _, StackTrace _) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            context.go(LibrariesRoutes.all);
-          }
-        });
-        return const Center(child: CircularProgressIndicator());
-      },
-    );
   }
 }

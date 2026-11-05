@@ -146,10 +146,6 @@ class _SeriesDetailMd3eContentState
           onPressed: () => _showInExplorer(context, series),
         ),
       ],
-      onMetadataChipTap: (String value) {
-        final String query = formatLibrarySearchExactMetaQuery(value);
-        context.push('/searched?q=${Uri.encodeQueryComponent(query)}');
-      },
       onAuthorTap: (String name) =>
           openAuthorDetailByName(context: context, ref: ref, name: name),
       onComicTap: (int globalIndex) {

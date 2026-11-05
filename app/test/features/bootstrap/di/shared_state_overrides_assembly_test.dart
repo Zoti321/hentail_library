@@ -11,6 +11,6 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    expect(() => container.read(currentLibraryPortProvider), returnsNormally);
+    expect(() => container.read(librariesPortProvider), returnsNormally);
   });
 }

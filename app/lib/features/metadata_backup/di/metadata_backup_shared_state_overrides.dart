@@ -12,10 +12,7 @@ List<Override> metadataBackupSharedStateOverrides() => <Override>[
   libraryMetadataExportActionProvider.overrideWithValue(
     (BuildContext context, String libraryId) => runMetadataExportFlow(
       context,
-      initialOptions: MetadataExportOptions(
-        currentLibraryOnly: true,
-        libraryId: libraryId,
-      ),
+      initialOptions: MetadataExportOptions(libraryId: libraryId),
     ),
   ),
   recentMetadataBackupAtReaderProvider.overrideWithValue(

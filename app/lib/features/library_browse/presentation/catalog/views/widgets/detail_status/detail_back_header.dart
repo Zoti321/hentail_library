@@ -76,7 +76,7 @@ class DetailBackHeader extends StatelessWidget {
       }
     }
     requestShellFadeThroughOnce();
-    goCurrentLibraryBrowseFromContext(context);
+    goDefaultLibraryBrowseFromContext(context);
   }
 
   static String? _readReturnSeriesId(BuildContext context) {

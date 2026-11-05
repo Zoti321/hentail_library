@@ -8,7 +8,8 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/libraries_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
@@ -26,11 +27,7 @@ class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   Stream<void> watchRevision() => _events.stream;
 }
 
-class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
-  _FakeCurrentLibraryNotifier({required this.currentId});
-
-  String? currentId;
-
+class _FakeLibrariesNotifier extends LibrariesNotifier {
   static const LocalLibrary _libraryA = (
     libraryId: 'lib-a',
     kind: 'local',
@@ -60,20 +57,9 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
   );
 
   @override
-  Future<CurrentLibraryState> build() async {
-    return CurrentLibraryState(
-      libraries: const <LocalLibrary>[_libraryA, _libraryB],
-      currentId: currentId,
-    );
-  }
-
-  void setCurrentIdSync(String libraryId) {
-    currentId = libraryId;
-    state = AsyncData(
-      CurrentLibraryState(
-        libraries: const <LocalLibrary>[_libraryA, _libraryB],
-        currentId: libraryId,
-      ),
+  Future<LibrariesState> build() async {
+    return const LibrariesState(
+      libraries: <LocalLibrary>[_libraryA, _libraryB],
     );
   }
 }
@@ -110,14 +96,14 @@ class _ControllableThumbnailEventCoordinator extends ThumbnailEventCoordinator {
 void main() {
   group('LibraryCatalogRevisionCoordinator', () {
     late StreamController<void> events;
-    late _FakeCurrentLibraryNotifier currentLibrary;
+    late _FakeLibrariesNotifier librariesNotifier;
     late _ControllableScanLibraryController scanLibrary;
     late _ControllableThumbnailEventCoordinator thumbnails;
     late ProviderContainer container;
 
     setUp(() {
       events = StreamController<void>.broadcast();
-      currentLibrary = _FakeCurrentLibraryNotifier(currentId: 'lib-a');
+      librariesNotifier = _FakeLibrariesNotifier();
       scanLibrary = _ControllableScanLibraryController(running: false);
       thumbnails = _ControllableThumbnailEventCoordinator();
       container = ProviderContainer(
@@ -127,13 +113,13 @@ void main() {
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),
-          currentLibraryProvider.overrideWith(() => currentLibrary),
+          librariesProvider.overrideWith(() => librariesNotifier),
           scanLibraryControllerProvider.overrideWith(() => scanLibrary),
           thumbnailEventCoordinatorProvider.overrideWith(() => thumbnails),
         ],
       );
       // Warm keepAlive providers so listens are attached and notifiers init.
-      container.read(currentLibraryProvider);
+      container.read(librariesProvider);
       container.read(libraryRevisionProvider);
       container.read(scanLibraryControllerProvider);
       container.read(thumbnailEventCoordinatorProvider);
@@ -166,8 +152,9 @@ void main() {
     );
 
     test(
-      'current library change flushes inactive catalog revision immediately',
+      'browse library scope change flushes inactive catalog revision immediately',
       () {
+        container.read(browseLibraryIdProvider.notifier).setId('lib-a');
         container.read(libraryRevisionProvider.notifier).notifyExternalChange();
         expect(
           container.read(
@@ -176,8 +163,7 @@ void main() {
           0,
         );
 
-        // Mirrors CurrentLibraryNotifier.select: revision first, then id.
-        currentLibrary.setCurrentIdSync('lib-b');
+        container.read(browseLibraryIdProvider.notifier).setId('lib-b');
 
         expect(
           container.read(

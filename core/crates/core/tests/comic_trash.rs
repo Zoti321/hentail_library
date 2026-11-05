@@ -12,7 +12,6 @@ use hentai_core::{
     find_series_by_id, import_comic_metadata, init_db_at_path, list_distinct_named_facet_names,
     open_reader, peek_metadata_backup_manifest, purge_comics, record_reading, resolve_series_cover,
     restore_comics, search_by_keyword_page, search_by_tag_expression, series_id_from_folder_path,
-    set_current_library_id, sync_library, trash_comics, try_acquire_library_write_lock,
     update_comic_user_meta, update_series_user_meta, watch_continue_reading_top5,
     watch_home_page_counts, watch_recently_added_on_home, ComicFilterDto, ComicSortOptionDto,
     ExportComicMetadataOptions, HentaiError, HentaiErrorCode, JunctionNamedFacet, LibraryDto,
@@ -91,9 +90,6 @@ async fn setup_local(fixture: &Fixture) -> LibraryDto {
     let library = create_local_library(&fixture.root.to_string_lossy(), Some("Lib"))
         .await
         .expect("create lib");
-    set_current_library_id(Some(&library.library_id))
-        .await
-        .expect("current");
     sync(&library).await;
     library
 }

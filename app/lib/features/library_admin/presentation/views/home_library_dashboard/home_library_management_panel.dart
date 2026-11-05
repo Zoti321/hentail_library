@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/domain/ports/library_management_port.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/features/library_admin/domain/current_library_state.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
 import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart';
@@ -35,13 +35,12 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
           data: (List<HomeLibraryStat> data) => data,
           orElse: () => const <HomeLibraryStat>[],
         );
-    final CurrentLibraryState? libraryState = ref
-        .watch(currentLibraryStateProvider)
+    final LibrariesState? libraryState = ref
+        .watch(librariesStateProvider)
         .asData
         ?.value;
     final List<LocalLibrary> libraries =
         libraryState?.libraries ?? const <LocalLibrary>[];
-    final String? currentLibraryId = libraryState?.currentId;
     final bool scanRunning = ref.watch(
       libraryScanActivityStateProvider.select(
         (LibraryScanActivityState activity) => activity.running,
@@ -74,8 +73,7 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
             comicCount: stat?.comicCount ?? 0,
             seriesCount: stat?.seriesCount ?? 0,
             lastSyncedAt: stat?.lastSuccessfulSyncAt,
-            scanInProgress:
-                scanRunning && library.libraryId == currentLibraryId,
+            scanInProgress: scanRunning,
             metadataRefreshInProgress: refreshingLibraryId == library.libraryId,
           );
         })
@@ -149,7 +147,7 @@ Future<void> _persistOrder(
   final LibrarySidebarSections sections = splitLibrarySidebar(next);
   try {
     await ref
-        .read(currentLibraryPortProvider)
+        .read(librariesPortProvider)
         .updateSidebarLayout(
           encodeLibrarySidebarLayout(
             pinned: sections.pinned,

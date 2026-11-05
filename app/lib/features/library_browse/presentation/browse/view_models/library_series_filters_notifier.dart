@@ -5,6 +5,7 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_age
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart';
+import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
@@ -225,11 +226,13 @@ final Provider<LibrarySeriesFilter> librarySeriesFiltersQueryProvider =
               async.asData?.value.preferLibraryRootSeries ?? true,
         ),
       );
+      final String? libraryId = ref.watch(browseLibraryIdProvider);
       return _seriesProjection.buildListFilter(
         ageRestriction: filters.ageRestriction,
         serializationStatusFilter: filters.serializationStatusFilter,
         preferLibraryRootSeries: preferLibraryRootSeries,
         keyword: keyword,
+        libraryId: libraryId,
       );
     });
 
