@@ -6,8 +6,8 @@ use hentai_core::ComicGrouping;
 use hentai_core::{
     connection, create_local_library, fetch_comics_page, fetch_series_page, init_db_at_path,
     set_current_library_id, update_comic_user_meta, ComicFilterDto, ComicSortFieldDto,
-    ComicSortOptionDto, PageRequestDto, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
-    UpdateComicUserMetaDto,
+    ComicSortOptionDto, PageRequestDto, SeriesFilterDto, SeriesGrouping, SeriesSortFieldDto,
+    SeriesSortOptionDto, UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -270,6 +270,7 @@ fn fetch_series_page_name_asc_uses_natural_order() {
                     require_items: true,
                     ..Default::default()
                 },
+                SeriesGrouping::None,
                 SeriesSortOptionDto {
                     field: SeriesSortFieldDto::Name,
                     descending: false,

@@ -1,6 +1,6 @@
 use sea_orm::Value;
 
-use super::dto::{ComicFilterDto, ComicSortOptionDto, now_ms};
+use super::dto::{now_ms, ComicFilterDto, ComicSortOptionDto};
 use super::filter_predicate::build_catalog_where_clause;
 use super::grouping::ComicGrouping;
 use crate::history::reading_history_retention_cutoff_ms;

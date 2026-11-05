@@ -1,5 +1,6 @@
-use hentai_core::{list_all_characters, list_all_parodies, list_distinct_characters,
-                  list_distinct_parodies};
+use hentai_core::{
+    list_all_characters, list_all_parodies, list_distinct_characters, list_distinct_parodies,
+};
 
 use super::init::HentaiErrorDto;
 

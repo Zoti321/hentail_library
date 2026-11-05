@@ -5,9 +5,9 @@ use std::path::Path;
 use hentai_core::{
     comic_id_from_path, connection, create_local_library, find_comic_by_id, find_series_by_id,
     find_series_thumbnail_by_series_id, get_reading_by_comic_id, init_db_at_path, list_libraries,
-    record_reading, series_id_from_folder_path, try_acquire_library_write_lock,
+    now_ms, record_reading, series_id_from_folder_path, try_acquire_library_write_lock,
     update_comic_user_meta, update_local_library_root, update_series_item_sort_order,
-    update_series_user_meta, now_ms, ReadingHistoryDto, UpdateComicUserMetaDto, UpdateSeriesUserMetaDto,
+    update_series_user_meta, ReadingHistoryDto, UpdateComicUserMetaDto, UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;

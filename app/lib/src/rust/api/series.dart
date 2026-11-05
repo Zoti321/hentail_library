@@ -12,7 +12,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'sync.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Future<PlatformInt64> countAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesCountAllSeriesFrb();
@@ -20,10 +20,12 @@ Future<PlatformInt64> countAllSeriesFrb() =>
 Future<PagedSeriesResultDto> fetchSeriesPageFrb({
   required PageRequestDto request,
   required SeriesFilterDto filter,
+  required SeriesGroupingDto grouping,
   required SeriesSortOptionDto sort,
 }) => RustLib.instance.api.crateApiSeriesFetchSeriesPageFrb(
   request: request,
   filter: filter,
+  grouping: grouping,
   sort: sort,
 );
 
@@ -415,6 +417,8 @@ class SeriesFilterDto {
           libraryId == other.libraryId &&
           preferLibraryRootSeries == other.preferLibraryRootSeries;
 }
+
+enum SeriesGroupingDto { none, bySerializationStatus }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesItemDto` 对齐，避免跨 crate opaque 绑定。
 class SeriesItemDto {

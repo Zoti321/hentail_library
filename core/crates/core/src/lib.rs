@@ -45,23 +45,23 @@ pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
     apply_comic_metadata_bulk_patch, count_all, count_trashed_comics, fetch_comics_page,
     fetch_trashed_comics_page, find_comic_by_id, find_comics_by_ids, is_comic_trashed,
-    list_trashed_comic_ids, paginate, purge_comics, read_data_version, restore_comics,
+    list_trashed_comic_ids, now_ms, paginate, purge_comics, read_data_version, restore_comics,
     search_by_keyword, search_by_keyword_page, search_by_tag_expression,
     search_by_tag_expression_page, set_comic_meta_locks, trash_comics, update_comic_user_meta,
     BulkPatchResultDto, ComicDto, ComicFilterDto, ComicGrouping, ComicMetaLocks,
     ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto, ComicSortOptionDto,
     MultiValueOp, MultiValuePatch, PageRequestDto, PageWindow, PagedComicResultDto,
     PagedTrashedComicResultDto, PublishedAtPatch, ScalarPatch, SetComicMetaLocksDto,
-    TrashedComicCountsDto, TrashedComicDto, UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS, now_ms,
+    TrashedComicCountsDto, TrashedComicDto, UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
 pub use error::{HentaiError, HentaiErrorCode};
 pub use history::{
     clear_all_reading, delete_reading_by_comic_id, delete_reading_by_comic_ids, fetch_reading_page,
-    get_reading_by_comic_id, list_all_reading, list_read_page_indexes, record_reading,
-    reading_history_retention_cutoff_ms, watch_reading_history_changes, PagedReadingHistoryDto,
-    ReadPageIndexDto, ReadingHistoryDto, READING_HISTORY_RETENTION_DAYS,
+    get_reading_by_comic_id, list_all_reading, list_read_page_indexes,
+    reading_history_retention_cutoff_ms, record_reading, watch_reading_history_changes,
+    PagedReadingHistoryDto, ReadPageIndexDto, ReadingHistoryDto, READING_HISTORY_RETENTION_DAYS,
 };
 pub use home::{
     watch_continue_reading_top5, watch_home_library_alerts, watch_home_page_counts,
@@ -109,9 +109,9 @@ pub use series::{
     set_series_item_sort_order_locked, set_series_items_order, set_series_meta_locks,
     update_series_item_sort_order, update_series_user_meta, watch_home_series_comic_order_map,
     PagedSeriesComicsResultDto, PagedSeriesResultDto, SeriesComicPageItemDto,
-    SeriesComicsMetadataDto, SeriesDto, SeriesFilterDto, SeriesItemDto, SeriesMetaLocks,
-    SeriesReadingContextDto, SeriesSortFieldDto, SeriesSortOptionDto, SetSeriesMetaLocksDto,
-    UpdateSeriesUserMetaDto,
+    SeriesComicsMetadataDto, SeriesDto, SeriesFilterDto, SeriesGrouping, SeriesItemDto,
+    SeriesMetaLocks, SeriesReadingContextDto, SeriesSortFieldDto, SeriesSortOptionDto,
+    SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
 };
 pub use series_id::{
     folder_path_from_comic_path, series_id_from_folder_path, series_name_from_folder_path,

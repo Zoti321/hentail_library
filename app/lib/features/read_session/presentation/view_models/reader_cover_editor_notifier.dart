@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/comic/public.dart';
+import 'package:hentai_library/features/series/public/di/series_cover_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

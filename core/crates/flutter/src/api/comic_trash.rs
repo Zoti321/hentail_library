@@ -46,9 +46,7 @@ pub struct ComicPurgeResultFrbDto {
 
 #[flutter_rust_bridge::frb]
 pub async fn trash_comics_frb(comic_ids: Vec<String>) -> Result<(), HentaiErrorDto> {
-    trash_comics(comic_ids)
-        .await
-        .map_err(HentaiErrorDto::from)
+    trash_comics(comic_ids).await.map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]
@@ -105,9 +103,7 @@ pub async fn fetch_trashed_comics_page_frb(
 
 #[flutter_rust_bridge::frb]
 pub async fn count_trashed_comics_frb() -> Result<TrashedComicCountsFrbDto, HentaiErrorDto> {
-    let counts = count_trashed_comics()
-        .await
-        .map_err(HentaiErrorDto::from)?;
+    let counts = count_trashed_comics().await.map_err(HentaiErrorDto::from)?;
     Ok(TrashedComicCountsFrbDto {
         total: counts.total,
         local: counts.local,
@@ -117,7 +113,5 @@ pub async fn count_trashed_comics_frb() -> Result<TrashedComicCountsFrbDto, Hent
 
 #[flutter_rust_bridge::frb]
 pub async fn list_trashed_comic_ids_frb() -> Result<Vec<String>, HentaiErrorDto> {
-    list_trashed_comic_ids()
-        .await
-        .map_err(HentaiErrorDto::from)
+    list_trashed_comic_ids().await.map_err(HentaiErrorDto::from)
 }

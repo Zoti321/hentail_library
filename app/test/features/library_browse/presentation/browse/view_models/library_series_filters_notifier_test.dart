@@ -1,19 +1,21 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
-import 'package:hentai_library/features/series/domain/library_prefer_library_root_series.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
+import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 import 'package:hentai_library/features/series/domain/library_series_projection.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 import 'package:hentai_library/features/series/domain/library_serialization_status_filter.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // 每个用例从空偏好开始：SharedPreferences 的 mock 存储按 isolate 复用，
-  // 不重置会把上一个用例写入的键带进来。
   setUp(() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
   });
@@ -27,7 +29,7 @@ void main() {
     return container.read(librarySeriesFiltersProvider.future);
   }
 
-  test('未落盘时四个维度全部取默认值', () async {
+  test('未落盘时维度全部取默认值', () async {
     await mockPrefs();
     final ProviderContainer container = ProviderContainer();
     addTearDown(container.dispose);
@@ -40,14 +42,11 @@ void main() {
       state.serializationStatusFilter,
       LibrarySerializationStatusFilter.unrestricted,
     );
-    expect(
-      state.preferLibraryRootSeries,
-      LibraryPreferLibraryRootSeries.defaultValue,
-    );
+    expect(state.grouping, LibrarySeriesGrouping.defaultValue);
     expect(state.sortOption, kLibraryDefaultSeriesSortOption);
   });
 
-  test('每个维度写回自己的键', () async {
+  test('筛选与分组维度写回自己的键', () async {
     final SharedPreferences prefs = await mockPrefs();
     final ProviderContainer container = ProviderContainer();
     addTearDown(container.dispose);
@@ -61,7 +60,7 @@ void main() {
         .setSerializationStatusFilter(LibrarySerializationStatusFilter.ongoing);
     await container
         .read(librarySeriesFiltersProvider.notifier)
-        .setPreferLibraryRootSeries(false);
+        .setGrouping(LibrarySeriesGrouping.bySerializationStatus);
     await container
         .read(librarySeriesFiltersProvider.notifier)
         .setSortField(LibrarySeriesSortField.comicCount);
@@ -74,7 +73,10 @@ void main() {
       prefs.getString(LibrarySerializationStatusFilter.storageKey),
       LibrarySerializationStatusFilter.ongoing.name,
     );
-    expect(prefs.getBool(LibraryPreferLibraryRootSeries.storageKey), false);
+    expect(
+      prefs.getString(LibrarySeriesGrouping.storageKey),
+      LibrarySeriesGrouping.bySerializationStatus.name,
+    );
     expect(prefs.getString('library_sort_series'), 'comicCount,false');
   });
 
@@ -89,10 +91,7 @@ void main() {
         .setAgeRestriction(LibraryAgeRestrictionFilter.r18Only);
     await container
         .read(librarySeriesFiltersProvider.notifier)
-        .setSerializationStatusFilter(LibrarySerializationStatusFilter.ongoing);
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setPreferLibraryRootSeries(false);
+        .setGrouping(LibrarySeriesGrouping.bySerializationStatus);
     await container
         .read(librarySeriesFiltersProvider.notifier)
         .setSortField(LibrarySeriesSortField.comicCount);
@@ -101,82 +100,29 @@ void main() {
 
     expect(await readState(container), LibrarySeriesFiltersState.defaults);
     expect(prefs.containsKey(kLibrarySeriesAgeRestrictionStorageKey), false);
-    expect(
-      prefs.containsKey(LibrarySerializationStatusFilter.storageKey),
-      false,
-    );
-    expect(prefs.containsKey(LibraryPreferLibraryRootSeries.storageKey), false);
+    expect(prefs.containsKey(LibrarySeriesGrouping.storageKey), false);
     expect(prefs.containsKey('library_sort_series'), false);
   });
 
-  test('查询 filter 由当前筛选与关键词派生', () async {
-    final ProviderContainer container = ProviderContainer();
+  test('查询 filter 的 prefer root 来自设置页', () async {
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        settingsProvider.overrideWith(
+          () => _FixedSettingsNotifier(
+            AppSetting(preferLibraryRootSeries: false),
+          ),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
     await readState(container);
-
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setAgeRestriction(LibraryAgeRestrictionFilter.r18Only);
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setSerializationStatusFilter(LibrarySerializationStatusFilter.ongoing);
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setPreferLibraryRootSeries(false);
+    await container.read(settingsProvider.future);
 
     final LibrarySeriesFilter filter = container.read(
       librarySeriesFiltersQueryProvider,
     );
 
-    expect(filter.showR18, true);
-    expect(filter.r18Only, true);
-    expect(filter.serializationStatus, 'ongoing');
-    expect(filter.preferLibraryRootSeries, false);
-  });
-
-  test('是否自定义由状态派生，四个维度各自独立判定', () async {
-    final ProviderContainer container = ProviderContainer();
-    addTearDown(container.dispose);
-    await readState(container);
-
-    expect(container.read(librarySeriesFiltersIsCustomizedProvider), false);
-
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setAgeRestriction(LibraryAgeRestrictionFilter.allAges);
-    expect(container.read(librarySeriesFiltersIsCustomizedProvider), true);
-
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setAgeRestriction(LibraryAgeRestrictionFilter.unrestricted);
-    expect(container.read(librarySeriesFiltersIsCustomizedProvider), false);
-
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setPreferLibraryRootSeries(false);
-    expect(container.read(librarySeriesFiltersIsCustomizedProvider), true);
-
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setPreferLibraryRootSeries(true);
-    expect(container.read(librarySeriesFiltersIsCustomizedProvider), false);
-
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setSerializationStatusFilter(LibrarySerializationStatusFilter.ongoing);
-    expect(container.read(librarySeriesFiltersIsCustomizedProvider), true);
-
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setSerializationStatusFilter(
-          LibrarySerializationStatusFilter.unrestricted,
-        );
-    expect(container.read(librarySeriesFiltersIsCustomizedProvider), false);
-
-    await container
-        .read(librarySeriesFiltersProvider.notifier)
-        .setSortField(LibrarySeriesSortField.comicCount);
-    expect(container.read(librarySeriesFiltersIsCustomizedProvider), true);
+    expect(filter.preferLibraryRootSeries, isFalse);
   });
 
   group('decodeLibrarySeriesSortOption', () {
@@ -188,23 +134,14 @@ void main() {
       expect(option.field, LibrarySeriesSortField.name);
       expect(option.descending, isTrue);
     });
-
-    test('decodes new series sort fields', () {
-      final LibrarySeriesSortOption option = decodeLibrarySeriesSortOption(
-        'comicCount,false',
-      );
-
-      expect(option.field, LibrarySeriesSortField.comicCount);
-      expect(option.descending, isFalse);
-    });
-
-    test('decodes random sort field', () {
-      final LibrarySeriesSortOption option = decodeLibrarySeriesSortOption(
-        'random,true',
-      );
-
-      expect(option.field, LibrarySeriesSortField.random);
-      expect(option.descending, isTrue);
-    });
   });
+}
+
+class _FixedSettingsNotifier extends SettingsNotifier {
+  _FixedSettingsNotifier(this._fixed);
+
+  final AppSetting _fixed;
+
+  @override
+  Future<AppSetting> build() async => _fixed;
 }

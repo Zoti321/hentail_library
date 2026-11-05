@@ -2,6 +2,7 @@
 library;
 
 export 'package:hentai_library/features/series/domain/library_prefer_library_root_series.dart';
+export 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 export 'package:hentai_library/features/series/domain/library_series_projection.dart';
 export 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 export 'package:hentai_library/features/series/domain/library_serialization_status_filter.dart';

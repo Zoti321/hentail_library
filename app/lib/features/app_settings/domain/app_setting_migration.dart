@@ -31,6 +31,7 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
   }
   migrated.putIfAbsent('useDynamicColor', () => false);
   migrated.putIfAbsent('colorSchemePreference', () => 'brand');
+  migrated.putIfAbsent('preferLibraryRootSeries', () => true);
   if (migrated['version'] is int && (migrated['version'] as int) < 4) {
     migrated['version'] = 4;
   }

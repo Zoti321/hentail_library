@@ -1372,6 +1372,8 @@ fn wire__crate__api__series__fetch_series_page_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
             let api_filter = <crate::api::series::SeriesFilterDto>::sse_decode(&mut deserializer);
+            let api_grouping =
+                <crate::api::series::SeriesGroupingDto>::sse_decode(&mut deserializer);
             let api_sort = <crate::api::series::SeriesSortOptionDto>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -1380,6 +1382,7 @@ fn wire__crate__api__series__fetch_series_page_frb_impl(
                         let output_ok = crate::api::series::fetch_series_page_frb(
                             api_request,
                             api_filter,
+                            api_grouping,
                             api_sort,
                         )
                         .await?;
@@ -6759,6 +6762,18 @@ impl SseDecode for crate::api::series::SeriesFilterDto {
     }
 }
 
+impl SseDecode for crate::api::series::SeriesGroupingDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::series::SeriesGroupingDto::None,
+            1 => crate::api::series::SeriesGroupingDto::BySerializationStatus,
+            _ => unreachable!("Invalid variant for SeriesGroupingDto: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::api::series::SeriesItemDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -9293,6 +9308,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::series::SeriesFilterDto>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesGroupingDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::None => 0.into_dart(),
+            Self::BySerializationStatus => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::series::SeriesGroupingDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::series::SeriesGroupingDto>
+    for crate::api::series::SeriesGroupingDto
+{
+    fn into_into_dart(self) -> crate::api::series::SeriesGroupingDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesItemDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -11244,6 +11280,22 @@ impl SseEncode for crate::api::series::SeriesFilterDto {
         <Option<String>>::sse_encode(self.serialization_status, serializer);
         <Option<String>>::sse_encode(self.library_id, serializer);
         <bool>::sse_encode(self.prefer_library_root_series, serializer);
+    }
+}
+
+impl SseEncode for crate::api::series::SeriesGroupingDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::series::SeriesGroupingDto::None => 0,
+                crate::api::series::SeriesGroupingDto::BySerializationStatus => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 

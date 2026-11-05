@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
@@ -89,10 +91,9 @@ LibrarySerializationStatusFilter librarySeriesTabSerializationStatusFilter(
 @Riverpod(keepAlive: true)
 bool librarySeriesTabPreferLibraryRootSeries(Ref ref) {
   return ref.watch(
-    librarySeriesFiltersProvider.select(
-      (AsyncValue<LibrarySeriesFiltersState> state) =>
-          state.value?.preferLibraryRootSeries ??
-          LibraryPreferLibraryRootSeries.defaultValue,
+    settingsProvider.select(
+      (AsyncValue<AppSetting> async) =>
+          async.asData?.value.preferLibraryRootSeries ?? true,
     ),
   );
 }

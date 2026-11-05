@@ -165,19 +165,23 @@ _Avoid_: 标题推断、自动分组
 _Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
 
 **Prefer library root series**:
-Library browse preference：Series 浏览列表中，开启时若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
+Library browse preference（现由设置页读写，默认开启）：Series 浏览列表中，开启时若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段与分组排列。不是 Series 分组项。
 _Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
+
+**Group by serialization status**（按连载状态分组）:
+Library browse preference（分组方式 `bySerializationStatus`）：Series 浏览列表保持扁平，按连载状态块顺序（ongoing → completed → hiatus → cancelled → unknown）排列；块内仍按当前 Series 排序字段排列。与排序正交；默认不分组（`none`）。
+_Avoid_: 连载筛选（那是 Filter）、折叠分组标题
 
 **Group by series**（按系列分组）:
 Library browse preference（分组方式 `bySeries`）：Comics 浏览列表保持扁平（无分组标题、无折叠），按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 无 Series 归属的 Comic 整块垫底」决定系列块顺序；**块内仍按当前 Comics 排序字段**排列。默认开启；与排序正交，不是视觉分组或折叠，也不共用 Prefer library root series 开关。
 _Avoid_: 按系列展开、expand by series、按系列折叠、系列模式列表
 
 **App preference**:
-应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Smart facet match（Comic metadata form 候选排序，默认开启）等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
+应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Healthy mode、**Prefer library root series**（Series 浏览列表置顶库根系列，默认开启）、Smart facet match（Comic metadata form 候选排序，默认开启）等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
 _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
 
 **Library browse preference**:
-库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Group by series、Prefer library root series、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
+库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Comic/Series **分组方式**（含「不分组」）、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页（**Prefer library root series** 除外，见 App preference）。
 _Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
 
 **Library property**:

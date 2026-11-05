@@ -15,7 +15,7 @@ use crate::error::HentaiError;
 use crate::history::reading_history_retention_cutoff_ms;
 
 use super::dto::{
-    ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto, now_ms,
+    now_ms, ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
 use super::filter_predicate;
 use super::grouping::ComicGrouping;

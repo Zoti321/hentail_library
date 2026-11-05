@@ -1838,6 +1838,30 @@ abstract class AppLocalizations {
   /// **'按系列分组'**
   String get libraryGroupBySeries;
 
+  /// No description provided for @libraryGroupNone.
+  ///
+  /// In zh, this message translates to:
+  /// **'不分组'**
+  String get libraryGroupNone;
+
+  /// No description provided for @libraryGroupBySerializationStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'按连载状态分组'**
+  String get libraryGroupBySerializationStatus;
+
+  /// No description provided for @settingsPreferLibraryRootSeriesLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'置顶库根系列'**
+  String get settingsPreferLibraryRootSeriesLabel;
+
+  /// No description provided for @settingsPreferLibraryRootSeriesDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'浏览系列列表时，将库根系列固定在列表最前。'**
+  String get settingsPreferLibraryRootSeriesDescription;
+
   /// No description provided for @librarySeriesSortName.
   ///
   /// In zh, this message translates to:

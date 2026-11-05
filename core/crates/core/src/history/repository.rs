@@ -113,10 +113,11 @@ pub async fn list_read_page_indexes() -> Result<Vec<super::dto::ReadPageIndexDto
     Ok(rows
         .into_iter()
         .filter_map(|row| {
-            row.page_index.map(|page_index| super::dto::ReadPageIndexDto {
-                comic_id: row.comic_id,
-                page_index,
-            })
+            row.page_index
+                .map(|page_index| super::dto::ReadPageIndexDto {
+                    comic_id: row.comic_id,
+                    page_index,
+                })
         })
         .collect())
 }

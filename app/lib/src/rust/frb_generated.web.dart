@@ -611,6 +611,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesFilterDto dco_decode_series_filter_dto(dynamic raw);
 
   @protected
+  SeriesGroupingDto dco_decode_series_grouping_dto(dynamic raw);
+
+  @protected
   SeriesItemDto dco_decode_series_item_dto(dynamic raw);
 
   @protected
@@ -1400,6 +1403,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesFilterDto sse_decode_series_filter_dto(SseDeserializer deserializer);
+
+  @protected
+  SeriesGroupingDto sse_decode_series_grouping_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer);
@@ -2394,6 +2402,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_series_filter_dto(
     SeriesFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_series_grouping_dto(
+    SeriesGroupingDto self,
     SseSerializer serializer,
   );
 

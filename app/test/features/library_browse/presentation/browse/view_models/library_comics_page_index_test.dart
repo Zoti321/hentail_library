@@ -5,6 +5,7 @@ import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_filter.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
+import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 import 'package:hentai_library/features/series/domain/library_series_projection.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
@@ -61,6 +62,7 @@ class _FakeSeriesRepo implements SeriesRepository {
   Future<PagedResult<Series>> fetchPage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
+    required LibrarySeriesGrouping grouping,
     required LibrarySeriesSortOption sortOption,
   }) async {
     return PagedResult<Series>(

@@ -34,6 +34,9 @@ abstract class AppSetting with _$AppSetting {
 
     /// Healthy mode：库、搜索与历史中隐藏 R18 Comic（不修改分级）。
     @Default(false) bool healthyMode,
+
+    /// Series 浏览：Library root series 固定排在列表最前（Library browse preference）。
+    @Default(true) bool preferLibraryRootSeries,
   }) = _AppSetting;
 
   const AppSetting._();

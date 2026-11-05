@@ -76,12 +76,10 @@ fn fetch_reading_page_hides_expired_rows() {
             assert_eq!(page.items.len(), 1);
             assert_eq!(page.items[0].comic_id, "fresh");
 
-            assert!(
-                get_reading_by_comic_id("stale")
-                    .await
-                    .expect("load stale")
-                    .is_none()
-            );
+            assert!(get_reading_by_comic_id("stale")
+                .await
+                .expect("load stale")
+                .is_none());
         });
     });
 }

@@ -8,6 +8,7 @@ import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
 import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
+import 'package:hentai_library/features/series/domain/library_prefer_library_root_series.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,7 +70,12 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
         return defaultSettings();
       }
       final Map<String, dynamic> json = jsonDecode(raw) as Map<String, dynamic>;
-      return AppSetting.fromJson(json);
+      AppSetting setting = AppSetting.fromJson(json);
+      setting = await _migratePreferLibraryRootSeriesFromBrowsePrefs(
+        prefs,
+        setting,
+      );
+      return setting;
     } catch (e, st) {
       logError(AppLog.dataRepo('app_setting'), '加载设置失败，已回退默认值', e, st);
       return defaultSettings();
@@ -181,4 +187,22 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   }
 
   static AppSetting defaultSettings() => AppSetting();
+
+  Future<AppSetting> _migratePreferLibraryRootSeriesFromBrowsePrefs(
+    SharedPreferences prefs,
+    AppSetting setting,
+  ) async {
+    if (!prefs.containsKey(LibraryPreferLibraryRootSeries.storageKey)) {
+      return setting;
+    }
+    final bool legacy = LibraryPreferLibraryRootSeries.fromStorage(
+      prefs.getBool(LibraryPreferLibraryRootSeries.storageKey),
+    );
+    final AppSetting migrated = setting.copyWith(
+      preferLibraryRootSeries: legacy,
+    );
+    await save(migrated);
+    await prefs.remove(LibraryPreferLibraryRootSeries.storageKey);
+    return migrated;
+  }
 }

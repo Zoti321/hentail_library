@@ -76,6 +76,7 @@ List<Widget> _personalizationSections() {
       ],
     ),
     Md3eSettingsSection(tiles: <Widget>[_HealthyModeTile()]),
+    Md3eSettingsSection(tiles: <Widget>[_PreferLibraryRootSeriesTile()]),
   ];
 }
 
@@ -220,6 +221,29 @@ class _HealthyModeTile extends ConsumerWidget {
       value: enabled,
       onChanged: (bool value) =>
           ref.read(settingsProvider.notifier).setHealthyMode(value),
+    );
+  }
+}
+
+class _PreferLibraryRootSeriesTile extends ConsumerWidget {
+  const _PreferLibraryRootSeriesTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final bool enabled = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) =>
+            async.asData?.value.preferLibraryRootSeries ?? true,
+      ),
+    );
+    return Md3eSettingsSwitchTile(
+      leading: Symbols.low_priority,
+      title: Text(l10n.settingsPreferLibraryRootSeriesLabel),
+      description: Text(l10n.settingsPreferLibraryRootSeriesDescription),
+      value: enabled,
+      onChanged: (bool value) =>
+          ref.read(settingsProvider.notifier).setPreferLibraryRootSeries(value),
     );
   }
 }

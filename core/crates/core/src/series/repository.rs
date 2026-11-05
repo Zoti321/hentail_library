@@ -16,6 +16,7 @@ use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
 
 use super::dto::{SeriesFilterDto, SeriesSortOptionDto};
+use super::grouping::SeriesGrouping;
 use super::page_query::{build_count_query, build_ids_page_query};
 use crate::comic_id::normalize_path_for_key;
 
@@ -103,6 +104,7 @@ pub async fn count_all_series() -> Result<i64, HentaiError> {
 pub async fn fetch_series_page(
     request: PageRequestDto,
     filter: SeriesFilterDto,
+    grouping: SeriesGrouping,
     sort: SeriesSortOptionDto,
 ) -> Result<PagedSeriesResultDto, HentaiError> {
     let db = connection()?;
@@ -130,6 +132,7 @@ pub async fn fetch_series_page(
     let ids_query = build_ids_page_query(
         &filter,
         &sort,
+        grouping,
         prefer_root_folder_path.as_deref(),
         window.page_size,
         window.offset as i32,

@@ -94,7 +94,10 @@ fn sort_order_by(sort: &ComicSortOptionDto) -> String {
 }
 
 /// 系列块之间的 ORDER BY 前缀（不含块内用户排序）。
-fn series_block_prefix_order_by(library_root_path: Option<&str>, values: &mut Vec<Value>) -> String {
+fn series_block_prefix_order_by(
+    library_root_path: Option<&str>,
+    values: &mut Vec<Value>,
+) -> String {
     if let Some(root) = library_root_path {
         values.push(Value::String(Some(Box::new(root.to_string()))));
     }
@@ -155,10 +158,8 @@ mod tests {
 
     #[test]
     fn by_series_join_includes_read_at_when_sort_requires_it() {
-        let clause = ComicGrouping::BySeries.join_clause(
-            ComicSortFieldDto::ReadAt,
-            1_700_000_000_000,
-        );
+        let clause =
+            ComicGrouping::BySeries.join_clause(ComicSortFieldDto::ReadAt, 1_700_000_000_000);
         assert!(clause.contains("series_items si"));
         assert!(clause.contains("comic_reading_histories rh"));
     }

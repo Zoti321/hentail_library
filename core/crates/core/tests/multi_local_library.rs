@@ -10,9 +10,9 @@ use hentai_core::ComicGrouping;
 use hentai_core::{
     comic_id_from_path, connection, create_local_library, delete_library, fetch_comics_page,
     find_comic_by_id, get_current_library_id, get_reading_by_comic_id, init_db_at_path,
-    library_id_from_root, list_libraries, now_ms, record_reading, set_current_library_id, sync_library,
-    update_library_resource_format_categories, ComicFilterDto, PageRequestDto, ReadingHistoryDto,
-    SyncScanMode,
+    library_id_from_root, list_libraries, now_ms, record_reading, set_current_library_id,
+    sync_library, update_library_resource_format_categories, ComicFilterDto, PageRequestDto,
+    ReadingHistoryDto, SyncScanMode,
 };
 use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;

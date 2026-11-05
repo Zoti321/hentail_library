@@ -4,14 +4,14 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_sort_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
 /// 库页筛选排序抽屉中的「分组」区（MD3E 生产实现）。
 ///
-/// 漫画 Tab：按系列分组开关；系列 Tab：优先根系列开关。
+/// 漫画 Tab：不分组 / 按系列分组（单选）；系列 Tab：不分组 / 按连载状态分组（单选）。
 class Md3eLibraryGroupingSection extends ConsumerWidget {
   const Md3eLibraryGroupingSection({super.key});
 
@@ -32,22 +32,27 @@ class _ComicsGroupingSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool bySeries = ref.watch(
+    final LibraryComicGrouping selected = ref.watch(
       libraryComicFiltersProvider.select(
         (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.grouping == LibraryComicGrouping.bySeries,
+            state.value?.grouping ?? LibraryComicGrouping.defaultValue,
       ),
     );
-    return _GroupingToggleRow(
-      label: context.l10n.libraryGroupBySeries,
-      value: bySeries,
-      onChanged: (bool value) {
-        ref
-            .read(libraryComicFiltersProvider.notifier)
-            .setGrouping(
-              value ? LibraryComicGrouping.bySeries : LibraryComicGrouping.none,
-            );
-      },
+    final notifier = ref.read(libraryComicFiltersProvider.notifier);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _GroupingRadioRow(
+          label: context.l10n.libraryGroupNone,
+          selected: selected == LibraryComicGrouping.none,
+          onSelected: () => notifier.setGrouping(LibraryComicGrouping.none),
+        ),
+        _GroupingRadioRow(
+          label: context.l10n.libraryGroupBySeries,
+          selected: selected == LibraryComicGrouping.bySeries,
+          onSelected: () => notifier.setGrouping(LibraryComicGrouping.bySeries),
+        ),
+      ],
     );
   }
 }
@@ -57,55 +62,65 @@ class _SeriesGroupingSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool preferRootSeries = ref.watch(
-      librarySeriesTabPreferLibraryRootSeriesProvider,
+    final LibrarySeriesGrouping selected = ref.watch(
+      librarySeriesTabGroupingProvider,
     );
-    return _GroupingToggleRow(
-      label: context.l10n.libraryPreferLibraryRootSeries,
-      value: preferRootSeries,
-      onChanged: (bool value) {
-        ref
-            .read(librarySeriesFiltersProvider.notifier)
-            .setPreferLibraryRootSeries(value);
-      },
+    final notifier = ref.read(librarySeriesFiltersProvider.notifier);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _GroupingRadioRow(
+          label: context.l10n.libraryGroupNone,
+          selected: selected == LibrarySeriesGrouping.none,
+          onSelected: () => notifier.setGrouping(LibrarySeriesGrouping.none),
+        ),
+        _GroupingRadioRow(
+          label: context.l10n.libraryGroupBySerializationStatus,
+          selected: selected == LibrarySeriesGrouping.bySerializationStatus,
+          onSelected: () =>
+              notifier.setGrouping(LibrarySeriesGrouping.bySerializationStatus),
+        ),
+      ],
     );
   }
 }
 
-class _GroupingToggleRow extends StatelessWidget {
-  const _GroupingToggleRow({
+class _GroupingRadioRow extends StatelessWidget {
+  const _GroupingRadioRow({
     required this.label,
-    required this.value,
-    required this.onChanged,
+    required this.selected,
+    required this.onSelected,
   });
 
   final String label;
-  final bool value;
-  final ValueChanged<bool> onChanged;
+  final bool selected;
+  final VoidCallback onSelected;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return InkWell(
-      onTap: () => onChanged(!value),
+      onTap: onSelected,
       hoverColor: theme.hoverColor,
       splashColor: theme.splashColor,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: kLibraryMd3eSortSectionInset,
-          vertical: 10,
+          vertical: 8,
         ),
         child: Row(
           children: <Widget>[
-            Expanded(
-              child: Text(
-                label,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Radio<bool>(
+                value: true,
+                groupValue: selected,
+                onChanged: (_) => onSelected(),
               ),
             ),
-            Switch(value: value, onChanged: onChanged),
+            const SizedBox(width: 8),
+            Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
           ],
         ),
       ),

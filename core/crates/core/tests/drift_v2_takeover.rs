@@ -136,7 +136,9 @@ fn fetch_series_page_hides_r18_series_by_default() {
                 .await
                 .expect("rebuild series");
             stamp_fixture_to_current_library(&db).await;
-            use hentai_core::{fetch_series_page, SeriesFilterDto, SeriesSortOptionDto};
+            use hentai_core::{
+                fetch_series_page, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto,
+            };
             let page = fetch_series_page(
                 PageRequestDto {
                     page: 1,
@@ -147,6 +149,7 @@ fn fetch_series_page_hides_r18_series_by_default() {
                     require_items: true,
                     ..Default::default()
                 },
+                SeriesGrouping::None,
                 SeriesSortOptionDto {
                     field: hentai_core::SeriesSortFieldDto::Name,
                     descending: false,
@@ -177,7 +180,9 @@ fn fetch_series_page_returns_series_with_items() {
                 .await
                 .expect("rebuild series");
             stamp_fixture_to_current_library(&db).await;
-            use hentai_core::{fetch_series_page, SeriesFilterDto, SeriesSortOptionDto};
+            use hentai_core::{
+                fetch_series_page, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto,
+            };
             let page = fetch_series_page(
                 PageRequestDto {
                     page: 1,
@@ -188,6 +193,7 @@ fn fetch_series_page_returns_series_with_items() {
                     require_items: true,
                     ..Default::default()
                 },
+                SeriesGrouping::None,
                 SeriesSortOptionDto {
                     field: hentai_core::SeriesSortFieldDto::Name,
                     descending: false,
@@ -219,7 +225,7 @@ fn fetch_series_comics_page_returns_ordered_comics() {
             stamp_fixture_to_current_library(&db).await;
             use hentai_core::{
                 fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
-                PageRequestDto, SeriesFilterDto, SeriesSortOptionDto,
+                PageRequestDto, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto,
             };
             let series_page = fetch_series_page(
                 PageRequestDto {
@@ -231,6 +237,7 @@ fn fetch_series_comics_page_returns_ordered_comics() {
                     require_items: true,
                     ..Default::default()
                 },
+                SeriesGrouping::None,
                 SeriesSortOptionDto {
                     field: hentai_core::SeriesSortFieldDto::Name,
                     descending: false,
@@ -306,7 +313,8 @@ fn fetch_series_page_random_order_varies_between_queries() {
                 .expect("rebuild series");
             stamp_fixture_to_current_library(&db).await;
             use hentai_core::{
-                fetch_series_page, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
+                fetch_series_page, SeriesFilterDto, SeriesGrouping, SeriesSortFieldDto,
+                SeriesSortOptionDto,
             };
             use std::collections::HashSet;
             // 关闭「优先库根」：否则 CASE 分区会把根系列钉死在最前，
@@ -325,6 +333,7 @@ fn fetch_series_page_random_order_varies_between_queries() {
                         page_size: 50,
                     },
                     filter.clone(),
+                    SeriesGrouping::None,
                     SeriesSortOptionDto {
                         field: SeriesSortFieldDto::Random,
                         descending: false,

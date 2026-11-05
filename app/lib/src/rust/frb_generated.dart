@@ -237,6 +237,7 @@ abstract class RustLibApi extends BaseApi {
   Future<PagedSeriesResultDto> crateApiSeriesFetchSeriesPageFrb({
     required PageRequestDto request,
     required SeriesFilterDto filter,
+    required SeriesGroupingDto grouping,
     required SeriesSortOptionDto sort,
   });
 
@@ -1744,6 +1745,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<PagedSeriesResultDto> crateApiSeriesFetchSeriesPageFrb({
     required PageRequestDto request,
     required SeriesFilterDto filter,
+    required SeriesGroupingDto grouping,
     required SeriesSortOptionDto sort,
   }) {
     return handler.executeNormal(
@@ -1752,6 +1754,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_page_request_dto(request, serializer);
           sse_encode_box_autoadd_series_filter_dto(filter, serializer);
+          sse_encode_series_grouping_dto(grouping, serializer);
           sse_encode_box_autoadd_series_sort_option_dto(sort, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
@@ -1765,7 +1768,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiSeriesFetchSeriesPageFrbConstMeta,
-        argValues: [request, filter, sort],
+        argValues: [request, filter, grouping, sort],
         apiImpl: this,
       ),
     );
@@ -1774,7 +1777,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiSeriesFetchSeriesPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_series_page_frb",
-        argNames: ["request", "filter", "sort"],
+        argNames: ["request", "filter", "grouping", "sort"],
       );
 
   @override
@@ -6484,6 +6487,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesGroupingDto dco_decode_series_grouping_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SeriesGroupingDto.values[raw as int];
+  }
+
+  @protected
   SeriesItemDto dco_decode_series_item_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -8830,6 +8839,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesGroupingDto sse_decode_series_grouping_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return SeriesGroupingDto.values[inner];
+  }
+
+  @protected
   SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_seriesId = sse_decode_String(deserializer);
@@ -11055,6 +11073,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.serializationStatus, serializer);
     sse_encode_opt_String(self.libraryId, serializer);
     sse_encode_bool(self.preferLibraryRootSeries, serializer);
+  }
+
+  @protected
+  void sse_encode_series_grouping_dto(
+    SeriesGroupingDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected

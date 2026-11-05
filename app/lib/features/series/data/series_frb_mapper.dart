@@ -1,5 +1,6 @@
 import 'package:hentai_library/shared/data/frb/comic_entity_mapper.dart';
 import 'package:hentai_library/features/series/domain/library_series_projection.dart';
+import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series_item.dart';
@@ -97,6 +98,14 @@ rust_series.SeriesSortOptionDto mapSeriesSortOption({
     descending: sortOption.descending,
   );
 }
+
+rust_series.SeriesGroupingDto mapSeriesGrouping(
+  LibrarySeriesGrouping grouping,
+) => switch (grouping) {
+  LibrarySeriesGrouping.none => rust_series.SeriesGroupingDto.none,
+  LibrarySeriesGrouping.bySerializationStatus =>
+    rust_series.SeriesGroupingDto.bySerializationStatus,
+};
 
 PagedResult<Series> mapPagedSeriesResult(
   rust_series.PagedSeriesResultDto page,

@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 import 'package:hentai_library/features/series/domain/library_series_projection.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
@@ -16,6 +17,7 @@ abstract class SeriesRepository {
   Future<PagedResult<Series>> fetchPage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
+    required LibrarySeriesGrouping grouping,
     required LibrarySeriesSortOption sortOption,
   });
 

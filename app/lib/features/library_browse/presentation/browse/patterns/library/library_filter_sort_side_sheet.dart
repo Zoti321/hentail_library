@@ -92,6 +92,10 @@ class Md3eLibraryFilterSortState {
     );
   }
 
+  Md3eLibraryFilterSortState selectGrouping(LibraryComicGrouping grouping) {
+    return copyWith(grouping: grouping);
+  }
+
   Md3eLibraryFilterSortState reset() => defaults;
 }
 
@@ -331,11 +335,20 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
             child: Text(l10n.libraryGroupSection, style: sectionTitle),
           ),
           const SizedBox(height: 8),
-          _Md3eGroupBySeriesRow(
-            enabled: state.grouping == LibraryComicGrouping.bySeries,
+          _Md3eGroupingRadioRow(
+            label: l10n.libraryGroupNone,
+            selected: state.grouping == LibraryComicGrouping.none,
             metrics: rowMetrics,
-            onChanged: (bool value) =>
-                onStateChanged(state.setGroupBySeries(value)),
+            onSelected: () =>
+                onStateChanged(state.selectGrouping(LibraryComicGrouping.none)),
+          ),
+          _Md3eGroupingRadioRow(
+            label: l10n.libraryGroupBySeries,
+            selected: state.grouping == LibraryComicGrouping.bySeries,
+            metrics: rowMetrics,
+            onSelected: () => onStateChanged(
+              state.selectGrouping(LibraryComicGrouping.bySeries),
+            ),
           ),
           const SizedBox(height: 24),
           Padding(
@@ -586,27 +599,28 @@ class _Md3eFilterCheckboxRow extends StatelessWidget {
   }
 }
 
-class _Md3eGroupBySeriesRow extends StatelessWidget {
-  const _Md3eGroupBySeriesRow({
-    required this.enabled,
+class _Md3eGroupingRadioRow extends StatelessWidget {
+  const _Md3eGroupingRadioRow({
+    required this.label,
+    required this.selected,
     required this.metrics,
-    required this.onChanged,
+    required this.onSelected,
   });
 
-  final bool enabled;
+  final String label;
+  final bool selected;
   final Md3eLibraryFilterSortRowMetrics metrics;
-  final ValueChanged<bool> onChanged;
+  final VoidCallback onSelected;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
-    final AppLocalizations l10n = context.l10n;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => onChanged(!enabled),
+        onTap: onSelected,
         hoverColor: theme.hoverColor,
         splashColor: theme.splashColor,
         child: SizedBox(
@@ -617,13 +631,23 @@ class _Md3eGroupBySeriesRow extends StatelessWidget {
             ),
             child: Row(
               children: <Widget>[
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Radio<bool>(
+                    value: true,
+                    groupValue: selected,
+                    onChanged: (_) => onSelected(),
+                    fillColor: WidgetStatePropertyAll<Color>(cs.primary),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    l10n.libraryGroupBySeries,
+                    label,
                     style: _md3eLibraryFilterSortOptionLabelStyle(cs, metrics),
                   ),
                 ),
-                Switch(value: enabled, onChanged: onChanged),
               ],
             ),
           ),

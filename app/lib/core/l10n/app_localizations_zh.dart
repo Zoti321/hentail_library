@@ -975,6 +975,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryGroupBySeries => '按系列分组';
 
   @override
+  String get libraryGroupNone => '不分组';
+
+  @override
+  String get libraryGroupBySerializationStatus => '按连载状态分组';
+
+  @override
+  String get settingsPreferLibraryRootSeriesLabel => '置顶库根系列';
+
+  @override
+  String get settingsPreferLibraryRootSeriesDescription =>
+      '浏览系列列表时，将库根系列固定在列表最前。';
+
+  @override
   String get librarySeriesSortName => '名称';
 
   @override

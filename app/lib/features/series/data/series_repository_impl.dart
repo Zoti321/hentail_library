@@ -1,5 +1,6 @@
 import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/features/series/data/series_frb_mapper.dart';
+import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 import 'package:hentai_library/features/series/domain/library_series_projection.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
@@ -26,12 +27,14 @@ class SeriesRepositoryImpl implements SeriesRepository {
   Future<PagedResult<Series>> fetchPage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
+    required LibrarySeriesGrouping grouping,
     required LibrarySeriesSortOption sortOption,
   }) async {
     final rust_series.PagedSeriesResultDto page = await guardFrb(
       () => rust_series.fetchSeriesPageFrb(
         request: mapSeriesPageRequest(request),
         filter: mapLibrarySeriesFilter(filter),
+        grouping: mapSeriesGrouping(grouping),
         sort: mapSeriesSortOption(sortOption: sortOption),
       ),
       fallbackMessage: '读取系列分页失败',

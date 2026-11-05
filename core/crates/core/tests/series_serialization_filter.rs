@@ -3,7 +3,7 @@ mod common;
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::{
     connection, create_local_library, fetch_series_page, init_db_at_path, set_current_library_id,
-    update_series_user_meta, PageRequestDto, SeriesFilterDto, SeriesSortOptionDto,
+    update_series_user_meta, PageRequestDto, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto,
     UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
@@ -121,6 +121,7 @@ fn fetch_series_page_filters_by_serialization_status() {
                     serialization_status: Some("ongoing".to_string()),
                     ..Default::default()
                 },
+                SeriesGrouping::None,
                 SeriesSortOptionDto {
                     field: hentai_core::SeriesSortFieldDto::Name,
                     descending: false,
@@ -160,6 +161,7 @@ fn fetch_series_page_without_serialization_status_returns_all_statuses() {
                     serialization_status: None,
                     ..Default::default()
                 },
+                SeriesGrouping::None,
                 SeriesSortOptionDto {
                     field: hentai_core::SeriesSortFieldDto::Name,
                     descending: false,

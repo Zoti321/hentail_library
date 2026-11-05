@@ -3,6 +3,7 @@ mod common;
 use std::path::{Path, PathBuf};
 
 use hentai_core::ComicGrouping;
+use hentai_core::SeriesGrouping;
 use hentai_core::{
     close_reader, comic_id_from_path, count_all, count_all_series, count_named_facet_attachments,
     count_trashed_comics, create_local_library, create_remote_library, create_sync_handle,
@@ -141,6 +142,7 @@ async fn series_page_ids(library: &LibraryDto) -> Vec<String> {
             library_id: Some(library.library_id.clone()),
             ..Default::default()
         },
+        SeriesGrouping::None,
         SeriesSortOptionDto::default(),
     )
     .await
@@ -643,11 +645,7 @@ fn trashed_list_orders_by_deleted_at_desc_with_library_info() {
             .await
             .expect("page");
             assert_eq!(page.total_count, 2);
-            let ids: Vec<String> = page
-                .items
-                .iter()
-                .map(|t| t.comic_id.clone())
-                .collect();
+            let ids: Vec<String> = page.items.iter().map(|t| t.comic_id.clone()).collect();
             assert_eq!(ids, vec![solo.clone(), a.clone()]);
             assert!(page.items[0].deleted_at >= page.items[1].deleted_at);
             assert_eq!(page.items[0].library_name, "Lib");

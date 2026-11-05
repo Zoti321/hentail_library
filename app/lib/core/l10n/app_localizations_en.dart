@@ -1018,6 +1018,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryGroupBySeries => 'Group by series';
 
   @override
+  String get libraryGroupNone => 'No grouping';
+
+  @override
+  String get libraryGroupBySerializationStatus =>
+      'Group by serialization status';
+
+  @override
+  String get settingsPreferLibraryRootSeriesLabel => 'Pin library root series';
+
+  @override
+  String get settingsPreferLibraryRootSeriesDescription =>
+      'When browsing series, keep the library root series at the top of the list.';
+
+  @override
   String get librarySeriesSortName => 'Name';
 
   @override

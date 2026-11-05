@@ -42,6 +42,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
       keyword,
       ref.watch(librarySeriesFiltersQueryProvider),
       ref.watch(librarySeriesTabSortOptionProvider),
+      ref.watch(librarySeriesTabGroupingProvider),
       ref.watch(librarySeriesTabPageSizeProvider),
     ));
   }
@@ -85,12 +86,20 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     final LibrarySeriesSortOption sortOption = ref.read(
       librarySeriesTabSortOptionProvider,
     );
+    final LibrarySeriesGrouping grouping = ref.read(
+      librarySeriesTabGroupingProvider,
+    );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);
     return _pagination.fetchPage<Series>(
       pageSize: pageSize,
       fetch: (request) => ref
           .read(seriesRepoProvider)
-          .fetchPage(request: request, filter: filter, sortOption: sortOption),
+          .fetchPage(
+            request: request,
+            filter: filter,
+            grouping: grouping,
+            sortOption: sortOption,
+          ),
     );
   }
 

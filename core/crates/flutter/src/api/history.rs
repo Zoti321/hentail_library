@@ -2,8 +2,8 @@ use hentai_core::{
     self, clear_all_reading as core_clear_all, delete_reading_by_comic_id as core_delete_reading,
     delete_reading_by_comic_ids as core_delete_readings,
     fetch_reading_page as core_fetch_reading_page, get_reading_by_comic_id as core_get_reading,
-    list_read_page_indexes as core_list_read_page_indexes,
-    record_reading as core_record_reading, PagedReadingHistoryDto as CorePagedReading, ReadPageIndexDto as CoreReadPageIndex,
+    list_read_page_indexes as core_list_read_page_indexes, record_reading as core_record_reading,
+    PagedReadingHistoryDto as CorePagedReading, ReadPageIndexDto as CoreReadPageIndex,
     ReadingHistoryDto as CoreReading,
 };
 
