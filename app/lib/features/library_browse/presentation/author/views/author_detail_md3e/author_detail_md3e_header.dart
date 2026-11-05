@@ -7,16 +7,19 @@ import 'package:hentai_library/features/library_browse/presentation/author/views
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail_md3e/author_image_view.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-const double _bannerHeight = 140;
-const double _avatarSize = 88;
+const double _bannerHeight = 152;
+const double _avatarSize = 96;
+const double _avatarRingWidth = 4;
 
 /// 横幅从竖版封面裁横条时偏上保留（人物面部多在上半部）。
 const Alignment _bannerAlignment = Alignment(0, -0.4);
 
-/// 作者详情头部：横幅、头像、名称（可改名）与链接。
+/// 作者详情头部：tonal 英雄卡（横幅 + 重叠头像、名称与链接）。
 class AuthorDetailMd3eHeader extends StatelessWidget {
   const AuthorDetailMd3eHeader({super.key, required this.detail});
 
@@ -24,71 +27,103 @@ class AuthorDetailMd3eHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme cs = theme.colorScheme;
     final AuthorImageRef image = detail.image;
     final String? backgroundComicId =
         image.backgroundComicId ?? image.avatarComicId;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: SizedBox(
-            height: _bannerHeight,
-            child: image.showsAuthorImageView(AuthorImageSlot.background)
-                ? AuthorImageView(
-                    authorId: detail.id,
-                    slot: AuthorImageSlot.background,
-                    comicId: backgroundComicId,
-                    platformImageUrl: image.platformImageUrlFor(
-                      AuthorImageSlot.background,
-                    ),
-                    alignment: _bannerAlignment,
-                  )
-                : ColoredBox(color: cs.surfaceContainerHighest),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            ClipOval(
-              child: SizedBox(
-                width: _avatarSize,
-                height: _avatarSize,
-                child: image.showsAuthorImageView(AuthorImageSlot.avatar)
+    final double avatarOverlap = _avatarSize / 2;
+
+    return Md3eTonalSurface(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              SizedBox(
+                height: _bannerHeight,
+                width: double.infinity,
+                child: image.showsAuthorImageView(AuthorImageSlot.background)
                     ? AuthorImageView(
                         authorId: detail.id,
-                        slot: AuthorImageSlot.avatar,
-                        comicId: image.avatarComicId,
+                        slot: AuthorImageSlot.background,
+                        comicId: backgroundComicId,
                         platformImageUrl: image.platformImageUrlFor(
-                          AuthorImageSlot.avatar,
+                          AuthorImageSlot.background,
                         ),
+                        alignment: _bannerAlignment,
                       )
-                    : ColoredBox(
-                        color: cs.surfaceContainerHighest,
-                        child: Icon(
-                          LucideIcons.user,
-                          size: 36,
-                          color: cs.onSurfaceVariant,
-                        ),
-                      ),
+                    : ColoredBox(color: cs.surfaceContainerHighest),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  _AuthorNameRow(detail: detail),
-                  const SizedBox(height: 8),
-                  AuthorDetailMd3eLinks(detail: detail),
-                ],
+              Positioned(
+                left: theme.spacing.xl,
+                bottom: -avatarOverlap,
+                child: _AuthorAvatarRing(
+                  ringColor: cs.surfaceContainerLow,
+                  child: SizedBox(
+                    width: _avatarSize,
+                    height: _avatarSize,
+                    child: image.showsAuthorImageView(AuthorImageSlot.avatar)
+                        ? AuthorImageView(
+                            authorId: detail.id,
+                            slot: AuthorImageSlot.avatar,
+                            comicId: image.avatarComicId,
+                            platformImageUrl: image.platformImageUrlFor(
+                              AuthorImageSlot.avatar,
+                            ),
+                          )
+                        : ColoredBox(
+                            color: cs.surfaceContainerHighest,
+                            child: Icon(
+                              Symbols.person,
+                              size: 40,
+                              color: cs.onSurfaceVariant,
+                            ),
+                          ),
+                  ),
+                ),
               ),
+            ],
+          ),
+          SizedBox(height: avatarOverlap + theme.spacing.md),
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              theme.spacing.xl,
+              0,
+              theme.spacing.xl,
+              theme.spacing.xl,
             ),
-          ],
-        ),
-      ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _AuthorNameRow(detail: detail),
+                SizedBox(height: theme.spacing.sm),
+                AuthorDetailMd3eLinks(detail: detail),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuthorAvatarRing extends StatelessWidget {
+  const _AuthorAvatarRing({required this.ringColor, required this.child});
+
+  final Color ringColor;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: ringColor, width: _avatarRingWidth),
+      ),
+      child: ClipOval(child: child),
     );
   }
 }
@@ -102,14 +137,17 @@ class _AuthorNameRow extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme cs = theme.colorScheme;
+    final M3ETypeScale type = theme.typeScale;
     final ValueNotifier<bool> editing = useState(false);
     final ObjectRef<bool> busy = useRef(false);
     final TextEditingController controller = useTextEditingController();
     final FocusNode focusNode = useFocusNode();
-    final TextStyle nameStyle = (textTheme.titleLarge ?? const TextStyle())
-        .copyWith(fontWeight: FontWeight.w700, color: cs.onSurface);
+    final TextStyle nameStyle = type.headlineSmall.copyWith(
+      fontWeight: FontWeight.w700,
+      color: cs.onSurface,
+    );
 
     Future<void> submit() async {
       if (!editing.value || busy.value) {
@@ -179,9 +217,9 @@ class _AuthorNameRow extends HookConsumerWidget {
         if (detail.verified) ...<Widget>[
           Tooltip(
             message: l10n.authorDetailVerified,
-            child: Icon(LucideIcons.badgeCheck, size: 20, color: cs.primary),
+            child: Icon(Symbols.verified, size: 22, color: cs.primary),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: theme.spacing.xs),
         ],
         Expanded(
           child: Column(
@@ -189,27 +227,26 @@ class _AuthorNameRow extends HookConsumerWidget {
             children: <Widget>[
               Text(
                 detail.name,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: nameStyle,
               ),
               if (aliases.isNotEmpty)
                 Text(
                   l10n.authorDetailAliases(aliases.join(', ')),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: cs.onSurfaceVariant,
-                  ),
+                  style: type.bodySmall.copyWith(color: cs.onSurfaceVariant),
                 ),
             ],
           ),
         ),
-        IconButton(
+        M3EIconButton(
+          icon: Icon(Symbols.edit, size: 18, color: cs.onSurfaceVariant),
+          variant: M3EIconButtonVariant.standard,
+          size: M3EIconButtonSize.sm,
           tooltip: l10n.authorDetailRename,
-          visualDensity: VisualDensity.compact,
-          iconSize: 16,
-          color: cs.onSurfaceVariant,
+          semanticLabel: l10n.authorDetailRename,
           onPressed: () {
             controller.text = detail.name;
             controller.selection = TextSelection(
@@ -218,7 +255,6 @@ class _AuthorNameRow extends HookConsumerWidget {
             );
             editing.value = true;
           },
-          icon: const Icon(LucideIcons.pencil),
         ),
       ],
     );

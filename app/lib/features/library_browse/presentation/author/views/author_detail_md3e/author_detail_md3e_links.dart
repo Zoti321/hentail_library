@@ -9,6 +9,8 @@ import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// 链接 chip 列表 + 「添加链接」；添加时原位变为输入框，平台按 URL 自动识别。
@@ -51,6 +53,7 @@ class AuthorDetailMd3eLinks extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
+    final M3EThemeData theme = M3ETheme.of(context);
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ValueNotifier<bool> adding = useState(false);
     final ObjectRef<bool> busy = useRef(false);
@@ -143,7 +146,7 @@ class AuthorDetailMd3eLinks extends HookConsumerWidget {
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
                   isDense: true,
-                  prefixIcon: const Icon(LucideIcons.link, size: 14),
+                  prefixIcon: Icon(Symbols.link, size: 16),
                   prefixIconConstraints: const BoxConstraints(
                     minWidth: 28,
                     minHeight: 20,
@@ -155,11 +158,12 @@ class AuthorDetailMd3eLinks extends HookConsumerWidget {
             ),
           )
         else
-          OutlinedMetaChip(
-            text: l10n.authorDetailAddLink,
-            compact: true,
-            icon: LucideIcons.plus,
-            onTap: () => adding.value = true,
+          M3EButton.icon(
+            style: M3EButtonStyle.filled,
+            size: M3EButtonSize.sm,
+            onPressed: () => adding.value = true,
+            icon: Icon(Symbols.add, size: 18),
+            label: Text(l10n.authorDetailAddLink),
           ),
       ],
     );

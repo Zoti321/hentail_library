@@ -8,9 +8,12 @@ import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.d
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../../../../widgetbook/lab/theme/md3e_theme.dart';
 import '../../../../../../support/fakes/author_repository_test_fakes.dart';
 import '../../../../../../support/pump_localized_app.dart';
 
@@ -93,12 +96,16 @@ Future<void> _pumpBody(WidgetTester tester, _StubAuthorRepository repo) async {
   final List<Override> overrides = <Override>[
     authorRepoProvider.overrideWithValue(repo),
   ];
+  final M3EThemeData m3e = buildMd3eThemeData(brightness: Brightness.light);
   await pumpLocalizedApp(
     tester,
     overrides: overrides,
     theme: buildAppTheme(Brightness.light),
-    home: const Scaffold(
-      body: SingleChildScrollView(child: AuthorDetailMd3eBody(authorId: 1)),
+    home: Md3eThemeScope(
+      m3e: m3e,
+      child: const Scaffold(
+        body: SingleChildScrollView(child: AuthorDetailMd3eBody(authorId: 1)),
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -121,7 +128,7 @@ void main() {
     final _StubAuthorRepository repo = _StubAuthorRepository();
     await _pumpBody(tester, repo);
 
-    await tester.tap(find.byTooltip('重命名'));
+    await tester.tap(find.byIcon(Symbols.edit));
     await tester.pumpAndSettle();
     final Finder field = find.byType(TextField);
     expect(field, findsOneWidget);
@@ -179,8 +186,9 @@ void main() {
   testWidgets('verified badge uses primary color', (WidgetTester tester) async {
     await _pumpBody(tester, _StubAuthorRepository());
 
-    final Icon badge = tester.widget<Icon>(find.byIcon(LucideIcons.badgeCheck));
-    expect(badge.color, buildAppTheme(Brightness.light).colorScheme.primary);
+    final Icon badge = tester.widget<Icon>(find.byIcon(Symbols.verified));
+    final M3EThemeData theme = M3ETheme.of(tester.element(find.text('Alice')));
+    expect(badge.color, theme.colorScheme.primary);
   });
 
   testWidgets('desktop hover reveals remove button on link chip', (
