@@ -253,6 +253,7 @@ void main() {
       comics: <Comic>[_comic('c1', 'Comic One'), _comic('c2', 'Comic Two')],
       selection: const CatalogSelectionState(
         active: true,
+        host: CatalogSelectionHost.libraryBrowse,
         selectedIds: <String>{'c1'},
       ),
     );

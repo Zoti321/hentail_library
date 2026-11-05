@@ -3,6 +3,8 @@
 /// Cross-feature 仅 import 本路径或 [library_browse/public.dart]；勿 deep import presentation。
 library;
 
+export 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_selection_header.dart';
+export 'package:hentai_library/features/library_browse/presentation/browse/views/widgets/md3e_comic_card_actions.dart';
 export 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 export 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
 export 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';

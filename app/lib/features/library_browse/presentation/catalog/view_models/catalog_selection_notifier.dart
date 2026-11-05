@@ -7,20 +7,40 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 
+/// 多选模式宿主：同一 [catalogSelectionProvider] 按页面隔离 UI。
+enum CatalogSelectionHost {
+  libraryBrowse,
+  seriesDetail,
+}
+
 class CatalogSelectionState {
   const CatalogSelectionState({
     this.active = false,
+    this.host,
     this.selectedIds = const <String>{},
   });
 
   final bool active;
+  final CatalogSelectionHost? host;
   final Set<String> selectedIds;
 
   int get count => selectedIds.length;
 
-  CatalogSelectionState copyWith({bool? active, Set<String>? selectedIds}) {
+  bool get isLibraryBrowseSelection =>
+      active && host == CatalogSelectionHost.libraryBrowse;
+
+  bool get isSeriesDetailSelection =>
+      active && host == CatalogSelectionHost.seriesDetail;
+
+  CatalogSelectionState copyWith({
+    bool? active,
+    CatalogSelectionHost? host,
+    Set<String>? selectedIds,
+    bool clearHost = false,
+  }) {
     return CatalogSelectionState(
       active: active ?? this.active,
+      host: clearHost ? null : (host ?? this.host),
       selectedIds: selectedIds ?? this.selectedIds,
     );
   }
@@ -52,9 +72,13 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     return const CatalogSelectionState();
   }
 
-  void enter() {
+  void enter([CatalogSelectionHost host = CatalogSelectionHost.libraryBrowse]) {
     ref.read(libraryReorderModePortProvider).exit();
-    state = state.copyWith(active: true);
+    state = CatalogSelectionState(
+      active: true,
+      host: host,
+      selectedIds: const <String>{},
+    );
   }
 
   void exit() {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -17,7 +19,7 @@ export 'package:hentai_library/features/series/presentation/views/series_detail_
 /// 系列详情页 Lab：粘滞页头 + 可滚动简介与漫画网格。
 ///
 /// [entry.comics] 仅为当前页；页码、页大小与总页数由调用方通过受控参数提供。
-class Md3eSeriesDetailPage extends StatefulWidget {
+class Md3eSeriesDetailPage extends ConsumerStatefulWidget {
   const Md3eSeriesDetailPage({
     super.key,
     required this.entry,
@@ -53,10 +55,11 @@ class Md3eSeriesDetailPage extends StatefulWidget {
   final ValueChanged<int>? onPageSizeChanged;
 
   @override
-  State<Md3eSeriesDetailPage> createState() => _Md3eSeriesDetailPageState();
+  ConsumerState<Md3eSeriesDetailPage> createState() =>
+      _Md3eSeriesDetailPageState();
 }
 
-class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
+class _Md3eSeriesDetailPageState extends ConsumerState<Md3eSeriesDetailPage> {
   final GlobalKey _comicsSectionKey = GlobalKey();
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
@@ -135,26 +138,65 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
     final double horizontalPadding = layout.horizontalInset;
     final double introTop = layout.headerToBodyGap;
 
-    final Widget header = Md3eSeriesDetailPageHeader(
-      onBack: _resolveVoid(widget.onBack),
-      onEdit: _resolveVoid(widget.onEdit),
-      moreMenuEntries: _resolveMoreMenu(l10n),
-      pageSize: widget.pageSize,
-      onPageSizeChanged: _setPageSize,
+    final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
+    final bool seriesSelection = selection.isSeriesDetailSelection;
+    final List<String> pageComicIds = <String>[
+      for (final Md3eSeriesDetailComicItem item in widget.entry.comics)
+        if (item.comic != null) item.comic!.comicId,
+    ];
+
+    final Widget modeHeader = seriesSelection
+        ? Md3eLibrarySelectionHeader(pageComicIds: pageComicIds)
+        : Md3eSeriesDetailPageHeader(
+            onBack: _resolveVoid(widget.onBack),
+            onEdit: _resolveVoid(widget.onEdit),
+            moreMenuEntries: _resolveMoreMenu(l10n),
+            pageSize: widget.pageSize,
+            onPageSizeChanged: _setPageSize,
+          );
+
+    final Widget header = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 220),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        final Animation<Offset> slide = Tween<Offset>(
+          begin: const Offset(0, -0.12),
+          end: Offset.zero,
+        ).animate(animation);
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(position: slide, child: child),
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey<bool>(seriesSelection),
+        child: modeHeader,
+      ),
     );
 
-    return ColoredBox(
-      color: md3eLabBrowseCanvasColor(scheme),
-      child: Stack(
-        children: <Widget>[
-          CustomScrollView(
-            controller: _scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
-              ),
+    return PopScope(
+      canPop: !seriesSelection,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop && seriesSelection) {
+          ref.read(catalogSelectionProvider.notifier).exit();
+        }
+      },
+      child: ColoredBox(
+        color: md3eLabBrowseCanvasColor(scheme),
+        child: Stack(
+          children: <Widget>[
+            CustomScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: <Widget>[
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: Md3ePageHeaderDelegate(
+                    layout: layout,
+                    child: header,
+                  ),
+                ),
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(
                   horizontalPadding,
@@ -195,6 +237,7 @@ class _Md3eSeriesDetailPageState extends State<Md3eSeriesDetailPage> {
           ),
         ],
       ),
+    ),
     );
   }
 }

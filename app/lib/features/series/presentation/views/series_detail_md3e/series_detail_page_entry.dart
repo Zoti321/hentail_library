@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
 
 export 'package:hentai_library/shared/ui/models/series_serialization_status.dart';
@@ -10,6 +11,7 @@ class Md3eSeriesDetailComicItem {
     this.pageCount,
     this.readProgress,
     this.cover,
+    this.comic,
   });
 
   final String title;
@@ -18,6 +20,9 @@ class Md3eSeriesDetailComicItem {
 
   /// 单册封面；为空时网格显示占位图标。
   final Widget? cover;
+
+  /// 生产页右键菜单；Lab 占位项可为 null。
+  final Comic? comic;
 }
 
 /// Lab 系列详情数据。

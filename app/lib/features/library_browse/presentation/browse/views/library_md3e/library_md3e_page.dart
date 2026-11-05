@@ -142,7 +142,8 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       LibraryDisplayTarget.series => seriesCatalog?.pagination,
     };
 
-    final Widget modeHeader = selection.active
+    final bool librarySelection = selection.isLibraryBrowseSelection;
+    final Widget modeHeader = librarySelection
         ? Md3eLibrarySelectionHeader(
             pageComicIds: <String>[
               for (final Comic comic in comicsCatalog?.items ?? const <Comic>[])
@@ -182,15 +183,15 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
         );
       },
       child: KeyedSubtree(
-        key: ValueKey<bool>(selection.active),
+        key: ValueKey<bool>(librarySelection),
         child: modeHeader,
       ),
     );
 
     return PopScope(
-      canPop: !selection.active,
+      canPop: !librarySelection,
       onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (!didPop && selection.active) {
+        if (!didPop && librarySelection) {
           ref.read(catalogSelectionProvider.notifier).exit();
         }
       },
@@ -357,6 +358,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
   }) {
     final AppLocalizations l10n = context.l10n;
     final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final bool librarySelection = selection.isLibraryBrowseSelection;
     switch (target) {
       case LibraryDisplayTarget.comics:
         if (comicsCatalog == null) {
@@ -387,7 +389,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                 final Comic comic = comics[index];
                 return Md3eComicCardActions(
                   comic: comic,
-                  enabled: !selection.active,
+                  enabled: !librarySelection,
                   child: Md3eComicListItem(
                     title: comic.title,
                     pageLabel: l10n.comicDetailPageCount(comic.pageCount),
@@ -396,7 +398,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                       pageIndex: readPages[comic.comicId],
                       pageCount: comic.pageCount,
                     ),
-                    selectionMode: selection.active,
+                    selectionMode: librarySelection,
                     selected: selection.selectedIds.contains(comic.comicId),
                     onTap: () => _openComicDetail(comic.comicId),
                     onSelectionChanged: (_) => ref
@@ -423,7 +425,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                 return Md3eComicCardActions(
                   key: ValueKey<String>(comic.comicId),
                   comic: comic,
-                  enabled: !selection.active,
+                  enabled: !librarySelection,
                   child: Md3eComicCard(
                     title: comic.title,
                     subtitle: l10n.comicDetailPageCount(comic.pageCount),
@@ -432,7 +434,7 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
                       pageIndex: readPages[comic.comicId],
                       pageCount: comic.pageCount,
                     ),
-                    selectionMode: selection.active,
+                    selectionMode: librarySelection,
                     selected: selection.selectedIds.contains(comic.comicId),
                     onTap: () => _openComicDetail(comic.comicId),
                     onSelectionChanged: (_) => ref

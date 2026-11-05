@@ -4,11 +4,14 @@ import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart'
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_locks_pane.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/series_serialization_dropdown.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
+import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_nav_item.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -44,6 +47,81 @@ class _Md3eSeriesMetadataEditFormState
     extends State<Md3eSeriesMetadataEditForm> {
   _Md3eSeriesMetadataEditTab _tab = _Md3eSeriesMetadataEditTab.content;
 
+  Widget _scrollPane(Widget child) {
+    return ScrollConfiguration(
+      behavior: Md3eMetadataEditScrollBehavior(),
+      child: SingleChildScrollView(primary: false, child: child),
+    );
+  }
+
+  Widget _sideTabLayout({
+    required double viewportHeight,
+    required double gap,
+    required AppLocalizations l10n,
+    required Widget tabBody,
+  }) {
+    return SizedBox(
+      height: viewportHeight,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          SizedBox(
+            width: Md3eMetadataEditFormMetrics.sideTabColumnWidth,
+            child: _scrollPane(_SideTabList(l10n: l10n, tab: _tab, onSelected: _selectTab)),
+          ),
+          SizedBox(width: gap),
+          Expanded(
+            child: Md3eListDetailDetailTransition(
+              switchKey: _tab,
+              child: _scrollPane(tabBody),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _topTabLayout({
+    required double viewportHeight,
+    required double gap,
+    required AppLocalizations l10n,
+    required Widget tabBody,
+  }) {
+    return SizedBox(
+      height: viewportHeight,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Md3eSegmentedCapsuleBar(
+            segments: <Md3eSegmentedCapsuleSegment>[
+              Md3eSegmentedCapsuleSegment(
+                label: l10n.dialogEditMetadataTabContent,
+              ),
+              Md3eSegmentedCapsuleSegment(
+                label: l10n.dialogEditMetadataTabFieldLocks,
+              ),
+            ],
+            selectedIndex: _tab.index,
+            onSelected: (int index) {
+              setState(() => _tab = _Md3eSeriesMetadataEditTab.values[index]);
+            },
+          ),
+          SizedBox(height: gap),
+          Expanded(
+            child: Md3eListDetailDetailTransition(
+              switchKey: _tab,
+              child: _scrollPane(tabBody),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _selectTab(int index) {
+    setState(() => _tab = _Md3eSeriesMetadataEditTab.values[index]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
@@ -65,25 +143,69 @@ class _Md3eSeriesMetadataEditFormState
       ),
     };
 
+    final bool useSideTabs =
+        sizeClass.index >= Md3eWindowSizeClass.medium.index;
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double viewportHeight =
+            Md3eMetadataEditFormMetrics.resolveTabbedViewportHeight(
+              context,
+              constraints,
+            );
+
+        if (useSideTabs) {
+          return _sideTabLayout(
+            viewportHeight: viewportHeight,
+            gap: gap,
+            l10n: l10n,
+            tabBody: tabBody,
+          );
+        }
+
+        return _topTabLayout(
+          viewportHeight: viewportHeight,
+          gap: gap,
+          l10n: l10n,
+          tabBody: tabBody,
+        );
+      },
+    );
+  }
+}
+
+class _SideTabList extends StatelessWidget {
+  const _SideTabList({
+    required this.l10n,
+    required this.tab,
+    required this.onSelected,
+  });
+
+  final AppLocalizations l10n;
+  final _Md3eSeriesMetadataEditTab tab;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<(String label, _Md3eSeriesMetadataEditTab value)> items =
+        <(String, _Md3eSeriesMetadataEditTab)>[
+          (l10n.dialogEditMetadataTabContent, _Md3eSeriesMetadataEditTab.content),
+          (
+            l10n.dialogEditMetadataTabFieldLocks,
+            _Md3eSeriesMetadataEditTab.fieldLocks,
+          ),
+        ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Md3eSegmentedCapsuleBar(
-          segments: <Md3eSegmentedCapsuleSegment>[
-            Md3eSegmentedCapsuleSegment(
-              label: l10n.dialogEditMetadataTabContent,
-            ),
-            Md3eSegmentedCapsuleSegment(
-              label: l10n.dialogEditMetadataTabFieldLocks,
-            ),
-          ],
-          selectedIndex: _tab.index,
-          onSelected: (int index) {
-            setState(() => _tab = _Md3eSeriesMetadataEditTab.values[index]);
-          },
-        ),
-        SizedBox(height: gap),
-        tabBody,
+        for (final (String label, _Md3eSeriesMetadataEditTab value) in items)
+          Md3eListDetailNavItem(
+            key: ValueKey<_Md3eSeriesMetadataEditTab>(value),
+            label: label,
+            selected: tab == value,
+            onTap: () => onSelected(value.index),
+          ),
       ],
     );
   }

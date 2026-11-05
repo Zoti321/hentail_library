@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列内漫画网格（复用书库 [Md3eCatalogGridSliver] 布局）。
-class Md3eSeriesDetailComicsGrid extends StatelessWidget {
+class Md3eSeriesDetailComicsGrid extends ConsumerWidget {
   const Md3eSeriesDetailComicsGrid({
     super.key,
     required this.items,
@@ -19,9 +22,14 @@ class Md3eSeriesDetailComicsGrid extends StatelessWidget {
   final ValueChanged<int>? onComicTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
+    final bool selectionActive = selection.isSeriesDetailSelection;
+    final CatalogSelectionNotifier selectionNotifier = ref.read(
+      catalogSelectionProvider.notifier,
+    );
 
     if (items.isEmpty) {
       return SliverToBoxAdapter(
@@ -46,7 +54,9 @@ class Md3eSeriesDetailComicsGrid extends StatelessWidget {
         final String? subtitle = item.pageCount == null
             ? null
             : l10n.comicDetailPageCount(item.pageCount!);
-        return Md3eComicCard(
+        final Comic? comic = item.comic;
+        final String? comicId = comic?.comicId;
+        final Widget card = Md3eComicCard(
           title: item.title,
           subtitle: subtitle,
           readProgress: item.readProgress,
@@ -59,7 +69,29 @@ class Md3eSeriesDetailComicsGrid extends StatelessWidget {
                   color: scheme.onSurfaceVariant,
                 ),
               ),
-          onTap: () => onComicTap?.call(index),
+          selectionMode: selectionActive,
+          selected: comicId != null && selection.selectedIds.contains(comicId),
+          onSelectionChanged: comicId == null
+              ? null
+              : (_) => selectionNotifier.toggle(comicId),
+          onTap: () {
+            if (selectionActive) {
+              if (comicId != null) {
+                selectionNotifier.toggle(comicId);
+              }
+              return;
+            }
+            onComicTap?.call(index);
+          },
+        );
+        if (comic == null) {
+          return card;
+        }
+        return Md3eComicCardActions(
+          key: ValueKey<String>(comic.comicId),
+          comic: comic,
+          enabled: !selectionActive,
+          child: card,
         );
       },
     );

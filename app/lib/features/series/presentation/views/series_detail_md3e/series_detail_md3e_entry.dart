@@ -41,6 +41,7 @@ Md3eSeriesDetailEntry seriesDetailMd3eEntry({
         Md3eSeriesDetailComicItem(
           title: item.comic.title,
           pageCount: item.comic.pageCount,
+          comic: item.comic,
           cover: comicCoverBuilder?.call(item.comic.comicId),
         ),
     ],

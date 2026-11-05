@@ -138,7 +138,9 @@ class _SeriesDetailMd3eContentState
         M3EMenuEntry(
           label: l10n.catalogSelectionEnter,
           leading: const Icon(LucideIcons.squareCheck),
-          onPressed: () => ref.read(catalogSelectionProvider.notifier).enter(),
+          onPressed: () => ref
+              .read(catalogSelectionProvider.notifier)
+              .enter(CatalogSelectionHost.seriesDetail),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailShowInExplorer,
