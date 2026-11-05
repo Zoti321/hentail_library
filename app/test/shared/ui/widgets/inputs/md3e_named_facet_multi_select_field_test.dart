@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/library_browse/domain/comic/smart_facet_match.dart';
+import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_copy.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

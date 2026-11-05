@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
+import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
+import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/read_session/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_not_found_page.dart';

@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/library_browse/domain/series/series_repository.dart';
 
 part 'series_metadata_form.freezed.dart';
 
@@ -37,8 +36,8 @@ abstract class SeriesMetadataFormValidation
   bool get isValid => nameError == null && totalCountError == null;
 }
 
-/// [SeriesMetadataForm.applyTo] 的结果：非法不调仓储；成功已落库。
-/// 仓储异常仍向上抛，由 UI toast。
+/// [SeriesMetadataApplyResult]：非法不调仓储；成功已落库。
+/// 仓储异常仍向上抛，由 UI toast。落库编排见 `features/series/application/`（#457）。
 sealed class SeriesMetadataApplyResult {
   const SeriesMetadataApplyResult();
 }
@@ -71,64 +70,5 @@ extension SeriesMetadataFormOps on SeriesMetadataForm {
       nameError: nameError,
       totalCountError: totalCountError,
     );
-  }
-
-  /// 非法 → [SeriesMetadataApplyInvalid]；相对 [original] 仅提交值变化字段 →
-  /// [SeriesMetadataApplySucceeded]。无变化时不调仓储。
-  Future<SeriesMetadataApplyResult> applyTo(
-    SeriesRepository repository,
-    Series original,
-  ) async {
-    final SeriesMetadataFormValidation validation = validate();
-    if (!validation.isValid) {
-      return SeriesMetadataApplyInvalid(validation);
-    }
-
-    final String trimmedName = name.trim();
-    final String? namePatch = trimmedName != original.name ? trimmedName : null;
-    final SerializationStatus? statusPatch =
-        serializationStatus != original.serializationStatus
-        ? serializationStatus
-        : null;
-
-    final String rawTotal = totalCountText.trim();
-    final int? totalCount;
-    final bool clearTotalCount;
-    if (rawTotal.isEmpty) {
-      if (original.totalCount != null) {
-        totalCount = null;
-        clearTotalCount = true;
-      } else {
-        totalCount = null;
-        clearTotalCount = false;
-      }
-    } else {
-      final int parsed = int.parse(rawTotal);
-      if (parsed != original.totalCount) {
-        totalCount = parsed;
-        clearTotalCount = false;
-      } else {
-        totalCount = null;
-        clearTotalCount = false;
-      }
-    }
-
-    final bool hasChanges =
-        namePatch != null ||
-        statusPatch != null ||
-        totalCount != null ||
-        clearTotalCount;
-    if (!hasChanges) {
-      return const SeriesMetadataApplySucceeded();
-    }
-
-    await repository.updateUserMeta(
-      seriesId: original.id,
-      name: namePatch,
-      serializationStatus: statusPatch,
-      totalCount: totalCount,
-      clearTotalCount: clearTotalCount,
-    );
-    return const SeriesMetadataApplySucceeded();
   }
 }

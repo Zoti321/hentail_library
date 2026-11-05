@@ -11,9 +11,11 @@
 | --- | --- |
 | `comic_trash/*`、`TrashedComic` read model | `features/comic_trash/domain/` |
 | `reading/*` | `features/read_session/domain/` |
-| 库 browse 规则（筛选/排序/投影等） | `features/library_browse/domain/{browse,series,comic}/` |
+| 库 browse 壳（跨 Tab 偏好、作者、catalog 壳） | `features/library_browse/domain/browse/`（**不含** comic/series Tab 规则） |
+| Comic 仓储、Comics Tab 规则、展示标题、smart facet | `features/comic/domain/` |
+| Series 仓储、Series Tab 规则 | `features/series/domain/` |
 | 库 admin（扫描、revision、current library 等） | `features/library_admin/domain/` |
-| `comic_display_title` 等 | `features/library_browse/domain/comic/` |
+| `comic_display_title` 等 | `features/comic/domain/` |
 | read_session / app_settings 端口实现类型 | 各 owner `domain/` |
 | `repositories/*` 契约 | 各 owner `features/*/domain/` |
 | **reading_history** | `features/reading_history/domain/` |
@@ -32,7 +34,7 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 - `models/entity/comic/**`、`models/enums.dart`
 - `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart`
 - 与 catalog 强绑定的 form / pick / meta VO（见 `models/models.dart` barrel）
-- `reading/series_reading_context.dart`（library_browse ↔ read_session 共用，避免 R5）
+- `reading/series_reading_context.dart`（类型；读口 `SeriesReadingContextPort` @ shared/di，实现 @ series）
 - `library/scan_interval.dart`、`library/metadata_refresh_types.dart`、`library/comic_metadata_bulk_patch_result.dart`（库扫描/批量结果；shared UI toast 与 `LocalLibrary` 共用）
 - `models/managed_named_facet_kind.dart`（metadata 管理 Tab 枚举）
 - `thumbnail/**`
@@ -45,10 +47,11 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 - `ports/comic_trash_command_port.dart`
 - `ports/library_management_port.dart`
 - `ports/library_revision_port.dart`、`ports/library_revision_signal_port.dart`
+- `ports/series_reading_context_port.dart`
 - `ports/read_session_launch_port.dart`
-- `library/comic_detail_return_series_port.dart`
+- `library/comic_detail_return_series_port.dart`（实现 @ `comic`）
 
-`shared/di` 声明跨 feature 协作用的 Riverpod token（#426）；实现与 `createXxx()` 在 owner `di/` / `public/di/`，由 `features/bootstrap/di/overrides/` 注入。类型与 UI 命令经 owner `public.dart` 或 `shared/domain/ports/`。封面等 codegen Provider 实现仅在 owner `di/`，跨 feature UI 用 `library_browse/public.dart`。
+`shared/di` 声明跨 feature 协作用的 Riverpod token（#426）；实现与 `createXxx()` 在 owner `di/` / `public/di/`，由 `features/bootstrap/di/overrides/` 注入。跨 feature UI 封面等用 **`comic/public.dart`**、**`series/public.dart`** 或 browse 壳 public。
 
 ## 测试目录约定
 

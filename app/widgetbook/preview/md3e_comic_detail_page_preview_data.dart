@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/library_browse/presentation/comic/views/comic_detail_md3e/comic_detail_page_entry.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
 
 /// Widgetbook / 预览用示例漫画详情。
 abstract final class Md3eComicDetailPagePreviewData {

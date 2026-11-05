@@ -1,5 +1,6 @@
 import 'package:hentai_library/features/bootstrap/di/overrides/app_settings_trash_shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/overrides/library_admin_shared_state_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/comic_series_shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/overrides/library_browse_shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/overrides/metadata_dictionary_shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/overrides/reading_history_shared_state_overrides.dart';
@@ -9,6 +10,7 @@ import 'package:riverpod/misc.dart' show Override;
 List<Override> sharedLibraryStateOverrides() => <Override>[
   ...libraryAdminSharedStateOverrides(),
   ...libraryBrowseSharedStateOverrides(),
+  ...comicSeriesSharedStateOverrides(),
   ...metadataAndDictionarySharedStateOverrides(),
   ...appSettingsAndTrashSharedStateOverrides(),
   ...readingHistorySharedStateOverrides(),

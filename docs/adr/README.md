@@ -114,3 +114,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0033](./0033-flutter-feature-application-layer.md) | Flutter feature Application 层（Wayfinder） | Accepted |
 | [0034](./0034-feature-public-api-only-cross-imports.md) | Cross-feature 协作 — public API only | Accepted |
 | [0035](./0035-catalog-shared-kernel.md) | Catalog Shared Kernel 保留于 `shared/domain` | Accepted |
+| [0036](./0036-comic-series-wayfinder-modules.md) | Comic / Series Wayfinder 模块切分（#457） | Accepted |

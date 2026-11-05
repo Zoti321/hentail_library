@@ -8,13 +8,13 @@ import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 
-import 'package:hentai_library/features/library_browse/domain/browse/library_comic_sort_option.dart';
+import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
 
-import 'package:hentai_library/features/library_browse/domain/browse/library_media_type_filter.dart';
+import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 
-import 'package:hentai_library/features/library_browse/domain/series/library_series_sort_option.dart';
+import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 
-import 'package:hentai_library/features/library_browse/domain/series/library_serialization_status_filter.dart';
+import 'package:hentai_library/features/series/domain/library_serialization_status_filter.dart';
 
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 

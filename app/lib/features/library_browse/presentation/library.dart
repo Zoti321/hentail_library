@@ -1,6 +1,3 @@
-export 'catalog/view_models/catalog_selection_notifier.dart';
-export 'comic/view_models/comic_detail_return_series_notifier.dart';
-export 'comic/view_models/comic_detail_series_nav_provider.dart';
 export 'browse/view_models/library_comic_filters_notifier.dart';
 export 'browse/view_models/library_catalog_revision_coordinator.dart';
 export 'browse/view_models/library_catalog_inactive_subscription.dart';
@@ -19,3 +16,6 @@ export 'browse/view_models/library_tab_filter_sort_providers.dart';
 export 'browse/view_models/library_tab_page_size_notifier.dart';
 export 'browse/view_models/library_tab_page_size_providers.dart';
 export 'browse/view_models/library_tab_page_size_settings.dart';
+export 'catalog/view_models/catalog_selection_notifier.dart';
+export 'package:hentai_library/features/comic/public/presentation/library_browse_shell_exports.dart'
+    show comicDetailReturnSeriesProvider, comicDetailSeriesNavProvider;

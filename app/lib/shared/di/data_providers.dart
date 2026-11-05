@@ -6,15 +6,15 @@ import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
 import 'package:hentai_library/features/named_metadata/domain/author_repository.dart';
-import 'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
+import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
-import 'package:hentai_library/features/library_browse/domain/comic/comic_thumbnail_repository.dart';
+import 'package:hentai_library/features/comic/domain/comic_thumbnail_repository.dart';
 import 'package:hentai_library/features/home/domain/home_page_repository.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
-import 'package:hentai_library/features/library_browse/domain/series/series_repository.dart';
+import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/named_metadata/domain/tag_repository.dart';
 
 Never _unimplemented(String name) =>

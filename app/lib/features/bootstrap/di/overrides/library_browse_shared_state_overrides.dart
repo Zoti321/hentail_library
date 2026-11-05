@@ -4,11 +4,8 @@ import 'package:hentai_library/shared/di/author_detail_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-/// library_browse owner：Port 工厂与 catalog 投影（#435）。
+/// library_browse 壳：作者详情 Port 与 catalog 年龄投影（#435 / #457）。
 List<Override> libraryBrowseSharedStateOverrides() => <Override>[
-  comicDetailReturnSeriesPortProvider.overrideWith(
-    createComicDetailReturnSeriesPort,
-  ),
   authorDetailPortProvider.overrideWith(createAuthorDetailPort),
   libraryComicAgeRestrictionStateProvider.overrideWith(
     (Ref ref) => ref.watch(

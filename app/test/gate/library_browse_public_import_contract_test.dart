@@ -7,20 +7,20 @@ void main() {
     const String allowedUri =
         'package:hentai_library/features/library_browse/public.dart';
     const String allowedDeep =
-        'package:hentai_library/features/library_browse/public/ui/comic_cover_content.dart';
+        'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
     const String deniedUri =
-        'package:hentai_library/features/library_browse/domain/comic/comic_lookup_repository.dart';
+        'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
 
     expect(isFeaturePublicPath('features/library_browse/public.dart'), isTrue);
     expect(
       isFeaturePublicPath(
-        'features/library_browse/public/ui/comic_cover_content.dart',
+        'features/comic/public/ui/comic_cover_content.dart',
       ),
       isTrue,
     );
     expect(
       isFeaturePublicPath(
-        'features/library_browse/domain/comic/comic_lookup_repository.dart',
+        'features/comic/domain/comic_lookup_repository.dart',
       ),
       isFalse,
     );

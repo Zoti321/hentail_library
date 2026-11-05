@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/library_browse/public/comic_lookup_repository.dart';
+import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';

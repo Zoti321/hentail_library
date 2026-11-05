@@ -1,7 +1,7 @@
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
-import 'package:hentai_library/features/library_browse/domain/series/series_repository.dart';
+import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:test/test.dart';
 
 class _RecordingSeriesRepository implements SeriesRepository {

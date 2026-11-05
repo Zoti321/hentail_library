@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/content_breadcrumb_labels.dart';
-import 'package:hentai_library/features/library_browse/presentation/comic/view_models/comic_detail_return_series_notifier.dart';
+import 'package:hentai_library/features/comic/public/presentation/library_browse_shell_exports.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_search_page_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/widgets/md3e_comic_card_actions.dart';
@@ -17,7 +17,7 @@ import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/library_browse/public/ui/comic_cover_content.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 const double _kSearchLoadMoreThreshold = 400;

@@ -2,7 +2,8 @@ import 'package:hentai_library/shared/domain/reading/series_reading_context.dart
 import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/reading_history_providers.dart';
-import 'package:hentai_library/features/library_browse/public/comic_display_title.dart';
+import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
+import 'package:hentai_library/features/comic/public/comic_display_title.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'series_reader_provider.g.dart';
@@ -59,7 +60,7 @@ Future<ReadSessionContextData> readSessionContextForReader(
 }) async {
   final String normalizedComicId = comicId.trim();
   final SeriesReadingContext? seriesContext = await ref
-      .read(seriesRepoProvider)
+      .read(seriesReadingContextPortProvider)
       .getReadingContextByComicId(normalizedComicId);
 
   final int? preferredPageIndex = (incognito || startFromFirstPage)

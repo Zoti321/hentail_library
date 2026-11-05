@@ -2,6 +2,5 @@
   "shared/domain/models/entity/library/local_library.dart|package:hentai_library/features/library_admin/domain/resource_format_category.dart",
   "shared/domain/models/value_objects/form/library_form.dart|package:hentai_library/features/library_admin/domain/library_repository.dart",
   "shared/domain/models/value_objects/form/library_form.dart|package:hentai_library/features/library_admin/domain/resource_format_category.dart",
-  "shared/domain/models/value_objects/form/series_metadata_form.dart|package:hentai_library/features/library_browse/domain/series/series_repository.dart",
   "shared/domain/ports/library_management_port.dart|package:hentai_library/features/library_admin/domain/sync_library_types.dart"
 ]
