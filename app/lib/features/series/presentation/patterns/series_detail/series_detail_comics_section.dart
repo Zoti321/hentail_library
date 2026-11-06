@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/series_detail_page_metrics.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_comics_grid.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 
 /// 系列漫画列表区：网格 + 底部分页。
-class Md3eSeriesDetailComicsSection extends StatelessWidget {
-  const Md3eSeriesDetailComicsSection({
+class SeriesDetailComicsSection extends StatelessWidget {
+  const SeriesDetailComicsSection({
     super.key,
     this.gridSectionKey,
     required this.pageItems,
@@ -18,7 +18,7 @@ class Md3eSeriesDetailComicsSection extends StatelessWidget {
   });
 
   final Key? gridSectionKey;
-  final List<Md3eSeriesDetailComicItem> pageItems;
+  final List<SeriesDetailComicItem> pageItems;
   final int page;
   final int totalPages;
   final ValueChanged<int> onPageChanged;
@@ -26,20 +26,20 @@ class Md3eSeriesDetailComicsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+    final WindowSizeClass sizeClass = windowSizeClassOf(context);
     final double paginationGap =
-        Md3eSeriesDetailPageMetrics.paginationVerticalSpacing(sizeClass);
+        SeriesDetailPageMetrics.paginationVerticalSpacing(sizeClass);
 
     return SliverMainAxisGroup(
       slivers: <Widget>[
         SliverToBoxAdapter(key: gridSectionKey, child: const SizedBox.shrink()),
-        Md3eSeriesDetailComicsGrid(items: pageItems, onComicTap: onComicTap),
+        SeriesDetailComicsGrid(items: pageItems, onComicTap: onComicTap),
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.only(top: paginationGap),
             child: Align(
               alignment: Alignment.centerRight,
-              child: Md3ePagination(
+              child: Pagination(
                 page: page,
                 totalPages: totalPages,
                 onPageChanged: onPageChanged,
@@ -48,9 +48,7 @@ class Md3eSeriesDetailComicsSection extends StatelessWidget {
           ),
         ),
         SliverToBoxAdapter(
-          child: SizedBox(
-            height: Md3eSeriesDetailPageMetrics.scrollBottomInset,
-          ),
+          child: SizedBox(height: SeriesDetailPageMetrics.scrollBottomInset),
         ),
       ],
     );

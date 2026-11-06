@@ -15,63 +15,63 @@ import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_
 export 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_detail_panes.dart';
 
 /// 设置页 Lab：≥840 list–detail（Kazumi 风 master + 分组卡片详情）。
-class Md3eSettingsPage extends StatefulWidget {
-  const Md3eSettingsPage({
+class SettingsLayout extends StatefulWidget {
+  const SettingsLayout({
     super.key,
-    this.initialCategory = Md3eSettingsCategory.personalization,
+    this.initialCategory = SettingsCategory.personalization,
     this.masterGroupTitle,
-    this.labState = const Md3eSettingsLabState(),
+    this.labState = const SettingsLabState(),
     this.onLabStateChanged,
     this.onBack,
-    this.optionLabels = const Md3eSettingsOptionLabels(),
+    this.optionLabels = const SettingsOptionLabels(),
     this.showUnwiredTiles = true,
     this.visibleCategories,
     this.sectionsBuilder,
   });
 
-  final Md3eSettingsCategory initialCategory;
+  final SettingsCategory initialCategory;
   final String? masterGroupTitle;
-  final Md3eSettingsLabState labState;
-  final ValueChanged<Md3eSettingsLabState>? onLabStateChanged;
+  final SettingsLabState labState;
+  final ValueChanged<SettingsLabState>? onLabStateChanged;
 
   /// 可选项文案（生产 Pilot 注入 l10n；Lab 使用默认值）。
-  final Md3eSettingsOptionLabels optionLabels;
+  final SettingsOptionLabels optionLabels;
 
   /// 为 false 时隐藏尚未接入业务的 tile。
   final bool showUnwiredTiles;
 
   /// 为 null 时显示全部分类；否则只显示列表中的分类。
-  final Set<Md3eSettingsCategory>? visibleCategories;
+  final Set<SettingsCategory>? visibleCategories;
 
   /// 为 null 时使用 Lab mock 分类内容；生产注入真实 section。
-  final Md3eSettingsSectionsBuilder? sectionsBuilder;
+  final SettingsSectionsBuilder? sectionsBuilder;
 
   /// 列表页（非 list-detail）返回：由外层决定回到哪里（壳层上一目的地 / 路由）。
   final VoidCallback? onBack;
 
   @override
-  State<Md3eSettingsPage> createState() => _Md3eSettingsPageState();
+  State<SettingsLayout> createState() => _SettingsPageState();
 }
 
-class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
-  late Md3eSettingsCategory _selected = widget.initialCategory;
-  late Md3eSettingsLabState _labState = widget.labState;
+class _SettingsPageState extends State<SettingsLayout> {
+  late SettingsCategory _selected = widget.initialCategory;
+  late SettingsLabState _labState = widget.labState;
   bool _showingNarrowDetail = false;
 
   @override
-  void didUpdateWidget(covariant Md3eSettingsPage oldWidget) {
+  void didUpdateWidget(covariant SettingsLayout oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.labState != widget.labState) {
       _labState = widget.labState;
     }
   }
 
-  void _updateLabState(Md3eSettingsLabState next) {
+  void _updateLabState(SettingsLabState next) {
     setState(() => _labState = next);
     widget.onLabStateChanged?.call(next);
   }
 
-  void _selectCategory(Md3eSettingsCategory category, {required bool wide}) {
+  void _selectCategory(SettingsCategory category, {required bool wide}) {
     setState(() {
       _selected = category;
       if (!wide) {
@@ -80,7 +80,7 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
     });
   }
 
-  /// 头部返回按钮与系统返回共用：窄屏详情先回分类列表，列表页交给 [Md3eSettingsPage.onBack] 或路由。
+  /// 头部返回按钮与系统返回共用：窄屏详情先回分类列表，列表页交给 [SettingsLayout.onBack] 或路由。
   void _handleBack() {
     if (_showingNarrowDetail) {
       setState(() => _showingNarrowDetail = false);
@@ -101,7 +101,7 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
       builder: (BuildContext context, BoxConstraints constraints) {
         return _buildPage(
           context,
-          listDetailWide: Md3eSettingsPageMetrics.useListDetail(
+          listDetailWide: SettingsPageMetrics.useListDetail(
             constraints.maxWidth,
           ),
         );
@@ -111,7 +111,7 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
 
   Widget _buildPage(BuildContext context, {required bool listDetailWide}) {
     final AppLocalizations l10n = context.l10n;
-    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontalPadding = layout.horizontalInset;
 
     return PopScope<Object?>(
@@ -129,15 +129,15 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Builder(
               builder: (BuildContext context) {
-                final Md3eSettingsCategoryInfo selectedInfo =
-                    kMd3eSettingsCategories.firstWhere(
-                      (Md3eSettingsCategoryInfo e) => e.category == _selected,
+                final SettingsCategoryInfo selectedInfo = kSettingsCategories
+                    .firstWhere(
+                      (SettingsCategoryInfo e) => e.category == _selected,
                     );
                 final String? headerTitle =
                     (!listDetailWide && _showingNarrowDetail)
                     ? selectedInfo.label(l10n)
                     : null;
-                return Md3eSettingsPageHeader(
+                return SettingsPageHeader(
                   title: headerTitle,
                   showBack: !listDetailWide,
                   onBack: _handleBack,
@@ -156,26 +156,26 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
               ),
               child: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
-                  final bool wide = Md3eSettingsPageMetrics.useListDetail(
+                  final bool wide = SettingsPageMetrics.useListDetail(
                     constraints.maxWidth,
                   );
 
                   final String masterGroupTitle =
                       widget.masterGroupTitle ??
                       l10n.settingsMasterMenuGroupTitle;
-                  final Widget master = Md3eSettingsMasterMenu(
-                    key: const Key('md3e_settings_master'),
+                  final Widget master = SettingsMasterMenu(
+                    key: const Key('_settings_master'),
                     wide: wide,
                     selected: _selected,
                     masterGroupTitle: masterGroupTitle,
                     visibleCategories: widget.visibleCategories,
-                    onSelect: (Md3eSettingsCategory category) {
+                    onSelect: (SettingsCategory category) {
                       _selectCategory(category, wide: wide);
                     },
                   );
 
-                  final Widget detail = Md3eSettingsDetailPane(
-                    key: const Key('md3e_settings_detail'),
+                  final Widget detail = SettingsDetailPane(
+                    key: const Key('_settings_detail'),
                     category: _selected,
                     showTitle: wide,
                     labState: _labState,
@@ -186,19 +186,18 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
                   );
 
                   if (wide) {
-                    return Md3eListDetailAdaptiveLayout(
+                    return ListDetailAdaptiveLayout(
                       showPaneDivider: false,
-                      listPaneFixedWidth:
-                          Md3eSettingsPageMetrics.masterPaneWidth,
-                      paneGap: Md3eSettingsPageMetrics.paneGap,
+                      listPaneFixedWidth: SettingsPageMetrics.masterPaneWidth,
+                      paneGap: SettingsPageMetrics.paneGap,
                       listPane: master,
-                      detailPane: Md3eListDetailDetailTransition(
+                      detailPane: ListDetailDetailTransition(
                         switchKey: _selected,
                         child: detail,
                       ),
                     );
                   }
-                  return Md3eSettingsNarrowPaneSwitcher(
+                  return SettingsNarrowPaneSwitcher(
                     showingDetail: _showingNarrowDetail,
                     masterList: master,
                     detailPane: detail,
@@ -214,8 +213,8 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
 }
 
 /// Narrow master ↔ detail transition (slide + fade).
-class Md3eSettingsNarrowPaneSwitcher extends StatelessWidget {
-  const Md3eSettingsNarrowPaneSwitcher({
+class SettingsNarrowPaneSwitcher extends StatelessWidget {
+  const SettingsNarrowPaneSwitcher({
     super.key,
     required this.showingDetail,
     required this.masterList,
@@ -232,14 +231,14 @@ class Md3eSettingsNarrowPaneSwitcher extends StatelessWidget {
       return showingDetail ? detailPane : masterList;
     }
 
-    final Duration duration = Md3eMotion.motionDurationOf(
+    final Duration duration = LabMotion.motionDurationOf(
       context,
-      Md3eMotion.routeTransitionDuration,
+      LabMotion.routeTransitionDuration,
     );
     // 与 Lab 页面转场同款 M3E expressive spatial 弹簧：进场允许轻微过冲，退场沿反向曲线收回。
-    final Curve springCurve = Md3eSpringCurve(
-      motion: Md3eMotion.routeSpring,
-      duration: Md3eMotion.routeTransitionDuration,
+    final Curve springCurve = SpringCurve(
+      motion: LabMotion.routeSpring,
+      duration: LabMotion.routeTransitionDuration,
     );
 
     return ClipRect(

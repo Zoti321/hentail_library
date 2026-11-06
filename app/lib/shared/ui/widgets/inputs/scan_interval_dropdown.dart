@@ -5,8 +5,8 @@ import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Scan interval 单选（[M3EDropdownMenu]）。
-class Md3eScanIntervalDropdown extends StatelessWidget {
-  const Md3eScanIntervalDropdown({
+class ScanIntervalDropdown extends StatelessWidget {
+  const ScanIntervalDropdown({
     super.key,
     required this.value,
     required this.onChanged,

@@ -5,23 +5,23 @@ import 'package:hentai_library/shared/ui/models/series_serialization_status.dart
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列连载状态单选（[M3EDropdownMenu]）。
-class Md3eSeriesSerializationDropdown extends StatelessWidget {
-  const Md3eSeriesSerializationDropdown({
+class SeriesSerializationDropdown extends StatelessWidget {
+  const SeriesSerializationDropdown({
     super.key,
     required this.value,
     required this.onChanged,
     this.enabled = true,
   });
 
-  final Md3eSeriesSerializationStatus value;
-  final ValueChanged<Md3eSeriesSerializationStatus> onChanged;
+  final SeriesSerializationStatus value;
+  final ValueChanged<SeriesSerializationStatus> onChanged;
   final bool enabled;
 
-  static const List<Md3eSeriesSerializationStatus> _selectable =
-      <Md3eSeriesSerializationStatus>[
-        Md3eSeriesSerializationStatus.ongoing,
-        Md3eSeriesSerializationStatus.ended,
-        Md3eSeriesSerializationStatus.hiatus,
+  static const List<SeriesSerializationStatus> _selectable =
+      <SeriesSerializationStatus>[
+        SeriesSerializationStatus.ongoing,
+        SeriesSerializationStatus.ended,
+        SeriesSerializationStatus.hiatus,
       ];
 
   @override
@@ -30,13 +30,13 @@ class Md3eSeriesSerializationDropdown extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final bool hasSelection = _selectable.contains(value);
 
-    return M3EDropdownMenu<Md3eSeriesSerializationStatus>(
+    return M3EDropdownMenu<SeriesSerializationStatus>(
       enabled: enabled,
       singleSelect: true,
       showChipAnimation: false,
       items: _selectable
           .map(
-            (Md3eSeriesSerializationStatus status) => M3EDropdownItem(
+            (SeriesSerializationStatus status) => M3EDropdownItem(
               label: _label(l10n, status),
               value: status,
               selected: hasSelection && status == value,
@@ -51,9 +51,9 @@ class Md3eSeriesSerializationDropdown extends StatelessWidget {
         ),
       ),
       onSelectionChanged:
-          (List<M3EDropdownItem<Md3eSeriesSerializationStatus>> items) {
+          (List<M3EDropdownItem<SeriesSerializationStatus>> items) {
             if (items.isEmpty) {
-              onChanged(Md3eSeriesSerializationStatus.unknown);
+              onChanged(SeriesSerializationStatus.unknown);
               return;
             }
             onChanged(items.first.value);
@@ -63,13 +63,13 @@ class Md3eSeriesSerializationDropdown extends StatelessWidget {
 
   static String _label(
     AppLocalizations l10n,
-    Md3eSeriesSerializationStatus status,
+    SeriesSerializationStatus status,
   ) {
     return switch (status) {
-      Md3eSeriesSerializationStatus.ongoing => l10n.serializationStatusOngoing,
-      Md3eSeriesSerializationStatus.ended => l10n.serializationStatusEnded,
-      Md3eSeriesSerializationStatus.hiatus => l10n.serializationStatusHiatus,
-      Md3eSeriesSerializationStatus.unknown => l10n.serializationStatusUnknown,
+      SeriesSerializationStatus.ongoing => l10n.serializationStatusOngoing,
+      SeriesSerializationStatus.ended => l10n.serializationStatusEnded,
+      SeriesSerializationStatus.hiatus => l10n.serializationStatusHiatus,
+      SeriesSerializationStatus.unknown => l10n.serializationStatusUnknown,
     };
   }
 }

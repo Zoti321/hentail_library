@@ -9,8 +9,8 @@ import 'package:window_manager/window_manager.dart';
 ///
 /// No global search (removed); the empty middle is a window drag area.
 /// When [showNavigationMenu] is true (drawer shell), ☰ opens app navigation.
-class Md3eDesktopTitleBar extends StatelessWidget {
-  const Md3eDesktopTitleBar({
+class DesktopTitleBar extends StatelessWidget {
+  const DesktopTitleBar({
     super.key,
     this.showWindowControls = true,
     this.showNavigationMenu = false,
@@ -28,7 +28,7 @@ class Md3eDesktopTitleBar extends StatelessWidget {
   final VoidCallback? onWindowMaximize;
   final VoidCallback? onWindowClose;
 
-  /// Defaults to [md3eLabBrowseCanvasColor] (`surfaceContainerLow`).
+  /// Defaults to [labBrowseCanvasColor] (`surfaceContainerLow`).
   final Color? backgroundColor;
 
   @override
@@ -36,10 +36,10 @@ class Md3eDesktopTitleBar extends StatelessWidget {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
 
     return SizedBox(
-      height: Md3eDesktopTitleBarMetrics.height,
+      height: DesktopTitleBarMetrics.height,
       width: double.infinity,
       child: ColoredBox(
-        color: backgroundColor ?? md3eLabBrowseCanvasColor(scheme),
+        color: backgroundColor ?? labBrowseCanvasColor(scheme),
         child: Stack(
           children: <Widget>[
             // Bottom layer: empty title-bar area drags the window; buttons above
@@ -53,8 +53,8 @@ class Md3eDesktopTitleBar extends StatelessWidget {
                 children: <Widget>[
                   if (showNavigationMenu)
                     SizedBox(
-                      width: Md3eDesktopTitleBarMetrics.navigationMenuWidth,
-                      height: Md3eDesktopTitleBarMetrics.height,
+                      width: DesktopTitleBarMetrics.navigationMenuWidth,
+                      height: DesktopTitleBarMetrics.height,
                       child: Center(
                         child: M3EIconButton(
                           icon: const Icon(Icons.menu),
@@ -66,7 +66,7 @@ class Md3eDesktopTitleBar extends StatelessWidget {
                     ),
                   const Spacer(),
                   if (showWindowControls)
-                    Md3eDesktopWindowControls(
+                    DesktopWindowControls(
                       onMinimize: onWindowMinimize,
                       onMaximize: onWindowMaximize,
                       onClose: onWindowClose,

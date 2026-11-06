@@ -18,8 +18,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// 筛选排序抽屉的本地状态（Widgetbook / 测试用，不绑 Riverpod）。
 ///
 /// 字段与生产 [LibraryComicFiltersState] 的抽屉子集一致。
-class Md3eLibraryFilterSortState {
-  Md3eLibraryFilterSortState({
+class LibraryFilterSortState {
+  LibraryFilterSortState({
     this.ageRestriction = LibraryAgeRestrictionFilter.unrestricted,
     this.mediaTypeFilter = const LibraryMediaTypeFilterSelection(),
     this.grouping = LibraryComicGrouping.defaultValue,
@@ -31,8 +31,7 @@ class Md3eLibraryFilterSortState {
   final LibraryComicGrouping grouping;
   final LibraryComicSortOption sortOption;
 
-  static final Md3eLibraryFilterSortState defaults =
-      Md3eLibraryFilterSortState();
+  static final LibraryFilterSortState defaults = LibraryFilterSortState();
 
   bool get isCustomized {
     final LibraryComicSortOption defaultSort = LibraryComicSortOption();
@@ -43,13 +42,13 @@ class Md3eLibraryFilterSortState {
         sortOption.descending != defaultSort.descending;
   }
 
-  Md3eLibraryFilterSortState copyWith({
+  LibraryFilterSortState copyWith({
     LibraryAgeRestrictionFilter? ageRestriction,
     LibraryMediaTypeFilterSelection? mediaTypeFilter,
     LibraryComicGrouping? grouping,
     LibraryComicSortOption? sortOption,
   }) {
-    return Md3eLibraryFilterSortState(
+    return LibraryFilterSortState(
       ageRestriction: ageRestriction ?? this.ageRestriction,
       mediaTypeFilter: mediaTypeFilter ?? this.mediaTypeFilter,
       grouping: grouping ?? this.grouping,
@@ -57,7 +56,7 @@ class Md3eLibraryFilterSortState {
     );
   }
 
-  Md3eLibraryFilterSortState toggleAgeRestriction(
+  LibraryFilterSortState toggleAgeRestriction(
     LibraryAgeRestrictionFilter option,
   ) {
     return copyWith(
@@ -67,13 +66,11 @@ class Md3eLibraryFilterSortState {
     );
   }
 
-  Md3eLibraryFilterSortState toggleMediaType(
-    LibraryMediaTypeFilterOption option,
-  ) {
+  LibraryFilterSortState toggleMediaType(LibraryMediaTypeFilterOption option) {
     return copyWith(mediaTypeFilter: mediaTypeFilter.withToggled(option));
   }
 
-  Md3eLibraryFilterSortState selectSortField(LibraryComicSortField field) {
+  LibraryFilterSortState selectSortField(LibraryComicSortField field) {
     if (sortOption.field == field) {
       return copyWith(
         sortOption: sortOption.copyWith(descending: !sortOption.descending),
@@ -84,7 +81,7 @@ class Md3eLibraryFilterSortState {
     );
   }
 
-  Md3eLibraryFilterSortState setGroupBySeries(bool enabled) {
+  LibraryFilterSortState setGroupBySeries(bool enabled) {
     return copyWith(
       grouping: enabled
           ? LibraryComicGrouping.bySeries
@@ -92,19 +89,19 @@ class Md3eLibraryFilterSortState {
     );
   }
 
-  Md3eLibraryFilterSortState selectGrouping(LibraryComicGrouping grouping) {
+  LibraryFilterSortState selectGrouping(LibraryComicGrouping grouping) {
     return copyWith(grouping: grouping);
   }
 
-  Md3eLibraryFilterSortState reset() => defaults;
+  LibraryFilterSortState reset() => defaults;
 }
 
 /// 漫画库筛选与排序模态面板：compact / medium 为 bottom sheet，expanded+ 为 side sheet（即时生效、无底部「应用」）。
-abstract final class Md3eLibraryFilterSortSideSheet {
-  Md3eLibraryFilterSortSideSheet._();
+abstract final class LibraryFilterSortSideSheet {
+  LibraryFilterSortSideSheet._();
 
   static double widthFor(BuildContext context) {
-    return md3eLibraryFilterSortSideSheetWidthForViewport(
+    return libraryFilterSortSideSheetWidthForViewport(
       MediaQuery.sizeOf(context).width,
     );
   }
@@ -114,12 +111,12 @@ abstract final class Md3eLibraryFilterSortSideSheet {
     return m3e.sideSheetTheme.copyWith(
       horizontalPadding: 16,
       topElementsGap: 8,
-      headlineTextStyle: const TextStyle(fontFamily: kMd3eAppFontFamily),
+      headlineTextStyle: const TextStyle(fontFamily: kAppFontFamily),
     );
   }
 
   static bool detachedFor(BuildContext context) {
-    return md3eLibraryFilterSortSideSheetDetachedForViewport(
+    return libraryFilterSortSideSheetDetachedForViewport(
       MediaQuery.sizeOf(context).width,
     );
   }
@@ -127,22 +124,23 @@ abstract final class Md3eLibraryFilterSortSideSheet {
   /// 模态呈现：compact / medium 用 [M3EBottomSheet]（全屏展开），expanded+ 用 [M3ESideSheet]（detached）。
   static Future<void> show(
     BuildContext context, {
-    required Md3eLibraryFilterSortState state,
-    required ValueChanged<Md3eLibraryFilterSortState> onStateChanged,
+    required LibraryFilterSortState state,
+    required ValueChanged<LibraryFilterSortState> onStateChanged,
     bool useRootNavigator = true,
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eOverlayRouteScopeSnapshot scope =
-        Md3eOverlayRouteScopeSnapshot.capture(context);
-    final Widget modalBody = md3eOverlayRouteScope(
+    final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
+      context,
+    );
+    final Widget modalBody = overlayRouteScope(
       scope: scope,
-      child: _Md3eLibraryFilterSortSideSheetModalBody(
+      child: _LibraryFilterSortSideSheetModalBody(
         initialState: state,
         onStateChanged: onStateChanged,
       ),
     );
 
-    if (md3eLibraryFilterSortPrefersBottomSheetForViewport(viewportWidth)) {
+    if (libraryFilterSortPrefersBottomSheetForViewport(viewportWidth)) {
       return M3EBottomSheet.show<void>(
         context,
         useRootNavigator: useRootNavigator,
@@ -159,10 +157,8 @@ abstract final class Md3eLibraryFilterSortSideSheet {
     return M3ESideSheet.show<void>(
       context,
       title: '',
-      width: md3eLibraryFilterSortSideSheetWidthForViewport(viewportWidth),
-      detached: md3eLibraryFilterSortSideSheetDetachedForViewport(
-        viewportWidth,
-      ),
+      width: libraryFilterSortSideSheetWidthForViewport(viewportWidth),
+      detached: libraryFilterSortSideSheetDetachedForViewport(viewportWidth),
       theme: _sheetTheme(context),
       scrollable: true,
       useRootNavigator: useRootNavigator,
@@ -171,59 +167,58 @@ abstract final class Md3eLibraryFilterSortSideSheet {
   }
 }
 
-/// 由 [Md3eLibraryFilterSortDrawerHost] 注入；[body] 子树内用 [Md3eLibraryFilterSortDrawerHost.openDrawer]。
-class _Md3eLibraryFilterSortHostScope extends InheritedWidget {
-  const _Md3eLibraryFilterSortHostScope({
+/// 由 [LibraryFilterSortDrawerHost] 注入；[body] 子树内用 [LibraryFilterSortDrawerHost.openDrawer]。
+class _LibraryFilterSortHostScope extends InheritedWidget {
+  const _LibraryFilterSortHostScope({
     required this.openSideSheet,
     required super.child,
   });
 
   final VoidCallback openSideSheet;
 
-  static _Md3eLibraryFilterSortHostScope? maybeOf(BuildContext context) {
-    return context
-        .getInheritedWidgetOfExactType<_Md3eLibraryFilterSortHostScope>();
+  static _LibraryFilterSortHostScope? maybeOf(BuildContext context) {
+    return context.getInheritedWidgetOfExactType<_LibraryFilterSortHostScope>();
   }
 
   @override
-  bool updateShouldNotify(_Md3eLibraryFilterSortHostScope oldWidget) => false;
+  bool updateShouldNotify(_LibraryFilterSortHostScope oldWidget) => false;
 }
 
 /// 模态内自持状态，便于在 sheet 打开期间即时更新筛选。
-class _Md3eLibraryFilterSortSideSheetModalBody extends StatefulWidget {
-  const _Md3eLibraryFilterSortSideSheetModalBody({
+class _LibraryFilterSortSideSheetModalBody extends StatefulWidget {
+  const _LibraryFilterSortSideSheetModalBody({
     required this.initialState,
     required this.onStateChanged,
   });
 
-  final Md3eLibraryFilterSortState initialState;
-  final ValueChanged<Md3eLibraryFilterSortState> onStateChanged;
+  final LibraryFilterSortState initialState;
+  final ValueChanged<LibraryFilterSortState> onStateChanged;
 
   @override
-  State<_Md3eLibraryFilterSortSideSheetModalBody> createState() =>
-      _Md3eLibraryFilterSortSideSheetModalBodyState();
+  State<_LibraryFilterSortSideSheetModalBody> createState() =>
+      _LibraryFilterSortSideSheetModalBodyState();
 }
 
-class _Md3eLibraryFilterSortSideSheetModalBodyState
-    extends State<_Md3eLibraryFilterSortSideSheetModalBody> {
-  late Md3eLibraryFilterSortState _state = widget.initialState;
+class _LibraryFilterSortSideSheetModalBodyState
+    extends State<_LibraryFilterSortSideSheetModalBody> {
+  late LibraryFilterSortState _state = widget.initialState;
 
   @override
-  void didUpdateWidget(covariant _Md3eLibraryFilterSortSideSheetModalBody old) {
+  void didUpdateWidget(covariant _LibraryFilterSortSideSheetModalBody old) {
     super.didUpdateWidget(old);
     if (old.initialState != widget.initialState) {
       _state = widget.initialState;
     }
   }
 
-  void _apply(Md3eLibraryFilterSortState next) {
+  void _apply(LibraryFilterSortState next) {
     setState(() => _state = next);
     widget.onStateChanged(next);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Md3eLibraryFilterSortSideSheetContent(
+    return LibraryFilterSortSideSheetContent(
       state: _state,
       onStateChanged: _apply,
     );
@@ -231,22 +226,22 @@ class _Md3eLibraryFilterSortSideSheetModalBodyState
 }
 
 /// 筛选排序面板正文（供 [M3ESideSheet.body] 与测试嵌入）。
-class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
-  const Md3eLibraryFilterSortSideSheetContent({
+class LibraryFilterSortSideSheetContent extends StatelessWidget {
+  const LibraryFilterSortSideSheetContent({
     super.key,
     required this.state,
     required this.onStateChanged,
   });
 
-  final Md3eLibraryFilterSortState state;
-  final ValueChanged<Md3eLibraryFilterSortState> onStateChanged;
+  final LibraryFilterSortState state;
+  final ValueChanged<LibraryFilterSortState> onStateChanged;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final Md3eLibraryFilterSortRowMetrics rowMetrics =
-        Md3eLibraryFilterSortRowMetrics.forViewportWidth(
+    final LibraryFilterSortRowMetrics rowMetrics =
+        LibraryFilterSortRowMetrics.forViewportWidth(
           MediaQuery.sizeOf(context).width,
         );
     final TextStyle sectionTitle = TextStyle(
@@ -262,7 +257,7 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: kMd3eLibraryFilterSortDrawerContentInset,
+              horizontal: kLibraryFilterSortDrawerContentInset,
             ),
             child: Row(
               children: <Widget>[
@@ -288,41 +283,36 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          _Md3eFilterAccordionSection(
+          _FilterAccordionSection(
             title: l10n.libraryAgeRestrictionFilter,
             metrics: rowMetrics,
             child: Column(
               children: LibraryAgeRestrictionFilter.selectableOptions
                   .map(
-                    (LibraryAgeRestrictionFilter option) =>
-                        _Md3eFilterCheckboxRow(
-                          label: l10n.libraryAgeRestrictionFilterLabel(option),
-                          selected: state.ageRestriction == option,
-                          metrics: rowMetrics,
-                          onChanged: () => onStateChanged(
-                            state.toggleAgeRestriction(option),
-                          ),
-                        ),
+                    (LibraryAgeRestrictionFilter option) => _FilterCheckboxRow(
+                      label: l10n.libraryAgeRestrictionFilterLabel(option),
+                      selected: state.ageRestriction == option,
+                      metrics: rowMetrics,
+                      onChanged: () =>
+                          onStateChanged(state.toggleAgeRestriction(option)),
+                    ),
                   )
                   .toList(),
             ),
           ),
-          _Md3eFilterAccordionSection(
+          _FilterAccordionSection(
             title: l10n.libraryMediaTypeFilter,
             metrics: rowMetrics,
             child: Column(
               children: LibraryMediaTypeFilterOption.selectableOptions
                   .map(
-                    (LibraryMediaTypeFilterOption option) =>
-                        _Md3eFilterCheckboxRow(
-                          label: l10n.libraryMediaTypeFilterLabel(option),
-                          selected: state.mediaTypeFilter.selected.contains(
-                            option,
-                          ),
-                          metrics: rowMetrics,
-                          onChanged: () =>
-                              onStateChanged(state.toggleMediaType(option)),
-                        ),
+                    (LibraryMediaTypeFilterOption option) => _FilterCheckboxRow(
+                      label: l10n.libraryMediaTypeFilterLabel(option),
+                      selected: state.mediaTypeFilter.selected.contains(option),
+                      metrics: rowMetrics,
+                      onChanged: () =>
+                          onStateChanged(state.toggleMediaType(option)),
+                    ),
                   )
                   .toList(),
             ),
@@ -330,19 +320,19 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.only(
-              left: kMd3eLibraryFilterSortDrawerContentInset,
+              left: kLibraryFilterSortDrawerContentInset,
             ),
             child: Text(l10n.libraryGroupSection, style: sectionTitle),
           ),
           const SizedBox(height: 8),
-          _Md3eGroupingRadioRow(
+          _GroupingRadioRow(
             label: l10n.libraryGroupNone,
             selected: state.grouping == LibraryComicGrouping.none,
             metrics: rowMetrics,
             onSelected: () =>
                 onStateChanged(state.selectGrouping(LibraryComicGrouping.none)),
           ),
-          _Md3eGroupingRadioRow(
+          _GroupingRadioRow(
             label: l10n.libraryGroupBySeries,
             selected: state.grouping == LibraryComicGrouping.bySeries,
             metrics: rowMetrics,
@@ -353,14 +343,14 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.only(
-              left: kMd3eLibraryFilterSortDrawerContentInset,
+              left: kLibraryFilterSortDrawerContentInset,
             ),
             child: Text(l10n.librarySortSection, style: sectionTitle),
           ),
           const SizedBox(height: 8),
           ...LibraryComicSortField.values.map((LibraryComicSortField field) {
             final bool selected = state.sortOption.field == field;
-            return _Md3eSortListRow(
+            return _SortListRow(
               label: l10n.libraryComicSortFieldLabel(field),
               selected: selected,
               ascending: !state.sortOption.descending,
@@ -374,20 +364,20 @@ class Md3eLibraryFilterSortSideSheetContent extends StatelessWidget {
   }
 }
 
-/// 持有筛选状态并调用 [Md3eLibraryFilterSortSideSheet.show]，供 Lab 预览与测试。
-class Md3eLibraryFilterSortDrawerHost extends StatefulWidget {
-  Md3eLibraryFilterSortDrawerHost({
+/// 持有筛选状态并调用 [LibraryFilterSortSideSheet.show]，供 Lab 预览与测试。
+class LibraryFilterSortDrawerHost extends StatefulWidget {
+  LibraryFilterSortDrawerHost({
     super.key,
     required this.body,
-    Md3eLibraryFilterSortState? initialState,
+    LibraryFilterSortState? initialState,
     this.onStateChanged,
     this.openSideSheetOnMount = false,
     this.useRootNavigator = true,
-  }) : initialState = initialState ?? Md3eLibraryFilterSortState.defaults;
+  }) : initialState = initialState ?? LibraryFilterSortState.defaults;
 
   final Widget body;
-  final Md3eLibraryFilterSortState initialState;
-  final ValueChanged<Md3eLibraryFilterSortState>? onStateChanged;
+  final LibraryFilterSortState initialState;
+  final ValueChanged<LibraryFilterSortState>? onStateChanged;
 
   /// 首帧后自动弹出 side sheet（Widgetbook 专用场景）。
   final bool openSideSheetOnMount;
@@ -397,17 +387,17 @@ class Md3eLibraryFilterSortDrawerHost extends StatefulWidget {
 
   /// [context] 须为 [body] 子树（或 Host 注入的 [InheritedWidget] 之下）。
   static void openDrawer(BuildContext context) {
-    _Md3eLibraryFilterSortHostScope.maybeOf(context)?.openSideSheet();
+    _LibraryFilterSortHostScope.maybeOf(context)?.openSideSheet();
   }
 
   @override
-  State<Md3eLibraryFilterSortDrawerHost> createState() =>
-      _Md3eLibraryFilterSortDrawerHostState();
+  State<LibraryFilterSortDrawerHost> createState() =>
+      _LibraryFilterSortDrawerHostState();
 }
 
-class _Md3eLibraryFilterSortDrawerHostState
-    extends State<Md3eLibraryFilterSortDrawerHost> {
-  late Md3eLibraryFilterSortState _state = widget.initialState;
+class _LibraryFilterSortDrawerHostState
+    extends State<LibraryFilterSortDrawerHost> {
+  late LibraryFilterSortState _state = widget.initialState;
 
   @override
   void initState() {
@@ -422,20 +412,20 @@ class _Md3eLibraryFilterSortDrawerHostState
   }
 
   @override
-  void didUpdateWidget(covariant Md3eLibraryFilterSortDrawerHost oldWidget) {
+  void didUpdateWidget(covariant LibraryFilterSortDrawerHost oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialState != widget.initialState) {
       _state = widget.initialState;
     }
   }
 
-  void _setState(Md3eLibraryFilterSortState next) {
+  void _setState(LibraryFilterSortState next) {
     setState(() => _state = next);
     widget.onStateChanged?.call(next);
   }
 
   void _openSideSheet() {
-    Md3eLibraryFilterSortSideSheet.show(
+    LibraryFilterSortSideSheet.show(
       context,
       state: _state,
       onStateChanged: _setState,
@@ -445,31 +435,30 @@ class _Md3eLibraryFilterSortDrawerHostState
 
   @override
   Widget build(BuildContext context) {
-    return _Md3eLibraryFilterSortHostScope(
+    return _LibraryFilterSortHostScope(
       openSideSheet: _openSideSheet,
       child: widget.body,
     );
   }
 }
 
-class _Md3eFilterAccordionSection extends StatefulWidget {
-  const _Md3eFilterAccordionSection({
+class _FilterAccordionSection extends StatefulWidget {
+  const _FilterAccordionSection({
     required this.title,
     required this.metrics,
     required this.child,
   });
 
   final String title;
-  final Md3eLibraryFilterSortRowMetrics metrics;
+  final LibraryFilterSortRowMetrics metrics;
   final Widget child;
 
   @override
-  State<_Md3eFilterAccordionSection> createState() =>
-      _Md3eFilterAccordionSectionState();
+  State<_FilterAccordionSection> createState() =>
+      _FilterAccordionSectionState();
 }
 
-class _Md3eFilterAccordionSectionState
-    extends State<_Md3eFilterAccordionSection> {
+class _FilterAccordionSectionState extends State<_FilterAccordionSection> {
   bool _expanded = false;
 
   @override
@@ -490,7 +479,7 @@ class _Md3eFilterAccordionSectionState
               height: widget.metrics.accordionHeaderMinHeight,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: kMd3eLibraryFilterSortDrawerContentInset,
+                  horizontal: kLibraryFilterSortDrawerContentInset,
                 ),
                 child: Row(
                   children: <Widget>[
@@ -504,9 +493,9 @@ class _Md3eFilterAccordionSectionState
                         ),
                       ),
                     ),
-                    Md3eSpringValue(
+                    SpringValue(
                       value: _expanded ? 0.5 : 0,
-                      motion: Md3eMotion.spatialReveal,
+                      motion: LabMotion.spatialReveal,
                       child: Icon(
                         Icons.keyboard_arrow_down,
                         size: widget.metrics.sortIconSize + 4,
@@ -526,7 +515,7 @@ class _Md3eFilterAccordionSectionState
             ),
           ),
         ),
-        Md3eSpringSize(
+        SpringSize(
           expanded: _expanded,
           alignment: Alignment.topCenter,
           child: widget.child,
@@ -536,15 +525,15 @@ class _Md3eFilterAccordionSectionState
   }
 }
 
-TextStyle _md3eLibraryFilterSortOptionLabelStyle(
+TextStyle libraryFilterSortOptionLabelStyle(
   ColorScheme cs,
-  Md3eLibraryFilterSortRowMetrics metrics,
+  LibraryFilterSortRowMetrics metrics,
 ) {
   return TextStyle(fontSize: metrics.optionLabelFontSize, color: cs.onSurface);
 }
 
-class _Md3eFilterCheckboxRow extends StatelessWidget {
-  const _Md3eFilterCheckboxRow({
+class _FilterCheckboxRow extends StatelessWidget {
+  const _FilterCheckboxRow({
     required this.label,
     required this.selected,
     required this.metrics,
@@ -553,7 +542,7 @@ class _Md3eFilterCheckboxRow extends StatelessWidget {
 
   final String label;
   final bool selected;
-  final Md3eLibraryFilterSortRowMetrics metrics;
+  final LibraryFilterSortRowMetrics metrics;
   final VoidCallback onChanged;
 
   @override
@@ -571,7 +560,7 @@ class _Md3eFilterCheckboxRow extends StatelessWidget {
           height: metrics.rowMinHeight,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: kMd3eLibraryFilterSortDrawerContentInset,
+              horizontal: kLibraryFilterSortDrawerContentInset,
             ),
             child: Row(
               children: <Widget>[
@@ -587,7 +576,7 @@ class _Md3eFilterCheckboxRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: _md3eLibraryFilterSortOptionLabelStyle(cs, metrics),
+                    style: libraryFilterSortOptionLabelStyle(cs, metrics),
                   ),
                 ),
               ],
@@ -599,8 +588,8 @@ class _Md3eFilterCheckboxRow extends StatelessWidget {
   }
 }
 
-class _Md3eGroupingRadioRow extends StatelessWidget {
-  const _Md3eGroupingRadioRow({
+class _GroupingRadioRow extends StatelessWidget {
+  const _GroupingRadioRow({
     required this.label,
     required this.selected,
     required this.metrics,
@@ -609,7 +598,7 @@ class _Md3eGroupingRadioRow extends StatelessWidget {
 
   final String label;
   final bool selected;
-  final Md3eLibraryFilterSortRowMetrics metrics;
+  final LibraryFilterSortRowMetrics metrics;
   final VoidCallback onSelected;
 
   @override
@@ -627,7 +616,7 @@ class _Md3eGroupingRadioRow extends StatelessWidget {
           height: metrics.rowMinHeight,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: kMd3eLibraryFilterSortDrawerContentInset,
+              horizontal: kLibraryFilterSortDrawerContentInset,
             ),
             child: Row(
               children: <Widget>[
@@ -645,7 +634,7 @@ class _Md3eGroupingRadioRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: _md3eLibraryFilterSortOptionLabelStyle(cs, metrics),
+                    style: libraryFilterSortOptionLabelStyle(cs, metrics),
                   ),
                 ),
               ],
@@ -657,8 +646,8 @@ class _Md3eGroupingRadioRow extends StatelessWidget {
   }
 }
 
-class _Md3eSortListRow extends StatelessWidget {
-  const _Md3eSortListRow({
+class _SortListRow extends StatelessWidget {
+  const _SortListRow({
     required this.label,
     required this.selected,
     required this.ascending,
@@ -669,7 +658,7 @@ class _Md3eSortListRow extends StatelessWidget {
   final String label;
   final bool selected;
   final bool ascending;
-  final Md3eLibraryFilterSortRowMetrics metrics;
+  final LibraryFilterSortRowMetrics metrics;
   final VoidCallback onTap;
 
   static const double _iconSlotWidth = 20;
@@ -690,7 +679,7 @@ class _Md3eSortListRow extends StatelessWidget {
           height: metrics.rowMinHeight,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: kMd3eLibraryFilterSortDrawerContentInset,
+              horizontal: kLibraryFilterSortDrawerContentInset,
             ),
             child: Row(
               children: <Widget>[
@@ -710,7 +699,7 @@ class _Md3eSortListRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: _md3eLibraryFilterSortOptionLabelStyle(cs, metrics),
+                    style: libraryFilterSortOptionLabelStyle(cs, metrics),
                   ),
                 ),
               ],

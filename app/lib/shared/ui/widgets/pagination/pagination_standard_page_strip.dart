@@ -7,8 +7,8 @@ import 'package:hentai_library/shared/ui/widgets/pagination/pagination_page_wind
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Page-number strip with a single animated selection block (no strip-wide switch).
-class Md3ePaginationStandardPageStrip extends StatelessWidget {
-  const Md3ePaginationStandardPageStrip({
+class PaginationStandardPageStrip extends StatelessWidget {
+  const PaginationStandardPageStrip({
     super.key,
     required this.page,
     required this.totalPages,
@@ -20,14 +20,14 @@ class Md3ePaginationStandardPageStrip extends StatelessWidget {
   final int page;
   final int totalPages;
   final bool enabled;
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
   final ValueChanged<int> onPageChanged;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Md3ePaginationMetrics.pageNumberStripWidth(sizeClass),
-      child: _Md3ePaginationSelectionStrip(
+      width: PaginationMetrics.pageNumberStripWidth(sizeClass),
+      child: _PaginationSelectionStrip(
         page: page,
         totalPages: totalPages,
         enabled: enabled,
@@ -38,8 +38,8 @@ class Md3ePaginationStandardPageStrip extends StatelessWidget {
   }
 }
 
-class _Md3ePaginationSelectionStrip extends StatefulWidget {
-  const _Md3ePaginationSelectionStrip({
+class _PaginationSelectionStrip extends StatefulWidget {
+  const _PaginationSelectionStrip({
     required this.page,
     required this.totalPages,
     required this.enabled,
@@ -50,24 +50,24 @@ class _Md3ePaginationSelectionStrip extends StatefulWidget {
   final int page;
   final int totalPages;
   final bool enabled;
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
   final ValueChanged<int> onPageChanged;
 
   @override
-  State<_Md3ePaginationSelectionStrip> createState() =>
-      _Md3ePaginationSelectionStripState();
+  State<_PaginationSelectionStrip> createState() =>
+      _PaginationSelectionStripState();
 }
 
-class _Md3ePaginationSelectionStripState
-    extends State<_Md3ePaginationSelectionStrip> {
-  List<Md3ePaginationWindowItem> _windowItems() {
-    final Md3ePaginationSiblingConfig config =
-        Md3ePaginationMetrics.siblingConfigFor(widget.sizeClass);
-    final int slotCount = Md3ePaginationMetrics.fixedPageSlotCount(
+class _PaginationSelectionStripState extends State<_PaginationSelectionStrip> {
+  List<PaginationWindowItem> _windowItems() {
+    final PaginationSiblingConfig config = PaginationMetrics.siblingConfigFor(
       widget.sizeClass,
     );
-    return md3ePadPaginationPageWindow(
-      md3eBuildPaginationPageWindow(
+    final int slotCount = PaginationMetrics.fixedPageSlotCount(
+      widget.sizeClass,
+    );
+    return padPaginationPageWindow(
+      buildPaginationPageWindow(
         currentPage: widget.page,
         totalPages: widget.totalPages,
         config: config,
@@ -76,10 +76,10 @@ class _Md3ePaginationSelectionStripState
     );
   }
 
-  int? _selectedSlotIndex(List<Md3ePaginationWindowItem> window) {
+  int? _selectedSlotIndex(List<PaginationWindowItem> window) {
     for (int i = 0; i < window.length; i++) {
-      final Md3ePaginationWindowItem item = window[i];
-      if (item is Md3ePaginationWindowPage && item.page == widget.page) {
+      final PaginationWindowItem item = window[i];
+      if (item is PaginationWindowPage && item.page == widget.page) {
         return i;
       }
     }
@@ -89,23 +89,23 @@ class _Md3ePaginationSelectionStripState
   @override
   Widget build(BuildContext context) {
     final bool interactive = widget.enabled;
-    final List<Md3ePaginationWindowItem> window = _windowItems();
+    final List<PaginationWindowItem> window = _windowItems();
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final TextStyle? ellipsisStyle = Theme.of(context).textTheme.bodySmall
         ?.copyWith(color: scheme.onSurfaceVariant);
     final int? selectedIndex = _selectedSlotIndex(window);
-    final double slot = Md3ePaginationMetrics.pageButtonSlotWidth;
-    final double visual = Md3ePaginationMetrics.pageButtonVisualSize;
+    final double slot = PaginationMetrics.pageButtonSlotWidth;
+    final double visual = PaginationMetrics.pageButtonVisualSize;
     final double inset = (slot - visual) / 2;
 
     return SizedBox(
-      height: Md3ePaginationMetrics.pageButtonSlotWidth,
+      height: PaginationMetrics.pageButtonSlotWidth,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.centerLeft,
         children: <Widget>[
           if (selectedIndex != null)
-            Md3eSpringPositioned(
+            SpringPositioned(
               rect: Rect.fromLTWH(
                 selectedIndex * slot + inset,
                 inset,
@@ -122,23 +122,21 @@ class _Md3ePaginationSelectionStripState
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              for (final Md3ePaginationWindowItem item in window)
+              for (final PaginationWindowItem item in window)
                 switch (item) {
-                  Md3ePaginationWindowPage(:final int page) =>
-                    Md3ePaginationPageButton(
-                      key: ValueKey<int>(page),
-                      page: page,
-                      selected: page == widget.page,
-                      showSelectionFill: false,
-                      onPressed: interactive && page != widget.page
-                          ? () => widget.onPageChanged(page)
-                          : null,
-                    ),
-                  Md3ePaginationWindowEllipsis() => Md3ePaginationEllipsisSlot(
+                  PaginationWindowPage(:final int page) => PaginationPageButton(
+                    key: ValueKey<int>(page),
+                    page: page,
+                    selected: page == widget.page,
+                    showSelectionFill: false,
+                    onPressed: interactive && page != widget.page
+                        ? () => widget.onPageChanged(page)
+                        : null,
+                  ),
+                  PaginationWindowEllipsis() => PaginationEllipsisSlot(
                     style: ellipsisStyle,
                   ),
-                  Md3ePaginationWindowEmpty() =>
-                    const Md3ePaginationEmptySlot(),
+                  PaginationWindowEmpty() => const PaginationEmptySlot(),
                 },
             ],
           ),

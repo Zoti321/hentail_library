@@ -5,11 +5,11 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Body-top catalog row: 漫画 / 系列 胶囊切换（与管理页同款 [Md3eSegmentedCapsuleBar]）+ 当前数量（末端）。
+/// Body-top catalog row: 漫画 / 系列 胶囊切换（与管理页同款 [SegmentedCapsuleBar]）+ 当前数量（末端）。
 ///
 /// Scrolls with the grid/list; the pinned header is title + actions only.
-class Md3eLibraryCatalogToolbar extends StatelessWidget {
-  const Md3eLibraryCatalogToolbar({
+class LibraryCatalogToolbar extends StatelessWidget {
+  const LibraryCatalogToolbar({
     super.key,
     required this.displayTarget,
     required this.comicCount,
@@ -37,14 +37,14 @@ class Md3eLibraryCatalogToolbar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(
-          child: Md3eSegmentedCapsuleBar(
-            segments: <Md3eSegmentedCapsuleSegment>[
-              Md3eSegmentedCapsuleSegment(
+          child: SegmentedCapsuleBar(
+            segments: <SegmentedCapsuleSegment>[
+              SegmentedCapsuleSegment(
                 label: l10n.libraryDisplayTargetTabLabel(
                   LibraryDisplayTarget.comics,
                 ),
               ),
-              Md3eSegmentedCapsuleSegment(
+              SegmentedCapsuleSegment(
                 label: l10n.libraryDisplayTargetTabLabel(
                   LibraryDisplayTarget.series,
                 ),

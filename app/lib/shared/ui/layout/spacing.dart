@@ -6,7 +6,7 @@ import 'package:material_3_expressive/foundations/foundations.dart';
 ///
 /// 尺度与 Material 3 Expressive 一致（4dp 网格）：xs 4 · sm 8 · md 12 · lg 16 · xl 24 · xxl 32；
 /// 见包内 [M3ESpacing.regular] 与 [M3EDimensions]。
-abstract final class Md3eSpacing {
+abstract final class Spacing {
   /// 当前主题的 Expressive 间距（随密度 / 主题变化）。
   static M3ESpacing of(BuildContext context) => M3ETheme.of(context).spacing;
 
@@ -25,17 +25,17 @@ abstract final class Md3eSpacing {
   static const double space48 = M3EDimensions.space48;
 
   /// 分页条与相邻区块的纵向间距。
-  static double paginationVertical(Md3eWindowSizeClass sizeClass) {
+  static double paginationVertical(WindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => space24,
+      WindowSizeClass.compact => space24,
       _ => space32,
     };
   }
 
   /// 滚动区底部留白（避免 FAB 遮挡分页等）。
-  static double scrollBottomInset(Md3eWindowSizeClass sizeClass) {
+  static double scrollBottomInset(WindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => space24,
+      WindowSizeClass.compact => space24,
       _ => space32,
     };
   }

@@ -5,8 +5,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Navigation row inside a split list (title + optional description + chevron).
-class Md3eSettingsNavigationTile extends StatelessWidget {
-  const Md3eSettingsNavigationTile({
+class SettingsNavigationTile extends StatelessWidget {
+  const SettingsNavigationTile({
     super.key,
     required this.title,
     this.leading,
@@ -27,13 +27,13 @@ class Md3eSettingsNavigationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Md3eSettingsTileShell(
+    return SettingsTileShell(
       enabled: enabled,
       onTap: enabled ? onTap : null,
       child: Row(
         children: <Widget>[
           Expanded(
-            child: _Md3eSettingsTileLabel(
+            child: _SettingsTileLabel(
               title: title,
               leading: leading,
               description: description,
@@ -68,8 +68,8 @@ class Md3eSettingsNavigationTile extends StatelessWidget {
 }
 
 /// Switch row inside a split list.
-class Md3eSettingsSwitchTile extends StatelessWidget {
-  const Md3eSettingsSwitchTile({
+class SettingsSwitchTile extends StatelessWidget {
+  const SettingsSwitchTile({
     super.key,
     required this.title,
     required this.value,
@@ -88,13 +88,13 @@ class Md3eSettingsSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Md3eSettingsTileShell(
+    return SettingsTileShell(
       enabled: enabled,
       onTap: enabled ? () => onChanged(!value) : null,
       child: Row(
         children: <Widget>[
           Expanded(
-            child: _Md3eSettingsTileLabel(
+            child: _SettingsTileLabel(
               title: title,
               leading: leading,
               description: description,
@@ -110,8 +110,8 @@ class Md3eSettingsSwitchTile extends StatelessWidget {
 }
 
 /// Wide master list category row (icon + title + description + chevron).
-class Md3eSettingsCategoryTile extends StatelessWidget {
-  const Md3eSettingsCategoryTile({
+class SettingsCategoryTile extends StatelessWidget {
+  const SettingsCategoryTile({
     super.key,
     required this.icon,
     required this.title,
@@ -132,7 +132,7 @@ class Md3eSettingsCategoryTile extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      onHighlightChanged: Md3eSplitListRow.pressReporterOf(context),
+      onHighlightChanged: SplitListRow.pressReporterOf(context),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
@@ -172,9 +172,9 @@ class Md3eSettingsCategoryTile extends StatelessWidget {
   }
 }
 
-/// Wide list–detail rail capsule item（视觉由 [Md3eListDetailNavItem] 统一提供）。
-class Md3eSettingsRailDestination extends StatelessWidget {
-  const Md3eSettingsRailDestination({
+/// Wide list–detail rail capsule item（视觉由 [ListDetailNavItem] 统一提供）。
+class SettingsRailDestination extends StatelessWidget {
+  const SettingsRailDestination({
     super.key,
     required this.icon,
     required this.label,
@@ -191,7 +191,7 @@ class Md3eSettingsRailDestination extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Md3eListDetailNavItem(
+      child: ListDetailNavItem(
         icon: icon,
         label: label,
         selected: selected,
@@ -201,8 +201,8 @@ class Md3eSettingsRailDestination extends StatelessWidget {
   }
 }
 
-class Md3eSettingsTileShell extends StatelessWidget {
-  const Md3eSettingsTileShell({
+class SettingsTileShell extends StatelessWidget {
+  const SettingsTileShell({
     super.key,
     required this.child,
     this.onTap,
@@ -217,7 +217,7 @@ class Md3eSettingsTileShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      onHighlightChanged: Md3eSplitListRow.pressReporterOf(context),
+      onHighlightChanged: SplitListRow.pressReporterOf(context),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: ConstrainedBox(
@@ -229,8 +229,8 @@ class Md3eSettingsTileShell extends StatelessWidget {
   }
 }
 
-class _Md3eSettingsTileLabel extends StatelessWidget {
-  const _Md3eSettingsTileLabel({
+class _SettingsTileLabel extends StatelessWidget {
+  const _SettingsTileLabel({
     required this.title,
     this.leading,
     this.description,

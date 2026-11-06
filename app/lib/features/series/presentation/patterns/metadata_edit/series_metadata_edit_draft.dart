@@ -1,32 +1,32 @@
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 
 /// Lab 系列元数据编辑草稿。
-class Md3eSeriesMetadataEditDraft {
-  const Md3eSeriesMetadataEditDraft({
+class SeriesMetadataEditDraft {
+  const SeriesMetadataEditDraft({
     required this.name,
-    this.serializationStatus = Md3eSeriesSerializationStatus.ongoing,
+    this.serializationStatus = SeriesSerializationStatus.ongoing,
     this.totalCountText = '',
   });
 
   final String name;
-  final Md3eSeriesSerializationStatus serializationStatus;
+  final SeriesSerializationStatus serializationStatus;
   final String totalCountText;
 
-  factory Md3eSeriesMetadataEditDraft.fromEntry(Md3eSeriesDetailEntry entry) {
+  factory SeriesMetadataEditDraft.fromEntry(SeriesDetailViewObject entry) {
     final String? total = entry.volumeTotal?.toString();
-    return Md3eSeriesMetadataEditDraft(
+    return SeriesMetadataEditDraft(
       name: entry.title,
       serializationStatus: entry.serializationStatus,
       totalCountText: total ?? '',
     );
   }
 
-  Md3eSeriesMetadataEditDraft copyWith({
+  SeriesMetadataEditDraft copyWith({
     String? name,
-    Md3eSeriesSerializationStatus? serializationStatus,
+    SeriesSerializationStatus? serializationStatus,
     String? totalCountText,
   }) {
-    return Md3eSeriesMetadataEditDraft(
+    return SeriesMetadataEditDraft(
       name: name ?? this.name,
       serializationStatus: serializationStatus ?? this.serializationStatus,
       totalCountText: totalCountText ?? this.totalCountText,

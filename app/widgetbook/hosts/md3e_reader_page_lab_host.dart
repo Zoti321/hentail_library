@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_md3e/reader_page.dart';
+import 'package:hentai_library/features/read_session/presentation/views/reader/reader_layout.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_boundary_snackbar.dart';
 
 import '../preview/md3e_reader_page_preview_data.dart';
@@ -17,10 +17,10 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 enum _SeriesBoundaryPrompt { none, advance, retreat }
 
 /// Widgetbook / Lab：本地维护页码与 chrome 显隐。
-class Md3eReaderPageLabHost extends StatefulWidget {
-  const Md3eReaderPageLabHost({
+class ReaderPageLabHost extends StatefulWidget {
+  const ReaderPageLabHost({
     super.key,
-    this.preview = const Md3eReaderPagePreviewData(
+    this.preview = const ReaderPagePreviewData(
       title: '第 01 卷',
       subtitle: '葬送的芙莉莲',
       totalPages: 24,
@@ -30,29 +30,29 @@ class Md3eReaderPageLabHost extends StatefulWidget {
     this.useRootNavigator = false,
   });
 
-  final Md3eReaderPagePreviewData preview;
+  final ReaderPagePreviewData preview;
   final VoidCallback? onBack;
 
   /// Widgetbook 预览区宜为 `false`，避免 sheet 挂到整窗 overlay。
   final bool useRootNavigator;
 
   @override
-  State<Md3eReaderPageLabHost> createState() => _Md3eReaderPageLabHostState();
+  State<ReaderPageLabHost> createState() => _Md3eReaderPageLabHostState();
 }
 
-class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
+class _Md3eReaderPageLabHostState extends State<ReaderPageLabHost> {
   late int _page = widget.preview.initialPage;
   late String _volumeId = widget.preview.currentVolumeId;
   late String _volumeTitle = widget.preview.title;
   _SeriesBoundaryPrompt _boundaryPrompt = _SeriesBoundaryPrompt.none;
-  late Md3eReaderViewportStatus _viewportStatus = widget.preview.viewportStatus;
+  late ReaderViewportStatus _viewportStatus = widget.preview.viewportStatus;
 
   /// 非空时展示边界提示条；[_boundarySeq] 区分同文案的重复提示，保证每次都重新进场动画。
   String? _boundaryMessage;
   int _boundarySeq = 0;
   bool _chromeVisible = true;
   bool _fullscreen = false;
-  late Md3eReaderSettingsLabState _settings = Md3eReaderSettingsLabState(
+  late ReaderSettingsLabState _settings = ReaderSettingsLabState(
     autoPlayEnabled: false,
   );
 
@@ -60,7 +60,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
       widget.preview.totalPages < 1 ? 1 : widget.preview.totalPages;
 
   int get _volumeIndex => widget.preview.seriesVolumes.indexWhere(
-    (Md3eReaderSeriesVolume volume) => volume.id == _volumeId,
+    (ReaderSeriesVolume volume) => volume.id == _volumeId,
   );
 
   void _showBoundaryMessage(String message) {
@@ -85,7 +85,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
     setState(() => _boundaryMessage = null);
   }
 
-  bool get _canPaginate => _viewportStatus == Md3eReaderViewportStatus.ready;
+  bool get _canPaginate => _viewportStatus == ReaderViewportStatus.ready;
 
   void _setPage(int page) {
     if (!_canPaginate) {
@@ -117,7 +117,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
   }
 
   void _requestSeriesBoundary(_SeriesBoundaryPrompt direction) {
-    final List<Md3eReaderSeriesVolume> volumes = widget.preview.seriesVolumes;
+    final List<ReaderSeriesVolume> volumes = widget.preview.seriesVolumes;
     final int current = _volumeIndex;
     final int neighbor =
         current + (direction == _SeriesBoundaryPrompt.advance ? 1 : -1);
@@ -138,7 +138,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
       return;
     }
 
-    final Md3eReaderSeriesVolume target = volumes[neighbor];
+    final ReaderSeriesVolume target = volumes[neighbor];
     setState(() {
       _volumeId = target.id;
       _volumeTitle = target.title;
@@ -148,17 +148,17 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
     _clearBoundaryMessage();
   }
 
-  void _handleTapZone(Md3eReaderTapZone zone) {
+  void _handleTapZone(ReaderViewportTapZone zone) {
     if (_chromeVisible) {
       setState(() => _chromeVisible = false);
       return;
     }
     switch (zone) {
-      case Md3eReaderTapZone.left:
+      case ReaderViewportTapZone.left:
         _stepPage(-1);
-      case Md3eReaderTapZone.right:
+      case ReaderViewportTapZone.right:
         _stepPage(1);
-      case Md3eReaderTapZone.center:
+      case ReaderViewportTapZone.center:
         setState(() => _chromeVisible = true);
     }
   }
@@ -168,11 +168,11 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
   }
 
   Future<void> _openSettings() async {
-    await Md3eReaderSettingsSideSheet.show(
+    await ReaderSettingsSideSheet.show(
       context,
       state: _settings,
       useRootNavigator: widget.useRootNavigator,
-      onStateChanged: (Md3eReaderSettingsLabState next) {
+      onStateChanged: (ReaderSettingsLabState next) {
         setState(() {
           _settings = next;
         });
@@ -184,13 +184,13 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
     if (widget.preview.seriesVolumes.isEmpty) {
       return;
     }
-    await Md3eReaderSeriesCatalogSheet.show(
+    await ReaderSeriesCatalogSheet.show(
       context,
       volumes: widget.preview.seriesVolumes,
       currentVolumeId: _volumeId,
       useRootNavigator: widget.useRootNavigator,
       onVolumeSelected: (String id) {
-        for (final Md3eReaderSeriesVolume volume
+        for (final ReaderSeriesVolume volume
             in widget.preview.seriesVolumes) {
           if (volume.id != id) {
             continue;
@@ -214,7 +214,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
     return Stack(
       fit: StackFit.expand,
       children: <Widget>[
-        Md3eReaderPage(
+        ReaderLayout(
           title: _volumeTitle,
           subtitle: widget.preview.subtitle,
           currentPage: _page,
@@ -227,7 +227,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
           onBack: widget.onBack,
           viewportStatus: _viewportStatus,
           onViewportRetry: () =>
-              setState(() => _viewportStatus = Md3eReaderViewportStatus.ready),
+              setState(() => _viewportStatus = ReaderViewportStatus.ready),
           onOpenSettings: _openSettings,
           onOpenSeriesCatalog: widget.preview.seriesVolumes.isEmpty
               ? null
@@ -252,7 +252,7 @@ class _Md3eReaderPageLabHostState extends State<Md3eReaderPageLabHost> {
             right: 0,
             bottom: 0,
             child: IgnorePointer(
-              child: Md3eReaderBoundarySnackbar(
+              child: ReaderBoundarySnackbar(
                 key: ValueKey<int>(_boundarySeq),
                 message: boundaryMessage,
                 onClosed: () => _onBoundaryMessageClosed(_boundarySeq),

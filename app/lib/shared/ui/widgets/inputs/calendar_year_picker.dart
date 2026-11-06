@@ -4,15 +4,15 @@ import 'package:hentai_library/shared/ui/l10n/m3e_material_localizations.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:flutter/material.dart' hide MaterialLocalizations;
 
-/// 与 [Md3eCalendarYearPicker] 网格行高一致（略高于 M3E 默认 52，便于胶囊选中态留白）。
-const double kMd3eCalendarYearPickerRowHeight = 56;
+/// 与 [CalendarYearPicker] 网格行高一致（略高于 M3E 默认 52，便于胶囊选中态留白）。
+const double kCalendarYearPickerRowHeight = 56;
 
 const double _kYearChipHeight = 40;
 const double _kYearChipHorizontalPadding = 12;
 final BorderRadius _kYearChipRadius = BorderRadius.circular(20);
 
-/// Lab 年份视图高度（对齐 [M3EDatePickerUtils.calendarYearViewHeight]，使用 [kMd3eCalendarYearPickerRowHeight]）。
-double md3eCalendarYearViewHeight(
+/// Lab 年份视图高度（对齐 [M3EDatePickerUtils.calendarYearViewHeight]，使用 [kCalendarYearPickerRowHeight]）。
+double calendarYearViewHeight(
   DateTime firstDate,
   DateTime lastDate, {
   bool includeSubHeader = true,
@@ -21,7 +21,7 @@ double md3eCalendarYearViewHeight(
   final int rows = M3EDatePickerUtils.yearPickerRowCount(yearCount);
   final double natural =
       M3EDatePickerConstants.yearPickerPadding * 2 +
-      rows * kMd3eCalendarYearPickerRowHeight +
+      rows * kCalendarYearPickerRowHeight +
       (rows - 1) * M3EDatePickerConstants.yearPickerRowSpacing;
   var height = math.min(natural, M3EDatePickerConstants.maxDayPickerHeight);
   if (includeSubHeader) {
@@ -33,8 +33,8 @@ double md3eCalendarYearViewHeight(
 /// Lab 年份网格：在 M3E 默认圆形选中态基础上改为胶囊形，避免 CJK `formatYear`（如「2022年」）贴边。
 ///
 /// 行为对齐 `material_3_expressive` `M3EYearPicker`；上游为固定直径圆形容器。
-class Md3eCalendarYearPicker extends StatefulWidget {
-  const Md3eCalendarYearPicker({
+class CalendarYearPicker extends StatefulWidget {
+  const CalendarYearPicker({
     required this.selectedDate,
     required this.firstDate,
     required this.lastDate,
@@ -52,10 +52,10 @@ class Md3eCalendarYearPicker extends StatefulWidget {
   final DateTime? displayedMonth;
 
   @override
-  State<Md3eCalendarYearPicker> createState() => _Md3eCalendarYearPickerState();
+  State<CalendarYearPicker> createState() => _CalendarYearPickerState();
 }
 
-class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
+class _CalendarYearPickerState extends State<CalendarYearPicker> {
   late final ScrollController _controller;
 
   @override
@@ -77,7 +77,7 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
-    final MaterialLocalizations localizations = md3eMaterialLocalizationsOf(
+    final MaterialLocalizations localizations = materialLocalizationsOf(
       context,
     );
     final int firstYear = widget.firstDate.year;
@@ -96,7 +96,7 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
             ),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: M3EDatePickerConstants.yearPickerColumnCount,
-              mainAxisExtent: kMd3eCalendarYearPickerRowHeight,
+              mainAxisExtent: kCalendarYearPickerRowHeight,
               mainAxisSpacing: M3EDatePickerConstants.yearPickerRowSpacing,
               crossAxisSpacing: M3EDatePickerConstants.yearPickerRowSpacing,
             ),
@@ -146,7 +146,7 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
       enabled: enabled,
     );
     return SizedBox(
-      height: kMd3eCalendarYearPickerRowHeight,
+      height: kCalendarYearPickerRowHeight,
       width: double.infinity,
       child: Center(
         child: M3ETappable(
@@ -199,7 +199,7 @@ class _Md3eCalendarYearPickerState extends State<Md3eCalendarYearPicker> {
 
   static double _initialOffset(int selectedYear, int firstYear) {
     const double rowHeight =
-        kMd3eCalendarYearPickerRowHeight +
+        kCalendarYearPickerRowHeight +
         M3EDatePickerConstants.yearPickerRowSpacing;
     const int columns = M3EDatePickerConstants.yearPickerColumnCount;
     final int row = ((selectedYear - firstYear) / columns).floor();

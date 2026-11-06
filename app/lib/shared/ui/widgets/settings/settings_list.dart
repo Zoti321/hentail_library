@@ -4,8 +4,8 @@ import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart'
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Scrollable detail column with optional max width (Kazumi-style ~1000dp).
-class Md3eSettingsList extends StatelessWidget {
-  const Md3eSettingsList({
+class SettingsList extends StatelessWidget {
+  const SettingsList({
     super.key,
     required this.sections,
     this.maxWidth = 1000,
@@ -33,9 +33,9 @@ class Md3eSettingsList extends StatelessWidget {
   }
 }
 
-/// One titled group of [Md3eSplitListGroup] tiles in a settings detail pane.
-class Md3eSettingsSection extends StatelessWidget {
-  const Md3eSettingsSection({
+/// One titled group of [SplitListGroup] tiles in a settings detail pane.
+class SettingsSection extends StatelessWidget {
+  const SettingsSection({
     super.key,
     required this.tiles,
     this.title,
@@ -59,9 +59,9 @@ class Md3eSettingsSection extends StatelessWidget {
           if (title != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Md3eSettingsSectionHeader(title: title!),
+              child: SettingsSectionHeader(title: title!),
             ),
-          Md3eSplitListGroup(children: tiles),
+          SplitListGroup(children: tiles),
           if (bottomInfo != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),

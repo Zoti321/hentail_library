@@ -8,8 +8,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// - 未选中：透明底 + `onSurfaceVariant` 文字/图标。
 /// - hover / press / focus 仅由 [InkWell] 的水波纹状态层呈现；无阴影、无 elevation，
 ///   也不依赖有内部状态的按钮组件，避免切换选中后残留 hover 底色。
-class Md3eListDetailNavItem extends StatelessWidget {
-  const Md3eListDetailNavItem({
+class ListDetailNavItem extends StatelessWidget {
+  const ListDetailNavItem({
     super.key,
     required this.label,
     required this.selected,
@@ -44,7 +44,7 @@ class Md3eListDetailNavItem extends StatelessWidget {
             children: <Widget>[
               const SizedBox(width: 16),
               if (icon != null) ...<Widget>[
-                md3eNavigationRailIconWidget(
+                navigationRailIconWidget(
                   icon: icon!,
                   selected: selected,
                   size: 24,

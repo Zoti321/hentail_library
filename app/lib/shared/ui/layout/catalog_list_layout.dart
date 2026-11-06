@@ -15,18 +15,18 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 /// | extraLarge | 4       | 3      |
 ///
 /// [desktop] defaults to the running platform ([isDesktop]).
-int md3eComicListColumnCount(Md3eWindowSizeClass window, {bool? desktop}) {
+int comicListColumnCount(WindowSizeClass window, {bool? desktop}) {
   final bool isDesktopLayout = desktop ?? isDesktop;
   switch (window) {
-    case Md3eWindowSizeClass.compact:
+    case WindowSizeClass.compact:
       return 1;
-    case Md3eWindowSizeClass.medium:
+    case WindowSizeClass.medium:
       return 2;
-    case Md3eWindowSizeClass.expanded:
+    case WindowSizeClass.expanded:
       return isDesktopLayout ? 3 : 2;
-    case Md3eWindowSizeClass.large:
+    case WindowSizeClass.large:
       return isDesktopLayout ? 4 : 3;
-    case Md3eWindowSizeClass.extraLarge:
+    case WindowSizeClass.extraLarge:
       return isDesktopLayout ? 4 : 3;
   }
 }

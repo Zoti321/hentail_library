@@ -6,8 +6,8 @@ import 'package:motor/motor.dart';
 ///
 /// 目标变化时从当前显示的装饰接续，不会跳变。圆角非零时裁剪子组件，与 AnimatedContainer 行为一致。
 /// 开启"减少动效"时直接切换到目标装饰。
-class Md3eEffectsDecoratedBox extends StatefulWidget {
-  const Md3eEffectsDecoratedBox({
+class EffectsDecoratedBox extends StatefulWidget {
+  const EffectsDecoratedBox({
     super.key,
     required this.decoration,
     required this.child,
@@ -17,11 +17,10 @@ class Md3eEffectsDecoratedBox extends StatefulWidget {
   final Widget child;
 
   @override
-  State<Md3eEffectsDecoratedBox> createState() =>
-      _Md3eEffectsDecoratedBoxState();
+  State<EffectsDecoratedBox> createState() => _EffectsDecoratedBoxState();
 }
 
-class _Md3eEffectsDecoratedBoxState extends State<Md3eEffectsDecoratedBox>
+class _EffectsDecoratedBoxState extends State<EffectsDecoratedBox>
     with SingleTickerProviderStateMixin {
   late final SingleMotionController _controller;
   late BoxDecoration _from = widget.decoration;
@@ -31,14 +30,14 @@ class _Md3eEffectsDecoratedBoxState extends State<Md3eEffectsDecoratedBox>
   void initState() {
     super.initState();
     _controller = SingleMotionController(
-      motion: Md3eMotion.effectsSpring,
+      motion: LabMotion.effectsSpring,
       vsync: this,
       initialValue: 1,
     );
   }
 
   @override
-  void didUpdateWidget(Md3eEffectsDecoratedBox oldWidget) {
+  void didUpdateWidget(EffectsDecoratedBox oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.decoration == widget.decoration) {
       return;
@@ -46,7 +45,7 @@ class _Md3eEffectsDecoratedBoxState extends State<Md3eEffectsDecoratedBox>
     // 从当前显示的装饰接续，避免中途切换时跳变。
     _from = _currentDecoration();
     _to = widget.decoration;
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       _controller.value = 1;
     } else {
       _controller.value = 0;

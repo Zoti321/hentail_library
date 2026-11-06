@@ -1,13 +1,15 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/ui/shell/md3e_app_shell_slot.dart';
+import 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
 
 /// 标题栏下方壳层级反馈 widget 列表（ADR-0027；owner 经 bootstrap 注入）。
 typedef AppShellFeedbackBelowTitleBarFactory = List<Widget> Function();
 
 /// MD3E 导航槽组装（需要 [WidgetRef] 读库状态；bootstrap 注入 owner 实现）。
-typedef Md3eAppShellNavigationSlotAssembly =
-    Md3eAppShellNavigationSlot Function(BuildContext context, WidgetRef ref);
+typedef AppShellNavigationSlotAssembly = AppShellNavigationSlot Function(
+  BuildContext context,
+  WidgetRef ref,
+);
 
 final Provider<VoidCallback> appShellOpenNavigationDrawerProvider =
     Provider<VoidCallback>(
@@ -24,10 +26,10 @@ appShellFeedbackBelowTitleBarFactoryProvider =
       ),
     );
 
-final Provider<Md3eAppShellNavigationSlotAssembly>
-md3eAppShellNavigationSlotAssemblyProvider =
-    Provider<Md3eAppShellNavigationSlotAssembly>(
+final Provider<AppShellNavigationSlotAssembly>
+appShellNavigationSlotAssemblyProvider =
+    Provider<AppShellNavigationSlotAssembly>(
       (Ref ref) => throw UnimplementedError(
-        'md3eAppShellNavigationSlotAssemblyProvider 未注入，请在 bootstrap 中 override',
+        'appShellNavigationSlotAssemblyProvider 未注入，请在 bootstrap 中 override',
       ),
     );

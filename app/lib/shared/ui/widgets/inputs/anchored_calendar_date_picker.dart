@@ -8,11 +8,11 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kAnchoredCalendarGap = 4;
 
-/// 在 [layerLink] 锚点处以浮层展示 [Md3eEmbeddableCalendarDatePicker]。
+/// 在 [layerLink] 锚点处以浮层展示 [EmbeddableCalendarDatePicker]。
 ///
 /// 使用 [CompositedTransformFollower] 对齐字段，避免 Widgetbook / 嵌套滚动下
 /// root overlay 坐标换算错位。点击遮罩或按 Esc 关闭；月历点选某一天后关闭。
-Future<void> md3eShowAnchoredCalendarDatePicker({
+Future<void> showAnchoredCalendarDatePicker({
   required BuildContext context,
   required LayerLink layerLink,
   required DateTime firstDate,
@@ -45,10 +45,10 @@ Future<void> md3eShowAnchoredCalendarDatePicker({
         data: mediaQuery,
         child: Localizations(
           locale: locale,
-          delegates: md3eMaterialLocalizationsDelegates,
+          delegates: materialLocalizationsDelegates,
           child: M3ETheme(
             data: themeData,
-            child: _Md3eAnchoredCalendarDatePickerLayer(
+            child: _AnchoredCalendarDatePickerLayer(
               layerLink: layerLink,
               placementContext: placementContext ?? context,
               firstDate: firstDate,
@@ -68,8 +68,8 @@ Future<void> md3eShowAnchoredCalendarDatePicker({
   return completer.future;
 }
 
-class _Md3eAnchoredCalendarDatePickerLayer extends StatefulWidget {
-  const _Md3eAnchoredCalendarDatePickerLayer({
+class _AnchoredCalendarDatePickerLayer extends StatefulWidget {
+  const _AnchoredCalendarDatePickerLayer({
     required this.layerLink,
     required this.placementContext,
     required this.firstDate,
@@ -92,12 +92,12 @@ class _Md3eAnchoredCalendarDatePickerLayer extends StatefulWidget {
   final VoidCallback onDismiss;
 
   @override
-  State<_Md3eAnchoredCalendarDatePickerLayer> createState() =>
-      _Md3eAnchoredCalendarDatePickerLayerState();
+  State<_AnchoredCalendarDatePickerLayer> createState() =>
+      _AnchoredCalendarDatePickerLayerState();
 }
 
-class _Md3eAnchoredCalendarDatePickerLayerState
-    extends State<_Md3eAnchoredCalendarDatePickerLayer> {
+class _AnchoredCalendarDatePickerLayerState
+    extends State<_AnchoredCalendarDatePickerLayer> {
   bool _openBelow = true;
 
   @override
@@ -211,7 +211,7 @@ class _CalendarPanel extends StatelessWidget {
       borderRadius: dateTheme.borderRadius,
       clipBehavior: Clip.antiAlias,
       color: Colors.transparent,
-      child: Md3eEmbeddableCalendarDatePicker(
+      child: EmbeddableCalendarDatePicker(
         initialDate: initialDate,
         firstDate: firstDate,
         lastDate: lastDate,

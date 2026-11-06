@@ -6,8 +6,8 @@ import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart'
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 单条字段锁 KV 行（左字段名、右锁按钮）。
-class Md3eMetadataFieldLockKvEntry {
-  const Md3eMetadataFieldLockKvEntry({
+class MetadataFieldLockKvEntry {
+  const MetadataFieldLockKvEntry({
     required this.label,
     required this.locked,
     required this.onChanged,
@@ -19,21 +19,20 @@ class Md3eMetadataFieldLockKvEntry {
 }
 
 /// 字段锁总览：split list（行间距 4dp）；宽屏双列，列间留 gap、无分隔线。
-class Md3eMetadataFieldLocksKvList extends StatelessWidget {
-  const Md3eMetadataFieldLocksKvList({super.key, required this.entries});
+class MetadataFieldLocksKvList extends StatelessWidget {
+  const MetadataFieldLocksKvList({super.key, required this.entries});
 
-  final List<Md3eMetadataFieldLockKvEntry> entries;
+  final List<MetadataFieldLockKvEntry> entries;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool twoColumns =
-            constraints.maxWidth >= Md3eBreakpoints.medium &&
-            entries.length > 1;
+            constraints.maxWidth >= Breakpoints.medium && entries.length > 1;
 
         if (!twoColumns) {
-          return _Md3eMetadataFieldLocksKvSplitGroup(entries: entries);
+          return _MetadataFieldLocksKvSplitGroup(entries: entries);
         }
 
         final int split = (entries.length + 1) ~/ 2;
@@ -43,13 +42,13 @@ class Md3eMetadataFieldLocksKvList extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Expanded(
-              child: _Md3eMetadataFieldLocksKvSplitGroup(
+              child: _MetadataFieldLocksKvSplitGroup(
                 entries: entries.sublist(0, split),
               ),
             ),
             SizedBox(width: gap),
             Expanded(
-              child: _Md3eMetadataFieldLocksKvSplitGroup(
+              child: _MetadataFieldLocksKvSplitGroup(
                 entries: entries.sublist(split),
               ),
             ),
@@ -60,10 +59,10 @@ class Md3eMetadataFieldLocksKvList extends StatelessWidget {
   }
 }
 
-class _Md3eMetadataFieldLocksKvSplitGroup extends StatelessWidget {
-  const _Md3eMetadataFieldLocksKvSplitGroup({required this.entries});
+class _MetadataFieldLocksKvSplitGroup extends StatelessWidget {
+  const _MetadataFieldLocksKvSplitGroup({required this.entries});
 
-  final List<Md3eMetadataFieldLockKvEntry> entries;
+  final List<MetadataFieldLockKvEntry> entries;
 
   @override
   Widget build(BuildContext context) {
@@ -72,15 +71,15 @@ class _Md3eMetadataFieldLocksKvSplitGroup extends StatelessWidget {
       color: theme.colorScheme.onSurface,
     );
 
-    return Md3eSplitListGroup(
+    return SplitListGroup(
       children: entries
           .map(
-            (Md3eMetadataFieldLockKvEntry entry) => Md3eSettingsTileShell(
+            (MetadataFieldLockKvEntry entry) => SettingsTileShell(
               onTap: () => entry.onChanged(!entry.locked),
               child: Row(
                 children: <Widget>[
                   Expanded(child: Text(entry.label, style: labelStyle)),
-                  Md3eMetadataFieldLockButton(
+                  MetadataFieldLockButton(
                     locked: entry.locked,
                     onChanged: entry.onChanged,
                   ),

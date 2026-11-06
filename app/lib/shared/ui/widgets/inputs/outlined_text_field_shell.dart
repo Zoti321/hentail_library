@@ -7,15 +7,15 @@ import 'package:material_3_expressive/components/text_fields/components/m3e_text
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:motor/motor.dart';
 
-/// Builds the editable region inside [Md3eOutlinedTextFieldShell].
-typedef Md3eOutlinedTextFieldInputBuilder = Widget Function(
+/// Builds the editable region inside [OutlinedTextFieldShell].
+typedef OutlinedTextFieldInputBuilder = Widget Function(
   BuildContext context,
   M3ETextFieldColors colors,
   M3ETextFieldTheme fieldTheme,
   TextStyle inputStyle,
 );
 
-typedef Md3eOutlinedTextFieldTrailingBuilder = Widget Function(
+typedef OutlinedTextFieldTrailingBuilder = Widget Function(
   BuildContext context,
   M3ETextFieldColors colors,
   M3ETextFieldTheme fieldTheme,
@@ -25,9 +25,9 @@ typedef Md3eOutlinedTextFieldTrailingBuilder = Widget Function(
 ///
 /// Container paint, notch, floating label, hover, and keyboard focus ring follow
 /// `material_3_expressive` `M3ETextField` (outlined). Used for composable
-/// inputs ([Md3eTagInputField]); ordinary fields use [Md3eOutlinedTextField].
-class Md3eOutlinedTextFieldShell extends StatefulWidget {
-  const Md3eOutlinedTextFieldShell({
+/// inputs ([TagInputField]); ordinary fields use [OutlinedTextField].
+class OutlinedTextFieldShell extends StatefulWidget {
+  const OutlinedTextFieldShell({
     super.key,
     required this.label,
     required this.focusNode,
@@ -49,12 +49,12 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
 
   final String label;
   final FocusNode focusNode;
-  final Md3eOutlinedTextFieldInputBuilder inputBuilder;
+  final OutlinedTextFieldInputBuilder inputBuilder;
   final bool enabled;
   final bool isPopulated;
   final Widget? leading;
   final Widget? trailing;
-  final Md3eOutlinedTextFieldTrailingBuilder? trailingBuilder;
+  final OutlinedTextFieldTrailingBuilder? trailingBuilder;
   final TapRegionCallback? onTapOutside;
   final M3ETextFieldTheme? fieldTheme;
   final TextEditingController? selectionController;
@@ -71,11 +71,10 @@ class Md3eOutlinedTextFieldShell extends StatefulWidget {
   final Object? tapRegionGroupId;
 
   @override
-  State<Md3eOutlinedTextFieldShell> createState() =>
-      _Md3eOutlinedTextFieldShellState();
+  State<OutlinedTextFieldShell> createState() => _OutlinedTextFieldShellState();
 }
 
-class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
+class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>
     with TickerProviderStateMixin {
   bool _hovered = false;
   bool _focused = false;
@@ -119,7 +118,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
   }
 
   @override
-  void didUpdateWidget(Md3eOutlinedTextFieldShell oldWidget) {
+  void didUpdateWidget(OutlinedTextFieldShell oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.appearanceFocused != widget.appearanceFocused) {
       _syncVisuals(animate: false);
@@ -247,7 +246,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     });
   }
 
-  _Md3eTextFieldNotch _notch(
+  _TextFieldNotch _notch(
     M3EThemeData theme,
     M3ETextFieldTheme fieldTheme,
     double labelStart,
@@ -265,7 +264,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
     final double full = painter.width + fieldTheme.notchPadding * 2;
     painter.dispose();
     final double width = full * progress.clamp(0, 1);
-    return _Md3eTextFieldNotch(
+    return _TextFieldNotch(
       labelStart - fieldTheme.notchPadding + (full - width) / 2,
       width,
     );
@@ -290,7 +289,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
       builder: (BuildContext context, Widget? _) {
         final M3ETextFieldColors colors = _currentColors;
         final double progress = _labelMotion.value;
-        final _Md3eTextFieldNotch notch = _notch(
+        final _TextFieldNotch notch = _notch(
           theme,
           fieldTheme,
           start,
@@ -390,7 +389,7 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
             onEnter: (_) => _updateHover(hovered: true),
             onExit: (_) => _updateHover(hovered: false),
             child: useSelectionGestures
-                ? Md3eOutlinedTextFieldSelectionScope(
+                ? OutlinedTextFieldSelectionScope(
                     focusNode: widget.focusNode,
                     controller: widget.selectionController!,
                     enabled: widget.enabled,
@@ -528,8 +527,8 @@ class _Md3eOutlinedTextFieldShellState extends State<Md3eOutlinedTextFieldShell>
 }
 
 @immutable
-class _Md3eTextFieldNotch {
-  const _Md3eTextFieldNotch(this.start, this.width);
+class _TextFieldNotch {
+  const _TextFieldNotch(this.start, this.width);
 
   final double start;
   final double width;

@@ -776,10 +776,10 @@
       "count": {"type": "int"}
     }
   },
-  "md3eNavRailExpand": "Expand navigation",
-  "md3eNavRailCollapse": "Collapse navigation",
-  "md3ePaginationPageSemantic": "Page {page}",
-  "@md3ePaginationPageSemantic": {
+  "navRailExpand": "Expand navigation",
+  "navRailCollapse": "Collapse navigation",
+  "paginationPageSemantic": "Page {page}",
+  "@paginationPageSemantic": {
     "placeholders": {
       "page": {"type": "int"}
     }

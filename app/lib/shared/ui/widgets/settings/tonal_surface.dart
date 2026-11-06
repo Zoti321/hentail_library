@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Outer radius for tonal settings cards and split-list groups.
-const double kMd3eTonalSurfaceRadius = 24;
+const double kTonalSurfaceRadius = 24;
 
 /// Filled surface block (`surfaceContainerLow`), Kazumi-style tonal card.
-class Md3eTonalSurface extends StatelessWidget {
-  const Md3eTonalSurface({
+class TonalSurface extends StatelessWidget {
+  const TonalSurface({
     super.key,
     required this.child,
     this.padding = EdgeInsets.zero,
-    this.borderRadius = kMd3eTonalSurfaceRadius,
+    this.borderRadius = kTonalSurfaceRadius,
   });
 
   final Widget child;

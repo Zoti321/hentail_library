@@ -7,7 +7,7 @@ import 'package:window_manager/window_manager.dart';
 /// Initializes [windowManager] for desktop platforms (no-op on web / mobile).
 ///
 /// Idempotent: [WindowManager.ensureInitialized] may be called more than once.
-Future<void> initMd3eWindowManager() async {
+Future<void> initWindowManager() async {
   if (kIsWeb) {
     return;
   }
@@ -17,11 +17,11 @@ Future<void> initMd3eWindowManager() async {
   await windowManager.ensureInitialized();
 }
 
-void md3eWindowManagerMinimize() {
+void windowManagerMinimize() {
   unawaited(windowManager.minimize());
 }
 
-void md3eWindowManagerToggleMaximize() {
+void windowManagerToggleMaximize() {
   unawaited(() async {
     if (await windowManager.isMaximized()) {
       await windowManager.unmaximize();
@@ -32,12 +32,12 @@ void md3eWindowManagerToggleMaximize() {
 }
 
 /// Closes the window. Clears `preventClose` first so the close is not swallowed
-/// by the guard in [Md3eWindowCloseListener].
-void md3eWindowManagerClose() {
-  unawaited(md3eWindowManagerCloseNow());
+/// by the guard in [WindowCloseListener].
+void windowManagerClose() {
+  unawaited(windowManagerCloseNow());
 }
 
-Future<void> md3eWindowManagerCloseNow() async {
+Future<void> windowManagerCloseNow() async {
   await windowManager.setPreventClose(false);
   await windowManager.close();
 }

@@ -7,22 +7,19 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 enum LayoutInputMode { pointer, touch }
 
 /// expanded 及以上的正文最大宽度（超宽窗口下居中，避免行过长）。
-const double kMd3ePageContentMaxWidth = 1280;
+const double kPageContentMaxWidth = 1280;
 
 /// 解析页面布局所需的全部输入（纯数据，便于测试）。
-final class Md3eLayoutContext {
-  const Md3eLayoutContext({
-    required this.viewportWidth,
-    required this.inputMode,
-  });
+final class LayoutContext {
+  const LayoutContext({required this.viewportWidth, required this.inputMode});
 
   /// 按当前运行平台推断输入形态；[desktop] 为空时使用 [isDesktop]。
-  factory Md3eLayoutContext.fromPlatform({
+  factory LayoutContext.fromPlatform({
     required double viewportWidth,
     bool? desktop,
   }) {
     final bool pointer = desktop ?? isDesktop;
-    return Md3eLayoutContext(
+    return LayoutContext(
       viewportWidth: viewportWidth,
       inputMode: pointer ? LayoutInputMode.pointer : LayoutInputMode.touch,
     );
@@ -31,8 +28,7 @@ final class Md3eLayoutContext {
   final double viewportWidth;
   final LayoutInputMode inputMode;
 
-  Md3eWindowSizeClass get sizeClass =>
-      Md3eWindowSizeClass.fromWidth(viewportWidth);
+  WindowSizeClass get sizeClass => WindowSizeClass.fromWidth(viewportWidth);
 }
 
 /// 页面布局规格：窗口档位 × 输入形态 → 页面所需的全部尺寸与标题样式。
@@ -40,9 +36,9 @@ final class Md3eLayoutContext {
 /// 这是页面间距与标题 typography 的唯一真值。页面只读取本类的字段，
 /// 不再写死数字，也不再各自拼装 metrics。
 ///
-/// 解析是纯函数（见 [Md3ePageLayoutSpec.resolve]），测试不需要 BuildContext。
-final class Md3ePageLayoutSpec {
-  const Md3ePageLayoutSpec._({
+/// 解析是纯函数（见 [PageLayoutSpec.resolve]），测试不需要 BuildContext。
+final class PageLayoutSpec {
+  const PageLayoutSpec._({
     required this.sizeClass,
     required this.inputMode,
     required this.horizontalInset,
@@ -57,34 +53,34 @@ final class Md3ePageLayoutSpec {
 
   /// 从 [BuildContext] 解析。
   ///
-  /// 优先取最近的 [Md3ePageViewport]（即页面真实视口宽度，已扣除 shell 侧栏）；
+  /// 优先取最近的 [PageViewport]（即页面真实视口宽度，已扣除 shell 侧栏）；
   /// 不在页面视口内（如根 Navigator 上的对话框、Widgetbook 独立页）时回退到整窗宽度。
-  factory Md3ePageLayoutSpec.of(BuildContext context) {
-    final Md3ePageLayoutScope? scope = context
-        .dependOnInheritedWidgetOfExactType<Md3ePageLayoutScope>();
+  factory PageLayoutSpec.of(BuildContext context) {
+    final PageLayoutScope? scope = context
+        .dependOnInheritedWidgetOfExactType<PageLayoutScope>();
     if (scope != null) {
       return scope.layout;
     }
-    return Md3ePageLayoutSpec.resolve(
-      Md3eLayoutContext.fromPlatform(
+    return PageLayoutSpec.resolve(
+      LayoutContext.fromPlatform(
         viewportWidth: MediaQuery.sizeOf(context).width,
       ),
     );
   }
 
   /// 纯函数解析。所有数值只在本文件的表格函数中出现。
-  factory Md3ePageLayoutSpec.resolve(Md3eLayoutContext layout) {
-    final Md3eWindowSizeClass sizeClass = layout.sizeClass;
+  factory PageLayoutSpec.resolve(LayoutContext layout) {
+    final WindowSizeClass sizeClass = layout.sizeClass;
     final LayoutInputMode mode = layout.inputMode;
     final double margin = _horizontalMargin(sizeClass, mode);
     final double maxWidth = sizeClass.isAtLeastExpanded
-        ? kMd3ePageContentMaxWidth
+        ? kPageContentMaxWidth
         : double.infinity;
     final double paddedWidth = layout.viewportWidth - margin * 2;
     final double centeredInset = paddedWidth > maxWidth
         ? (paddedWidth - maxWidth) / 2
         : 0;
-    return Md3ePageLayoutSpec._(
+    return PageLayoutSpec._(
       sizeClass: sizeClass,
       inputMode: mode,
       horizontalInset: margin + centeredInset,
@@ -98,7 +94,7 @@ final class Md3ePageLayoutSpec {
     );
   }
 
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
   final LayoutInputMode inputMode;
 
   /// 页面左右实际留白（已包含超宽窗口下的居中偏移）。用于正文、页头、搜索框等。
@@ -133,7 +129,7 @@ final class Md3ePageLayoutSpec {
 
   @override
   bool operator ==(Object other) {
-    return other is Md3ePageLayoutSpec &&
+    return other is PageLayoutSpec &&
         other.sizeClass == sizeClass &&
         other.inputMode == inputMode &&
         other.horizontalInset == horizontalInset &&
@@ -172,20 +168,20 @@ final class Md3ePageLayoutSpec {
   }
 
   static double _horizontalMargin(
-    Md3eWindowSizeClass sizeClass,
+    WindowSizeClass sizeClass,
     LayoutInputMode mode,
   ) {
     return switch ((mode, sizeClass)) {
-      (LayoutInputMode.touch, Md3eWindowSizeClass.compact) => 16,
-      (LayoutInputMode.touch, Md3eWindowSizeClass.medium) => 24,
-      (LayoutInputMode.touch, Md3eWindowSizeClass.expanded) => 32,
-      (LayoutInputMode.touch, Md3eWindowSizeClass.large) => 40,
-      (LayoutInputMode.touch, Md3eWindowSizeClass.extraLarge) => 40,
-      (LayoutInputMode.pointer, Md3eWindowSizeClass.compact) => 16,
-      (LayoutInputMode.pointer, Md3eWindowSizeClass.medium) => 20,
-      (LayoutInputMode.pointer, Md3eWindowSizeClass.expanded) => 24,
-      (LayoutInputMode.pointer, Md3eWindowSizeClass.large) => 32,
-      (LayoutInputMode.pointer, Md3eWindowSizeClass.extraLarge) => 32,
+      (LayoutInputMode.touch, WindowSizeClass.compact) => 16,
+      (LayoutInputMode.touch, WindowSizeClass.medium) => 24,
+      (LayoutInputMode.touch, WindowSizeClass.expanded) => 32,
+      (LayoutInputMode.touch, WindowSizeClass.large) => 40,
+      (LayoutInputMode.touch, WindowSizeClass.extraLarge) => 40,
+      (LayoutInputMode.pointer, WindowSizeClass.compact) => 16,
+      (LayoutInputMode.pointer, WindowSizeClass.medium) => 20,
+      (LayoutInputMode.pointer, WindowSizeClass.expanded) => 24,
+      (LayoutInputMode.pointer, WindowSizeClass.large) => 32,
+      (LayoutInputMode.pointer, WindowSizeClass.extraLarge) => 32,
     };
   }
 
@@ -197,37 +193,34 @@ final class Md3ePageLayoutSpec {
   }
 
   static double _headerToBodyGap(
-    Md3eWindowSizeClass sizeClass,
+    WindowSizeClass sizeClass,
     LayoutInputMode mode,
   ) {
     return switch ((mode, sizeClass)) {
-      (LayoutInputMode.touch, Md3eWindowSizeClass.compact) => 16,
-      (LayoutInputMode.touch, Md3eWindowSizeClass.medium) => 20,
+      (LayoutInputMode.touch, WindowSizeClass.compact) => 16,
+      (LayoutInputMode.touch, WindowSizeClass.medium) => 20,
       (LayoutInputMode.touch, _) => 24,
-      (LayoutInputMode.pointer, Md3eWindowSizeClass.compact) => 12,
+      (LayoutInputMode.pointer, WindowSizeClass.compact) => 12,
       (LayoutInputMode.pointer, _) => 16,
     };
   }
 
   static double _bodyBottomInset(
-    Md3eWindowSizeClass sizeClass,
+    WindowSizeClass sizeClass,
     LayoutInputMode mode,
   ) {
     return switch ((mode, sizeClass)) {
-      (LayoutInputMode.touch, Md3eWindowSizeClass.compact) => 24,
-      (LayoutInputMode.touch, Md3eWindowSizeClass.medium) => 24,
+      (LayoutInputMode.touch, WindowSizeClass.compact) => 24,
+      (LayoutInputMode.touch, WindowSizeClass.medium) => 24,
       (LayoutInputMode.touch, _) => 32,
-      (LayoutInputMode.pointer, Md3eWindowSizeClass.compact) => 16,
+      (LayoutInputMode.pointer, WindowSizeClass.compact) => 16,
       (LayoutInputMode.pointer, _) => 24,
     };
   }
 
-  static double _listItemGap(
-    Md3eWindowSizeClass sizeClass,
-    LayoutInputMode mode,
-  ) {
+  static double _listItemGap(WindowSizeClass sizeClass, LayoutInputMode mode) {
     return switch ((mode, sizeClass)) {
-      (LayoutInputMode.touch, Md3eWindowSizeClass.compact) => 12,
+      (LayoutInputMode.touch, WindowSizeClass.compact) => 12,
       (LayoutInputMode.touch, _) => 16,
       (LayoutInputMode.pointer, _) => 8,
     };
@@ -240,23 +233,23 @@ final class Md3ePageLayoutSpec {
     };
   }
 
-  static double _titleFontSize(Md3eWindowSizeClass sizeClass) {
+  static double _titleFontSize(WindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 24,
-      Md3eWindowSizeClass.medium => 24,
-      Md3eWindowSizeClass.expanded => 28,
-      Md3eWindowSizeClass.large => 32,
-      Md3eWindowSizeClass.extraLarge => 32,
+      WindowSizeClass.compact => 24,
+      WindowSizeClass.medium => 24,
+      WindowSizeClass.expanded => 28,
+      WindowSizeClass.large => 32,
+      WindowSizeClass.extraLarge => 32,
     };
   }
 }
 
 /// 页面视口：用 [LayoutBuilder] 量出 [child] 实际可用宽度（shell 内容区，已扣除侧栏），
-/// 并把解析好的 [Md3ePageLayoutSpec] 通过 [Md3ePageLayoutScope] 下发给子树。
+/// 并把解析好的 [PageLayoutSpec] 通过 [PageLayoutScope] 下发给子树。
 ///
-/// 只需在 shell 内容区包一次；其下所有 [Md3ePageLayoutSpec.of] 自动取视口宽度。
-class Md3ePageViewport extends StatelessWidget {
-  const Md3ePageViewport({super.key, required this.child});
+/// 只需在 shell 内容区包一次；其下所有 [PageLayoutSpec.of] 自动取视口宽度。
+class PageViewport extends StatelessWidget {
+  const PageViewport({super.key, required this.child});
 
   final Widget child;
 
@@ -264,9 +257,9 @@ class Md3ePageViewport extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        return Md3ePageLayoutScope(
-          layout: Md3ePageLayoutSpec.resolve(
-            Md3eLayoutContext.fromPlatform(viewportWidth: constraints.maxWidth),
+        return PageLayoutScope(
+          layout: PageLayoutSpec.resolve(
+            LayoutContext.fromPlatform(viewportWidth: constraints.maxWidth),
           ),
           child: child,
         );
@@ -275,18 +268,18 @@ class Md3ePageViewport extends StatelessWidget {
   }
 }
 
-/// 布局规格的继承作用域，由 [Md3ePageViewport] 提供，读取方使用 [Md3ePageLayoutSpec.of]。
-final class Md3ePageLayoutScope extends InheritedWidget {
-  const Md3ePageLayoutScope({
+/// 布局规格的继承作用域，由 [PageViewport] 提供，读取方使用 [PageLayoutSpec.of]。
+final class PageLayoutScope extends InheritedWidget {
+  const PageLayoutScope({
     super.key,
     required this.layout,
     required super.child,
   });
 
-  final Md3ePageLayoutSpec layout;
+  final PageLayoutSpec layout;
 
   @override
-  bool updateShouldNotify(Md3ePageLayoutScope oldWidget) {
+  bool updateShouldNotify(PageLayoutScope oldWidget) {
     return oldWidget.layout != layout;
   }
 }

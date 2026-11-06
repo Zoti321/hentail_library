@@ -8,22 +8,22 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Lab 系列目录（生产 [ReaderSeriesMenuButton] 的 M3E 面板版）。
-abstract final class Md3eReaderSeriesCatalogSheet {
-  Md3eReaderSeriesCatalogSheet._();
+abstract final class ReaderSeriesCatalogSheet {
+  ReaderSeriesCatalogSheet._();
 
   static Future<void> show(
     BuildContext context, {
-    required List<Md3eReaderSeriesVolume> volumes,
+    required List<ReaderSeriesVolume> volumes,
     required String currentVolumeId,
     required ValueChanged<String> onVolumeSelected,
     bool useRootNavigator = false,
   }) {
     final AppLocalizations l10n = context.l10n;
-    return Md3eReaderAdaptivePanel.show<void>(
+    return ReaderAdaptivePanel.show<void>(
       context,
       title: l10n.readerSeriesCatalog,
       useRootNavigator: useRootNavigator,
-      body: _Md3eReaderSeriesCatalogBody(
+      body: _ReaderSeriesCatalogBody(
         volumes: volumes,
         currentVolumeId: currentVolumeId,
         onVolumeSelected: onVolumeSelected,
@@ -32,14 +32,14 @@ abstract final class Md3eReaderSeriesCatalogSheet {
   }
 }
 
-class _Md3eReaderSeriesCatalogBody extends StatelessWidget {
-  const _Md3eReaderSeriesCatalogBody({
+class _ReaderSeriesCatalogBody extends StatelessWidget {
+  const _ReaderSeriesCatalogBody({
     required this.volumes,
     required this.currentVolumeId,
     required this.onVolumeSelected,
   });
 
-  final List<Md3eReaderSeriesVolume> volumes;
+  final List<ReaderSeriesVolume> volumes;
   final String currentVolumeId;
   final ValueChanged<String> onVolumeSelected;
 
@@ -51,7 +51,7 @@ class _Md3eReaderSeriesCatalogBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         for (int i = 0; i < volumes.length; i++)
-          Md3eSettingsNavigationTile(
+          SettingsNavigationTile(
             leading: Symbols.menu_book,
             title: Text('${i + 1}-${volumes[i].title}'),
             onTap: () {

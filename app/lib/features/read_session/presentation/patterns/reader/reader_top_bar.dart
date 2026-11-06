@@ -10,8 +10,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Lab 顶栏：磨砂 tonal surface + [M3EAppBar.top]（漫画名/系列名双行）。
-class Md3eReaderTopBar extends StatelessWidget {
-  const Md3eReaderTopBar({
+class ReaderTopBar extends StatelessWidget {
+  const ReaderTopBar({
     super.key,
     required this.title,
     this.subtitle,
@@ -36,10 +36,10 @@ class Md3eReaderTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final bool compactChrome = Md3eWindowSizeClass.fromWidth(viewportWidth)
+    final bool compactChrome = WindowSizeClass.fromWidth(viewportWidth)
         .isCompact;
     final EdgeInsets horizontalInsets = EdgeInsets.symmetric(
-      horizontal: Md3eReaderChromeMetrics.chromeContentHorizontalPadding(
+      horizontal: ReaderChromeMetrics.chromeContentHorizontalPadding(
         viewportWidth,
       ),
     );
@@ -90,7 +90,7 @@ class Md3eReaderTopBar extends StatelessWidget {
           onPressed: null,
         )
       else
-        Md3eAnchoredMenu(
+        AnchoredMenu(
           position: M3EMenuAnchorPosition.bottomEnd,
           children: menuEntries,
           anchorBuilder: (BuildContext context, VoidCallback open) {
@@ -105,8 +105,8 @@ class Md3eReaderTopBar extends StatelessWidget {
         ),
     ];
 
-    return Md3eReaderChromeBand(
-      edge: Md3eReaderChromeBandEdge.top,
+    return ReaderChromeBand(
+      edge: ReaderChromeBandEdge.top,
       padding: horizontalInsets,
       child: M3EAppBar.top(
         backgroundColor: Colors.transparent,
@@ -134,7 +134,7 @@ class Md3eReaderTopBar extends StatelessWidget {
     VoidCallback? onPressed,
   }) {
     return M3EIconButton(
-      icon: Icon(icon, size: Md3eReaderChromeMetrics.actionIconSize),
+      icon: Icon(icon, size: ReaderChromeMetrics.actionIconSize),
       variant: M3EIconButtonVariant.standard,
       size: M3EIconButtonSize.sm,
       tooltip: tooltip,
@@ -152,7 +152,7 @@ class _ReaderAppBarTitleBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eReaderChromeScope scope = Md3eReaderChromeScope.of(context);
+    final ReaderChromeScope scope = ReaderChromeScope.of(context);
     final M3ETypeScale type = M3ETheme.of(context).typeScale;
 
     return Column(

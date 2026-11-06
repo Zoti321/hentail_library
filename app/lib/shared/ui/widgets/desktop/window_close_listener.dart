@@ -6,17 +6,16 @@ import 'package:window_manager/window_manager.dart';
 ///
 /// `main.dart` sets `preventClose(true)`; without a listener the OS close
 /// button / Alt+F4 would be swallowed. This widget closes the window on request.
-class Md3eWindowCloseListener extends StatefulWidget {
-  const Md3eWindowCloseListener({super.key, required this.child});
+class WindowCloseListener extends StatefulWidget {
+  const WindowCloseListener({super.key, required this.child});
 
   final Widget child;
 
   @override
-  State<Md3eWindowCloseListener> createState() =>
-      _Md3eWindowCloseListenerState();
+  State<WindowCloseListener> createState() => _WindowCloseListenerState();
 }
 
-class _Md3eWindowCloseListenerState extends State<Md3eWindowCloseListener>
+class _WindowCloseListenerState extends State<WindowCloseListener>
     with WindowListener {
   @override
   void initState() {
@@ -32,7 +31,7 @@ class _Md3eWindowCloseListenerState extends State<Md3eWindowCloseListener>
 
   @override
   void onWindowClose() {
-    md3eWindowManagerClose();
+    windowManagerClose();
   }
 
   @override

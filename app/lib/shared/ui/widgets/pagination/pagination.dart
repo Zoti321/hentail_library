@@ -8,9 +8,9 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// Responsive MD3E pagination (Lab only; production uses [LibraryPaginationBar]).
 ///
 /// Compact vs standard follows **window** width ([MediaQuery.sizeOf]), same as
-/// [Md3eLibraryPageHeader] breakpoints—not the parent’s shrink-wrapped width.
-class Md3ePagination extends StatelessWidget {
-  const Md3ePagination({
+/// [LibraryPageHeader] breakpoints—not the parent’s shrink-wrapped width.
+class Pagination extends StatelessWidget {
+  const Pagination({
     super.key,
     required this.page,
     required this.totalPages,
@@ -36,15 +36,13 @@ class Md3ePagination extends StatelessWidget {
     }
     final int clampedPage = page.clamp(1, totalPages);
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      windowWidth,
-    );
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(windowWidth);
     final bool useCompact =
         sizeClass.isCompact ||
-        windowWidth < Md3ePaginationMetrics.standardBarMinWidth(sizeClass);
+        windowWidth < PaginationMetrics.standardBarMinWidth(sizeClass);
 
     if (useCompact) {
-      return Md3ePaginationCompact(
+      return PaginationCompact(
         page: clampedPage,
         totalPages: totalPages,
         enabled: enabled,
@@ -58,7 +56,7 @@ class Md3ePagination extends StatelessWidget {
       );
     }
 
-    return Md3ePaginationStandard(
+    return PaginationStandard(
       page: clampedPage,
       totalPages: totalPages,
       enabled: enabled,

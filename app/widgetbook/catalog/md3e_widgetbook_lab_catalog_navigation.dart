@@ -6,7 +6,7 @@ void md3eWidgetbookOpenLabCatalogDetail(
   required LibraryDisplayTarget displayTarget,
   required int catalogIndex,
 }) {
-  openMd3eLabCatalogDetail(
+  openLabCatalogDetail(
     context,
     displayTarget: displayTarget,
     catalogIndex: catalogIndex,
@@ -17,7 +17,7 @@ void md3eWidgetbookPushLabComicDetail(
   BuildContext context, {
   int catalogIndex = 0,
 }) {
-  openMd3eLabCatalogDetail(
+  openLabCatalogDetail(
     context,
     displayTarget: LibraryDisplayTarget.comics,
     catalogIndex: catalogIndex,
@@ -26,20 +26,20 @@ void md3eWidgetbookPushLabComicDetail(
 
 void _md3eWidgetbookOpenLabComicMetadataEdit(
   BuildContext context, {
-  required Md3eComicDetailEntry entry,
+  required ComicDetailViewObject entry,
 }) {
-  showMd3eComicMetadataEdit(
+  showComicMetadataEditLayout(
     context: context,
-    initialDraft: Md3eComicMetadataEditDraft.fromEntry(entry),
+    initialDraft: ComicMetadataEditDraft.fromEntry(entry),
   );
 }
 
 void _md3eWidgetbookOpenLabSeriesMetadataEdit(
   BuildContext context, {
-  required Md3eSeriesDetailEntry entry,
+  required SeriesDetailViewObject entry,
 }) {
-  showMd3eSeriesMetadataEdit(
+  showSeriesMetadataEditLayout(
     context: context,
-    initialDraft: Md3eSeriesMetadataEditDraft.fromEntry(entry),
+    initialDraft: SeriesMetadataEditDraft.fromEntry(entry),
   );
 }

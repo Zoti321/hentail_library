@@ -1,17 +1,17 @@
-import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/lab_catalog_item_preview.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
-/// 由目录 index 生成 Lab 详情 preview（与 [Md3eLabCatalogItemPreview] 标题一致）。
+/// 由目录 index 生成 Lab 详情 preview（与 [LabCatalogItemPreview] 标题一致）。
 abstract final class Md3eLabCatalogDetailPreviewData {
-  static Md3eComicDetailEntry comicDetail({required int catalogIndex}) {
-    final Md3eLabCatalogItemPreview item = Md3eLabCatalogItemPreview.forIndex(
+  static ComicDetailViewObject comicDetail({required int catalogIndex}) {
+    final LabCatalogItemPreview item = LabCatalogItemPreview.forIndex(
       displayTarget: LibraryDisplayTarget.comics,
       index: catalogIndex,
     );
     final int pageCount = 64 + catalogIndex * 8;
-    return Md3eComicDetailEntry(
+    return ComicDetailViewObject(
       title: item.title,
       description: 'Lab 预览：${item.title}。简介由占位数据生成，用于验收目录 → 详情标题一致。',
       pageCount: pageCount,
@@ -32,24 +32,24 @@ abstract final class Md3eLabCatalogDetailPreviewData {
     );
   }
 
-  static Md3eSeriesDetailEntry seriesDetail({required int catalogIndex}) {
-    final Md3eLabCatalogItemPreview item = Md3eLabCatalogItemPreview.forIndex(
+  static SeriesDetailViewObject seriesDetail({required int catalogIndex}) {
+    final LabCatalogItemPreview item = LabCatalogItemPreview.forIndex(
       displayTarget: LibraryDisplayTarget.series,
       index: catalogIndex,
     );
     final int comicCount = 3 + catalogIndex % 8;
-    final List<Md3eSeriesDetailComicItem> comics =
-        List<Md3eSeriesDetailComicItem>.generate(comicCount, (int i) {
-          return Md3eSeriesDetailComicItem(
+    final List<SeriesDetailComicItem> comics =
+        List<SeriesDetailComicItem>.generate(comicCount, (int i) {
+          return SeriesDetailComicItem(
             title: '${item.title} · 第 ${i + 1} 册',
             pageCount: 160 + i * 12,
             readProgress: i.isEven ? (i % 10) / 10 : null,
           );
         });
 
-    return Md3eSeriesDetailEntry(
+    return SeriesDetailViewObject(
       title: item.title,
-      serializationStatus: Md3eSeriesSerializationStatus.ongoing,
+      serializationStatus: SeriesSerializationStatus.ongoing,
       languages: const <String>['日文'],
       showAgeRestrictionChip: catalogIndex.isOdd,
       volumeCurrent: comics.length,
@@ -60,15 +60,15 @@ abstract final class Md3eLabCatalogDetailPreviewData {
     );
   }
 
-  static Md3eComicDetailEntry comicDetailFromSeriesVolume({
-    required Md3eSeriesDetailEntry series,
+  static ComicDetailViewObject comicDetailFromSeriesVolume({
+    required SeriesDetailViewObject series,
     required int comicIndex,
   }) {
     if (comicIndex < 0 || comicIndex >= series.comics.length) {
       return comicDetail(catalogIndex: 0);
     }
-    final Md3eSeriesDetailComicItem volume = series.comics[comicIndex];
-    return Md3eComicDetailEntry(
+    final SeriesDetailComicItem volume = series.comics[comicIndex];
+    return ComicDetailViewObject(
       title: volume.title,
       description: 'Lab 预览：从系列「${series.title}」进入的单册详情。',
       pageCount: volume.pageCount,
@@ -76,7 +76,7 @@ abstract final class Md3eLabCatalogDetailPreviewData {
       tags: series.tags,
       showSeriesNav: true,
       seriesCatalog: series.comics
-          .map((Md3eSeriesDetailComicItem c) => c.title)
+          .map((SeriesDetailComicItem c) => c.title)
           .toList(),
       seriesCurrentIndex: comicIndex,
     );

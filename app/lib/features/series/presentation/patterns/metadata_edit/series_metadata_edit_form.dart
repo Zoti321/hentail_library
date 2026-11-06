@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_form_scroll.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_field_label_row.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
@@ -17,11 +17,11 @@ import 'package:hentai_library/shared/domain/models/value_objects/series_meta_lo
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
-enum _Md3eSeriesMetadataEditTab { content, fieldLocks }
+enum _SeriesMetadataEditTab { content, fieldLocks }
 
 /// 系列元数据编辑表单（对齐生产 [EditSeriesDialog] 字段）。
-class Md3eSeriesMetadataEditForm extends StatefulWidget {
-  const Md3eSeriesMetadataEditForm({
+class SeriesMetadataEditForm extends StatefulWidget {
+  const SeriesMetadataEditForm({
     super.key,
     required this.draft,
     required this.onDraftChanged,
@@ -31,25 +31,23 @@ class Md3eSeriesMetadataEditForm extends StatefulWidget {
     this.totalCountError,
   });
 
-  final Md3eSeriesMetadataEditDraft draft;
-  final ValueChanged<Md3eSeriesMetadataEditDraft> onDraftChanged;
+  final SeriesMetadataEditDraft draft;
+  final ValueChanged<SeriesMetadataEditDraft> onDraftChanged;
   final SeriesMetaLocks locks;
-  final Md3eSeriesMetadataLockChanged onLockChanged;
+  final SeriesMetadataLockChanged onLockChanged;
   final String? nameError;
   final String? totalCountError;
 
   @override
-  State<Md3eSeriesMetadataEditForm> createState() =>
-      _Md3eSeriesMetadataEditFormState();
+  State<SeriesMetadataEditForm> createState() => _SeriesMetadataEditFormState();
 }
 
-class _Md3eSeriesMetadataEditFormState
-    extends State<Md3eSeriesMetadataEditForm> {
-  _Md3eSeriesMetadataEditTab _tab = _Md3eSeriesMetadataEditTab.content;
+class _SeriesMetadataEditFormState extends State<SeriesMetadataEditForm> {
+  _SeriesMetadataEditTab _tab = _SeriesMetadataEditTab.content;
 
   Widget _scrollPane(Widget child) {
     return ScrollConfiguration(
-      behavior: Md3eMetadataEditScrollBehavior(),
+      behavior: MetadataEditScrollBehavior(),
       child: SingleChildScrollView(primary: false, child: child),
     );
   }
@@ -66,14 +64,14 @@ class _Md3eSeriesMetadataEditFormState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SizedBox(
-            width: Md3eMetadataEditFormMetrics.sideTabColumnWidth,
+            width: MetadataEditFormMetrics.sideTabColumnWidth,
             child: _scrollPane(
               _SideTabList(l10n: l10n, tab: _tab, onSelected: _selectTab),
             ),
           ),
           SizedBox(width: gap),
           Expanded(
-            child: Md3eListDetailDetailTransition(
+            child: ListDetailDetailTransition(
               switchKey: _tab,
               child: _scrollPane(tabBody),
             ),
@@ -94,23 +92,21 @@ class _Md3eSeriesMetadataEditFormState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Md3eSegmentedCapsuleBar(
-            segments: <Md3eSegmentedCapsuleSegment>[
-              Md3eSegmentedCapsuleSegment(
-                label: l10n.dialogEditMetadataTabContent,
-              ),
-              Md3eSegmentedCapsuleSegment(
+          SegmentedCapsuleBar(
+            segments: <SegmentedCapsuleSegment>[
+              SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabContent),
+              SegmentedCapsuleSegment(
                 label: l10n.dialogEditMetadataTabFieldLocks,
               ),
             ],
             selectedIndex: _tab.index,
             onSelected: (int index) {
-              setState(() => _tab = _Md3eSeriesMetadataEditTab.values[index]);
+              setState(() => _tab = _SeriesMetadataEditTab.values[index]);
             },
           ),
           SizedBox(height: gap),
           Expanded(
-            child: Md3eListDetailDetailTransition(
+            child: ListDetailDetailTransition(
               switchKey: _tab,
               child: _scrollPane(tabBody),
             ),
@@ -121,17 +117,17 @@ class _Md3eSeriesMetadataEditFormState
   }
 
   void _selectTab(int index) {
-    setState(() => _tab = _Md3eSeriesMetadataEditTab.values[index]);
+    setState(() => _tab = _SeriesMetadataEditTab.values[index]);
   }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final double gap = Md3eMetadataEditFormMetrics.sectionGap(sizeClass);
+    final WindowSizeClass sizeClass = windowSizeClassOf(context);
+    final double gap = MetadataEditFormMetrics.sectionGap(sizeClass);
 
     final Widget tabBody = switch (_tab) {
-      _Md3eSeriesMetadataEditTab.content => _SeriesContentFields(
+      _SeriesMetadataEditTab.content => _SeriesContentFields(
         draft: widget.draft,
         onDraftChanged: widget.onDraftChanged,
         nameError: widget.nameError,
@@ -139,19 +135,18 @@ class _Md3eSeriesMetadataEditFormState
         gap: gap,
         l10n: l10n,
       ),
-      _Md3eSeriesMetadataEditTab.fieldLocks => Md3eSeriesMetadataLocksPane(
+      _SeriesMetadataEditTab.fieldLocks => SeriesMetadataLocksPane(
         locks: widget.locks,
         onLockChanged: widget.onLockChanged,
       ),
     };
 
-    final bool useSideTabs =
-        sizeClass.index >= Md3eWindowSizeClass.medium.index;
+    final bool useSideTabs = sizeClass.index >= WindowSizeClass.medium.index;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double viewportHeight =
-            Md3eMetadataEditFormMetrics.resolveTabbedViewportHeight(
+            MetadataEditFormMetrics.resolveTabbedViewportHeight(
               context,
               constraints,
             );
@@ -184,29 +179,26 @@ class _SideTabList extends StatelessWidget {
   });
 
   final AppLocalizations l10n;
-  final _Md3eSeriesMetadataEditTab tab;
+  final _SeriesMetadataEditTab tab;
   final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final List<(String label, _Md3eSeriesMetadataEditTab value)> items =
-        <(String, _Md3eSeriesMetadataEditTab)>[
-          (
-            l10n.dialogEditMetadataTabContent,
-            _Md3eSeriesMetadataEditTab.content,
-          ),
+    final List<(String label, _SeriesMetadataEditTab value)> items =
+        <(String, _SeriesMetadataEditTab)>[
+          (l10n.dialogEditMetadataTabContent, _SeriesMetadataEditTab.content),
           (
             l10n.dialogEditMetadataTabFieldLocks,
-            _Md3eSeriesMetadataEditTab.fieldLocks,
+            _SeriesMetadataEditTab.fieldLocks,
           ),
         ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        for (final (String label, _Md3eSeriesMetadataEditTab value) in items)
-          Md3eListDetailNavItem(
-            key: ValueKey<_Md3eSeriesMetadataEditTab>(value),
+        for (final (String label, _SeriesMetadataEditTab value) in items)
+          ListDetailNavItem(
+            key: ValueKey<_SeriesMetadataEditTab>(value),
             label: label,
             selected: tab == value,
             onTap: () => onSelected(value.index),
@@ -226,8 +218,8 @@ class _SeriesContentFields extends StatelessWidget {
     required this.l10n,
   });
 
-  final Md3eSeriesMetadataEditDraft draft;
-  final ValueChanged<Md3eSeriesMetadataEditDraft> onDraftChanged;
+  final SeriesMetadataEditDraft draft;
+  final ValueChanged<SeriesMetadataEditDraft> onDraftChanged;
   final String? nameError;
   final String? totalCountError;
   final double gap;
@@ -240,7 +232,7 @@ class _SeriesContentFields extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Md3eOutlinedTextField(
+        OutlinedTextField(
           label: l10n.formSeriesNameLabel,
           initialValue: draft.name,
           errorText: nameError,
@@ -248,18 +240,16 @@ class _SeriesContentFields extends StatelessWidget {
               onDraftChanged(draft.copyWith(name: value)),
         ),
         SizedBox(height: gap),
-        Md3eMetadataFieldLabelRow(
-          label: l10n.formSeriesSerializationStatusLabel,
-        ),
+        MetadataFieldLabelRow(label: l10n.formSeriesSerializationStatusLabel),
         SizedBox(height: spacing.sm),
-        Md3eSeriesSerializationDropdown(
+        SeriesSerializationDropdown(
           value: draft.serializationStatus,
-          onChanged: (Md3eSeriesSerializationStatus status) {
+          onChanged: (SeriesSerializationStatus status) {
             onDraftChanged(draft.copyWith(serializationStatus: status));
           },
         ),
         SizedBox(height: gap),
-        Md3eOutlinedTextField(
+        OutlinedTextField(
           label: l10n.formSeriesTotalCountLabel,
           initialValue: draft.totalCountText,
           hintText: l10n.formSeriesTotalCountHint,

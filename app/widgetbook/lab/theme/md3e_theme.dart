@@ -7,9 +7,9 @@ export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart'
     show
         buildAppM3eThemeData,
         flutterColorSchemeFromM3e,
-        kMd3eAppFontFamily,
-        kMd3eLabSeedColor,
-        md3eWithAppFontFamily;
+        kAppFontFamily,
+        kLabSeedColor,
+        withAppFontFamily;
 
 M3EColorScheme _md3eColorSchemeFor({
   Object? dynamicSource,
@@ -25,10 +25,10 @@ M3EColorScheme _md3eColorSchemeFor({
 }
 
 M3EThemeData _applyMd3eLabOverrides(M3EThemeData base) =>
-    applyMd3eShellNavRailOverrides(base);
+    applyShellNavRailOverrides(base);
 
 /// Builds [M3EThemeData] for the MD3E lab (seed + optional OS dynamic color).
-M3EThemeData buildMd3eThemeData({
+M3EThemeData buildThemeData({
   Object? lightDynamic,
   Object? darkDynamic,
   Brightness brightness = Brightness.light,
@@ -47,12 +47,12 @@ M3EThemeData buildMd3eThemeData({
 }
 
 /// Flutter [ThemeData] for [MaterialApp] / legacy widgets alongside [M3ETheme].
-ThemeData buildMd3eMaterialTheme(Brightness brightness, {M3EThemeData? m3e}) {
+ThemeData buildMaterialTheme(Brightness brightness, {M3EThemeData? m3e}) {
   final M3EThemeData resolved =
-      m3e ?? buildMd3eThemeData(brightness: brightness);
+      m3e ?? buildThemeData(brightness: brightness);
   return ThemeData(
     useMaterial3: true,
-    fontFamily: kMd3eAppFontFamily,
+    fontFamily: kAppFontFamily,
     colorScheme: flutterColorSchemeFromM3e(resolved.colorScheme),
   );
 }
@@ -73,12 +73,12 @@ class Md3eDynamicTheme extends StatelessWidget {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (Object? lightDynamic, Object? darkDynamic) {
-        final M3EThemeData lightM3e = buildMd3eThemeData(
+        final M3EThemeData lightM3e = buildThemeData(
           lightDynamic: lightDynamic,
           darkDynamic: darkDynamic,
           brightness: Brightness.light,
         );
-        final M3EThemeData darkM3e = buildMd3eThemeData(
+        final M3EThemeData darkM3e = buildThemeData(
           lightDynamic: lightDynamic,
           darkDynamic: darkDynamic,
           brightness: Brightness.dark,
@@ -88,8 +88,8 @@ class Md3eDynamicTheme extends StatelessWidget {
           child: builder(
             context,
             lightM3e,
-            buildMd3eMaterialTheme(Brightness.light, m3e: lightM3e),
-            buildMd3eMaterialTheme(Brightness.dark, m3e: darkM3e),
+            buildMaterialTheme(Brightness.light, m3e: lightM3e),
+            buildMaterialTheme(Brightness.dark, m3e: darkM3e),
           ),
         );
       },
@@ -98,15 +98,15 @@ class Md3eDynamicTheme extends StatelessWidget {
 }
 
 /// Wraps [child] with expressive tokens (no dynamic color; for tests and static previews).
-class Md3eThemeScope extends StatelessWidget {
-  const Md3eThemeScope({super.key, required this.child, this.m3e});
+class ThemeScope extends StatelessWidget {
+  const ThemeScope({super.key, required this.child, this.m3e});
 
   final Widget child;
   final M3EThemeData? m3e;
 
   @override
   Widget build(BuildContext context) {
-    final M3EThemeData data = m3e ?? buildMd3eThemeData();
+    final M3EThemeData data = m3e ?? buildThemeData();
     return M3ETheme(data: data, child: child);
   }
 }

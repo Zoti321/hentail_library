@@ -2894,23 +2894,23 @@ abstract class AppLocalizations {
   /// **'{count, plural, other{{count} 位角色}}'**
   String metadataCharacterCount(int count);
 
-  /// No description provided for @md3eNavRailExpand.
+  /// No description provided for @navRailExpand.
   ///
   /// In zh, this message translates to:
   /// **'展开导航'**
-  String get md3eNavRailExpand;
+  String get navRailExpand;
 
-  /// No description provided for @md3eNavRailCollapse.
+  /// No description provided for @navRailCollapse.
   ///
   /// In zh, this message translates to:
   /// **'收起导航'**
-  String get md3eNavRailCollapse;
+  String get navRailCollapse;
 
-  /// No description provided for @md3ePaginationPageSemantic.
+  /// No description provided for @paginationPageSemantic.
   ///
   /// In zh, this message translates to:
   /// **'第 {page} 页'**
-  String md3ePaginationPageSemantic(int page);
+  String paginationPageSemantic(int page);
 
   /// No description provided for @metadataRenameAuthor.
   ///

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Group label above settings blocks (primary [titleSmall]).
-class Md3eSettingsSectionHeader extends StatelessWidget {
-  const Md3eSettingsSectionHeader({
+class SettingsSectionHeader extends StatelessWidget {
+  const SettingsSectionHeader({
     super.key,
     required this.title,
     this.description,

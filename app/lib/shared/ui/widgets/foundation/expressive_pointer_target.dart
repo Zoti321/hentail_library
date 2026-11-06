@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 /// Material minimum interactive target (48dp) for MD3E controls.
-const double kMd3eMinInteractiveSize = 48;
+const double kMinInteractiveSize = 48;
 
 /// Expands hit area to at least [minSize] without changing child layout intent.
-class Md3ePointerTarget extends StatelessWidget {
-  const Md3ePointerTarget({
+class PointerTarget extends StatelessWidget {
+  const PointerTarget({
     super.key,
     required this.child,
     this.onTap,
-    this.minSize = kMd3eMinInteractiveSize,
+    this.minSize = kMinInteractiveSize,
   });
 
   final Widget child;

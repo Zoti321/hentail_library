@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_md3e_confirm_dialog.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_md3e_form_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library/library_confirm_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library/library_form_dialog.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
@@ -17,25 +17,23 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
   final Ref _ref;
 
   @override
-  Future<void> addLocalLibrary(BuildContext context) =>
-      showLibraryMd3eFormDialog(
-        context: context,
-        mode: LibraryFormMode.createLocal,
-      );
+  Future<void> addLocalLibrary(BuildContext context) => showLibraryFormDialog(
+    context: context,
+    mode: LibraryFormMode.createLocal,
+  );
 
   @override
-  Future<void> addRemoteLibrary(BuildContext context) =>
-      showLibraryMd3eFormDialog(
-        context: context,
-        mode: LibraryFormMode.createRemote,
-      );
+  Future<void> addRemoteLibrary(BuildContext context) => showLibraryFormDialog(
+    context: context,
+    mode: LibraryFormMode.createRemote,
+  );
 
   @override
   Future<void> editRemoteLibrary(BuildContext context, LocalLibrary library) {
     if (!isRemoteLibrary(library)) {
       return Future<void>.value();
     }
-    return showLibraryMd3eFormDialog(
+    return showLibraryFormDialog(
       context: context,
       mode: LibraryFormMode.edit,
       library: library,
@@ -46,7 +44,7 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
   Future<void> editLibrarySettings(
     BuildContext context,
     LocalLibrary library,
-  ) => showLibraryMd3eFormDialog(
+  ) => showLibraryFormDialog(
     context: context,
     mode: LibraryFormMode.edit,
     library: library,
@@ -58,7 +56,7 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     LocalLibrary library, {
     bool navigateAfter = true,
   }) async {
-    final bool confirmed = await showLibraryMd3eRemovePathConfirm(
+    final bool confirmed = await showLibraryRemovePathConfirm(
       context,
       path: library.rootPath,
     );

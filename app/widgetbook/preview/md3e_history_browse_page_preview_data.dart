@@ -13,15 +13,15 @@ abstract final class Md3eHistoryBrowsePagePreviewData {
     '孤独摇滚',
   ];
 
-  static List<Md3eReadingHistoryMoreMenuEntry> sampleMoreMenuEntries({
+  static List<ReadingHistoryMoreMenuEntry> sampleMoreMenuEntries({
     VoidCallback? onDeleteRecord,
   }) {
-    return <Md3eReadingHistoryMoreMenuEntry>[
-      Md3eReadingHistoryMoreMenuEntry(
+    return <ReadingHistoryMoreMenuEntry>[
+      ReadingHistoryMoreMenuEntry(
         label: '删除记录',
         onSelected: onDeleteRecord,
       ),
-      const Md3eReadingHistoryMoreMenuEntry(label: '在资源管理器中显示'),
+      const ReadingHistoryMoreMenuEntry(label: '在资源管理器中显示'),
     ];
   }
 

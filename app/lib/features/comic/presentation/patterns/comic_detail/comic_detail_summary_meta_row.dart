@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/age_restriction_chip_mount.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-const String kMd3eComicDetailSummaryMetaSeparator = ' • ';
+const String kComicDetailSummaryMetaSeparator = ' • ';
 
 /// 封面右侧摘要：年龄限制 chip、页数、出版日期。
-class Md3eComicDetailSummaryMetaRow extends StatefulWidget {
-  const Md3eComicDetailSummaryMetaRow({super.key, required this.entry});
+class ComicDetailSummaryMetaRow extends StatefulWidget {
+  const ComicDetailSummaryMetaRow({super.key, required this.entry});
 
-  final Md3eComicDetailEntry entry;
+  final ComicDetailViewObject entry;
 
   @override
-  State<Md3eComicDetailSummaryMetaRow> createState() =>
-      _Md3eComicDetailSummaryMetaRowState();
+  State<ComicDetailSummaryMetaRow> createState() =>
+      _ComicDetailSummaryMetaRowState();
 }
 
-class _Md3eComicDetailSummaryMetaRowState
-    extends State<Md3eComicDetailSummaryMetaRow> {
+class _ComicDetailSummaryMetaRowState extends State<ComicDetailSummaryMetaRow> {
   bool _ageChipInTree = false;
 
   @override
@@ -29,7 +28,7 @@ class _Md3eComicDetailSummaryMetaRowState
   }
 
   @override
-  void didUpdateWidget(covariant Md3eComicDetailSummaryMetaRow oldWidget) {
+  void didUpdateWidget(covariant ComicDetailSummaryMetaRow oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.entry.showAgeRestrictionChip) {
       _ageChipInTree = true;
@@ -53,7 +52,7 @@ class _Md3eComicDetailSummaryMetaRowState
 
     if (_ageChipInTree) {
       children.add(
-        Md3eAgeRestrictionChipMount(
+        AgeRestrictionChipMount(
           visible: widget.entry.showAgeRestrictionChip,
           onFullyHidden: () => setState(() => _ageChipInTree = false),
         ),
@@ -67,7 +66,7 @@ class _Md3eComicDetailSummaryMetaRowState
           children: <Widget>[
             if (pageLabel != null) Text(pageLabel, style: style),
             if (pageLabel != null && publishedLabel != null)
-              Text(kMd3eComicDetailSummaryMetaSeparator, style: style),
+              Text(kComicDetailSummaryMetaSeparator, style: style),
             if (publishedLabel != null) Text(publishedLabel, style: style),
           ],
         ),

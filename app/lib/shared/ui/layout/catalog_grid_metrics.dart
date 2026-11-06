@@ -7,8 +7,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 
 /// Resolved grid geometry for a viewport width (cell width matches delegate).
-class Md3eCatalogGridLayout {
-  const Md3eCatalogGridLayout({
+class CatalogGridLayout {
+  const CatalogGridLayout({
     required this.sizeClass,
     required this.horizontalMargin,
     required this.crossAxisCount,
@@ -17,7 +17,7 @@ class Md3eCatalogGridLayout {
     required this.mainAxisExtent,
   });
 
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
   final double horizontalMargin;
   final int crossAxisCount;
   final double cellWidth;
@@ -28,37 +28,37 @@ class Md3eCatalogGridLayout {
 }
 
 /// Responsive catalog grid cell metrics (aligned with production library tiers).
-abstract final class Md3eCatalogGridMetrics {
-  /// 书库网格左右留白：与页面正文共用 [Md3ePageLayoutSpec]（含超宽窗口的居中偏移）。
+abstract final class CatalogGridMetrics {
+  /// 书库网格左右留白：与页面正文共用 [PageLayoutSpec]（含超宽窗口的居中偏移）。
   static double _horizontalInsetFor(double viewportWidth) {
-    return Md3ePageLayoutSpec.resolve(
-      Md3eLayoutContext.fromPlatform(viewportWidth: viewportWidth),
+    return PageLayoutSpec.resolve(
+      LayoutContext.fromPlatform(viewportWidth: viewportWidth),
     ).horizontalInset;
   }
 
   /// Max cross-axis extent per M3 window class (wider on large / XL).
-  static double maxCrossAxisExtent(Md3eWindowSizeClass window) {
+  static double maxCrossAxisExtent(WindowSizeClass window) {
     return switch (window) {
-      Md3eWindowSizeClass.compact => 132,
-      Md3eWindowSizeClass.medium => 148,
-      Md3eWindowSizeClass.expanded => 160,
-      Md3eWindowSizeClass.large => 172,
-      Md3eWindowSizeClass.extraLarge => 184,
+      WindowSizeClass.compact => 132,
+      WindowSizeClass.medium => 148,
+      WindowSizeClass.expanded => 160,
+      WindowSizeClass.large => 172,
+      WindowSizeClass.extraLarge => 184,
     };
   }
 
   /// Gutter between grid cells (roomier than minimal M3 8dp; scales with width).
-  static double gridSpacing(Md3eWindowSizeClass window) {
+  static double gridSpacing(WindowSizeClass window) {
     return switch (window) {
-      Md3eWindowSizeClass.compact => 16,
-      Md3eWindowSizeClass.medium => 18,
-      Md3eWindowSizeClass.expanded => 20,
-      Md3eWindowSizeClass.large => 24,
-      Md3eWindowSizeClass.extraLarge => 24,
+      WindowSizeClass.compact => 16,
+      WindowSizeClass.medium => 18,
+      WindowSizeClass.expanded => 20,
+      WindowSizeClass.large => 24,
+      WindowSizeClass.extraLarge => 24,
     };
   }
 
-  static int crossAxisCount(double viewportWidth, Md3eWindowSizeClass window) {
+  static int crossAxisCount(double viewportWidth, WindowSizeClass window) {
     final double horizontalMargin = _horizontalInsetFor(viewportWidth);
     final double innerWidth = math.max(0, viewportWidth - horizontalMargin * 2);
     return _crossAxisCountForInnerWidth(
@@ -69,17 +69,17 @@ abstract final class Md3eCatalogGridMetrics {
   }
 
   /// Full grid geometry for [viewportWidth], including row [mainAxisExtent].
-  static Md3eCatalogGridLayout resolve({
+  static CatalogGridLayout resolve({
     required double viewportWidth,
     required M3ESpacing spacing,
     double? horizontalMargin,
     bool hasSubtitle = true,
   }) {
-    final Md3eCatalogGridLayout partial = _layoutForViewportWidth(
+    final CatalogGridLayout partial = _layoutForViewportWidth(
       viewportWidth,
       horizontalMargin: horizontalMargin,
     );
-    return Md3eCatalogGridLayout(
+    return CatalogGridLayout(
       sizeClass: partial.sizeClass,
       horizontalMargin: partial.horizontalMargin,
       crossAxisCount: partial.crossAxisCount,
@@ -93,17 +93,15 @@ abstract final class Md3eCatalogGridMetrics {
     );
   }
 
-  static Md3eCatalogGridLayout layoutForViewportWidth(double viewportWidth) {
+  static CatalogGridLayout layoutForViewportWidth(double viewportWidth) {
     return _layoutForViewportWidth(viewportWidth);
   }
 
-  static Md3eCatalogGridLayout _layoutForViewportWidth(
+  static CatalogGridLayout _layoutForViewportWidth(
     double viewportWidth, {
     double? horizontalMargin,
   }) {
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
-      viewportWidth,
-    );
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(viewportWidth);
     final double margin =
         horizontalMargin ?? _horizontalInsetFor(viewportWidth);
     final double innerWidth = math.max(0, viewportWidth - margin * 2);
@@ -116,7 +114,7 @@ abstract final class Md3eCatalogGridMetrics {
     final double cellWidth = count <= 1
         ? innerWidth
         : (innerWidth - gutter * (count - 1)) / count;
-    return Md3eCatalogGridLayout(
+    return CatalogGridLayout(
       sizeClass: sizeClass,
       horizontalMargin: margin,
       crossAxisCount: count,
@@ -128,7 +126,7 @@ abstract final class Md3eCatalogGridMetrics {
 
   static int _crossAxisCountForInnerWidth(
     double innerWidth,
-    Md3eWindowSizeClass window, {
+    WindowSizeClass window, {
     required double gutter,
   }) {
     if (innerWidth <= 0) {
@@ -139,7 +137,7 @@ abstract final class Md3eCatalogGridMetrics {
   }
 
   /// Grid row height from the **actual** cell width (not [maxCrossAxisExtent]).
-  /// Extra row height so [Md3eComicCard] typography / [M3ECard] chrome fits the cell.
+  /// Extra row height so [ComicCard] typography / [M3ECard] chrome fits the cell.
   static const double mainAxisSlack = 8;
 
   static double mainAxisExtentForCellWidth(
@@ -147,7 +145,7 @@ abstract final class Md3eCatalogGridMetrics {
     M3ESpacing spacing, {
     bool hasSubtitle = true,
   }) {
-    return Md3eComicCard.layoutMainAxisExtent(
+    return ComicCard.layoutMainAxisExtent(
           cardWidth: cellWidth,
           coverToInfoGap: spacing.md,
           infoBottomPadding: spacing.sm,

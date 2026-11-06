@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
 /// Widgetbook / Lab 用的 Library 编辑样例。
-abstract final class Md3eLibraryEditPreviewData {
+abstract final class LibraryEditPreviewData {
   static LocalLibrary get sampleLocalLibrary => (
     libraryId: 'lab-local-1',
     kind: 'local',

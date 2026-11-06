@@ -1648,13 +1648,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get md3eNavRailExpand => 'Expand navigation';
+  String get navRailExpand => 'Expand navigation';
 
   @override
-  String get md3eNavRailCollapse => 'Collapse navigation';
+  String get navRailCollapse => 'Collapse navigation';
 
   @override
-  String md3ePaginationPageSemantic(int page) {
+  String paginationPageSemantic(int page) {
     return 'Page $page';
   }
 

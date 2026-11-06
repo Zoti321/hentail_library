@@ -5,8 +5,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 作者资料顶栏：仅返回（重命名与链接编辑在正文原位进行）。
-class Md3eAuthorDetailPageHeader extends StatelessWidget {
-  const Md3eAuthorDetailPageHeader({super.key, this.onBack});
+class AuthorDetailPageHeader extends StatelessWidget {
+  const AuthorDetailPageHeader({super.key, this.onBack});
 
   final VoidCallback? onBack;
 
@@ -16,7 +16,7 @@ class Md3eAuthorDetailPageHeader extends StatelessWidget {
     final Color iconColor = scheme.onSurfaceVariant;
     const double iconSize = 20;
 
-    return Md3ePinnedToolbarChrome(
+    return PinnedToolbarChrome(
       child: Align(
         alignment: Alignment.centerLeft,
         child: M3EIconButton(

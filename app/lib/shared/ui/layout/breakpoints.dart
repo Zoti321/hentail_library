@@ -11,17 +11,17 @@ import 'package:flutter/widgets.dart';
 /// - expanded: 840 ≤ *w* &lt; 1200
 /// - large: 1200 ≤ *w* &lt; 1600
 /// - extra large: *w* ≥ 1600
-abstract final class Md3eBreakpoints {
-  /// Lower bound for [Md3eWindowSizeClass.medium].
+abstract final class Breakpoints {
+  /// Lower bound for [WindowSizeClass.medium].
   static const double medium = 600;
 
-  /// Lower bound for [Md3eWindowSizeClass.expanded].
+  /// Lower bound for [WindowSizeClass.expanded].
   static const double expanded = 840;
 
-  /// Lower bound for [Md3eWindowSizeClass.large].
+  /// Lower bound for [WindowSizeClass.large].
   static const double large = 1200;
 
-  /// Lower bound for [Md3eWindowSizeClass.extraLarge].
+  /// Lower bound for [WindowSizeClass.extraLarge].
   static const double extraLarge = 1600;
 
   /// Catalog preview widths aligned with design-system frame sizes (not spec mins).
@@ -33,40 +33,40 @@ abstract final class Md3eBreakpoints {
 }
 
 /// M3 window size class for the app window width.
-enum Md3eWindowSizeClass {
+enum WindowSizeClass {
   compact,
   medium,
   expanded,
   large,
   extraLarge;
 
-  static Md3eWindowSizeClass fromWidth(double width) {
-    if (width >= Md3eBreakpoints.extraLarge) {
-      return Md3eWindowSizeClass.extraLarge;
+  static WindowSizeClass fromWidth(double width) {
+    if (width >= Breakpoints.extraLarge) {
+      return WindowSizeClass.extraLarge;
     }
-    if (width >= Md3eBreakpoints.large) {
-      return Md3eWindowSizeClass.large;
+    if (width >= Breakpoints.large) {
+      return WindowSizeClass.large;
     }
-    if (width >= Md3eBreakpoints.expanded) {
-      return Md3eWindowSizeClass.expanded;
+    if (width >= Breakpoints.expanded) {
+      return WindowSizeClass.expanded;
     }
-    if (width >= Md3eBreakpoints.medium) {
-      return Md3eWindowSizeClass.medium;
+    if (width >= Breakpoints.medium) {
+      return WindowSizeClass.medium;
     }
-    return Md3eWindowSizeClass.compact;
+    return WindowSizeClass.compact;
   }
 
-  bool get isCompact => this == Md3eWindowSizeClass.compact;
+  bool get isCompact => this == WindowSizeClass.compact;
 
-  bool get isAtLeastExpanded => index >= Md3eWindowSizeClass.expanded.index;
+  bool get isAtLeastExpanded => index >= WindowSizeClass.expanded.index;
 
   /// compact / medium：元数据与库表单走全屏壳；expanded+ 走 Modal Dialog。
   bool get usesMetadataEditFullScreenRoute =>
-      this == Md3eWindowSizeClass.compact || this == Md3eWindowSizeClass.medium;
+      this == WindowSizeClass.compact || this == WindowSizeClass.medium;
 }
 
 /// Resolves the current window size class from [MediaQuery] width.
-Md3eWindowSizeClass md3eWindowSizeClassOf(BuildContext context) {
+WindowSizeClass windowSizeClassOf(BuildContext context) {
   final double width = MediaQuery.sizeOf(context).width;
-  return Md3eWindowSizeClass.fromWidth(width);
+  return WindowSizeClass.fromWidth(width);
 }

@@ -64,7 +64,7 @@ class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
     final l10n = context.l10n;
     return HentaiDialog(
       title: widget.title,
-      content: Md3eOutlinedTextField(
+      content: OutlinedTextField(
         label: widget.labelText,
         controller: _controller,
         hintText: widget.hintText,

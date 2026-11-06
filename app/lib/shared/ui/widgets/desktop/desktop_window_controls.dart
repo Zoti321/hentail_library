@@ -4,8 +4,8 @@ import 'package:hentai_library/shared/ui/widgets/desktop/window_manager_bindings
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Windows-style minimize / maximize / close cluster (MASTER `WindowButton` set).
-class Md3eDesktopWindowControls extends StatelessWidget {
-  const Md3eDesktopWindowControls({
+class DesktopWindowControls extends StatelessWidget {
+  const DesktopWindowControls({
     super.key,
     this.onMinimize,
     this.onMaximize,
@@ -17,8 +17,8 @@ class Md3eDesktopWindowControls extends StatelessWidget {
   final VoidCallback? onClose;
 
   static const Size _buttonVisual = Size(
-    Md3eDesktopTitleBarMetrics.windowButtonSize,
-    Md3eDesktopTitleBarMetrics.windowButtonSize,
+    DesktopTitleBarMetrics.windowButtonSize,
+    DesktopTitleBarMetrics.windowButtonSize,
   );
 
   @override
@@ -26,26 +26,26 @@ class Md3eDesktopWindowControls extends StatelessWidget {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
 
     return SizedBox(
-      width: Md3eDesktopTitleBarMetrics.windowControlsWidth,
-      height: Md3eDesktopTitleBarMetrics.windowButtonSize,
+      width: DesktopTitleBarMetrics.windowControlsWidth,
+      height: DesktopTitleBarMetrics.windowButtonSize,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          _Md3eWindowControlButton(
+          _WindowControlButton(
             icon: Icons.remove,
             tooltip: '最小化',
-            onPressed: onMinimize ?? md3eWindowManagerMinimize,
+            onPressed: onMinimize ?? windowManagerMinimize,
           ),
-          _Md3eWindowControlButton(
+          _WindowControlButton(
             icon: Icons.crop_square,
             tooltip: '最大化',
-            onPressed: onMaximize ?? md3eWindowManagerToggleMaximize,
+            onPressed: onMaximize ?? windowManagerToggleMaximize,
           ),
-          _Md3eWindowControlButton(
+          _WindowControlButton(
             icon: Icons.close,
             tooltip: '关闭',
-            onPressed: onClose ?? md3eWindowManagerClose,
-            decoration: _md3eCloseWindowButtonDecoration(scheme),
+            onPressed: onClose ?? windowManagerClose,
+            decoration: closeWindowButtonDecoration(scheme),
           ),
         ],
       ),
@@ -57,9 +57,7 @@ class Md3eDesktopWindowControls extends StatelessWidget {
 ///
 /// `backgroundColor` / `foregroundColor` on the decoration are resolved once
 /// without hover states in M3E 1.2 — only `overlayColor` is state-aware.
-M3EIconButtonDecoration _md3eCloseWindowButtonDecoration(
-  M3EColorScheme scheme,
-) {
+M3EIconButtonDecoration closeWindowButtonDecoration(M3EColorScheme scheme) {
   return M3EIconButtonDecoration(
     overlayColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       if (states.contains(WidgetState.disabled)) {
@@ -78,8 +76,8 @@ M3EIconButtonDecoration _md3eCloseWindowButtonDecoration(
   );
 }
 
-class _Md3eWindowControlButton extends StatelessWidget {
-  const _Md3eWindowControlButton({
+class _WindowControlButton extends StatelessWidget {
+  const _WindowControlButton({
     required this.icon,
     required this.tooltip,
     required this.onPressed,
@@ -94,12 +92,12 @@ class _Md3eWindowControlButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return M3EIconButton(
-      icon: Icon(icon, size: Md3eDesktopTitleBarMetrics.windowButtonIconSize),
+      icon: Icon(icon, size: DesktopTitleBarMetrics.windowButtonIconSize),
       tooltip: tooltip,
       onPressed: onPressed,
       variant: M3EIconButtonVariant.standard,
       size: M3EIconButtonSize.sm,
-      visualSize: Md3eDesktopWindowControls._buttonVisual,
+      visualSize: DesktopWindowControls._buttonVisual,
       inflateHitTarget: false,
       decoration: decoration,
     );

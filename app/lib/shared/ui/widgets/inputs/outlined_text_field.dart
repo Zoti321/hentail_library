@@ -5,9 +5,9 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 通用 outlined 文本字段（单行或多行），封装 [M3ETextField]。
 ///
-/// Tag 等可组合输入直接用 [Md3eOutlinedTextFieldShell]；勿再在此复刻 shell。
-class Md3eOutlinedTextField extends StatefulWidget {
-  const Md3eOutlinedTextField({
+/// Tag 等可组合输入直接用 [OutlinedTextFieldShell]；勿再在此复刻 shell。
+class OutlinedTextField extends StatefulWidget {
+  const OutlinedTextField({
     super.key,
     required this.label,
     this.controller,
@@ -51,10 +51,10 @@ class Md3eOutlinedTextField extends StatefulWidget {
   final bool showPasswordToggle;
 
   @override
-  State<Md3eOutlinedTextField> createState() => _Md3eOutlinedTextFieldState();
+  State<OutlinedTextField> createState() => _OutlinedTextFieldState();
 }
 
-class _Md3eOutlinedTextFieldState extends State<Md3eOutlinedTextField> {
+class _OutlinedTextFieldState extends State<OutlinedTextField> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
   late final bool _ownsController;
@@ -79,7 +79,7 @@ class _Md3eOutlinedTextFieldState extends State<Md3eOutlinedTextField> {
   }
 
   @override
-  void didUpdateWidget(covariant Md3eOutlinedTextField oldWidget) {
+  void didUpdateWidget(covariant OutlinedTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (_ownsController &&
         widget.initialValue != null &&

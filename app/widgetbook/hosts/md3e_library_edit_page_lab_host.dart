@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library/library_edit_page.dart';
 
 import '../preview/md3e_library_edit_preview_data.dart';
 
@@ -7,29 +7,29 @@ import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_su
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
 /// Lab / Widgetbook：Library 表单 preview；远程 WebDAV 凭证可编辑内存，不写 secure storage / 无真实连接。
-class Md3eLibraryEditPageLabHost extends StatefulWidget {
-  const Md3eLibraryEditPageLabHost({
+class LibraryEditPageLabHost extends StatefulWidget {
+  const LibraryEditPageLabHost({
     super.key,
-    this.intent = Md3eLibraryEditPageIntent.editLocal,
+    this.intent = LibraryEditPageIntent.editLocal,
     this.initialForm,
-    this.presentation = Md3eMetadataEditPresentation.embedded,
+    this.presentation = MetadataEditPresentation.embedded,
     this.onSaved,
     this.onCancel,
   });
 
-  final Md3eLibraryEditPageIntent intent;
+  final LibraryEditPageIntent intent;
   final LibraryForm? initialForm;
-  final Md3eMetadataEditPresentation presentation;
+  final MetadataEditPresentation presentation;
   final ValueChanged<LibraryForm>? onSaved;
   final VoidCallback? onCancel;
 
   @override
-  State<Md3eLibraryEditPageLabHost> createState() =>
+  State<LibraryEditPageLabHost> createState() =>
       _Md3eLibraryEditPageLabHostState();
 }
 
 class _Md3eLibraryEditPageLabHostState
-    extends State<Md3eLibraryEditPageLabHost> {
+    extends State<LibraryEditPageLabHost> {
   LibraryForm? _previewFormAfterSave;
 
   LibraryForm _resolveInitialForm() {
@@ -40,12 +40,12 @@ class _Md3eLibraryEditPageLabHostState
       return _previewFormAfterSave!;
     }
     return switch (widget.intent) {
-      Md3eLibraryEditPageIntent.editLocal =>
-        Md3eLibraryEditPreviewData.editLocalForm(),
-      Md3eLibraryEditPageIntent.editRemote =>
-        Md3eLibraryEditPreviewData.editRemoteForm(),
-      Md3eLibraryEditPageIntent.createLocal => LibraryForm.createLocal(),
-      Md3eLibraryEditPageIntent.createRemote => LibraryForm.createRemote(),
+      LibraryEditPageIntent.editLocal =>
+        LibraryEditPreviewData.editLocalForm(),
+      LibraryEditPageIntent.editRemote =>
+        LibraryEditPreviewData.editRemoteForm(),
+      LibraryEditPageIntent.createLocal => LibraryForm.createLocal(),
+      LibraryEditPageIntent.createRemote => LibraryForm.createRemote(),
     };
   }
 
@@ -56,7 +56,7 @@ class _Md3eLibraryEditPageLabHostState
 
   @override
   Widget build(BuildContext context) {
-    return Md3eLibraryEditPage(
+    return LibraryEditPage(
       key: ValueKey<Object?>(
         widget.initialForm ?? _previewFormAfterSave ?? widget.intent,
       ),

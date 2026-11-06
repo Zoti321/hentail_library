@@ -15,7 +15,7 @@ void main() {
       throwsA(isA<ProviderException>()),
     );
     expect(
-      () => container.read(md3eAppShellNavigationSlotAssemblyProvider),
+      () => container.read(appShellNavigationSlotAssemblyProvider),
       throwsA(isA<ProviderException>()),
     );
   });
@@ -31,8 +31,8 @@ void main() {
     )();
     expect(feedback, isNotEmpty);
 
-    final Md3eAppShellNavigationSlotAssembly assembly = container.read(
-      md3eAppShellNavigationSlotAssemblyProvider,
+    final AppShellNavigationSlotAssembly assembly = container.read(
+      appShellNavigationSlotAssemblyProvider,
     );
     expect(assembly, isNotNull);
   });

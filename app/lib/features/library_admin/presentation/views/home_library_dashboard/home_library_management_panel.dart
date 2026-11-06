@@ -4,8 +4,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_list_order.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_section.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
 import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/domain/ports/library_management_port.dart';
@@ -61,15 +61,15 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
     final Map<String, HomeLibraryStat> statsById = <String, HomeLibraryStat>{
       for (final HomeLibraryStat stat in stats) stat.libraryId: stat,
     };
-    final List<Md3eHomeLibraryDashboardRow> rows = ordered
+    final List<HomeLibraryDashboardRow> rows = ordered
         .map((LocalLibrary library) {
           final HomeLibraryStat? stat = statsById[library.libraryId];
-          return Md3eHomeLibraryDashboardRow(
+          return HomeLibraryDashboardRow(
             libraryId: library.libraryId,
             displayName: localLibraryDisplayName(library),
             kind: isRemoteLibrary(library)
-                ? Md3eHomeLibraryKind.remote
-                : Md3eHomeLibraryKind.local,
+                ? HomeLibraryKind.remote
+                : HomeLibraryKind.local,
             comicCount: stat?.comicCount ?? 0,
             seriesCount: stat?.seriesCount ?? 0,
             lastSyncedAt: stat?.lastSuccessfulSyncAt,
@@ -85,7 +85,7 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
 
     void handleReorder(int oldIndex, int newIndex) {
       final List<LocalLibrary> next = _pinnedFirst(
-        applyMd3eHomeLibraryListReorder(ordered, oldIndex, newIndex),
+        applyHomeLibraryListReorder(ordered, oldIndex, newIndex),
       );
       if (_sameLibraryIds(ordered, next)) {
         return;
@@ -94,10 +94,7 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
       unawaited(_persistOrder(context, ref, next, pendingOrder));
     }
 
-    void handleAction(
-      String libraryId,
-      Md3eHomeLibraryManagementAction action,
-    ) {
+    void handleAction(String libraryId, HomeLibraryManagementAction action) {
       final LocalLibrary? library = libraryById[libraryId];
       if (library == null) {
         return;
@@ -109,7 +106,7 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
       libraryManagementPortProvider,
     );
 
-    return Md3eHomeLibraryManagementSection(
+    return HomeLibraryManagementSection(
       libraries: rows,
       onLibraryOpen: (String libraryId) =>
           unawaited(management.openLibrary(context, libraryId)),
@@ -166,18 +163,18 @@ Future<void> _runLibraryAction(
   BuildContext context,
   WidgetRef ref,
   LocalLibrary library,
-  Md3eHomeLibraryManagementAction action,
+  HomeLibraryManagementAction action,
 ) async {
   final LibraryManagementPort management = ref.read(
     libraryManagementPortProvider,
   );
   final String libraryId = library.libraryId;
   switch (action) {
-    case Md3eHomeLibraryManagementAction.scan:
+    case HomeLibraryManagementAction.scan:
       await management.scanLibrary(context, libraryId);
-    case Md3eHomeLibraryManagementAction.deepScan:
+    case HomeLibraryManagementAction.deepScan:
       await management.scanLibrary(context, libraryId, mode: ScanMode.full);
-    case Md3eHomeLibraryManagementAction.refreshMetadata:
+    case HomeLibraryManagementAction.refreshMetadata:
       final LibraryMetadataRefreshCommandPort refresh = ref.read(
         libraryMetadataRefreshCommandPortProvider,
       );
@@ -199,9 +196,9 @@ Future<void> _runLibraryAction(
           showErrorSnackbar(context, err);
         }
       }
-    case Md3eHomeLibraryManagementAction.edit:
+    case HomeLibraryManagementAction.edit:
       await management.editLibrarySettings(context, library);
-    case Md3eHomeLibraryManagementAction.delete:
+    case HomeLibraryManagementAction.delete:
       await management.deleteLibrary(context, library);
   }
 }

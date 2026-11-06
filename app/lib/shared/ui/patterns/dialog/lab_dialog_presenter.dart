@@ -3,10 +3,10 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_route.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Lab 对话框统一入口（M3EDialog；断点与 [Md3eBreakpoints.expanded] 对齐）。
-abstract final class Md3eLabDialogPresenter {
+/// Lab 对话框统一入口（M3EDialog；断点与 [Breakpoints.expanded] 对齐）。
+abstract final class LabDialogPresenter {
   static bool usesFullScreenPresentation(BuildContext context) {
-    return md3eWindowSizeClassOf(context).usesMetadataEditFullScreenRoute;
+    return windowSizeClassOf(context).usesMetadataEditFullScreenRoute;
   }
 
   static Future<T?> showBasic<T>(
@@ -15,7 +15,7 @@ abstract final class Md3eLabDialogPresenter {
     bool barrierDismissible = true,
     M3EDialogPosition position = M3EDialogPosition.center,
   }) {
-    return md3ePushLabDialogRoute<T>(
+    return pushLabDialogRoute<T>(
       context,
       variant: M3EDialogVariant.basic,
       barrierDismissible: barrierDismissible,
@@ -39,7 +39,7 @@ abstract final class Md3eLabDialogPresenter {
     VoidCallback? onConfirm,
     List<Widget> bottomActions = const <Widget>[],
   }) {
-    return md3ePushLabDialogRoute<T>(
+    return pushLabDialogRoute<T>(
       context,
       variant: M3EDialogVariant.fullScreen,
       barrierDismissible: false,

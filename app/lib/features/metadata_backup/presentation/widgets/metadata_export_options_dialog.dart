@@ -49,7 +49,7 @@ class _MetadataExportOptionsDialogState
             ),
           ),
           SizedBox(height: tokens.spacing.lg),
-          Md3eSettingsSwitchTile(
+          SettingsSwitchTile(
             title: Text(l10n.settingsMetadataBackupExportGzipLabel),
             value: _gzip,
             description: Text(
@@ -58,7 +58,7 @@ class _MetadataExportOptionsDialogState
             onChanged: (bool value) => setState(() => _gzip = value),
           ),
           SizedBox(height: tokens.spacing.lg),
-          Md3eSettingsSwitchTile(
+          SettingsSwitchTile(
             title: Text(l10n.settingsMetadataBackupExportOrphanFacetsLabel),
             value: _includeOrphanFacets,
             description: Text(

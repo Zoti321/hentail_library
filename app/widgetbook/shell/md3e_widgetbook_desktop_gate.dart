@@ -19,12 +19,12 @@ class Md3eWidgetbookDesktopExpandedGate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.sizeOf(context).width;
-    if (width < Md3eBreakpoints.expanded) {
+    if (width < Breakpoints.expanded) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            '此用例仅适用于桌面壳（窗口宽 ≥ ${Md3eBreakpoints.expanded.toInt()}dp）。'
+            '此用例仅适用于桌面壳（窗口宽 ≥ ${Breakpoints.expanded.toInt()}dp）。'
             '请在 Widgetbook 左侧 Viewport 中选择「Expanded (840–1199dp)」或更宽档位。',
             textAlign: TextAlign.center,
             style: M3ETheme.of(context).typeScale.bodyLarge.copyWith(

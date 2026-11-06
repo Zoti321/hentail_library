@@ -7,8 +7,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画库页右下角「回到顶部」（Lab；行为对齐生产 [LibraryScrollToTopButton]）。
-class Md3eLibraryScrollToTopButton extends StatefulWidget {
-  const Md3eLibraryScrollToTopButton({
+class ExpressiveLibraryScrollToTopButton extends StatefulWidget {
+  const ExpressiveLibraryScrollToTopButton({
     super.key,
     required this.scrollController,
     required this.horizontalPadding,
@@ -20,12 +20,12 @@ class Md3eLibraryScrollToTopButton extends StatefulWidget {
   final bool hidden;
 
   @override
-  State<Md3eLibraryScrollToTopButton> createState() =>
-      _Md3eLibraryScrollToTopButtonState();
+  State<ExpressiveLibraryScrollToTopButton> createState() =>
+      _ExpressiveLibraryScrollToTopButtonState();
 }
 
-class _Md3eLibraryScrollToTopButtonState
-    extends State<Md3eLibraryScrollToTopButton> {
+class _ExpressiveLibraryScrollToTopButtonState
+    extends State<ExpressiveLibraryScrollToTopButton> {
   bool _scrollPastShowThreshold = false;
 
   @override
@@ -36,7 +36,7 @@ class _Md3eLibraryScrollToTopButtonState
   }
 
   @override
-  void didUpdateWidget(covariant Md3eLibraryScrollToTopButton oldWidget) {
+  void didUpdateWidget(covariant ExpressiveLibraryScrollToTopButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.scrollController != widget.scrollController) {
       oldWidget.scrollController.removeListener(_onScrollOffset);
@@ -64,9 +64,9 @@ class _Md3eLibraryScrollToTopButtonState
     final double offset = position.pixels;
     final double viewport = position.viewportDimension;
     final double showThreshold =
-        viewport * Md3eLibraryBrowsePageMetrics.scrollToTopShowViewportRatio;
+        viewport * LibraryBrowsePageMetrics.scrollToTopShowViewportRatio;
     final double hideThreshold =
-        viewport * Md3eLibraryBrowsePageMetrics.scrollToTopHideViewportRatio;
+        viewport * LibraryBrowsePageMetrics.scrollToTopHideViewportRatio;
 
     final bool nextPastThreshold = _scrollPastShowThreshold
         ? offset >= hideThreshold
@@ -92,8 +92,8 @@ class _Md3eLibraryScrollToTopButtonState
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final double width = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(width);
-    final M3EFabSize fabSize = Md3eFabSizing.responsive(sizeClass);
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(width);
+    final M3EFabSize fabSize = FabSizing.responsive(sizeClass);
     final M3EFabMetrics metrics = theme.fabTheme.resolve(
       size: fabSize,
       color: M3EFabColor.primary,
@@ -104,8 +104,8 @@ class _Md3eLibraryScrollToTopButtonState
     // 显隐（位移 + 透明度）由外层 M3E 空间弹簧驱动，不再使用 FAB 内置的滚动显隐。
     return Positioned(
       right: widget.horizontalPadding,
-      bottom: Md3eLibraryBrowsePageMetrics.scrollToTopBottomInset,
-      child: Md3eSpringReveal(
+      bottom: LibraryBrowsePageMetrics.scrollToTopBottomInset,
+      child: SpringReveal(
         visible: _scrollPastShowThreshold && !widget.hidden,
         hiddenOffset: const Offset(0, 24),
         child: Semantics(
@@ -114,7 +114,7 @@ class _Md3eLibraryScrollToTopButtonState
           child: M3EFab(
             size: fabSize,
             color: M3EFabColor.primary,
-            cornerRadius: Md3eLibraryBrowsePageMetrics.scrollToTopCornerRadius,
+            cornerRadius: LibraryBrowsePageMetrics.scrollToTopCornerRadius,
             icon: Icon(LucideIcons.arrowUp, size: metrics.iconSize),
             onPressed: _scrollToTop,
           ),

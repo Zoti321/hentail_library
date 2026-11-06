@@ -6,8 +6,8 @@ import 'package:motor/motor.dart';
 ///
 /// 显示时从 [hiddenOffset] 位置弹入并允许回弹越过终点；隐藏时沿同一弹簧收回。
 /// 完全隐藏后不接收指针与语义。开启"减少动效"时直接切换。
-class Md3eSpringReveal extends StatefulWidget {
-  const Md3eSpringReveal({
+class SpringReveal extends StatefulWidget {
+  const SpringReveal({
     super.key,
     required this.visible,
     required this.hiddenOffset,
@@ -21,10 +21,10 @@ class Md3eSpringReveal extends StatefulWidget {
   final Widget child;
 
   @override
-  State<Md3eSpringReveal> createState() => _Md3eSpringRevealState();
+  State<SpringReveal> createState() => _SpringRevealState();
 }
 
-class _Md3eSpringRevealState extends State<Md3eSpringReveal>
+class _SpringRevealState extends State<SpringReveal>
     with SingleTickerProviderStateMixin {
   /// 无界控制器：过冲时透明度 clamp 到 [0, 1]，位移保留过冲。
   late final SingleMotionController _controller;
@@ -33,20 +33,20 @@ class _Md3eSpringRevealState extends State<Md3eSpringReveal>
   void initState() {
     super.initState();
     _controller = SingleMotionController(
-      motion: Md3eMotion.spatialReveal,
+      motion: LabMotion.spatialReveal,
       vsync: this,
       initialValue: widget.visible ? 1 : 0,
     );
   }
 
   @override
-  void didUpdateWidget(Md3eSpringReveal oldWidget) {
+  void didUpdateWidget(SpringReveal oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.visible == widget.visible) {
       return;
     }
     final double target = widget.visible ? 1 : 0;
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       _controller.value = target;
     } else {
       _controller.animateTo(target);
@@ -61,7 +61,7 @@ class _Md3eSpringRevealState extends State<Md3eSpringReveal>
 
   @override
   Widget build(BuildContext context) {
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       return IgnorePointer(
         ignoring: !widget.visible,
         child: ExcludeSemantics(

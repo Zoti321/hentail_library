@@ -1,8 +1,8 @@
 /// Lab 首页「管库」列表行（预览 / 将来接生产 read model）。
-enum Md3eHomeLibraryKind { local, remote }
+enum HomeLibraryKind { local, remote }
 
 /// 与侧栏 overflow 顺序一致的操作项。
-enum Md3eHomeLibraryManagementAction {
+enum HomeLibraryManagementAction {
   scan,
   deepScan,
   refreshMetadata,
@@ -10,45 +10,45 @@ enum Md3eHomeLibraryManagementAction {
   delete,
 }
 
-enum Md3eHomeLibraryRowHint { none, syncWarning, unreachable }
+enum HomeLibraryRowHint { none, syncWarning, unreachable }
 
-class Md3eHomeLibraryDashboardRow {
-  const Md3eHomeLibraryDashboardRow({
+class HomeLibraryDashboardRow {
+  const HomeLibraryDashboardRow({
     required this.libraryId,
     required this.displayName,
     required this.kind,
     required this.comicCount,
     required this.seriesCount,
     this.lastSyncedAt,
-    this.hint = Md3eHomeLibraryRowHint.none,
+    this.hint = HomeLibraryRowHint.none,
     this.scanInProgress = false,
     this.metadataRefreshInProgress = false,
   });
 
   final String libraryId;
   final String displayName;
-  final Md3eHomeLibraryKind kind;
+  final HomeLibraryKind kind;
   final int comicCount;
   final int seriesCount;
   final DateTime? lastSyncedAt;
-  final Md3eHomeLibraryRowHint hint;
+  final HomeLibraryRowHint hint;
   final bool scanInProgress;
   final bool metadataRefreshInProgress;
 
   bool get busy => scanInProgress || metadataRefreshInProgress;
 
-  Md3eHomeLibraryDashboardRow copyWith({
+  HomeLibraryDashboardRow copyWith({
     String? libraryId,
     String? displayName,
-    Md3eHomeLibraryKind? kind,
+    HomeLibraryKind? kind,
     int? comicCount,
     int? seriesCount,
     DateTime? lastSyncedAt,
-    Md3eHomeLibraryRowHint? hint,
+    HomeLibraryRowHint? hint,
     bool? scanInProgress,
     bool? metadataRefreshInProgress,
   }) {
-    return Md3eHomeLibraryDashboardRow(
+    return HomeLibraryDashboardRow(
       libraryId: libraryId ?? this.libraryId,
       displayName: displayName ?? this.displayName,
       kind: kind ?? this.kind,

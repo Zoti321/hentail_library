@@ -1,22 +1,21 @@
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
 /// 阅读历史四档时间分桶（纯逻辑 + 分桶标题文案）。
-enum Md3eHistoryTimeSection { today, yesterday, thisWeek, earlier }
+enum HistoryTimeSection { today, yesterday, thisWeek, earlier }
 
 /// 展示顺序（仅渲染非空分组）。
-const List<Md3eHistoryTimeSection> kMd3eHistoryTimeSectionOrder =
-    <Md3eHistoryTimeSection>[
-      Md3eHistoryTimeSection.today,
-      Md3eHistoryTimeSection.yesterday,
-      Md3eHistoryTimeSection.thisWeek,
-      Md3eHistoryTimeSection.earlier,
-    ];
+const List<HistoryTimeSection> kHistoryTimeSectionOrder = <HistoryTimeSection>[
+  HistoryTimeSection.today,
+  HistoryTimeSection.yesterday,
+  HistoryTimeSection.thisWeek,
+  HistoryTimeSection.earlier,
+];
 
 /// 同一分桶内的一条记录（泛型承载业务/预览模型）。
-class Md3eHistoryTimeGroup<T> {
-  const Md3eHistoryTimeGroup({required this.section, required this.items});
+class HistoryTimeGroup<T> {
+  const HistoryTimeGroup({required this.section, required this.items});
 
-  final Md3eHistoryTimeSection section;
+  final HistoryTimeSection section;
   final List<T> items;
 }
 
@@ -26,66 +25,62 @@ DateTime _startOfLocalDay(DateTime value) {
 }
 
 /// 将 [lastReadAt] 映射到四档分桶（相对 [clock]）。
-Md3eHistoryTimeSection md3eHistoryTimeSectionFor(
-  DateTime lastReadAt,
-  DateTime clock,
-) {
+HistoryTimeSection historyTimeSectionFor(DateTime lastReadAt, DateTime clock) {
   final DateTime today = _startOfLocalDay(clock);
   final DateTime readDay = _startOfLocalDay(lastReadAt);
   if (readDay == today) {
-    return Md3eHistoryTimeSection.today;
+    return HistoryTimeSection.today;
   }
   final DateTime yesterday = today.subtract(const Duration(days: 1));
   if (readDay == yesterday) {
-    return Md3eHistoryTimeSection.yesterday;
+    return HistoryTimeSection.yesterday;
   }
   final int weekday = today.weekday;
   final DateTime weekStart = today.subtract(Duration(days: weekday - 1));
   if (!readDay.isBefore(weekStart) && readDay.isBefore(yesterday)) {
-    return Md3eHistoryTimeSection.thisWeek;
+    return HistoryTimeSection.thisWeek;
   }
-  return Md3eHistoryTimeSection.earlier;
+  return HistoryTimeSection.earlier;
 }
 
 /// 按四档分桶分组；空桶省略；桶内保持 [items] 原顺序。
-List<Md3eHistoryTimeGroup<T>> groupHistoryByTimeSection<T>(
+List<HistoryTimeGroup<T>> groupHistoryByTimeSection<T>(
   List<T> items,
   DateTime Function(T item) lastReadAt, {
   DateTime? clock,
 }) {
   if (items.isEmpty) {
-    return <Md3eHistoryTimeGroup<T>>[];
+    return <HistoryTimeGroup<T>>[];
   }
   final DateTime now = clock ?? DateTime.now();
-  final Map<Md3eHistoryTimeSection, List<T>> buckets =
-      <Md3eHistoryTimeSection, List<T>>{
-        for (final Md3eHistoryTimeSection section
-            in kMd3eHistoryTimeSectionOrder)
+  final Map<HistoryTimeSection, List<T>> buckets =
+      <HistoryTimeSection, List<T>>{
+        for (final HistoryTimeSection section in kHistoryTimeSectionOrder)
           section: <T>[],
       };
   for (final T item in items) {
-    final Md3eHistoryTimeSection section = md3eHistoryTimeSectionFor(
+    final HistoryTimeSection section = historyTimeSectionFor(
       lastReadAt(item),
       now,
     );
     buckets[section]!.add(item);
   }
-  return <Md3eHistoryTimeGroup<T>>[
-    for (final Md3eHistoryTimeSection section in kMd3eHistoryTimeSectionOrder)
+  return <HistoryTimeGroup<T>>[
+    for (final HistoryTimeSection section in kHistoryTimeSectionOrder)
       if (buckets[section]!.isNotEmpty)
-        Md3eHistoryTimeGroup<T>(section: section, items: buckets[section]!),
+        HistoryTimeGroup<T>(section: section, items: buckets[section]!),
   ];
 }
 
 /// 分桶标题（今天 / 昨天 / …）。
-String md3eHistoryTimeSectionLabel(
+String historyTimeSectionLabel(
   AppLocalizations l10n,
-  Md3eHistoryTimeSection section,
+  HistoryTimeSection section,
 ) {
   return switch (section) {
-    Md3eHistoryTimeSection.today => l10n.historySectionToday,
-    Md3eHistoryTimeSection.yesterday => l10n.historySectionYesterday,
-    Md3eHistoryTimeSection.thisWeek => l10n.historySectionThisWeek,
-    Md3eHistoryTimeSection.earlier => l10n.historySectionEarlier,
+    HistoryTimeSection.today => l10n.historySectionToday,
+    HistoryTimeSection.yesterday => l10n.historySectionYesterday,
+    HistoryTimeSection.thisWeek => l10n.historySectionThisWeek,
+    HistoryTimeSection.earlier => l10n.historySectionEarlier,
   };
 }

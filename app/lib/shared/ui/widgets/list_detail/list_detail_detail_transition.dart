@@ -5,8 +5,8 @@ import 'package:hentai_library/shared/ui/motion/spring_curve.dart';
 /// Kazumi 风 list-detail **详情区**切换：水平 slide + fade，M3E spatial 弹簧（可轻微过冲）。
 ///
 /// 左侧导航不变，仅 [switchKey] 变化时对本 pane 做转场（设置分类、库/元数据表单侧栏 Tab 等）。
-class Md3eListDetailDetailTransition extends StatelessWidget {
-  const Md3eListDetailDetailTransition({
+class ListDetailDetailTransition extends StatelessWidget {
+  const ListDetailDetailTransition({
     super.key,
     required this.switchKey,
     required this.child,
@@ -25,17 +25,17 @@ class Md3eListDetailDetailTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       return child;
     }
 
-    final Duration duration = Md3eMotion.motionDurationOf(
+    final Duration duration = LabMotion.motionDurationOf(
       context,
-      Md3eMotion.routeTransitionDuration,
+      LabMotion.routeTransitionDuration,
     );
-    final Curve springCurve = Md3eSpringCurve(
-      motion: Md3eMotion.routeSpring,
-      duration: Md3eMotion.routeTransitionDuration,
+    final Curve springCurve = SpringCurve(
+      motion: LabMotion.routeSpring,
+      duration: LabMotion.routeTransitionDuration,
     );
     final ValueKey<Object> activeKey = ValueKey<Object>(switchKey);
 

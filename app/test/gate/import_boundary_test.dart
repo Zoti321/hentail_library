@@ -43,7 +43,7 @@ void main() {
     );
     expect(
       isFrbImportAllowedSource(
-        'features/comic_trash/presentation/views/trash_md3e/trash_md3e_page.dart',
+        'features/comic_trash/presentation/views/trash/trash_page.dart',
       ),
       isFalse,
     );

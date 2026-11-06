@@ -5,8 +5,8 @@ import 'package:hentai_library/shared/ui/widgets/pagination/pagination_standard_
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Standard (≥ 600dp) pagination: MUI-like page window + first/prev/next/last.
-class Md3ePaginationStandard extends StatelessWidget {
-  const Md3ePaginationStandard({
+class PaginationStandard extends StatelessWidget {
+  const PaginationStandard({
     super.key,
     required this.page,
     required this.totalPages,
@@ -19,7 +19,7 @@ class Md3ePaginationStandard extends StatelessWidget {
   final int totalPages;
   final ValueChanged<int> onPageChanged;
   final bool enabled;
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class Md3ePaginationStandard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: Md3ePaginationMetrics.horizontalPaddingStandard,
+        horizontal: PaginationMetrics.horizontalPaddingStandard,
         vertical: 8,
       ),
       child: Row(
@@ -45,7 +45,7 @@ class Md3ePaginationStandard extends StatelessWidget {
             tooltip: '上一页',
             onPressed: canGoPrevious ? () => onPageChanged(page - 1) : null,
           ),
-          Md3ePaginationStandardPageStrip(
+          PaginationStandardPageStrip(
             page: page,
             totalPages: totalPages,
             enabled: interactive,
@@ -78,11 +78,11 @@ class _NavIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Md3ePaginationMetrics.standardNavIconSlot,
-      height: Md3ePaginationMetrics.standardNavIconSlot,
+      width: PaginationMetrics.standardNavIconSlot,
+      height: PaginationMetrics.standardNavIconSlot,
       child: Center(
         child: M3EIconButton(
-          icon: Icon(icon, size: Md3ePaginationMetrics.iconSize),
+          icon: Icon(icon, size: PaginationMetrics.iconSize),
           variant: M3EIconButtonVariant.standard,
           size: M3EIconButtonSize.sm,
           tooltip: tooltip,

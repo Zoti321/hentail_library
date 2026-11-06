@@ -1,21 +1,21 @@
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 
 /// Widgetbook / 预览用示例系列详情。
-abstract final class Md3eSeriesDetailPagePreviewData {
-  static Md3eSeriesDetailEntry sample() {
-    final List<Md3eSeriesDetailComicItem> comics =
-        List<Md3eSeriesDetailComicItem>.generate(24, (int index) {
+abstract final class SeriesDetailPagePreviewData {
+  static SeriesDetailViewObject sample() {
+    final List<SeriesDetailComicItem> comics =
+        List<SeriesDetailComicItem>.generate(24, (int index) {
           final int volume = index + 1;
-          return Md3eSeriesDetailComicItem(
+          return SeriesDetailComicItem(
             title: '葬送的芙莉莲 第 $volume 卷',
             pageCount: 180 + index * 4,
             readProgress: index.isEven ? (index % 10) / 10 : null,
           );
         });
 
-    return Md3eSeriesDetailEntry(
+    return SeriesDetailViewObject(
       title: '葬送的芙莉莲',
-      serializationStatus: Md3eSeriesSerializationStatus.ongoing,
+      serializationStatus: SeriesSerializationStatus.ongoing,
       languages: const <String>['日文'],
       showAgeRestrictionChip: true,
       volumeCurrent: comics.length,

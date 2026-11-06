@@ -5,13 +5,13 @@ import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_age_
 import 'package:hentai_library/shared/ui/motion/spring_size.dart';
 
 /// 关闭 [visible] 后延迟收起，避免 knob / 状态切换时摘要行瞬间跳动。
-const Duration kMd3eComicDetailAgeRestrictionChipHideDebounce = Duration(
+const Duration kComicDetailAgeRestrictionChipHideDebounce = Duration(
   milliseconds: 300,
 );
 
 /// 带移除防抖与尺寸动画的年龄限制 chip 槽位。
-class Md3eComicDetailAgeRestrictionChipSlot extends StatefulWidget {
-  const Md3eComicDetailAgeRestrictionChipSlot({
+class ComicDetailAgeRestrictionChipSlot extends StatefulWidget {
+  const ComicDetailAgeRestrictionChipSlot({
     super.key,
     required this.visible,
     this.onFullyHidden,
@@ -21,12 +21,12 @@ class Md3eComicDetailAgeRestrictionChipSlot extends StatefulWidget {
   final VoidCallback? onFullyHidden;
 
   @override
-  State<Md3eComicDetailAgeRestrictionChipSlot> createState() =>
-      _Md3eComicDetailAgeRestrictionChipSlotState();
+  State<ComicDetailAgeRestrictionChipSlot> createState() =>
+      _ComicDetailAgeRestrictionChipSlotState();
 }
 
-class _Md3eComicDetailAgeRestrictionChipSlotState
-    extends State<Md3eComicDetailAgeRestrictionChipSlot> {
+class _ComicDetailAgeRestrictionChipSlotState
+    extends State<ComicDetailAgeRestrictionChipSlot> {
   bool _rendered = false;
   Timer? _hideTimer;
 
@@ -37,9 +37,7 @@ class _Md3eComicDetailAgeRestrictionChipSlotState
   }
 
   @override
-  void didUpdateWidget(
-    covariant Md3eComicDetailAgeRestrictionChipSlot oldWidget,
-  ) {
+  void didUpdateWidget(covariant ComicDetailAgeRestrictionChipSlot oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.visible) {
       _hideTimer?.cancel();
@@ -53,7 +51,7 @@ class _Md3eComicDetailAgeRestrictionChipSlotState
       return;
     }
     _hideTimer?.cancel();
-    _hideTimer = Timer(kMd3eComicDetailAgeRestrictionChipHideDebounce, () {
+    _hideTimer = Timer(kComicDetailAgeRestrictionChipHideDebounce, () {
       if (!mounted || widget.visible) {
         return;
       }
@@ -70,10 +68,10 @@ class _Md3eComicDetailAgeRestrictionChipSlotState
 
   @override
   Widget build(BuildContext context) {
-    return Md3eSpringSize(
+    return SpringSize(
       expanded: _rendered,
       alignment: Alignment.centerLeft,
-      child: const Md3eComicDetailAgeRestrictionChip(),
+      child: const ComicDetailAgeRestrictionChip(),
     );
   }
 }

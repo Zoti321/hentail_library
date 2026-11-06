@@ -7,8 +7,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 阅读页系列边界提示：与 [M3ESnackbarHost] 同一套动效（自下方滑入 emphasized、
 /// 自动消失时反向滑出）与安全区 / 边距，但挂在阅读画布自身的 Stack 内，不走根 Overlay。
-class Md3eReaderBoundarySnackbar extends StatefulWidget {
-  const Md3eReaderBoundarySnackbar({
+class ReaderBoundarySnackbar extends StatefulWidget {
+  const ReaderBoundarySnackbar({
     super.key,
     required this.message,
     required this.onClosed,
@@ -24,11 +24,10 @@ class Md3eReaderBoundarySnackbar extends StatefulWidget {
   final Duration duration;
 
   @override
-  State<Md3eReaderBoundarySnackbar> createState() =>
-      _Md3eReaderBoundarySnackbarState();
+  State<ReaderBoundarySnackbar> createState() => _ReaderBoundarySnackbarState();
 }
 
-class _Md3eReaderBoundarySnackbarState extends State<Md3eReaderBoundarySnackbar>
+class _ReaderBoundarySnackbarState extends State<ReaderBoundarySnackbar>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Offset> _offset;
@@ -40,14 +39,14 @@ class _Md3eReaderBoundarySnackbarState extends State<Md3eReaderBoundarySnackbar>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Md3eMotion.durationMedium,
-      reverseDuration: Md3eMotion.durationShort,
+      duration: LabMotion.durationMedium,
+      reverseDuration: LabMotion.durationShort,
     );
     _offset = Tween<Offset>(begin: const Offset(0, 1.5), end: Offset.zero)
         .animate(
           CurvedAnimation(
             parent: _controller,
-            curve: Md3eMotion.curveEmphasized,
+            curve: LabMotion.curveEmphasized,
           ),
         );
     _controller.forward();
@@ -93,7 +92,7 @@ class _Md3eReaderBoundarySnackbarState extends State<Md3eReaderBoundarySnackbar>
         child: SlideTransition(
           position: _offset,
           child: DefaultTextStyle.merge(
-            style: const TextStyle(fontFamily: kMd3eAppFontFamily),
+            style: const TextStyle(fontFamily: kAppFontFamily),
             child: M3EComponentTheme(
               builder: (BuildContext context) =>
                   M3ESnackbar(message: widget.message),

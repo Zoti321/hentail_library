@@ -12,7 +12,7 @@ import 'shell/md3e_widgetbook_theme_addon.dart';
 /// Run: `flutter run -t widgetbook/main.dart`
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initMd3eWindowManager();
+  await initWindowManager();
   runApp(
     Widgetbook(
       directories: buildWidgetbookDirectories(),

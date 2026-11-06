@@ -3,7 +3,7 @@ import 'package:hentai_library/features/reading_history/presentation/patterns/hi
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -49,11 +49,11 @@ class HistoryBrowsePage<T> extends StatefulWidget {
 class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
-  List<Md3eHistoryTimeGroup<T>>? _cachedGroups;
+  List<HistoryTimeGroup<T>>? _cachedGroups;
   List<T>? _cachedGroupSourceItems;
   DateTime? _cachedGroupClock;
 
-  List<Md3eHistoryTimeGroup<T>> _resolveGroups() {
+  List<HistoryTimeGroup<T>> _resolveGroups() {
     if (identical(_cachedGroupSourceItems, widget.items) &&
         _cachedGroupClock == widget.clock &&
         _cachedGroups != null) {
@@ -86,12 +86,12 @@ class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 
-    final List<Md3eHistoryTimeGroup<T>> groups = _resolveGroups();
+    final List<HistoryTimeGroup<T>> groups = _resolveGroups();
 
-    final Widget header = Md3eHistoryPageHeader(
+    final Widget header = HistoryPageHeader(
       clearEnabled: widget.totalCount > 0,
       onClearAll: widget.onClearAll,
       onOpenNavigation: widget.onOpenNavigation,
@@ -104,7 +104,7 @@ class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
       slivers: <Widget>[
         SliverPersistentHeader(
           pinned: true,
-          delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
+          delegate: PageHeaderDelegate(layout: layout, child: header),
         ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
@@ -113,7 +113,7 @@ class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
             horizontal,
             layout.bodyBottomInset,
           ),
-          sliver: Md3eHistoryBrowseContent<T>(
+          sliver: HistoryBrowseContent<T>(
             totalCount: widget.totalCount,
             groups: groups,
             searchField: widget.searchField,
@@ -136,7 +136,7 @@ class _HistoryBrowsePageState<T> extends State<HistoryBrowsePage<T>> {
     }
 
     return ColoredBox(
-      color: md3eLabBrowseCanvasColor(M3ETheme.of(context).colorScheme),
+      color: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
       child: scrollView,
     );
   }

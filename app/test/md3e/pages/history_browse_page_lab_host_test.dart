@@ -1,0 +1,72 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+
+import '../../../widgetbook/hosts/md3e_history_browse_page_lab_host.dart';
+import '../../../widgetbook/hosts/md3e_reader_page_lab_host.dart';
+
+import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+
+import '../../support/pump_app.dart';
+
+void main() {
+  testWidgets('LabHost 点击列表项进入阅读页', (WidgetTester tester) async {
+    await pumpApp(
+      tester,
+      home: HistoryBrowsePageLabHost(clock: DateTime(2026, 6, 15, 14)),
+    );
+
+    await tester.tap(find.text('只有神知道的世界').first);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReaderPageLabHost), findsOneWidget);
+  });
+
+  testWidgets('LabHost 删除记录会移除对应假数据', (WidgetTester tester) async {
+    // 列表已懒加载：加高画布，让全部假数据行进入视口后再断言数量。
+    await tester.binding.setSurfaceSize(const Size(800, 4000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await pumpApp(
+      tester,
+      home: HistoryBrowsePageLabHost(clock: DateTime(2026, 6, 15, 14)),
+    );
+
+    expect(find.byType(ReadingHistoryListItem), findsNWidgets(6));
+
+    await tester.tap(find.byIcon(Icons.more_vert).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('删除记录').first);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReadingHistoryListItem), findsNWidgets(5));
+  });
+
+  testWidgets('LabHost 确认清空后 preview 列表为空', (WidgetTester tester) async {
+    final DateTime clock = DateTime(2026, 6, 15, 14);
+
+    await pumpApp(tester, home: HistoryBrowsePageLabHost(clock: clock));
+
+    final AppLocalizations l10n = AppLocalizations.of(
+      tester.element(find.byType(HistoryBrowsePageLabHost)),
+    );
+
+    expect(find.text('只有神知道的世界'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel(l10n.commonClear));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(M3EDialog), findsOneWidget);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(M3EDialog),
+        matching: find.text(l10n.commonClear),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(l10n.historyEmpty), findsOneWidget);
+    expect(find.text('只有神知道的世界'), findsNothing);
+  });
+}

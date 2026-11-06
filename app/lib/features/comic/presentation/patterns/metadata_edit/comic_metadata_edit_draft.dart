@@ -1,8 +1,8 @@
-import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
 
 /// Lab 漫画元数据编辑草稿（无领域 / Riverpod）。
-class Md3eComicMetadataEditDraft {
-  const Md3eComicMetadataEditDraft({
+class ComicMetadataEditDraft {
+  const ComicMetadataEditDraft({
     required this.title,
     this.description = '',
     this.publishedLabel = '',
@@ -28,8 +28,8 @@ class Md3eComicMetadataEditDraft {
   /// 所属系列内排序文本；null 表示该漫画不属于系列，不显示排序字段。
   final String? seriesSortOrderText;
 
-  factory Md3eComicMetadataEditDraft.fromEntry(Md3eComicDetailEntry entry) {
-    return Md3eComicMetadataEditDraft(
+  factory ComicMetadataEditDraft.fromEntry(ComicDetailViewObject entry) {
+    return ComicMetadataEditDraft(
       title: entry.title,
       description: entry.description ?? '',
       publishedLabel: entry.publishedLabel ?? '',
@@ -42,7 +42,7 @@ class Md3eComicMetadataEditDraft {
     );
   }
 
-  Md3eComicMetadataEditDraft copyWith({
+  ComicMetadataEditDraft copyWith({
     String? title,
     String? description,
     String? publishedLabel,
@@ -54,7 +54,7 @@ class Md3eComicMetadataEditDraft {
     List<String>? tags,
     String? seriesSortOrderText,
   }) {
-    return Md3eComicMetadataEditDraft(
+    return ComicMetadataEditDraft(
       title: title ?? this.title,
       description: description ?? this.description,
       publishedLabel: publishedLabel ?? this.publishedLabel,

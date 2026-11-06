@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/ui/patterns/dialog/md3e_confirm_dialog.dart';
+import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,7 +17,7 @@ Future<void> confirmAndTrashComic(
   FutureOr<void> Function()? onTrashed,
 }) async {
   final l10n = context.l10n;
-  final bool confirmed = await showMd3eConfirmDialog(
+  final bool confirmed = await showConfirmDialog(
     context,
     title: l10n.comicDetailDeleteTitle,
     content: Builder(

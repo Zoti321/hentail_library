@@ -4,26 +4,25 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_page_size_settings.dart'
+    show kLibraryPageSizeOptions;
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Default page-size choices for the overflow submenu (Lab).
-const List<int> kMd3eLibraryPageSizeOptions = <int>[20, 50, 100, 200];
-
-/// 漫画库粘滞页头：标题 + 操作（与 [Md3eLibraryBrowsePage] 一致）。
+/// 漫画库粘滞页头：标题 + 操作（与 [LibraryBrowseLayout] 一致）。
 ///
-/// 漫画 / 系列切换在 [Md3eLibraryCatalogToolbar]，随列表滚动，不在本组件内。
-class Md3eLibraryPageHeader extends StatelessWidget {
-  const Md3eLibraryPageHeader({
+/// 漫画 / 系列切换在 [LibraryCatalogToolbar]，随列表滚动，不在本组件内。
+class LibraryPageHeader extends StatelessWidget {
+  const LibraryPageHeader({
     super.key,
     this.title,
     this.onFilterSort,
     this.overflowMenuEntries = const <M3EMenuNode>[],
     this.pageSize,
     this.onPageSizeChanged,
-    this.pageSizeOptions = kMd3eLibraryPageSizeOptions,
+    this.pageSizeOptions = kLibraryPageSizeOptions,
     this.filterSortActive = false,
   });
 
@@ -38,12 +37,11 @@ class Md3eLibraryPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 断点取页面视口宽度（已扣除 shell 侧栏），与其他页面的 Md3ePageLayoutSpec 保持一致。
-    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(context)
-        .sizeClass;
+    // 断点取页面视口宽度（已扣除 shell 侧栏），与其他页面的 PageLayoutSpec 保持一致。
+    final WindowSizeClass sizeClass = PageLayoutSpec.of(context).sizeClass;
 
-    return Md3ePinnedToolbarChrome(
-      child: _Md3eLibraryPageHeaderToolbar(
+    return PinnedToolbarChrome(
+      child: _LibraryPageHeaderToolbar(
         title: title,
         sizeClass: sizeClass,
         onFilterSort: onFilterSort,
@@ -57,21 +55,21 @@ class Md3eLibraryPageHeader extends StatelessWidget {
   }
 }
 
-class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
-  const _Md3eLibraryPageHeaderToolbar({
+class _LibraryPageHeaderToolbar extends StatelessWidget {
+  const _LibraryPageHeaderToolbar({
     required this.title,
     required this.sizeClass,
     this.onFilterSort,
     this.overflowMenuEntries = const <M3EMenuNode>[],
     this.pageSize,
     this.onPageSizeChanged,
-    this.pageSizeOptions = kMd3eLibraryPageSizeOptions,
+    this.pageSizeOptions = kLibraryPageSizeOptions,
     this.filterSortActive = false,
   });
 
   /// Defaults to [AppLocalizations.libraryTitle] when null.
   final String? title;
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
   final VoidCallback? onFilterSort;
   final List<M3EMenuNode> overflowMenuEntries;
   final int? pageSize;
@@ -82,9 +80,9 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final Widget leading = Md3ePageTitle(title ?? l10n.libraryTitle);
+    final Widget leading = PageTitle(title ?? l10n.libraryTitle);
 
-    final Widget actions = _Md3eLibraryHeaderActions(
+    final Widget actions = _LibraryHeaderActions(
       sizeClass: sizeClass,
       filterSortActive: filterSortActive,
       onFilterSort: onFilterSort,
@@ -106,18 +104,18 @@ class _Md3eLibraryPageHeaderToolbar extends StatelessWidget {
   }
 }
 
-class _Md3eLibraryHeaderActions extends StatelessWidget {
-  const _Md3eLibraryHeaderActions({
+class _LibraryHeaderActions extends StatelessWidget {
+  const _LibraryHeaderActions({
     required this.sizeClass,
     required this.filterSortActive,
     this.onFilterSort,
     this.overflowMenuEntries = const <M3EMenuNode>[],
     this.pageSize,
     this.onPageSizeChanged,
-    this.pageSizeOptions = kMd3eLibraryPageSizeOptions,
+    this.pageSizeOptions = kLibraryPageSizeOptions,
   });
 
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
   final bool filterSortActive;
   final VoidCallback? onFilterSort;
   final List<M3EMenuNode> overflowMenuEntries;
@@ -133,7 +131,7 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
           label: l10n.libraryPageSizeTooltip,
           leading: Icon(
             Icons.view_module_outlined,
-            size: Md3eLibraryPageHeaderMetrics.actionIconSize,
+            size: LibraryPageHeaderMetrics.actionIconSize,
           ),
           children: <M3EMenuNode>[
             for (final int option in pageSizeOptions)
@@ -154,7 +152,7 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final double gap = Md3eLibraryPageHeaderMetrics.actionSpacing(sizeClass);
+    final double gap = LibraryPageHeaderMetrics.actionSpacing(sizeClass);
     final Color filterColor = filterSortActive
         ? scheme.primary
         : scheme.onSurfaceVariant;
@@ -178,7 +176,7 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
             onPressed: null,
           )
         else
-          Md3eAnchoredMenu(
+          AnchoredMenu(
             position: M3EMenuAnchorPosition.bottomEnd,
             children: menuChildren,
             anchorBuilder: (BuildContext context, VoidCallback open) {
@@ -203,7 +201,7 @@ class _Md3eLibraryHeaderActions extends StatelessWidget {
     return M3EIconButton(
       icon: Icon(
         icon,
-        size: Md3eLibraryPageHeaderMetrics.actionIconSize,
+        size: LibraryPageHeaderMetrics.actionIconSize,
         color: color,
       ),
       variant: M3EIconButtonVariant.standard,

@@ -10,8 +10,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 发布日期：可编辑文本 + M3E trailing 日历 + clear。
-class Md3ePublishedDateTextField extends StatefulWidget {
-  const Md3ePublishedDateTextField({
+class PublishedDateTextField extends StatefulWidget {
+  const PublishedDateTextField({
     super.key,
     required this.label,
     required this.value,
@@ -29,12 +29,10 @@ class Md3ePublishedDateTextField extends StatefulWidget {
   final M3EDatePickerMode initialCalendarMode;
 
   @override
-  State<Md3ePublishedDateTextField> createState() =>
-      _Md3ePublishedDateTextFieldState();
+  State<PublishedDateTextField> createState() => _PublishedDateTextFieldState();
 }
 
-class _Md3ePublishedDateTextFieldState
-    extends State<Md3ePublishedDateTextField> {
+class _PublishedDateTextFieldState extends State<PublishedDateTextField> {
   final LayerLink _layerLink = LayerLink();
   late final TextEditingController _controller = TextEditingController(
     text: widget.value,
@@ -42,7 +40,7 @@ class _Md3ePublishedDateTextFieldState
   bool _pickerOpen = false;
 
   @override
-  void didUpdateWidget(covariant Md3ePublishedDateTextField oldWidget) {
+  void didUpdateWidget(covariant PublishedDateTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.value != _controller.text) {
       _controller.text = widget.value;
@@ -73,12 +71,12 @@ class _Md3ePublishedDateTextFieldState
     }
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _pickerOpen = true);
-    await md3eShowAnchoredCalendarDatePicker(
+    await showAnchoredCalendarDatePicker(
       context: context,
       layerLink: _layerLink,
       initialDate: _parseValue(),
-      firstDate: widget.firstDate ?? kMd3ePublishedDatePickerFirstDate,
-      lastDate: widget.lastDate ?? kMd3ePublishedDatePickerLastDate,
+      firstDate: widget.firstDate ?? kPublishedDatePickerFirstDate,
+      lastDate: widget.lastDate ?? kPublishedDatePickerLastDate,
       initialCalendarMode: widget.initialCalendarMode,
       onDateChanged: _applyDate,
     );
@@ -104,7 +102,7 @@ class _Md3ePublishedDateTextFieldState
 
     return CompositedTransformTarget(
       link: _layerLink,
-      child: Md3eOutlinedTextField(
+      child: OutlinedTextField(
         label: widget.label,
         controller: _controller,
         keyboardType: TextInputType.datetime,

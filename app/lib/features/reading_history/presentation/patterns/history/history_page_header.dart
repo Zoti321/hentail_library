@@ -5,15 +5,15 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_clear_confirm_dialog.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header_back_button.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 阅读历史粘滞页头：标题 + 清空全部（需二次确认）。
-class Md3eHistoryPageHeader extends StatelessWidget {
-  const Md3eHistoryPageHeader({
+class HistoryPageHeader extends StatelessWidget {
+  const HistoryPageHeader({
     super.key,
     this.title,
     this.clearEnabled = true,
@@ -30,10 +30,9 @@ class Md3eHistoryPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(context)
-        .sizeClass;
+    final WindowSizeClass sizeClass = PageLayoutSpec.of(context).sizeClass;
 
-    return _Md3eHistoryPageHeaderToolbar(
+    return _HistoryPageHeaderToolbar(
       title: title,
       sizeClass: sizeClass,
       clearEnabled: clearEnabled,
@@ -44,8 +43,8 @@ class Md3eHistoryPageHeader extends StatelessWidget {
   }
 }
 
-class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
-  const _Md3eHistoryPageHeaderToolbar({
+class _HistoryPageHeaderToolbar extends StatelessWidget {
+  const _HistoryPageHeaderToolbar({
     required this.title,
     required this.sizeClass,
     required this.clearEnabled,
@@ -55,7 +54,7 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
   });
 
   final String? title;
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
   final bool clearEnabled;
   final VoidCallback? onClearAll;
   final VoidCallback? onOpenNavigation;
@@ -69,19 +68,19 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
 
     final bool showMenu = sizeClass.isCompact && onOpenNavigation != null;
 
-    return Md3ePinnedToolbarChrome(
+    return PinnedToolbarChrome(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           if (onBack != null) ...<Widget>[
-            Md3ePageHeaderBackButton(onPressed: onBack!),
+            PageHeaderBackButton(onPressed: onBack!),
             const SizedBox(width: 4),
           ],
           if (showMenu) ...<Widget>[
             M3EIconButton(
               icon: Icon(
                 Symbols.menu,
-                size: Md3eLibraryPageHeaderMetrics.actionIconSize,
+                size: LibraryPageHeaderMetrics.actionIconSize,
                 color: scheme.onSurfaceVariant,
               ),
               variant: M3EIconButtonVariant.standard,
@@ -95,13 +94,13 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Md3ePageTitle(title ?? l10n.historyTitle),
+              child: PageTitle(title ?? l10n.historyTitle),
             ),
           ),
           M3EIconButton(
             icon: Icon(
               Symbols.delete,
-              size: Md3eLibraryPageHeaderMetrics.actionIconSize,
+              size: LibraryPageHeaderMetrics.actionIconSize,
               color: clearEnabled ? scheme.error : scheme.onSurfaceVariant,
             ),
             variant: M3EIconButtonVariant.standard,
@@ -116,7 +115,7 @@ class _Md3eHistoryPageHeaderToolbar extends StatelessWidget {
   }
 
   Future<void> _onClearPressed(BuildContext context) async {
-    final bool confirmed = await showMd3eClearReadingHistoryConfirmDialog(
+    final bool confirmed = await showClearReadingHistoryConfirmDialog(
       context: context,
     );
     if (!confirmed) {

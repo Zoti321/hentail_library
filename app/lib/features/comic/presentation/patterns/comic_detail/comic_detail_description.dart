@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 简介纯文本，默认最多 4 行截断。
-class Md3eComicDetailDescription extends StatelessWidget {
-  const Md3eComicDetailDescription({
+class ComicDetailDescription extends StatelessWidget {
+  const ComicDetailDescription({
     super.key,
     required this.text,
     this.maxLines = 4,

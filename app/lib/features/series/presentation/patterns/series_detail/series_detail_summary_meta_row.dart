@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/age_restriction_chip_mount.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_language_row.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_serialization_chip.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列封面右侧摘要：语言、连载 / R18、卷数进度。
-class Md3eSeriesDetailSummaryMetaRow extends StatefulWidget {
-  const Md3eSeriesDetailSummaryMetaRow({super.key, required this.entry});
+class SeriesDetailSummaryMetaRow extends StatefulWidget {
+  const SeriesDetailSummaryMetaRow({super.key, required this.entry});
 
-  final Md3eSeriesDetailEntry entry;
+  final SeriesDetailViewObject entry;
 
   @override
-  State<Md3eSeriesDetailSummaryMetaRow> createState() =>
-      _Md3eSeriesDetailSummaryMetaRowState();
+  State<SeriesDetailSummaryMetaRow> createState() =>
+      _SeriesDetailSummaryMetaRowState();
 }
 
-class _Md3eSeriesDetailSummaryMetaRowState
-    extends State<Md3eSeriesDetailSummaryMetaRow> {
+class _SeriesDetailSummaryMetaRowState
+    extends State<SeriesDetailSummaryMetaRow> {
   bool _ageChipInTree = false;
 
   @override
@@ -29,7 +29,7 @@ class _Md3eSeriesDetailSummaryMetaRowState
   }
 
   @override
-  void didUpdateWidget(covariant Md3eSeriesDetailSummaryMetaRow oldWidget) {
+  void didUpdateWidget(covariant SeriesDetailSummaryMetaRow oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.entry.showAgeRestrictionChip) {
       _ageChipInTree = true;
@@ -53,20 +53,17 @@ class _Md3eSeriesDetailSummaryMetaRowState
         l10n.seriesVolumeCountLabel(widget.entry.volumeCurrent);
 
     final bool showSerialization =
-        widget.entry.serializationStatus !=
-        Md3eSeriesSerializationStatus.unknown;
+        widget.entry.serializationStatus != SeriesSerializationStatus.unknown;
 
     final List<Widget> chipChildren = <Widget>[];
     if (showSerialization) {
       chipChildren.add(
-        Md3eSeriesDetailSerializationChip(
-          status: widget.entry.serializationStatus,
-        ),
+        SeriesDetailSerializationChip(status: widget.entry.serializationStatus),
       );
     }
     if (_ageChipInTree) {
       chipChildren.add(
-        Md3eAgeRestrictionChipMount(
+        AgeRestrictionChipMount(
           visible: widget.entry.showAgeRestrictionChip,
           onFullyHidden: () => setState(() => _ageChipInTree = false),
         ),
@@ -77,7 +74,7 @@ class _Md3eSeriesDetailSummaryMetaRowState
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: spacing.xs,
       children: <Widget>[
-        Md3eSeriesDetailLanguageRow(languages: widget.entry.languages),
+        SeriesDetailLanguageRow(languages: widget.entry.languages),
         if (chipChildren.isNotEmpty)
           Wrap(
             spacing: spacing.sm,

@@ -6,11 +6,11 @@ import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 阅读器 secondary 面板：compact/medium 用 bottom sheet，expanded+ 用 side sheet。
-abstract final class Md3eReaderAdaptivePanel {
-  Md3eReaderAdaptivePanel._();
+abstract final class ReaderAdaptivePanel {
+  ReaderAdaptivePanel._();
 
   static bool preferBottomSheet(double viewportWidth) {
-    return viewportWidth < Md3eBreakpoints.expanded;
+    return viewportWidth < Breakpoints.expanded;
   }
 
   static M3ESideSheetTheme sideSheetTheme(M3EThemeData m3e) {
@@ -18,13 +18,13 @@ abstract final class Md3eReaderAdaptivePanel {
       horizontalPadding: 16,
       topElementsGap: 8,
       headlineTextStyle: m3e.typeScale.titleLarge.copyWith(
-        fontFamily: kMd3eAppFontFamily,
+        fontFamily: kAppFontFamily,
       ),
     );
   }
 
   static bool sideSheetDetachedFor(double viewportWidth) {
-    return md3eLibraryFilterSortSideSheetDetachedForViewport(viewportWidth);
+    return libraryFilterSortSideSheetDetachedForViewport(viewportWidth);
   }
 
   static double sideSheetWidthFor(double viewportWidth) {
@@ -42,8 +42,8 @@ abstract final class Md3eReaderAdaptivePanel {
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     final M3EThemeData m3e = M3ETheme.of(context);
-    final Widget scopedBody = md3eOverlayRouteScope(
-      scope: Md3eOverlayRouteScopeSnapshot.capture(context),
+    final Widget scopedBody = overlayRouteScope(
+      scope: OverlayRouteScopeSnapshot.capture(context),
       child: body,
     );
 

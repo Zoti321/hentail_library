@@ -9,7 +9,7 @@ import 'package:hentai_library/features/reading_history/presentation/view_models
 import 'package:hentai_library/features/reading_history/presentation/views/history_page_actions.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header_back_button.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -67,7 +67,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
     );
 
     return M3ETheme(
-      data: md3eWithAppFontFamily(M3ETheme.of(context)),
+      data: withAppFontFamily(M3ETheme.of(context)),
       child: initialLoading
           ? const Center(child: CircularProgressIndicator())
           : loadError != null
@@ -117,7 +117,7 @@ class _HistoryBrowseFeed extends ConsumerWidget {
       isLoadingMore: isLoadingMore,
       useLabBrowseCanvas: true,
       onOpenNavigation: appShellPageNavigationOpener(context),
-      onBack: () => md3ePopOrGoHome(context),
+      onBack: () => popOrGoHome(context),
       onClearAll: () => clearAllReadingHistory(context, ref),
       itemBuilder: (BuildContext context, HistoryCardItem item) {
         return HistoryListItem(

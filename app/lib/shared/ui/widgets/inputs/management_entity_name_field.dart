@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 
 /// 管理页新建实体：单行 outlined 输入（Dialog 与桌面内联共用）。
-class Md3eManagementEntityNameField extends StatelessWidget {
-  const Md3eManagementEntityNameField({
+class ManagementEntityNameField extends StatelessWidget {
+  const ManagementEntityNameField({
     super.key,
     required this.label,
     this.controller,
@@ -20,7 +20,7 @@ class Md3eManagementEntityNameField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Md3eOutlinedTextField(
+    return OutlinedTextField(
       label: label,
       controller: controller,
       focusNode: focusNode,

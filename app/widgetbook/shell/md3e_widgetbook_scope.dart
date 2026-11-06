@@ -15,9 +15,9 @@ class Md3eWidgetbookScope extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     return DefaultTextStyle.merge(
-      style: const TextStyle(fontFamily: kMd3eAppFontFamily),
+      style: const TextStyle(fontFamily: kAppFontFamily),
       child: Scaffold(
-        backgroundColor: md3eLabBrowseCanvasColor(scheme),
+        backgroundColor: labBrowseCanvasColor(scheme),
         body: child,
       ),
     );

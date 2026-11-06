@@ -11,4 +11,4 @@ export 'public/di/reader_settings_command_port_factory.dart';
 export 'public/presentation/settings_view_model_exports.dart';
 export 'public/reader_settings_command_port.dart';
 export 'public/ui/diagnostic_mode_banner.dart';
-export 'public/ui/settings_md3e_page.dart';
+export 'public/ui/settings_page.dart';

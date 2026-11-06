@@ -2,72 +2,72 @@ import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dar
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 
 /// Lab 假库 catalog：壳层 Current library、Home 仪表盘、Widgetbook 共用。
-abstract final class Md3eLabLibraryCatalog {
+abstract final class LabLibraryCatalog {
   static const String defaultLibraryId = 'lab-local-main';
 
   static final DateTime referenceNow = DateTime(2026, 10, 28, 14, 30);
 
-  static List<Md3eHomeLibraryDashboardRow> libraries({DateTime? referenceNow}) {
-    final DateTime now = referenceNow ?? Md3eLabLibraryCatalog.referenceNow;
-    return <Md3eHomeLibraryDashboardRow>[
-      Md3eHomeLibraryDashboardRow(
+  static List<HomeLibraryDashboardRow> libraries({DateTime? referenceNow}) {
+    final DateTime now = referenceNow ?? LabLibraryCatalog.referenceNow;
+    return <HomeLibraryDashboardRow>[
+      HomeLibraryDashboardRow(
         libraryId: 'lab-local-main',
         displayName: '本机漫画',
-        kind: Md3eHomeLibraryKind.local,
+        kind: HomeLibraryKind.local,
         comicCount: 1284,
         seriesCount: 96,
         lastSyncedAt: now.subtract(const Duration(hours: 5, minutes: 12)),
       ),
-      Md3eHomeLibraryDashboardRow(
+      HomeLibraryDashboardRow(
         libraryId: 'lab-local-archive',
         displayName: '归档库',
-        kind: Md3eHomeLibraryKind.local,
+        kind: HomeLibraryKind.local,
         comicCount: 412,
         seriesCount: 38,
         lastSyncedAt: now.subtract(const Duration(days: 2, hours: 3)),
         scanInProgress: true,
       ),
-      Md3eHomeLibraryDashboardRow(
+      HomeLibraryDashboardRow(
         libraryId: 'lab-remote-nas',
         displayName: 'NAS WebDAV',
-        kind: Md3eHomeLibraryKind.remote,
+        kind: HomeLibraryKind.remote,
         comicCount: 856,
         seriesCount: 71,
         lastSyncedAt: now.subtract(const Duration(days: 9)),
-        hint: Md3eHomeLibraryRowHint.syncWarning,
+        hint: HomeLibraryRowHint.syncWarning,
       ),
-      Md3eHomeLibraryDashboardRow(
+      HomeLibraryDashboardRow(
         libraryId: 'lab-remote-offline',
         displayName: '离线远程库',
-        kind: Md3eHomeLibraryKind.remote,
+        kind: HomeLibraryKind.remote,
         comicCount: 0,
         seriesCount: 0,
         lastSyncedAt: null,
-        hint: Md3eHomeLibraryRowHint.unreachable,
+        hint: HomeLibraryRowHint.unreachable,
       ),
     ];
   }
 
-  static Md3eHomeLibraryDashboardRow rowForId(String libraryId) {
+  static HomeLibraryDashboardRow rowForId(String libraryId) {
     return libraries().firstWhere(
-      (Md3eHomeLibraryDashboardRow row) => row.libraryId == libraryId,
+      (HomeLibraryDashboardRow row) => row.libraryId == libraryId,
     );
   }
 
   static String displayNameForId(String libraryId) =>
       rowForId(libraryId).displayName;
 
-  static Md3eHomeAggregateCounts aggregateCounts({DateTime? referenceNow}) {
-    final List<Md3eHomeLibraryDashboardRow> rows = libraries(
+  static HomeAggregateCounts aggregateCounts({DateTime? referenceNow}) {
+    final List<HomeLibraryDashboardRow> rows = libraries(
       referenceNow: referenceNow,
     );
     var comicTotal = 0;
     var seriesTotal = 0;
-    for (final Md3eHomeLibraryDashboardRow row in rows) {
+    for (final HomeLibraryDashboardRow row in rows) {
       comicTotal += row.comicCount;
       seriesTotal += row.seriesCount;
     }
-    return Md3eHomeAggregateCounts(
+    return HomeAggregateCounts(
       comicCount: comicTotal,
       seriesCount: seriesTotal,
       authorCount: 1842,

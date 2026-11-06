@@ -7,8 +7,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 ///
 /// - 鼠标平台（Windows / macOS / Linux）：小号 FAB 与更小热区；窄窗口仍用 regular。
 /// - 触屏平台：按断点 regular / medium / large。
-abstract final class Md3eFabSizing {
-  static M3EFabSize responsive(Md3eWindowSizeClass sizeClass) {
+abstract final class FabSizing {
+  static M3EFabSize responsive(WindowSizeClass sizeClass) {
     final bool pointerPlatform = switch (defaultTargetPlatform) {
       TargetPlatform.windows ||
       TargetPlatform.macOS ||
@@ -19,11 +19,9 @@ abstract final class Md3eFabSizing {
       return sizeClass.isCompact ? M3EFabSize.regular : M3EFabSize.small;
     }
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact ||
-      Md3eWindowSizeClass.medium => M3EFabSize.regular,
-      Md3eWindowSizeClass.expanded => M3EFabSize.medium,
-      Md3eWindowSizeClass.large ||
-      Md3eWindowSizeClass.extraLarge => M3EFabSize.large,
+      WindowSizeClass.compact || WindowSizeClass.medium => M3EFabSize.regular,
+      WindowSizeClass.expanded => M3EFabSize.medium,
+      WindowSizeClass.large || WindowSizeClass.extraLarge => M3EFabSize.large,
     };
   }
 

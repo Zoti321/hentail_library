@@ -1,5 +1,5 @@
 /// Desktop title bar metrics (Cursor-like compact chrome, no global search).
-abstract final class Md3eDesktopTitleBarMetrics {
+abstract final class DesktopTitleBarMetrics {
   /// Compact band height, aligned with Cursor / VS Code custom title bars.
   static const double height = 36;
   static const double windowButtonSize = 36;

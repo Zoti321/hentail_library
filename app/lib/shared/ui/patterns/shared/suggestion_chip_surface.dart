@@ -4,8 +4,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// Suggestion [M3EChip] 容器绘制（与 `m3e_chips.dart` 启用态一致），[child] 替换标签槽。
 ///
 /// [editingFocusNode] 交给内层 [EditableText]；[staticChrome] 为 true 时不绘制焦点环/状态层。
-class Md3eSuggestionChipSurface extends StatefulWidget {
-  const Md3eSuggestionChipSurface({
+class SuggestionChipSurface extends StatefulWidget {
+  const SuggestionChipSurface({
     super.key,
     required this.editingFocusNode,
     required this.onPressed,
@@ -23,11 +23,10 @@ class Md3eSuggestionChipSurface extends StatefulWidget {
   final bool staticChrome;
 
   @override
-  State<Md3eSuggestionChipSurface> createState() =>
-      _Md3eSuggestionChipSurfaceState();
+  State<SuggestionChipSurface> createState() => _SuggestionChipSurfaceState();
 }
 
-class _Md3eSuggestionChipSurfaceState extends State<Md3eSuggestionChipSurface> {
+class _SuggestionChipSurfaceState extends State<SuggestionChipSurface> {
   static const M3EChipType _chipType = M3EChipType.suggestion;
   bool _hovered = false;
 

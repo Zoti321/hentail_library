@@ -8,6 +8,6 @@ void main() {
     expect(HomePageRepository, isNotNull);
     expect(createHomePageRepository, isNotNull);
     expect(homeLibraryStatsStreamProvider, isNotNull);
-    expect(HomeMd3ePage, isNotNull);
+    expect(HomePage, isNotNull);
   });
 }

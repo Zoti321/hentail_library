@@ -8,13 +8,13 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// Modal expanded navigation rail scoped to the shell (not [Overlay.rootOverlay]).
 ///
 /// [M3ENavigationRailModality.modal] inserts at the app root, which misaligns in
-/// Widgetbook [ViewportAddon] previews; this overlay stays inside [Md3eDesktopShell].
+/// Widgetbook [ViewportAddon] previews; this overlay stays inside [DesktopShell].
 ///
 /// At compact + medium (&lt; expanded), destinations with a secondary pane (漫画库) show a
-/// trailing chevron; tapping drills into [Md3eShellModalLibrarySecondaryPane] with a
+/// trailing chevron; tapping drills into [ShellModalLibrarySecondaryPane] with a
 /// back affordance (MD3 navigation drawer pattern).
-class Md3eShellCompactModalRailOverlay extends StatelessWidget {
-  const Md3eShellCompactModalRailOverlay({
+class ShellCompactModalRailOverlay extends StatelessWidget {
+  const ShellCompactModalRailOverlay({
     super.key,
     required this.open,
     required this.height,
@@ -36,13 +36,13 @@ class Md3eShellCompactModalRailOverlay extends StatelessWidget {
   final double height;
   final M3EThemeData m3eTheme;
   final Color surfaceBackground;
-  final List<Md3eNavigationRailDestination> destinations;
+  final List<ExpressiveNavigationRailDestination> destinations;
   final int selectedIndex;
   final VoidCallback onDismiss;
   final ValueChanged<int> onDestinationSelected;
   final bool libraryDrillInEnabled;
   final bool librarySecondaryOpen;
-  final List<Md3eHomeLibraryDashboardRow> libraries;
+  final List<HomeLibraryDashboardRow> libraries;
   final String selectedLibraryId;
   final VoidCallback onLibrarySecondaryBack;
   final ValueChanged<String> onLibrarySelected;
@@ -74,19 +74,19 @@ class Md3eShellCompactModalRailOverlay extends StatelessWidget {
             color: surfaceBackground,
             elevation: M3EElevation.level1,
             child: SizedBox(
-              width: Md3eNavigationRailMetrics.expandedWidth,
+              width: ExpressiveNavigationRailMetrics.expandedWidth,
               height: height,
               child: M3ETheme(
                 data: railTheme,
                 child: showLibrarySecondary
-                    ? Md3eShellModalLibrarySecondaryPane(
+                    ? ShellModalLibrarySecondaryPane(
                         libraries: libraries,
                         selectedLibraryId: selectedLibraryId,
                         backgroundColor: surfaceBackground,
                         onBack: onLibrarySecondaryBack,
                         onLibrarySelected: onLibrarySelected,
                       )
-                    : _Md3eShellModalPrimaryRailBody(
+                    : _ShellModalPrimaryRailBody(
                         destinations: destinations,
                         selectedIndex: selectedIndex,
                         onDestinationSelected: onDestinationSelected,
@@ -102,8 +102,8 @@ class Md3eShellCompactModalRailOverlay extends StatelessWidget {
   }
 }
 
-class _Md3eShellModalPrimaryRailBody extends StatelessWidget {
-  const _Md3eShellModalPrimaryRailBody({
+class _ShellModalPrimaryRailBody extends StatelessWidget {
+  const _ShellModalPrimaryRailBody({
     required this.destinations,
     required this.selectedIndex,
     required this.onDestinationSelected,
@@ -111,7 +111,7 @@ class _Md3eShellModalPrimaryRailBody extends StatelessWidget {
     required this.libraryDrillInEnabled,
   });
 
-  final List<Md3eNavigationRailDestination> destinations;
+  final List<ExpressiveNavigationRailDestination> destinations;
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
   final VoidCallback onMenuPressed;
@@ -123,22 +123,20 @@ class _Md3eShellModalPrimaryRailBody extends StatelessWidget {
     final M3ENavigationRailTheme navTheme = theme.navigationRailTheme;
     const bool railExtended = true;
 
-    final double libraryTop = Md3eShellRailLibraryHoverMetrics.destinationTop(
+    final double libraryTop = ShellRailLibraryHoverMetrics.destinationTop(
       theme: navTheme,
       railExtended: railExtended,
-      destinationIndex:
-          Md3eShellRailLibraryHoverMetrics.libraryDestinationIndex,
+      destinationIndex: ShellRailLibraryHoverMetrics.libraryDestinationIndex,
     );
-    final double libraryHeight =
-        Md3eShellRailLibraryHoverMetrics.destinationHeight(
-          theme: navTheme,
-          railExtended: railExtended,
-        );
+    final double libraryHeight = ShellRailLibraryHoverMetrics.destinationHeight(
+      theme: navTheme,
+      railExtended: railExtended,
+    );
 
     return Stack(
       clipBehavior: Clip.none,
       children: <Widget>[
-        Md3eNavigationRail(
+        ExpressiveNavigationRail(
           destinations: destinations,
           selectedIndex: selectedIndex,
           extended: railExtended,

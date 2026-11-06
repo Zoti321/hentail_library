@@ -31,7 +31,7 @@ class HistoryListItem extends ConsumerWidget {
       ref.read(readSessionLaunchPortProvider).openComic(comicId: item.comicId);
     }
 
-    return Md3eReadingHistoryListItem(
+    return ReadingHistoryListItem(
       title: item.title,
       cover: ComicCoverContent(comicId: item.comicId),
       currentPage: currentPage,
@@ -39,8 +39,8 @@ class HistoryListItem extends ConsumerWidget {
       lastReadTime: item.lastReadTime,
       onTap: openReader,
       onContinueReading: openReader,
-      moreMenuEntries: <Md3eReadingHistoryMoreMenuEntry>[
-        Md3eReadingHistoryMoreMenuEntry(
+      moreMenuEntries: <ReadingHistoryMoreMenuEntry>[
+        ReadingHistoryMoreMenuEntry(
           label: l10n.historyDeleteRecord,
           onSelected: onDeleteRecord,
         ),

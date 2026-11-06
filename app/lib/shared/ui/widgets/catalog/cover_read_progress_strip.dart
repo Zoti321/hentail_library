@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/motion/spring_value.dart';
 
 /// Height of catalog cover read-progress strips (card + list leading).
-const double kMd3eCoverReadProgressHeight = 2;
+const double kCoverReadProgressHeight = 2;
 
 /// Whether a read-progress strip should be shown for [readProgress].
-bool md3eShowsReadProgressStrip(double? readProgress) {
+bool showsReadProgressStrip(double? readProgress) {
   return readProgress != null && readProgress > 0;
 }
 
 /// Animated full-width progress strip for catalog cover thumbnails.
-class Md3eCoverReadProgressStrip extends StatelessWidget {
-  const Md3eCoverReadProgressStrip({
+class CoverReadProgressStrip extends StatelessWidget {
+  const CoverReadProgressStrip({
     super.key,
     required this.progress,
     required this.activeColor,
@@ -33,14 +33,14 @@ class Md3eCoverReadProgressStrip extends StatelessWidget {
             fit: StackFit.expand,
             children: <Widget>[
               ColoredBox(color: trackColor),
-              Md3eSpringValue(
+              SpringValue(
                 value: progress.clamp(0.0, 1.0),
                 builder: (BuildContext context, double value, Widget? child) {
                   return Align(
                     alignment: Alignment.centerLeft,
                     child: SizedBox(
                       width: maxWidth * value,
-                      height: kMd3eCoverReadProgressHeight,
+                      height: kCoverReadProgressHeight,
                       child: ColoredBox(color: activeColor),
                     ),
                   );

@@ -4,21 +4,19 @@ import 'package:hentai_library/shared/ui/widgets/catalog/cover_read_progress_str
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'package:hentai_library/shared/ui/widgets/catalog/comic_catalog_card_shell.dart'
-    show kMd3eComicCardRadius;
+    show kComicCardRadius;
 
 /// Inset of the selection control from the cover top-left (MASTER 多选稿).
-const double kMd3eComicCardSelectionInset = 8;
+const double kComicCardSelectionInset = 8;
 
-/// Alias of [kMd3eCoverReadProgressHeight] for comic card call sites.
-const double kMd3eComicCardCoverProgressHeight = kMd3eCoverReadProgressHeight;
+/// Alias of [kCoverReadProgressHeight] for comic card call sites.
+const double kComicCardCoverProgressHeight = kCoverReadProgressHeight;
 
 /// Key for the cover progress strip (tests / semantics tooling).
-const Key kMd3eComicCardCoverProgressKey = Key(
-  'md3e_comic_card_cover_progress',
-);
+const Key kComicCardCoverProgressKey = Key('_comic_card_cover_progress');
 
 /// Pins M3 elevated-card visuals for catalogs (e.g. Widgetbook); not for production grids.
-enum Md3eComicCardVisualState {
+enum ComicCardVisualState {
   normal,
   hovered,
   focused,
@@ -29,10 +27,10 @@ enum Md3eComicCardVisualState {
   selectionSelected,
 }
 
-/// Catalog grid comic card ([Md3eComicCatalogCardShell]; props only, no domain types).
+/// Catalog grid comic card ([ComicCatalogCardShell]; props only, no domain types).
 ///
 /// Anatomy: flush [cover] (2:3) + padded title / [subtitle]; progress on cover bottom.
-class Md3eComicCard extends StatelessWidget {
+class ComicCard extends StatelessWidget {
   /// Main-axis height for a flush-cover card at [cardWidth] (grid delegate).
   static double layoutMainAxisExtent({
     required double cardWidth,
@@ -53,7 +51,7 @@ class Md3eComicCard extends StatelessWidget {
 
   /// Whether the cover progress strip should be built for [readProgress].
   static bool showsCoverReadProgress(double? readProgress) {
-    return md3eShowsReadProgressStrip(readProgress);
+    return showsReadProgressStrip(readProgress);
   }
 
   /// Grid row height when the delegate cell width equals [maxCrossAxisExtent].
@@ -71,7 +69,7 @@ class Md3eComicCard extends StatelessWidget {
     ).ceilToDouble();
   }
 
-  const Md3eComicCard({
+  const ComicCard({
     super.key,
     required this.title,
     required this.cover,
@@ -98,7 +96,7 @@ class Md3eComicCard extends StatelessWidget {
   final ValueChanged<bool>? onSelectionChanged;
 
   final bool enabled;
-  final Md3eComicCardVisualState? visualState;
+  final ComicCardVisualState? visualState;
   final double? readProgress;
 
   @override
@@ -115,13 +113,13 @@ class Md3eComicCard extends StatelessWidget {
         visualState == null &&
         (onTap != null || onSelectionChanged != null);
     final bool cardEnabled =
-        enabled && visualState != Md3eComicCardVisualState.disabled;
-    final bool dragged = visualState == Md3eComicCardVisualState.dragged;
+        enabled && visualState != ComicCardVisualState.disabled;
+    final bool dragged = visualState == ComicCardVisualState.dragged;
 
     const double titleSubtitleGap = 6;
 
     final double? coverProgress = readProgress;
-    final bool showCoverProgress = md3eShowsReadProgressStrip(coverProgress);
+    final bool showCoverProgress = showsReadProgressStrip(coverProgress);
 
     final Widget coverLayer = AspectRatio(
       aspectRatio: 2 / 3,
@@ -131,8 +129,8 @@ class Md3eComicCard extends StatelessWidget {
           cover,
           if (effectiveSelectionMode)
             Positioned(
-              left: kMd3eComicCardSelectionInset,
-              top: kMd3eComicCardSelectionInset,
+              left: kComicCardSelectionInset,
+              top: kComicCardSelectionInset,
               child: M3ECheckbox(
                 value: effectiveSelected,
                 onChanged: cardEnabled && onSelectionChanged != null
@@ -150,9 +148,9 @@ class Md3eComicCard extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              height: kMd3eComicCardCoverProgressHeight,
-              child: Md3eCoverReadProgressStrip(
-                key: kMd3eComicCardCoverProgressKey,
+              height: kComicCardCoverProgressHeight,
+              child: CoverReadProgressStrip(
+                key: kComicCardCoverProgressKey,
                 progress: readProgress!,
                 activeColor: scheme.primary,
                 trackColor: scheme.onSurface.withValues(alpha: 0.24),
@@ -169,10 +167,10 @@ class Md3eComicCard extends StatelessWidget {
         coverLayer,
         Padding(
           padding: EdgeInsets.fromLTRB(
-            kMd3eComicCatalogContentHorizontalPadding,
+            kComicCatalogContentHorizontalPadding,
             spacing.md,
-            kMd3eComicCatalogContentHorizontalPadding,
-            kMd3eComicCatalogContentHorizontalPadding,
+            kComicCatalogContentHorizontalPadding,
+            kComicCatalogContentHorizontalPadding,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,14 +180,14 @@ class Md3eComicCard extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: md3eComicCatalogTitleStyle(type, scheme),
+                style: comicCatalogTitleStyle(type, scheme),
               ),
               if (subtitle != null)
                 Text(
                   subtitle!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: md3eComicCatalogSubtitleStyle(type, scheme),
+                  style: comicCatalogSubtitleStyle(type, scheme),
                 ),
             ],
           ),
@@ -197,7 +195,7 @@ class Md3eComicCard extends StatelessWidget {
       ],
     );
 
-    return Md3eComicCatalogCardShell(
+    return ComicCatalogCardShell(
       enabled: cardEnabled,
       dragged: dragged,
       trackHover: visualState == null,
@@ -210,18 +208,18 @@ class Md3eComicCard extends StatelessWidget {
   }
 
   bool get _effectiveSelectionMode {
-    if (visualState == Md3eComicCardVisualState.selectionUnselected ||
-        visualState == Md3eComicCardVisualState.selectionSelected) {
+    if (visualState == ComicCardVisualState.selectionUnselected ||
+        visualState == ComicCardVisualState.selectionSelected) {
       return true;
     }
     return selectionMode;
   }
 
   bool get _effectiveSelected {
-    if (visualState == Md3eComicCardVisualState.selectionSelected) {
+    if (visualState == ComicCardVisualState.selectionSelected) {
       return true;
     }
-    if (visualState == Md3eComicCardVisualState.selectionUnselected) {
+    if (visualState == ComicCardVisualState.selectionUnselected) {
       return false;
     }
     return selected;
@@ -235,18 +233,18 @@ class Md3eComicCard extends StatelessWidget {
     onTap?.call();
   }
 
-  static double _pinnedOverlayAlphaFor(Md3eComicCardVisualState? state) {
+  static double _pinnedOverlayAlphaFor(ComicCardVisualState? state) {
     switch (state) {
-      case Md3eComicCardVisualState.pressed:
-      case Md3eComicCardVisualState.focused:
-        return kMd3eComicCatalogPinnedOverlayAlphaStrong;
-      case Md3eComicCardVisualState.hovered:
-      case Md3eComicCardVisualState.dragged:
-        return kMd3eComicCatalogPinnedOverlayAlphaLight;
-      case Md3eComicCardVisualState.disabled:
-      case Md3eComicCardVisualState.normal:
-      case Md3eComicCardVisualState.selectionUnselected:
-      case Md3eComicCardVisualState.selectionSelected:
+      case ComicCardVisualState.pressed:
+      case ComicCardVisualState.focused:
+        return kComicCatalogPinnedOverlayAlphaStrong;
+      case ComicCardVisualState.hovered:
+      case ComicCardVisualState.dragged:
+        return kComicCatalogPinnedOverlayAlphaLight;
+      case ComicCardVisualState.disabled:
+      case ComicCardVisualState.normal:
+      case ComicCardVisualState.selectionUnselected:
+      case ComicCardVisualState.selectionSelected:
       case null:
         return 0;
     }
@@ -256,7 +254,7 @@ class Md3eComicCard extends StatelessWidget {
     required String title,
     required double? readProgress,
   }) {
-    if (!md3eShowsReadProgressStrip(readProgress)) {
+    if (!showsReadProgressStrip(readProgress)) {
       return title;
     }
     final int percent = (readProgress!.clamp(0.0, 1.0) * 100).round();

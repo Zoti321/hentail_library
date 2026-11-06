@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
-import 'package:motor/motor.dart';
+import 'package:motor/motor.dart' as motor;
 
 /// Lab defaults for MD3E motion (motor + M3E duration/curve tokens).
-abstract final class Md3eMotion {
+abstract final class LabMotion {
   static Duration get durationShort => M3EMotion.short4;
 
   static Duration get durationMedium => M3EMotion.medium2;
@@ -15,11 +15,11 @@ abstract final class Md3eMotion {
   static Curve get curveEmphasizedAccelerate => M3EMotion.emphasizedAccelerate;
 
   /// Preferred spring for expressive micro-interactions in MD3E widgets.
-  static const Motion expressiveSpring = Motion.smoothSpring();
+  static const motor.Motion expressiveSpring = motor.Motion.smoothSpring();
 
   /// Spatial reveal for shell library secondary pane (M3E navigation drawer).
-  static const MaterialSpringMotion shellLibrarySecondaryReveal =
-      MaterialSpringMotion.expressiveSpatialDefault();
+  static const motor.MaterialSpringMotion shellLibrarySecondaryReveal =
+      motor.MaterialSpringMotion.expressiveSpatialDefault();
 
   /// M3 emphasized curve when a state layer or elevation **enters**.
   static Curve curveForStateEnter({required bool reduceMotion}) {
@@ -37,20 +37,20 @@ abstract final class Md3eMotion {
 
   /// 阅读页顶/底栏显隐：与 M3E 工具栏显隐同款 expressive spatial spring（过冲很轻，符合 M3E 手感），
   /// 不用固定时长曲线。
-  static const MaterialSpringMotion readerChromeReveal =
-      MaterialSpringMotion.expressiveSpatialDefault();
+  static const motor.MaterialSpringMotion readerChromeReveal =
+      motor.MaterialSpringMotion.expressiveSpatialDefault();
 
   /// 空间类显隐 / 尺寸展开（无固定时长，由弹簧自然收敛）：与 M3E expressive spatial 同值。
-  static const MaterialSpringMotion spatialReveal =
-      MaterialSpringMotion.expressiveSpatialDefault();
+  static const motor.MaterialSpringMotion spatialReveal =
+      motor.MaterialSpringMotion.expressiveSpatialDefault();
 
   /// 效果类动效（透明度、颜色、形状背景）：与 M3E 包 expressiveEffectsDefault 同值。
-  static const MaterialSpringMotion effectsSpring =
-      MaterialSpringMotion.expressiveEffectsDefault();
+  static const motor.MaterialSpringMotion effectsSpring =
+      motor.MaterialSpringMotion.expressiveEffectsDefault();
 
   /// Lab 页面转场（shared-axis）的空间弹簧：与 M3E expressiveSpatialDefault 同值。
-  static const MaterialSpringMotion routeSpring =
-      MaterialSpringMotion.expressiveSpatialDefault();
+  static const motor.MaterialSpringMotion routeSpring =
+      motor.MaterialSpringMotion.expressiveSpatialDefault();
 
   /// Lab 页面转场时长（弹簧按此时长采样；0.5s 内基本稳定）。
   static const Duration routeTransitionDuration = Duration(milliseconds: 500);

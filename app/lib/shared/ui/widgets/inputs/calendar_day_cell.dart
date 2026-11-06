@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 月历日格：在 M3E 日格基础上为圆形选中区绘制 state layer。
-class Md3eCalendarDayCell extends StatelessWidget {
-  const Md3eCalendarDayCell({
+class CalendarDayCell extends StatelessWidget {
+  const CalendarDayCell({
     required this.date,
     required this.selected,
     required this.today,

@@ -4,12 +4,12 @@ import 'package:hentai_library/shared/ui/widgets/lists/reorder_exclude.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-const double kMd3eSplitListInnerRadius = 4;
-const double kMd3eSplitListRowGap = 4;
+const double kSplitListInnerRadius = 4;
+const double kSplitListRowGap = 4;
 
 /// 拖拽浮层的外观（颜色、圆角）。由可拖拽分段组注入，行据此绘制浮层背景。
-class Md3eSplitDragScope extends InheritedWidget {
-  const Md3eSplitDragScope({
+class SplitDragScope extends InheritedWidget {
+  const SplitDragScope({
     required this.color,
     required this.radius,
     required super.child,
@@ -19,24 +19,24 @@ class Md3eSplitDragScope extends InheritedWidget {
   final Color color;
   final double radius;
 
-  static Md3eSplitDragScope? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<Md3eSplitDragScope>();
+  static SplitDragScope? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<SplitDragScope>();
   }
 
   @override
-  bool updateShouldNotify(Md3eSplitDragScope oldWidget) {
+  bool updateShouldNotify(SplitDragScope oldWidget) {
     return color != oldWidget.color || radius != oldWidget.radius;
   }
 }
 
-/// One row inside [Md3eSplitListGroup]; animates corner radius on press.
-class Md3eSplitListRow extends StatefulWidget {
-  const Md3eSplitListRow({
+/// One row inside [SplitListGroup]; animates corner radius on press.
+class SplitListRow extends StatefulWidget {
+  const SplitListRow({
     super.key,
     required this.child,
-    this.topRadius = kMd3eSplitListInnerRadius,
-    this.bottomRadius = kMd3eSplitListInnerRadius,
-    this.pressedRadius = kMd3eTonalSurfaceRadius,
+    this.topRadius = kSplitListInnerRadius,
+    this.bottomRadius = kSplitListInnerRadius,
+    this.pressedRadius = kTonalSurfaceRadius,
     this.onTap,
     this.mouseCursor,
   });
@@ -50,18 +50,18 @@ class Md3eSplitListRow extends StatefulWidget {
 
   static ValueChanged<bool>? pressReporterOf(BuildContext context) {
     return context
-        .dependOnInheritedWidgetOfExactType<_Md3eSplitRowScope>()
+        .dependOnInheritedWidgetOfExactType<_SplitRowScope>()
         ?.onPressChanged;
   }
 
   @override
-  State<Md3eSplitListRow> createState() => _Md3eSplitListRowState();
+  State<SplitListRow> createState() => _SplitListRowState();
 }
 
-class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
+class _SplitListRowState extends State<SplitListRow> {
   bool _pressed = false;
 
-  /// 本次按下是否落在 [Md3eReorderExclude] 区域（如行内「更多」按钮）内；
+  /// 本次按下是否落在 [ReorderExclude] 区域（如行内「更多」按钮）内；
   /// 是则不触发行点击，避免点控件时误打开整行。
   bool _pressStartedInExclude = false;
 
@@ -77,12 +77,12 @@ class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme colors = M3ETheme.of(context).colorScheme;
-    final Md3eSplitDragScope? drag = Md3eSplitDragScope.maybeOf(context);
+    final SplitDragScope? drag = SplitDragScope.maybeOf(context);
     final Widget child = widget.onTap == null
         ? widget.child
         : Listener(
             onPointerDown: (PointerDownEvent event) => _pressStartedInExclude =
-                md3eIsPointerInReorderExclude(context, event.position),
+                isPointerInReorderExclude(context, event.position),
             child: InkWell(
               onTap: _handleTap,
               mouseCursor: widget.mouseCursor,
@@ -96,7 +96,7 @@ class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
     final double bottomRadius =
         drag?.radius ?? (_pressed ? widget.pressedRadius : widget.bottomRadius);
 
-    return Md3eEffectsDecoratedBox(
+    return EffectsDecoratedBox(
       decoration: BoxDecoration(
         color: drag?.color ?? colors.surfaceContainer,
         borderRadius: BorderRadius.vertical(
@@ -106,30 +106,27 @@ class _Md3eSplitListRowState extends State<Md3eSplitListRow> {
       ),
       child: Material(
         type: MaterialType.transparency,
-        child: _Md3eSplitRowScope(onPressChanged: _reportPress, child: child),
+        child: _SplitRowScope(onPressChanged: _reportPress, child: child),
       ),
     );
   }
 }
 
-class _Md3eSplitRowScope extends InheritedWidget {
-  const _Md3eSplitRowScope({
-    required this.onPressChanged,
-    required super.child,
-  });
+class _SplitRowScope extends InheritedWidget {
+  const _SplitRowScope({required this.onPressChanged, required super.child});
 
   final ValueChanged<bool> onPressChanged;
 
   @override
-  bool updateShouldNotify(_Md3eSplitRowScope oldWidget) => false;
+  bool updateShouldNotify(_SplitRowScope oldWidget) => false;
 }
 
 /// Stacked settings rows with outer 24dp radius and 4dp gutters.
-class Md3eSplitListGroup extends StatelessWidget {
-  const Md3eSplitListGroup({
+class SplitListGroup extends StatelessWidget {
+  const SplitListGroup({
     super.key,
     required this.children,
-    this.outerRadius = kMd3eTonalSurfaceRadius,
+    this.outerRadius = kTonalSurfaceRadius,
   });
 
   final List<Widget> children;
@@ -141,12 +138,12 @@ class Md3eSplitListGroup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         for (int i = 0; i < children.length; i++) ...<Widget>[
-          if (i > 0) const SizedBox(height: kMd3eSplitListRowGap),
-          Md3eSplitListRow(
-            topRadius: i == 0 ? outerRadius : kMd3eSplitListInnerRadius,
+          if (i > 0) const SizedBox(height: kSplitListRowGap),
+          SplitListRow(
+            topRadius: i == 0 ? outerRadius : kSplitListInnerRadius,
             bottomRadius: i == children.length - 1
                 ? outerRadius
-                : kMd3eSplitListInnerRadius,
+                : kSplitListInnerRadius,
             pressedRadius: outerRadius,
             child: children[i],
           ),

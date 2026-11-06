@@ -12,4 +12,4 @@ export 'public/read_session_launch_port.dart';
 export 'public/reader_session_port.dart';
 export 'public/reading_preference_l10n.dart';
 export 'public/reading_preference_types.dart';
-export 'public/ui/reader_md3e_page.dart';
+export 'public/ui/reader_page.dart';

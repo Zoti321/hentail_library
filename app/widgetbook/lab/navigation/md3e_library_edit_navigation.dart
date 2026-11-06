@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/ui/layout/library_edit_form_metrics.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/motion/motion.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library/library_edit_page.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/features/library_admin/presentation/patterns/library_edit_form.dart';
 
@@ -15,9 +15,9 @@ import 'package:hentai_library/shared/domain/models/value_objects/form/library_f
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 打开 Library 创建/编辑：compact / medium M3E 全屏；expanded+ M3E basic dialog。
-Future<LibraryForm?> showMd3eLibraryEdit({
+Future<LibraryForm?> showLibraryEdit({
   required BuildContext context,
-  required Md3eLibraryEditPageIntent intent,
+  required LibraryEditPageIntent intent,
   LibraryForm? initialForm,
 }) {
   return _Md3eLibraryEditDialog.present(
@@ -35,13 +35,13 @@ class _Md3eLibraryEditDialog extends StatefulWidget {
     required this.formOnly,
   });
 
-  final Md3eLibraryEditPageIntent intent;
+  final LibraryEditPageIntent intent;
   final LibraryForm? initialForm;
   final bool formOnly;
 
   static Future<LibraryForm?> present(
     BuildContext context, {
-    required Md3eLibraryEditPageIntent intent,
+    required LibraryEditPageIntent intent,
     LibraryForm? initialForm,
   }) {
     final GlobalKey<_Md3eLibraryEditDialogState> formKey =
@@ -49,8 +49,8 @@ class _Md3eLibraryEditDialog extends StatefulWidget {
     final AppLocalizations l10n = context.l10n;
     final String title = _titleForIntent(l10n, intent);
 
-    if (Md3eLabDialogPresenter.usesFullScreenPresentation(context)) {
-      return Md3eLabDialogPresenter.showFullScreen<LibraryForm>(
+    if (LabDialogPresenter.usesFullScreenPresentation(context)) {
+      return LabDialogPresenter.showFullScreen<LibraryForm>(
         context,
         title: title,
         body: _Md3eLibraryEditDialog(
@@ -71,7 +71,7 @@ class _Md3eLibraryEditDialog extends StatefulWidget {
       );
     }
 
-    return Md3eLabDialogPresenter.showBasic<LibraryForm>(
+    return LabDialogPresenter.showBasic<LibraryForm>(
       context,
       dialog: _Md3eLibraryEditDialog(
         key: formKey,
@@ -84,15 +84,15 @@ class _Md3eLibraryEditDialog extends StatefulWidget {
 
   static String _titleForIntent(
     AppLocalizations l10n,
-    Md3eLibraryEditPageIntent intent,
+    LibraryEditPageIntent intent,
   ) {
     return switch (intent) {
-      Md3eLibraryEditPageIntent.createLocal =>
+      LibraryEditPageIntent.createLocal =>
         l10n.dialogCreateLocalLibraryTitle,
-      Md3eLibraryEditPageIntent.createRemote =>
+      LibraryEditPageIntent.createRemote =>
         l10n.dialogCreateRemoteLibraryTitle,
-      Md3eLibraryEditPageIntent.editLocal ||
-      Md3eLibraryEditPageIntent.editRemote => l10n.dialogEditLibraryTitle,
+      LibraryEditPageIntent.editLocal ||
+      LibraryEditPageIntent.editRemote => l10n.dialogEditLibraryTitle,
     };
   }
 
@@ -106,20 +106,20 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
   bool _saving = false;
 
   bool get _isCreate => switch (widget.intent) {
-    Md3eLibraryEditPageIntent.createLocal ||
-    Md3eLibraryEditPageIntent.createRemote => true,
-    Md3eLibraryEditPageIntent.editLocal ||
-    Md3eLibraryEditPageIntent.editRemote => false,
+    LibraryEditPageIntent.createLocal ||
+    LibraryEditPageIntent.createRemote => true,
+    LibraryEditPageIntent.editLocal ||
+    LibraryEditPageIntent.editRemote => false,
   };
 
-  static LibraryForm _formForIntent(Md3eLibraryEditPageIntent intent) {
+  static LibraryForm _formForIntent(LibraryEditPageIntent intent) {
     return switch (intent) {
-      Md3eLibraryEditPageIntent.editLocal =>
-        Md3eLibraryEditPreviewData.editLocalForm(),
-      Md3eLibraryEditPageIntent.editRemote =>
-        Md3eLibraryEditPreviewData.editRemoteForm(),
-      Md3eLibraryEditPageIntent.createLocal => LibraryForm.createLocal(),
-      Md3eLibraryEditPageIntent.createRemote => LibraryForm.createRemote(),
+      LibraryEditPageIntent.editLocal =>
+        LibraryEditPreviewData.editLocalForm(),
+      LibraryEditPageIntent.editRemote =>
+        LibraryEditPreviewData.editRemoteForm(),
+      LibraryEditPageIntent.createLocal => LibraryForm.createLocal(),
+      LibraryEditPageIntent.createRemote => LibraryForm.createRemote(),
     };
   }
 
@@ -135,7 +135,7 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
       _validation = null;
       _saving = true;
     });
-    await Future<void>.delayed(Md3eMotion.labSimulatedSaveDuration);
+    await Future<void>.delayed(LabMotion.labSimulatedSaveDuration);
     if (!mounted) {
       return;
     }
@@ -144,7 +144,7 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
   }
 
   Widget _buildForm() {
-    return Md3eLibraryEditForm(
+    return LibraryEditForm(
       form: _form,
       isCreate: _isCreate,
       validation: _validation,
@@ -168,14 +168,14 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
     }
 
     final AppLocalizations l10n = context.l10n;
-    final double horizontalInset = Md3ePageLayoutSpec.of(context)
+    final double horizontalInset = PageLayoutSpec.of(context)
         .horizontalInset;
 
     return M3EDialog(
       title: _Md3eLibraryEditDialog._titleForIntent(l10n, widget.intent),
       content: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: Md3eLibraryEditFormMetrics.maxWidth,
+          maxWidth: LibraryEditFormMetrics.maxWidth,
           maxHeight: MediaQuery.sizeOf(context).height * 0.55,
         ),
         child: SingleChildScrollView(
@@ -184,7 +184,7 @@ class _Md3eLibraryEditDialogState extends State<_Md3eLibraryEditDialog> {
         ),
       ),
       bottomDivider: true,
-      actions: md3eMetadataEditDialogActions(
+      actions: metadataEditDialogActions(
         context,
         onCancel: () => Navigator.of(context).pop(),
         onSave: _saving ? null : _saveAndPop,

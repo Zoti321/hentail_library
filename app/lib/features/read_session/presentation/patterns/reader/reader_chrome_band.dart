@@ -6,39 +6,37 @@ import 'package:hentai_library/shared/ui/layout/reader_chrome_metrics.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-enum Md3eReaderChromeBandEdge { top, bottom }
+enum ReaderChromeBandEdge { top, bottom }
 
 /// 沉浸顶/底 chrome：MD3 半透明 surface + 轻磨砂（非纯黑条）。
-class Md3eReaderChromeBand extends StatelessWidget {
-  const Md3eReaderChromeBand({
+class ReaderChromeBand extends StatelessWidget {
+  const ReaderChromeBand({
     super.key,
     required this.edge,
     required this.child,
     this.padding,
   });
 
-  final Md3eReaderChromeBandEdge edge;
+  final ReaderChromeBandEdge edge;
   final Widget child;
   final EdgeInsetsGeometry? padding;
 
   static bool _useCenteredContentRail(double viewportWidth) {
-    return Md3eWindowSizeClass.fromWidth(viewportWidth) ==
-        Md3eWindowSizeClass.extraLarge;
+    return WindowSizeClass.fromWidth(viewportWidth) ==
+        WindowSizeClass.extraLarge;
   }
 
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final bool top = edge == Md3eReaderChromeBandEdge.top;
+    final bool top = edge == ReaderChromeBandEdge.top;
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Color fill = Md3eReaderImmersiveColors.chromeSurface(scheme);
+    final Color fill = ReaderImmersiveColors.chromeSurface(scheme);
     final BorderRadius clipRadius = top
         ? BorderRadius.zero
         : const BorderRadius.vertical(
-            top: Radius.circular(
-              Md3eReaderImmersiveColors.bottomChromeTopRadius,
-            ),
+            top: Radius.circular(ReaderImmersiveColors.bottomChromeTopRadius),
           );
 
     Widget content = Padding(
@@ -83,9 +81,7 @@ class Md3eReaderChromeBand extends StatelessWidget {
       alignment: top ? Alignment.topCenter : Alignment.bottomCenter,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: Md3eReaderChromeMetrics.chromeContentMaxWidth(
-            viewportWidth,
-          ),
+          maxWidth: ReaderChromeMetrics.chromeContentMaxWidth(viewportWidth),
         ),
         child: child,
       ),

@@ -4,8 +4,8 @@ import 'package:hentai_library/features/read_session/presentation/patterns/reade
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 阅读器底栏：页码 + [M3ESlider]（Lab 拆分组件）。
-class Md3eReaderPageProgress extends StatefulWidget {
-  const Md3eReaderPageProgress({
+class ReaderPageProgress extends StatefulWidget {
+  const ReaderPageProgress({
     super.key,
     required this.currentPage,
     required this.totalPages,
@@ -17,10 +17,10 @@ class Md3eReaderPageProgress extends StatefulWidget {
   final ValueChanged<int> onPageChanged;
 
   @override
-  State<Md3eReaderPageProgress> createState() => _Md3eReaderPageProgressState();
+  State<ReaderPageProgress> createState() => _ReaderPageProgressState();
 }
 
-class _Md3eReaderPageProgressState extends State<Md3eReaderPageProgress> {
+class _ReaderPageProgressState extends State<ReaderPageProgress> {
   double? _dragValue;
 
   int get _safeTotal => widget.totalPages < 1 ? 1 : widget.totalPages;
@@ -34,9 +34,7 @@ class _Md3eReaderPageProgressState extends State<Md3eReaderPageProgress> {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
-    final Md3eReaderChromeScope? chrome = Md3eReaderChromeScope.maybeOf(
-      context,
-    );
+    final ReaderChromeScope? chrome = ReaderChromeScope.maybeOf(context);
     final Color pageNumberColor = chrome?.onChrome ?? scheme.onSurface;
     final TextStyle pageNumberStyle = type.labelLarge.copyWith(
       fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
@@ -46,7 +44,7 @@ class _Md3eReaderPageProgressState extends State<Md3eReaderPageProgress> {
         .clamp(1.0, _safeTotal.toDouble());
 
     return Semantics(
-      label: Md3eReaderPageCopy.pageProgressLabel(_displayPage, _safeTotal),
+      label: ReaderPageCopy.pageProgressLabel(_displayPage, _safeTotal),
       child: Row(
         children: <Widget>[
           SizedBox(
@@ -61,7 +59,7 @@ class _Md3eReaderPageProgressState extends State<Md3eReaderPageProgress> {
               size: M3ESliderSize.xs,
               haptic: M3EHapticFeedback.light,
               semanticFormatterCallback: (double value) =>
-                  Md3eReaderPageCopy.pageProgressLabel(
+                  ReaderPageCopy.pageProgressLabel(
                     value.round().clamp(1, _safeTotal),
                     _safeTotal,
                   ),

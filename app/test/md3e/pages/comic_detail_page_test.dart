@@ -1,0 +1,26 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
+
+import '../../../widgetbook/preview/md3e_comic_detail_page_preview_data.dart';
+
+import '../../support/pump_app.dart';
+
+void main() {
+  testWidgets('shows title and read actions', (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(const Size(1024, 800));
+    await pumpApp(
+      tester,
+      home: Center(
+        child: SizedBox(
+          width: 1024,
+          height: 800,
+          child: ComicDetailLayout(entry: ComicDetailPagePreviewData.sample()),
+        ),
+      ),
+    );
+    expect(find.text('葬送的芙莉莲'), findsOneWidget);
+    expect(find.text('阅读'), findsOneWidget);
+    await tester.binding.setSurfaceSize(null);
+  });
+}
