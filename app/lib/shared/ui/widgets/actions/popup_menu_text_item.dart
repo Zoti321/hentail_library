@@ -22,30 +22,25 @@ class PopupMenuTextItem extends HookWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final HentaiColorScheme h = context.hentai;
     final ValueNotifier<bool> hovered = useState(false);
 
     // Idle must be opaque (panel surface). Lerping from Colors.transparent
     // goes through muddy greys and looks like a broken color animation.
     final Color idleBackground = cs.surface;
     // Light danger wash (not solid red) so hover stays readable.
-    final Color dangerHover = Color.lerp(
-      idleBackground,
-      h.contextMenuDanger,
-      0.2,
-    )!;
+    final Color dangerHover = Color.lerp(idleBackground, cs.error, 0.2)!;
 
     final Color background;
     final Color foreground;
     if (!enabled) {
       background = idleBackground;
-      foreground = h.textTertiary;
+      foreground = cs.onSurfaceVariant;
     } else if (hovered.value) {
-      background = isDestructive ? dangerHover : h.contextMenuHover;
-      foreground = isDestructive ? h.contextMenuDanger : h.textPrimary;
+      background = isDestructive ? dangerHover : cs.surfaceContainerHighest;
+      foreground = isDestructive ? cs.error : cs.onSurface;
     } else {
       background = idleBackground;
-      foreground = h.textPrimary;
+      foreground = cs.onSurface;
     }
 
     // copyWith keeps ThemeData.fontFamily (MI_Sans_Regular); a bare TextStyle

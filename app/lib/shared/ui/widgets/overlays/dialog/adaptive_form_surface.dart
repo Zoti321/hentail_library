@@ -261,7 +261,7 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                 color: backgroundColor ?? cs.surface,
                 borderRadius: BorderRadius.circular(radius),
                 border: Border.all(
-                  color: context.hentai.borderSubtle.withValues(
+                  color: Theme.of(context).colorScheme.outlineVariant.withValues(
                     alpha: (1 - t).clamp(0.0, 1.0),
                   ),
                   width: 1,
@@ -303,7 +303,7 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: pageMode ? tokens.text.titleSm : 16,
                                 fontWeight: FontWeight.w600,
-                                color: context.hentai.textPrimary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),

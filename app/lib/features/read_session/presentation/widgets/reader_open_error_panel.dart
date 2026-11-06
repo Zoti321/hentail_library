@@ -34,7 +34,7 @@ class ReaderOpenErrorPanel extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: tokens.text.bodyLg,
-                  color: context.hentai.readerTextMuted,
+                  color: context.reader.readerTextMuted,
                 ),
               ),
               SizedBox(height: tokens.spacing.xl),

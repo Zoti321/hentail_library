@@ -44,7 +44,7 @@ class _MetadataExportOptionsDialogState
             l10n.settingsMetadataBackupExportDescription,
             style: TextStyle(
               fontSize: tokens.text.bodyMd,
-              color: context.hentai.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               height: 1.45,
             ),
           ),

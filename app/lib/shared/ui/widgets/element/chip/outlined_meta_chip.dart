@@ -63,11 +63,11 @@ class OutlinedMetaChip extends HookWidget {
     final AppThemeTokens tokens = context.tokens;
     final BorderRadius borderRadius = BorderRadius.circular(tokens.radius.pill);
     final Color effectiveBorder = showBorder
-        ? (borderColor ?? context.hentai.borderSubtle)
+        ? (borderColor ?? Theme.of(context).colorScheme.outlineVariant)
         : Colors.transparent;
     final Color restBackground =
         backgroundColor ?? (showBorder ? cs.surface : Colors.transparent);
-    final Color effectiveTextColor = textColor ?? context.hentai.textSecondary;
+    final Color effectiveTextColor = textColor ?? Theme.of(context).colorScheme.onSurfaceVariant;
     final EdgeInsets padding = compact
         ? const EdgeInsets.symmetric(horizontal: 10, vertical: 4)
         : const EdgeInsets.symmetric(horizontal: 12, vertical: 6);

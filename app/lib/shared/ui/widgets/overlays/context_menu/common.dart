@@ -96,7 +96,7 @@ class ContextMenuContainer extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: context.hentai.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -128,16 +128,15 @@ class ContextMenuActionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final HentaiColorScheme palette = context.hentai;
     final Color hoverColor = isDestructive
-        ? palette.contextMenuDanger.withAlpha(26)
+        ? cs.error.withAlpha(26)
         : cs.primary.withAlpha(10);
     final Color iconColor = enabled
-        ? (isDestructive ? palette.contextMenuDanger : palette.iconDefault)
-        : palette.iconSecondary;
+        ? (isDestructive ? cs.error : cs.onSurfaceVariant)
+        : cs.onSurfaceVariant;
     final Color labelColor = enabled
-        ? (isDestructive ? palette.contextMenuDanger : palette.textPrimary)
-        : palette.textTertiary;
+        ? (isDestructive ? cs.error : cs.onSurface)
+        : cs.onSurfaceVariant;
     return Material(
       color: Colors.transparent,
       child: InkWell(

@@ -220,7 +220,7 @@ class ReaderPage extends HookConsumerWidget {
         child: M3ETheme(
           data: withAppFontFamily(M3ETheme.of(context)),
           child: Scaffold(
-            backgroundColor: theme.hentai.readerBackground,
+            backgroundColor: theme.reader.readerBackground,
             body: shellAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (Object e, StackTrace st) => ReaderOpenErrorPanel(

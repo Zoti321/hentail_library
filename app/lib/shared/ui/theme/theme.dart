@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
-import 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
+import 'package:hentai_library/shared/ui/theme/color/reader_color_scheme.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_motion_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_shadow_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
@@ -12,10 +12,9 @@ import 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart
 import 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
 
 export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
-export 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
 export 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart';
 export 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
-export 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
+export 'package:hentai_library/shared/ui/theme/color/reader_color_scheme.dart';
 export 'package:hentai_library/shared/ui/theme/extensions/theme_context_extensions.dart';
 export 'package:hentai_library/shared/ui/theme/tokens/app_layout_tokens.dart';
 export 'package:hentai_library/shared/ui/theme/tokens/app_motion_tokens.dart';
@@ -55,9 +54,6 @@ ThemeData buildAppTheme(
   final Color seed = colorSchemeSeedForId(colorSchemeId);
   final M3EThemeData m3e = buildAppM3eThemeData(brightness, seed: seed);
   final ColorScheme colorScheme = flutterColorSchemeFromM3e(m3e.colorScheme);
-  final HentaiColorScheme semantic = HentaiColorScheme.forBrightness(
-    brightness,
-  );
   final AppThemeTokens tokens = brightness == Brightness.dark
       ? AppThemeTokens.dark()
       : AppThemeTokens.light();
@@ -99,7 +95,12 @@ ThemeData buildAppTheme(
         TargetPlatform.windows: DesktopFadeThroughPageTransitionsBuilder(),
       },
     ),
-    extensions: <ThemeExtension<dynamic>>[tokens, semantic, shadows, motion],
+    extensions: <ThemeExtension<dynamic>>[
+      tokens,
+      ReaderColorScheme.immersive,
+      shadows,
+      motion,
+    ],
   );
 }
 

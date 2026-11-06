@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum ComicCoverPlaceholderVariant { card, detail }
@@ -20,48 +19,54 @@ class ComicCoverPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HentaiColorScheme semantic = context.hentai;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return switch (variant) {
-      ComicCoverPlaceholderVariant.card => _buildCard(semantic),
-      ComicCoverPlaceholderVariant.detail => _buildDetail(semantic),
+      ComicCoverPlaceholderVariant.card => _buildCard(colorScheme),
+      ComicCoverPlaceholderVariant.detail => _buildDetail(colorScheme),
     };
   }
 
-  Widget _buildCard(HentaiColorScheme semantic) {
+  Widget _buildCard(ColorScheme colorScheme) {
     return switch (kind) {
       ComicCoverPlaceholderKind.loading => ColoredBox(
-        color: semantic.imagePlaceholder,
+        color: colorScheme.surfaceContainerHighest,
       ),
       ComicCoverPlaceholderKind.noCover => ColoredBox(
-        color: semantic.imageFallback,
+        color: colorScheme.surfaceContainerHigh,
         child: Center(
-          child: Icon(LucideIcons.imageOff, color: semantic.iconSecondary),
+          child: Icon(
+            LucideIcons.imageOff,
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
       ),
       ComicCoverPlaceholderKind.error => ColoredBox(
-        color: semantic.imageFallback,
+        color: colorScheme.surfaceContainerHigh,
         child: Center(
-          child: Icon(LucideIcons.circleAlert, color: semantic.textTertiary),
+          child: Icon(
+            LucideIcons.circleAlert,
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
       ),
     };
   }
 
-  Widget _buildDetail(HentaiColorScheme semantic) {
+  Widget _buildDetail(ColorScheme colorScheme) {
     final double resolvedIconSize = iconSize ?? 40;
     return switch (kind) {
       ComicCoverPlaceholderKind.loading => const SizedBox.expand(),
       ComicCoverPlaceholderKind.noCover => Center(
         child: Icon(
           LucideIcons.imageOff,
-          color: semantic.iconSecondary,
+          color: colorScheme.onSurfaceVariant,
           size: resolvedIconSize,
         ),
       ),
       ComicCoverPlaceholderKind.error => Center(
         child: Icon(
           LucideIcons.circleAlert,
-          color: semantic.textTertiary,
+          color: colorScheme.onSurfaceVariant,
           size: resolvedIconSize,
         ),
       ),

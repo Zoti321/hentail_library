@@ -15,7 +15,7 @@ void main() {
           useDynamicColor: true,
         );
         expect(theme.extension<AppThemeTokens>(), isNotNull);
-        expect(theme.extension<HentaiColorScheme>(), isNotNull);
+        expect(theme.extension<ReaderColorScheme>(), isNotNull);
         expect(theme.extension<AppShadowTokens>(), isNotNull);
         expect(theme.extension<AppMotionTokens>(), isNotNull);
       }

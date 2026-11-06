@@ -220,7 +220,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
   }
 
   Widget _buildReaderLoadingSurface(BuildContext context) {
-    return ColoredBox(color: context.hentai.readerBackground);
+    return ColoredBox(color: context.reader.readerBackground);
   }
 
   Widget _buildReaderImageErrorPlaceholder(BuildContext context) {
@@ -229,7 +229,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       child: Icon(
         LucideIcons.bookImage,
         size: 24,
-        color: context.hentai.readerTextMuted,
+        color: context.reader.readerTextMuted,
       ),
     );
   }

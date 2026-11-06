@@ -129,7 +129,7 @@ List<RouteBase> buildSharedContentRoutes({
         // 详情 → 阅读：M3 forward/back + Lab shared-axis（非 Shell 顶层 fade-through）。
         return buildSharedAxisPage(
           state: state,
-          fillColor: context.hentai.readerBackground,
+          fillColor: context.reader.readerBackground,
           transitionDuration: LabMotion.motionDurationOf(
             context,
             kSharedAxisRouteDuration,

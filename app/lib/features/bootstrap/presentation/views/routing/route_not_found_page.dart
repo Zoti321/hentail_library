@@ -24,14 +24,14 @@ class RouteNotFoundPage extends StatelessWidget {
             Icon(
               LucideIcons.circleAlert,
               size: 48,
-              color: context.hentai.textTertiary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             Text(
               l10n.notFoundTitle,
               style: TextStyle(
                 fontSize: tokens.text.titleSm,
                 fontWeight: FontWeight.w600,
-                color: context.hentai.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             Text(
@@ -39,7 +39,7 @@ class RouteNotFoundPage extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: tokens.text.bodySm,
-                color: context.hentai.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             Wrap(

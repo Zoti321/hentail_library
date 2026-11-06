@@ -93,7 +93,7 @@ class ReadingHistoryCard extends HookConsumerWidget {
                   color: cardBackground,
                   borderRadius: cardRadius,
                   border: Border.all(
-                    color: context.hentai.borderSubtle,
+                    color: Theme.of(context).colorScheme.outlineVariant,
                     width: 1,
                   ),
                   boxShadow: cardShadows,
@@ -128,7 +128,7 @@ class ReadingHistoryCard extends HookConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
-                                  color: context.hentai.textPrimary,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -137,14 +137,14 @@ class ReadingHistoryCard extends HookConsumerWidget {
                                   Icon(
                                     LucideIcons.clock,
                                     size: 12,
-                                    color: context.hentai.textTertiary,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     context.l10n.relativeTimeAgo(lastReadTime),
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: context.hentai.textTertiary,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ],
@@ -156,7 +156,7 @@ class ReadingHistoryCard extends HookConsumerWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: context.hentai.textSecondary,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -176,7 +176,7 @@ class ReadingHistoryCard extends HookConsumerWidget {
                               iconSize: 18,
                               size: 32,
                               borderRadius: tokens.radius.md,
-                              foregroundColor: context.hentai.textTertiary,
+                              foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
                               hoverColor: theme.hoverColor,
                               overlayColor: theme.hoverColor.withAlpha(110),
                               delayTooltipThreeSeconds: true,

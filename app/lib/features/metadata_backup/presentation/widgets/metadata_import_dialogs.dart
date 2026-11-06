@@ -271,7 +271,7 @@ class _MetadataImportDetailsAccordion extends StatelessWidget {
                     child: Icon(
                       LucideIcons.chevronDown,
                       size: 16,
-                      color: context.hentai.iconSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
