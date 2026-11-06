@@ -53,5 +53,19 @@ void main() {
       );
       expect(teal.colorScheme.primary, isNot(brand.colorScheme.primary));
     });
+
+    test('useDynamicColor stub does not change brand assembly', () {
+      final ThemeData off = buildAppTheme(
+        Brightness.light,
+        colorSchemeId: 'brand',
+      );
+      final ThemeData on = buildAppTheme(
+        Brightness.light,
+        colorSchemeId: 'brand',
+        useDynamicColor: true,
+      );
+      expect(on.colorScheme.primary, off.colorScheme.primary);
+      expect(on.colorScheme.surface, off.colorScheme.surface);
+    });
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
 
 /// App UI font ([pubspec.yaml] `MI_Sans_Regular`); aligned with production shell.
 const String kAppFontFamily = 'MI_Sans_Regular';
@@ -8,11 +9,20 @@ const String kAppFontFamily = 'MI_Sans_Regular';
 /// MD3E default seed (Widgetbook Lab purple). Production uses the same seed.
 const Color kLabSeedColor = Color(0xFF6750A4);
 
+/// Tone-based color system：seed → MCU fidelity scheme → M3E roles。
+///
+/// `M3EColorScheme.fromSeed` 不透传 variant，故经 material_ui
+/// [ColorScheme.fromSeed] 薄封装后再 [M3EColorScheme.fromColorScheme]。
 M3EColorScheme m3eColorSchemeForBrightness(
   Brightness brightness, {
   Color seed = kLabSeedColor,
 }) {
-  return M3EColorScheme.fromSeed(seed, brightness: brightness);
+  final material_ui.ColorScheme seeded = material_ui.ColorScheme.fromSeed(
+    seedColor: seed,
+    brightness: brightness,
+    dynamicSchemeVariant: material_ui.DynamicSchemeVariant.fidelity,
+  );
+  return M3EColorScheme.fromColorScheme(seeded);
 }
 
 /// Applies app font to [M3EThemeData.fontFamily] and [M3EThemeData.typography].
