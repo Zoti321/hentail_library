@@ -19,7 +19,15 @@ Future<AppColorSchemePreference?> showColorSchemePickerDialog({
   final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
     context,
   );
-  final M3EThemeData m3e = withAppFontFamily(scope.m3e);
+  final M3EThemeData base = withAppFontFamily(scope.m3e);
+  // 配色弹窗用偏白的 surfaceContainerLow，与壳层 surface 画布区分。
+  final M3EThemeData m3e = base.copyWith(
+    dialogTheme: base.dialogTheme.copyWith(
+      appearance: base.dialogTheme.appearance.copyWith(
+        containerColor: base.colorScheme.surfaceContainerLow,
+      ),
+    ),
+  );
   return M3EDialog.show<AppColorSchemePreference>(
     context,
     dialog: overlayRouteScope(
@@ -144,7 +152,11 @@ class _ColorSchemeOption extends StatelessWidget {
   }
 }
 
-/// 对齐 Kazumi `PaletteCard`：默认 [Card]（不覆盖 color）+ HCT 三色圆 + 选中勾。
+/// 对齐 Kazumi `PaletteCard`：圆角 [Card]（`surfaceContainerLow`）+ HCT 圆形三色调。
+///
+/// 必须用 [Container]（有 decoration、无 child）而非 [ColoredBox]：后者在
+/// [Expanded] 的松约束下会缩成 `constraints.smallest`（`0×h` / `w×0`），
+/// 三色圆不可见，只剩固定尺寸的选中勾。见 diagnostics 测试。
 class _PaletteCard extends StatelessWidget {
   const _PaletteCard({required this.color, required this.selected});
 
@@ -158,29 +170,32 @@ class _PaletteCard extends StatelessWidget {
     final Color tertiary = Color(Hct.from(hct.hue + 50, 20.0, 85.0).toInt());
     final Color primaryContainer = Color(Hct.from(hct.hue, 30.0, 50.0).toInt());
     final Color checkbox = Color(Hct.from(hct.hue, 30.0, 40.0).toInt());
+    final Color surfaceContainerLow =
+        M3ETheme.of(context).colorScheme.surfaceContainerLow;
 
     return SizedBox(
       width: _PaletteMetrics.cardSize,
       height: _PaletteMetrics.cardSize,
       child: Stack(
-        fit: StackFit.expand,
         children: <Widget>[
-          // 与 Kazumi 相同：elevation: 0、不设 color → M3 默认 surfaceContainerLow。
           Card(
             elevation: 0,
             margin: EdgeInsets.zero,
+            color: surfaceContainerLow,
             clipBehavior: Clip.antiAlias,
             child: Padding(
               padding: const EdgeInsets.all(_PaletteMetrics.cardInset),
               child: ClipOval(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Expanded(child: ColoredBox(color: primary)),
+                    Expanded(child: Container(color: primary)),
                     Expanded(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Expanded(child: ColoredBox(color: tertiary)),
-                          Expanded(child: ColoredBox(color: primaryContainer)),
+                          Expanded(child: Container(color: tertiary)),
+                          Expanded(child: Container(color: primaryContainer)),
                         ],
                       ),
                     ),
@@ -200,7 +215,7 @@ class _PaletteCard extends StatelessWidget {
                 ),
                 child: Icon(
                   Icons.check_rounded,
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  color: surfaceContainerLow,
                   size: 12,
                 ),
               ),
