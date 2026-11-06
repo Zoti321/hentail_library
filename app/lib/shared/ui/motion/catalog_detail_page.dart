@@ -7,7 +7,8 @@ import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
 /// 不用 desktop fade-through（前半段目标页 opacity=0 会让 Hero 落地闪一下）。
 /// 对齐 Kazumi：普通 Material 系淡入，共享封面由 [Hero] 在 overlay 上飞行。
 ///
-/// 系列内切卷请传 [CatalogSeriesNavExtra]，改用水平 Shared Axis（同级卷切换）。
+/// 系列内切卷请 [pushReplacement] 并传 [CatalogSeriesNavExtra]，改用水平 Shared Axis；
+/// 勿用 [GoRouter.go]，以免清空库浏览 → 系列详情底层栈。
 const Duration kCatalogDetailPageTransitionDuration = Duration(
   milliseconds: 300,
 );
