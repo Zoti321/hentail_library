@@ -29,14 +29,14 @@ import 'package:hentai_library/features/library_browse/public/catalog/for_comic_
 
 enum _ComicMetadataEditTab { general, authorsTags, fieldLocks }
 
-List<String> TagListWithAdded(List<String> list, String value) {
+List<String> tagListWithAdded(List<String> list, String value) {
   if (list.contains(value)) {
     return list;
   }
   return <String>[...list, value];
 }
 
-List<String> TagListWithRemoved(List<String> list, String value) {
+List<String> tagListWithRemoved(List<String> list, String value) {
   return list.where((String e) => e != value).toList();
 }
 
@@ -149,10 +149,10 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
             _update((d) => d.copyWith(publishedLabel: v)),
         onR18Changed: (bool v) => _update((d) => d.copyWith(isR18: v)),
         onLanguageAdded: (String v) => _update(
-          (d) => d.copyWith(languages: TagListWithAdded(d.languages, v)),
+          (d) => d.copyWith(languages: tagListWithAdded(d.languages, v)),
         ),
         onLanguageRemoved: (String v) => _update(
-          (d) => d.copyWith(languages: TagListWithRemoved(d.languages, v)),
+          (d) => d.copyWith(languages: tagListWithRemoved(d.languages, v)),
         ),
         onSortOrderChanged: (String v) =>
             _update((d) => d.copyWith(seriesSortOrderText: v)),
@@ -409,9 +409,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           scope: scope,
           selectedNames: draft.parodies,
           onAdd: (String v) =>
-              onParodiesChanged(TagListWithAdded(draft.parodies, v)),
+              onParodiesChanged(tagListWithAdded(draft.parodies, v)),
           onRemove: (String v) =>
-              onParodiesChanged(TagListWithRemoved(draft.parodies, v)),
+              onParodiesChanged(tagListWithRemoved(draft.parodies, v)),
           onClearAll: () => onParodiesChanged(const <String>[]),
         ),
         SizedBox(height: gap),
@@ -421,9 +421,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           scope: scope,
           selectedNames: draft.authors,
           onAdd: (String v) =>
-              onAuthorsChanged(TagListWithAdded(draft.authors, v)),
+              onAuthorsChanged(tagListWithAdded(draft.authors, v)),
           onRemove: (String v) =>
-              onAuthorsChanged(TagListWithRemoved(draft.authors, v)),
+              onAuthorsChanged(tagListWithRemoved(draft.authors, v)),
           onClearAll: () => onAuthorsChanged(const <String>[]),
         ),
         SizedBox(height: gap),
@@ -433,9 +433,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           scope: scope,
           selectedNames: draft.characters,
           onAdd: (String v) =>
-              onCharactersChanged(TagListWithAdded(draft.characters, v)),
+              onCharactersChanged(tagListWithAdded(draft.characters, v)),
           onRemove: (String v) =>
-              onCharactersChanged(TagListWithRemoved(draft.characters, v)),
+              onCharactersChanged(tagListWithRemoved(draft.characters, v)),
           onClearAll: () => onCharactersChanged(const <String>[]),
         ),
         SizedBox(height: gap),
@@ -444,9 +444,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           icon: Symbols.label,
           scope: scope,
           selectedNames: draft.tags,
-          onAdd: (String v) => onTagsChanged(TagListWithAdded(draft.tags, v)),
+          onAdd: (String v) => onTagsChanged(tagListWithAdded(draft.tags, v)),
           onRemove: (String v) =>
-              onTagsChanged(TagListWithRemoved(draft.tags, v)),
+              onTagsChanged(tagListWithRemoved(draft.tags, v)),
           onClearAll: () => onTagsChanged(const <String>[]),
         ),
       ],

@@ -9,7 +9,7 @@ test/shared/domain
 test/core
 test/shared/di
 test/features/app_settings/presentation/app_data_wipe_flow_test.dart
-test/features/app_settings/presentation/views/settings_page/settings_md3e_page_test.dart
+test/features/app_settings/presentation/views/settings_page/settings_page_test.dart
 test/shared/data
 
 # FRB 线缝冒烟（真实 cdylib；run-gate.sh dart-test 会先 cargo build）
@@ -26,18 +26,18 @@ test/widget_test.dart
 
 # Dart hard-manifest UI（已晋升快轨）
 test/shared/ui/widgets/actions/destructive_filled_button_test.dart
-test/shared/ui/widgets/inputs/md3e_named_facet_multi_select_field_test.dart
+test/shared/ui/widgets/inputs/named_facet_multi_select_field_test.dart
 test/shared/ui/widgets/overlays/dialog/confirm
-test/features/named_metadata/presentation/views/metadata_md3e/named_facet_fill_viewport_test.dart
-test/features/series/presentation/views/series_detail_md3e/series_detail_md3e_entry_test.dart
-test/features/comic/presentation/views/comic_detail_md3e/comic_detail_md3e_entry_test.dart
-test/features/library_browse/presentation/author/views/author_detail_md3e/author_detail_md3e_body_test.dart
-test/features/library_browse/presentation/author/views/author_detail_md3e/author_image_view_test.dart
+test/features/named_metadata/presentation/views/metadata/named_facet_fill_viewport_test.dart
+test/features/series/presentation/views/series_detail/series_detail_entry_test.dart
+test/features/comic/presentation/views/comic_detail/comic_detail_entry_test.dart
+test/features/library_browse/presentation/author/views/author_detail/author_detail_body_test.dart
+test/features/library_browse/presentation/author/views/author_detail/author_image_view_test.dart
 test/features/read_session/presentation/reader_viewport_pages_test.dart
 test/features/read_session/presentation/reader_open_error_message_test.dart
-test/features/read_session/presentation/views/reader_md3e
-test/features/library_admin/presentation/views/library_md3e/library_md3e_form_dialog_test.dart
-test/features/series/presentation/views/metadata_edit_md3e/series_metadata_edit_md3e_view_test.dart
+test/features/read_session/presentation/views/reader
+test/features/library_admin/presentation/views/library/library_form_dialog_test.dart
+test/features/series/presentation/views/metadata_edit/series_metadata_edit_view_test.dart
 
 # Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
 test/shared/ui/motion/app_motion_test.dart
@@ -64,13 +64,13 @@ test/features/app_settings/presentation/view_models/reading_mode_persist_test.da
 test/features/reading_history/presentation/view_models/history_load_more_throttle_test.dart
 test/features/reading_history/presentation/view_models/history_paged_feed_controller_test.dart
 test/features/home/presentation/view_models/home_alert_dismiss_notifier_test.dart
-test/shared/ui/layout/md3e_page_layout_spec_test.dart
-test/shared/ui/layout/md3e_page_viewport_test.dart
+test/shared/ui/layout/page_layout_spec_test.dart
+test/shared/ui/layout/page_viewport_test.dart
 test/features/reading_history/presentation/views/history_page_test.dart
-test/features/home/presentation/views/home_md3e/md3e_home_page_test.dart
-test/features/library_admin/presentation/views/home_library_dashboard/md3e_home_library_management_row_test.dart
-test/features/library_admin/presentation/views/home_library_dashboard/md3e_home_library_delete_confirm_dialog_test.dart
-test/features/library_admin/presentation/views/home_library_dashboard/md3e_home_library_list_order_test.dart
+test/features/home/presentation/views/home/home_page_test.dart
+test/features/library_admin/presentation/views/home_library_dashboard/home_library_management_row_test.dart
+test/features/library_admin/presentation/views/home_library_dashboard/home_library_delete_confirm_dialog_test.dart
+test/features/library_admin/presentation/views/home_library_dashboard/home_library_list_order_test.dart
 test/features/library_admin/presentation/view_models/library_revision_throttle_busy_test.dart
 test/features/library_admin/presentation/view_models/library_scan_toasts_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_toasts_test.dart
@@ -83,5 +83,5 @@ test/shared/util/name_pinyin_assisted_filter_test.dart
 test/features/library_admin/presentation/view_models/metadata_refresh_controller_revision_test.dart
 test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart
-test/features/comic_trash/presentation/views/trash_md3e
+test/features/comic_trash/presentation/views/trash
 test/features/read_session/application

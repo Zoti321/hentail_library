@@ -45,7 +45,7 @@ class PaginationSiblingConfig {
   );
 }
 
-List<int> PaginationRange(int start, int end) {
+List<int> paginationRange(int start, int end) {
   if (end < start) {
     return const <int>[];
   }
@@ -65,11 +65,11 @@ List<PaginationWindowItem> buildPaginationPageWindow({
   final int boundaryCount = config.boundaryCount;
   final int siblingCount = config.siblingCount;
 
-  final List<int> startPages = PaginationRange(
+  final List<int> startPages = paginationRange(
     1,
     boundaryCount < count ? boundaryCount : count,
   );
-  final List<int> endPages = PaginationRange(
+  final List<int> endPages = paginationRange(
     count - boundaryCount + 1 > boundaryCount + 1
         ? count - boundaryCount + 1
         : boundaryCount + 1,
@@ -98,7 +98,7 @@ List<PaginationWindowItem> buildPaginationPageWindow({
     items.add(PaginationWindowItem.page(boundaryCount + 1));
   }
 
-  for (final int siblingPage in PaginationRange(siblingsStart, siblingsEnd)) {
+  for (final int siblingPage in paginationRange(siblingsStart, siblingsEnd)) {
     items.add(PaginationWindowItem.page(siblingPage));
   }
 

@@ -1,6 +1,6 @@
 part of 'named_facet_multi_select_field.dart';
 
-double NamedFacetMenuPanelMaxHeight(BuildContext context) {
+double namedFacetMenuPanelMaxHeight(BuildContext context) {
   final M3EDropdownMenuTheme menuTheme = M3ETheme.of(context).dropdownMenuTheme;
   return math.min(
     _kNamedFacetMultiSelectMenuMaxHeight,
@@ -11,7 +11,7 @@ double NamedFacetMenuPanelMaxHeight(BuildContext context) {
   );
 }
 
-double NamedFacetMenuBodyMinHeight(double panelMaxHeight) {
+double namedFacetMenuBodyMinHeight(double panelMaxHeight) {
   return math.min(panelMaxHeight, _kNamedFacetMultiSelectMenuEmptyMinHeight);
 }
 
@@ -54,8 +54,8 @@ class _NamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<List<T>> asyncItems = ref.watch(itemsProvider);
-    final double panelMaxHeight = NamedFacetMenuPanelMaxHeight(context);
-    final double bodyMinHeight = NamedFacetMenuBodyMinHeight(panelMaxHeight);
+    final double panelMaxHeight = namedFacetMenuPanelMaxHeight(context);
+    final double bodyMinHeight = namedFacetMenuBodyMinHeight(panelMaxHeight);
     return asyncItems.when(
       loading: () {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -223,8 +223,8 @@ class _NamedFacetMenuList<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
-    final double panelMaxHeight = NamedFacetMenuPanelMaxHeight(context);
-    final double bodyMinHeight = NamedFacetMenuBodyMinHeight(panelMaxHeight);
+    final double panelMaxHeight = namedFacetMenuPanelMaxHeight(context);
+    final double bodyMinHeight = namedFacetMenuBodyMinHeight(panelMaxHeight);
 
     return _NamedFacetMenuShell(
       width: width,

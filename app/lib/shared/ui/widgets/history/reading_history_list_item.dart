@@ -18,10 +18,10 @@ class ReadingHistoryMoreMenuEntry {
 }
 
 /// 上次阅读日期：`{YYYY}年{MM}月{DD}日`（如 2026年06月15日）。
-final DateFormat ReadingHistoryLastReadDateFormat = DateFormat('yyyy年MM月dd日');
+final DateFormat readingHistoryLastReadDateFormat = DateFormat('yyyy年MM月dd日');
 
 String readingHistoryLastReadDateLabel(DateTime lastReadTime) {
-  return ReadingHistoryLastReadDateFormat.format(lastReadTime);
+  return readingHistoryLastReadDateFormat.format(lastReadTime);
 }
 
 /// 阅读历史列表行：封面 + 标题 + 进度条与页码 + 上次阅读日期 + 继续阅读 / 更多。

@@ -36,7 +36,6 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import '../hosts/md3e_library_edit_page_lab_host.dart';
 
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
-import 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_edit_navigation.dart';
 
 import '../lab/navigation/md3e_lab_catalog_navigation.dart';

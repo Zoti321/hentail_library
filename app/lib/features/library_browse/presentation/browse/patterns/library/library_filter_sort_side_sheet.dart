@@ -525,7 +525,7 @@ class _FilterAccordionSectionState extends State<_FilterAccordionSection> {
   }
 }
 
-TextStyle LibraryFilterSortOptionLabelStyle(
+TextStyle libraryFilterSortOptionLabelStyle(
   ColorScheme cs,
   LibraryFilterSortRowMetrics metrics,
 ) {
@@ -576,7 +576,7 @@ class _FilterCheckboxRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: LibraryFilterSortOptionLabelStyle(cs, metrics),
+                    style: libraryFilterSortOptionLabelStyle(cs, metrics),
                   ),
                 ),
               ],
@@ -634,7 +634,7 @@ class _GroupingRadioRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: LibraryFilterSortOptionLabelStyle(cs, metrics),
+                    style: libraryFilterSortOptionLabelStyle(cs, metrics),
                   ),
                 ),
               ],
@@ -699,7 +699,7 @@ class _SortListRow extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: LibraryFilterSortOptionLabelStyle(cs, metrics),
+                    style: libraryFilterSortOptionLabelStyle(cs, metrics),
                   ),
                 ),
               ],
