@@ -94,7 +94,7 @@ void main() {
     );
   });
 
-  testWidgets('wide layout detail category switch uses fade through', (
+  testWidgets('wide layout detail category switch uses horizontal shared axis', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(1280, 800));
@@ -125,7 +125,10 @@ void main() {
     await tester.pump();
 
     expect(find.byType(PageTransitionSwitcher), findsWidgets);
-    expect(find.byType(FadeThroughTransition), findsWidgets);
+    final SharedAxisTransition axis = tester.widget(
+      find.byType(SharedAxisTransition).first,
+    );
+    expect(axis.transitionType, SharedAxisTransitionType.horizontal);
 
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('_settings_detail')), findsOneWidget);

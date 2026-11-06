@@ -3,24 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 
+import '../../../../support/pump_app.dart';
+
 void main() {
   group('ListDetailDetailTransition', () {
-    testWidgets('uses PageTransitionSwitcher and FadeThroughTransition', (
+    testWidgets('uses PageTransitionSwitcher and horizontal SharedAxis', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ListDetailDetailTransition(
-              switchKey: 'a',
-              child: Text('pane-a'),
-            ),
+      await pumpApp(
+        tester,
+        home: const Scaffold(
+          body: ListDetailDetailTransition(
+            switchKey: 'a',
+            child: Text('pane-a'),
           ),
         ),
       );
 
       expect(find.byType(PageTransitionSwitcher), findsOneWidget);
-      expect(find.byType(FadeThroughTransition), findsWidgets);
+      final SharedAxisTransition axis = tester.widget(
+        find.byType(SharedAxisTransition),
+      );
+      expect(axis.transitionType, SharedAxisTransitionType.horizontal);
       expect(find.text('pane-a'), findsOneWidget);
     });
 
@@ -28,27 +32,26 @@ void main() {
       WidgetTester tester,
     ) async {
       Object switchKey = 'a';
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Column(
-                  children: <Widget>[
-                    TextButton(
-                      onPressed: () => setState(() => switchKey = 'b'),
-                      child: const Text('switch'),
+      await pumpApp(
+        tester,
+        home: Scaffold(
+          body: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () => setState(() => switchKey = 'b'),
+                    child: const Text('switch'),
+                  ),
+                  Expanded(
+                    child: ListDetailDetailTransition(
+                      switchKey: switchKey,
+                      child: Text('pane-$switchKey'),
                     ),
-                    Expanded(
-                      child: ListDetailDetailTransition(
-                        switchKey: switchKey,
-                        child: Text('pane-$switchKey'),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       );
@@ -64,15 +67,14 @@ void main() {
     testWidgets('reduce motion skips PageTransitionSwitcher', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: MediaQuery(
-            data: MediaQueryData(disableAnimations: true),
-            child: Scaffold(
-              body: ListDetailDetailTransition(
-                switchKey: 'a',
-                child: Text('pane-a'),
-              ),
+      await pumpApp(
+        tester,
+        home: const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: Scaffold(
+            body: ListDetailDetailTransition(
+              switchKey: 'a',
+              child: Text('pane-a'),
             ),
           ),
         ),

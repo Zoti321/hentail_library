@@ -1,6 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Desktop / shell top-level fade-through（对齐官方 animations FadeThrough）。
 const Duration kDesktopPageTransitionDuration = Duration(milliseconds: 280);
@@ -55,10 +57,11 @@ Widget desktopFadeThroughTransitionWrapper({
 
   // secondary 停住：库浏览被详情 push 盖住时不淡出下方页，避免 pop 中段闪白。
   // Shell 顶层 go 切换只依赖各页自己的 primary FadeThrough。
+  // fillColor 与壳层画布一致，避免透明页被 Theme.surface 盖成另一套底色。
   return FadeThroughTransition(
     animation: animation,
     secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
-    fillColor: Theme.of(context).colorScheme.surface,
+    fillColor: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
     child: child,
   );
 }

@@ -57,6 +57,7 @@ class _SettingsPageState extends State<SettingsLayout> {
   late SettingsCategory _selected = widget.initialCategory;
   late SettingsLabState _labState = widget.labState;
   bool _showingNarrowDetail = false;
+  bool _detailTransitionReverse = false;
 
   @override
   void didUpdateWidget(covariant SettingsLayout oldWidget) {
@@ -73,11 +74,24 @@ class _SettingsPageState extends State<SettingsLayout> {
 
   void _selectCategory(SettingsCategory category, {required bool wide}) {
     setState(() {
+      _detailTransitionReverse =
+          _settingsCategoryOrderIndex(category) <
+          _settingsCategoryOrderIndex(_selected);
       _selected = category;
       if (!wide) {
         _showingNarrowDetail = true;
       }
     });
+  }
+
+  int _settingsCategoryOrderIndex(SettingsCategory category) {
+    final List<SettingsCategory> visible =
+        widget.visibleCategories?.toList(growable: false) ??
+        kSettingsCategories
+            .map((SettingsCategoryInfo e) => e.category)
+            .toList(growable: false);
+    final int index = visible.indexOf(category);
+    return index >= 0 ? index : category.index;
   }
 
   /// 头部返回按钮与系统返回共用：窄屏详情先回分类列表，列表页交给 [SettingsLayout.onBack] 或路由。
@@ -193,6 +207,7 @@ class _SettingsPageState extends State<SettingsLayout> {
                       listPane: master,
                       detailPane: ListDetailDetailTransition(
                         switchKey: _selected,
+                        reverse: _detailTransitionReverse,
                         child: detail,
                       ),
                     );

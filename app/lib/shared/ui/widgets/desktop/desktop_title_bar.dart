@@ -28,7 +28,7 @@ class DesktopTitleBar extends StatelessWidget {
   final VoidCallback? onWindowMaximize;
   final VoidCallback? onWindowClose;
 
-  /// Defaults to [labBrowseCanvasColor] (`surfaceContainerLow`).
+  /// Defaults to [labBrowseCanvasColor] (`surface`).
   final Color? backgroundColor;
 
   @override
