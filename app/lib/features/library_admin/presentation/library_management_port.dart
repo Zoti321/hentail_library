@@ -105,15 +105,9 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
   }
 
   @override
-  void goAllLibraries(BuildContext context) {
-    _ref.read(comicDetailReturnSeriesPortProvider).clear();
-    context.go(LibrariesRoutes.all);
-  }
-
-  @override
   void goDefaultLibraryBrowse(BuildContext context) {
     _ref.read(comicDetailReturnSeriesPortProvider).clear();
-    context.go(LibrariesRoutes.defaultBrowse);
+    context.go('/home');
   }
 
   @override

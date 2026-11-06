@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/features/home/public.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
@@ -17,11 +16,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 final GlobalKey<NavigatorState> appRootNavigatorKey =
     GlobalKey<NavigatorState>();
 
-String? _librariesRootRedirect(BuildContext context, GoRouterState state) {
-  if (state.uri.path == LibrariesRoutes.root) {
-    return LibrariesRoutes.all;
-  }
-  return null;
+String? _librariesRedirect(BuildContext context, GoRouterState state) {
+  return LibrariesRoutes.redirectPath(locationPath: state.uri.path);
 }
 
 final GoRouter appRouter = GoRouter(
@@ -41,16 +37,12 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: LibrariesRoutes.root,
-          redirect: _librariesRootRedirect,
+          redirect: _librariesRedirect,
           routes: <RouteBase>[
+            // Legacy bookmark: never treat `all` as a library id.
             GoRoute(
-              path: LibrariesRoutes.allSegment,
-              name: '全部库',
-              pageBuilder: (BuildContext context, GoRouterState state) =>
-                  buildShellNavPage(
-                    state: state,
-                    child: const AllLibrariesBrowsePage(),
-                  ),
+              path: LibrariesRoutes.legacyAllSegment,
+              redirect: (BuildContext context, GoRouterState state) => '/home',
             ),
             GoRoute(
               path: ':libraryId',
@@ -69,8 +61,7 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/local',
           name: '本地漫画',
-          redirect: (BuildContext context, GoRouterState state) =>
-              LibrariesRoutes.all,
+          redirect: (BuildContext context, GoRouterState state) => '/home',
         ),
         GoRoute(
           path: '/history',

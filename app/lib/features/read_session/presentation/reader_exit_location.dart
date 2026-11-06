@@ -1,5 +1,3 @@
-import 'package:hentai_library/core/constants/libraries_routes.dart';
-
 /// Leaves the reader after session cleanup.
 ///
 /// Prefer [pop] so library → detail → reader keeps its stack. Only [go] when
@@ -22,5 +20,5 @@ String resolveReaderExitLocation({required String comicId}) {
   if (normalizedComicId.isNotEmpty) {
     return '/comic/${Uri.encodeComponent(normalizedComicId)}';
   }
-  return LibrariesRoutes.defaultBrowse;
+  return '/home';
 }

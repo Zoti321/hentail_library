@@ -13,12 +13,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryTitle => '漫画库';
 
   @override
-  String get allLibrariesBrowsePlaceholderTitle => '全部库浏览';
-
-  @override
-  String get allLibrariesBrowsePlaceholderBody => '跨库聚合浏览后续实现。请从侧栏选择具体漫画库。';
-
-  @override
   String get sidebarAddLibraryTooltip => '新建漫画库';
 
   @override

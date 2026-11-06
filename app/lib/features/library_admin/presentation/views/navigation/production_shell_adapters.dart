@@ -67,8 +67,7 @@ String productionSelectedNavId({required String path}) {
   if (flatNavId.isNotEmpty) {
     return flatNavId;
   }
-  if (LibrariesRoutes.isAllLibrariesPath(path) ||
-      LibrariesRoutes.libraryIdFromPath(path) != null) {
+  if (LibrariesRoutes.libraryIdFromPath(path) != null) {
     return AppNavigation.navIdLibrary;
   }
   if (path.startsWith('/comic/') || path.startsWith('/series/')) {

@@ -23,8 +23,7 @@ abstract interface class LibraryManagementPort {
 
   Future<void> openLibrary(BuildContext context, String libraryId);
 
-  void goAllLibraries(BuildContext context);
-
+  /// Fallback when there is no specific library browse to return to (→ `/home`).
   void goDefaultLibraryBrowse(BuildContext context);
 
   Future<void> scanLibrary(

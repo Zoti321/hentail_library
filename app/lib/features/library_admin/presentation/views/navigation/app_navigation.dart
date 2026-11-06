@@ -31,8 +31,7 @@ abstract final class AppNavigation {
 
   /// 与 MD3E rail 导航 id 对应；库 flyout 选库不经此函数。
   static String activeNavIdForPath(String path) {
-    if (LibrariesRoutes.isAllLibrariesPath(path) ||
-        LibrariesRoutes.libraryIdFromPath(path) != null) {
+    if (LibrariesRoutes.libraryIdFromPath(path) != null) {
       return '';
     }
     switch (path) {
@@ -72,7 +71,7 @@ abstract final class AppNavigation {
               .read(libraryManagementPortProvider)
               .goDefaultLibraryBrowse(context);
         } else {
-          context.go(LibrariesRoutes.all);
+          context.go('/home');
         }
         break;
       case navIdMetadata:

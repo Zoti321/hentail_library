@@ -1,8 +1,6 @@
 {
   "@@locale": "en",
   "libraryTitle": "Library",
-  "allLibrariesBrowsePlaceholderTitle": "All libraries",
-  "allLibrariesBrowsePlaceholderBody": "Browsing all libraries together is coming later. Pick a library from the sidebar.",
   "sidebarAddLibraryTooltip": "Add library",
   "sidebarAddLocalLibrary": "Add local library",
   "sidebarAddRemoteLibrary": "Add remote library",

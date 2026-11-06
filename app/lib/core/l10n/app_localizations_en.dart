@@ -13,13 +13,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryTitle => 'Library';
 
   @override
-  String get allLibrariesBrowsePlaceholderTitle => 'All libraries';
-
-  @override
-  String get allLibrariesBrowsePlaceholderBody =>
-      'Browsing all libraries together is coming later. Pick a library from the sidebar.';
-
-  @override
   String get sidebarAddLibraryTooltip => 'Add library';
 
   @override

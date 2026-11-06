@@ -3,17 +3,24 @@ import 'package:hentai_library/core/constants/libraries_routes.dart';
 
 void main() {
   group('LibrariesRoutes', () {
-    test('redirects /local to all libraries browse', () {
+    test('redirects /local to home', () {
       expect(
         LibrariesRoutes.redirectPath(locationPath: '/local'),
-        LibrariesRoutes.all,
+        '/home',
       );
     });
 
-    test('redirects bare /libraries to all', () {
+    test('redirects bare /libraries to home', () {
       expect(
         LibrariesRoutes.redirectPath(locationPath: LibrariesRoutes.root),
-        LibrariesRoutes.all,
+        '/home',
+      );
+    });
+
+    test('redirects legacy /libraries/all to home', () {
+      expect(
+        LibrariesRoutes.redirectPath(locationPath: LibrariesRoutes.legacyAll),
+        '/home',
       );
     });
 
@@ -24,25 +31,25 @@ void main() {
   });
 
   group('librariesSidebarSelection', () {
-    test('all libraries path activates section', () {
-      expect(librariesSidebarSelection(path: LibrariesRoutes.all), (
-        sectionActive: true,
-        activeLibraryId: null,
-      ));
+    test('legacy all path does not activate a library', () {
+      expect(
+        librariesSidebarSelection(path: LibrariesRoutes.legacyAll),
+        (activeLibraryId: null),
+      );
     });
 
     test('library browse path highlights that library', () {
-      expect(librariesSidebarSelection(path: '/libraries/lib-a'), (
-        sectionActive: false,
-        activeLibraryId: 'lib-a',
-      ));
+      expect(
+        librariesSidebarSelection(path: '/libraries/lib-a'),
+        (activeLibraryId: 'lib-a'),
+      );
     });
 
     test('comic detail does not imply a library selection', () {
-      expect(librariesSidebarSelection(path: '/comic/c1'), (
-        sectionActive: false,
-        activeLibraryId: null,
-      ));
+      expect(
+        librariesSidebarSelection(path: '/comic/c1'),
+        (activeLibraryId: null),
+      );
     });
   });
 
@@ -60,10 +67,10 @@ void main() {
   });
 
   group('afterLibraryDeleteNavigation', () {
-    test('goes to all when no libraries remain', () {
+    test('goes to home when no libraries remain', () {
       expect(
         afterLibraryDeleteNavigation(remainingLibraryIds: <String>[]).goPath,
-        LibrariesRoutes.all,
+        '/home',
       );
     });
 

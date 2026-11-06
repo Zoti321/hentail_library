@@ -104,18 +104,6 @@ abstract class AppLocalizations {
   /// **'漫画库'**
   String get libraryTitle;
 
-  /// No description provided for @allLibrariesBrowsePlaceholderTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'全部库浏览'**
-  String get allLibrariesBrowsePlaceholderTitle;
-
-  /// No description provided for @allLibrariesBrowsePlaceholderBody.
-  ///
-  /// In zh, this message translates to:
-  /// **'跨库聚合浏览后续实现。请从侧栏选择具体漫画库。'**
-  String get allLibrariesBrowsePlaceholderBody;
-
   /// No description provided for @sidebarAddLibraryTooltip.
   ///
   /// In zh, this message translates to:

@@ -17,10 +17,10 @@ void main() {
       );
     });
 
-    test('goes to all libraries when cannot pop and comic id blank', () {
+    test('goes to home when cannot pop and comic id blank', () {
       expect(
         resolveReaderExitNavigation(canPop: false, comicId: ' '),
-        '/libraries/all',
+        '/home',
       );
     });
   });
@@ -37,8 +37,8 @@ void main() {
       );
     });
 
-    test('falls back to all libraries browse when comic id blank', () {
-      expect(resolveReaderExitLocation(comicId: ' '), '/libraries/all');
+    test('falls back to home when comic id blank', () {
+      expect(resolveReaderExitLocation(comicId: ' '), '/home');
     });
   });
 }

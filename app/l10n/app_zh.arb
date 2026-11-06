@@ -1,8 +1,6 @@
 {
   "@@locale": "zh",
   "libraryTitle": "漫画库",
-  "allLibrariesBrowsePlaceholderTitle": "全部库浏览",
-  "allLibrariesBrowsePlaceholderBody": "跨库聚合浏览后续实现。请从侧栏选择具体漫画库。",
   "sidebarAddLibraryTooltip": "新建漫画库",
   "sidebarAddLocalLibrary": "添加本地库",
   "sidebarAddRemoteLibrary": "添加远程库",

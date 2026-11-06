@@ -25,12 +25,8 @@ _Avoid_: deep import 其他 feature 的 presentation / data / di；让 `shared/*
 ### Library & resources
 
 **Library**:
-用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（Supported resource formats、Scan on startup、Scan interval），以及可独立于 Library root 编辑的显示名。应用内可同时存在多个 Library。
-_Avoid_: 书架（UI 可用）；把「全部库合并」称作一个 Library
-
-**All libraries browse**:
-跨多个 Library 的聚合浏览面（趋近 Komga「全部库」）；不是一个 Library。路由占位为 `/libraries/all`；本阶段仅占位提示，不实现聚合目录。
-_Avoid_: 全部库（若被理解成一个 Library）、合并库、全局书架
+用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（Supported resource formats、Scan on startup、Scan interval），以及可独立于 Library root 编辑的显示名。应用内可同时存在多个 Library。多库态势与入口在 Home page；不提供跨库聚合浏览面。
+_Avoid_: 书架（UI 可用）；全部库浏览、合并库、全局书架（产品不做）
 
 **Home page**:
 应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**提供常驻 Library sync 入口。详见 ADR-0020。
