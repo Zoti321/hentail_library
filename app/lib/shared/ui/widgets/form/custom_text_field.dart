@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Active (focused) chrome for [CustomTextField]: border color only, no glow.
