@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_sort_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
@@ -18,7 +16,9 @@ class Md3eLibraryGroupingSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     return switch (displayTarget) {
       LibraryDisplayTarget.comics => const _ComicsGroupingSection(),
@@ -33,24 +33,26 @@ class _ComicsGroupingSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryComicGrouping selected = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.grouping ?? LibraryComicGrouping.defaultValue,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.grouping,
       ),
     );
-    final notifier = ref.read(libraryComicFiltersProvider.notifier);
+    final LibraryPageFacadeNotifier facade = ref.read(
+      libraryPageFacadeProvider.notifier,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _GroupingRadioRow(
           label: context.l10n.libraryGroupNone,
           selected: selected == LibraryComicGrouping.none,
-          onSelected: () => notifier.setGrouping(LibraryComicGrouping.none),
+          onSelected: () => facade.setComicGrouping(LibraryComicGrouping.none),
         ),
         _GroupingRadioRow(
           label: context.l10n.libraryGroupBySeries,
           selected: selected == LibraryComicGrouping.bySeries,
-          onSelected: () => notifier.setGrouping(LibraryComicGrouping.bySeries),
+          onSelected: () =>
+              facade.setComicGrouping(LibraryComicGrouping.bySeries),
         ),
       ],
     );
@@ -63,22 +65,28 @@ class _SeriesGroupingSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibrarySeriesGrouping selected = ref.watch(
-      librarySeriesTabGroupingProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.seriesFilters.grouping,
+      ),
     );
-    final notifier = ref.read(librarySeriesFiltersProvider.notifier);
+    final LibraryPageFacadeNotifier facade = ref.read(
+      libraryPageFacadeProvider.notifier,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         _GroupingRadioRow(
           label: context.l10n.libraryGroupNone,
           selected: selected == LibrarySeriesGrouping.none,
-          onSelected: () => notifier.setGrouping(LibrarySeriesGrouping.none),
+          onSelected: () =>
+              facade.setSeriesGrouping(LibrarySeriesGrouping.none),
         ),
         _GroupingRadioRow(
           label: context.l10n.libraryGroupBySerializationStatus,
           selected: selected == LibrarySeriesGrouping.bySerializationStatus,
-          onSelected: () =>
-              notifier.setGrouping(LibrarySeriesGrouping.bySerializationStatus),
+          onSelected: () => facade.setSeriesGrouping(
+            LibrarySeriesGrouping.bySerializationStatus,
+          ),
         ),
       ],
     );

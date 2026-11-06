@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -26,7 +23,9 @@ class Md3eLibrarySortSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     return switch (displayTarget) {
       LibraryDisplayTarget.comics => const _ComicsSortSection(),
@@ -140,7 +139,9 @@ class _ComicSortRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryComicSortOption sortOption = ref.watch(
-      libraryActiveComicSortOptionProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.sortOption,
+      ),
     );
     final bool implemented = field.isImplemented;
     return _SortRowShell(
@@ -150,7 +151,7 @@ class _ComicSortRow extends ConsumerWidget {
       isAscending: !sortOption.descending,
       comingSoon: !implemented,
       onTap: () {
-        ref.read(libraryComicFiltersProvider.notifier).setSortField(field);
+        ref.read(libraryPageFacadeProvider.notifier).setComicSortField(field);
       },
     );
   }
@@ -164,7 +165,9 @@ class _SeriesSortRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibrarySeriesSortOption sortOption = ref.watch(
-      libraryActiveSeriesSortOptionProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.seriesFilters.sortOption,
+      ),
     );
     final bool implemented = field.isImplemented;
     return _SortRowShell(
@@ -174,7 +177,7 @@ class _SeriesSortRow extends ConsumerWidget {
       isAscending: !sortOption.descending,
       comingSoon: !implemented,
       onTap: () {
-        ref.read(librarySeriesFiltersProvider.notifier).setSortField(field);
+        ref.read(libraryPageFacadeProvider.notifier).setSeriesSortField(field);
       },
     );
   }

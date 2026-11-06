@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_distinct_metadata_providers.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_sort_section.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
@@ -97,11 +95,13 @@ class _Md3eAgeRestrictionFilterGroup extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
-    );
     final LibraryAgeRestrictionFilter selected = ref.watch(
-      libraryActiveAgeRestrictionFilterProvider,
+      libraryPageFacadeProvider.select((LibraryPageFacadeState state) {
+        return switch (state.displayTarget) {
+          LibraryDisplayTarget.comics => state.comicFilters.ageRestriction,
+          LibraryDisplayTarget.series => state.seriesFilters.ageRestriction,
+        };
+      }),
     );
     final AppLocalizations l10n = context.l10n;
     return _Md3eFilterAccordion(
@@ -114,16 +114,9 @@ class _Md3eAgeRestrictionFilterGroup extends ConsumerWidget {
               label: l10n.libraryAgeRestrictionFilterLabel(option),
               selected: selected == option,
               onTap: () {
-                switch (displayTarget) {
-                  case LibraryDisplayTarget.comics:
-                    ref
-                        .read(libraryComicFiltersProvider.notifier)
-                        .toggleAgeRestrictionOption(option);
-                  case LibraryDisplayTarget.series:
-                    ref
-                        .read(librarySeriesFiltersProvider.notifier)
-                        .toggleAgeRestrictionOption(option);
-                }
+                ref
+                    .read(libraryPageFacadeProvider.notifier)
+                    .toggleAgeRestrictionOption(option);
               },
             ),
         ],
@@ -138,16 +131,16 @@ class _Md3eMediaTypeFilterGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     if (displayTarget != LibraryDisplayTarget.comics) {
       return const SizedBox.shrink();
     }
     final LibraryMediaTypeFilterSelection selected = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.mediaTypeFilter ??
-            const LibraryMediaTypeFilterSelection(),
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.mediaTypeFilter,
       ),
     );
     final AppLocalizations l10n = context.l10n;
@@ -161,7 +154,7 @@ class _Md3eMediaTypeFilterGroup extends ConsumerWidget {
               label: l10n.libraryMediaTypeFilterLabel(option),
               selected: selected.selected.contains(option),
               onTap: () => ref
-                  .read(libraryComicFiltersProvider.notifier)
+                  .read(libraryPageFacadeProvider.notifier)
                   .toggleMediaType(option),
             ),
         ],
@@ -176,13 +169,18 @@ class _Md3eSerializationStatusFilterGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     if (displayTarget != LibraryDisplayTarget.series) {
       return const SizedBox.shrink();
     }
     final LibrarySerializationStatusFilter selected = ref.watch(
-      librarySeriesTabSerializationStatusFilterProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) =>
+            state.seriesFilters.serializationStatusFilter,
+      ),
     );
     final AppLocalizations l10n = context.l10n;
     return _Md3eFilterAccordion(
@@ -195,7 +193,7 @@ class _Md3eSerializationStatusFilterGroup extends ConsumerWidget {
               label: l10n.librarySerializationStatusFilterLabel(option),
               selected: selected == option,
               onTap: () => ref
-                  .read(librarySeriesFiltersProvider.notifier)
+                  .read(libraryPageFacadeProvider.notifier)
                   .toggleSerializationStatusFilterOption(option),
             ),
         ],
@@ -210,7 +208,9 @@ class _Md3eTagFilterGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     if (displayTarget != LibraryDisplayTarget.comics) {
       return const SizedBox.shrink();
@@ -219,20 +219,21 @@ class _Md3eTagFilterGroup extends ConsumerWidget {
       libraryFilterTagNamesProvider,
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.tagFilter ?? const LibraryMetadataFilterSelection(),
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.tagFilter,
       ),
     );
     final List<String> names = namesAsync.value ?? const <String>[];
-    final notifier = ref.read(libraryComicFiltersProvider.notifier);
+    final LibraryPageFacadeNotifier facade = ref.read(
+      libraryPageFacadeProvider.notifier,
+    );
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryTagFilter,
       names: names,
       selection: selection,
       isLoading: namesAsync.isLoading && !namesAsync.hasValue,
-      onToggle: notifier.toggleTag,
-      onIncludeModeChanged: notifier.setTagIncludeMode,
+      onToggle: facade.toggleTag,
+      onIncludeModeChanged: facade.setTagIncludeMode,
     );
   }
 }
@@ -243,7 +244,9 @@ class _Md3eAuthorFilterGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     if (displayTarget != LibraryDisplayTarget.comics) {
       return const SizedBox.shrink();
@@ -252,13 +255,14 @@ class _Md3eAuthorFilterGroup extends ConsumerWidget {
       libraryFilterAuthorNamesProvider,
     );
     final LibraryMetadataFilterSelection selection = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.authorFilter ?? const LibraryMetadataFilterSelection(),
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.authorFilter,
       ),
     );
     final List<String> names = namesAsync.value ?? const <String>[];
-    final notifier = ref.read(libraryComicFiltersProvider.notifier);
+    final LibraryPageFacadeNotifier facade = ref.read(
+      libraryPageFacadeProvider.notifier,
+    );
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryAuthorFilter,
       names: names,
@@ -278,8 +282,8 @@ class _Md3eAuthorFilterGroup extends ConsumerWidget {
         }
         return id;
       },
-      onToggle: notifier.toggleAuthor,
-      onIncludeModeChanged: notifier.setAuthorIncludeMode,
+      onToggle: facade.toggleAuthor,
+      onIncludeModeChanged: facade.setAuthorIncludeMode,
     );
   }
 }
@@ -290,18 +294,21 @@ class _Md3eLanguageFilterGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     if (displayTarget != LibraryDisplayTarget.comics) {
       return const SizedBox.shrink();
     }
     final Set<String> selected = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.languageFilter ?? const <String>{},
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.languageFilter,
       ),
     );
-    final notifier = ref.read(libraryComicFiltersProvider.notifier);
+    final LibraryPageFacadeNotifier facade = ref.read(
+      libraryPageFacadeProvider.notifier,
+    );
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryLanguageFilter,
       names: ComicLanguageNames.closedSet,
@@ -310,7 +317,7 @@ class _Md3eLanguageFilterGroup extends ConsumerWidget {
       enablePinyinAssistedNameMatch: false,
       labelFor: context.l10n.comicLanguageLabel,
       onToggle: (String name) =>
-          notifier.toggleIncludeSet(LibraryIncludeSetKind.language, name),
+          facade.toggleIncludeSet(LibraryIncludeSetKind.language, name),
     );
   }
 }
@@ -321,7 +328,9 @@ class _Md3eParodyFilterGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     if (displayTarget != LibraryDisplayTarget.comics) {
       return const SizedBox.shrink();
@@ -330,14 +339,15 @@ class _Md3eParodyFilterGroup extends ConsumerWidget {
       libraryDistinctParodiesProvider,
     );
     final Set<String> selected = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.parodyFilter ?? const <String>{},
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.parodyFilter,
       ),
     );
     final List<String> names =
         (parodiesAsync.value ?? const <String>[]).toList()..sort();
-    final notifier = ref.read(libraryComicFiltersProvider.notifier);
+    final LibraryPageFacadeNotifier facade = ref.read(
+      libraryPageFacadeProvider.notifier,
+    );
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryParodyFilter,
       names: names,
@@ -345,7 +355,7 @@ class _Md3eParodyFilterGroup extends ConsumerWidget {
       includeOnly: true,
       isLoading: parodiesAsync.isLoading && !parodiesAsync.hasValue,
       onToggle: (String name) =>
-          notifier.toggleIncludeSet(LibraryIncludeSetKind.parody, name),
+          facade.toggleIncludeSet(LibraryIncludeSetKind.parody, name),
     );
   }
 }
@@ -356,7 +366,9 @@ class _Md3eCharacterFilterGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     if (displayTarget != LibraryDisplayTarget.comics) {
       return const SizedBox.shrink();
@@ -365,14 +377,15 @@ class _Md3eCharacterFilterGroup extends ConsumerWidget {
       libraryDistinctCharactersProvider,
     );
     final Set<String> selected = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.characterFilter ?? const <String>{},
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.characterFilter,
       ),
     );
     final List<String> names =
         (charactersAsync.value ?? const <String>[]).toList()..sort();
-    final notifier = ref.read(libraryComicFiltersProvider.notifier);
+    final LibraryPageFacadeNotifier facade = ref.read(
+      libraryPageFacadeProvider.notifier,
+    );
     return _Md3eMetadataFilterGroup(
       title: context.l10n.libraryCharacterFilter,
       names: names,
@@ -380,7 +393,7 @@ class _Md3eCharacterFilterGroup extends ConsumerWidget {
       includeOnly: true,
       isLoading: charactersAsync.isLoading && !charactersAsync.hasValue,
       onToggle: (String name) =>
-          notifier.toggleIncludeSet(LibraryIncludeSetKind.character, name),
+          facade.toggleIncludeSet(LibraryIncludeSetKind.character, name),
     );
   }
 }
@@ -391,15 +404,16 @@ class _Md3eOrganizeFilterGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     if (displayTarget != LibraryDisplayTarget.comics) {
       return const SizedBox.shrink();
     }
     final bool needsMetadataOnly = ref.watch(
-      libraryComicFiltersProvider.select(
-        (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.needsMetadataOnly ?? false,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.comicFilters.needsMetadataOnly,
       ),
     );
     final AppLocalizations l10n = context.l10n;
@@ -409,7 +423,7 @@ class _Md3eOrganizeFilterGroup extends ConsumerWidget {
         label: l10n.libraryNeedsMetadataOnlyFilter,
         selected: needsMetadataOnly,
         onTap: () => ref
-            .read(libraryComicFiltersProvider.notifier)
+            .read(libraryPageFacadeProvider.notifier)
             .setNeedsMetadataOnly(!needsMetadataOnly),
       ),
     );

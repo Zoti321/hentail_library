@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -7,8 +6,8 @@ import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/features/comic/public/comic_detail_return_series.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_comics_catalog_state.dart';
+import 'package:hentai_library/features/series/presentation/view_models/series_detail_page_facade_notifier.dart';
 import 'package:hentai_library/features/series/presentation/view_models/series_detail_page_size_notifier.dart';
-import 'package:hentai_library/features/series/presentation/view_models/series_detail_page_size_providers.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_md3e_cover.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_md3e_entry.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page.dart';
@@ -95,10 +94,11 @@ class _SeriesDetailMd3eContentState
     final SeriesComicsMetadata? metadata = ref
         .watch(seriesComicsMetadataProvider(seriesId))
         .value;
-    final SeriesDetailComicsCatalogState? catalog = ref
-        .watch(seriesDetailComicsCatalogControllerProvider(seriesId))
-        .value;
-    final int pageSize = ref.watch(seriesDetailActivePageSizeProvider);
+    final SeriesDetailPageFacadeState facade = ref.watch(
+      seriesDetailPageFacadeProvider(seriesId),
+    );
+    final SeriesDetailComicsCatalogState? catalog = facade.catalog.value;
+    final int pageSize = facade.pageSize;
     final int page = catalog?.pagination.page ?? 1;
     final int totalPages = catalog?.pagination.totalPages ?? 1;
     final List<SeriesComicPageItem> items =
@@ -122,7 +122,7 @@ class _SeriesDetailMd3eContentState
       pageSize: pageSize,
       totalPages: totalPages,
       onPageChanged: (int target) => ref
-          .read(seriesDetailComicsCatalogControllerProvider(seriesId).notifier)
+          .read(seriesDetailPageFacadeProvider(seriesId).notifier)
           .setPage(target),
       onPageSizeChanged: (int size) =>
           ref.read(seriesDetailPageSizeProvider.notifier).setPageSize(size),

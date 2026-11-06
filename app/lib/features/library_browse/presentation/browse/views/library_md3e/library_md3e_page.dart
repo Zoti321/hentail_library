@@ -8,10 +8,8 @@ import 'package:hentai_library/features/library_browse/presentation/integrations
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_filter_sort_sheet.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library_md3e/library_md3e_overflow_entries.dart';
@@ -113,10 +111,10 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       libraryPageFacadeProvider.notifier,
     );
     final LibraryComicsCatalogState? comicsCatalog = stableCatalogSnapshot(
-      ref.watch(libraryComicsCatalogControllerProvider),
+      facade.comicsCatalog,
     );
     final LibrarySeriesCatalogState? seriesCatalog = stableCatalogSnapshot(
-      ref.watch(librarySeriesCatalogControllerProvider),
+      facade.seriesCatalog,
     );
     final String? browseLibraryId = ref.watch(browseLibraryIdProvider);
     final LibrariesState? librariesState =

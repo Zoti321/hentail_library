@@ -24,6 +24,7 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_page_size_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
@@ -293,7 +294,7 @@ void main() {
   });
 
   group('libraryPageShouldScrollToTop', () {
-    const LibraryPageFacadeState base = (
+    final LibraryPageFacadeState base = (
       displayTarget: LibraryDisplayTarget.comics,
       keyword: '',
       isFilterSortCustomized: false,
@@ -301,6 +302,13 @@ void main() {
       seriesPage: 1,
       comicsPageSize: 50,
       seriesPageSize: 50,
+      activePageSize: 50,
+      displayedComicCount: 0,
+      displayedSeriesCount: 0,
+      comicFilters: LibraryComicFiltersState.defaults,
+      seriesFilters: LibrarySeriesFiltersState.defaults,
+      comicsCatalog: const AsyncLoading<LibraryComicsCatalogState>(),
+      seriesCatalog: const AsyncLoading<LibrarySeriesCatalogState>(),
     );
     LibraryPageFacadeState copy({
       LibraryDisplayTarget displayTarget = LibraryDisplayTarget.comics,
@@ -319,6 +327,15 @@ void main() {
         seriesPage: seriesPage,
         comicsPageSize: comicsPageSize,
         seriesPageSize: seriesPageSize,
+        activePageSize: displayTarget == LibraryDisplayTarget.comics
+            ? comicsPageSize
+            : seriesPageSize,
+        displayedComicCount: 0,
+        displayedSeriesCount: 0,
+        comicFilters: LibraryComicFiltersState.defaults,
+        seriesFilters: LibrarySeriesFiltersState.defaults,
+        comicsCatalog: const AsyncLoading<LibraryComicsCatalogState>(),
+        seriesCatalog: const AsyncLoading<LibrarySeriesCatalogState>(),
       );
     }
 
