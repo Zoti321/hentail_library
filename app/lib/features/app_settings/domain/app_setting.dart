@@ -13,7 +13,7 @@ abstract class AppSetting with _$AppSetting {
     @Default(AppColorSchemePreference.brand)
     AppColorSchemePreference colorSchemePreference,
 
-    /// 预留：Material 动态取色；本迭代不实现运行时取色（ADR-0032）。
+    /// 系统动态配色：开启后以平台强调色为 seed（ADR-0037）。
     @Default(false) bool useDynamicColor,
     @Default(AppLocalePreference.system) AppLocalePreference localePreference,
     @Default(kDefaultReadingMode) ReadingMode readingMode,

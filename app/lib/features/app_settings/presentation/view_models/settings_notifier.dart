@@ -45,6 +45,12 @@ class SettingsNotifier extends _$SettingsNotifier {
     await updateSettings(current.copyWith(colorSchemePreference: value));
   }
 
+  Future<void> setUseDynamicColor(bool value) async {
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(useDynamicColor: value));
+  }
+
   Future<void> setLocalePreference(AppLocalePreference value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;

@@ -74,7 +74,12 @@ List<Widget> _personalizationSections(AppLocalizations l10n) {
   return <Widget>[
     SettingsSection(
       title: Text(l10n.settingsSectionAppearance),
-      tiles: const <Widget>[_ThemeTile(), _ColorSchemeTile(), _LocaleTile()],
+      tiles: const <Widget>[
+        _ThemeTile(),
+        _DynamicColorTile(),
+        _ColorSchemeTile(),
+        _LocaleTile(),
+      ],
     ),
     SettingsSection(
       title: Text(l10n.settingsSectionReading),
@@ -143,30 +148,59 @@ class _ThemeTile extends ConsumerWidget {
   }
 }
 
+class _DynamicColorTile extends ConsumerWidget {
+  const _DynamicColorTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final bool enabled = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) =>
+            async.asData?.value.useDynamicColor ?? false,
+      ),
+    );
+    return SettingsSwitchTile(
+      leading: Symbols.wallpaper,
+      title: Text(l10n.settingsDynamicColorLabel),
+      description: Text(l10n.settingsDynamicColorDescription),
+      value: enabled,
+      onChanged: (bool value) =>
+          ref.read(settingsProvider.notifier).setUseDynamicColor(value),
+    );
+  }
+}
+
 class _ColorSchemeTile extends ConsumerWidget {
   const _ColorSchemeTile();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final AppColorSchemePreference preference = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> async) =>
-            async.asData?.value.colorSchemePreference ??
-            AppColorSchemePreference.brand,
-      ),
-    );
+    final ({AppColorSchemePreference preference, bool useDynamicColor}) state =
+        ref.watch(
+          settingsProvider.select((AsyncValue<AppSetting> async) {
+            final AppSetting? setting = async.asData?.value;
+            return (
+              preference:
+                  setting?.colorSchemePreference ??
+                  AppColorSchemePreference.brand,
+              useDynamicColor: setting?.useDynamicColor ?? false,
+            );
+          }),
+        );
     return SettingsNavigationTile(
       leading: Symbols.palette,
       title: Text(l10n.settingsColorSchemeLabel),
-      value: Text(l10n.colorSchemePreferenceLabel(preference)),
+      value: Text(l10n.colorSchemePreferenceLabel(state.preference)),
+      enabled: !state.useDynamicColor,
       onTap: () async {
         final AppColorSchemePreference? picked =
             await showColorSchemePickerDialog(
               context: context,
-              selected: preference,
+              selected: state.preference,
             );
-        if (picked == null || picked == preference) {
+        if (picked == null || picked == state.preference) {
           return;
         }
         await ref

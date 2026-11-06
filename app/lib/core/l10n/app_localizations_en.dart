@@ -202,6 +202,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themePreferenceDark => 'Dark';
 
   @override
+  String get settingsDynamicColorLabel => 'Dynamic color';
+
+  @override
+  String get settingsDynamicColorDescription =>
+      'Use colors from the system wallpaper. Disables the manual color scheme while on.';
+
+  @override
   String get settingsColorSchemeLabel => 'Color scheme';
 
   @override

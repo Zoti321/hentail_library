@@ -197,6 +197,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get themePreferenceDark => '深色';
 
   @override
+  String get settingsDynamicColorLabel => '动态配色';
+
+  @override
+  String get settingsDynamicColorDescription => '跟随系统壁纸取色；开启后不可选手动配色方案';
+
+  @override
   String get settingsColorSchemeLabel => '配色方案';
 
   @override

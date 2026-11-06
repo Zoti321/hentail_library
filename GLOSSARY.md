@@ -308,7 +308,11 @@ _Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）、仍称并行于
 
 **Tone-based color system**:
 以 HCT 的 tone（感知亮度）与角色间 tone 差为骨架、从 seed 派生整套颜色角色的约定；是 MD3E design system 的色真源模型，不绑定某个固定 hex。
-_Avoid_: toneBased（壳层 surface 配对 API）、HCT 系统（单指色空间时）、动态配色（系统壁纸取色，另项）
+_Avoid_: toneBased（壳层 surface 配对 API）、HCT 系统（单指色空间时）
+
+**动态配色**:
+系统壁纸 / 系统强调色取色；开启后以平台 `ColorScheme.primary` 为 seed 进入 Tone-based 装配，并禁用手动配色方案设置项。
+_Avoid_: Monet（Android 实现绰号）、dynamic scheme variant（MCU 的 fidelity/tonalSpot 等）
 
 **Reader color extension**:
 阅读器沉浸场景专用的小范围主题色扩展；与壳层配色方案解耦，保持恒暗阅读底，不随应用明暗或 seed 重算整套壳层语义色。

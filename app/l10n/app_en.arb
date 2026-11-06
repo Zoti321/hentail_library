@@ -77,6 +77,8 @@
   "themePreferenceSystem": "System",
   "themePreferenceLight": "Light",
   "themePreferenceDark": "Dark",
+  "settingsDynamicColorLabel": "Dynamic color",
+  "settingsDynamicColorDescription": "Use colors from the system wallpaper. Disables the manual color scheme while on.",
   "settingsColorSchemeLabel": "Color scheme",
   "colorSchemePreferenceBrand": "Default",
   "colorSchemePreferenceTeal": "Teal",

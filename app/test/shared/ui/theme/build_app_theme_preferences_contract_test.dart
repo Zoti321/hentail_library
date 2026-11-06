@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 
 void main() {
-  group('buildAppTheme preference assembly contract (ADR-0032)', () {
-    test('registers extensions for brand palette with dynamic color stub', () {
+  group('buildAppTheme preference assembly contract (ADR-0032 / ADR-0037)', () {
+    test('registers extensions for brand palette', () {
       for (final Brightness brightness in <Brightness>[
         Brightness.light,
         Brightness.dark,
@@ -12,7 +12,6 @@ void main() {
         final ThemeData theme = buildAppTheme(
           brightness,
           colorSchemeId: 'brand',
-          useDynamicColor: true,
         );
         expect(theme.extension<AppThemeTokens>(), isNotNull);
         expect(theme.extension<ReaderColorScheme>(), isNotNull);
@@ -54,18 +53,55 @@ void main() {
       expect(teal.colorScheme.primary, isNot(brand.colorScheme.primary));
     });
 
-    test('useDynamicColor stub does not change brand assembly', () {
-      final ThemeData off = buildAppTheme(
+    test('explicit seed overrides fixed colorSchemeId', () {
+      const Color overrideSeed = Color(0xFF006A6A);
+      final ThemeData brand = buildAppTheme(
         Brightness.light,
         colorSchemeId: 'brand',
       );
-      final ThemeData on = buildAppTheme(
+      final ThemeData overridden = buildAppTheme(
         Brightness.light,
         colorSchemeId: 'brand',
-        useDynamicColor: true,
+        seed: overrideSeed,
       );
-      expect(on.colorScheme.primary, off.colorScheme.primary);
-      expect(on.colorScheme.surface, off.colorScheme.surface);
+      expect(overridden.colorScheme.primary, isNot(brand.colorScheme.primary));
+    });
+  });
+
+  group('resolveAppThemeSeed', () {
+    test('uses fixed palette when dynamic color is off', () {
+      const Color platformPrimary = Color(0xFF006A6A);
+      expect(
+        resolveAppThemeSeed(
+          useDynamicColor: false,
+          platformPrimary: platformPrimary,
+          colorSchemeId: 'teal',
+        ),
+        colorSchemeSeedForId('teal'),
+      );
+    });
+
+    test('uses platform primary when dynamic color is on', () {
+      const Color platformPrimary = Color(0xFF006A6A);
+      expect(
+        resolveAppThemeSeed(
+          useDynamicColor: true,
+          platformPrimary: platformPrimary,
+          colorSchemeId: 'brand',
+        ),
+        platformPrimary,
+      );
+    });
+
+    test('falls back to fixed palette when platform primary is null', () {
+      expect(
+        resolveAppThemeSeed(
+          useDynamicColor: true,
+          platformPrimary: null,
+          colorSchemeId: 'indigo',
+        ),
+        colorSchemeSeedForId('indigo'),
+      );
     });
   });
 }

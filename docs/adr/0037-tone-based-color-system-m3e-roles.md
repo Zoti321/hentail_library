@@ -18,7 +18,7 @@ ADR-0028 将颜色定为两层：`ColorScheme` + 大表语义扩展 `HentaiColor
 2. **Variant**：生产固定 **fidelity**（contrast 默认 0），保证九档固定配色「所选即所得」。不在本决策启用 `expressive`（会故意扭开 primary 色相）。
 3. **消费**：壳层与共享组件以 M3E / Flutter color roles 为主。禁止新代码依赖大表壳层语义色。
 4. **扩展**：仅 **Reader color extension**（恒暗沉浸底，不跟壳层 seed / 应用浅色主题把阅读页变浅）。
-5. **动态配色**：延后；`useDynamicColor` 保持占位，开启不改变装配结果。
+5. **动态配色**：`useDynamicColor` 开启时，经 `DynamicColorBuilder` 取系统 `ColorScheme.primary` 作为 seed，再走同一 fidelity 装配；平台无动态色时回退固定配色方案。开启期间设置页禁用「配色方案」项，但保留已选 preference。
 6. **品牌 seed**：仍为临时 Lab 紫；不定稿。
 7. **相对 ADR-0028**：废弃「大表 `HentaiColorScheme` 作为通用第二层」；保留 ThemeExtension 机制仅用于阅读器等白名单场景。ADR-0032 的单源装配入口不变。
 
@@ -28,13 +28,14 @@ ADR-0028 将颜色定为两层：`ColorScheme` + 大表语义扩展 `HentaiColor
 
 - 换配色后壳层表面与 seed 同源，减少双轨色。
 - 与 MD3E design system / GLOSSARY（Tone-based color system、Reader color extension）对齐。
-- 后续接系统动态色只需替换 seed 来源。
+- 动态配色与固定配色共用同一 Tone-based 装配路径，仅替换 seed 来源。
 
 ### Negative
 
 - 需迁移历史 `context.hentai` 调用并收缩扩展，有一波视觉回归面。
 - fidelity 与旧 tonalSpot / 手写语义表观感不同，需按预设 × 明暗目视。
 - 薄封装依赖 material_ui API；若上游 `fromSeed` 透传 variant，可再简化但不必阻塞。
+- 桌面等无系统动态色的平台开启开关后外观仍跟固定方案，需靠文案说明。
 
 ## References
 

@@ -6,17 +6,23 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 
 import '../../../../../support/pump_localized_app.dart';
 
 class _RecordingSettingsNotifier extends SettingsNotifier {
+  _RecordingSettingsNotifier({AppSetting? initial})
+    : _initial = initial ?? AppSetting();
+
+  final AppSetting _initial;
   final List<AppThemePreference> themeCalls = <AppThemePreference>[];
   final List<AppColorSchemePreference> colorSchemeCalls =
       <AppColorSchemePreference>[];
+  final List<bool> dynamicColorCalls = <bool>[];
   final List<bool> healthyCalls = <bool>[];
 
   @override
-  Future<AppSetting> build() async => AppSetting();
+  Future<AppSetting> build() async => _initial;
 
   @override
   Future<void> setThemePreference(AppThemePreference value) async {
@@ -29,15 +35,26 @@ class _RecordingSettingsNotifier extends SettingsNotifier {
   }
 
   @override
+  Future<void> setUseDynamicColor(bool value) async {
+    dynamicColorCalls.add(value);
+    state = AsyncData<AppSetting>(_initial.copyWith(useDynamicColor: value));
+  }
+
+  @override
   Future<void> setHealthyMode(bool value) async {
     healthyCalls.add(value);
   }
 }
 
-Future<_RecordingSettingsNotifier> _pumpPage(WidgetTester tester) async {
+Future<_RecordingSettingsNotifier> _pumpPage(
+  WidgetTester tester, {
+  AppSetting? initial,
+}) async {
   configureTestView(tester, const Size(1200, 900));
 
-  final _RecordingSettingsNotifier notifier = _RecordingSettingsNotifier();
+  final _RecordingSettingsNotifier notifier = _RecordingSettingsNotifier(
+    initial: initial,
+  );
   final ProviderContainer container = ProviderContainer(
     overrides: [settingsProvider.overrideWith(() => notifier)],
   );
@@ -88,9 +105,8 @@ void main() {
       await tester.tap(find.text(l10n.settingsColorSchemeLabel));
       await tester.pumpAndSettle();
       expect(notifier.colorSchemeCalls, isEmpty);
-      // 网格 + 圆角卡内三色圆；默认选中带 check。
       expect(find.byType(GridView), findsOneWidget);
-      expect(find.byType(CustomPaint), findsWidgets);
+      expect(find.byType(Card), findsWidgets);
       expect(find.byIcon(Icons.check_rounded), findsOneWidget);
 
       await tester.tap(find.text(l10n.colorSchemePreferenceTeal));
@@ -101,6 +117,46 @@ void main() {
       ]);
     },
   );
+
+  testWidgets(
+    'toggling dynamic color persists and disables color scheme tile',
+    (WidgetTester tester) async {
+      final _RecordingSettingsNotifier notifier = await _pumpPage(tester);
+      final AppLocalizations l10n = lookupAppLocalizations(const Locale('zh'));
+
+      await tester.tap(find.text(l10n.settingsDynamicColorLabel));
+      await tester.pumpAndSettle();
+      expect(notifier.dynamicColorCalls, <bool>[true]);
+
+      final SettingsNavigationTile colorTile = tester.widget(
+        find.widgetWithText(
+          SettingsNavigationTile,
+          l10n.settingsColorSchemeLabel,
+        ),
+      );
+      expect(colorTile.enabled, isFalse);
+
+      await tester.tap(find.text(l10n.settingsColorSchemeLabel));
+      await tester.pumpAndSettle();
+      expect(find.byType(GridView), findsNothing);
+      expect(notifier.colorSchemeCalls, isEmpty);
+    },
+  );
+
+  testWidgets('color scheme tile stays disabled when dynamic color is on', (
+    WidgetTester tester,
+  ) async {
+    await _pumpPage(tester, initial: AppSetting(useDynamicColor: true));
+    final AppLocalizations l10n = lookupAppLocalizations(const Locale('zh'));
+
+    final SettingsNavigationTile colorTile = tester.widget(
+      find.widgetWithText(
+        SettingsNavigationTile,
+        l10n.settingsColorSchemeLabel,
+      ),
+    );
+    expect(colorTile.enabled, isFalse);
+  });
 
   testWidgets('toggling healthy mode persists through SettingsNotifier', (
     WidgetTester tester,

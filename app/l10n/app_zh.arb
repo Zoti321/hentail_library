@@ -77,6 +77,8 @@
   "themePreferenceSystem": "跟随系统",
   "themePreferenceLight": "浅色",
   "themePreferenceDark": "深色",
+  "settingsDynamicColorLabel": "动态配色",
+  "settingsDynamicColorDescription": "跟随系统壁纸取色；开启后不可选手动配色方案",
   "settingsColorSchemeLabel": "配色方案",
   "colorSchemePreferenceBrand": "默认",
   "colorSchemePreferenceTeal": "青色",

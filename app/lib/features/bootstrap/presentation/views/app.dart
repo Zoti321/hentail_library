@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import 'package:hentai_library/core/util/app_window_title.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
@@ -48,7 +50,6 @@ class _AppRootState extends ConsumerState<_AppRoot> {
     final String colorSchemeId = colorSchemeIdForPreference(
       themePrefs.colorSchemePreference,
     );
-    final Color colorSchemeSeed = colorSchemeSeedForId(colorSchemeId);
     final Locale? locale = ref.watch(
       settingsProvider.select((AsyncValue<AppSetting> async) {
         final AsyncData<AppSetting>? data = async.asData;
@@ -59,37 +60,51 @@ class _AppRootState extends ConsumerState<_AppRoot> {
       }),
     );
 
-    return MaterialApp.router(
-      locale: locale,
-      // Prefer zh as first entry so unmatched device locales fall back to Chinese.
-      supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      title: appWindowTitle(),
-      debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(
-        Brightness.light,
-        colorSchemeId: colorSchemeId,
-        useDynamicColor: themePrefs.useDynamicColor,
-      ),
-      darkTheme: buildAppTheme(
-        Brightness.dark,
-        colorSchemeId: colorSchemeId,
-        useDynamicColor: themePrefs.useDynamicColor,
-      ),
-      themeMode: themeMode,
-      routerConfig: appRouter,
-      builder: (BuildContext context, Widget? child) {
-        final Brightness brightness = Theme.of(context).brightness;
-        final M3EThemeData m3e = buildAppM3eThemeData(
-          brightness,
-          seed: colorSchemeSeed,
+    // dynamic_color 2.x 的 ColorScheme 来自 material_ui，与 Flutter ColorScheme 不同型。
+    return DynamicColorBuilder(
+      builder:
+          (
+            material_ui.ColorScheme? lightDynamic,
+            material_ui.ColorScheme? darkDynamic,
+          ) {
+        final Color lightSeed = resolveAppThemeSeed(
+          useDynamicColor: themePrefs.useDynamicColor,
+          platformPrimary: lightDynamic?.primary,
+          colorSchemeId: colorSchemeId,
         );
-        return M3ETheme(
-          data: m3e,
-          child: AnnotatedRegion<SystemUiOverlayStyle>(
-            value: appSystemUiOverlayStyle(Theme.of(context).colorScheme),
-            child: child ?? const SizedBox.shrink(),
-          ),
+        final Color darkSeed = resolveAppThemeSeed(
+          useDynamicColor: themePrefs.useDynamicColor,
+          platformPrimary: darkDynamic?.primary,
+          colorSchemeId: colorSchemeId,
+        );
+        return MaterialApp.router(
+          locale: locale,
+          // Prefer zh as first entry so unmatched device locales fall back to Chinese.
+          supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          title: appWindowTitle(),
+          debugShowCheckedModeBanner: false,
+          theme: buildAppTheme(Brightness.light, seed: lightSeed),
+          darkTheme: buildAppTheme(Brightness.dark, seed: darkSeed),
+          themeMode: themeMode,
+          routerConfig: appRouter,
+          builder: (BuildContext context, Widget? child) {
+            final Brightness brightness = Theme.of(context).brightness;
+            final Color seed = brightness == Brightness.dark
+                ? darkSeed
+                : lightSeed;
+            final M3EThemeData m3e = buildAppM3eThemeData(
+              brightness,
+              seed: seed,
+            );
+            return M3ETheme(
+              data: m3e,
+              child: AnnotatedRegion<SystemUiOverlayStyle>(
+                value: appSystemUiOverlayStyle(Theme.of(context).colorScheme),
+                child: child ?? const SizedBox.shrink(),
+              ),
+            );
+          },
         );
       },
     );

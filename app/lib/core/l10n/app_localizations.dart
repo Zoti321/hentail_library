@@ -446,6 +446,18 @@ abstract class AppLocalizations {
   /// **'深色'**
   String get themePreferenceDark;
 
+  /// No description provided for @settingsDynamicColorLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'动态配色'**
+  String get settingsDynamicColorLabel;
+
+  /// No description provided for @settingsDynamicColorDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'跟随系统壁纸取色；开启后不可选手动配色方案'**
+  String get settingsDynamicColorDescription;
+
   /// No description provided for @settingsColorSchemeLabel.
   ///
   /// In zh, this message translates to:

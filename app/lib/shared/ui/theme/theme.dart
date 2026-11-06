@@ -38,21 +38,34 @@ SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
   );
 }
 
+/// Resolves Tone-based seed for shell theme assembly (ADR-0037).
+///
+/// When [useDynamicColor] is on and [platformPrimary] is non-null (from
+/// `dynamic_color` / system accent), use it as seed. Otherwise fall back to
+/// the fixed [colorSchemeId] palette. Manual preference is preserved while
+/// dynamic is on.
+Color resolveAppThemeSeed({
+  required bool useDynamicColor,
+  Color? platformPrimary,
+  String colorSchemeId = 'brand',
+}) {
+  if (useDynamicColor && platformPrimary != null) {
+    return platformPrimary;
+  }
+  return colorSchemeSeedForId(colorSchemeId);
+}
+
 /// Single assembly entry for app [ThemeData] (light/dark).
 ///
-/// [colorSchemeId] 选择固定 seed palette；[useDynamicColor] 仍为契约占位（ADR-0032）。
+/// [colorSchemeId] selects a fixed seed palette; [seed] overrides it when the
+/// caller already resolved a dynamic or custom seed.
 ThemeData buildAppTheme(
   Brightness brightness, {
   String colorSchemeId = 'brand',
-  bool useDynamicColor = false,
+  Color? seed,
 }) {
-  // 动态取色仍为契约占位：开启时不改变装配结果（ADR-0032）。
-  assert(
-    !useDynamicColor || colorSchemeId == 'brand',
-    'useDynamicColor 尚未实现；仅 brand palette 可用',
-  );
-  final Color seed = colorSchemeSeedForId(colorSchemeId);
-  final M3EThemeData m3e = buildAppM3eThemeData(brightness, seed: seed);
+  final Color resolvedSeed = seed ?? colorSchemeSeedForId(colorSchemeId);
+  final M3EThemeData m3e = buildAppM3eThemeData(brightness, seed: resolvedSeed);
   final ColorScheme colorScheme = flutterColorSchemeFromM3e(m3e.colorScheme);
   final AppThemeTokens tokens = brightness == Brightness.dark
       ? AppThemeTokens.dark()
