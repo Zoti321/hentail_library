@@ -109,12 +109,25 @@ class LibraryBrowsePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(() {
       final String? scopedId = libraryId.isEmpty ? null : libraryId;
+      // 先抓住 notifier：dispose 后不能再用 ref。
+      final BrowseLibraryId scope = ref.read(browseLibraryIdProvider.notifier);
+      var cancelled = false;
+      int? epoch;
+      // claim/release 必须离开 build；epoch 防止旧页 dispose 清掉新页已 claim 的 id。
       Future<void>.microtask(() {
-        ref.read(browseLibraryIdProvider.notifier).setId(scopedId);
+        if (cancelled) {
+          return;
+        }
+        epoch = scope.claim(scopedId);
       });
       return () {
+        cancelled = true;
         Future<void>.microtask(() {
-          ref.read(browseLibraryIdProvider.notifier).setId(null);
+          final int? claimed = epoch;
+          if (claimed == null) {
+            return;
+          }
+          scope.release(claimed);
         });
       };
     }, <Object?>[libraryId]);
