@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/catalog_detail_page.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
+import 'package:hentai_library/shared/ui/motion/motion.dart';
+import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/read_session/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_not_found_page.dart';
+
 
 typedef ComicDetailBuilder = Widget Function(
   BuildContext context,
@@ -122,8 +126,14 @@ List<RouteBase> buildSharedContentRoutes({
         final ReaderRouteArgs args = ReaderRouteArgs.fromQuery(
           state.uri.queryParameters,
         );
-        return buildDesktopFadeThroughPage(
+        // 详情 → 阅读：M3 forward/back + Lab shared-axis（非 Shell 顶层 fade-through）。
+        return buildSharedAxisPage(
           state: state,
+          fillColor: context.hentai.readerBackground,
+          transitionDuration: LabMotion.motionDurationOf(
+            context,
+            kSharedAxisRouteDuration,
+          ),
           child: ReaderPage(
             comicId: args.comicId,
             keepControlsOpen: args.keepControlsOpen,
