@@ -80,7 +80,6 @@ ThemeData buildAppTheme(
     fontFamily: 'MI_Sans_Regular',
     appBarTheme: _buildAppBarThemeData(colorScheme),
     navigationRailTheme: _buildNavRailThemeData(colorScheme),
-    scrollbarTheme: _buildScrollbarTheme(colorScheme),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(shape: buttonShape),
     ),
@@ -98,28 +97,6 @@ ThemeData buildAppTheme(
       },
     ),
     extensions: <ThemeExtension<dynamic>>[tokens, semantic, shadows, motion],
-  );
-}
-
-ScrollbarThemeData _buildScrollbarTheme(ColorScheme colorScheme) {
-  return ScrollbarThemeData(
-    thumbVisibility: WidgetStateProperty.all(false),
-    thickness: WidgetStateProperty.all(4),
-    mainAxisMargin: 10,
-    crossAxisMargin: 3,
-    radius: const Radius.circular(999),
-    thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
-      final base = colorScheme.onSurfaceVariant;
-      if (states.contains(WidgetState.dragged)) {
-        return base.withOpacity(0.95);
-      }
-      if (states.contains(WidgetState.hovered)) {
-        return base.withOpacity(0.85);
-      }
-      return base.withOpacity(0.65);
-    }),
-    trackColor: WidgetStateProperty.all(Colors.transparent),
-    trackBorderColor: WidgetStateProperty.all(Colors.transparent),
   );
 }
 
