@@ -78,7 +78,10 @@ class ComicDetailSeriesNav extends StatelessWidget {
   }
 }
 
-/// 禁用时不使用 [M3EIconButton]（避免 null [onPressed] 仍绘制 state layer）。
+/// 禁用时不使用可点的 [M3EIconButton]（避免 null [onPressed] 仍绘制 state layer）。
+///
+/// 启用/禁用必须占同一槽位：sm 默认 [inflateHitTarget] 会把命中区撑到 48，
+/// 而禁用态若只用 40 的 [SizedBox] 会在首/尾卷切换时抖动。
 class _ComicDetailSeriesNavIconButton extends StatelessWidget {
   const _ComicDetailSeriesNavIconButton({
     required this.icon,
@@ -94,7 +97,8 @@ class _ComicDetailSeriesNavIconButton extends StatelessWidget {
   final bool enabled;
   final VoidCallback? onPressed;
 
-  static const double _hitExtent = 40;
+  /// 与 [M3EIconButtonSize.sm] visual 一致；关闭 inflate 以免与禁用槽错位。
+  static const double _slotExtent = 40;
 
   @override
   Widget build(BuildContext context) {
@@ -104,28 +108,27 @@ class _ComicDetailSeriesNavIconButton extends StatelessWidget {
         ? scheme.onSurfaceVariant
         : scheme.onSurface.withValues(alpha: 0.38);
 
-    if (!enabled) {
-      return Semantics(
-        button: true,
-        enabled: false,
-        label: semanticLabel,
-        child: SizedBox(
-          width: _hitExtent,
-          height: _hitExtent,
-          child: Center(
-            child: Icon(icon, size: iconSize, color: iconColor),
-          ),
-        ),
-      );
-    }
-
-    return M3EIconButton(
-      icon: Icon(icon, size: iconSize, color: iconColor),
-      variant: M3EIconButtonVariant.standard,
-      size: M3EIconButtonSize.sm,
-      tooltip: tooltip,
-      semanticLabel: semanticLabel,
-      onPressed: onPressed,
+    return SizedBox(
+      width: _slotExtent,
+      height: _slotExtent,
+      child: enabled
+          ? M3EIconButton(
+              icon: Icon(icon, size: iconSize, color: iconColor),
+              variant: M3EIconButtonVariant.standard,
+              size: M3EIconButtonSize.sm,
+              tooltip: tooltip,
+              semanticLabel: semanticLabel,
+              inflateHitTarget: false,
+              onPressed: onPressed,
+            )
+          : Semantics(
+              button: true,
+              enabled: false,
+              label: semanticLabel,
+              child: Center(
+                child: Icon(icon, size: iconSize, color: iconColor),
+              ),
+            ),
     );
   }
 }

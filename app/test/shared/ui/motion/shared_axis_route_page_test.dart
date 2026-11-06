@@ -58,6 +58,37 @@ void main() {
       expect(find.text('reader'), findsOneWidget);
     });
 
+    testWidgets('mirrors horizontal axis when reverse is true', (
+      WidgetTester tester,
+    ) async {
+      final AnimationController primary = AnimationController(
+        vsync: tester,
+        value: 1,
+      );
+      addTearDown(primary.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (BuildContext context) {
+              return sharedAxisTransitionWrapper(
+                context: context,
+                animation: primary,
+                secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
+                fillColor: Colors.black,
+                reverse: true,
+                child: const Text('reader'),
+              );
+            },
+          ),
+        ),
+      );
+
+      expect(find.byType(SharedAxisTransition), findsOneWidget);
+      expect(find.byType(Transform), findsWidgets);
+      expect(find.text('reader'), findsOneWidget);
+    });
+
     testWidgets('skips SharedAxis when reduce motion is on', (
       WidgetTester tester,
     ) async {

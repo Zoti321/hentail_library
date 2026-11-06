@@ -10,6 +10,7 @@ import 'package:hentai_library/features/comic/presentation/views/comic_detail/co
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_cover.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_entry.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_layout.dart';
+import 'package:hentai_library/shared/ui/motion/catalog_detail_page.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/comic_detail_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
@@ -158,7 +159,11 @@ class _ComicDetailContent extends ConsumerWidget {
         if (items == null || index < 0 || index >= items.length) {
           return;
         }
-        context.go('/comic/${Uri.encodeComponent(items[index].comicId)}');
+        final int current = seriesNav?.currentIndex ?? 0;
+        context.go(
+          '/comic/${Uri.encodeComponent(items[index].comicId)}',
+          extra: CatalogSeriesNavExtra(reverse: index < current),
+        );
       },
     );
   }
