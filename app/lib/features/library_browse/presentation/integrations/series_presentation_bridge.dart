@@ -1,4 +1,6 @@
-/// library_browse 壳层 re-export Series presentation（同 module 内 import；#457）。
+/// library_browse 壳内 Series 集成桥（#457）。
+///
+/// browse 本地消费 series presentation / 窄 public；勿再经 `series/public/shell`。
 library;
 
 export 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';

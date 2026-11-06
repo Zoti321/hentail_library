@@ -30,16 +30,11 @@ Comics/Series Tab **筛选/排序/投影规则类型** 分别 @ `comic/domain`�
 - **外置**：Series 成员与排序（`series`）、Comic trash 生命周期（`comic_trash`）、阅读历史、跨本 bulk / sync（`library_admin` + 库级写锁）。
 - Catalog 实体 DTO 仍 @ Shared Kernel（ADR-0035）；勿为目录整齐迁入 `comic/domain`。
 
-## `comic/public/shell` 消费者基线（阶段 1 清单）
+## browse ↔ comic/series 壳接缝（阶段 2）
 
-`features/comic/public/shell/library_browse_shell_exports.dart` 是 #457 壳接缝（re-export presentation），**非领域 API**；阶段 2 可收窄。观测（`integrate/md3e`）：
-
-| 符号（经 shell / 等价 bridge） | 实际消费方 |
-| --- | --- |
-| `ComicCardHost`、return-series / series-nav VM、`comic_read_progress`、bulk presenter、metadata draft/present/page | **`library_browse`** 经 `presentation/integrations/comic_presentation_bridge.dart`（browse 内同符号 deep export；壳文件大量 `import` 该 bridge） |
-| 其它 feature（`series` / `read_session` / `comic_trash` / `reading_history` / `app_settings` / bootstrap） | 多用 `comic/public` 窄路径（cover、lookup、display_title、DI），**不**依赖 shell 桶 |
-
-结论：browse 主路径已走本地 bridge；`public/shell` 仍经 `comic/public.dart` 对外暴露，收窄前勿假定「无外部消费者」。
+- **已删除** `comic/public/shell` 与 `series/public/shell`；browse 经本地 `presentation/integrations/{comic,series}_presentation_bridge.dart` 消费 presentation / 窄 public。
+- **`library_browse/public/catalog/for_comic_and_series.dart`**：仅保留 comic/series 实际使用的壳原子（详情状态、锁 UI、metadata mappers/presenters、catalog selection/pagination、page size、breadcrumb、comic card actions 等）；已去掉未消费的 `library_page_header`、`library_search_query_parser`、`author_detail_page` re-export。
+- **R12**：`public/` 对自身 `presentation/` 的 `export` 纳入门禁；既有 `public/ui` 与本 catalog barrel 等见 `app/test/gate/public_presentation_export_allowlist.txt`（只缩不扩）。
 
 ## Cross-feature
 

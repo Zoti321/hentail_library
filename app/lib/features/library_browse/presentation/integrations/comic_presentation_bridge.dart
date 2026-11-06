@@ -1,4 +1,6 @@
-/// library_browse 壳层 re-export Comic presentation（同 module 内 import；#457）。
+/// library_browse 壳内 Comic 集成桥（#457）。
+///
+/// browse 本地消费 comic presentation / 窄 public；勿再经 `comic/public/shell`。
 library;
 
 export 'package:hentai_library/features/comic/presentation/comic_card_host.dart';

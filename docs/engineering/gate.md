@@ -158,7 +158,7 @@ Epic [#447](https://github.com/Zoti321/hentail_library/issues/447) 清理 Flutte
 
 |  concern | 测试 / 文件 |
 |----------|-------------|
-| L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation | `import_boundary_test.dart`（R1–R12） |
+| L1 domain↔data、FRB 面、application 依赖、shared→feature public、public→presentation（含 `export`，R12 allowlist） | `import_boundary_test.dart`（R1–R12）；`public_presentation_export_allowlist.txt`（只缩不扩） |
 | L2 product 图 ratchet（M1 非 public 边、M2/M3） | `import_boundary_baseline.json` → `dart run tool/generate_import_boundary_baseline.dart` |
 | Cross-feature 协作约定 | [`cross-feature-collaboration.md`](cross-feature-collaboration.md) |
 | public 图无环 | `import_boundary_test.dart`（`collectPublicCrossFeatureAdjacency`） |

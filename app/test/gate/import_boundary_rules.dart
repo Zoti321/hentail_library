@@ -4,7 +4,7 @@ import 'package:path/path.dart' as p;
 
 import 'lib_layout_scan_helpers.dart';
 
-/// Module ids for Wayfinder import-boundary Gate (#220).
+/// Feature / module ids for import-boundary Gate (#220).
 ///
 /// Keep in sync with `scripts/research/cross_feature_import_audit.py` (`classify`).
 const Set<String> kImportBoundaryModules = <String>{
@@ -30,6 +30,48 @@ final RegExp _importUriRe = RegExp(
   r"^import\s+'package:hentai_library/([^']+)';",
   multiLine: true,
 );
+
+/// `export` of own `presentation/` from `public/` (R12); M1/M2/M3 stay import-only.
+final RegExp _exportUriRe = RegExp(
+  r"^export\s+'package:hentai_library/([^']+)';",
+  multiLine: true,
+);
+
+/// lib-relative paths allowed to `export` own feature `presentation/` (R12).
+/// Source: `app/test/gate/public_presentation_export_allowlist.txt` (only shrink).
+Set<String>? _publicPresentationExportAllowlistCache;
+
+Set<String> publicPresentationExportAllowlist({Directory? gateDir}) {
+  final Set<String>? cached = _publicPresentationExportAllowlistCache;
+  if (cached != null && gateDir == null) {
+    return cached;
+  }
+  final Directory dir =
+      gateDir ?? Directory(p.join(Directory.current.path, 'test', 'gate'));
+  final File file = File(
+    p.join(dir.path, 'public_presentation_export_allowlist.txt'),
+  );
+  final Set<String> entries = <String>{};
+  if (file.existsSync()) {
+    for (final String raw in file.readAsLinesSync()) {
+      final String line = raw.trim();
+      if (line.isEmpty || line.startsWith('#')) {
+        continue;
+      }
+      entries.add(line.replaceAll(r'\', '/'));
+    }
+  }
+  if (gateDir == null) {
+    _publicPresentationExportAllowlistCache = entries;
+  }
+  return entries;
+}
+
+bool isPublicPresentationExportAllowlisted(String libRelativePosix) {
+  return publicPresentationExportAllowlist().contains(
+    libRelativePosix.replaceAll(r'\', '/'),
+  );
+}
 
 final RegExp _exportOnlyShimRe = RegExp(
   r"^\s*export\s+'package:hentai_library/[^']+';\s*$",
@@ -265,6 +307,32 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
         targetModule: targetModule,
       );
     }
+    // R12 also covers `export` of own presentation from public/ (ADR-0034).
+    // Cross-feature deep `export` (e.g. browse bridges) stay import-only for M1.
+    if (isFeaturePublicLayerPath(rel) && isProductModule(sourceModule)) {
+      for (final RegExpMatch match in _exportUriRe.allMatches(contents)) {
+        final String importPath = match.group(1)!;
+        if (!importPath.startsWith('features/$sourceModule/presentation/')) {
+          continue;
+        }
+        final String importUri = '$_packagePrefix$importPath';
+        final String? targetModule = resolveImportTargetModule(
+          importPath,
+          libDir,
+        );
+        if (targetModule == null) {
+          continue;
+        }
+        _checkStructuralRules(
+          found: found,
+          sourceRel: rel,
+          sourceModule: sourceModule,
+          importPath: importPath,
+          importUri: importUri,
+          targetModule: targetModule,
+        );
+      }
+    }
   }
   return found;
 }
@@ -424,7 +492,8 @@ void _checkStructuralRules({
 
   if (isFeaturePublicLayerPath(sourceRel) &&
       isProductModule(sourceModule) &&
-      importPath.startsWith('features/$sourceModule/presentation/')) {
+      importPath.startsWith('features/$sourceModule/presentation/') &&
+      !isPublicPresentationExportAllowlisted(sourceRel)) {
     found.add(
       violation(
         ruleId: 'R12',
