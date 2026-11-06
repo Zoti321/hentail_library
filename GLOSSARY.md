@@ -334,6 +334,20 @@ _Avoid_: 大重构（无阶段含义时）
 MD3E 内按产品场景命名的 UI 组合块（如设置分组列表），仅通过通用 props 与 callback 交互，不 import 领域类型或 feature。
 _Avoid_: 业务组件（若指 feature 内编排）、设计 pattern 混指 Figma 帧
 
+**ViewObject**:
+屏级 UI 展示用的聚合只读数据，类名后缀 `ViewObject`（如 `ComicDetailViewObject`）。由 Route page / Display layout 消费；不是 FRB/传输载荷，也不是菜单碎件。
+_Avoid_: Entry（指屏级聚合时）、View、Dto、ViewModel（状态/命令见 ADR-0017）
+
+**Route page**:
+生产路由绑定的功能页 Widget；去 `Md3e` 前缀后类名以 `Page` 结尾（如 `ComicDetailPage`，原 `ComicDetailMd3ePage`）。持 ViewModel / Facade，组装真数据进 ViewObject。不是 MD3E preview page，也不是无路由的展示壳。
+_Avoid_: Md3ePage（新代码）、View（作路由页类名时）、把 Lab 展示壳叫 Page
+
+**Display layout**:
+展示壳或 Lab / 预览用布局 Widget，类名以 `Layout` 结尾（如 `ComicDetailLayout`）。消费 ViewObject 拼视觉结构；故意不用 `*View`，以免与 ViewObject、MVVM View 抢名。不是阅读器的 Scroll layout / Paged layout，也不是 ADR-0027 shared Layout 层的泛称。
+_Avoid_: View（展示壳类名）、Page（无生产路由绑定时）
+
+菜单碎件可继续 `*Entry`；FRB / 跨边界传输仍 `*Dto`。二者都不是 ViewObject。
+
 ### Reading
 
 **Read session**:
