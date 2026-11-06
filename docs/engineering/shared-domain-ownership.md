@@ -27,6 +27,12 @@ Feature 内代码应 **import owner `domain/`**（`library_browse` 内按 [`libr
 
 `models/models.dart` 仍 re-export `reading_history` 与 `app_setting` 的 **feature URI**（便捷 barrel，非 strangler 文件）。
 
+## Comic 聚合 vs feature 边界（ADR-0002 / 0026 / 0036）
+
+- **聚合写集在 Rust**：以 `comicId` 为根，同事务提交 `comics` + `comic_meta` + facet junction + Metadata field lock。单本用户写不持库级写锁；跨本 bulk / sync / trash 等走库级写接缝。
+- **`features/comic` 是 feature，不是 Dart Aggregate Root**：契约与 Comics Tab 规则、展示标题、smart facet、单本元数据 application 在此；**勿**在 Dart 侧再建 `ComicAggregate` 或把 Kernel DTO 迁入本 feature（ADR-0035）。
+- **对照归属**：Series 成员/排序 → `features/series`；trash 生命周期 → `features/comic_trash`；库级 bulk patch 编排 → `features/library_admin`；浏览壳 → `features/library_browse`。分区协作见 [`library-browse-zones.md`](library-browse-zones.md)。
+
 ## Catalog Shared Kernel（真源 @ shared，ADR-0035）
 
 不在 #436 批量迁出；consumer 继续 `import shared/domain/...`：

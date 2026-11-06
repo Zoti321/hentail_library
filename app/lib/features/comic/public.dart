@@ -1,4 +1,6 @@
-/// comic 模块 public API（ADR-0034 / ADR-0036 / #457）。
+/// comic feature public API（ADR-0034 / ADR-0036 / #457）。
+///
+/// `public/shell/` 仅为 browse 壳接缝（presentation re-export），非领域契约面。
 library;
 
 export 'public/comic_detail_return_series_port.dart';
