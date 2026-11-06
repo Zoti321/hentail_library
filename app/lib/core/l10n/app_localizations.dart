@@ -1817,7 +1817,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryResetAllFilters.
   ///
   /// In zh, this message translates to:
-  /// **'重置全部'**
+  /// **'恢复默认'**
   String get libraryResetAllFilters;
 
   /// No description provided for @libraryComingSoon.

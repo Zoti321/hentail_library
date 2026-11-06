@@ -963,7 +963,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryMetadataFilterIncludeAll => '满足全部';
 
   @override
-  String get libraryResetAllFilters => '重置全部';
+  String get libraryResetAllFilters => '恢复默认';
 
   @override
   String get libraryComingSoon => '即将推出';

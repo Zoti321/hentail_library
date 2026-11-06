@@ -419,7 +419,7 @@
   "libraryMetadataFilterEmpty": "无匹配项",
   "libraryMetadataFilterIncludeAny": "满足任一",
   "libraryMetadataFilterIncludeAll": "满足全部",
-  "libraryResetAllFilters": "重置全部",
+  "libraryResetAllFilters": "恢复默认",
   "libraryComingSoon": "即将推出",
   "libraryComicSortTitle": "标题",
   "libraryComicSortCreatedAt": "添加时间",

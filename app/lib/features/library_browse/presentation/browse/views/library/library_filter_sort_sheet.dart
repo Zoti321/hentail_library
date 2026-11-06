@@ -10,6 +10,7 @@ import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_me
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// 库页筛选排序面板（MD3E）：compact / medium 为底部 sheet（全屏展开），expanded+ 为侧边 sheet。
 ///
@@ -95,16 +96,17 @@ class LibraryFilterSortContent extends ConsumerWidget {
                   ),
                 ),
                 // 始终占位、无变化时禁用，避免出现/消失造成布局抖动。
-                TextButton(
+                M3EIconButton(
+                  icon: const Icon(Symbols.settings_backup_restore, size: 20),
+                  tooltip: l10n.libraryResetAllFilters,
+                  semanticLabel: l10n.libraryResetAllFilters,
                   onPressed: isCustomized
                       ? () => ref
                             .read(libraryPageFacadeProvider.notifier)
                             .resetFilters()
                       : null,
-                  child: Text(
-                    l10n.libraryResetAllFilters,
-                    style: TextStyle(fontSize: 12, color: cs.primary),
-                  ),
+                  variant: M3EIconButtonVariant.standard,
+                  size: M3EIconButtonSize.sm,
                 ),
               ],
             ),

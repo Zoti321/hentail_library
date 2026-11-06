@@ -14,6 +14,7 @@ import 'package:hentai_library/features/library_browse/domain/browse/library_age
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// 筛选排序抽屉的本地状态（Widgetbook / 测试用，不绑 Riverpod）。
 ///
@@ -265,14 +266,9 @@ class LibraryFilterSortSideSheetContent extends StatelessWidget {
                   child: Text(l10n.libraryFilterSection, style: sectionTitle),
                 ),
                 M3EIconButton(
-                  icon: Icon(
-                    Icons.filter_alt_off_outlined,
-                    size: 20,
-                    color: state.isCustomized
-                        ? cs.primary
-                        : cs.onSurfaceVariant.withValues(alpha: 0.38),
-                  ),
+                  icon: const Icon(Symbols.settings_backup_restore, size: 20),
                   tooltip: l10n.libraryResetAllFilters,
+                  semanticLabel: l10n.libraryResetAllFilters,
                   onPressed: state.isCustomized
                       ? () => onStateChanged(state.reset())
                       : null,

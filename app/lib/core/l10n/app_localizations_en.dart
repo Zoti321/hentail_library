@@ -1006,7 +1006,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryMetadataFilterIncludeAll => 'Match all';
 
   @override
-  String get libraryResetAllFilters => 'Reset all';
+  String get libraryResetAllFilters => 'Restore defaults';
 
   @override
   String get libraryComingSoon => 'Coming soon';

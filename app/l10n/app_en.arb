@@ -419,7 +419,7 @@
   "libraryMetadataFilterEmpty": "No matches",
   "libraryMetadataFilterIncludeAny": "Match any",
   "libraryMetadataFilterIncludeAll": "Match all",
-  "libraryResetAllFilters": "Reset all",
+  "libraryResetAllFilters": "Restore defaults",
   "libraryComingSoon": "Coming soon",
   "libraryComicSortTitle": "Title",
   "libraryComicSortCreatedAt": "Date added",
