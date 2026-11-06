@@ -26,8 +26,6 @@ import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dar
 
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 
-import 'package:intl/intl.dart';
-
 extension AppLocalizationsContextX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
 }
@@ -435,17 +433,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
         canonical,
         closedLabels: comicLanguageClosedLabels,
       );
-
-  String formatFluentDatePickerLabel(DateTime date, Locale locale) {
-    if (locale.languageCode == 'zh') {
-      return DateFormat(
-        'yyyy年MM月dd日',
-        locale.toString(),
-      ).format(date.toLocal());
-    }
-
-    return DateFormat.yMMMd(locale.toString()).format(date.toLocal());
-  }
 
   String relativeTimeAgo(DateTime time) {
     final DateTime now = DateTime.now();

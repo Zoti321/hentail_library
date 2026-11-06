@@ -35,15 +35,15 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('使用 GZIP 压缩'), findsOneWidget);
-    expect(find.text('仅当前 LIBRARY'), findsOneWidget);
-    expect(find.text('开启'), findsWidgets);
+    expect(find.text('使用 gzip 压缩'), findsOneWidget);
+    expect(find.text('包含孤立标签与字典项'), findsOneWidget);
+    expect(find.byType(Switch), findsNWidgets(2));
 
-    await tester.tap(find.text('继续'));
+    await tester.tap(find.widgetWithText(FilledButton, '继续'));
     await tester.pumpAndSettle();
 
     expect(confirmed?.gzip, isTrue);
-    expect(confirmed?.libraryId, isNull);
+    expect(confirmed?.includeOrphanFacets, isFalse);
     expect(confirmed?.libraryId, 'lib-1');
   });
 }

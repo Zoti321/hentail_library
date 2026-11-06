@@ -3,8 +3,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 
 class MetadataExportOptionsDialog extends StatefulWidget {
   const MetadataExportOptionsDialog({required this.initialOptions, super.key});
@@ -49,19 +49,21 @@ class _MetadataExportOptionsDialogState
             ),
           ),
           SizedBox(height: tokens.spacing.lg),
-          FluentToggleField(
-            labelText: l10n.settingsMetadataBackupExportGzipLabel,
+          Md3eSettingsSwitchTile(
+            title: Text(l10n.settingsMetadataBackupExportGzipLabel),
             value: _gzip,
-            checkedLabel: l10n.commonToggleOn,
-            uncheckedLabel: l10n.commonToggleOff,
+            description: Text(
+              _gzip ? l10n.commonToggleOn : l10n.commonToggleOff,
+            ),
             onChanged: (bool value) => setState(() => _gzip = value),
           ),
           SizedBox(height: tokens.spacing.lg),
-          FluentToggleField(
-            labelText: l10n.settingsMetadataBackupExportOrphanFacetsLabel,
+          Md3eSettingsSwitchTile(
+            title: Text(l10n.settingsMetadataBackupExportOrphanFacetsLabel),
             value: _includeOrphanFacets,
-            checkedLabel: l10n.commonToggleOn,
-            uncheckedLabel: l10n.commonToggleOff,
+            description: Text(
+              _includeOrphanFacets ? l10n.commonToggleOn : l10n.commonToggleOff,
+            ),
             onChanged: (bool value) =>
                 setState(() => _includeOrphanFacets = value),
           ),
