@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -9,6 +7,7 @@ import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart';
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_color_utilities/material_color_utilities.dart';
 
 /// 弹出配色方案选择 dialog（参考 Kazumi：圆角卡 + 圆形三色调 + 点选即生效）。
 ///
@@ -145,7 +144,7 @@ class _ColorSchemeOption extends StatelessWidget {
   }
 }
 
-/// Kazumi `PaletteCard`：圆角矩形容器 + 内嵌圆形三色调 + 选中勾。
+/// 对齐 Kazumi `PaletteCard`：默认 [Card]（不覆盖 color）+ HCT 三色圆 + 选中勾。
 class _PaletteCard extends StatelessWidget {
   const _PaletteCard({required this.color, required this.selected});
 
@@ -154,94 +153,60 @@ class _PaletteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme scheme = ColorScheme.fromSeed(seedColor: color);
-    final M3EColorScheme m3e = M3ETheme.of(context).colorScheme;
-    const double circleSize =
-        _PaletteMetrics.cardSize - 2 * _PaletteMetrics.cardInset;
+    final Hct hct = Hct.fromInt(color.toARGB32());
+    final Color primary = Color(Hct.from(hct.hue, 20.0, 90.0).toInt());
+    final Color tertiary = Color(Hct.from(hct.hue + 50, 20.0, 85.0).toInt());
+    final Color primaryContainer = Color(Hct.from(hct.hue, 30.0, 50.0).toInt());
+    final Color checkbox = Color(Hct.from(hct.hue, 30.0, 40.0).toInt());
 
     return SizedBox(
       width: _PaletteMetrics.cardSize,
       height: _PaletteMetrics.cardSize,
       child: Stack(
-        alignment: Alignment.center,
+        fit: StackFit.expand,
         children: <Widget>[
-          Material(
-            color: m3e.surfaceContainerHighest,
+          // 与 Kazumi 相同：elevation: 0、不设 color → M3 默认 surfaceContainerLow。
+          Card(
             elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            margin: EdgeInsets.zero,
             clipBehavior: Clip.antiAlias,
             child: Padding(
               padding: const EdgeInsets.all(_PaletteMetrics.cardInset),
-              child: CustomPaint(
-                size: const Size.square(circleSize),
-                painter: _ThreeToneCirclePainter(
-                  top: scheme.primaryContainer,
-                  bottomLeft: scheme.tertiaryContainer,
-                  bottomRight: scheme.primary,
+              child: ClipOval(
+                child: Column(
+                  children: <Widget>[
+                    Expanded(child: ColoredBox(color: primary)),
+                    Expanded(
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(child: ColoredBox(color: tertiary)),
+                          Expanded(child: ColoredBox(color: primaryContainer)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
           if (selected)
-            Container(
-              width: 25,
-              height: 25,
-              decoration: BoxDecoration(
-                color: scheme.primary,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check_rounded,
-                color: scheme.onPrimary,
-                size: 12,
+            Center(
+              child: Container(
+                width: 25,
+                height: 25,
+                decoration: BoxDecoration(
+                  color: checkbox,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.check_rounded,
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  size: 12,
+                ),
               ),
             ),
         ],
       ),
     );
-  }
-}
-
-class _ThreeToneCirclePainter extends CustomPainter {
-  const _ThreeToneCirclePainter({
-    required this.top,
-    required this.bottomLeft,
-    required this.bottomRight,
-  });
-
-  final Color top;
-  final Color bottomLeft;
-  final Color bottomRight;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Offset center = size.center(Offset.zero);
-    final double radius = size.shortestSide / 2;
-    final Rect oval = Rect.fromCircle(center: center, radius: radius);
-
-    canvas.save();
-    canvas.clipPath(Path()..addOval(oval));
-
-    final Paint paint = Paint()..style = PaintingStyle.fill;
-
-    paint.color = top;
-    canvas.drawArc(oval, math.pi, math.pi, true, paint);
-
-    paint.color = bottomLeft;
-    canvas.drawArc(oval, math.pi / 2, math.pi / 2, true, paint);
-
-    paint.color = bottomRight;
-    canvas.drawArc(oval, 0, math.pi / 2, true, paint);
-
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _ThreeToneCirclePainter oldDelegate) {
-    return top != oldDelegate.top ||
-        bottomLeft != oldDelegate.bottomLeft ||
-        bottomRight != oldDelegate.bottomRight;
   }
 }
