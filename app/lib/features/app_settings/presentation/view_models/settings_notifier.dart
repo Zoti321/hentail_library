@@ -1,7 +1,11 @@
 import 'dart:async';
 
 import 'package:hentai_library/shared/domain/models/models.dart'
-    show AppLocalePreference, AppSetting, AppThemePreference;
+    show
+        AppColorSchemePreference,
+        AppLocalePreference,
+        AppSetting,
+        AppThemePreference;
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -33,6 +37,12 @@ class SettingsNotifier extends _$SettingsNotifier {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
     await updateSettings(current.copyWith(themePreference: value));
+  }
+
+  Future<void> setColorSchemePreference(AppColorSchemePreference value) async {
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(colorSchemePreference: value));
   }
 
   Future<void> setLocalePreference(AppLocalePreference value) async {

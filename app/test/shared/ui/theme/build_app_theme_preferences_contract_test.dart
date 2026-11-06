@@ -41,5 +41,17 @@ void main() {
         throwsAssertionError,
       );
     });
+
+    test('non-brand colorSchemeId changes primary seed palette', () {
+      final ThemeData brand = buildAppTheme(
+        Brightness.light,
+        colorSchemeId: 'brand',
+      );
+      final ThemeData teal = buildAppTheme(
+        Brightness.light,
+        colorSchemeId: 'teal',
+      );
+      expect(teal.colorScheme.primary, isNot(brand.colorScheme.primary));
+    });
   });
 }

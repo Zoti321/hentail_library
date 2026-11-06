@@ -41,10 +41,13 @@ M3EThemeData applyShellNavRailOverrides(M3EThemeData base) {
   );
 }
 
-/// Expressive theme for app shell and MD3E widgets (brand seed, nav-rail metrics).
-M3EThemeData buildAppM3eThemeData(Brightness brightness) {
+/// Expressive theme for app shell and MD3E widgets (seed + nav-rail metrics).
+M3EThemeData buildAppM3eThemeData(
+  Brightness brightness, {
+  Color seed = kLabSeedColor,
+}) {
   final M3EThemeData base = M3EThemeData(
-    colorScheme: m3eColorSchemeForBrightness(brightness),
+    colorScheme: m3eColorSchemeForBrightness(brightness, seed: seed),
   );
   final M3EColorScheme colors = base.colorScheme;
   return applyShellNavRailOverrides(

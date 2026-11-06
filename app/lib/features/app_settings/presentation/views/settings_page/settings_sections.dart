@@ -8,6 +8,7 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/ap
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
+import 'package:hentai_library/features/app_settings/presentation/views/dialogs/color_scheme_picker_dialog.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
@@ -73,7 +74,7 @@ List<Widget> _personalizationSections(AppLocalizations l10n) {
   return <Widget>[
     SettingsSection(
       title: Text(l10n.settingsSectionAppearance),
-      tiles: const <Widget>[_ThemeTile(), _LocaleTile()],
+      tiles: const <Widget>[_ThemeTile(), _ColorSchemeTile(), _LocaleTile()],
     ),
     SettingsSection(
       title: Text(l10n.settingsSectionReading),
@@ -138,6 +139,40 @@ class _ThemeTile extends ConsumerWidget {
         labelOf: l10n.themePreferenceLabel,
         onSelected: ref.read(settingsProvider.notifier).setThemePreference,
       ),
+    );
+  }
+}
+
+class _ColorSchemeTile extends ConsumerWidget {
+  const _ColorSchemeTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final AppColorSchemePreference preference = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) =>
+            async.asData?.value.colorSchemePreference ??
+            AppColorSchemePreference.brand,
+      ),
+    );
+    return SettingsNavigationTile(
+      leading: Symbols.palette,
+      title: Text(l10n.settingsColorSchemeLabel),
+      value: Text(l10n.colorSchemePreferenceLabel(preference)),
+      onTap: () async {
+        final AppColorSchemePreference? picked =
+            await showColorSchemePickerDialog(
+              context: context,
+              selected: preference,
+            );
+        if (picked == null || picked == preference) {
+          return;
+        }
+        await ref
+            .read(settingsProvider.notifier)
+            .setColorSchemePreference(picked);
+      },
     );
   }
 }

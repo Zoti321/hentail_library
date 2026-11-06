@@ -446,6 +446,66 @@ abstract class AppLocalizations {
   /// **'深色'**
   String get themePreferenceDark;
 
+  /// No description provided for @settingsColorSchemeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'配色方案'**
+  String get settingsColorSchemeLabel;
+
+  /// No description provided for @colorSchemePreferenceBrand.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认'**
+  String get colorSchemePreferenceBrand;
+
+  /// No description provided for @colorSchemePreferenceTeal.
+  ///
+  /// In zh, this message translates to:
+  /// **'青色'**
+  String get colorSchemePreferenceTeal;
+
+  /// No description provided for @colorSchemePreferenceBlue.
+  ///
+  /// In zh, this message translates to:
+  /// **'蓝色'**
+  String get colorSchemePreferenceBlue;
+
+  /// No description provided for @colorSchemePreferenceIndigo.
+  ///
+  /// In zh, this message translates to:
+  /// **'靛蓝色'**
+  String get colorSchemePreferenceIndigo;
+
+  /// No description provided for @colorSchemePreferenceViolet.
+  ///
+  /// In zh, this message translates to:
+  /// **'紫罗兰色'**
+  String get colorSchemePreferenceViolet;
+
+  /// No description provided for @colorSchemePreferencePink.
+  ///
+  /// In zh, this message translates to:
+  /// **'粉红色'**
+  String get colorSchemePreferencePink;
+
+  /// No description provided for @colorSchemePreferenceYellow.
+  ///
+  /// In zh, this message translates to:
+  /// **'黄色'**
+  String get colorSchemePreferenceYellow;
+
+  /// No description provided for @colorSchemePreferenceOrange.
+  ///
+  /// In zh, this message translates to:
+  /// **'橙色'**
+  String get colorSchemePreferenceOrange;
+
+  /// No description provided for @colorSchemePreferenceDeepOrange.
+  ///
+  /// In zh, this message translates to:
+  /// **'深橙色'**
+  String get colorSchemePreferenceDeepOrange;
+
   /// No description provided for @navHome.
   ///
   /// In zh, this message translates to:

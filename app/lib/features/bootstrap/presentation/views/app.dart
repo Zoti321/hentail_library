@@ -45,6 +45,10 @@ class _AppRootState extends ConsumerState<_AppRoot> {
     final ThemeMode themeMode = themeModeFromPreference(
       themePrefs.themePreference,
     );
+    final String colorSchemeId = colorSchemeIdForPreference(
+      themePrefs.colorSchemePreference,
+    );
+    final Color colorSchemeSeed = colorSchemeSeedForId(colorSchemeId);
     final Locale? locale = ref.watch(
       settingsProvider.select((AsyncValue<AppSetting> async) {
         final AsyncData<AppSetting>? data = async.asData;
@@ -64,19 +68,22 @@ class _AppRootState extends ConsumerState<_AppRoot> {
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(
         Brightness.light,
-        colorSchemeId: _colorSchemeId(themePrefs.colorSchemePreference),
+        colorSchemeId: colorSchemeId,
         useDynamicColor: themePrefs.useDynamicColor,
       ),
       darkTheme: buildAppTheme(
         Brightness.dark,
-        colorSchemeId: _colorSchemeId(themePrefs.colorSchemePreference),
+        colorSchemeId: colorSchemeId,
         useDynamicColor: themePrefs.useDynamicColor,
       ),
       themeMode: themeMode,
       routerConfig: appRouter,
       builder: (BuildContext context, Widget? child) {
         final Brightness brightness = Theme.of(context).brightness;
-        final M3EThemeData m3e = buildAppM3eThemeData(brightness);
+        final M3EThemeData m3e = buildAppM3eThemeData(
+          brightness,
+          seed: colorSchemeSeed,
+        );
         return M3ETheme(
           data: m3e,
           child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -86,12 +93,5 @@ class _AppRootState extends ConsumerState<_AppRoot> {
         );
       },
     );
-  }
-}
-
-String _colorSchemeId(AppColorSchemePreference preference) {
-  switch (preference) {
-    case AppColorSchemePreference.brand:
-      return 'brand';
   }
 }

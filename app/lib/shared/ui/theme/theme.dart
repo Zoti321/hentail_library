@@ -8,10 +8,12 @@ import 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_motion_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_shadow_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
 
 export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 export 'package:hentai_library/shared/ui/theme/color/app_color_scheme.dart';
+export 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart';
 export 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
 export 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
 export 'package:hentai_library/shared/ui/theme/extensions/theme_context_extensions.dart';
@@ -39,18 +41,19 @@ SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
 
 /// Single assembly entry for app [ThemeData] (light/dark).
 ///
-/// [colorSchemeId] / [useDynamicColor] 为设置契约预留；动态色与多 palette 尚未改变色值（ADR-0032）。
+/// [colorSchemeId] 选择固定 seed palette；[useDynamicColor] 仍为契约占位（ADR-0032）。
 ThemeData buildAppTheme(
   Brightness brightness, {
   String colorSchemeId = 'brand',
   bool useDynamicColor = false,
 }) {
+  // 动态取色仍为契约占位：开启时不改变装配结果（ADR-0032）。
   assert(
     !useDynamicColor || colorSchemeId == 'brand',
     'useDynamicColor 尚未实现；仅 brand palette 可用',
   );
-  assert(colorSchemeId == 'brand', '未知 colorSchemeId: $colorSchemeId');
-  final M3EThemeData m3e = buildAppM3eThemeData(brightness);
+  final Color seed = colorSchemeSeedForId(colorSchemeId);
+  final M3EThemeData m3e = buildAppM3eThemeData(brightness, seed: seed);
   final ColorScheme colorScheme = flutterColorSchemeFromM3e(m3e.colorScheme);
   final HentaiColorScheme semantic = HentaiColorScheme.forBrightness(
     brightness,

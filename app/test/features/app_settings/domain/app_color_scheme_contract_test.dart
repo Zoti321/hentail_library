@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/app_settings/domain/app_color_scheme_preference.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
 void main() {
@@ -22,6 +23,21 @@ void main() {
       expect(setting.useDynamicColor, isFalse);
       expect(setting.toJson()['colorSchemePreference'], 'brand');
       expect(setting.toJson()['useDynamicColor'], isFalse);
+    });
+
+    test('persists non-brand colorSchemePreference', () {
+      final AppSetting setting = AppSetting(
+        colorSchemePreference: AppColorSchemePreference.teal,
+      );
+      expect(setting.toJson()['colorSchemePreference'], 'teal');
+      expect(
+        AppSetting.fromJson(setting.toJson()).colorSchemePreference,
+        AppColorSchemePreference.teal,
+      );
+      expect(
+        colorSchemeIdForPreference(AppColorSchemePreference.deepOrange),
+        'deepOrange',
+      );
     });
   });
 }

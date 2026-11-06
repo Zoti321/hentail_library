@@ -44,6 +44,20 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     }
   }
 
+  String colorSchemePreferenceLabel(AppColorSchemePreference preference) {
+    return switch (preference) {
+      AppColorSchemePreference.brand => colorSchemePreferenceBrand,
+      AppColorSchemePreference.teal => colorSchemePreferenceTeal,
+      AppColorSchemePreference.blue => colorSchemePreferenceBlue,
+      AppColorSchemePreference.indigo => colorSchemePreferenceIndigo,
+      AppColorSchemePreference.violet => colorSchemePreferenceViolet,
+      AppColorSchemePreference.pink => colorSchemePreferencePink,
+      AppColorSchemePreference.yellow => colorSchemePreferenceYellow,
+      AppColorSchemePreference.orange => colorSchemePreferenceOrange,
+      AppColorSchemePreference.deepOrange => colorSchemePreferenceDeepOrange,
+    };
+  }
+
   String localePreferenceLabel(AppLocalePreference preference) {
     switch (preference) {
       case AppLocalePreference.system:

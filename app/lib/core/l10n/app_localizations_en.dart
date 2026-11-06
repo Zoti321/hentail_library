@@ -202,6 +202,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themePreferenceDark => 'Dark';
 
   @override
+  String get settingsColorSchemeLabel => 'Color scheme';
+
+  @override
+  String get colorSchemePreferenceBrand => 'Default';
+
+  @override
+  String get colorSchemePreferenceTeal => 'Teal';
+
+  @override
+  String get colorSchemePreferenceBlue => 'Blue';
+
+  @override
+  String get colorSchemePreferenceIndigo => 'Indigo';
+
+  @override
+  String get colorSchemePreferenceViolet => 'Violet';
+
+  @override
+  String get colorSchemePreferencePink => 'Pink';
+
+  @override
+  String get colorSchemePreferenceYellow => 'Yellow';
+
+  @override
+  String get colorSchemePreferenceOrange => 'Orange';
+
+  @override
+  String get colorSchemePreferenceDeepOrange => 'Deep orange';
+
+  @override
   String get navHome => 'Home';
 
   @override

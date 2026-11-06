@@ -11,6 +11,8 @@ import '../../../../../support/pump_localized_app.dart';
 
 class _RecordingSettingsNotifier extends SettingsNotifier {
   final List<AppThemePreference> themeCalls = <AppThemePreference>[];
+  final List<AppColorSchemePreference> colorSchemeCalls =
+      <AppColorSchemePreference>[];
   final List<bool> healthyCalls = <bool>[];
 
   @override
@@ -19,6 +21,11 @@ class _RecordingSettingsNotifier extends SettingsNotifier {
   @override
   Future<void> setThemePreference(AppThemePreference value) async {
     themeCalls.add(value);
+  }
+
+  @override
+  Future<void> setColorSchemePreference(AppColorSchemePreference value) async {
+    colorSchemeCalls.add(value);
   }
 
   @override
@@ -68,6 +75,25 @@ void main() {
 
       expect(notifier.themeCalls, <AppThemePreference>[
         AppThemePreference.light,
+      ]);
+    },
+  );
+
+  testWidgets(
+    'tapping color scheme tile opens dialog and persists the chosen preference',
+    (WidgetTester tester) async {
+      final _RecordingSettingsNotifier notifier = await _pumpPage(tester);
+      final AppLocalizations l10n = lookupAppLocalizations(const Locale('zh'));
+
+      await tester.tap(find.text(l10n.settingsColorSchemeLabel));
+      await tester.pumpAndSettle();
+      expect(notifier.colorSchemeCalls, isEmpty);
+
+      await tester.tap(find.text(l10n.colorSchemePreferenceTeal));
+      await tester.pumpAndSettle();
+
+      expect(notifier.colorSchemeCalls, <AppColorSchemePreference>[
+        AppColorSchemePreference.teal,
       ]);
     },
   );
