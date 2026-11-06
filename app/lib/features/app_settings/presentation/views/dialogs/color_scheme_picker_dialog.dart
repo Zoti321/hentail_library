@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 弹出配色方案选择 dialog（参考 Kazumi：圆形三色调 palette + 点选即生效）。
+/// 弹出配色方案选择 dialog（参考 Kazumi：圆角卡 + 圆形三色调 + 点选即生效）。
 ///
 /// 使用 [M3EDialog.show]（`rootNavigator: true`），scrim 覆盖整窗含导航轨。
 Future<AppColorSchemePreference?> showColorSchemePickerDialog({
@@ -30,6 +30,21 @@ Future<AppColorSchemePreference?> showColorSchemePickerDialog({
   );
 }
 
+/// 配色选项瓦片度量（对齐 Kazumi PaletteCard 70² + 文案列宽）。
+abstract final class _PaletteMetrics {
+  static const double cardSize = 70;
+  static const double cardInset = 10;
+  static const double tileMinWidth = 76;
+  static const double tileHeight = 108;
+  static const double gap = 8;
+
+  /// 按内容区宽度计算列数，保证格子等宽、左右边距由 dialog padding 对称承担。
+  static int columnsFor(double maxWidth) {
+    final int columns = ((maxWidth + gap) / (tileMinWidth + gap)).floor();
+    return columns.clamp(3, AppColorSchemePreference.values.length);
+  }
+}
+
 class _ColorSchemePickerDialog extends StatelessWidget {
   const _ColorSchemePickerDialog({required this.selected});
 
@@ -40,23 +55,42 @@ class _ColorSchemePickerDialog extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
+    final List<AppColorSchemePreference> preferences =
+        AppColorSchemePreference.values;
 
     return M3EDialog(
       title: l10n.settingsColorSchemeLabel,
-      content: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: spacing.sm,
-        runSpacing: spacing.sm,
-        children: <Widget>[
-          for (final AppColorSchemePreference preference
-              in AppColorSchemePreference.values)
-            _ColorSchemeOption(
-              preference: preference,
-              label: l10n.colorSchemePreferenceLabel(preference),
-              selected: preference == selected,
-              onTap: () => Navigator.of(context).pop(preference),
+      // 左右对称；避免默认 content padding 与 Wrap 居中叠出视觉偏斜。
+      contentPadding: EdgeInsets.fromLTRB(
+        spacing.lg,
+        spacing.sm,
+        spacing.lg,
+        spacing.lg,
+      ),
+      content: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final int columns = _PaletteMetrics.columnsFor(constraints.maxWidth);
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: preferences.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: columns,
+              mainAxisSpacing: _PaletteMetrics.gap,
+              crossAxisSpacing: _PaletteMetrics.gap,
+              mainAxisExtent: _PaletteMetrics.tileHeight,
             ),
-        ],
+            itemBuilder: (BuildContext context, int index) {
+              final AppColorSchemePreference preference = preferences[index];
+              return _ColorSchemeOption(
+                preference: preference,
+                label: l10n.colorSchemePreferenceLabel(preference),
+                selected: preference == selected,
+                onTap: () => Navigator.of(context).pop(preference),
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -84,41 +118,36 @@ class _ColorSchemeOption extends StatelessWidget {
       label: label,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(36),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: theme.spacing.xs,
-            vertical: theme.spacing.xs,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              _PaletteCard(
-                color: colorSchemeSeedForId(
-                  colorSchemeIdForPreference(preference),
-                ),
-                selected: selected,
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _PaletteCard(
+              color: colorSchemeSeedForId(
+                colorSchemeIdForPreference(preference),
               ),
-              SizedBox(height: theme.spacing.xs),
-              Text(
-                label,
-                style: theme.typeScale.labelMedium.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
+              selected: selected,
+            ),
+            SizedBox(height: theme.spacing.xs),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: theme.typeScale.labelMedium.copyWith(
+                color: theme.colorScheme.onSurface,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-/// 正圆三色调预览（上半 / 左下 / 右下），对齐 Kazumi PaletteCard 分区。
+/// Kazumi `PaletteCard`：圆角矩形容器 + 内嵌圆形三色调 + 选中勾。
 class _PaletteCard extends StatelessWidget {
   const _PaletteCard({required this.color, required this.selected});
-
-  static const double _size = 56;
 
   final Color color;
   final bool selected;
@@ -126,24 +155,39 @@ class _PaletteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = ColorScheme.fromSeed(seedColor: color);
+    final M3EColorScheme m3e = M3ETheme.of(context).colorScheme;
+    const double circleSize =
+        _PaletteMetrics.cardSize - 2 * _PaletteMetrics.cardInset;
+
     return SizedBox(
-      width: _size,
-      height: _size,
+      width: _PaletteMetrics.cardSize,
+      height: _PaletteMetrics.cardSize,
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          CustomPaint(
-            size: const Size.square(_size),
-            painter: _ThreeToneCirclePainter(
-              top: scheme.primaryContainer,
-              bottomLeft: scheme.tertiaryContainer,
-              bottomRight: scheme.primary,
+          Material(
+            color: m3e.surfaceContainerHighest,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Padding(
+              padding: const EdgeInsets.all(_PaletteMetrics.cardInset),
+              child: CustomPaint(
+                size: const Size.square(circleSize),
+                painter: _ThreeToneCirclePainter(
+                  top: scheme.primaryContainer,
+                  bottomLeft: scheme.tertiaryContainer,
+                  bottomRight: scheme.primary,
+                ),
+              ),
             ),
           ),
           if (selected)
             Container(
-              width: 22,
-              height: 22,
+              width: 25,
+              height: 25,
               decoration: BoxDecoration(
                 color: scheme.primary,
                 shape: BoxShape.circle,
@@ -151,7 +195,7 @@ class _PaletteCard extends StatelessWidget {
               child: Icon(
                 Icons.check_rounded,
                 color: scheme.onPrimary,
-                size: 14,
+                size: 12,
               ),
             ),
         ],
@@ -182,15 +226,12 @@ class _ThreeToneCirclePainter extends CustomPainter {
 
     final Paint paint = Paint()..style = PaintingStyle.fill;
 
-    // 上半圆
     paint.color = top;
     canvas.drawArc(oval, math.pi, math.pi, true, paint);
 
-    // 左下
     paint.color = bottomLeft;
     canvas.drawArc(oval, math.pi / 2, math.pi / 2, true, paint);
 
-    // 右下
     paint.color = bottomRight;
     canvas.drawArc(oval, 0, math.pi / 2, true, paint);
 
