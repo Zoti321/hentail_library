@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -7,9 +9,8 @@ import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart';
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
-import 'package:material_color_utilities/material_color_utilities.dart';
 
-/// 弹出配色方案选择 dialog（参考 Kazumi：四象限 palette + 点选即生效）。
+/// 弹出配色方案选择 dialog（参考 Kazumi：圆形三色调 palette + 点选即生效）。
 ///
 /// 使用 [M3EDialog.show]（`rootNavigator: true`），scrim 覆盖整窗含导航轨。
 Future<AppColorSchemePreference?> showColorSchemePickerDialog({
@@ -83,7 +84,7 @@ class _ColorSchemeOption extends StatelessWidget {
       label: label,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(36),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: theme.spacing.xs,
@@ -113,75 +114,93 @@ class _ColorSchemeOption extends StatelessWidget {
   }
 }
 
-/// Kazumi `PaletteCard` 同构：由 seed 派生三色四象限预览 + 选中勾。
-///
-/// 必须在固定尺寸内用 [StackFit.expand] 给 [Column]/[Expanded] 有界高度，
-/// 否则 Card 按 intrinsic 收缩、色块高度为 0（只剩空白卡片底）。
+/// 正圆三色调预览（上半 / 左下 / 右下），对齐 Kazumi PaletteCard 分区。
 class _PaletteCard extends StatelessWidget {
   const _PaletteCard({required this.color, required this.selected});
+
+  static const double _size = 56;
 
   final Color color;
   final bool selected;
 
   @override
   Widget build(BuildContext context) {
-    final Hct hct = Hct.fromInt(color.toARGB32());
-    final Color primary = Color(Hct.from(hct.hue, 20.0, 90.0).toInt());
-    final Color tertiary = Color(Hct.from(hct.hue + 50, 20.0, 85.0).toInt());
-    final Color primaryContainer = Color(Hct.from(hct.hue, 30.0, 50.0).toInt());
-    final Color checkbox = Color(Hct.from(hct.hue, 30.0, 40.0).toInt());
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-
+    final ColorScheme scheme = ColorScheme.fromSeed(seedColor: color);
     return SizedBox(
-      width: 70,
-      height: 70,
+      width: _size,
+      height: _size,
       child: Stack(
-        fit: StackFit.expand,
+        alignment: Alignment.center,
         children: <Widget>[
-          Material(
-            color: scheme.surfaceContainerHighest,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: ClipOval(
-                child: Column(
-                  children: <Widget>[
-                    Expanded(child: ColoredBox(color: primary)),
-                    Expanded(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(child: ColoredBox(color: tertiary)),
-                          Expanded(child: ColoredBox(color: primaryContainer)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          CustomPaint(
+            size: const Size.square(_size),
+            painter: _ThreeToneCirclePainter(
+              top: scheme.primaryContainer,
+              bottomLeft: scheme.tertiaryContainer,
+              bottomRight: scheme.primary,
             ),
           ),
           if (selected)
-            Center(
-              child: Container(
-                width: 25,
-                height: 25,
-                decoration: BoxDecoration(
-                  color: checkbox,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check_rounded,
-                  color: scheme.surfaceContainerLow,
-                  size: 12,
-                ),
+            Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                color: scheme.primary,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.check_rounded,
+                color: scheme.onPrimary,
+                size: 14,
               ),
             ),
         ],
       ),
     );
+  }
+}
+
+class _ThreeToneCirclePainter extends CustomPainter {
+  const _ThreeToneCirclePainter({
+    required this.top,
+    required this.bottomLeft,
+    required this.bottomRight,
+  });
+
+  final Color top;
+  final Color bottomLeft;
+  final Color bottomRight;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Offset center = size.center(Offset.zero);
+    final double radius = size.shortestSide / 2;
+    final Rect oval = Rect.fromCircle(center: center, radius: radius);
+
+    canvas.save();
+    canvas.clipPath(Path()..addOval(oval));
+
+    final Paint paint = Paint()..style = PaintingStyle.fill;
+
+    // 上半圆
+    paint.color = top;
+    canvas.drawArc(oval, math.pi, math.pi, true, paint);
+
+    // 左下
+    paint.color = bottomLeft;
+    canvas.drawArc(oval, math.pi / 2, math.pi / 2, true, paint);
+
+    // 右下
+    paint.color = bottomRight;
+    canvas.drawArc(oval, 0, math.pi / 2, true, paint);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _ThreeToneCirclePainter oldDelegate) {
+    return top != oldDelegate.top ||
+        bottomLeft != oldDelegate.bottomLeft ||
+        bottomRight != oldDelegate.bottomRight;
   }
 }

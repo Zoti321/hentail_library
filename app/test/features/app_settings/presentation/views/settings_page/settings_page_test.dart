@@ -88,6 +88,9 @@ void main() {
       await tester.tap(find.text(l10n.settingsColorSchemeLabel));
       await tester.pumpAndSettle();
       expect(notifier.colorSchemeCalls, isEmpty);
+      // 每个方案一张圆形三色调 CustomPaint；默认选中带 check。
+      expect(find.byType(CustomPaint), findsWidgets);
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
 
       await tester.tap(find.text(l10n.colorSchemePreferenceTeal));
       await tester.pumpAndSettle();
