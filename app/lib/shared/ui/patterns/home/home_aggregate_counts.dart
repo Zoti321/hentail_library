@@ -1,6 +1,6 @@
 /// Lab 首页全库聚合统计（预览 / 将来接 [HomePageCounts] 扩展字段）。
-class Md3eHomeAggregateCounts {
-  const Md3eHomeAggregateCounts({
+class HomeAggregateCounts {
+  const HomeAggregateCounts({
     required this.comicCount,
     required this.seriesCount,
     required this.authorCount,

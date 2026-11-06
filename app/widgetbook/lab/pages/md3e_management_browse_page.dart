@@ -3,12 +3,12 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 
 /// 管理页 Lab 壳层：粘滞标题 + 胶囊维度条 + 流式 chip 列表。
-class Md3eManagementBrowsePage extends StatefulWidget {
-  const Md3eManagementBrowsePage({
+class ManagementBrowsePage extends StatefulWidget {
+  const ManagementBrowsePage({
     super.key,
     required this.facet,
     required this.facetCount,
@@ -27,16 +27,16 @@ class Md3eManagementBrowsePage extends StatefulWidget {
   final ValueChanged<ManagedNamedFacetKind> onFacetChanged;
   final ValueChanged<String>? onChipPressed;
   final ValueChanged<String>? onEntityCreated;
-  final Md3eManagementCreateInteraction? createInteractionOverride;
+  final ManagementCreateInteraction? createInteractionOverride;
   final String? title;
   final ScrollController? scrollController;
 
   @override
-  State<Md3eManagementBrowsePage> createState() =>
+  State<ManagementBrowsePage> createState() =>
       _Md3eManagementBrowsePageState();
 }
 
-class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
+class _Md3eManagementBrowsePageState extends State<ManagementBrowsePage> {
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
   bool _showInlineCreateField = false;
@@ -49,7 +49,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
   }
 
   @override
-  void didUpdateWidget(covariant Md3eManagementBrowsePage oldWidget) {
+  void didUpdateWidget(covariant ManagementBrowsePage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.facet != widget.facet) {
       _showInlineCreateField = false;
@@ -81,7 +81,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
       setState(() => _showInlineCreateField = true);
       return;
     }
-    showMd3eManagementCreateEntityDialog(
+    showManagementCreateEntityDialog(
       context: context,
       facet: widget.facet,
       onCreate: _handleEntityCreated,
@@ -91,28 +91,28 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
       viewportWidth,
     );
-    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 
-    final Md3eManagementCreateInteraction interaction =
-        md3eManagementCreateInteractionOf(
+    final ManagementCreateInteraction interaction =
+        managementCreateInteractionOf(
           context,
           override: widget.createInteractionOverride,
         );
     final bool useMobileCreateDialog =
-        interaction == Md3eManagementCreateInteraction.mobileDialog;
+        interaction == ManagementCreateInteraction.mobileDialog;
     final bool createEnabled = widget.onEntityCreated != null;
     final bool showFab = createEnabled;
     final bool showInlineCreate =
         createEnabled && !useMobileCreateDialog && _showInlineCreateField;
 
-    final Widget header = Md3eManagementPageHeader(title: widget.title);
+    final Widget header = ManagementPageHeader(title: widget.title);
 
     final double scrollBottomPadding = createEnabled
-        ? Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass)
+        ? LibraryBrowsePageMetrics.scrollBottomInset(sizeClass)
         : layout.headerToBodyGap;
 
     return Stack(
@@ -123,7 +123,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
           slivers: <Widget>[
             SliverPersistentHeader(
               pinned: true,
-              delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
+              delegate: PageHeaderDelegate(layout: layout, child: header),
             ),
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
@@ -136,22 +136,22 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Md3eManagementCatalogToolbar(
+                    ManagementCatalogToolbar(
                       facet: widget.facet,
                       facetCount: widget.facetCount,
                       onFacetChanged: widget.onFacetChanged,
                     ),
                     SizedBox(
                       height:
-                          Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
+                          LibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
                             sizeClass,
                           ),
                     ),
-                    Md3eManagementFacetChipWrap(
+                    ManagementFacetChipWrap(
                       labels: widget.chipLabels,
                       onLabelPressed: widget.onChipPressed,
                       trailing: showInlineCreate
-                          ? Md3eManagementDraftEntityChip(
+                          ? ManagementDraftEntityChip(
                               onCommit: _handleEntityCreated,
                               onDismiss: () {
                                 setState(() => _showInlineCreateField = false);
@@ -165,7 +165,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
             ),
           ],
         ),
-        Md3eManagementCreateEntityFab(
+        ManagementCreateEntityFab(
           facet: widget.facet,
           horizontalPadding: horizontal,
           onPressed: () => _onCreateFabPressed(useMobileCreateDialog),
@@ -177,7 +177,7 @@ class _Md3eManagementBrowsePageState extends State<Md3eManagementBrowsePage> {
 }
 
 /// Widgetbook / 预览用各维度示例数据。
-abstract final class Md3eManagementBrowsePagePreviewData {
+abstract final class ManagementBrowsePagePreviewData {
   static const Map<ManagedNamedFacetKind, List<String>>
   sampleLabels = <ManagedNamedFacetKind, List<String>>{
     ManagedNamedFacetKind.author: <String>['村上水军', '比村兵長', '紺野アサラ', 'みちきんぐ'],

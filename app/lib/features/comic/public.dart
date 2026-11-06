@@ -15,4 +15,4 @@ export 'public/shell/library_browse_shell_exports.dart';
 export 'public/ui/comic_detail_layout.dart';
 export 'public/smart_facet_match_preference.dart';
 export 'public/ui/comic_cover_content.dart';
-export 'public/ui/comic_detail_md3e_page.dart';
+export 'public/ui/comic_detail_page.dart';

@@ -15,7 +15,7 @@ import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 
 import '../hosts/md3e_home_page_lab_host.dart';
 
-import 'package:hentai_library/features/comic_trash/presentation/views/trash_md3e/trash_md3e_purge_dialog.dart';
+import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_purge_dialog.dart';
 
 import '../hosts/md3e_history_browse_page_lab_host.dart';
 import '../preview/md3e_history_browse_page_preview_data.dart';
@@ -23,7 +23,7 @@ import '../lab/pages/library_browse_page.dart';
 import '../hosts/md3e_management_browse_page_lab_host.dart';
 import '../hosts/md3e_settings_page_lab_host.dart';
 
-import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
 
 import '../hosts/md3e_reader_page_lab_host.dart';
 import '../preview/md3e_reader_page_preview_data.dart';
@@ -31,12 +31,12 @@ import '../preview/md3e_reader_page_preview_data.dart';
 
 import '../hosts/md3e_comic_metadata_edit_page_lab_host.dart';
 
-import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library/library_edit_page.dart';
 
 import '../hosts/md3e_library_edit_page_lab_host.dart';
 
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_lab_host.dart';
-import 'package:hentai_library/features/series/presentation/views/metadata_edit_md3e/series_metadata_edit_page.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
+import 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_page.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_edit_navigation.dart';
 
 import '../lab/navigation/md3e_lab_catalog_navigation.dart';
@@ -70,7 +70,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
           name: 'widgets',
           children: <WidgetbookNode>[
             WidgetbookComponent(
-              name: 'Md3eComicCard',
+              name: 'ComicCard',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Interactive',
@@ -86,7 +86,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eSegmentedCapsuleBar',
+              name: 'SegmentedCapsuleBar',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Management facets',
@@ -97,7 +97,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eCatalogViewModeButtonGroup',
+              name: 'CatalogViewModeButtonGroup',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Grid · List toggle',
@@ -110,7 +110,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eComicListItem',
+              name: 'ComicListItem',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Interactive',
@@ -130,7 +130,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eReadingHistoryListItem',
+              name: 'ReadingHistoryListItem',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
@@ -142,7 +142,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                         child: CustomScrollView(
                           shrinkWrap: true,
                           slivers: <Widget>[
-                            Md3eReadingHistoryListLayout(
+                            ReadingHistoryListLayout(
                               itemCount: 6,
                               itemBuilder: (BuildContext context, int index) {
                                 return _Md3eReadingHistoryListItemPreview(
@@ -160,20 +160,20 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eDesktopTitleBar',
+              name: 'DesktopTitleBar',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Desktop · 1024',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
                     child: Md3eWidgetbookDesktopExpandedGate(
-                      child: const Md3eDesktopTitleBar(),
+                      child: const DesktopTitleBar(),
                     ),
                   ),
                 ),
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eNavigationRail',
+              name: 'ExpressiveNavigationRail',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: '600h · menu toggles width',
@@ -190,7 +190,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3ePagination',
+              name: 'Pagination',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Interactive',
@@ -201,18 +201,18 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eTagInputField',
+              name: 'TagInputField',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eTagInputFieldPreview(),
+                    child: TagInputFieldPreview(),
                   ),
                 ),
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eNamedFacetMultiSelectField',
+              name: 'FacetMultiSelectField',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Authors · smart hint',
@@ -241,10 +241,10 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                         ? viewportHeight
                         : 768;
                     return Md3eWidgetbookScope(
-                      child: Md3eDesktopShell(
+                      child: DesktopShell(
                         height: shellHeight,
                         initialRailExtended: false,
-                        surfaceRoles: Md3eDesktopShellSurfaceRoles.toneBased(
+                        surfaceRoles: DesktopShellSurfaceRoles.toneBased(
                           scheme,
                         ),
                       ),
@@ -254,7 +254,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eLibraryFilterSortSideSheet',
+              name: 'LibraryFilterSortSideSheet',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Adaptive modal · bottom (<840) / side (≥840)',
@@ -265,13 +265,13 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eComicDetailMetadataTagsSection',
+              name: 'ComicDetailMetadataTagsSection',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Tag section',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Md3eComicDetailMetadataTagsSection(
-                      entry: Md3eComicDetailPagePreviewData.sample(),
+                    child: ComicDetailMetadataTagsSection(
+                      entry: ComicDetailPagePreviewData.sample(),
                     ),
                   ),
                 ),
@@ -298,17 +298,17 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
           name: 'pages',
           children: <WidgetbookNode>[
             WidgetbookComponent(
-              name: 'Md3eHomePage',
+              name: 'HomeLayout',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) =>
-                      const Md3eWidgetbookScope(child: Md3eHomePageLabHost()),
+                      const Md3eWidgetbookScope(child: HomePageLabHost()),
                 ),
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eLibraryBrowsePage',
+              name: 'LibraryBrowseLayout',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
@@ -319,7 +319,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eManagementBrowsePage',
+              name: 'ManagementBrowsePage',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
@@ -335,7 +335,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Md3eHistoryBrowsePageLabHost(
+                    child: HistoryBrowsePageLabHost(
                       clock: DateTime(2026, 6, 15, 14),
                     ),
                   ),
@@ -343,13 +343,13 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eTrashPurgeConfirmDialog',
+              name: 'TrashPurgeConfirmDialog',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Single local',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
                     child: Center(
-                      child: Md3eTrashPurgeConfirmDialog(
+                      child: TrashPurgeConfirmDialog(
                         title: '只有神知道的世界',
                         counts: (local: 1, remote: 0),
                       ),
@@ -360,7 +360,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                   name: 'Mixed batch',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
                     child: Center(
-                      child: Md3eTrashPurgeConfirmDialog(
+                      child: TrashPurgeConfirmDialog(
                         counts: (local: 2, remote: 3),
                       ),
                     ),
@@ -369,29 +369,29 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eSettingsPage',
+              name: 'SettingsLayout',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eSettingsPageLabHost(),
+                    child: SettingsPageLabHost(),
                   ),
                 ),
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eReaderPage',
+              name: 'ReaderLayout',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) =>
-                      const Md3eWidgetbookScope(child: Md3eReaderPageLabHost()),
+                      const Md3eWidgetbookScope(child: ReaderPageLabHost()),
                 ),
                 WidgetbookUseCase(
                   name: 'Series boundary · last page',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eReaderPageLabHost(
-                      preview: Md3eReaderPagePreviewData(
+                    child: ReaderPageLabHost(
+                      preview: ReaderPagePreviewData(
                         title: '第 01 卷',
                         subtitle: '葬送的芙莉莲',
                         totalPages: 3,
@@ -403,13 +403,13 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Viewport · loading',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eReaderPageLabHost(
-                      preview: Md3eReaderPagePreviewData(
+                    child: ReaderPageLabHost(
+                      preview: ReaderPagePreviewData(
                         title: '第 01 卷',
                         subtitle: '葬送的芙莉莲',
                         totalPages: 24,
                         initialPage: 3,
-                        viewportStatus: Md3eReaderViewportStatus.loading,
+                        viewportStatus: ReaderViewportStatus.loading,
                       ),
                     ),
                   ),
@@ -417,13 +417,13 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
                 WidgetbookUseCase(
                   name: 'Viewport · open error',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eReaderPageLabHost(
-                      preview: Md3eReaderPagePreviewData(
+                    child: ReaderPageLabHost(
+                      preview: ReaderPagePreviewData(
                         title: '第 01 卷',
                         subtitle: '葬送的芙莉莲',
                         totalPages: 24,
                         initialPage: 3,
-                        viewportStatus: Md3eReaderViewportStatus.error,
+                        viewportStatus: ReaderViewportStatus.error,
                       ),
                     ),
                   ),
@@ -431,7 +431,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eComicDetailPage',
+              name: 'ComicDetailLayout',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
@@ -442,7 +442,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eSeriesDetailPage',
+              name: 'SeriesDetailLayout',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
@@ -453,25 +453,25 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eComicMetadataEditPage',
+              name: 'ComicMetadataEditLayout',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eComicMetadataEditPageLabHost(),
+                    child: ComicMetadataEditPageLabHost(),
                   ),
                 ),
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eSeriesMetadataEditPage',
+              name: 'SeriesMetadataEditLayout',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Responsive · viewport addon',
                   builder: (BuildContext context) => Md3eWidgetbookScope(
-                    child: Md3eSeriesMetadataEditPage(
-                      initialDraft: Md3eSeriesMetadataEditDraft.fromEntry(
-                        Md3eSeriesDetailPagePreviewData.sample(),
+                    child: SeriesMetadataEditLayout(
+                      initialDraft: SeriesMetadataEditDraft.fromEntry(
+                        SeriesDetailPagePreviewData.sample(),
                       ),
                     ),
                   ),
@@ -479,21 +479,21 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
               ],
             ),
             WidgetbookComponent(
-              name: 'Md3eLibraryEditPage',
+              name: 'LibraryEditPage',
               useCases: <WidgetbookUseCase>[
                 WidgetbookUseCase(
                   name: 'Edit local · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eLibraryEditPageLabHost(
-                      intent: Md3eLibraryEditPageIntent.editLocal,
+                    child: LibraryEditPageLabHost(
+                      intent: LibraryEditPageIntent.editLocal,
                     ),
                   ),
                 ),
                 WidgetbookUseCase(
                   name: 'Edit remote · viewport addon',
                   builder: (BuildContext context) => const Md3eWidgetbookScope(
-                    child: Md3eLibraryEditPageLabHost(
-                      intent: Md3eLibraryEditPageIntent.editRemote,
+                    child: LibraryEditPageLabHost(
+                      intent: LibraryEditPageIntent.editRemote,
                     ),
                   ),
                 ),
@@ -506,7 +506,7 @@ List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
   ];
 }
 
-/// Sample read progress on Md3eComicCard / Md3eComicListItem Widgetbook examples.
+/// Sample read progress on ComicCard / ComicListItem Widgetbook examples.
 const double kMd3eWidgetbookComicReadProgress = 0.42;
 
 const List<String> _demoReadingHistoryTitles = <String>[
@@ -529,7 +529,7 @@ class _Md3eReadingHistoryListItemPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final DateTime resolvedLastReadTime =
         lastReadTime ?? DateTime.now().subtract(const Duration(hours: 2));
-    return Md3eReadingHistoryListItem(
+    return ReadingHistoryListItem(
       title: title,
       cover: cover,
       currentPage: 42,
@@ -542,12 +542,12 @@ class _Md3eReadingHistoryListItemPreview extends StatelessWidget {
   }
 }
 
-List<Md3eComicListMoreMenuEntry> _demoComicListMoreMenu() {
-  return const <Md3eComicListMoreMenuEntry>[
-    Md3eComicListMoreMenuEntry(label: '继续阅读'),
-    Md3eComicListMoreMenuEntry(label: '编辑元数据'),
-    Md3eComicListMoreMenuEntry(label: '在资源管理器中显示'),
-    Md3eComicListMoreMenuEntry(label: '删除'),
+List<ComicListMoreMenuEntry> _demoComicListMoreMenu() {
+  return const <ComicListMoreMenuEntry>[
+    ComicListMoreMenuEntry(label: '继续阅读'),
+    ComicListMoreMenuEntry(label: '编辑元数据'),
+    ComicListMoreMenuEntry(label: '在资源管理器中显示'),
+    ComicListMoreMenuEntry(label: '删除'),
   ];
 }
 
@@ -567,9 +567,9 @@ Widget _md3eComicDetailPageKnobsPreview(BuildContext context) {
     description: '控制摘要区 R18 年龄限制 chip 是否显示。',
     initialValue: true,
   );
-  final Md3eComicDetailEntry entry = Md3eComicDetailPagePreviewData.sample()
+  final ComicDetailViewObject entry = ComicDetailPagePreviewData.sample()
       .copyWith(showAgeRestrictionChip: showAgeRestriction);
-  return Md3eComicDetailPage(
+  return ComicDetailLayout(
     entry: entry,
     onEdit: () =>
         _md3eWidgetbookOpenLabComicMetadataEdit(context, entry: entry),
@@ -587,12 +587,12 @@ Widget _md3eSeriesDetailPageKnobsPreview(BuildContext context) {
     description: '控制 Parody / Author / Tag 等 chip 区块。',
     initialValue: true,
   );
-  final Md3eSeriesDetailEntry entry = Md3eSeriesDetailPagePreviewData.sample()
+  final SeriesDetailViewObject entry = SeriesDetailPagePreviewData.sample()
       .copyWith(
         showAgeRestrictionChip: showAgeRestriction,
         showMetadataBlock: showMetadata,
       );
-  return Md3eSeriesDetailPageLabHost(
+  return SeriesDetailPageLabHost(
     entry: entry,
     onEdit: () =>
         _md3eWidgetbookOpenLabSeriesMetadataEdit(context, entry: entry),
@@ -651,7 +651,7 @@ class _Md3eComicCardKnobsHostState extends State<_Md3eComicCardKnobsHost> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 160,
-      child: Md3eComicCard(
+      child: ComicCard(
         title: '深海图书馆',
         subtitle: '128 页',
         readProgress: kMd3eWidgetbookComicReadProgress,
@@ -720,7 +720,7 @@ class _Md3eComicListItemKnobsHostState
   Widget build(BuildContext context) {
     return SizedBox(
       width: 400,
-      child: Md3eComicListItem(
+      child: ComicListItem(
         title: '深海图书馆',
         author: '示例作者',
         pageLabel: '128 页',
@@ -751,7 +751,7 @@ Widget _md3ePaginationKnobsPreview(BuildContext context) {
     divisions: _kMd3eWidgetbookPaginationTotalPages - 1,
   );
 
-  return Md3ePagination(
+  return Pagination(
     page: page,
     totalPages: _kMd3eWidgetbookPaginationTotalPages,
     totalItems: 120,
@@ -766,14 +766,14 @@ Widget _md3eManagementBrowsePageLabHostPreview(BuildContext context) {
     options: <String>['自动', '移动端 Dialog', '桌面端内联'],
     initialOption: '自动',
   );
-  final Md3eManagementCreateInteraction? interactionOverride =
+  final ManagementCreateInteraction? interactionOverride =
       switch (interactionKnob) {
-        '移动端 Dialog' => Md3eManagementCreateInteraction.mobileDialog,
-        '桌面端内联' => Md3eManagementCreateInteraction.desktopInline,
+        '移动端 Dialog' => ManagementCreateInteraction.mobileDialog,
+        '桌面端内联' => ManagementCreateInteraction.desktopInline,
         _ => null,
       };
 
-  return Md3eManagementBrowsePageLabHost(
+  return ManagementBrowsePageLabHost(
     createInteractionOverride: interactionOverride,
   );
 }
@@ -791,23 +791,23 @@ class _Md3eLibraryBrowsePagePreview extends StatefulWidget {
 class _Md3eLibraryBrowsePagePreviewState
     extends State<_Md3eLibraryBrowsePagePreview> {
   LibraryDisplayTarget _target = LibraryDisplayTarget.comics;
-  Md3eCatalogViewMode _viewMode = Md3eCatalogViewMode.grid;
-  Md3eLibraryFilterSortState _filterSort = Md3eLibraryFilterSortState.defaults;
+  CatalogViewMode _viewMode = CatalogViewMode.grid;
+  LibraryFilterSortState _filterSort = LibraryFilterSortState.defaults;
   int _pageSize = 50;
   int _page = 1;
   static const int _totalPages = 8;
 
   @override
   Widget build(BuildContext context) {
-    return Md3eLibraryFilterSortDrawerHost(
+    return LibraryFilterSortDrawerHost(
       initialState: _filterSort,
       useRootNavigator: false,
-      onStateChanged: (Md3eLibraryFilterSortState value) {
+      onStateChanged: (LibraryFilterSortState value) {
         setState(() => _filterSort = value);
       },
       body: Builder(
         builder: (BuildContext hostContext) {
-          return Md3eLibraryBrowsePage(
+          return LibraryBrowseLayout(
             libraryDisplayName: widget.libraryDisplayName,
             displayTarget: _target,
             viewMode: _viewMode,
@@ -827,12 +827,12 @@ class _Md3eLibraryBrowsePagePreviewState
             onDisplayTargetChanged: (LibraryDisplayTarget value) {
               setState(() => _target = value);
             },
-            onViewModeChanged: (Md3eCatalogViewMode value) {
+            onViewModeChanged: (CatalogViewMode value) {
               setState(() => _viewMode = value);
             },
             onFilterSort: () =>
-                Md3eLibraryFilterSortDrawerHost.openDrawer(hostContext),
-            onCatalogItemTap: (int index) => openMd3eLabCatalogDetail(
+                LibraryFilterSortDrawerHost.openDrawer(hostContext),
+            onCatalogItemTap: (int index) => openLabCatalogDetail(
               hostContext,
               displayTarget: _target,
               catalogIndex: index,
@@ -861,11 +861,11 @@ class _Md3eSegmentedCapsuleBarPreviewState
     final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Md3eSegmentedCapsuleBar(
-        segments: Md3eManagedNamedFacetUi.capsuleSegments(l10n),
-        selectedIndex: Md3eManagedNamedFacetUi.indexOf(_facet),
+      child: SegmentedCapsuleBar(
+        segments: ManagedNamedFacetUi.capsuleSegments(l10n),
+        selectedIndex: ManagedNamedFacetUi.indexOf(_facet),
         onSelected: (int index) {
-          setState(() => _facet = Md3eManagedNamedFacetUi.facetAt(index));
+          setState(() => _facet = ManagedNamedFacetUi.facetAt(index));
         },
       ),
     );
@@ -882,13 +882,13 @@ class _Md3eCatalogViewModeButtonGroupPreview extends StatefulWidget {
 
 class _Md3eCatalogViewModeButtonGroupPreviewState
     extends State<_Md3eCatalogViewModeButtonGroupPreview> {
-  Md3eCatalogViewMode _mode = Md3eCatalogViewMode.grid;
+  CatalogViewMode _mode = CatalogViewMode.grid;
 
   @override
   Widget build(BuildContext context) {
-    return Md3eCatalogViewModeButtonGroup(
+    return CatalogViewModeButtonGroup(
       mode: _mode,
-      onModeChanged: (Md3eCatalogViewMode value) {
+      onModeChanged: (CatalogViewMode value) {
         setState(() => _mode = value);
       },
     );
@@ -905,15 +905,15 @@ class _Md3eLibraryFilterSortSideSheetPreview extends StatefulWidget {
 
 class _Md3eLibraryFilterSortSideSheetPreviewState
     extends State<_Md3eLibraryFilterSortSideSheetPreview> {
-  Md3eLibraryFilterSortState _state = Md3eLibraryFilterSortState.defaults;
+  LibraryFilterSortState _state = LibraryFilterSortState.defaults;
 
   @override
   Widget build(BuildContext context) {
-    return Md3eLibraryFilterSortDrawerHost(
+    return LibraryFilterSortDrawerHost(
       initialState: _state,
       openSideSheetOnMount: true,
       useRootNavigator: false,
-      onStateChanged: (Md3eLibraryFilterSortState value) {
+      onStateChanged: (LibraryFilterSortState value) {
         setState(() => _state = value);
       },
       body: Builder(
@@ -924,7 +924,7 @@ class _Md3eLibraryFilterSortSideSheetPreviewState
               padding: const EdgeInsets.only(top: 24),
               child: M3EButton(
                 onPressed: () =>
-                    Md3eLibraryFilterSortDrawerHost.openDrawer(hostContext),
+                    LibraryFilterSortDrawerHost.openDrawer(hostContext),
                 style: M3EButtonStyle.filled,
                 size: M3EButtonSize.sm,
                 shape: M3EButtonShape.round,
@@ -953,8 +953,8 @@ class _Md3eNavigationRailPreviewState
 
   @override
   Widget build(BuildContext context) {
-    return Md3eNavigationRail(
-      destinations: md3eDefaultNavigationRailDestinations(context.l10n),
+    return ExpressiveNavigationRail(
+      destinations: defaultNavigationRailDestinations(context.l10n),
       selectedIndex: _selectedIndex,
       extended: _extended,
       onMenuPressed: () => setState(() => _extended = !_extended),

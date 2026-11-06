@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/comic/presentation/views/metadata_edit_md3e/comic_metadata_edit_page.dart';
+import 'package:hentai_library/features/comic/presentation/views/metadata_edit/comic_metadata_edit_layout.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 打开漫画元数据编辑：compact / medium M3E 全屏；expanded+ M3EDialog basic。
-Future<Md3eComicMetadataEditDraft?> showMd3eComicMetadataEdit({
+Future<ComicMetadataEditDraft?> showComicMetadataEditLayout({
   required BuildContext context,
-  required Md3eComicMetadataEditDraft initialDraft,
+  required ComicMetadataEditDraft initialDraft,
 }) {
   final GlobalKey pageKey = GlobalKey();
   final AppLocalizations l10n = context.l10n;
 
-  if (Md3eLabDialogPresenter.usesFullScreenPresentation(context)) {
-    return Md3eLabDialogPresenter.showFullScreen<Md3eComicMetadataEditDraft>(
+  if (LabDialogPresenter.usesFullScreenPresentation(context)) {
+    return LabDialogPresenter.showFullScreen<ComicMetadataEditDraft>(
       context,
       title: l10n.dialogEditMetadataTitle,
-      body: Md3eComicMetadataEditPage(
+      body: ComicMetadataEditLayout(
         key: pageKey,
         initialDraft: initialDraft,
-        presentation: Md3eMetadataEditPresentation.labFormBody,
+        presentation: MetadataEditPresentation.labFormBody,
       ),
       confirmLabel: l10n.commonSave,
       onConfirm: () {
@@ -40,13 +40,13 @@ Future<Md3eComicMetadataEditDraft?> showMd3eComicMetadataEdit({
     );
   }
 
-  return Md3eLabDialogPresenter.showBasic<Md3eComicMetadataEditDraft>(
+  return LabDialogPresenter.showBasic<ComicMetadataEditDraft>(
     context,
-    dialog: Md3eComicMetadataEditPage(
+    dialog: ComicMetadataEditLayout(
       initialDraft: initialDraft,
-      presentation: Md3eMetadataEditPresentation.modal,
+      presentation: MetadataEditPresentation.modal,
       onCancel: () => Navigator.of(context).pop(),
-      onSaved: (Md3eComicMetadataEditDraft draft) {
+      onSaved: (ComicMetadataEditDraft draft) {
         Navigator.of(context).pop(draft);
       },
     ),

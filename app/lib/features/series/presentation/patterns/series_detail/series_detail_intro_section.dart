@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/series_detail_page_metrics.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_metadata_section.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_primary_block.dart';
 
 /// 系列详情滚动区上部：主信息 + 元数据。
-class Md3eSeriesDetailIntroSection extends StatelessWidget {
-  const Md3eSeriesDetailIntroSection({
+class SeriesDetailIntroSection extends StatelessWidget {
+  const SeriesDetailIntroSection({
     super.key,
     required this.entry,
     this.onMetadataChipTap,
     this.onAuthorTap,
   });
 
-  final Md3eSeriesDetailEntry entry;
+  final SeriesDetailViewObject entry;
   final ValueChanged<String>? onMetadataChipTap;
   final ValueChanged<String>? onAuthorTap;
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+    final WindowSizeClass sizeClass = windowSizeClassOf(context);
     final double primaryToMeta =
-        Md3eSeriesDetailPageMetrics.primaryToMetadataSpacing(sizeClass);
+        SeriesDetailPageMetrics.primaryToMetadataSpacing(sizeClass);
     final double beforeComics =
-        Md3eSeriesDetailPageMetrics.metadataToComicsSpacing(sizeClass);
+        SeriesDetailPageMetrics.metadataToComicsSpacing(sizeClass);
     final bool showMeta = entry.showMetadataBlock && _hasMetadataChips(entry);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Md3eSeriesDetailPrimaryBlock(entry: entry),
+        SeriesDetailPrimaryBlock(entry: entry),
         if (showMeta) ...<Widget>[
           SizedBox(height: primaryToMeta),
-          Md3eSeriesDetailMetadataSection(
+          SeriesDetailMetadataSection(
             entry: entry,
             onChipTap: onMetadataChipTap,
             onAuthorTap: onAuthorTap,
@@ -42,13 +42,13 @@ class Md3eSeriesDetailIntroSection extends StatelessWidget {
         SizedBox(
           height: showMeta
               ? beforeComics
-              : Md3eSeriesDetailPageMetrics.comicsSectionTopSpacing(sizeClass),
+              : SeriesDetailPageMetrics.comicsSectionTopSpacing(sizeClass),
         ),
       ],
     );
   }
 
-  static bool _hasMetadataChips(Md3eSeriesDetailEntry entry) {
+  static bool _hasMetadataChips(SeriesDetailViewObject entry) {
     return entry.parodies.isNotEmpty ||
         entry.authors.isNotEmpty ||
         entry.characters.isNotEmpty ||

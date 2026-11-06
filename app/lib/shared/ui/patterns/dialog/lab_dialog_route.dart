@@ -6,7 +6,7 @@ import 'package:material_3_expressive/components/dialogs/res/m3e_dialog_strings.
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 对话框路由：与 M3E 包动画/scrim 一致，但 [rootNavigator: false]（Widgetbook 预览内）。
-Future<T?> md3ePushLabDialogRoute<T>(
+Future<T?> pushLabDialogRoute<T>(
   BuildContext anchorContext, {
   required M3EDialogVariant variant,
   required bool barrierDismissible,
@@ -25,8 +25,8 @@ Future<T?> md3ePushLabDialogRoute<T>(
     return M3EDialog.showDiscardConfirmation(context, labels: labels);
   }
 
-  final Md3eOverlayRouteScopeSnapshot overlayScope =
-      Md3eOverlayRouteScopeSnapshot.capture(anchorContext);
+  final OverlayRouteScopeSnapshot overlayScope =
+      OverlayRouteScopeSnapshot.capture(anchorContext);
   return Navigator.of(anchorContext, rootNavigator: false).push<T>(
     RawDialogRoute<T>(
       barrierDismissible: barrierDismissible,
@@ -45,7 +45,7 @@ Future<T?> md3ePushLabDialogRoute<T>(
               autofocusFirst: autofocusFirst,
               variant: variant,
               discardPrompt: discardPrompt,
-              child: md3eOverlayRouteScope(
+              child: overlayRouteScope(
                 scope: overlayScope,
                 child: builder(themedContext),
               ),

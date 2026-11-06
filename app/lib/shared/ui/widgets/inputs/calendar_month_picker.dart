@@ -6,9 +6,9 @@ import 'package:hentai_library/shared/ui/widgets/inputs/calendar_day_picker.dart
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:flutter/material.dart' hide MaterialLocalizations;
 
-/// 月历翻页（使用 [Md3eCalendarDayPicker]）。
-class Md3eCalendarMonthPicker extends StatefulWidget {
-  const Md3eCalendarMonthPicker({
+/// 月历翻页（使用 [CalendarDayPicker]）。
+class CalendarMonthPicker extends StatefulWidget {
+  const CalendarMonthPicker({
     required this.initialMonth,
     required this.firstDate,
     required this.lastDate,
@@ -40,19 +40,19 @@ class Md3eCalendarMonthPicker extends StatefulWidget {
   final ValueChanged<M3EDatePickerMode>? onModeChanged;
 
   @override
-  State<Md3eCalendarMonthPicker> createState() =>
-      _Md3eCalendarMonthPickerState();
+  State<CalendarMonthPicker> createState() =>
+      _CalendarMonthPickerState();
 }
 
-class _Md3eCalendarMonthPickerState extends State<Md3eCalendarMonthPicker> {
+class _CalendarMonthPickerState extends State<CalendarMonthPicker> {
   late PageController _pageController;
   late DateTime _currentMonth;
   late int _monthCount;
 
-  /// 月份翻页曲线：M3E 空间弹簧（允许轻微回弹），采样时长与 [Md3eMotion.monthSwitchDuration] 一致。
-  final Curve _monthCurve = Md3eSpringCurve(
-    motion: Md3eMotion.routeSpring,
-    duration: Md3eMotion.monthSwitchDuration,
+  /// 月份翻页曲线：M3E 空间弹簧（允许轻微回弹），采样时长与 [LabMotion.monthSwitchDuration] 一致。
+  final Curve _monthCurve = SpringCurve(
+    motion: LabMotion.routeSpring,
+    duration: LabMotion.monthSwitchDuration,
   );
 
   @override
@@ -82,13 +82,13 @@ class _Md3eCalendarMonthPickerState extends State<Md3eCalendarMonthPicker> {
   }
 
   void _goToPage(int page) {
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       _pageController.jumpToPage(page);
       return;
     }
     _pageController.animateToPage(
       page,
-      duration: Md3eMotion.monthSwitchDuration,
+      duration: LabMotion.monthSwitchDuration,
       curve: _monthCurve,
     );
   }
@@ -163,7 +163,7 @@ class _Md3eCalendarMonthPickerState extends State<Md3eCalendarMonthPicker> {
         ),
         if (widget.expandToFit)
           Expanded(
-            child: Md3eCalendarDayPicker(
+            child: CalendarDayPicker(
               displayedMonth: month,
               selectedDate: widget.selectedDate,
               currentDate: widget.currentDate,
@@ -177,7 +177,7 @@ class _Md3eCalendarMonthPickerState extends State<Md3eCalendarMonthPicker> {
             ),
           )
         else
-          Md3eCalendarDayPicker(
+          CalendarDayPicker(
             displayedMonth: month,
             selectedDate: widget.selectedDate,
             currentDate: widget.currentDate,
@@ -225,7 +225,7 @@ class _MonthNavRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
-    final MaterialLocalizations localizations = md3eMaterialLocalizationsOf(
+    final MaterialLocalizations localizations = materialLocalizationsOf(
       context,
     );
     final String label = localizations.formatMonthYear(month);

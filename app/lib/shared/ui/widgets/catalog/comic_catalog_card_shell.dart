@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/motion/spring_value.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Shared corner radius for catalog grid [Md3eComicCard] and list [Md3eComicListItem].
-const double kMd3eComicCardRadius = 12;
+/// Shared corner radius for catalog grid [ComicCard] and list [ComicListItem].
+const double kComicCardRadius = 12;
 
 /// Horizontal inset for text blocks (card info + list row).
-const double kMd3eComicCatalogContentHorizontalPadding = 12;
+const double kComicCatalogContentHorizontalPadding = 12;
 
 /// Widgetbook pinned overlay alpha (pressed / focused).
-const double kMd3eComicCatalogPinnedOverlayAlphaStrong = 0.12;
+const double kComicCatalogPinnedOverlayAlphaStrong = 0.12;
 
 /// Widgetbook pinned overlay alpha (hover / drag).
-const double kMd3eComicCatalogPinnedOverlayAlphaLight = 0.08;
+const double kComicCatalogPinnedOverlayAlphaLight = 0.08;
 
 /// Catalog comic surface: flat filled [M3ECard] (`surfaceContainer`, no shadow) shared by card and list layouts.
-class Md3eComicCatalogCardShell extends StatelessWidget {
-  const Md3eComicCatalogCardShell({
+class ComicCatalogCardShell extends StatelessWidget {
+  const ComicCatalogCardShell({
     super.key,
     required this.child,
     required this.enabled,
@@ -46,7 +46,7 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final BorderRadius radius = BorderRadius.circular(kMd3eComicCardRadius);
+    final BorderRadius radius = BorderRadius.circular(kComicCardRadius);
 
     // 遮罩层常驻于树中，使 0 ↔ 非 0 的变化能走弹簧补间（而不是重新挂载直接出现）。
     // 圆角由 M3ECard 的 clipBehavior 统一裁剪。
@@ -56,7 +56,7 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
         child,
         Positioned.fill(
           child: IgnorePointer(
-            child: Md3eSpringValue(
+            child: SpringValue(
               value: pinnedOverlayAlpha,
               builder: (BuildContext context, double alpha, Widget? child) {
                 if (alpha <= 0) {
@@ -99,7 +99,7 @@ class Md3eComicCatalogCardShell extends StatelessWidget {
 }
 
 /// Title style shared by catalog card and list item.
-TextStyle md3eComicCatalogTitleStyle(M3ETypeScale type, M3EColorScheme scheme) {
+TextStyle comicCatalogTitleStyle(M3ETypeScale type, M3EColorScheme scheme) {
   return type.titleSmall.copyWith(
     fontWeight: FontWeight.w600,
     color: scheme.onSurface,
@@ -107,7 +107,7 @@ TextStyle md3eComicCatalogTitleStyle(M3ETypeScale type, M3EColorScheme scheme) {
 }
 
 /// Subtitle / meta style shared by catalog card and list item.
-TextStyle md3eComicCatalogSubtitleStyle(
+TextStyle comicCatalogSubtitleStyle(
   M3ETypeScale type,
   M3EColorScheme scheme,
 ) {

@@ -4,9 +4,9 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 详情主标题（漫画 / 系列共用，最多两行，可选 tooltip）。
 ///
-/// 字阶与页面标题同源：来自 [Md3ePageLayoutSpec.titleStyle]（基于 `headlineSmall`）。
-class Md3eComicDetailTitle extends StatelessWidget {
-  const Md3eComicDetailTitle({
+/// 字阶与页面标题同源：来自 [PageLayoutSpec.titleStyle]（基于 `headlineSmall`）。
+class ComicDetailTitle extends StatelessWidget {
+  const ComicDetailTitle({
     super.key,
     required this.title,
     this.maxLines = 2,
@@ -18,7 +18,7 @@ class Md3eComicDetailTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
-    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
     return Tooltip(
       message: title,
       waitDuration: const Duration(milliseconds: 2000),

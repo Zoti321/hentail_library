@@ -2,28 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// 阅读页键盘意图（Lab；对齐生产 [readerKeyboardCommandFor] 子集）。
-final class Md3eReaderPrevPageIntent extends Intent {
-  const Md3eReaderPrevPageIntent();
+final class ReaderPrevPageIntent extends Intent {
+  const ReaderPrevPageIntent();
 }
 
-final class Md3eReaderNextPageIntent extends Intent {
-  const Md3eReaderNextPageIntent();
+final class ReaderNextPageIntent extends Intent {
+  const ReaderNextPageIntent();
 }
 
-final class Md3eReaderToggleAutoPlayIntent extends Intent {
-  const Md3eReaderToggleAutoPlayIntent();
+final class ReaderToggleAutoPlayIntent extends Intent {
+  const ReaderToggleAutoPlayIntent();
 }
 
-final class Md3eReaderToggleChromeIntent extends Intent {
-  const Md3eReaderToggleChromeIntent();
+final class ReaderToggleChromeIntent extends Intent {
+  const ReaderToggleChromeIntent();
 }
 
-abstract final class Md3eReaderKeyboard {
+abstract final class ReaderKeyboard {
   static const Map<ShortcutActivator, Intent>
   shortcuts = <ShortcutActivator, Intent>{
-    SingleActivator(LogicalKeyboardKey.arrowLeft): Md3eReaderPrevPageIntent(),
-    SingleActivator(LogicalKeyboardKey.arrowRight): Md3eReaderNextPageIntent(),
-    SingleActivator(LogicalKeyboardKey.space): Md3eReaderToggleAutoPlayIntent(),
-    SingleActivator(LogicalKeyboardKey.escape): Md3eReaderToggleChromeIntent(),
+    SingleActivator(LogicalKeyboardKey.arrowLeft): ReaderPrevPageIntent(),
+    SingleActivator(LogicalKeyboardKey.arrowRight): ReaderNextPageIntent(),
+    SingleActivator(LogicalKeyboardKey.space): ReaderToggleAutoPlayIntent(),
+    SingleActivator(LogicalKeyboardKey.escape): ReaderToggleChromeIntent(),
   };
 }

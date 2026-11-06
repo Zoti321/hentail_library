@@ -12,7 +12,7 @@ List<Override> bootstrapShellSlotOverrides() => <Override>[
       ...libraryAdminShellFeedbackBelowTitleBar(),
     ],
   ),
-  md3eAppShellNavigationSlotAssemblyProvider.overrideWithValue(
-    buildLibraryAdminMd3eAppShellNavigationSlot,
+  appShellNavigationSlotAssemblyProvider.overrideWithValue(
+    buildLibraryAdminAppShellNavigationSlot,
   ),
 ];

@@ -3,8 +3,8 @@ import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_meta
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// KV 行：固定宽 label + 值（资源格式 / 路径等）。
-class Md3eComicDetailInfoRow extends StatelessWidget {
-  const Md3eComicDetailInfoRow({
+class ComicDetailInfoRow extends StatelessWidget {
+  const ComicDetailInfoRow({
     super.key,
     required this.label,
     required this.value,
@@ -32,7 +32,7 @@ class Md3eComicDetailInfoRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(
-          width: kMd3eComicDetailMetaLabelWidth,
+          width: kComicDetailMetaLabelWidth,
           child: Text(
             label,
             style: type.bodySmall.copyWith(

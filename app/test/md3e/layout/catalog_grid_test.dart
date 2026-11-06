@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
+
+import '../../support/pump_app.dart';
+
+void main() {
+  testWidgets('CatalogGridSliver uses fixed cross axis count delegate', (
+    WidgetTester tester,
+  ) async {
+    await pumpApp(
+      tester,
+      home: SizedBox(
+        width: 800,
+        height: 600,
+        child: Scaffold(
+          body: CustomScrollView(
+            slivers: <Widget>[
+              CatalogGridSliver(
+                itemCount: 2,
+                itemBuilder: (BuildContext context, int index, _) {
+                  return ComicCard(
+                    title: 'Item $index',
+                    subtitle: '12 页',
+                    cover: const ColoredBox(color: Color(0xFFE0E0E0)),
+                    onTap: () {},
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final Finder grid = find.byType(SliverGrid);
+    expect(grid, findsOneWidget);
+    final SliverGrid sliverGrid = tester.widget<SliverGrid>(grid);
+    final SliverGridDelegateWithFixedCrossAxisCount delegate =
+        sliverGrid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+    expect(delegate.crossAxisCount, greaterThan(1));
+    expect(delegate.mainAxisExtent, greaterThan(200));
+  });
+}

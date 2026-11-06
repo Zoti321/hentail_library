@@ -3,8 +3,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Shell [Md3eNavigationRail] 主目的地图标（Material Symbols；选中态由 fill=1 呈现）。
-abstract final class Md3eShellRailSymbols {
+/// Shell [ExpressiveNavigationRail] 主目的地图标（Material Symbols；选中态由 fill=1 呈现）。
+abstract final class ShellRailSymbols {
   static const IconData home = Symbols.home;
   static const IconData library = Symbols.auto_stories;
   static const IconData metadata = Symbols.layers;
@@ -12,22 +12,22 @@ abstract final class Md3eShellRailSymbols {
 }
 
 /// Primary shell destination indices for the **Lab default** rail
-/// ([md3eLabDefaultShellRailDestinations]).
-abstract final class Md3eShellNavigation {
+/// ([labDefaultShellRailDestinations]).
+abstract final class ShellNavigation {
   static const int homeDestinationIndex = 0;
   static const int libraryDestinationIndex = 1;
   static const int managementDestinationIndex = 2;
   static const int settingsDestinationIndex = 3;
 
-  /// [Md3eNavigationRail.selectedIndex]：无对应 Rail 目的地（如 `/history`）。
+  /// [ExpressiveNavigationRail.selectedIndex]：无对应 Rail 目的地（如 `/history`）。
   static const int noDestinationIndex = -1;
 
   static const double librarySecondaryPanelWidth = 280;
 }
 
 /// One shell rail slot with stable [navId] for production routing.
-class Md3eShellRailDestination {
-  const Md3eShellRailDestination({
+class ShellRailDestination {
+  const ShellRailDestination({
     required this.navId,
     required this.label,
     required this.icon,
@@ -41,8 +41,8 @@ class Md3eShellRailDestination {
   final IconData selectedIcon;
   final bool isLibraryFlyoutAnchor;
 
-  Md3eNavigationRailDestination toNavigationDestination() {
-    return Md3eNavigationRailDestination(
+  ExpressiveNavigationRailDestination toNavigationDestination() {
+    return ExpressiveNavigationRailDestination(
       label: label,
       icon: icon,
       selectedIcon: selectedIcon,
@@ -50,27 +50,27 @@ class Md3eShellRailDestination {
   }
 }
 
-int md3eShellLibraryAnchorIndex(List<Md3eShellRailDestination> destinations) {
+int shellLibraryAnchorIndex(List<ShellRailDestination> destinations) {
   return destinations.indexWhere(
-    (Md3eShellRailDestination destination) => destination.isLibraryFlyoutAnchor,
+    (ShellRailDestination destination) => destination.isLibraryFlyoutAnchor,
   );
 }
 
-int md3eShellDestinationIndexForNavId(
-  List<Md3eShellRailDestination> destinations,
+int shellDestinationIndexForNavId(
+  List<ShellRailDestination> destinations,
   String navId,
 ) {
   if (navId.isEmpty) {
-    return Md3eShellNavigation.noDestinationIndex;
+    return ShellNavigation.noDestinationIndex;
   }
   final int index = destinations.indexWhere(
-    (Md3eShellRailDestination destination) => destination.navId == navId,
+    (ShellRailDestination destination) => destination.navId == navId,
   );
-  return index >= 0 ? index : Md3eShellNavigation.noDestinationIndex;
+  return index >= 0 ? index : ShellNavigation.noDestinationIndex;
 }
 
-String md3eShellNavIdForDestinationIndex(
-  List<Md3eShellRailDestination> destinations,
+String shellNavIdForDestinationIndex(
+  List<ShellRailDestination> destinations,
   int index,
 ) {
   if (index < 0 || index >= destinations.length) {
@@ -79,29 +79,29 @@ String md3eShellNavIdForDestinationIndex(
   return destinations[index].navId;
 }
 
-int md3eShellSettingsDestinationIndex(
-  List<Md3eShellRailDestination> destinations,
+int shellSettingsDestinationIndex(
+  List<ShellRailDestination> destinations,
 ) {
   final int index = destinations.indexWhere(
-    (Md3eShellRailDestination destination) => destination.navId == 'settings',
+    (ShellRailDestination destination) => destination.navId == 'settings',
   );
   return index >= 0 ? index : destinations.length - 1;
 }
 
-List<Md3eNavigationRailDestination> md3eNavigationDestinationsFromShell(
-  List<Md3eShellRailDestination> destinations,
+List<ExpressiveNavigationRailDestination> navigationDestinationsFromShell(
+  List<ShellRailDestination> destinations,
 ) {
   return destinations
       .map(
-        (Md3eShellRailDestination destination) =>
+        (ShellRailDestination destination) =>
             destination.toNavigationDestination(),
       )
       .toList(growable: false);
 }
 
-/// Navigation inputs passed to [Md3eDesktopShellPaneBuilder].
-class Md3eShellNavigationSnapshot {
-  const Md3eShellNavigationSnapshot({
+/// Navigation inputs passed to [DesktopShellPaneBuilder].
+class ShellNavigationSnapshot {
+  const ShellNavigationSnapshot({
     required this.destinationIndex,
     required this.selectedLibraryId,
     required this.selectedLibraryDisplayName,
@@ -116,46 +116,46 @@ class Md3eShellNavigationSnapshot {
   final VoidCallback? onBackToPreviousDestination;
 }
 
-/// Builds the main pane for [Md3eDesktopShell].
-typedef Md3eDesktopShellPaneBuilder = Widget Function(
+/// Builds the main pane for [DesktopShell].
+typedef DesktopShellPaneBuilder = Widget Function(
   BuildContext context,
-  Md3eShellNavigationSnapshot navigation,
+  ShellNavigationSnapshot navigation,
 );
 
 /// Lab / Widgetbook shell rail specs (no 回收站).
-List<Md3eShellRailDestination> md3eLabDefaultShellRailDestinations(
+List<ShellRailDestination> labDefaultShellRailDestinations(
   AppLocalizations l10n,
 ) {
-  return <Md3eShellRailDestination>[
-    Md3eShellRailDestination(
+  return <ShellRailDestination>[
+    ShellRailDestination(
       navId: 'home',
       label: l10n.navHome,
-      icon: Md3eShellRailSymbols.home,
+      icon: ShellRailSymbols.home,
     ),
-    Md3eShellRailDestination(
+    ShellRailDestination(
       navId: 'library',
       label: l10n.libraryTitle,
-      icon: Md3eShellRailSymbols.library,
+      icon: ShellRailSymbols.library,
       isLibraryFlyoutAnchor: true,
     ),
-    Md3eShellRailDestination(
+    ShellRailDestination(
       navId: 'metadata',
       label: l10n.navMetadata,
-      icon: Md3eShellRailSymbols.metadata,
+      icon: ShellRailSymbols.metadata,
     ),
-    Md3eShellRailDestination(
+    ShellRailDestination(
       navId: 'settings',
       label: l10n.navSettings,
-      icon: Md3eShellRailSymbols.settings,
+      icon: ShellRailSymbols.settings,
     ),
   ];
 }
 
 /// Default shell destinations aligned with production nav labels ([AppNavigation]).
-List<Md3eNavigationRailDestination> md3eDefaultNavigationRailDestinations(
+List<ExpressiveNavigationRailDestination> defaultNavigationRailDestinations(
   AppLocalizations l10n,
 ) {
-  return md3eNavigationDestinationsFromShell(
-    md3eLabDefaultShellRailDestinations(l10n),
+  return navigationDestinationsFromShell(
+    labDefaultShellRailDestinations(l10n),
   );
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// "current / total" label for [Md3ePaginationCompact] (no strip animation).
-class Md3ePaginationCompactSummary extends StatelessWidget {
-  const Md3ePaginationCompactSummary({
+/// "current / total" label for [PaginationCompact] (no strip animation).
+class PaginationCompactSummary extends StatelessWidget {
+  const PaginationCompactSummary({
     super.key,
     required this.page,
     required this.totalPages,

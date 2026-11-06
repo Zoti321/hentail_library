@@ -6,18 +6,18 @@ import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar_metri
 import 'package:hentai_library/shared/ui/widgets/desktop/window_close_listener.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
-import 'package:hentai_library/shared/ui/shell/md3e_app_shell_slot.dart';
+import 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 export 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 export 'package:hentai_library/shared/ui/shell/app_shell_sidebar_slot.dart';
-export 'package:hentai_library/shared/ui/shell/md3e_app_shell_slot.dart';
+export 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
 
 /// 壳层外部（页头菜单等）通过此 key 打开 MD3E 紧凑导航。
-final GlobalKey<Md3eDesktopShellState> appShellDesktopShellKey =
-    GlobalKey<Md3eDesktopShellState>();
+final GlobalKey<DesktopShellState> appShellDesktopShellKey =
+    GlobalKey<DesktopShellState>();
 
-/// 打开紧凑（< expanded）导航：即 [Md3eDesktopShell] 的 modal rail。名称保留以兼容既有 provider。
+/// 打开紧凑（< expanded）导航：即 [DesktopShell] 的 modal rail。名称保留以兼容既有 provider。
 void openAppShellNavigationDrawer() {
   appShellDesktopShellKey.currentState?.openNavigationRail();
 }
@@ -32,7 +32,7 @@ class ResponsiveAppShell extends StatelessWidget {
     required this.isDesktopSidebarExpanded,
     required this.onToggleDesktopSidebarExpanded,
     required this.isReaderFullscreen,
-    required this.md3eNavigationSlotBuilder,
+    required this.navigationSlotBuilder,
     this.shellFeedbackBelowTitleBar = const <Widget>[],
   });
 
@@ -40,18 +40,18 @@ class ResponsiveAppShell extends StatelessWidget {
   final bool isDesktopSidebarExpanded;
   final VoidCallback onToggleDesktopSidebarExpanded;
   final bool isReaderFullscreen;
-  final Md3eAppShellNavigationSlotBuilder md3eNavigationSlotBuilder;
+  final AppShellNavigationSlotBuilder navigationSlotBuilder;
   final List<Widget> shellFeedbackBelowTitleBar;
 
-  Widget _buildMd3eDesktopShell(
+  Widget _buildDesktopShell(
     BuildContext context,
-    Md3eAppShellNavigationSlot slot,
+    AppShellNavigationSlot slot,
   ) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final Md3eDesktopShellSurfaceRoles surfaces =
-        slot.surfaceRoles ?? Md3eDesktopShellSurfaceRoles.toneBased(scheme);
+    final DesktopShellSurfaceRoles surfaces =
+        slot.surfaceRoles ?? DesktopShellSurfaceRoles.toneBased(scheme);
 
-    return Md3eDesktopShell(
+    return DesktopShell(
       key: appShellDesktopShellKey,
       fillHeight: true,
       railDestinations: slot.railDestinations,
@@ -78,7 +78,7 @@ class ResponsiveAppShell extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool showShellChrome =
-            constraints.maxHeight >= Md3eDesktopTitleBarMetrics.height;
+            constraints.maxHeight >= DesktopTitleBarMetrics.height;
 
         final Widget body = isReaderRoute
             ? Column(
@@ -86,19 +86,19 @@ class ResponsiveAppShell extends StatelessWidget {
                   if (showShellChrome &&
                       !isReaderFullscreen &&
                       supportsDesktopWindowChrome)
-                    const Md3eDesktopTitleBar(),
+                    const DesktopTitleBar(),
                   if (showShellChrome) ...shellFeedbackBelowTitleBar,
                   Expanded(child: routeChild),
                 ],
               )
-            : _buildMd3eDesktopShell(
+            : _buildDesktopShell(
                 context,
-                md3eNavigationSlotBuilder(context),
+                navigationSlotBuilder(context),
               );
 
-        return Md3eWindowCloseListener(
+        return WindowCloseListener(
           child: Scaffold(
-            backgroundColor: md3eLabBrowseCanvasColor(
+            backgroundColor: labBrowseCanvasColor(
               M3ETheme.of(context).colorScheme,
             ),
             body: body,

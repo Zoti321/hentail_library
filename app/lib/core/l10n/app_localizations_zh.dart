@@ -1585,13 +1585,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get md3eNavRailExpand => '展开导航';
+  String get navRailExpand => '展开导航';
 
   @override
-  String get md3eNavRailCollapse => '收起导航';
+  String get navRailCollapse => '收起导航';
 
   @override
-  String md3ePaginationPageSemantic(int page) {
+  String paginationPageSemantic(int page) {
     return '第 $page 页';
   }
 

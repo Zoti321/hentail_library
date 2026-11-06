@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_lab_host.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
 import 'package:hentai_library/shared/ui/motion/shared_axis_route.dart';
 
 import '../data/md3e_lab_catalog_detail_preview_data.dart';
@@ -19,18 +19,18 @@ const List<M3EMenuNode> kMd3eLabComicDetailMoreMenuEntries = <M3EMenuNode>[
 ];
 
 /// Lab：目录条目 → 详情（preview 数据；[rootNavigator: false]）。
-Future<void> openMd3eLabCatalogDetail(
+Future<void> openLabCatalogDetail(
   BuildContext context, {
   required LibraryDisplayTarget displayTarget,
   required int catalogIndex,
 }) {
-  final Md3eOverlayRouteScopeSnapshot scope =
-      Md3eOverlayRouteScopeSnapshot.capture(context);
+  final OverlayRouteScopeSnapshot scope =
+      OverlayRouteScopeSnapshot.capture(context);
   return Navigator.of(context, rootNavigator: false).push<void>(
-    md3eSharedAxisRoute<void>(
+    sharedAxisRoute<void>(
       context,
       builder: (BuildContext routeContext) {
-        return md3eOverlayRouteScope(
+        return overlayRouteScope(
           scope: scope,
           child: switch (displayTarget) {
             LibraryDisplayTarget.comics => _Md3eLabComicDetailRoute(
@@ -53,28 +53,28 @@ class _Md3eLabComicDetailRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eComicDetailEntry entry =
+    final ComicDetailViewObject entry =
         Md3eLabCatalogDetailPreviewData.comicDetail(catalogIndex: catalogIndex);
-    return Md3eComicDetailPage(
+    return ComicDetailLayout(
       entry: entry,
       onBack: () => Navigator.of(context).maybePop(),
       moreMenuEntries: kMd3eLabComicDetailMoreMenuEntries,
       onRead: () {
-        openMd3eLabReader(
+        openLabReader(
           context,
           preview: md3eReaderPreviewDataForComicDetail(entry),
         );
       },
       onReadIncognito: () {
-        openMd3eLabReader(
+        openLabReader(
           context,
           preview: md3eReaderPreviewDataForComicDetail(entry),
         );
       },
       onEdit: () {
-        showMd3eComicMetadataEdit(
+        showComicMetadataEditLayout(
           context: context,
-          initialDraft: Md3eComicMetadataEditDraft.fromEntry(entry),
+          initialDraft: ComicMetadataEditDraft.fromEntry(entry),
         );
       },
     );
@@ -88,53 +88,53 @@ class _Md3eLabSeriesDetailRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Md3eSeriesDetailEntry entry =
+    final SeriesDetailViewObject entry =
         Md3eLabCatalogDetailPreviewData.seriesDetail(
           catalogIndex: catalogIndex,
         );
-    return Md3eSeriesDetailPageLabHost(
+    return SeriesDetailPageLabHost(
       entry: entry,
       onBack: () => Navigator.of(context).maybePop(),
       onEdit: () {
-        showMd3eSeriesMetadataEdit(
+        showSeriesMetadataEditLayout(
           context: context,
-          initialDraft: Md3eSeriesMetadataEditDraft.fromEntry(entry),
+          initialDraft: SeriesMetadataEditDraft.fromEntry(entry),
         );
       },
       onComicTap: (int comicIndex) {
-        final Md3eComicDetailEntry comicEntry =
+        final ComicDetailViewObject comicEntry =
             Md3eLabCatalogDetailPreviewData.comicDetailFromSeriesVolume(
               series: entry,
               comicIndex: comicIndex,
             );
-        final Md3eOverlayRouteScopeSnapshot scope =
-            Md3eOverlayRouteScopeSnapshot.capture(context);
+        final OverlayRouteScopeSnapshot scope =
+            OverlayRouteScopeSnapshot.capture(context);
         Navigator.of(context, rootNavigator: false).push<void>(
-          md3eSharedAxisRoute<void>(
+          sharedAxisRoute<void>(
             context,
             builder: (BuildContext routeContext) {
-              return md3eOverlayRouteScope(
+              return overlayRouteScope(
                 scope: scope,
-                child: Md3eComicDetailPage(
+                child: ComicDetailLayout(
                   entry: comicEntry,
                   onBack: () => Navigator.of(routeContext).maybePop(),
                   moreMenuEntries: kMd3eLabComicDetailMoreMenuEntries,
                   onRead: () {
-                    openMd3eLabReader(
+                    openLabReader(
                       routeContext,
                       preview: md3eReaderPreviewDataForComicDetail(comicEntry),
                     );
                   },
                   onReadIncognito: () {
-                    openMd3eLabReader(
+                    openLabReader(
                       routeContext,
                       preview: md3eReaderPreviewDataForComicDetail(comicEntry),
                     );
                   },
                   onEdit: () {
-                    showMd3eComicMetadataEdit(
+                    showComicMetadataEditLayout(
                       context: routeContext,
-                      initialDraft: Md3eComicMetadataEditDraft.fromEntry(
+                      initialDraft: ComicMetadataEditDraft.fromEntry(
                         comicEntry,
                       ),
                     );

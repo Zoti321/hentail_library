@@ -9,7 +9,7 @@ void main() {
     expect(createReadSessionLaunchPort, isNotNull);
     expect(createReaderSessionPort, isNotNull);
     expect(createComicPageSourcePort, isNotNull);
-    expect(ReaderMd3ePage, isNotNull);
+    expect(ReaderPage, isNotNull);
     expect(ReaderRouteArgs, isNotNull);
     expect(openReadSession, isNotNull);
     expect(readerFullscreenControllerProvider, isNotNull);

@@ -3,8 +3,8 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 阅读历史页无记录时的正文占位。
-class Md3eHistoryEmptyBody extends StatelessWidget {
-  const Md3eHistoryEmptyBody({super.key, this.message});
+class HistoryEmptyBody extends StatelessWidget {
+  const HistoryEmptyBody({super.key, this.message});
 
   final String? message;
 

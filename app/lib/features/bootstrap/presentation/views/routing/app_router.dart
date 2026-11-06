@@ -38,7 +38,7 @@ final GoRouter appRouter = GoRouter(
           path: '/home',
           name: '主页',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const HomeMd3ePage()),
+              buildShellNavPage(state: state, child: const HomePage()),
         ),
         GoRoute(
           path: LibrariesRoutes.root,
@@ -85,13 +85,13 @@ final GoRouter appRouter = GoRouter(
           path: '/trash',
           name: '已删除',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const TrashMd3ePage()),
+              buildShellNavPage(state: state, child: const TrashPage()),
         ),
         GoRoute(
           path: '/settings',
           name: '设置',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(state: state, child: const SettingsMd3ePage()),
+              buildShellNavPage(state: state, child: const SettingsPage()),
         ),
         ...buildSharedContentRoutes(),
       ],
@@ -119,6 +119,6 @@ class LibraryBrowsePage extends HookConsumerWidget {
       };
     }, <Object?>[libraryId]);
 
-    return const LibraryMd3ePage();
+    return const LibraryPage();
   }
 }

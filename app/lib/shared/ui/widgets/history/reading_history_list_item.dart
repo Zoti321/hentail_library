@@ -10,28 +10,28 @@ import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Overflow menu entry on the history list row.
-class Md3eReadingHistoryMoreMenuEntry {
-  const Md3eReadingHistoryMoreMenuEntry({required this.label, this.onSelected});
+class ReadingHistoryMoreMenuEntry {
+  const ReadingHistoryMoreMenuEntry({required this.label, this.onSelected});
 
   final String label;
   final VoidCallback? onSelected;
 }
 
 /// 上次阅读日期：`{YYYY}年{MM}月{DD}日`（如 2026年06月15日）。
-final DateFormat _md3eReadingHistoryLastReadDateFormat = DateFormat(
+final DateFormat ReadingHistoryLastReadDateFormat = DateFormat(
   'yyyy年MM月dd日',
 );
 
-String md3eReadingHistoryLastReadDateLabel(DateTime lastReadTime) {
-  return _md3eReadingHistoryLastReadDateFormat.format(lastReadTime);
+String readingHistoryLastReadDateLabel(DateTime lastReadTime) {
+  return ReadingHistoryLastReadDateFormat.format(lastReadTime);
 }
 
 /// 阅读历史列表行：封面 + 标题 + 进度条与页码 + 上次阅读日期 + 继续阅读 / 更多。
 ///
 /// 行级 hover / press 由 [M3ECard] 提供；state layer 动效使用 M3E 标准 token，减少动效时为 0。
-/// 尺寸见 [Md3eReadingHistoryListItemMetrics]。
-class Md3eReadingHistoryListItem extends StatelessWidget {
-  const Md3eReadingHistoryListItem({
+/// 尺寸见 [ReadingHistoryListItemMetrics]。
+class ReadingHistoryListItem extends StatelessWidget {
+  const ReadingHistoryListItem({
     super.key,
     required this.title,
     required this.cover,
@@ -40,7 +40,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
     required this.lastReadTime,
     this.onTap,
     this.onContinueReading,
-    this.moreMenuEntries = const <Md3eReadingHistoryMoreMenuEntry>[],
+    this.moreMenuEntries = const <ReadingHistoryMoreMenuEntry>[],
     this.enabled = true,
     this.sizeClass,
   }) : assert(currentPage >= 0),
@@ -54,27 +54,27 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
   final DateTime lastReadTime;
   final VoidCallback? onTap;
   final VoidCallback? onContinueReading;
-  final List<Md3eReadingHistoryMoreMenuEntry> moreMenuEntries;
+  final List<ReadingHistoryMoreMenuEntry> moreMenuEntries;
   final bool enabled;
 
   /// When null, resolved from [MediaQuery] width.
-  final Md3eWindowSizeClass? sizeClass;
+  final WindowSizeClass? sizeClass;
 
   static double itemExtent(BuildContext context) {
-    final Md3eWindowSizeClass window = sizeClassOf(context);
-    return Md3eReadingHistoryListItemMetrics.specFor(window).rowHeight;
+    final WindowSizeClass window = sizeClassOf(context);
+    return ReadingHistoryListItemMetrics.specFor(window).rowHeight;
   }
 
-  static Md3eWindowSizeClass sizeClassOf(BuildContext context) {
-    return md3eWindowSizeClassOf(context);
+  static WindowSizeClass sizeClassOf(BuildContext context) {
+    return windowSizeClassOf(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass window =
-        sizeClass ?? md3eWindowSizeClassOf(context);
-    final Md3eReadingHistoryListItemSpec spec =
-        Md3eReadingHistoryListItemMetrics.specFor(window);
+    final WindowSizeClass window =
+        sizeClass ?? windowSizeClassOf(context);
+    final ReadingHistoryListItemSpec spec =
+        ReadingHistoryListItemMetrics.specFor(window);
 
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
@@ -86,7 +86,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
       currentPage,
       totalPages,
     );
-    final String dateLabel = md3eReadingHistoryLastReadDateLabel(lastReadTime);
+    final String dateLabel = readingHistoryLastReadDateLabel(lastReadTime);
     final double progress = currentPage / totalPages;
 
     final Widget coverLeading = ClipRRect(
@@ -109,7 +109,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: md3eReadingHistoryListItemTitleStyle(type, scheme),
+              style: readingHistoryListItemTitleStyle(type, scheme),
             ),
             SizedBox(height: spacing.sm),
             Row(
@@ -126,7 +126,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
                 Text(
                   progressLabel,
                   maxLines: 1,
-                  style: md3eReadingHistoryListItemProgressStyle(type, scheme),
+                  style: readingHistoryListItemProgressStyle(type, scheme),
                 ),
               ],
             ),
@@ -135,7 +135,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
               dateLabel,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: md3eReadingHistoryListItemTimeStyle(type, scheme),
+              style: readingHistoryListItemTimeStyle(type, scheme),
             ),
           ],
         ),
@@ -157,11 +157,11 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
 
     Widget? moreButton;
     if (moreMenuEntries.isNotEmpty) {
-      moreButton = Md3eAnchoredMenu(
+      moreButton = AnchoredMenu(
         enabled: enabled,
         position: M3EMenuAnchorPosition.bottomEnd,
         children: <M3EMenuEntry>[
-          for (final Md3eReadingHistoryMoreMenuEntry entry in moreMenuEntries)
+          for (final ReadingHistoryMoreMenuEntry entry in moreMenuEntries)
             M3EMenuEntry(
               label: entry.label,
               enabled: enabled && entry.onSelected != null,
@@ -204,7 +204,7 @@ class Md3eReadingHistoryListItem extends StatelessWidget {
     );
 
     final BorderRadius radius = BorderRadius.circular(spec.containerRadius);
-    final Duration stateDuration = Md3eMotion.motionDurationOf(
+    final Duration stateDuration = LabMotion.motionDurationOf(
       context,
       M3EMotion.short3,
     );

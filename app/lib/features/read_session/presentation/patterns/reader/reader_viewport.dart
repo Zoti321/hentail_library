@@ -5,13 +5,13 @@ import 'package:hentai_library/features/read_session/presentation/patterns/reade
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status_panel.dart';
 
 /// 阅读画布手势层：三分区点击（chrome 显隐与翻页由外层处理）。
-class Md3eReaderViewport extends StatelessWidget {
-  const Md3eReaderViewport({
+class ReaderViewport extends StatelessWidget {
+  const ReaderViewport({
     super.key,
     required this.currentPage,
     this.onTapZone,
     this.focusNode,
-    this.status = Md3eReaderViewportStatus.ready,
+    this.status = ReaderViewportStatus.ready,
     this.onBack,
     this.onRetry,
   });
@@ -19,9 +19,9 @@ class Md3eReaderViewport extends StatelessWidget {
   final int currentPage;
 
   /// 为空时点击不产生分区回调（生产页由内容层自行处理点击）。
-  final ValueChanged<Md3eReaderTapZone>? onTapZone;
+  final ValueChanged<ReaderViewportTapZone>? onTapZone;
   final FocusNode? focusNode;
-  final Md3eReaderViewportStatus status;
+  final ReaderViewportStatus status;
   final VoidCallback? onBack;
   final VoidCallback? onRetry;
 
@@ -33,20 +33,20 @@ class Md3eReaderViewport extends StatelessWidget {
         focusNode?.requestFocus();
         final RenderBox? box = context.findRenderObject() as RenderBox?;
         if (box == null) {
-          onTapZone?.call(Md3eReaderTapZone.center);
+          onTapZone?.call(ReaderViewportTapZone.center);
           return;
         }
         final Offset local = box.globalToLocal(details.globalPosition);
         onTapZone?.call(
-          md3eResolveReaderTapZone(localX: local.dx, width: box.size.width),
+          resolveReaderViewportTapZone(localX: local.dx, width: box.size.width),
         );
       },
       child: switch (status) {
-        Md3eReaderViewportStatus.ready => Md3eReaderViewportPlaceholder(
+        ReaderViewportStatus.ready => ReaderViewportPlaceholder(
           page: currentPage,
         ),
-        Md3eReaderViewportStatus.loading => const Md3eReaderViewportLoading(),
-        Md3eReaderViewportStatus.error => Md3eReaderViewportErrorPanel(
+        ReaderViewportStatus.loading => const ReaderViewportLoading(),
+        ReaderViewportStatus.error => ReaderViewportErrorPanel(
           onBack: onBack,
           onRetry: onRetry,
         ),

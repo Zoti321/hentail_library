@@ -11,7 +11,7 @@ void main() {
       expect(TrashedComic, isNotNull);
       expect(ComicTrashRepository, isNotNull);
       expect(PurgeConfirmCopy, isNotNull);
-      expect(TrashMd3ePage, isNotNull);
+      expect(TrashPage, isNotNull);
     },
   );
 }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 详情封面 + 主信息：窄屏单列、宽屏横排。
-class Md3eComicDetailPrimaryRowLayout extends StatelessWidget {
-  const Md3eComicDetailPrimaryRowLayout({
+class ComicDetailPrimaryRowLayout extends StatelessWidget {
+  const ComicDetailPrimaryRowLayout({
     super.key,
     required this.cover,
     required this.content,

@@ -4,8 +4,8 @@ import 'package:hentai_library/features/read_session/presentation/patterns/reade
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 阅读画布占位：竖向贴边、左右 letterbox（非 FRB 图像）。
-class Md3eReaderViewportPlaceholder extends StatelessWidget {
-  const Md3eReaderViewportPlaceholder({super.key, required this.page});
+class ReaderViewportPlaceholder extends StatelessWidget {
+  const ReaderViewportPlaceholder({super.key, required this.page});
 
   final int page;
 
@@ -14,7 +14,7 @@ class Md3eReaderViewportPlaceholder extends StatelessWidget {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final M3ETypeScale type = M3ETheme.of(context).typeScale;
     final double horizontalInset =
-        Md3eReaderChromeMetrics.viewportHorizontalInset(
+        ReaderChromeMetrics.viewportHorizontalInset(
           MediaQuery.sizeOf(context).width,
         );
 
@@ -24,7 +24,7 @@ class Md3eReaderViewportPlaceholder extends StatelessWidget {
         color: scheme.surfaceBright,
         child: Center(
           child: Text(
-            Md3eReaderPageCopy.viewportPlaceholder(page),
+            ReaderPageCopy.viewportPlaceholder(page),
             style: type.bodyLarge.copyWith(
               color: scheme.scrim.withValues(alpha: 0.35),
             ),

@@ -8,43 +8,43 @@ import 'package:hentai_library/shared/ui/widgets/catalog/cover_read_progress_str
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Middle dot between author and page label (e.g. `作者名 · 128 页`).
-const String kMd3eComicListItemMetaSeparator = ' · ';
+const String kComicListItemMetaSeparator = ' · ';
 
-/// List-row cover width (2:3, same media treatment as [Md3eComicCard]).
-const double kMd3eComicListItemCoverWidth = 80;
+/// List-row cover width (2:3, same media treatment as [ComicCard]).
+const double kComicListItemCoverWidth = 80;
 
 /// Derived list cover height.
-double get kMd3eComicListItemCoverHeight =>
-    kMd3eComicListItemCoverWidth * 3 / 2;
+double get kComicListItemCoverHeight =>
+    kComicListItemCoverWidth * 3 / 2;
 
 /// Vertical padding inside the shared catalog card shell.
-const double kMd3eComicListItemVerticalPadding = 10;
+const double kComicListItemVerticalPadding = 10;
 
 /// Minimum row height (cover + vertical insets).
-double get kMd3eComicListItemMinHeight =>
-    kMd3eComicListItemCoverHeight + 2 * kMd3eComicListItemVerticalPadding;
+double get kComicListItemMinHeight =>
+    kComicListItemCoverHeight + 2 * kComicListItemVerticalPadding;
 
 /// Max width of the read-progress bar when shown under meta (list-only layout).
-const double kMd3eComicListItemProgressMaxWidth = 160;
+const double kComicListItemProgressMaxWidth = 160;
 
 /// Gap between meta line and list progress bar.
-const double kMd3eComicListItemProgressTopGap = 6;
+const double kComicListItemProgressTopGap = 6;
 
 /// Key for list-row progress strip in tests (under title/meta, not on cover).
-const Key kMd3eComicListItemInfoProgressKey = Key(
-  'md3e_comic_list_item_info_progress',
+const Key kComicListItemInfoProgressKey = Key(
+  '_comic_list_item_info_progress',
 );
 
 /// One action in the trailing overflow ([Icons.more_vert]) menu.
-class Md3eComicListMoreMenuEntry {
-  const Md3eComicListMoreMenuEntry({required this.label, this.onSelected});
+class ComicListMoreMenuEntry {
+  const ComicListMoreMenuEntry({required this.label, this.onSelected});
 
   final String label;
   final VoidCallback? onSelected;
 }
 
 /// Pins M3 list-item visuals for Widgetbook; not for production lists.
-enum Md3eComicListItemVisualState {
+enum ComicListItemVisualState {
   normal,
   hovered,
   focused,
@@ -54,10 +54,10 @@ enum Md3eComicListItemVisualState {
   selectionSelected,
 }
 
-/// Catalog list comic item: same [Md3eComicCatalogCardShell] as [Md3eComicCard],
+/// Catalog list comic item: same [ComicCatalogCardShell] as [ComicCard],
 /// horizontal cover + text + optional trailing menu.
-class Md3eComicListItem extends StatelessWidget {
-  const Md3eComicListItem({
+class ComicListItem extends StatelessWidget {
+  const ComicListItem({
     super.key,
     required this.title,
     required this.cover,
@@ -70,13 +70,13 @@ class Md3eComicListItem extends StatelessWidget {
     this.selected = false,
     this.onSelectionChanged,
     this.readProgress,
-    this.moreMenuEntries = const <Md3eComicListMoreMenuEntry>[],
+    this.moreMenuEntries = const <ComicListMoreMenuEntry>[],
   }) : assert(
          readProgress == null || (readProgress >= 0 && readProgress <= 1),
          'readProgress must be between 0 and 1',
        );
 
-  static double itemExtent() => kMd3eComicListItemMinHeight;
+  static double itemExtent() => kComicListItemMinHeight;
 
   static String? metaLine({String? author, String? pageLabel}) {
     final List<String> parts = <String>[];
@@ -91,14 +91,14 @@ class Md3eComicListItem extends StatelessWidget {
     if (parts.isEmpty) {
       return null;
     }
-    return parts.join(kMd3eComicListItemMetaSeparator);
+    return parts.join(kComicListItemMetaSeparator);
   }
 
   static double infoProgressWidthFor(double availableWidth) {
     if (availableWidth <= 0) {
       return 0;
     }
-    return math.min(availableWidth, kMd3eComicListItemProgressMaxWidth);
+    return math.min(availableWidth, kComicListItemProgressMaxWidth);
   }
 
   final String title;
@@ -112,10 +112,10 @@ class Md3eComicListItem extends StatelessWidget {
   final ValueChanged<bool>? onSelectionChanged;
 
   final bool enabled;
-  final Md3eComicListItemVisualState? visualState;
+  final ComicListItemVisualState? visualState;
 
   final double? readProgress;
-  final List<Md3eComicListMoreMenuEntry> moreMenuEntries;
+  final List<ComicListMoreMenuEntry> moreMenuEntries;
 
   @override
   Widget build(BuildContext context) {
@@ -131,23 +131,23 @@ class Md3eComicListItem extends StatelessWidget {
         visualState == null &&
         (onTap != null || onSelectionChanged != null);
     final bool rowEnabled =
-        enabled && visualState != Md3eComicListItemVisualState.disabled;
+        enabled && visualState != ComicListItemVisualState.disabled;
     final String? meta = metaLine(author: author, pageLabel: pageLabel);
-    final bool showListProgress = md3eShowsReadProgressStrip(readProgress);
+    final bool showListProgress = showsReadProgressStrip(readProgress);
 
     final Widget coverLayer = ClipRRect(
-      borderRadius: BorderRadius.circular(kMd3eComicCardRadius),
+      borderRadius: BorderRadius.circular(kComicCardRadius),
       child: SizedBox(
-        width: kMd3eComicListItemCoverWidth,
-        height: kMd3eComicListItemCoverHeight,
+        width: kComicListItemCoverWidth,
+        height: kComicListItemCoverHeight,
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
             cover,
             if (effectiveSelectionMode)
               Positioned(
-                left: kMd3eComicCardSelectionInset,
-                top: kMd3eComicCardSelectionInset,
+                left: kComicCardSelectionInset,
+                top: kComicCardSelectionInset,
                 child: M3ECheckbox(
                   value: effectiveSelected,
                   onChanged: rowEnabled && onSelectionChanged != null
@@ -167,11 +167,11 @@ class Md3eComicListItem extends StatelessWidget {
 
     Widget? trailingMore;
     if (moreMenuEntries.isNotEmpty) {
-      trailingMore = Md3eAnchoredMenu(
+      trailingMore = AnchoredMenu(
         enabled: rowEnabled,
         position: M3EMenuAnchorPosition.bottomEnd,
         children: <M3EMenuEntry>[
-          for (final Md3eComicListMoreMenuEntry entry in moreMenuEntries)
+          for (final ComicListMoreMenuEntry entry in moreMenuEntries)
             M3EMenuEntry(
               label: entry.label,
               enabled: rowEnabled && entry.onSelected != null,
@@ -198,7 +198,7 @@ class Md3eComicListItem extends StatelessWidget {
           title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: md3eComicCatalogTitleStyle(type, scheme),
+          style: comicCatalogTitleStyle(type, scheme),
         ),
         if (meta != null) ...<Widget>[
           const SizedBox(height: 4),
@@ -206,11 +206,11 @@ class Md3eComicListItem extends StatelessWidget {
             meta,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: md3eComicCatalogSubtitleStyle(type, scheme),
+            style: comicCatalogSubtitleStyle(type, scheme),
           ),
         ],
         if (showListProgress) ...<Widget>[
-          SizedBox(height: kMd3eComicListItemProgressTopGap),
+          SizedBox(height: kComicListItemProgressTopGap),
           LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               final double progressWidth = infoProgressWidthFor(
@@ -218,9 +218,9 @@ class Md3eComicListItem extends StatelessWidget {
               );
               return SizedBox(
                 width: progressWidth,
-                height: kMd3eCoverReadProgressHeight,
-                child: Md3eCoverReadProgressStrip(
-                  key: kMd3eComicListItemInfoProgressKey,
+                height: kCoverReadProgressHeight,
+                child: CoverReadProgressStrip(
+                  key: kComicListItemInfoProgressKey,
                   progress: readProgress!,
                   activeColor: scheme.primary,
                   trackColor: scheme.onSurface.withValues(alpha: 0.24),
@@ -234,10 +234,10 @@ class Md3eComicListItem extends StatelessWidget {
 
     final Widget row = Padding(
       padding: const EdgeInsets.fromLTRB(
-        kMd3eComicCatalogContentHorizontalPadding,
-        kMd3eComicListItemVerticalPadding,
-        kMd3eComicCatalogContentHorizontalPadding - 4,
-        kMd3eComicListItemVerticalPadding,
+        kComicCatalogContentHorizontalPadding,
+        kComicListItemVerticalPadding,
+        kComicCatalogContentHorizontalPadding - 4,
+        kComicListItemVerticalPadding,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -253,15 +253,15 @@ class Md3eComicListItem extends StatelessWidget {
       ),
     );
 
-    return Md3eComicCatalogCardShell(
-      height: kMd3eComicListItemMinHeight,
+    return ComicCatalogCardShell(
+      height: kComicListItemMinHeight,
       width: double.infinity,
       enabled: rowEnabled,
       trackHover: visualState == null,
       onPressed: interactive ? _handleTap : null,
       selected: effectiveSelectionMode && effectiveSelected,
       pinnedOverlayAlpha: _pinnedOverlayAlphaFor(visualState),
-      semanticLabel: Md3eComicCard.showsCoverReadProgress(readProgress)
+      semanticLabel: ComicCard.showsCoverReadProgress(readProgress)
           ? '$title，已读 ${(readProgress!.clamp(0.0, 1.0) * 100).round()}%'
           : title,
       child: row,
@@ -269,18 +269,18 @@ class Md3eComicListItem extends StatelessWidget {
   }
 
   bool get _effectiveSelectionMode {
-    if (visualState == Md3eComicListItemVisualState.selectionUnselected ||
-        visualState == Md3eComicListItemVisualState.selectionSelected) {
+    if (visualState == ComicListItemVisualState.selectionUnselected ||
+        visualState == ComicListItemVisualState.selectionSelected) {
       return true;
     }
     return selectionMode;
   }
 
   bool get _effectiveSelected {
-    if (visualState == Md3eComicListItemVisualState.selectionSelected) {
+    if (visualState == ComicListItemVisualState.selectionSelected) {
       return true;
     }
-    if (visualState == Md3eComicListItemVisualState.selectionUnselected) {
+    if (visualState == ComicListItemVisualState.selectionUnselected) {
       return false;
     }
     return selected;
@@ -294,17 +294,17 @@ class Md3eComicListItem extends StatelessWidget {
     onTap?.call();
   }
 
-  static double _pinnedOverlayAlphaFor(Md3eComicListItemVisualState? state) {
+  static double _pinnedOverlayAlphaFor(ComicListItemVisualState? state) {
     switch (state) {
-      case Md3eComicListItemVisualState.pressed:
-      case Md3eComicListItemVisualState.focused:
-        return kMd3eComicCatalogPinnedOverlayAlphaStrong;
-      case Md3eComicListItemVisualState.hovered:
-        return kMd3eComicCatalogPinnedOverlayAlphaLight;
-      case Md3eComicListItemVisualState.disabled:
-      case Md3eComicListItemVisualState.normal:
-      case Md3eComicListItemVisualState.selectionUnselected:
-      case Md3eComicListItemVisualState.selectionSelected:
+      case ComicListItemVisualState.pressed:
+      case ComicListItemVisualState.focused:
+        return kComicCatalogPinnedOverlayAlphaStrong;
+      case ComicListItemVisualState.hovered:
+        return kComicCatalogPinnedOverlayAlphaLight;
+      case ComicListItemVisualState.disabled:
+      case ComicListItemVisualState.normal:
+      case ComicListItemVisualState.selectionUnselected:
+      case ComicListItemVisualState.selectionSelected:
       case null:
         return 0;
     }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/widgets/foundation/expressive_pointer_target.dart';
 
 /// MD3E-styled primary action (Material 3 [FilledButton] with min touch target).
-class Md3eFilledButton extends StatelessWidget {
-  const Md3eFilledButton({
+class ExpressiveFilledButton extends StatelessWidget {
+  const ExpressiveFilledButton({
     super.key,
     required this.label,
     this.onPressed,
@@ -23,6 +23,6 @@ class Md3eFilledButton extends StatelessWidget {
             icon: Icon(icon),
             label: Text(label),
           );
-    return Md3ePointerTarget(child: button);
+    return PointerTarget(child: button);
   }
 }

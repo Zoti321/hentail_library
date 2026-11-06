@@ -5,8 +5,8 @@ import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_meta
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Parody → Author → Character → Tag（漫画 / 系列详情共用）。
-class Md3eDetailMetadataChipRows extends StatelessWidget {
-  const Md3eDetailMetadataChipRows({
+class DetailMetadataChipRows extends StatelessWidget {
+  const DetailMetadataChipRows({
     super.key,
     this.parodies = const <String>[],
     this.authors = const <String>[],
@@ -46,7 +46,7 @@ class Md3eDetailMetadataChipRows extends StatelessWidget {
         return;
       }
       rows.add(
-        Md3eComicDetailMetaChipRow(
+        ComicDetailMetaChipRow(
           label: label,
           items: items,
           onItemTap: onTap ?? onChipTap,

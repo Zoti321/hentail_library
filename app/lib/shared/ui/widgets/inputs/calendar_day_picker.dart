@@ -3,9 +3,9 @@ import 'package:hentai_library/shared/ui/widgets/inputs/calendar_day_cell.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:flutter/material.dart' hide MaterialLocalizations;
 
-/// 月历日网格（使用 [Md3eCalendarDayCell]）。
-class Md3eCalendarDayPicker extends StatelessWidget {
-  const Md3eCalendarDayPicker({
+/// 月历日网格（使用 [CalendarDayCell]）。
+class CalendarDayPicker extends StatelessWidget {
+  const CalendarDayPicker({
     required this.displayedMonth,
     required this.selectedDate,
     required this.currentDate,
@@ -34,7 +34,7 @@ class Md3eCalendarDayPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EDatePickerTheme dateTheme = theme.datePickerTheme;
-    final MaterialLocalizations localizations = md3eMaterialLocalizationsOf(
+    final MaterialLocalizations localizations = materialLocalizationsOf(
       context,
     );
     final int year = displayedMonth.year;
@@ -158,7 +158,7 @@ class Md3eCalendarDayPicker extends StatelessWidget {
     );
     final DateTime? start = rangeStart;
     final DateTime? end = rangeEnd;
-    return Md3eCalendarDayCell(
+    return CalendarDayCell(
       date: date,
       selected: M3EDatePickerUtils.isSameDay(date, selectedDate),
       today: M3EDatePickerUtils.isSameDay(date, currentDate),

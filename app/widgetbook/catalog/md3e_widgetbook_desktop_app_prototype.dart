@@ -11,10 +11,10 @@ class _Md3eLabAppPrototype extends StatelessWidget {
     final double shellHeight = viewportHeight >= 560 ? viewportHeight : 768;
 
     return Md3eWidgetbookScope(
-      child: Md3eDesktopShell(
+      child: DesktopShell(
         height: shellHeight,
         initialRailExtended: false,
-        surfaceRoles: Md3eDesktopShellSurfaceRoles.lab(scheme),
+        surfaceRoles: DesktopShellSurfaceRoles.lab(scheme),
         paneBuilder: _paneForNavigation,
       ),
     );
@@ -22,23 +22,23 @@ class _Md3eLabAppPrototype extends StatelessWidget {
 
   static Widget _paneForNavigation(
     BuildContext context,
-    Md3eShellNavigationSnapshot navigation,
+    ShellNavigationSnapshot navigation,
   ) {
     switch (navigation.destinationIndex) {
-      case Md3eShellNavigation.homeDestinationIndex:
-        return const Md3eHomePageLabHost();
-      case Md3eShellNavigation.libraryDestinationIndex:
+      case ShellNavigation.homeDestinationIndex:
+        return const HomePageLabHost();
+      case ShellNavigation.libraryDestinationIndex:
         return _Md3eLibraryBrowsePagePreview(
           libraryDisplayName: navigation.selectedLibraryDisplayName,
         );
-      case Md3eShellNavigation.managementDestinationIndex:
-        return const Md3eManagementBrowsePageLabHost();
-      case Md3eShellNavigation.settingsDestinationIndex:
-        return Md3eSettingsPageLabHost(
+      case ShellNavigation.managementDestinationIndex:
+        return const ManagementBrowsePageLabHost();
+      case ShellNavigation.settingsDestinationIndex:
+        return SettingsPageLabHost(
           onBack: navigation.onBackToPreviousDestination,
         );
       default:
-        return const Md3eHomePageLabHost();
+        return const HomePageLabHost();
     }
   }
 }

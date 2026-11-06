@@ -5,8 +5,8 @@ import 'package:hentai_library/shared/domain/models/value_objects/comic_language
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画语言闭集快捷多选（对齐生产编辑元数据语言 chip）。
-class Md3eComicLanguageQuickPick extends StatelessWidget {
-  const Md3eComicLanguageQuickPick({
+class ComicLanguageQuickPick extends StatelessWidget {
+  const ComicLanguageQuickPick({
     super.key,
     required this.selected,
     required this.onCanonicalToggled,

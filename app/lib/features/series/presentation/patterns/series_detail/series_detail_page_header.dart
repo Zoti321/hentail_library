@@ -9,16 +9,16 @@ import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.d
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
-/// 系列详情工具栏内容（粘滞阴影由 [Md3ePageHeaderDelegate] 绘制）。
-class Md3eSeriesDetailPageHeader extends StatelessWidget {
-  const Md3eSeriesDetailPageHeader({
+/// 系列详情工具栏内容（粘滞阴影由 [PageHeaderDelegate] 绘制）。
+class SeriesDetailPageHeader extends StatelessWidget {
+  const SeriesDetailPageHeader({
     super.key,
     this.onBack,
     this.onEdit,
     this.moreMenuEntries = const <M3EMenuNode>[],
     required this.pageSize,
     required this.onPageSizeChanged,
-    this.pageSizeOptions = kMd3eLibraryPageSizeOptions,
+    this.pageSizeOptions = kLibraryPageSizeOptions,
   });
 
   final VoidCallback? onBack;
@@ -31,17 +31,17 @@ class Md3eSeriesDetailPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final Md3eWindowSizeClass sizeClass = Md3ePageLayoutSpec.of(context)
+    final WindowSizeClass sizeClass = PageLayoutSpec.of(context)
         .sizeClass;
     final bool showStandalonePageSize =
-        sizeClass.index > Md3eWindowSizeClass.medium.index;
+        sizeClass.index > WindowSizeClass.medium.index;
 
     final List<M3EMenuNode> toolbarMoreEntries = List<M3EMenuNode>.of(
       moreMenuEntries,
     );
     if (!showStandalonePageSize) {
       toolbarMoreEntries.addAll(
-        md3eSeriesDetailPageSizeMenuNodes(
+        seriesDetailPageSizeMenuNodes(
           l10n: l10n,
           pageSize: pageSize,
           onPageSizeChanged: onPageSizeChanged,
@@ -51,10 +51,10 @@ class Md3eSeriesDetailPageHeader extends StatelessWidget {
       );
     }
 
-    return Md3ePinnedToolbarChrome(
+    return PinnedToolbarChrome(
       child: Row(
         children: <Widget>[
-          Md3eDetailHeaderToolbar(
+          DetailHeaderToolbar(
             onBack: onBack,
             onEdit: onEdit,
             editTooltip: l10n.seriesDetailEdit,
@@ -62,7 +62,7 @@ class Md3eSeriesDetailPageHeader extends StatelessWidget {
           ),
           const Spacer(),
           if (showStandalonePageSize)
-            Md3eSeriesDetailPageSizeControl(
+            SeriesDetailPageSizeControl(
               pageSize: pageSize,
               onPageSizeChanged: onPageSizeChanged,
               pageSizeOptions: pageSizeOptions,

@@ -7,9 +7,9 @@ import 'package:material_3_expressive/components/date_pickers/components/m3e_dat
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:flutter/material.dart' hide MaterialLocalizations;
 
-/// 可嵌入表单的日历（与 [M3ECalendarDatePicker] 一致，年份模式使用 [Md3eCalendarYearPicker]）。
-class Md3eEmbeddableCalendarDatePicker extends StatefulWidget {
-  const Md3eEmbeddableCalendarDatePicker({
+/// 可嵌入表单的日历（与 [M3ECalendarDatePicker] 一致，年份模式使用 [CalendarYearPicker]）。
+class EmbeddableCalendarDatePicker extends StatefulWidget {
+  const EmbeddableCalendarDatePicker({
     required this.onDateChanged,
     required this.firstDate,
     required this.lastDate,
@@ -37,12 +37,12 @@ class Md3eEmbeddableCalendarDatePicker extends StatefulWidget {
   final ValueChanged<DateTime>? onDaySelected;
 
   @override
-  State<Md3eEmbeddableCalendarDatePicker> createState() =>
-      _Md3eEmbeddableCalendarDatePickerState();
+  State<EmbeddableCalendarDatePicker> createState() =>
+      _EmbeddableCalendarDatePickerState();
 }
 
-class _Md3eEmbeddableCalendarDatePickerState
-    extends State<Md3eEmbeddableCalendarDatePicker> {
+class _EmbeddableCalendarDatePickerState
+    extends State<EmbeddableCalendarDatePicker> {
   late M3EDatePickerMode _mode;
   late DateTime _displayedMonth;
   late DateTime _firstDate;
@@ -118,14 +118,14 @@ class _Md3eEmbeddableCalendarDatePickerState
   }
 
   double _inlinePickerBodyHeight(BuildContext context) {
-    final int firstDayOfWeekIndex = md3eMaterialLocalizationsOf(context)
+    final int firstDayOfWeekIndex = materialLocalizationsOf(context)
         .firstDayOfWeekIndex;
     return switch (_mode) {
       M3EDatePickerMode.day => M3EDatePickerUtils.calendarDayViewHeight(
         _displayedMonth,
         firstDayOfWeekIndex,
       ),
-      M3EDatePickerMode.year => md3eCalendarYearViewHeight(
+      M3EDatePickerMode.year => calendarYearViewHeight(
         _firstDate,
         _lastDate,
         includeSubHeader: false,
@@ -134,7 +134,7 @@ class _Md3eEmbeddableCalendarDatePickerState
   }
 
   Widget _yearPicker() {
-    return Md3eCalendarYearPicker(
+    return CalendarYearPicker(
       selectedDate: _selectedDate,
       firstDate: _firstDate,
       lastDate: _lastDate,
@@ -148,7 +148,7 @@ class _Md3eEmbeddableCalendarDatePickerState
   Widget build(BuildContext context) {
     return M3EComponentTheme(
       builder: (BuildContext context) {
-        return md3eMaterialUiLocalizationsScope(
+        return materialUiLocalizationsScope(
           child: Builder(
             builder: (BuildContext scopedContext) {
               final M3EThemeData theme = M3ETheme.of(scopedContext);
@@ -156,7 +156,7 @@ class _Md3eEmbeddableCalendarDatePickerState
 
               if (widget.expandToFit) {
                 final Widget picker = switch (_mode) {
-                  M3EDatePickerMode.day => Md3eCalendarMonthPicker(
+                  M3EDatePickerMode.day => CalendarMonthPicker(
                     initialMonth: _displayedMonth,
                     firstDate: _firstDate,
                     lastDate: _lastDate,
@@ -198,9 +198,9 @@ class _Md3eEmbeddableCalendarDatePickerState
                     monthDate: _displayedMonth,
                     onChanged: _handleModeChanged,
                   ),
-                  Md3eSpringValue(
+                  SpringValue(
                     value: bodyHeight,
-                    motion: Md3eMotion.spatialReveal,
+                    motion: LabMotion.spatialReveal,
                     builder:
                         (BuildContext context, double height, Widget? child) {
                           return SizedBox(
@@ -218,7 +218,7 @@ class _Md3eEmbeddableCalendarDatePickerState
                     child: SizedBox(
                       height: bodyHeight,
                       child: switch (_mode) {
-                        M3EDatePickerMode.day => Md3eCalendarMonthPicker(
+                        M3EDatePickerMode.day => CalendarMonthPicker(
                           initialMonth: _displayedMonth,
                           firstDate: _firstDate,
                           lastDate: _lastDate,

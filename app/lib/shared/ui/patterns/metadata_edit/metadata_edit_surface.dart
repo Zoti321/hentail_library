@@ -13,8 +13,8 @@ import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_fo
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 元数据编辑壳：compact / medium 用 M3E 全屏 dialog；expanded+ 用 M3EDialog basic。
-enum Md3eMetadataEditPresentation {
-  /// Widgetbook：宽屏居中卡片 / 窄屏全屏（由 [Md3eLabDialogPresenter] 打开时勿用）。
+enum MetadataEditPresentation {
+  /// Widgetbook：宽屏居中卡片 / 窄屏全屏（由 [LabDialogPresenter] 打开时勿用）。
   embedded,
 
   /// [M3EDialog] basic 内容（由 presenter 包裹路由）。
@@ -24,15 +24,15 @@ enum Md3eMetadataEditPresentation {
   labFormBody,
 }
 
-class Md3eMetadataEditSurface extends StatelessWidget {
-  const Md3eMetadataEditSurface({
+class MetadataEditSurface extends StatelessWidget {
+  const MetadataEditSurface({
     super.key,
     required this.title,
     required this.body,
     required this.onCancel,
     required this.onSave,
-    this.maxWidth = Md3eMetadataEditFormMetrics.comicMaxWidth,
-    this.presentation = Md3eMetadataEditPresentation.embedded,
+    this.maxWidth = MetadataEditFormMetrics.comicMaxWidth,
+    this.presentation = MetadataEditPresentation.embedded,
     this.saving = false,
     this.saveEnabled = true,
     this.onBack,
@@ -43,51 +43,51 @@ class Md3eMetadataEditSurface extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onSave;
   final double maxWidth;
-  final Md3eMetadataEditPresentation presentation;
+  final MetadataEditPresentation presentation;
   final bool saving;
   final bool saveEnabled;
   final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+    final WindowSizeClass sizeClass = windowSizeClassOf(context);
     final bool useFullPage =
-        presentation == Md3eMetadataEditPresentation.embedded &&
+        presentation == MetadataEditPresentation.embedded &&
         sizeClass.usesMetadataEditFullScreenRoute;
 
-    if (presentation == Md3eMetadataEditPresentation.labFormBody) {
+    if (presentation == MetadataEditPresentation.labFormBody) {
       return body;
     }
 
-    if (presentation == Md3eMetadataEditPresentation.modal) {
+    if (presentation == MetadataEditPresentation.modal) {
       final M3EThemeData theme = M3ETheme.of(context);
       return M3ETheme(
         data: theme.copyWith(
           dialogTheme: theme.dialogTheme.copyWith(
-            maxWidth: Md3eMetadataEditFormMetrics.dialogShellMaxWidth(context),
+            maxWidth: MetadataEditFormMetrics.dialogShellMaxWidth(context),
           ),
         ),
         child: M3EDialog(
           title: title,
           content: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: Md3eMetadataEditFormMetrics.dialogContentMaxWidth(
+              maxWidth: MetadataEditFormMetrics.dialogContentMaxWidth(
                 context,
               ),
             ),
             child: SizedBox(
-              height: Md3eMetadataEditFormMetrics.dialogContentMaxHeight(
+              height: MetadataEditFormMetrics.dialogContentMaxHeight(
                 context,
               ),
               width: double.infinity,
               child: ScrollConfiguration(
-                behavior: Md3eMetadataEditScrollBehavior(),
+                behavior: MetadataEditScrollBehavior(),
                 child: body,
               ),
             ),
           ),
           bottomDivider: true,
-          actions: md3eMetadataEditDialogActions(
+          actions: metadataEditDialogActions(
             context,
             onCancel: onCancel,
             onSave: onSave,
@@ -102,7 +102,7 @@ class Md3eMetadataEditSurface extends StatelessWidget {
       return M3EFullScreenDialog(
         title: title,
         body: ScrollConfiguration(
-          behavior: Md3eMetadataEditScrollBehavior(),
+          behavior: MetadataEditScrollBehavior(),
           child: body,
         ),
         confirmLabel: context.l10n.commonSave,
@@ -119,11 +119,11 @@ class Md3eMetadataEditSurface extends StatelessWidget {
     }
 
     return ColoredBox(
-      color: md3eLabBrowseCanvasColor(M3ETheme.of(context).colorScheme),
+      color: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
       child: Center(
         child: Padding(
           padding: EdgeInsets.all(
-            Md3ePageLayoutSpec.of(context).horizontalInset,
+            PageLayoutSpec.of(context).horizontalInset,
           ),
           child: _DialogCard(
             maxWidth: maxWidth,
@@ -164,7 +164,7 @@ class _DialogCard extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
     final Size size = MediaQuery.sizeOf(context);
-    final double horizontalInset = Md3ePageLayoutSpec.of(context)
+    final double horizontalInset = PageLayoutSpec.of(context)
         .horizontalInset;
     final double width = math.min(maxWidth, size.width - horizontalInset * 2);
     final double maxHeight = size.height * 0.88;

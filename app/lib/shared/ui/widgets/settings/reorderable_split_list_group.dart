@@ -30,7 +30,7 @@ const double _kLiftOffset = 12;
 /// 拖拽浮层阴影高度（level 4）。
 const double _kDragElevation = 8;
 
-/// 可拖拽排序的分段列表：长按行后拖动，未拖拽时视觉与 [Md3eSplitListGroup] 完全一致。
+/// 可拖拽排序的分段列表：长按行后拖动，未拖拽时视觉与 [SplitListGroup] 完全一致。
 ///
 /// 交互与视觉（自实现，手感对齐 M3E 列表拖拽）：
 /// - 长按 [kLongPressTimeout] 开始拖拽，移动超过 [kTouchSlop] 则取消；开始时触发中等震动；
@@ -40,12 +40,12 @@ const double _kDragElevation = 8;
 /// - 松手时浮层以弹簧回落到目标槽位，回落完成后才回调重排。
 ///
 /// [onReorder] 使用 Flutter [ReorderCallback] 约定（`newIndex` 需先减一再插入，
-/// 可直接用 `applyMd3eReorder` 处理）。
+/// 可直接用 `applyReorder` 处理）。
 ///
 /// [itemKeyOf] 给出每行的稳定标识，用于重排后保持行的状态；缺省按下标。
-/// 行内的按钮等应包在 [Md3eReorderExclude] 中，长按它们不会开始拖拽。
-class Md3eReorderableSplitListGroup extends StatefulWidget {
-  const Md3eReorderableSplitListGroup({
+/// 行内的按钮等应包在 [ReorderExclude] 中，长按它们不会开始拖拽。
+class ReorderableSplitListGroup extends StatefulWidget {
+  const ReorderableSplitListGroup({
     super.key,
     required this.itemCount,
     required this.itemBuilder,
@@ -53,7 +53,7 @@ class Md3eReorderableSplitListGroup extends StatefulWidget {
     this.itemKeyOf,
     this.onItemTap,
     this.mouseCursor,
-    this.outerRadius = kMd3eTonalSurfaceRadius,
+    this.outerRadius = kTonalSurfaceRadius,
   });
 
   final int itemCount;
@@ -71,12 +71,12 @@ class Md3eReorderableSplitListGroup extends StatefulWidget {
   final double outerRadius;
 
   @override
-  State<Md3eReorderableSplitListGroup> createState() =>
-      _Md3eReorderableSplitListGroupState();
+  State<ReorderableSplitListGroup> createState() =>
+      _ReorderableSplitListGroupState();
 }
 
-class _Md3eReorderableSplitListGroupState
-    extends State<Md3eReorderableSplitListGroup>
+class _ReorderableSplitListGroupState
+    extends State<ReorderableSplitListGroup>
     with TickerProviderStateMixin {
   final GlobalKey _listKey = GlobalKey();
   final Map<Object, GlobalKey> _rowKeys = <Object, GlobalKey>{};
@@ -166,7 +166,7 @@ class _Md3eReorderableSplitListGroupState
     }
     final BuildContext? rowContext = _rowKey(_idOf(index)).currentContext;
     if (rowContext == null ||
-        md3eIsPointerInReorderExclude(rowContext, event.position)) {
+        isPointerInReorderExclude(rowContext, event.position)) {
       return;
     }
     _activePointer = event.pointer;
@@ -250,7 +250,7 @@ class _Md3eReorderableSplitListGroupState
     double cursor = _slotOrigins.isEmpty ? 0 : _slotOrigins[0].dy;
     for (final int index in order) {
       tops[index] = cursor;
-      cursor += _slotHeights[index] + kMd3eSplitListRowGap;
+      cursor += _slotHeights[index] + kSplitListRowGap;
     }
     return tops;
   }
@@ -455,10 +455,10 @@ class _Md3eReorderableSplitListGroupState
 
     final Widget row = KeyedSubtree(
       key: _rowKey(id),
-      child: Md3eSplitListRow(
+      child: SplitListRow(
         key: ValueKey<int>(_rowEpoch),
-        topRadius: first ? widget.outerRadius : kMd3eSplitListInnerRadius,
-        bottomRadius: last ? widget.outerRadius : kMd3eSplitListInnerRadius,
+        topRadius: first ? widget.outerRadius : kSplitListInnerRadius,
+        bottomRadius: last ? widget.outerRadius : kSplitListInnerRadius,
         pressedRadius: widget.outerRadius,
         mouseCursor: widget.onItemTap == null ? null : widget.mouseCursor,
         onTap: widget.onItemTap == null ? null : () => widget.onItemTap!(index),
@@ -481,7 +481,7 @@ class _Md3eReorderableSplitListGroupState
     return KeyedSubtree(
       key: ValueKey<Object>(id),
       child: Padding(
-        padding: EdgeInsets.only(bottom: last ? 0 : kMd3eSplitListRowGap),
+        padding: EdgeInsets.only(bottom: last ? 0 : kSplitListRowGap),
         child: slot,
       ),
     );
@@ -536,10 +536,10 @@ class _Md3eReorderableSplitListGroupState
         color: scheme.surfaceContainerHigh,
         elevation: _kDragElevation,
         borderRadius: BorderRadius.circular(widget.outerRadius),
-        child: Md3eSplitDragScope(
+        child: SplitDragScope(
           color: scheme.surfaceContainerHigh,
           radius: widget.outerRadius,
-          child: Md3eSplitListRow(
+          child: SplitListRow(
             topRadius: widget.outerRadius,
             bottomRadius: widget.outerRadius,
             child: widget.itemBuilder(context, from),

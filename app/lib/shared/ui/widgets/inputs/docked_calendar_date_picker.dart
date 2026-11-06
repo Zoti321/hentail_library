@@ -3,12 +3,12 @@ import 'package:hentai_library/shared/ui/widgets/inputs/embeddable_calendar_date
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画元数据发布日期默认可选范围（与 Lab 预览一致）。
-final DateTime kMd3ePublishedDatePickerFirstDate = DateTime(1970);
-final DateTime kMd3ePublishedDatePickerLastDate = DateTime(2030, 12, 31);
+final DateTime kPublishedDatePickerFirstDate = DateTime(1970);
+final DateTime kPublishedDatePickerLastDate = DateTime(2030, 12, 31);
 
 /// 贴在表单字段下方的 docked 日历（非 Dialog）；仅一层 M3E 容器背景。
-class Md3eDockedCalendarDatePicker extends StatelessWidget {
-  const Md3eDockedCalendarDatePicker({
+class DockedCalendarDatePicker extends StatelessWidget {
+  const DockedCalendarDatePicker({
     super.key,
     required this.onDateChanged,
     this.initialDate,
@@ -31,10 +31,10 @@ class Md3eDockedCalendarDatePicker extends StatelessWidget {
       padding: EdgeInsets.only(top: spacing.sm),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Md3eEmbeddableCalendarDatePicker(
+        child: EmbeddableCalendarDatePicker(
           initialDate: initialDate,
-          firstDate: firstDate ?? kMd3ePublishedDatePickerFirstDate,
-          lastDate: lastDate ?? kMd3ePublishedDatePickerLastDate,
+          firstDate: firstDate ?? kPublishedDatePickerFirstDate,
+          lastDate: lastDate ?? kPublishedDatePickerLastDate,
           initialCalendarMode: initialCalendarMode,
           expandToFit: false,
           onDateChanged: onDateChanged,

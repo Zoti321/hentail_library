@@ -3,15 +3,15 @@ import 'package:hentai_library/shared/ui/shell/shell_library_secondary_layout.da
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-class Md3eShellLibraryPickerRow extends StatelessWidget {
-  const Md3eShellLibraryPickerRow({
+class ShellLibraryPickerRow extends StatelessWidget {
+  const ShellLibraryPickerRow({
     super.key,
     required this.row,
     required this.selected,
     required this.onTap,
   });
 
-  final Md3eHomeLibraryDashboardRow row;
+  final HomeLibraryDashboardRow row;
   final bool selected;
   final VoidCallback onTap;
 
@@ -19,14 +19,14 @@ class Md3eShellLibraryPickerRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
-    final IconData icon = row.kind == Md3eHomeLibraryKind.local
+    final IconData icon = row.kind == HomeLibraryKind.local
         ? Icons.folder_outlined
         : Icons.cloud_outlined;
 
     return Padding(
       padding: EdgeInsets.only(bottom: theme.spacing.xs),
       child: MouseRegion(
-        cursor: Md3eShellNavigationCursor.interactive,
+        cursor: ShellNavigationCursor.interactive,
         child: Material(
           color: selected ? scheme.secondaryContainer : Colors.transparent,
           borderRadius: BorderRadius.circular(28),

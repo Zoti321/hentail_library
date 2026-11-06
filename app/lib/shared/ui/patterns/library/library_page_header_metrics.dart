@@ -2,14 +2,14 @@ import 'package:flutter/painting.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Layout mode for [Md3eLibraryPageHeader] (MASTER §5.1 漫画库粘滞头).
-enum Md3eLibraryPageHeaderLayout {
-  /// 标题 + 操作；漫画/系列 tabs 在 [Md3eLibraryCatalogToolbar]（随列表滚动）。
+/// Layout mode for [LibraryPageHeader] (MASTER §5.1 漫画库粘滞头).
+enum LibraryPageHeaderLayout {
+  /// 标题 + 操作；漫画/系列 tabs 在 [LibraryCatalogToolbar]（随列表滚动）。
   titleAndActionsOnly,
 }
 
 /// MASTER §5.1 漫画库页内头部尺寸。
-abstract final class Md3eLibraryPageHeaderMetrics {
+abstract final class LibraryPageHeaderMetrics {
   static const double actionIconSize = 20;
 
   /// 与旧 Baseline 库页 display target tabs 一致的两 tab 间距。
@@ -20,14 +20,14 @@ abstract final class Md3eLibraryPageHeaderMetrics {
   /// 指示条比文案左右各宽 2dp（[`M3ETabTheme.indicatorInset`] 为负值）。
   static const double displayTargetIndicatorSideExtend = 2;
 
-  /// 注入 [`Md3eLibraryDisplayTargetTabs`] 的 [`M3ETabTheme`]（无底部分割线、生产风指示条）。
+  /// 注入 [`LibraryDisplayTargetTabs`] 的 [`M3ETabTheme`]（无底部分割线、生产风指示条）。
   ///
   /// [`M3ETabs`] 的 hover / focus / press 由包内 [`M3ETappable`] + 本 theme 的
   /// state opacity 驱动；指示条位移用 [indicatorSpring]。Tab 命中区为矩形铺满槽位，
   /// 圆角 state layer 需改 M3E 组件或换胶囊分段控件。
-  static M3ETabTheme displayTargetTabThemeFor(Md3eWindowSizeClass sizeClass) {
+  static M3ETabTheme displayTargetTabThemeFor(WindowSizeClass sizeClass) {
     final double barHeight = switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 40,
+      WindowSizeClass.compact => 40,
       _ => 44,
     };
     return M3ETabTheme(
@@ -62,14 +62,14 @@ abstract final class Md3eLibraryPageHeaderMetrics {
     return width;
   }
 
-  static Md3eLibraryPageHeaderLayout layoutFor(Md3eWindowSizeClass sizeClass) {
-    return Md3eLibraryPageHeaderLayout.titleAndActionsOnly;
+  static LibraryPageHeaderLayout layoutFor(WindowSizeClass sizeClass) {
+    return LibraryPageHeaderLayout.titleAndActionsOnly;
   }
 
-  static double actionSpacing(Md3eWindowSizeClass sizeClass) {
+  static double actionSpacing(WindowSizeClass sizeClass) {
     return switch (sizeClass) {
-      Md3eWindowSizeClass.compact => 4,
-      Md3eWindowSizeClass.medium => 8,
+      WindowSizeClass.compact => 4,
+      WindowSizeClass.medium => 8,
       _ => 8,
     };
   }

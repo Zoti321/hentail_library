@@ -8,7 +8,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/comic_metadata_bulk_patch_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library_scan_shell_feedback.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/md3e_production_shell_adapters.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/navigation/production_shell_adapters.dart';
 import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
 import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -16,7 +16,7 @@ import 'package:hentai_library/shared/domain/library/home_library_stat.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
-import 'package:hentai_library/shared/ui/shell/md3e_app_shell_slot.dart';
+import 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 List<Widget> libraryAdminShellFeedbackBelowTitleBar() {
@@ -26,7 +26,7 @@ List<Widget> libraryAdminShellFeedbackBelowTitleBar() {
   ];
 }
 
-Md3eAppShellNavigationSlot buildLibraryAdminMd3eAppShellNavigationSlot(
+AppShellNavigationSlot buildLibraryAdminAppShellNavigationSlot(
   BuildContext context,
   WidgetRef ref,
 ) {
@@ -43,15 +43,15 @@ Md3eAppShellNavigationSlot buildLibraryAdminMd3eAppShellNavigationSlot(
         data: (List<HomeLibraryStat> data) => data,
         orElse: () => const <HomeLibraryStat>[],
       );
-  final List<Md3eHomeLibraryDashboardRow> libraryRows =
-      md3eDashboardRowsForLibraries(libraries: libraries, stats: stats);
+  final List<HomeLibraryDashboardRow> libraryRows =
+      dashboardRowsForLibraries(libraries: libraries, stats: stats);
   final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
 
   return (
-    railDestinations: productionMd3eShellRailDestinations(context.l10n),
+    railDestinations: productionShellRailDestinations(context.l10n),
     libraries: libraryRows,
-    selectedNavId: productionMd3eSelectedNavId(path: path),
-    selectedLibraryId: productionMd3eSelectedLibraryId(
+    selectedNavId: productionSelectedNavId(path: path),
+    selectedLibraryId: productionSelectedLibraryId(
       path: path,
       libraries: libraryRows,
     ),
@@ -61,6 +61,6 @@ Md3eAppShellNavigationSlot buildLibraryAdminMd3eAppShellNavigationSlot(
     onLibrarySelected: (String libraryId) {
       ref.read(libraryManagementPortProvider).openLibrary(context, libraryId);
     },
-    surfaceRoles: Md3eDesktopShellSurfaceRoles.toneBased(scheme),
+    surfaceRoles: DesktopShellSurfaceRoles.toneBased(scheme),
   );
 }

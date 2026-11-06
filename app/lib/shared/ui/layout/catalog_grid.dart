@@ -3,14 +3,14 @@ import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Builds one catalog grid cell (index + resolved layout).
-typedef Md3eCatalogGridItemBuilder = Widget Function(
+typedef CatalogGridItemBuilder = Widget Function(
   BuildContext context,
   int index,
-  Md3eCatalogGridLayout layout,
+  CatalogGridLayout layout,
 );
 
-/// [SliverGridDelegate] from a resolved [Md3eCatalogGridLayout].
-SliverGridDelegate md3eCatalogGridDelegate(Md3eCatalogGridLayout layout) {
+/// [SliverGridDelegate] from a resolved [CatalogGridLayout].
+SliverGridDelegate catalogGridDelegate(CatalogGridLayout layout) {
   return SliverGridDelegateWithFixedCrossAxisCount(
     crossAxisCount: layout.crossAxisCount,
     mainAxisExtent: layout.mainAxisExtent,
@@ -20,8 +20,8 @@ SliverGridDelegate md3eCatalogGridDelegate(Md3eCatalogGridLayout layout) {
 }
 
 /// Top-aligns a catalog card inside a grid cell (cross-axis stretch, no vertical centering).
-class Md3eCatalogGridCell extends StatelessWidget {
-  const Md3eCatalogGridCell({super.key, required this.child});
+class CatalogGridCell extends StatelessWidget {
+  const CatalogGridCell({super.key, required this.child});
 
   final Widget child;
 
@@ -38,8 +38,8 @@ class Md3eCatalogGridCell extends StatelessWidget {
 
 /// Responsive comic catalog grid: margins, column count, gutters, and row height
 /// are computed in the layout layer; children only fill the cell.
-class Md3eCatalogGridSliver extends StatelessWidget {
-  const Md3eCatalogGridSliver({
+class CatalogGridSliver extends StatelessWidget {
+  const CatalogGridSliver({
     super.key,
     required this.itemCount,
     required this.itemBuilder,
@@ -48,7 +48,7 @@ class Md3eCatalogGridSliver extends StatelessWidget {
   });
 
   final int itemCount;
-  final Md3eCatalogGridItemBuilder itemBuilder;
+  final CatalogGridItemBuilder itemBuilder;
   final double? horizontalMargin;
   final bool hasSubtitle;
 
@@ -57,7 +57,7 @@ class Md3eCatalogGridSliver extends StatelessWidget {
     return SliverLayoutBuilder(
       builder: (BuildContext context, constraints) {
         final M3ESpacing spacing = M3ETheme.of(context).spacing;
-        final Md3eCatalogGridLayout layout = Md3eCatalogGridMetrics.resolve(
+        final CatalogGridLayout layout = CatalogGridMetrics.resolve(
           viewportWidth: constraints.crossAxisExtent,
           spacing: spacing,
           horizontalMargin: horizontalMargin,
@@ -67,12 +67,12 @@ class Md3eCatalogGridSliver extends StatelessWidget {
         return SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: layout.horizontalMargin),
           sliver: SliverGrid(
-            gridDelegate: md3eCatalogGridDelegate(layout),
+            gridDelegate: catalogGridDelegate(layout),
             delegate: SliverChildBuilderDelegate((
               BuildContext context,
               int index,
             ) {
-              return Md3eCatalogGridCell(
+              return CatalogGridCell(
                 child: itemBuilder(context, index, layout),
               );
             }, childCount: itemCount),

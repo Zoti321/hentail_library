@@ -5,8 +5,8 @@ import 'package:hentai_library/shared/ui/widgets/pagination/pagination_metrics.d
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Compact (&lt; 600dp) pagination: large icon prev/next and tappable page summary.
-class Md3ePaginationCompact extends StatelessWidget {
-  const Md3ePaginationCompact({
+class PaginationCompact extends StatelessWidget {
+  const PaginationCompact({
     super.key,
     required this.page,
     required this.totalPages,
@@ -31,7 +31,7 @@ class Md3ePaginationCompact extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: Md3ePaginationMetrics.horizontalPaddingCompact,
+        horizontal: PaginationMetrics.horizontalPaddingCompact,
         vertical: 8,
       ),
       child: Row(
@@ -46,11 +46,11 @@ class Md3ePaginationCompact extends StatelessWidget {
               ),
             ),
           ),
-          Md3ePointerTarget(
+          PointerTarget(
             onTap: enabled ? onOpenPagePicker : null,
             child: SizedBox(
-              width: Md3ePaginationMetrics.compactPageSummaryMinWidth,
-              child: Md3ePaginationCompactSummary(
+              width: PaginationMetrics.compactPageSummaryMinWidth,
+              child: PaginationCompactSummary(
                 page: page,
                 totalPages: totalPages,
                 style: summaryStyle,
@@ -87,11 +87,11 @@ class _CompactNavIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Md3ePaginationMetrics.compactNavIconSlot,
-      height: Md3ePaginationMetrics.compactNavIconSlot,
+      width: PaginationMetrics.compactNavIconSlot,
+      height: PaginationMetrics.compactNavIconSlot,
       child: Center(
         child: M3EIconButton(
-          icon: Icon(icon, size: Md3ePaginationMetrics.compactNavIconSize),
+          icon: Icon(icon, size: PaginationMetrics.compactNavIconSize),
           variant: M3EIconButtonVariant.standard,
           size: M3EIconButtonSize.md,
           tooltip: tooltip,

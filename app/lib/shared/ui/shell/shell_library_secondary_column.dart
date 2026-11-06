@@ -9,7 +9,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:motor/motor.dart';
 
 /// Floating library secondary pane (M3E drawer-style spatial reveal).
-abstract final class Md3eShellLibrarySecondaryPanelMetrics {
+abstract final class ShellLibrarySecondaryPanelMetrics {
   static const double cornerRadius = 16;
 
   /// M3 resting elevation for modal navigation drawer / side sheet (level 1 = 1dp).
@@ -42,8 +42,8 @@ abstract final class Md3eShellLibrarySecondaryPanelMetrics {
 }
 
 /// Library secondary flyout beside the navigation rail.
-class Md3eShellLibrarySecondaryColumn extends StatefulWidget {
-  const Md3eShellLibrarySecondaryColumn({
+class ShellLibrarySecondaryColumn extends StatefulWidget {
+  const ShellLibrarySecondaryColumn({
     super.key,
     required this.open,
     required this.height,
@@ -59,7 +59,7 @@ class Md3eShellLibrarySecondaryColumn extends StatefulWidget {
   final bool open;
   final double height;
   final Color backgroundColor;
-  final List<Md3eHomeLibraryDashboardRow> libraries;
+  final List<HomeLibraryDashboardRow> libraries;
   final String selectedLibraryId;
   final ValueChanged<String> onLibrarySelected;
   final Color? dividerColor;
@@ -67,15 +67,15 @@ class Md3eShellLibrarySecondaryColumn extends StatefulWidget {
   final VoidCallback? onPointerExit;
 
   @override
-  State<Md3eShellLibrarySecondaryColumn> createState() =>
-      _Md3eShellLibrarySecondaryColumnState();
+  State<ShellLibrarySecondaryColumn> createState() =>
+      _ShellLibrarySecondaryColumnState();
 }
 
-class _Md3eShellLibrarySecondaryColumnState
-    extends State<Md3eShellLibrarySecondaryColumn>
+class _ShellLibrarySecondaryColumnState
+    extends State<ShellLibrarySecondaryColumn>
     with SingleTickerProviderStateMixin {
   late final SingleMotionController _reveal = SingleMotionController(
-    motion: Md3eMotion.shellLibrarySecondaryReveal,
+    motion: LabMotion.shellLibrarySecondaryReveal,
     vsync: this,
   );
 
@@ -86,16 +86,16 @@ class _Md3eShellLibrarySecondaryColumnState
   }
 
   @override
-  void didUpdateWidget(covariant Md3eShellLibrarySecondaryColumn oldWidget) {
+  void didUpdateWidget(covariant ShellLibrarySecondaryColumn oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.open == widget.open) {
       return;
     }
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       _reveal.value = widget.open ? 1.0 : 0.0;
       return;
     }
-    _reveal.motion = Md3eMotion.shellLibrarySecondaryReveal;
+    _reveal.motion = LabMotion.shellLibrarySecondaryReveal;
     _reveal.animateTo(widget.open ? 1.0 : 0.0);
   }
 
@@ -116,29 +116,29 @@ class _Md3eShellLibrarySecondaryColumnState
         }
 
         const double panelWidth =
-            Md3eShellNavigation.librarySecondaryPanelWidth;
+            ShellNavigation.librarySecondaryPanelWidth;
 
         final TextDirection textDirection = Directionality.of(context);
         final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
 
         final BorderRadius flyoutRadius = BorderRadiusDirectional.only(
           topEnd: Radius.circular(
-            Md3eShellLibrarySecondaryPanelMetrics.cornerRadius,
+            ShellLibrarySecondaryPanelMetrics.cornerRadius,
           ),
           bottomEnd: Radius.circular(
-            Md3eShellLibrarySecondaryPanelMetrics.cornerRadius,
+            ShellLibrarySecondaryPanelMetrics.cornerRadius,
           ),
         ).resolve(textDirection);
 
         final Widget panelChrome = Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Md3eShellNavVerticalDivider(
+            ShellNavVerticalDivider(
               color: widget.dividerColor,
               height: widget.height,
             ),
             Expanded(
-              child: Md3eShellLibrarySecondaryPanel(
+              child: ShellLibrarySecondaryPanel(
                 libraries: widget.libraries,
                 selectedLibraryId: widget.selectedLibraryId,
                 onLibrarySelected: widget.onLibrarySelected,
@@ -152,7 +152,7 @@ class _Md3eShellLibrarySecondaryColumnState
           decoration: BoxDecoration(
             color: widget.backgroundColor,
             borderRadius: flyoutRadius,
-            boxShadow: Md3eShellLibrarySecondaryPanelMetrics.trailingShadows(
+            boxShadow: ShellLibrarySecondaryPanelMetrics.trailingShadows(
               scheme.shadow,
               textDirection,
             ),
@@ -161,7 +161,7 @@ class _Md3eShellLibrarySecondaryColumnState
         );
 
         final Widget interactivePane = MouseRegion(
-          cursor: Md3eShellNavigationCursor.interactive,
+          cursor: ShellNavigationCursor.interactive,
           onEnter: (_) => widget.onPointerEnter?.call(),
           onExit: (_) => widget.onPointerExit?.call(),
           child: panelBody,
@@ -170,7 +170,7 @@ class _Md3eShellLibrarySecondaryColumnState
         final double revealedWidth = panelWidth * reveal;
         final double layoutWidth =
             revealedWidth +
-            Md3eShellLibrarySecondaryPanelMetrics.trailingShadowMargin;
+            ShellLibrarySecondaryPanelMetrics.trailingShadowMargin;
 
         return SizedBox(
           width: layoutWidth,

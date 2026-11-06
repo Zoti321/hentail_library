@@ -3,9 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:material_3_expressive/components/text_fields/components/m3e_text_field_selection_builder.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 
-/// Wraps [Md3eOutlinedTextFieldShell] like [M3ETextField]'s selection gestures.
-class Md3eOutlinedTextFieldSelectionScope extends StatefulWidget {
-  const Md3eOutlinedTextFieldSelectionScope({
+/// Wraps [OutlinedTextFieldShell] like [M3ETextField]'s selection gestures.
+class OutlinedTextFieldSelectionScope extends StatefulWidget {
+  const OutlinedTextFieldSelectionScope({
     super.key,
     required this.focusNode,
     required this.controller,
@@ -21,12 +21,12 @@ class Md3eOutlinedTextFieldSelectionScope extends StatefulWidget {
   final Widget child;
 
   @override
-  State<Md3eOutlinedTextFieldSelectionScope> createState() =>
-      _Md3eOutlinedTextFieldSelectionScopeState();
+  State<OutlinedTextFieldSelectionScope> createState() =>
+      _OutlinedTextFieldSelectionScopeState();
 }
 
-class _Md3eOutlinedTextFieldSelectionScopeState
-    extends State<Md3eOutlinedTextFieldSelectionScope>
+class _OutlinedTextFieldSelectionScopeState
+    extends State<OutlinedTextFieldSelectionScope>
     implements TextSelectionGestureDetectorBuilderDelegate {
   late final M3ETextFieldSelectionBuilder _selectionBuilder =
       M3ETextFieldSelectionBuilder(delegate: this);

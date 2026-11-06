@@ -9,8 +9,8 @@ import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart'
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Lab 阅读设置（自适应 bottom / side sheet；不绑 Riverpod / FRB）。
-class Md3eReaderSettingsLabState {
-  const Md3eReaderSettingsLabState({
+class ReaderSettingsLabState {
+  const ReaderSettingsLabState({
     this.autoPlayEnabled = false,
     this.pagedLayoutLabel = '单页',
     this.autoPlayMode = AutoPlayMode.comicOnce,
@@ -26,13 +26,13 @@ class Md3eReaderSettingsLabState {
   final AutoPlayMode autoPlayMode;
   final int autoPlayIntervalSeconds;
 
-  Md3eReaderSettingsLabState copyWith({
+  ReaderSettingsLabState copyWith({
     bool? autoPlayEnabled,
     String? pagedLayoutLabel,
     AutoPlayMode? autoPlayMode,
     int? autoPlayIntervalSeconds,
   }) {
-    return Md3eReaderSettingsLabState(
+    return ReaderSettingsLabState(
       autoPlayEnabled: autoPlayEnabled ?? this.autoPlayEnabled,
       pagedLayoutLabel: pagedLayoutLabel ?? this.pagedLayoutLabel,
       autoPlayMode: autoPlayMode ?? this.autoPlayMode,
@@ -45,21 +45,21 @@ class Md3eReaderSettingsLabState {
   }
 }
 
-abstract final class Md3eReaderSettingsSideSheet {
-  Md3eReaderSettingsSideSheet._();
+abstract final class ReaderSettingsSideSheet {
+  ReaderSettingsSideSheet._();
 
   static Future<void> show(
     BuildContext context, {
-    required Md3eReaderSettingsLabState state,
-    required ValueChanged<Md3eReaderSettingsLabState> onStateChanged,
+    required ReaderSettingsLabState state,
+    required ValueChanged<ReaderSettingsLabState> onStateChanged,
     bool useRootNavigator = false,
   }) {
     final AppLocalizations l10n = context.l10n;
-    return Md3eReaderAdaptivePanel.show<void>(
+    return ReaderAdaptivePanel.show<void>(
       context,
       title: l10n.readerSettingsTitle,
       useRootNavigator: useRootNavigator,
-      body: _Md3eReaderSettingsSideSheetBody(
+      body: _ReaderSettingsSideSheetBody(
         initialState: state,
         onStateChanged: onStateChanged,
       ),
@@ -67,25 +67,25 @@ abstract final class Md3eReaderSettingsSideSheet {
   }
 }
 
-class _Md3eReaderSettingsSideSheetBody extends StatefulWidget {
-  const _Md3eReaderSettingsSideSheetBody({
+class _ReaderSettingsSideSheetBody extends StatefulWidget {
+  const _ReaderSettingsSideSheetBody({
     required this.initialState,
     required this.onStateChanged,
   });
 
-  final Md3eReaderSettingsLabState initialState;
-  final ValueChanged<Md3eReaderSettingsLabState> onStateChanged;
+  final ReaderSettingsLabState initialState;
+  final ValueChanged<ReaderSettingsLabState> onStateChanged;
 
   @override
-  State<_Md3eReaderSettingsSideSheetBody> createState() =>
-      _Md3eReaderSettingsSideSheetBodyState();
+  State<_ReaderSettingsSideSheetBody> createState() =>
+      _ReaderSettingsSideSheetBodyState();
 }
 
-class _Md3eReaderSettingsSideSheetBodyState
-    extends State<_Md3eReaderSettingsSideSheetBody> {
-  late Md3eReaderSettingsLabState _state = widget.initialState;
+class _ReaderSettingsSideSheetBodyState
+    extends State<_ReaderSettingsSideSheetBody> {
+  late ReaderSettingsLabState _state = widget.initialState;
 
-  void _apply(Md3eReaderSettingsLabState next) {
+  void _apply(ReaderSettingsLabState next) {
     setState(() => _state = next);
     widget.onStateChanged(next);
   }
@@ -103,17 +103,17 @@ class _Md3eReaderSettingsSideSheetBodyState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Md3eContentSection.group(
+        ContentSection.group(
           title: l10n.readerSettingsGeneral,
           children: <Widget>[
-            Md3eSettingsSwitchTile(
+            SettingsSwitchTile(
               leading: Symbols.play_circle,
               title: Text(l10n.readerSettingsAutoPlay),
               value: _state.autoPlayEnabled,
               onChanged: (bool value) =>
                   _apply(_state.copyWith(autoPlayEnabled: value)),
             ),
-            Md3eSettingsNavigationTile(
+            SettingsNavigationTile(
               key: const Key('reader_settings_auto_play_mode'),
               leading: Symbols.repeat,
               title: Text(l10n.readerSettingsAutoPlayMode),
@@ -124,7 +124,7 @@ class _Md3eReaderSettingsSideSheetBodyState
                 ),
               ),
             ),
-            Md3eSettingsNavigationTile(
+            SettingsNavigationTile(
               leading: Symbols.timer,
               title: Text(l10n.readerSettingsPlayInterval),
               trailing: Row(
@@ -159,10 +159,10 @@ class _Md3eReaderSettingsSideSheetBodyState
             ),
           ],
         ),
-        Md3eContentSection.group(
+        ContentSection.group(
           title: l10n.readerSettingsPagedOptions,
           children: <Widget>[
-            Md3eSettingsNavigationTile(
+            SettingsNavigationTile(
               leading: Symbols.view_day,
               title: Text(l10n.readerSettingsPageLayout),
               value: Text(_state.pagedLayoutLabel),

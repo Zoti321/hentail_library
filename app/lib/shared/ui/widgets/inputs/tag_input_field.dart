@@ -1,24 +1,24 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/md3e_input_chip_field_layout.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/input_chip_field_layout.dart';
 import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field_shell.dart';
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Default min width for tag input previews (lab text fields).
-const double kMd3eTagInputFieldMinWidth = 280;
+const double kTagInputFieldMinWidth = 280;
 
 /// Default max width for tag input previews.
-const double kMd3eTagInputFieldMaxWidth = 560;
+const double kTagInputFieldMaxWidth = 560;
 
-/// Tag input: [Md3eOutlinedTextFieldShell] + input chips in a [Wrap].
-class Md3eTagInputField extends StatefulWidget {
-  const Md3eTagInputField({
+/// Tag input: [OutlinedTextFieldShell] + input chips in a [Wrap].
+class TagInputField extends StatefulWidget {
+  const TagInputField({
     super.key,
     required this.label,
     required this.tags,
-    this.minWidth = kMd3eTagInputFieldMinWidth,
-    this.maxWidth = kMd3eTagInputFieldMaxWidth,
+    this.minWidth = kTagInputFieldMinWidth,
+    this.maxWidth = kTagInputFieldMaxWidth,
     this.onTagRemoved,
     this.onTagCommitted,
   });
@@ -31,10 +31,10 @@ class Md3eTagInputField extends StatefulWidget {
   final ValueChanged<String>? onTagCommitted;
 
   @override
-  State<Md3eTagInputField> createState() => _Md3eTagInputFieldState();
+  State<TagInputField> createState() => _TagInputFieldState();
 }
 
-class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
+class _TagInputFieldState extends State<TagInputField> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final GlobalKey<EditableTextState> _editableKey =
@@ -48,7 +48,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
   }
 
   void _commitTag() {
-    final String tag = md3eInputChipCommitLabel(_controller.text);
+    final String tag = inputChipCommitLabel(_controller.text);
     if (tag.isEmpty) {
       return;
     }
@@ -72,7 +72,7 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
       child: ListenableBuilder(
         listenable: _controller,
         builder: (BuildContext context, Widget? _) {
-          return Md3eOutlinedTextFieldShell(
+          return OutlinedTextFieldShell(
             label: widget.label,
             focusNode: _focusNode,
             iconSlotAlignment: M3ETextFieldSlotAlignment.firstLine,
@@ -88,31 +88,31 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
                   TextStyle inputStyle,
                 ) {
                   final M3EChipTheme chipTheme = M3ETheme.of(context).chipTheme;
-                  final double inlineWidth = md3eInputChipInlineWidth(
+                  final double inlineWidth = inputChipInlineWidth(
                     style: inputStyle,
                     text: _controller.text,
                   );
                   final bool hasChips = widget.tags.isNotEmpty;
-                  final double rowLineHeight = md3eInputChipRowLineHeight(
+                  final double rowLineHeight = inputChipRowLineHeight(
                     chipTheme: chipTheme,
                     inputStyle: inputStyle,
                     hasChips: hasChips,
                   );
                   final double textTopInset = hasChips
-                      ? md3eInputChipInlineTopInset(
+                      ? inputChipInlineTopInset(
                           rowLineHeight: rowLineHeight,
                           inputStyle: inputStyle,
                         )
                       : 0;
 
-                  return Md3eInputChipFieldContent(
+                  return InputChipFieldContent(
                     fieldTheme: fieldTheme,
                     inputStyle: inputStyle,
                     hasChips: hasChips,
                     onTap: _focusInput,
                     chips: <Widget>[
                       for (final String tag in widget.tags)
-                        md3eCompactInputChip(
+                        compactInputChip(
                           context: context,
                           label: tag,
                           onPressed: _focusInput,
@@ -164,15 +164,15 @@ class _Md3eTagInputFieldState extends State<Md3eTagInputField> {
 }
 
 /// Widgetbook demo with local tag list.
-class Md3eTagInputFieldPreview extends StatefulWidget {
-  const Md3eTagInputFieldPreview({super.key});
+class TagInputFieldPreview extends StatefulWidget {
+  const TagInputFieldPreview({super.key});
 
   @override
-  State<Md3eTagInputFieldPreview> createState() =>
-      _Md3eTagInputFieldPreviewState();
+  State<TagInputFieldPreview> createState() =>
+      _TagInputFieldPreviewState();
 }
 
-class _Md3eTagInputFieldPreviewState extends State<Md3eTagInputFieldPreview> {
+class _TagInputFieldPreviewState extends State<TagInputFieldPreview> {
   final List<String> _tags = <String>['深海', '图书馆'];
 
   @override
@@ -183,7 +183,7 @@ class _Md3eTagInputFieldPreviewState extends State<Md3eTagInputFieldPreview> {
       padding: EdgeInsets.all(spacing.lg),
       child: Align(
         alignment: Alignment.topCenter,
-        child: Md3eTagInputField(
+        child: TagInputField(
           label: '标签',
           tags: _tags,
           onTagRemoved: (String tag) {

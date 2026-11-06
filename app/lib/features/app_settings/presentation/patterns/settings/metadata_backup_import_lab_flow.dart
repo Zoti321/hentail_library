@@ -6,8 +6,8 @@ import 'package:hentai_library/shared/ui/theme/lab_text.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 元数据备份导入预演数据（只读示例，不读文件、不写库）。
-class Md3eMetadataBackupImportLabPreview {
-  const Md3eMetadataBackupImportLabPreview({
+class MetadataBackupImportLabPreview {
+  const MetadataBackupImportLabPreview({
     required this.schemaVersion,
     required this.exportedAt,
     required this.comicCount,
@@ -30,8 +30,8 @@ class Md3eMetadataBackupImportLabPreview {
   final int orphanFacets;
 }
 
-const Md3eMetadataBackupImportLabPreview kMd3eMetadataBackupImportLabPreview =
-    Md3eMetadataBackupImportLabPreview(
+const MetadataBackupImportLabPreview kMetadataBackupImportLabPreview =
+    MetadataBackupImportLabPreview(
       schemaVersion: 3,
       exportedAt: '2026-06-15 14:00',
       comicCount: 15,
@@ -43,58 +43,58 @@ const Md3eMetadataBackupImportLabPreview kMd3eMetadataBackupImportLabPreview =
     );
 
 /// Lab：元数据备份导入「选择 → 确认 → 结果」三步弹窗，全部为内存预演。
-Future<void> showMd3eMetadataBackupImportLabFlow(BuildContext context) async {
+Future<void> showMetadataBackupImportLabFlow(BuildContext context) async {
   final bool picked = await _showPickDialog(context);
   if (!picked || !context.mounted) {
     return;
   }
   final bool confirmed = await _showConfirmDialog(
     context,
-    kMd3eMetadataBackupImportLabPreview,
+    kMetadataBackupImportLabPreview,
   );
   if (!confirmed || !context.mounted) {
     return;
   }
-  await _showResultDialog(context, kMd3eMetadataBackupImportLabPreview);
+  await _showResultDialog(context, kMetadataBackupImportLabPreview);
 }
 
 Future<bool> _showPickDialog(BuildContext context) async {
-  final bool? result = await Md3eLabDialogPresenter.showBasic<bool>(
+  final bool? result = await LabDialogPresenter.showBasic<bool>(
     context,
-    dialog: const _Md3eMetadataImportPickDialog(),
+    dialog: const _MetadataImportPickDialog(),
   );
   return result ?? false;
 }
 
 Future<bool> _showConfirmDialog(
   BuildContext context,
-  Md3eMetadataBackupImportLabPreview preview,
+  MetadataBackupImportLabPreview preview,
 ) async {
-  final bool? result = await Md3eLabDialogPresenter.showBasic<bool>(
+  final bool? result = await LabDialogPresenter.showBasic<bool>(
     context,
-    dialog: _Md3eMetadataImportConfirmDialog(preview: preview),
+    dialog: _MetadataImportConfirmPanel(preview: preview),
   );
   return result ?? false;
 }
 
 Future<void> _showResultDialog(
   BuildContext context,
-  Md3eMetadataBackupImportLabPreview preview,
+  MetadataBackupImportLabPreview preview,
 ) {
-  return Md3eLabDialogPresenter.showBasic<void>(
+  return LabDialogPresenter.showBasic<void>(
     context,
-    dialog: _Md3eMetadataImportResultDialog(preview: preview),
+    dialog: _MetadataImportResultPanel(preview: preview),
   );
 }
 
-class _Md3eMetadataImportPickDialog extends StatelessWidget {
-  const _Md3eMetadataImportPickDialog();
+class _MetadataImportPickDialog extends StatelessWidget {
+  const _MetadataImportPickDialog();
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+    final TextStyle actionLabelStyle = labButtonLabelStyle(
       theme,
       M3EButtonSize.sm,
     );
@@ -126,25 +126,25 @@ class _Md3eMetadataImportPickDialog extends StatelessWidget {
   }
 }
 
-class _Md3eMetadataImportConfirmDialog extends StatelessWidget {
-  const _Md3eMetadataImportConfirmDialog({required this.preview});
+class _MetadataImportConfirmPanel extends StatelessWidget {
+  const _MetadataImportConfirmPanel({required this.preview});
 
-  final Md3eMetadataBackupImportLabPreview preview;
+  final MetadataBackupImportLabPreview preview;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+    final TextStyle actionLabelStyle = labButtonLabelStyle(
       theme,
       M3EButtonSize.sm,
     );
 
     return M3EDialog(
       title: l10n.settingsMetadataBackupImportConfirmTitle,
-      content: _Md3eImportSummaryColumn(
-        sections: <_Md3eImportSummarySection>[
-          _Md3eImportSummarySection(
+      content: _ImportSummaryColumn(
+        sections: <_ImportSummarySection>[
+          _ImportSummarySection(
             title: l10n.settingsMetadataBackupImportConfirmManifestSection,
             rows: <(String, String)>[
               (
@@ -165,7 +165,7 @@ class _Md3eMetadataImportConfirmDialog extends StatelessWidget {
               ),
             ],
           ),
-          _Md3eImportSummarySection(
+          _ImportSummarySection(
             title: l10n.settingsMetadataBackupImportConfirmPreviewSection,
             rows: <(String, String)>[
               (
@@ -186,7 +186,7 @@ class _Md3eMetadataImportConfirmDialog extends StatelessWidget {
               ),
             ],
           ),
-          _Md3eImportSummarySection(
+          _ImportSummarySection(
             title: null,
             rows: const <(String, String)>[],
             footnote: l10n.settingsMetadataBackupImportConfirmWarning,
@@ -216,25 +216,25 @@ class _Md3eMetadataImportConfirmDialog extends StatelessWidget {
   }
 }
 
-class _Md3eMetadataImportResultDialog extends StatelessWidget {
-  const _Md3eMetadataImportResultDialog({required this.preview});
+class _MetadataImportResultPanel extends StatelessWidget {
+  const _MetadataImportResultPanel({required this.preview});
 
-  final Md3eMetadataBackupImportLabPreview preview;
+  final MetadataBackupImportLabPreview preview;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+    final TextStyle actionLabelStyle = labButtonLabelStyle(
       theme,
       M3EButtonSize.sm,
     );
 
     return M3EDialog(
       title: l10n.settingsMetadataBackupImportResultTitle,
-      content: _Md3eImportSummaryColumn(
-        sections: <_Md3eImportSummarySection>[
-          _Md3eImportSummarySection(
+      content: _ImportSummaryColumn(
+        sections: <_ImportSummarySection>[
+          _ImportSummarySection(
             title: null,
             rows: <(String, String)>[
               (
@@ -267,8 +267,8 @@ class _Md3eMetadataImportResultDialog extends StatelessWidget {
   }
 }
 
-class _Md3eImportSummarySection {
-  const _Md3eImportSummarySection({
+class _ImportSummarySection {
+  const _ImportSummarySection({
     required this.title,
     required this.rows,
     this.footnote,
@@ -279,10 +279,10 @@ class _Md3eImportSummarySection {
   final String? footnote;
 }
 
-class _Md3eImportSummaryColumn extends StatelessWidget {
-  const _Md3eImportSummaryColumn({required this.sections});
+class _ImportSummaryColumn extends StatelessWidget {
+  const _ImportSummaryColumn({required this.sections});
 
-  final List<_Md3eImportSummarySection> sections;
+  final List<_ImportSummarySection> sections;
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +294,7 @@ class _Md3eImportSummaryColumn extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        for (final _Md3eImportSummarySection section in sections) ...<Widget>[
+        for (final _ImportSummarySection section in sections) ...<Widget>[
           if (section.title != null)
             Padding(
               padding: const EdgeInsets.only(top: 8, bottom: 4),

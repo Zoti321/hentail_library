@@ -10,8 +10,8 @@ export 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart'
         ResponsiveAppShell,
         AppShellSidebarBuilder,
         AppShellSidebarSlot,
-        Md3eAppShellNavigationSlot,
-        Md3eAppShellNavigationSlotBuilder,
+        AppShellNavigationSlot,
+        AppShellNavigationSlotBuilder,
         openAppShellNavigationDrawer,
         appShellDesktopShellKey;
 
@@ -33,8 +33,8 @@ class ApplicationShell extends ConsumerWidget {
     final AppShellFeedbackBelowTitleBarFactory feedbackFactory = ref.watch(
       appShellFeedbackBelowTitleBarFactoryProvider,
     );
-    final Md3eAppShellNavigationSlotAssembly navigationAssembly = ref.watch(
-      md3eAppShellNavigationSlotAssemblyProvider,
+    final AppShellNavigationSlotAssembly navigationAssembly = ref.watch(
+      appShellNavigationSlotAssemblyProvider,
     );
 
     return ResponsiveAppShell(
@@ -47,7 +47,7 @@ class ApplicationShell extends ConsumerWidget {
       },
       isReaderFullscreen: readerFullscreen,
       shellFeedbackBelowTitleBar: feedbackFactory(),
-      md3eNavigationSlotBuilder: (BuildContext ctx) =>
+      navigationSlotBuilder: (BuildContext ctx) =>
           navigationAssembly(ctx, ref),
     );
   }

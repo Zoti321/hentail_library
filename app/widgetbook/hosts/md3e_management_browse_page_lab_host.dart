@@ -5,8 +5,8 @@ import '../lab/pages/md3e_management_browse_page.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
 
 /// Lab / Widgetbook：preview facet chip 列表 + 新建实体（Dialog / 内联草稿 → 内存列表，不写 FRB）。
-class Md3eManagementBrowsePageLabHost extends StatefulWidget {
-  const Md3eManagementBrowsePageLabHost({
+class ManagementBrowsePageLabHost extends StatefulWidget {
+  const ManagementBrowsePageLabHost({
     super.key,
     this.initialFacet = ManagedNamedFacetKind.author,
     this.initialLabelsByFacet,
@@ -16,16 +16,16 @@ class Md3eManagementBrowsePageLabHost extends StatefulWidget {
 
   final ManagedNamedFacetKind initialFacet;
   final Map<ManagedNamedFacetKind, List<String>>? initialLabelsByFacet;
-  final Md3eManagementCreateInteraction? createInteractionOverride;
+  final ManagementCreateInteraction? createInteractionOverride;
   final String? title;
 
   @override
-  State<Md3eManagementBrowsePageLabHost> createState() =>
+  State<ManagementBrowsePageLabHost> createState() =>
       _Md3eManagementBrowsePageLabHostState();
 }
 
 class _Md3eManagementBrowsePageLabHostState
-    extends State<Md3eManagementBrowsePageLabHost> {
+    extends State<ManagementBrowsePageLabHost> {
   late ManagedNamedFacetKind _facet = widget.initialFacet;
   late final Map<ManagedNamedFacetKind, List<String>> _labelsByFacet =
       _copyLabelsByFacet(widget.initialLabelsByFacet);
@@ -42,7 +42,7 @@ class _Md3eManagementBrowsePageLabHostState
     }
     return <ManagedNamedFacetKind, List<String>>{
       for (final ManagedNamedFacetKind facet in kManagedNamedFacetTabOrder)
-        facet: Md3eManagementBrowsePagePreviewData.sampleChipsFor(facet),
+        facet: ManagementBrowsePagePreviewData.sampleChipsFor(facet),
     };
   }
 
@@ -58,7 +58,7 @@ class _Md3eManagementBrowsePageLabHostState
   Widget build(BuildContext context) {
     final List<String> chips = _labelsByFacet[_facet]!;
 
-    return Md3eManagementBrowsePage(
+    return ManagementBrowsePage(
       facet: _facet,
       facetCount: chips.length,
       chipLabels: chips,

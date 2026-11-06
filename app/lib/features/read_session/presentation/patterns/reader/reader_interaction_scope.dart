@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_keyboard.dart';
 
 /// 阅读页键盘快捷键与焦点（Lab；对齐 M3E 文档中 app bar 的 Tab/Space 交互习惯）。
-class Md3eReaderInteractionScope extends StatelessWidget {
-  const Md3eReaderInteractionScope({
+class ReaderInteractionScope extends StatelessWidget {
+  const ReaderInteractionScope({
     super.key,
     required this.focusNode,
     required this.child,
@@ -25,30 +25,30 @@ class Md3eReaderInteractionScope extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shortcuts(
-      shortcuts: Md3eReaderKeyboard.shortcuts,
+      shortcuts: ReaderKeyboard.shortcuts,
       child: Actions(
         actions: <Type, Action<Intent>>{
-          Md3eReaderPrevPageIntent: CallbackAction<Md3eReaderPrevPageIntent>(
+          ReaderPrevPageIntent: CallbackAction<ReaderPrevPageIntent>(
             onInvoke: (_) {
               onPreviousPage?.call();
               return null;
             },
           ),
-          Md3eReaderNextPageIntent: CallbackAction<Md3eReaderNextPageIntent>(
+          ReaderNextPageIntent: CallbackAction<ReaderNextPageIntent>(
             onInvoke: (_) {
               onNextPage?.call();
               return null;
             },
           ),
-          Md3eReaderToggleAutoPlayIntent:
-              CallbackAction<Md3eReaderToggleAutoPlayIntent>(
+          ReaderToggleAutoPlayIntent:
+              CallbackAction<ReaderToggleAutoPlayIntent>(
                 onInvoke: (_) {
                   onToggleAutoPlay?.call();
                   return null;
                 },
               ),
-          Md3eReaderToggleChromeIntent:
-              CallbackAction<Md3eReaderToggleChromeIntent>(
+          ReaderToggleChromeIntent:
+              CallbackAction<ReaderToggleChromeIntent>(
                 onInvoke: (_) {
                   onToggleChromeFromKeyboard?.call();
                   return null;

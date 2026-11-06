@@ -16,11 +16,11 @@ import 'package:hentai_library/features/library_admin/domain/scan_interval.dart'
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-enum _Md3eLibraryEditTab { general, webDav, scanner }
+enum _LibraryEditTab { general, webDav, scanner }
 
 /// Library 创建/编辑表单（字段对齐生产 [LibraryFormDialog]）。
-class Md3eLibraryEditForm extends StatefulWidget {
-  const Md3eLibraryEditForm({
+class LibraryEditForm extends StatefulWidget {
+  const LibraryEditForm({
     super.key,
     required this.form,
     required this.isCreate,
@@ -38,23 +38,23 @@ class Md3eLibraryEditForm extends StatefulWidget {
   final VoidCallback? onBrowseRoot;
 
   @override
-  State<Md3eLibraryEditForm> createState() => _Md3eLibraryEditFormState();
+  State<LibraryEditForm> createState() => _LibraryEditFormState();
 }
 
-class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
-  _Md3eLibraryEditTab _tab = _Md3eLibraryEditTab.general;
+class _LibraryEditFormState extends State<LibraryEditForm> {
+  _LibraryEditTab _tab = _LibraryEditTab.general;
 
   bool get _isRemote => widget.form.isRemote;
 
-  List<_Md3eLibraryEditTab> get _tabs => _isRemote
-      ? const <_Md3eLibraryEditTab>[
-          _Md3eLibraryEditTab.general,
-          _Md3eLibraryEditTab.webDav,
-          _Md3eLibraryEditTab.scanner,
+  List<_LibraryEditTab> get _tabs => _isRemote
+      ? const <_LibraryEditTab>[
+          _LibraryEditTab.general,
+          _LibraryEditTab.webDav,
+          _LibraryEditTab.scanner,
         ]
-      : const <_Md3eLibraryEditTab>[
-          _Md3eLibraryEditTab.general,
-          _Md3eLibraryEditTab.scanner,
+      : const <_LibraryEditTab>[
+          _LibraryEditTab.general,
+          _LibraryEditTab.scanner,
         ];
 
   List<ResourceFormatCategory> get _selectableResourceFormatCategories {
@@ -69,7 +69,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
   }
 
   @override
-  void didUpdateWidget(covariant Md3eLibraryEditForm oldWidget) {
+  void didUpdateWidget(covariant LibraryEditForm oldWidget) {
     super.didUpdateWidget(oldWidget);
     final LibraryFormValidation? validation = widget.validation;
     if (validation != null && validation != oldWidget.validation) {
@@ -77,19 +77,19 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
     }
   }
 
-  _Md3eLibraryEditTab _tabForValidation(LibraryFormValidation validation) {
+  _LibraryEditTab _tabForValidation(LibraryFormValidation validation) {
     if (validation.nameError != null) {
-      return _Md3eLibraryEditTab.general;
+      return _LibraryEditTab.general;
     }
     if (validation.rootError != null) {
       return _isRemote
-          ? _Md3eLibraryEditTab.webDav
-          : _Md3eLibraryEditTab.general;
+          ? _LibraryEditTab.webDav
+          : _LibraryEditTab.general;
     }
     if (validation.passwordError != null) {
-      return _Md3eLibraryEditTab.webDav;
+      return _LibraryEditTab.webDav;
     }
-    return _Md3eLibraryEditTab.general;
+    return _LibraryEditTab.general;
   }
 
   void _patch(LibraryForm Function(LibraryForm f) fn) {
@@ -128,13 +128,13 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final double gap = Md3eLibraryEditFormMetrics.sectionGap(sizeClass);
+    final WindowSizeClass sizeClass = windowSizeClassOf(context);
+    final double gap = LibraryEditFormMetrics.sectionGap(sizeClass);
     final LibraryForm form = widget.form;
     final LibraryFormValidation? validation = widget.validation;
 
     final Widget tabBody = switch (_tab) {
-      _Md3eLibraryEditTab.general => _GeneralTab(
+      _LibraryEditTab.general => _GeneralTab(
         name: form.name,
         nameError: validation?.nameError,
         rootPath: _isRemote ? null : form.rootPath,
@@ -154,7 +154,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
                 _patch((LibraryForm f) => f.copyWith(rootPath: value));
               },
       ),
-      _Md3eLibraryEditTab.webDav => _WebDavTab(
+      _LibraryEditTab.webDav => _WebDavTab(
         rootPath: form.rootPath,
         username: form.username,
         password: form.password,
@@ -176,7 +176,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
           _patch((LibraryForm f) => f.copyWith(allowHttp: value));
         },
       ),
-      _Md3eLibraryEditTab.scanner => _ScannerTab(
+      _LibraryEditTab.scanner => _ScannerTab(
         scanOnStartup: form.scanOnStartup,
         scanInterval: form.scanInterval,
         enabledResourceFormatCategories: form.enabledResourceFormatCategories
@@ -194,7 +194,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
     };
 
     final bool useSideTabs =
-        sizeClass.index >= Md3eWindowSizeClass.medium.index;
+        sizeClass.index >= WindowSizeClass.medium.index;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -216,13 +216,13 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
               SizedBox(height: gap),
               if (boundedHeight)
                 Flexible(
-                  child: Md3eListDetailDetailTransition(
+                  child: ListDetailDetailTransition(
                     switchKey: _tab,
                     child: scrollableTabBody,
                   ),
                 )
               else
-                Md3eListDetailDetailTransition(switchKey: _tab, child: tabBody),
+                ListDetailDetailTransition(switchKey: _tab, child: tabBody),
             ],
           );
         }
@@ -231,7 +231,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
-              width: Md3eLibraryEditFormMetrics.sideTabColumnWidth,
+              width: LibraryEditFormMetrics.sideTabColumnWidth,
               child: _SideTabList(
                 l10n: l10n,
                 tabs: _tabs,
@@ -241,7 +241,7 @@ class _Md3eLibraryEditFormState extends State<Md3eLibraryEditForm> {
             ),
             SizedBox(width: gap),
             Expanded(
-              child: Md3eListDetailDetailTransition(
+              child: ListDetailDetailTransition(
                 switchKey: _tab,
                 child: scrollableTabBody,
               ),
@@ -262,17 +262,17 @@ class _TopTabBar extends StatelessWidget {
   });
 
   final AppLocalizations l10n;
-  final List<_Md3eLibraryEditTab> tabs;
-  final _Md3eLibraryEditTab selected;
+  final List<_LibraryEditTab> tabs;
+  final _LibraryEditTab selected;
   final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Md3eSegmentedCapsuleBar(
+    return SegmentedCapsuleBar(
       segments: tabs
           .map(
-            (_Md3eLibraryEditTab tab) =>
-                Md3eSegmentedCapsuleSegment(label: _tabLabel(l10n, tab)),
+            (_LibraryEditTab tab) =>
+                SegmentedCapsuleSegment(label: _tabLabel(l10n, tab)),
           )
           .toList(growable: false),
       selectedIndex: tabs.indexOf(selected),
@@ -290,8 +290,8 @@ class _SideTabList extends StatelessWidget {
   });
 
   final AppLocalizations l10n;
-  final List<_Md3eLibraryEditTab> tabs;
-  final _Md3eLibraryEditTab selected;
+  final List<_LibraryEditTab> tabs;
+  final _LibraryEditTab selected;
   final ValueChanged<int> onSelected;
 
   @override
@@ -299,9 +299,9 @@ class _SideTabList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        for (final _Md3eLibraryEditTab tab in tabs)
-          Md3eListDetailNavItem(
-            key: ValueKey<_Md3eLibraryEditTab>(tab),
+        for (final _LibraryEditTab tab in tabs)
+          ListDetailNavItem(
+            key: ValueKey<_LibraryEditTab>(tab),
             label: _tabLabel(l10n, tab),
             selected: tab == selected,
             onTap: () => onSelected(tabs.indexOf(tab)),
@@ -311,11 +311,11 @@ class _SideTabList extends StatelessWidget {
   }
 }
 
-String _tabLabel(AppLocalizations l10n, _Md3eLibraryEditTab tab) {
+String _tabLabel(AppLocalizations l10n, _LibraryEditTab tab) {
   return switch (tab) {
-    _Md3eLibraryEditTab.general => l10n.dialogEditLibraryTabGeneral,
-    _Md3eLibraryEditTab.webDav => l10n.dialogEditLibraryTabWebDav,
-    _Md3eLibraryEditTab.scanner => l10n.dialogEditLibraryTabScanner,
+    _LibraryEditTab.general => l10n.dialogEditLibraryTabGeneral,
+    _LibraryEditTab.webDav => l10n.dialogEditLibraryTabWebDav,
+    _LibraryEditTab.scanner => l10n.dialogEditLibraryTabScanner,
   };
 }
 
@@ -350,7 +350,7 @@ class _GeneralTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Md3eOutlinedTextField(
+        OutlinedTextField(
           label: l10n.formLibraryNameLabel,
           initialValue: name,
           errorText: nameError,
@@ -363,7 +363,7 @@ class _GeneralTab extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Expanded(
-                child: Md3eOutlinedTextField(
+                child: OutlinedTextField(
                   label: l10n.formLibraryRootLabel,
                   initialValue: rootPath,
                   errorText: rootError,
@@ -423,7 +423,7 @@ class _WebDavTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Md3eOutlinedTextField(
+        OutlinedTextField(
           label: l10n.remoteLibraryUrlLabel,
           hintText: l10n.remoteLibraryUrlHint,
           initialValue: rootPath,
@@ -433,14 +433,14 @@ class _WebDavTab extends StatelessWidget {
           onChanged: onRootChanged,
         ),
         SizedBox(height: spacing.lg),
-        Md3eOutlinedTextField(
+        OutlinedTextField(
           label: l10n.remoteLibraryUsernameLabel,
           initialValue: username,
           enabled: enabled,
           onChanged: onUsernameChanged,
         ),
         SizedBox(height: spacing.lg),
-        Md3eOutlinedTextField(
+        OutlinedTextField(
           label: isEdit
               ? l10n.remoteLibraryPasswordEditLabel
               : l10n.remoteLibraryPasswordLabel,
@@ -453,7 +453,7 @@ class _WebDavTab extends StatelessWidget {
           onChanged: onPasswordChanged,
         ),
         SizedBox(height: spacing.lg),
-        Md3eSettingsSwitchTile(
+        SettingsSwitchTile(
           title: Text(l10n.remoteLibraryAllowHttpLabel),
           value: allowHttp,
           enabled: enabled,
@@ -501,7 +501,7 @@ class _ScannerTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Md3eSettingsSwitchTile(
+        SettingsSwitchTile(
           title: Text(l10n.formLibraryScanOnStartupLabel),
           value: scanOnStartup,
           enabled: enabled,
@@ -513,9 +513,9 @@ class _ScannerTab extends StatelessWidget {
           ),
         ),
         SizedBox(height: spacing.lg),
-        Md3eMetadataFieldLabelRow(label: l10n.formLibraryScanIntervalLabel),
+        MetadataFieldLabelRow(label: l10n.formLibraryScanIntervalLabel),
         SizedBox(height: spacing.sm),
-        Md3eScanIntervalDropdown(
+        ScanIntervalDropdown(
           value: scanInterval,
           enabled: enabled,
           onChanged: onScanIntervalChanged,
@@ -563,8 +563,8 @@ class _ResourceFormatCategoryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
-    final Md3eLibraryFilterSortRowMetrics metrics =
-        Md3eLibraryFilterSortRowMetrics.forViewportWidth(
+    final LibraryFilterSortRowMetrics metrics =
+        LibraryFilterSortRowMetrics.forViewportWidth(
           MediaQuery.sizeOf(context).width,
         );
 

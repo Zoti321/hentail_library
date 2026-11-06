@@ -25,7 +25,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.byType(HistoryBrowsePage<HistoryCardItem>), findsOneWidget);
-      expect(find.byType(Md3eHistoryPageHeader), findsOneWidget);
+      expect(find.byType(HistoryPageHeader), findsOneWidget);
       expect(find.text('阅读历史'), findsOneWidget);
       expect(find.byIcon(Symbols.menu), findsOneWidget);
     });
@@ -75,9 +75,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       final M3EThemeData theme = M3ETheme.of(
-        tester.element(find.byType(Md3eHistoryPageHeader)),
+        tester.element(find.byType(HistoryPageHeader)),
       );
-      expect(theme.typeScale.titleMedium.fontFamily, kMd3eAppFontFamily);
+      expect(theme.typeScale.titleMedium.fontFamily, kAppFontFamily);
     });
   });
 }

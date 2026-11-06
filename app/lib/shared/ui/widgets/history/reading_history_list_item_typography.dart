@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_catalog_card_shell.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Title line in [Md3eReadingHistoryListItem] (aligned with catalog list rows).
-TextStyle md3eReadingHistoryListItemTitleStyle(
+/// Title line in [ReadingHistoryListItem] (aligned with catalog list rows).
+TextStyle readingHistoryListItemTitleStyle(
   M3ETypeScale type,
   M3EColorScheme scheme,
 ) {
-  return md3eComicCatalogTitleStyle(type, scheme);
+  return comicCatalogTitleStyle(type, scheme);
 }
 
 /// Page label (`current/total`) beside the progress bar.
-TextStyle md3eReadingHistoryListItemProgressStyle(
+TextStyle readingHistoryListItemProgressStyle(
   M3ETypeScale type,
   M3EColorScheme scheme,
 ) {
@@ -23,9 +23,9 @@ TextStyle md3eReadingHistoryListItemProgressStyle(
 }
 
 /// Last-read date (secondary meta).
-TextStyle md3eReadingHistoryListItemTimeStyle(
+TextStyle readingHistoryListItemTimeStyle(
   M3ETypeScale type,
   M3EColorScheme scheme,
 ) {
-  return md3eComicCatalogSubtitleStyle(type, scheme);
+  return comicCatalogSubtitleStyle(type, scheme);
 }

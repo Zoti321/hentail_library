@@ -5,8 +5,8 @@ import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_mo
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Library secondary level inside modal navigation (&lt; expanded, medium drill-in).
-class Md3eShellModalLibrarySecondaryPane extends StatelessWidget {
-  const Md3eShellModalLibrarySecondaryPane({
+class ShellModalLibrarySecondaryPane extends StatelessWidget {
+  const ShellModalLibrarySecondaryPane({
     super.key,
     required this.libraries,
     required this.selectedLibraryId,
@@ -15,7 +15,7 @@ class Md3eShellModalLibrarySecondaryPane extends StatelessWidget {
     this.backgroundColor,
   });
 
-  final List<Md3eHomeLibraryDashboardRow> libraries;
+  final List<HomeLibraryDashboardRow> libraries;
   final String selectedLibraryId;
   final VoidCallback onBack;
   final ValueChanged<String> onLibrarySelected;
@@ -52,7 +52,7 @@ class Md3eShellModalLibrarySecondaryPane extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      Md3eShellModalNavigationCopy.primaryNavBackLabel,
+                      ShellModalNavigationCopy.primaryNavBackLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.typeScale.titleMedium.copyWith(
@@ -66,7 +66,7 @@ class Md3eShellModalLibrarySecondaryPane extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Md3eShellLibrarySecondaryPanel(
+            child: ShellLibrarySecondaryPanel(
               libraries: libraries,
               selectedLibraryId: selectedLibraryId,
               onLibrarySelected: onLibrarySelected,

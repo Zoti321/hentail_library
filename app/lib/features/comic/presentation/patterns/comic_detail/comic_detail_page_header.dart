@@ -4,9 +4,9 @@ import 'package:hentai_library/features/comic/presentation/patterns/comic_detail
 import 'package:hentai_library/shared/ui/patterns/shared/pinned_toolbar_chrome.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 漫画详情工具栏内容（粘滞阴影由 [Md3ePageHeaderDelegate] 绘制）。
-class Md3eComicDetailPageHeader extends StatelessWidget {
-  const Md3eComicDetailPageHeader({
+/// 漫画详情工具栏内容（粘滞阴影由 [PageHeaderDelegate] 绘制）。
+class ComicDetailPageHeader extends StatelessWidget {
+  const ComicDetailPageHeader({
     super.key,
     this.onBack,
     this.onEdit,
@@ -33,17 +33,17 @@ class Md3eComicDetailPageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool showNav = showSeriesNav && seriesCatalog.length > 1;
 
-    return Md3ePinnedToolbarChrome(
+    return PinnedToolbarChrome(
       child: Row(
         children: <Widget>[
-          Md3eComicDetailHeaderToolbar(
+          ComicDetailHeaderToolbar(
             onBack: onBack,
             onEdit: onEdit,
             moreMenuEntries: moreMenuEntries,
           ),
           const Spacer(),
           if (showNav)
-            Md3eComicDetailSeriesNav(
+            ComicDetailSeriesNav(
               catalog: seriesCatalog,
               currentIndex: seriesCurrentIndex.clamp(
                 0,

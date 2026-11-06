@@ -1,34 +1,34 @@
 /// One slot in the desktop page-number strip (MUI [usePagination] page items).
-sealed class Md3ePaginationWindowItem {
-  const Md3ePaginationWindowItem();
+sealed class PaginationWindowItem {
+  const PaginationWindowItem();
 
-  const factory Md3ePaginationWindowItem.page(int page) =
-      Md3ePaginationWindowPage._;
+  const factory PaginationWindowItem.page(int page) =
+      PaginationWindowPage._;
 
-  const factory Md3ePaginationWindowItem.ellipsis() =
-      Md3ePaginationWindowEllipsis._;
+  const factory PaginationWindowItem.ellipsis() =
+      PaginationWindowEllipsis._;
 
-  const factory Md3ePaginationWindowItem.empty() = Md3ePaginationWindowEmpty._;
+  const factory PaginationWindowItem.empty() = PaginationWindowEmpty._;
 }
 
-final class Md3ePaginationWindowPage extends Md3ePaginationWindowItem {
-  const Md3ePaginationWindowPage._(this.page);
+final class PaginationWindowPage extends PaginationWindowItem {
+  const PaginationWindowPage._(this.page);
 
   final int page;
 }
 
-final class Md3ePaginationWindowEllipsis extends Md3ePaginationWindowItem {
-  const Md3ePaginationWindowEllipsis._();
+final class PaginationWindowEllipsis extends PaginationWindowItem {
+  const PaginationWindowEllipsis._();
 }
 
 /// Placeholder slot so the strip width stays constant while paging.
-final class Md3ePaginationWindowEmpty extends Md3ePaginationWindowItem {
-  const Md3ePaginationWindowEmpty._();
+final class PaginationWindowEmpty extends PaginationWindowItem {
+  const PaginationWindowEmpty._();
 }
 
 /// MUI defaults: [boundaryCount] and [siblingCount] (see usePagination.js).
-class Md3ePaginationSiblingConfig {
-  const Md3ePaginationSiblingConfig({
+class PaginationSiblingConfig {
+  const PaginationSiblingConfig({
     required this.boundaryCount,
     required this.siblingCount,
   });
@@ -36,14 +36,14 @@ class Md3ePaginationSiblingConfig {
   final int boundaryCount;
   final int siblingCount;
 
-  static const Md3ePaginationSiblingConfig muiDefault =
-      Md3ePaginationSiblingConfig(boundaryCount: 1, siblingCount: 1);
+  static const PaginationSiblingConfig muiDefault =
+      PaginationSiblingConfig(boundaryCount: 1, siblingCount: 1);
 
-  static const Md3ePaginationSiblingConfig compact =
-      Md3ePaginationSiblingConfig(boundaryCount: 1, siblingCount: 0);
+  static const PaginationSiblingConfig compact =
+      PaginationSiblingConfig(boundaryCount: 1, siblingCount: 0);
 }
 
-List<int> _md3ePaginationRange(int start, int end) {
+List<int> PaginationRange(int start, int end) {
   if (end < start) {
     return const <int>[];
   }
@@ -52,10 +52,10 @@ List<int> _md3ePaginationRange(int start, int end) {
 
 /// Page-number items only (no first/prev/next/last), ported from MUI
 /// `usePagination`.
-List<Md3ePaginationWindowItem> md3eBuildPaginationPageWindow({
+List<PaginationWindowItem> buildPaginationPageWindow({
   required int currentPage,
   required int totalPages,
-  Md3ePaginationSiblingConfig config = Md3ePaginationSiblingConfig.muiDefault,
+  PaginationSiblingConfig config = PaginationSiblingConfig.muiDefault,
 }) {
   assert(currentPage >= 1 && currentPage <= totalPages);
   final int page = currentPage;
@@ -63,11 +63,11 @@ List<Md3ePaginationWindowItem> md3eBuildPaginationPageWindow({
   final int boundaryCount = config.boundaryCount;
   final int siblingCount = config.siblingCount;
 
-  final List<int> startPages = _md3ePaginationRange(
+  final List<int> startPages = PaginationRange(
     1,
     boundaryCount < count ? boundaryCount : count,
   );
-  final List<int> endPages = _md3ePaginationRange(
+  final List<int> endPages = PaginationRange(
     count - boundaryCount + 1 > boundaryCount + 1
         ? count - boundaryCount + 1
         : boundaryCount + 1,
@@ -84,41 +84,41 @@ List<Md3ePaginationWindowItem> md3eBuildPaginationPageWindow({
     count - boundaryCount - 1,
   );
 
-  final List<Md3ePaginationWindowItem> items = <Md3ePaginationWindowItem>[];
+  final List<PaginationWindowItem> items = <PaginationWindowItem>[];
 
   for (final int startPage in startPages) {
-    items.add(Md3ePaginationWindowItem.page(startPage));
+    items.add(PaginationWindowItem.page(startPage));
   }
 
   if (siblingsStart > boundaryCount + 2) {
-    items.add(const Md3ePaginationWindowItem.ellipsis());
+    items.add(const PaginationWindowItem.ellipsis());
   } else if (boundaryCount + 1 < count - boundaryCount) {
-    items.add(Md3ePaginationWindowItem.page(boundaryCount + 1));
+    items.add(PaginationWindowItem.page(boundaryCount + 1));
   }
 
-  for (final int siblingPage in _md3ePaginationRange(
+  for (final int siblingPage in PaginationRange(
     siblingsStart,
     siblingsEnd,
   )) {
-    items.add(Md3ePaginationWindowItem.page(siblingPage));
+    items.add(PaginationWindowItem.page(siblingPage));
   }
 
   if (siblingsEnd < count - boundaryCount - 1) {
-    items.add(const Md3ePaginationWindowItem.ellipsis());
+    items.add(const PaginationWindowItem.ellipsis());
   } else if (count - boundaryCount > boundaryCount) {
-    items.add(Md3ePaginationWindowItem.page(count - boundaryCount));
+    items.add(PaginationWindowItem.page(count - boundaryCount));
   }
 
   for (final int endPage in endPages) {
-    items.add(Md3ePaginationWindowItem.page(endPage));
+    items.add(PaginationWindowItem.page(endPage));
   }
 
   return _dedupeAdjacentPageItems(items);
 }
 
 /// Pads [items] to [slotCount] with empty slots (centered) for a stable strip.
-List<Md3ePaginationWindowItem> md3ePadPaginationPageWindow(
-  List<Md3ePaginationWindowItem> items, {
+List<PaginationWindowItem> padPaginationPageWindow(
+  List<PaginationWindowItem> items, {
   required int slotCount,
 }) {
   if (items.length >= slotCount) {
@@ -126,19 +126,19 @@ List<Md3ePaginationWindowItem> md3ePadPaginationPageWindow(
   }
   final int leading = (slotCount - items.length) ~/ 2;
   final int trailing = slotCount - items.length - leading;
-  return <Md3ePaginationWindowItem>[
-    for (int i = 0; i < leading; i++) const Md3ePaginationWindowItem.empty(),
+  return <PaginationWindowItem>[
+    for (int i = 0; i < leading; i++) const PaginationWindowItem.empty(),
     ...items,
-    for (int i = 0; i < trailing; i++) const Md3ePaginationWindowItem.empty(),
+    for (int i = 0; i < trailing; i++) const PaginationWindowItem.empty(),
   ];
 }
 
 /// Max page-item count for a large [count] (strip width constant while paging).
-int md3ePaginationFixedPageSlotCount(Md3ePaginationSiblingConfig config) {
+int paginationFixedPageSlotCount(PaginationSiblingConfig config) {
   const int sampleCount = 999;
   int maxItems = 0;
   for (int page = 1; page <= sampleCount; page++) {
-    final int length = md3eBuildPaginationPageWindow(
+    final int length = buildPaginationPageWindow(
       currentPage: page,
       totalPages: sampleCount,
       config: config,
@@ -150,15 +150,15 @@ int md3ePaginationFixedPageSlotCount(Md3ePaginationSiblingConfig config) {
   return maxItems;
 }
 
-List<Md3ePaginationWindowItem> _dedupeAdjacentPageItems(
-  List<Md3ePaginationWindowItem> items,
+List<PaginationWindowItem> _dedupeAdjacentPageItems(
+  List<PaginationWindowItem> items,
 ) {
-  final List<Md3ePaginationWindowItem> deduped = <Md3ePaginationWindowItem>[];
-  for (final Md3ePaginationWindowItem item in items) {
-    if (item is Md3ePaginationWindowPage &&
+  final List<PaginationWindowItem> deduped = <PaginationWindowItem>[];
+  for (final PaginationWindowItem item in items) {
+    if (item is PaginationWindowPage &&
         deduped.isNotEmpty &&
-        deduped.last is Md3ePaginationWindowPage &&
-        (deduped.last as Md3ePaginationWindowPage).page == item.page) {
+        deduped.last is PaginationWindowPage &&
+        (deduped.last as PaginationWindowPage).page == item.page) {
       continue;
     }
     deduped.add(item);

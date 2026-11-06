@@ -5,8 +5,8 @@ import 'package:hentai_library/features/read_session/presentation/patterns/reade
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 顶/底 chrome 组合（overlay + bars）。显隐由外层驱动；滚动隐藏待接视口后改用 [M3EAppBarController]。
-class Md3eReaderChrome extends StatelessWidget {
-  const Md3eReaderChrome({
+class ReaderChrome extends StatelessWidget {
+  const ReaderChrome({
     super.key,
     required this.visible,
     required this.title,
@@ -45,9 +45,9 @@ class Md3eReaderChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Md3eReaderChromeOverlay(
+    return ReaderChromeOverlay(
       visible: visible,
-      topBar: Md3eReaderTopBar(
+      topBar: ReaderTopBar(
         title: title,
         subtitle: subtitle,
         onBack: onBack,
@@ -57,7 +57,7 @@ class Md3eReaderChrome extends StatelessWidget {
         isFullscreen: isFullscreen,
         moreMenuEntries: moreMenuEntries,
       ),
-      bottomBar: Md3eReaderBottomBar(
+      bottomBar: ReaderBottomBar(
         currentPage: currentPage,
         totalPages: totalPages,
         onPageChanged: onPageChanged ?? (_) {},

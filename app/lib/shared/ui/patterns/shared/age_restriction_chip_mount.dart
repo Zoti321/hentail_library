@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_age_restriction_chip_slot.dart';
 
 /// 控制年龄限制 chip 的挂载与移除防抖（供详情摘要行复用）。
-class Md3eAgeRestrictionChipMount extends StatefulWidget {
-  const Md3eAgeRestrictionChipMount({
+class AgeRestrictionChipMount extends StatefulWidget {
+  const AgeRestrictionChipMount({
     super.key,
     required this.visible,
     this.onFullyHidden,
@@ -13,12 +13,12 @@ class Md3eAgeRestrictionChipMount extends StatefulWidget {
   final VoidCallback? onFullyHidden;
 
   @override
-  State<Md3eAgeRestrictionChipMount> createState() =>
-      _Md3eAgeRestrictionChipMountState();
+  State<AgeRestrictionChipMount> createState() =>
+      _AgeRestrictionChipMountState();
 }
 
-class _Md3eAgeRestrictionChipMountState
-    extends State<Md3eAgeRestrictionChipMount> {
+class _AgeRestrictionChipMountState
+    extends State<AgeRestrictionChipMount> {
   bool _mounted = false;
 
   @override
@@ -28,7 +28,7 @@ class _Md3eAgeRestrictionChipMountState
   }
 
   @override
-  void didUpdateWidget(covariant Md3eAgeRestrictionChipMount oldWidget) {
+  void didUpdateWidget(covariant AgeRestrictionChipMount oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.visible) {
       _mounted = true;
@@ -47,7 +47,7 @@ class _Md3eAgeRestrictionChipMountState
     if (!_mounted) {
       return const SizedBox.shrink();
     }
-    return Md3eComicDetailAgeRestrictionChipSlot(
+    return ComicDetailAgeRestrictionChipSlot(
       visible: widget.visible,
       onFullyHidden: _onFullyHidden,
     );

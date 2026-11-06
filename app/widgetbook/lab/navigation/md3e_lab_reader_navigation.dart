@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
 
 import '../../hosts/md3e_reader_page_lab_host.dart';
 
@@ -9,23 +9,23 @@ import '../../preview/md3e_reader_page_preview_data.dart';
 
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 
-/// Lab：详情 / 目录 → [Md3eReaderPageLabHost]（preview 会话；不接 read_session FRB）。
-Future<void> openMd3eLabReader(
+/// Lab：详情 / 目录 → [ReaderPageLabHost]（preview 会话；不接 read_session FRB）。
+Future<void> openLabReader(
   BuildContext context, {
-  Md3eReaderPagePreviewData? preview,
+  ReaderPagePreviewData? preview,
 }) {
-  final Md3eReaderPagePreviewData data =
-      preview ?? Md3eReaderPagePreviewData.sample();
-  final Md3eOverlayRouteScopeSnapshot scope =
-      Md3eOverlayRouteScopeSnapshot.capture(context);
+  final ReaderPagePreviewData data =
+      preview ?? ReaderPagePreviewData.sample();
+  final OverlayRouteScopeSnapshot scope =
+      OverlayRouteScopeSnapshot.capture(context);
 
   return Navigator.of(context, rootNavigator: false).push<void>(
-    md3eSharedAxisRoute<void>(
+    sharedAxisRoute<void>(
       context,
       builder: (BuildContext routeContext) {
-        return md3eOverlayRouteScope(
+        return overlayRouteScope(
           scope: scope,
-          child: Md3eReaderPageLabHost(
+          child: ReaderPageLabHost(
             preview: data,
             onBack: () => Navigator.of(routeContext).maybePop(),
           ),
@@ -35,11 +35,11 @@ Future<void> openMd3eLabReader(
   );
 }
 
-Md3eReaderPagePreviewData md3eReaderPreviewDataForComicDetail(
-  Md3eComicDetailEntry entry,
+ReaderPagePreviewData md3eReaderPreviewDataForComicDetail(
+  ComicDetailViewObject entry,
 ) {
   final int totalPages = entry.pageCount ?? 24;
-  return Md3eReaderPagePreviewData(
+  return ReaderPagePreviewData(
     title: entry.title,
     totalPages: totalPages,
     initialPage: 1,

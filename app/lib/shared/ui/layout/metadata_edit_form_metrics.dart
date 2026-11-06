@@ -6,8 +6,8 @@ import 'package:hentai_library/shared/ui/layout/spacing.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画 / 系列元数据编辑表单布局 token（Lab）。
-/// 页面水平留白统一来自 Md3ePageLayoutSpec，本类不再重复定义。
-abstract final class Md3eMetadataEditFormMetrics {
+/// 页面水平留白统一来自 PageLayoutSpec，本类不再重复定义。
+abstract final class MetadataEditFormMetrics {
   static const double comicMaxWidth = 720;
   static const double seriesMaxWidth = 480;
   static const double sideTabColumnWidth = 168;
@@ -25,21 +25,21 @@ abstract final class Md3eMetadataEditFormMetrics {
   /// 全屏元数据编辑时 header + 安全区预留。
   static const double _fullScreenChromeHeight = 72;
 
-  static double sectionGap(Md3eWindowSizeClass sizeClass) {
-    return sizeClass.isCompact ? Md3eSpacing.space16 : Md3eSpacing.space20;
+  static double sectionGap(WindowSizeClass sizeClass) {
+    return sizeClass.isCompact ? Spacing.space16 : Spacing.space20;
   }
 
   /// 自适应 [M3EDialog] 内容区最大宽度（expanded+ 更宽）。
   static double dialogContentMaxWidth(BuildContext context) {
-    switch (md3eWindowSizeClassOf(context)) {
-      case Md3eWindowSizeClass.expanded:
+    switch (windowSizeClassOf(context)) {
+      case WindowSizeClass.expanded:
         return expandedDialogContentMaxWidth;
-      case Md3eWindowSizeClass.large:
+      case WindowSizeClass.large:
         return largeDialogContentMaxWidth;
-      case Md3eWindowSizeClass.extraLarge:
+      case WindowSizeClass.extraLarge:
         return extraLargeDialogContentMaxWidth;
-      case Md3eWindowSizeClass.compact:
-      case Md3eWindowSizeClass.medium:
+      case WindowSizeClass.compact:
+      case WindowSizeClass.medium:
         return comicMaxWidth;
     }
   }
@@ -54,7 +54,7 @@ abstract final class Md3eMetadataEditFormMetrics {
   static double dialogContentMaxHeight(BuildContext context) {
     final MediaQueryData media = MediaQuery.of(context);
     final double screenH = media.size.height;
-    final bool fullScreen = md3eWindowSizeClassOf(context)
+    final bool fullScreen = windowSizeClassOf(context)
         .usesMetadataEditFullScreenRoute;
     if (fullScreen) {
       return math.max(
@@ -62,20 +62,20 @@ abstract final class Md3eMetadataEditFormMetrics {
         screenH - media.padding.vertical - _fullScreenChromeHeight,
       );
     }
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
+    final WindowSizeClass sizeClass = windowSizeClassOf(context);
     final double heightRatio = switch (sizeClass) {
-      Md3eWindowSizeClass.expanded => 0.72,
-      Md3eWindowSizeClass.large => 0.78,
-      Md3eWindowSizeClass.extraLarge => 0.82,
-      Md3eWindowSizeClass.compact || Md3eWindowSizeClass.medium => 0.55,
+      WindowSizeClass.expanded => 0.72,
+      WindowSizeClass.large => 0.78,
+      WindowSizeClass.extraLarge => 0.82,
+      WindowSizeClass.compact || WindowSizeClass.medium => 0.55,
     };
     final M3EDialogTheme dialogTheme = M3ETheme.of(context).dialogTheme;
     final double marginVertical = dialogTheme.screenMargin.vertical;
     final double maxFraction = switch (sizeClass) {
-      Md3eWindowSizeClass.expanded => 0.68,
-      Md3eWindowSizeClass.large => 0.74,
-      Md3eWindowSizeClass.extraLarge => 0.78,
-      Md3eWindowSizeClass.compact || Md3eWindowSizeClass.medium => 0.42,
+      WindowSizeClass.expanded => 0.68,
+      WindowSizeClass.large => 0.74,
+      WindowSizeClass.extraLarge => 0.78,
+      WindowSizeClass.compact || WindowSizeClass.medium => 0.42,
     };
     return (screenH * heightRatio - _basicDialogChromeHeight - marginVertical)
         .clamp(280.0, screenH * maxFraction)

@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 元数据 / Library 编辑 M3EDialog 底部 actions（Cancel + Save）。
-List<Widget> md3eMetadataEditDialogActions(
+List<Widget> metadataEditDialogActions(
   BuildContext context, {
   required VoidCallback? onCancel,
   required VoidCallback? onSave,

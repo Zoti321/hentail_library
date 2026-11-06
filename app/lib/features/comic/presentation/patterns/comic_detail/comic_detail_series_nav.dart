@@ -7,8 +7,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 系列上一本 / 目录菜单 / 下一本。
-class Md3eComicDetailSeriesNav extends StatelessWidget {
-  const Md3eComicDetailSeriesNav({
+class ComicDetailSeriesNav extends StatelessWidget {
+  const ComicDetailSeriesNav({
     super.key,
     required this.catalog,
     required this.currentIndex,
@@ -43,7 +43,7 @@ class Md3eComicDetailSeriesNav extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        _Md3eComicDetailSeriesNavIconButton(
+        _ComicDetailSeriesNavIconButton(
           icon: Symbols.chevron_left,
           tooltip: l10n.comicDetailSeriesPrev,
           semanticLabel: l10n.comicDetailSeriesPrevSemantic,
@@ -51,12 +51,12 @@ class Md3eComicDetailSeriesNav extends StatelessWidget {
           onPressed: onPrev,
         ),
         const SizedBox(width: 4),
-        Md3eAnchoredMenu(
+        AnchoredMenu(
           position: M3EMenuAnchorPosition.bottomEnd,
           children: menuChildren,
           enabled: catalog.isNotEmpty,
           anchorBuilder: (BuildContext context, VoidCallback open) {
-            return _Md3eComicDetailSeriesNavIconButton(
+            return _ComicDetailSeriesNavIconButton(
               icon: Symbols.list_alt,
               tooltip: l10n.comicDetailSeriesCatalog,
               semanticLabel: l10n.comicDetailSeriesCatalog,
@@ -66,7 +66,7 @@ class Md3eComicDetailSeriesNav extends StatelessWidget {
           },
         ),
         const SizedBox(width: 4),
-        _Md3eComicDetailSeriesNavIconButton(
+        _ComicDetailSeriesNavIconButton(
           icon: Symbols.chevron_right,
           tooltip: l10n.comicDetailSeriesNext,
           semanticLabel: l10n.comicDetailSeriesNextSemantic,
@@ -79,8 +79,8 @@ class Md3eComicDetailSeriesNav extends StatelessWidget {
 }
 
 /// 禁用时不使用 [M3EIconButton]（避免 null [onPressed] 仍绘制 state layer）。
-class _Md3eComicDetailSeriesNavIconButton extends StatelessWidget {
-  const _Md3eComicDetailSeriesNavIconButton({
+class _ComicDetailSeriesNavIconButton extends StatelessWidget {
+  const _ComicDetailSeriesNavIconButton({
     required this.icon,
     required this.tooltip,
     required this.semanticLabel,
@@ -99,7 +99,7 @@ class _Md3eComicDetailSeriesNavIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    const double iconSize = Md3eLibraryPageHeaderMetrics.actionIconSize;
+    const double iconSize = LibraryPageHeaderMetrics.actionIconSize;
     final Color iconColor = enabled
         ? scheme.onSurfaceVariant
         : scheme.onSurface.withValues(alpha: 0.38);

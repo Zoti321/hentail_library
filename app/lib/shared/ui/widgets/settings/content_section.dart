@@ -4,8 +4,8 @@ import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart'
 import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
 
 /// Titled block: header + tonal card or split list group.
-class Md3eContentSection extends StatelessWidget {
-  const Md3eContentSection({
+class ContentSection extends StatelessWidget {
+  const ContentSection({
     super.key,
     required this.title,
     required Widget child,
@@ -17,7 +17,7 @@ class Md3eContentSection extends StatelessWidget {
   }) : _child = child,
        _children = null;
 
-  const Md3eContentSection.group({
+  const ContentSection.group({
     super.key,
     required this.title,
     required List<Widget> children,
@@ -42,18 +42,18 @@ class Md3eContentSection extends StatelessWidget {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: Md3eSettingsSectionHeader(
+          child: SettingsSectionHeader(
             title: Text(title),
             description: description == null ? null : Text(description!),
             trailing: titleTrailing,
           ),
         ),
         if (_children != null)
-          Md3eSplitListGroup(children: _children)
+          SplitListGroup(children: _children)
         else
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Md3eTonalSurface(padding: padding, child: _child!),
+            child: TonalSurface(padding: padding, child: _child!),
           ),
       ],
     );

@@ -1,0 +1,34 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../../../widgetbook/lab/pages/library_browse_page.dart';
+
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
+
+import '../../support/pump_app.dart';
+
+void main() {
+  testWidgets('library browse page shows header and view toggle', (
+    WidgetTester tester,
+  ) async {
+    await pumpApp(
+      tester,
+      home: Scaffold(
+        body: LibraryBrowseLayout(
+          displayTarget: LibraryDisplayTarget.comics,
+          viewMode: CatalogViewMode.grid,
+          filterSortActive: false,
+          totalPages: 3,
+          onDisplayTargetChanged: (_) {},
+          onViewModeChanged: (_) {},
+          onPageChanged: (_) {},
+        ),
+      ),
+    );
+
+    expect(find.text('漫画库'), findsOneWidget);
+    expect(find.text('1284 本'), findsOneWidget);
+    expect(find.byType(CatalogViewModeButtonGroup), findsOneWidget);
+  });
+}

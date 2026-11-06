@@ -2,7 +2,7 @@ import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Approximate vertical slot of the library destination on [M3ENavigationRail].
-abstract final class Md3eShellRailLibraryHoverMetrics {
+abstract final class ShellRailLibraryHoverMetrics {
   static double destinationTop({
     required M3ENavigationRailTheme theme,
     required bool railExtended,
@@ -27,5 +27,5 @@ abstract final class Md3eShellRailLibraryHoverMetrics {
   }
 
   static int get libraryDestinationIndex =>
-      Md3eShellNavigation.libraryDestinationIndex;
+      ShellNavigation.libraryDestinationIndex;
 }

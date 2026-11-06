@@ -5,8 +5,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 阅读 / 无痕阅读主操作。
-class Md3eComicDetailPrimaryActions extends StatelessWidget {
-  const Md3eComicDetailPrimaryActions({
+class ComicDetailPrimaryActions extends StatelessWidget {
+  const ComicDetailPrimaryActions({
     super.key,
     this.onRead,
     this.onReadIncognito,

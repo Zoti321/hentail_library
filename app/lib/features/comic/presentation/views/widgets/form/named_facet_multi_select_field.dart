@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_copy.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_field.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_copy.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
 
@@ -31,13 +31,13 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
   final ProviderListenable<AsyncValue<List<SmartFacetMatchCandidate>>>
   itemsProvider;
   final VoidCallback onRetry;
-  final Md3eNamedFacetMultiSelectCopy copy;
+  final NamedFacetMultiSelectCopy copy;
   final bool compactTrigger;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String tooltip = context.l10n.smartFacetMatchHintTooltip;
-    return Md3eNamedFacetMultiSelectField<SmartFacetMatchCandidate>(
+    return FacetMultiSelectField<SmartFacetMatchCandidate>(
       label: label,
       selectedNames: selectedNames,
       onAdd: onAdd,

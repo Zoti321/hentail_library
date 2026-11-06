@@ -1,8 +1,8 @@
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/widgets/pagination/pagination_page_window.dart';
 
-/// Layout constants for [Md3ePagination].
-abstract final class Md3ePaginationMetrics {
+/// Layout constants for [Pagination].
+abstract final class PaginationMetrics {
   static const double pageButtonVisualSize = 40;
   static const double iconSize = 20;
   static const double horizontalPaddingCompact = 16;
@@ -19,21 +19,21 @@ abstract final class Md3ePaginationMetrics {
   static double get pageButtonSlotWidth =>
       pageButtonVisualSize + gapBetweenPageButtons * 2;
 
-  static Md3ePaginationSiblingConfig siblingConfigFor(
-    Md3eWindowSizeClass sizeClass,
+  static PaginationSiblingConfig siblingConfigFor(
+    WindowSizeClass sizeClass,
   ) {
-    if (sizeClass.index < Md3eWindowSizeClass.expanded.index) {
-      return Md3ePaginationSiblingConfig.compact;
+    if (sizeClass.index < WindowSizeClass.expanded.index) {
+      return PaginationSiblingConfig.compact;
     }
-    return Md3ePaginationSiblingConfig.muiDefault;
+    return PaginationSiblingConfig.muiDefault;
   }
 
-  static int fixedPageSlotCount(Md3eWindowSizeClass sizeClass) {
-    return md3ePaginationFixedPageSlotCount(siblingConfigFor(sizeClass));
+  static int fixedPageSlotCount(WindowSizeClass sizeClass) {
+    return paginationFixedPageSlotCount(siblingConfigFor(sizeClass));
   }
 
   /// Stable page-number strip width (MUI-style fixed slots).
-  static double pageNumberStripWidth(Md3eWindowSizeClass sizeClass) {
+  static double pageNumberStripWidth(WindowSizeClass sizeClass) {
     return pageButtonSlotWidth * fixedPageSlotCount(sizeClass);
   }
 
@@ -42,8 +42,8 @@ abstract final class Md3ePaginationMetrics {
   /// [M3EIconButtonSize.sm] interactive footprint.
   static const double standardNavIconSlot = 48;
 
-  /// Minimum width needed to render [Md3ePaginationStandard] without clipping.
-  static double standardBarMinWidth(Md3eWindowSizeClass sizeClass) {
+  /// Minimum width needed to render [PaginationStandard] without clipping.
+  static double standardBarMinWidth(WindowSizeClass sizeClass) {
     return horizontalPaddingStandard * 2 +
         standardNavIconSlot * 4 +
         pageNumberStripWidth(sizeClass);

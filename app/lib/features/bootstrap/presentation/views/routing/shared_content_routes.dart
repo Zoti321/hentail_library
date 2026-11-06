@@ -18,11 +18,11 @@ typedef SeriesDetailBuilder = Widget Function(
 );
 
 Widget buildSharedComicDetailPage(BuildContext context, String comicId) {
-  return ComicDetailMd3ePage(comicId: comicId);
+  return ComicDetailPage(comicId: comicId);
 }
 
 Widget buildSharedSeriesDetailPage(BuildContext context, String seriesId) {
-  return SeriesDetailMd3ePage(seriesId: seriesId);
+  return SeriesDetailPage(seriesId: seriesId);
 }
 
 List<RouteBase> buildSharedContentRoutes({
@@ -88,7 +88,7 @@ List<RouteBase> buildSharedContentRoutes({
           state: state,
           child: authorId == null
               ? const RouteNotFoundPage()
-              : AuthorDetailMd3ePage(authorId: authorId),
+              : AuthorDetailPage(authorId: authorId),
         );
       },
     ),
@@ -123,7 +123,7 @@ List<RouteBase> buildSharedContentRoutes({
         );
         return buildDesktopFadeThroughPage(
           state: state,
-          child: ReaderMd3ePage(
+          child: ReaderPage(
             comicId: args.comicId,
             keepControlsOpen: args.keepControlsOpen,
             incognito: args.incognito,

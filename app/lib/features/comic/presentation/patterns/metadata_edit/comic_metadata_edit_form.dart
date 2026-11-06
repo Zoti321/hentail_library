@@ -27,22 +27,22 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
-enum _Md3eComicMetadataEditTab { general, authorsTags, fieldLocks }
+enum _ComicMetadataEditTab { general, authorsTags, fieldLocks }
 
-List<String> _md3eTagListWithAdded(List<String> list, String value) {
+List<String> TagListWithAdded(List<String> list, String value) {
   if (list.contains(value)) {
     return list;
   }
   return <String>[...list, value];
 }
 
-List<String> _md3eTagListWithRemoved(List<String> list, String value) {
+List<String> TagListWithRemoved(List<String> list, String value) {
   return list.where((String e) => e != value).toList();
 }
 
 /// 漫画元数据编辑表单主体（常规 + 作者&标签），字段对齐生产 [EditMetadataDialog]。
-class Md3eComicMetadataEditForm extends StatefulWidget {
-  const Md3eComicMetadataEditForm({
+class ComicMetadataEditForm extends StatefulWidget {
+  const ComicMetadataEditForm({
     super.key,
     required this.draft,
     required this.onDraftChanged,
@@ -52,30 +52,30 @@ class Md3eComicMetadataEditForm extends StatefulWidget {
     this.titleError,
   });
 
-  final Md3eComicMetadataEditDraft draft;
-  final ValueChanged<Md3eComicMetadataEditDraft> onDraftChanged;
+  final ComicMetadataEditDraft draft;
+  final ValueChanged<ComicMetadataEditDraft> onDraftChanged;
   final ComicMetaLocks locks;
-  final Md3eComicMetadataLockChanged onLockChanged;
+  final ComicMetadataLockChanged onLockChanged;
   final ComicMetadataSmartFacetScope smartFacetScope;
   final String? titleError;
 
   @override
-  State<Md3eComicMetadataEditForm> createState() =>
-      _Md3eComicMetadataEditFormState();
+  State<ComicMetadataEditForm> createState() =>
+      _ComicMetadataEditFormState();
 }
 
-class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
-  _Md3eComicMetadataEditTab _tab = _Md3eComicMetadataEditTab.general;
+class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
+  _ComicMetadataEditTab _tab = _ComicMetadataEditTab.general;
 
   void _update(
-    Md3eComicMetadataEditDraft Function(Md3eComicMetadataEditDraft d) fn,
+    ComicMetadataEditDraft Function(ComicMetadataEditDraft d) fn,
   ) {
     widget.onDraftChanged(fn(widget.draft));
   }
 
   Widget _scrollPane(Widget child) {
     return ScrollConfiguration(
-      behavior: Md3eMetadataEditScrollBehavior(),
+      behavior: MetadataEditScrollBehavior(),
       child: SingleChildScrollView(primary: false, child: child),
     );
   }
@@ -92,14 +92,14 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SizedBox(
-            width: Md3eMetadataEditFormMetrics.sideTabColumnWidth,
+            width: MetadataEditFormMetrics.sideTabColumnWidth,
             child: _scrollPane(
               _SideTabList(l10n: l10n, tab: _tab, onSelected: _selectTab),
             ),
           ),
           SizedBox(width: gap),
           Expanded(
-            child: Md3eListDetailDetailTransition(
+            child: ListDetailDetailTransition(
               switchKey: _tab,
               child: _scrollPane(tabBody),
             ),
@@ -123,7 +123,7 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
           _TopTabBar(l10n: l10n, tab: _tab, onSelected: _selectTab),
           SizedBox(height: gap),
           Expanded(
-            child: Md3eListDetailDetailTransition(
+            child: ListDetailDetailTransition(
               switchKey: _tab,
               child: _scrollPane(tabBody),
             ),
@@ -136,12 +136,12 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final Md3eWindowSizeClass sizeClass = md3eWindowSizeClassOf(context);
-    final double gap = Md3eMetadataEditFormMetrics.sectionGap(sizeClass);
-    final Md3eComicMetadataEditDraft draft = widget.draft;
+    final WindowSizeClass sizeClass = windowSizeClassOf(context);
+    final double gap = MetadataEditFormMetrics.sectionGap(sizeClass);
+    final ComicMetadataEditDraft draft = widget.draft;
 
     final Widget tabBody = switch (_tab) {
-      _Md3eComicMetadataEditTab.general => _GeneralFields(
+      _ComicMetadataEditTab.general => _GeneralFields(
         draft: draft,
         titleError: widget.titleError,
         gap: gap,
@@ -152,15 +152,15 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
             _update((d) => d.copyWith(publishedLabel: v)),
         onR18Changed: (bool v) => _update((d) => d.copyWith(isR18: v)),
         onLanguageAdded: (String v) => _update(
-          (d) => d.copyWith(languages: _md3eTagListWithAdded(d.languages, v)),
+          (d) => d.copyWith(languages: TagListWithAdded(d.languages, v)),
         ),
         onLanguageRemoved: (String v) => _update(
-          (d) => d.copyWith(languages: _md3eTagListWithRemoved(d.languages, v)),
+          (d) => d.copyWith(languages: TagListWithRemoved(d.languages, v)),
         ),
         onSortOrderChanged: (String v) =>
             _update((d) => d.copyWith(seriesSortOrderText: v)),
       ),
-      _Md3eComicMetadataEditTab.authorsTags => _AuthorsTagsFields(
+      _ComicMetadataEditTab.authorsTags => _AuthorsTagsFields(
         draft: draft,
         gap: gap,
         l10n: l10n,
@@ -173,19 +173,19 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
             _update((d) => d.copyWith(characters: v)),
         onTagsChanged: (List<String> v) => _update((d) => d.copyWith(tags: v)),
       ),
-      _Md3eComicMetadataEditTab.fieldLocks => Md3eComicMetadataLocksPane(
+      _ComicMetadataEditTab.fieldLocks => ComicMetadataLocksPane(
         locks: widget.locks,
         onLockChanged: widget.onLockChanged,
       ),
     };
 
     final bool useSideTabs =
-        sizeClass.index >= Md3eWindowSizeClass.medium.index;
+        sizeClass.index >= WindowSizeClass.medium.index;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double viewportHeight =
-            Md3eMetadataEditFormMetrics.resolveTabbedViewportHeight(
+            MetadataEditFormMetrics.resolveTabbedViewportHeight(
               context,
               constraints,
             );
@@ -210,7 +210,7 @@ class _Md3eComicMetadataEditFormState extends State<Md3eComicMetadataEditForm> {
   }
 
   void _selectTab(int index) {
-    setState(() => _tab = _Md3eComicMetadataEditTab.values[index]);
+    setState(() => _tab = _ComicMetadataEditTab.values[index]);
   }
 }
 
@@ -222,18 +222,18 @@ class _TopTabBar extends StatelessWidget {
   });
 
   final AppLocalizations l10n;
-  final _Md3eComicMetadataEditTab tab;
+  final _ComicMetadataEditTab tab;
   final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Md3eSegmentedCapsuleBar(
-      segments: <Md3eSegmentedCapsuleSegment>[
-        Md3eSegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabGeneral),
-        Md3eSegmentedCapsuleSegment(
+    return SegmentedCapsuleBar(
+      segments: <SegmentedCapsuleSegment>[
+        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabGeneral),
+        SegmentedCapsuleSegment(
           label: l10n.dialogEditMetadataTabAuthorsTags,
         ),
-        Md3eSegmentedCapsuleSegment(
+        SegmentedCapsuleSegment(
           label: l10n.dialogEditMetadataTabFieldLocks,
         ),
       ],
@@ -251,33 +251,33 @@ class _SideTabList extends StatelessWidget {
   });
 
   final AppLocalizations l10n;
-  final _Md3eComicMetadataEditTab tab;
+  final _ComicMetadataEditTab tab;
   final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final List<(String label, _Md3eComicMetadataEditTab value)> items =
-        <(String, _Md3eComicMetadataEditTab)>[
+    final List<(String label, _ComicMetadataEditTab value)> items =
+        <(String, _ComicMetadataEditTab)>[
           (
             l10n.dialogEditMetadataTabGeneral,
-            _Md3eComicMetadataEditTab.general,
+            _ComicMetadataEditTab.general,
           ),
           (
             l10n.dialogEditMetadataTabAuthorsTags,
-            _Md3eComicMetadataEditTab.authorsTags,
+            _ComicMetadataEditTab.authorsTags,
           ),
           (
             l10n.dialogEditMetadataTabFieldLocks,
-            _Md3eComicMetadataEditTab.fieldLocks,
+            _ComicMetadataEditTab.fieldLocks,
           ),
         ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        for (final (String label, _Md3eComicMetadataEditTab value) in items)
-          Md3eListDetailNavItem(
-            key: ValueKey<_Md3eComicMetadataEditTab>(value),
+        for (final (String label, _ComicMetadataEditTab value) in items)
+          ListDetailNavItem(
+            key: ValueKey<_ComicMetadataEditTab>(value),
             label: label,
             selected: tab == value,
             onTap: () => onSelected(value.index),
@@ -301,7 +301,7 @@ class _GeneralFields extends StatelessWidget {
     required this.onSortOrderChanged,
   });
 
-  final Md3eComicMetadataEditDraft draft;
+  final ComicMetadataEditDraft draft;
   final String? titleError;
   final double gap;
   final ValueChanged<String> onSortOrderChanged;
@@ -319,7 +319,7 @@ class _GeneralFields extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Md3eOutlinedTextField(
+        OutlinedTextField(
           label: l10n.formComicTitleLabel,
           initialValue: draft.title,
           hintText: l10n.formComicTitleHint,
@@ -327,7 +327,7 @@ class _GeneralFields extends StatelessWidget {
           onChanged: onTitleChanged,
         ),
         SizedBox(height: gap),
-        Md3eOutlinedTextField(
+        OutlinedTextField(
           label: l10n.formComicDescriptionLabel,
           initialValue: draft.description,
           hintText: l10n.formComicDescriptionHint,
@@ -335,16 +335,16 @@ class _GeneralFields extends StatelessWidget {
           onChanged: onDescriptionChanged,
         ),
         SizedBox(height: gap),
-        Md3ePublishedDateTextField(
+        PublishedDateTextField(
           label: l10n.formPublishedDateLabel,
           value: draft.publishedLabel,
           onChanged: onPublishedChanged,
         ),
         SizedBox(height: gap),
-        Md3eContentSection.group(
+        ContentSection.group(
           title: l10n.formAgeRestrictionLabel,
           children: <Widget>[
-            Md3eSettingsSwitchTile(
+            SettingsSwitchTile(
               leading: Symbols.eighteen_up_rating,
               title: Text(draft.isR18 ? 'R18' : l10n.filterAgeAllAges),
               description: Text(l10n.formAgeRestrictionLabel),
@@ -354,9 +354,9 @@ class _GeneralFields extends StatelessWidget {
           ],
         ),
         SizedBox(height: gap),
-        Md3eMetadataFieldLabelRow(label: l10n.formLanguagesLabel),
+        MetadataFieldLabelRow(label: l10n.formLanguagesLabel),
         SizedBox(height: M3ETheme.of(context).spacing.sm),
-        Md3eComicLanguageQuickPick(
+        ComicLanguageQuickPick(
           selected: draft.languages,
           onCanonicalToggled: (String canonical) {
             if (draft.languages.contains(canonical)) {
@@ -367,7 +367,7 @@ class _GeneralFields extends StatelessWidget {
           },
         ),
         SizedBox(height: M3ETheme.of(context).spacing.sm),
-        Md3eTagInputField(
+        TagInputField(
           label: l10n.metadataAdd,
           tags: draft.languages,
           onTagCommitted: onLanguageAdded,
@@ -376,7 +376,7 @@ class _GeneralFields extends StatelessWidget {
         ),
         if (draft.seriesSortOrderText != null) ...<Widget>[
           SizedBox(height: gap),
-          Md3eOutlinedTextField(
+          OutlinedTextField(
             label: l10n.formSeriesItemSortOrderLabel,
             initialValue: draft.seriesSortOrderText!,
             hintText: l10n.formSeriesItemSortOrderHint,
@@ -400,7 +400,7 @@ class _AuthorsTagsFields extends ConsumerWidget {
     required this.onTagsChanged,
   });
 
-  final Md3eComicMetadataEditDraft draft;
+  final ComicMetadataEditDraft draft;
   final double gap;
   final AppLocalizations l10n;
   final ComicMetadataSmartFacetScope scope;
@@ -420,9 +420,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           scope: scope,
           selectedNames: draft.parodies,
           onAdd: (String v) =>
-              onParodiesChanged(_md3eTagListWithAdded(draft.parodies, v)),
+              onParodiesChanged(TagListWithAdded(draft.parodies, v)),
           onRemove: (String v) =>
-              onParodiesChanged(_md3eTagListWithRemoved(draft.parodies, v)),
+              onParodiesChanged(TagListWithRemoved(draft.parodies, v)),
           onClearAll: () => onParodiesChanged(const <String>[]),
         ),
         SizedBox(height: gap),
@@ -432,9 +432,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           scope: scope,
           selectedNames: draft.authors,
           onAdd: (String v) =>
-              onAuthorsChanged(_md3eTagListWithAdded(draft.authors, v)),
+              onAuthorsChanged(TagListWithAdded(draft.authors, v)),
           onRemove: (String v) =>
-              onAuthorsChanged(_md3eTagListWithRemoved(draft.authors, v)),
+              onAuthorsChanged(TagListWithRemoved(draft.authors, v)),
           onClearAll: () => onAuthorsChanged(const <String>[]),
         ),
         SizedBox(height: gap),
@@ -444,9 +444,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           scope: scope,
           selectedNames: draft.characters,
           onAdd: (String v) =>
-              onCharactersChanged(_md3eTagListWithAdded(draft.characters, v)),
+              onCharactersChanged(TagListWithAdded(draft.characters, v)),
           onRemove: (String v) =>
-              onCharactersChanged(_md3eTagListWithRemoved(draft.characters, v)),
+              onCharactersChanged(TagListWithRemoved(draft.characters, v)),
           onClearAll: () => onCharactersChanged(const <String>[]),
         ),
         SizedBox(height: gap),
@@ -456,9 +456,9 @@ class _AuthorsTagsFields extends ConsumerWidget {
           scope: scope,
           selectedNames: draft.tags,
           onAdd: (String v) =>
-              onTagsChanged(_md3eTagListWithAdded(draft.tags, v)),
+              onTagsChanged(TagListWithAdded(draft.tags, v)),
           onRemove: (String v) =>
-              onTagsChanged(_md3eTagListWithRemoved(draft.tags, v)),
+              onTagsChanged(TagListWithRemoved(draft.tags, v)),
           onClearAll: () => onTagsChanged(const <String>[]),
         ),
       ],

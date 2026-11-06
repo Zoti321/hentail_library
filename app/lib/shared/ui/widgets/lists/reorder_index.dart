@@ -1,7 +1,7 @@
 /// 按 Flutter [ReorderCallback] 约定重排列表（纯函数，不做持久化）。
 ///
 /// `newIndex` 与 [ReorderableListView] 一致：`oldIndex < newIndex` 时先减一再移动。
-List<T> applyMd3eReorder<T>(List<T> items, int oldIndex, int newIndex) {
+List<T> applyReorder<T>(List<T> items, int oldIndex, int newIndex) {
   if (items.isEmpty ||
       oldIndex < 0 ||
       oldIndex >= items.length ||

@@ -2,4 +2,4 @@
 library;
 
 export 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/home_library_management_panel.dart';
-export 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_section.dart';
+export 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';

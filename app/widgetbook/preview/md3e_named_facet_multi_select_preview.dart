@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_copy.dart';
-import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_field.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_copy.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/named_facet_multi_select_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -46,7 +46,7 @@ class _Md3eNamedFacetMultiSelectFieldPreviewState
       padding: EdgeInsets.all(spacing.lg),
       child: Align(
         alignment: Alignment.topCenter,
-        child: Md3eNamedFacetMultiSelectField<SmartFacetMatchCandidate>(
+        child: FacetMultiSelectField<SmartFacetMatchCandidate>(
           label: '作者',
           selectedNames: _selected,
           onAdd: (String name) {
@@ -65,7 +65,7 @@ class _Md3eNamedFacetMultiSelectFieldPreviewState
           resolveName: (SmartFacetMatchCandidate c) => c.name,
           resolveSmartMatched: (SmartFacetMatchCandidate c) => c.smartMatched,
           smartMatchedTooltip: context.l10n.smartFacetMatchHintTooltip,
-          copy: Md3eNamedFacetMultiSelectCopy(
+          copy: NamedFacetMultiSelectCopy(
             listLoadFailed: context.l10n.formAuthorListLoadFailed,
             emptyCatalog: context.l10n.formAuthorEmptyCatalog,
             emptyRemaining: context.l10n.formAuthorEmptyRemaining,

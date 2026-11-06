@@ -7,8 +7,8 @@ import 'package:widgetbook/widgetbook.dart';
 
 /// Light / dark [M3EThemeData] switcher for MD3E Widgetbook previews.
 ThemeAddon<M3EThemeData> buildMd3eWidgetbookThemeAddon() {
-  final M3EThemeData light = buildMd3eThemeData(brightness: Brightness.light);
-  final M3EThemeData dark = buildMd3eThemeData(brightness: Brightness.dark);
+  final M3EThemeData light = buildThemeData(brightness: Brightness.light);
+  final M3EThemeData dark = buildThemeData(brightness: Brightness.dark);
 
   return ThemeAddon<M3EThemeData>(
     initialTheme: WidgetbookTheme<M3EThemeData>(name: 'Light', data: light),
@@ -21,7 +21,7 @@ ThemeAddon<M3EThemeData> buildMd3eWidgetbookThemeAddon() {
       return M3ETheme(
         data: m3e,
         child: Theme(
-          data: buildMd3eMaterialTheme(brightness, m3e: m3e),
+          data: buildMaterialTheme(brightness, m3e: m3e),
           child: ColoredBox(color: m3e.colorScheme.surface, child: child),
         ),
       );

@@ -1,26 +1,26 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/home/presentation/views/home_md3e/md3e_home_page.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/library_md3e/library_edit_page.dart';
+import 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/library/library_edit_page.dart';
 
 import '../lab/navigation/md3e_library_edit_navigation.dart';
 
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_copy.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_management_section.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_delete_confirm_dialog.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/md3e_home_library_list_order.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_copy.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 
 import '../preview/md3e_home_page_preview_data.dart';
-import '../hosts/md3e_history_browse_page_lab_host.dart';
+import 'md3e_history_browse_page_lab_host.dart';
 
 /// Widgetbook / Lab：在本地维护库列表顺序；生产侧由 notifier + repository 接同样回调形状。
 ///
 /// 未注入 callback 时提供 Lab 默认编排（Library form 导航、mock 扫描/删除）。
-class Md3eHomePageLabHost extends StatefulWidget {
-  const Md3eHomePageLabHost({
+class HomePageLabHost extends StatefulWidget {
+  const HomePageLabHost({
     super.key,
     this.initialLibraries,
     this.onOpenNavigation,
@@ -31,23 +31,23 @@ class Md3eHomePageLabHost extends StatefulWidget {
     this.enableReorder = true,
   });
 
-  final List<Md3eHomeLibraryDashboardRow>? initialLibraries;
+  final List<HomeLibraryDashboardRow>? initialLibraries;
   final VoidCallback? onOpenNavigation;
   final ValueChanged<String>? onLibraryOpen;
-  final void Function(String libraryId, Md3eHomeLibraryManagementAction action)?
+  final void Function(String libraryId, HomeLibraryManagementAction action)?
   onLibraryAction;
   final VoidCallback? onAddLocalLibrary;
   final VoidCallback? onAddRemoteLibrary;
   final bool enableReorder;
 
   @override
-  State<Md3eHomePageLabHost> createState() => _Md3eHomePageLabHostState();
+  State<HomePageLabHost> createState() => _Md3eHomePageLabHostState();
 }
 
-class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
-  late List<Md3eHomeLibraryDashboardRow> _libraries =
-      List<Md3eHomeLibraryDashboardRow>.of(
-        widget.initialLibraries ?? Md3eHomePagePreviewData.sampleLibraries(),
+class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
+  late List<HomeLibraryDashboardRow> _libraries =
+      List<HomeLibraryDashboardRow>.of(
+        widget.initialLibraries ?? HomePagePreviewData.sampleLibraries(),
       );
 
   final Map<String, Timer> _busyResetTimers = <String, Timer>{};
@@ -61,11 +61,11 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
   }
 
   @override
-  void didUpdateWidget(covariant Md3eHomePageLabHost oldWidget) {
+  void didUpdateWidget(covariant HomePageLabHost oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialLibraries != null &&
         widget.initialLibraries != oldWidget.initialLibraries) {
-      _libraries = List<Md3eHomeLibraryDashboardRow>.of(
+      _libraries = List<HomeLibraryDashboardRow>.of(
         widget.initialLibraries!,
       );
     }
@@ -73,7 +73,7 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
 
   void _handleReorder(int oldIndex, int newIndex) {
     setState(() {
-      _libraries = applyMd3eHomeLibraryListReorder(
+      _libraries = applyHomeLibraryListReorder(
         _libraries,
         oldIndex,
         newIndex,
@@ -81,8 +81,8 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
     });
   }
 
-  Md3eHomeLibraryDashboardRow? _rowFor(String libraryId) {
-    for (final Md3eHomeLibraryDashboardRow row in _libraries) {
+  HomeLibraryDashboardRow? _rowFor(String libraryId) {
+    for (final HomeLibraryDashboardRow row in _libraries) {
       if (row.libraryId == libraryId) {
         return row;
       }
@@ -90,15 +90,15 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
     return null;
   }
 
-  void _updateRow(Md3eHomeLibraryDashboardRow next) {
+  void _updateRow(HomeLibraryDashboardRow next) {
     final int index = _libraries.indexWhere(
-      (Md3eHomeLibraryDashboardRow row) => row.libraryId == next.libraryId,
+      (HomeLibraryDashboardRow row) => row.libraryId == next.libraryId,
     );
     if (index < 0) {
       return;
     }
     setState(() {
-      _libraries = List<Md3eHomeLibraryDashboardRow>.of(_libraries)
+      _libraries = List<HomeLibraryDashboardRow>.of(_libraries)
         ..[index] = next;
     });
   }
@@ -109,7 +109,7 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
       if (!mounted) {
         return;
       }
-      final Md3eHomeLibraryDashboardRow? row = _rowFor(libraryId);
+      final HomeLibraryDashboardRow? row = _rowFor(libraryId);
       if (row == null) {
         return;
       }
@@ -120,61 +120,61 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
     });
   }
 
-  Future<void> _openLibraryEdit(Md3eLibraryEditPageIntent intent) async {
-    await showMd3eLibraryEdit(context: context, intent: intent);
+  Future<void> _openLibraryEdit(LibraryEditPageIntent intent) async {
+    await showLibraryEdit(context: context, intent: intent);
   }
 
   void _defaultAddLocalLibrary() {
-    unawaited(_openLibraryEdit(Md3eLibraryEditPageIntent.createLocal));
+    unawaited(_openLibraryEdit(LibraryEditPageIntent.createLocal));
   }
 
   void _defaultAddRemoteLibrary() {
-    unawaited(_openLibraryEdit(Md3eLibraryEditPageIntent.createRemote));
+    unawaited(_openLibraryEdit(LibraryEditPageIntent.createRemote));
   }
 
   Future<void> _defaultLibraryAction(
     String libraryId,
-    Md3eHomeLibraryManagementAction action,
+    HomeLibraryManagementAction action,
   ) async {
-    final Md3eHomeLibraryDashboardRow? row = _rowFor(libraryId);
+    final HomeLibraryDashboardRow? row = _rowFor(libraryId);
     if (row == null) {
       return;
     }
 
     switch (action) {
-      case Md3eHomeLibraryManagementAction.edit:
-        final Md3eLibraryEditPageIntent intent =
-            row.kind == Md3eHomeLibraryKind.remote
-            ? Md3eLibraryEditPageIntent.editRemote
-            : Md3eLibraryEditPageIntent.editLocal;
+      case HomeLibraryManagementAction.edit:
+        final LibraryEditPageIntent intent =
+            row.kind == HomeLibraryKind.remote
+            ? LibraryEditPageIntent.editRemote
+            : LibraryEditPageIntent.editLocal;
         await _openLibraryEdit(intent);
-      case Md3eHomeLibraryManagementAction.scan:
-      case Md3eHomeLibraryManagementAction.deepScan:
+      case HomeLibraryManagementAction.scan:
+      case HomeLibraryManagementAction.deepScan:
         _updateRow(row.copyWith(scanInProgress: true));
         _scheduleBusyReset(libraryId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                Md3eHomeLibraryManagementCopy.labScanPreviewSnackBar,
+                HomeLibraryManagementCopy.labScanPreviewSnackBar,
               ),
             ),
           );
         }
-      case Md3eHomeLibraryManagementAction.refreshMetadata:
+      case HomeLibraryManagementAction.refreshMetadata:
         _updateRow(row.copyWith(metadataRefreshInProgress: true));
         _scheduleBusyReset(libraryId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                Md3eHomeLibraryManagementCopy.labMetadataRefreshPreviewSnackBar,
+                HomeLibraryManagementCopy.labMetadataRefreshPreviewSnackBar,
               ),
             ),
           );
         }
-      case Md3eHomeLibraryManagementAction.delete:
-        final bool confirmed = await showMd3eHomeLibraryDeleteConfirmDialog(
+      case HomeLibraryManagementAction.delete:
+        final bool confirmed = await showHomeLibraryDeleteConfirmDialog(
           context: context,
           libraryDisplayName: row.displayName,
         );
@@ -184,7 +184,7 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
         setState(() {
           _libraries = _libraries
               .where(
-                (Md3eHomeLibraryDashboardRow item) =>
+                (HomeLibraryDashboardRow item) =>
                     item.libraryId != libraryId,
               )
               .toList(growable: false);
@@ -194,7 +194,7 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
 
   void _handleLibraryAction(
     String libraryId,
-    Md3eHomeLibraryManagementAction action,
+    HomeLibraryManagementAction action,
   ) {
     if (widget.onLibraryAction != null) {
       widget.onLibraryAction!(libraryId, action);
@@ -205,15 +205,15 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
 
   @override
   Widget build(BuildContext context) {
-    return Md3eHomePage(
-      aggregateCounts: Md3eHomePagePreviewData.sampleAggregateCounts(),
+    return HomeLayout(
+      aggregateCounts: HomePagePreviewData.sampleAggregateCounts(),
       onOpenNavigation: widget.onOpenNavigation,
       onOpenHistory: () {
         unawaited(
           Navigator.of(context).push<void>(
             MaterialPageRoute<void>(
               builder: (BuildContext context) =>
-                  Md3eHistoryBrowsePageLabHost(clock: DateTime(2026, 6, 15, 14)),
+                  HistoryBrowsePageLabHost(clock: DateTime(2026, 6, 15, 14)),
             ),
           ),
         );
@@ -229,7 +229,7 @@ class _Md3eHomePageLabHostState extends State<Md3eHomePageLabHost> {
           ),
         );
       },
-      libraryManagementSection: Md3eHomeLibraryManagementSection(
+      libraryManagementSection: HomeLibraryManagementSection(
         libraries: _libraries,
         onLibraryOpen: widget.onLibraryOpen,
         onLibraryAction: _handleLibraryAction,

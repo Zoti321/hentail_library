@@ -7,21 +7,21 @@ import 'package:hentai_library/shared/ui/motion/spring_curve.dart';
 /// 前进：页面从右侧水平滑入并淡入；后退：方向相反。
 /// 空间位移使用 M3E expressive spatial 弹簧（允许轻微回弹），透明度使用 effects 弹簧。
 /// 开启"减少动效"时直接切换，不播放任何位移。
-PageRoute<T> md3eSharedAxisRoute<T>(
+PageRoute<T> sharedAxisRoute<T>(
   BuildContext context, {
   required WidgetBuilder builder,
 }) {
-  final Duration duration = Md3eMotion.motionDurationOf(
+  final Duration duration = LabMotion.motionDurationOf(
     context,
-    Md3eMotion.routeTransitionDuration,
+    LabMotion.routeTransitionDuration,
   );
-  final Curve spatialCurve = Md3eSpringCurve(
-    motion: Md3eMotion.routeSpring,
-    duration: Md3eMotion.routeTransitionDuration,
+  final Curve spatialCurve = SpringCurve(
+    motion: LabMotion.routeSpring,
+    duration: LabMotion.routeTransitionDuration,
   );
-  final Curve effectsCurve = Md3eSpringCurve(
-    motion: Md3eMotion.effectsSpring,
-    duration: Md3eMotion.routeTransitionDuration,
+  final Curve effectsCurve = SpringCurve(
+    motion: LabMotion.effectsSpring,
+    duration: LabMotion.routeTransitionDuration,
   );
 
   return PageRouteBuilder<T>(
@@ -42,7 +42,7 @@ PageRoute<T> md3eSharedAxisRoute<T>(
           Animation<double> secondaryAnimation,
           Widget child,
         ) {
-          if (Md3eMotion.reduceMotionOf(routeContext)) {
+          if (LabMotion.reduceMotionOf(routeContext)) {
             return child;
           }
           // 后退使用正向曲线的 flipped，保证反向时同样从边界开始运动，而不是在 1 附近停滞。

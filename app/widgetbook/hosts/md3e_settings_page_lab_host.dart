@@ -3,35 +3,35 @@ import 'package:hentai_library/features/app_settings/presentation/views/settings
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 
 /// Lab / Widgetbook：设置页 preview 状态由 Host 持有（阅读偏好、Healthy mode 等 tile 仅内存，不写 AppSetting）。
-class Md3eSettingsPageLabHost extends StatefulWidget {
-  const Md3eSettingsPageLabHost({
+class SettingsPageLabHost extends StatefulWidget {
+  const SettingsPageLabHost({
     super.key,
-    this.initialCategory = Md3eSettingsCategory.personalization,
+    this.initialCategory = SettingsCategory.personalization,
     this.masterGroupTitle,
-    this.initialLabState = const Md3eSettingsLabState(),
+    this.initialLabState = const SettingsLabState(),
     this.onBack,
   });
 
-  final Md3eSettingsCategory initialCategory;
+  final SettingsCategory initialCategory;
   final String? masterGroupTitle;
-  final Md3eSettingsLabState initialLabState;
+  final SettingsLabState initialLabState;
   final VoidCallback? onBack;
 
   @override
-  State<Md3eSettingsPageLabHost> createState() =>
+  State<SettingsPageLabHost> createState() =>
       _Md3eSettingsPageLabHostState();
 }
 
-class _Md3eSettingsPageLabHostState extends State<Md3eSettingsPageLabHost> {
-  late Md3eSettingsLabState _labState = widget.initialLabState;
+class _Md3eSettingsPageLabHostState extends State<SettingsPageLabHost> {
+  late SettingsLabState _labState = widget.initialLabState;
 
-  void _onLabStateChanged(Md3eSettingsLabState next) {
+  void _onLabStateChanged(SettingsLabState next) {
     setState(() => _labState = next);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Md3eSettingsPage(
+    return SettingsLayout(
       initialCategory: widget.initialCategory,
       masterGroupTitle: widget.masterGroupTitle,
       labState: _labState,

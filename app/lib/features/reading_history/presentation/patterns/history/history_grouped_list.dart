@@ -10,30 +10,30 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 四档时间分组 + 可折叠组标题（sliver）+ 组内懒加载列表。
-class Md3eReadingHistoryGroupedList<T> extends StatefulWidget {
-  const Md3eReadingHistoryGroupedList({
+class ReadingHistoryGroupedList<T> extends StatefulWidget {
+  const ReadingHistoryGroupedList({
     super.key,
     required this.groups,
     required this.itemBuilder,
   });
 
-  final List<Md3eHistoryTimeGroup<T>> groups;
+  final List<HistoryTimeGroup<T>> groups;
   final Widget Function(BuildContext context, T item) itemBuilder;
 
   @override
-  State<Md3eReadingHistoryGroupedList<T>> createState() =>
-      _Md3eReadingHistoryGroupedListState<T>();
+  State<ReadingHistoryGroupedList<T>> createState() =>
+      _ReadingHistoryGroupedListState<T>();
 }
 
-class _Md3eReadingHistoryGroupedListState<T>
-    extends State<Md3eReadingHistoryGroupedList<T>> {
-  final Set<Md3eHistoryTimeSection> _collapsed = <Md3eHistoryTimeSection>{};
+class _ReadingHistoryGroupedListState<T>
+    extends State<ReadingHistoryGroupedList<T>> {
+  final Set<HistoryTimeSection> _collapsed = <HistoryTimeSection>{};
 
-  bool _isExpanded(Md3eHistoryTimeSection section) {
+  bool _isExpanded(HistoryTimeSection section) {
     return !_collapsed.contains(section);
   }
 
-  void _toggle(Md3eHistoryTimeSection section) {
+  void _toggle(HistoryTimeSection section) {
     setState(() {
       if (_collapsed.contains(section)) {
         _collapsed.remove(section);
@@ -72,7 +72,7 @@ class _HistoryGroupSection<T> extends StatelessWidget {
     required this.itemBuilder,
   });
 
-  final Md3eHistoryTimeGroup<T> group;
+  final HistoryTimeGroup<T> group;
   final bool expanded;
   final VoidCallback onHeaderPressed;
   final Widget Function(BuildContext context, T item) itemBuilder;
@@ -93,7 +93,7 @@ class _HistoryGroupSection<T> extends StatelessWidget {
         ),
         if (expanded) ...<Widget>[
           SliverToBoxAdapter(child: SizedBox(height: spacing.xs)),
-          Md3eReadingHistoryListLayout(
+          ReadingHistoryListLayout(
             itemCount: group.items.length,
             itemBuilder: (BuildContext context, int index) {
               return itemBuilder(context, group.items[index]);
@@ -113,7 +113,7 @@ class _HistorySectionHeader extends StatelessWidget {
     required this.onPressed,
   });
 
-  final Md3eHistoryTimeSection section;
+  final HistoryTimeSection section;
   final int itemCount;
   final bool expanded;
   final VoidCallback onPressed;
@@ -126,7 +126,7 @@ class _HistorySectionHeader extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
-    final String bucketLabel = md3eHistoryTimeSectionLabel(l10n, section);
+    final String bucketLabel = historyTimeSectionLabel(l10n, section);
     final String countLabel = l10n.historySectionItemCount(itemCount);
     final String titleText = '$bucketLabel$_separator$countLabel';
 
@@ -155,7 +155,7 @@ class _HistorySectionHeader extends StatelessWidget {
                     ),
                   ),
                 ),
-                Md3eSpringValue(
+                SpringValue(
                   value: expanded ? 0.5 : 0,
                   builder: (BuildContext context, double turns, Widget? child) {
                     return Transform.rotate(

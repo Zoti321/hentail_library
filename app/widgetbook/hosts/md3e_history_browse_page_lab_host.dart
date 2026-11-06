@@ -9,8 +9,8 @@ import '../lab/navigation/md3e_lab_reader_navigation.dart';
 import '../preview/md3e_reader_page_preview_data.dart';
 
 /// Lab / Widgetbook：preview 阅读历史 + 清空全部（M3E 确认 → 清内存列表，不写 FRB）。
-class Md3eHistoryBrowsePageLabHost extends StatefulWidget {
-  const Md3eHistoryBrowsePageLabHost({
+class HistoryBrowsePageLabHost extends StatefulWidget {
+  const HistoryBrowsePageLabHost({
     super.key,
     this.initialItems,
     this.clock,
@@ -20,12 +20,12 @@ class Md3eHistoryBrowsePageLabHost extends StatefulWidget {
   final DateTime? clock;
 
   @override
-  State<Md3eHistoryBrowsePageLabHost> createState() =>
+  State<HistoryBrowsePageLabHost> createState() =>
       _Md3eHistoryBrowsePageLabHostState();
 }
 
 class _Md3eHistoryBrowsePageLabHostState
-    extends State<Md3eHistoryBrowsePageLabHost> {
+    extends State<HistoryBrowsePageLabHost> {
   static const int _previewTotalPages = 48;
 
   late List<HistoryCardItem> _items = List<HistoryCardItem>.of(
@@ -44,9 +44,9 @@ class _Md3eHistoryBrowsePageLabHostState
   }
 
   void _openReader(BuildContext context, HistoryCardItem item) {
-    openMd3eLabReader(
+    openLabReader(
       context,
-      preview: Md3eReaderPagePreviewData(
+      preview: ReaderPagePreviewData(
         title: item.title,
         totalPages: _previewTotalPages,
         initialPage: item.pageIndex ?? 1,
@@ -66,7 +66,7 @@ class _Md3eHistoryBrowsePageLabHostState
       onClearAll: _clearAllPreviewEntries,
       itemBuilder: (BuildContext context, HistoryCardItem item) {
         void openReader() => _openReader(context, item);
-        return Md3eReadingHistoryListItem(
+        return ReadingHistoryListItem(
           title: item.title,
           currentPage: item.pageIndex ?? 1,
           totalPages: _previewTotalPages,

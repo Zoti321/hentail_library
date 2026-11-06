@@ -8,8 +8,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Lab 阅读器底栏：tonal 面板上的进度 · 翻页 · 自动播放。
-class Md3eReaderBottomBar extends StatelessWidget {
-  const Md3eReaderBottomBar({
+class ReaderBottomBar extends StatelessWidget {
+  const ReaderBottomBar({
     super.key,
     required this.currentPage,
     required this.totalPages,
@@ -35,23 +35,23 @@ class Md3eReaderBottomBar extends StatelessWidget {
     final bool canPrev = currentPage > 1;
     final bool canNext = totalPages > 0 && currentPage < totalPages;
     final EdgeInsets padding = EdgeInsets.fromLTRB(
-      Md3eReaderChromeMetrics.chromeContentHorizontalPadding(media.size.width),
+      ReaderChromeMetrics.chromeContentHorizontalPadding(media.size.width),
       8,
-      Md3eReaderChromeMetrics.chromeContentHorizontalPadding(media.size.width),
-      media.padding.bottom + Md3eReaderChromeMetrics.edgeGap,
+      ReaderChromeMetrics.chromeContentHorizontalPadding(media.size.width),
+      media.padding.bottom + ReaderChromeMetrics.edgeGap,
     );
 
-    return Md3eReaderChromeBand(
-      edge: Md3eReaderChromeBandEdge.bottom,
+    return ReaderChromeBand(
+      edge: ReaderChromeBandEdge.bottom,
       padding: padding,
       child: ConstrainedBox(
         constraints: const BoxConstraints(
-          minHeight: Md3eReaderChromeMetrics.bottomBarMinHeight,
+          minHeight: ReaderChromeMetrics.bottomBarMinHeight,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Md3eReaderPageProgress(
+            ReaderPageProgress(
               currentPage: currentPage,
               totalPages: totalPages,
               onPageChanged: onPageChanged,
@@ -108,7 +108,7 @@ class Md3eReaderBottomBar extends StatelessWidget {
     bool filled = false,
   }) {
     return M3EIconButton(
-      icon: Icon(icon, size: Md3eReaderChromeMetrics.actionIconSize),
+      icon: Icon(icon, size: ReaderChromeMetrics.actionIconSize),
       variant: filled
           ? M3EIconButtonVariant.tonal
           : M3EIconButtonVariant.standard,

@@ -10,7 +10,7 @@ import 'md3e_widgetbook_localizations.dart';
 
 /// Wraps each Widgetbook use-case preview in [M3EMaterialApp] + lab theme.
 Widget md3eWidgetbookAppBuilder(BuildContext context, Widget child) {
-  final M3EThemeData lightM3e = buildMd3eThemeData(
+  final M3EThemeData lightM3e = buildThemeData(
     brightness: Brightness.light,
   );
 
@@ -18,7 +18,7 @@ Widget md3eWidgetbookAppBuilder(BuildContext context, Widget child) {
   // `theme` / `darkTheme` expect material_ui [ThemeData], not Flutter's.
   return M3EMaterialApp(
     data: lightM3e,
-    fontFamily: kMd3eAppFontFamily,
+    fontFamily: kAppFontFamily,
     debugShowCheckedModeBanner: false,
     // material_ui MaterialLocalizations only fully covers `en`.
     locale: const Locale('en'),
@@ -26,7 +26,7 @@ Widget md3eWidgetbookAppBuilder(BuildContext context, Widget child) {
     supportedLocales: AppLocalizations.supportedLocales,
     appBuilder: (BuildContext context, Widget? themedChild) {
       return DefaultTextStyle.merge(
-        style: const TextStyle(fontFamily: kMd3eAppFontFamily),
+        style: const TextStyle(fontFamily: kAppFontFamily),
         child: themedChild ?? const SizedBox.shrink(),
       );
     },

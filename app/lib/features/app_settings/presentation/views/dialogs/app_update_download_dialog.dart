@@ -20,8 +20,8 @@ Future<void> showAppUpdateDownloadDialog({
   required BuildContext context,
   required AppReleaseAsset asset,
 }) {
-  final M3EThemeData m3e = md3eWithAppFontFamily(M3ETheme.of(context));
-  return Md3eLabDialogPresenter.showBasic<void>(
+  final M3EThemeData m3e = withAppFontFamily(M3ETheme.of(context));
+  return LabDialogPresenter.showBasic<void>(
     context,
     barrierDismissible: false,
     dialog: M3ETheme(
@@ -42,7 +42,7 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ESpacing spacing = theme.spacing;
-    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+    final TextStyle actionLabelStyle = labButtonLabelStyle(
       theme,
       M3EButtonSize.sm,
     );

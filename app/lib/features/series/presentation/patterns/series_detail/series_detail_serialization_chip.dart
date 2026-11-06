@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列详情连载状态（MD3E 描边胶囊，非生产 [SeriesSerializationChip]）。
-class Md3eSeriesDetailSerializationChip extends StatelessWidget {
-  const Md3eSeriesDetailSerializationChip({super.key, required this.status});
+class SeriesDetailSerializationChip extends StatelessWidget {
+  const SeriesDetailSerializationChip({super.key, required this.status});
 
-  final Md3eSeriesSerializationStatus status;
+  final SeriesSerializationStatus status;
 
   @override
   Widget build(BuildContext context) {
-    if (status == Md3eSeriesSerializationStatus.unknown) {
+    if (status == SeriesSerializationStatus.unknown) {
       return const SizedBox.shrink();
     }
     final AppLocalizations l10n = context.l10n;
@@ -46,25 +46,25 @@ class Md3eSeriesDetailSerializationChip extends StatelessWidget {
 
   static Color _accentColor(
     M3EColorScheme scheme,
-    Md3eSeriesSerializationStatus status,
+    SeriesSerializationStatus status,
   ) {
     return switch (status) {
-      Md3eSeriesSerializationStatus.ongoing => scheme.primary,
-      Md3eSeriesSerializationStatus.ended => scheme.onSurfaceVariant,
-      Md3eSeriesSerializationStatus.hiatus => scheme.error,
-      Md3eSeriesSerializationStatus.unknown => scheme.onSurfaceVariant,
+      SeriesSerializationStatus.ongoing => scheme.primary,
+      SeriesSerializationStatus.ended => scheme.onSurfaceVariant,
+      SeriesSerializationStatus.hiatus => scheme.error,
+      SeriesSerializationStatus.unknown => scheme.onSurfaceVariant,
     };
   }
 
   static String _label(
     AppLocalizations l10n,
-    Md3eSeriesSerializationStatus status,
+    SeriesSerializationStatus status,
   ) {
     return switch (status) {
-      Md3eSeriesSerializationStatus.ongoing => l10n.serializationStatusOngoing,
-      Md3eSeriesSerializationStatus.ended => l10n.serializationStatusEnded,
-      Md3eSeriesSerializationStatus.hiatus => l10n.serializationStatusHiatus,
-      Md3eSeriesSerializationStatus.unknown => l10n.serializationStatusUnknown,
+      SeriesSerializationStatus.ongoing => l10n.serializationStatusOngoing,
+      SeriesSerializationStatus.ended => l10n.serializationStatusEnded,
+      SeriesSerializationStatus.hiatus => l10n.serializationStatusHiatus,
+      SeriesSerializationStatus.unknown => l10n.serializationStatusUnknown,
     };
   }
 }

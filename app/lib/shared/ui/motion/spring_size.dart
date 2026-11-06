@@ -5,8 +5,8 @@ import 'package:motor/motor.dart';
 /// 尺寸展开 / 收起：高度因子由 M3E 空间弹簧驱动，展开时允许越过终点回弹。
 ///
 /// 收起到弹簧底部（≤0）时不再渲染子树，尺寸为零。开启"减少动效"时直接切换。
-class Md3eSpringSize extends StatefulWidget {
-  const Md3eSpringSize({
+class SpringSize extends StatefulWidget {
+  const SpringSize({
     super.key,
     required this.expanded,
     required this.child,
@@ -18,10 +18,10 @@ class Md3eSpringSize extends StatefulWidget {
   final AlignmentGeometry alignment;
 
   @override
-  State<Md3eSpringSize> createState() => _Md3eSpringSizeState();
+  State<SpringSize> createState() => _SpringSizeState();
 }
 
-class _Md3eSpringSizeState extends State<Md3eSpringSize>
+class _SpringSizeState extends State<SpringSize>
     with SingleTickerProviderStateMixin {
   /// 弹簧收敛时的残余值视为收起（约 0.1% 高度，肉眼不可辨）。
   static const double _hiddenFactor = 0.001;
@@ -33,20 +33,20 @@ class _Md3eSpringSizeState extends State<Md3eSpringSize>
   void initState() {
     super.initState();
     _controller = SingleMotionController(
-      motion: Md3eMotion.spatialReveal,
+      motion: LabMotion.spatialReveal,
       vsync: this,
       initialValue: widget.expanded ? 1 : 0,
     );
   }
 
   @override
-  void didUpdateWidget(Md3eSpringSize oldWidget) {
+  void didUpdateWidget(SpringSize oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.expanded == widget.expanded) {
       return;
     }
     final double target = widget.expanded ? 1 : 0;
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       _controller.value = target;
     } else {
       _controller.animateTo(target);
@@ -61,7 +61,7 @@ class _Md3eSpringSizeState extends State<Md3eSpringSize>
 
   @override
   Widget build(BuildContext context) {
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       return widget.expanded ? widget.child : const SizedBox.shrink();
     }
 

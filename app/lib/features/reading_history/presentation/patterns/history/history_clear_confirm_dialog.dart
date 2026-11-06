@@ -6,24 +6,24 @@ import 'package:hentai_library/shared/ui/theme/lab_text.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab：清空全部阅读历史的二次确认（文案与生产 [ClearReadingHistoryConfirmDialog] 一致）。
-Future<bool> showMd3eClearReadingHistoryConfirmDialog({
+Future<bool> showClearReadingHistoryConfirmDialog({
   required BuildContext context,
 }) async {
-  final bool? confirmed = await Md3eLabDialogPresenter.showBasic<bool>(
+  final bool? confirmed = await LabDialogPresenter.showBasic<bool>(
     context,
-    dialog: const _Md3eClearReadingHistoryConfirmDialog(),
+    dialog: const _ClearReadingHistoryConfirmPanel(),
   );
   return confirmed ?? false;
 }
 
-class _Md3eClearReadingHistoryConfirmDialog extends StatelessWidget {
-  const _Md3eClearReadingHistoryConfirmDialog();
+class _ClearReadingHistoryConfirmPanel extends StatelessWidget {
+  const _ClearReadingHistoryConfirmPanel();
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+    final TextStyle actionLabelStyle = labButtonLabelStyle(
       theme,
       M3EButtonSize.sm,
     );

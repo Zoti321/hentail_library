@@ -3,18 +3,18 @@ import 'package:hentai_library/shared/ui/motion/spring_positioned.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// One mutually exclusive segment in [Md3eSegmentedCapsuleBar].
-class Md3eSegmentedCapsuleSegment {
-  const Md3eSegmentedCapsuleSegment({required this.label, this.semanticLabel});
+/// One mutually exclusive segment in [SegmentedCapsuleBar].
+class SegmentedCapsuleSegment {
+  const SegmentedCapsuleSegment({required this.label, this.semanticLabel});
 
   final String label;
   final String? semanticLabel;
 }
 
 /// Kazumi-style horizontal **segmented control**: spaced text pills with a single
-/// sliding selection block ([Md3eSpringPositioned]).
-class Md3eSegmentedCapsuleBar extends StatefulWidget {
-  const Md3eSegmentedCapsuleBar({
+/// sliding selection block ([SpringPositioned]).
+class SegmentedCapsuleBar extends StatefulWidget {
+  const SegmentedCapsuleBar({
     super.key,
     required this.segments,
     required this.selectedIndex,
@@ -22,16 +22,16 @@ class Md3eSegmentedCapsuleBar extends StatefulWidget {
   }) : assert(segments.length > 0),
        assert(selectedIndex >= 0 && selectedIndex < segments.length);
 
-  final List<Md3eSegmentedCapsuleSegment> segments;
+  final List<SegmentedCapsuleSegment> segments;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
 
   @override
-  State<Md3eSegmentedCapsuleBar> createState() =>
-      _Md3eSegmentedCapsuleBarState();
+  State<SegmentedCapsuleBar> createState() =>
+      _SegmentedCapsuleBarState();
 }
 
-class _Md3eSegmentedCapsuleBarState extends State<Md3eSegmentedCapsuleBar> {
+class _SegmentedCapsuleBarState extends State<SegmentedCapsuleBar> {
   final GlobalKey _stackKey = GlobalKey();
   late List<GlobalKey> _segmentKeys;
 
@@ -46,7 +46,7 @@ class _Md3eSegmentedCapsuleBarState extends State<Md3eSegmentedCapsuleBar> {
   }
 
   @override
-  void didUpdateWidget(covariant Md3eSegmentedCapsuleBar oldWidget) {
+  void didUpdateWidget(covariant SegmentedCapsuleBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.segments.length != widget.segments.length) {
       _segmentKeys = _keysForLength(widget.segments.length);
@@ -98,25 +98,25 @@ class _Md3eSegmentedCapsuleBarState extends State<Md3eSegmentedCapsuleBar> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SizedBox(
-        height: Md3eSegmentedCapsuleBarMetrics.barHeight,
+        height: SegmentedCapsuleBarMetrics.barHeight,
         child: Stack(
           key: _stackKey,
           clipBehavior: Clip.none,
           alignment: Alignment.centerLeft,
           children: <Widget>[
             if (_indicatorWidth > 0)
-              Md3eSpringPositioned(
+              SpringPositioned(
                 rect: Rect.fromLTWH(
                   _indicatorLeft,
                   0,
                   _indicatorWidth,
-                  Md3eSegmentedCapsuleBarMetrics.barHeight,
+                  SegmentedCapsuleBarMetrics.barHeight,
                 ),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: scheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(
-                      Md3eSegmentedCapsuleBarMetrics.pillBorderRadius(),
+                      SegmentedCapsuleBarMetrics.pillBorderRadius(),
                     ),
                   ),
                 ),
@@ -128,7 +128,7 @@ class _Md3eSegmentedCapsuleBarState extends State<Md3eSegmentedCapsuleBar> {
                   Padding(
                     padding: EdgeInsets.only(
                       right: i < widget.segments.length - 1
-                          ? Md3eSegmentedCapsuleBarMetrics.segmentGap
+                          ? SegmentedCapsuleBarMetrics.segmentGap
                           : 0,
                     ),
                     child: _SegmentTapTarget(
@@ -206,11 +206,11 @@ class _SegmentTapTarget extends StatelessWidget {
             return null;
           }),
           child: SizedBox(
-            height: Md3eSegmentedCapsuleBarMetrics.barHeight,
+            height: SegmentedCapsuleBarMetrics.barHeight,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal:
-                    Md3eSegmentedCapsuleBarMetrics.segmentHorizontalPadding,
+                    SegmentedCapsuleBarMetrics.segmentHorizontalPadding,
               ),
               child: Center(
                 child: Text(

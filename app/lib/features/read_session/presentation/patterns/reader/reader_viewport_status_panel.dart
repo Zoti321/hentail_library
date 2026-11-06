@@ -4,8 +4,8 @@ import 'package:hentai_library/shared/ui/theme/lab_text.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 阅读画布：打开中（静态）。
-class Md3eReaderViewportLoading extends StatelessWidget {
-  const Md3eReaderViewportLoading({super.key});
+class ReaderViewportLoading extends StatelessWidget {
+  const ReaderViewportLoading({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class Md3eReaderViewportLoading extends StatelessWidget {
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
             Text(
-              Md3eReaderPageCopy.viewportLoading,
+              ReaderPageCopy.viewportLoading,
               style: theme.typeScale.bodyLarge.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -32,8 +32,8 @@ class Md3eReaderViewportLoading extends StatelessWidget {
 }
 
 /// Lab 阅读画布：打开失败（静态；与生产 ReaderOpenErrorPanel 操作项对齐）。
-class Md3eReaderViewportErrorPanel extends StatelessWidget {
-  const Md3eReaderViewportErrorPanel({super.key, this.onBack, this.onRetry});
+class ReaderViewportErrorPanel extends StatelessWidget {
+  const ReaderViewportErrorPanel({super.key, this.onBack, this.onRetry});
 
   final VoidCallback? onBack;
   final VoidCallback? onRetry;
@@ -41,7 +41,7 @@ class Md3eReaderViewportErrorPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
-    final TextStyle actionLabelStyle = md3eLabButtonLabelStyle(
+    final TextStyle actionLabelStyle = labButtonLabelStyle(
       theme,
       M3EButtonSize.sm,
     );
@@ -56,7 +56,7 @@ class Md3eReaderViewportErrorPanel extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Text(
-                  Md3eReaderPageCopy.viewportErrorMessage,
+                  ReaderPageCopy.viewportErrorMessage,
                   textAlign: TextAlign.center,
                   style: theme.typeScale.bodyLarge.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -75,7 +75,7 @@ class Md3eReaderViewportErrorPanel extends StatelessWidget {
                         decoration: M3EButtonDecoration(
                           textStyle: actionLabelStyle,
                         ),
-                        label: Text(Md3eReaderPageCopy.viewportErrorBack),
+                        label: Text(ReaderPageCopy.viewportErrorBack),
                       ),
                     if (onRetry != null)
                       M3EButton(
@@ -84,7 +84,7 @@ class Md3eReaderViewportErrorPanel extends StatelessWidget {
                         decoration: M3EButtonDecoration(
                           textStyle: actionLabelStyle,
                         ),
-                        label: Text(Md3eReaderPageCopy.viewportErrorRetry),
+                        label: Text(ReaderPageCopy.viewportErrorRetry),
                       ),
                   ],
                 ),

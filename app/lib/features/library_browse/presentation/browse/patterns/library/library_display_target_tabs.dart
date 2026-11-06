@@ -9,11 +9,11 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画 / 系列切换：[`M3ETabs`] primary + 局部 [`M3ETabTheme`]（动画指示条、state layer）。
 ///
-/// 形状与动效：通过 [Md3eLibraryPageHeaderMetrics.displayTargetTabThemeFor] 注入
+/// 形状与动效：通过 [LibraryPageHeaderMetrics.displayTargetTabThemeFor] 注入
 /// （divider、indicator 尺寸/圆角/inset、spring、state opacity）。SDK 不提供圆角
 /// state layer 槽形；需要胶囊形态可参考 M3E Segmented Button。
-class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
-  const Md3eLibraryDisplayTargetTabs({
+class LibraryDisplayTargetTabs extends StatelessWidget {
+  const LibraryDisplayTargetTabs({
     super.key,
     required this.displayTarget,
     required this.sizeClass,
@@ -22,7 +22,7 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
   });
 
   final LibraryDisplayTarget displayTarget;
-  final Md3eWindowSizeClass sizeClass;
+  final WindowSizeClass sizeClass;
   final ValueChanged<LibraryDisplayTarget> onChanged;
 
   /// When false, tabs align to the start (catalog toolbar / Kazumi-style row).
@@ -41,7 +41,7 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETabTheme tabTheme =
-        Md3eLibraryPageHeaderMetrics.displayTargetTabThemeFor(sizeClass);
+        LibraryPageHeaderMetrics.displayTargetTabThemeFor(sizeClass);
 
     final TextStyle selectedLabelStyle = tabTheme.labelStyle(
       theme.typeScale,
@@ -50,17 +50,17 @@ class Md3eLibraryDisplayTargetTabs extends StatelessWidget {
       variant: M3ETabsVariant.primary,
     );
     final double barWidth =
-        Md3eLibraryPageHeaderMetrics.displayTargetTabsBarWidth(
+        LibraryPageHeaderMetrics.displayTargetTabsBarWidth(
           tabLabels: tabLabels,
           labelStyle: selectedLabelStyle,
           textDirection: Directionality.of(context),
         );
 
     // M3ETabs bar fill is [M3ETabTheme.backgroundColor] → `scheme.surface` (M3 spec).
-    // Lab browse canvas is [md3eLabBrowseCanvasColor]; alias surface locally so the
+    // Lab browse canvas is [labBrowseCanvasColor]; alias surface locally so the
     // bar matches the page without repainting the whole scroll view.
     final M3EColorScheme tabsColorScheme = scheme.copyWith(
-      surface: md3eLabBrowseCanvasColor(scheme),
+      surface: labBrowseCanvasColor(scheme),
     );
 
     final Widget tabs = SizedBox(

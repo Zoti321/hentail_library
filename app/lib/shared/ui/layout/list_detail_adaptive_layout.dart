@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 
-/// List+detail side-by-side at [Md3eWindowSizeClass.expanded] and wider (≥840dp).
-const double kMd3eListDetailExpandedBreakpoint = Md3eBreakpoints.expanded;
+/// List+detail side-by-side at [WindowSizeClass.expanded] and wider (≥840dp).
+const double kListDetailExpandedBreakpoint = Breakpoints.expanded;
 
 /// Responsive list–detail shell for MD3E Lab (not production App Shell).
 ///
 /// Expanded: list and detail panes together. Compact: list only, or full-screen
 /// detail when [showDetailOnCompact] is true (e.g. after navigation).
-class Md3eListDetailAdaptiveLayout extends StatelessWidget {
-  const Md3eListDetailAdaptiveLayout({
+class ListDetailAdaptiveLayout extends StatelessWidget {
+  const ListDetailAdaptiveLayout({
     super.key,
     required this.listPane,
     required this.detailPane,
-    this.expandedBreakpoint = kMd3eListDetailExpandedBreakpoint,
+    this.expandedBreakpoint = kListDetailExpandedBreakpoint,
     this.showDetailOnCompact = false,
     this.showPaneDivider = true,
     this.listPaneFixedWidth,

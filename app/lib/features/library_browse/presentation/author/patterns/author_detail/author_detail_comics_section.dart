@@ -8,12 +8,12 @@ import 'package:hentai_library/shared/ui/widgets/settings/content_section.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 
-const double kMd3eAuthorDetailComicCardWidth = 96;
-const double kMd3eAuthorDetailComicCardHeight = 144;
+const double kAuthorDetailComicCardWidth = 96;
+const double kAuthorDetailComicCardHeight = 144;
 
 /// 作者作品区：元数据 chip + 封面网格，包在 tonal 卡片内。
-class Md3eAuthorDetailComicsSection extends StatelessWidget {
-  const Md3eAuthorDetailComicsSection({super.key, required this.detail});
+class AuthorDetailComicsSection extends StatelessWidget {
+  const AuthorDetailComicsSection({super.key, required this.detail});
 
   final AuthorDetail detail;
 
@@ -29,7 +29,7 @@ class Md3eAuthorDetailComicsSection extends StatelessWidget {
       ...detail.tags,
     ];
 
-    return Md3eContentSection(
+    return ContentSection(
       title: l10n.authorDetailComicsSection(detail.comicCount),
       padding: EdgeInsets.all(theme.spacing.xl),
       child: Column(
@@ -37,8 +37,8 @@ class Md3eAuthorDetailComicsSection extends StatelessWidget {
         children: <Widget>[
           if (facets.isNotEmpty) ...<Widget>[
             Wrap(
-              spacing: kMd3eComicDetailMetaChipGap,
-              runSpacing: kMd3eComicDetailMetaChipGap,
+              spacing: kComicDetailMetaChipGap,
+              runSpacing: kComicDetailMetaChipGap,
               children: <Widget>[
                 for (final AuthorFacetCount item in facets)
                   M3EChip(
@@ -84,8 +84,8 @@ class _AuthorComicCoverCard extends StatelessWidget {
         button: true,
         label: comic.title,
         child: SizedBox(
-          width: kMd3eAuthorDetailComicCardWidth,
-          height: kMd3eAuthorDetailComicCardHeight,
+          width: kAuthorDetailComicCardWidth,
+          height: kAuthorDetailComicCardHeight,
           child: ClipRRect(
             borderRadius: radius,
             child: Material(

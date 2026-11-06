@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/lab_catalog_item_preview.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_header.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
@@ -18,8 +18,8 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 漫画库页 Lab 壳层：粘滞页头 + 可滚动目录区（视图切换 / 网格·列表 / 分页）。
-class Md3eLibraryBrowsePage extends StatefulWidget {
-  const Md3eLibraryBrowsePage({
+class LibraryBrowseLayout extends StatefulWidget {
+  const LibraryBrowseLayout({
     super.key,
     required this.displayTarget,
     required this.viewMode,
@@ -43,10 +43,10 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
   });
 
   final LibraryDisplayTarget displayTarget;
-  final Md3eCatalogViewMode viewMode;
+  final CatalogViewMode viewMode;
   final bool filterSortActive;
   final ValueChanged<LibraryDisplayTarget>? onDisplayTargetChanged;
-  final ValueChanged<Md3eCatalogViewMode>? onViewModeChanged;
+  final ValueChanged<CatalogViewMode>? onViewModeChanged;
   final VoidCallback? onFilterSort;
   final int? pageSize;
   final ValueChanged<int>? onPageSizeChanged;
@@ -70,10 +70,10 @@ class Md3eLibraryBrowsePage extends StatefulWidget {
   final String? libraryDisplayName;
 
   @override
-  State<Md3eLibraryBrowsePage> createState() => _Md3eLibraryBrowsePageState();
+  State<LibraryBrowseLayout> createState() => _Md3eLibraryBrowsePageState();
 }
 
-class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
+class _Md3eLibraryBrowsePageState extends State<LibraryBrowseLayout> {
   late final ScrollController _scrollController;
   late final bool _ownsScrollController;
 
@@ -85,7 +85,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
   }
 
   @override
-  void didUpdateWidget(covariant Md3eLibraryBrowsePage oldWidget) {
+  void didUpdateWidget(covariant LibraryBrowseLayout oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
 
@@ -105,13 +105,13 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
   @override
   Widget build(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
       viewportWidth,
     );
-    final Md3ePageLayoutSpec layout = Md3ePageLayoutSpec.of(context);
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final double horizontal = layout.horizontalInset;
 
-    final Widget header = Md3eLibraryPageHeader(
+    final Widget header = LibraryPageHeader(
       title: widget.libraryDisplayName,
       filterSortActive: widget.filterSortActive,
       pageSize: widget.pageSize,
@@ -128,7 +128,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
           slivers: <Widget>[
             SliverPersistentHeader(
               pinned: true,
-              delegate: Md3ePageHeaderDelegate(layout: layout, child: header),
+              delegate: PageHeaderDelegate(layout: layout, child: header),
             ),
             if (widget.onDisplayTargetChanged != null)
               SliverPadding(
@@ -139,7 +139,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
                   0,
                 ),
                 sliver: SliverToBoxAdapter(
-                  child: Md3eLibraryCatalogToolbar(
+                  child: LibraryCatalogToolbar(
                     displayTarget: widget.displayTarget,
                     comicCount: widget.comicCount,
                     seriesCount: widget.seriesCount,
@@ -151,7 +151,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
               padding: EdgeInsets.fromLTRB(
                 horizontal,
                 widget.onDisplayTargetChanged != null
-                    ? Md3eLibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
+                    ? LibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
                         sizeClass,
                       )
                     : layout.headerToBodyGap,
@@ -161,7 +161,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
               sliver: SliverToBoxAdapter(
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Md3eCatalogViewModeButtonGroup(
+                  child: CatalogViewModeButtonGroup(
                     mode: widget.viewMode,
                     onModeChanged: widget.onViewModeChanged ?? (_) {},
                   ),
@@ -171,11 +171,11 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
             SliverPadding(
               padding: EdgeInsets.only(top: layout.headerToBodyGap),
               sliver: switch (widget.viewMode) {
-                Md3eCatalogViewMode.grid => Md3eCatalogGridSliver(
+                CatalogViewMode.grid => CatalogGridSliver(
                   itemCount: widget.itemCount,
                   itemBuilder: _buildGridCard,
                 ),
-                Md3eCatalogViewMode.list => _Md3eLibraryBrowseListSliver(
+                CatalogViewMode.list => _Md3eLibraryBrowseListSliver(
                   itemCount: widget.itemCount,
                   horizontalPadding: horizontal,
                   displayTarget: widget.displayTarget,
@@ -186,14 +186,14 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
             SliverPadding(
               padding: EdgeInsets.fromLTRB(
                 horizontal,
-                Md3eLibraryBrowsePageMetrics.paginationVerticalSpacing(
+                LibraryBrowsePageMetrics.paginationVerticalSpacing(
                   sizeClass,
                 ),
                 horizontal,
-                Md3eLibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
+                LibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
               ),
               sliver: SliverToBoxAdapter(
-                child: Md3ePagination(
+                child: Pagination(
                   page: widget.page,
                   totalPages: widget.totalPages,
                   onPageChanged: widget.onPageChanged ?? (_) {},
@@ -202,7 +202,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
             ),
           ],
         ),
-        Md3eLibraryScrollToTopButton(
+        ExpressiveLibraryScrollToTopButton(
           scrollController: _scrollController,
           horizontalPadding: horizontal,
           hidden: widget.hideScrollToTop,
@@ -214,7 +214,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
   Widget _buildGridCard(
     BuildContext context,
     int index,
-    Md3eCatalogGridLayout _,
+    CatalogGridLayout _,
   ) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final double? readProgress =
@@ -223,12 +223,12 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
         : null;
     final _Md3eLibraryBrowseCatalogItemCopy copy =
         _Md3eLibraryBrowseCatalogItemCopy.fromPreview(
-          Md3eLabCatalogItemPreview.forIndex(
+          LabCatalogItemPreview.forIndex(
             displayTarget: widget.displayTarget,
             index: index,
           ),
         );
-    return Md3eComicCard(
+    return ComicCard(
       title: copy.title,
       subtitle: copy.subtitle,
       readProgress: readProgress,
@@ -243,7 +243,7 @@ class _Md3eLibraryBrowsePageState extends State<Md3eLibraryBrowsePage> {
   }
 }
 
-/// Lab 占位目录文案（漫画 / 系列卡片共用 [Md3eComicCard] / [Md3eComicListItem]）。
+/// Lab 占位目录文案（漫画 / 系列卡片共用 [ComicCard] / [ComicListItem]）。
 @immutable
 class _Md3eLibraryBrowseCatalogItemCopy {
   const _Md3eLibraryBrowseCatalogItemCopy({
@@ -257,7 +257,7 @@ class _Md3eLibraryBrowseCatalogItemCopy {
   final String? listAuthor;
 
   static _Md3eLibraryBrowseCatalogItemCopy fromPreview(
-    Md3eLabCatalogItemPreview preview,
+    LabCatalogItemPreview preview,
   ) {
     return _Md3eLibraryBrowseCatalogItemCopy(
       title: preview.title,
@@ -283,8 +283,8 @@ class _Md3eLibraryBrowseListSliver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    final Md3eWindowSizeClass window = md3eWindowSizeClassOf(context);
-    final int columns = md3eComicListColumnCount(window);
+    final WindowSizeClass window = windowSizeClassOf(context);
+    final int columns = comicListColumnCount(window);
 
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -347,7 +347,7 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final _Md3eLibraryBrowseCatalogItemCopy copy =
         _Md3eLibraryBrowseCatalogItemCopy.fromPreview(
-          Md3eLabCatalogItemPreview.forIndex(
+          LabCatalogItemPreview.forIndex(
             displayTarget: displayTarget,
             index: index,
           ),
@@ -358,15 +358,15 @@ class _Md3eLibraryBrowseListItem extends StatelessWidget {
         : null;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Md3eComicListItem(
+      child: ComicListItem(
         title: copy.title,
         author: copy.listAuthor ?? '',
         pageLabel: copy.subtitle,
         readProgress: readProgress,
-        moreMenuEntries: const <Md3eComicListMoreMenuEntry>[
-          Md3eComicListMoreMenuEntry(label: '继续阅读'),
-          Md3eComicListMoreMenuEntry(label: '编辑元数据'),
-          Md3eComicListMoreMenuEntry(label: '删除'),
+        moreMenuEntries: const <ComicListMoreMenuEntry>[
+          ComicListMoreMenuEntry(label: '继续阅读'),
+          ComicListMoreMenuEntry(label: '编辑元数据'),
+          ComicListMoreMenuEntry(label: '删除'),
         ],
         cover: ColoredBox(
           color: scheme.surfaceContainerHigh,

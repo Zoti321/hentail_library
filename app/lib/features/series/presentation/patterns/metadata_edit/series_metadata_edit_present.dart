@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/series/presentation/views/metadata_edit_md3e/series_metadata_edit_page.dart';
+import 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_layout.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 打开系列元数据编辑。
-Future<Md3eSeriesMetadataEditDraft?> showMd3eSeriesMetadataEdit({
+Future<SeriesMetadataEditDraft?> showSeriesMetadataEditLayout({
   required BuildContext context,
-  required Md3eSeriesMetadataEditDraft initialDraft,
+  required SeriesMetadataEditDraft initialDraft,
 }) {
   final GlobalKey pageKey = GlobalKey();
   final AppLocalizations l10n = context.l10n;
 
-  if (Md3eLabDialogPresenter.usesFullScreenPresentation(context)) {
-    return Md3eLabDialogPresenter.showFullScreen<Md3eSeriesMetadataEditDraft>(
+  if (LabDialogPresenter.usesFullScreenPresentation(context)) {
+    return LabDialogPresenter.showFullScreen<SeriesMetadataEditDraft>(
       context,
       title: l10n.dialogEditSeriesTitle,
-      body: Md3eSeriesMetadataEditPage(
+      body: SeriesMetadataEditLayout(
         key: pageKey,
         initialDraft: initialDraft,
-        presentation: Md3eMetadataEditPresentation.labFormBody,
+        presentation: MetadataEditPresentation.labFormBody,
       ),
       confirmLabel: l10n.commonSave,
       onConfirm: () {
@@ -40,13 +40,13 @@ Future<Md3eSeriesMetadataEditDraft?> showMd3eSeriesMetadataEdit({
     );
   }
 
-  return Md3eLabDialogPresenter.showBasic<Md3eSeriesMetadataEditDraft>(
+  return LabDialogPresenter.showBasic<SeriesMetadataEditDraft>(
     context,
-    dialog: Md3eSeriesMetadataEditPage(
+    dialog: SeriesMetadataEditLayout(
       initialDraft: initialDraft,
-      presentation: Md3eMetadataEditPresentation.modal,
+      presentation: MetadataEditPresentation.modal,
       onCancel: () => Navigator.of(context).pop(),
-      onSaved: (Md3eSeriesMetadataEditDraft draft) {
+      onSaved: (SeriesMetadataEditDraft draft) {
         Navigator.of(context).pop(draft);
       },
     ),

@@ -7,8 +7,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 漫画 / 系列详情顶栏左侧：返回、更多、编辑。
-class Md3eDetailHeaderToolbar extends StatelessWidget {
-  const Md3eDetailHeaderToolbar({
+class DetailHeaderToolbar extends StatelessWidget {
+  const DetailHeaderToolbar({
     super.key,
     this.onBack,
     this.onEdit,
@@ -26,7 +26,7 @@ class Md3eDetailHeaderToolbar extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final Color iconColor = scheme.onSurfaceVariant;
-    const double iconSize = Md3eLibraryPageHeaderMetrics.actionIconSize;
+    const double iconSize = LibraryPageHeaderMetrics.actionIconSize;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -49,7 +49,7 @@ class Md3eDetailHeaderToolbar extends StatelessWidget {
             iconSize: iconSize,
           )
         else
-          Md3eAnchoredMenu(
+          AnchoredMenu(
             position: M3EMenuAnchorPosition.bottomStart,
             children: moreMenuEntries,
             anchorBuilder: (BuildContext context, VoidCallback open) {

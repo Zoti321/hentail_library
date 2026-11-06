@@ -6,8 +6,8 @@ import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_it
 ///
 /// 水平留白由外层 `SliverPadding` 负责，这里只用 crossAxisExtent 计算列宽；
 /// 只有进入视口（含 cacheExtent）的行会被构建，因此封面请求也只发生在可见区域。
-class Md3eReadingHistoryListLayout extends StatelessWidget {
-  const Md3eReadingHistoryListLayout({
+class ReadingHistoryListLayout extends StatelessWidget {
+  const ReadingHistoryListLayout({
     super.key,
     required this.itemCount,
     required this.itemBuilder,
@@ -25,8 +25,8 @@ class Md3eReadingHistoryListLayout extends StatelessWidget {
           return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
-        final Md3eReadingHistoryListLayoutSpec layout =
-            Md3eReadingHistoryListItemMetrics.layoutForViewportWidth(
+        final ReadingHistoryListLayoutSpec layout =
+            ReadingHistoryListItemMetrics.layoutForViewportWidth(
               viewportWidth,
               horizontalInset: 0,
             );

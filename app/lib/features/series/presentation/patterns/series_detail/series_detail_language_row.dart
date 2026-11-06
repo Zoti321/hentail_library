@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 系列摘要语言分段（`|` 分隔；数据为卷册语言并集，通常 0–1 项，少见多项）。
-class Md3eSeriesDetailLanguageRow extends StatelessWidget {
-  const Md3eSeriesDetailLanguageRow({super.key, required this.languages});
+class SeriesDetailLanguageRow extends StatelessWidget {
+  const SeriesDetailLanguageRow({super.key, required this.languages});
 
   final List<String> languages;
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 
 /// Lab 阅读器顶/底 chrome 尺寸（沉浸 letterbox + 全宽 scrim）。
-abstract final class Md3eReaderChromeMetrics {
+abstract final class ReaderChromeMetrics {
   static const double edgeGap = 4;
   static const double hideSlidePx = 16;
   static const double topBarMinHeight = 48;
@@ -16,9 +16,9 @@ abstract final class Md3eReaderChromeMetrics {
 
   /// 画布左右 letterbox（竖向仍贴顶/底 chrome）。
   static double viewportHorizontalInset(double viewportWidth) {
-    return switch (Md3eWindowSizeClass.fromWidth(viewportWidth)) {
-      Md3eWindowSizeClass.compact => 12,
-      Md3eWindowSizeClass.medium => 16,
+    return switch (WindowSizeClass.fromWidth(viewportWidth)) {
+      WindowSizeClass.compact => 12,
+      WindowSizeClass.medium => 16,
       _ => 24,
     };
   }
@@ -36,10 +36,10 @@ abstract final class Md3eReaderChromeMetrics {
 
   /// 超大屏（≥1600）时顶/底控件行的最大宽度；其余宽度铺满。
   static double chromeContentMaxWidth(double viewportWidth) {
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
       viewportWidth,
     );
-    if (sizeClass != Md3eWindowSizeClass.extraLarge) {
+    if (sizeClass != WindowSizeClass.extraLarge) {
       return viewportWidth;
     }
     return (viewportWidth * 0.82).clamp(560.0, 1120.0);
@@ -50,7 +50,7 @@ abstract final class Md3eReaderChromeMetrics {
     double viewportWidth, {
     double horizontalSafePadding = 0,
   }) {
-    final Md3eWindowSizeClass sizeClass = Md3eWindowSizeClass.fromWidth(
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
       viewportWidth,
     );
     if (sizeClass.isCompact) {

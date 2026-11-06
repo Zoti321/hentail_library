@@ -16,7 +16,7 @@ void main() {
       expect(createAppThemePreferencesPort, isNotNull);
       expect(createReaderDisplayPreferencesPort, isNotNull);
       expect(createReaderSettingsCommandPort, isNotNull);
-      expect(SettingsMd3ePage, isNotNull);
+      expect(SettingsPage, isNotNull);
       expect(DiagnosticModeBanner, isNotNull);
       expect(settingsProvider, isNotNull);
     },

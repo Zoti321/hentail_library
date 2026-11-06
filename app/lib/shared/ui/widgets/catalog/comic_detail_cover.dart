@@ -4,8 +4,8 @@ import 'package:hentai_library/shared/ui/layout/comic_detail_page_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 详情页封面占位（2:3，轻阴影）。
-class Md3eComicDetailCover extends StatelessWidget {
-  const Md3eComicDetailCover({super.key, this.child, this.width});
+class AppComicDetailCover extends StatelessWidget {
+  const AppComicDetailCover({super.key, this.child, this.width});
 
   final Widget? child;
   final double? width;
@@ -15,11 +15,11 @@ class Md3eComicDetailCover extends StatelessWidget {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final double resolvedWidth =
         width ??
-        Md3eComicDetailPageMetrics.coverWidth(md3eWindowSizeClassOf(context));
+        ComicDetailPageMetrics.coverWidth(windowSizeClassOf(context));
     final double height =
-        resolvedWidth / Md3eComicDetailPageMetrics.coverAspectRatio;
+        resolvedWidth / ComicDetailPageMetrics.coverAspectRatio;
     final BorderRadius radius = BorderRadius.circular(
-      Md3eComicDetailPageMetrics.coverCornerRadius,
+      ComicDetailPageMetrics.coverCornerRadius,
     );
 
     return Material(

@@ -38,10 +38,10 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Md3eSettingsSection(
+            SettingsSection(
               title: Text(l10n.settingsMetadataBackupAutoGroupTitle),
               tiles: <Widget>[
-                Md3eSettingsSwitchTile(
+                SettingsSwitchTile(
                   leading: Symbols.hard_drive,
                   title: Text(l10n.settingsMetadataBackupAutoToggleLabel),
                   description: Text(
@@ -52,12 +52,12 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                       .read(metadataAutoBackupProvider.notifier)
                       .setEnabled(value),
                 ),
-                Md3eSettingsNavigationTile(
+                SettingsNavigationTile(
                   leading: Symbols.folder,
                   title: Text(l10n.settingsMetadataBackupStoragePathLabel),
                   description: Text(storagePath),
                 ),
-                Md3eSettingsNavigationTile(
+                SettingsNavigationTile(
                   leading: Symbols.schedule,
                   title: Text(l10n.settingsMetadataBackupLastBackupLabel),
                   description: Text(
@@ -70,10 +70,10 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                 ),
               ],
             ),
-            Md3eSettingsSection(
+            SettingsSection(
               title: Text(l10n.settingsMetadataBackupManualGroupTitle),
               tiles: <Widget>[
-                Md3eSettingsNavigationTile(
+                SettingsNavigationTile(
                   leading: Symbols.save,
                   title: Text(l10n.settingsMetadataBackupNowLabel),
                   description: Text(l10n.settingsMetadataBackupNowDescription),
@@ -90,7 +90,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                   },
                 ),
                 if (isDesktop)
-                  Md3eSettingsNavigationTile(
+                  SettingsNavigationTile(
                     leading: Symbols.folder_open,
                     title: Text(l10n.settingsMetadataBackupOpenFolderLabel),
                     description: Text(
@@ -106,7 +106,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                       }
                     },
                   ),
-                Md3eSettingsNavigationTile(
+                SettingsNavigationTile(
                   leading: Symbols.upload,
                   title: Text(l10n.settingsMetadataBackupExportLabel),
                   description: Text(
@@ -117,7 +117,7 @@ class MetadataBackupSettingsSections extends ConsumerWidget {
                     initialOptions: const MetadataExportOptions(),
                   ),
                 ),
-                Md3eSettingsNavigationTile(
+                SettingsNavigationTile(
                   leading: Symbols.download,
                   title: Text(l10n.settingsMetadataBackupImportLabel),
                   description: Text(

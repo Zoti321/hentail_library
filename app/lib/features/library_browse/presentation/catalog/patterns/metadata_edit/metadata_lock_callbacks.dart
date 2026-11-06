@@ -1,5 +1,5 @@
 /// 漫画元数据字段锁切换（与生产 [ComicMetaLocks] 字段一一对应）。
-typedef Md3eComicMetadataLockChanged = void Function({
+typedef ComicMetadataLockChanged = void Function({
   bool? title,
   bool? description,
   bool? publishedAt,
@@ -12,7 +12,7 @@ typedef Md3eComicMetadataLockChanged = void Function({
 });
 
 /// 系列元数据字段锁切换。
-typedef Md3eSeriesMetadataLockChanged = void Function({
+typedef SeriesMetadataLockChanged = void Function({
   bool? name,
   bool? serializationStatus,
   bool? totalCount,

@@ -1,9 +1,9 @@
-import 'package:hentai_library/features/comic/presentation/views/comic_detail_md3e/comic_detail_page_entry.dart';
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
 
 /// Widgetbook / 预览用示例漫画详情。
-abstract final class Md3eComicDetailPagePreviewData {
-  static Md3eComicDetailEntry sample() {
-    return const Md3eComicDetailEntry(
+abstract final class ComicDetailPagePreviewData {
+  static ComicDetailViewObject sample() {
+    return const ComicDetailViewObject(
       title: '葬送的芙莉莲',
       description:
           '这是一段用于 Lab 预览的简介文案。最多显示四行，超出部分以省略号截断。'

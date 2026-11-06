@@ -3,38 +3,38 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 与 Kazumi / 书库工具栏一致的 Lucide 图标尺寸（20dp）。
-const double kMd3eCatalogViewModeButtonGroupIconSize = 20;
+const double kCatalogViewModeButtonGroupIconSize = 20;
 
 /// 漫画库目录展示：竖向标准卡片 vs 横向圆角矩形卡片（同一套元数据，仅容器形态不同）。
-enum Md3eCatalogViewMode { grid, list }
+enum CatalogViewMode { grid, list }
 
 /// Kazumi / M3E：connected tonal 双图标按钮组（卡片 · 列表）。
 ///
 /// 选中态 `secondaryContainer`、未选 `surfaceContainerLow`（随 [M3EThemeData]）。
-class Md3eCatalogViewModeButtonGroup extends StatelessWidget {
-  const Md3eCatalogViewModeButtonGroup({
+class CatalogViewModeButtonGroup extends StatelessWidget {
+  const CatalogViewModeButtonGroup({
     super.key,
     required this.mode,
     required this.onModeChanged,
     this.size = M3EButtonSize.sm,
   });
 
-  final Md3eCatalogViewMode mode;
-  final ValueChanged<Md3eCatalogViewMode> onModeChanged;
+  final CatalogViewMode mode;
+  final ValueChanged<CatalogViewMode> onModeChanged;
   final M3EButtonSize size;
 
-  static int indexForMode(Md3eCatalogViewMode mode) {
+  static int indexForMode(CatalogViewMode mode) {
     return switch (mode) {
-      Md3eCatalogViewMode.grid => 0,
-      Md3eCatalogViewMode.list => 1,
+      CatalogViewMode.grid => 0,
+      CatalogViewMode.list => 1,
     };
   }
 
-  static Md3eCatalogViewMode modeForIndex(int index) {
+  static CatalogViewMode modeForIndex(int index) {
     return switch (index) {
-      0 => Md3eCatalogViewMode.grid,
-      1 => Md3eCatalogViewMode.list,
-      _ => Md3eCatalogViewMode.grid,
+      0 => CatalogViewMode.grid,
+      1 => CatalogViewMode.list,
+      _ => CatalogViewMode.grid,
     };
   }
 
@@ -58,12 +58,12 @@ class Md3eCatalogViewModeButtonGroup extends StatelessWidget {
         }
         onModeChanged(modeForIndex(index));
       },
-      decoration: md3eCatalogViewModeButtonGroupDecoration(context),
+      decoration: catalogViewModeButtonGroupDecoration(context),
       actions: const <M3EButtonGroupAction>[
         M3EButtonGroupAction(
           icon: Icon(
             LucideIcons.layoutGrid,
-            size: kMd3eCatalogViewModeButtonGroupIconSize,
+            size: kCatalogViewModeButtonGroupIconSize,
           ),
           semanticLabel: '卡片视图',
           minWidth: 48,
@@ -71,7 +71,7 @@ class Md3eCatalogViewModeButtonGroup extends StatelessWidget {
         M3EButtonGroupAction(
           icon: Icon(
             LucideIcons.list,
-            size: kMd3eCatalogViewModeButtonGroupIconSize,
+            size: kCatalogViewModeButtonGroupIconSize,
           ),
           semanticLabel: '列表视图',
           minWidth: 48,
@@ -82,12 +82,12 @@ class Md3eCatalogViewModeButtonGroup extends StatelessWidget {
 }
 
 /// 选中 / 未选底色（对齐 Kazumi tonal 分段控件观感）。
-M3EButtonDecoration md3eCatalogViewModeButtonGroupDecoration(
+M3EButtonDecoration catalogViewModeButtonGroupDecoration(
   BuildContext context,
 ) {
   final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
   return M3EButtonDecoration(
-    iconSize: kMd3eCatalogViewModeButtonGroupIconSize,
+    iconSize: kCatalogViewModeButtonGroupIconSize,
     foregroundColor: WidgetStatePropertyAll<Color?>(scheme.onSurfaceVariant),
     backgroundColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       if (states.contains(WidgetState.selected)) {

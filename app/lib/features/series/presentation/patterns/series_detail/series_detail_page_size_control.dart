@@ -8,14 +8,14 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 /// 系列详情顶栏每页条数菜单节点（宽屏一级菜单 / 窄屏收进「更多」二级子菜单）。
-List<M3EMenuNode> md3eSeriesDetailPageSizeMenuNodes({
+List<M3EMenuNode> seriesDetailPageSizeMenuNodes({
   required AppLocalizations l10n,
   required int pageSize,
   required ValueChanged<int> onPageSizeChanged,
   required List<int> pageSizeOptions,
   required bool nestedInMoreMenu,
 }) {
-  const double iconSize = Md3eLibraryPageHeaderMetrics.actionIconSize;
+  const double iconSize = LibraryPageHeaderMetrics.actionIconSize;
   final List<M3EMenuNode> options = <M3EMenuNode>[
     for (final int option in pageSizeOptions)
       M3EMenuSelectable(
@@ -38,12 +38,12 @@ List<M3EMenuNode> md3eSeriesDetailPageSizeMenuNodes({
 }
 
 /// 系列详情顶栏每页条数（expanded+：独立按钮 + 一级可选菜单）。
-class Md3eSeriesDetailPageSizeControl extends StatelessWidget {
-  const Md3eSeriesDetailPageSizeControl({
+class SeriesDetailPageSizeControl extends StatelessWidget {
+  const SeriesDetailPageSizeControl({
     super.key,
     required this.pageSize,
     required this.onPageSizeChanged,
-    this.pageSizeOptions = kMd3eLibraryPageSizeOptions,
+    this.pageSizeOptions = kLibraryPageSizeOptions,
   });
 
   final int pageSize;
@@ -54,11 +54,11 @@ class Md3eSeriesDetailPageSizeControl extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    const double iconSize = Md3eLibraryPageHeaderMetrics.actionIconSize;
+    const double iconSize = LibraryPageHeaderMetrics.actionIconSize;
 
-    return Md3eAnchoredMenu(
+    return AnchoredMenu(
       position: M3EMenuAnchorPosition.bottomEnd,
-      children: md3eSeriesDetailPageSizeMenuNodes(
+      children: seriesDetailPageSizeMenuNodes(
         l10n: l10n,
         pageSize: pageSize,
         onPageSizeChanged: onPageSizeChanged,

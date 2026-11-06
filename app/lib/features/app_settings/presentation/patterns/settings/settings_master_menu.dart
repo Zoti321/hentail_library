@@ -7,8 +7,8 @@ import 'package:hentai_library/shared/ui/widgets/settings/settings_section_heade
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 
 /// Settings master pane: rail (wide) or grouped category tiles (narrow).
-class Md3eSettingsMasterMenu extends StatelessWidget {
-  const Md3eSettingsMasterMenu({
+class SettingsMasterMenu extends StatelessWidget {
+  const SettingsMasterMenu({
     super.key,
     required this.wide,
     required this.selected,
@@ -18,21 +18,21 @@ class Md3eSettingsMasterMenu extends StatelessWidget {
   });
 
   final bool wide;
-  final Md3eSettingsCategory selected;
-  final ValueChanged<Md3eSettingsCategory> onSelect;
+  final SettingsCategory selected;
+  final ValueChanged<SettingsCategory> onSelect;
 
   /// Shown above rail items on wide layouts (e.g. 「应用」).
   final String? masterGroupTitle;
 
   /// 为 null 时显示全部分类。
-  final Set<Md3eSettingsCategory>? visibleCategories;
+  final Set<SettingsCategory>? visibleCategories;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final List<Md3eSettingsCategoryInfo> categories =
-        <Md3eSettingsCategoryInfo>[
-          for (final Md3eSettingsCategoryInfo info in kMd3eSettingsCategories)
+    final List<SettingsCategoryInfo> categories =
+        <SettingsCategoryInfo>[
+          for (final SettingsCategoryInfo info in kSettingsCategories)
             if (visibleCategories == null ||
                 visibleCategories!.contains(info.category))
               info,
@@ -49,23 +49,23 @@ class Md3eSettingsMasterMenu extends StatelessWidget {
             if (masterGroupTitle != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(28, 16, 28, 8),
-                child: Md3eSettingsSectionHeader(
+                child: SettingsSectionHeader(
                   title: Text(masterGroupTitle!),
                 ),
               ),
-            for (final Md3eSettingsCategoryInfo info in categories)
-              Md3eSettingsRailDestination(
+            for (final SettingsCategoryInfo info in categories)
+              SettingsRailDestination(
                 icon: info.icon,
                 label: info.label(l10n),
                 selected: selected == info.category,
                 onTap: () => onSelect(info.category),
               ),
           ] else
-            Md3eContentSection.group(
+            ContentSection.group(
               title: masterGroupTitle ?? l10n.navSettings,
               children: <Widget>[
-                for (final Md3eSettingsCategoryInfo info in categories)
-                  Md3eSettingsCategoryTile(
+                for (final SettingsCategoryInfo info in categories)
+                  SettingsCategoryTile(
                     icon: info.icon,
                     title: info.label(l10n),
                     description: info.description(l10n),

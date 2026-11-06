@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+
+import '../../../widgetbook/hosts/md3e_comic_metadata_edit_page_lab_host.dart';
+
+import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+import '../../support/pump_app.dart';
+
+void main() {
+  testWidgets('LabHost 字段锁 KV 可切换标题锁', (WidgetTester tester) async {
+    await tester.binding.setSurfaceSize(const Size(900, 720));
+    await pumpApp(
+      tester,
+      home: const Scaffold(
+        body: SizedBox(
+          width: 900,
+          height: 720,
+          child: ComicMetadataEditPageLabHost(
+            initialLocks: ComicMetaLocks.unlocked,
+          ),
+        ),
+      ),
+    );
+
+    final AppLocalizations l10n = AppLocalizations.of(
+      tester.element(find.byType(ComicMetadataEditPageLabHost)),
+    );
+
+    await tester.tap(find.text(l10n.dialogEditMetadataTabFieldLocks));
+    await tester.pumpAndSettle();
+
+    final Finder titleRow = find.ancestor(
+      of: find.text(l10n.formComicTitleLabel),
+      matching: find.byType(SettingsTileShell),
+    );
+
+    expect(find.byIcon(Symbols.lock_open_right), findsWidgets);
+    expect(find.byIcon(Symbols.lock), findsNothing);
+
+    await tester.tap(titleRow);
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Symbols.lock), findsWidgets);
+
+    await tester.binding.setSurfaceSize(null);
+  });
+}

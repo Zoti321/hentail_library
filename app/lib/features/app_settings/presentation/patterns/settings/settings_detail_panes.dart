@@ -3,40 +3,40 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/settings_page_metrics.dart';
 import 'package:hentai_library/shared/ui/layout/spacing.dart';
-import 'package:hentai_library/shared/ui/patterns/shared/md3e_page_title.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/metadata_backup_import_lab_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/patterns/settings/settings_catalog.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 生产或 Lab 注入某分类的 section 列表（每项为 [Md3eSettingsSection] 等组件）。
-typedef Md3eSettingsSectionsBuilder = List<Widget> Function(
+/// 生产或 Lab 注入某分类的 section 列表（每项为 [SettingsSection] 等组件）。
+typedef SettingsSectionsBuilder = List<Widget> Function(
   BuildContext context,
-  Md3eSettingsCategory category,
+  SettingsCategory category,
 );
 
-/// Detail pane for one [Md3eSettingsCategory].
+/// Detail pane for one [SettingsCategory].
 ///
 /// 未提供 [sectionsBuilder] 时使用 Lab 的 mock 内容（[labState] 驱动）。
-class Md3eSettingsDetailPane extends StatelessWidget {
-  const Md3eSettingsDetailPane({
+class SettingsDetailPane extends StatelessWidget {
+  const SettingsDetailPane({
     super.key,
     required this.category,
     required this.showTitle,
-    this.labState = const Md3eSettingsLabState(),
+    this.labState = const SettingsLabState(),
     this.onLabStateChanged,
-    this.optionLabels = const Md3eSettingsOptionLabels(),
+    this.optionLabels = const SettingsOptionLabels(),
     this.showUnwiredTiles = true,
     this.sectionsBuilder,
   });
 
-  final Md3eSettingsCategory category;
+  final SettingsCategory category;
   final bool showTitle;
-  final Md3eSettingsLabState labState;
-  final ValueChanged<Md3eSettingsLabState>? onLabStateChanged;
-  final Md3eSettingsOptionLabels optionLabels;
-  final Md3eSettingsSectionsBuilder? sectionsBuilder;
+  final SettingsLabState labState;
+  final ValueChanged<SettingsLabState>? onLabStateChanged;
+  final SettingsOptionLabels optionLabels;
+  final SettingsSectionsBuilder? sectionsBuilder;
 
   /// 为 false 时隐藏尚未接入业务的 tile（Pilot 页面使用）。
   final bool showUnwiredTiles;
@@ -44,8 +44,8 @@ class Md3eSettingsDetailPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final Md3eSettingsCategoryInfo info = kMd3eSettingsCategories.firstWhere(
-      (Md3eSettingsCategoryInfo e) => e.category == category,
+    final SettingsCategoryInfo info = kSettingsCategories.firstWhere(
+      (SettingsCategoryInfo e) => e.category == category,
     );
     final List<Widget> sections =
         sectionsBuilder?.call(context, category) ??
@@ -53,12 +53,12 @@ class Md3eSettingsDetailPane extends StatelessWidget {
           context,
           category,
           labState,
-          onLabStateChanged ?? (Md3eSettingsLabState _) {},
+          onLabStateChanged ?? (SettingsLabState _) {},
           optionLabels,
           showUnwiredTiles,
         );
-    final Widget body = Md3eSettingsList(
-      maxWidth: Md3eSettingsPageMetrics.detailListMaxWidth,
+    final Widget body = SettingsList(
+      maxWidth: SettingsPageMetrics.detailListMaxWidth,
       sections: sections,
     );
 
@@ -71,8 +71,8 @@ class Md3eSettingsDetailPane extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(bottom: Md3eSpacing.space8),
-          child: Md3ePageTitle(info.label(l10n)),
+          padding: const EdgeInsets.only(bottom: Spacing.space8),
+          child: PageTitle(info.label(l10n)),
         ),
         Expanded(child: body),
       ],
@@ -82,26 +82,26 @@ class Md3eSettingsDetailPane extends StatelessWidget {
 
 List<Widget> _sectionsForCategory(
   BuildContext context,
-  Md3eSettingsCategory category,
-  Md3eSettingsLabState labState,
-  ValueChanged<Md3eSettingsLabState> onChanged,
-  Md3eSettingsOptionLabels optionLabels,
+  SettingsCategory category,
+  SettingsLabState labState,
+  ValueChanged<SettingsLabState> onChanged,
+  SettingsOptionLabels optionLabels,
   bool showUnwiredTiles,
 ) {
   final AppLocalizations l10n = context.l10n;
   return switch (category) {
-    Md3eSettingsCategory.personalization => <Widget>[
-      Md3eSettingsSection(
+    SettingsCategory.personalization => <Widget>[
+      SettingsSection(
         title: Text(l10n.settingsSectionAppearance),
         tiles: <Widget>[
-          Md3eSettingsNavigationTile(
+          SettingsNavigationTile(
             leading: Symbols.dark_mode,
             title: Text(l10n.settingsThemeLabel),
             value: Text(labState.themeLabel),
             onTap: () {
               onChanged(
                 labState.copyWith(
-                  themeLabel: nextMd3eOption(
+                  themeLabel: nextOption(
                     labState.themeLabel,
                     optionLabels.themeOptions,
                   ),
@@ -109,14 +109,14 @@ List<Widget> _sectionsForCategory(
               );
             },
           ),
-          Md3eSettingsNavigationTile(
+          SettingsNavigationTile(
             leading: Symbols.language,
             title: Text(l10n.settingsLanguageLabel),
             value: Text(labState.localeLabel),
             onTap: () {
               onChanged(
                 labState.copyWith(
-                  localeLabel: nextMd3eOption(
+                  localeLabel: nextOption(
                     labState.localeLabel,
                     optionLabels.localeOptions,
                   ),
@@ -126,17 +126,17 @@ List<Widget> _sectionsForCategory(
           ),
         ],
       ),
-      Md3eSettingsSection(
+      SettingsSection(
         title: Text(l10n.settingsSectionReading),
         tiles: <Widget>[
-          Md3eSettingsNavigationTile(
+          SettingsNavigationTile(
             leading: Symbols.menu_book,
             title: Text(l10n.readerSettingsReadingMode),
             value: Text(labState.readingModeLabel),
             onTap: () {
               onChanged(
                 labState.copyWith(
-                  readingModeLabel: nextMd3eOption(
+                  readingModeLabel: nextOption(
                     labState.readingModeLabel,
                     optionLabels.readingModeOptions,
                   ),
@@ -147,10 +147,10 @@ List<Widget> _sectionsForCategory(
         ],
       ),
       if (showUnwiredTiles)
-        Md3eSettingsSection(
+        SettingsSection(
           title: Text(l10n.settingsSectionLibraryBrowse),
           tiles: <Widget>[
-            Md3eSettingsSwitchTile(
+            SettingsSwitchTile(
               leading: Symbols.shield,
               title: Text(l10n.settingsHealthyModeLabel),
               description: Text(l10n.settingsHealthyModeDescription),
@@ -162,11 +162,11 @@ List<Widget> _sectionsForCategory(
           ],
         ),
     ],
-    Md3eSettingsCategory.metadataBackup => <Widget>[
-      Md3eSettingsSection(
+    SettingsCategory.metadataBackup => <Widget>[
+      SettingsSection(
         title: Text(l10n.settingsMetadataBackupAutoGroupTitle),
         tiles: <Widget>[
-          Md3eSettingsSwitchTile(
+          SettingsSwitchTile(
             leading: Symbols.backup,
             title: Text(l10n.settingsMetadataBackupAutoToggleLabel),
             description: Text(l10n.settingsMetadataBackupAutoToggleDescription),
@@ -177,35 +177,35 @@ List<Widget> _sectionsForCategory(
           ),
         ],
       ),
-      Md3eSettingsSection(
+      SettingsSection(
         title: Text(l10n.settingsMetadataBackupManualGroupTitle),
         tiles: <Widget>[
-          Md3eSettingsNavigationTile(
+          SettingsNavigationTile(
             leading: Symbols.upload,
             title: Text(l10n.settingsMetadataBackupNowLabel),
             description: Text(l10n.settingsMetadataBackupNowDescription),
             onTap: () {},
           ),
-          Md3eSettingsNavigationTile(
+          SettingsNavigationTile(
             leading: Symbols.folder_open,
             title: Text(l10n.settingsMetadataBackupOpenFolderLabel),
             description: Text(l10n.settingsMetadataBackupOpenFolderDescription),
             onTap: () {},
           ),
-          Md3eSettingsNavigationTile(
+          SettingsNavigationTile(
             leading: Symbols.restore,
             title: Text(l10n.settingsMetadataBackupImportLabel),
             description: Text(l10n.settingsMetadataBackupImportDescription),
-            onTap: () => showMd3eMetadataBackupImportLabFlow(context),
+            onTap: () => showMetadataBackupImportLabFlow(context),
           ),
         ],
       ),
     ],
-    Md3eSettingsCategory.diagnostics => <Widget>[
-      Md3eSettingsSection(
+    SettingsCategory.diagnostics => <Widget>[
+      SettingsSection(
         title: Text(l10n.settingsSectionDiagnostics),
         tiles: <Widget>[
-          Md3eSettingsSwitchTile(
+          SettingsSwitchTile(
             leading: Symbols.bug_report,
             title: Text(l10n.settingsDiagnosticModeLabel),
             description: Text(
@@ -219,7 +219,7 @@ List<Widget> _sectionsForCategory(
             },
           ),
           if (showUnwiredTiles)
-            Md3eSettingsNavigationTile(
+            SettingsNavigationTile(
               leading: Symbols.article,
               title: Text(l10n.settingsExportLogsLabel),
               onTap: () {},
@@ -227,11 +227,11 @@ List<Widget> _sectionsForCategory(
         ],
       ),
     ],
-    Md3eSettingsCategory.about => <Widget>[
-      Md3eSettingsSection(
+    SettingsCategory.about => <Widget>[
+      SettingsSection(
         title: Text(l10n.settingsSectionUpdates),
         tiles: <Widget>[
-          Md3eSettingsSwitchTile(
+          SettingsSwitchTile(
             leading: Symbols.download,
             title: Text(l10n.settingsAutoUpdateLabel),
             value: labState.autoUpdate,
@@ -240,7 +240,7 @@ List<Widget> _sectionsForCategory(
             },
           ),
           if (showUnwiredTiles)
-            Md3eSettingsNavigationTile(
+            SettingsNavigationTile(
               leading: Symbols.info,
               title: Text(l10n.settingsCheckForUpdatesLabel),
               value: Text(l10n.settingsCurrentVersion('0.0.0-lab')),
@@ -253,7 +253,7 @@ List<Widget> _sectionsForCategory(
 }
 
 /// 阅读模式 preview 取值（与生产 `ReadingMode` 展示名对齐，循环切换）。
-const List<String> kMd3eSettingsReadingModeLabels = <String>[
+const List<String> kSettingsReadingModeLabels = <String>[
   '单页',
   '双页',
   '双页（封面独立）',
@@ -261,11 +261,11 @@ const List<String> kMd3eSettingsReadingModeLabels = <String>[
 ];
 
 /// 设置页可选项文案：Lab 使用默认值，生产 Pilot 注入 l10n 文案（顺序与枚举 `values` 一致）。
-class Md3eSettingsOptionLabels {
-  const Md3eSettingsOptionLabels({
+class SettingsOptionLabels {
+  const SettingsOptionLabels({
     this.themeOptions = const <String>['深色', '浅色'],
     this.localeOptions = const <String>['简体中文', 'English'],
-    this.readingModeOptions = kMd3eSettingsReadingModeLabels,
+    this.readingModeOptions = kSettingsReadingModeLabels,
   });
 
   final List<String> themeOptions;
@@ -274,13 +274,13 @@ class Md3eSettingsOptionLabels {
 }
 
 /// 循环切换到下一个可选项；当前值不在列表中时从第一项开始。
-String nextMd3eOption(String current, List<String> options) {
+String nextOption(String current, List<String> options) {
   final int index = options.indexOf(current);
   return options[(index + 1) % options.length];
 }
 
-class Md3eSettingsLabState {
-  const Md3eSettingsLabState({
+class SettingsLabState {
+  const SettingsLabState({
     this.themeLabel = '深色',
     this.localeLabel = '简体中文',
     this.autoMetadataBackup = true,
@@ -298,7 +298,7 @@ class Md3eSettingsLabState {
   final String readingModeLabel;
   final bool healthyMode;
 
-  Md3eSettingsLabState copyWith({
+  SettingsLabState copyWith({
     String? themeLabel,
     String? localeLabel,
     bool? autoMetadataBackup,
@@ -307,7 +307,7 @@ class Md3eSettingsLabState {
     String? readingModeLabel,
     bool? healthyMode,
   }) {
-    return Md3eSettingsLabState(
+    return SettingsLabState(
       themeLabel: themeLabel ?? this.themeLabel,
       localeLabel: localeLabel ?? this.localeLabel,
       autoMetadataBackup: autoMetadataBackup ?? this.autoMetadataBackup,

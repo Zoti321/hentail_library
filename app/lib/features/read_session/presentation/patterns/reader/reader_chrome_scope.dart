@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 沉浸阅读色彩（MD3 tonal surface + 纯黑 letterbox；Lab 暂不接封面 Monet）。
-abstract final class Md3eReaderImmersiveColors {
+abstract final class ReaderImmersiveColors {
   /// 画格外 letterbox：深黑底，突出纸面与 M3E 控件对比。
   static Color letterbox(M3EColorScheme scheme) => const Color(0xFF121212);
 
@@ -20,8 +20,8 @@ abstract final class Md3eReaderImmersiveColors {
 }
 
 /// 沉浸阅读 chrome 上的前景色（继承 M3E [ColorScheme]）。
-class Md3eReaderChromeScope extends InheritedWidget {
-  const Md3eReaderChromeScope({
+class ReaderChromeScope extends InheritedWidget {
+  const ReaderChromeScope({
     super.key,
     required this.onChrome,
     required this.onChromeVariant,
@@ -31,19 +31,19 @@ class Md3eReaderChromeScope extends InheritedWidget {
   final Color onChrome;
   final Color onChromeVariant;
 
-  static Md3eReaderChromeScope of(BuildContext context) {
-    final Md3eReaderChromeScope? scope = context
-        .dependOnInheritedWidgetOfExactType<Md3eReaderChromeScope>();
-    assert(scope != null, 'Md3eReaderChromeScope not found');
+  static ReaderChromeScope of(BuildContext context) {
+    final ReaderChromeScope? scope = context
+        .dependOnInheritedWidgetOfExactType<ReaderChromeScope>();
+    assert(scope != null, 'ReaderChromeScope not found');
     return scope!;
   }
 
-  static Md3eReaderChromeScope? maybeOf(BuildContext context) {
-    return context.getInheritedWidgetOfExactType<Md3eReaderChromeScope>();
+  static ReaderChromeScope? maybeOf(BuildContext context) {
+    return context.getInheritedWidgetOfExactType<ReaderChromeScope>();
   }
 
   @override
-  bool updateShouldNotify(Md3eReaderChromeScope oldWidget) {
+  bool updateShouldNotify(ReaderChromeScope oldWidget) {
     return onChrome != oldWidget.onChrome ||
         onChromeVariant != oldWidget.onChromeVariant;
   }

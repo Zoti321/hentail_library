@@ -5,18 +5,18 @@ import 'package:motor/motor.dart';
 /// 数值补间：目标值变化时，从当前显示值向新目标值的过渡由 M3E 效果弹簧驱动（非线性）。
 ///
 /// 中途变化目标时从当前显示值接续，不跳变。开启"减少动效"时直接到达目标值。
-class Md3eSpringValue extends StatefulWidget {
-  const Md3eSpringValue({
+class SpringValue extends StatefulWidget {
+  const SpringValue({
     super.key,
     required this.value,
     required this.builder,
-    this.motion = Md3eMotion.effectsSpring,
+    this.motion = LabMotion.effectsSpring,
     this.child,
   });
 
   final double value;
 
-  /// 默认效果弹簧（无过冲）；需要回弹时传入空间弹簧（如 [Md3eMotion.spatialReveal]）。
+  /// 默认效果弹簧（无过冲）；需要回弹时传入空间弹簧（如 [LabMotion.spatialReveal]）。
   final Motion motion;
 
   /// 不随数值变化的子组件，原样传给 [builder]。
@@ -26,10 +26,10 @@ class Md3eSpringValue extends StatefulWidget {
   builder;
 
   @override
-  State<Md3eSpringValue> createState() => _Md3eSpringValueState();
+  State<SpringValue> createState() => _SpringValueState();
 }
 
-class _Md3eSpringValueState extends State<Md3eSpringValue>
+class _SpringValueState extends State<SpringValue>
     with SingleTickerProviderStateMixin {
   late final SingleMotionController _controller;
   late double _from = widget.value;
@@ -46,14 +46,14 @@ class _Md3eSpringValueState extends State<Md3eSpringValue>
   }
 
   @override
-  void didUpdateWidget(Md3eSpringValue oldWidget) {
+  void didUpdateWidget(SpringValue oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value == widget.value) {
       return;
     }
     _from = _current();
     _to = widget.value;
-    if (Md3eMotion.reduceMotionOf(context)) {
+    if (LabMotion.reduceMotionOf(context)) {
       _controller.value = 1;
     } else {
       _controller.value = 0;

@@ -6,5 +6,5 @@ export 'public/di/named_metadata_repository_factory.dart';
 export 'public/named_metadata_form_listing.dart';
 export 'public/presentation/metadata_management_exports.dart';
 export 'public/named_metadata_cross_feature_types.dart';
-export 'public/ui/metadata_md3e_lab_patterns.dart';
-export 'public/ui/metadata_md3e_page.dart';
+export 'public/ui/metadata_lab_patterns.dart';
+export 'public/ui/metadata_page.dart';

@@ -5,8 +5,8 @@ import 'package:hentai_library/shared/ui/widgets/pagination/pagination_metrics.d
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Single page number control in the standard pagination strip.
-class Md3ePaginationPageButton extends StatelessWidget {
-  const Md3ePaginationPageButton({
+class PaginationPageButton extends StatelessWidget {
+  const PaginationPageButton({
     super.key,
     required this.page,
     required this.selected,
@@ -18,7 +18,7 @@ class Md3ePaginationPageButton extends StatelessWidget {
   final bool selected;
   final VoidCallback? onPressed;
 
-  /// When false, selection is drawn by [Md3ePaginationStandardPageStrip].
+  /// When false, selection is drawn by [PaginationStandardPageStrip].
   final bool showSelectionFill;
 
   @override
@@ -29,12 +29,12 @@ class Md3ePaginationPageButton extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     return SizedBox(
-      width: Md3ePaginationMetrics.pageButtonSlotWidth,
-      height: Md3ePaginationMetrics.pageButtonSlotWidth,
+      width: PaginationMetrics.pageButtonSlotWidth,
+      height: PaginationMetrics.pageButtonSlotWidth,
       child: M3ETappable(
         onTap: onPressed,
         enabled: onPressed != null,
-        semanticLabel: context.l10n.md3ePaginationPageSemantic(page),
+        semanticLabel: context.l10n.paginationPageSemantic(page),
         builder: (BuildContext context, M3EInteractionState state) {
           final double stateAlpha = tabTheme.stateOpacity(
             hovered: state.hovered,
@@ -57,14 +57,14 @@ class Md3ePaginationPageButton extends StatelessWidget {
           );
 
           return Center(
-            child: Md3eEffectsDecoratedBox(
+            child: EffectsDecoratedBox(
               decoration: BoxDecoration(
                 color: fill,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: SizedBox(
-                width: Md3ePaginationMetrics.pageButtonVisualSize,
-                height: Md3ePaginationMetrics.pageButtonVisualSize,
+                width: PaginationMetrics.pageButtonVisualSize,
+                height: PaginationMetrics.pageButtonVisualSize,
                 child: Center(child: Text('$page', style: labelStyle)),
               ),
             ),
@@ -75,31 +75,31 @@ class Md3ePaginationPageButton extends StatelessWidget {
   }
 }
 
-/// Ellipsis slot matching [Md3ePaginationPageButton] footprint.
-class Md3ePaginationEllipsisSlot extends StatelessWidget {
-  const Md3ePaginationEllipsisSlot({super.key, required this.style});
+/// Ellipsis slot matching [PaginationPageButton] footprint.
+class PaginationEllipsisSlot extends StatelessWidget {
+  const PaginationEllipsisSlot({super.key, required this.style});
 
   final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Md3ePaginationMetrics.pageButtonSlotWidth,
-      height: Md3ePaginationMetrics.pageButtonSlotWidth,
+      width: PaginationMetrics.pageButtonSlotWidth,
+      height: PaginationMetrics.pageButtonSlotWidth,
       child: Center(child: Text('…', style: style)),
     );
   }
 }
 
 /// Invisible slot reserved for stable strip width.
-class Md3ePaginationEmptySlot extends StatelessWidget {
-  const Md3ePaginationEmptySlot({super.key});
+class PaginationEmptySlot extends StatelessWidget {
+  const PaginationEmptySlot({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Md3ePaginationMetrics.pageButtonSlotWidth,
-      height: Md3ePaginationMetrics.pageButtonSlotWidth,
+      width: PaginationMetrics.pageButtonSlotWidth,
+      height: PaginationMetrics.pageButtonSlotWidth,
     );
   }
 }

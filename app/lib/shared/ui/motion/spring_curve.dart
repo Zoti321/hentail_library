@@ -5,8 +5,8 @@ import 'package:motor/motor.dart';
 ///
 /// 进度 `t`（0..1）换算为秒后取弹簧位置，因此弹簧的回弹在整个时长内完成，
 /// 而不是被压缩到 1 秒内。
-class Md3eSpringCurve extends Curve {
-  Md3eSpringCurve({required Motion motion, required Duration duration})
+class SpringCurve extends Curve {
+  SpringCurve({required Motion motion, required Duration duration})
     : _simulation = motion.createSimulation(),
       _seconds = duration.inMicroseconds / Duration.microsecondsPerSecond;
 

@@ -1,0 +1,30 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
+
+/// 管理页粘滞头：仅左侧标题（间距与字阶来自 [PageLayoutSpec]）。
+class ManagementPageHeader extends StatelessWidget {
+  const ManagementPageHeader({super.key, this.title});
+
+  /// Defaults to [AppLocalizations.navMetadata] when null.
+  final String? title;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: layout.headerVerticalInset),
+      child: SizedBox(
+        height: PageLayoutSpec.toolbarRowHeight,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: PageTitle(title ?? l10n.navMetadata),
+        ),
+      ),
+    );
+  }
+}

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Label column width on comic detail metadata rows (production `kComicDetailMetaLabelWidth`).
-const double kMd3eComicDetailMetaLabelWidth = 88;
+const double kComicDetailMetaLabelWidth = 88;
 
 /// Horizontal gap between metadata chips (MASTER §5.1).
-const double kMd3eComicDetailMetaChipGap = 8;
+const double kComicDetailMetaChipGap = 8;
 
 /// One KV row: fixed-width label + wrapping suggestion chips (detail tag / author / …).
-class Md3eComicDetailMetaChipRow extends StatelessWidget {
-  const Md3eComicDetailMetaChipRow({
+class ComicDetailMetaChipRow extends StatelessWidget {
+  const ComicDetailMetaChipRow({
     super.key,
     required this.label,
     required this.items,
@@ -33,7 +33,7 @@ class Md3eComicDetailMetaChipRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         SizedBox(
-          width: kMd3eComicDetailMetaLabelWidth,
+          width: kComicDetailMetaLabelWidth,
           child: Text(
             label,
             style: type.bodySmall.copyWith(
@@ -45,8 +45,8 @@ class Md3eComicDetailMetaChipRow extends StatelessWidget {
         SizedBox(width: theme.spacing.lg),
         Expanded(
           child: Wrap(
-            spacing: kMd3eComicDetailMetaChipGap,
-            runSpacing: kMd3eComicDetailMetaChipGap,
+            spacing: kComicDetailMetaChipGap,
+            runSpacing: kComicDetailMetaChipGap,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
               for (final String item in items)

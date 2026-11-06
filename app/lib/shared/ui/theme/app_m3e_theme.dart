@@ -3,28 +3,28 @@ import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// App UI font ([pubspec.yaml] `MI_Sans_Regular`); aligned with production shell.
-const String kMd3eAppFontFamily = 'MI_Sans_Regular';
+const String kAppFontFamily = 'MI_Sans_Regular';
 
 /// MD3E default seed (Widgetbook Lab purple). Production uses the same seed.
-const Color kMd3eLabSeedColor = Color(0xFF6750A4);
+const Color kLabSeedColor = Color(0xFF6750A4);
 
 M3EColorScheme m3eColorSchemeForBrightness(
   Brightness brightness, {
-  Color seed = kMd3eLabSeedColor,
+  Color seed = kLabSeedColor,
 }) {
   return M3EColorScheme.fromSeed(seed, brightness: brightness);
 }
 
 /// Applies app font to [M3EThemeData.fontFamily] and [M3EThemeData.typography].
-M3EThemeData md3eWithAppFontFamily(M3EThemeData base) {
+M3EThemeData withAppFontFamily(M3EThemeData base) {
   return base.copyWith(
-    fontFamily: kMd3eAppFontFamily,
-    typography: base.typography.apply(fontFamily: kMd3eAppFontFamily),
+    fontFamily: kAppFontFamily,
+    typography: base.typography.apply(fontFamily: kAppFontFamily),
   );
 }
 
-M3EThemeData applyMd3eShellNavRailOverrides(M3EThemeData base) {
-  final M3EThemeData withFont = md3eWithAppFontFamily(base);
+M3EThemeData applyShellNavRailOverrides(M3EThemeData base) {
+  final M3EThemeData withFont = withAppFontFamily(base);
   final M3EColorScheme colors = withFont.colorScheme;
   return withFont.copyWith(
     navigationRailTheme: withFont.navigationRailTheme.copyWith(
@@ -46,11 +46,11 @@ M3EThemeData buildAppM3eThemeData(Brightness brightness) {
   final M3EThemeData base = M3EThemeData(
     colorScheme: m3eColorSchemeForBrightness(brightness),
   );
-  return applyMd3eShellNavRailOverrides(
+  return applyShellNavRailOverrides(
     base.copyWith(
-      // 与 [Md3eBreakpoints.expanded] 对齐：宽度 < 840 时 M3EDialog.showAdaptive 全屏，否则基础弹窗。
+      // 与 [Breakpoints.expanded] 对齐：宽度 < 840 时 M3EDialog.showAdaptive 全屏，否则基础弹窗。
       dialogTheme: base.dialogTheme.copyWith(
-        compactBreakpoint: Md3eBreakpoints.expanded,
+        compactBreakpoint: Breakpoints.expanded,
       ),
     ),
   );
@@ -97,11 +97,11 @@ ColorScheme flutterColorSchemeFromM3e(M3EColorScheme scheme) {
 }
 
 /// Flutter [ThemeData] for legacy widgets alongside [M3ETheme] (overlays, dialogs).
-ThemeData buildMd3eMaterialTheme(Brightness brightness, {M3EThemeData? m3e}) {
+ThemeData buildMaterialTheme(Brightness brightness, {M3EThemeData? m3e}) {
   final M3EThemeData resolved = m3e ?? buildAppM3eThemeData(brightness);
   return ThemeData(
     useMaterial3: true,
-    fontFamily: kMd3eAppFontFamily,
+    fontFamily: kAppFontFamily,
     colorScheme: flutterColorSchemeFromM3e(resolved.colorScheme),
   );
 }

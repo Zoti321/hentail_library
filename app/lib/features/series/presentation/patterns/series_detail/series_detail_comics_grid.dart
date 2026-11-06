@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
-import 'package:hentai_library/features/series/presentation/views/series_detail_md3e/series_detail_page_entry.dart';
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
@@ -10,15 +10,15 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 系列内漫画网格（复用书库 [Md3eCatalogGridSliver] 布局）。
-class Md3eSeriesDetailComicsGrid extends ConsumerWidget {
-  const Md3eSeriesDetailComicsGrid({
+/// 系列内漫画网格（复用书库 [CatalogGridSliver] 布局）。
+class SeriesDetailComicsGrid extends ConsumerWidget {
+  const SeriesDetailComicsGrid({
     super.key,
     required this.items,
     this.onComicTap,
   });
 
-  final List<Md3eSeriesDetailComicItem> items;
+  final List<SeriesDetailComicItem> items;
   final ValueChanged<int>? onComicTap;
 
   @override
@@ -46,17 +46,17 @@ class Md3eSeriesDetailComicsGrid extends ConsumerWidget {
       );
     }
 
-    return Md3eCatalogGridSliver(
+    return CatalogGridSliver(
       horizontalMargin: 0,
       itemCount: items.length,
-      itemBuilder: (BuildContext context, int index, Md3eCatalogGridLayout _) {
-        final Md3eSeriesDetailComicItem item = items[index];
+      itemBuilder: (BuildContext context, int index, CatalogGridLayout _) {
+        final SeriesDetailComicItem item = items[index];
         final String? subtitle = item.pageCount == null
             ? null
             : l10n.comicDetailPageCount(item.pageCount!);
         final Comic? comic = item.comic;
         final String? comicId = comic?.comicId;
-        final Widget card = Md3eComicCard(
+        final Widget card = ComicCard(
           title: item.title,
           subtitle: subtitle,
           readProgress: item.readProgress,
@@ -87,7 +87,7 @@ class Md3eSeriesDetailComicsGrid extends ConsumerWidget {
         if (comic == null) {
           return card;
         }
-        return Md3eComicCardActions(
+        return ComicCardActions(
           key: ValueKey<String>(comic.comicId),
           comic: comic,
           enabled: !selectionActive,
