@@ -38,6 +38,7 @@ class CardLetterboxedCoverImage extends StatelessWidget {
             fit: fit,
             alignment: alignment,
             cacheWidth: cacheSize.cacheWidth,
+            gaplessPlayback: true,
             placeholder: const ComicCoverPlaceholder(
               variant: ComicCoverPlaceholderVariant.card,
               kind: ComicCoverPlaceholderKind.loading,

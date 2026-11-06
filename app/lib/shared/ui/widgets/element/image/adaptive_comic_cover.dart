@@ -58,6 +58,8 @@ class AdaptiveComicCover extends StatelessWidget {
               filePath: coverDisplay?.filePath,
               fit: _effectiveFit,
               filterQuality: filterQuality,
+              // 对齐 Kazumi 详情侧 fadeIn/Out = 0，避免 Hero 交接时加载闪烁。
+              gaplessPlayback: true,
               placeholder: placeholder,
               errorPlaceholder: errorPlaceholder ?? placeholder,
               onDecodeError: onDecodeError,

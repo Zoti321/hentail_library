@@ -21,12 +21,13 @@ class AppComicDetailCover extends StatelessWidget {
       ComicDetailPageMetrics.coverCornerRadius,
     );
 
+    // 白底与列表 letterbox 封面一致，避免 Hero 落地时露出 surfaceContainer 闪一下。
     return Material(
       elevation: M3EElevation.level1,
       shadowColor: scheme.shadow.withValues(alpha: 0.18),
       borderRadius: radius,
       clipBehavior: Clip.antiAlias,
-      color: scheme.surfaceContainerHighest,
+      color: Colors.white,
       child: SizedBox(
         width: resolvedWidth,
         height: height,

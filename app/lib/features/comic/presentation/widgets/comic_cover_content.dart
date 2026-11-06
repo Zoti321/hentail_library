@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,6 +18,7 @@ class ComicCoverContent extends ConsumerWidget {
     this.coverViewport,
     this.fit = BoxFit.contain,
     this.alignment = Alignment.center,
+    this.enableHero = true,
   });
 
   /// [BoxFit.cover] 时填满并裁剪（横幅、头像）。
@@ -34,6 +36,9 @@ class ComicCoverContent extends ConsumerWidget {
   /// 覆盖默认的库页视口集合（例如 History 专用 notifier）。
   final ProviderListenable<Set<int>>? coverViewport;
 
+  /// 为 false 时不包 [Hero]（例如系列封面回退到成员漫画图，避免嵌套 Hero）。
+  final bool enableHero;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThumbnailPriority effectivePriority = _effectivePriority(ref);
@@ -44,7 +49,7 @@ class ComicCoverContent extends ConsumerWidget {
         .bumpPriority(effectivePriority);
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
-    return switch (state) {
+    final Widget cover = switch (state) {
       ComicCoverReady(:final data) => CardLetterboxedCoverImage(
         cover: data,
         fit: fit,
@@ -75,6 +80,12 @@ class ComicCoverContent extends ConsumerWidget {
         kind: ComicCoverPlaceholderKind.error,
       ),
     };
+
+    return CatalogCoverHero.wrap(
+      tag: CatalogCoverHero.comicTag(comicId),
+      enabled: enableHero,
+      child: cover,
+    );
   }
 
   ThumbnailPriority _effectivePriority(WidgetRef ref) {

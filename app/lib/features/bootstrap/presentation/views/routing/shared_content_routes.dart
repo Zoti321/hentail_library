@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/shared/ui/motion/catalog_detail_page.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
@@ -39,7 +40,7 @@ List<RouteBase> buildSharedContentRoutes({
       name: '漫画详情',
       pageBuilder: (BuildContext context, GoRouterState state) {
         final String comicId = Uri.decodeComponent(state.pathParameters['id']!);
-        return buildDesktopFadeThroughPage(
+        return buildCatalogDetailPage(
           state: state,
           child: resolvedComicDetailBuilder(context, comicId),
         );
@@ -99,7 +100,7 @@ List<RouteBase> buildSharedContentRoutes({
         final String seriesId = Uri.decodeComponent(
           state.pathParameters['id']!,
         );
-        return buildDesktopFadeThroughPage(
+        return buildCatalogDetailPage(
           state: state,
           child: resolvedSeriesDetailBuilder(context, seriesId),
         );

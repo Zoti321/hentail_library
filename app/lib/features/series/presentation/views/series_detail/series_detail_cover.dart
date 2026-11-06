@@ -5,6 +5,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/adaptive_comic_cover.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -22,7 +23,7 @@ class SeriesDetailCover extends ConsumerWidget {
     final AsyncValue<SeriesCoverSource> async = ref.watch(
       seriesCoverSourceProvider(seriesId),
     );
-    return async.when(
+    final Widget cover = async.when(
       loading: () => _cover(null, ComicCoverPlaceholderKind.loading),
       error: (_, _) => _cover(null, ComicCoverPlaceholderKind.error),
       data: (SeriesCoverSource source) => switch (source) {
@@ -36,6 +37,11 @@ class SeriesDetailCover extends ConsumerWidget {
         ),
         SeriesCoverMissing() => _cover(null, ComicCoverPlaceholderKind.noCover),
       },
+    );
+
+    return CatalogCoverHero.wrap(
+      tag: CatalogCoverHero.seriesTag(seriesId),
+      child: cover,
     );
   }
 
