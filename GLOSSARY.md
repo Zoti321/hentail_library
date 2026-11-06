@@ -303,8 +303,16 @@ _Avoid_: 安全模式、青少年模式、R18 过滤
 ### Design & UI
 
 **MD3E design system**:
-生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。实现落在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。Lab 默认紫 seed 仍为临时品牌色，非最终定稿。不替代 Rust 业务真值。
+生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。实现落在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。壳层与组件色消费以 **M3E color roles** 为主；Lab 默认紫 seed 仍为临时品牌色，非最终定稿。不替代 Rust 业务真值。
 _Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）、仍称并行于 Baseline
+
+**Tone-based color system**:
+以 HCT 的 tone（感知亮度）与角色间 tone 差为骨架、从 seed 派生整套颜色角色的约定；是 MD3E design system 的色真源模型，不绑定某个固定 hex。
+_Avoid_: toneBased（壳层 surface 配对 API）、HCT 系统（单指色空间时）、动态配色（系统壁纸取色，另项）
+
+**Reader color extension**:
+阅读器沉浸场景专用的小范围主题色扩展；与壳层配色方案解耦，保持恒暗阅读底，不随应用明暗或 seed 重算整套壳层语义色。
+_Avoid_: HentaiColorScheme（整表语义扩展）、阅读器跟主题（指跟壳层 seed/明暗全量联动时）
 
 **Baseline UI**:
 历史 Fluent 取向共享 UI / 主题装配；Cutover 主体完成后**不再**是生产功能视图主壳。残余命名或个别遗留控件属收尾债，不表示双轨仍在。
