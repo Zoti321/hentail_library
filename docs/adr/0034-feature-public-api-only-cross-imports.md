@@ -58,11 +58,11 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 | `features/<id>/public/ui/` | 含 `BuildContext` 的 UI 命令（不 export View / Notifier） |
 | owner `di/` 或 `public/di/` | Provider 工厂；consumer 仍 read **`shared/di` token** |
 
-**L1（R12）**：`public/` 内 **不得** import 本 feature `presentation/`（含 `view_models/`、`views/`）。
+**L1（R12）**：`public/` 内 **不得** `import` **或** `export` 本 feature `presentation/`（含 `view_models/`、`views/`），除非该源文件列入 Gate allowlist `app/test/gate/public_presentation_export_allowlist.txt`（仅收缩、不扩张；用于既有 `public/ui` 路由页与经评审的 catalog 壳 barrel）。
 
 **Anti-patterns（review 拒收）**
 
-- 在 `public/` export presentation 类型或 re-export `presentation/` barrel。
+- 在 allowlist 之外于 `public/` `import`/`export` presentation，或新增壳桶 re-export 半棵 presentation 树。
 - 在 `public/` 复制 `shared/domain` 实体为第二套 DTO。
 - 让 `shared/**` import `features/*/public/`（R11）。
 - Consumer deep import `features/<other>/data|application|di/`（M1）。

@@ -1,0 +1,27 @@
+# R12 allowlist: features/<id>/public/** may export own presentation/** only if listed.
+# Paths are lib-relative (posix). Only shrink — do not add without ADR-0034 review.
+features/app_settings/public/presentation/settings_view_model_exports.dart
+features/app_settings/public/ui/diagnostic_mode_banner.dart
+features/app_settings/public/ui/settings_page.dart
+features/comic/public/comic_detail_return_series.dart
+features/comic/public/smart_facet_match_preference.dart
+features/comic/public/ui/comic_cover_content.dart
+features/comic/public/ui/comic_detail_layout.dart
+features/comic/public/ui/comic_detail_page.dart
+features/comic_trash/public/ui/trash_page.dart
+features/home/public/ui/home_page.dart
+features/library_admin/public/presentation/library_admin_bootstrap_exports.dart
+features/library_admin/public/ui/home_library_management_panel.dart
+features/library_browse/public/catalog/for_comic_and_series.dart
+features/library_browse/public/presentation/library_browse_bootstrap_exports.dart
+features/library_browse/public/ui/author_detail_page.dart
+features/library_browse/public/ui/library_page.dart
+features/named_metadata/public/presentation/metadata_management_exports.dart
+features/named_metadata/public/ui/metadata_lab_patterns.dart
+features/named_metadata/public/ui/metadata_page.dart
+features/read_session/public/presentation/open_read_session.dart
+features/read_session/public/presentation/reader_route_args.dart
+features/read_session/public/presentation/reader_shell_exports.dart
+features/read_session/public/ui/reader_page.dart
+features/reading_history/public/ui/history_page.dart
+features/series/public/ui/series_detail_page.dart

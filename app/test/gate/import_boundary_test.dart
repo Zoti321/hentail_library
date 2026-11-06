@@ -70,6 +70,33 @@ void main() {
     expect(isFeaturePublicPath('shared/domain/foo.dart'), isFalse);
   });
 
+  test('R12 public→presentation export allowlist (only shrink)', () {
+    expect(
+      isPublicPresentationExportAllowlisted(
+        'features/comic/public/ui/comic_detail_page.dart',
+      ),
+      isTrue,
+    );
+    expect(
+      isPublicPresentationExportAllowlisted(
+        'features/library_browse/public/catalog/for_comic_and_series.dart',
+      ),
+      isTrue,
+    );
+    expect(
+      isPublicPresentationExportAllowlisted(
+        'features/comic/public/shell/library_browse_shell_exports.dart',
+      ),
+      isFalse,
+    );
+    expect(
+      isPublicPresentationExportAllowlisted(
+        'features/series/public/shell/library_browse_shell_exports.dart',
+      ),
+      isFalse,
+    );
+  });
+
   test('import boundaries: L1 structural rules are zero-tolerance', () {
     final List<ImportViolation> all = collectImportViolations(libDir);
     final List<ImportViolation> structural = structuralViolations(all);
