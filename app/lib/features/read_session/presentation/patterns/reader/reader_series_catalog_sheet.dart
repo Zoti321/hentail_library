@@ -3,7 +3,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_adaptive_panel.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_volume.dart';
-import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -45,23 +44,23 @@ class _ReaderSeriesCatalogBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final double itemGap = M3ETheme.of(context).menuTheme.itemGap;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        for (int i = 0; i < volumes.length; i++)
-          SettingsNavigationTile(
-            leading: Symbols.menu_book,
-            title: Text('${i + 1}-${volumes[i].title}'),
+        for (int i = 0; i < volumes.length; i++) ...<Widget>[
+          if (i > 0 && itemGap > 0) SizedBox(height: itemGap),
+          M3EMenuItem(
+            label: '${i + 1}-${volumes[i].title}',
+            leading: const Icon(Symbols.menu_book),
+            selected: volumes[i].id == currentVolumeId,
             onTap: () {
               onVolumeSelected(volumes[i].id);
               Navigator.of(context).maybePop();
             },
-            value: volumes[i].id == currentVolumeId
-                ? Icon(Symbols.check, size: 20, color: scheme.primary)
-                : null,
           ),
+        ],
       ],
     );
   }
