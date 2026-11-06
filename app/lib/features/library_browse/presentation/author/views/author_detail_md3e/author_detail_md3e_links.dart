@@ -53,7 +53,6 @@ class AuthorDetailMd3eLinks extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final M3EThemeData theme = M3ETheme.of(context);
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ValueNotifier<bool> adding = useState(false);
     final ObjectRef<bool> busy = useRef(false);

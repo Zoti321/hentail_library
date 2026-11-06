@@ -5,7 +5,6 @@ import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/comic_trash/public.dart';
 import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/comic/public.dart';
-import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/home/public.dart';

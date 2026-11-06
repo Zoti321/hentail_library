@@ -160,7 +160,7 @@ void main() {
     );
     feedSubscription = container.listen(
       historyPagedFeedControllerProvider,
-      (_, __) {},
+      (_, _) {},
     );
   });
 

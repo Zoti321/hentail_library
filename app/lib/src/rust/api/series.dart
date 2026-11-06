@@ -94,19 +94,24 @@ void setSeriesItemSortOrderLockedFrb({
   locked: locked,
 );
 
-Future<List<SeriesDto>> searchSeriesByKeywordFrb({required String keyword}) =>
-    RustLib.instance.api.crateApiSeriesSearchSeriesByKeywordFrb(
-      keyword: keyword,
-    );
+Future<List<SeriesDto>> searchSeriesByKeywordFrb({
+  required String keyword,
+  String? libraryId,
+}) => RustLib.instance.api.crateApiSeriesSearchSeriesByKeywordFrb(
+  keyword: keyword,
+  libraryId: libraryId,
+);
 
 Future<List<SeriesDto>> searchSeriesByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
   required List<String> mustExclude,
+  String? libraryId,
 }) => RustLib.instance.api.crateApiSeriesSearchSeriesByTagExpressionFrb(
   mustInclude: mustInclude,
   optionalOr: optionalOr,
   mustExclude: mustExclude,
+  libraryId: libraryId,
 );
 
 List<SeriesComicOrderEntryDto> loadHomeSeriesComicOrderMapFrb() =>

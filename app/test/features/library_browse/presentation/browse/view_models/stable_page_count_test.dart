@@ -32,6 +32,9 @@ void main() {
     );
     expect(
       stableCatalogSnapshot(
+        // riverpod marks copyWithPrevious @internal; still the supported way
+        // to build AsyncLoading that retains prior data for this selector.
+        // ignore: invalid_use_of_internal_member
         AsyncLoading<LibraryComicsCatalogState>().copyWithPrevious(
           AsyncData<LibraryComicsCatalogState>(loaded),
         ),

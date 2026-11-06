@@ -139,10 +139,7 @@ Future<Map<String, int>> _matchedSourceCountsForKind({
 }
 
 String? _libraryRootForPath(Ref ref, String resourcePath) {
-  final LibrariesState? state = ref
-      .watch(librariesStateProvider)
-      .asData
-      ?.value;
+  final LibrariesState? state = ref.watch(librariesStateProvider).asData?.value;
   if (state == null) {
     return null;
   }

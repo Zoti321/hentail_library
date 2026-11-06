@@ -431,17 +431,20 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<ComicDto>> crateApiComicSearchByKeywordFrb({
     required String keyword,
+    String? libraryId,
   });
 
   Future<PagedComicResultDto> crateApiComicSearchByKeywordPageFrb({
     required String keyword,
     required PageRequestDto request,
+    String? libraryId,
   });
 
   Future<List<ComicDto>> crateApiComicSearchByTagExpressionFrb({
     required List<String> mustInclude,
     required List<String> optionalOr,
     required List<String> mustExclude,
+    String? libraryId,
   });
 
   Future<PagedComicResultDto> crateApiComicSearchByTagExpressionPageFrb({
@@ -449,16 +452,19 @@ abstract class RustLibApi extends BaseApi {
     required List<String> optionalOr,
     required List<String> mustExclude,
     required PageRequestDto request,
+    String? libraryId,
   });
 
   Future<List<SeriesDto>> crateApiSeriesSearchSeriesByKeywordFrb({
     required String keyword,
+    String? libraryId,
   });
 
   Future<List<SeriesDto>> crateApiSeriesSearchSeriesByTagExpressionFrb({
     required List<String> mustInclude,
     required List<String> optionalOr,
     required List<String> mustExclude,
+    String? libraryId,
   });
 
   Future<SeriesComicsMetadataDto>
@@ -3285,12 +3291,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<List<ComicDto>> crateApiComicSearchByKeywordFrb({
     required String keyword,
+    String? libraryId,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(keyword, serializer);
+          sse_encode_opt_String(libraryId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3303,7 +3311,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiComicSearchByKeywordFrbConstMeta,
-        argValues: [keyword],
+        argValues: [keyword, libraryId],
         apiImpl: this,
       ),
     );
@@ -3312,13 +3320,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicSearchByKeywordFrbConstMeta =>
       const TaskConstMeta(
         debugName: "search_by_keyword_frb",
-        argNames: ["keyword"],
+        argNames: ["keyword", "libraryId"],
       );
 
   @override
   Future<PagedComicResultDto> crateApiComicSearchByKeywordPageFrb({
     required String keyword,
     required PageRequestDto request,
+    String? libraryId,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -3326,6 +3335,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(keyword, serializer);
           sse_encode_box_autoadd_page_request_dto(request, serializer);
+          sse_encode_opt_String(libraryId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3338,7 +3348,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiComicSearchByKeywordPageFrbConstMeta,
-        argValues: [keyword, request],
+        argValues: [keyword, request, libraryId],
         apiImpl: this,
       ),
     );
@@ -3347,7 +3357,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicSearchByKeywordPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "search_by_keyword_page_frb",
-        argNames: ["keyword", "request"],
+        argNames: ["keyword", "request", "libraryId"],
       );
 
   @override
@@ -3355,6 +3365,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required List<String> mustInclude,
     required List<String> optionalOr,
     required List<String> mustExclude,
+    String? libraryId,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -3363,6 +3374,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_String(mustInclude, serializer);
           sse_encode_list_String(optionalOr, serializer);
           sse_encode_list_String(mustExclude, serializer);
+          sse_encode_opt_String(libraryId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3375,7 +3387,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiComicSearchByTagExpressionFrbConstMeta,
-        argValues: [mustInclude, optionalOr, mustExclude],
+        argValues: [mustInclude, optionalOr, mustExclude, libraryId],
         apiImpl: this,
       ),
     );
@@ -3384,7 +3396,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicSearchByTagExpressionFrbConstMeta =>
       const TaskConstMeta(
         debugName: "search_by_tag_expression_frb",
-        argNames: ["mustInclude", "optionalOr", "mustExclude"],
+        argNames: ["mustInclude", "optionalOr", "mustExclude", "libraryId"],
       );
 
   @override
@@ -3393,6 +3405,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required List<String> optionalOr,
     required List<String> mustExclude,
     required PageRequestDto request,
+    String? libraryId,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -3402,6 +3415,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_String(optionalOr, serializer);
           sse_encode_list_String(mustExclude, serializer);
           sse_encode_box_autoadd_page_request_dto(request, serializer);
+          sse_encode_opt_String(libraryId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3414,7 +3428,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiComicSearchByTagExpressionPageFrbConstMeta,
-        argValues: [mustInclude, optionalOr, mustExclude, request],
+        argValues: [mustInclude, optionalOr, mustExclude, request, libraryId],
         apiImpl: this,
       ),
     );
@@ -3423,18 +3437,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicSearchByTagExpressionPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "search_by_tag_expression_page_frb",
-        argNames: ["mustInclude", "optionalOr", "mustExclude", "request"],
+        argNames: [
+          "mustInclude",
+          "optionalOr",
+          "mustExclude",
+          "request",
+          "libraryId",
+        ],
       );
 
   @override
   Future<List<SeriesDto>> crateApiSeriesSearchSeriesByKeywordFrb({
     required String keyword,
+    String? libraryId,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(keyword, serializer);
+          sse_encode_opt_String(libraryId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3447,7 +3469,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiSeriesSearchSeriesByKeywordFrbConstMeta,
-        argValues: [keyword],
+        argValues: [keyword, libraryId],
         apiImpl: this,
       ),
     );
@@ -3456,7 +3478,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiSeriesSearchSeriesByKeywordFrbConstMeta =>
       const TaskConstMeta(
         debugName: "search_series_by_keyword_frb",
-        argNames: ["keyword"],
+        argNames: ["keyword", "libraryId"],
       );
 
   @override
@@ -3464,6 +3486,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required List<String> mustInclude,
     required List<String> optionalOr,
     required List<String> mustExclude,
+    String? libraryId,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -3472,6 +3495,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_String(mustInclude, serializer);
           sse_encode_list_String(optionalOr, serializer);
           sse_encode_list_String(mustExclude, serializer);
+          sse_encode_opt_String(libraryId, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -3484,7 +3508,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiSeriesSearchSeriesByTagExpressionFrbConstMeta,
-        argValues: [mustInclude, optionalOr, mustExclude],
+        argValues: [mustInclude, optionalOr, mustExclude, libraryId],
         apiImpl: this,
       ),
     );
@@ -3493,7 +3517,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiSeriesSearchSeriesByTagExpressionFrbConstMeta =>
       const TaskConstMeta(
         debugName: "search_series_by_tag_expression_frb",
-        argNames: ["mustInclude", "optionalOr", "mustExclude"],
+        argNames: ["mustInclude", "optionalOr", "mustExclude", "libraryId"],
       );
 
   @override

@@ -170,9 +170,15 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<List<Series>> searchByKeyword(String keyword) async {
+  Future<List<Series>> searchByKeyword({
+    required String keyword,
+    required String libraryId,
+  }) async {
     final List<rust_series.SeriesDto> rows = await guardFrb(
-      () => rust_series.searchSeriesByKeywordFrb(keyword: keyword),
+      () => rust_series.searchSeriesByKeywordFrb(
+        keyword: keyword,
+        libraryId: libraryId,
+      ),
       fallbackMessage: '搜索系列失败',
     );
     return rows.map(mapRustSeries).toList();
@@ -183,12 +189,14 @@ class SeriesRepositoryImpl implements SeriesRepository {
     required Set<String> mustInclude,
     required Set<String> optionalOr,
     required Set<String> mustExclude,
+    required String libraryId,
   }) async {
     final List<rust_series.SeriesDto> rows = await guardFrb(
       () => rust_series.searchSeriesByTagExpressionFrb(
         mustInclude: mustInclude.toList(),
         optionalOr: optionalOr.toList(),
         mustExclude: mustExclude.toList(),
+        libraryId: libraryId,
       ),
       fallbackMessage: '按元数据搜索系列失败',
     );

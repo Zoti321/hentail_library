@@ -3134,12 +3134,14 @@ fn wire__crate__api__comic__search_by_keyword_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_keyword = <String>::sse_decode(&mut deserializer);
+            let api_library_id = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
                         let output_ok =
-                            crate::api::comic::search_by_keyword_frb(api_keyword).await?;
+                            crate::api::comic::search_by_keyword_frb(api_keyword, api_library_id)
+                                .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -3172,13 +3174,17 @@ fn wire__crate__api__comic__search_by_keyword_page_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_keyword = <String>::sse_decode(&mut deserializer);
             let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
+            let api_library_id = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::comic::search_by_keyword_page_frb(api_keyword, api_request)
-                                .await?;
+                        let output_ok = crate::api::comic::search_by_keyword_page_frb(
+                            api_keyword,
+                            api_request,
+                            api_library_id,
+                        )
+                        .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -3212,6 +3218,7 @@ fn wire__crate__api__comic__search_by_tag_expression_frb_impl(
             let api_must_include = <Vec<String>>::sse_decode(&mut deserializer);
             let api_optional_or = <Vec<String>>::sse_decode(&mut deserializer);
             let api_must_exclude = <Vec<String>>::sse_decode(&mut deserializer);
+            let api_library_id = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
@@ -3220,6 +3227,7 @@ fn wire__crate__api__comic__search_by_tag_expression_frb_impl(
                             api_must_include,
                             api_optional_or,
                             api_must_exclude,
+                            api_library_id,
                         )
                         .await?;
                         std::result::Result::Ok(output_ok)
@@ -3256,6 +3264,7 @@ fn wire__crate__api__comic__search_by_tag_expression_page_frb_impl(
             let api_optional_or = <Vec<String>>::sse_decode(&mut deserializer);
             let api_must_exclude = <Vec<String>>::sse_decode(&mut deserializer);
             let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
+            let api_library_id = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
@@ -3265,6 +3274,7 @@ fn wire__crate__api__comic__search_by_tag_expression_page_frb_impl(
                             api_optional_or,
                             api_must_exclude,
                             api_request,
+                            api_library_id,
                         )
                         .await?;
                         std::result::Result::Ok(output_ok)
@@ -3298,12 +3308,16 @@ fn wire__crate__api__series__search_series_by_keyword_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_keyword = <String>::sse_decode(&mut deserializer);
+            let api_library_id = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::series::search_series_by_keyword_frb(api_keyword).await?;
+                        let output_ok = crate::api::series::search_series_by_keyword_frb(
+                            api_keyword,
+                            api_library_id,
+                        )
+                        .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -3337,6 +3351,7 @@ fn wire__crate__api__series__search_series_by_tag_expression_frb_impl(
             let api_must_include = <Vec<String>>::sse_decode(&mut deserializer);
             let api_optional_or = <Vec<String>>::sse_decode(&mut deserializer);
             let api_must_exclude = <Vec<String>>::sse_decode(&mut deserializer);
+            let api_library_id = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
@@ -3345,6 +3360,7 @@ fn wire__crate__api__series__search_series_by_tag_expression_frb_impl(
                             api_must_include,
                             api_optional_or,
                             api_must_exclude,
+                            api_library_id,
                         )
                         .await?;
                         std::result::Result::Ok(output_ok)

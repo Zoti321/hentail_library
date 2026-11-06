@@ -9,10 +9,7 @@ import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 import 'package:test/test.dart';
 
 class _CredRepo implements LibraryRepository {
-  _CredRepo({
-    required this.libraries,
-    required this.passwords,
-  });
+  _CredRepo({required this.libraries, required this.passwords});
 
   final List<LocalLibrary> libraries;
   final Map<String, String?> passwords;

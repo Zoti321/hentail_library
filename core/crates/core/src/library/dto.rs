@@ -9,7 +9,6 @@ use crate::entity::libraries;
 use crate::error::HentaiError;
 use crate::sync::resource_format_category::ResourceFormatCategory;
 
-pub(crate) const PREF_CURRENT_LIBRARY_ID: &str = "current_library_id";
 pub(crate) const KIND_LOCAL: &str = "local";
 pub(crate) const KIND_REMOTE: &str = "remote";
 pub(crate) const DEFAULT_RESOURCE_FORMAT_CATEGORIES: [ResourceFormatCategory; 4] =

@@ -1,6 +1,6 @@
-import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
+import 'package:hentai_library/features/series/application/series_item_sort_service.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
-import 'package:hentai_library/features/series/presentation/view_models/series_item_sort_persist.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:test/test.dart';
 
 /// 模拟 core：`updateSeriesItemSortOrder` 写 order 且自动上锁。

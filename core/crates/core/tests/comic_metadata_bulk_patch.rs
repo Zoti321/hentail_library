@@ -2,8 +2,9 @@ mod common;
 
 use hentai_core::{
     apply_comic_metadata_bulk_patch, cancel_sync, connection, create_local_library,
-    try_acquire_library_write_lock, update_comic_user_meta, ComicMetadataBulkPatch, MultiValueOp,
-    MultiValuePatch, PublishedAtPatch, ScalarPatch, UpdateComicUserMetaDto,
+    create_sync_handle, find_comic_by_id, init_db_at_path, try_acquire_library_write_lock,
+    update_comic_user_meta, ComicMetadataBulkPatch, MultiValueOp, MultiValuePatch,
+    PublishedAtPatch, ScalarPatch, UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;

@@ -1,15 +1,20 @@
 mod common;
 
+use std::collections::HashSet;
+
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::sync::writer::clear_all_comics;
 use hentai_core::ComicGrouping;
 use hentai_core::{
-    connection, create_local_library, fetch_comics_page, find_comic_by_id, init_db_at_path,
+    connection, create_local_library, fetch_comics_page, fetch_series_comics_metadata,
+    fetch_series_comics_page, fetch_series_page, find_comic_by_id, init_db_at_path, ComicFilterDto,
+    ComicSortOptionDto, PageRequestDto, SeriesFilterDto, SeriesGrouping, SeriesSortFieldDto,
+    SeriesSortOptionDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
 
-async fn stamp_fixture_to_current_library(db: &DatabaseConnection) {
+async fn stamp_fixture_to_current_library(db: &DatabaseConnection) -> String {
     let lib = create_local_library("C:/漫画", None)
         .await
         .expect("library");
@@ -25,10 +30,13 @@ async fn stamp_fixture_to_current_library(db: &DatabaseConnection) {
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE series SET library_id = ?",
-        [sea_orm::Value::String(Some(Box::new(lib.library_id)))],
+        [sea_orm::Value::String(Some(Box::new(
+            lib.library_id.clone(),
+        )))],
     ))
     .await
     .expect("stamp series");
+    lib.library_id
 }
 
 async fn count_comic_reading_histories(db: &DatabaseConnection) -> i64 {
@@ -72,13 +80,14 @@ fn fetch_comics_page_hides_r18_by_default() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            stamp_fixture_to_current_library(&db).await;
+            let library_id = stamp_fixture_to_current_library(&db).await;
             let page = fetch_comics_page(
                 PageRequestDto {
                     page: 1,
                     page_size: 50,
                 },
                 ComicFilterDto {
+                    library_id: Some(library_id),
                     show_r18: false,
                     ..Default::default()
                 },
@@ -131,23 +140,21 @@ fn fetch_series_page_hides_r18_series_by_default() {
             rebuild_series_from_comics(&db, None)
                 .await
                 .expect("rebuild series");
-            stamp_fixture_to_current_library(&db).await;
-            use hentai_core::{
-                fetch_series_page, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto,
-            };
+            let library_id = stamp_fixture_to_current_library(&db).await;
             let page = fetch_series_page(
                 PageRequestDto {
                     page: 1,
                     page_size: 50,
                 },
                 SeriesFilterDto {
+                    library_id: Some(library_id),
                     show_r18: false,
                     require_items: true,
                     ..Default::default()
                 },
                 SeriesGrouping::None,
                 SeriesSortOptionDto {
-                    field: hentai_core::SeriesSortFieldDto::Name,
+                    field: SeriesSortFieldDto::Name,
                     descending: false,
                 },
             )
@@ -175,23 +182,21 @@ fn fetch_series_page_returns_series_with_items() {
             rebuild_series_from_comics(&db, None)
                 .await
                 .expect("rebuild series");
-            stamp_fixture_to_current_library(&db).await;
-            use hentai_core::{
-                fetch_series_page, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto,
-            };
+            let library_id = stamp_fixture_to_current_library(&db).await;
             let page = fetch_series_page(
                 PageRequestDto {
                     page: 1,
                     page_size: 50,
                 },
                 SeriesFilterDto {
+                    library_id: Some(library_id),
                     show_r18: true,
                     require_items: true,
                     ..Default::default()
                 },
                 SeriesGrouping::None,
                 SeriesSortOptionDto {
-                    field: hentai_core::SeriesSortFieldDto::Name,
+                    field: SeriesSortFieldDto::Name,
                     descending: false,
                 },
             )
@@ -218,24 +223,21 @@ fn fetch_series_comics_page_returns_ordered_comics() {
             rebuild_series_from_comics(&db, None)
                 .await
                 .expect("rebuild series");
-            stamp_fixture_to_current_library(&db).await;
-            use hentai_core::{
-                fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
-                PageRequestDto, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto,
-            };
+            let library_id = stamp_fixture_to_current_library(&db).await;
             let series_page = fetch_series_page(
                 PageRequestDto {
                     page: 1,
                     page_size: 50,
                 },
                 SeriesFilterDto {
+                    library_id: Some(library_id),
                     show_r18: true,
                     require_items: true,
                     ..Default::default()
                 },
                 SeriesGrouping::None,
                 SeriesSortOptionDto {
-                    field: hentai_core::SeriesSortFieldDto::Name,
+                    field: SeriesSortFieldDto::Name,
                     descending: false,
                 },
             )
@@ -307,15 +309,11 @@ fn fetch_series_page_random_order_varies_between_queries() {
             rebuild_series_from_comics(&db, None)
                 .await
                 .expect("rebuild series");
-            stamp_fixture_to_current_library(&db).await;
-            use hentai_core::{
-                fetch_series_page, SeriesFilterDto, SeriesGrouping, SeriesSortFieldDto,
-                SeriesSortOptionDto,
-            };
-            use std::collections::HashSet;
+            let library_id = stamp_fixture_to_current_library(&db).await;
             // 关闭「优先库根」：否则 CASE 分区会把根系列钉死在最前，
             // fixture 里若根/非根各仅少数条，RANDOM() 无法体现整体顺序变化。
             let filter = SeriesFilterDto {
+                library_id: Some(library_id),
                 show_r18: true,
                 require_items: true,
                 prefer_library_root_series: false,

@@ -17,12 +17,11 @@ import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.
 /// 实现与 `createX…Port` 工厂见 owner
 /// `features/library_admin/public.dart`（bootstrap override 注入）。
 
-final Provider<LibrariesPort> librariesPortProvider =
-    Provider<LibrariesPort>(
-      (Ref ref) => throw UnimplementedError(
-        'librariesPortProvider 未注入，请在 bootstrap 中 override',
-      ),
-    );
+final Provider<LibrariesPort> librariesPortProvider = Provider<LibrariesPort>(
+  (Ref ref) => throw UnimplementedError(
+    'librariesPortProvider 未注入，请在 bootstrap 中 override',
+  ),
+);
 
 final Provider<LibraryReorderModePort> libraryReorderModePortProvider =
     Provider<LibraryReorderModePort>(

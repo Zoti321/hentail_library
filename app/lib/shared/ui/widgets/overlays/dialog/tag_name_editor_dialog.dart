@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/outlined_text_field.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
-import 'package:hentai_library/shared/ui/widgets/form/fluent_text_field.dart';
 
 class TagNameEditorDialog extends ConsumerStatefulWidget {
   const TagNameEditorDialog({
@@ -64,12 +64,11 @@ class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
     final l10n = context.l10n;
     return HentaiDialog(
       title: widget.title,
-      content: FluentTextField(
-        initialValue: _controller.text,
-        labelText: widget.labelText,
+      content: Md3eOutlinedTextField(
+        label: widget.labelText,
+        controller: _controller,
         hintText: widget.hintText,
         autofocus: true,
-        onChanged: (value) => _controller.text = value,
         onSubmitted: (_) async {
           if (_saving) return;
           await _handleSave();

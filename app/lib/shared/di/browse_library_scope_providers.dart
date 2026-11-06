@@ -9,8 +9,9 @@ class BrowseLibraryId extends _$BrowseLibraryId {
   String? build() => null;
 
   void setId(String? libraryId) {
-    final String? normalized =
-        libraryId == null || libraryId.trim().isEmpty ? null : libraryId.trim();
+    final String? normalized = libraryId == null || libraryId.trim().isEmpty
+        ? null
+        : libraryId.trim();
     if (state == normalized) {
       return;
     }

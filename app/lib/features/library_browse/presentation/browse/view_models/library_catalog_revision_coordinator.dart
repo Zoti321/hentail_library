@@ -92,7 +92,10 @@ class LibraryCatalogRevisionCoordinator
       _runAfterBuild(_flushInactiveRevision);
     });
 
-    ref.listen<String?>(browseLibraryIdProvider, (String? previous, String? next) {
+    ref.listen<String?>(browseLibraryIdProvider, (
+      String? previous,
+      String? next,
+    ) {
       if (previous == next) {
         return;
       }
@@ -179,10 +182,7 @@ class LibraryCatalogRevisionCoordinator
     _inactiveRefreshTimer?.cancel();
     _inactiveRefreshTimer = null;
     final int bumped = state.activeRevision + 1;
-    state = state.copyWith(
-      activeRevision: bumped,
-      inactiveRevision: bumped,
-    );
+    state = state.copyWith(activeRevision: bumped, inactiveRevision: bumped);
   }
 }
 

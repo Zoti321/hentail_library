@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
-import 'package:hentai_library/features/reading_history/presentation/views/history_page.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
@@ -16,7 +15,6 @@ import 'package:riverpod/misc.dart' show Override;
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 
 import '../../../../support/pump_localized_app.dart';
-import '../../../../support/test_view.dart';
 
 void main() {
   group('History production page', () {

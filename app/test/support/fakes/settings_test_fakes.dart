@@ -3,8 +3,6 @@ import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart'
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
-import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod/misc.dart' show Override;
 

@@ -7,7 +7,7 @@ import 'package:hentai_library/features/library_browse/presentation/catalog/patt
 import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-import '../../../../../../support/pump_localized_app.dart';
+import '../../../../../support/pump_localized_app.dart';
 
 class _RecordingSeriesMetadataEditor extends SeriesMetadataEditorNotifier {
   final List<({String seriesId, bool? name})> lockCalls =

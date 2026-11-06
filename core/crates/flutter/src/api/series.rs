@@ -408,8 +408,9 @@ pub fn set_series_item_sort_order_locked_frb(
 #[flutter_rust_bridge::frb]
 pub async fn search_series_by_keyword_frb(
     keyword: String,
+    library_id: Option<String>,
 ) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
-    search_series_by_keyword(&keyword)
+    search_series_by_keyword(&keyword, library_id)
         .await
         .map(map_series_list)
         .map_err(HentaiErrorDto::from)
@@ -420,8 +421,9 @@ pub async fn search_series_by_tag_expression_frb(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
+    library_id: Option<String>,
 ) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
-    search_series_by_tag_expression(must_include, optional_or, must_exclude)
+    search_series_by_tag_expression(must_include, optional_or, must_exclude, library_id)
         .await
         .map(map_series_list)
         .map_err(HentaiErrorDto::from)

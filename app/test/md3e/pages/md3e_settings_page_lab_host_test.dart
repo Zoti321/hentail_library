@@ -41,10 +41,10 @@ void main() {
 
     Switch healthySwitch() => tester.widget<Switch>(find.byType(Switch).first);
 
-    expect(find.text('Healthy mode'), findsOneWidget);
+    expect(find.text('健康模式'), findsOneWidget);
     expect(healthySwitch().value, isFalse);
 
-    await tester.tap(find.text('Healthy mode'));
+    await tester.tap(find.text('健康模式'));
     await tester.pumpAndSettle();
 
     expect(healthySwitch().value, isTrue);

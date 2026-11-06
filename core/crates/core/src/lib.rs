@@ -71,14 +71,14 @@ pub use home::{
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
-    library_id_from_root, library_id_from_webdav_root, list_libraries,
-    normalize_webdav_root, parse_resource_format_categories_json, parse_scan_interval,
-    record_library_sync_failure, record_library_sync_success, resolve_access_for_comic,
-    resolve_browse_library_id, serialize_resource_format_categories,
-    set_all_libraries_scan_on_startup, set_remote_library_credentials,
-    update_library_resource_format_categories, update_library_settings,
-    update_library_sidebar_layout, update_local_library_root, update_remote_library, LibraryDto,
-    LibrarySidebarPlacement, RemoteLibraryCredential, ResolvedAccess, ScanInterval,
+    library_id_from_root, library_id_from_webdav_root, list_libraries, normalize_webdav_root,
+    parse_resource_format_categories_json, parse_scan_interval, record_library_sync_failure,
+    record_library_sync_success, resolve_access_for_comic, resolve_browse_library_id,
+    serialize_resource_format_categories, set_all_libraries_scan_on_startup,
+    set_remote_library_credentials, update_library_resource_format_categories,
+    update_library_settings, update_library_sidebar_layout, update_local_library_root,
+    update_remote_library, LibraryDto, LibrarySidebarPlacement, RemoteLibraryCredential,
+    ResolvedAccess, ScanInterval,
 };
 pub use metadata_backup::{
     export_comic_metadata, import_comic_metadata, peek_metadata_backup_manifest,

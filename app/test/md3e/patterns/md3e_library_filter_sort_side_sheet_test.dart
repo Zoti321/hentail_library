@@ -207,7 +207,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.filter_list));
     await tester.pumpAndSettle();
 
-    expect(find.text('筛选与排序'), findsOneWidget);
+    expect(find.text('排序'), findsOneWidget);
     expect(find.text('年龄限制'), findsOneWidget);
   });
 

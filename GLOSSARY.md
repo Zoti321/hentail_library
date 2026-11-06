@@ -307,27 +307,27 @@ _Avoid_: 安全模式、青少年模式、R18 过滤
 ### Design & UI
 
 **MD3E design system**:
-并行于 Baseline UI 的 Material 3 Expressive 取向设计系统实现（Lab 阶段主题色为临时默认紫，非最终品牌定稿）。含主题、布局、动效、交互、原子控件、场景 pattern 与 MD3E 预览页；不替代 Rust 业务真值。
-_Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）
+生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。实现落在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。Lab 默认紫 seed 仍为临时品牌色，非最终定稿。不替代 Rust 业务真值。
+_Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）、仍称并行于 Baseline
 
 **Baseline UI**:
-当前生产默认的 Fluent 取向共享 UI 与 Baseline 主题装配；MD3E Pilot/Cutover 完成前仍为功能视图主壳。
-_Avoid_: 旧主题、老 UI、legacy 皮肤
+历史 Fluent 取向共享 UI / 主题装配；Cutover 主体完成后**不再**是生产功能视图主壳。残余命名或个别遗留控件属收尾债，不表示双轨仍在。
+_Avoid_: 旧主题、老 UI、legacy 皮肤（作现行主壳时）
 
 **MD3E preview page**:
 仅在 MD3E 设计系统内、用假数据或 Widgetbook 组装的整页预览，用于设计验收；不是带 ViewModel 的**功能视图**。
 _Avoid_: 预览 View、md3e 功能页
 
 **MD3E Lab**:
-不改动生产 feature 与 Baseline UI，在独立模块与 Widgetbook 中建设并测试 MD3E 栈。
-_Avoid_: 全仓换肤阶段
+Cutover 前在独立模块与 Widgetbook 中建设 MD3E 栈、不改生产 feature 的阶段。生产 Lab 包路径 `app/lib/md3e/` 已删除；预览面留在 `app/widgetbook/`。
+_Avoid_: 全仓换肤阶段、仍存在的生产 Lab 双轨
 
 **MD3E Pilot**:
-单个 feature（首选应用设置）可选接入 MD3E 组件与主题，用于真数据与路由验证。
+Cutover 前单个 feature（首选应用设置）可选接入 MD3E 组件与主题、做真数据与路由验证的阶段；主体已完成，条目保留供读 ADR/历史 PR。
 _Avoid_: Beta 换肤
 
 **MD3E Cutover**:
-按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。完成判定与 spec 分批规则见 ADR-0031。
+按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。主体已完成（路由 MD3E 化、Lab 删除、主题单源）；剩余主要为去 `md3e_` 生产前缀与文档/命名收尾。完成判定与 spec 分批规则见 ADR-0031。
 _Avoid_: 大重构（无阶段含义时）
 
 **MD3E pattern**:

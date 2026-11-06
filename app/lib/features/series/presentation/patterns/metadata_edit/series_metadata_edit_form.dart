@@ -67,7 +67,9 @@ class _Md3eSeriesMetadataEditFormState
         children: <Widget>[
           SizedBox(
             width: Md3eMetadataEditFormMetrics.sideTabColumnWidth,
-            child: _scrollPane(_SideTabList(l10n: l10n, tab: _tab, onSelected: _selectTab)),
+            child: _scrollPane(
+              _SideTabList(l10n: l10n, tab: _tab, onSelected: _selectTab),
+            ),
           ),
           SizedBox(width: gap),
           Expanded(
@@ -189,7 +191,10 @@ class _SideTabList extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<(String label, _Md3eSeriesMetadataEditTab value)> items =
         <(String, _Md3eSeriesMetadataEditTab)>[
-          (l10n.dialogEditMetadataTabContent, _Md3eSeriesMetadataEditTab.content),
+          (
+            l10n.dialogEditMetadataTabContent,
+            _Md3eSeriesMetadataEditTab.content,
+          ),
           (
             l10n.dialogEditMetadataTabFieldLocks,
             _Md3eSeriesMetadataEditTab.fieldLocks,

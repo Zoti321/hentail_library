@@ -119,7 +119,6 @@ void main() {
 
     expect(find.text('Alice'), findsWidgets);
     expect(find.text('漫画 · 0'), findsOneWidget);
-    expect(find.text('在搜索中查看'), findsOneWidget);
   });
 
   testWidgets('pencil button switches name to inline editor and renames', (

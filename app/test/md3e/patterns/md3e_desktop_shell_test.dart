@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
 import 'package:hentai_library/shared/ui/shell/shell_compact_app_bar.dart';
-import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
 import 'package:hentai_library/shared/ui/shell/shell_rail_library_hover_metrics.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
 import 'package:hentai_library/features/library_browse/public.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/features/home/public.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
@@ -109,8 +108,7 @@ class LibraryBrowsePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(() {
-      final String? scopedId =
-          libraryId.isEmpty ? null : libraryId;
+      final String? scopedId = libraryId.isEmpty ? null : libraryId;
       Future<void>.microtask(() {
         ref.read(browseLibraryIdProvider.notifier).setId(scopedId);
       });

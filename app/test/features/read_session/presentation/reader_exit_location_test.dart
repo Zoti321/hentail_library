@@ -4,10 +4,7 @@ import 'package:hentai_library/features/read_session/presentation/reader_exit_lo
 void main() {
   group('resolveReaderExitLocation', () {
     test('returns comic detail when comic id is set', () {
-      expect(
-        resolveReaderExitLocation(comicId: 'comic-a'),
-        '/comic/comic-a',
-      );
+      expect(resolveReaderExitLocation(comicId: 'comic-a'), '/comic/comic-a');
     });
 
     test('encodes comic id in path', () {

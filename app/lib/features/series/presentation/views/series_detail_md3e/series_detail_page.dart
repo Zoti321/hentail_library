@@ -197,47 +197,48 @@ class _Md3eSeriesDetailPageState extends ConsumerState<Md3eSeriesDetailPage> {
                     child: header,
                   ),
                 ),
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  introTop,
-                  horizontalPadding,
-                  0,
-                ),
-                sliver: SliverToBoxAdapter(
-                  child: Md3eSeriesDetailIntroSection(
-                    entry: widget.entry,
-                    onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
-                    onAuthorTap: widget.onAuthorTap,
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    introTop,
+                    horizontalPadding,
+                    0,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child: Md3eSeriesDetailIntroSection(
+                      entry: widget.entry,
+                      onMetadataChipTap: widget.onMetadataChipTap ?? (_) {},
+                      onAuthorTap: widget.onAuthorTap,
+                    ),
                   ),
                 ),
-              ),
-              SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                sliver: Md3eSeriesDetailComicsSection(
-                  gridSectionKey: _comicsSectionKey,
-                  pageItems: widget.entry.comics,
-                  page: widget.page,
-                  totalPages: widget.totalPages,
-                  onPageChanged: _setPage,
-                  onComicTap: widget.onComicTap == null
-                      ? null
-                      : (int localIndex) {
-                          final int globalIndex =
-                              (widget.page - 1) * widget.pageSize + localIndex;
-                          widget.onComicTap!(globalIndex);
-                        },
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  sliver: Md3eSeriesDetailComicsSection(
+                    gridSectionKey: _comicsSectionKey,
+                    pageItems: widget.entry.comics,
+                    page: widget.page,
+                    totalPages: widget.totalPages,
+                    onPageChanged: _setPage,
+                    onComicTap: widget.onComicTap == null
+                        ? null
+                        : (int localIndex) {
+                            final int globalIndex =
+                                (widget.page - 1) * widget.pageSize +
+                                localIndex;
+                            widget.onComicTap!(globalIndex);
+                          },
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Md3eLibraryScrollToTopButton(
-            scrollController: _scrollController,
-            horizontalPadding: horizontalPadding,
-          ),
-        ],
+              ],
+            ),
+            Md3eLibraryScrollToTopButton(
+              scrollController: _scrollController,
+              horizontalPadding: horizontalPadding,
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 }

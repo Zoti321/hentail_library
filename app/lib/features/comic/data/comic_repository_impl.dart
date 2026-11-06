@@ -142,9 +142,12 @@ class ComicRepositoryImpl
   }
 
   @override
-  Future<List<Comic>> searchByKeyword(String keyword) async {
+  Future<List<Comic>> searchByKeyword({
+    required String keyword,
+    required String libraryId,
+  }) async {
     final List<rust.ComicDto> rows = await guardFrb(
-      () => rust.searchByKeywordFrb(keyword: keyword),
+      () => rust.searchByKeywordFrb(keyword: keyword, libraryId: libraryId),
       fallbackMessage: '搜索漫画失败',
     );
     return rows.map(mapRustComic).toList();
@@ -154,6 +157,7 @@ class ComicRepositoryImpl
   Future<PagedResult<Comic>> searchByKeywordPage({
     required String keyword,
     required PageRequest request,
+    required String libraryId,
   }) async {
     final rust.PagedComicResultDto page = await guardFrb(
       () => rust.searchByKeywordPageFrb(
@@ -162,6 +166,7 @@ class ComicRepositoryImpl
           page: request.page,
           pageSize: request.pageSize,
         ),
+        libraryId: libraryId,
       ),
       fallbackMessage: '搜索漫画失败',
     );
@@ -173,12 +178,14 @@ class ComicRepositoryImpl
     required Set<String> mustInclude,
     required Set<String> optionalOr,
     required Set<String> mustExclude,
+    required String libraryId,
   }) async {
     final List<rust.ComicDto> rows = await guardFrb(
       () => rust.searchByTagExpressionFrb(
         mustInclude: mustInclude.toList(),
         optionalOr: optionalOr.toList(),
         mustExclude: mustExclude.toList(),
+        libraryId: libraryId,
       ),
       fallbackMessage: '按元数据搜索漫画失败',
     );
@@ -191,6 +198,7 @@ class ComicRepositoryImpl
     required Set<String> optionalOr,
     required Set<String> mustExclude,
     required PageRequest request,
+    required String libraryId,
   }) async {
     final rust.PagedComicResultDto page = await guardFrb(
       () => rust.searchByTagExpressionPageFrb(
@@ -201,6 +209,7 @@ class ComicRepositoryImpl
           page: request.page,
           pageSize: request.pageSize,
         ),
+        libraryId: libraryId,
       ),
       fallbackMessage: '按元数据搜索漫画失败',
     );

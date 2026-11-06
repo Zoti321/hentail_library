@@ -4,7 +4,7 @@ import 'package:hentai_library/features/comic/presentation/views/metadata_edit_m
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
-import '../../../../../../support/pump_localized_app.dart';
+import '../../../../../support/pump_localized_app.dart';
 
 void main() {
   testWidgets('comic metadata edit view shows comic title field', (

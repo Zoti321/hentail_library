@@ -4,22 +4,25 @@ import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail_icon.da
 import 'package:material_symbols_icons/symbols.dart';
 
 void main() {
-  test('Material Symbols use fill when selected and icon matches selectedIcon', () {
-    final Widget selected = md3eNavigationRailIconWidget(
-      icon: Symbols.home,
-      selectedIcon: Symbols.home,
-      selected: true,
-    );
-    final Icon icon = selected as Icon;
-    expect(icon.fill, 1);
+  test(
+    'Material Symbols use fill when selected and icon matches selectedIcon',
+    () {
+      final Widget selected = md3eNavigationRailIconWidget(
+        icon: Symbols.home,
+        selectedIcon: Symbols.home,
+        selected: true,
+      );
+      final Icon icon = selected as Icon;
+      expect(icon.fill, 1);
 
-    final Widget unselected = md3eNavigationRailIconWidget(
-      icon: Symbols.home,
-      selectedIcon: Symbols.home,
-      selected: false,
-    );
-    expect((unselected as Icon).fill, 0);
-  });
+      final Widget unselected = md3eNavigationRailIconWidget(
+        icon: Symbols.home,
+        selectedIcon: Symbols.home,
+        selected: false,
+      );
+      expect((unselected as Icon).fill, 0);
+    },
+  );
 
   test('explicit outlined/filled pair ignores fill axis', () {
     final Widget selected = md3eNavigationRailIconWidget(

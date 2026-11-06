@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/domain/ports/comic_trash_command_port.dart
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-import '../../../../support/pump_localized_app.dart';
+import '../../../support/pump_localized_app.dart';
 
 class _RecordingComicTrashCommandPort implements ComicTrashCommandPort {
   final List<List<String>> trashed = <List<String>>[];
@@ -135,5 +135,5 @@ Future<AppLocalizations> _pumpAndL10n(
   _RecordingComicTrashCommandPort port,
 ) async {
   await _pump(tester, port);
-  return AppLocalizations.of(tester.element(find.byType(M3EDialog)))!;
+  return AppLocalizations.of(tester.element(find.byType(M3EDialog)));
 }

@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 
-/// 清空全部阅读历史的确认对话框（与标签/系列删除确认对话框同一套 Fluent 壳层）。
+/// 清空全部阅读历史的确认对话框（与标签/系列删除确认对话框同一套 [HentaiDialog] 壳层）。
 class ClearReadingHistoryConfirmDialog extends StatelessWidget {
   const ClearReadingHistoryConfirmDialog({super.key});
 
