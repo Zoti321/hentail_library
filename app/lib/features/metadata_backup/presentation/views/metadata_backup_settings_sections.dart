@@ -12,7 +12,6 @@ import 'package:hentai_library/features/metadata_backup/presentation/view_models
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';

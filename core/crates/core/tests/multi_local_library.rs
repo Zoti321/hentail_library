@@ -9,10 +9,10 @@ use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::ComicGrouping;
 use hentai_core::{
     comic_id_from_path, connection, create_local_library, delete_library, fetch_comics_page,
-    find_comic_by_id, get_reading_by_comic_id, init_db_at_path,
-    library_id_from_root, list_libraries, now_ms, record_reading,
-    sync_library, update_library_resource_format_categories, ComicFilterDto, PageRequestDto,
-    ReadingHistoryDto, SyncScanMode,
+    find_comic_by_id, get_reading_by_comic_id, init_db_at_path, library_id_from_root,
+    list_libraries, now_ms, record_reading, sync_library,
+    update_library_resource_format_categories, ComicFilterDto, PageRequestDto, ReadingHistoryDto,
+    SyncScanMode,
 };
 use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
@@ -174,8 +174,8 @@ fn sync_target_library_does_not_remove_other_library_comics() {
                 vec![],
                 |_| {},
             )
-                .await
-                .expect("sync a");
+            .await
+            .expect("sync a");
 
             assert!(find_comic_by_id(&id_a).await.unwrap().is_none());
             assert!(
@@ -238,8 +238,8 @@ fn per_library_resource_format_categories_only_affect_that_library_on_sync() {
                 vec![],
                 |_| {},
             )
-                .await
-                .expect("sync a");
+            .await
+            .expect("sync a");
 
             assert!(find_comic_by_id(&archive_a).await.unwrap().is_none());
             assert!(
@@ -299,8 +299,10 @@ fn delete_library_clears_only_that_library_comics_and_series() {
             assert_eq!(remaining.len(), 1);
             assert_eq!(remaining[0].library_id, lib_b.library_id);
 
-            let mut filter = ComicFilterDto::default();
-            filter.library_id = Some(lib_b.library_id.clone());
+            let filter = ComicFilterDto {
+                library_id: Some(lib_b.library_id.clone()),
+                ..Default::default()
+            };
             let page = fetch_comics_page(
                 PageRequestDto {
                     page: 1,
@@ -357,8 +359,10 @@ fn browse_requires_explicit_library_id() {
             .expect("empty scope");
             assert_eq!(empty.total_count, 0);
 
-            let mut filter_a = ComicFilterDto::default();
-            filter_a.library_id = Some(lib_a.library_id.clone());
+            let filter_a = ComicFilterDto {
+                library_id: Some(lib_a.library_id.clone()),
+                ..Default::default()
+            };
             let page_a = fetch_comics_page(
                 PageRequestDto {
                     page: 1,
@@ -373,8 +377,10 @@ fn browse_requires_explicit_library_id() {
             assert_eq!(page_a.total_count, 1);
             assert!(page_a.items[0].path.contains("lib_a"));
 
-            let mut filter_b = ComicFilterDto::default();
-            filter_b.library_id = Some(lib_b.library_id.clone());
+            let filter_b = ComicFilterDto {
+                library_id: Some(lib_b.library_id.clone()),
+                ..Default::default()
+            };
             let page_b = fetch_comics_page(
                 PageRequestDto {
                     page: 1,

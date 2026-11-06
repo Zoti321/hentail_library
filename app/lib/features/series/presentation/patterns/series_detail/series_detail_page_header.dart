@@ -36,8 +36,9 @@ class Md3eSeriesDetailPageHeader extends StatelessWidget {
     final bool showStandalonePageSize =
         sizeClass.index > Md3eWindowSizeClass.medium.index;
 
-    final List<M3EMenuNode> toolbarMoreEntries =
-        List<M3EMenuNode>.of(moreMenuEntries);
+    final List<M3EMenuNode> toolbarMoreEntries = List<M3EMenuNode>.of(
+      moreMenuEntries,
+    );
     if (!showStandalonePageSize) {
       toolbarMoreEntries.addAll(
         md3eSeriesDetailPageSizeMenuNodes(

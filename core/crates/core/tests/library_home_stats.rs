@@ -3,8 +3,9 @@ mod common;
 use std::path::Path;
 
 use hentai_core::{
-    comic_id_from_path, create_local_library, create_sync_handle, init_db_at_path,
-    LibraryDto, LibraryHomeStatDto, SyncScanMode,
+    comic_id_from_path, create_local_library, create_sync_handle, init_db_at_path, sync_library,
+    trash_comics, watch_library_home_stats, HentaiError, LibraryDto, LibraryHomeStatDto,
+    SyncScanMode,
 };
 use tempfile::TempDir;
 

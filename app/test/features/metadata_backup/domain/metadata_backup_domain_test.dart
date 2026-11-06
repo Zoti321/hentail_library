@@ -8,7 +8,9 @@ void main() {
 
   test('MetadataExportOptions normalizes library id', () {
     expect(
-      const MetadataExportOptions(libraryId: '  lib-a  ').normalized().libraryId,
+      const MetadataExportOptions(libraryId: '  lib-a  ')
+          .normalized()
+          .libraryId,
       'lib-a',
     );
   });

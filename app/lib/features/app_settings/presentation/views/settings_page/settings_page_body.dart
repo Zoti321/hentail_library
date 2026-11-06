@@ -160,7 +160,7 @@ class _Md3eSettingsPageState extends State<Md3eSettingsPage> {
                     constraints.maxWidth,
                   );
 
-                  final String? masterGroupTitle =
+                  final String masterGroupTitle =
                       widget.masterGroupTitle ??
                       l10n.settingsMasterMenuGroupTitle;
                   final Widget master = Md3eSettingsMasterMenu(

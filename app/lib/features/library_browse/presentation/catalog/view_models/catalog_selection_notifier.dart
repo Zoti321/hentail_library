@@ -8,10 +8,7 @@ import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 
 /// 多选模式宿主：同一 [catalogSelectionProvider] 按页面隔离 UI。
-enum CatalogSelectionHost {
-  libraryBrowse,
-  seriesDetail,
-}
+enum CatalogSelectionHost { libraryBrowse, seriesDetail }
 
 class CatalogSelectionState {
   const CatalogSelectionState({

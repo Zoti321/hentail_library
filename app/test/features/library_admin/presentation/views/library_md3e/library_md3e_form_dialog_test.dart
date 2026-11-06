@@ -18,9 +18,7 @@ class _RecordingLibrariesNotifier extends LibrariesNotifier {
 
   @override
   Future<LibrariesState> build() async {
-    return const LibrariesState(
-      libraries: <LocalLibrary>[],
-    );
+    return const LibrariesState(libraries: <LocalLibrary>[]);
   }
 
   @override
@@ -74,6 +72,13 @@ Finder _primaryButton(String label) {
   return find.text(label).last;
 }
 
+Finder _webDavUrlField() {
+  return find.byWidgetPredicate(
+    (Widget widget) =>
+        widget is EditableText && widget.keyboardType == TextInputType.url,
+  );
+}
+
 Future<void> _tapPrimary(WidgetTester tester, String label) async {
   await tester.tap(_primaryButton(label));
   await tester.pump();
@@ -84,8 +89,7 @@ void main() {
   testWidgets('empty local create shows field errors and does not submit', (
     WidgetTester tester,
   ) async {
-    final _RecordingLibrariesNotifier notifier =
-        _RecordingLibrariesNotifier();
+    final _RecordingLibrariesNotifier notifier = _RecordingLibrariesNotifier();
     await _pumpForm(
       tester,
       mode: LibraryFormMode.createLocal,
@@ -103,8 +107,7 @@ void main() {
   testWidgets('remote create without password switches to WebDAV tab', (
     WidgetTester tester,
   ) async {
-    final _RecordingLibrariesNotifier notifier =
-        _RecordingLibrariesNotifier();
+    final _RecordingLibrariesNotifier notifier = _RecordingLibrariesNotifier();
     await _pumpForm(
       tester,
       mode: LibraryFormMode.createRemote,
@@ -115,10 +118,7 @@ void main() {
     await tester.tap(find.text('WebDAV').first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
-    await tester.enterText(
-      find.byType(EditableText).first,
-      'https://example.com/dav',
-    );
+    await tester.enterText(_webDavUrlField(), 'https://example.com/dav');
     await _tapPrimary(tester, '添加');
 
     expect(find.text('密码不能为空'), findsOneWidget);
@@ -128,8 +128,7 @@ void main() {
   testWidgets('valid remote create calls submitLibraryForm and closes', (
     WidgetTester tester,
   ) async {
-    final _RecordingLibrariesNotifier notifier =
-        _RecordingLibrariesNotifier();
+    final _RecordingLibrariesNotifier notifier = _RecordingLibrariesNotifier();
     await _pumpForm(
       tester,
       mode: LibraryFormMode.createRemote,
@@ -141,10 +140,8 @@ void main() {
     await tester.tap(find.text('WebDAV').first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
-    await tester.enterText(
-      find.byType(EditableText).first,
-      'https://example.com/dav',
-    );
+    await tester.enterText(_webDavUrlField(), 'https://example.com/dav');
+    await tester.pump();
     await tester.enterText(
       find.byWidgetPredicate(
         (Widget widget) => widget is EditableText && widget.obscureText,
@@ -155,6 +152,9 @@ void main() {
     await _tapPrimary(tester, '添加');
     await tester.pump(const Duration(milliseconds: 400));
 
+    expect(find.text('库名称不能为空'), findsNothing);
+    expect(find.text('WebDAV 根 URL 不能为空'), findsNothing);
+    expect(find.text('密码不能为空'), findsNothing);
     expect(notifier.submitCalls, hasLength(1));
     expect(notifier.submitCalls.single.form.name, '远程库 B');
     expect(notifier.submitCalls.single.form.password, 'secret');

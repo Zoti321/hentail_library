@@ -2,13 +2,13 @@ mod common;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::{
-    update_series_user_meta, PageRequestDto, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto,
-    UpdateSeriesUserMetaDto,
+    connection, create_local_library, fetch_series_page, init_db_at_path, update_series_user_meta,
+    PageRequestDto, SeriesFilterDto, SeriesGrouping, SeriesSortOptionDto, UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
 
-async fn seed_two_series(db: &DatabaseConnection) -> (String, String) {
+async fn seed_two_series(db: &DatabaseConnection) -> (String, String, String) {
     db.execute(Statement::from_string(
         sea_orm::DatabaseBackend::Sqlite,
         "DELETE FROM series_items; DELETE FROM series; DELETE FROM comic_meta; DELETE FROM comics"
@@ -48,7 +48,9 @@ async fn seed_two_series(db: &DatabaseConnection) -> (String, String) {
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE series SET library_id = ?",
-        [sea_orm::Value::String(Some(Box::new(lib.library_id)))],
+        [sea_orm::Value::String(Some(Box::new(
+            lib.library_id.clone(),
+        )))],
     ))
     .await
     .expect("stamp series");
@@ -92,7 +94,7 @@ async fn seed_two_series(db: &DatabaseConnection) -> (String, String) {
     .await
     .expect("mark ended");
 
-    (ongoing_id, ended_id)
+    (ongoing_id, ended_id, lib.library_id)
 }
 
 #[test]
@@ -104,7 +106,7 @@ fn fetch_series_page_filters_by_serialization_status() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            let (ongoing_id, ended_id) = seed_two_series(&db).await;
+            let (ongoing_id, ended_id, library_id) = seed_two_series(&db).await;
 
             let page = fetch_series_page(
                 PageRequestDto {
@@ -112,6 +114,7 @@ fn fetch_series_page_filters_by_serialization_status() {
                     page_size: 50,
                 },
                 SeriesFilterDto {
+                    library_id: Some(library_id),
                     show_r18: true,
                     require_items: true,
                     serialization_status: Some("ongoing".to_string()),
@@ -144,7 +147,7 @@ fn fetch_series_page_without_serialization_status_returns_all_statuses() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            let (ongoing_id, ended_id) = seed_two_series(&db).await;
+            let (ongoing_id, ended_id, library_id) = seed_two_series(&db).await;
 
             let page = fetch_series_page(
                 PageRequestDto {
@@ -152,6 +155,7 @@ fn fetch_series_page_without_serialization_status_returns_all_statuses() {
                     page_size: 50,
                 },
                 SeriesFilterDto {
+                    library_id: Some(library_id),
                     show_r18: true,
                     require_items: true,
                     serialization_status: None,

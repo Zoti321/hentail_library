@@ -83,7 +83,10 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
   }
 
   void _navigateAfterLibraryDeleted(BuildContext context) {
-    final LibrariesState? state = _ref.read(librariesStateProvider).asData?.value;
+    final LibrariesState? state = _ref
+        .read(librariesStateProvider)
+        .asData
+        ?.value;
     final List<LocalLibrary> remaining =
         state?.libraries ?? const <LocalLibrary>[];
     final AfterLibraryDeleteNavigation nav = afterLibraryDeleteNavigation(
@@ -125,11 +128,9 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     if (navigate && context.mounted) {
       context.go(LibrariesRoutes.library(libraryId));
     }
-    await _ref.read(libraryScanCommandPortProvider).start(
-      mode: mode,
-      targetLibraryId: libraryId,
-      silent: true,
-    );
+    await _ref
+        .read(libraryScanCommandPortProvider)
+        .start(mode: mode, targetLibraryId: libraryId, silent: true);
   }
 
   @override

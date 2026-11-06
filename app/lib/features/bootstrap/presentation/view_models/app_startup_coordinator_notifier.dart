@@ -88,10 +88,7 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
   }
 
   Future<void> _tickIntervals() async {
-    final LibrariesState? state = ref
-        .read(librariesProvider)
-        .asData
-        ?.value;
+    final LibrariesState? state = ref.read(librariesProvider).asData?.value;
     if (state == null) {
       return;
     }

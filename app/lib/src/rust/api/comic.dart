@@ -42,15 +42,22 @@ Future<ComicDto?> findComicByIdFrb({required String comicId}) =>
 Future<List<ComicDto>> findComicsByIdsFrb({required List<String> comicIds}) =>
     RustLib.instance.api.crateApiComicFindComicsByIdsFrb(comicIds: comicIds);
 
-Future<List<ComicDto>> searchByKeywordFrb({required String keyword}) =>
-    RustLib.instance.api.crateApiComicSearchByKeywordFrb(keyword: keyword);
+Future<List<ComicDto>> searchByKeywordFrb({
+  required String keyword,
+  String? libraryId,
+}) => RustLib.instance.api.crateApiComicSearchByKeywordFrb(
+  keyword: keyword,
+  libraryId: libraryId,
+);
 
 Future<PagedComicResultDto> searchByKeywordPageFrb({
   required String keyword,
   required PageRequestDto request,
+  String? libraryId,
 }) => RustLib.instance.api.crateApiComicSearchByKeywordPageFrb(
   keyword: keyword,
   request: request,
+  libraryId: libraryId,
 );
 
 void updateComicUserMetaFrb({
@@ -86,10 +93,12 @@ Future<List<ComicDto>> searchByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
   required List<String> mustExclude,
+  String? libraryId,
 }) => RustLib.instance.api.crateApiComicSearchByTagExpressionFrb(
   mustInclude: mustInclude,
   optionalOr: optionalOr,
   mustExclude: mustExclude,
+  libraryId: libraryId,
 );
 
 Future<PagedComicResultDto> searchByTagExpressionPageFrb({
@@ -97,11 +106,13 @@ Future<PagedComicResultDto> searchByTagExpressionPageFrb({
   required List<String> optionalOr,
   required List<String> mustExclude,
   required PageRequestDto request,
+  String? libraryId,
 }) => RustLib.instance.api.crateApiComicSearchByTagExpressionPageFrb(
   mustInclude: mustInclude,
   optionalOr: optionalOr,
   mustExclude: mustExclude,
   request: request,
+  libraryId: libraryId,
 );
 
 Future<PlatformInt64> countAllComicsFrb() =>

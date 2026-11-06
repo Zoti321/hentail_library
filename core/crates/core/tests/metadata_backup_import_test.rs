@@ -3,7 +3,8 @@ mod common;
 use hentai_core::{
     add_author, add_author_link, create_local_library, export_comic_metadata, find_comic_by_id,
     import_comic_metadata, init_db_at_path, list_author_links, peek_metadata_backup_manifest,
-    ExportComicMetadataOptions, MatchTier, UpdateComicUserMetaDto,
+    preview_import_comic_metadata, AuthorLinkPlatform, ExportComicMetadataOptions, MatchTier,
+    UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;

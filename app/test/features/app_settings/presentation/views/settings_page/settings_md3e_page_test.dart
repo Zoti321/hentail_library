@@ -8,7 +8,6 @@ import 'package:hentai_library/features/app_settings/presentation/views/settings
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
 import '../../../../../support/pump_localized_app.dart';
-import '../../../../../support/test_view.dart';
 
 class _RecordingSettingsNotifier extends SettingsNotifier {
   final List<AppThemePreference> themeCalls = <AppThemePreference>[];

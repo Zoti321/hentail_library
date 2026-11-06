@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
 import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-import '../../../../../../support/pump_md3e_app.dart';
+import '../../../../../support/pump_md3e_app.dart';
 
 Comic _comic(String id) {
   return Comic(

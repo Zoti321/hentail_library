@@ -119,8 +119,10 @@ class _LibraryMd3ePageState extends ConsumerState<LibraryMd3ePage> {
       ref.watch(librarySeriesCatalogControllerProvider),
     );
     final String? browseLibraryId = ref.watch(browseLibraryIdProvider);
-    final LibrariesState? librariesState =
-        ref.watch(librariesStateProvider).asData?.value;
+    final LibrariesState? librariesState = ref
+        .watch(librariesStateProvider)
+        .asData
+        ?.value;
     final LocalLibrary? browseLibrary = browseLibraryId == null
         ? null
         : librariesState?.findById(browseLibraryId);

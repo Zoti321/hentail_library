@@ -5,7 +5,8 @@ use hentai_core::util::compute_sort_key;
 use hentai_core::ComicGrouping;
 use hentai_core::{
     connection, create_local_library, fetch_comics_page, init_db_at_path, set_comic_meta_locks,
-    ComicSortOptionDto, PageRequestDto, SetComicMetaLocksDto, UpdateComicUserMetaDto,
+    update_comic_user_meta, ComicFilterDto, ComicSortFieldDto, ComicSortOptionDto, PageRequestDto,
+    SetComicMetaLocksDto, UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, Value};
 use tempfile::TempDir;
@@ -61,7 +62,7 @@ async fn insert_comic(db: &DatabaseConnection, comic_id: &str, resource_type: &s
     .await;
 }
 
-async fn stamp_all_to_current_library(db: &DatabaseConnection) {
+async fn stamp_all_to_library(db: &DatabaseConnection) -> String {
     let lib = create_local_library("E:/lib", None)
         .await
         .expect("create library");
@@ -71,6 +72,7 @@ async fn stamp_all_to_current_library(db: &DatabaseConnection) {
         vec![text(&lib.library_id)],
     )
     .await;
+    lib.library_id
 }
 
 async fn fetch_ids(filter: ComicFilterDto, page_size: i32) -> (Vec<String>, i64) {
@@ -91,9 +93,10 @@ async fn fetch_ids(filter: ComicFilterDto, page_size: i32) -> (Vec<String>, i64)
     )
 }
 
-fn needs_metadata_filter() -> ComicFilterDto {
+fn needs_metadata_filter(library_id: &str) -> ComicFilterDto {
     ComicFilterDto {
         needs_metadata_only: true,
+        library_id: Some(library_id.to_string()),
         ..Default::default()
     }
 }
@@ -135,7 +138,7 @@ fn needs_metadata_keeps_title_only_comics_and_excludes_each_metadata_field() {
         ] {
             insert_comic(&db, id, "cbz").await;
         }
-        stamp_all_to_current_library(&db).await;
+        let library_id = stamp_all_to_library(&db).await;
 
         update(
             "b-tag",
@@ -210,7 +213,7 @@ fn needs_metadata_keeps_title_only_comics_and_excludes_each_metadata_field() {
         )
         .await;
 
-        let (ids, total) = fetch_ids(needs_metadata_filter(), 50).await;
+        let (ids, total) = fetch_ids(needs_metadata_filter(&library_id), 50).await;
         assert_eq!(ids, vec!["a-blank"]);
         assert_eq!(total, 1);
     });
@@ -223,7 +226,7 @@ fn needs_metadata_excludes_scan_written_metadata_and_treats_blank_description_as
         insert_comic(&db, "b-scan-author", "cbz").await;
         insert_comic(&db, "c-scan-description", "cbz").await;
         insert_comic(&db, "d-empty-language-entry", "cbz").await;
-        stamp_all_to_current_library(&db).await;
+        let library_id = stamp_all_to_library(&db).await;
 
         exec(
             &db,
@@ -248,7 +251,7 @@ fn needs_metadata_excludes_scan_written_metadata_and_treats_blank_description_as
         )
         .await;
 
-        let (ids, _) = fetch_ids(needs_metadata_filter(), 50).await;
+        let (ids, _) = fetch_ids(needs_metadata_filter(&library_id), 50).await;
         assert_eq!(ids, vec!["a-blank-description", "d-empty-language-entry"]);
     });
 }
@@ -257,7 +260,7 @@ fn needs_metadata_excludes_scan_written_metadata_and_treats_blank_description_as
 fn needs_metadata_ignores_field_locks_with_empty_values() {
     run(|db| async move {
         insert_comic(&db, "a-locked-empty", "cbz").await;
-        stamp_all_to_current_library(&db).await;
+        let library_id = stamp_all_to_library(&db).await;
         set_comic_meta_locks(
             "a-locked-empty",
             SetComicMetaLocksDto {
@@ -271,7 +274,7 @@ fn needs_metadata_ignores_field_locks_with_empty_values() {
         .await
         .expect("locks");
 
-        let (ids, _) = fetch_ids(needs_metadata_filter(), 50).await;
+        let (ids, _) = fetch_ids(needs_metadata_filter(&library_id), 50).await;
         assert_eq!(ids, vec!["a-locked-empty"]);
     });
 }
@@ -284,7 +287,7 @@ fn needs_metadata_combines_with_other_filters_and_count_matches_pages() {
         insert_comic(&db, "c-pdf-blank", "pdf").await;
         insert_comic(&db, "d-pdf-tagged", "pdf").await;
         insert_comic(&db, "e-cbz-blank", "cbz").await;
-        stamp_all_to_current_library(&db).await;
+        let library_id = stamp_all_to_library(&db).await;
         update(
             "d-pdf-tagged",
             UpdateComicUserMetaDto {
@@ -297,6 +300,7 @@ fn needs_metadata_combines_with_other_filters_and_count_matches_pages() {
         let pdf_needs_metadata = ComicFilterDto {
             needs_metadata_only: true,
             resource_types: vec!["pdf".to_string()],
+            library_id: Some(library_id.clone()),
             ..Default::default()
         };
         let (first_page, total) = fetch_ids(pdf_needs_metadata.clone(), 2).await;
@@ -307,7 +311,14 @@ fn needs_metadata_combines_with_other_filters_and_count_matches_pages() {
         assert_eq!(all, vec!["a-pdf-blank", "b-pdf-blank", "c-pdf-blank"]);
         assert_eq!(total_all, all.len() as i64);
 
-        let (unfiltered, unfiltered_total) = fetch_ids(ComicFilterDto::default(), 50).await;
+        let (unfiltered, unfiltered_total) = fetch_ids(
+            ComicFilterDto {
+                library_id: Some(library_id.clone()),
+                ..Default::default()
+            },
+            50,
+        )
+        .await;
         assert_eq!(unfiltered.len(), 5);
         assert_eq!(unfiltered_total, 5);
     });

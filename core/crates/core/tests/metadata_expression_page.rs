@@ -55,6 +55,7 @@ fn metadata_expression_page_uses_sql_window() {
                     .expect("tag comic");
                 }
 
+                let library_id = Some(library.library_id.clone());
                 let page1 = search_by_tag_expression_page(
                     vec!["shared".to_string()],
                     vec![],
@@ -63,6 +64,7 @@ fn metadata_expression_page_uses_sql_window() {
                         page: 1,
                         page_size: 1,
                     },
+                    library_id.clone(),
                 )
                 .await
                 .expect("page 1");
@@ -79,6 +81,7 @@ fn metadata_expression_page_uses_sql_window() {
                         page: 3,
                         page_size: 1,
                     },
+                    library_id.clone(),
                 )
                 .await
                 .expect("page 3");
@@ -100,6 +103,7 @@ fn metadata_expression_page_uses_sql_window() {
                         page: 1,
                         page_size: 10,
                     },
+                    library_id,
                 )
                 .await
                 .expect("empty expression");

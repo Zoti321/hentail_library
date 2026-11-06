@@ -18,34 +18,31 @@ void main() {
     });
 
     test('libraryIdFromPath parses single-library browse', () {
-      expect(
-        LibrariesRoutes.libraryIdFromPath('/libraries/lib-a'),
-        'lib-a',
-      );
+      expect(LibrariesRoutes.libraryIdFromPath('/libraries/lib-a'), 'lib-a');
       expect(LibrariesRoutes.libraryIdFromPath('/libraries/all'), isNull);
     });
   });
 
   group('librariesSidebarSelection', () {
     test('all libraries path activates section', () {
-      expect(
-        librariesSidebarSelection(path: LibrariesRoutes.all),
-        (sectionActive: true, activeLibraryId: null),
-      );
+      expect(librariesSidebarSelection(path: LibrariesRoutes.all), (
+        sectionActive: true,
+        activeLibraryId: null,
+      ));
     });
 
     test('library browse path highlights that library', () {
-      expect(
-        librariesSidebarSelection(path: '/libraries/lib-a'),
-        (sectionActive: false, activeLibraryId: 'lib-a'),
-      );
+      expect(librariesSidebarSelection(path: '/libraries/lib-a'), (
+        sectionActive: false,
+        activeLibraryId: 'lib-a',
+      ));
     });
 
     test('comic detail does not imply a library selection', () {
-      expect(
-        librariesSidebarSelection(path: '/comic/c1'),
-        (sectionActive: false, activeLibraryId: null),
-      );
+      expect(librariesSidebarSelection(path: '/comic/c1'), (
+        sectionActive: false,
+        activeLibraryId: null,
+      ));
     });
   });
 

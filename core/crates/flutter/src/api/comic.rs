@@ -244,8 +244,11 @@ pub async fn find_comics_by_ids_frb(
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn search_by_keyword_frb(keyword: String) -> Result<Vec<ComicDto>, HentaiErrorDto> {
-    search_by_keyword(&keyword)
+pub async fn search_by_keyword_frb(
+    keyword: String,
+    library_id: Option<String>,
+) -> Result<Vec<ComicDto>, HentaiErrorDto> {
+    search_by_keyword(&keyword, library_id)
         .await
         .map(|rows| rows.into_iter().map(ComicDto::from).collect())
         .map_err(HentaiErrorDto::from)
@@ -255,8 +258,9 @@ pub async fn search_by_keyword_frb(keyword: String) -> Result<Vec<ComicDto>, Hen
 pub async fn search_by_keyword_page_frb(
     keyword: String,
     request: PageRequestDto,
+    library_id: Option<String>,
 ) -> Result<PagedComicResultDto, HentaiErrorDto> {
-    search_by_keyword_page(&keyword, request.into())
+    search_by_keyword_page(&keyword, request.into(), library_id)
         .await
         .map(PagedComicResultDto::from)
         .map_err(HentaiErrorDto::from)
@@ -454,8 +458,9 @@ pub async fn search_by_tag_expression_frb(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
+    library_id: Option<String>,
 ) -> Result<Vec<ComicDto>, HentaiErrorDto> {
-    hentai_core::search_by_tag_expression(must_include, optional_or, must_exclude)
+    hentai_core::search_by_tag_expression(must_include, optional_or, must_exclude, library_id)
         .await
         .map(|rows| rows.into_iter().map(ComicDto::from).collect())
         .map_err(HentaiErrorDto::from)
@@ -467,11 +472,18 @@ pub async fn search_by_tag_expression_page_frb(
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
     request: PageRequestDto,
+    library_id: Option<String>,
 ) -> Result<PagedComicResultDto, HentaiErrorDto> {
-    search_by_tag_expression_page(must_include, optional_or, must_exclude, request.into())
-        .await
-        .map(PagedComicResultDto::from)
-        .map_err(HentaiErrorDto::from)
+    search_by_tag_expression_page(
+        must_include,
+        optional_or,
+        must_exclude,
+        request.into(),
+        library_id,
+    )
+    .await
+    .map(PagedComicResultDto::from)
+    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]

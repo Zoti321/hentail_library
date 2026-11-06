@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_s
 import 'package:hentai_library/shared/ui/widgets/inputs/md3e_named_facet_multi_select_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:riverpod/misc.dart' show Override, ProviderListenable;
+import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../support/pump_md3e_app.dart';
 

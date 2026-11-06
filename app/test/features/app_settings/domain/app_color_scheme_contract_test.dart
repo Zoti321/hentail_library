@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 
 void main() {
   group('color scheme and dynamic color contract fields', () {

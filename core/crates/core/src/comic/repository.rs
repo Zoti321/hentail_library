@@ -121,13 +121,17 @@ pub async fn find_comics_by_ids(comic_ids: Vec<String>) -> Result<Vec<ComicDto>,
     load_comics_ordered(&db, comic_ids).await
 }
 
-pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiError> {
+pub async fn search_by_keyword(
+    keyword: &str,
+    library_id: Option<String>,
+) -> Result<Vec<ComicDto>, HentaiError> {
     let page = search_by_keyword_page(
         keyword,
         PageRequestDto {
             page: 1,
             page_size: i32::MAX,
         },
+        library_id,
     )
     .await?;
     Ok(page.items)
@@ -136,6 +140,7 @@ pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiErr
 pub async fn search_by_keyword_page(
     keyword: &str,
     request: PageRequestDto,
+    library_id: Option<String>,
 ) -> Result<PagedComicResultDto, HentaiError> {
     let q = keyword.trim().to_lowercase();
     if q.is_empty() {
@@ -147,7 +152,7 @@ pub async fn search_by_keyword_page(
             page_size: window.page_size,
         });
     }
-    let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
+    let Some(library_id) = crate::library::resolve_browse_library_id(library_id).await? else {
         let window = paginate(request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
@@ -220,6 +225,7 @@ async fn resolve_metadata_expression_terms(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
+    library_id: Option<String>,
 ) -> Result<Option<MetadataExpressionTerms>, HentaiError> {
     let must_include = normalize_tag_expression_tokens(&must_include);
     let optional_or = normalize_tag_expression_tokens(&optional_or);
@@ -227,7 +233,7 @@ async fn resolve_metadata_expression_terms(
     if must_include.is_empty() && optional_or.is_empty() && must_exclude.is_empty() {
         return Ok(None);
     }
-    let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
+    let Some(library_id) = crate::library::resolve_browse_library_id(library_id).await? else {
         return Ok(None);
     };
     Ok(Some(MetadataExpressionTerms {
@@ -304,9 +310,11 @@ pub async fn search_comic_ids_by_tag_expression(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
+    library_id: Option<String>,
 ) -> Result<Vec<String>, HentaiError> {
     let Some(terms) =
-        resolve_metadata_expression_terms(must_include, optional_or, must_exclude).await?
+        resolve_metadata_expression_terms(must_include, optional_or, must_exclude, library_id)
+            .await?
     else {
         return Ok(vec![]);
     };
@@ -318,6 +326,7 @@ pub async fn search_by_tag_expression(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
+    library_id: Option<String>,
 ) -> Result<Vec<ComicDto>, HentaiError> {
     let page = search_by_tag_expression_page(
         must_include,
@@ -327,6 +336,7 @@ pub async fn search_by_tag_expression(
             page: 1,
             page_size: i32::MAX,
         },
+        library_id,
     )
     .await?;
     Ok(page.items)
@@ -337,9 +347,11 @@ pub async fn search_by_tag_expression_page(
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
     request: PageRequestDto,
+    library_id: Option<String>,
 ) -> Result<PagedComicResultDto, HentaiError> {
     let Some(terms) =
-        resolve_metadata_expression_terms(must_include, optional_or, must_exclude).await?
+        resolve_metadata_expression_terms(must_include, optional_or, must_exclude, library_id)
+            .await?
     else {
         let window = paginate(request, 0);
         return Ok(PagedComicResultDto {

@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::db::connection;
 use crate::error::HentaiError;
 use crate::library::{
-    find_library_by_id, list_libraries, record_library_sync_failure,
-    record_library_sync_success, LibraryDto,
+    find_library_by_id, list_libraries, record_library_sync_failure, record_library_sync_success,
+    LibraryDto,
 };
 use crate::probe::rebuild_snapshot_from_scan_items;
 use crate::reader::clear_reader_sessions;

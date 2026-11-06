@@ -10,8 +10,9 @@ use hentai_core::{
     delete_library, export_comic_metadata, fetch_comics_page, fetch_reading_page,
     fetch_series_comics_page, fetch_series_page, fetch_trashed_comics_page, find_comic_by_id,
     find_series_by_id, import_comic_metadata, init_db_at_path, list_distinct_named_facet_names,
-    open_reader, peek_metadata_backup_manifest, purge_comics, record_reading, resolve_series_cover,
-    restore_comics, search_by_keyword_page, search_by_tag_expression, series_id_from_folder_path,
+    now_ms, open_reader, peek_metadata_backup_manifest, purge_comics, record_reading,
+    resolve_series_cover, restore_comics, search_by_keyword_page, search_by_tag_expression,
+    series_id_from_folder_path, sync_library, trash_comics, try_acquire_library_write_lock,
     update_comic_user_meta, update_series_user_meta, watch_continue_reading_top5,
     watch_home_page_counts, watch_recently_added_on_home, ComicFilterDto, ComicSortOptionDto,
     ExportComicMetadataOptions, HentaiError, HentaiErrorCode, JunctionNamedFacet, LibraryDto,
@@ -190,7 +191,8 @@ async fn read(comic_id: &str) {
     record_reading(&ReadingHistoryDto {
         comic_id: comic_id.to_string(),
         title: "read".to_string(),
-        last_read_time_ms: 1_000,
+        // Must be within the rolling retention window; a fixed epoch ms is purged on write.
+        last_read_time_ms: now_ms(),
         page_index: Some(0),
         page_count: None,
     })
@@ -226,13 +228,19 @@ fn trash_hides_comic_from_browse_surfaces_and_keeps_record() {
                     page: 1,
                     page_size: 50,
                 },
+                Some(library.library_id.clone()),
             )
             .await
             .expect("search");
             assert_eq!(search.total_count, 0);
-            let by_tag = search_by_tag_expression(vec!["trash-tag".to_string()], vec![], vec![])
-                .await
-                .expect("tag search");
+            let by_tag = search_by_tag_expression(
+                vec!["trash-tag".to_string()],
+                vec![],
+                vec![],
+                Some(library.library_id.clone()),
+            )
+            .await
+            .expect("tag search");
             assert!(by_tag.is_empty());
             assert!(!history_ids().await.contains(&solo));
             let tags =

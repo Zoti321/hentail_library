@@ -1,6 +1,5 @@
 import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
