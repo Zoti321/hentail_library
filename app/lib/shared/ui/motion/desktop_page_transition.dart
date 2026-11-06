@@ -1,54 +1,46 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Desktop route fade-through: old page fully out, then new page in (280ms total).
+/// Desktop / shell top-level fade-through（对齐官方 animations FadeThrough）。
 const Duration kDesktopPageTransitionDuration = Duration(milliseconds: 280);
 
-/// Opacity while a route is entering (push forward, [t]: 0→1).
+/// 官方 FadeThrough 进场透明度分界（前 6/20 保持 0）。
+@visibleForTesting
+const double kFadeThroughIncomingStart = 6 / 20;
+
+/// 官方 FadeThrough 退场透明度分界（前 6/20 淡到 0）。
+@visibleForTesting
+const double kFadeThroughOutgoingEnd = 6 / 20;
+
+/// 与 animations `_ZoomedFadeIn` 进场 opacity 同权重：前 6/20 为 0，其后淡入。
 @visibleForTesting
 double desktopFadeThroughEnterOpacity(double t) {
-  if (t <= 0.5) {
+  if (t <= kFadeThroughIncomingStart) {
     return 0.0;
   }
-  return Curves.easeOutCubic.transform((t - 0.5) / 0.5);
+  if (t >= 1.0) {
+    return 1.0;
+  }
+  final double local = (t - kFadeThroughIncomingStart) /
+      (1.0 - kFadeThroughIncomingStart);
+  return const Cubic(0.0, 0.0, 0.2, 1.0).transform(local.clamp(0.0, 1.0));
 }
 
-/// Opacity while a route is exiting (pop reverse, [t]: 1→0).
+/// 与 animations `_FadeOut` 退场 opacity 同权重：前 6/20 淡到 0，其后保持 0。
+///
+/// [t] 为 **forward** 进度（0→1 表示正在退场），不是 ReverseAnimation 的值。
 @visibleForTesting
 double desktopFadeThroughExitOpacity(double t) {
-  if (t >= 0.5) {
+  if (t <= 0.0) {
     return 1.0;
   }
-  return Curves.easeInCubic.transform(t / 0.5);
-}
-
-@visibleForTesting
-double resolveDesktopFadeThroughOpacity({
-  required Animation<double> animation,
-  required Animation<double> secondaryAnimation,
-}) {
-  switch (animation.status) {
-    case AnimationStatus.forward:
-      return desktopFadeThroughEnterOpacity(animation.value);
-    case AnimationStatus.reverse:
-      return desktopFadeThroughExitOpacity(animation.value);
-    case AnimationStatus.completed:
-    case AnimationStatus.dismissed:
-      break;
-  }
-
-  // 下方路由（如库浏览被 comic/series 详情 push 盖住）保持不透明。
-  // 若对 secondary 做 fade-through，pop 中段 opacity=0 会露出壳层白底，
-  // 而 NavigationRail 在 Shell 外不受 page 过渡影响，表现为「只有内容区闪白」。
-  // Shell 顶层 go 切换只走上方 primary enter/exit，不依赖 secondary 淡出。
-  if (animation.isCompleted && secondaryAnimation.value > 0) {
-    return 1.0;
-  }
-
-  if (animation.isDismissed) {
+  if (t >= kFadeThroughOutgoingEnd) {
     return 0.0;
   }
-  return 1.0;
+  final double local = t / kFadeThroughOutgoingEnd;
+  return 1.0 -
+      const Cubic(0.4, 0.0, 1.0, 1.0).transform(local.clamp(0.0, 1.0));
 }
 
 Widget desktopFadeThroughTransitionWrapper({
@@ -61,15 +53,12 @@ Widget desktopFadeThroughTransitionWrapper({
     return child;
   }
 
-  return AnimatedBuilder(
-    animation: Listenable.merge(<Listenable>[animation, secondaryAnimation]),
-    builder: (BuildContext context, Widget? builtChild) {
-      final double opacity = resolveDesktopFadeThroughOpacity(
-        animation: animation,
-        secondaryAnimation: secondaryAnimation,
-      );
-      return Opacity(opacity: opacity.clamp(0.0, 1.0), child: builtChild);
-    },
+  // secondary 停住：库浏览被详情 push 盖住时不淡出下方页，避免 pop 中段闪白。
+  // Shell 顶层 go 切换只依赖各页自己的 primary FadeThrough。
+  return FadeThroughTransition(
+    animation: animation,
+    secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
+    fillColor: Theme.of(context).colorScheme.surface,
     child: child,
   );
 }

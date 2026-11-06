@@ -1,44 +1,29 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/widgets/list_detail/list_detail_detail_transition.dart';
 
 void main() {
-  group('listDetailFadeThrough opacity', () {
-    test('enter stays zero for the first half then rises', () {
-      expect(listDetailFadeThroughEnterOpacity(0.0), 0.0);
-      expect(listDetailFadeThroughEnterOpacity(0.5), 0.0);
-      expect(listDetailFadeThroughEnterOpacity(1.0), 1.0);
-    });
-
-    test('outgoing on reverse anim fades only while value > 0.5', () {
-      expect(listDetailFadeThroughOutgoingOpacity(1.0), 1.0);
-      expect(listDetailFadeThroughOutgoingOpacity(0.5), 0.0);
-      expect(listDetailFadeThroughOutgoingOpacity(0.0), 0.0);
-    });
-
-    test('enter and outgoing never both opaque at the same progress', () {
-      for (int i = 0; i <= 20; i++) {
-        final double t = i / 20;
-        final double enter = listDetailFadeThroughEnterOpacity(t);
-        // Outgoing ReverseAnimation value at forward progress t is 1 - t.
-        final double outgoing = listDetailFadeThroughOutgoingOpacity(1.0 - t);
-        expect(
-          enter * outgoing,
-          0.0,
-          reason: 'at t=$t enter=$enter outgoing=$outgoing should not overlap',
-        );
-      }
-    });
-
-    test('spring overshoot beyond 0..1 does not throw and clamps opacity', () {
-      expect(listDetailFadeThroughEnterOpacity(1.05), 1.0);
-      expect(listDetailFadeThroughEnterOpacity(-0.05), 0.0);
-      expect(listDetailFadeThroughOutgoingOpacity(1.05), 1.0);
-      expect(listDetailFadeThroughOutgoingOpacity(-0.05), 0.0);
-    });
-  });
-
   group('ListDetailDetailTransition', () {
+    testWidgets('uses PageTransitionSwitcher and FadeThroughTransition', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ListDetailDetailTransition(
+              switchKey: 'a',
+              child: Text('pane-a'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(PageTransitionSwitcher), findsOneWidget);
+      expect(find.byType(FadeThroughTransition), findsWidgets);
+      expect(find.text('pane-a'), findsOneWidget);
+    });
+
     testWidgets('switches detail child when switchKey changes', (
       WidgetTester tester,
     ) async {
@@ -74,6 +59,27 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('pane-b'), findsOneWidget);
       expect(find.text('pane-a'), findsNothing);
+    });
+
+    testWidgets('reduce motion skips PageTransitionSwitcher', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: Scaffold(
+              body: ListDetailDetailTransition(
+                switchKey: 'a',
+                child: Text('pane-a'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(PageTransitionSwitcher), findsNothing);
+      expect(find.text('pane-a'), findsOneWidget);
     });
   });
 }

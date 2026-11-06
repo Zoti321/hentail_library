@@ -15,7 +15,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # --- UI / 主题 / 组件（共 13）---
+  # --- UI / 主题 / 组件（共 14）---
+  animations: ^2.1.1
   cupertino_icons: ^2.0.0
   custom_pop_up_menu: ^1.2.4
   dynamic_color: ^2.1.0

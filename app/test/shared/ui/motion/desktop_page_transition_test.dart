@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -27,44 +28,67 @@ void main() {
     });
   });
 
-  group('desktop fade-through opacity curves', () {
-    test('enter is zero for the first half then eases in', () {
+  group('official fade-through opacity sequences', () {
+    test('enter stays zero until 6/20 then rises', () {
       expect(desktopFadeThroughEnterOpacity(0.0), 0.0);
-      expect(desktopFadeThroughEnterOpacity(0.5), 0.0);
+      expect(desktopFadeThroughEnterOpacity(kFadeThroughIncomingStart), 0.0);
       expect(desktopFadeThroughEnterOpacity(1.0), 1.0);
+      expect(
+        desktopFadeThroughEnterOpacity(kFadeThroughIncomingStart + 0.01),
+        greaterThan(0.0),
+      );
     });
 
-    test('exit stays visible for the first half then eases out', () {
-      expect(desktopFadeThroughExitOpacity(1.0), 1.0);
-      expect(desktopFadeThroughExitOpacity(0.5), 1.0);
-      expect(desktopFadeThroughExitOpacity(0.0), 0.0);
+    test('exit reaches zero by 6/20 and stays zero', () {
+      expect(desktopFadeThroughExitOpacity(0.0), 1.0);
+      expect(desktopFadeThroughExitOpacity(kFadeThroughOutgoingEnd), 0.0);
+      expect(desktopFadeThroughExitOpacity(1.0), 0.0);
     });
 
-    testWidgets(
-      'covered route stays opaque while secondary runs (no white flash under detail)',
-      (WidgetTester tester) async {
-        final AnimationController primary = AnimationController(
-          vsync: tester,
-          value: 1,
+    test('enter and exit never both opaque at the same progress', () {
+      for (int i = 0; i <= 20; i++) {
+        final double t = i / 20;
+        final double enter = desktopFadeThroughEnterOpacity(t);
+        final double exit = desktopFadeThroughExitOpacity(t);
+        expect(
+          enter * exit,
+          0.0,
+          reason: 'at t=$t enter=$enter exit=$exit should not overlap',
         );
-        final AnimationController secondary = AnimationController(
-          vsync: tester,
-          duration: kDesktopPageTransitionDuration,
-        );
-        addTearDown(primary.dispose);
-        addTearDown(secondary.dispose);
+      }
+    });
+  });
 
-        for (final double t in <double>[0.25, 0.5, 0.75, 1.0]) {
-          secondary.value = t;
-          expect(
-            resolveDesktopFadeThroughOpacity(
-              animation: primary,
-              secondaryAnimation: secondary,
-            ),
-            1.0,
-          );
-        }
-      },
-    );
+  group('desktopFadeThroughTransitionWrapper', () {
+    testWidgets('uses FadeThroughTransition with stopped secondary', (
+      WidgetTester tester,
+    ) async {
+      final AnimationController primary = AnimationController(
+        vsync: tester,
+        value: 1,
+      );
+      addTearDown(primary.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (BuildContext context) {
+              return desktopFadeThroughTransitionWrapper(
+                context: context,
+                animation: primary,
+                secondaryAnimation: const AlwaysStoppedAnimation<double>(0.5),
+                child: const Text('content'),
+              );
+            },
+          ),
+        ),
+      );
+
+      final FadeThroughTransition fade = tester.widget(
+        find.byType(FadeThroughTransition),
+      );
+      expect(fade.secondaryAnimation.value, 0.0);
+      expect(find.text('content'), findsOneWidget);
+    });
   });
 }
