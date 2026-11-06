@@ -237,6 +237,14 @@ class ReaderController extends _$ReaderController
       return;
     }
     final GoRouter router = GoRouter.of(context);
-    router.go(resolveReaderExitLocation(comicId: routeContext.comicId));
+    final String? goLocation = resolveReaderExitNavigation(
+      canPop: router.canPop(),
+      comicId: routeContext.comicId,
+    );
+    if (goLocation == null) {
+      router.pop();
+      return;
+    }
+    router.go(goLocation);
   }
 }
