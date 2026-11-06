@@ -18,3 +18,4 @@ export 'package:hentai_library/features/library_browse/presentation/catalog/view
 export 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit/metadata_edit_presenters.dart';
 export 'package:hentai_library/features/library_browse/presentation/catalog/views/widgets/detail_status/detail_back_header.dart';
 export 'package:hentai_library/features/library_browse/presentation/catalog/views/widgets/detail_status/detail_status_scaffold.dart';
+export 'package:hentai_library/features/library_browse/public/ui/author_detail_page.dart';

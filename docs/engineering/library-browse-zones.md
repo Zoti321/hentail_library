@@ -33,7 +33,7 @@ Comics/Series Tab **筛选/排序/投影规则类型** 分别 @ `comic/domain`�
 ## browse ↔ comic/series 壳接缝（阶段 2）
 
 - **已删除** `comic/public/shell` 与 `series/public/shell`；browse 经本地 `presentation/integrations/{comic,series}_presentation_bridge.dart` 消费 presentation / 窄 public。
-- **`library_browse/public/catalog/for_comic_and_series.dart`**：仅保留 comic/series 实际使用的壳原子（详情状态、锁 UI、metadata mappers/presenters、catalog selection/pagination、page size、breadcrumb、comic card actions 等）；已去掉未消费的 `library_page_header`、`library_search_query_parser`、`author_detail_page` re-export。
+- **`library_browse/public/catalog/for_comic_and_series.dart`**：仅保留 comic/series 实际使用的壳原子（详情状态、锁 UI、metadata mappers/presenters、catalog selection/pagination、page size、breadcrumb、comic card actions、`openAuthorDetailByName`、bulkEditComicsByIdsProvider 等）；已去掉未消费的 `library_page_header`、`library_search_query_parser` re-export。
 - **R12**：`public/` 对自身 `presentation/` 的 `export` 纳入门禁；既有 `public/ui` 与本 catalog barrel 等见 `app/test/gate/public_presentation_export_allowlist.txt`（只缩不扩）。
 
 ## Cross-feature
