@@ -43,6 +43,7 @@ class LibraryEditForm extends StatefulWidget {
 
 class _LibraryEditFormState extends State<LibraryEditForm> {
   _LibraryEditTab _tab = _LibraryEditTab.general;
+  bool _detailTransitionReverse = false;
 
   bool get _isRemote => widget.form.isRemote;
 
@@ -120,7 +121,24 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
   }
 
   void _selectTab(int index) {
-    setState(() => _tab = _tabs[index]);
+    setState(() {
+      final _LibraryEditTab next = _tabs[index];
+      _detailTransitionReverse = _tabs.indexOf(next) < _tabs.indexOf(_tab);
+      _tab = next;
+    });
+  }
+
+  Widget _detailTransition(Widget child) {
+    return ListDetailDetailTransition(
+      switchKey: _tab,
+      reverse: _detailTransitionReverse,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: LibraryEditFormMetrics.detailContentHorizontalInset,
+        ),
+        child: child,
+      ),
+    );
   }
 
   @override
@@ -212,14 +230,9 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
               ),
               SizedBox(height: gap),
               if (boundedHeight)
-                Flexible(
-                  child: ListDetailDetailTransition(
-                    switchKey: _tab,
-                    child: scrollableTabBody,
-                  ),
-                )
+                Flexible(child: _detailTransition(scrollableTabBody))
               else
-                ListDetailDetailTransition(switchKey: _tab, child: tabBody),
+                _detailTransition(tabBody),
             ],
           );
         }
@@ -237,12 +250,7 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
               ),
             ),
             SizedBox(width: gap),
-            Expanded(
-              child: ListDetailDetailTransition(
-                switchKey: _tab,
-                child: scrollableTabBody,
-              ),
-            ),
+            Expanded(child: _detailTransition(scrollableTabBody)),
           ],
         );
       },

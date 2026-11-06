@@ -27,6 +27,7 @@ import 'package:hentai_library/shared/ui/layout/spacing.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_catalog_toolbar.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
+import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
@@ -170,24 +171,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             ),
           );
 
-    final Widget header = AnimatedSwitcher(
-      duration: const Duration(milliseconds: 220),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        final Animation<Offset> slide = Tween<Offset>(
-          begin: const Offset(0, -0.12),
-          end: Offset.zero,
-        ).animate(animation);
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(position: slide, child: child),
-        );
-      },
-      child: KeyedSubtree(
-        key: ValueKey<bool>(librarySelection),
-        child: modeHeader,
-      ),
+    final Widget header = ModeChromeTransition(
+      switchKey: librarySelection,
+      reverse: !librarySelection,
+      child: modeHeader,
     );
 
     return PopScope(

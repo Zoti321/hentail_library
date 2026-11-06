@@ -5,6 +5,7 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_view_object.dart';
+import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/features/series/presentation/patterns/series_detail/series_detail_comics_section.dart';
@@ -154,24 +155,10 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
             onPageSizeChanged: _setPageSize,
           );
 
-    final Widget header = AnimatedSwitcher(
-      duration: const Duration(milliseconds: 220),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        final Animation<Offset> slide = Tween<Offset>(
-          begin: const Offset(0, -0.12),
-          end: Offset.zero,
-        ).animate(animation);
-        return FadeTransition(
-          opacity: animation,
-          child: SlideTransition(position: slide, child: child),
-        );
-      },
-      child: KeyedSubtree(
-        key: ValueKey<bool>(seriesSelection),
-        child: modeHeader,
-      ),
+    final Widget header = ModeChromeTransition(
+      switchKey: seriesSelection,
+      reverse: !seriesSelection,
+      child: modeHeader,
     );
 
     return PopScope(

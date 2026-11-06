@@ -12,6 +12,9 @@ abstract final class MetadataEditFormMetrics {
   static const double seriesMaxWidth = 480;
   static const double sideTabColumnWidth = 168;
 
+  /// Detail 区水平内边距（侧栏间隙之外，字段左右留白）。
+  static const double detailContentHorizontalInset = Spacing.space16;
+
   /// expanded+ 基础弹窗内容最大宽度（侧栏 + 表单区）。
   static const double expandedDialogContentMaxWidth = 920;
 
@@ -26,7 +29,8 @@ abstract final class MetadataEditFormMetrics {
   static const double _fullScreenChromeHeight = 72;
 
   static double sectionGap(WindowSizeClass sizeClass) {
-    return sizeClass.isCompact ? Spacing.space16 : Spacing.space20;
+    // 与设置页 list-detail paneGap（24）对齐。
+    return sizeClass.isCompact ? Spacing.space16 : Spacing.space24;
   }
 
   /// 自适应 [M3EDialog] 内容区最大宽度（expanded+ 更宽）。

@@ -46,11 +46,17 @@ M3EThemeData buildAppM3eThemeData(Brightness brightness) {
   final M3EThemeData base = M3EThemeData(
     colorScheme: m3eColorSchemeForBrightness(brightness),
   );
+  final M3EColorScheme colors = base.colorScheme;
   return applyShellNavRailOverrides(
     base.copyWith(
       // 与 [Breakpoints.expanded] 对齐：宽度 < 840 时 M3EDialog.showAdaptive 全屏，否则基础弹窗。
+      // 基础弹窗容器默认 surfaceContainerHigh；改为 surface，与壳层画布 /
+      // list-detail SharedAxis fillColor 一致（设置页同色）。
       dialogTheme: base.dialogTheme.copyWith(
         compactBreakpoint: Breakpoints.expanded,
+        appearance: base.dialogTheme.appearance.copyWith(
+          containerColor: colors.surface,
+        ),
       ),
     ),
   );

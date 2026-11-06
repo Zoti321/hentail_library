@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -5,22 +6,6 @@ import '../../../widgetbook/lab/navigation/md3e_lab_reader_navigation.dart';
 import '../../../widgetbook/hosts/md3e_reader_page_lab_host.dart';
 
 import '../../support/pump_app.dart';
-
-Finder _routeSlide() => find.ancestor(
-  of: find.byType(ReaderPageLabHost),
-  matching: find.byType(SlideTransition),
-);
-
-double _routeDx(WidgetTester tester) {
-  return tester.widget<SlideTransition>(_routeSlide().first).position.value.dx;
-}
-
-/// 点击后路由挂载时机不固定，轮询直到页面出现（最多约 160ms）。
-Future<void> _pumpUntilRouteMounted(WidgetTester tester) async {
-  for (int i = 0; i < 20 && _routeSlide().evaluate().isEmpty; i++) {
-    await tester.pump(const Duration(milliseconds: 8));
-  }
-}
 
 Future<void> _pumpLauncher(WidgetTester tester) async {
   await pumpApp(
@@ -37,49 +22,37 @@ Future<void> _pumpLauncher(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('forward route slides in from the right with spring overshoot', (
+  testWidgets('forward route uses horizontal SharedAxisTransition', (
     WidgetTester tester,
   ) async {
     await _pumpLauncher(tester);
     await tester.tap(find.text('open'));
-    await _pumpUntilRouteMounted(tester);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 16));
 
-    expect(_routeDx(tester), greaterThan(0), reason: '进场起点应在右侧');
-
-    double minDx = double.infinity;
-    for (int i = 0; i < 60; i++) {
-      await tester.pump(const Duration(milliseconds: 8));
-      final double dx = _routeDx(tester);
-      if (dx < minDx) {
-        minDx = dx;
-      }
-    }
-    // 弹簧过冲：位移会越过终点（dx < 0）。固定曲线不会出现这一现象。
-    expect(minDx, lessThan(0));
+    expect(find.byType(ReaderPageLabHost), findsOneWidget);
+    expect(find.byType(SharedAxisTransition), findsWidgets);
+    final SharedAxisTransition axis = tester.widget(
+      find.byType(SharedAxisTransition).first,
+    );
+    expect(axis.transitionType, SharedAxisTransitionType.horizontal);
 
     await tester.pumpAndSettle();
-    expect(_routeDx(tester), closeTo(0, 0.001));
+    expect(find.byType(ReaderPageLabHost), findsOneWidget);
   });
 
-  testWidgets('back route reverses direction and removes the page', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('back route pops the page', (WidgetTester tester) async {
     await _pumpLauncher(tester);
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
-    expect(_routeDx(tester), closeTo(0, 0.001));
+    expect(find.byType(ReaderPageLabHost), findsOneWidget);
 
     tester.state<NavigatorState>(find.byType(Navigator)).pop();
-    // 第一帧确定反向动画起点，之后再推进 50ms 观察位移。
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-    expect(_routeDx(tester), greaterThan(0), reason: '后退时页面应向右滑出');
-
     await tester.pumpAndSettle();
     expect(find.byType(ReaderPageLabHost), findsNothing);
   });
 
-  testWidgets('reduce motion switches route without any slide', (
+  testWidgets('reduce motion switches route without SharedAxis', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -103,7 +76,7 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pump();
 
-    expect(_routeSlide(), findsNothing);
+    expect(find.byType(SharedAxisTransition), findsNothing);
     expect(find.byType(ReaderPageLabHost), findsOneWidget);
   });
 }

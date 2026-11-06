@@ -61,6 +61,7 @@ List<BulkMetadataEditFieldKind> _fieldsFor(_BulkEditTab tab) {
 class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
   final BulkMetadataEditSession _session = BulkMetadataEditSession();
   _BulkEditTab _tab = _BulkEditTab.general;
+  bool _detailTransitionReverse = false;
   bool _loading = true;
 
   @override
@@ -207,11 +208,14 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
   }
 
   void _selectTabIndex(int index) {
-    setState(() => _tab = _BulkEditTab.values[index]);
+    _selectTab(_BulkEditTab.values[index]);
   }
 
   void _selectTab(_BulkEditTab tab) {
-    setState(() => _tab = tab);
+    setState(() {
+      _detailTransitionReverse = tab.index < _tab.index;
+      _tab = tab;
+    });
   }
 
   Widget _scrollPane(Widget child) {
@@ -281,7 +285,16 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
           Expanded(
             child: ListDetailDetailTransition(
               switchKey: _tab,
-              child: _scrollPane(_buildTabFieldSections(l10n, fields, spacing)),
+              reverse: _detailTransitionReverse,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal:
+                      MetadataEditFormMetrics.detailContentHorizontalInset,
+                ),
+                child: _scrollPane(
+                  _buildTabFieldSections(l10n, fields, spacing),
+                ),
+              ),
             ),
           ),
         ],

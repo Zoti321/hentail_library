@@ -48,11 +48,11 @@ abstract final class LabMotion {
   static const motor.MaterialSpringMotion effectsSpring =
       motor.MaterialSpringMotion.expressiveEffectsDefault();
 
-  /// Lab 页面转场（shared-axis）的空间弹簧：与 M3E expressiveSpatialDefault 同值。
+  /// 窄屏设置等仍用手写弹簧滑入时的空间弹簧（官方 SharedAxis 路由不再用此）。
   static const motor.MaterialSpringMotion routeSpring =
       motor.MaterialSpringMotion.expressiveSpatialDefault();
 
-  /// Lab 页面转场时长（弹簧按此时长采样；0.5s 内基本稳定）。
+  /// 窄屏设置等弹簧滑入采样时长（0.5s 内基本稳定）。
   static const Duration routeTransitionDuration = Duration(milliseconds: 500);
 
   /// 日历月份切换（PageView 弹簧翻页）的采样时长；弹簧在此时长内收敛。

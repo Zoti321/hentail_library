@@ -44,11 +44,25 @@ class SeriesMetadataEditForm extends StatefulWidget {
 
 class _SeriesMetadataEditFormState extends State<SeriesMetadataEditForm> {
   _SeriesMetadataEditTab _tab = _SeriesMetadataEditTab.content;
+  bool _detailTransitionReverse = false;
 
   Widget _scrollPane(Widget child) {
     return ScrollConfiguration(
       behavior: MetadataEditScrollBehavior(),
       child: SingleChildScrollView(primary: false, child: child),
+    );
+  }
+
+  Widget _detailTransition(Widget child) {
+    return ListDetailDetailTransition(
+      switchKey: _tab,
+      reverse: _detailTransitionReverse,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: MetadataEditFormMetrics.detailContentHorizontalInset,
+        ),
+        child: child,
+      ),
     );
   }
 
@@ -70,12 +84,7 @@ class _SeriesMetadataEditFormState extends State<SeriesMetadataEditForm> {
             ),
           ),
           SizedBox(width: gap),
-          Expanded(
-            child: ListDetailDetailTransition(
-              switchKey: _tab,
-              child: _scrollPane(tabBody),
-            ),
-          ),
+          Expanded(child: _detailTransition(_scrollPane(tabBody))),
         ],
       ),
     );
@@ -100,24 +109,21 @@ class _SeriesMetadataEditFormState extends State<SeriesMetadataEditForm> {
               ),
             ],
             selectedIndex: _tab.index,
-            onSelected: (int index) {
-              setState(() => _tab = _SeriesMetadataEditTab.values[index]);
-            },
+            onSelected: _selectTab,
           ),
           SizedBox(height: gap),
-          Expanded(
-            child: ListDetailDetailTransition(
-              switchKey: _tab,
-              child: _scrollPane(tabBody),
-            ),
-          ),
+          Expanded(child: _detailTransition(_scrollPane(tabBody))),
         ],
       ),
     );
   }
 
   void _selectTab(int index) {
-    setState(() => _tab = _SeriesMetadataEditTab.values[index]);
+    setState(() {
+      final _SeriesMetadataEditTab next = _SeriesMetadataEditTab.values[index];
+      _detailTransitionReverse = next.index < _tab.index;
+      _tab = next;
+    });
   }
 
   @override

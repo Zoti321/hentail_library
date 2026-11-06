@@ -65,6 +65,7 @@ class ComicMetadataEditForm extends StatefulWidget {
 
 class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
   _ComicMetadataEditTab _tab = _ComicMetadataEditTab.general;
+  bool _detailTransitionReverse = false;
 
   void _update(ComicMetadataEditDraft Function(ComicMetadataEditDraft d) fn) {
     widget.onDraftChanged(fn(widget.draft));
@@ -74,6 +75,19 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
     return ScrollConfiguration(
       behavior: MetadataEditScrollBehavior(),
       child: SingleChildScrollView(primary: false, child: child),
+    );
+  }
+
+  Widget _detailTransition(Widget child) {
+    return ListDetailDetailTransition(
+      switchKey: _tab,
+      reverse: _detailTransitionReverse,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: MetadataEditFormMetrics.detailContentHorizontalInset,
+        ),
+        child: child,
+      ),
     );
   }
 
@@ -95,12 +109,7 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
             ),
           ),
           SizedBox(width: gap),
-          Expanded(
-            child: ListDetailDetailTransition(
-              switchKey: _tab,
-              child: _scrollPane(tabBody),
-            ),
-          ),
+          Expanded(child: _detailTransition(_scrollPane(tabBody))),
         ],
       ),
     );
@@ -119,12 +128,7 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
         children: <Widget>[
           _TopTabBar(l10n: l10n, tab: _tab, onSelected: _selectTab),
           SizedBox(height: gap),
-          Expanded(
-            child: ListDetailDetailTransition(
-              switchKey: _tab,
-              child: _scrollPane(tabBody),
-            ),
-          ),
+          Expanded(child: _detailTransition(_scrollPane(tabBody))),
         ],
       ),
     );
@@ -206,7 +210,11 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
   }
 
   void _selectTab(int index) {
-    setState(() => _tab = _ComicMetadataEditTab.values[index]);
+    setState(() {
+      final _ComicMetadataEditTab next = _ComicMetadataEditTab.values[index];
+      _detailTransitionReverse = next.index < _tab.index;
+      _tab = next;
+    });
   }
 }
 

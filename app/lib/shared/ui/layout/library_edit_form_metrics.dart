@@ -7,7 +7,11 @@ abstract final class LibraryEditFormMetrics {
   static const double maxWidth = 640;
   static const double sideTabColumnWidth = 168;
 
+  /// Detail 区水平内边距（侧栏间隙之外，字段左右留白）。
+  static const double detailContentHorizontalInset = Spacing.space16;
+
   static double sectionGap(WindowSizeClass sizeClass) {
-    return sizeClass.isCompact ? Spacing.space16 : Spacing.space20;
+    // 与设置页 list-detail paneGap（24）对齐。
+    return sizeClass.isCompact ? Spacing.space16 : Spacing.space24;
   }
 }
