@@ -51,7 +51,6 @@ final GoRouter appRouter = GoRouter(
                   buildShellNavPage(
                     state: state,
                     child: const AllLibrariesBrowsePage(),
-                    allowPendingFadeThrough: true,
                   ),
             ),
             GoRoute(
@@ -63,7 +62,6 @@ final GoRouter appRouter = GoRouter(
                 return buildShellNavPage(
                   state: state,
                   child: LibraryBrowsePage(libraryId: libraryId),
-                  allowPendingFadeThrough: true,
                 );
               },
             ),

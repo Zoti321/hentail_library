@@ -12,54 +12,19 @@ class _FakeGoRouterState extends Fake implements GoRouterState {
 }
 
 void main() {
-  tearDown(debugResetPendingShellFadeThrough);
-
-  group('shell nav pending fade-through', () {
-    test('library shell page stays NoTransition without a pending request', () {
+  group('buildShellNavPage', () {
+    test('returns desktop fade-through for shell top-level nav', () {
       final Page<void> page = buildShellNavPage(
         state: _FakeGoRouterState(),
         child: const SizedBox(),
-        allowPendingFadeThrough: true,
       );
 
-      expect(page, isA<NoTransitionPage<void>>());
-    });
-
-    test('one-shot request makes the next allowPendingFadeThrough page fade-through', () {
-      requestShellFadeThroughOnce();
-
-      final Page<void> animated = buildShellNavPage(
-        state: _FakeGoRouterState(),
-        child: const SizedBox(),
-        allowPendingFadeThrough: true,
-      );
-      expect(animated, isA<CustomTransitionPage<void>>());
+      expect(page, isA<CustomTransitionPage<void>>());
       final CustomTransitionPage<void> custom =
-          animated as CustomTransitionPage<void>;
+          page as CustomTransitionPage<void>;
       expect(custom.transitionDuration, kDesktopPageTransitionDuration);
       expect(custom.reverseTransitionDuration, kDesktopPageTransitionDuration);
-
-      final Page<void> next = buildShellNavPage(
-        state: _FakeGoRouterState(),
-        child: const SizedBox(),
-        allowPendingFadeThrough: true,
-      );
-      expect(next, isA<NoTransitionPage<void>>());
     });
-
-    test(
-      'pending request is ignored when allowPendingFadeThrough is false',
-      () {
-        requestShellFadeThroughOnce();
-
-        final Page<void> page = buildShellNavPage(
-          state: _FakeGoRouterState(),
-          child: const SizedBox(),
-        );
-        expect(page, isA<NoTransitionPage<void>>());
-        expect(debugPendingShellFadeThrough, isTrue);
-      },
-    );
   });
 
   group('desktop fade-through opacity curves', () {

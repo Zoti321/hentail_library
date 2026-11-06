@@ -173,39 +173,10 @@ CustomTransitionPage<void> buildDesktopFadeThroughPage({
   );
 }
 
-bool _pendingShellFadeThrough = false;
-
-/// Request one desktop fade-through for the next shell page that opts in
-/// via [buildShellNavPage] `allowPendingFadeThrough: true` (detail back → library).
-void requestShellFadeThroughOnce() {
-  _pendingShellFadeThrough = true;
-}
-
-@visibleForTesting
-bool get debugPendingShellFadeThrough => _pendingShellFadeThrough;
-
-@visibleForTesting
-void debugResetPendingShellFadeThrough() {
-  _pendingShellFadeThrough = false;
-}
-
-/// Shell top-level nav (sidebar / drawer): instant swap, no page transition.
-///
-/// When [allowPendingFadeThrough] is true and [requestShellFadeThroughOnce]
-/// was called, consumes the one-shot and returns [buildDesktopFadeThroughPage]
-/// instead (so detail-back `go` can animate without changing sidebar nav).
+/// Shell 顶层导航（Rail / drawer / 首页→历史·垃圾桶等）：MD3 Top level fade-through。
 Page<void> buildShellNavPage({
   required GoRouterState state,
   required Widget child,
-  bool allowPendingFadeThrough = false,
 }) {
-  if (allowPendingFadeThrough && _pendingShellFadeThrough) {
-    _pendingShellFadeThrough = false;
-    return buildDesktopFadeThroughPage(state: state, child: child);
-  }
-  return NoTransitionPage<void>(
-    key: state.pageKey,
-    name: state.name,
-    child: child,
-  );
+  return buildDesktopFadeThroughPage(state: state, child: child);
 }
