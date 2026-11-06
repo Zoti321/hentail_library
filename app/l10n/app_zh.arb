@@ -979,8 +979,14 @@
       "count": {"type": "int"}
     }
   },
-  "confirmRemovePathTitle": "确认移除",
-  "confirmRemovePathContent": "将删除该本地库及其漫画记录。此操作立即生效且不可撤销。",
+  "homeLibraryDeleteConfirmTitle": "删除「{name}」？",
+  "@homeLibraryDeleteConfirmTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "homeLibraryDeleteConfirmBody": "将从应用中移除此库。漫画文件会保留在原位置。",
+  "homeLibraryDeleteConfirmAcknowledge": "我了解不会删除漫画文件",
   "confirmClearHistoryTitle": "确认清空",
   "confirmClearHistoryContent": "将清空全部阅读历史记录。此操作不可撤销。",
   "breadcrumbReturnLibrary": "返回漫画库",

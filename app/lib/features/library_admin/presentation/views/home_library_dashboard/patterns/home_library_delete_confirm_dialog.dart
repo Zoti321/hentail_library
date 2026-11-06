@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
-
-import 'home_library_management_copy.dart';
-
 import 'package:hentai_library/shared/ui/theme/lab_text.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Lab：从 Home 预览列表移除 Library 的确认（不写 FRB / 不删 Resource）。
+/// 从 Home「我的漫画库」移除 Library 的确认（勾选闸门；不删 Resource）。
 Future<bool> showHomeLibraryDeleteConfirmDialog({
   required BuildContext context,
   required String libraryDisplayName,
@@ -48,9 +45,7 @@ class _HomeLibraryDeleteConfirmDialogState
     );
 
     return M3EDialog(
-      title: HomeLibraryManagementCopy.deleteConfirmTitle(
-        widget.libraryDisplayName,
-      ),
+      title: l10n.homeLibraryDeleteConfirmTitle(widget.libraryDisplayName),
       content: _HomeLibraryDeleteConfirmBody(
         acknowledged: _acknowledged,
         onAcknowledgementChanged: (bool value) {
@@ -105,6 +100,7 @@ class _HomeLibraryDeleteConfirmBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final TextStyle descriptionStyle = theme.typeScale.bodyMedium.copyWith(
       color: scheme.onSurfaceVariant,
     );
@@ -119,45 +115,28 @@ class _HomeLibraryDeleteConfirmBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          HomeLibraryManagementCopy.deleteConfirmBody,
-          style: descriptionStyle,
-        ),
+        Text(l10n.homeLibraryDeleteConfirmBody, style: descriptionStyle),
         SizedBox(height: spacing.md),
-        Material(
-          color: scheme.surfaceContainerHigh,
+        InkWell(
           borderRadius: BorderRadius.circular(12),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: toggleAcknowledgement,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: spacing.sm,
-                horizontal: spacing.sm,
+          onTap: toggleAcknowledgement,
+          child: Row(
+            children: <Widget>[
+              M3ECheckbox(
+                value: acknowledged,
+                onChanged: (bool? value) {
+                  onAcknowledgementChanged(value ?? false);
+                },
+                focusable: true,
               ),
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    M3ECheckbox(
-                      value: acknowledged,
-                      onChanged: (bool? value) {
-                        onAcknowledgementChanged(value ?? false);
-                      },
-                      focusable: true,
-                    ),
-                    SizedBox(width: spacing.sm),
-                    Expanded(
-                      child: Text(
-                        HomeLibraryManagementCopy.deleteConfirmAcknowledgement,
-                        style: acknowledgementStyle,
-                      ),
-                    ),
-                  ],
+              SizedBox(width: spacing.sm),
+              Expanded(
+                child: Text(
+                  l10n.homeLibraryDeleteConfirmAcknowledge,
+                  style: acknowledgementStyle,
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ],

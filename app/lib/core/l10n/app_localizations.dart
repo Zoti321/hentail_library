@@ -3708,17 +3708,23 @@ abstract class AppLocalizations {
   /// **'将删除「{name}」，并解除与 {count} 本漫画的附着。此操作不可撤销。'**
   String confirmDeleteNamedFacetContent(String name, int count);
 
-  /// No description provided for @confirmRemovePathTitle.
+  /// No description provided for @homeLibraryDeleteConfirmTitle.
   ///
   /// In zh, this message translates to:
-  /// **'确认移除'**
-  String get confirmRemovePathTitle;
+  /// **'删除「{name}」？'**
+  String homeLibraryDeleteConfirmTitle(String name);
 
-  /// No description provided for @confirmRemovePathContent.
+  /// No description provided for @homeLibraryDeleteConfirmBody.
   ///
   /// In zh, this message translates to:
-  /// **'将删除该本地库及其漫画记录。此操作立即生效且不可撤销。'**
-  String get confirmRemovePathContent;
+  /// **'将从应用中移除此库。漫画文件会保留在原位置。'**
+  String get homeLibraryDeleteConfirmBody;
+
+  /// No description provided for @homeLibraryDeleteConfirmAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解不会删除漫画文件'**
+  String get homeLibraryDeleteConfirmAcknowledge;
 
   /// No description provided for @confirmClearHistoryTitle.
   ///

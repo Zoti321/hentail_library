@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/library/library_confirm_dialog.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/library/library_form_dialog.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -56,9 +56,9 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
     LocalLibrary library, {
     bool navigateAfter = true,
   }) async {
-    final bool confirmed = await showLibraryRemovePathConfirm(
-      context,
-      path: library.rootPath,
+    final bool confirmed = await showHomeLibraryDeleteConfirmDialog(
+      context: context,
+      libraryDisplayName: localLibraryDisplayName(library),
     );
     if (!context.mounted || !confirmed) {
       return;

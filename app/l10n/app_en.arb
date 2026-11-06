@@ -977,8 +977,14 @@
       "count": {"type": "int"}
     }
   },
-  "confirmRemovePathTitle": "Confirm removal",
-  "confirmRemovePathContent": "This local library and its comics will be deleted immediately. This cannot be undone.",
+  "homeLibraryDeleteConfirmTitle": "Delete \"{name}\"?",
+  "@homeLibraryDeleteConfirmTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "homeLibraryDeleteConfirmBody": "This will remove the library from the app. Comic files stay in place.",
+  "homeLibraryDeleteConfirmAcknowledge": "I understand comic files will not be deleted",
   "confirmClearHistoryTitle": "Confirm clear",
   "confirmClearHistoryContent": "All reading history will be cleared. This cannot be undone.",
   "breadcrumbReturnLibrary": "Back to library",

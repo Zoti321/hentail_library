@@ -2021,10 +2021,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get confirmRemovePathTitle => '确认移除';
+  String homeLibraryDeleteConfirmTitle(String name) {
+    return '删除「$name」？';
+  }
 
   @override
-  String get confirmRemovePathContent => '将删除该本地库及其漫画记录。此操作立即生效且不可撤销。';
+  String get homeLibraryDeleteConfirmBody => '将从应用中移除此库。漫画文件会保留在原位置。';
+
+  @override
+  String get homeLibraryDeleteConfirmAcknowledge => '我了解不会删除漫画文件';
 
   @override
   String get confirmClearHistoryTitle => '确认清空';

@@ -11,6 +11,7 @@ import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/reorderable_split_list_group.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 首页「我的漫画库」：汇总 + 可操作的库列表（Lab；数据由调用方注入）。
@@ -351,6 +352,8 @@ class HomeLibraryRowMoreMenu extends StatelessWidget {
       ),
       M3EMenuEntry(
         label: l10n.sidebarDeleteLibrary,
+        leading: Icon(LucideIcons.trash2, color: scheme.error),
+        isDestructive: true,
         enabled: menuEnabled,
         onPressed: menuEnabled
             ? () => emit(HomeLibraryManagementAction.delete)

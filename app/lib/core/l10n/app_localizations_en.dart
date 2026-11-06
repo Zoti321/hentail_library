@@ -2091,11 +2091,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get confirmRemovePathTitle => 'Confirm removal';
+  String homeLibraryDeleteConfirmTitle(String name) {
+    return 'Delete \"$name\"?';
+  }
 
   @override
-  String get confirmRemovePathContent =>
-      'This local library and its comics will be deleted immediately. This cannot be undone.';
+  String get homeLibraryDeleteConfirmBody =>
+      'This will remove the library from the app. Comic files stay in place.';
+
+  @override
+  String get homeLibraryDeleteConfirmAcknowledge =>
+      'I understand comic files will not be deleted';
 
   @override
   String get confirmClearHistoryTitle => 'Confirm clear';
