@@ -39,12 +39,10 @@ class SeriesMetadataEditForm extends StatefulWidget {
   final String? totalCountError;
 
   @override
-  State<SeriesMetadataEditForm> createState() =>
-      _SeriesMetadataEditFormState();
+  State<SeriesMetadataEditForm> createState() => _SeriesMetadataEditFormState();
 }
 
-class _SeriesMetadataEditFormState
-    extends State<SeriesMetadataEditForm> {
+class _SeriesMetadataEditFormState extends State<SeriesMetadataEditForm> {
   _SeriesMetadataEditTab _tab = _SeriesMetadataEditTab.content;
 
   Widget _scrollPane(Widget child) {
@@ -96,9 +94,7 @@ class _SeriesMetadataEditFormState
         children: <Widget>[
           SegmentedCapsuleBar(
             segments: <SegmentedCapsuleSegment>[
-              SegmentedCapsuleSegment(
-                label: l10n.dialogEditMetadataTabContent,
-              ),
+              SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabContent),
               SegmentedCapsuleSegment(
                 label: l10n.dialogEditMetadataTabFieldLocks,
               ),
@@ -145,8 +141,7 @@ class _SeriesMetadataEditFormState
       ),
     };
 
-    final bool useSideTabs =
-        sizeClass.index >= WindowSizeClass.medium.index;
+    final bool useSideTabs = sizeClass.index >= WindowSizeClass.medium.index;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -191,10 +186,7 @@ class _SideTabList extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<(String label, _SeriesMetadataEditTab value)> items =
         <(String, _SeriesMetadataEditTab)>[
-          (
-            l10n.dialogEditMetadataTabContent,
-            _SeriesMetadataEditTab.content,
-          ),
+          (l10n.dialogEditMetadataTabContent, _SeriesMetadataEditTab.content),
           (
             l10n.dialogEditMetadataTabFieldLocks,
             _SeriesMetadataEditTab.fieldLocks,
@@ -248,9 +240,7 @@ class _SeriesContentFields extends StatelessWidget {
               onDraftChanged(draft.copyWith(name: value)),
         ),
         SizedBox(height: gap),
-        MetadataFieldLabelRow(
-          label: l10n.formSeriesSerializationStatusLabel,
-        ),
+        MetadataFieldLabelRow(label: l10n.formSeriesSerializationStatusLabel),
         SizedBox(height: spacing.sm),
         SeriesSerializationDropdown(
           value: draft.serializationStatus,

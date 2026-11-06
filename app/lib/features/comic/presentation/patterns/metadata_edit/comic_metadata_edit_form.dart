@@ -60,16 +60,13 @@ class ComicMetadataEditForm extends StatefulWidget {
   final String? titleError;
 
   @override
-  State<ComicMetadataEditForm> createState() =>
-      _ComicMetadataEditFormState();
+  State<ComicMetadataEditForm> createState() => _ComicMetadataEditFormState();
 }
 
 class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
   _ComicMetadataEditTab _tab = _ComicMetadataEditTab.general;
 
-  void _update(
-    ComicMetadataEditDraft Function(ComicMetadataEditDraft d) fn,
-  ) {
+  void _update(ComicMetadataEditDraft Function(ComicMetadataEditDraft d) fn) {
     widget.onDraftChanged(fn(widget.draft));
   }
 
@@ -179,8 +176,7 @@ class _ComicMetadataEditFormState extends State<ComicMetadataEditForm> {
       ),
     };
 
-    final bool useSideTabs =
-        sizeClass.index >= WindowSizeClass.medium.index;
+    final bool useSideTabs = sizeClass.index >= WindowSizeClass.medium.index;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -230,12 +226,8 @@ class _TopTabBar extends StatelessWidget {
     return SegmentedCapsuleBar(
       segments: <SegmentedCapsuleSegment>[
         SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabGeneral),
-        SegmentedCapsuleSegment(
-          label: l10n.dialogEditMetadataTabAuthorsTags,
-        ),
-        SegmentedCapsuleSegment(
-          label: l10n.dialogEditMetadataTabFieldLocks,
-        ),
+        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabAuthorsTags),
+        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabFieldLocks),
       ],
       selectedIndex: tab.index,
       onSelected: onSelected,
@@ -258,10 +250,7 @@ class _SideTabList extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<(String label, _ComicMetadataEditTab value)> items =
         <(String, _ComicMetadataEditTab)>[
-          (
-            l10n.dialogEditMetadataTabGeneral,
-            _ComicMetadataEditTab.general,
-          ),
+          (l10n.dialogEditMetadataTabGeneral, _ComicMetadataEditTab.general),
           (
             l10n.dialogEditMetadataTabAuthorsTags,
             _ComicMetadataEditTab.authorsTags,
@@ -455,8 +444,7 @@ class _AuthorsTagsFields extends ConsumerWidget {
           icon: Symbols.label,
           scope: scope,
           selectedNames: draft.tags,
-          onAdd: (String v) =>
-              onTagsChanged(TagListWithAdded(draft.tags, v)),
+          onAdd: (String v) => onTagsChanged(TagListWithAdded(draft.tags, v)),
           onRemove: (String v) =>
               onTagsChanged(TagListWithRemoved(draft.tags, v)),
           onClearAll: () => onTagsChanged(const <String>[]),

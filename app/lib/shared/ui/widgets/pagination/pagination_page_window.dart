@@ -2,11 +2,9 @@
 sealed class PaginationWindowItem {
   const PaginationWindowItem();
 
-  const factory PaginationWindowItem.page(int page) =
-      PaginationWindowPage._;
+  const factory PaginationWindowItem.page(int page) = PaginationWindowPage._;
 
-  const factory PaginationWindowItem.ellipsis() =
-      PaginationWindowEllipsis._;
+  const factory PaginationWindowItem.ellipsis() = PaginationWindowEllipsis._;
 
   const factory PaginationWindowItem.empty() = PaginationWindowEmpty._;
 }
@@ -36,11 +34,15 @@ class PaginationSiblingConfig {
   final int boundaryCount;
   final int siblingCount;
 
-  static const PaginationSiblingConfig muiDefault =
-      PaginationSiblingConfig(boundaryCount: 1, siblingCount: 1);
+  static const PaginationSiblingConfig muiDefault = PaginationSiblingConfig(
+    boundaryCount: 1,
+    siblingCount: 1,
+  );
 
-  static const PaginationSiblingConfig compact =
-      PaginationSiblingConfig(boundaryCount: 1, siblingCount: 0);
+  static const PaginationSiblingConfig compact = PaginationSiblingConfig(
+    boundaryCount: 1,
+    siblingCount: 0,
+  );
 }
 
 List<int> PaginationRange(int start, int end) {
@@ -96,10 +98,7 @@ List<PaginationWindowItem> buildPaginationPageWindow({
     items.add(PaginationWindowItem.page(boundaryCount + 1));
   }
 
-  for (final int siblingPage in PaginationRange(
-    siblingsStart,
-    siblingsEnd,
-  )) {
+  for (final int siblingPage in PaginationRange(siblingsStart, siblingsEnd)) {
     items.add(PaginationWindowItem.page(siblingPage));
   }
 

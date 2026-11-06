@@ -55,10 +55,9 @@ void main() {
       expect(entry.showAgeRestrictionChip, isTrue);
       expect(entry.showMetadataBlock, isTrue);
       expect(entry.volumeTotal, 5);
-      expect(
-        entry.comics.map((SeriesDetailComicItem c) => c.title),
-        <String>['第二话'],
-      );
+      expect(entry.comics.map((SeriesDetailComicItem c) => c.title), <String>[
+        '第二话',
+      ]);
       expect(entry.initialPage, 2);
       expect(entry.initialPageSize, 20);
     });

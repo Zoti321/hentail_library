@@ -43,8 +43,10 @@ AppShellNavigationSlot buildLibraryAdminAppShellNavigationSlot(
         data: (List<HomeLibraryStat> data) => data,
         orElse: () => const <HomeLibraryStat>[],
       );
-  final List<HomeLibraryDashboardRow> libraryRows =
-      dashboardRowsForLibraries(libraries: libraries, stats: stats);
+  final List<HomeLibraryDashboardRow> libraryRows = dashboardRowsForLibraries(
+    libraries: libraries,
+    stats: stats,
+  );
   final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
 
   return (

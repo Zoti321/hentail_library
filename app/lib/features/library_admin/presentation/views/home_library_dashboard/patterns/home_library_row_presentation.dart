@@ -19,10 +19,7 @@ IconData homeLibraryKindIcon(HomeLibraryKind kind) {
   };
 }
 
-Color homeLibraryHintColor(
-  M3EColorScheme scheme,
-  HomeLibraryRowHint hint,
-) {
+Color homeLibraryHintColor(M3EColorScheme scheme, HomeLibraryRowHint hint) {
   return switch (hint) {
     HomeLibraryRowHint.unreachable => scheme.error,
     HomeLibraryRowHint.syncWarning => scheme.tertiary,
@@ -54,12 +51,10 @@ String? homeLibraryStatusLine(HomeLibraryDashboardRow row) {
     return HomeLibraryManagementCopy.metadataRefreshInProgressHint;
   }
   return switch (row.hint) {
-    HomeLibraryRowHint.syncWarning =>
-      HomeLibraryManagementCopy.syncWarningHint(
-        homeLibraryPreviewStaleDays,
-      ),
-    HomeLibraryRowHint.unreachable =>
-      HomeLibraryManagementCopy.unreachableHint,
+    HomeLibraryRowHint.syncWarning => HomeLibraryManagementCopy.syncWarningHint(
+      homeLibraryPreviewStaleDays,
+    ),
+    HomeLibraryRowHint.unreachable => HomeLibraryManagementCopy.unreachableHint,
     HomeLibraryRowHint.none => null,
   };
 }

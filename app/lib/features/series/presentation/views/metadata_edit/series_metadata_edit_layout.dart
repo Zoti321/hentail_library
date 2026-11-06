@@ -30,8 +30,7 @@ class SeriesMetadataEditLayout extends StatefulWidget {
       _SeriesMetadataEditPageState();
 }
 
-class _SeriesMetadataEditPageState
-    extends State<SeriesMetadataEditLayout> {
+class _SeriesMetadataEditPageState extends State<SeriesMetadataEditLayout> {
   late SeriesMetadataEditDraft _draft = widget.initialDraft;
   String? _nameError;
   String? _totalCountError;

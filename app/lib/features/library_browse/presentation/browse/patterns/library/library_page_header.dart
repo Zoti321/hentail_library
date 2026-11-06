@@ -11,7 +11,6 @@ import 'package:hentai_library/features/library_browse/presentation/browse/view_
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-
 /// 漫画库粘滞页头：标题 + 操作（与 [LibraryBrowseLayout] 一致）。
 ///
 /// 漫画 / 系列切换在 [LibraryCatalogToolbar]，随列表滚动，不在本组件内。
@@ -39,8 +38,7 @@ class LibraryPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 断点取页面视口宽度（已扣除 shell 侧栏），与其他页面的 PageLayoutSpec 保持一致。
-    final WindowSizeClass sizeClass = PageLayoutSpec.of(context)
-        .sizeClass;
+    final WindowSizeClass sizeClass = PageLayoutSpec.of(context).sizeClass;
 
     return PinnedToolbarChrome(
       child: _LibraryPageHeaderToolbar(

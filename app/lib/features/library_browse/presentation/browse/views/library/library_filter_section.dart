@@ -573,8 +573,7 @@ class _MetadataFilterGroup extends StatefulWidget {
   final String Function(String name)? labelFor;
 
   @override
-  State<_MetadataFilterGroup> createState() =>
-      _MetadataFilterGroupState();
+  State<_MetadataFilterGroup> createState() => _MetadataFilterGroupState();
 }
 
 class _MetadataFilterGroupState extends State<_MetadataFilterGroup> {

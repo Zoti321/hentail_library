@@ -71,14 +71,10 @@ class MetadataEditSurface extends StatelessWidget {
           title: title,
           content: ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: MetadataEditFormMetrics.dialogContentMaxWidth(
-                context,
-              ),
+              maxWidth: MetadataEditFormMetrics.dialogContentMaxWidth(context),
             ),
             child: SizedBox(
-              height: MetadataEditFormMetrics.dialogContentMaxHeight(
-                context,
-              ),
+              height: MetadataEditFormMetrics.dialogContentMaxHeight(context),
               width: double.infinity,
               child: ScrollConfiguration(
                 behavior: MetadataEditScrollBehavior(),
@@ -122,9 +118,7 @@ class MetadataEditSurface extends StatelessWidget {
       color: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
       child: Center(
         child: Padding(
-          padding: EdgeInsets.all(
-            PageLayoutSpec.of(context).horizontalInset,
-          ),
+          padding: EdgeInsets.all(PageLayoutSpec.of(context).horizontalInset),
           child: _DialogCard(
             maxWidth: maxWidth,
             title: title,
@@ -164,8 +158,7 @@ class _DialogCard extends StatelessWidget {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
     final Size size = MediaQuery.sizeOf(context);
-    final double horizontalInset = PageLayoutSpec.of(context)
-        .horizontalInset;
+    final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
     final double width = math.min(maxWidth, size.width - horizontalInset * 2);
     final double maxHeight = size.height * 0.88;
 

@@ -20,8 +20,7 @@ class ComicDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double horizontalPadding = PageLayoutSpec.of(context)
-        .horizontalInset;
+    final double horizontalPadding = PageLayoutSpec.of(context).horizontalInset;
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),

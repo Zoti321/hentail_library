@@ -82,9 +82,7 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
       return _LibraryEditTab.general;
     }
     if (validation.rootError != null) {
-      return _isRemote
-          ? _LibraryEditTab.webDav
-          : _LibraryEditTab.general;
+      return _isRemote ? _LibraryEditTab.webDav : _LibraryEditTab.general;
     }
     if (validation.passwordError != null) {
       return _LibraryEditTab.webDav;
@@ -193,8 +191,7 @@ class _LibraryEditFormState extends State<LibraryEditForm> {
       ),
     };
 
-    final bool useSideTabs =
-        sizeClass.index >= WindowSizeClass.medium.index;
+    final bool useSideTabs = sizeClass.index >= WindowSizeClass.medium.index;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {

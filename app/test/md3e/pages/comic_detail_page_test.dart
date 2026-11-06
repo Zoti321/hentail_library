@@ -15,9 +15,7 @@ void main() {
         child: SizedBox(
           width: 1024,
           height: 800,
-          child: ComicDetailLayout(
-            entry: ComicDetailPagePreviewData.sample(),
-          ),
+          child: ComicDetailLayout(entry: ComicDetailPagePreviewData.sample()),
         ),
       ),
     );

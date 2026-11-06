@@ -8,12 +8,7 @@ import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_su
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
 /// Lab 中 Library 编辑页的打开意图（Widgetbook / 路由）。
-enum LibraryEditPageIntent {
-  editLocal,
-  editRemote,
-  createLocal,
-  createRemote,
-}
+enum LibraryEditPageIntent { editLocal, editRemote, createLocal, createRemote }
 
 /// Library 创建/编辑 Lab 页（Widgetbook / 路由）。
 class LibraryEditPage extends StatefulWidget {
@@ -50,10 +45,8 @@ class _LibraryEditPageState extends State<LibraryEditPage> {
 
   String _title(AppLocalizations l10n) {
     return switch (widget.intent) {
-      LibraryEditPageIntent.createLocal =>
-        l10n.dialogCreateLocalLibraryTitle,
-      LibraryEditPageIntent.createRemote =>
-        l10n.dialogCreateRemoteLibraryTitle,
+      LibraryEditPageIntent.createLocal => l10n.dialogCreateLocalLibraryTitle,
+      LibraryEditPageIntent.createRemote => l10n.dialogCreateRemoteLibraryTitle,
       LibraryEditPageIntent.editLocal ||
       LibraryEditPageIntent.editRemote => l10n.dialogEditLibraryTitle,
     };

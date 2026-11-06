@@ -168,8 +168,7 @@ class TagInputFieldPreview extends StatefulWidget {
   const TagInputFieldPreview({super.key});
 
   @override
-  State<TagInputFieldPreview> createState() =>
-      _TagInputFieldPreviewState();
+  State<TagInputFieldPreview> createState() => _TagInputFieldPreviewState();
 }
 
 class _TagInputFieldPreviewState extends State<TagInputFieldPreview> {

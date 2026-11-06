@@ -79,9 +79,7 @@ String shellNavIdForDestinationIndex(
   return destinations[index].navId;
 }
 
-int shellSettingsDestinationIndex(
-  List<ShellRailDestination> destinations,
-) {
+int shellSettingsDestinationIndex(List<ShellRailDestination> destinations) {
   final int index = destinations.indexWhere(
     (ShellRailDestination destination) => destination.navId == 'settings',
   );
@@ -155,7 +153,5 @@ List<ShellRailDestination> labDefaultShellRailDestinations(
 List<ExpressiveNavigationRailDestination> defaultNavigationRailDestinations(
   AppLocalizations l10n,
 ) {
-  return navigationDestinationsFromShell(
-    labDefaultShellRailDestinations(l10n),
-  );
+  return navigationDestinationsFromShell(labDefaultShellRailDestinations(l10n));
 }

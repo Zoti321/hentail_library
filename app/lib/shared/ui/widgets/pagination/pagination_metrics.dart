@@ -19,9 +19,7 @@ abstract final class PaginationMetrics {
   static double get pageButtonSlotWidth =>
       pageButtonVisualSize + gapBetweenPageButtons * 2;
 
-  static PaginationSiblingConfig siblingConfigFor(
-    WindowSizeClass sizeClass,
-  ) {
+  static PaginationSiblingConfig siblingConfigFor(WindowSizeClass sizeClass) {
     if (sizeClass.index < WindowSizeClass.expanded.index) {
       return PaginationSiblingConfig.compact;
     }

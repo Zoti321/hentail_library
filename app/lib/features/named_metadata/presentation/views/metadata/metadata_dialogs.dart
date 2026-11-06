@@ -36,8 +36,7 @@ class _MergeConfirmDialog extends StatefulWidget {
   final ValueChanged<bool> onSkipChanged;
 
   @override
-  State<_MergeConfirmDialog> createState() =>
-      _MergeConfirmDialogState();
+  State<_MergeConfirmDialog> createState() => _MergeConfirmDialogState();
 }
 
 class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
@@ -130,10 +129,7 @@ Future<bool> showMetadataDeleteFacetDialog({
 }
 
 class _DestructiveConfirmDialog extends StatelessWidget {
-  const _DestructiveConfirmDialog({
-    required this.title,
-    required this.message,
-  });
+  const _DestructiveConfirmDialog({required this.title, required this.message});
 
   final String title;
   final String message;

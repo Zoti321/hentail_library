@@ -6,8 +6,10 @@ import 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
 typedef AppShellFeedbackBelowTitleBarFactory = List<Widget> Function();
 
 /// MD3E 导航槽组装（需要 [WidgetRef] 读库状态；bootstrap 注入 owner 实现）。
-typedef AppShellNavigationSlotAssembly =
-    AppShellNavigationSlot Function(BuildContext context, WidgetRef ref);
+typedef AppShellNavigationSlotAssembly = AppShellNavigationSlot Function(
+  BuildContext context,
+  WidgetRef ref,
+);
 
 final Provider<VoidCallback> appShellOpenNavigationDrawerProvider =
     Provider<VoidCallback>(

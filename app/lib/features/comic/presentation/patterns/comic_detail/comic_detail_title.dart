@@ -6,11 +6,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 ///
 /// 字阶与页面标题同源：来自 [PageLayoutSpec.titleStyle]（基于 `headlineSmall`）。
 class ComicDetailTitle extends StatelessWidget {
-  const ComicDetailTitle({
-    super.key,
-    required this.title,
-    this.maxLines = 2,
-  });
+  const ComicDetailTitle({super.key, required this.title, this.maxLines = 2});
 
   final String title;
   final int maxLines;

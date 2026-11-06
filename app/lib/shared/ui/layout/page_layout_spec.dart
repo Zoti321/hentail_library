@@ -11,10 +11,7 @@ const double kPageContentMaxWidth = 1280;
 
 /// 解析页面布局所需的全部输入（纯数据，便于测试）。
 final class LayoutContext {
-  const LayoutContext({
-    required this.viewportWidth,
-    required this.inputMode,
-  });
+  const LayoutContext({required this.viewportWidth, required this.inputMode});
 
   /// 按当前运行平台推断输入形态；[desktop] 为空时使用 [isDesktop]。
   factory LayoutContext.fromPlatform({
@@ -31,8 +28,7 @@ final class LayoutContext {
   final double viewportWidth;
   final LayoutInputMode inputMode;
 
-  WindowSizeClass get sizeClass =>
-      WindowSizeClass.fromWidth(viewportWidth);
+  WindowSizeClass get sizeClass => WindowSizeClass.fromWidth(viewportWidth);
 }
 
 /// 页面布局规格：窗口档位 × 输入形态 → 页面所需的全部尺寸与标题样式。
@@ -222,10 +218,7 @@ final class PageLayoutSpec {
     };
   }
 
-  static double _listItemGap(
-    WindowSizeClass sizeClass,
-    LayoutInputMode mode,
-  ) {
+  static double _listItemGap(WindowSizeClass sizeClass, LayoutInputMode mode) {
     return switch ((mode, sizeClass)) {
       (LayoutInputMode.touch, WindowSizeClass.compact) => 12,
       (LayoutInputMode.touch, _) => 16,

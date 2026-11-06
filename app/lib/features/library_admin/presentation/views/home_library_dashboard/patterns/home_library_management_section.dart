@@ -198,9 +198,7 @@ class HomeLibraryDashboardTile extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 0, 12),
                 // 内容区点击穿透到底层点按层；只有「更多」参与命中。
-                child: IgnorePointer(
-                  child: _HomeLibraryRowContent(row: row),
-                ),
+                child: IgnorePointer(child: _HomeLibraryRowContent(row: row)),
               ),
             ),
             if (showMoreMenu)

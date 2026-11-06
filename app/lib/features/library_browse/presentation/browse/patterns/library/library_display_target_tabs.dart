@@ -49,12 +49,11 @@ class LibraryDisplayTargetTabs extends StatelessWidget {
       selected: true,
       variant: M3ETabsVariant.primary,
     );
-    final double barWidth =
-        LibraryPageHeaderMetrics.displayTargetTabsBarWidth(
-          tabLabels: tabLabels,
-          labelStyle: selectedLabelStyle,
-          textDirection: Directionality.of(context),
-        );
+    final double barWidth = LibraryPageHeaderMetrics.displayTargetTabsBarWidth(
+      tabLabels: tabLabels,
+      labelStyle: selectedLabelStyle,
+      textDirection: Directionality.of(context),
+    );
 
     // M3ETabs bar fill is [M3ETabTheme.backgroundColor] → `scheme.surface` (M3 spec).
     // Lab browse canvas is [labBrowseCanvasColor]; alias surface locally so the

@@ -25,8 +25,9 @@ Future<T?> showAdaptiveFormDialog<T>(
   final double contentWidth = fullScreen
       ? basicMaxWidth
       : MetadataEditFormMetrics.dialogContentMaxWidth(context);
-  final double contentHeight =
-      MetadataEditFormMetrics.dialogContentMaxHeight(context);
+  final double contentHeight = MetadataEditFormMetrics.dialogContentMaxHeight(
+    context,
+  );
   // 表单主体由 ComicMetadataEditForm 自行分区滚动，避免对话框双层滚动与滚动条。
   final Widget material = Material(
     type: MaterialType.transparency,
@@ -69,8 +70,9 @@ Future<T?> showAdaptiveFormDialog<T>(
     );
   }
 
-  final OverlayRouteScopeSnapshot scope =
-      OverlayRouteScopeSnapshot.capture(context);
+  final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
+    context,
+  );
 
   return M3EDialog.show<T>(
     context,

@@ -19,11 +19,9 @@ abstract final class FabSizing {
       return sizeClass.isCompact ? M3EFabSize.regular : M3EFabSize.small;
     }
     return switch (sizeClass) {
-      WindowSizeClass.compact ||
-      WindowSizeClass.medium => M3EFabSize.regular,
+      WindowSizeClass.compact || WindowSizeClass.medium => M3EFabSize.regular,
       WindowSizeClass.expanded => M3EFabSize.medium,
-      WindowSizeClass.large ||
-      WindowSizeClass.extraLarge => M3EFabSize.large,
+      WindowSizeClass.large || WindowSizeClass.extraLarge => M3EFabSize.large,
     };
   }
 

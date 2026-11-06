@@ -66,9 +66,7 @@ class HomeLayout extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    height: HomePageMetrics.greetingToSectionSpacing(
-                      sizeClass,
-                    ),
+                    height: HomePageMetrics.greetingToSectionSpacing(sizeClass),
                   ),
                   HomeAggregateStatsSection(
                     counts: aggregateCounts,
@@ -76,9 +74,7 @@ class HomeLayout extends StatelessWidget {
                     onOpenTrash: onOpenTrash,
                   ),
                   SizedBox(
-                    height: HomePageMetrics.sectionVerticalSpacing(
-                      sizeClass,
-                    ),
+                    height: HomePageMetrics.sectionVerticalSpacing(sizeClass),
                   ),
                   libraryManagementSection,
                 ],

@@ -53,15 +53,12 @@ class _SeriesDetailSummaryMetaRowState
         l10n.seriesVolumeCountLabel(widget.entry.volumeCurrent);
 
     final bool showSerialization =
-        widget.entry.serializationStatus !=
-        SeriesSerializationStatus.unknown;
+        widget.entry.serializationStatus != SeriesSerializationStatus.unknown;
 
     final List<Widget> chipChildren = <Widget>[];
     if (showSerialization) {
       chipChildren.add(
-        SeriesDetailSerializationChip(
-          status: widget.entry.serializationStatus,
-        ),
+        SeriesDetailSerializationChip(status: widget.entry.serializationStatus),
       );
     }
     if (_ageChipInTree) {

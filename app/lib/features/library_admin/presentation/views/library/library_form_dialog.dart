@@ -34,8 +34,7 @@ Future<void> showLibraryFormDialog({
   final AppLocalizations l10n = context.l10n;
   final String title = _titleFor(l10n, mode);
   final bool isCreate = mode != LibraryFormMode.edit;
-  final GlobalKey<_LibraryFormState> formKey =
-      GlobalKey<_LibraryFormState>();
+  final GlobalKey<_LibraryFormState> formKey = GlobalKey<_LibraryFormState>();
   // 侧栏等非 MD3E 页面发起时，路由内同样需要 M3E 主题与应用字体。
   final M3EThemeData m3e = withAppFontFamily(M3ETheme.of(context));
 
@@ -258,8 +257,7 @@ class _LibraryFormState extends ConsumerState<_LibraryFormFields> {
       return SingleChildScrollView(child: form);
     }
 
-    final double horizontalInset = PageLayoutSpec.of(context)
-        .horizontalInset;
+    final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
 
     return M3EDialog(
       title: _titleFor(l10n, widget.mode),

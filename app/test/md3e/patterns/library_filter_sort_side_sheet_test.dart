@@ -51,10 +51,7 @@ void main() {
 
     test('medium and expanded tiers', () {
       expect(
-        libraryFilterSortDrawerWidth(
-          LibraryFilterSortLayoutTier.medium,
-          800,
-        ),
+        libraryFilterSortDrawerWidth(LibraryFilterSortLayoutTier.medium, 800),
         280,
       );
       expect(
@@ -76,15 +73,11 @@ void main() {
         isFalse,
       );
       expect(
-        libraryFilterSortSideSheetDetachedForViewport(
-          Breakpoints.expanded - 1,
-        ),
+        libraryFilterSortSideSheetDetachedForViewport(Breakpoints.expanded - 1),
         isFalse,
       );
       expect(
-        libraryFilterSortSideSheetDetachedForViewport(
-          Breakpoints.expanded,
-        ),
+        libraryFilterSortSideSheetDetachedForViewport(Breakpoints.expanded),
         isTrue,
       );
       expect(
@@ -129,9 +122,7 @@ void main() {
         isTrue,
       );
       expect(
-        libraryFilterSortPrefersBottomSheetForViewport(
-          Breakpoints.expanded,
-        ),
+        libraryFilterSortPrefersBottomSheetForViewport(Breakpoints.expanded),
         isFalse,
       );
       expect(
@@ -277,8 +268,7 @@ void main() {
   testWidgets('customized filter highlights header filter action', (
     WidgetTester tester,
   ) async {
-    final LibraryFilterSortState customized = LibraryFilterSortState
-        .defaults
+    final LibraryFilterSortState customized = LibraryFilterSortState.defaults
         .toggleAgeRestriction(LibraryAgeRestrictionFilter.r18Only);
 
     await pumpApp(
@@ -288,9 +278,7 @@ void main() {
           width: Breakpoints.previewWidthExpanded,
           child: LibraryFilterSortDrawerHost(
             initialState: customized,
-            body: LibraryPageHeader(
-              filterSortActive: customized.isCustomized,
-            ),
+            body: LibraryPageHeader(filterSortActive: customized.isCustomized),
           ),
         ),
       ),

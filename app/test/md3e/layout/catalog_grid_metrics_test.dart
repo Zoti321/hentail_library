@@ -11,9 +11,7 @@ void main() {
     expect(
       CatalogGridMetrics.maxCrossAxisExtent(WindowSizeClass.compact),
       lessThan(
-        CatalogGridMetrics.maxCrossAxisExtent(
-          WindowSizeClass.extraLarge,
-        ),
+        CatalogGridMetrics.maxCrossAxisExtent(WindowSizeClass.extraLarge),
       ),
     );
   });
@@ -23,10 +21,7 @@ void main() {
       CatalogGridMetrics.crossAxisCount(1200, WindowSizeClass.expanded),
       greaterThan(4),
     );
-    expect(
-      CatalogGridMetrics.crossAxisCount(400, WindowSizeClass.compact),
-      2,
-    );
+    expect(CatalogGridMetrics.crossAxisCount(400, WindowSizeClass.compact), 2);
   });
 
   test('resolve includes main axis extent from cell width', () {
@@ -40,8 +35,9 @@ void main() {
 
   test('layout cell width matches inner viewport', () {
     const double width = 360;
-    final CatalogGridLayout layout =
-        CatalogGridMetrics.layoutForViewportWidth(width);
+    final CatalogGridLayout layout = CatalogGridMetrics.layoutForViewportWidth(
+      width,
+    );
     final double inner = width - layout.horizontalMargin * 2;
     final double reconstructed =
         layout.cellWidth * layout.crossAxisCount +

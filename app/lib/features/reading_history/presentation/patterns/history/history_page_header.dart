@@ -30,8 +30,7 @@ class HistoryPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WindowSizeClass sizeClass = PageLayoutSpec.of(context)
-        .sizeClass;
+    final WindowSizeClass sizeClass = PageLayoutSpec.of(context).sizeClass;
 
     return _HistoryPageHeaderToolbar(
       title: title,

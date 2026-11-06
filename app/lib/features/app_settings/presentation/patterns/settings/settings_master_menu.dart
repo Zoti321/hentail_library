@@ -30,13 +30,12 @@ class SettingsMasterMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final List<SettingsCategoryInfo> categories =
-        <SettingsCategoryInfo>[
-          for (final SettingsCategoryInfo info in kSettingsCategories)
-            if (visibleCategories == null ||
-                visibleCategories!.contains(info.category))
-              info,
-        ];
+    final List<SettingsCategoryInfo> categories = <SettingsCategoryInfo>[
+      for (final SettingsCategoryInfo info in kSettingsCategories)
+        if (visibleCategories == null ||
+            visibleCategories!.contains(info.category))
+          info,
+    ];
 
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
@@ -49,9 +48,7 @@ class SettingsMasterMenu extends StatelessWidget {
             if (masterGroupTitle != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(28, 16, 28, 8),
-                child: SettingsSectionHeader(
-                  title: Text(masterGroupTitle!),
-                ),
+                child: SettingsSectionHeader(title: Text(masterGroupTitle!)),
               ),
             for (final SettingsCategoryInfo info in categories)
               SettingsRailDestination(

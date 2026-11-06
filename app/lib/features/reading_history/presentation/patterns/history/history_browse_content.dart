@@ -32,9 +32,7 @@ class HistoryBrowseContent<T> extends StatelessWidget {
 
     return SliverMainAxisGroup(
       slivers: <Widget>[
-        SliverToBoxAdapter(
-          child: HistoryRecordSummary(totalCount: totalCount),
-        ),
+        SliverToBoxAdapter(child: HistoryRecordSummary(totalCount: totalCount)),
         if (searchField != null) ...<Widget>[
           SliverToBoxAdapter(child: SizedBox(height: spacing.sm)),
           SliverToBoxAdapter(child: searchField!),

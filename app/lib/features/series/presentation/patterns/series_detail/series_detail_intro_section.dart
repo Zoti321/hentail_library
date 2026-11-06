@@ -23,8 +23,9 @@ class SeriesDetailIntroSection extends StatelessWidget {
     final WindowSizeClass sizeClass = windowSizeClassOf(context);
     final double primaryToMeta =
         SeriesDetailPageMetrics.primaryToMetadataSpacing(sizeClass);
-    final double beforeComics =
-        SeriesDetailPageMetrics.metadataToComicsSpacing(sizeClass);
+    final double beforeComics = SeriesDetailPageMetrics.metadataToComicsSpacing(
+      sizeClass,
+    );
     final bool showMeta = entry.showMetadataBlock && _hasMetadataChips(entry);
 
     return Column(

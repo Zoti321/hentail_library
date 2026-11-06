@@ -60,8 +60,7 @@ class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
       HomeBentoStatEmphasis.compact => 24,
     };
     final bool reduceMotion = LabMotion.reduceMotionOf(context);
-    final WindowSizeClass sizeClass = PageLayoutSpec.of(context)
-        .sizeClass;
+    final WindowSizeClass sizeClass = PageLayoutSpec.of(context).sizeClass;
     final EdgeInsets padding =
         widget.contentPadding ??
         HomePageMetrics.statCardContentPadding(sizeClass);

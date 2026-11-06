@@ -17,8 +17,7 @@ class EffectsDecoratedBox extends StatefulWidget {
   final Widget child;
 
   @override
-  State<EffectsDecoratedBox> createState() =>
-      _EffectsDecoratedBoxState();
+  State<EffectsDecoratedBox> createState() => _EffectsDecoratedBoxState();
 }
 
 class _EffectsDecoratedBoxState extends State<EffectsDecoratedBox>

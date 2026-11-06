@@ -22,11 +22,7 @@ Future<bool> showTrashPurgeConfirmDialog({
 }
 
 class TrashPurgeConfirmDialog extends StatefulWidget {
-  const TrashPurgeConfirmDialog({
-    super.key,
-    this.title,
-    required this.counts,
-  });
+  const TrashPurgeConfirmDialog({super.key, this.title, required this.counts});
 
   final String? title;
   final PurgeTargetCounts counts;
@@ -36,8 +32,7 @@ class TrashPurgeConfirmDialog extends StatefulWidget {
       _TrashPurgeConfirmDialogState();
 }
 
-class _TrashPurgeConfirmDialogState
-    extends State<TrashPurgeConfirmDialog> {
+class _TrashPurgeConfirmDialogState extends State<TrashPurgeConfirmDialog> {
   bool _acknowledged = false;
 
   @override

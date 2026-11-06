@@ -281,9 +281,7 @@ class _TrashEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     return Padding(
-      padding: EdgeInsets.only(
-        top: PageLayoutSpec.of(context).stateTopInset,
-      ),
+      padding: EdgeInsets.only(top: PageLayoutSpec.of(context).stateTopInset),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

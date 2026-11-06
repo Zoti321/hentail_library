@@ -6,11 +6,7 @@ import 'package:motor/motor.dart';
 ///
 /// 目标矩形变化时从当前显示的矩形接续。开启"减少动效"时直接到达目标。
 class SpringPositioned extends StatefulWidget {
-  const SpringPositioned({
-    super.key,
-    required this.rect,
-    required this.child,
-  });
+  const SpringPositioned({super.key, required this.rect, required this.child});
 
   final Rect rect;
   final Widget child;

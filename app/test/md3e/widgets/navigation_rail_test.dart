@@ -63,8 +63,14 @@ void main() {
     final M3ENavigationRailTheme theme = M3ETheme.of(
       tester.element(find.byType(M3ENavigationRail)),
     ).navigationRailTheme;
-    expect(theme.collapsedWidth, ExpressiveNavigationRailMetrics.collapsedWidth);
-    expect(theme.expandedMinWidth, ExpressiveNavigationRailMetrics.expandedWidth);
+    expect(
+      theme.collapsedWidth,
+      ExpressiveNavigationRailMetrics.collapsedWidth,
+    );
+    expect(
+      theme.expandedMinWidth,
+      ExpressiveNavigationRailMetrics.expandedWidth,
+    );
     expect(theme.itemVerticalGap, 8);
   });
 

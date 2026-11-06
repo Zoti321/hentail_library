@@ -47,13 +47,12 @@ class ReaderInteractionScope extends StatelessWidget {
                   return null;
                 },
               ),
-          ReaderToggleChromeIntent:
-              CallbackAction<ReaderToggleChromeIntent>(
-                onInvoke: (_) {
-                  onToggleChromeFromKeyboard?.call();
-                  return null;
-                },
-              ),
+          ReaderToggleChromeIntent: CallbackAction<ReaderToggleChromeIntent>(
+            onInvoke: (_) {
+              onToggleChromeFromKeyboard?.call();
+              return null;
+            },
+          ),
         },
         child: Focus(autofocus: true, focusNode: focusNode, child: child),
       ),

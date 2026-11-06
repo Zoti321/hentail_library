@@ -68,9 +68,6 @@ class MetadataHeader extends StatelessWidget {
       );
     }
 
-    return SizedBox(
-      height: PageLayoutSpec.toolbarRowHeight,
-      child: content,
-    );
+    return SizedBox(height: PageLayoutSpec.toolbarRowHeight, child: content);
   }
 }

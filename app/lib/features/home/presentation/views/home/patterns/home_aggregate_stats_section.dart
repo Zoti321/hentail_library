@@ -30,8 +30,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WindowSizeClass sizeClass = PageLayoutSpec.of(context)
-        .sizeClass;
+    final WindowSizeClass sizeClass = PageLayoutSpec.of(context).sizeClass;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;

@@ -61,10 +61,7 @@ void main() {
       await _tapNext(tester);
 
       expect(find.text(_advancePrompt), findsOneWidget);
-      expect(
-        find.text(ReaderPageCopy.viewportPlaceholder(3)),
-        findsOneWidget,
-      );
+      expect(find.text(ReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
       expect(find.text('第 01 卷'), findsOneWidget);
     },
   );
@@ -85,10 +82,7 @@ void main() {
     await _tapNext(tester);
 
     expect(find.text('第 02 卷'), findsOneWidget);
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(1)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(1)), findsOneWidget);
     expect(find.text(_advancePrompt), findsNothing);
   });
 
@@ -126,10 +120,7 @@ void main() {
     await _tapPrev(tester);
 
     expect(find.text('第 01 卷'), findsOneWidget);
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(1)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(1)), findsOneWidget);
   });
 
   testWidgets('last volume at last page shows no prompt and does not move', (
@@ -150,10 +141,7 @@ void main() {
 
     expect(find.text(_advancePrompt), findsNothing);
     expect(find.text('第 03 卷'), findsOneWidget);
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(3)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
   });
 
   testWidgets(
@@ -180,10 +168,7 @@ void main() {
       final BuildContext textContext = tester.element(
         find.text(_advancePrompt),
       );
-      expect(
-        DefaultTextStyle.of(textContext).style.fontFamily,
-        kAppFontFamily,
-      );
+      expect(DefaultTextStyle.of(textContext).style.fontFamily, kAppFontFamily);
     },
   );
 
@@ -239,17 +224,11 @@ void main() {
 
     await _tapPrev(tester);
     expect(find.text(_advancePrompt), findsNothing);
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(2)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(2)), findsOneWidget);
 
     // 回到边界后第一次翻页应重新提示，而不是直接跨卷。
     await _tapNext(tester);
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(3)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
     await _tapNext(tester);
     expect(find.text('第 01 卷'), findsOneWidget);
     expect(find.text(_advancePrompt), findsOneWidget);

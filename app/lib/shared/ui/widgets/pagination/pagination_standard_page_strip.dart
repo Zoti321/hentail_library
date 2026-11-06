@@ -58,11 +58,11 @@ class _PaginationSelectionStrip extends StatefulWidget {
       _PaginationSelectionStripState();
 }
 
-class _PaginationSelectionStripState
-    extends State<_PaginationSelectionStrip> {
+class _PaginationSelectionStripState extends State<_PaginationSelectionStrip> {
   List<PaginationWindowItem> _windowItems() {
-    final PaginationSiblingConfig config =
-        PaginationMetrics.siblingConfigFor(widget.sizeClass);
+    final PaginationSiblingConfig config = PaginationMetrics.siblingConfigFor(
+      widget.sizeClass,
+    );
     final int slotCount = PaginationMetrics.fixedPageSlotCount(
       widget.sizeClass,
     );
@@ -124,21 +124,19 @@ class _PaginationSelectionStripState
             children: <Widget>[
               for (final PaginationWindowItem item in window)
                 switch (item) {
-                  PaginationWindowPage(:final int page) =>
-                    PaginationPageButton(
-                      key: ValueKey<int>(page),
-                      page: page,
-                      selected: page == widget.page,
-                      showSelectionFill: false,
-                      onPressed: interactive && page != widget.page
-                          ? () => widget.onPageChanged(page)
-                          : null,
-                    ),
+                  PaginationWindowPage(:final int page) => PaginationPageButton(
+                    key: ValueKey<int>(page),
+                    page: page,
+                    selected: page == widget.page,
+                    showSelectionFill: false,
+                    onPressed: interactive && page != widget.page
+                        ? () => widget.onPageChanged(page)
+                        : null,
+                  ),
                   PaginationWindowEllipsis() => PaginationEllipsisSlot(
                     style: ellipsisStyle,
                   ),
-                  PaginationWindowEmpty() =>
-                    const PaginationEmptySlot(),
+                  PaginationWindowEmpty() => const PaginationEmptySlot(),
                 },
             ],
           ),

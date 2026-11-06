@@ -29,8 +29,7 @@ class MetadataFieldLocksKvList extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool twoColumns =
-            constraints.maxWidth >= Breakpoints.medium &&
-            entries.length > 1;
+            constraints.maxWidth >= Breakpoints.medium && entries.length > 1;
 
         if (!twoColumns) {
           return _MetadataFieldLocksKvSplitGroup(entries: entries);

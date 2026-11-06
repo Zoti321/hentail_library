@@ -150,8 +150,7 @@ class _HomeLibraryDeleteConfirmBody extends StatelessWidget {
                     SizedBox(width: spacing.sm),
                     Expanded(
                       child: Text(
-                        HomeLibraryManagementCopy
-                            .deleteConfirmAcknowledgement,
+                        HomeLibraryManagementCopy.deleteConfirmAcknowledgement,
                         style: acknowledgementStyle,
                       ),
                     ),

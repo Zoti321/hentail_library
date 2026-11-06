@@ -23,8 +23,7 @@ class SuggestionChipSurface extends StatefulWidget {
   final bool staticChrome;
 
   @override
-  State<SuggestionChipSurface> createState() =>
-      _SuggestionChipSurfaceState();
+  State<SuggestionChipSurface> createState() => _SuggestionChipSurfaceState();
 }
 
 class _SuggestionChipSurfaceState extends State<SuggestionChipSurface> {

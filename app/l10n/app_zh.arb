@@ -778,10 +778,10 @@
       "count": {"type": "int"}
     }
   },
-  "md3eNavRailExpand": "展开导航",
-  "md3eNavRailCollapse": "收起导航",
-  "md3ePaginationPageSemantic": "第 {page} 页",
-  "@md3ePaginationPageSemantic": {
+  "navRailExpand": "展开导航",
+  "navRailCollapse": "收起导航",
+  "paginationPageSemantic": "第 {page} 页",
+  "@paginationPageSemantic": {
     "placeholders": {
       "page": {"type": "int"}
     }

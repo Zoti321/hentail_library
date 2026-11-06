@@ -14,8 +14,7 @@ class AppComicDetailCover extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final double resolvedWidth =
-        width ??
-        ComicDetailPageMetrics.coverWidth(windowSizeClassOf(context));
+        width ?? ComicDetailPageMetrics.coverWidth(windowSizeClassOf(context));
     final double height =
         resolvedWidth / ComicDetailPageMetrics.coverAspectRatio;
     final BorderRadius radius = BorderRadius.circular(

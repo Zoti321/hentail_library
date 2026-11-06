@@ -31,8 +31,7 @@ class LibraryFilterSortState {
   final LibraryComicGrouping grouping;
   final LibraryComicSortOption sortOption;
 
-  static final LibraryFilterSortState defaults =
-      LibraryFilterSortState();
+  static final LibraryFilterSortState defaults = LibraryFilterSortState();
 
   bool get isCustomized {
     final LibraryComicSortOption defaultSort = LibraryComicSortOption();
@@ -67,9 +66,7 @@ class LibraryFilterSortState {
     );
   }
 
-  LibraryFilterSortState toggleMediaType(
-    LibraryMediaTypeFilterOption option,
-  ) {
+  LibraryFilterSortState toggleMediaType(LibraryMediaTypeFilterOption option) {
     return copyWith(mediaTypeFilter: mediaTypeFilter.withToggled(option));
   }
 
@@ -132,8 +129,9 @@ abstract final class LibraryFilterSortSideSheet {
     bool useRootNavigator = true,
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final OverlayRouteScopeSnapshot scope =
-        OverlayRouteScopeSnapshot.capture(context);
+    final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
+      context,
+    );
     final Widget modalBody = overlayRouteScope(
       scope: scope,
       child: _LibraryFilterSortSideSheetModalBody(
@@ -160,9 +158,7 @@ abstract final class LibraryFilterSortSideSheet {
       context,
       title: '',
       width: libraryFilterSortSideSheetWidthForViewport(viewportWidth),
-      detached: libraryFilterSortSideSheetDetachedForViewport(
-        viewportWidth,
-      ),
+      detached: libraryFilterSortSideSheetDetachedForViewport(viewportWidth),
       theme: _sheetTheme(context),
       scrollable: true,
       useRootNavigator: useRootNavigator,
@@ -181,8 +177,7 @@ class _LibraryFilterSortHostScope extends InheritedWidget {
   final VoidCallback openSideSheet;
 
   static _LibraryFilterSortHostScope? maybeOf(BuildContext context) {
-    return context
-        .getInheritedWidgetOfExactType<_LibraryFilterSortHostScope>();
+    return context.getInheritedWidgetOfExactType<_LibraryFilterSortHostScope>();
   }
 
   @override
@@ -294,15 +289,13 @@ class LibraryFilterSortSideSheetContent extends StatelessWidget {
             child: Column(
               children: LibraryAgeRestrictionFilter.selectableOptions
                   .map(
-                    (LibraryAgeRestrictionFilter option) =>
-                        _FilterCheckboxRow(
-                          label: l10n.libraryAgeRestrictionFilterLabel(option),
-                          selected: state.ageRestriction == option,
-                          metrics: rowMetrics,
-                          onChanged: () => onStateChanged(
-                            state.toggleAgeRestriction(option),
-                          ),
-                        ),
+                    (LibraryAgeRestrictionFilter option) => _FilterCheckboxRow(
+                      label: l10n.libraryAgeRestrictionFilterLabel(option),
+                      selected: state.ageRestriction == option,
+                      metrics: rowMetrics,
+                      onChanged: () =>
+                          onStateChanged(state.toggleAgeRestriction(option)),
+                    ),
                   )
                   .toList(),
             ),
@@ -313,16 +306,13 @@ class LibraryFilterSortSideSheetContent extends StatelessWidget {
             child: Column(
               children: LibraryMediaTypeFilterOption.selectableOptions
                   .map(
-                    (LibraryMediaTypeFilterOption option) =>
-                        _FilterCheckboxRow(
-                          label: l10n.libraryMediaTypeFilterLabel(option),
-                          selected: state.mediaTypeFilter.selected.contains(
-                            option,
-                          ),
-                          metrics: rowMetrics,
-                          onChanged: () =>
-                              onStateChanged(state.toggleMediaType(option)),
-                        ),
+                    (LibraryMediaTypeFilterOption option) => _FilterCheckboxRow(
+                      label: l10n.libraryMediaTypeFilterLabel(option),
+                      selected: state.mediaTypeFilter.selected.contains(option),
+                      metrics: rowMetrics,
+                      onChanged: () =>
+                          onStateChanged(state.toggleMediaType(option)),
+                    ),
                   )
                   .toList(),
             ),
@@ -468,8 +458,7 @@ class _FilterAccordionSection extends StatefulWidget {
       _FilterAccordionSectionState();
 }
 
-class _FilterAccordionSectionState
-    extends State<_FilterAccordionSection> {
+class _FilterAccordionSectionState extends State<_FilterAccordionSection> {
   bool _expanded = false;
 
   @override

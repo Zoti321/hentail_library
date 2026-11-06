@@ -12,7 +12,10 @@ void main() {
     await pumpApp(
       tester,
       home: Center(
-        child: ExpressiveFilledButton(label: '继续', onPressed: () => tapped = true),
+        child: ExpressiveFilledButton(
+          label: '继续',
+          onPressed: () => tapped = true,
+        ),
       ),
     );
     expect(find.text('继续'), findsOneWidget);

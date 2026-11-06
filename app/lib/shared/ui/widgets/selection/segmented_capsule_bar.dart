@@ -27,8 +27,7 @@ class SegmentedCapsuleBar extends StatefulWidget {
   final ValueChanged<int> onSelected;
 
   @override
-  State<SegmentedCapsuleBar> createState() =>
-      _SegmentedCapsuleBarState();
+  State<SegmentedCapsuleBar> createState() => _SegmentedCapsuleBarState();
 }
 
 class _SegmentedCapsuleBarState extends State<SegmentedCapsuleBar> {
@@ -209,8 +208,7 @@ class _SegmentTapTarget extends StatelessWidget {
             height: SegmentedCapsuleBarMetrics.barHeight,
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal:
-                    SegmentedCapsuleBarMetrics.segmentHorizontalPadding,
+                horizontal: SegmentedCapsuleBarMetrics.segmentHorizontalPadding,
               ),
               child: Center(
                 child: Text(

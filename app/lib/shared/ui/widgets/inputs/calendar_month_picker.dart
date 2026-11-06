@@ -40,8 +40,7 @@ class CalendarMonthPicker extends StatefulWidget {
   final ValueChanged<M3EDatePickerMode>? onModeChanged;
 
   @override
-  State<CalendarMonthPicker> createState() =>
-      _CalendarMonthPickerState();
+  State<CalendarMonthPicker> createState() => _CalendarMonthPickerState();
 }
 
 class _CalendarMonthPickerState extends State<CalendarMonthPicker> {

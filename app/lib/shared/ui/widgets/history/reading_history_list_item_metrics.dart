@@ -148,9 +148,7 @@ abstract final class ReadingHistoryListItemMetrics {
     double viewportWidth, {
     double? horizontalInset,
   }) {
-    final WindowSizeClass window = WindowSizeClass.fromWidth(
-      viewportWidth,
-    );
+    final WindowSizeClass window = WindowSizeClass.fromWidth(viewportWidth);
     final ReadingHistoryListItemSpec itemSpec = specFor(window);
     final double inset =
         horizontalInset ??

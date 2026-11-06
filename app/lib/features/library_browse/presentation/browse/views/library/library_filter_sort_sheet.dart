@@ -19,8 +19,9 @@ abstract final class LibraryFilterSortSheet {
 
   static Future<void> show(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
-    final OverlayRouteScopeSnapshot scope =
-        OverlayRouteScopeSnapshot.capture(context);
+    final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
+      context,
+    );
     final M3EThemeData m3e = withAppFontFamily(M3ETheme.of(context));
     final Widget body = overlayRouteScope(
       scope: scope,
@@ -45,9 +46,7 @@ abstract final class LibraryFilterSortSheet {
       context,
       title: '',
       width: libraryFilterSortSideSheetWidthForViewport(viewportWidth),
-      detached: libraryFilterSortSideSheetDetachedForViewport(
-        viewportWidth,
-      ),
+      detached: libraryFilterSortSideSheetDetachedForViewport(viewportWidth),
       // 侧栏标题由 sheet 自身上下文读取主题，需显式指定应用字体。
       theme: M3ETheme.of(context).sideSheetTheme.copyWith(
         horizontalPadding: 16,

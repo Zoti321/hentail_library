@@ -101,9 +101,7 @@ abstract final class CatalogGridMetrics {
     double viewportWidth, {
     double? horizontalMargin,
   }) {
-    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
-      viewportWidth,
-    );
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(viewportWidth);
     final double margin =
         horizontalMargin ?? _horizontalInsetFor(viewportWidth);
     final double innerWidth = math.max(0, viewportWidth - margin * 2);

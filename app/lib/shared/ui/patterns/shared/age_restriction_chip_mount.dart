@@ -17,8 +17,7 @@ class AgeRestrictionChipMount extends StatefulWidget {
       _AgeRestrictionChipMountState();
 }
 
-class _AgeRestrictionChipMountState
-    extends State<AgeRestrictionChipMount> {
+class _AgeRestrictionChipMountState extends State<AgeRestrictionChipMount> {
   bool _mounted = false;
 
   @override

@@ -82,8 +82,7 @@ class _SeriesDetailContent extends ConsumerStatefulWidget {
       _SeriesDetailContentState();
 }
 
-class _SeriesDetailContentState
-    extends ConsumerState<_SeriesDetailContent> {
+class _SeriesDetailContentState extends ConsumerState<_SeriesDetailContent> {
   @override
   void dispose() {
     exitCatalogSelectionFromContext(context);
@@ -129,8 +128,7 @@ class _SeriesDetailContentState
       onPageSizeChanged: (int size) =>
           ref.read(seriesDetailPageSizeProvider.notifier).setPageSize(size),
       onBack: () => DetailBackHeader.popOrGoLibrary(context),
-      onEdit: () =>
-          showSeriesMetadataEdit(context: context, series: series),
+      onEdit: () => showSeriesMetadataEdit(context: context, series: series),
       moreMenuEntries: <M3EMenuNode>[
         M3EMenuEntry(
           label: l10n.refreshMetadata,

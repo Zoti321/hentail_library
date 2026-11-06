@@ -3,12 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Lab settings categories (aligned with production groups).
-enum SettingsCategory {
-  personalization,
-  metadataBackup,
-  diagnostics,
-  about,
-}
+enum SettingsCategory { personalization, metadataBackup, diagnostics, about }
 
 /// Master list metadata for [SettingsCategory].
 class SettingsCategoryInfo {
@@ -40,22 +35,18 @@ class SettingsCategoryInfo {
   }
 }
 
-const List<SettingsCategoryInfo> kSettingsCategories =
-    <SettingsCategoryInfo>[
-      SettingsCategoryInfo(
-        category: SettingsCategory.personalization,
-        icon: Symbols.palette,
-      ),
-      SettingsCategoryInfo(
-        category: SettingsCategory.metadataBackup,
-        icon: Symbols.backup,
-      ),
-      SettingsCategoryInfo(
-        category: SettingsCategory.diagnostics,
-        icon: Symbols.bug_report,
-      ),
-      SettingsCategoryInfo(
-        category: SettingsCategory.about,
-        icon: Symbols.info,
-      ),
-    ];
+const List<SettingsCategoryInfo> kSettingsCategories = <SettingsCategoryInfo>[
+  SettingsCategoryInfo(
+    category: SettingsCategory.personalization,
+    icon: Symbols.palette,
+  ),
+  SettingsCategoryInfo(
+    category: SettingsCategory.metadataBackup,
+    icon: Symbols.backup,
+  ),
+  SettingsCategoryInfo(
+    category: SettingsCategory.diagnostics,
+    icon: Symbols.bug_report,
+  ),
+  SettingsCategoryInfo(category: SettingsCategory.about, icon: Symbols.info),
+];

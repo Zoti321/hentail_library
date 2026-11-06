@@ -113,10 +113,7 @@ class _SplitListRowState extends State<SplitListRow> {
 }
 
 class _SplitRowScope extends InheritedWidget {
-  const _SplitRowScope({
-    required this.onPressChanged,
-    required super.child,
-  });
+  const _SplitRowScope({required this.onPressChanged, required super.child});
 
   final ValueChanged<bool> onPressChanged;
 

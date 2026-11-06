@@ -13,10 +13,9 @@ class ReaderViewportPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final M3ETypeScale type = M3ETheme.of(context).typeScale;
-    final double horizontalInset =
-        ReaderChromeMetrics.viewportHorizontalInset(
-          MediaQuery.sizeOf(context).width,
-        );
+    final double horizontalInset = ReaderChromeMetrics.viewportHorizontalInset(
+      MediaQuery.sizeOf(context).width,
+    );
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: horizontalInset),

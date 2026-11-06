@@ -23,10 +23,7 @@ void main() {
     });
 
     test('extra large from 1600', () {
-      expect(
-        WindowSizeClass.fromWidth(1600),
-        WindowSizeClass.extraLarge,
-      );
+      expect(WindowSizeClass.fromWidth(1600), WindowSizeClass.extraLarge);
     });
   });
 

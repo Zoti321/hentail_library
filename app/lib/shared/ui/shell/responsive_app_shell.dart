@@ -43,10 +43,7 @@ class ResponsiveAppShell extends StatelessWidget {
   final AppShellNavigationSlotBuilder navigationSlotBuilder;
   final List<Widget> shellFeedbackBelowTitleBar;
 
-  Widget _buildDesktopShell(
-    BuildContext context,
-    AppShellNavigationSlot slot,
-  ) {
+  Widget _buildDesktopShell(BuildContext context, AppShellNavigationSlot slot) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final DesktopShellSurfaceRoles surfaces =
         slot.surfaceRoles ?? DesktopShellSurfaceRoles.toneBased(scheme);
@@ -91,10 +88,7 @@ class ResponsiveAppShell extends StatelessWidget {
                   Expanded(child: routeChild),
                 ],
               )
-            : _buildDesktopShell(
-                context,
-                navigationSlotBuilder(context),
-              );
+            : _buildDesktopShell(context, navigationSlotBuilder(context));
 
         return WindowCloseListener(
           child: Scaffold(

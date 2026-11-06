@@ -5,9 +5,7 @@ import 'package:hentai_library/features/named_metadata/domain/named_facet_manage
 
 /// MD3E management toolbar helpers over [ManagedNamedFacetKind].
 abstract final class ManagedNamedFacetUi {
-  static List<SegmentedCapsuleSegment> capsuleSegments(
-    AppLocalizations l10n,
-  ) {
+  static List<SegmentedCapsuleSegment> capsuleSegments(AppLocalizations l10n) {
     return kManagedNamedFacetTabOrder
         .map(
           (ManagedNamedFacetKind kind) =>

@@ -82,9 +82,7 @@ class CatalogViewModeButtonGroup extends StatelessWidget {
 }
 
 /// 选中 / 未选底色（对齐 Kazumi tonal 分段控件观感）。
-M3EButtonDecoration catalogViewModeButtonGroupDecoration(
-  BuildContext context,
-) {
+M3EButtonDecoration catalogViewModeButtonGroupDecoration(BuildContext context) {
   final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
   return M3EButtonDecoration(
     iconSize: kCatalogViewModeButtonGroupIconSize,

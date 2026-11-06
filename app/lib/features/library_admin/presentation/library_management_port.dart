@@ -17,18 +17,16 @@ class _LibraryManagementAdapter implements LibraryManagementPort {
   final Ref _ref;
 
   @override
-  Future<void> addLocalLibrary(BuildContext context) =>
-      showLibraryFormDialog(
-        context: context,
-        mode: LibraryFormMode.createLocal,
-      );
+  Future<void> addLocalLibrary(BuildContext context) => showLibraryFormDialog(
+    context: context,
+    mode: LibraryFormMode.createLocal,
+  );
 
   @override
-  Future<void> addRemoteLibrary(BuildContext context) =>
-      showLibraryFormDialog(
-        context: context,
-        mode: LibraryFormMode.createRemote,
-      );
+  Future<void> addRemoteLibrary(BuildContext context) => showLibraryFormDialog(
+    context: context,
+    mode: LibraryFormMode.createRemote,
+  );
 
   @override
   Future<void> editRemoteLibrary(BuildContext context, LocalLibrary library) {

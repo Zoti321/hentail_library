@@ -3,11 +3,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 表单项标题行（label + 右侧附件，如字段锁）。
 class MetadataFieldLabelRow extends StatelessWidget {
-  const MetadataFieldLabelRow({
-    super.key,
-    required this.label,
-    this.trailing,
-  });
+  const MetadataFieldLabelRow({super.key, required this.label, this.trailing});
 
   final String label;
   final Widget? trailing;

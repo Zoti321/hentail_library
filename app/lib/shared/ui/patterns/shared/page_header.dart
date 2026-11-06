@@ -66,11 +66,7 @@ class PageHeaderDelegate extends SliverPersistentHeaderDelegate {
   ) {
     final bool elevated = shrinkOffset > 0 || overlapsContent;
 
-    return PageHeaderChrome(
-      layout: layout,
-      elevated: elevated,
-      child: child,
-    );
+    return PageHeaderChrome(layout: layout, elevated: elevated, child: child);
   }
 
   @override

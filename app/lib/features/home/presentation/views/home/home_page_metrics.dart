@@ -25,12 +25,7 @@ abstract final class HomePageMetrics {
   }) {
     if (tagPill) {
       return switch (sizeClass) {
-        WindowSizeClass.compact => const EdgeInsets.fromLTRB(
-          24,
-          16,
-          20,
-          16,
-        ),
+        WindowSizeClass.compact => const EdgeInsets.fromLTRB(24, 16, 20, 16),
         _ => const EdgeInsets.fromLTRB(32, 18, 28, 18),
       };
     }

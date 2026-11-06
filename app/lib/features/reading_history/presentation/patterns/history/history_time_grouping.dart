@@ -4,13 +4,12 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 enum HistoryTimeSection { today, yesterday, thisWeek, earlier }
 
 /// 展示顺序（仅渲染非空分组）。
-const List<HistoryTimeSection> kHistoryTimeSectionOrder =
-    <HistoryTimeSection>[
-      HistoryTimeSection.today,
-      HistoryTimeSection.yesterday,
-      HistoryTimeSection.thisWeek,
-      HistoryTimeSection.earlier,
-    ];
+const List<HistoryTimeSection> kHistoryTimeSectionOrder = <HistoryTimeSection>[
+  HistoryTimeSection.today,
+  HistoryTimeSection.yesterday,
+  HistoryTimeSection.thisWeek,
+  HistoryTimeSection.earlier,
+];
 
 /// 同一分桶内的一条记录（泛型承载业务/预览模型）。
 class HistoryTimeGroup<T> {
@@ -26,10 +25,7 @@ DateTime _startOfLocalDay(DateTime value) {
 }
 
 /// 将 [lastReadAt] 映射到四档分桶（相对 [clock]）。
-HistoryTimeSection historyTimeSectionFor(
-  DateTime lastReadAt,
-  DateTime clock,
-) {
+HistoryTimeSection historyTimeSectionFor(DateTime lastReadAt, DateTime clock) {
   final DateTime today = _startOfLocalDay(clock);
   final DateTime readDay = _startOfLocalDay(lastReadAt);
   if (readDay == today) {
@@ -59,8 +55,7 @@ List<HistoryTimeGroup<T>> groupHistoryByTimeSection<T>(
   final DateTime now = clock ?? DateTime.now();
   final Map<HistoryTimeSection, List<T>> buckets =
       <HistoryTimeSection, List<T>>{
-        for (final HistoryTimeSection section
-            in kHistoryTimeSectionOrder)
+        for (final HistoryTimeSection section in kHistoryTimeSectionOrder)
           section: <T>[],
       };
   for (final T item in items) {

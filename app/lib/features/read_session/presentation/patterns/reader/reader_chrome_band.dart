@@ -36,9 +36,7 @@ class ReaderChromeBand extends StatelessWidget {
     final BorderRadius clipRadius = top
         ? BorderRadius.zero
         : const BorderRadius.vertical(
-            top: Radius.circular(
-              ReaderImmersiveColors.bottomChromeTopRadius,
-            ),
+            top: Radius.circular(ReaderImmersiveColors.bottomChromeTopRadius),
           );
 
     Widget content = Padding(
@@ -83,9 +81,7 @@ class ReaderChromeBand extends StatelessWidget {
       alignment: top ? Alignment.topCenter : Alignment.bottomCenter,
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: ReaderChromeMetrics.chromeContentMaxWidth(
-            viewportWidth,
-          ),
+          maxWidth: ReaderChromeMetrics.chromeContentMaxWidth(viewportWidth),
         ),
         child: child,
       ),

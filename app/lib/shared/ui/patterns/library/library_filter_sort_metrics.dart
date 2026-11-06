@@ -12,9 +12,7 @@ const Color kLibraryFilterSortDrawerScrimColor = Color(0x52000000);
 /// 与旧 Baseline 库页布局档位一致的三档，用于抽屉宽度（600 / 1024 阈值）。
 enum LibraryFilterSortLayoutTier { compact, medium, expanded }
 
-LibraryFilterSortLayoutTier libraryFilterSortLayoutTierForWidth(
-  double width,
-) {
+LibraryFilterSortLayoutTier libraryFilterSortLayoutTierForWidth(double width) {
   if (width < 600) {
     return LibraryFilterSortLayoutTier.compact;
   }
@@ -34,14 +32,8 @@ double libraryFilterSortDrawerWidth(
       math.max(viewportWidth * 0.55, 200),
       math.min(viewportWidth - 16, 400),
     ),
-    LibraryFilterSortLayoutTier.medium => math.min(
-      360,
-      viewportWidth * 0.35,
-    ),
-    LibraryFilterSortLayoutTier.expanded => math.min(
-      360,
-      viewportWidth * 0.30,
-    ),
+    LibraryFilterSortLayoutTier.medium => math.min(360, viewportWidth * 0.35),
+    LibraryFilterSortLayoutTier.expanded => math.min(360, viewportWidth * 0.30),
   };
 }
 
@@ -54,12 +46,10 @@ double libraryFilterSortDrawerWidthForViewport(double viewportWidth) {
 
 /// 模态 [M3ESideSheet] 宽度：在抽屉公式基础上抬高 compact/medium 下限，避免标题被截断。
 double libraryFilterSortSideSheetWidthForViewport(double viewportWidth) {
-  final LibraryFilterSortLayoutTier tier =
-      libraryFilterSortLayoutTierForWidth(viewportWidth);
-  final double drawerWidth = libraryFilterSortDrawerWidth(
-    tier,
+  final LibraryFilterSortLayoutTier tier = libraryFilterSortLayoutTierForWidth(
     viewportWidth,
   );
+  final double drawerWidth = libraryFilterSortDrawerWidth(tier, viewportWidth);
   return switch (tier) {
     LibraryFilterSortLayoutTier.compact => math.min(
       math.max(drawerWidth, 260),
@@ -105,49 +95,42 @@ class LibraryFilterSortRowMetrics {
   final double checkboxHitSize;
   final double checkboxTargetSize;
 
-  static LibraryFilterSortRowMetrics forViewportWidth(
-    double viewportWidth,
-  ) {
+  static LibraryFilterSortRowMetrics forViewportWidth(double viewportWidth) {
     return forTier(libraryFilterSortLayoutTierForWidth(viewportWidth));
   }
 
-  static LibraryFilterSortRowMetrics forTier(
-    LibraryFilterSortLayoutTier tier,
-  ) {
+  static LibraryFilterSortRowMetrics forTier(LibraryFilterSortLayoutTier tier) {
     return switch (tier) {
-      LibraryFilterSortLayoutTier.compact =>
-        const LibraryFilterSortRowMetrics(
-          rowMinHeight: 48,
-          optionLabelFontSize: 14,
-          accordionTitleFontSize: 15,
-          accordionHeaderMinHeight: 48,
-          sortIconSize: 16,
-          checkboxBoxSize: 18,
-          checkboxHitSize: 40,
-          checkboxTargetSize: 48,
-        ),
-      LibraryFilterSortLayoutTier.medium =>
-        const LibraryFilterSortRowMetrics(
-          rowMinHeight: 44,
-          optionLabelFontSize: 13,
-          accordionTitleFontSize: 14,
-          accordionHeaderMinHeight: 44,
-          sortIconSize: 15,
-          checkboxBoxSize: 18,
-          checkboxHitSize: 36,
-          checkboxTargetSize: 44,
-        ),
-      LibraryFilterSortLayoutTier.expanded =>
-        const LibraryFilterSortRowMetrics(
-          rowMinHeight: 40,
-          optionLabelFontSize: 13,
-          accordionTitleFontSize: 14,
-          accordionHeaderMinHeight: 40,
-          sortIconSize: 14,
-          checkboxBoxSize: 18,
-          checkboxHitSize: 32,
-          checkboxTargetSize: 40,
-        ),
+      LibraryFilterSortLayoutTier.compact => const LibraryFilterSortRowMetrics(
+        rowMinHeight: 48,
+        optionLabelFontSize: 14,
+        accordionTitleFontSize: 15,
+        accordionHeaderMinHeight: 48,
+        sortIconSize: 16,
+        checkboxBoxSize: 18,
+        checkboxHitSize: 40,
+        checkboxTargetSize: 48,
+      ),
+      LibraryFilterSortLayoutTier.medium => const LibraryFilterSortRowMetrics(
+        rowMinHeight: 44,
+        optionLabelFontSize: 13,
+        accordionTitleFontSize: 14,
+        accordionHeaderMinHeight: 44,
+        sortIconSize: 15,
+        checkboxBoxSize: 18,
+        checkboxHitSize: 36,
+        checkboxTargetSize: 44,
+      ),
+      LibraryFilterSortLayoutTier.expanded => const LibraryFilterSortRowMetrics(
+        rowMinHeight: 40,
+        optionLabelFontSize: 13,
+        accordionTitleFontSize: 14,
+        accordionHeaderMinHeight: 40,
+        sortIconSize: 14,
+        checkboxBoxSize: 18,
+        checkboxHitSize: 32,
+        checkboxTargetSize: 40,
+      ),
     };
   }
 }

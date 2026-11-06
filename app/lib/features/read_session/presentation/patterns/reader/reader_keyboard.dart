@@ -19,11 +19,11 @@ final class ReaderToggleChromeIntent extends Intent {
 }
 
 abstract final class ReaderKeyboard {
-  static const Map<ShortcutActivator, Intent>
-  shortcuts = <ShortcutActivator, Intent>{
-    SingleActivator(LogicalKeyboardKey.arrowLeft): ReaderPrevPageIntent(),
-    SingleActivator(LogicalKeyboardKey.arrowRight): ReaderNextPageIntent(),
-    SingleActivator(LogicalKeyboardKey.space): ReaderToggleAutoPlayIntent(),
-    SingleActivator(LogicalKeyboardKey.escape): ReaderToggleChromeIntent(),
-  };
+  static const Map<ShortcutActivator, Intent> shortcuts =
+      <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.arrowLeft): ReaderPrevPageIntent(),
+        SingleActivator(LogicalKeyboardKey.arrowRight): ReaderNextPageIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ReaderToggleAutoPlayIntent(),
+        SingleActivator(LogicalKeyboardKey.escape): ReaderToggleChromeIntent(),
+      };
 }

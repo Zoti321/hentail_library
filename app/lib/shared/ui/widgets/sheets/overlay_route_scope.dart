@@ -20,10 +20,7 @@ final class OverlayRouteScopeSnapshot {
     return OverlayRouteScopeSnapshot._(
       locale: Localizations.localeOf(anchorContext),
       m3e: m3e,
-      materialTheme: buildMaterialTheme(
-        m3e.colorScheme.brightness,
-        m3e: m3e,
-      ),
+      materialTheme: buildMaterialTheme(m3e.colorScheme.brightness, m3e: m3e),
     );
   }
 
@@ -31,10 +28,7 @@ final class OverlayRouteScopeSnapshot {
     return OverlayRouteScopeSnapshot._(
       locale: locale,
       m3e: m3e,
-      materialTheme: buildMaterialTheme(
-        m3e.colorScheme.brightness,
-        m3e: m3e,
-      ),
+      materialTheme: buildMaterialTheme(m3e.colorScheme.brightness, m3e: m3e),
     );
   }
 

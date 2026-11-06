@@ -37,10 +37,7 @@ void main() {
     WidgetTester tester,
   ) async {
     ReaderSettingsLabState latest = const ReaderSettingsLabState();
-    await _openSheet(
-      tester,
-      (ReaderSettingsLabState next) => latest = next,
-    );
+    await _openSheet(tester, (ReaderSettingsLabState next) => latest = next);
 
     final BuildContext context = tester.element(find.byType(Scaffold));
     final l10n = context.l10n;
@@ -75,10 +72,7 @@ void main() {
     WidgetTester tester,
   ) async {
     ReaderSettingsLabState latest = const ReaderSettingsLabState();
-    await _openSheet(
-      tester,
-      (ReaderSettingsLabState next) => latest = next,
-    );
+    await _openSheet(tester, (ReaderSettingsLabState next) => latest = next);
 
     expect(latest.autoPlayIntervalSeconds, 5);
     await tester.tap(find.byKey(const Key('reader_settings_interval_plus')));

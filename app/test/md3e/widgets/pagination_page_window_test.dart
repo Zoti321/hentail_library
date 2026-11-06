@@ -4,20 +4,26 @@ import 'package:hentai_library/shared/ui/widgets/pagination/pagination_page_wind
 void main() {
   group('buildPaginationPageWindow (MUI usePagination)', () {
     test('page 1 of 10 matches MUI default window', () {
-      final List<PaginationWindowItem> items =
-          buildPaginationPageWindow(currentPage: 1, totalPages: 10);
+      final List<PaginationWindowItem> items = buildPaginationPageWindow(
+        currentPage: 1,
+        totalPages: 10,
+      );
       expect(_pageTokens(items), <int>[1, 2, 3, 4, 5, -1, 10]);
     });
 
     test('middle page uses both ellipses', () {
-      final List<PaginationWindowItem> items =
-          buildPaginationPageWindow(currentPage: 6, totalPages: 10);
+      final List<PaginationWindowItem> items = buildPaginationPageWindow(
+        currentPage: 6,
+        totalPages: 10,
+      );
       expect(_pageTokens(items), <int>[1, -1, 5, 6, 7, -1, 10]);
     });
 
     test('padding fixes strip length', () {
-      final List<PaginationWindowItem> short =
-          buildPaginationPageWindow(currentPage: 1, totalPages: 4);
+      final List<PaginationWindowItem> short = buildPaginationPageWindow(
+        currentPage: 1,
+        totalPages: 4,
+      );
       final List<PaginationWindowItem> padded = padPaginationPageWindow(
         short,
         slotCount: 7,

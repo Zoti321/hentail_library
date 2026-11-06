@@ -48,9 +48,7 @@ class SeriesDetailComicsSection extends StatelessWidget {
           ),
         ),
         SliverToBoxAdapter(
-          child: SizedBox(
-            height: SeriesDetailPageMetrics.scrollBottomInset,
-          ),
+          child: SizedBox(height: SeriesDetailPageMetrics.scrollBottomInset),
         ),
       ],
     );

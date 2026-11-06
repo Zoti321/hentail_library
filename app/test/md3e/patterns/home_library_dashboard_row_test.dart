@@ -11,9 +11,7 @@ void main() {
       seriesCount: 1,
     );
 
-    final HomeLibraryDashboardRow scanning = row.copyWith(
-      scanInProgress: true,
-    );
+    final HomeLibraryDashboardRow scanning = row.copyWith(scanInProgress: true);
     expect(scanning.scanInProgress, isTrue);
     expect(scanning.busy, isTrue);
   });

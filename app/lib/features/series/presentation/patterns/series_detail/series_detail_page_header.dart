@@ -31,8 +31,7 @@ class SeriesDetailPageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final WindowSizeClass sizeClass = PageLayoutSpec.of(context)
-        .sizeClass;
+    final WindowSizeClass sizeClass = PageLayoutSpec.of(context).sizeClass;
     final bool showStandalonePageSize =
         sizeClass.index > WindowSizeClass.medium.index;
 

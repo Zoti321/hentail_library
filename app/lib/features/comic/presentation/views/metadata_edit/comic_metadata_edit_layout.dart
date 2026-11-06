@@ -29,8 +29,7 @@ class ComicMetadataEditLayout extends StatefulWidget {
   final VoidCallback? onCancel;
 
   @override
-  State<ComicMetadataEditLayout> createState() =>
-      _ComicMetadataEditPageState();
+  State<ComicMetadataEditLayout> createState() => _ComicMetadataEditPageState();
 }
 
 class _ComicMetadataEditPageState extends State<ComicMetadataEditLayout> {

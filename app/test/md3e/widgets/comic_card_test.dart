@@ -122,25 +122,24 @@ void main() {
     expect(find.byKey(kComicCardCoverProgressKey), findsNothing);
   });
 
-  testWidgets(
-    'ComicCard shows cover progress strip when readProgress > 0',
-    (WidgetTester tester) async {
-      await pumpApp(
-        tester,
-        home: Center(
-          child: SizedBox(
-            width: 160,
-            child: ComicCard(
-              title: '在读',
-              readProgress: 0.5,
-              cover: const ColoredBox(color: Color(0xFFE0E0E0)),
-            ),
+  testWidgets('ComicCard shows cover progress strip when readProgress > 0', (
+    WidgetTester tester,
+  ) async {
+    await pumpApp(
+      tester,
+      home: Center(
+        child: SizedBox(
+          width: 160,
+          child: ComicCard(
+            title: '在读',
+            readProgress: 0.5,
+            cover: const ColoredBox(color: Color(0xFFE0E0E0)),
           ),
         ),
-      );
-      expect(find.byKey(kComicCardCoverProgressKey), findsOneWidget);
-    },
-  );
+      ),
+    );
+    expect(find.byKey(kComicCardCoverProgressKey), findsOneWidget);
+  });
 
   testWidgets('ComicCard does not tap when disabled', (
     WidgetTester tester,

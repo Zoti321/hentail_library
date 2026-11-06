@@ -103,10 +103,7 @@ void main() {
 
       expect(range.max, greaterThan(100.5), reason: '展开中间帧应越过终点 100 回弹');
       await tester.pumpAndSettle();
-      expect(
-        tester.getSize(find.byType(SpringSize)).height,
-        closeTo(100, 0.5),
-      );
+      expect(tester.getSize(find.byType(SpringSize)).height, closeTo(100, 0.5));
     });
 
     testWidgets('collapsing ends at zero size', (WidgetTester tester) async {
@@ -119,10 +116,7 @@ void main() {
       );
       state.flip();
       await tester.pumpAndSettle();
-      expect(
-        tester.getSize(find.byType(SpringSize)).height,
-        closeTo(100, 0.5),
-      );
+      expect(tester.getSize(find.byType(SpringSize)).height, closeTo(100, 0.5));
 
       state.flip();
       await tester.pumpAndSettle();

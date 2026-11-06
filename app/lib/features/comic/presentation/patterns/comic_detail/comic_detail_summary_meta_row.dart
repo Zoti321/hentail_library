@@ -18,8 +18,7 @@ class ComicDetailSummaryMetaRow extends StatefulWidget {
       _ComicDetailSummaryMetaRowState();
 }
 
-class _ComicDetailSummaryMetaRowState
-    extends State<ComicDetailSummaryMetaRow> {
+class _ComicDetailSummaryMetaRowState extends State<ComicDetailSummaryMetaRow> {
   bool _ageChipInTree = false;
 
   @override

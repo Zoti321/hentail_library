@@ -126,14 +126,12 @@ class _ShellModalPrimaryRailBody extends StatelessWidget {
     final double libraryTop = ShellRailLibraryHoverMetrics.destinationTop(
       theme: navTheme,
       railExtended: railExtended,
-      destinationIndex:
-          ShellRailLibraryHoverMetrics.libraryDestinationIndex,
+      destinationIndex: ShellRailLibraryHoverMetrics.libraryDestinationIndex,
     );
-    final double libraryHeight =
-        ShellRailLibraryHoverMetrics.destinationHeight(
-          theme: navTheme,
-          railExtended: railExtended,
-        );
+    final double libraryHeight = ShellRailLibraryHoverMetrics.destinationHeight(
+      theme: navTheme,
+      railExtended: railExtended,
+    );
 
     return Stack(
       clipBehavior: Clip.none,

@@ -55,8 +55,7 @@ class SeriesDetailLayout extends ConsumerStatefulWidget {
   final ValueChanged<int>? onPageSizeChanged;
 
   @override
-  ConsumerState<SeriesDetailLayout> createState() =>
-      _SeriesDetailPageState();
+  ConsumerState<SeriesDetailLayout> createState() => _SeriesDetailPageState();
 }
 
 class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
@@ -192,10 +191,7 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
               slivers: <Widget>[
                 SliverPersistentHeader(
                   pinned: true,
-                  delegate: PageHeaderDelegate(
-                    layout: layout,
-                    child: header,
-                  ),
+                  delegate: PageHeaderDelegate(layout: layout, child: header),
                 ),
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(

@@ -34,9 +34,7 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
-    final ReaderChromeScope? chrome = ReaderChromeScope.maybeOf(
-      context,
-    );
+    final ReaderChromeScope? chrome = ReaderChromeScope.maybeOf(context);
     final Color pageNumberColor = chrome?.onChrome ?? scheme.onSurface;
     final TextStyle pageNumberStyle = type.labelLarge.copyWith(
       fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],

@@ -94,10 +94,7 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
       unawaited(_persistOrder(context, ref, next, pendingOrder));
     }
 
-    void handleAction(
-      String libraryId,
-      HomeLibraryManagementAction action,
-    ) {
+    void handleAction(String libraryId, HomeLibraryManagementAction action) {
       final LocalLibrary? library = libraryById[libraryId];
       if (library == null) {
         return;

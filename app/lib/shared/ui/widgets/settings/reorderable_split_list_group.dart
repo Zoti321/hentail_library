@@ -75,8 +75,7 @@ class ReorderableSplitListGroup extends StatefulWidget {
       _ReorderableSplitListGroupState();
 }
 
-class _ReorderableSplitListGroupState
-    extends State<ReorderableSplitListGroup>
+class _ReorderableSplitListGroupState extends State<ReorderableSplitListGroup>
     with TickerProviderStateMixin {
   final GlobalKey _listKey = GlobalKey();
   final Map<Object, GlobalKey> _rowKeys = <Object, GlobalKey>{};

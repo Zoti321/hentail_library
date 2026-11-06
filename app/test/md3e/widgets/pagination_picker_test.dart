@@ -18,11 +18,7 @@ void main() {
     await pumpApp(
       tester,
       home: Center(
-        child: Pagination(
-          page: 1,
-          totalPages: 5,
-          onPageChanged: changed.add,
-        ),
+        child: Pagination(page: 1, totalPages: 5, onPageChanged: changed.add),
       ),
     );
 

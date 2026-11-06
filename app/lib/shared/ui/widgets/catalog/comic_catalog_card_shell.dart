@@ -107,9 +107,6 @@ TextStyle comicCatalogTitleStyle(M3ETypeScale type, M3EColorScheme scheme) {
 }
 
 /// Subtitle / meta style shared by catalog card and list item.
-TextStyle comicCatalogSubtitleStyle(
-  M3ETypeScale type,
-  M3EColorScheme scheme,
-) {
+TextStyle comicCatalogSubtitleStyle(M3ETypeScale type, M3EColorScheme scheme) {
   return type.labelSmall.copyWith(color: scheme.onSurfaceVariant);
 }

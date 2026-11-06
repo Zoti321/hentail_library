@@ -12,8 +12,7 @@ class WindowCloseListener extends StatefulWidget {
   final Widget child;
 
   @override
-  State<WindowCloseListener> createState() =>
-      _WindowCloseListenerState();
+  State<WindowCloseListener> createState() => _WindowCloseListenerState();
 }
 
 class _WindowCloseListenerState extends State<WindowCloseListener>

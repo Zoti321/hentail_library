@@ -36,23 +36,17 @@ void main() {
 
   group('ReadingHistoryListItemMetrics.layoutForViewportWidth', () {
     test('single column on phone widths', () {
-      final layout = ReadingHistoryListItemMetrics.layoutForViewportWidth(
-        390,
-      );
+      final layout = ReadingHistoryListItemMetrics.layoutForViewportWidth(390);
       expect(layout.columnCount, 1);
     });
 
     test('two columns on expanded desktop widths', () {
-      final layout = ReadingHistoryListItemMetrics.layoutForViewportWidth(
-        1024,
-      );
+      final layout = ReadingHistoryListItemMetrics.layoutForViewportWidth(1024);
       expect(layout.columnCount, 2);
     });
 
     test('up to three columns on large widths', () {
-      final layout = ReadingHistoryListItemMetrics.layoutForViewportWidth(
-        1600,
-      );
+      final layout = ReadingHistoryListItemMetrics.layoutForViewportWidth(1600);
       expect(layout.columnCount, 3);
     });
   });

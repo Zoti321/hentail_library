@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 
 /// 壳层统一画布色：自定义标题栏背景、内容区背景、各页 header 与 body 均使用此色。
-Color labBrowseCanvasColor(M3EColorScheme scheme) =>
-    scheme.surfaceContainerLow;
+Color labBrowseCanvasColor(M3EColorScheme scheme) => scheme.surfaceContainerLow;
 
 /// Region fills for [DesktopShell] (decoupled from MASTER product mapping).
 ///

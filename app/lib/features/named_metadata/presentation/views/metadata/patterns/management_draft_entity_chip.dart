@@ -24,8 +24,7 @@ class ManagementDraftEntityChip extends StatefulWidget {
       _ManagementDraftEntityChipState();
 }
 
-class _ManagementDraftEntityChipState
-    extends State<ManagementDraftEntityChip> {
+class _ManagementDraftEntityChipState extends State<ManagementDraftEntityChip> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   bool _closing = false;

@@ -13,9 +13,7 @@ const double kComicCardSelectionInset = 8;
 const double kComicCardCoverProgressHeight = kCoverReadProgressHeight;
 
 /// Key for the cover progress strip (tests / semantics tooling).
-const Key kComicCardCoverProgressKey = Key(
-  '_comic_card_cover_progress',
-);
+const Key kComicCardCoverProgressKey = Key('_comic_card_cover_progress');
 
 /// Pins M3 elevated-card visuals for catalogs (e.g. Widgetbook); not for production grids.
 enum ComicCardVisualState {

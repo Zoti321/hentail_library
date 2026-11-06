@@ -67,10 +67,7 @@ void main() {
     await tester.tap(find.byType(EditableText));
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(FacetMultiSelectField.menuPanelKey),
-      findsOneWidget,
-    );
+    expect(find.byKey(FacetMultiSelectField.menuPanelKey), findsOneWidget);
     expect(find.text('深海'), findsWidgets);
 
     await tester.tap(find.text('深海').last);
@@ -106,20 +103,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(FacetMultiSelectField.clearAllButtonKey),
-      findsOneWidget,
-    );
+    expect(find.byKey(FacetMultiSelectField.clearAllButtonKey), findsOneWidget);
 
-    await tester.tap(
-      find.byKey(FacetMultiSelectField.clearAllButtonKey),
-    );
+    await tester.tap(find.byKey(FacetMultiSelectField.clearAllButtonKey));
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(FacetMultiSelectField.clearAllButtonKey),
-      findsNothing,
-    );
+    expect(find.byKey(FacetMultiSelectField.clearAllButtonKey), findsNothing);
   });
 
   testWidgets('Enter commits free-text name', (WidgetTester tester) async {
@@ -239,18 +228,12 @@ void main() {
 
     await tester.tap(find.byType(EditableText));
     await tester.pumpAndSettle();
-    expect(
-      find.byKey(FacetMultiSelectField.menuPanelKey),
-      findsOneWidget,
-    );
+    expect(find.byKey(FacetMultiSelectField.menuPanelKey), findsOneWidget);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle(const Duration(milliseconds: 400));
 
-    expect(
-      find.byKey(FacetMultiSelectField.menuPanelKey),
-      findsNothing,
-    );
+    expect(find.byKey(FacetMultiSelectField.menuPanelKey), findsNothing);
   });
 
   testWidgets('Backspace on empty input removes last chip', (

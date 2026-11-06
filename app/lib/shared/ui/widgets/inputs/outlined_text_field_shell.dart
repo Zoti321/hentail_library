@@ -71,8 +71,7 @@ class OutlinedTextFieldShell extends StatefulWidget {
   final Object? tapRegionGroupId;
 
   @override
-  State<OutlinedTextFieldShell> createState() =>
-      _OutlinedTextFieldShellState();
+  State<OutlinedTextFieldShell> createState() => _OutlinedTextFieldShellState();
 }
 
 class _OutlinedTextFieldShellState extends State<OutlinedTextFieldShell>

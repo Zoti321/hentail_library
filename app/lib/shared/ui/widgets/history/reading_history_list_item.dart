@@ -18,9 +18,7 @@ class ReadingHistoryMoreMenuEntry {
 }
 
 /// 上次阅读日期：`{YYYY}年{MM}月{DD}日`（如 2026年06月15日）。
-final DateFormat ReadingHistoryLastReadDateFormat = DateFormat(
-  'yyyy年MM月dd日',
-);
+final DateFormat ReadingHistoryLastReadDateFormat = DateFormat('yyyy年MM月dd日');
 
 String readingHistoryLastReadDateLabel(DateTime lastReadTime) {
   return ReadingHistoryLastReadDateFormat.format(lastReadTime);
@@ -71,8 +69,7 @@ class ReadingHistoryListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WindowSizeClass window =
-        sizeClass ?? windowSizeClassOf(context);
+    final WindowSizeClass window = sizeClass ?? windowSizeClassOf(context);
     final ReadingHistoryListItemSpec spec =
         ReadingHistoryListItemMetrics.specFor(window);
 

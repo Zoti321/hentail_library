@@ -58,8 +58,7 @@ List<BulkMetadataEditFieldKind> _fieldsFor(_BulkEditTab tab) {
   };
 }
 
-class BulkEditMetadataFormState
-    extends ConsumerState<BulkEditMetadataForm> {
+class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
   final BulkMetadataEditSession _session = BulkMetadataEditSession();
   _BulkEditTab _tab = _BulkEditTab.general;
   bool _loading = true;
@@ -226,9 +225,7 @@ class BulkEditMetadataFormState
     return SegmentedCapsuleBar(
       segments: <SegmentedCapsuleSegment>[
         SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabGeneral),
-        SegmentedCapsuleSegment(
-          label: l10n.dialogEditMetadataTabAuthorsTags,
-        ),
+        SegmentedCapsuleSegment(label: l10n.dialogEditMetadataTabAuthorsTags),
       ],
       selectedIndex: _tab.index,
       onSelected: _selectTabIndex,
@@ -461,9 +458,8 @@ class BulkEditMetadataFormState
           SegmentedCapsuleBar(
             segments: ComicMetadataBulkScalarOp.values
                 .map(
-                  (ComicMetadataBulkScalarOp op) => SegmentedCapsuleSegment(
-                    label: _scalarOpLabel(l10n, op),
-                  ),
+                  (ComicMetadataBulkScalarOp op) =>
+                      SegmentedCapsuleSegment(label: _scalarOpLabel(l10n, op)),
                 )
                 .toList(growable: false),
             selectedIndex: state.op.index,

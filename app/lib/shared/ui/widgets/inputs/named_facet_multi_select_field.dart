@@ -46,9 +46,7 @@ class FacetMultiSelectField<T> extends ConsumerStatefulWidget {
   static const Key fieldSurfaceKey = Key(
     '_named_facet_multi_select_field_surface',
   );
-  static const Key menuPanelKey = Key(
-    '_named_facet_multi_select_menu_panel',
-  );
+  static const Key menuPanelKey = Key('_named_facet_multi_select_menu_panel');
   static const Key smartMatchedHintKey = Key(
     '_named_facet_multi_select_smart_matched_hint',
   );
@@ -673,8 +671,7 @@ class _NamedFacetMultiSelectFieldState<T>
                               message:
                                   widget.clearAllTooltip ?? l10n.commonClear,
                               child: M3ETextFieldAffordance(
-                                key: FacetMultiSelectField
-                                    .clearAllButtonKey,
+                                key: FacetMultiSelectField.clearAllButtonKey,
                                 icon: M3EIcons.cancel,
                                 color: colors.trailingIcon,
                                 iconSize: fieldTheme.iconSize,
@@ -696,12 +693,11 @@ class _NamedFacetMultiSelectFieldState<T>
                             final double inlineWidth = _inlineWidth(inputStyle);
                             final bool hasChips =
                                 widget.selectedNames.isNotEmpty;
-                            final double rowLineHeight =
-                                inputChipRowLineHeight(
-                                  chipTheme: chipTheme,
-                                  inputStyle: inputStyle,
-                                  hasChips: hasChips,
-                                );
+                            final double rowLineHeight = inputChipRowLineHeight(
+                              chipTheme: chipTheme,
+                              inputStyle: inputStyle,
+                              hasChips: hasChips,
+                            );
                             final double textTopInset = hasChips
                                 ? inputChipInlineTopInset(
                                     rowLineHeight: rowLineHeight,

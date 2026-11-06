@@ -21,10 +21,7 @@ void main() {
   group('LayoutContext', () {
     test('fromPlatform maps desktop to pointer and mobile to touch', () {
       expect(
-        LayoutContext.fromPlatform(
-          viewportWidth: 800,
-          desktop: true,
-        ).inputMode,
+        LayoutContext.fromPlatform(viewportWidth: 800, desktop: true).inputMode,
         LayoutInputMode.pointer,
       );
       expect(
@@ -200,10 +197,7 @@ void main() {
     test('pointer spacing never exceeds touch spacing', () {
       for (final double width in widths) {
         final PageLayoutSpec touch = _resolve(width, LayoutInputMode.touch);
-        final PageLayoutSpec pointer = _resolve(
-          width,
-          LayoutInputMode.pointer,
-        );
+        final PageLayoutSpec pointer = _resolve(width, LayoutInputMode.pointer);
         expect(
           pointer.horizontalInset,
           lessThanOrEqualTo(touch.horizontalInset),

@@ -67,8 +67,7 @@ class _ManagementCreateEntityDialogState
       M3EButtonSize.sm,
     );
     final Size size = MediaQuery.sizeOf(context);
-    final double horizontalInset = PageLayoutSpec.of(context)
-        .horizontalInset;
+    final double horizontalInset = PageLayoutSpec.of(context).horizontalInset;
     final double contentWidth = math.min(
       _kManagementCreateDialogMaxWidth,
       size.width - horizontalInset * 2,

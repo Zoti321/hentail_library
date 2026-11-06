@@ -167,10 +167,6 @@ class _PageHostState extends State<_PageHost> {
 
   @override
   Widget build(BuildContext context) {
-    return PaginationPageButton(
-      page: 2,
-      selected: _selected,
-      onPressed: () {},
-    );
+    return PaginationPageButton(page: 2, selected: _selected, onPressed: () {});
   }
 }

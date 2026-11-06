@@ -77,10 +77,7 @@ String inputChipDisplayLabel(String label) {
   return '${label.substring(0, kInputChipMaxLabelLength)}…';
 }
 
-double inputChipInlineWidth({
-  required TextStyle style,
-  required String text,
-}) {
+double inputChipInlineWidth({required TextStyle style, required String text}) {
   if (text.isEmpty) {
     return kInputChipInlineEmptyWidth;
   }
@@ -147,8 +144,7 @@ class InputChipFieldContent extends StatefulWidget {
   final VoidCallback? onTap;
 
   @override
-  State<InputChipFieldContent> createState() =>
-      _InputChipFieldContentState();
+  State<InputChipFieldContent> createState() => _InputChipFieldContentState();
 }
 
 class _InputChipFieldContentState extends State<InputChipFieldContent> {
@@ -203,12 +199,11 @@ class _InputChipFieldContentState extends State<InputChipFieldContent> {
       inputStyle: widget.inputStyle,
       hasChips: widget.hasChips,
     );
-    final ({double top, double bottom}) insets =
-        inputChipFieldVerticalInsets(
-          fieldTheme: widget.fieldTheme,
-          rowLineHeight: rowLineHeight,
-          multiline: _multiline,
-        );
+    final ({double top, double bottom}) insets = inputChipFieldVerticalInsets(
+      fieldTheme: widget.fieldTheme,
+      rowLineHeight: rowLineHeight,
+      multiline: _multiline,
+    );
 
     final Widget wrap = Wrap(
       key: _wrapKey,

@@ -27,10 +27,7 @@ void main() {
     );
     expect(find.text('葬送的芙莉莲'), findsOneWidget);
     expect(find.text('第 01 卷'), findsOneWidget);
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(3)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
     expect(find.byType(M3ESlider), findsOneWidget);
     await tester.binding.setSurfaceSize(null);
   });
@@ -49,24 +46,15 @@ void main() {
     );
     await tester.tapAt(const Offset(512, 400));
     await tester.pumpAndSettle();
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(3)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
 
     await tester.tapAt(const Offset(900, 400));
     await tester.pumpAndSettle();
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(4)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(4)), findsOneWidget);
 
     await tester.tapAt(const Offset(100, 400));
     await tester.pumpAndSettle();
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(3)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
 
     await tester.binding.setSurfaceSize(null);
   });
@@ -130,10 +118,7 @@ void main() {
     await tester.tap(find.text(ReaderPageCopy.viewportErrorRetry));
     await tester.pumpAndSettle();
     expect(find.text(ReaderPageCopy.viewportErrorMessage), findsNothing);
-    expect(
-      find.text(ReaderPageCopy.viewportPlaceholder(3)),
-      findsOneWidget,
-    );
+    expect(find.text(ReaderPageCopy.viewportPlaceholder(3)), findsOneWidget);
     await tester.binding.setSurfaceSize(null);
   });
 }

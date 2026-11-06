@@ -24,8 +24,7 @@ class ReaderBoundarySnackbar extends StatefulWidget {
   final Duration duration;
 
   @override
-  State<ReaderBoundarySnackbar> createState() =>
-      _ReaderBoundarySnackbarState();
+  State<ReaderBoundarySnackbar> createState() => _ReaderBoundarySnackbarState();
 }
 
 class _ReaderBoundarySnackbarState extends State<ReaderBoundarySnackbar>

@@ -31,8 +31,7 @@ class HomeNavShortcutCard extends StatefulWidget {
   final double minHeight;
 
   @override
-  State<HomeNavShortcutCard> createState() =>
-      _HomeNavShortcutCardState();
+  State<HomeNavShortcutCard> createState() => _HomeNavShortcutCardState();
 }
 
 class _HomeNavShortcutCardState extends State<HomeNavShortcutCard> {

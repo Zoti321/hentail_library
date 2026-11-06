@@ -13,10 +13,7 @@ class ReorderExclude extends StatelessWidget {
 }
 
 /// [globalPosition] 是否落在 [context] 子树中某个 [ReorderExclude] 区域内。
-bool isPointerInReorderExclude(
-  BuildContext context,
-  Offset globalPosition,
-) {
+bool isPointerInReorderExclude(BuildContext context, Offset globalPosition) {
   bool hit = false;
   void visit(Element element) {
     if (hit) {

@@ -115,8 +115,7 @@ class _ShellLibrarySecondaryColumnState
           return SizedBox(height: widget.height);
         }
 
-        const double panelWidth =
-            ShellNavigation.librarySecondaryPanelWidth;
+        const double panelWidth = ShellNavigation.librarySecondaryPanelWidth;
 
         final TextDirection textDirection = Directionality.of(context);
         final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;

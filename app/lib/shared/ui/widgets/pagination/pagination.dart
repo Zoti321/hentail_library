@@ -36,9 +36,7 @@ class Pagination extends StatelessWidget {
     }
     final int clampedPage = page.clamp(1, totalPages);
     final double windowWidth = MediaQuery.sizeOf(context).width;
-    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(
-      windowWidth,
-    );
+    final WindowSizeClass sizeClass = WindowSizeClass.fromWidth(windowWidth);
     final bool useCompact =
         sizeClass.isCompact ||
         windowWidth < PaginationMetrics.standardBarMinWidth(sizeClass);

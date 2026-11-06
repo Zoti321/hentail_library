@@ -198,9 +198,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: labBrowseCanvasColor(
-          M3ETheme.of(context).colorScheme,
-        ),
+        backgroundColor: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
         body: Stack(
           children: <Widget>[
             CustomScrollView(
@@ -209,10 +207,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               slivers: <Widget>[
                 SliverPersistentHeader(
                   pinned: true,
-                  delegate: PageHeaderDelegate(
-                    layout: layout,
-                    child: header,
-                  ),
+                  delegate: PageHeaderDelegate(layout: layout, child: header),
                 ),
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(

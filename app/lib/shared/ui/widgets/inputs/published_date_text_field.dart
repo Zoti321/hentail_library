@@ -29,12 +29,10 @@ class PublishedDateTextField extends StatefulWidget {
   final M3EDatePickerMode initialCalendarMode;
 
   @override
-  State<PublishedDateTextField> createState() =>
-      _PublishedDateTextFieldState();
+  State<PublishedDateTextField> createState() => _PublishedDateTextFieldState();
 }
 
-class _PublishedDateTextFieldState
-    extends State<PublishedDateTextField> {
+class _PublishedDateTextFieldState extends State<PublishedDateTextField> {
   final LayerLink _layerLink = LayerLink();
   late final TextEditingController _controller = TextEditingController(
     text: widget.value,

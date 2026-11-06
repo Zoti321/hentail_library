@@ -418,9 +418,7 @@ class DesktopShellState extends State<DesktopShell> {
     required double cornerRadius,
   }) {
     return ClipRRect(
-      borderRadius: DesktopShellMetrics.contentCardLeadingRadius(
-        cornerRadius,
-      ),
+      borderRadius: DesktopShellMetrics.contentCardLeadingRadius(cornerRadius),
       child: ColoredBox(
         color: surfaces.contentPaneBackground,
         child: Column(
@@ -463,11 +461,10 @@ class DesktopShellState extends State<DesktopShell> {
       railExtended: _effectiveRailExtended,
       destinationIndex: libraryIndex,
     );
-    final double libraryHeight =
-        ShellRailLibraryHoverMetrics.destinationHeight(
-          theme: navTheme,
-          railExtended: _effectiveRailExtended,
-        );
+    final double libraryHeight = ShellRailLibraryHoverMetrics.destinationHeight(
+      theme: navTheme,
+      railExtended: _effectiveRailExtended,
+    );
 
     return MouseRegion(
       cursor: ShellNavigationCursor.chrome,

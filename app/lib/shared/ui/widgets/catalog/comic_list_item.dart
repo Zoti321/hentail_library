@@ -14,8 +14,7 @@ const String kComicListItemMetaSeparator = ' · ';
 const double kComicListItemCoverWidth = 80;
 
 /// Derived list cover height.
-double get kComicListItemCoverHeight =>
-    kComicListItemCoverWidth * 3 / 2;
+double get kComicListItemCoverHeight => kComicListItemCoverWidth * 3 / 2;
 
 /// Vertical padding inside the shared catalog card shell.
 const double kComicListItemVerticalPadding = 10;
@@ -31,9 +30,7 @@ const double kComicListItemProgressMaxWidth = 160;
 const double kComicListItemProgressTopGap = 6;
 
 /// Key for list-row progress strip in tests (under title/meta, not on cover).
-const Key kComicListItemInfoProgressKey = Key(
-  '_comic_list_item_info_progress',
-);
+const Key kComicListItemInfoProgressKey = Key('_comic_list_item_info_progress');
 
 /// One action in the trailing overflow ([Icons.more_vert]) menu.
 class ComicListMoreMenuEntry {

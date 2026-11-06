@@ -160,9 +160,7 @@ void main() {
       expect(applyReorder(_items, from, to), <String>['B', 'A', 'C']);
     });
 
-    testWidgets('拖拽过程中存在浮层（SplitDragScope），松手后移除', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('拖拽过程中存在浮层（SplitDragScope），松手后移除', (WidgetTester tester) async {
       await _pumpGroup(tester, onReorder: (int _, int _) {});
 
       final TestGesture gesture = await tester.startGesture(

@@ -34,8 +34,7 @@ class SeriesDetailPageLabHost extends StatefulWidget {
       _SeriesDetailPageLabHostState();
 }
 
-class _SeriesDetailPageLabHostState
-    extends State<SeriesDetailPageLabHost> {
+class _SeriesDetailPageLabHostState extends State<SeriesDetailPageLabHost> {
   late int _pageSize;
   late int _page;
 

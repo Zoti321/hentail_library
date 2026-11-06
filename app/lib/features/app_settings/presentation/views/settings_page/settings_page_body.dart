@@ -129,8 +129,8 @@ class _SettingsPageState extends State<SettingsLayout> {
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Builder(
               builder: (BuildContext context) {
-                final SettingsCategoryInfo selectedInfo =
-                    kSettingsCategories.firstWhere(
+                final SettingsCategoryInfo selectedInfo = kSettingsCategories
+                    .firstWhere(
                       (SettingsCategoryInfo e) => e.category == _selected,
                     );
                 final String? headerTitle =
@@ -188,8 +188,7 @@ class _SettingsPageState extends State<SettingsLayout> {
                   if (wide) {
                     return ListDetailAdaptiveLayout(
                       showPaneDivider: false,
-                      listPaneFixedWidth:
-                          SettingsPageMetrics.masterPaneWidth,
+                      listPaneFixedWidth: SettingsPageMetrics.masterPaneWidth,
                       paneGap: SettingsPageMetrics.paneGap,
                       listPane: master,
                       detailPane: ListDetailDetailTransition(

@@ -47,8 +47,7 @@ class ApplicationShell extends ConsumerWidget {
       },
       isReaderFullscreen: readerFullscreen,
       shellFeedbackBelowTitleBar: feedbackFactory(),
-      navigationSlotBuilder: (BuildContext ctx) =>
-          navigationAssembly(ctx, ref),
+      navigationSlotBuilder: (BuildContext ctx) => navigationAssembly(ctx, ref),
     );
   }
 }

@@ -37,9 +37,7 @@ class _ComicDetailAgeRestrictionChipSlotState
   }
 
   @override
-  void didUpdateWidget(
-    covariant ComicDetailAgeRestrictionChipSlot oldWidget,
-  ) {
+  void didUpdateWidget(covariant ComicDetailAgeRestrictionChipSlot oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.visible) {
       _hideTimer?.cancel();

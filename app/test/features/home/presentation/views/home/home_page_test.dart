@@ -31,20 +31,14 @@ void main() {
       ),
     );
 
-    expect(
-      find.text(HomePageCopy.aggregateStatsSectionTitle),
-      findsOneWidget,
-    );
+    expect(find.text(HomePageCopy.aggregateStatsSectionTitle), findsOneWidget);
     expect(find.text('阅读历史'), findsOneWidget);
     expect(find.text('查看阅读记录'), findsOneWidget);
     expect(find.text('垃圾桶'), findsOneWidget);
     expect(find.text('可恢复删除'), findsOneWidget);
     expect(find.text('进入'), findsNothing);
     expect(find.textContaining('2552'), findsOneWidget);
-    expect(
-      find.text(HomeLibraryManagementCopy.sectionTitle),
-      findsOneWidget,
-    );
+    expect(find.text(HomeLibraryManagementCopy.sectionTitle), findsOneWidget);
     expect(find.text('本机漫画'), findsOneWidget);
     expect(find.text('NAS WebDAV'), findsOneWidget);
     await tester.binding.setSurfaceSize(null);

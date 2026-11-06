@@ -15,8 +15,9 @@ void main() {
     WidgetTester tester,
   ) async {
     const ManagedNamedFacetKind facet = ManagedNamedFacetKind.tag;
-    final List<String> chips =
-        ManagementBrowsePagePreviewData.sampleChipsFor(facet);
+    final List<String> chips = ManagementBrowsePagePreviewData.sampleChipsFor(
+      facet,
+    );
 
     await pumpApp(
       tester,
@@ -41,8 +42,9 @@ void main() {
     WidgetTester tester,
   ) async {
     const ManagedNamedFacetKind facet = ManagedNamedFacetKind.tag;
-    final List<String> chips =
-        ManagementBrowsePagePreviewData.sampleChipsFor(facet);
+    final List<String> chips = ManagementBrowsePagePreviewData.sampleChipsFor(
+      facet,
+    );
 
     await pumpApp(
       tester,
@@ -51,8 +53,7 @@ void main() {
           facet: facet,
           facetCount: chips.length,
           chipLabels: chips,
-          createInteractionOverride:
-              ManagementCreateInteraction.desktopInline,
+          createInteractionOverride: ManagementCreateInteraction.desktopInline,
           onFacetChanged: (_) {},
           onEntityCreated: (_) {},
         ),
@@ -72,8 +73,9 @@ void main() {
     WidgetTester tester,
   ) async {
     const ManagedNamedFacetKind facet = ManagedNamedFacetKind.tag;
-    final List<String> chips =
-        ManagementBrowsePagePreviewData.sampleChipsFor(facet);
+    final List<String> chips = ManagementBrowsePagePreviewData.sampleChipsFor(
+      facet,
+    );
 
     await pumpApp(
       tester,
@@ -82,8 +84,7 @@ void main() {
           facet: facet,
           facetCount: chips.length,
           chipLabels: chips,
-          createInteractionOverride:
-              ManagementCreateInteraction.mobileDialog,
+          createInteractionOverride: ManagementCreateInteraction.mobileDialog,
           onFacetChanged: (_) {},
           onEntityCreated: (_) {},
         ),

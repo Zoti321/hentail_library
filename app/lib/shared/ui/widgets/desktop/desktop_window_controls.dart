@@ -57,9 +57,7 @@ class DesktopWindowControls extends StatelessWidget {
 ///
 /// `backgroundColor` / `foregroundColor` on the decoration are resolved once
 /// without hover states in M3E 1.2 — only `overlayColor` is state-aware.
-M3EIconButtonDecoration CloseWindowButtonDecoration(
-  M3EColorScheme scheme,
-) {
+M3EIconButtonDecoration CloseWindowButtonDecoration(M3EColorScheme scheme) {
   return M3EIconButtonDecoration(
     overlayColor: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       if (states.contains(WidgetState.disabled)) {

@@ -16,8 +16,7 @@ Future<void> _hoverLibraryRailDestination(WidgetTester tester) async {
     tester.element(find.byType(DesktopShell)),
   );
   final M3ENavigationRailTheme navTheme = theme.navigationRailTheme;
-  final int libraryIndex =
-      ShellRailLibraryHoverMetrics.libraryDestinationIndex;
+  final int libraryIndex = ShellRailLibraryHoverMetrics.libraryDestinationIndex;
   final double top = ShellRailLibraryHoverMetrics.destinationTop(
     theme: navTheme,
     railExtended: false,
@@ -49,11 +48,7 @@ void main() {
 
     await pumpApp(
       tester,
-      home: DesktopShell(
-        width: 1024,
-        height: 768,
-        initialRailExtended: false,
-      ),
+      home: DesktopShell(width: 1024, height: 768, initialRailExtended: false),
     );
 
     expect(find.byType(ExpressiveNavigationRail), findsOneWidget);
@@ -67,10 +62,7 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(600, 768));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      await pumpApp(
-        tester,
-        home: DesktopShell(width: 600, height: 768),
-      );
+      await pumpApp(tester, home: DesktopShell(width: 600, height: 768));
 
       expect(find.byType(ShellCompactAppBar), findsOneWidget);
       expect(find.byType(ExpressiveNavigationRail), findsNothing);
@@ -115,11 +107,7 @@ void main() {
 
       await pumpApp(
         tester,
-        home: DesktopShell(
-          width: 848,
-          height: 768,
-          initialRailExtended: true,
-        ),
+        home: DesktopShell(width: 848, height: 768, initialRailExtended: true),
       );
 
       expect(tester.takeException(), isNull);
@@ -131,9 +119,7 @@ void main() {
   ) async {
     Future<void> pumpAndSelectLibrary(double width) async {
       const String targetId = 'lab-remote-nas';
-      final String targetName = LabLibraryCatalog.displayNameForId(
-        targetId,
-      );
+      final String targetName = LabLibraryCatalog.displayNameForId(targetId);
       ShellNavigationSnapshot? lastSnapshot;
 
       await tester.binding.setSurfaceSize(Size(width, 768));
