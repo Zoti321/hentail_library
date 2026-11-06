@@ -34,18 +34,18 @@
           <tbody>
             <tr>
               <td><span class="tag lab">Lab</span></td>
-              <td>不改生产 feature，在 md3e + Widgetbook 建 UI</td>
-              <td><span class="tag ok">OK</span>integrate/md3e 活跃</td>
+              <td>不改生产 feature，在独立模块 + Widgetbook 建 UI</td>
+              <td><span class="tag ok">OK</span>生产 <code>app/lib/md3e/</code> 已删；预览留 <code>app/widgetbook/</code></td>
             </tr>
             <tr>
               <td><span class="tag pilot">Pilot</span></td>
               <td>单 feature 接真路由 / ViewModel 验证</td>
-              <td><span class="tag stub">STUB</span>尚未系统切换</td>
+              <td><span class="tag ok">OK</span>主体已完成；条目保留供读 ADR/历史</td>
             </tr>
             <tr>
               <td>Cutover</td>
               <td>生产 Baseline UI 迁到 MD3E，收双轨</td>
-              <td><span class="tag miss">未开始</span></td>
+              <td><span class="tag ok">OK</span>主体完成；余去 <code>md3e_</code> 生产前缀与命名收尾</td>
             </tr>
           </tbody>
         </table>
@@ -62,32 +62,28 @@
           </thead>
           <tbody>
             <tr>
-              <td><code>md3e/theme/</code></td>
-              <td>M3ETheme、MI Sans、动态色 Lab 种子</td>
-            </tr>
-            <tr>
-              <td><code>md3e/layout/</code></td>
-              <td>断点、间距、各页 metrics</td>
-            </tr>
-            <tr>
-              <td><code>md3e/widgets/</code></td>
-              <td>原子控件（M3E 封装）</td>
-            </tr>
-            <tr>
-              <td><code>md3e/patterns/</code></td>
-              <td>场景组合（无 Riverpod / 领域 import）</td>
-            </tr>
-            <tr>
-              <td><code>md3e/pages/</code></td>
-              <td>整页预览 + *LabHost 假数据壳</td>
-            </tr>
-            <tr>
-              <td><code>design-system/</code></td>
-              <td>已清空，仅保留占位与示例参考图（2026-11-01）；ADR-0030</td>
+              <td><code>app/lib/shared/ui/theme/</code></td>
+              <td>生产主题单源（<code>buildAppTheme</code>）；Lab 紫 seed 仍为临时品牌色</td>
             </tr>
             <tr>
               <td><code>app/lib/shared/ui/</code></td>
-              <td>生产 Baseline Fluent UI（仍为主壳）</td>
+              <td>生产 UI 真源（layout / widgets / patterns / shell）；MD3E 取向</td>
+            </tr>
+            <tr>
+              <td><code>app/lib/features/*/presentation/</code></td>
+              <td>各 feature 生产 MD3E 页与场景；文件名仍可能带 <code>md3e_</code> 前缀（收尾中）</td>
+            </tr>
+            <tr>
+              <td><code>app/widgetbook/</code></td>
+              <td>Lab 预览、Host、假数据；不随生产 <code>lib/</code> 发布</td>
+            </tr>
+            <tr>
+              <td><code>design-system/</code></td>
+              <td>已清空，仅保留占位与示例参考图；ADR-0030</td>
+            </tr>
+            <tr>
+              <td><code>app/lib/md3e/</code></td>
+              <td>已删除（Cutover 后不再保留生产 Lab 包路径）</td>
             </tr>
           </tbody>
         </table>
