@@ -4,37 +4,6 @@ import 'package:go_router/go_router.dart';
 /// Desktop route fade-through: old page fully out, then new page in (280ms total).
 const Duration kDesktopPageTransitionDuration = Duration(milliseconds: 280);
 
-/// Tracks whether the active navigator transition is a pop (vs push/replace).
-///
-/// Used to pick covered vs uncovered opacity when [ModalRoute.animation] is idle
-/// but [ModalRoute.secondaryAnimation] is running on the route below.
-final DesktopPageTransitionObserver desktopPageTransitionObserver =
-    DesktopPageTransitionObserver();
-
-class DesktopPageTransitionObserver extends NavigatorObserver {
-  bool lastTransitionWasPop = false;
-
-  @override
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    lastTransitionWasPop = true;
-  }
-
-  @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    lastTransitionWasPop = false;
-  }
-
-  @override
-  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    lastTransitionWasPop = false;
-  }
-
-  @override
-  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    lastTransitionWasPop = false;
-  }
-}
-
 /// Opacity while a route is entering (push forward, [t]: 0→1).
 @visibleForTesting
 double desktopFadeThroughEnterOpacity(double t) {
@@ -53,29 +22,10 @@ double desktopFadeThroughExitOpacity(double t) {
   return Curves.easeInCubic.transform(t / 0.5);
 }
 
-/// Opacity for a route being covered by a push ([t]: secondary 0→1).
-@visibleForTesting
-double desktopFadeThroughCoveredOpacity(double t) {
-  if (t >= 0.5) {
-    return 0.0;
-  }
-  return 1.0 - Curves.easeInCubic.transform(t / 0.5);
-}
-
-/// Opacity for a route revealed after a pop ([t]: secondary 0→1).
-@visibleForTesting
-double desktopFadeThroughUncoveredOpacity(double t) {
-  if (t <= 0.5) {
-    return 0.0;
-  }
-  return Curves.easeOutCubic.transform((t - 0.5) / 0.5);
-}
-
 @visibleForTesting
 double resolveDesktopFadeThroughOpacity({
   required Animation<double> animation,
   required Animation<double> secondaryAnimation,
-  required bool revealingFromPop,
 }) {
   switch (animation.status) {
     case AnimationStatus.forward:
@@ -87,11 +37,12 @@ double resolveDesktopFadeThroughOpacity({
       break;
   }
 
+  // 下方路由（如库浏览被 comic/series 详情 push 盖住）保持不透明。
+  // 若对 secondary 做 fade-through，pop 中段 opacity=0 会露出壳层白底，
+  // 而 NavigationRail 在 Shell 外不受 page 过渡影响，表现为「只有内容区闪白」。
+  // Shell 顶层 go 切换只走上方 primary enter/exit，不依赖 secondary 淡出。
   if (animation.isCompleted && secondaryAnimation.value > 0) {
-    if (revealingFromPop) {
-      return desktopFadeThroughUncoveredOpacity(secondaryAnimation.value);
-    }
-    return desktopFadeThroughCoveredOpacity(secondaryAnimation.value);
+    return 1.0;
   }
 
   if (animation.isDismissed) {
@@ -116,7 +67,6 @@ Widget desktopFadeThroughTransitionWrapper({
       final double opacity = resolveDesktopFadeThroughOpacity(
         animation: animation,
         secondaryAnimation: secondaryAnimation,
-        revealingFromPop: desktopPageTransitionObserver.lastTransitionWasPop,
       );
       return Opacity(opacity: opacity.clamp(0.0, 1.0), child: builtChild);
     },

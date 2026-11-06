@@ -40,20 +40,8 @@ void main() {
       expect(desktopFadeThroughExitOpacity(0.0), 0.0);
     });
 
-    test('covered route fades out during the first half of secondary', () {
-      expect(desktopFadeThroughCoveredOpacity(0.0), 1.0);
-      expect(desktopFadeThroughCoveredOpacity(0.5), 0.0);
-      expect(desktopFadeThroughCoveredOpacity(1.0), 0.0);
-    });
-
-    test('uncovered route fades in during the second half of secondary', () {
-      expect(desktopFadeThroughUncoveredOpacity(0.0), 0.0);
-      expect(desktopFadeThroughUncoveredOpacity(0.5), 0.0);
-      expect(desktopFadeThroughUncoveredOpacity(1.0), 1.0);
-    });
-
     testWidgets(
-      'secondary animation uses covered vs uncovered based on pop flag',
+      'covered route stays opaque while secondary runs (no white flash under detail)',
       (WidgetTester tester) async {
         final AnimationController primary = AnimationController(
           vsync: tester,
@@ -66,25 +54,16 @@ void main() {
         addTearDown(primary.dispose);
         addTearDown(secondary.dispose);
 
-        secondary.value = 0.25;
-        expect(
-          resolveDesktopFadeThroughOpacity(
-            animation: primary,
-            secondaryAnimation: secondary,
-            revealingFromPop: false,
-          ),
-          desktopFadeThroughCoveredOpacity(0.25),
-        );
-
-        secondary.value = 0.75;
-        expect(
-          resolveDesktopFadeThroughOpacity(
-            animation: primary,
-            secondaryAnimation: secondary,
-            revealingFromPop: true,
-          ),
-          desktopFadeThroughUncoveredOpacity(0.75),
-        );
+        for (final double t in <double>[0.25, 0.5, 0.75, 1.0]) {
+          secondary.value = t;
+          expect(
+            resolveDesktopFadeThroughOpacity(
+              animation: primary,
+              secondaryAnimation: secondary,
+            ),
+            1.0,
+          );
+        }
       },
     );
   });

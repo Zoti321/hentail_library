@@ -26,7 +26,6 @@ String? _librariesRootRedirect(BuildContext context, GoRouterState state) {
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: appRootNavigatorKey,
-  observers: <NavigatorObserver>[desktopPageTransitionObserver],
   initialLocation: '/home',
   routes: <RouteBase>[
     ShellRoute(
