@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
-import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,6 +21,8 @@ class NamedFacetManagementState {
     required this.hasMore,
     this.attachmentCounts = const <String, int>{},
     this.error,
+    this.mergeTarget,
+    this.mergeSources = const <String>{},
   });
 
   factory NamedFacetManagementState.initial() =>
@@ -42,8 +44,15 @@ class NamedFacetManagementState {
   final Map<String, int> attachmentCounts;
   final Object? error;
 
+  /// 合并模式目标名；null 表示未进入合并。
+  final String? mergeTarget;
+  final Set<String> mergeSources;
+
   bool get hasSearchQuery => query.trim().isNotEmpty;
   bool get isEmpty => !isLoading && items.isEmpty;
+  bool get isMergeMode => mergeTarget != null;
+  int get mergeSelectionCount =>
+      mergeTarget == null ? 0 : 1 + mergeSources.length;
 
   NamedFacetManagementState copyWith({
     String? query,
@@ -54,6 +63,9 @@ class NamedFacetManagementState {
     bool? hasMore,
     Map<String, int>? attachmentCounts,
     Object? error = _sentinel,
+    String? mergeTarget,
+    bool clearMergeTarget = false,
+    Set<String>? mergeSources,
   }) {
     return NamedFacetManagementState(
       query: query ?? this.query,
@@ -64,6 +76,8 @@ class NamedFacetManagementState {
       hasMore: hasMore ?? this.hasMore,
       attachmentCounts: attachmentCounts ?? this.attachmentCounts,
       error: identical(error, _sentinel) ? this.error : error,
+      mergeTarget: clearMergeTarget ? null : (mergeTarget ?? this.mergeTarget),
+      mergeSources: mergeSources ?? this.mergeSources,
     );
   }
 }
@@ -87,11 +101,9 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
         final List<String> all = await ref
             .read(namedFacetManagementRepoProvider)
             .listAll(kind);
+        final NamePinyinIndex index = await buildNamePinyinIndex(all);
         final List<String> filtered = all
-            .where(
-              (String item) =>
-                  nameMatchesPinyinAssistedFilter(item, state.query),
-            )
+            .where((String item) => index.matches(item, state.query))
             .toList();
         state = state.copyWith(
           items: filtered,
@@ -198,30 +210,41 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
     await refresh();
   }
 
-  /// 删掉当前 facet 的全部名字，不受搜索过滤影响。
-  /// Tag 会同时让 [allTagsProvider] 重新读取同一份名字。
-  Future<void> deleteAll() async {
-    final List<String> names = await ref
-        .read(namedFacetManagementRepoProvider)
-        .listAll(kind);
-    if (names.isNotEmpty) {
-      await ref
-          .read(namedFacetManagementRepoProvider)
-          .deleteByNames(kind, names);
-    }
-    if (kind == ManagedNamedFacetKind.tag) {
-      await refreshAfterTagDictionaryChange();
-      return;
-    }
-    await refresh();
-  }
-
   /// 标签字典变了（清空或导入）之后，管理页和 [allTagsProvider] 读同一份名字。
   Future<void> refreshAfterTagDictionaryChange() async {
     ref.invalidate(allTagsProvider);
     if (kind == ManagedNamedFacetKind.tag) {
       await refresh();
     }
+  }
+
+  void enterMerge(String target) {
+    if (kind == ManagedNamedFacetKind.author) {
+      return;
+    }
+    state = state.copyWith(mergeTarget: target, mergeSources: const <String>{});
+  }
+
+  void toggleMergeSource(String source) {
+    final String? target = state.mergeTarget;
+    if (target == null || source == target) {
+      return;
+    }
+    final Set<String> next = <String>{...state.mergeSources};
+    if (!next.add(source)) {
+      next.remove(source);
+    }
+    state = state.copyWith(mergeSources: next);
+  }
+
+  void exitMerge() {
+    if (!state.isMergeMode && state.mergeSources.isEmpty) {
+      return;
+    }
+    state = state.copyWith(
+      clearMergeTarget: true,
+      mergeSources: const <String>{},
+    );
   }
 
   Future<void> merge({
@@ -232,6 +255,7 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
     for (final String sourceName in sourceNames) {
       await repo.merge(kind, sourceName, targetName);
     }
+    exitMerge();
     await refresh();
   }
 

@@ -14,22 +14,22 @@ _Avoid_: 开发库、发布库、数据库环境（易与 Library 混淆）
 用户主动清除当前 **App data profile** 下全部本机应用状态（SQLite、自动元数据备份 `metadata_backups/`、日志、缓存及 App preference / Library browse preference）。不删除 Library root Resource，不删除用户目录手动导出的 `.hlmeta.json.gz`；不是 Comic deletion，也不是卸载应用本身。详见 ADR-0019。
 _Avoid_: 卸载应用、删库、清空漫画
 
+**Application layer**（Dart 应用层）:
+Wayfinder feature 内可选目录 `features/*/application/`：无 Flutter 的用例编排（Service / Coordinator）。与上文 **Application data**（磁盘上的应用数据）无关。Gate L1 R6–R10。详见 ADR-0033。
+_Avoid_: 把 Application data 目录称为 Application 层；在 application 层 import presentation / FRB
+
+**Feature public API**:
+跨 feature 协作时，消费方只 `import` owner 的 `features/<id>/public/**` 或 `public.dart`；仍通过 `shared/di` 的 Provider token + bootstrap override 拿实现。详见 ADR-0034。
+_Avoid_: deep import 其他 feature 的 presentation / data / di；让 `shared/**` import feature public
+
 ### Library & resources
 
 **Library**:
-用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（Supported resource formats、Scan on startup、Scan interval），以及可独立于 Library root 编辑的显示名。应用内可同时存在多个 Library。
-_Avoid_: 书架（UI 可用）；把「全部库合并」称作一个 Library
-
-**Current library**:
-用户当前选中的 Library；浏览与搜索默认作用于此。Reading history 跨 Library 全局可见。
-_Avoid_: 活动库、选中书架
-
-**All libraries browse**:
-跨多个 Library 的聚合浏览面（趋近 Komga「全部库」）；不是一个 Library。路由占位为 `/libraries/all`；本阶段仅占位提示，不实现聚合目录。
-_Avoid_: 全部库（若被理解成一个 Library）、合并库、全局书架
+用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（Supported resource formats、Scan on startup、Scan interval），以及可独立于 Library root 编辑的显示名。应用内可同时存在多个 Library。多库态势与入口在 Home page；不提供跨库聚合浏览面。
+_Avoid_: 书架（UI 可用）；全部库浏览、合并库、全局书架（产品不做）
 
 **Home page**:
-应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**展示 Current library 指示，**不**提供常驻 Library sync 入口。详见 ADR-0020。
+应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**提供常驻 Library sync 入口。详见 ADR-0020。
 _Avoid_: 当前库仪表盘、首页扫描、Home dashboard（口语可用；文档与 issue 用 Home page）
 
 **Home library alert**:
@@ -61,7 +61,7 @@ _Avoid_: 云库、网盘库、在线书架（无官方云账号语义）
 _Avoid_: 扫描路径、挂载点；Saved path（旧称，仅指 Local 根）
 
 **Saved path**:
-Local library 的 Library root 之旧称。UI 与 FRB 的 Path 面已按 ADR-0014 退役（`/paths` 现重定向至 Home，`PathRepository` 与 Rust `path` 模块已删除）；仅 `saved_paths` 表与迁移代码保留该名。新表述一律用 Library root / Local library。用户侧创建与管理 Library 仅经 Library form 与侧栏入口。
+Local library 的 Library root 之旧称。UI 与 FRB 的 Path 面已按 ADR-0014 退役（`/paths` 现重定向至 Home，`PathRepository` 与 Rust `path` 模块已删除）；仅 `saved_paths` 表与迁移代码保留该名。新表述一律用 Library root / Local library。用户侧创建与管理 Library 仅经 Library form 与 **Home「我的漫画库」**（及 shell 库 flyout 建库快捷方式）。
 _Avoid_: 在新设计中把 Saved path 扩成远程 URI；选中路径页、Selected Paths、路径管理页
 
 **Comic**:
@@ -105,17 +105,17 @@ _Avoid_: VFS、存储驱动、网盘 SDK
 _Avoid_: 导入、索引（未体现与根对齐的删除语义）
 
 **Library sync**:
-让某个 Library 与其 Library root 下内容对齐的完整操作：包含 Scan，并写库——新增缺失 Comic、按字段锁合并后更新仍存在的 Comic、对可配对的位置变化执行 Path migration、删除根上已消失且未迁走的 Comic。默认只 sync Current library（可配置为全部 Library）。Remote library 在根不可达（网络/鉴权失败）时跳过该库且不删除其已有 Comic。若某 Library 被移除，则清除该库及其 Comic/Series。元数据合并见 Metadata field lock。写库后由 core 使相关阅读会话失效；与 Metadata refresh、Local 改根（含 Path migration）共用库级写锁。
+让某个 Library 与其 Library root 下内容对齐的完整操作：包含 Scan，并写库——新增缺失 Comic、按字段锁合并后更新仍存在的 Comic、对可配对的位置变化执行 Path migration、删除根上已消失且未迁走的 Comic。UI 触发的单次 sync 需指定目标 Library，或使用 sync all。Remote library 在根不可达（网络/鉴权失败）时跳过该库且不删除其已有 Comic。若某 Library 被移除，则清除该库及其 Comic/Series。元数据合并见 Metadata field lock。写库后由 core 使相关阅读会话失效；与 Metadata refresh、Local 改根（含 Path migration）共用库级写锁。
 _Avoid_: 同步、刷新（太泛，未体现镜像语义）
 
 _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
 
 **Supported resource formats**:
-按 Library 配置的、Library sync 会收录的 Resource 格式范围；按 Format group 勾选。未启用分组下的 Resource 不进入该次扫描结果，库中对应 Comic 按 orphan 删除。默认值与 Local / Remote 首版能力见产品定位；取消勾选仅在下次 sync 生效。
+按 Library 配置的、Library sync 会收录的 Resource 格式范围；按 Resource format category 勾选。未启用分组下的 Resource 不进入该次扫描结果，库中对应 Comic 按 orphan 删除。默认值与 Local / Remote 首版能力见产品定位；取消勾选仅在下次 sync 生效。
 _Avoid_: 媒体类型（库页浏览筛选用语）、导入格式、全局唯一一份格式设置（已改为每库）
 
-**Format group**:
-Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。分组到 `resource_type` 的展开由 core 维护。Remote library 首版不收录 `folder`。
+**Resource format category**（资源格式类别）:
+Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。归类到 `resource_type` 的展开由 core 维护。Remote library 首版不收录 `folder`。
 _Avoid_: 扩展名列表（用户设置层用分组）
 
 **Scan on startup**:
@@ -127,11 +127,11 @@ _Avoid_: 自动扫描（易与全局旧设置或间隔扫混淆）、autoScan（
 _Avoid_: 自动扫描间隔（口语可用）、cron、全局扫描周期
 
 **Pinned library**:
-用户选择在侧栏 Libraries 分区直接列出的 Library；Library 列表的全局顺序中 Pinned 一组排在 Unpinned 之前。新建 Library 默认为 Pinned，并排在已固定组末尾。详见 ADR-0009。
+Pinned 组在 **Home 库列表**与 shell 库 flyout 中排在 Unpinned 之前；新建 Library 默认为 Pinned，并排在已固定组末尾。详见 ADR-0009。
 _Avoid_: 置顶库、收藏库、固定库（易与 sticky header 的 pinned 混淆）；文档用 Pinned library，UI 文案可用「已固定」
 
 **Unpinned library**:
-用户选择不在侧栏直接列出的 Library；平时藏在「更多」展开后渲染，未固定组为空时不显示「更多」。排序模式里出现在「未固定」段。
+`pinned = false` 的 Library；在 Home 库列表中位于已固定组之后（无 legacy 侧栏「更多」折叠）。拖拽排序时仍可跨组改变 Pinned/Unpinned。
 _Avoid_: 隐藏库、折叠库、次要库
 
 **Library sidebar order**:
@@ -139,7 +139,7 @@ Pinned 组内与 Unpinned 组内各自的用户顺序；与 Series 成员的 `or
 _Avoid_: 库排序（太泛）、sortOrder（Series 用语）
 
 **Library reorder mode**:
-侧栏的短暂状态：整栏换成「重新排序」顶栏与已固定/未固定两段，靠跨段拖拽同时改 Pinned/Unpinned 与 Library sidebar order；退出后恢复普通侧栏。不是 Library 上的持久字段。
+历史侧栏「重新排序」全栏模式的领域名；**生产 UI 已退役**（2026-11-03）。Home 库列表支持长按拖拽排序（无需单独模式）。`LibraryReorderModePort` 仍供 browse 多选与排序态互斥（`exit()`）。
 _Avoid_: 编辑模式、排序页、固定开关（pin 只能在此模式用拖拽改，没有单独菜单项）
 
 ### Organization & metadata
@@ -157,23 +157,27 @@ _Avoid_: 标题推断、自动分组
 _Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
 
 **Prefer library root series**:
-Library browse preference：Series 浏览列表中，开启时若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
+Library browse preference（现由设置页读写，默认开启）：Series 浏览列表中，开启时若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段与分组排列。不是 Series 分组项。
 _Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
 
-**Expand by series**:
-Library browse preference：Comics 浏览列表中，开启时仍为扁平 Comic 列表，但按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」展开；开启时忽略 Comics 排序字段。默认开启；非视觉分组/折叠，也不共用 Prefer library root series 开关。
-_Avoid_: 分组浏览、按系列折叠、group by series、系列模式列表
+**Group by serialization status**（按连载状态分组）:
+Library browse preference（分组方式 `bySerializationStatus`）：Series 浏览列表保持扁平，按连载状态块顺序（ongoing → completed → hiatus → cancelled → unknown）排列；块内仍按当前 Series 排序字段排列。与排序正交；默认不分组（`none`）。
+_Avoid_: 连载筛选（那是 Filter）、折叠分组标题
+
+**Group by series**（按系列分组）:
+Library browse preference（分组方式 `bySeries`）：Comics 浏览列表保持扁平（无分组标题、无折叠），按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 无 Series 归属的 Comic 整块垫底」决定系列块顺序；**块内仍按当前 Comics 排序字段**排列。默认开启；与排序正交，不是视觉分组或折叠，也不共用 Prefer library root series 开关。
+_Avoid_: 按系列展开、expand by series、按系列折叠、系列模式列表
 
 **App preference**:
-应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
+应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Healthy mode、**Prefer library root series**（Series 浏览列表置顶库根系列，默认开启）、Smart facet match（Comic metadata form 候选排序，默认开启）等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
 _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
 
 **Library browse preference**:
-库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Expand by series、Prefer library root series、Smart facet match、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
+库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Comic/Series **分组方式**（含「不分组」）、年龄限制筛选等。其中 Author 筛选按 Author 稳定身份持久化，UI 渲染当前显示名；Tag 等名字 facet 仍按名称。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页（**Prefer library root series** 除外，见 App preference）。
 _Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
 
 **Library property**:
-绑定某一 Library 实体的配置，由 Library form 或侧栏操作读写，经 FRB 落入 Rust SQLite。包括 Scan on startup、Scan interval、Supported resource formats（per-library）、Pinned、sidebar order、Current library id 等。与 App preference、Library browse preference 区分。
+绑定某一 Library 实体的配置，由 Library form 或侧栏操作读写，经 FRB 落入 Rust SQLite。包括 Scan on startup、Scan interval、Supported resource formats（per-library）、Pinned、sidebar order 等。与 App preference、Library browse preference 区分。
 _Avoid_: 库偏好、Library settings form（旧称）
 
 **Settings list–detail**:
@@ -221,7 +225,7 @@ Comic 中出场人物名（可多值）；用于展示与筛选，与 Tag / Auth
 _Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
 
 **Named metadata facet**:
-Comic 上可筛选的元数据面：Tag / Parody / Character 以「名称字符串」字典 + junction 全量 replace；Author 为稳定身份实体 + junction（显示名可变），管理入口仍与其它 facet 并列；Language 为 `comic_meta.languages` JSON 闭集特例。新增与 Tag 同类的名字字典 facet 应扩展 `JunctionNamedFacet`；Author 身份管线单独演进，不强迫塞回纯名字字典模型。
+Comic 上可筛选的元数据面：Tag / Parody / Character 以「名称字符串」字典 + junction 全量 replace；Author 为稳定身份实体 + junction（显示名可变），管理入口仍与其它 facet 并列；Language 为 `comic_meta.languages` JSON 闭集特例。名字字典类 facet（Tag / Parody / Character）与 Author 稳定身份管线分开实现、各自演进，不强迫 Author 塞回纯名字字典模型。
 _Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
 
 **Named facet attachment count**:
@@ -233,7 +237,7 @@ _Avoid_: 引用次数、usage count、ref_count、热度
 _Avoid_: 拼音搜索引擎、fuzzy search、拼音索引、全文检索
 
 **Smart facet match**:
-Comic metadata form 候选列表的排序增强：在对应 Named metadata facet 全局字典内，将信号命中的名字排在 Named facet attachment count 之前，并在下拉候选行提示来源；不自动写入表单已选值，不从信号发明典外新名。Author 信号为三个独立来源的字典名 whole-string、大小写不敏感 substring 命中：Comic 标题、Resource 文件名（去扩展名）、相对 Library root 的 Resource 路径中全部父目录段；三源各自独立计分，同一名字命中源越多排序越靠前（标题与文件名相同时只计一次）；不解析方括号等命名惯例、不拆分括号内子串。Tag / Parody / Character 信号为同一非根 Folder series 内其它成员已附着的名字。可由应用级偏好开关，默认开启。
+Comic metadata form 候选列表的排序增强：在对应 Named metadata facet 全局字典内，将信号命中的名字排在 Named facet attachment count 之前，并在下拉候选行提示来源；不自动写入表单已选值，不从信号发明典外新名。Author 信号为三个独立来源的字典名 whole-string、大小写不敏感 substring 命中：Comic 标题、Resource 文件名（去扩展名）、相对 Library root 的 Resource 路径中全部父目录段；三源各自独立计分，同一名字命中源越多排序越靠前（标题与文件名相同时只计一次）；不解析方括号等命名惯例、不拆分括号内子串。Tag / Parody / Character 信号为同一非根 Folder series 内其它成员已附着的名字。是否启用由 **App preference** 在 MD3E 设置页开关（`smart_facet_match_enabled`，默认开启）；不在 Comic metadata form 内重复提供开关。
 _Avoid_: 智能匹配、自动打标、建议填充、引用次数排序（后者仅指 attachment count）
 
 **Comic catalog query**:
@@ -269,7 +273,7 @@ _Avoid_: 批量编辑（口语可用）、批量刷新、批量表单
 _Avoid_: 系列表单、SeriesForm、编辑系列 DTO
 
 **Library form**:
-创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 Local root 时保留 `libraryId`；若新根可读则按相对路径做 Path migration（含 Series），否则只写新根、不立刻迁移。不自动触发 Library sync。无变化则不写库。用户侧新建 Local / Remote library 均经此草稿（及侧栏入口），不以裸选目录或路径页捷径代替。详见 ADR-0014。
+创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 Local root 时保留 `libraryId`；若新根可读则按相对路径做 Path migration（含 Series），否则只写新根、不立刻迁移。不自动触发 Library sync。无变化则不写库。用户侧新建 Local / Remote library 均经此草稿（及 **Home / flyout 入口**），不以裸选目录或路径页捷径代替。详见 ADR-0014。
 _Avoid_: 库表单、LibraryForm DTO、Library settings form（旧称）、编辑库元数据；选中路径页作为建库入口
 
 **Metadata field lock**:
@@ -277,7 +281,7 @@ Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Libr
 _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
 
 **Metadata refresh**:
-从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」），作用对象可为单个 Comic、单个 Series，或指定 Library（侧栏该库的 `libraryId`，可非 Current library，且不切换 Current）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图。Library：对该库全部 Comic 执行 Comic 刷新，并对该库 Series 在 `name` 未锁定时用文件夹名覆盖（其余 Series 字段规则同 Series 级）。部分成员失败则跳过并汇总；可取消（已写回保留、不回滚）。Remote library 根不可达时跳过该库且不改已有数据。与 Library sync 共用 core 库级写锁（全局单飞，占用则立即失败不排队）；互斥不在 Flutter 编排层重复实现。UI 不展示实时进度，仅 busy 态与结束汇总。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync（不 orphan 删除、不重建成员排序、不再生缩略图）。
+从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」），作用对象可为单个 Comic、单个 Series，或指定 Library（**Home 库列表行内**对该库 `libraryId`）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图。Library：对该库全部 Comic 执行 Comic 刷新，并对该库 Series 在 `name` 未锁定时用文件夹名覆盖（其余 Series 字段规则同 Series 级）。部分成员失败则跳过并汇总；可取消（已写回保留、不回滚）。Remote library 根不可达时跳过该库且不改已有数据。与 Library sync 共用 core 库级写锁（全局单飞，占用则立即失败不排队）；互斥不在 Flutter 编排层重复实现。UI 不展示实时进度，仅 busy 态与结束汇总。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync（不 orphan 删除、不重建成员排序、不再生缩略图）。
 _Avoid_: 刷新、重新扫描、同步（易与 UI catalog refresh / Library sync 混淆）
 
 **Metadata backup**:
@@ -296,6 +300,62 @@ _Avoid_: dry-run（用户文案用「导入预演」）
 应用级浏览过滤：开启后库、搜索、历史等视图隐藏 `contentRating == r18` 的 Comic；不修改 Comic 自身的分级。
 _Avoid_: 安全模式、青少年模式、R18 过滤
 
+### Design & UI
+
+**MD3E design system**:
+生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。实现落在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。壳层与组件色消费以 **M3E color roles** 为主；品牌 seed 定稿为配色方案「紫罗兰色」（`kBrandSeedColor` / 与偏好 `violet` 同色）。不替代 Rust 业务真值。
+_Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）、仍称并行于 Baseline
+
+**Tone-based color system**:
+以 HCT 的 tone（感知亮度）与角色间 tone 差为骨架、从 seed 派生整套颜色角色的约定；是 MD3E design system 的色真源模型，不绑定某个固定 hex。
+_Avoid_: toneBased（壳层 surface 配对 API）、HCT 系统（单指色空间时）
+
+**动态配色**:
+系统壁纸 / 系统强调色取色；开启后以平台 `ColorScheme.primary` 为 seed 进入 Tone-based 装配，并禁用手动配色方案设置项。
+_Avoid_: Monet（Android 实现绰号）、dynamic scheme variant（MCU 的 fidelity/tonalSpot 等）
+
+**Reader color extension**:
+阅读器沉浸场景专用的小范围主题色扩展；画布等沉浸底恒暗、不随应用浅色主题变浅；强调色（滑块/激活钮）从当前壳层 `ColorScheme` 派生以跟配色 / 品牌 seed。
+_Avoid_: HentaiColorScheme（整表语义扩展）、阅读器跟主题（指跟壳层明暗把阅读底变浅时）
+
+**Baseline UI**:
+历史 Fluent 取向共享 UI / 主题装配；Cutover 主体完成后**不再**是生产功能视图主壳。残余命名或个别遗留控件属收尾债，不表示双轨仍在。
+_Avoid_: 旧主题、老 UI、legacy 皮肤（作现行主壳时）
+
+**MD3E preview page**:
+仅在 MD3E 设计系统内、用假数据或 Widgetbook 组装的整页预览，用于设计验收；不是带 ViewModel 的**功能视图**。
+_Avoid_: 预览 View、md3e 功能页
+
+**MD3E Lab**:
+Cutover 前在独立模块与 Widgetbook 中建设 MD3E 栈、不改生产 feature 的阶段。生产 Lab 包路径 `app/lib/md3e/` 已删除；预览面留在 `app/widgetbook/`。
+_Avoid_: 全仓换肤阶段、仍存在的生产 Lab 双轨
+
+**MD3E Pilot**:
+Cutover 前单个 feature（首选应用设置）可选接入 MD3E 组件与主题、做真数据与路由验证的阶段；主体已完成，条目保留供读 ADR/历史 PR。
+_Avoid_: Beta 换肤
+
+**MD3E Cutover**:
+按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。主体已完成（路由 MD3E 化、Lab 删除、主题单源）；剩余主要为去 `md3e_` 生产前缀与文档/命名收尾。完成判定与 spec 分批规则见 ADR-0031。
+_Avoid_: 大重构（无阶段含义时）
+
+**MD3E pattern**:
+MD3E 内按产品场景命名的 UI 组合块（如设置分组列表），仅通过通用 props 与 callback 交互，不 import 领域类型或 feature。
+_Avoid_: 业务组件（若指 feature 内编排）、设计 pattern 混指 Figma 帧
+
+**ViewObject**:
+屏级 UI 展示用的聚合只读数据，类名后缀 `ViewObject`（如 `ComicDetailViewObject`）。由 Route page / Display layout 消费；不是 FRB/传输载荷，也不是菜单碎件。
+_Avoid_: Entry（指屏级聚合时）、View、Dto、ViewModel（状态/命令见 ADR-0017）
+
+**Route page**:
+生产路由绑定的功能页 Widget；去 `Md3e` 前缀后类名以 `Page` 结尾（如 `ComicDetailPage`，原 `ComicDetailMd3ePage`）。持 ViewModel / Facade，组装真数据进 ViewObject。不是 MD3E preview page，也不是无路由的展示壳。
+_Avoid_: Md3ePage（新代码）、View（作路由页类名时）、把 Lab 展示壳叫 Page
+
+**Display layout**:
+展示壳或 Lab / 预览用布局 Widget，类名以 `Layout` 结尾（如 `ComicDetailLayout`）。消费 ViewObject 拼视觉结构；故意不用 `*View`，以免与 ViewObject、MVVM View 抢名。不是阅读器的 Scroll layout / Paged layout，也不是 ADR-0027 shared Layout 层的泛称。
+_Avoid_: View（展示壳类名）、Page（无生产路由绑定时）
+
+菜单碎件可继续 `*Entry`；FRB / 跨边界传输仍 `*Dto`。二者都不是 ViewObject。
+
 ### Reading
 
 **Read session**:
@@ -309,6 +369,10 @@ _Avoid_: 系列阅读模式、Series read、系列会话
 **Reading history**:
 用户对某 Comic 最近一次阅读的时间与页码记录；跨 Library 全局保留与展示。从库/详情/历史等重新打开该 Comic 时恢复页码；阅读器内切到同系列另一卷时，先落盘当前 Comic 进度（无痕除外），目标卷从第 1 页打开。无痕 Read session 不读写 Reading history。
 _Avoid_: 阅读记录、系列进度、Series reading history
+
+**Reading progress (history list)**:
+历史列表等界面展示的「当前页 / 总页数」。当前页来自 Reading history；总页数对应该 Comic 的编目页数，不是 Reading history 的持久化字段。
+_Avoid_: 进度条数据、page count 字段（口语）
 
 **Scroll layout**:
 阅读器纵向连续滚动的版式；适用于长条阅读体验。

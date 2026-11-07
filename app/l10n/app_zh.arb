@@ -1,8 +1,6 @@
 {
   "@@locale": "zh",
   "libraryTitle": "漫画库",
-  "allLibrariesBrowsePlaceholderTitle": "全部库浏览",
-  "allLibrariesBrowsePlaceholderBody": "跨库聚合浏览后续实现。请从侧栏选择具体漫画库。",
   "sidebarAddLibraryTooltip": "新建漫画库",
   "sidebarAddLocalLibrary": "添加本地库",
   "sidebarAddRemoteLibrary": "添加远程库",
@@ -75,10 +73,29 @@
   "localePreferenceSystem": "跟随系统",
   "localePreferenceZhCn": "中文",
   "localePreferenceEn": "English",
+  "settingsFontLabel": "界面字体",
+  "fontPreferenceMiSans": "小米字体",
+  "fontPreferenceNotoSans": "Noto Sans",
   "settingsThemeLabel": "应用主题",
   "themePreferenceSystem": "跟随系统",
   "themePreferenceLight": "浅色",
   "themePreferenceDark": "深色",
+  "settingsDynamicColorLabel": "动态配色",
+  "settingsDynamicColorDescription": "跟随系统壁纸取色；开启后不可选手动配色方案",
+  "settingsColorSchemeLabel": "配色方案",
+  "colorSchemePreferenceBrand": "紫罗兰色",
+  "colorSchemePreferenceTeal": "青瓷色",
+  "colorSchemePreferenceCyan": "天青色",
+  "colorSchemePreferenceBlue": "矢车菊色",
+  "colorSchemePreferenceIndigo": "靛蓝色",
+  "colorSchemePreferenceDeepPurple": "葡萄色",
+  "colorSchemePreferenceViolet": "紫罗兰色",
+  "colorSchemePreferencePink": "蔷薇色",
+  "colorSchemePreferenceSakura": "樱花色",
+  "colorSchemePreferenceYellow": "琥珀色",
+  "colorSchemePreferenceOrange": "金盏花色",
+  "colorSchemePreferenceDeepOrange": "朱砂色",
+  "colorSchemePreferenceGreen": "苔绿色",
   "navHome": "首页",
   "navMetadata": "管理",
   "navHistory": "历史",
@@ -97,6 +114,9 @@
   "shellRetrying": "重试中…",
   "shellProcessing": "处理中…",
   "homeTitle": "首页",
+  "homeShortcutsSectionTitle": "快捷入口",
+  "homeHistoryCardCaption": "查看阅读记录",
+  "homeTrashCardCaption": "可恢复删除",
   "homeScanLibrary": "扫描漫画库",
   "homeGreetingLateNight": "凌晨好",
   "homeGreetingEarlyMorning": "早上好",
@@ -135,13 +155,6 @@
     "placeholders": {
       "libraryName": { "type": "String" },
       "days": { "type": "int" }
-    }
-  },
-  "homeAlertPendingResources": "{libraryName} 发现 {count} 个新/变更 Resource，建议同步",
-  "@homeAlertPendingResources": {
-    "placeholders": {
-      "libraryName": { "type": "String" },
-      "count": { "type": "int" }
     }
   },
   "homeStatSeries": "系列",
@@ -186,8 +199,21 @@
   "historyTitle": "阅读历史",
   "historyClearAction": "清空阅读历史",
   "historyClearedToast": "已清空阅读历史",
-  "historyRecordSummary": "{count, plural, other{{count} 条记录 • 最长保留 30 天}}",
+  "historyRecordSummary": "{count, plural, other{{count} 条记录 • 最长保留 1 年}}",
   "@historyRecordSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historySectionToday": "今天",
+  "historySectionYesterday": "昨天",
+  "historySectionThisWeek": "本周",
+  "historySectionThisMonth": "本月",
+  "historySectionEarlier": "更早",
+  "historySectionItemCount": "{count, plural, other{{count} 条}}",
+  "@historySectionItemCount": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -228,6 +254,13 @@
   "settingsGroupMetadataBackup": "元数据备份",
   "settingsGroupDiagnostics": "诊断与支持",
   "settingsGroupAbout": "关于",
+  "settingsMasterMenuGroupTitle": "应用",
+  "settingsSectionAppearance": "外观与语言",
+  "settingsSectionReading": "阅读",
+  "settingsSectionLibraryBrowse": "库与浏览",
+  "settingsSectionDiagnostics": "诊断",
+  "settingsSectionApplicationData": "应用数据",
+  "settingsSectionUpdates": "更新",
   "settingsMetadataBackupAutoGroupTitle": "自动备份",
   "settingsMetadataBackupManualGroupTitle": "手动备份",
   "settingsMetadataBackupAutoToggleLabel": "元数据自动备份",
@@ -303,6 +336,8 @@
       }
     }
   },
+  "settingsHealthyModeLabel": "健康模式",
+  "settingsHealthyModeDescription": "库、搜索与历史中隐藏 R18 Comic，不修改分级",
   "settingsDiagnosticModeLabel": "详细诊断",
   "settingsDiagnosticModeDescriptionEnabled": "已开启：Dart 与 Rust 记录更详细日志",
   "settingsDiagnosticModeDescriptionDisabled": "临时提高日志详细程度，便于复现问题",
@@ -385,6 +420,7 @@
   "libraryDeepScan": "深度扫描",
   "libraryScrollToTop": "回到顶部",
   "libraryFilterSection": "筛选",
+  "libraryGroupSection": "分组",
   "librarySortSection": "排序",
   "libraryAgeRestrictionFilter": "年龄限制",
   "libraryMediaTypeFilter": "媒体类型",
@@ -401,7 +437,7 @@
   "libraryMetadataFilterEmpty": "无匹配项",
   "libraryMetadataFilterIncludeAny": "满足任一",
   "libraryMetadataFilterIncludeAll": "满足全部",
-  "libraryResetAllFilters": "重置全部",
+  "libraryResetAllFilters": "恢复默认",
   "libraryComingSoon": "即将推出",
   "libraryComicSortTitle": "标题",
   "libraryComicSortCreatedAt": "添加时间",
@@ -411,6 +447,13 @@
   "libraryComicSortFileSize": "文件大小",
   "libraryComicSortPageCount": "页数",
   "libraryExpandBySeries": "按系列展开",
+  "libraryGroupBySeries": "按系列分组",
+  "libraryGroupNone": "不分组",
+  "libraryGroupBySerializationStatus": "按连载状态分组",
+  "settingsPreferLibraryRootSeriesLabel": "置顶库根系列",
+  "settingsPreferLibraryRootSeriesDescription": "浏览系列列表时，将库根系列固定在列表最前。",
+  "libraryGroupNone": "不分组",
+  "libraryGroupBySerializationStatus": "按连载状态分组",
   "librarySeriesSortName": "名称",
   "librarySeriesSortComicCount": "漫画数量",
   "librarySeriesSortRandom": "随机",
@@ -516,6 +559,7 @@
   "comicDetailTags": "标签",
   "comicDetailParodies": "原作",
   "comicDetailCharacters": "角色",
+  "comicDetailResourceInfo": "资源信息",
   "comicDetailResourceFormat": "资源格式",
   "comicDetailResourceSize": "资源大小",
   "comicDetailResourcePath": "资源路径",
@@ -715,6 +759,19 @@
   "metadataSearchNameHint": "搜索名称…",
   "metadataRename": "重命名",
   "metadataMerge": "合并",
+  "metadataMergeConfirmTitle": "确认合并",
+  "metadataMergeConfirmBody": "将 {sourceCount} 个标签合并到「{target}」？来源标签的漫画附着会转移到目标，来源标签将被删除。",
+  "@metadataMergeConfirmBody": {
+    "placeholders": {
+      "sourceCount": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "metadataMergeConfirmDontAskAgain": "以后不再提示",
   "metadataDelete": "删除",
   "metadataMoreActions": "更多操作",
   "metadataAllAuthors": "全部作者",
@@ -727,6 +784,38 @@
       "count": {
         "type": "int"
       }
+    }
+  },
+  "metadataAuthorCount": "{count, plural, other{{count} 位作者}}",
+  "@metadataAuthorCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataTagCount": "{count, plural, other{{count} 个标签}}",
+  "@metadataTagCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataParodyCount": "{count, plural, other{{count} 部原作}}",
+  "@metadataParodyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataCharacterCount": "{count, plural, other{{count} 位角色}}",
+  "@metadataCharacterCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "navRailExpand": "展开导航",
+  "navRailCollapse": "收起导航",
+  "paginationPageSemantic": "第 {page} 页",
+  "@paginationPageSemantic": {
+    "placeholders": {
+      "page": {"type": "int"}
     }
   },
   "metadataRenameAuthor": "重命名作者",
@@ -796,6 +885,8 @@
   "dialogEditMetadataTitle": "编辑元数据",
   "dialogEditMetadataTabGeneral": "常规",
   "dialogEditMetadataTabAuthorsTags": "作者&标签",
+  "dialogEditMetadataTabFieldLocks": "字段锁",
+  "dialogEditMetadataTabContent": "内容",
   "smartFacetMatchToggleLabel": "智能匹配",
   "smartFacetMatchHintTooltip": "由智能匹配推荐",
   "formSeriesNameLabel": "系列名称",
@@ -901,9 +992,9 @@
       "date": {"type": "String"}
     }
   },
-  "updateRemindLater": "稍后提醒",
+  "updateRemindLater": "稍后",
   "updateViewDetails": "查看详情",
-  "updateNow": "立即更新",
+  "updateNow": "更新",
   "updateManualDownloadToast": "请手动下载适合您系统的安装包",
   "updateDownloadingTitle": "正在下载更新",
   "updateDownloadFailed": "下载失败，请重试",
@@ -922,8 +1013,14 @@
       "count": {"type": "int"}
     }
   },
-  "confirmRemovePathTitle": "确认移除",
-  "confirmRemovePathContent": "将删除该本地库及其漫画记录。此操作立即生效且不可撤销。",
+  "homeLibraryDeleteConfirmTitle": "删除「{name}」？",
+  "@homeLibraryDeleteConfirmTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "homeLibraryDeleteConfirmBody": "将从应用中移除此库。漫画文件会保留在原位置。",
+  "homeLibraryDeleteConfirmAcknowledge": "我了解不会删除漫画文件",
   "confirmClearHistoryTitle": "确认清空",
   "confirmClearHistoryContent": "将清空全部阅读历史记录。此操作不可撤销。",
   "breadcrumbReturnLibrary": "返回漫画库",
@@ -973,6 +1070,14 @@
       "page": {"type": "int"}
     }
   },
+  "readingProgressPageOfTotal": "{current}/{total}",
+  "@readingProgressPageOfTotal": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "historyGoToComicDetail": "跳转到详情页",
   "historyDeleteRecord": "删除记录",
   "bootstrapStartupFailed": "启动失败：{error}",
   "@bootstrapStartupFailed": {

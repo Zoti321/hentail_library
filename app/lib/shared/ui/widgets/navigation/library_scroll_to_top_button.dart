@@ -104,7 +104,9 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
             decoration: BoxDecoration(
               color: cs.surface,
               borderRadius: BorderRadius.circular(tokens.radius.md),
-              border: Border.all(color: context.hentai.borderSubtle),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
               boxShadow: context.shadows.raisedPanel(),
             ),
             child: GhostButton.icon(
@@ -114,7 +116,7 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
               size: 40,
               iconSize: 18,
               borderRadius: tokens.radius.md,
-              foregroundColor: context.hentai.iconDefault,
+              foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
               hoverColor: cs.surfaceContainerHighest,
               overlayColor: cs.primary.withAlpha(32),
               onPressed: _scrollToTop,

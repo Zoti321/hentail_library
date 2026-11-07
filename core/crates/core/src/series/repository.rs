@@ -16,6 +16,7 @@ use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
 
 use super::dto::{SeriesFilterDto, SeriesSortOptionDto};
+use super::grouping::SeriesGrouping;
 use super::page_query::{build_count_query, build_ids_page_query};
 use crate::comic_id::normalize_path_for_key;
 
@@ -103,6 +104,7 @@ pub async fn count_all_series() -> Result<i64, HentaiError> {
 pub async fn fetch_series_page(
     request: PageRequestDto,
     filter: SeriesFilterDto,
+    grouping: SeriesGrouping,
     sort: SeriesSortOptionDto,
 ) -> Result<PagedSeriesResultDto, HentaiError> {
     let db = connection()?;
@@ -130,6 +132,7 @@ pub async fn fetch_series_page(
     let ids_query = build_ids_page_query(
         &filter,
         &sort,
+        grouping,
         prefer_root_folder_path.as_deref(),
         window.page_size,
         window.offset as i32,
@@ -478,12 +481,15 @@ pub async fn set_series_items_order(
     Ok(())
 }
 
-pub async fn search_series_by_keyword(keyword: &str) -> Result<Vec<SeriesDto>, HentaiError> {
+pub async fn search_series_by_keyword(
+    keyword: &str,
+    library_id: Option<String>,
+) -> Result<Vec<SeriesDto>, HentaiError> {
     let q = keyword.trim().to_lowercase();
     if q.is_empty() {
         return Ok(vec![]);
     }
-    let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
+    let Some(library_id) = crate::library::resolve_browse_library_id(library_id).await? else {
         return Ok(vec![]);
     };
     let db = connection()?;
@@ -512,9 +518,11 @@ pub async fn search_series_by_tag_expression(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
+    library_id: Option<String>,
 ) -> Result<Vec<SeriesDto>, HentaiError> {
     let comic_ids =
-        search_comic_ids_by_tag_expression(must_include, optional_or, must_exclude).await?;
+        search_comic_ids_by_tag_expression(must_include, optional_or, must_exclude, library_id)
+            .await?;
     if comic_ids.is_empty() {
         return Ok(vec![]);
     }

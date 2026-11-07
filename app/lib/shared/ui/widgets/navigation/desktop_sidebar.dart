@@ -149,9 +149,11 @@ class DesktopSidebar extends HookWidget {
           height: double.infinity,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: context.hentai.sidebarBackground,
+            color: Theme.of(context).colorScheme.surfaceContainerLow,
             border: Border(
-              right: BorderSide(color: context.hentai.borderSubtle),
+              right: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
             ),
           ),
           padding: EdgeInsets.fromLTRB(
@@ -177,9 +179,15 @@ class DesktopSidebar extends HookWidget {
                       iconSize: 18,
                       size: 36,
                       borderRadius: tokens.radius.md,
-                      foregroundColor: context.hentai.textSecondary,
-                      hoverColor: context.hentai.sidebarItemHoverBackground,
-                      overlayColor: context.hentai.sidebarItemHoverBackground
+                      foregroundColor: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant,
+                      hoverColor: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                      overlayColor: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
                           .withAlpha(110),
                       delayTooltipThreeSeconds: false,
                       onPressed: onToggleExpanded,
@@ -248,24 +256,26 @@ class _SidebarButtonState extends State<_SidebarButton> {
     final ThemeData theme = Theme.of(context);
     final double t = widget.expandProgress.clamp(0.0, 1.0);
 
-    final Color idleBackground = context.hentai.sidebarBackground;
+    final Color idleBackground = Theme.of(context)
+        .colorScheme
+        .surfaceContainerLow;
     final Color backgroundColor = widget.isActive
-        ? context.hentai.sidebarItemActiveBackground
+        ? Theme.of(context).colorScheme.surfaceContainerHigh
         : (_isHovered
-              ? context.hentai.sidebarItemHoverBackground
+              ? Theme.of(context).colorScheme.surfaceContainerHighest
               : idleBackground);
 
     final Color textColor = widget.isActive
-        ? context.hentai.textPrimary
+        ? Theme.of(context).colorScheme.onSurface
         : (_isHovered
-              ? context.hentai.textPrimary
-              : context.hentai.textSecondary);
+              ? Theme.of(context).colorScheme.onSurface
+              : Theme.of(context).colorScheme.onSurfaceVariant);
 
     final Color iconColor = widget.isActive
-        ? context.hentai.textPrimary
+        ? Theme.of(context).colorScheme.onSurface
         : (_isHovered
-              ? context.hentai.textPrimary
-              : context.hentai.textSecondary);
+              ? Theme.of(context).colorScheme.onSurface
+              : Theme.of(context).colorScheme.onSurfaceVariant);
 
     final Widget actionable = Semantics(
       button: true,
@@ -300,14 +310,13 @@ class _SidebarButtonState extends State<_SidebarButton> {
                     border: Border.all(
                       width: 1,
                       color: widget.isActive
-                          ? context.hentai.sidebarItemActiveBorder
+                          ? Theme.of(context).colorScheme.outlineVariant
                           : idleBackground,
                     ),
                     boxShadow: widget.isActive
                         ? <BoxShadow>[
                             BoxShadow(
-                              color:
-                                  context.hentai.sidebarItemActiveShadowColor,
+                              color: Theme.of(context).colorScheme.shadow,
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),

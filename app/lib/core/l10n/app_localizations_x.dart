@@ -2,35 +2,29 @@ import 'package:flutter/widgets.dart';
 
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
-import 'package:hentai_library/shared/domain/library/format_group.dart';
+import 'package:hentai_library/features/library_admin/domain/resource_format_category.dart';
 
 import 'package:hentai_library/shared/domain/library/scan_interval.dart';
 
-import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 
-import 'package:hentai_library/shared/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
 
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 
-import 'package:hentai_library/shared/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 
-import 'package:hentai_library/shared/domain/library/library_serialization_status_filter.dart';
+import 'package:hentai_library/features/series/domain/library_serialization_status_filter.dart';
 
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
+import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 
 import 'package:hentai_library/shared/domain/models/enums.dart';
 
+import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
+
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
-
-import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
-
-import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
-
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-
-import 'package:intl/intl.dart';
 
 extension AppLocalizationsContextX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
@@ -50,6 +44,25 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     }
   }
 
+  String colorSchemePreferenceLabel(AppColorSchemePreference preference) {
+    return switch (preference) {
+      // brand 文案已定稿为紫罗兰色；遗留 violet 偏好显示同一标签。
+      AppColorSchemePreference.brand ||
+      AppColorSchemePreference.violet => colorSchemePreferenceBrand,
+      AppColorSchemePreference.teal => colorSchemePreferenceTeal,
+      AppColorSchemePreference.cyan => colorSchemePreferenceCyan,
+      AppColorSchemePreference.blue => colorSchemePreferenceBlue,
+      AppColorSchemePreference.indigo => colorSchemePreferenceIndigo,
+      AppColorSchemePreference.deepPurple => colorSchemePreferenceDeepPurple,
+      AppColorSchemePreference.pink => colorSchemePreferencePink,
+      AppColorSchemePreference.sakura => colorSchemePreferenceSakura,
+      AppColorSchemePreference.yellow => colorSchemePreferenceYellow,
+      AppColorSchemePreference.orange => colorSchemePreferenceOrange,
+      AppColorSchemePreference.deepOrange => colorSchemePreferenceDeepOrange,
+      AppColorSchemePreference.green => colorSchemePreferenceGreen,
+    };
+  }
+
   String localePreferenceLabel(AppLocalePreference preference) {
     switch (preference) {
       case AppLocalePreference.system:
@@ -61,6 +74,13 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       case AppLocalePreference.en:
         return localePreferenceEn;
     }
+  }
+
+  String fontPreferenceLabel(AppFontPreference preference) {
+    return switch (preference) {
+      AppFontPreference.miSans => fontPreferenceMiSans,
+      AppFontPreference.notoSans => fontPreferenceNotoSans,
+    };
   }
 
   String homeGreetingPhraseForHour(int hour) {
@@ -158,6 +178,22 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     };
   }
 
+  String libraryDisplayTargetTabLabel(LibraryDisplayTarget target) {
+    return switch (target) {
+      LibraryDisplayTarget.comics => libraryTabComics,
+      LibraryDisplayTarget.series => libraryTabSeries,
+    };
+  }
+
+  String managedNamedFacetCountLabel(ManagedNamedFacetKind kind, int count) {
+    return switch (kind) {
+      ManagedNamedFacetKind.author => metadataAuthorCount(count),
+      ManagedNamedFacetKind.tag => metadataTagCount(count),
+      ManagedNamedFacetKind.parody => metadataParodyCount(count),
+      ManagedNamedFacetKind.character => metadataCharacterCount(count),
+    };
+  }
+
   String librarySeriesSortFieldLabel(LibrarySeriesSortField field) {
     return switch (field) {
       LibrarySeriesSortField.name => librarySeriesSortName,
@@ -200,12 +236,12 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     };
   }
 
-  String formatGroupLabel(FormatGroup group) {
+  String resourceFormatCategoryLabel(ResourceFormatCategory group) {
     return switch (group) {
-      FormatGroup.folder => settingsFormatGroupFolder,
-      FormatGroup.pdf => settingsFormatGroupPdf,
-      FormatGroup.epub => settingsFormatGroupEpub,
-      FormatGroup.archive => settingsFormatGroupArchive,
+      ResourceFormatCategory.folder => settingsFormatGroupFolder,
+      ResourceFormatCategory.pdf => settingsFormatGroupPdf,
+      ResourceFormatCategory.epub => settingsFormatGroupEpub,
+      ResourceFormatCategory.archive => settingsFormatGroupArchive,
     };
   }
 
@@ -287,61 +323,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
                 progress.migratedCount ?? 0,
               ),
     };
-  }
-
-  String readerModeCategoryLabel(ReaderModeCategory category) {
-    return switch (category) {
-      ReaderModeCategory.paged => readingModeCategoryPaged,
-
-      ReaderModeCategory.webtoon => readingModeCategoryWebtoon,
-    };
-  }
-
-  String autoPlayModeLabel(AutoPlayMode mode) {
-    return switch (mode) {
-      AutoPlayMode.comicOnce => autoPlayModeComicOnce,
-      AutoPlayMode.comicLoop => autoPlayModeComicLoop,
-      AutoPlayMode.seriesOnce => autoPlayModeSeriesOnce,
-      AutoPlayMode.seriesLoop => autoPlayModeSeriesLoop,
-    };
-  }
-
-  String pagedLayoutLabel(PagedLayout layout) {
-    return switch (layout) {
-      PagedLayout.single => readingModePagedSingle,
-
-      PagedLayout.dual => readingModePagedDual,
-
-      PagedLayout.dualNoCover => readingModePagedDualNoCover,
-    };
-  }
-
-  String webtoonZoomModeLabel(WebtoonZoomMode mode) {
-    return switch (mode) {
-      WebtoonZoomMode.fitWidth => readingModeWebtoonFitWidth,
-
-      WebtoonZoomMode.originalSize => readingModeWebtoonOriginalSize,
-    };
-  }
-
-  String readingModeLabel(ReadingMode mode) {
-    return switch (mode) {
-      ReadingMode.paged => readingModePaged,
-
-      ReadingMode.webtoon => readingModeWebtoon,
-
-      ReadingMode.dualPage => readingModeDualPage,
-
-      ReadingMode.dualPageNoCover => readingModeDualPageNoCover,
-    };
-  }
-
-  String readerWebtoonMarginLabel(int percent) {
-    if (percent == 0) {
-      return readerSettingsMarginNone;
-    }
-
-    return readerSettingsMarginPercent(percent);
   }
 
   String metadataAddEntityTooltip(int tabIndex) {
@@ -478,17 +459,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
         canonical,
         closedLabels: comicLanguageClosedLabels,
       );
-
-  String formatFluentDatePickerLabel(DateTime date, Locale locale) {
-    if (locale.languageCode == 'zh') {
-      return DateFormat(
-        'yyyy年MM月dd日',
-        locale.toString(),
-      ).format(date.toLocal());
-    }
-
-    return DateFormat.yMMMd(locale.toString()).format(date.toLocal());
-  }
 
   String relativeTimeAgo(DateTime time) {
     final DateTime now = DateTime.now();

@@ -2,19 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/features/library_admin/domain/library_scan_scheduler.dart';
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_startup_coordinator_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
-  static const LibraryScanScheduler _scheduler = LibraryScanScheduler();
+  static const LibraryScanDomainService _scheduler = LibraryScanDomainService();
 
   int _startupToken = 0;
   bool _startupScheduled = false;
@@ -47,11 +43,11 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
       _intervalTicker?.cancel();
       _intervalTicker = null;
     });
-    ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryProvider, (
-      AsyncValue<CurrentLibraryState>? previous,
-      AsyncValue<CurrentLibraryState> next,
+    ref.listen<AsyncValue<LibrariesState>>(librariesProvider, (
+      AsyncValue<LibrariesState>? previous,
+      AsyncValue<LibrariesState> next,
     ) {
-      next.whenData((CurrentLibraryState state) {
+      next.whenData((LibrariesState state) {
         _syncIntervalAnchors(state.libraries);
         _ensureIntervalTicker();
         if (!_startupScheduled) {
@@ -92,10 +88,7 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
   }
 
   Future<void> _tickIntervals() async {
-    final CurrentLibraryState? state = ref
-        .read(currentLibraryProvider)
-        .asData
-        ?.value;
+    final LibrariesState? state = ref.read(librariesProvider).asData?.value;
     if (state == null) {
       return;
     }

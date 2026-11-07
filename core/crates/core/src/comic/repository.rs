@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use sea_orm::sea_query::Expr;
 use sea_orm::{
-    ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder, Statement, Value,
+    ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder,
+    Statement, Value,
 };
 
 use crate::db::{connection, map_db_err, version_connection};
@@ -11,13 +12,17 @@ use crate::entity::{
     prelude::*,
 };
 use crate::error::HentaiError;
+use crate::history::reading_history_retention_cutoff_ms;
 
 use super::dto::{
-    ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
+    now_ms, ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
+use super::filter_predicate;
+use super::grouping::ComicGrouping;
 use super::page_query::{build_count_query, build_ids_page_query};
 use super::pagination::paginate;
 use super::visibility::visible_comic_sql;
+use crate::metadata_lock::normalize_tag_expression_tokens;
 
 pub async fn count_all() -> Result<i64, HentaiError> {
     let db = connection()?;
@@ -39,7 +44,7 @@ pub async fn count_all() -> Result<i64, HentaiError> {
 pub async fn fetch_comics_page(
     request: PageRequestDto,
     filter: ComicFilterDto,
-    expand_by_series: bool,
+    grouping: ComicGrouping,
     sort: ComicSortOptionDto,
 ) -> Result<PagedComicResultDto, HentaiError> {
     let db = connection()?;
@@ -63,11 +68,11 @@ pub async fn fetch_comics_page(
             page_size: window.page_size,
         });
     }
-    let library_root_path = resolve_library_root_path(&filter, expand_by_series).await?;
+    let library_root_path = resolve_library_root_path(&filter, grouping).await?;
     let ids_query = build_ids_page_query(
         &filter,
         &sort,
-        expand_by_series,
+        grouping,
         library_root_path.as_deref(),
         window.page_size,
         window.offset as i32,
@@ -84,9 +89,9 @@ pub async fn fetch_comics_page(
 
 async fn resolve_library_root_path(
     filter: &ComicFilterDto,
-    expand_by_series: bool,
+    grouping: ComicGrouping,
 ) -> Result<Option<String>, HentaiError> {
-    if !expand_by_series {
+    if !grouping.needs_library_root() {
         return Ok(None);
     }
     let Some(library_id) = filter.library_id.as_deref() else {
@@ -116,33 +121,44 @@ pub async fn find_comics_by_ids(comic_ids: Vec<String>) -> Result<Vec<ComicDto>,
     load_comics_ordered(&db, comic_ids).await
 }
 
-pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiError> {
-    let page = search_by_keyword_page(keyword, 1, i32::MAX).await?;
+pub async fn search_by_keyword(
+    keyword: &str,
+    library_id: Option<String>,
+) -> Result<Vec<ComicDto>, HentaiError> {
+    let page = search_by_keyword_page(
+        keyword,
+        PageRequestDto {
+            page: 1,
+            page_size: i32::MAX,
+        },
+        library_id,
+    )
+    .await?;
     Ok(page.items)
 }
 
 pub async fn search_by_keyword_page(
     keyword: &str,
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
+    library_id: Option<String>,
 ) -> Result<PagedComicResultDto, HentaiError> {
     let q = keyword.trim().to_lowercase();
-    let page = page.max(1);
-    let page_size = page_size.max(1);
     if q.is_empty() {
+        let window = paginate(request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
-            page,
-            page_size,
+            page: window.page,
+            page_size: window.page_size,
         });
     }
-    let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
+    let Some(library_id) = crate::library::resolve_browse_library_id(library_id).await? else {
+        let window = paginate(request, 0);
         return Ok(PagedComicResultDto {
             items: vec![],
             total_count: 0,
-            page,
-            page_size,
+            page: window.page,
+            page_size: window.page_size,
         });
     };
     let db = connection()?;
@@ -167,7 +183,7 @@ pub async fn search_by_keyword_page(
         .try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
     // 越界页保持原样：本路径是顺序翻页（由 `has_next` 驱动），不钳到末页。
-    let window = paginate(PageRequestDto { page, page_size }, total_count);
+    let window = paginate(request, total_count);
     let offset = window.offset;
     let page = window.page;
     let page_size = window.page_size;
@@ -195,6 +211,182 @@ pub async fn search_by_keyword_page(
         total_count,
         page,
         page_size,
+    })
+}
+
+struct MetadataExpressionTerms {
+    library_id: String,
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+}
+
+async fn resolve_metadata_expression_terms(
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+    library_id: Option<String>,
+) -> Result<Option<MetadataExpressionTerms>, HentaiError> {
+    let must_include = normalize_tag_expression_tokens(&must_include);
+    let optional_or = normalize_tag_expression_tokens(&optional_or);
+    let must_exclude = normalize_tag_expression_tokens(&must_exclude);
+    if must_include.is_empty() && optional_or.is_empty() && must_exclude.is_empty() {
+        return Ok(None);
+    }
+    let Some(library_id) = crate::library::resolve_browse_library_id(library_id).await? else {
+        return Ok(None);
+    };
+    Ok(Some(MetadataExpressionTerms {
+        library_id,
+        must_include,
+        optional_or,
+        must_exclude,
+    }))
+}
+
+fn append_metadata_expression_from(
+    sql: &mut String,
+    values: &mut Vec<Value>,
+    terms: &MetadataExpressionTerms,
+) {
+    sql.push_str(
+        " FROM comics c INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+         WHERE c.library_id = ? AND ",
+    );
+    values.push(Value::String(Some(Box::new(terms.library_id.clone()))));
+    sql.push_str(&visible_comic_sql("c"));
+    filter_predicate::append_metadata_expression_predicates(
+        sql,
+        values,
+        &terms.must_include,
+        &terms.optional_or,
+        &terms.must_exclude,
+    );
+}
+
+async fn count_metadata_expression_comics(
+    db: &DatabaseConnection,
+    terms: &MetadataExpressionTerms,
+) -> Result<i64, HentaiError> {
+    let mut sql = String::from("SELECT COUNT(*)");
+    let mut values = Vec::new();
+    append_metadata_expression_from(&mut sql, &mut values, terms);
+    let row = db
+        .query_one(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            sql,
+            values,
+        ))
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::db_query_failed("metadata expression count 无结果", None))?;
+    row.try_get_by_index::<i64>(0)
+        .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+}
+
+async fn query_metadata_expression_comic_ids(
+    db: &DatabaseConnection,
+    terms: &MetadataExpressionTerms,
+    limit: Option<i64>,
+    offset: i64,
+) -> Result<Vec<String>, HentaiError> {
+    let mut sql = String::from("SELECT c.comic_id");
+    let mut values = Vec::new();
+    append_metadata_expression_from(&mut sql, &mut values, terms);
+    sql.push_str(" ORDER BY lower(m.title) ASC");
+    if let Some(limit) = limit {
+        sql.push_str(" LIMIT ? OFFSET ?");
+        values.push(Value::BigInt(Some(limit)));
+        values.push(Value::BigInt(Some(offset)));
+    }
+    query_ids_from_stmt(
+        db,
+        Statement::from_sql_and_values(sea_orm::DatabaseBackend::Sqlite, sql, values),
+    )
+    .await
+}
+
+pub async fn search_comic_ids_by_tag_expression(
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+    library_id: Option<String>,
+) -> Result<Vec<String>, HentaiError> {
+    let Some(terms) =
+        resolve_metadata_expression_terms(must_include, optional_or, must_exclude, library_id)
+            .await?
+    else {
+        return Ok(vec![]);
+    };
+    let db = connection()?;
+    query_metadata_expression_comic_ids(&db, &terms, None, 0).await
+}
+
+pub async fn search_by_tag_expression(
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+    library_id: Option<String>,
+) -> Result<Vec<ComicDto>, HentaiError> {
+    let page = search_by_tag_expression_page(
+        must_include,
+        optional_or,
+        must_exclude,
+        PageRequestDto {
+            page: 1,
+            page_size: i32::MAX,
+        },
+        library_id,
+    )
+    .await?;
+    Ok(page.items)
+}
+
+pub async fn search_by_tag_expression_page(
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+    request: PageRequestDto,
+    library_id: Option<String>,
+) -> Result<PagedComicResultDto, HentaiError> {
+    let Some(terms) =
+        resolve_metadata_expression_terms(must_include, optional_or, must_exclude, library_id)
+            .await?
+    else {
+        let window = paginate(request, 0);
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page: window.page,
+            page_size: window.page_size,
+        });
+    };
+    let db = connection()?;
+    let total_count = count_metadata_expression_comics(&db, &terms).await?;
+    if total_count <= 0 {
+        let window = paginate(request, 0);
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page: window.page,
+            page_size: window.page_size,
+        });
+    }
+    // 越界页保持原样，只把窗口按总行数截断（与关键字搜索同属顺序翻页路径）。
+    let window = paginate(request, total_count);
+    let comic_ids = query_metadata_expression_comic_ids(
+        &db,
+        &terms,
+        Some(window.page_size as i64),
+        window.offset,
+    )
+    .await?;
+    let items = load_comics_ordered(&db, comic_ids).await?;
+    Ok(PagedComicResultDto {
+        items,
+        total_count,
+        page: window.page,
+        page_size: window.page_size,
     })
 }
 
@@ -336,8 +528,10 @@ async fn load_last_read_times(
     if comic_ids.is_empty() {
         return Ok(HashMap::new());
     }
+    let cutoff = reading_history_retention_cutoff_ms(now_ms());
     let rows = ComicReadingHistories::find()
         .filter(Expr::col(comic_reading_histories::Column::ComicId).is_in(comic_ids.to_vec()))
+        .filter(comic_reading_histories::Column::LastReadTime.gte(cutoff))
         .all(db)
         .await
         .map_err(map_db_err)?;

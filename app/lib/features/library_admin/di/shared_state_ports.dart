@@ -1,55 +1,42 @@
 import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
-import 'package:hentai_library/shared/domain/library/library_metadata_refresh_command_port.dart';
-import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
-import 'package:hentai_library/shared/domain/library/library_scan_command_port.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
+import 'package:hentai_library/features/library_admin/domain/library_metadata_refresh_command_port.dart';
+import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
+import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
+import 'package:hentai_library/features/library_admin/domain/library_sidebar_layout.dart';
+import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
+import 'package:hentai_library/features/library_admin/presentation/view_models/libraries_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
-import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_edit_command_port.dart';
-import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_types.dart';
-import 'package:hentai_library/shared/domain/library/current_library_port.dart';
-import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
+import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart';
+import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
+import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// library_admin 对共享状态端口的实现（#260 步骤0）。
-///
-/// 仅委托到现有 Notifier，不改变其行为；消费方在后续 slice 中改为依赖端口。
-class _CurrentLibraryAdapter implements CurrentLibraryPort {
-  _CurrentLibraryAdapter(this._ref);
+class _LibrariesAdapter implements LibrariesPort {
+  _LibrariesAdapter(this._ref);
 
   final Ref _ref;
 
   @override
-  Future<String?> currentId() async {
-    final CurrentLibraryState state = await _ref.read(
-      currentLibraryProvider.future,
-    );
-    return state.currentId;
-  }
-
-  @override
-  Future<void> select(String libraryId) =>
-      _ref.read(currentLibraryProvider.notifier).select(libraryId);
-
-  @override
-  Future<void> clear() => _ref.read(currentLibraryProvider.notifier).clear();
-
-  @override
   Future<void> deleteLibrary(String libraryId) =>
-      _ref.read(currentLibraryProvider.notifier).deleteLibrary(libraryId);
+      _ref.read(librariesProvider.notifier).deleteLibrary(libraryId);
+
+  @override
+  Future<void> updateSidebarLayout(List<LibrarySidebarPlacement> placements) =>
+      _ref.read(librariesProvider.notifier).updateSidebarLayout(placements);
 
   @override
   Future<LibraryFormApplyResult> submitLibraryForm(
     LibraryForm form, {
     LocalLibrary? original,
   }) => _ref
-      .read(currentLibraryProvider.notifier)
+      .read(librariesProvider.notifier)
       .submitLibraryForm(form, original: original);
 }
 
@@ -77,10 +64,16 @@ class _LibraryScanCommandAdapter implements LibraryScanCommandPort {
   Future<void> start({
     ScanMode mode = ScanMode.incremental,
     bool syncAll = false,
+    String? targetLibraryId,
     bool silent = false,
   }) => _ref
       .read(scanLibraryControllerProvider.notifier)
-      .start(mode: mode, syncAll: syncAll, silent: silent);
+      .start(
+        mode: mode,
+        syncAll: syncAll,
+        targetLibraryId: targetLibraryId,
+        silent: silent,
+      );
 
   @override
   void cancel() => _ref.read(scanLibraryControllerProvider.notifier).cancel();
@@ -104,6 +97,12 @@ class _LibraryMetadataRefreshCommandAdapter
     required String seriesId,
     required String name,
   }) => _controller.refreshSeries(seriesId: seriesId, name: name);
+
+  @override
+  Future<MetadataRefreshBatchResult> refreshLibrary({
+    required String libraryId,
+    required String name,
+  }) => _controller.refreshLibrary(libraryId: libraryId, name: name);
 
   @override
   void cancel() => _controller.cancel();
@@ -141,9 +140,7 @@ class _LibraryRevisionSignalAdapter implements LibraryRevisionSignalPort {
       _ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
 }
 
-/// 适配器工厂：由 bootstrap 通过 `shared/di` 的端口 Provider `overrideWith` 注入（#261a）。
-CurrentLibraryPort createCurrentLibraryPort(Ref ref) =>
-    _CurrentLibraryAdapter(ref);
+LibrariesPort createLibrariesPort(Ref ref) => _LibrariesAdapter(ref);
 
 LibraryReorderModePort createLibraryReorderModePort(Ref ref) =>
     _LibraryReorderModeAdapter(ref);

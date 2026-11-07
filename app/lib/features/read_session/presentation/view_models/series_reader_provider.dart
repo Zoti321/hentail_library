@@ -1,7 +1,9 @@
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/domain/comic/comic_display_title.dart';
+import 'package:hentai_library/shared/di/reading_history_providers.dart';
+import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
+import 'package:hentai_library/features/comic/public/comic_display_title.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'series_reader_provider.g.dart';
@@ -25,10 +27,9 @@ Future<int?> comicReadingPageIndexForReader(Ref ref, String comicId) async {
   if (comicId.isEmpty) {
     return null;
   }
-  final history = await ref
-      .read(readingHistoryRepoProvider)
-      .getByComicId(comicId);
-  return history?.pageIndex;
+  return ref
+      .read(readingHistoryCommandPortProvider)
+      .readResumePageIndex(comicId);
 }
 
 Future<List<ReaderComicListItem>> _buildNavItemsFromContext(
@@ -59,7 +60,7 @@ Future<ReadSessionContextData> readSessionContextForReader(
 }) async {
   final String normalizedComicId = comicId.trim();
   final SeriesReadingContext? seriesContext = await ref
-      .read(seriesRepoProvider)
+      .read(seriesReadingContextPortProvider)
       .getReadingContextByComicId(normalizedComicId);
 
   final int? preferredPageIndex = (incognito || startFromFirstPage)

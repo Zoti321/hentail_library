@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:window_manager/window_manager.dart';
 
 class AppTitleBar extends StatefulWidget {
@@ -43,7 +42,10 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
       decoration: BoxDecoration(
         color: cs.surface,
         border: Border(
-          bottom: BorderSide(color: context.hentai.borderSubtle, width: 1),
+          bottom: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant,
+            width: 1,
+          ),
         ),
       ),
       child: Row(

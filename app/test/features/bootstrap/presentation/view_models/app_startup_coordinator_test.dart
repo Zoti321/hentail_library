@@ -1,18 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
-import 'package:hentai_library/shared/domain/library/scan_interval.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 
 LocalLibrary _lib({required String id, bool scanOnStartup = false}) {
   return (
@@ -20,7 +15,7 @@ LocalLibrary _lib({required String id, bool scanOnStartup = false}) {
     kind: 'local',
     rootPath: '/$id',
     name: id,
-    enabledFormatGroups: const <FormatGroup>[],
+    enabledResourceFormatCategories: const <ResourceFormatCategory>[],
     username: '',
     allowHttp: false,
     scanOnStartup: scanOnStartup,
@@ -39,17 +34,14 @@ class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   Stream<void> watchRevision() => _events.stream;
 }
 
-class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
-  _FakeCurrentLibraryNotifier(this._libraries);
+class _FakeLibrariesNotifier extends LibrariesNotifier {
+  _FakeLibrariesNotifier(this._libraries);
 
   final List<LocalLibrary> _libraries;
 
   @override
-  Future<CurrentLibraryState> build() async {
-    return CurrentLibraryState(
-      libraries: _libraries,
-      currentId: _libraries.isEmpty ? null : _libraries.first.libraryId,
-    );
+  Future<LibrariesState> build() async {
+    return LibrariesState(libraries: _libraries);
   }
 }
 
@@ -180,8 +172,8 @@ void main() {
         scan = _RecordingScanLibraryController()..expectStarts(2);
         container = ProviderContainer(
           overrides: <Override>[
-            currentLibraryProvider.overrideWith(
-              () => _FakeCurrentLibraryNotifier(<LocalLibrary>[
+            librariesProvider.overrideWith(
+              () => _FakeLibrariesNotifier(<LocalLibrary>[
                 _lib(id: 'a', scanOnStartup: true),
                 _lib(id: 'b', scanOnStartup: false),
                 _lib(id: 'c', scanOnStartup: true),
@@ -192,7 +184,7 @@ void main() {
         );
 
         container.read(appStartupCoordinatorProvider);
-        await container.read(currentLibraryProvider.future);
+        await container.read(librariesProvider.future);
         await scan.allDone.timeout(const Duration(seconds: 2));
 
         expect(scan.starts.length, 2);
@@ -219,8 +211,8 @@ void main() {
             libraryRevisionPortProvider.overrideWithValue(
               _FakeLibraryRevisionPort(revisionEvents),
             ),
-            currentLibraryProvider.overrideWith(
-              () => _FakeCurrentLibraryNotifier(<LocalLibrary>[
+            librariesProvider.overrideWith(
+              () => _FakeLibrariesNotifier(<LocalLibrary>[
                 _lib(id: 'a', scanOnStartup: true),
                 _lib(id: 'c', scanOnStartup: true),
               ]),
@@ -230,7 +222,7 @@ void main() {
         );
 
         container.read(appStartupCoordinatorProvider);
-        await container.read(currentLibraryProvider.future);
+        await container.read(librariesProvider.future);
         container.read(libraryRevisionProvider);
         await scan.firstStart.timeout(const Duration(seconds: 2));
 

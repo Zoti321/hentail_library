@@ -4,8 +4,7 @@ use std::path::Path;
 
 use hentai_core::{
     comic_id_from_path, create_local_library, create_sync_handle, find_comic_by_id,
-    init_db_at_path, set_current_library_id, sync_library, SyncLibraryPhaseDto,
-    SyncLibraryProgressDto, SyncScanMode,
+    init_db_at_path, sync_library, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncScanMode,
 };
 use tempfile::TempDir;
 
@@ -35,15 +34,17 @@ fn local_sync_missing_root_ends_with_warning_not_silent_empty_align() {
             let lib = create_local_library(&missing.to_string_lossy(), Some("Missing"))
                 .await
                 .expect("create");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
 
             let handle = create_sync_handle();
             let mut events = Vec::new();
-            sync_library(handle, SyncScanMode::Full, false, None, vec![], |p| {
-                events.push(p)
-            })
+            sync_library(
+                handle,
+                SyncScanMode::Full,
+                false,
+                Some(lib.library_id.as_str()),
+                vec![],
+                |p| events.push(p),
+            )
             .await
             .expect("sync");
 
@@ -80,14 +81,18 @@ fn local_sync_unreadable_root_keeps_existing_comics() {
             let lib = create_local_library(&root.to_string_lossy(), Some("Lib"))
                 .await
                 .expect("create");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("current");
 
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, false, None, vec![], |_| {})
-                .await
-                .expect("first sync");
+            sync_library(
+                handle,
+                SyncScanMode::Full,
+                false,
+                Some(lib.library_id.as_str()),
+                vec![],
+                |_| {},
+            )
+            .await
+            .expect("first sync");
             let comic_id = comic_id_from_path(&comic_dir.to_string_lossy());
             assert!(find_comic_by_id(&comic_id).await.unwrap().is_some());
 
@@ -95,9 +100,14 @@ fn local_sync_unreadable_root_keeps_existing_comics() {
 
             let handle = create_sync_handle();
             let mut events = Vec::new();
-            sync_library(handle, SyncScanMode::Full, false, None, vec![], |p| {
-                events.push(p)
-            })
+            sync_library(
+                handle,
+                SyncScanMode::Full,
+                false,
+                Some(lib.library_id.as_str()),
+                vec![],
+                |p| events.push(p),
+            )
             .await
             .expect("second sync");
 

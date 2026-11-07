@@ -1,20 +1,26 @@
 import 'dart:io';
 
+import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_schedule_specification.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_naming.dart';
 import 'package:path/path.dart' as p;
 
-const Duration metadataAutoBackupStartupInterval = Duration(days: 7);
-const Duration metadataAutoBackupSaveDebounce = Duration(minutes: 5);
-const int metadataAutoBackupMaxFiles = 3;
+export 'metadata_auto_backup_schedule_specification.dart';
+
+const Duration metadataAutoBackupStartupInterval =
+    MetadataAutoBackupScheduleSpecification.startupInterval;
+const Duration metadataAutoBackupSaveDebounce =
+    MetadataAutoBackupScheduleSpecification.saveDebounce;
+const int metadataAutoBackupMaxFiles =
+    MetadataAutoBackupScheduleSpecification.maxFiles;
 
 bool shouldRunStartupMetadataAutoBackup({
   required DateTime now,
   DateTime? lastBackupAt,
 }) {
-  if (lastBackupAt == null) {
-    return true;
-  }
-  return now.difference(lastBackupAt) >= metadataAutoBackupStartupInterval;
+  return MetadataAutoBackupScheduleSpecification.shouldRunStartupBackup(
+    now: now,
+    lastBackupAt: lastBackupAt,
+  );
 }
 
 List<File> listMetadataBackupFiles(String directoryPath) {
@@ -35,7 +41,6 @@ List<File> listMetadataBackupFiles(String directoryPath) {
     if (modified != 0) {
       return modified;
     }
-    // Filename embeds timestamp; use as tiebreaker when mtimes match.
     return b.path.compareTo(a.path);
   });
   return files;

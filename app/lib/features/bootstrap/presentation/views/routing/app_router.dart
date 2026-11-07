@@ -2,33 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/desktop_page_transition.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/library_page/library_page.dart';
-import 'package:hentai_library/features/library_browse/presentation/views/searched_page.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/current_library_notifier.dart';
-import 'package:hentai_library/features/bootstrap/presentation/views/all_libraries_browse_page.dart';
-import 'package:hentai_library/features/home/presentation/views/home_page/home_page.dart';
-import 'package:hentai_library/features/home/presentation/views/history_page.dart';
+import 'package:hentai_library/features/library_browse/public.dart';
+import 'package:hentai_library/features/app_settings/public.dart';
+import 'package:hentai_library/features/home/public.dart';
+import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/application_shell.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/shared_content_routes.dart';
-import 'package:hentai_library/features/comic_trash/presentation/views/trash_page/trash_page.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
+import 'package:hentai_library/features/comic_trash/public.dart';
+import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final GlobalKey<NavigatorState> appRootNavigatorKey =
     GlobalKey<NavigatorState>();
 
-String? _librariesRootRedirect(BuildContext context, GoRouterState state) {
-  if (state.uri.path == LibrariesRoutes.root) {
-    return LibrariesRoutes.all;
-  }
-  return null;
+String? _librariesRedirect(BuildContext context, GoRouterState state) {
+  return LibrariesRoutes.redirectPath(locationPath: state.uri.path);
 }
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: appRootNavigatorKey,
-  observers: <NavigatorObserver>[desktopPageTransitionObserver],
   initialLocation: '/home',
   routes: <RouteBase>[
     ShellRoute(
@@ -44,17 +37,12 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: LibrariesRoutes.root,
-          redirect: _librariesRootRedirect,
+          redirect: _librariesRedirect,
           routes: <RouteBase>[
+            // Legacy bookmark: never treat `all` as a library id.
             GoRoute(
-              path: LibrariesRoutes.allSegment,
-              name: '全部库',
-              pageBuilder: (BuildContext context, GoRouterState state) =>
-                  buildShellNavPage(
-                    state: state,
-                    child: const AllLibrariesBrowsePage(),
-                    allowPendingFadeThrough: true,
-                  ),
+              path: LibrariesRoutes.legacyAllSegment,
+              redirect: (BuildContext context, GoRouterState state) => '/home',
             ),
             GoRoute(
               path: ':libraryId',
@@ -65,7 +53,6 @@ final GoRouter appRouter = GoRouter(
                 return buildShellNavPage(
                   state: state,
                   child: LibraryBrowsePage(libraryId: libraryId),
-                  allowPendingFadeThrough: true,
                 );
               },
             ),
@@ -74,28 +61,13 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/local',
           name: '本地漫画',
-          pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(
-                state: state,
-                child: const LegacyLocalLibraryRedirectPage(),
-              ),
+          redirect: (BuildContext context, GoRouterState state) => '/home',
         ),
         GoRoute(
           path: '/history',
           name: '历史记录',
           pageBuilder: (BuildContext context, GoRouterState state) =>
               buildShellNavPage(state: state, child: const HistoryPage()),
-        ),
-        GoRoute(
-          path: '/searched',
-          name: '搜索结果',
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            final String query = state.uri.queryParameters['q'] ?? '';
-            return buildShellNavPage(
-              state: state,
-              child: SearchedPage(query: query),
-            );
-          },
         ),
         GoRoute(
           path: '/trash',
@@ -115,7 +87,7 @@ final GoRouter appRouter = GoRouter(
   ],
 );
 
-/// Ensures route [libraryId] is selected as Current library, then shows catalog.
+/// 单库浏览页：注入 [browseLibraryIdProvider] 作用域后展示目录。
 class LibraryBrowsePage extends HookConsumerWidget {
   const LibraryBrowsePage({super.key, required this.libraryId});
 
@@ -124,60 +96,30 @@ class LibraryBrowsePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(() {
-      Future<void> sync() async {
-        if (libraryId.isEmpty) {
+      final String? scopedId = libraryId.isEmpty ? null : libraryId;
+      // 先抓住 notifier：dispose 后不能再用 ref。
+      final BrowseLibraryId scope = ref.read(browseLibraryIdProvider.notifier);
+      var cancelled = false;
+      int? epoch;
+      // claim/release 必须离开 build；epoch 防止旧页 dispose 清掉新页已 claim 的 id。
+      Future<void>.microtask(() {
+        if (cancelled) {
           return;
         }
-        final String? currentId = ref
-            .read(currentLibraryProvider)
-            .asData
-            ?.value
-            .currentId;
-        if (currentId == libraryId) {
-          return;
-        }
-        try {
-          await ref.read(currentLibraryProvider.notifier).select(libraryId);
-        } catch (_) {
-          // Invalid id: leave catalog empty / error surfaces via providers.
-        }
-      }
-
-      sync();
-      return null;
+        epoch = scope.claim(scopedId);
+      });
+      return () {
+        cancelled = true;
+        Future<void>.microtask(() {
+          final int? claimed = epoch;
+          if (claimed == null) {
+            return;
+          }
+          scope.release(claimed);
+        });
+      };
     }, <Object?>[libraryId]);
 
     return const LibraryPage();
-  }
-}
-
-/// Legacy `/local` bookmark: wait for Current library then redirect.
-class LegacyLocalLibraryRedirectPage extends ConsumerWidget {
-  const LegacyLocalLibraryRedirectPage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<CurrentLibraryState> async = ref.watch(
-      currentLibraryProvider,
-    );
-    return async.when(
-      data: (CurrentLibraryState value) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            context.go(LibrariesRoutes.browsePathForCurrent(value.currentId));
-          }
-        });
-        return const Center(child: CircularProgressIndicator());
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (Object _, StackTrace _) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            context.go(LibrariesRoutes.all);
-          }
-        });
-        return const Center(child: CircularProgressIndicator());
-      },
-    );
   }
 }

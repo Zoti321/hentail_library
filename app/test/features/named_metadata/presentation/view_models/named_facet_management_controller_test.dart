@@ -6,11 +6,11 @@ import 'package:hentai_library/features/named_metadata/presentation/view_models/
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/shared/domain/models/tag_dictionary_import_result.dart';
+import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/tag_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/tag_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -86,26 +86,6 @@ class _FakeTagRepository implements TagRepository {
   }
 
   @override
-  Future<PagedResult<Tag>> fetchPage(PageRequest request) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> add(Tag tag) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> deleteByNames(List<String> names) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> rename(String oldName, String newName) {
-    throw UnimplementedError();
-  }
-
-  @override
   Future<TagDictionaryImportResult> importTagDictionary(
     List<int> jsonBytes,
   ) async {
@@ -132,75 +112,6 @@ ProviderContainer _container(_SharedTagNames tags) {
 }
 
 void main() {
-  test(
-    'deleteAll clears the tag page and the tag dictionary together',
-    () async {
-      final _SharedTagNames tags = _SharedTagNames(<String>['alpha', 'beta']);
-      final ProviderContainer container = _container(tags);
-
-      container.read(
-        namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
-      );
-      await pumpEventQueue();
-      expect(
-        container
-            .read(
-              namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
-            )
-            .totalCount,
-        2,
-      );
-      expect(
-        (await container.read(allTagsProvider.future))
-            .map((Tag tag) => tag.name),
-        <String>['alpha', 'beta'],
-      );
-
-      await container
-          .read(
-            namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag)
-                .notifier,
-          )
-          .deleteAll();
-
-      final NamedFacetManagementState page = container.read(
-        namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
-      );
-      expect(page.items, isEmpty);
-      expect(page.totalCount, 0);
-      expect(await container.read(allTagsProvider.future), isEmpty);
-    },
-  );
-
-  test('deleteAll removes tags hidden by the current search query', () async {
-    final _SharedTagNames tags = _SharedTagNames(<String>['alpha', 'beta']);
-    final ProviderContainer container = _container(tags);
-    final NamedFacetManagementController controller = container.read(
-      namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag)
-          .notifier,
-    );
-    await pumpEventQueue();
-    await controller.setQuery('alpha');
-
-    expect(
-      container
-          .read(
-            namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
-          )
-          .items,
-      <String>['alpha'],
-    );
-
-    await controller.deleteAll();
-
-    final NamedFacetManagementState page = container.read(
-      namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
-    );
-    expect(page.items, isEmpty);
-    expect(page.totalCount, 0);
-    expect(await container.read(allTagsProvider.future), isEmpty);
-  });
-
   test(
     'importing a tag dictionary refreshes the tag page and allTagsProvider',
     () async {

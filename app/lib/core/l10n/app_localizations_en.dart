@@ -13,13 +13,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryTitle => 'Library';
 
   @override
-  String get allLibrariesBrowsePlaceholderTitle => 'All libraries';
-
-  @override
-  String get allLibrariesBrowsePlaceholderBody =>
-      'Browsing all libraries together is coming later. Pick a library from the sidebar.';
-
-  @override
   String get sidebarAddLibraryTooltip => 'Add library';
 
   @override
@@ -197,6 +190,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localePreferenceEn => 'English';
 
   @override
+  String get settingsFontLabel => 'UI font';
+
+  @override
+  String get fontPreferenceMiSans => 'Mi Sans';
+
+  @override
+  String get fontPreferenceNotoSans => 'Noto Sans';
+
+  @override
   String get settingsThemeLabel => 'App theme';
 
   @override
@@ -207,6 +209,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themePreferenceDark => 'Dark';
+
+  @override
+  String get settingsDynamicColorLabel => 'Dynamic color';
+
+  @override
+  String get settingsDynamicColorDescription =>
+      'Use colors from the system wallpaper. Disables the manual color scheme while on.';
+
+  @override
+  String get settingsColorSchemeLabel => 'Color scheme';
+
+  @override
+  String get colorSchemePreferenceBrand => 'Violet';
+
+  @override
+  String get colorSchemePreferenceTeal => 'Celadon';
+
+  @override
+  String get colorSchemePreferenceCyan => 'Sky';
+
+  @override
+  String get colorSchemePreferenceBlue => 'Cornflower';
+
+  @override
+  String get colorSchemePreferenceIndigo => 'Indigo';
+
+  @override
+  String get colorSchemePreferenceDeepPurple => 'Grape';
+
+  @override
+  String get colorSchemePreferenceViolet => 'Violet';
+
+  @override
+  String get colorSchemePreferencePink => 'Rose';
+
+  @override
+  String get colorSchemePreferenceSakura => 'Sakura';
+
+  @override
+  String get colorSchemePreferenceYellow => 'Amber';
+
+  @override
+  String get colorSchemePreferenceOrange => 'Marigold';
+
+  @override
+  String get colorSchemePreferenceDeepOrange => 'Cinnabar';
+
+  @override
+  String get colorSchemePreferenceGreen => 'Moss';
 
   @override
   String get navHome => 'Home';
@@ -261,6 +312,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeTitle => 'Home';
+
+  @override
+  String get homeShortcutsSectionTitle => 'Shortcuts';
+
+  @override
+  String get homeHistoryCardCaption => 'View reading log';
+
+  @override
+  String get homeTrashCardCaption => 'Restore or delete';
 
   @override
   String get homeScanLibrary => 'Scan library';
@@ -320,11 +380,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String homeAlertStaleSync(String libraryName, int days) {
     return '$libraryName last synced $days days ago — sync recommended';
-  }
-
-  @override
-  String homeAlertPendingResources(String libraryName, int count) {
-    return '$libraryName: $count new/changed Resources detected — sync recommended';
   }
 
   @override
@@ -406,8 +461,34 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count entries · kept for 30 days max',
-      one: '1 entry · kept for 30 days max',
+      other: '$count entries · kept for up to 1 year',
+      one: '1 entry · kept for up to 1 year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historySectionToday => 'Today';
+
+  @override
+  String get historySectionYesterday => 'Yesterday';
+
+  @override
+  String get historySectionThisWeek => 'This week';
+
+  @override
+  String get historySectionThisMonth => 'This month';
+
+  @override
+  String get historySectionEarlier => 'Earlier';
+
+  @override
+  String historySectionItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries',
+      one: '1 entry',
     );
     return '$_temp0';
   }
@@ -517,6 +598,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsGroupAbout => 'About';
+
+  @override
+  String get settingsMasterMenuGroupTitle => 'App';
+
+  @override
+  String get settingsSectionAppearance => 'Appearance & language';
+
+  @override
+  String get settingsSectionReading => 'Reading';
+
+  @override
+  String get settingsSectionLibraryBrowse => 'Library & browsing';
+
+  @override
+  String get settingsSectionDiagnostics => 'Diagnostics';
+
+  @override
+  String get settingsSectionApplicationData => 'Application data';
+
+  @override
+  String get settingsSectionUpdates => 'Updates';
 
   @override
   String get settingsMetadataBackupAutoGroupTitle => 'Automatic backup';
@@ -712,6 +814,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsHealthyModeLabel => 'Healthy mode';
+
+  @override
+  String get settingsHealthyModeDescription =>
+      'Hide R18 comics in library, search and history. Ratings are not changed.';
+
+  @override
   String get settingsDiagnosticModeLabel => 'Verbose diagnostics';
 
   @override
@@ -900,6 +1009,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryFilterSection => 'Filter';
 
   @override
+  String get libraryGroupSection => 'Group';
+
+  @override
   String get librarySortSection => 'Sort';
 
   @override
@@ -948,7 +1060,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryMetadataFilterIncludeAll => 'Match all';
 
   @override
-  String get libraryResetAllFilters => 'Reset all';
+  String get libraryResetAllFilters => 'Restore defaults';
 
   @override
   String get libraryComingSoon => 'Coming soon';
@@ -976,6 +1088,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryExpandBySeries => 'Expand by series';
+
+  @override
+  String get libraryGroupBySeries => 'Group by series';
+
+  @override
+  String get libraryGroupNone => 'No grouping';
+
+  @override
+  String get libraryGroupBySerializationStatus =>
+      'Group by serialization status';
+
+  @override
+  String get settingsPreferLibraryRootSeriesLabel => 'Pin library root series';
+
+  @override
+  String get settingsPreferLibraryRootSeriesDescription =>
+      'When browsing series, keep the library root series at the top of the list.';
 
   @override
   String get librarySeriesSortName => 'Name';
@@ -1093,6 +1222,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get comicDetailCharacters => 'Characters';
+
+  @override
+  String get comicDetailResourceInfo => 'Resource info';
 
   @override
   String get comicDetailResourceFormat => 'Format';
@@ -1500,6 +1632,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataMerge => 'Merge';
 
   @override
+  String get metadataMergeConfirmTitle => 'Confirm merge';
+
+  @override
+  String metadataMergeConfirmBody(int sourceCount, String target) {
+    return 'Merge $sourceCount tags into \"$target\"? Comic attachments from the source tags move to the target, and the source tags are deleted.';
+  }
+
+  @override
+  String get metadataMergeConfirmDontAskAgain => 'Don\'t ask again';
+
+  @override
   String get metadataDelete => 'Delete';
 
   @override
@@ -1526,6 +1669,61 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 item',
     );
     return '$_temp0';
+  }
+
+  @override
+  String metadataAuthorCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count authors',
+      one: '1 author',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataTagCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags',
+      one: '1 tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataParodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count parodies',
+      one: '1 parody',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataCharacterCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count characters',
+      one: '1 character',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get navRailExpand => 'Expand navigation';
+
+  @override
+  String get navRailCollapse => 'Collapse navigation';
+
+  @override
+  String paginationPageSemantic(int page) {
+    return 'Page $page';
   }
 
   @override
@@ -1717,6 +1915,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dialogEditMetadataTabAuthorsTags => 'Authors & tags';
+
+  @override
+  String get dialogEditMetadataTabFieldLocks => 'Field locks';
+
+  @override
+  String get dialogEditMetadataTabContent => 'Content';
 
   @override
   String get smartFacetMatchToggleLabel => 'Smart match';
@@ -1920,13 +2124,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get updateRemindLater => 'Remind me later';
+  String get updateRemindLater => 'Later';
 
   @override
   String get updateViewDetails => 'View details';
 
   @override
-  String get updateNow => 'Update now';
+  String get updateNow => 'Update';
 
   @override
   String get updateManualDownloadToast =>
@@ -1962,11 +2166,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get confirmRemovePathTitle => 'Confirm removal';
+  String homeLibraryDeleteConfirmTitle(String name) {
+    return 'Delete \"$name\"?';
+  }
 
   @override
-  String get confirmRemovePathContent =>
-      'This local library and its comics will be deleted immediately. This cannot be undone.';
+  String get homeLibraryDeleteConfirmBody =>
+      'This will remove the library from the app. Comic files stay in place.';
+
+  @override
+  String get homeLibraryDeleteConfirmAcknowledge =>
+      'I understand comic files will not be deleted';
 
   @override
   String get confirmClearHistoryTitle => 'Confirm clear';
@@ -2062,6 +2272,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String readingProgressPage(int page) {
     return 'Page $page';
   }
+
+  @override
+  String readingProgressPageOfTotal(int current, int total) {
+    return '$current/$total';
+  }
+
+  @override
+  String get historyGoToComicDetail => 'Go to comic details';
 
   @override
   String get historyDeleteRecord => 'Delete entry';

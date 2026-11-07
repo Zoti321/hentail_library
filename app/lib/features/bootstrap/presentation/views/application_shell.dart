@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/bootstrap/di/deps.dart';
-import 'package:hentai_library/features/app_settings/presentation/views/widgets/diagnostic_mode_banner.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/comic_metadata_bulk_patch_shell_feedback.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/library_scan_shell_feedback.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/app_navigation.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_app_sidebar.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/navigation/libraries_sidebar_reorder_pane.dart';
-import 'package:hentai_library/shared/domain/models/models.dart'
-    show AppSetting;
+import 'package:hentai_library/features/app_settings/public.dart';
+import 'package:hentai_library/features/read_session/public.dart';
+import 'package:hentai_library/shared/di/app_shell_providers.dart';
 import 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart';
 
 export 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart'
@@ -16,8 +10,10 @@ export 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart'
         ResponsiveAppShell,
         AppShellSidebarBuilder,
         AppShellSidebarSlot,
+        AppShellNavigationSlot,
+        AppShellNavigationSlotBuilder,
         openAppShellNavigationDrawer,
-        appShellScaffoldKey;
+        appShellDesktopShellKey;
 
 /// Composition root: binds app preferences, navigation, and feature shell slots.
 class ApplicationShell extends ConsumerWidget {
@@ -34,13 +30,15 @@ class ApplicationShell extends ConsumerWidget {
       ),
     );
     final bool readerFullscreen = ref.watch(readerFullscreenControllerProvider);
+    final AppShellFeedbackBelowTitleBarFactory feedbackFactory = ref.watch(
+      appShellFeedbackBelowTitleBarFactoryProvider,
+    );
+    final AppShellNavigationSlotAssembly navigationAssembly = ref.watch(
+      appShellNavigationSlotAssemblyProvider,
+    );
 
     return ResponsiveAppShell(
       routeChild: routeChild,
-      activeNavIdForPath: AppNavigation.activeNavIdForPath,
-      onNavDestinationSelected: (BuildContext ctx, String id) {
-        AppNavigation.goToNavId(ctx, id, ref: ref);
-      },
       isDesktopSidebarExpanded: isSidebarExpandedPref,
       onToggleDesktopSidebarExpanded: () {
         ref
@@ -48,15 +46,8 @@ class ApplicationShell extends ConsumerWidget {
             .setDesktopSidebarExpanded(!isSidebarExpandedPref);
       },
       isReaderFullscreen: readerFullscreen,
-      shellFeedbackBelowTitleBar: const <Widget>[
-        DiagnosticModeBanner(),
-        LibraryScanShellFeedback(),
-        ComicMetadataBulkPatchShellFeedback(),
-      ],
-      sidebarBuilder: (AppShellSidebarSlot slot) => LibrariesAppSidebar(
-        slot: slot,
-        librariesReorderPaneBuilder: (_) => const LibrariesSidebarReorderPane(),
-      ),
+      shellFeedbackBelowTitleBar: feedbackFactory(),
+      navigationSlotBuilder: (BuildContext ctx) => navigationAssembly(ctx, ref),
     );
   }
 }

@@ -31,45 +31,51 @@ pub mod thumbnail;
 pub mod util;
 
 pub use author::{
-    add_author, add_author_link, count_all_authors, delete_author_link, delete_authors_by_names,
-    fetch_authors_page, get_author_detail, list_all_authors, list_author_links, load_author_image,
+    add_author, add_author_link, author_merge_unsupported_error, count_all_authors,
+    count_author_attachments, delete_author_link, delete_authors_by_names, fetch_author_name_page,
+    fetch_author_names_page_result, fetch_authors_page, fetch_authors_page_result,
+    get_author_detail, list_all_author_names, list_all_authors, list_author_links,
+    list_author_names_for_form, list_distinct_author_names, load_author_image, reject_author_merge,
     rename_author, replace_comic_authors, resolve_author_image, update_author_link, watch_authors,
     AuthorDetailDto, AuthorFacetCountDto, AuthorIdentity, AuthorImageRef, AuthorImageSlot,
     AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform, AuthorTopComicDto,
+    PagedAuthorIdentitiesDto, PagedAuthorNamesDto,
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
     apply_comic_metadata_bulk_patch, count_all, count_trashed_comics, fetch_comics_page,
     fetch_trashed_comics_page, find_comic_by_id, find_comics_by_ids, is_comic_trashed,
-    list_trashed_comic_ids, paginate, purge_comics, read_data_version, restore_comics,
+    list_trashed_comic_ids, now_ms, paginate, purge_comics, read_data_version, restore_comics,
     search_by_keyword, search_by_keyword_page, search_by_tag_expression,
     search_by_tag_expression_page, set_comic_meta_locks, trash_comics, update_comic_user_meta,
-    BulkPatchResultDto, ComicDto, ComicFilterDto, ComicMetaLocks, ComicMetadataBulkPatch,
-    ComicPurgeResultDto, ComicSortFieldDto, ComicSortOptionDto, MultiValueOp, MultiValuePatch,
-    PageRequestDto, PageWindow, PagedComicResultDto, PagedTrashedComicResultDto, PublishedAtPatch,
-    ScalarPatch, SetComicMetaLocksDto, TrashedComicCountsDto, TrashedComicDto,
-    UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
+    BulkPatchResultDto, ComicDto, ComicFilterDto, ComicGrouping, ComicMetaLocks,
+    ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto, ComicSortOptionDto,
+    MultiValueOp, MultiValuePatch, PageRequestDto, PageWindow, PagedComicResultDto,
+    PagedTrashedComicResultDto, PublishedAtPatch, ScalarPatch, SetComicMetaLocksDto,
+    TrashedComicCountsDto, TrashedComicDto, UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
 pub use error::{HentaiError, HentaiErrorCode};
 pub use history::{
     clear_all_reading, delete_reading_by_comic_id, delete_reading_by_comic_ids, fetch_reading_page,
-    get_reading_by_comic_id, list_all_reading, record_reading, watch_reading_histories,
-    PagedReadingHistoryDto, ReadingHistoryDto,
+    get_reading_by_comic_id, list_all_reading, list_read_page_indexes,
+    reading_history_retention_cutoff_ms, record_reading, watch_reading_history_changes,
+    PagedReadingHistoryDto, ReadPageIndexDto, ReadingHistoryDto, READING_HISTORY_RETENTION_DAYS,
 };
 pub use home::{
     watch_continue_reading_top5, watch_home_library_alerts, watch_home_page_counts,
-    watch_recently_added_on_home, HomeContinueReadingDto, HomeLibraryAlertDto,
-    HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
+    watch_library_home_stats, watch_recently_added_on_home, HomeContinueReadingDto,
+    HomeLibraryAlertDto, HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
+    LibraryHomeStatDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
-    get_current_library_id, library_id_from_root, library_id_from_webdav_root, list_libraries,
-    normalize_webdav_root, parse_format_groups_json, parse_scan_interval,
-    record_library_sync_failure, record_library_sync_success, resolve_access_for_comic,
-    resolve_browse_library_id, serialize_format_groups, set_all_libraries_scan_on_startup,
-    set_current_library_id, set_remote_library_credentials, update_library_format_groups,
+    library_id_from_root, library_id_from_webdav_root, list_libraries, normalize_webdav_root,
+    parse_resource_format_categories_json, parse_scan_interval, record_library_sync_failure,
+    record_library_sync_success, resolve_access_for_comic, resolve_browse_library_id,
+    serialize_resource_format_categories, set_all_libraries_scan_on_startup,
+    set_remote_library_credentials, update_library_resource_format_categories,
     update_library_settings, update_library_sidebar_layout, update_local_library_root,
     update_remote_library, LibraryDto, LibrarySidebarPlacement, RemoteLibraryCredential,
     ResolvedAccess, ScanInterval,
@@ -83,12 +89,14 @@ pub use metadata_backup::{
 };
 pub use named_facet::{
     add_named_facet_name, count_all_named_facet_names, count_named_facet_attachments,
-    delete_named_facet_by_names, fetch_named_facet_page, list_all_named_facet_names,
-    list_distinct_named_facet_names, list_named_facet_for_form, merge_named_facet_name,
-    rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet, NamedFacetFormEntry,
+    delete_named_facet_by_names, fetch_management_facet_names_page, fetch_named_facet_names_page,
+    fetch_named_facet_page, list_all_named_facet_names, list_distinct_named_facet_names,
+    list_named_facet_for_form, merge_named_facet_name, rename_named_facet_name,
+    replace_comic_named_facet, JunctionNamedFacet, ManagementFacetKind, NamedFacetFormEntry,
+    PagedStringNamesDto,
 };
 pub use parody::{list_all_parodies, list_distinct_parodies};
-pub use probe::{probe_library, rebuild_snapshot_from_scan_items, LibraryProbeResultDto};
+pub use probe::rebuild_snapshot_from_scan_items;
 pub use reader::{
     clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
     load_reader_page, open_reader, open_reader_with, prefetch_reader_pages, writeback_after_open,
@@ -101,9 +109,9 @@ pub use series::{
     set_series_item_sort_order_locked, set_series_items_order, set_series_meta_locks,
     update_series_item_sort_order, update_series_user_meta, watch_home_series_comic_order_map,
     PagedSeriesComicsResultDto, PagedSeriesResultDto, SeriesComicPageItemDto,
-    SeriesComicsMetadataDto, SeriesDto, SeriesFilterDto, SeriesItemDto, SeriesMetaLocks,
-    SeriesReadingContextDto, SeriesSortFieldDto, SeriesSortOptionDto, SetSeriesMetaLocksDto,
-    UpdateSeriesUserMetaDto,
+    SeriesComicsMetadataDto, SeriesDto, SeriesFilterDto, SeriesGrouping, SeriesItemDto,
+    SeriesMetaLocks, SeriesReadingContextDto, SeriesSortFieldDto, SeriesSortOptionDto,
+    SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
 };
 pub use series_id::{
     folder_path_from_comic_path, series_id_from_folder_path, series_name_from_folder_path,
@@ -111,14 +119,11 @@ pub use series_id::{
 pub use sync::{
     cancel_sync, comic_id_for_remote_location, create_sync_handle, refresh_comic_metadata,
     refresh_library_metadata, refresh_series_metadata, scan_remote_lightweight, sync_library,
-    try_acquire_library_write_lock, FormatGroup, LibrarySyncCountsDto, RefreshLibraryResultDto,
-    RefreshSeriesProgressDto, RefreshSeriesResultDto, RemoteScanOutcome, SyncHandle,
-    SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
+    try_acquire_library_write_lock, LibrarySyncCountsDto, RefreshLibraryResultDto,
+    RefreshSeriesProgressDto, RefreshSeriesResultDto, RemoteScanOutcome, ResourceFormatCategory,
+    SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
 };
-pub use tag::{
-    add_tag, count_all_tags, delete_tags_by_names, fetch_tags_page, import_tag_dictionary,
-    list_all_tags, rename_tag, watch_tags, TagDictionaryImportResult,
-};
+pub use tag::{import_tag_dictionary, TagDictionaryImportResult};
 pub use thumbnail::{
     delete_thumbnails_by_comic_ids, enqueue_thumbnails_low, ensure_thumbnail,
     find_series_thumbnail_by_series_id, find_thumbnail_by_comic_id, resolve_series_cover,

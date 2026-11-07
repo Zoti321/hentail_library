@@ -8,12 +8,12 @@
 //!   Flutter must not duplicate that invalidation.
 
 pub mod dto;
-pub mod format_group;
 pub mod handle;
 pub mod orchestrator;
 pub mod plan;
 pub mod refresh;
 pub mod remote;
+pub mod resource_format_category;
 pub mod scanner;
 pub mod series_rebuild;
 pub mod thumbnail;
@@ -24,7 +24,6 @@ pub use dto::{
     LibrarySyncCountsDto, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto,
     SyncScanMode,
 };
-pub use format_group::FormatGroup;
 pub use handle::{cancel_sync, create_sync_handle, SyncHandle};
 pub use orchestrator::sync_library;
 pub use refresh::{
@@ -33,3 +32,4 @@ pub use refresh::{
     RefreshSeriesResultDto,
 };
 pub use remote::{comic_id_for_remote_location, scan_remote_lightweight, RemoteScanOutcome};
+pub use resource_format_category::ResourceFormatCategory;

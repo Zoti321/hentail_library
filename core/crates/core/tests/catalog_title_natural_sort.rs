@@ -2,10 +2,11 @@ mod common;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::util::compute_sort_key;
+use hentai_core::ComicGrouping;
 use hentai_core::{
     connection, create_local_library, fetch_comics_page, fetch_series_page, init_db_at_path,
-    set_current_library_id, update_comic_user_meta, ComicFilterDto, ComicSortFieldDto,
-    ComicSortOptionDto, PageRequestDto, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
+    update_comic_user_meta, ComicFilterDto, ComicSortFieldDto, ComicSortOptionDto, PageRequestDto,
+    SeriesFilterDto, SeriesGrouping, SeriesSortFieldDto, SeriesSortOptionDto,
     UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
@@ -21,13 +22,10 @@ async fn clear_library(db: &DatabaseConnection) {
     .expect("clear");
 }
 
-async fn stamp_all_to_current_library(db: &DatabaseConnection, root: &str) {
+async fn stamp_all_to_library(db: &DatabaseConnection, root: &str) -> String {
     let lib = create_local_library(root, None)
         .await
         .expect("create library");
-    set_current_library_id(Some(&lib.library_id))
-        .await
-        .expect("set current");
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE comics SET library_id = ?",
@@ -40,10 +38,13 @@ async fn stamp_all_to_current_library(db: &DatabaseConnection, root: &str) {
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE series SET library_id = ?",
-        [sea_orm::Value::String(Some(Box::new(lib.library_id)))],
+        [sea_orm::Value::String(Some(Box::new(
+            lib.library_id.clone(),
+        )))],
     ))
     .await
     .expect("stamp series");
+    lib.library_id
 }
 
 async fn insert_comic(db: &DatabaseConnection, comic_id: &str, path: &str, title: &str) {
@@ -130,7 +131,7 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
             insert_comic(&db, "c10", "E:/lib/Vol 10.cbz", "Vol 10").await;
             insert_comic(&db, "c2", "E:/lib/Vol 2.cbz", "Vol 2").await;
             insert_comic(&db, "c1", "E:/lib/Vol 1.cbz", "vol 1").await;
-            stamp_all_to_current_library(&db, "E:/lib").await;
+            let library_id = stamp_all_to_library(&db, "E:/lib").await;
 
             let page = fetch_comics_page(
                 PageRequestDto {
@@ -139,9 +140,10 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
                 },
                 ComicFilterDto {
                     show_r18: true,
+                    library_id: Some(library_id.clone()),
                     ..Default::default()
                 },
-                false,
+                ComicGrouping::None,
                 ComicSortOptionDto {
                     field: ComicSortFieldDto::Title,
                     descending: false,
@@ -157,7 +159,7 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
 }
 
 #[test]
-fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
+fn fetch_comics_page_by_series_grouping_flattens_series_blocks() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = common::create_fixture_db(temp.path());
@@ -178,9 +180,6 @@ fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
             let lib = create_local_library("E:/lib", None)
                 .await
                 .expect("create library");
-            set_current_library_id(Some(&lib.library_id))
-                .await
-                .expect("set current");
             db.execute(Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 "UPDATE comics SET library_id = ?",
@@ -221,9 +220,10 @@ fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
                 },
                 ComicFilterDto {
                     show_r18: true,
+                    library_id: Some(lib.library_id.clone()),
                     ..Default::default()
                 },
-                true,
+                ComicGrouping::BySeries,
                 ComicSortOptionDto {
                     field: ComicSortFieldDto::CreatedAt,
                     descending: true,
@@ -257,7 +257,7 @@ fn fetch_series_page_name_asc_uses_natural_order() {
             rebuild_series_from_comics(&db, None)
                 .await
                 .expect("rebuild");
-            stamp_all_to_current_library(&db, "E:/lib").await;
+            let library_id = stamp_all_to_library(&db, "E:/lib").await;
 
             let page = fetch_series_page(
                 PageRequestDto {
@@ -267,8 +267,10 @@ fn fetch_series_page_name_asc_uses_natural_order() {
                 SeriesFilterDto {
                     show_r18: true,
                     require_items: true,
+                    library_id: Some(library_id.clone()),
                     ..Default::default()
                 },
+                SeriesGrouping::None,
                 SeriesSortOptionDto {
                     field: SeriesSortFieldDto::Name,
                     descending: false,

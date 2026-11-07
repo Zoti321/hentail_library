@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:hentai_library/shared/data/adapters/reader_frb_mapper.dart';
+import 'package:hentai_library/features/read_session/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/shared/domain/ports/comic_page_source_port.dart';
-import 'package:hentai_library/shared/domain/reading/read_session_page.dart';
-import 'package:hentai_library/shared/domain/reading/reader_page_payload.dart';
+import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
+import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 
@@ -42,12 +43,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         growable: false,
       );
     } on HentaiErrorDto catch (error) {
-      throwReaderException(
-        error,
-        resourceType: comic.resourceType,
-        path: comic.path,
-        comicId: comic.comicId,
-      );
+      throwReaderException(error, path: comic.path, comicId: comic.comicId);
     }
   }
 
@@ -71,19 +67,14 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
           ReaderPageBytes(:final Uint8List data) => data,
         };
       }
-      return rust.loadPageBytesFrb(
+      return await rust.loadPageBytesFrb(
         comicId: comic.comicId,
         path: comic.path,
         resourceType: mapResourceType(comic.resourceType),
         pageIndex: pageIndex,
       );
     } on HentaiErrorDto catch (error) {
-      throwReaderException(
-        error,
-        resourceType: comic.resourceType,
-        path: comic.path,
-        comicId: comic.comicId,
-      );
+      throwReaderException(error, path: comic.path, comicId: comic.comicId);
     }
   }
 
@@ -108,12 +99,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         ),
       };
     } on HentaiErrorDto catch (error) {
-      throwReaderException(
-        error,
-        resourceType: comic.resourceType,
-        path: comic.path,
-        comicId: comic.comicId,
-      );
+      throwReaderException(error, path: comic.path, comicId: comic.comicId);
     }
   }
 
@@ -135,12 +121,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         generation: BigInt.from(generation),
       );
     } on HentaiErrorDto catch (error) {
-      throwReaderException(
-        error,
-        resourceType: comic.resourceType,
-        path: comic.path,
-        comicId: comic.comicId,
-      );
+      throwReaderException(error, path: comic.path, comicId: comic.comicId);
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +6,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/shared/ui/shell/shell_nav_item.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/core/constants/libraries_routes.dart';
-import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 abstract final class AppNavigation {
@@ -21,29 +21,23 @@ abstract final class AppNavigation {
       <ShellNavItem>[
         (id: navIdHome, label: l10n.navHome, icon: LucideIcons.house),
         (id: navIdMetadata, label: l10n.navMetadata, icon: LucideIcons.layers),
-        (id: navIdHistory, label: l10n.navHistory, icon: LucideIcons.history),
       ];
 
   static List<ShellNavItem> desktopSystemNavItems(
     AppLocalizations l10n,
   ) => <ShellNavItem>[
-    (id: navIdTrash, label: l10n.navTrash, icon: LucideIcons.trash2),
     (id: navIdSettings, label: l10n.navSettings, icon: LucideIcons.settings),
   ];
 
-  /// 与 [DesktopSidebar] 扁平菜单 id 对应；Libraries 分区用
-  /// [librariesSidebarSelection]，不经此函数。
+  /// 与 MD3E rail 导航 id 对应；库 flyout 选库不经此函数。
   static String activeNavIdForPath(String path) {
-    if (LibrariesRoutes.isAllLibrariesPath(path) ||
-        LibrariesRoutes.libraryIdFromPath(path) != null) {
+    if (LibrariesRoutes.libraryIdFromPath(path) != null) {
       return '';
     }
     switch (path) {
       case '/home':
         return navIdHome;
       case '/local':
-        return '';
-      case '/searched':
         return '';
       case '/metadata':
       case '/tags':
@@ -75,9 +69,9 @@ abstract final class AppNavigation {
         if (ref != null) {
           ref
               .read(libraryManagementPortProvider)
-              .goCurrentLibraryBrowse(context);
+              .goDefaultLibraryBrowse(context);
         } else {
-          context.go(LibrariesRoutes.all);
+          context.go('/home');
         }
         break;
       case navIdMetadata:

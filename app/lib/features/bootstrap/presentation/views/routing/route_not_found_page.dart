@@ -1,5 +1,5 @@
+import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/di/library_management_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
@@ -24,14 +24,14 @@ class RouteNotFoundPage extends StatelessWidget {
             Icon(
               LucideIcons.circleAlert,
               size: 48,
-              color: context.hentai.textTertiary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             Text(
               l10n.notFoundTitle,
               style: TextStyle(
                 fontSize: tokens.text.titleSm,
                 fontWeight: FontWeight.w600,
-                color: context.hentai.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             Text(
@@ -39,7 +39,7 @@ class RouteNotFoundPage extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: tokens.text.bodySm,
-                color: context.hentai.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             Wrap(
@@ -55,7 +55,7 @@ class RouteNotFoundPage extends StatelessWidget {
                 GhostButton.iconText(
                   icon: LucideIcons.library,
                   text: l10n.notFoundGoLibrary,
-                  onPressed: () => goCurrentLibraryBrowseFromContext(context),
+                  onPressed: () => goDefaultLibraryBrowseFromContext(context),
                 ),
               ],
             ),

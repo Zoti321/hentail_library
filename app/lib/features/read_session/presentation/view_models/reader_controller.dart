@@ -4,16 +4,16 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/domain/auto_play_boundary.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/spread_index.dart';
-import 'package:hentai_library/shared/domain/reading/auto_play_mode.dart';
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_auto_play_carry.dart';
 import 'package:hentai_library/features/read_session/presentation/reader_exit_location.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/features/read_session/domain/read_session_coordinator.dart';
+import 'package:hentai_library/features/read_session/application/read_session_coordinator.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/features/read_session/di/session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
@@ -94,6 +94,13 @@ class ReaderController extends _$ReaderController
     final bool carryAutoPlay = ref
         .read(readerAutoPlayCarryProvider.notifier)
         .take();
+    await ref
+        .read(readSessionCoordinatorProvider)
+        .beginReadSession(
+          comic: snapshot.comic,
+          incognito: incognito,
+          initialPageIndex: snapshot.resumePageIndex,
+        );
     return ReaderState(
       comic: snapshot.comic,
       readingMode: initialMode,
@@ -237,6 +244,14 @@ class ReaderController extends _$ReaderController
       return;
     }
     final GoRouter router = GoRouter.of(context);
-    router.go(resolveReaderExitLocation(comicId: routeContext.comicId));
+    final String? goLocation = resolveReaderExitNavigation(
+      canPop: router.canPop(),
+      comicId: routeContext.comicId,
+    );
+    if (goLocation == null) {
+      router.pop();
+      return;
+    }
+    router.go(goLocation);
   }
 }

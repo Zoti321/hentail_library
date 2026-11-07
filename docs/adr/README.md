@@ -45,7 +45,7 @@
 ### 避免过期快照
 
 - Consequences 与「已实现」列表写**稳定事实**（删了哪些模块、用户可见行为），勿写会随 FRB codegen 变化的 **sync/async 入口计数** 等瞬时数字。
-- 物理路径、目录分层以 `app/test/gate/` 与 ADR-0027 为准；勿保留 Wayfinder 迁移前的 `ui/features` 用语。
+- 物理路径、目录分层以 `app/test/gate/` 与 ADR-0027、**ADR-0033**、**ADR-0034** 为准；勿保留 Wayfinder 迁移前的 `ui/features` 用语或已删除的 `shared/application/ports/` 路径。
 
 ## 模板
 
@@ -108,3 +108,11 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0027](./0027-flutter-ui-shell-layout-component-layers.md) | Flutter UI Shell / Layout / Component 四层与 shared 依赖边界 | Accepted |
 | [0028](./0028-design-system-theme-extensions.md) | 设计系统主骨架（ThemeExtension + theme_tailor + Widgetbook dev） | Accepted |
 | [0029](./0029-design-system-documentation-charter.md) | design-system 目录章程（规划文档、Agent 规范、ui-ux-pro-max 输出） | Accepted |
+| [0030](./0030-md3e-lab-freeze-design-system-docs.md) | MD3E Lab 阶段冻结 design-system 文档；Lab 以 Widgetbook + md3e 为准 | Accepted |
+| [0031](./0031-md3e-production-cutover-by-feature.md) | MD3E 生产迁移按 feature Cutover，完成后收缩 Lab 目录 | Accepted |
+| [0032](./0032-single-theme-source-after-md3e-cutover.md) | MD3E Cutover 后 `shared/ui/theme` 只保留一套主题 | Accepted |
+| [0033](./0033-flutter-feature-application-layer.md) | Flutter feature Application 层（Wayfinder） | Accepted |
+| [0034](./0034-feature-public-api-only-cross-imports.md) | Cross-feature 协作 — public API only | Accepted |
+| [0035](./0035-catalog-shared-kernel.md) | Catalog Shared Kernel 保留于 `shared/domain` | Accepted |
+| [0036](./0036-comic-series-wayfinder-modules.md) | Comic / Series Wayfinder 模块切分（#457） | Accepted |
+| [0037](./0037-tone-based-color-system-m3e-roles.md) | Tone-based color system 与 M3E roles 为主（#470） | Accepted |

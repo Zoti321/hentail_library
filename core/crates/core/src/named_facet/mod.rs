@@ -1,6 +1,7 @@
-//! Junction-backed named metadata facets (Tag / Author / Parody / Character).
+//! Junction-backed named metadata dictionary facets (Tag / Parody / Character).
 //!
-//! Language is a closed-set JSON column on `comic_meta` and is not handled here.
+//! Author is a stable-identity entity and lives in `crate::author`; Language is a
+//! closed-set JSON column on `comic_meta`. Neither is handled here.
 
 use sea_orm::{ConnectionTrait, Statement, TransactionTrait, Value};
 
@@ -9,22 +10,38 @@ use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 use crate::library_write::with_library_write;
 
-use crate::author::replace_comic_authors;
-
-/// Named metadata facet stored as a global dictionary table + comic junction.
+/// Named metadata dictionary facet stored as a global dictionary table + comic junction.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JunctionNamedFacet {
     Tag,
-    Author,
     Parody,
     Character,
+}
+
+/// Metadata management UI facet (authors + dictionary facets).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ManagementFacetKind {
+    Author,
+    Tag,
+    Parody,
+    Character,
+}
+
+impl ManagementFacetKind {
+    pub fn junction(self) -> Option<JunctionNamedFacet> {
+        match self {
+            Self::Author => None,
+            Self::Tag => Some(JunctionNamedFacet::Tag),
+            Self::Parody => Some(JunctionNamedFacet::Parody),
+            Self::Character => Some(JunctionNamedFacet::Character),
+        }
+    }
 }
 
 impl JunctionNamedFacet {
     pub fn dict_table(self) -> &'static str {
         match self {
             Self::Tag => "tags",
-            Self::Author => "authors",
             Self::Parody => "parodies",
             Self::Character => "characters",
         }
@@ -33,7 +50,6 @@ impl JunctionNamedFacet {
     pub fn junction_table(self) -> &'static str {
         match self {
             Self::Tag => "comic_tags",
-            Self::Author => "comic_authors",
             Self::Parody => "comic_parodies",
             Self::Character => "comic_characters",
         }
@@ -42,7 +58,6 @@ impl JunctionNamedFacet {
     pub fn junction_name_column(self) -> &'static str {
         match self {
             Self::Tag => "tag_name",
-            Self::Author => "author_id",
             Self::Parody => "parody_name",
             Self::Character => "character_name",
         }
@@ -51,27 +66,15 @@ impl JunctionNamedFacet {
     /// Library-scoped distinct attached names (ORDER BY name COLLATE NOCASE).
     pub fn distinct_attached_sql(self) -> String {
         let visible = visible_comic_sql("c");
-        match self {
-            Self::Author => format!(
-                "SELECT DISTINCT a.name AS name \
-                 FROM comic_authors j \
-                 INNER JOIN authors a ON a.id = j.author_id \
-                 INNER JOIN comics c ON c.comic_id = j.comic_id \
-                 WHERE c.library_id = ? AND {visible} \
-                 ORDER BY a.name COLLATE NOCASE"
-            ),
-            _ => {
-                let junction = self.junction_table();
-                let name_col = self.junction_name_column();
-                format!(
-                    "SELECT DISTINCT j.{name_col} AS name \
-                     FROM {junction} j \
-                     INNER JOIN comics c ON c.comic_id = j.comic_id \
-                     WHERE c.library_id = ? AND {visible} \
-                     ORDER BY j.{name_col} COLLATE NOCASE"
-                )
-            }
-        }
+        let junction = self.junction_table();
+        let name_col = self.junction_name_column();
+        format!(
+            "SELECT DISTINCT j.{name_col} AS name \
+             FROM {junction} j \
+             INNER JOIN comics c ON c.comic_id = j.comic_id \
+             WHERE c.library_id = ? AND {visible} \
+             ORDER BY j.{name_col} COLLATE NOCASE"
+        )
     }
 
     /// Form picker candidates: name + global attachment count.
@@ -81,25 +84,14 @@ impl JunctionNamedFacet {
         let dict = self.dict_table();
         let junction = self.junction_table();
         let visible = visible_comic_id_sql("j.comic_id");
-        match self {
-            Self::Author => format!(
-                "SELECT d.name AS name, COUNT(j.author_id) AS attachment_count \
-                 FROM authors d \
-                 LEFT JOIN comic_authors j ON j.author_id = d.id AND {visible} \
-                 GROUP BY d.id, d.name \
-                 ORDER BY attachment_count DESC, d.name ASC"
-            ),
-            _ => {
-                let name_col = self.junction_name_column();
-                format!(
-                    "SELECT d.name AS name, COUNT(j.{name_col}) AS attachment_count \
-                     FROM {dict} d \
-                     LEFT JOIN {junction} j ON j.{name_col} = d.name AND {visible} \
-                     GROUP BY d.name \
-                     ORDER BY attachment_count DESC, d.name ASC"
-                )
-            }
-        }
+        let name_col = self.junction_name_column();
+        format!(
+            "SELECT d.name AS name, COUNT(j.{name_col}) AS attachment_count \
+             FROM {dict} d \
+             LEFT JOIN {junction} j ON j.{name_col} = d.name AND {visible} \
+             GROUP BY d.name \
+             ORDER BY attachment_count DESC, d.name ASC"
+        )
     }
 }
 
@@ -117,9 +109,6 @@ pub async fn replace_comic_named_facet<C: ConnectionTrait>(
     comic_id: &str,
     names: &[String],
 ) -> Result<(), HentaiError> {
-    if facet == JunctionNamedFacet::Author {
-        return replace_comic_authors(db, comic_id, names).await;
-    }
     let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
     let dict = facet.dict_table();
@@ -219,6 +208,61 @@ pub async fn fetch_named_facet_page(
         .collect()
 }
 
+/// Paged dictionary name list (Tag / Parody / Character management).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PagedStringNamesDto {
+    pub items: Vec<String>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
+pub async fn fetch_named_facet_names_page(
+    facet: JunctionNamedFacet,
+    request: crate::comic::PageRequestDto,
+) -> Result<PagedStringNamesDto, HentaiError> {
+    use crate::comic::pagination::paginate;
+
+    let total = count_all_named_facet_names(facet).await?;
+    let window = paginate(request, total).clamped();
+    if total <= 0 {
+        return Ok(PagedStringNamesDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size: window.page_size,
+        });
+    }
+    let items = fetch_named_facet_page(facet, window.page_size, window.offset as i32).await?;
+    Ok(PagedStringNamesDto {
+        items,
+        total_count: total,
+        page: window.page,
+        page_size: window.page_size,
+    })
+}
+
+/// Paged management-tab names (Author display names or dictionary facet names).
+pub async fn fetch_management_facet_names_page(
+    facet: ManagementFacetKind,
+    request: crate::comic::PageRequestDto,
+) -> Result<PagedStringNamesDto, HentaiError> {
+    match facet {
+        ManagementFacetKind::Author => {
+            let page = crate::author::fetch_author_names_page_result(request).await?;
+            Ok(PagedStringNamesDto {
+                items: page.items,
+                total_count: page.total_count,
+                page: page.page,
+                page_size: page.page_size,
+            })
+        }
+        ManagementFacetKind::Tag | ManagementFacetKind::Parody | ManagementFacetKind::Character => {
+            fetch_named_facet_names_page(facet.junction().expect("dictionary facet"), request).await
+        }
+    }
+}
+
 pub async fn list_distinct_named_facet_names(
     facet: JunctionNamedFacet,
     library_id: Option<String>,
@@ -247,10 +291,6 @@ pub async fn add_named_facet_name(
     facet: JunctionNamedFacet,
     name: &str,
 ) -> Result<(), HentaiError> {
-    if facet == JunctionNamedFacet::Author {
-        crate::author::add_author(name).await?;
-        return Ok(());
-    }
     let db = connection()?;
     let dict = facet.dict_table();
     db.execute(Statement::from_sql_and_values(
@@ -277,9 +317,6 @@ async fn delete_named_facet_by_names_locked(
     facet: JunctionNamedFacet,
     names: Vec<String>,
 ) -> Result<(), HentaiError> {
-    if facet == JunctionNamedFacet::Author {
-        return crate::author::delete_authors_by_names_locked(names).await;
-    }
     let db = connection()?;
     let dict = facet.dict_table();
     let placeholders = std::iter::repeat_n("?", names.len())
@@ -312,9 +349,6 @@ async fn rename_named_facet_name_locked(
     old_name: &str,
     new_name: &str,
 ) -> Result<(), HentaiError> {
-    if facet == JunctionNamedFacet::Author {
-        return crate::author::rename_author_locked(old_name, new_name).await;
-    }
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
     let dict = facet.dict_table();
@@ -352,7 +386,7 @@ async fn rename_named_facet_name_locked(
     Ok(())
 }
 
-/// Merge one non-author Named facet name into another in a single transaction.
+/// Merge one dictionary Named facet name into another in a single transaction.
 pub async fn merge_named_facet_name(
     facet: JunctionNamedFacet,
     source_name: &str,
@@ -366,9 +400,6 @@ async fn merge_named_facet_name_locked(
     source_name: &str,
     target_name: &str,
 ) -> Result<(), HentaiError> {
-    if facet == JunctionNamedFacet::Author {
-        return Err(HentaiError::validation("作者暂不支持合并"));
-    }
     let source = source_name.trim();
     let target = target_name.trim();
     if source.is_empty() || target.is_empty() {
@@ -465,24 +496,6 @@ pub async fn count_named_facet_attachments(
     name: &str,
 ) -> Result<i64, HentaiError> {
     let db = connection()?;
-    if facet == JunctionNamedFacet::Author {
-        let rows = db
-            .query_all(Statement::from_sql_and_values(
-                sea_orm::DatabaseBackend::Sqlite,
-                crate::author::author_attachment_count_sql(),
-                [Value::String(Some(Box::new(name.to_string())))],
-            ))
-            .await
-            .map_err(map_db_err)?;
-        return rows
-            .into_iter()
-            .next()
-            .ok_or_else(|| HentaiError::db_query_failed("count row missing".to_string(), None))
-            .and_then(|row| {
-                row.try_get_by_index::<i64>(0)
-                    .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
-            });
-    }
     let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
     let rows = db
@@ -513,16 +526,13 @@ mod tests {
     fn distinct_sql_scopes_library_for_each_facet() {
         for facet in [
             JunctionNamedFacet::Tag,
-            JunctionNamedFacet::Author,
             JunctionNamedFacet::Parody,
             JunctionNamedFacet::Character,
         ] {
             let sql = facet.distinct_attached_sql();
             assert!(sql.contains(facet.junction_table()), "{facet:?}");
             assert!(sql.contains("c.library_id = ?"), "{facet:?}");
-            if facet != JunctionNamedFacet::Author {
-                assert!(sql.contains(facet.junction_name_column()), "{facet:?}");
-            }
+            assert!(sql.contains(facet.junction_name_column()), "{facet:?}");
         }
     }
 
@@ -530,7 +540,6 @@ mod tests {
     fn form_listing_sql_counts_and_orders_for_each_facet() {
         for facet in [
             JunctionNamedFacet::Tag,
-            JunctionNamedFacet::Author,
             JunctionNamedFacet::Parody,
             JunctionNamedFacet::Character,
         ] {

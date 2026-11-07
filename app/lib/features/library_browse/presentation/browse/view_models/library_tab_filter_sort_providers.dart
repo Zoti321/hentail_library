@@ -1,0 +1,112 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+
+part 'library_tab_filter_sort_providers.g.dart';
+
+/// 当前 Tab 生效的年龄限制：Comics 取自 [LibraryComicFiltersNotifier]，
+/// Series 取自 [LibrarySeriesFiltersNotifier]。
+@Riverpod(keepAlive: true)
+LibraryAgeRestrictionFilter libraryActiveAgeRestrictionFilter(Ref ref) {
+  final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
+  return switch (target) {
+    LibraryDisplayTarget.comics => ref.watch(
+      libraryComicFiltersProvider.select(
+        (AsyncValue<LibraryComicFiltersState> state) =>
+            state.value?.ageRestriction ??
+            LibraryAgeRestrictionFilter.unrestricted,
+      ),
+    ),
+    LibraryDisplayTarget.series => ref.watch(
+      librarySeriesTabAgeRestrictionFilterProvider,
+    ),
+  };
+}
+
+@Riverpod(keepAlive: true)
+LibraryComicSortOption libraryActiveComicSortOption(Ref ref) {
+  final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
+  if (target != LibraryDisplayTarget.comics) {
+    return kLibraryDefaultSortOption;
+  }
+  return ref.watch(
+    libraryComicFiltersProvider.select(
+      (AsyncValue<LibraryComicFiltersState> state) =>
+          state.value?.sortOption ?? kLibraryDefaultSortOption,
+    ),
+  );
+}
+
+@Riverpod(keepAlive: true)
+LibrarySeriesSortOption libraryActiveSeriesSortOption(Ref ref) {
+  final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
+  if (target != LibraryDisplayTarget.series) {
+    return kLibraryDefaultSeriesSortOption;
+  }
+  return ref.watch(librarySeriesTabSortOptionProvider);
+}
+
+@Riverpod(keepAlive: true)
+LibraryAgeRestrictionFilter librarySeriesTabAgeRestrictionFilter(Ref ref) {
+  return ref.watch(
+    librarySeriesFiltersProvider.select(
+      (AsyncValue<LibrarySeriesFiltersState> state) =>
+          state.value?.ageRestriction ??
+          LibraryAgeRestrictionFilter.unrestricted,
+    ),
+  );
+}
+
+@Riverpod(keepAlive: true)
+LibrarySeriesSortOption librarySeriesTabSortOption(Ref ref) {
+  return ref.watch(
+    librarySeriesFiltersProvider.select(
+      (AsyncValue<LibrarySeriesFiltersState> state) =>
+          state.value?.sortOption ?? kLibraryDefaultSeriesSortOption,
+    ),
+  );
+}
+
+@Riverpod(keepAlive: true)
+LibrarySerializationStatusFilter librarySeriesTabSerializationStatusFilter(
+  Ref ref,
+) {
+  return ref.watch(
+    librarySeriesFiltersProvider.select(
+      (AsyncValue<LibrarySeriesFiltersState> state) =>
+          state.value?.serializationStatusFilter ??
+          LibrarySerializationStatusFilter.unrestricted,
+    ),
+  );
+}
+
+@Riverpod(keepAlive: true)
+bool librarySeriesTabPreferLibraryRootSeries(Ref ref) {
+  return ref.watch(
+    settingsProvider.select(
+      (AsyncValue<AppSetting> async) =>
+          async.asData?.value.preferLibraryRootSeries ?? true,
+    ),
+  );
+}
+
+@Riverpod(keepAlive: true)
+bool libraryActiveFilterSortIsCustomized(Ref ref) {
+  final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
+  return switch (target) {
+    LibraryDisplayTarget.comics => ref.watch(
+      libraryComicFiltersIsCustomizedProvider,
+    ),
+    LibraryDisplayTarget.series => ref.watch(
+      librarySeriesFiltersIsCustomizedProvider,
+    ),
+  };
+}

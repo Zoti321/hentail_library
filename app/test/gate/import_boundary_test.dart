@@ -28,7 +28,73 @@ void main() {
       isFrbImportAllowedSource('features/library_admin/domain/foo.dart'),
       isFalse,
     );
+    expect(
+      isFrbImportAllowedSource(
+        'features/read_session/application/reader_session_service.dart',
+      ),
+      isFalse,
+    );
     expect(isFrbImportAllowedSource('shared/data/adapters/foo.dart'), isTrue);
+    expect(
+      isFrbImportAllowedSource(
+        'features/comic_trash/data/adapters/comic_trash_frb_adapter.dart',
+      ),
+      isTrue,
+    );
+    expect(
+      isFrbImportAllowedSource(
+        'features/comic_trash/presentation/views/trash/trash_page.dart',
+      ),
+      isFalse,
+    );
+  });
+
+  test('M1 public path allowlist (ADR-0034 / #429)', () {
+    expect(
+      isFeaturePublicPath('features/library_admin/public/library_admin.dart'),
+      isTrue,
+    );
+    expect(isFeaturePublicPath('features/library_admin/public.dart'), isTrue);
+    expect(
+      isFeaturePublicPath('features/library_admin/public/ui/commands.dart'),
+      isTrue,
+    );
+    expect(
+      isFeaturePublicPath('features/library_admin/application/foo.dart'),
+      isFalse,
+    );
+    expect(
+      isFeaturePublicPath('features/library_admin/presentation/bar.dart'),
+      isFalse,
+    );
+    expect(isFeaturePublicPath('shared/domain/foo.dart'), isFalse);
+  });
+
+  test('R12 public→presentation export allowlist (only shrink)', () {
+    expect(
+      isPublicPresentationExportAllowlisted(
+        'features/comic/public/ui/comic_detail_page.dart',
+      ),
+      isTrue,
+    );
+    expect(
+      isPublicPresentationExportAllowlisted(
+        'features/library_browse/public/catalog/for_comic_and_series.dart',
+      ),
+      isTrue,
+    );
+    expect(
+      isPublicPresentationExportAllowlisted(
+        'features/comic/public/shell/library_browse_shell_exports.dart',
+      ),
+      isFalse,
+    );
+    expect(
+      isPublicPresentationExportAllowlisted(
+        'features/series/public/shell/library_browse_shell_exports.dart',
+      ),
+      isFalse,
+    );
   });
 
   test('import boundaries: L1 structural rules are zero-tolerance', () {
@@ -36,10 +102,23 @@ void main() {
     final List<ImportViolation> structural = structuralViolations(all);
     if (structural.isNotEmpty) {
       fail(
-        'Structural import violations (R1–R5):\n'
+        'Structural import violations (R1–R12):\n'
         '${_formatViolations(structural)}',
       );
     }
+  });
+
+  test('import boundaries: no cycles in public cross-feature graph', () {
+    final Map<String, Set<String>> adjacency =
+        collectPublicCrossFeatureAdjacency(libDir);
+    final List<String>? cycle = findPublicCrossFeatureCycle(adjacency);
+    expect(
+      cycle,
+      isNull,
+      reason: cycle == null
+          ? null
+          : 'Public API dependency cycle: ${cycle.join(' -> ')}',
+    );
   });
 
   test('import boundaries: L2 product graph ratchet vs baseline', () {

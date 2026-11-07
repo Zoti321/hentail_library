@@ -24,8 +24,16 @@ pub enum ThumbnailPriority {
 
 #[derive(Debug, Clone)]
 pub enum ThumbnailEvent {
-    Ready { comic_id: String },
-    Progress { done: i32, total: i32, failed: i32 },
+    /// [thumbnail] 为 JPEG 字节；缺失时 Flutter 可回退 find。
+    Ready {
+        comic_id: String,
+        thumbnail: Option<Vec<u8>>,
+    },
+    Progress {
+        done: i32,
+        total: i32,
+        failed: i32,
+    },
 }
 
 #[derive(Debug, Default)]
@@ -171,8 +179,14 @@ impl ThumbnailQueue {
             self.emit_progress().await;
         }
         if ready {
+            let thumbnail = find_thumbnail_by_comic_id(comic_id)
+                .await
+                .ok()
+                .flatten()
+                .map(|row| row.thumbnail);
             let _ = self.events.send(ThumbnailEvent::Ready {
                 comic_id: comic_id.to_string(),
+                thumbnail,
             });
         }
         self.notify_waiters(comic_id).await;

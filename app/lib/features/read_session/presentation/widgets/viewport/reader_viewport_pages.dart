@@ -51,7 +51,7 @@ class ReaderViewportPagesFeedback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color muted = context.hentai.readerTextMuted;
+    final Color muted = context.reader.readerTextMuted;
     return switch (pages) {
       ReaderViewportPagesLoading() => const Center(
         child: CircularProgressIndicator(),

@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
+import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-export 'package:hentai_library/shared/domain/library/library_revision_state.dart';
+export 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 
 part 'library_revision_notifier.g.dart';
 

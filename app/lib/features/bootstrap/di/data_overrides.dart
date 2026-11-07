@@ -1,72 +1,66 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/read_session/data/adapters/comic_page_source_frb_adapter.dart';
-import 'package:hentai_library/features/read_session/data/adapters/reader_session_frb_adapter.dart';
-import 'package:hentai_library/features/library_admin/data/adapters/library_revision_frb_adapter.dart';
-import 'package:hentai_library/features/app_settings/data/repositories/app_setting_repository_impl.dart';
-import 'package:hentai_library/features/named_metadata/data/repositories/author_repository_impl.dart';
-import 'package:hentai_library/features/library_browse/data/repositories/comic_repository_impl.dart';
-import 'package:hentai_library/features/library_browse/di/comic_repository_providers.dart';
-import 'package:hentai_library/shared/data/repositories/comic_thumbnail_repository_impl.dart';
-import 'package:hentai_library/features/home/data/repositories/home_page_repository_impl.dart';
-import 'package:hentai_library/features/library_admin/data/repositories/library_repository_impl.dart';
-import 'package:hentai_library/features/named_metadata/data/repositories/named_facet_dictionary_repository_impl.dart';
-import 'package:hentai_library/features/named_metadata/data/repositories/named_facet_management_repository_impl.dart';
-import 'package:hentai_library/features/home/data/repositories/reading_history_repository_impl.dart';
-import 'package:hentai_library/features/library_browse/data/repositories/series_repository_impl.dart';
-import 'package:hentai_library/features/named_metadata/data/repositories/tag_repository_impl.dart';
+import 'package:hentai_library/features/bootstrap/di/adapters/comic_trash_reader_session_adapter.dart';
+import 'package:hentai_library/features/read_session/public.dart';
+import 'package:hentai_library/features/app_settings/public.dart';
+import 'package:hentai_library/features/comic_trash/public.dart';
+import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/features/comic/public.dart';
+import 'package:hentai_library/features/series/public.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/home/public.dart';
+import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary_repository.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 List<Override> dataProviderOverrides() => <Override>[
-  comicThumbnailRepoProvider.overrideWith(
-    (Ref ref) => ComicThumbnailRepositoryImpl(
-      libraryRepository: ref.read(libraryRepoProvider),
-    ),
+  remoteLibraryCredentialsPortProvider.overrideWith(
+    (Ref ref) =>
+        createRemoteLibraryCredentialsPort(ref.read(libraryRepoProvider)),
   ),
+  comicThumbnailRepoProvider.overrideWith(createComicThumbnailRepository),
   comicLookupRepositoryProvider.overrideWith(
-    (Ref ref) => const ComicRepositoryImpl(),
+    (Ref ref) => createComicRepository(),
   ),
   comicTrashRepositoryProvider.overrideWith(
-    (Ref ref) => const ComicRepositoryImpl(),
+    (Ref ref) => createComicTrashRepository(),
   ),
   comicCatalogRepositoryProvider.overrideWith(
-    (Ref ref) => const ComicRepositoryImpl(),
+    (Ref ref) => createComicCatalogRepository(),
   ),
   comicUserMetadataRepositoryProvider.overrideWith(
-    (Ref ref) => const ComicRepositoryImpl(),
+    (Ref ref) => createComicUserMetadataRepository(),
   ),
-  seriesRepoProvider.overrideWith((Ref ref) => const SeriesRepositoryImpl()),
-  tagRepoProvider.overrideWith((Ref ref) => const TagRepositoryImpl()),
-  authorRepoProvider.overrideWith((Ref ref) => const AuthorRepositoryImpl()),
-  namedFacetManagementRepoProvider.overrideWith(
-    (Ref ref) => const NamedFacetManagementRepositoryImpl(),
-  ),
-  parodyRepoProvider.overrideWith(
-    (Ref ref) =>
-        const NamedFacetDictionaryRepositoryImpl(NamedFacetKind.parody),
-  ),
-  characterRepoProvider.overrideWith(
-    (Ref ref) =>
-        const NamedFacetDictionaryRepositoryImpl(NamedFacetKind.character),
-  ),
-  libraryRepoProvider.overrideWith((Ref ref) => const LibraryRepositoryImpl()),
-  readingHistoryRepoProvider.overrideWith(
-    (Ref ref) => const ReadingHistoryRepositoryImpl(),
-  ),
-  appSettingRepoProvider.overrideWith((Ref ref) => AppSettingRepositoryImpl()),
-  homePageRepoProvider.overrideWith(
-    (Ref ref) => const HomePageRepositoryImpl(),
-  ),
-  readerSessionPortProvider.overrideWith(
-    (Ref ref) => ReaderSessionFrbAdapter(
-      libraryRepository: ref.read(libraryRepoProvider),
+  seriesRepoProvider.overrideWith((Ref ref) => createSeriesRepository()),
+  tagRepoProvider.overrideWith(
+    (Ref ref) => createTagRepository(
+      namedFacets: ref.read(namedFacetManagementRepoProvider),
     ),
   ),
-  comicPageSourcePortProvider.overrideWith(
-    (Ref ref) => const ComicPageSourceFrbAdapter(),
+  authorRepoProvider.overrideWith((Ref ref) => createAuthorRepository()),
+  namedFacetManagementRepoProvider.overrideWith(
+    (Ref ref) => createNamedFacetManagementRepository(),
   ),
+  parodyRepoProvider.overrideWith(
+    (Ref ref) => createNamedFacetDictionaryRepository(NamedFacetKind.parody),
+  ),
+  characterRepoProvider.overrideWith(
+    (Ref ref) => createNamedFacetDictionaryRepository(NamedFacetKind.character),
+  ),
+  libraryRepoProvider.overrideWith((Ref ref) => createLibraryRepository()),
+  readingHistoryRepoProvider.overrideWith(
+    (Ref ref) => createReadingHistoryRepository(),
+  ),
+  appSettingRepoProvider.overrideWith(
+    (Ref ref) => createAppSettingRepository(),
+  ),
+  homePageRepoProvider.overrideWith((Ref ref) => createHomePageRepository()),
+  readerSessionPortProvider.overrideWith(createReaderSessionPort),
+  comicTrashReaderSessionPortProvider.overrideWith(
+    (Ref ref) =>
+        ComicTrashReaderSessionAdapter(ref.read(readerSessionPortProvider)),
+  ),
+  comicPageSourcePortProvider.overrideWith(createComicPageSourcePort),
   libraryRevisionPortProvider.overrideWith(
-    (Ref ref) => const LibraryRevisionFrbAdapter(),
+    (Ref ref) => createLibraryRevisionPort(),
   ),
 ];

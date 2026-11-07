@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/features/library_admin/data/local_library_root_access.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_port.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/data/frb/frb_error_mapper.dart';
+import 'package:hentai_library/features/library_admin/application/sync_library_use_case.dart';
+import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/di/library_sync.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'scan_library_controller.freezed.dart';
@@ -68,29 +66,19 @@ class ScanLibraryController extends _$ScanLibraryController {
       progress: null,
     );
 
-    final SyncLibraryPort syncAdapter = ref.read(syncLibraryPortProvider);
+    final SyncLibraryUseCase sync = ref.read(syncLibraryUseCaseProvider);
     _future =
         () async {
-              if (promptStorageAccess) {
-                await ensureLocalFilesystemAccess();
-              }
-              if (_cancelled) {
-                return;
-              }
-              await syncAdapter.call(
-                scanMode: mode,
+              await sync.run(
+                mode: mode,
                 syncAll: syncAll,
                 targetLibraryId: targetLibraryId,
                 isCancelled: () => _cancelled,
                 onProgress: (SyncLibraryProgress progress) {
                   state = state.copyWith(progress: progress);
                 },
+                promptStorageAccess: promptStorageAccess,
               );
-              if (!_cancelled) {
-                ref
-                    .read(libraryRevisionProvider.notifier)
-                    .notifyExternalChange();
-              }
             }()
             .then((_) {
               state = state.copyWith(running: false);
@@ -110,7 +98,7 @@ class ScanLibraryController extends _$ScanLibraryController {
   void cancel() {
     if (!state.running) return;
     _cancelled = true;
-    ref.read(syncLibraryPortProvider).cancelActive();
+    ref.read(syncLibraryUseCaseProvider).cancelActive();
     state = state.copyWith(running: false, cancelled: true);
   }
 

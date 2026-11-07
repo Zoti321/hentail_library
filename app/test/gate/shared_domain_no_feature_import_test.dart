@@ -18,24 +18,7 @@ void main() {
   });
 
   test('shared/data intentional feature-import exemptions stay documented', () {
-    expect(
-      isSharedDataFeatureImportExempt(
-        'shared/data/adapters/reader_frb_mapper.dart',
-      ),
-      isTrue,
-    );
-    expect(
-      isSharedDataFeatureImportExempt(
-        'shared/data/adapters/series_frb_mapper.dart',
-      ),
-      isTrue,
-    );
-    expect(
-      isSharedDataFeatureImportExempt(
-        'shared/data/repositories/named_facet_form_listing.dart',
-      ),
-      isTrue,
-    );
+    expect(kSharedDataExplicitFeatureImportAllowlist, isEmpty);
   });
 
   test('shared/domain -> features import ratchet vs baseline (L3)', () {

@@ -1,6 +1,6 @@
 mod common;
 
-use hentai_core::sync::format_group::FormatGroup;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::{
     create_local_library, create_remote_library, init_db_at_path, list_libraries,
     parse_scan_interval, update_library_settings, ScanInterval,
@@ -65,7 +65,7 @@ fn update_library_settings_renames_without_changing_identity_or_root() {
             let updated = update_library_settings(
                 &created.library_id,
                 "Renamed",
-                vec![FormatGroup::Pdf, FormatGroup::Archive],
+                vec![ResourceFormatCategory::Pdf, ResourceFormatCategory::Archive],
                 true,
                 ScanInterval::Daily,
             )
@@ -78,8 +78,8 @@ fn update_library_settings_renames_without_changing_identity_or_root() {
             assert!(updated.scan_on_startup);
             assert_eq!(updated.scan_interval, ScanInterval::Daily);
             assert_eq!(
-                updated.enabled_format_groups,
-                vec![FormatGroup::Pdf, FormatGroup::Archive]
+                updated.enabled_resource_format_categories,
+                vec![ResourceFormatCategory::Pdf, ResourceFormatCategory::Archive]
             );
         });
     });

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/logging/app_logging.dart';
 import 'package:hentai_library/core/logging/log_export_service.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -56,12 +56,12 @@ Future<void> runLogExportFlow(
     );
 
     if (context.mounted) {
-      showSuccessToast(context, '日志已导出至 ${p.basename(outputPath)}');
+      showSuccessSnackbar(context, '日志已导出至 ${p.basename(outputPath)}');
     }
   } catch (e, st) {
     logError(AppLog.core('logging'), '导出日志失败', e, st);
     if (context.mounted) {
-      showErrorToast(context, e);
+      showErrorSnackbar(context, e);
     }
   }
 }

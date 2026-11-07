@@ -7,6 +7,7 @@ use crate::comic::visibility::{
 };
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
+use crate::history::reading_history_retention_cutoff_ms;
 use crate::library::ScanInterval;
 
 #[derive(Debug, Clone, Default)]
@@ -52,6 +53,15 @@ pub struct HomeRecentlyAddedDto {
     pub created_at_ms: i64,
 }
 
+/// 首页库列表的每库统计：可见漫画数、可浏览系列数、上次成功同步时间。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LibraryHomeStatDto {
+    pub library_id: String,
+    pub comic_count: i32,
+    pub series_count: i32,
+    pub last_successful_sync_at_ms: Option<i64>,
+}
+
 fn counts_sql(exclude_r18: bool) -> String {
     let (c_comic, c_series) = if exclude_r18 {
         (
@@ -90,7 +100,7 @@ fn counts_sql(exclude_r18: bool) -> String {
     )
 }
 
-fn continue_reading_sql(exclude_r18: bool) -> String {
+fn continue_reading_sql(exclude_r18: bool, retention_cutoff_ms: i64) -> String {
     let (rating_join, rating_filter) = if exclude_r18 {
         (
             "INNER JOIN comic_meta cm ON cm.comic_id = h.comic_id",
@@ -102,7 +112,7 @@ fn continue_reading_sql(exclude_r18: bool) -> String {
     format!(
         "SELECT h.last_read_time, h.comic_id, h.title, h.page_index \
          FROM comic_reading_histories h {rating_join} \
-         WHERE {rating_filter}{} \
+         WHERE {rating_filter}h.last_read_time >= {retention_cutoff_ms} AND {} \
          ORDER BY h.last_read_time DESC \
          LIMIT 5",
         comic_id_not_trashed_sql("h.comic_id")
@@ -134,6 +144,50 @@ fn recently_added_sql(exclude_r18: bool) -> String {
          LIMIT 8",
         visible_comic_sql("c")
     )
+}
+
+/// 每库统计 SQL：两个相关子查询，R18 绑定顺序为「漫画子查询、系列子查询」。
+fn library_stats_sql(exclude_r18: bool) -> String {
+    let (comic_join, comic_rating, series_rating, series_visible) = if exclude_r18 {
+        (
+            "INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id",
+            " AND cm.content_rating != ?",
+            format!(
+                " AND NOT EXISTS ( \
+                 SELECT 1 FROM series_items si1 \
+                 INNER JOIN comic_meta cm1 ON cm1.comic_id = si1.comic_id \
+                 WHERE si1.series_id = s.series_id AND {} AND cm1.content_rating = ?)",
+                visible_comic_id_sql("si1.comic_id")
+            ),
+            series_has_visible_member_sql("s.series_id"),
+        )
+    } else {
+        ("", "", String::new(), series_browsable_sql("s.series_id"))
+    };
+    format!(
+        "SELECT l.library_id AS library_id, \
+         (SELECT COUNT(*) FROM comics c {comic_join} \
+          WHERE c.library_id = l.library_id AND {}{comic_rating}) AS c_comic, \
+         (SELECT COUNT(*) FROM series s \
+          WHERE s.library_id = l.library_id AND {series_visible}{series_rating}) AS c_series, \
+         l.last_successful_sync_at AS last_sync \
+         FROM libraries l \
+         ORDER BY l.sidebar_order ASC, l.library_id ASC",
+        visible_comic_sql("c")
+    )
+}
+
+pub async fn watch_library_home_stats(
+    exclude_r18: bool,
+    mut emit: impl FnMut(Vec<LibraryHomeStatDto>) -> Result<(), HentaiError>,
+) -> Result<(), HentaiError> {
+    let db = connection()?;
+    let mut changes = crate::revision::subscribe();
+    emit(load_library_home_stats(&db, exclude_r18).await?)?;
+    while changes.changed().await.is_ok() {
+        emit(load_library_home_stats(&db, exclude_r18).await?)?;
+    }
+    Ok(())
 }
 
 pub async fn watch_home_page_counts(
@@ -193,7 +247,7 @@ async fn load_continue_reading(
 ) -> Result<Vec<HomeContinueReadingDto>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         db.get_database_backend(),
-        continue_reading_sql(exclude_r18),
+        continue_reading_sql(exclude_r18, reading_history_retention_cutoff_ms(now_ms())),
         r18_values(exclude_r18, 1),
     );
     let rows = db.query_all(stmt).await.map_err(map_db_err)?;
@@ -227,6 +281,30 @@ async fn load_recently_added(
                 library_id: row.try_get("", "library_id").unwrap_or_default(),
                 library_display_name: row.try_get("", "library_name").unwrap_or_default(),
                 created_at_ms: row.try_get("", "created_at").unwrap_or(0),
+            })
+        })
+        .collect()
+}
+
+async fn load_library_home_stats(
+    db: &DatabaseConnection,
+    exclude_r18: bool,
+) -> Result<Vec<LibraryHomeStatDto>, HentaiError> {
+    let stmt = Statement::from_sql_and_values(
+        db.get_database_backend(),
+        library_stats_sql(exclude_r18),
+        r18_values(exclude_r18, 2),
+    );
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            Ok(LibraryHomeStatDto {
+                library_id: row.try_get("", "library_id").unwrap_or_default(),
+                comic_count: row.try_get::<i32>("", "c_comic").unwrap_or(0),
+                series_count: row.try_get::<i32>("", "c_series").unwrap_or(0),
+                last_successful_sync_at_ms: row
+                    .try_get::<Option<i64>>("", "last_sync")
+                    .unwrap_or(None),
             })
         })
         .collect()
@@ -367,7 +445,7 @@ mod tests {
             allow_http: 0,
             scan_on_startup: 0,
             scan_interval: scan_interval.to_string(),
-            enabled_format_groups: "[]".to_string(),
+            enabled_resource_format_categories: "[]".to_string(),
             created_at: 0,
             pinned: 0,
             sidebar_order: 0,

@@ -4,13 +4,15 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
+use hentai_core::ComicGrouping;
 use hentai_core::{
     comic_id_from_path, connection, create_local_library, delete_library, fetch_comics_page,
-    find_comic_by_id, get_current_library_id, get_reading_by_comic_id, init_db_at_path,
-    library_id_from_root, list_libraries, record_reading, set_current_library_id, sync_library,
-    update_library_format_groups, ComicFilterDto, PageRequestDto, ReadingHistoryDto, SyncScanMode,
+    find_comic_by_id, get_reading_by_comic_id, init_db_at_path, library_id_from_root,
+    list_libraries, now_ms, record_reading, sync_library,
+    update_library_resource_format_categories, ComicFilterDto, PageRequestDto, ReadingHistoryDto,
+    SyncScanMode,
 };
 use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
@@ -112,9 +114,6 @@ fn saved_paths_migrate_to_local_libraries_preserving_comic_ids() {
             assert_eq!(a.library_id, lib_a_id);
             assert_eq!(b.library_id, lib_b_id);
 
-            let current = get_current_library_id().await.expect("current");
-            assert!(current.is_some());
-
             let db = connection().expect("db");
             let leftover = db
                 .query_one(Statement::from_string(
@@ -130,7 +129,7 @@ fn saved_paths_migrate_to_local_libraries_preserving_comic_ids() {
 }
 
 #[test]
-fn sync_current_library_does_not_remove_other_library_comics() {
+fn sync_target_library_does_not_remove_other_library_comics() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = common::create_fixture_db(temp.path());
@@ -152,9 +151,6 @@ fn sync_current_library_does_not_remove_other_library_comics() {
             let lib_b = create_local_library(&root_b.to_string_lossy(), None)
                 .await
                 .expect("create b");
-            set_current_library_id(Some(&lib_a.library_id))
-                .await
-                .expect("set current a");
 
             let handle = create_sync_handle();
             // Sync all once to populate both.
@@ -167,15 +163,19 @@ fn sync_current_library_does_not_remove_other_library_comics() {
             assert!(find_comic_by_id(&id_a).await.unwrap().is_some());
             assert!(find_comic_by_id(&id_b).await.unwrap().is_some());
 
-            // Remove comic_a from disk, sync only current (A).
+            // Remove comic_a from disk, sync only library A.
             std::fs::remove_dir_all(&comic_a).expect("rm a");
-            set_current_library_id(Some(&lib_a.library_id))
-                .await
-                .expect("current a");
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, false, None, vec![], |_| {})
-                .await
-                .expect("sync current");
+            sync_library(
+                handle,
+                SyncScanMode::Full,
+                false,
+                Some(lib_a.library_id.as_str()),
+                vec![],
+                |_| {},
+            )
+            .await
+            .expect("sync a");
 
             assert!(find_comic_by_id(&id_a).await.unwrap().is_none());
             assert!(
@@ -191,7 +191,7 @@ fn sync_current_library_does_not_remove_other_library_comics() {
 }
 
 #[test]
-fn per_library_format_groups_only_affect_that_library_on_sync() {
+fn per_library_resource_format_categories_only_affect_that_library_on_sync() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = common::create_fixture_db(temp.path());
@@ -223,16 +223,23 @@ fn per_library_format_groups_only_affect_that_library_on_sync() {
             assert!(find_comic_by_id(&archive_a).await.unwrap().is_some());
             assert!(find_comic_by_id(&archive_b).await.unwrap().is_some());
 
-            update_library_format_groups(&lib_a.library_id, vec![FormatGroup::Folder])
-                .await
-                .expect("formats a");
-            set_current_library_id(Some(&lib_a.library_id))
-                .await
-                .expect("current");
+            update_library_resource_format_categories(
+                &lib_a.library_id,
+                vec![ResourceFormatCategory::Folder],
+            )
+            .await
+            .expect("formats a");
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, false, None, vec![], |_| {})
-                .await
-                .expect("sync a");
+            sync_library(
+                handle,
+                SyncScanMode::Full,
+                false,
+                Some(lib_a.library_id.as_str()),
+                vec![],
+                |_| {},
+            )
+            .await
+            .expect("sync a");
 
             assert!(find_comic_by_id(&archive_a).await.unwrap().is_none());
             assert!(
@@ -275,8 +282,9 @@ fn delete_library_clears_only_that_library_comics_and_series() {
             record_reading(&ReadingHistoryDto {
                 comic_id: id_b.clone(),
                 title: "keep".into(),
-                last_read_time_ms: 100,
+                last_read_time_ms: now_ms(),
                 page_index: Some(0),
+                page_count: None,
             })
             .await
             .expect("history b");
@@ -290,21 +298,18 @@ fn delete_library_clears_only_that_library_comics_and_series() {
             let remaining = list_libraries().await.expect("list");
             assert_eq!(remaining.len(), 1);
             assert_eq!(remaining[0].library_id, lib_b.library_id);
-            assert_eq!(
-                get_current_library_id().await.unwrap().as_deref(),
-                Some(lib_b.library_id.as_str())
-            );
 
-            set_current_library_id(Some(&lib_b.library_id))
-                .await
-                .expect("current b");
+            let filter = ComicFilterDto {
+                library_id: Some(lib_b.library_id.clone()),
+                ..Default::default()
+            };
             let page = fetch_comics_page(
                 PageRequestDto {
                     page: 1,
                     page_size: 50,
                 },
-                ComicFilterDto::default(),
-                false,
+                filter,
+                ComicGrouping::None,
                 Default::default(),
             )
             .await
@@ -316,7 +321,7 @@ fn delete_library_clears_only_that_library_comics_and_series() {
 }
 
 #[test]
-fn browse_defaults_to_current_library_scope() {
+fn browse_requires_explicit_library_id() {
     common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = common::create_fixture_db(temp.path());
@@ -341,16 +346,30 @@ fn browse_defaults_to_current_library_scope() {
                 .await
                 .expect("sync");
 
-            set_current_library_id(Some(&lib_a.library_id))
-                .await
-                .expect("current a");
-            let page_a = fetch_comics_page(
+            let empty = fetch_comics_page(
                 PageRequestDto {
                     page: 1,
                     page_size: 50,
                 },
                 ComicFilterDto::default(),
-                false,
+                ComicGrouping::None,
+                Default::default(),
+            )
+            .await
+            .expect("empty scope");
+            assert_eq!(empty.total_count, 0);
+
+            let filter_a = ComicFilterDto {
+                library_id: Some(lib_a.library_id.clone()),
+                ..Default::default()
+            };
+            let page_a = fetch_comics_page(
+                PageRequestDto {
+                    page: 1,
+                    page_size: 50,
+                },
+                filter_a,
+                ComicGrouping::None,
                 Default::default(),
             )
             .await
@@ -358,16 +377,17 @@ fn browse_defaults_to_current_library_scope() {
             assert_eq!(page_a.total_count, 1);
             assert!(page_a.items[0].path.contains("lib_a"));
 
-            set_current_library_id(Some(&lib_b.library_id))
-                .await
-                .expect("current b");
+            let filter_b = ComicFilterDto {
+                library_id: Some(lib_b.library_id.clone()),
+                ..Default::default()
+            };
             let page_b = fetch_comics_page(
                 PageRequestDto {
                     page: 1,
                     page_size: 50,
                 },
-                ComicFilterDto::default(),
-                false,
+                filter_b,
+                ComicGrouping::None,
                 Default::default(),
             )
             .await

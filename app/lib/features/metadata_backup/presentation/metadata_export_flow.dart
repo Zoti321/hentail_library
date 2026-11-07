@@ -1,37 +1,28 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/features/metadata_backup/application/metadata_export_use_case.dart';
+import 'package:hentai_library/features/metadata_backup/data/repositories/metadata_backup_repository_impl.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
-import 'package:hentai_library/features/metadata_backup/data/adapters/metadata_backup_frb_adapter.dart';
-import 'package:hentai_library/features/metadata_backup/data/adapters/metadata_backup_frb_types.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/shared/ui/widgets/form/fluent_toggle_field.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/features/metadata_backup/presentation/widgets/metadata_export_options_dialog.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 
-typedef MetadataExportInvoker = Uint8List Function(
-  ExportComicMetadataOptionsDto options,
-);
+export 'widgets/metadata_export_options_dialog.dart';
 
-/// 手动导出 Comic 用户元数据：选项 dialog → 另存为 → FRB export → Toast。
+/// 手动导出 Comic 用户元数据：选项 dialog → 另存为 → 用例写入 → Toast。
 Future<void> runMetadataExportFlow(
   BuildContext context, {
   required MetadataExportOptions initialOptions,
-  MetadataExportInvoker? exportInvoker,
+  MetadataExportUseCase? exportUseCase,
 }) async {
-  final MetadataExportOptions? options =
-      await showDialog<MetadataExportOptions>(
-        context: context,
-        builder: (BuildContext context) =>
-            MetadataExportOptionsDialog(initialOptions: initialOptions),
-      );
+  final MetadataExportOptions? options = await showMetadataExportOptionsDialog(
+    context: context,
+    initialOptions: initialOptions,
+  );
   if (options == null || !context.mounted) {
     return;
   }
@@ -50,22 +41,18 @@ Future<void> runMetadataExportFlow(
     return;
   }
 
+  final MetadataExportUseCase useCase =
+      exportUseCase ??
+      MetadataExportUseCase(const MetadataBackupRepositoryImpl());
+
   try {
-    final ExportComicMetadataOptionsDto dto = ExportComicMetadataOptionsDto(
-      libraryId: options.currentLibraryOnly ? options.libraryId : null,
-      includeOrphanFacets: options.includeOrphanFacets,
+    final String outputPath = await useCase.writeExportToPath(
+      options: options,
+      savePath: savePath,
     );
-    final MetadataExportInvoker invoke =
-        exportInvoker ??
-        (ExportComicMetadataOptionsDto options) =>
-            const MetadataBackupFrbAdapter().export(options: options);
-    final Uint8List raw = invoke(dto);
-    final List<int> output = options.gzip ? GZipCodec().encode(raw) : raw;
-    final String outputPath = _ensureExtension(savePath, extension);
-    await File(outputPath).writeAsBytes(output, flush: true);
 
     if (context.mounted) {
-      showSuccessToast(
+      showSuccessSnackbar(
         context,
         l10n.settingsMetadataBackupExportSuccess(p.basename(outputPath)),
       );
@@ -73,113 +60,7 @@ Future<void> runMetadataExportFlow(
   } catch (e, st) {
     logError(AppLog.core('metadata_backup'), '导出元数据失败', e, st);
     if (context.mounted) {
-      showErrorToast(context, e);
+      showErrorSnackbar(context, e);
     }
-  }
-}
-
-String _ensureExtension(String savePath, String extension) {
-  final String lower = savePath.toLowerCase();
-  if (lower.endsWith('.${extension.toLowerCase()}')) {
-    return savePath;
-  }
-  if (lower.endsWith('.json') && extension == 'hlmeta.json') {
-    return savePath;
-  }
-  return '$savePath.$extension';
-}
-
-class MetadataExportOptionsDialog extends StatefulWidget {
-  const MetadataExportOptionsDialog({required this.initialOptions, super.key});
-
-  final MetadataExportOptions initialOptions;
-
-  @override
-  State<MetadataExportOptionsDialog> createState() =>
-      _MetadataExportOptionsDialogState();
-}
-
-class _MetadataExportOptionsDialogState
-    extends State<MetadataExportOptionsDialog> {
-  late bool _gzip;
-  late bool _includeOrphanFacets;
-  late bool _currentLibraryOnly;
-
-  @override
-  void initState() {
-    super.initState();
-    _gzip = widget.initialOptions.gzip;
-    _includeOrphanFacets = widget.initialOptions.includeOrphanFacets;
-    _currentLibraryOnly = widget.initialOptions.currentLibraryOnly;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final AppThemeTokens tokens = context.tokens;
-
-    return HentaiDialog(
-      title: l10n.settingsMetadataBackupExportDialogTitle,
-      fitContentHeight: true,
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            l10n.settingsMetadataBackupExportDescription,
-            style: TextStyle(
-              fontSize: tokens.text.bodyMd,
-              color: context.hentai.textSecondary,
-              height: 1.45,
-            ),
-          ),
-          SizedBox(height: tokens.spacing.lg),
-          FluentToggleField(
-            labelText: l10n.settingsMetadataBackupExportGzipLabel,
-            value: _gzip,
-            checkedLabel: l10n.commonToggleOn,
-            uncheckedLabel: l10n.commonToggleOff,
-            onChanged: (bool value) => setState(() => _gzip = value),
-          ),
-          SizedBox(height: tokens.spacing.lg),
-          FluentToggleField(
-            labelText: l10n.settingsMetadataBackupExportOrphanFacetsLabel,
-            value: _includeOrphanFacets,
-            checkedLabel: l10n.commonToggleOn,
-            uncheckedLabel: l10n.commonToggleOff,
-            onChanged: (bool value) =>
-                setState(() => _includeOrphanFacets = value),
-          ),
-          if (widget.initialOptions.libraryId != null) ...<Widget>[
-            SizedBox(height: tokens.spacing.lg),
-            FluentToggleField(
-              labelText: l10n.settingsMetadataBackupExportCurrentLibraryLabel,
-              value: _currentLibraryOnly,
-              checkedLabel: l10n.commonToggleOn,
-              uncheckedLabel: l10n.commonToggleOff,
-              onChanged: (bool value) =>
-                  setState(() => _currentLibraryOnly = value),
-            ),
-          ],
-        ],
-      ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.commonCancel),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(
-            MetadataExportOptions(
-              gzip: _gzip,
-              includeOrphanFacets: _includeOrphanFacets,
-              currentLibraryOnly: _currentLibraryOnly,
-              libraryId: widget.initialOptions.libraryId,
-            ),
-          ),
-          child: Text(l10n.settingsMetadataBackupExportConfirm),
-        ),
-      ],
-    );
   }
 }

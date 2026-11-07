@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,13 +6,14 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/util/app_locale.dart';
 import 'package:hentai_library/core/util/app_theme_mode.dart';
 import 'package:hentai_library/core/util/app_window_title.dart';
-import 'package:hentai_library/shared/domain/models/models.dart'
-    show AppSetting;
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/features/app_settings/presentation/settings.dart';
-import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_coordinator_notifier.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
+import 'package:hentai_library/features/app_settings/domain/app_font_preference.dart';
+import 'package:hentai_library/features/app_settings/public.dart';
+import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
-import 'package:hentai_library/features/home/presentation/view_models/home_probe_coordinator_notifier.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/app_router.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -37,19 +39,19 @@ class _AppRootState extends ConsumerState<_AppRoot> {
   @override
   Widget build(BuildContext context) {
     ref.watch(appStartupCoordinatorProvider);
-    ref.watch(homeProbeCoordinatorProvider);
     ref.watch(metadataAutoBackupCoordinatorProvider);
     ref.watch(appUpdateCoordinatorProvider);
 
-    final ThemeMode themeMode = ref.watch(
-      settingsProvider.select((AsyncValue<AppSetting> async) {
-        final AsyncData<AppSetting>? data = async.asData;
-        if (data == null) {
-          return ThemeMode.system;
-        }
-        return themeModeFromPreference(data.value.themePreference);
-      }),
+    final AppThemePreferencesPort themePrefs = ref.watch(
+      appThemePreferencesPortProvider,
     );
+    final ThemeMode themeMode = themeModeFromPreference(
+      themePrefs.themePreference,
+    );
+    final String colorSchemeId = colorSchemeIdForPreference(
+      themePrefs.colorSchemePreference,
+    );
+    final AppFontSpec font = appFontSpecFor(themePrefs.fontPreference);
     final Locale? locale = ref.watch(
       settingsProvider.select((AsyncValue<AppSetting> async) {
         final AsyncData<AppSetting>? data = async.asData;
@@ -60,23 +62,59 @@ class _AppRootState extends ConsumerState<_AppRoot> {
       }),
     );
 
-    return MaterialApp.router(
-      locale: locale,
-      // Prefer zh as first entry so unmatched device locales fall back to Chinese.
-      supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      title: appWindowTitle(),
-      debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(Brightness.light),
-      darkTheme: buildAppTheme(Brightness.dark),
-      themeMode: themeMode,
-      routerConfig: appRouter,
-      builder: (BuildContext context, Widget? child) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: appSystemUiOverlayStyle(Theme.of(context).colorScheme),
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
+    // dynamic_color 2.x 的 ColorScheme 来自 material_ui，与 Flutter ColorScheme 不同型。
+    return DynamicColorBuilder(
+      builder:
+          (
+            material_ui.ColorScheme? lightDynamic,
+            material_ui.ColorScheme? darkDynamic,
+          ) {
+            final AssembledAppTheme light = assembleAppTheme(
+              Brightness.light,
+              seed: resolveAppThemeSeed(
+                useDynamicColor: themePrefs.useDynamicColor,
+                platformPrimary: lightDynamic?.primary,
+                colorSchemeId: colorSchemeId,
+              ),
+              font: font,
+            );
+            final AssembledAppTheme dark = assembleAppTheme(
+              Brightness.dark,
+              seed: resolveAppThemeSeed(
+                useDynamicColor: themePrefs.useDynamicColor,
+                platformPrimary: darkDynamic?.primary,
+                colorSchemeId: colorSchemeId,
+              ),
+              font: font,
+            );
+            return MaterialApp.router(
+              locale: locale,
+              // Prefer zh as first entry so unmatched device locales fall back to Chinese.
+              supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              title: appWindowTitle(),
+              debugShowCheckedModeBanner: false,
+              theme: light.material,
+              darkTheme: dark.material,
+              themeMode: themeMode,
+              routerConfig: appRouter,
+              builder: (BuildContext context, Widget? child) {
+                final AssembledAppTheme assembled =
+                    Theme.of(context).brightness == Brightness.dark
+                    ? dark
+                    : light;
+                return M3ETheme(
+                  data: assembled.m3e,
+                  child: AnnotatedRegion<SystemUiOverlayStyle>(
+                    value: appSystemUiOverlayStyle(
+                      Theme.of(context).colorScheme,
+                    ),
+                    child: child ?? const SizedBox.shrink(),
+                  ),
+                );
+              },
+            );
+          },
     );
   }
 }

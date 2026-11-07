@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
@@ -75,17 +76,8 @@ Future<T?> showAdaptiveFormSurfaceWidget<T>({
           Animation<double> secondaryAnimation,
           Widget child,
         ) {
-          final Animation<double> curved = CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-          );
-          return FadeTransition(
-            opacity: curved,
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
-              child: child,
-            ),
-          );
+          // Material Fade（modal）：淡入 + 从 ~80% 缩放到 100%。
+          return FadeScaleTransition(animation: animation, child: child);
         },
   );
 }
@@ -265,14 +257,12 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                 minHeight: minHeight,
               ),
               decoration: BoxDecoration(
-                color:
-                    backgroundColor ??
-                    (pageMode ? cs.surface : context.hentai.cardHover),
+                // 与壳层 / M3EDialog / SharedAxis fill 统一为 surface。
+                color: backgroundColor ?? cs.surface,
                 borderRadius: BorderRadius.circular(radius),
                 border: Border.all(
-                  color: context.hentai.borderSubtle.withValues(
-                    alpha: (1 - t).clamp(0.0, 1.0),
-                  ),
+                  color: Theme.of(context).colorScheme.outlineVariant
+                      .withValues(alpha: (1 - t).clamp(0.0, 1.0)),
                   width: 1,
                 ),
                 boxShadow: shadowOpacity <= 0
@@ -312,7 +302,7 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: pageMode ? tokens.text.titleSm : 16,
                                 fontWeight: FontWeight.w600,
-                                color: context.hentai.textPrimary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ),

@@ -1,12 +1,12 @@
 mod common;
 
 use hentai_core::resource::{FakeResourceAccess, ResourceAccess};
-use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
 use hentai_core::sync::remote::{
     comic_id_for_remote_location, scan_remote_lightweight, RemoteScanOutcome,
 };
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::scanner::ScanContext;
 use hentai_core::{connection, create_remote_library, find_comic_by_id, init_db_at_path};
 use std::collections::HashMap;
@@ -38,7 +38,11 @@ fn remote_lightweight_scan_registers_files_by_extension_not_folders() {
             thumbnail_stats: HashMap::new(),
         },
         &handle,
-        &[FormatGroup::Archive, FormatGroup::Pdf, FormatGroup::Epub],
+        &[
+            ResourceFormatCategory::Archive,
+            ResourceFormatCategory::Pdf,
+            ResourceFormatCategory::Epub,
+        ],
     )
     .expect("scan");
 
@@ -73,7 +77,7 @@ fn remote_format_filter_excludes_disabled_groups() {
             thumbnail_stats: HashMap::new(),
         },
         &handle,
-        &[FormatGroup::Pdf],
+        &[ResourceFormatCategory::Pdf],
     )
     .expect("scan");
     let RemoteScanOutcome::Scanned(items) = outcome else {
@@ -97,7 +101,7 @@ fn remote_unreachable_probe_does_not_surface_as_scanned() {
             thumbnail_stats: HashMap::new(),
         },
         &handle,
-        &FormatGroup::ALL,
+        &ResourceFormatCategory::ALL,
     )
     .expect("probe");
     match outcome {
@@ -131,7 +135,7 @@ fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
                     thumbnail_stats: HashMap::new(),
                 },
                 &handle,
-                &lib.enabled_format_groups,
+                &lib.enabled_resource_format_categories,
             )
             .expect("scan");
             let RemoteScanOutcome::Scanned(mut items) = outcome else {
@@ -163,7 +167,7 @@ fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
                     thumbnail_stats: HashMap::new(),
                 },
                 &handle,
-                &lib.enabled_format_groups,
+                &lib.enabled_resource_format_categories,
             )
             .expect("scan2");
             let RemoteScanOutcome::Scanned(mut items) = outcome else {
@@ -193,7 +197,7 @@ fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
                     thumbnail_stats: HashMap::new(),
                 },
                 &handle,
-                &lib.enabled_format_groups,
+                &lib.enabled_resource_format_categories,
             )
             .expect("unreachable");
             assert!(matches!(outcome, RemoteScanOutcome::Unreachable { .. }));

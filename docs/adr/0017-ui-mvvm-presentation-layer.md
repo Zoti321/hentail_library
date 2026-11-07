@@ -77,5 +77,5 @@ Flutter UI 已以 Riverpod Notifier/Provider 为主干，但存在以下漂移�
 
 ## References
 
-- ADR-0027（Shell / shared UI 分层）；`app/test/gate/` 强制执行分层与 import
+- ADR-0027（Shell / shared UI 分层）；**ADR-0033**（feature Application 层）；**ADR-0034**（feature public API）；`app/test/gate/` 强制执行分层与 import
 - `docs/engineering/gate.md` — ViewModel 层 mock Repo 测试为首选接缝

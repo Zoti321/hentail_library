@@ -144,7 +144,7 @@ async fn load_library_roots(
 async fn load_orphan_facets(db: &DatabaseConnection) -> Result<OrphanFacetsRecord, HentaiError> {
     Ok(OrphanFacetsRecord {
         tags: load_orphan_names(db, JunctionNamedFacet::Tag).await?,
-        authors: load_orphan_names(db, JunctionNamedFacet::Author).await?,
+        authors: crate::author::list_orphan_author_names(db).await?,
         parodies: load_orphan_names(db, JunctionNamedFacet::Parody).await?,
         characters: load_orphan_names(db, JunctionNamedFacet::Character).await?,
     })
@@ -157,18 +157,11 @@ async fn load_orphan_names(
     let dict = facet.dict_table();
     let junction = facet.junction_table();
     let name_col = facet.junction_name_column();
-    let sql = match facet {
-        JunctionNamedFacet::Author => format!(
-            "SELECT d.name FROM {dict} d \
-             WHERE NOT EXISTS (SELECT 1 FROM {junction} j WHERE j.author_id = d.id) \
-             ORDER BY d.name COLLATE NOCASE ASC"
-        ),
-        _ => format!(
-            "SELECT d.name FROM {dict} d \
-             WHERE NOT EXISTS (SELECT 1 FROM {junction} j WHERE j.{name_col} = d.name) \
-             ORDER BY d.name COLLATE NOCASE ASC"
-        ),
-    };
+    let sql = format!(
+        "SELECT d.name FROM {dict} d \
+         WHERE NOT EXISTS (SELECT 1 FROM {junction} j WHERE j.{name_col} = d.name) \
+         ORDER BY d.name COLLATE NOCASE ASC"
+    );
     let rows = db
         .query_all(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,

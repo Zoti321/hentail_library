@@ -1,7 +1,8 @@
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
-import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
+import 'package:hentai_library/features/series/application/series_metadata_service.dart';
+import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:test/test.dart';
 
 class _RecordingSeriesRepository implements SeriesRepository {
@@ -117,14 +118,18 @@ void main() {
     });
   });
 
-  group('SeriesMetadataForm.applyTo', () {
+  group('applySeriesMetadataForm', () {
     test('returns Invalid and does not call repository', () async {
       final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
-      final SeriesMetadataApplyResult result = await SeriesMetadataForm(
-        name: '',
-        serializationStatus: SerializationStatus.ongoing,
-        totalCountText: 'x',
-      ).applyTo(repo, _series());
+      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
+        repo,
+        SeriesMetadataForm(
+          name: '',
+          serializationStatus: SerializationStatus.ongoing,
+          totalCountText: 'x',
+        ),
+        _series(),
+      );
 
       expect(result, isA<SeriesMetadataApplyInvalid>());
       expect(repo.callCount, 0);
@@ -141,10 +146,12 @@ void main() {
         status: SerializationStatus.ongoing,
         totalCount: 12,
       );
-      final SeriesMetadataApplyResult result =
-          await SeriesMetadataForm.fromSeries(original)
-              .copyWith(serializationStatus: SerializationStatus.ended)
-              .applyTo(repo, original);
+      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
+        repo,
+        SeriesMetadataForm.fromSeries(original)
+            .copyWith(serializationStatus: SerializationStatus.ended),
+        original,
+      );
 
       expect(result, isA<SeriesMetadataApplySucceeded>());
       expect(repo.callCount, 1);
@@ -160,9 +167,11 @@ void main() {
       () async {
         final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
         final Series original = _series(totalCount: null);
-        final SeriesMetadataApplyResult result =
-            await SeriesMetadataForm.fromSeries(original)
-                .applyTo(repo, original);
+        final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
+          repo,
+          SeriesMetadataForm.fromSeries(original),
+          original,
+        );
 
         expect(result, isA<SeriesMetadataApplySucceeded>());
         expect(repo.callCount, 0);
@@ -176,11 +185,15 @@ void main() {
         status: SerializationStatus.ongoing,
         totalCount: 3,
       );
-      final SeriesMetadataApplyResult result = await SeriesMetadataForm(
-        name: ' 新系列 ',
-        serializationStatus: SerializationStatus.ended,
-        totalCountText: '8',
-      ).applyTo(repo, original);
+      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
+        repo,
+        SeriesMetadataForm(
+          name: ' 新系列 ',
+          serializationStatus: SerializationStatus.ended,
+          totalCountText: '8',
+        ),
+        original,
+      );
 
       expect(result, isA<SeriesMetadataApplySucceeded>());
       expect(repo.callCount, 1);
@@ -198,10 +211,11 @@ void main() {
         status: SerializationStatus.ongoing,
         totalCount: 12,
       );
-      final SeriesMetadataApplyResult result =
-          await SeriesMetadataForm.fromSeries(original)
-              .copyWith(totalCountText: '')
-              .applyTo(repo, original);
+      final SeriesMetadataApplyResult result = await applySeriesMetadataForm(
+        repo,
+        SeriesMetadataForm.fromSeries(original).copyWith(totalCountText: ''),
+        original,
+      );
 
       expect(result, isA<SeriesMetadataApplySucceeded>());
       expect(repo.callCount, 1);

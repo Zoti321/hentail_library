@@ -6,14 +6,14 @@ use std::io::Write;
 use std::path::Path;
 
 use hentai_core::comic::UpdateComicUserMetaDto;
-use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
+use hentai_core::sync::resource_format_category::ResourceFormatCategory;
 use hentai_core::sync::scanner::{scan_roots, ScanContext};
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{
     comic_id_from_path, connection, find_comic_by_id, get_reading_by_comic_id, init_db_at_path,
-    record_reading, update_comic_user_meta, ReadingHistoryDto,
+    now_ms, record_reading, update_comic_user_meta, ReadingHistoryDto,
 };
 use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
@@ -55,7 +55,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("first scan");
             let plan = build_scan_replace_plan(&db, first_scan, "")
@@ -76,11 +76,13 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
             .await
             .expect("update meta");
 
+            let read_at = now_ms();
             record_reading(&ReadingHistoryDto {
                 comic_id: old_id.clone(),
                 title: "用户标题".to_string(),
-                last_read_time_ms: 42,
+                last_read_time_ms: read_at,
                 page_index: Some(3),
+                page_count: None,
             })
             .await
             .expect("record reading");
@@ -94,7 +96,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("second scan");
             let plan = build_scan_replace_plan(&db, second_scan, "")
@@ -126,7 +128,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 .expect("history")
                 .expect("reading history");
             assert_eq!(history.page_index, Some(3));
-            assert_eq!(history.last_read_time_ms, 42);
+            assert_eq!(history.last_read_time_ms, read_at);
         });
     });
 }
@@ -161,7 +163,7 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("first scan");
             apply_scan_replace_plan(
@@ -201,7 +203,7 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
                 &empty_ctx,
                 &handle,
                 true,
-                &FormatGroup::ALL,
+                &ResourceFormatCategory::ALL,
             )
             .expect("second scan");
             let plan = build_scan_replace_plan(&db, second_scan, "")

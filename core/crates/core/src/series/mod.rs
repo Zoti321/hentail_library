@@ -1,9 +1,11 @@
 mod dto;
+mod grouping;
 mod page_query;
 mod repository;
 mod write;
 
 pub use dto::{SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto};
+pub use grouping::SeriesGrouping;
 pub use repository::{
     count_all_series, fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
     find_series_by_id, find_series_item_by_comic_id, get_series_reading_context_by_comic_id,

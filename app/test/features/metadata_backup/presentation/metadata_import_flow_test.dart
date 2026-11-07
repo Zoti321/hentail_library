@@ -4,13 +4,16 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_bytes.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_manifest.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_import_match_tier.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_import_preview.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_import_result.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/metadata_import_flow.dart';
-import 'package:hentai_library/src/rust/api/metadata_backup.dart';
 
 import '../../../support/pump_localized_app.dart';
 
 void main() {
-  const MetadataBackupManifestDto manifest = MetadataBackupManifestDto(
+  const MetadataBackupManifest manifest = MetadataBackupManifest(
     schemaVersion: 1,
     exportedAt: '2026-01-01T00:00:00.000Z',
     appVersion: '0.1.0',
@@ -18,48 +21,46 @@ void main() {
     includeOrphanFacets: false,
   );
 
-  const PreviewImportComicMetadataResultDto previewWithMatches =
-      PreviewImportComicMetadataResultDto(
-        wouldApply: 2,
-        skippedNotFound: 0,
-        skippedAmbiguous: 0,
-        wouldUpsertOrphanFacetCount: 3,
-        samplesWouldApply: <WouldApplySampleDto>[
-          WouldApplySampleDto(
-            comicId: 'backup-1',
-            path: 'E:/very/long/library/root/folder/subfolder/comic.cbz',
-            title: 'Sample Comic',
-            matchedComicId: 'c1',
-            matchTier: MatchTierDto.path,
-          ),
-        ],
-        samplesNotFound: <NotFoundSampleDto>[],
-        samplesAmbiguous: <AmbiguousSampleDto>[],
-      );
+  const MetadataImportPreview previewWithMatches = MetadataImportPreview(
+    wouldApply: 2,
+    skippedNotFound: 0,
+    skippedAmbiguous: 0,
+    wouldUpsertOrphanFacetCount: 3,
+    samplesWouldApply: <MetadataImportWouldApplySample>[
+      MetadataImportWouldApplySample(
+        comicId: 'backup-1',
+        path: 'E:/very/long/library/root/folder/subfolder/comic.cbz',
+        title: 'Sample Comic',
+        matchedComicId: 'c1',
+        matchTier: MetadataImportMatchTier.path,
+      ),
+    ],
+    samplesNotFound: <MetadataImportNotFoundSample>[],
+    samplesAmbiguous: <MetadataImportAmbiguousSample>[],
+  );
 
-  const PreviewImportComicMetadataResultDto previewWithSkips =
-      PreviewImportComicMetadataResultDto(
-        wouldApply: 0,
-        skippedNotFound: 1,
-        skippedAmbiguous: 1,
-        wouldUpsertOrphanFacetCount: 5,
-        samplesWouldApply: <WouldApplySampleDto>[],
-        samplesNotFound: <NotFoundSampleDto>[
-          NotFoundSampleDto(
-            comicId: 'missing',
-            path: 'E:/lib/gone.cbz',
-            title: 'Missing Comic',
-          ),
-        ],
-        samplesAmbiguous: <AmbiguousSampleDto>[
-          AmbiguousSampleDto(
-            comicId: 'dup',
-            path: 'E:/lib/dup.cbz',
-            title: 'Dup Comic',
-            candidateComicIds: <String>['c2', 'c3'],
-          ),
-        ],
-      );
+  const MetadataImportPreview previewWithSkips = MetadataImportPreview(
+    wouldApply: 0,
+    skippedNotFound: 1,
+    skippedAmbiguous: 1,
+    wouldUpsertOrphanFacetCount: 5,
+    samplesWouldApply: <MetadataImportWouldApplySample>[],
+    samplesNotFound: <MetadataImportNotFoundSample>[
+      MetadataImportNotFoundSample(
+        comicId: 'missing',
+        path: 'E:/lib/gone.cbz',
+        title: 'Missing Comic',
+      ),
+    ],
+    samplesAmbiguous: <MetadataImportAmbiguousSample>[
+      MetadataImportAmbiguousSample(
+        comicId: 'dup',
+        path: 'E:/lib/dup.cbz',
+        title: 'Dup Comic',
+        candidateComicIds: <String>['c2', 'c3'],
+      ),
+    ],
+  );
 
   testWidgets('confirm dialog cancels without calling import', (
     WidgetTester tester,
@@ -125,14 +126,15 @@ void main() {
               importCalls += 1;
               await showDialog<void>(
                 context: context,
-                builder: (BuildContext context) => MetadataImportResultDialog(
-                  result: const ImportComicMetadataResultDto(
-                    applied: 2,
-                    skippedNotFound: 0,
-                    skippedAmbiguous: 0,
-                    errors: <String>[],
-                  ),
-                ),
+                builder: (BuildContext context) =>
+                    const MetadataImportResultDialog(
+                      result: MetadataImportResult(
+                        applied: 2,
+                        skippedNotFound: 0,
+                        skippedAmbiguous: 0,
+                        errors: <String>[],
+                      ),
+                    ),
               );
             },
             child: const Text('open'),
@@ -243,9 +245,9 @@ void main() {
     expect(shortened, contains('…'));
   });
 
-  test('decodeMetadataBackupFileBytes accepts gzip payloads', () {
+  test('decodeMetadataBackupFileBytes accepts gzip payloads', () async {
     final List<int> gz = GZipCodec().encode(<int>[123, 125]);
-    final Uint8List decoded = decodeMetadataBackupFileBytes(
+    final Uint8List decoded = await decodeMetadataBackupFileBytes(
       gz,
       'backup.hlmeta.json.gz',
     );

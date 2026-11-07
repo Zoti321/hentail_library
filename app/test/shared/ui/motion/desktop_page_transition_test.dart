@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -12,115 +13,82 @@ class _FakeGoRouterState extends Fake implements GoRouterState {
 }
 
 void main() {
-  tearDown(debugResetPendingShellFadeThrough);
-
-  group('shell nav pending fade-through', () {
-    test('library shell page stays NoTransition without a pending request', () {
+  group('buildShellNavPage', () {
+    test('returns desktop fade-through for shell top-level nav', () {
       final Page<void> page = buildShellNavPage(
         state: _FakeGoRouterState(),
         child: const SizedBox(),
-        allowPendingFadeThrough: true,
       );
 
-      expect(page, isA<NoTransitionPage<void>>());
-    });
-
-    test('one-shot request makes the next allowPendingFadeThrough page fade-through', () {
-      requestShellFadeThroughOnce();
-
-      final Page<void> animated = buildShellNavPage(
-        state: _FakeGoRouterState(),
-        child: const SizedBox(),
-        allowPendingFadeThrough: true,
-      );
-      expect(animated, isA<CustomTransitionPage<void>>());
+      expect(page, isA<CustomTransitionPage<void>>());
       final CustomTransitionPage<void> custom =
-          animated as CustomTransitionPage<void>;
+          page as CustomTransitionPage<void>;
       expect(custom.transitionDuration, kDesktopPageTransitionDuration);
       expect(custom.reverseTransitionDuration, kDesktopPageTransitionDuration);
-
-      final Page<void> next = buildShellNavPage(
-        state: _FakeGoRouterState(),
-        child: const SizedBox(),
-        allowPendingFadeThrough: true,
-      );
-      expect(next, isA<NoTransitionPage<void>>());
     });
-
-    test(
-      'pending request is ignored when allowPendingFadeThrough is false',
-      () {
-        requestShellFadeThroughOnce();
-
-        final Page<void> page = buildShellNavPage(
-          state: _FakeGoRouterState(),
-          child: const SizedBox(),
-        );
-        expect(page, isA<NoTransitionPage<void>>());
-        expect(debugPendingShellFadeThrough, isTrue);
-      },
-    );
   });
 
-  group('desktop fade-through opacity curves', () {
-    test('enter is zero for the first half then eases in', () {
+  group('official fade-through opacity sequences', () {
+    test('enter stays zero until 6/20 then rises', () {
       expect(desktopFadeThroughEnterOpacity(0.0), 0.0);
-      expect(desktopFadeThroughEnterOpacity(0.5), 0.0);
+      expect(desktopFadeThroughEnterOpacity(kFadeThroughIncomingStart), 0.0);
       expect(desktopFadeThroughEnterOpacity(1.0), 1.0);
+      expect(
+        desktopFadeThroughEnterOpacity(kFadeThroughIncomingStart + 0.01),
+        greaterThan(0.0),
+      );
     });
 
-    test('exit stays visible for the first half then eases out', () {
-      expect(desktopFadeThroughExitOpacity(1.0), 1.0);
-      expect(desktopFadeThroughExitOpacity(0.5), 1.0);
-      expect(desktopFadeThroughExitOpacity(0.0), 0.0);
+    test('exit reaches zero by 6/20 and stays zero', () {
+      expect(desktopFadeThroughExitOpacity(0.0), 1.0);
+      expect(desktopFadeThroughExitOpacity(kFadeThroughOutgoingEnd), 0.0);
+      expect(desktopFadeThroughExitOpacity(1.0), 0.0);
     });
 
-    test('covered route fades out during the first half of secondary', () {
-      expect(desktopFadeThroughCoveredOpacity(0.0), 1.0);
-      expect(desktopFadeThroughCoveredOpacity(0.5), 0.0);
-      expect(desktopFadeThroughCoveredOpacity(1.0), 0.0);
-    });
-
-    test('uncovered route fades in during the second half of secondary', () {
-      expect(desktopFadeThroughUncoveredOpacity(0.0), 0.0);
-      expect(desktopFadeThroughUncoveredOpacity(0.5), 0.0);
-      expect(desktopFadeThroughUncoveredOpacity(1.0), 1.0);
-    });
-
-    testWidgets(
-      'secondary animation uses covered vs uncovered based on pop flag',
-      (WidgetTester tester) async {
-        final AnimationController primary = AnimationController(
-          vsync: tester,
-          value: 1,
-        );
-        final AnimationController secondary = AnimationController(
-          vsync: tester,
-          duration: kDesktopPageTransitionDuration,
-        );
-        addTearDown(primary.dispose);
-        addTearDown(secondary.dispose);
-
-        secondary.value = 0.25;
+    test('enter and exit never both opaque at the same progress', () {
+      for (int i = 0; i <= 20; i++) {
+        final double t = i / 20;
+        final double enter = desktopFadeThroughEnterOpacity(t);
+        final double exit = desktopFadeThroughExitOpacity(t);
         expect(
-          resolveDesktopFadeThroughOpacity(
-            animation: primary,
-            secondaryAnimation: secondary,
-            revealingFromPop: false,
-          ),
-          desktopFadeThroughCoveredOpacity(0.25),
+          enter * exit,
+          0.0,
+          reason: 'at t=$t enter=$enter exit=$exit should not overlap',
         );
+      }
+    });
+  });
 
-        secondary.value = 0.75;
-        expect(
-          resolveDesktopFadeThroughOpacity(
-            animation: primary,
-            secondaryAnimation: secondary,
-            revealingFromPop: true,
+  group('desktopFadeThroughTransitionWrapper', () {
+    testWidgets('uses FadeThroughTransition with stopped secondary', (
+      WidgetTester tester,
+    ) async {
+      final AnimationController primary = AnimationController(
+        vsync: tester,
+        value: 1,
+      );
+      addTearDown(primary.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (BuildContext context) {
+              return desktopFadeThroughTransitionWrapper(
+                context: context,
+                animation: primary,
+                secondaryAnimation: const AlwaysStoppedAnimation<double>(0.5),
+                child: const Text('content'),
+              );
+            },
           ),
-          desktopFadeThroughUncoveredOpacity(0.75),
-        );
-      },
-    );
+        ),
+      );
+
+      final FadeThroughTransition fade = tester.widget(
+        find.byType(FadeThroughTransition),
+      );
+      expect(fade.secondaryAnimation.value, 0.0);
+      expect(find.text('content'), findsOneWidget);
+    });
   });
 }

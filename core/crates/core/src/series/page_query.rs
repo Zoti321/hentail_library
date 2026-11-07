@@ -1,6 +1,7 @@
 use sea_orm::Value;
 
 use super::dto::{SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto};
+use super::grouping::SeriesGrouping;
 use crate::comic::visibility::{
     series_browsable_sql, series_has_visible_member_sql, visible_comic_sql,
 };
@@ -22,13 +23,14 @@ pub fn build_count_query(filter: &SeriesFilterDto) -> PageSqlQuery {
 pub fn build_ids_page_query(
     filter: &SeriesFilterDto,
     sort: &SeriesSortOptionDto,
+    grouping: SeriesGrouping,
     prefer_root_folder_path: Option<&str>,
     limit: i32,
     offset: i32,
 ) -> PageSqlQuery {
     let mut values = Vec::new();
     let where_clause = build_where_clause(filter, &mut values);
-    let order_by = build_order_by_clause(sort, prefer_root_folder_path, &mut values);
+    let order_by = build_order_by_clause(sort, grouping, prefer_root_folder_path, &mut values);
     values.push(Value::Int(Some(limit)));
     values.push(Value::Int(Some(offset)));
     PageSqlQuery {
@@ -44,10 +46,25 @@ pub fn build_ids_page_query(
 
 fn build_order_by_clause(
     sort: &SeriesSortOptionDto,
+    grouping: SeriesGrouping,
     prefer_root_folder_path: Option<&str>,
     values: &mut Vec<Value>,
 ) -> String {
-    let secondary = match sort.field {
+    let secondary = user_sort_order_by(sort);
+    let mut parts: Vec<String> = Vec::new();
+    if let Some(root) = prefer_root_folder_path {
+        push_sqlite_text(values, root.to_string());
+        parts.push("CASE WHEN s.folder_path = ? THEN 0 ELSE 1 END ASC".to_string());
+    }
+    if let Some(prefix) = grouping.order_prefix() {
+        parts.push(prefix.to_string());
+    }
+    parts.push(secondary);
+    parts.join(", ")
+}
+
+fn user_sort_order_by(sort: &SeriesSortOptionDto) -> String {
+    match sort.field {
         SeriesSortFieldDto::Name => {
             let direction = if sort.descending { "DESC" } else { "ASC" };
             format!("s.name_sort_key {direction}, s.series_id ASC")
@@ -66,13 +83,6 @@ fn build_order_by_clause(
             let direction = if sort.descending { "DESC" } else { "ASC" };
             format!("RANDOM() {direction}, s.series_id ASC")
         }
-    };
-    match prefer_root_folder_path {
-        Some(root) => {
-            push_sqlite_text(values, root.to_string());
-            format!("CASE WHEN s.folder_path = ? THEN 0 ELSE 1 END ASC, {secondary}")
-        }
-        None => secondary,
     }
 }
 
@@ -118,6 +128,7 @@ fn push_sqlite_text(values: &mut Vec<Value>, text: String) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::series::grouping::SeriesGrouping;
 
     #[test]
     fn random_order_uses_sql_random() {
@@ -127,6 +138,7 @@ mod tests {
                 field: SeriesSortFieldDto::Random,
                 descending: true,
             },
+            SeriesGrouping::None,
             None,
             20,
             0,
@@ -143,6 +155,7 @@ mod tests {
                 field: SeriesSortFieldDto::ComicCount,
                 descending: true,
             },
+            SeriesGrouping::None,
             None,
             10,
             0,
@@ -159,6 +172,7 @@ mod tests {
                 field: SeriesSortFieldDto::Name,
                 descending: false,
             },
+            SeriesGrouping::None,
             Some("E:/lib"),
             20,
             0,
@@ -183,11 +197,26 @@ mod tests {
                 field: SeriesSortFieldDto::Name,
                 descending: false,
             },
+            SeriesGrouping::None,
             None,
             20,
             0,
         );
         assert!(!query.sql.contains("CASE WHEN s.folder_path"));
         assert_eq!(query.values.len(), 2);
+    }
+
+    #[test]
+    fn by_serialization_status_grouping_prefixes_order_by() {
+        let query = build_ids_page_query(
+            &SeriesFilterDto::default(),
+            &SeriesSortOptionDto::default(),
+            SeriesGrouping::BySerializationStatus,
+            None,
+            10,
+            0,
+        );
+        assert!(query.sql.contains("s.serialization_status"));
+        assert!(query.sql.contains("'ongoing'"));
     }
 }

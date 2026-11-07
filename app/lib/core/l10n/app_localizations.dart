@@ -104,18 +104,6 @@ abstract class AppLocalizations {
   /// **'漫画库'**
   String get libraryTitle;
 
-  /// No description provided for @allLibrariesBrowsePlaceholderTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'全部库浏览'**
-  String get allLibrariesBrowsePlaceholderTitle;
-
-  /// No description provided for @allLibrariesBrowsePlaceholderBody.
-  ///
-  /// In zh, this message translates to:
-  /// **'跨库聚合浏览后续实现。请从侧栏选择具体漫画库。'**
-  String get allLibrariesBrowsePlaceholderBody;
-
   /// No description provided for @sidebarAddLibraryTooltip.
   ///
   /// In zh, this message translates to:
@@ -434,6 +422,24 @@ abstract class AppLocalizations {
   /// **'English'**
   String get localePreferenceEn;
 
+  /// No description provided for @settingsFontLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'界面字体'**
+  String get settingsFontLabel;
+
+  /// No description provided for @fontPreferenceMiSans.
+  ///
+  /// In zh, this message translates to:
+  /// **'小米字体'**
+  String get fontPreferenceMiSans;
+
+  /// No description provided for @fontPreferenceNotoSans.
+  ///
+  /// In zh, this message translates to:
+  /// **'Noto Sans'**
+  String get fontPreferenceNotoSans;
+
   /// No description provided for @settingsThemeLabel.
   ///
   /// In zh, this message translates to:
@@ -457,6 +463,102 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'深色'**
   String get themePreferenceDark;
+
+  /// No description provided for @settingsDynamicColorLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'动态配色'**
+  String get settingsDynamicColorLabel;
+
+  /// No description provided for @settingsDynamicColorDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'跟随系统壁纸取色；开启后不可选手动配色方案'**
+  String get settingsDynamicColorDescription;
+
+  /// No description provided for @settingsColorSchemeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'配色方案'**
+  String get settingsColorSchemeLabel;
+
+  /// No description provided for @colorSchemePreferenceBrand.
+  ///
+  /// In zh, this message translates to:
+  /// **'紫罗兰色'**
+  String get colorSchemePreferenceBrand;
+
+  /// No description provided for @colorSchemePreferenceTeal.
+  ///
+  /// In zh, this message translates to:
+  /// **'青瓷色'**
+  String get colorSchemePreferenceTeal;
+
+  /// No description provided for @colorSchemePreferenceCyan.
+  ///
+  /// In zh, this message translates to:
+  /// **'天青色'**
+  String get colorSchemePreferenceCyan;
+
+  /// No description provided for @colorSchemePreferenceBlue.
+  ///
+  /// In zh, this message translates to:
+  /// **'矢车菊色'**
+  String get colorSchemePreferenceBlue;
+
+  /// No description provided for @colorSchemePreferenceIndigo.
+  ///
+  /// In zh, this message translates to:
+  /// **'靛蓝色'**
+  String get colorSchemePreferenceIndigo;
+
+  /// No description provided for @colorSchemePreferenceDeepPurple.
+  ///
+  /// In zh, this message translates to:
+  /// **'葡萄色'**
+  String get colorSchemePreferenceDeepPurple;
+
+  /// No description provided for @colorSchemePreferenceViolet.
+  ///
+  /// In zh, this message translates to:
+  /// **'紫罗兰色'**
+  String get colorSchemePreferenceViolet;
+
+  /// No description provided for @colorSchemePreferencePink.
+  ///
+  /// In zh, this message translates to:
+  /// **'蔷薇色'**
+  String get colorSchemePreferencePink;
+
+  /// No description provided for @colorSchemePreferenceSakura.
+  ///
+  /// In zh, this message translates to:
+  /// **'樱花色'**
+  String get colorSchemePreferenceSakura;
+
+  /// No description provided for @colorSchemePreferenceYellow.
+  ///
+  /// In zh, this message translates to:
+  /// **'琥珀色'**
+  String get colorSchemePreferenceYellow;
+
+  /// No description provided for @colorSchemePreferenceOrange.
+  ///
+  /// In zh, this message translates to:
+  /// **'金盏花色'**
+  String get colorSchemePreferenceOrange;
+
+  /// No description provided for @colorSchemePreferenceDeepOrange.
+  ///
+  /// In zh, this message translates to:
+  /// **'朱砂色'**
+  String get colorSchemePreferenceDeepOrange;
+
+  /// No description provided for @colorSchemePreferenceGreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'苔绿色'**
+  String get colorSchemePreferenceGreen;
 
   /// No description provided for @navHome.
   ///
@@ -566,6 +668,24 @@ abstract class AppLocalizations {
   /// **'首页'**
   String get homeTitle;
 
+  /// No description provided for @homeShortcutsSectionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'快捷入口'**
+  String get homeShortcutsSectionTitle;
+
+  /// No description provided for @homeHistoryCardCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看阅读记录'**
+  String get homeHistoryCardCaption;
+
+  /// No description provided for @homeTrashCardCaption.
+  ///
+  /// In zh, this message translates to:
+  /// **'可恢复删除'**
+  String get homeTrashCardCaption;
+
   /// No description provided for @homeScanLibrary.
   ///
   /// In zh, this message translates to:
@@ -668,12 +788,6 @@ abstract class AppLocalizations {
   /// **'{libraryName} 距上次同步已 {days} 天，建议同步'**
   String homeAlertStaleSync(String libraryName, int days);
 
-  /// No description provided for @homeAlertPendingResources.
-  ///
-  /// In zh, this message translates to:
-  /// **'{libraryName} 发现 {count} 个新/变更 Resource，建议同步'**
-  String homeAlertPendingResources(String libraryName, int count);
-
   /// No description provided for @homeStatSeries.
   ///
   /// In zh, this message translates to:
@@ -761,8 +875,44 @@ abstract class AppLocalizations {
   /// No description provided for @historyRecordSummary.
   ///
   /// In zh, this message translates to:
-  /// **'{count, plural, other{{count} 条记录 • 最长保留 30 天}}'**
+  /// **'{count, plural, other{{count} 条记录 • 最长保留 1 年}}'**
   String historyRecordSummary(int count);
+
+  /// No description provided for @historySectionToday.
+  ///
+  /// In zh, this message translates to:
+  /// **'今天'**
+  String get historySectionToday;
+
+  /// No description provided for @historySectionYesterday.
+  ///
+  /// In zh, this message translates to:
+  /// **'昨天'**
+  String get historySectionYesterday;
+
+  /// No description provided for @historySectionThisWeek.
+  ///
+  /// In zh, this message translates to:
+  /// **'本周'**
+  String get historySectionThisWeek;
+
+  /// No description provided for @historySectionThisMonth.
+  ///
+  /// In zh, this message translates to:
+  /// **'本月'**
+  String get historySectionThisMonth;
+
+  /// No description provided for @historySectionEarlier.
+  ///
+  /// In zh, this message translates to:
+  /// **'更早'**
+  String get historySectionEarlier;
+
+  /// No description provided for @historySectionItemCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 条}}'**
+  String historySectionItemCount(int count);
 
   /// No description provided for @historySearchHint.
   ///
@@ -967,6 +1117,48 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'关于'**
   String get settingsGroupAbout;
+
+  /// No description provided for @settingsMasterMenuGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用'**
+  String get settingsMasterMenuGroupTitle;
+
+  /// No description provided for @settingsSectionAppearance.
+  ///
+  /// In zh, this message translates to:
+  /// **'外观与语言'**
+  String get settingsSectionAppearance;
+
+  /// No description provided for @settingsSectionReading.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读'**
+  String get settingsSectionReading;
+
+  /// No description provided for @settingsSectionLibraryBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'库与浏览'**
+  String get settingsSectionLibraryBrowse;
+
+  /// No description provided for @settingsSectionDiagnostics.
+  ///
+  /// In zh, this message translates to:
+  /// **'诊断'**
+  String get settingsSectionDiagnostics;
+
+  /// No description provided for @settingsSectionApplicationData.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用数据'**
+  String get settingsSectionApplicationData;
+
+  /// No description provided for @settingsSectionUpdates.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新'**
+  String get settingsSectionUpdates;
 
   /// No description provided for @settingsMetadataBackupAutoGroupTitle.
   ///
@@ -1292,6 +1484,18 @@ abstract class AppLocalizations {
   /// **'元数据已导出至 {fileName}'**
   String settingsMetadataBackupExportSuccess(String fileName);
 
+  /// No description provided for @settingsHealthyModeLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'健康模式'**
+  String get settingsHealthyModeLabel;
+
+  /// No description provided for @settingsHealthyModeDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'库、搜索与历史中隐藏 R18 Comic，不修改分级'**
+  String get settingsHealthyModeDescription;
+
   /// No description provided for @settingsDiagnosticModeLabel.
   ///
   /// In zh, this message translates to:
@@ -1616,6 +1820,12 @@ abstract class AppLocalizations {
   /// **'筛选'**
   String get libraryFilterSection;
 
+  /// No description provided for @libraryGroupSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'分组'**
+  String get libraryGroupSection;
+
   /// No description provided for @librarySortSection.
   ///
   /// In zh, this message translates to:
@@ -1715,7 +1925,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryResetAllFilters.
   ///
   /// In zh, this message translates to:
-  /// **'重置全部'**
+  /// **'恢复默认'**
   String get libraryResetAllFilters;
 
   /// No description provided for @libraryComingSoon.
@@ -1771,6 +1981,36 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'按系列展开'**
   String get libraryExpandBySeries;
+
+  /// No description provided for @libraryGroupBySeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'按系列分组'**
+  String get libraryGroupBySeries;
+
+  /// No description provided for @libraryGroupNone.
+  ///
+  /// In zh, this message translates to:
+  /// **'不分组'**
+  String get libraryGroupNone;
+
+  /// No description provided for @libraryGroupBySerializationStatus.
+  ///
+  /// In zh, this message translates to:
+  /// **'按连载状态分组'**
+  String get libraryGroupBySerializationStatus;
+
+  /// No description provided for @settingsPreferLibraryRootSeriesLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'置顶库根系列'**
+  String get settingsPreferLibraryRootSeriesLabel;
+
+  /// No description provided for @settingsPreferLibraryRootSeriesDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'浏览系列列表时，将库根系列固定在列表最前。'**
+  String get settingsPreferLibraryRootSeriesDescription;
 
   /// No description provided for @librarySeriesSortName.
   ///
@@ -1957,6 +2197,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'角色'**
   String get comicDetailCharacters;
+
+  /// No description provided for @comicDetailResourceInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'资源信息'**
+  String get comicDetailResourceInfo;
 
   /// No description provided for @comicDetailResourceFormat.
   ///
@@ -2696,6 +2942,24 @@ abstract class AppLocalizations {
   /// **'合并'**
   String get metadataMerge;
 
+  /// No description provided for @metadataMergeConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认合并'**
+  String get metadataMergeConfirmTitle;
+
+  /// No description provided for @metadataMergeConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'将 {sourceCount} 个标签合并到「{target}」？来源标签的漫画附着会转移到目标，来源标签将被删除。'**
+  String metadataMergeConfirmBody(int sourceCount, String target);
+
+  /// No description provided for @metadataMergeConfirmDontAskAgain.
+  ///
+  /// In zh, this message translates to:
+  /// **'以后不再提示'**
+  String get metadataMergeConfirmDontAskAgain;
+
   /// No description provided for @metadataDelete.
   ///
   /// In zh, this message translates to:
@@ -2737,6 +3001,48 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'{count, plural, other{共 {count} 条}}'**
   String metadataTotalCount(int count);
+
+  /// No description provided for @metadataAuthorCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 位作者}}'**
+  String metadataAuthorCount(int count);
+
+  /// No description provided for @metadataTagCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 个标签}}'**
+  String metadataTagCount(int count);
+
+  /// No description provided for @metadataParodyCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 部原作}}'**
+  String metadataParodyCount(int count);
+
+  /// No description provided for @metadataCharacterCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 位角色}}'**
+  String metadataCharacterCount(int count);
+
+  /// No description provided for @navRailExpand.
+  ///
+  /// In zh, this message translates to:
+  /// **'展开导航'**
+  String get navRailExpand;
+
+  /// No description provided for @navRailCollapse.
+  ///
+  /// In zh, this message translates to:
+  /// **'收起导航'**
+  String get navRailCollapse;
+
+  /// No description provided for @paginationPageSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'第 {page} 页'**
+  String paginationPageSemantic(int page);
 
   /// No description provided for @metadataRenameAuthor.
   ///
@@ -3101,6 +3407,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'作者&标签'**
   String get dialogEditMetadataTabAuthorsTags;
+
+  /// No description provided for @dialogEditMetadataTabFieldLocks.
+  ///
+  /// In zh, this message translates to:
+  /// **'字段锁'**
+  String get dialogEditMetadataTabFieldLocks;
+
+  /// No description provided for @dialogEditMetadataTabContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'内容'**
+  String get dialogEditMetadataTabContent;
 
   /// No description provided for @smartFacetMatchToggleLabel.
   ///
@@ -3477,7 +3795,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateRemindLater.
   ///
   /// In zh, this message translates to:
-  /// **'稍后提醒'**
+  /// **'稍后'**
   String get updateRemindLater;
 
   /// No description provided for @updateViewDetails.
@@ -3489,7 +3807,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateNow.
   ///
   /// In zh, this message translates to:
-  /// **'立即更新'**
+  /// **'更新'**
   String get updateNow;
 
   /// No description provided for @updateManualDownloadToast.
@@ -3534,17 +3852,23 @@ abstract class AppLocalizations {
   /// **'将删除「{name}」，并解除与 {count} 本漫画的附着。此操作不可撤销。'**
   String confirmDeleteNamedFacetContent(String name, int count);
 
-  /// No description provided for @confirmRemovePathTitle.
+  /// No description provided for @homeLibraryDeleteConfirmTitle.
   ///
   /// In zh, this message translates to:
-  /// **'确认移除'**
-  String get confirmRemovePathTitle;
+  /// **'删除「{name}」？'**
+  String homeLibraryDeleteConfirmTitle(String name);
 
-  /// No description provided for @confirmRemovePathContent.
+  /// No description provided for @homeLibraryDeleteConfirmBody.
   ///
   /// In zh, this message translates to:
-  /// **'将删除该本地库及其漫画记录。此操作立即生效且不可撤销。'**
-  String get confirmRemovePathContent;
+  /// **'将从应用中移除此库。漫画文件会保留在原位置。'**
+  String get homeLibraryDeleteConfirmBody;
+
+  /// No description provided for @homeLibraryDeleteConfirmAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解不会删除漫画文件'**
+  String get homeLibraryDeleteConfirmAcknowledge;
 
   /// No description provided for @confirmClearHistoryTitle.
   ///
@@ -3659,6 +3983,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'第 {page} 页'**
   String readingProgressPage(int page);
+
+  /// No description provided for @readingProgressPageOfTotal.
+  ///
+  /// In zh, this message translates to:
+  /// **'{current}/{total}'**
+  String readingProgressPageOfTotal(int current, int total);
+
+  /// No description provided for @historyGoToComicDetail.
+  ///
+  /// In zh, this message translates to:
+  /// **'跳转到详情页'**
+  String get historyGoToComicDetail;
 
   /// No description provided for @historyDeleteRecord.
   ///

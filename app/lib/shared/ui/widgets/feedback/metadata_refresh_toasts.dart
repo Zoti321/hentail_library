@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/library/metadata_refresh_types.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 String metadataRefreshBatchMessage(
   AppLocalizations l10n,
@@ -23,8 +23,8 @@ void showMetadataRefreshBatchToast(
 ) {
   final String message = metadataRefreshBatchMessage(context.l10n, result);
   if (result.skipped || result.cancelled || result.failed > 0) {
-    showInfoToast(context, message);
+    showInfoSnackbar(context, message);
     return;
   }
-  showSuccessToast(context, message);
+  showSuccessSnackbar(context, message);
 }

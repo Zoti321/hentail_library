@@ -22,6 +22,7 @@ MODULES = frozenset(
         "library_admin",
         "library_browse",
         "read_session",
+        "reading_history",
         "comic_trash",
         "named_metadata",
         "app_settings",
@@ -68,7 +69,9 @@ def resolve_module(import_path: str) -> str | None:
 
 
 def is_ui_layer(path: str) -> bool:
-    return (path.startswith("features/") and "/presentation/" in path) or path.startswith("shared/ui/")
+    return (path.startswith("features/") and "/presentation/" in path) or path.startswith(
+        "shared/ui/"
+    )
 
 
 def main() -> None:

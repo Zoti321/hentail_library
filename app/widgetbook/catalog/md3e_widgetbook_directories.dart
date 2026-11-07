@@ -1,0 +1,964 @@
+import 'package:flutter/material.dart';
+
+import '../preview/md3e_comic_detail_page_preview_data.dart';
+import '../preview/md3e_series_detail_page_preview_data.dart';
+
+import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
+import 'package:hentai_library/shared/ui/layout/reading_history_list_layout.dart';
+import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
+import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_metadata_tags_section.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+
+import '../hosts/md3e_home_page_lab_host.dart';
+
+import 'package:hentai_library/features/comic_trash/presentation/views/trash/trash_purge_dialog.dart';
+
+import '../hosts/md3e_history_browse_page_lab_host.dart';
+import '../preview/md3e_history_browse_page_preview_data.dart';
+import '../lab/pages/library_browse_page.dart';
+import '../hosts/md3e_management_browse_page_lab_host.dart';
+import '../hosts/md3e_settings_page_lab_host.dart';
+
+import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_page.dart';
+
+import '../hosts/md3e_reader_page_lab_host.dart';
+import '../preview/md3e_reader_page_preview_data.dart';
+
+
+import '../hosts/md3e_comic_metadata_edit_page_lab_host.dart';
+
+import 'package:hentai_library/features/library_admin/presentation/views/library/library_edit_page.dart';
+
+import '../hosts/md3e_library_edit_page_lab_host.dart';
+
+import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_page_lab_host.dart';
+import 'package:hentai_library/features/library_browse/presentation/catalog/patterns/metadata_edit/metadata_edit_navigation.dart';
+
+import '../lab/navigation/md3e_lab_catalog_navigation.dart';
+
+import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_filter_sort_side_sheet.dart';
+import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/tag_input_field.dart';
+import '../preview/md3e_named_facet_multi_select_preview.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:widgetbook/widgetbook.dart';
+
+import '../shell/md3e_widgetbook_desktop_gate.dart';
+import '../shell/md3e_widgetbook_scope.dart';
+
+part 'md3e_widgetbook_desktop_app_prototype.dart';
+part 'md3e_widgetbook_lab_catalog_navigation.dart';
+
+List<WidgetbookNode> buildMd3eWidgetbookDirectories() {
+  return <WidgetbookNode>[
+    WidgetbookFolder(
+      name: 'MD3E (Lab)',
+      children: <WidgetbookNode>[
+        WidgetbookFolder(
+          name: 'widgets',
+          children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'ComicCard',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Interactive',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Center(
+                      child: _md3eComicCardKnobsPreview(
+                        context,
+                        cover: _demoCover(context),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'SegmentedCapsuleBar',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Management facets',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Center(child: _Md3eSegmentedCapsuleBarPreview()),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'CatalogViewModeButtonGroup',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Grid · List toggle',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Center(
+                      child: _Md3eCatalogViewModeButtonGroupPreview(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ComicListItem',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Interactive',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: _md3eComicListItemKnobsPreview(
+                          context,
+                          cover: _demoCover(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ReadingHistoryListItem',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: CustomScrollView(
+                          shrinkWrap: true,
+                          slivers: <Widget>[
+                            ReadingHistoryListLayout(
+                              itemCount: 6,
+                              itemBuilder: (BuildContext context, int index) {
+                                return _Md3eReadingHistoryListItemPreview(
+                                  title: _demoReadingHistoryTitles[index % 3],
+                                  cover: _demoCover(context),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'DesktopTitleBar',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Desktop · 1024',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Md3eWidgetbookDesktopExpandedGate(
+                      child: const DesktopTitleBar(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ExpressiveNavigationRail',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: '600h · menu toggles width',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: SizedBox(
+                        height: 600,
+                        child: const _Md3eNavigationRailPreview(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Pagination',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Interactive',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: Center(child: _md3ePaginationKnobsPreview(context)),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'TagInputField',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: TagInputFieldPreview(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'FacetMultiSelectField',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Authors · smart hint',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Md3eNamedFacetMultiSelectFieldPreview(),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'patterns',
+          children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'Md3eAppShell',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) {
+                    final M3EColorScheme scheme = M3ETheme.of(context)
+                        .colorScheme;
+                    final double viewportHeight = MediaQuery.sizeOf(context)
+                        .height;
+                    final double shellHeight = viewportHeight >= 560
+                        ? viewportHeight
+                        : 768;
+                    return Md3eWidgetbookScope(
+                      child: DesktopShell(
+                        height: shellHeight,
+                        initialRailExtended: false,
+                        surfaceRoles: DesktopShellSurfaceRoles.toneBased(
+                          scheme,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'LibraryFilterSortSideSheet',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Adaptive modal · bottom (<840) / side (≥840)',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: _Md3eLibraryFilterSortSideSheetPreview(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ComicDetailMetadataTagsSection',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Tag section',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: ComicDetailMetadataTagsSection(
+                      entry: ComicDetailPagePreviewData.sample(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'scenarios',
+          children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'Md3eLabApp',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Shell + destinations · viewport addon',
+                  builder: (BuildContext context) =>
+                      const _Md3eLabAppPrototype(),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'pages',
+          children: <WidgetbookNode>[
+            WidgetbookComponent(
+              name: 'HomeLayout',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) =>
+                      const Md3eWidgetbookScope(child: HomePageLabHost()),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'LibraryBrowseLayout',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: _Md3eLibraryBrowsePagePreview(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ManagementBrowsePage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: _md3eManagementBrowsePageLabHostPreview(context),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Md3eHistoryBrowsePage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: HistoryBrowsePageLabHost(
+                      clock: DateTime(2026, 6, 15, 14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'TrashPurgeConfirmDialog',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Single local',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Center(
+                      child: TrashPurgeConfirmDialog(
+                        title: '只有神知道的世界',
+                        counts: (local: 1, remote: 0),
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Mixed batch',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: Center(
+                      child: TrashPurgeConfirmDialog(
+                        counts: (local: 2, remote: 3),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'SettingsLayout',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: SettingsPageLabHost(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ReaderLayout',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) =>
+                      const Md3eWidgetbookScope(child: ReaderPageLabHost()),
+                ),
+                WidgetbookUseCase(
+                  name: 'Series boundary · last page',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ReaderPageLabHost(
+                      preview: ReaderPagePreviewData(
+                        title: '第 01 卷',
+                        subtitle: '葬送的芙莉莲',
+                        totalPages: 3,
+                        initialPage: 3,
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Viewport · loading',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ReaderPageLabHost(
+                      preview: ReaderPagePreviewData(
+                        title: '第 01 卷',
+                        subtitle: '葬送的芙莉莲',
+                        totalPages: 24,
+                        initialPage: 3,
+                        viewportStatus: ReaderViewportStatus.loading,
+                      ),
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Viewport · open error',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ReaderPageLabHost(
+                      preview: ReaderPagePreviewData(
+                        title: '第 01 卷',
+                        subtitle: '葬送的芙莉莲',
+                        totalPages: 24,
+                        initialPage: 3,
+                        viewportStatus: ReaderViewportStatus.error,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ComicDetailLayout',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: _md3eComicDetailPageKnobsPreview(context),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'SeriesDetailLayout',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: _md3eSeriesDetailPageKnobsPreview(context),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'ComicMetadataEditLayout',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: ComicMetadataEditPageLabHost(),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'SeriesMetadataEditLayout',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Responsive · viewport addon',
+                  builder: (BuildContext context) => Md3eWidgetbookScope(
+                    child: SeriesMetadataEditLayout(
+                      initialDraft: SeriesMetadataEditDraft.fromEntry(
+                        SeriesDetailPagePreviewData.sample(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'LibraryEditPage',
+              useCases: <WidgetbookUseCase>[
+                WidgetbookUseCase(
+                  name: 'Edit local · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: LibraryEditPageLabHost(
+                      intent: LibraryEditPageIntent.editLocal,
+                    ),
+                  ),
+                ),
+                WidgetbookUseCase(
+                  name: 'Edit remote · viewport addon',
+                  builder: (BuildContext context) => const Md3eWidgetbookScope(
+                    child: LibraryEditPageLabHost(
+                      intent: LibraryEditPageIntent.editRemote,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    ),
+  ];
+}
+
+/// Sample read progress on ComicCard / ComicListItem Widgetbook examples.
+const double kMd3eWidgetbookComicReadProgress = 0.42;
+
+const List<String> _demoReadingHistoryTitles = <String>[
+  '只有神知道的世界',
+  '葬送的芙莉莲',
+  '迷宫饭',
+];
+
+class _Md3eReadingHistoryListItemPreview extends StatelessWidget {
+  const _Md3eReadingHistoryListItemPreview({
+    required this.cover,
+    this.title = '只有神知道的世界',
+  }) : lastReadTime = null;
+
+  final Widget cover;
+  final String title;
+  final DateTime? lastReadTime;
+
+  @override
+  Widget build(BuildContext context) {
+    final DateTime resolvedLastReadTime =
+        lastReadTime ?? DateTime.now().subtract(const Duration(hours: 2));
+    return ReadingHistoryListItem(
+      title: title,
+      cover: cover,
+      currentPage: 42,
+      totalPages: 208,
+      lastReadTime: resolvedLastReadTime,
+      onTap: () {},
+      onContinueReading: () {},
+      moreMenuEntries: Md3eHistoryBrowsePagePreviewData.sampleMoreMenuEntries(),
+    );
+  }
+}
+
+List<ComicListMoreMenuEntry> _demoComicListMoreMenu() {
+  return const <ComicListMoreMenuEntry>[
+    ComicListMoreMenuEntry(label: '继续阅读'),
+    ComicListMoreMenuEntry(label: '编辑元数据'),
+    ComicListMoreMenuEntry(label: '在资源管理器中显示'),
+    ComicListMoreMenuEntry(label: '删除'),
+  ];
+}
+
+Widget _demoCover(BuildContext context) {
+  return ColoredBox(
+    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+    child: Icon(
+      Icons.image_outlined,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    ),
+  );
+}
+
+Widget _md3eComicDetailPageKnobsPreview(BuildContext context) {
+  final bool showAgeRestriction = context.knobs.boolean(
+    label: '年龄限制',
+    description: '控制摘要区 R18 年龄限制 chip 是否显示。',
+    initialValue: true,
+  );
+  final ComicDetailViewObject entry = ComicDetailPagePreviewData.sample()
+      .copyWith(showAgeRestrictionChip: showAgeRestriction);
+  return ComicDetailLayout(
+    entry: entry,
+    onEdit: () =>
+        _md3eWidgetbookOpenLabComicMetadataEdit(context, entry: entry),
+  );
+}
+
+Widget _md3eSeriesDetailPageKnobsPreview(BuildContext context) {
+  final bool showAgeRestriction = context.knobs.boolean(
+    label: '年龄限制',
+    description: '控制摘要区 R18 chip 是否显示。',
+    initialValue: true,
+  );
+  final bool showMetadata = context.knobs.boolean(
+    label: '元数据区',
+    description: '控制 Parody / Author / Tag 等 chip 区块。',
+    initialValue: true,
+  );
+  final SeriesDetailViewObject entry = SeriesDetailPagePreviewData.sample()
+      .copyWith(
+        showAgeRestrictionChip: showAgeRestriction,
+        showMetadataBlock: showMetadata,
+      );
+  return SeriesDetailPageLabHost(
+    entry: entry,
+    onEdit: () =>
+        _md3eWidgetbookOpenLabSeriesMetadataEdit(context, entry: entry),
+    onComicTap: (_) => md3eWidgetbookPushLabComicDetail(context),
+  );
+}
+
+Widget _md3eComicCardKnobsPreview(
+  BuildContext context, {
+  required Widget cover,
+}) {
+  final bool disabled = context.knobs.boolean(label: '禁用', initialValue: false);
+  final bool selectionMode = disabled
+      ? false
+      : context.knobs.boolean(
+          label: '选择模式',
+          description: '开启后点击卡片或复选框切换选中。',
+          initialValue: false,
+        );
+
+  return _Md3eComicCardKnobsHost(
+    cover: cover,
+    disabled: disabled,
+    selectionMode: selectionMode,
+  );
+}
+
+class _Md3eComicCardKnobsHost extends StatefulWidget {
+  const _Md3eComicCardKnobsHost({
+    required this.cover,
+    required this.disabled,
+    required this.selectionMode,
+  });
+
+  final Widget cover;
+  final bool disabled;
+  final bool selectionMode;
+
+  @override
+  State<_Md3eComicCardKnobsHost> createState() =>
+      _Md3eComicCardKnobsHostState();
+}
+
+class _Md3eComicCardKnobsHostState extends State<_Md3eComicCardKnobsHost> {
+  bool _selected = false;
+
+  @override
+  void didUpdateWidget(covariant _Md3eComicCardKnobsHost oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.disabled || !widget.selectionMode) {
+      _selected = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 160,
+      child: ComicCard(
+        title: '深海图书馆',
+        subtitle: '128 页',
+        readProgress: kMd3eWidgetbookComicReadProgress,
+        cover: widget.cover,
+        enabled: !widget.disabled,
+        selectionMode: widget.selectionMode,
+        selected: _selected,
+        onTap: widget.selectionMode ? null : () {},
+        onSelectionChanged: widget.selectionMode
+            ? (bool value) => setState(() => _selected = value)
+            : null,
+      ),
+    );
+  }
+}
+
+Widget _md3eComicListItemKnobsPreview(
+  BuildContext context, {
+  required Widget cover,
+}) {
+  final bool disabled = context.knobs.boolean(label: '禁用', initialValue: false);
+  final bool selectionMode = disabled
+      ? false
+      : context.knobs.boolean(
+          label: '选择模式',
+          description: '开启后点击行或复选框切换选中。',
+          initialValue: false,
+        );
+
+  return _Md3eComicListItemKnobsHost(
+    cover: cover,
+    disabled: disabled,
+    selectionMode: selectionMode,
+  );
+}
+
+class _Md3eComicListItemKnobsHost extends StatefulWidget {
+  const _Md3eComicListItemKnobsHost({
+    required this.cover,
+    required this.disabled,
+    required this.selectionMode,
+  });
+
+  final Widget cover;
+  final bool disabled;
+  final bool selectionMode;
+
+  @override
+  State<_Md3eComicListItemKnobsHost> createState() =>
+      _Md3eComicListItemKnobsHostState();
+}
+
+class _Md3eComicListItemKnobsHostState
+    extends State<_Md3eComicListItemKnobsHost> {
+  bool _selected = false;
+
+  @override
+  void didUpdateWidget(covariant _Md3eComicListItemKnobsHost oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.disabled || !widget.selectionMode) {
+      _selected = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 400,
+      child: ComicListItem(
+        title: '深海图书馆',
+        author: '示例作者',
+        pageLabel: '128 页',
+        readProgress: kMd3eWidgetbookComicReadProgress,
+        moreMenuEntries: _demoComicListMoreMenu(),
+        cover: widget.cover,
+        enabled: !widget.disabled,
+        selectionMode: widget.selectionMode,
+        selected: _selected,
+        onTap: widget.selectionMode ? null : () {},
+        onSelectionChanged: widget.selectionMode
+            ? (bool value) => setState(() => _selected = value)
+            : null,
+      ),
+    );
+  }
+}
+
+const int _kMd3eWidgetbookPaginationTotalPages = 12;
+
+Widget _md3ePaginationKnobsPreview(BuildContext context) {
+  final int page = context.knobs.int.slider(
+    label: '当前页',
+    description: '紧凑/标准由 Viewport addon 窗口宽度决定（与漫画库页一致）。',
+    initialValue: 5,
+    min: 1,
+    max: _kMd3eWidgetbookPaginationTotalPages,
+    divisions: _kMd3eWidgetbookPaginationTotalPages - 1,
+  );
+
+  return Pagination(
+    page: page,
+    totalPages: _kMd3eWidgetbookPaginationTotalPages,
+    totalItems: 120,
+    pageSize: 10,
+    onPageChanged: (_) {},
+  );
+}
+
+Widget _md3eManagementBrowsePageLabHostPreview(BuildContext context) {
+  final String interactionKnob = context.knobs.list(
+    label: '新建交互',
+    options: <String>['自动', '移动端 Dialog', '桌面端内联'],
+    initialOption: '自动',
+  );
+  final ManagementCreateInteraction? interactionOverride =
+      switch (interactionKnob) {
+        '移动端 Dialog' => ManagementCreateInteraction.mobileDialog,
+        '桌面端内联' => ManagementCreateInteraction.desktopInline,
+        _ => null,
+      };
+
+  return ManagementBrowsePageLabHost(
+    createInteractionOverride: interactionOverride,
+  );
+}
+
+class _Md3eLibraryBrowsePagePreview extends StatefulWidget {
+  const _Md3eLibraryBrowsePagePreview({this.libraryDisplayName});
+
+  final String? libraryDisplayName;
+
+  @override
+  State<_Md3eLibraryBrowsePagePreview> createState() =>
+      _Md3eLibraryBrowsePagePreviewState();
+}
+
+class _Md3eLibraryBrowsePagePreviewState
+    extends State<_Md3eLibraryBrowsePagePreview> {
+  LibraryDisplayTarget _target = LibraryDisplayTarget.comics;
+  CatalogViewMode _viewMode = CatalogViewMode.grid;
+  LibraryFilterSortState _filterSort = LibraryFilterSortState.defaults;
+  int _pageSize = 50;
+  int _page = 1;
+  static const int _totalPages = 8;
+
+  @override
+  Widget build(BuildContext context) {
+    return LibraryFilterSortDrawerHost(
+      initialState: _filterSort,
+      useRootNavigator: false,
+      onStateChanged: (LibraryFilterSortState value) {
+        setState(() => _filterSort = value);
+      },
+      body: Builder(
+        builder: (BuildContext hostContext) {
+          return LibraryBrowseLayout(
+            libraryDisplayName: widget.libraryDisplayName,
+            displayTarget: _target,
+            viewMode: _viewMode,
+            filterSortActive: _filterSort.isCustomized,
+            page: _page,
+            totalPages: _totalPages,
+            onPageChanged: (int value) => setState(() => _page = value),
+            pageSize: _pageSize,
+            onPageSizeChanged: (int value) => setState(() => _pageSize = value),
+            overflowMenuEntries: <M3EMenuEntry>[
+              M3EMenuEntry(
+                label: '刷新目录',
+                leading: const Icon(Icons.refresh),
+                onPressed: () {},
+              ),
+            ],
+            onDisplayTargetChanged: (LibraryDisplayTarget value) {
+              setState(() => _target = value);
+            },
+            onViewModeChanged: (CatalogViewMode value) {
+              setState(() => _viewMode = value);
+            },
+            onFilterSort: () =>
+                LibraryFilterSortDrawerHost.openDrawer(hostContext),
+            onCatalogItemTap: (int index) => openLabCatalogDetail(
+              hostContext,
+              displayTarget: _target,
+              catalogIndex: index,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _Md3eSegmentedCapsuleBarPreview extends StatefulWidget {
+  const _Md3eSegmentedCapsuleBarPreview();
+
+  @override
+  State<_Md3eSegmentedCapsuleBarPreview> createState() =>
+      _Md3eSegmentedCapsuleBarPreviewState();
+}
+
+class _Md3eSegmentedCapsuleBarPreviewState
+    extends State<_Md3eSegmentedCapsuleBarPreview> {
+  ManagedNamedFacetKind _facet = ManagedNamedFacetKind.author;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: SegmentedCapsuleBar(
+        segments: ManagedNamedFacetUi.capsuleSegments(l10n),
+        selectedIndex: ManagedNamedFacetUi.indexOf(_facet),
+        onSelected: (int index) {
+          setState(() => _facet = ManagedNamedFacetUi.facetAt(index));
+        },
+      ),
+    );
+  }
+}
+
+class _Md3eCatalogViewModeButtonGroupPreview extends StatefulWidget {
+  const _Md3eCatalogViewModeButtonGroupPreview();
+
+  @override
+  State<_Md3eCatalogViewModeButtonGroupPreview> createState() =>
+      _Md3eCatalogViewModeButtonGroupPreviewState();
+}
+
+class _Md3eCatalogViewModeButtonGroupPreviewState
+    extends State<_Md3eCatalogViewModeButtonGroupPreview> {
+  CatalogViewMode _mode = CatalogViewMode.grid;
+
+  @override
+  Widget build(BuildContext context) {
+    return CatalogViewModeButtonGroup(
+      mode: _mode,
+      onModeChanged: (CatalogViewMode value) {
+        setState(() => _mode = value);
+      },
+    );
+  }
+}
+
+class _Md3eLibraryFilterSortSideSheetPreview extends StatefulWidget {
+  const _Md3eLibraryFilterSortSideSheetPreview();
+
+  @override
+  State<_Md3eLibraryFilterSortSideSheetPreview> createState() =>
+      _Md3eLibraryFilterSortSideSheetPreviewState();
+}
+
+class _Md3eLibraryFilterSortSideSheetPreviewState
+    extends State<_Md3eLibraryFilterSortSideSheetPreview> {
+  LibraryFilterSortState _state = LibraryFilterSortState.defaults;
+
+  @override
+  Widget build(BuildContext context) {
+    return LibraryFilterSortDrawerHost(
+      initialState: _state,
+      openSideSheetOnMount: true,
+      useRootNavigator: false,
+      onStateChanged: (LibraryFilterSortState value) {
+        setState(() => _state = value);
+      },
+      body: Builder(
+        builder: (BuildContext hostContext) {
+          return Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: M3EButton(
+                onPressed: () =>
+                    LibraryFilterSortDrawerHost.openDrawer(hostContext),
+                style: M3EButtonStyle.filled,
+                size: M3EButtonSize.sm,
+                shape: M3EButtonShape.round,
+                label: const Text('打开筛选与排序'),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _Md3eNavigationRailPreview extends StatefulWidget {
+  const _Md3eNavigationRailPreview();
+
+  @override
+  State<_Md3eNavigationRailPreview> createState() =>
+      _Md3eNavigationRailPreviewState();
+}
+
+class _Md3eNavigationRailPreviewState
+    extends State<_Md3eNavigationRailPreview> {
+  bool _extended = false;
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpressiveNavigationRail(
+      destinations: defaultNavigationRailDestinations(context.l10n),
+      selectedIndex: _selectedIndex,
+      extended: _extended,
+      onMenuPressed: () => setState(() => _extended = !_extended),
+      onDestinationSelected: (int index) =>
+          setState(() => _selectedIndex = index),
+    );
+  }
+}

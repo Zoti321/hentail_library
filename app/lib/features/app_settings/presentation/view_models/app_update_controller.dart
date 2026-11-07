@@ -7,10 +7,10 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/util/app_root_navigator.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
-import 'package:hentai_library/shared/domain/models/app_release_info.dart';
+import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/features/app_settings/presentation/views/dialogs/app_update_dialog.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
@@ -144,7 +144,7 @@ class AppUpdateController extends _$AppUpdateController {
         ? uiContext
         : appRootNavigatorKey.currentContext;
     if (ctx != null && ctx.mounted) {
-      showInfoToast(ctx, message(AppLocalizations.of(ctx)));
+      showInfoSnackbar(ctx, message(AppLocalizations.of(ctx)));
     }
   }
 }

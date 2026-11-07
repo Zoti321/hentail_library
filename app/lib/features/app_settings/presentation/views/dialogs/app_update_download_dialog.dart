@@ -3,26 +3,31 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/util/open_downloaded_file.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/shared/domain/models/app_release_info.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/features/app_settings/di/app_update_providers.dart';
+import 'package:hentai_library/features/app_settings/domain/app_release_info.dart';
+import 'package:hentai_library/shared/ui/patterns/dialog/lab_dialog_presenter.dart';
+import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/shared/ui/theme/lab_text.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 Future<void> showAppUpdateDownloadDialog({
   required BuildContext context,
   required AppReleaseAsset asset,
 }) {
-  return showDialog<void>(
-    context: context,
+  final M3EThemeData m3e = withAppFontFamily(M3ETheme.of(context));
+  return LabDialogPresenter.showBasic<void>(
+    context,
     barrierDismissible: false,
-    builder: (BuildContext dialogContext) {
-      return AppUpdateDownloadDialog(asset: asset);
-    },
+    dialog: M3ETheme(
+      data: m3e,
+      child: AppUpdateDownloadDialog(asset: asset),
+    ),
   );
 }
 
@@ -33,13 +38,21 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
+    final AppLocalizations l10n = context.l10n;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
+    final M3ESpacing spacing = theme.spacing;
+    final TextStyle actionLabelStyle = labButtonLabelStyle(
+      theme,
+      M3EButtonSize.sm,
+    );
     final ValueNotifier<double?> progress = useState<double?>(0);
     final ValueNotifier<int> receivedBytes = useState<int>(0);
     final ValueNotifier<int> totalBytes = useState<int>(asset.size);
     final ValueNotifier<bool> isDownloading = useState<bool>(true);
     final ValueNotifier<bool> hasFailed = useState<bool>(false);
     final ObjectRef<CancelToken?> cancelTokenRef = useRef<CancelToken?>(null);
+
     Future<void> startDownload() async {
       isDownloading.value = true;
       hasFailed.value = false;
@@ -89,53 +102,64 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
         cancelTokenRef.value?.cancel();
       };
     }, const <Object?>[]);
+
     final String progressLabel = totalBytes.value > 0
         ? '${receivedBytes.value.toReadableSize()} / ${totalBytes.value.toReadableSize()}'
         : receivedBytes.value.toReadableSize();
-    return HentaiDialog(
+
+    return M3EDialog(
       title: l10n.updateDownloadingTitle,
-      width: 420,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
             asset.name,
-            style: TextStyle(fontSize: 13, color: context.hentai.textSecondary),
+            style: theme.typeScale.bodyMedium.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 16),
-          LinearProgressIndicator(
+          SizedBox(height: spacing.lg),
+          M3EProgressIndicator.linear(
             value: hasFailed.value ? null : progress.value,
-            minHeight: 6,
-            borderRadius: BorderRadius.circular(3),
+            color: hasFailed.value ? scheme.error : scheme.primary,
+            trackColor: scheme.surfaceContainerHighest,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: spacing.sm),
           Text(
             hasFailed.value ? l10n.updateDownloadFailed : progressLabel,
-            style: TextStyle(fontSize: 12, color: context.hentai.textTertiary),
+            style: theme.typeScale.bodySmall.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
+      bottomDivider: true,
       actions: <Widget>[
         if (isDownloading.value)
-          TextButton(
+          M3EButton(
             onPressed: () {
               cancelTokenRef.value?.cancel();
               Navigator.of(context).pop();
             },
-            child: Text(l10n.commonCancel),
+            style: M3EButtonStyle.text,
+            decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
+            label: Text(l10n.commonCancel),
           )
         else if (hasFailed.value) ...<Widget>[
-          TextButton(
+          M3EButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.commonClose),
+            style: M3EButtonStyle.text,
+            decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
+            label: Text(l10n.commonClose),
           ),
-          const SizedBox(width: 8),
-          FilledButton(
+          M3EButton(
             onPressed: () => unawaited(startDownload()),
-            child: Text(l10n.commonRetry),
+            style: M3EButtonStyle.filled,
+            decoration: M3EButtonDecoration(textStyle: actionLabelStyle),
+            label: Text(l10n.commonRetry),
           ),
         ],
       ],

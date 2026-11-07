@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/metadata_backup/data/metadata_auto_backup_service.dart';
+import 'package:hentai_library/features/metadata_backup/data/services/metadata_auto_backup_service.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_naming.dart';
 
 void main() {
@@ -22,14 +22,14 @@ void main() {
 
       for (int index = 0; index < 3; index++) {
         await runMetadataAutoBackup(
-          export: (_) => Uint8List.fromList(<int>[index]),
+          export: () => Uint8List.fromList(<int>[index]),
           now: () => DateTime(2026, 1, 10, 12, 0, index),
           directoryPathOverride: tempDir.path,
         );
       }
 
       final MetadataAutoBackupRunResult result = await runMetadataAutoBackup(
-        export: (_) => Uint8List.fromList(<int>[9, 9, 9]),
+        export: () => Uint8List.fromList(<int>[9, 9, 9]),
         now: () => DateTime(2026, 1, 10, 12, 0, 3),
         directoryPathOverride: tempDir.path,
       );

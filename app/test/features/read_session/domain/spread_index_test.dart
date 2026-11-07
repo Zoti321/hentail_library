@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
+import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/features/read_session/domain/spread_index.dart';
 import 'package:test/test.dart';
 

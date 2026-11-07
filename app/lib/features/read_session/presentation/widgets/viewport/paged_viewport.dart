@@ -7,12 +7,12 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/session/reader_session_bindings.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_pages.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_prefetch_binder.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/resume_visible_sync_gate.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_image_item.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PagedViewport extends HookConsumerWidget {
@@ -41,12 +41,6 @@ class PagedViewport extends HookConsumerWidget {
       comicId,
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
-    );
-    final int currentIndex = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
-            value.asData?.value.currentIndex ?? 1,
-      ),
     );
     final int totalPages = ref.watch(
       readerControllerProvider(viewKey).select(
@@ -91,6 +85,13 @@ class PagedViewport extends HookConsumerWidget {
       if (imageList.isEmpty) {
         return null;
       }
+      final int currentIndex =
+          ref
+              .read(readerControllerProvider(viewKey))
+              .asData
+              ?.value
+              .currentIndex ??
+          1;
       // itemCount 0→N can reset PageView; hold sync until resume target shows.
       resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: currentIndex);
       return null;
@@ -103,6 +104,13 @@ class PagedViewport extends HookConsumerWidget {
       final int safeTotalPages = totalPages > 0 ? totalPages : 1;
       final int safeIndex = preferred.clamp(1, safeTotalPages);
       hasAppliedPreferredPage.value = true;
+      final int currentIndex =
+          ref
+              .read(readerControllerProvider(viewKey))
+              .asData
+              ?.value
+              .currentIndex ??
+          1;
       if (currentIndex != safeIndex) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!context.mounted) {
@@ -114,25 +122,22 @@ class PagedViewport extends HookConsumerWidget {
         });
       }
       return null;
-    }, <Object?>[comicId, preferredPageIndex, totalPages, currentIndex]);
-    // Jump/animate before prefetch so the landing page mounts and starts loading
-    // ahead of neighbor warmWindow contention (large slider jumps).
-    useEffect(() {
+    }, <Object?>[comicId, preferredPageIndex, totalPages]);
+
+    void alignToIndex(int currentIndex) {
       if (!pageController.hasClients || imageList.isEmpty) {
-        return null;
+        return;
       }
       final int targetPage = currentIndex - 1;
       final int currentPage =
           pageController.page?.round() ?? pageController.initialPage;
       if (currentPage == targetPage) {
-        // Already on resume page — release gate without waiting for onPageChanged.
         resumeSyncGate.value.onVisibleIndex(currentIndex);
-        return null;
+        return;
       }
       isProgrammaticScroll.value = true;
       resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: currentIndex);
       final int generation = ++alignGeneration.value;
-      // Large resume deltas: jump to avoid scrubbing intermediate onPageChanged.
       if ((currentPage - targetPage).abs() > 1) {
         pageController.jumpToPage(targetPage);
         resumeSyncGate.value.onVisibleIndex(currentIndex);
@@ -142,9 +147,7 @@ class PagedViewport extends HookConsumerWidget {
           }
           isProgrammaticScroll.value = false;
         });
-        return () {
-          alignGeneration.value++;
-        };
+        return;
       }
       pageController
           .animateToPage(
@@ -159,96 +162,112 @@ class PagedViewport extends HookConsumerWidget {
             resumeSyncGate.value.onVisibleIndex(currentIndex);
             isProgrammaticScroll.value = false;
           });
-      return () {
-        alignGeneration.value++;
-      };
-    }, <Object?>[currentIndex, pageController, imageList.length]);
+    }
 
-    useReaderPrefetchWindow(
-      ref: ref,
-      context: context,
-      comicId: comicId,
-      centerPageOneBased: currentIndex,
-      totalPages: totalPages,
-      slotLogicalWidth: readerPagedSlotLogicalWidth(viewportSize.width),
-      imageList: imageList,
+    ref.listen<int>(
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> value) =>
+            value.asData?.value.currentIndex ?? 1,
+      ),
+      (int? previous, int next) {
+        final int currentPage = pageController.hasClients
+            ? (pageController.page?.round() ?? pageController.initialPage)
+            : pageController.initialPage;
+        if (currentPage == next - 1) {
+          resumeSyncGate.value.onVisibleIndex(next);
+          return;
+        }
+        alignToIndex(next);
+      },
     );
 
     if (resolvedPages is! ReaderViewportPagesReady) {
       return ReaderViewportPagesFeedback(pages: resolvedPages);
     }
 
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: viewportSize.width),
-        child: Listener(
-          onPointerSignal: (PointerSignalEvent event) {
-            if (event is! PointerScrollEvent) {
-              return;
-            }
-            final double dy = event.scrollDelta.dy;
-            if (dy == 0) {
-              return;
-            }
-            final DateTime now = DateTime.now();
-            final DateTime? last = lastWheelAt.value;
-            if (last != null &&
-                now.difference(last).inMilliseconds < wheelThrottleMs) {
-              return;
-            }
-            lastWheelAt.value = now;
-            final ReaderController notifier = ref.read(
-              readerControllerProvider(viewKey).notifier,
-            );
-            if (dy > 0) {
-              if (onRequestNextPage != null) {
-                unawaited(onRequestNextPage!());
-              } else {
-                notifier.nextPage();
-              }
-            } else {
-              if (onRequestPrevPage != null) {
-                unawaited(onRequestPrevPage!());
-              } else {
-                notifier.prevPage();
-              }
-            }
-          },
-          child: PageView.builder(
-            controller: pageController,
-            physics: const BouncingScrollPhysics(),
-            onPageChanged: (int index) {
-              if (isProgrammaticScroll.value) {
-                return;
-              }
-              final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
-                index + 1,
-              );
-              if (applyIndex == null) {
-                return;
-              }
-              ref
-                  .read(readerControllerProvider(viewKey).notifier)
-                  .setIndex(applyIndex);
-            },
-            itemCount: imageList.length,
-            itemBuilder: (BuildContext context, int index) {
-              final ReaderPageImageData imageData = imageList[index];
-              final double slotLogicalWidth = readerPagedSlotLogicalWidth(
-                MediaQuery.sizeOf(context).width,
-              );
-              return ReaderImageItem(
-                comic: comic,
-                imageData: imageData,
-                slotLogicalWidth: slotLogicalWidth,
-                enableCrossfade: readerPageCrossfadeEnabled(
-                  reduceMotion: MediaQuery.disableAnimationsOf(context),
-                ),
-              );
-            },
+    final double slotLogicalWidth = readerPagedSlotLogicalWidth(
+      viewportSize.width,
+    );
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: viewportSize.width),
+            child: Listener(
+              onPointerSignal: (PointerSignalEvent event) {
+                if (event is! PointerScrollEvent) {
+                  return;
+                }
+                final double dy = event.scrollDelta.dy;
+                if (dy == 0) {
+                  return;
+                }
+                final DateTime now = DateTime.now();
+                final DateTime? last = lastWheelAt.value;
+                if (last != null &&
+                    now.difference(last).inMilliseconds < wheelThrottleMs) {
+                  return;
+                }
+                lastWheelAt.value = now;
+                final ReaderController notifier = ref.read(
+                  readerControllerProvider(viewKey).notifier,
+                );
+                if (dy > 0) {
+                  if (onRequestNextPage != null) {
+                    unawaited(onRequestNextPage!());
+                  } else {
+                    notifier.nextPage();
+                  }
+                } else {
+                  if (onRequestPrevPage != null) {
+                    unawaited(onRequestPrevPage!());
+                  } else {
+                    notifier.prevPage();
+                  }
+                }
+              },
+              child: PageView.builder(
+                controller: pageController,
+                physics: const BouncingScrollPhysics(),
+                onPageChanged: (int index) {
+                  if (isProgrammaticScroll.value) {
+                    return;
+                  }
+                  final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
+                    index + 1,
+                  );
+                  if (applyIndex == null) {
+                    return;
+                  }
+                  ref
+                      .read(readerControllerProvider(viewKey).notifier)
+                      .setIndex(applyIndex);
+                },
+                itemCount: imageList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final ReaderPageImageData imageData = imageList[index];
+                  return ReaderImageItem(
+                    comic: comic,
+                    imageData: imageData,
+                    slotLogicalWidth: slotLogicalWidth,
+                    enableCrossfade: readerPageCrossfadeEnabled(
+                      reduceMotion: MediaQuery.disableAnimationsOf(context),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ),
-      ),
+        ReaderViewportPrefetchBinder(
+          viewKey: viewKey,
+          comicId: comicId,
+          totalPages: totalPages,
+          slotLogicalWidth: slotLogicalWidth,
+          imageList: imageList,
+        ),
+      ],
     );
   }
 }

@@ -43,9 +43,11 @@ Accepted
 
 ### 覆盖
 
-持锁入口：`sync_library`、`refresh_comic_metadata`、`refresh_series_metadata`、`refresh_library_metadata`、`apply_comic_metadata_bulk_patch`、`trash_comics`、`restore_comics`、`purge_comics`、`update_local_library_root`，以及本次新纳入的跨 Comic 批量写：`import_comic_metadata`、`rename_tag`、`delete_tags_by_names`、`rename_author`、`delete_authors_by_names`、`rename_named_facet_name`、`delete_named_facet_by_names`、`merge_named_facet_name`、`clear_all_reading`。
+持锁入口：`sync_library`、`refresh_comic_metadata`、`refresh_series_metadata`、`refresh_library_metadata`、`apply_comic_metadata_bulk_patch`、`trash_comics`、`restore_comics`、`purge_comics`、`update_local_library_root`，以及本次新纳入的跨 Comic 批量写：`import_comic_metadata`、`rename_author`、`delete_authors_by_names`、`rename_named_facet_name`、`delete_named_facet_by_names`、`merge_named_facet_name`、`clear_all_reading`。
 
-不纳入：只写字典且幂等的 `add_tag` / `add_named_facet_name` / `import_tag_dictionary`；单 Comic 的 `replace_comic_named_facet` 与全部单 Comic 用户写；Series 成员排序（ADR-0006 用字段锁解决）。
+不纳入：只写字典且幂等的 `add_named_facet_name` / `import_tag_dictionary`；单 Comic 的 `replace_comic_named_facet` 与全部单 Comic 用户写；Series 成员排序（ADR-0006 用字段锁解决）。
+
+> **实现修订（2026-11-01）**：`tag` 模块中与 `named_facet` 重复的 `rename_tag` / `delete_tags_by_names` / `add_tag`（以及 list / page / count / `watch_tags`）已删除；Tag 字典的增删改与合并只经 `*_named_facet_name(JunctionNamedFacet::Tag, …)`，持锁规则不变。`tag` 模块仅保留 Tag dictionary import。
 
 `import_comic_metadata` 在解析 payload 之前取锁（plan 阶段读匹配索引也在锁内），每本记录一个事务写入全部字段；不再单独调用 `set_comic_meta_locks`（九个字段全部写入时 auto-lock 已等价置满）。
 
@@ -59,7 +61,7 @@ Accepted
 - 补上 `import_comic_metadata` 的漏锁与双重事务；`delete_authors_by_names` 的三条 DELETE 现在同一事务。
 - Metadata refresh 的写入集边界与 Library sync 对齐：`upsert_comics` 虽然已经拥有 16 列 `comic_meta` 写入集与四个 junction 替换，但刷新路径此前把同一份写入集拆成逐条自动提交，失败会在库里留下「`comics` 已更新、`comic_meta` 未更新」的撕裂行；现在逐 Comic 单事务。
 - `upsert_comics` 返回未写入的 Comic（`page_count <= 0`），调用方不再把「什么都没写」当作成功。
-- fail-fast 由集成测试覆盖到全部持锁入口：`tests/library_write_lock.rs`（Library sync、元数据备份导入、Tag / Author / Named facet 的批量改名与删除、清空阅读历史）、`tests/comic_trash.rs`（trash / restore / purge）、`tests/comic_metadata_bulk_patch.rs`、`tests/metadata_refresh.rs`（三个 refresh）、`tests/update_local_library_root.rs`。
+- fail-fast 由集成测试覆盖到全部持锁入口：`tests/library_write_lock.rs`（Library sync、元数据备份导入、Author / Named facet（含 Tag）的批量改名与删除、清空阅读历史）、`tests/comic_trash.rs`（trash / restore / purge）、`tests/comic_metadata_bulk_patch.rs`、`tests/metadata_refresh.rs`（三个 refresh）、`tests/update_local_library_root.rs`。
 
 ### Negative
 

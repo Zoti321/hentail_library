@@ -2,17 +2,17 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/shared/domain/models/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/reading/reading_mode.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_prefetch_hook.dart';
+import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_pages.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_prefetch_binder.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/resume_visible_sync_gate.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_aspect_ratios.dart';
 import 'package:hentai_library/features/read_session/presentation/session/reader_session_bindings.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader_page/widgets/reader_image_item.dart';
+import 'package:hentai_library/features/read_session/presentation/widgets/reader_image_item.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -38,12 +38,14 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
     );
-    final int currentIndex = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
-            value.asData?.value.currentIndex ?? 1,
-      ),
-    );
+    // Do not watch currentIndex here — scroll setIndex must not rebuild the list.
+    final int seedIndex =
+        ref
+            .read(readerControllerProvider(viewKey))
+            .asData
+            ?.value
+            .currentIndex ??
+        1;
     final Comic? comic = ref.watch(
       readerControllerProvider(viewKey)
           .select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
@@ -80,7 +82,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final ObjectRef<int> scrollGeneration = useRef<int>(0);
     final ObjectRef<int?> frozenInitialScrollIndex = useRef<int?>(null);
     if (imageList.isNotEmpty && frozenInitialScrollIndex.value == null) {
-      final int initialOneBased = currentIndex.clamp(1, imageList.length);
+      final int initialOneBased = seedIndex.clamp(1, imageList.length);
       frozenInitialScrollIndex.value = initialOneBased - 1;
       resumeSyncGate.value.beginProgrammaticAlign(
         targetOneBased: initialOneBased,
@@ -89,14 +91,9 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final int initialScrollIndex = frozenInitialScrollIndex.value ?? 0;
     final Size viewportSize = MediaQuery.sizeOf(context);
     final int totalPages = imageList.length;
-    final AppSetting? settings = ref
-        .watch(appSettingsStateProvider)
-        .asData
-        ?.value;
-    final int marginPercent =
-        settings?.webtoonMarginPercent ?? kDefaultWebtoonMarginPercent;
-    final WebtoonZoomMode zoomMode =
-        settings?.webtoonZoomMode ?? kDefaultWebtoonZoomMode;
+    final displayPrefs = ref.watch(readerDisplayPreferencesPortProvider);
+    final int marginPercent = displayPrefs.webtoonMarginPercent;
+    final WebtoonZoomMode zoomMode = displayPrefs.webtoonZoomMode;
     final double slotLogicalWidth = zoomMode == WebtoonZoomMode.fitWidth
         ? readerContinuousSlotLogicalWidth(
             viewportSize.width,
@@ -141,38 +138,33 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       hasAppliedPreferredPage.value = false;
       return null;
     }, <Object?>[comicId, preferredPageIndex]);
-    useEffect(
-      () {
-        final int? preferred = preferredPageIndex;
-        if (preferred == null ||
-            hasAppliedPreferredPage.value ||
-            imageList.isEmpty) {
-          return null;
-        }
-        final int safeIndex = preferred.clamp(1, imageList.length);
-        hasAppliedPreferredPage.value = true;
-        if (safeIndex == currentIndex) {
-          return null;
-        }
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) {
-            return;
-          }
-          controller.setIndex(safeIndex);
-        });
+    useEffect(() {
+      final int? preferred = preferredPageIndex;
+      if (preferred == null ||
+          hasAppliedPreferredPage.value ||
+          imageList.isEmpty) {
         return null;
-      },
-      <Object?>[
-        comicId,
-        preferredPageIndex,
-        imageList.length,
-        currentIndex,
-        controller,
-      ],
-    );
-
-    final ObjectRef<int> currentIndexRef = useRef<int>(currentIndex);
-    currentIndexRef.value = currentIndex;
+      }
+      final int safeIndex = preferred.clamp(1, imageList.length);
+      hasAppliedPreferredPage.value = true;
+      final int current =
+          ref
+              .read(readerControllerProvider(viewKey))
+              .asData
+              ?.value
+              .currentIndex ??
+          1;
+      if (safeIndex == current) {
+        return null;
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) {
+          return;
+        }
+        controller.setIndex(safeIndex);
+      });
+      return null;
+    }, <Object?>[comicId, preferredPageIndex, imageList.length, controller]);
 
     useEffect(() {
       void handleVisiblePositionChange() {
@@ -196,7 +188,14 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
           return;
         }
         lastVisibleMainIndex.value = applyIndex;
-        if (currentIndexRef.value == applyIndex) {
+        final int current =
+            ref
+                .read(readerControllerProvider(viewKey))
+                .asData
+                ?.value
+                .currentIndex ??
+            1;
+        if (current == applyIndex) {
           return;
         }
         controller.setIndex(applyIndex);
@@ -217,44 +216,41 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
         );
       };
     }, <Object?>[itemPositionsListener, imageList.length, controller]);
+
     useEffect(() {
       if (imageList.isEmpty) {
         lastVisibleMainIndex.value = null;
         isProgrammaticScroll.value = false;
         resumeSyncGate.value = ResumeVisibleSyncGate();
-        return null;
       }
-      final int safeIndex = currentIndex.clamp(1, imageList.length);
-      if (safeIndex == lastVisibleMainIndex.value) {
-        return null;
-      }
-      final bool shouldSkipInitialTopScroll =
-          safeIndex == 1 && lastVisibleMainIndex.value == null;
-      if (shouldSkipInitialTopScroll) {
-        lastVisibleMainIndex.value = 1;
-        resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: 1);
-        return null;
-      }
-      // Nail the target before jump; gate ignores mismatched visible indices.
-      lastVisibleMainIndex.value = safeIndex;
-      final int generation = ++scrollGeneration.value;
-      scheduleScrollToIndex(safeIndex, generation);
-      return () {
-        scrollGeneration.value++;
-        isProgrammaticScroll.value = false;
-      };
-    }, <Object?>[currentIndex, imageList.length]);
+      return null;
+    }, <Object?>[imageList.length]);
 
-    // Prefetch after programmatic jump scheduling so large slider seeks hit the
-    // landing page load path before neighbor warmWindow work.
-    useReaderPrefetchWindow(
-      ref: ref,
-      context: context,
-      comicId: comicId,
-      centerPageOneBased: currentIndex,
-      totalPages: totalPages,
-      slotLogicalWidth: slotLogicalWidth,
-      imageList: imageList,
+    // External jumps (slider / resume / setIndex from chrome) — not scroll sync.
+    ref.listen<int>(
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> value) =>
+            value.asData?.value.currentIndex ?? 1,
+      ),
+      (int? previous, int next) {
+        if (imageList.isEmpty) {
+          return;
+        }
+        final int safeIndex = next.clamp(1, imageList.length);
+        if (safeIndex == lastVisibleMainIndex.value) {
+          return;
+        }
+        final bool shouldSkipInitialTopScroll =
+            safeIndex == 1 && lastVisibleMainIndex.value == null;
+        if (shouldSkipInitialTopScroll) {
+          lastVisibleMainIndex.value = 1;
+          resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: 1);
+          return;
+        }
+        lastVisibleMainIndex.value = safeIndex;
+        final int generation = ++scrollGeneration.value;
+        scheduleScrollToIndex(safeIndex, generation);
+      },
     );
 
     final bool useOriginalSize = zoomMode == WebtoonZoomMode.originalSize;
@@ -266,23 +262,34 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       itemCount: imageList.length,
       itemBuilder: (BuildContext context, int index) {
         final ReaderPageImageData imageData = imageList[index];
-        final Widget page = ReaderImageItem(
+        final String aspectKey = readerPageAspectRatioKey(
+          comic.comicId,
+          imageData.archivePageIndex,
+        );
+        final double resolvedAspect = ref.watch(
+          readerPageAspectRatiosProvider.select(
+            (Map<String, double> ratios) =>
+                ratios[aspectKey] ?? kReaderDefaultPageAspectRatio,
+          ),
+        );
+        final Widget image = ReaderImageItem(
           comic: comic,
           imageData: imageData,
           slotLogicalWidth: slotLogicalWidth,
           enableCrossfade: false,
           fit: useOriginalSize ? BoxFit.none : BoxFit.contain,
         );
-        if (!useOriginalSize) {
-          return page;
+        if (useOriginalSize) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: viewportSize.width),
+              child: image,
+            ),
+          );
         }
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: viewportSize.width),
-            child: page,
-          ),
-        );
+        // Reserve height before decode so ScrollablePositionedList does not jump.
+        return AspectRatio(aspectRatio: resolvedAspect, child: image);
       },
     );
     final Widget viewport = useOriginalSize
@@ -296,9 +303,21 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     if (resolvedPages is! ReaderViewportPagesReady) {
       return ReaderViewportPagesFeedback(pages: resolvedPages);
     }
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-      child: viewport,
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+          child: viewport,
+        ),
+        ReaderViewportPrefetchBinder(
+          viewKey: viewKey,
+          comicId: comicId,
+          totalPages: totalPages,
+          slotLogicalWidth: slotLogicalWidth,
+          imageList: imageList,
+        ),
+      ],
     );
   }
 }

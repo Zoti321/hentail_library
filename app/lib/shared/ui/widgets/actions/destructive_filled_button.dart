@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 
 /// Filled confirm action for delete / remove / clear dialogs.
 ///
-/// Uses [HentaiColorScheme.destructive] / [HentaiColorScheme.onDestructive].
+/// Uses [ColorScheme.error] / [ColorScheme.onError] (M3E danger maps to error).
 /// When disabled (`onPressed == null`), keeps the destructive hue at reduced
 /// opacity instead of falling back to the default grey disabled fill.
 class DestructiveFilledButton extends StatelessWidget {
@@ -21,18 +20,14 @@ class DestructiveFilledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HentaiColorScheme h = context.hentai;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     return FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(
-        backgroundColor: h.destructive,
-        foregroundColor: h.onDestructive,
-        disabledBackgroundColor: h.destructive.withAlpha(
-          _disabledBackgroundAlpha,
-        ),
-        disabledForegroundColor: h.onDestructive.withAlpha(
-          _disabledForegroundAlpha,
-        ),
+        backgroundColor: cs.error,
+        foregroundColor: cs.onError,
+        disabledBackgroundColor: cs.error.withAlpha(_disabledBackgroundAlpha),
+        disabledForegroundColor: cs.onError.withAlpha(_disabledForegroundAlpha),
       ),
       child: child,
     );

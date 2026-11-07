@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
-import 'gate/wayfinder_layout_helpers.dart';
+import 'gate/lib_layout_scan_helpers.dart';
 
 void main() {
   group('monorepo layout', () {
@@ -33,21 +33,19 @@ void main() {
       expect(Directory(p.join(repoRoot.path, '.github')).existsSync(), isTrue);
     });
 
-    test('design-system MASTER declares directory charter (ADR-0029)', () {
-      final File master = File(
-        p.join(repoRoot.path, 'design-system', 'hentai-library', 'MASTER.md'),
-      );
-      expect(master.existsSync(), isTrue);
-      final String content = master.readAsStringSync();
-      expect(content, contains('## Directory charter'));
-      expect(content, contains('pages/[page-name].md'));
-      expect(
-        Directory(
-          p.join(repoRoot.path, 'design-system', 'hentai-library', 'pages'),
-        ).existsSync(),
-        isTrue,
-      );
-    });
+    test(
+      'design-system/ keeps placeholder only (archive cleared 2026-11-01)',
+      () {
+        final Directory designSystem = Directory(
+          p.join(repoRoot.path, 'design-system'),
+        );
+        expect(designSystem.existsSync(), isTrue);
+        expect(
+          File(p.join(designSystem.path, '.gitkeep')).existsSync(),
+          isTrue,
+        );
+      },
+    );
 
     test('core/ Rust workspace exists', () {
       expect(Directory(p.join(repoRoot.path, 'core')).existsSync(), isTrue);
@@ -99,34 +97,44 @@ void main() {
       skip: kEnforceWayfinderPhaseBLayout ? false : 'bootstrap-final slice',
     );
 
-    test('features/ modules use canonical ids and layer folders only', () {
-      final Directory featuresDir = Directory(p.join(libDir.path, 'features'));
-      if (!featuresDir.existsSync()) {
-        return;
-      }
-      final List<String> badModuleIds = <String>[];
-      final List<String> badLayerDirs = <String>[];
-      for (final FileSystemEntity entity in featuresDir.listSync()) {
-        if (entity is! Directory) {
-          continue;
+    test(
+      'feature public/ layer requires a single barrel when present (#430)',
+      () {
+        final Directory featuresDir = Directory(
+          p.join(libDir.path, 'features'),
+        );
+        if (!featuresDir.existsSync()) {
+          return;
         }
-        final String moduleId = p.basename(entity.path);
-        if (!kWayfinderFeatureModuleIds.contains(moduleId)) {
-          badModuleIds.add(moduleId);
-        }
-        for (final FileSystemEntity child in entity.listSync()) {
-          if (child is! Directory) {
+        final List<String> missingBarrels = <String>[];
+        for (final FileSystemEntity entity in featuresDir.listSync()) {
+          if (entity is! Directory) {
             continue;
           }
-          final String layer = p.basename(child.path);
-          if (!kWayfinderFeatureLayerDirs.contains(layer)) {
-            badLayerDirs.add(p.posix.join('features', moduleId, layer));
+          final String moduleId = p.basename(entity.path);
+          final Directory publicDir = Directory(p.join(entity.path, 'public'));
+          if (!publicDir.existsSync()) {
+            continue;
+          }
+          final bool hasPublicDart = dartFilesUnder(publicDir).isNotEmpty;
+          if (!hasPublicDart) {
+            continue;
+          }
+          final File featureBarrel = File(p.join(entity.path, 'public.dart'));
+          final File nestedBarrel = File(p.join(publicDir.path, 'public.dart'));
+          if (!featureBarrel.existsSync() && !nestedBarrel.existsSync()) {
+            missingBarrels.add('features/$moduleId/public/');
           }
         }
-      }
-      expect(badModuleIds, isEmpty);
-      expect(badLayerDirs, isEmpty);
-    });
+        expect(
+          missingBarrels,
+          isEmpty,
+          reason:
+              'Add features/<id>/public.dart (or public/public.dart) exporting '
+              'the module public API:\n${missingBarrels.join('\n')}',
+        );
+      },
+    );
 
     test('no presentation/state/ directories under lib/', () {
       expect(findPresentationStateDirs(libDir), isEmpty);

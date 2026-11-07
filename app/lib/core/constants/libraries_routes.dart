@@ -1,34 +1,22 @@
-/// Library browse routes (Komga-like `/libraries/...`).
+/// Library browse routes (Komga-like `/libraries/:id`).
 abstract final class LibrariesRoutes {
   static const String root = '/libraries';
-  static const String all = '/libraries/all';
-  static const String allSegment = 'all';
+
+  /// Legacy aggregate-browse path; always redirect away (not a real Library).
+  static const String legacyAll = '/libraries/all';
+  static const String legacyAllSegment = 'all';
 
   static String library(String libraryId) => '$root/$libraryId';
 
-  /// Single-library browse for [currentId], or All libraries browse when unset.
-  static String browsePathForCurrent(String? currentId) {
-    if (currentId == null || currentId.isEmpty) {
-      return all;
-    }
-    return library(currentId);
-  }
-
-  /// Redirect target for legacy `/local` and bare `/libraries`.
-  static String? redirectPath({
-    required String locationPath,
-    required String? currentLibraryId,
-  }) {
-    if (locationPath == '/local') {
-      return browsePathForCurrent(currentLibraryId);
-    }
-    if (locationPath == root) {
-      return all;
+  /// Redirect target for legacy `/local`, bare `/libraries`, and `/libraries/all`.
+  static String? redirectPath({required String locationPath}) {
+    if (locationPath == '/local' ||
+        locationPath == root ||
+        locationPath == legacyAll) {
+      return '/home';
     }
     return null;
   }
-
-  static bool isAllLibrariesPath(String path) => path == all;
 
   static bool isLibraryBrowsePath(String path) {
     return libraryIdFromPath(path) != null;
@@ -39,53 +27,42 @@ abstract final class LibrariesRoutes {
       return null;
     }
     final String id = path.substring(root.length + 1);
-    if (id.isEmpty || id.contains('/') || id == allSegment) {
+    if (id.isEmpty || id.contains('/') || id == legacyAllSegment) {
       return null;
     }
     return id;
   }
 }
 
-/// Sidebar selection derived from location + Current library.
-typedef LibrariesSidebarSelection = ({
-  bool sectionActive,
-  String? activeLibraryId,
-});
+/// Sidebar selection derived from location only.
+typedef LibrariesSidebarSelection = ({String? activeLibraryId});
 
-/// Collapsed rail icon is active for All libraries or a specific library context.
+/// Collapsed rail icon is active when a specific library browse is open.
 bool librariesRailIconActive(LibrariesSidebarSelection selection) {
-  return selection.sectionActive || selection.activeLibraryId != null;
+  return selection.activeLibraryId != null;
 }
 
-LibrariesSidebarSelection librariesSidebarSelection({
-  required String path,
-  required String? currentLibraryId,
-}) {
-  if (LibrariesRoutes.isAllLibrariesPath(path)) {
-    return (sectionActive: true, activeLibraryId: null);
-  }
-  final String? pathLibraryId = LibrariesRoutes.libraryIdFromPath(path);
-  if (pathLibraryId != null) {
-    return (sectionActive: false, activeLibraryId: pathLibraryId);
-  }
-  if (path.startsWith('/comic/') || path.startsWith('/series/')) {
-    return (sectionActive: false, activeLibraryId: currentLibraryId);
-  }
-  return (sectionActive: false, activeLibraryId: null);
+LibrariesSidebarSelection librariesSidebarSelection({required String path}) {
+  return (activeLibraryId: LibrariesRoutes.libraryIdFromPath(path));
 }
 
-/// Where to go / what to select after deleting the viewed or Current library.
-typedef AfterLibraryDeleteNavigation = ({
-  String? selectLibraryId,
-  String goPath,
-});
+/// 二级库列表高亮：仅当路由为 `/libraries/:id` 时返回该 id，否则为空。
+String librariesSidebarSelectedLibraryId({required String path}) {
+  final String? activeId = librariesSidebarSelection(path: path)
+      .activeLibraryId;
+  if (activeId != null && activeId.isNotEmpty) {
+    return activeId;
+  }
+  return '';
+}
+
+typedef AfterLibraryDeleteNavigation = ({String goPath});
 
 AfterLibraryDeleteNavigation afterLibraryDeleteNavigation({
   required List<String> remainingLibraryIds,
 }) {
   if (remainingLibraryIds.isEmpty) {
-    return (selectLibraryId: null, goPath: LibrariesRoutes.all);
+    return (goPath: '/home');
   }
-  final String nextId = remainingLibraryIds.first;
-  return (selectLibraryId: nextId, goPath: LibrariesRoutes.library(nextId));
+  return (goPath: LibrariesRoutes.library(remainingLibraryIds.first));
 }

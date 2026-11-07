@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:hentai_library/core/logging/log_export_manifest.dart';
@@ -50,31 +52,30 @@ class LogExportService {
     String? homeDirectory,
   }) async {
     final List<File> logFiles = await listLogFiles(logsDirectory);
-    final Archive archive = Archive();
     final String? home = homeDirectory ?? _defaultHomeDirectory();
 
+    final List<({String name, Uint8List bytes})> entries =
+        <({String name, Uint8List bytes})>[];
     for (final File file in logFiles) {
-      final String archiveName = p.basename(file.path);
-      var bytes = await file.readAsBytes();
-      if (redact) {
-        final String text = utf8.decode(bytes, allowMalformed: true);
-        bytes = utf8.encode(redactLogText(text, homeDirectory: home));
-      }
-      archive.addFile(ArchiveFile(archiveName, bytes.length, bytes));
+      entries.add((
+        name: p.basename(file.path),
+        bytes: await file.readAsBytes(),
+      ));
     }
 
     final Map<String, Object?> manifest = buildDiagnosticsManifest(
       packageInfo: packageInfo,
       diagnosticVerbose: diagnosticVerbose,
     );
-    final List<int> manifestBytes = utf8.encode(
-      const JsonEncoder.withIndent('  ').convert(manifest),
-    );
-    archive.addFile(
-      ArchiveFile('diagnostics.json', manifestBytes.length, manifestBytes),
-    );
 
-    final List<int> zipBytes = ZipEncoder().encode(archive);
+    final List<int> zipBytes = await Isolate.run(
+      () => buildLogExportZipBytes(
+        entries: entries,
+        redact: redact,
+        homeDirectory: home,
+        manifest: manifest,
+      ),
+    );
 
     final File outputFile = File(outputPath);
     await outputFile.parent.create(recursive: true);
@@ -87,4 +88,32 @@ class LogExportService {
     }
     return Platform.environment['HOME'];
   }
+}
+
+/// CPU-bound zip assembly (optional redact + ZipEncoder). Safe for [Isolate.run].
+List<int> buildLogExportZipBytes({
+  required List<({String name, Uint8List bytes})> entries,
+  required bool redact,
+  required String? homeDirectory,
+  required Map<String, Object?> manifest,
+}) {
+  final Archive archive = Archive();
+
+  for (final ({String name, Uint8List bytes}) entry in entries) {
+    List<int> bytes = entry.bytes;
+    if (redact) {
+      final String text = utf8.decode(bytes, allowMalformed: true);
+      bytes = utf8.encode(redactLogText(text, homeDirectory: homeDirectory));
+    }
+    archive.addFile(ArchiveFile(entry.name, bytes.length, bytes));
+  }
+
+  final List<int> manifestBytes = utf8.encode(
+    const JsonEncoder.withIndent('  ').convert(manifest),
+  );
+  archive.addFile(
+    ArchiveFile('diagnostics.json', manifestBytes.length, manifestBytes),
+  );
+
+  return ZipEncoder().encode(archive);
 }

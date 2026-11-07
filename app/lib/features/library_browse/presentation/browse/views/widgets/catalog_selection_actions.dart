@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit/metadata_edit_presenters.dart';
+import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_comics_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/comic_metadata_bulk_patch_toasts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
+
+Future<void> openCatalogSelectionMetadataEditor(
+  BuildContext context,
+  WidgetRef ref,
+) async {
+  final CatalogSelectionState selection = ref.read(catalogSelectionProvider);
+  if (selection.count == 0) {
+    return;
+  }
+  await openComicMetadataEditorForIds(
+    context,
+    ref,
+    selection.selectedIds.toList(growable: false),
+    exitSelectionOnDone: true,
+  );
+}
+
+Future<void> openComicMetadataEditorForIds(
+  BuildContext context,
+  WidgetRef ref,
+  List<String> ids, {
+  bool exitSelectionOnDone = false,
+}) async {
+  if (ids.isEmpty) {
+    return;
+  }
+  if (ids.length == 1) {
+    final Comic? comic = await ref.read(
+      libraryComicDetailProvider(ids.first).future,
+    );
+    if (!context.mounted || comic == null) {
+      return;
+    }
+    await showComicMetadataEdit(context: context, comic: comic);
+    if (context.mounted && exitSelectionOnDone) {
+      ref.read(catalogSelectionProvider.notifier).exit();
+    }
+    return;
+  }
+
+  final ComicMetadataBulkPatch? patch = await showBulkEditMetadata(
+    context: context,
+    comicIds: ids,
+  );
+  if (!context.mounted || patch == null) {
+    return;
+  }
+
+  await applyComicMetadataBulkPatchForComicIds(
+    context,
+    ref,
+    comicIds: ids,
+    patch: patch,
+    exitSelectionOnDone: exitSelectionOnDone,
+  );
+}
+
+/// 批量 patch 写入与结果 toast（由 [openComicMetadataEditorForIds] 在 MD3E 面板确认后调用）。
+Future<void> applyComicMetadataBulkPatchForComicIds(
+  BuildContext context,
+  WidgetRef ref, {
+  required List<String> comicIds,
+  required ComicMetadataBulkPatch patch,
+  bool exitSelectionOnDone = false,
+}) async {
+  try {
+    final ComicMetadataBulkPatchResult result = await ref
+        .read(comicMetadataBulkEditCommandPortProvider)
+        .apply(comicIds: comicIds, patch: patch);
+    if (!context.mounted) {
+      return;
+    }
+    showComicMetadataBulkPatchToast(context, result);
+    if (exitSelectionOnDone) {
+      ref.read(catalogSelectionProvider.notifier).exit();
+    }
+  } catch (err) {
+    if (!context.mounted) {
+      return;
+    }
+    if (err is AppException) {
+      showErrorSnackbar(context, err);
+    } else {
+      showErrorSnackbar(context, AppException(err.toString()));
+    }
+  }
+}

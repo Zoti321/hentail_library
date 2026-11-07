@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Active (focused) chrome for [CustomTextField]: border color only, no glow.
@@ -68,7 +67,7 @@ class CustomTextField extends HookWidget {
         isFocused: isFocused.value,
         surface: colorScheme.surface,
         focusedBorder: colorScheme.primary,
-        idleBorder: context.hentai.borderMedium,
+        idleBorder: Theme.of(context).colorScheme.outline,
       ),
       child: Row(
         children: [
@@ -79,7 +78,7 @@ class CustomTextField extends HookWidget {
               size: 16,
               color: isFocused.value
                   ? colorScheme.primary
-                  : context.hentai.textPlaceholder,
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           Expanded(
@@ -88,7 +87,10 @@ class CustomTextField extends HookWidget {
               focusNode: focusNode,
               onChanged: onChanged,
               onSubmitted: onSubmitted,
-              style: TextStyle(fontSize: 13, color: context.hentai.textPrimary),
+              style: TextStyle(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               cursorColor: colorScheme.onSurface,
               cursorWidth: 0.8,
               cursorHeight: 16,
@@ -98,7 +100,7 @@ class CustomTextField extends HookWidget {
                 hintStyle: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w300,
-                  color: context.hentai.textPlaceholder,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
@@ -123,7 +125,7 @@ class CustomTextField extends HookWidget {
                     child: Icon(
                       LucideIcons.circleX,
                       size: 14,
-                      color: context.hentai.textPlaceholder,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),

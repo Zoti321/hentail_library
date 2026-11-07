@@ -1,103 +1,47 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Desktop route fade-through: old page fully out, then new page in (280ms total).
+/// Desktop / shell top-level fade-through（对齐官方 animations FadeThrough）。
 const Duration kDesktopPageTransitionDuration = Duration(milliseconds: 280);
 
-/// Tracks whether the active navigator transition is a pop (vs push/replace).
-///
-/// Used to pick covered vs uncovered opacity when [ModalRoute.animation] is idle
-/// but [ModalRoute.secondaryAnimation] is running on the route below.
-final DesktopPageTransitionObserver desktopPageTransitionObserver =
-    DesktopPageTransitionObserver();
+/// 官方 FadeThrough 进场透明度分界（前 6/20 保持 0）。
+@visibleForTesting
+const double kFadeThroughIncomingStart = 6 / 20;
 
-class DesktopPageTransitionObserver extends NavigatorObserver {
-  bool lastTransitionWasPop = false;
+/// 官方 FadeThrough 退场透明度分界（前 6/20 淡到 0）。
+@visibleForTesting
+const double kFadeThroughOutgoingEnd = 6 / 20;
 
-  @override
-  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    lastTransitionWasPop = true;
-  }
-
-  @override
-  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    lastTransitionWasPop = false;
-  }
-
-  @override
-  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    lastTransitionWasPop = false;
-  }
-
-  @override
-  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    lastTransitionWasPop = false;
-  }
-}
-
-/// Opacity while a route is entering (push forward, [t]: 0→1).
+/// 与 animations `_ZoomedFadeIn` 进场 opacity 同权重：前 6/20 为 0，其后淡入。
 @visibleForTesting
 double desktopFadeThroughEnterOpacity(double t) {
-  if (t <= 0.5) {
+  if (t <= kFadeThroughIncomingStart) {
     return 0.0;
   }
-  return Curves.easeOutCubic.transform((t - 0.5) / 0.5);
-}
-
-/// Opacity while a route is exiting (pop reverse, [t]: 1→0).
-@visibleForTesting
-double desktopFadeThroughExitOpacity(double t) {
-  if (t >= 0.5) {
+  if (t >= 1.0) {
     return 1.0;
   }
-  return Curves.easeInCubic.transform(t / 0.5);
+  final double local =
+      (t - kFadeThroughIncomingStart) / (1.0 - kFadeThroughIncomingStart);
+  return const Cubic(0.0, 0.0, 0.2, 1.0).transform(local.clamp(0.0, 1.0));
 }
 
-/// Opacity for a route being covered by a push ([t]: secondary 0→1).
+/// 与 animations `_FadeOut` 退场 opacity 同权重：前 6/20 淡到 0，其后保持 0。
+///
+/// [t] 为 **forward** 进度（0→1 表示正在退场），不是 ReverseAnimation 的值。
 @visibleForTesting
-double desktopFadeThroughCoveredOpacity(double t) {
-  if (t >= 0.5) {
+double desktopFadeThroughExitOpacity(double t) {
+  if (t <= 0.0) {
+    return 1.0;
+  }
+  if (t >= kFadeThroughOutgoingEnd) {
     return 0.0;
   }
-  return 1.0 - Curves.easeInCubic.transform(t / 0.5);
-}
-
-/// Opacity for a route revealed after a pop ([t]: secondary 0→1).
-@visibleForTesting
-double desktopFadeThroughUncoveredOpacity(double t) {
-  if (t <= 0.5) {
-    return 0.0;
-  }
-  return Curves.easeOutCubic.transform((t - 0.5) / 0.5);
-}
-
-@visibleForTesting
-double resolveDesktopFadeThroughOpacity({
-  required Animation<double> animation,
-  required Animation<double> secondaryAnimation,
-  required bool revealingFromPop,
-}) {
-  switch (animation.status) {
-    case AnimationStatus.forward:
-      return desktopFadeThroughEnterOpacity(animation.value);
-    case AnimationStatus.reverse:
-      return desktopFadeThroughExitOpacity(animation.value);
-    case AnimationStatus.completed:
-    case AnimationStatus.dismissed:
-      break;
-  }
-
-  if (animation.isCompleted && secondaryAnimation.value > 0) {
-    if (revealingFromPop) {
-      return desktopFadeThroughUncoveredOpacity(secondaryAnimation.value);
-    }
-    return desktopFadeThroughCoveredOpacity(secondaryAnimation.value);
-  }
-
-  if (animation.isDismissed) {
-    return 0.0;
-  }
-  return 1.0;
+  final double local = t / kFadeThroughOutgoingEnd;
+  return 1.0 - const Cubic(0.4, 0.0, 1.0, 1.0).transform(local.clamp(0.0, 1.0));
 }
 
 Widget desktopFadeThroughTransitionWrapper({
@@ -110,16 +54,13 @@ Widget desktopFadeThroughTransitionWrapper({
     return child;
   }
 
-  return AnimatedBuilder(
-    animation: Listenable.merge(<Listenable>[animation, secondaryAnimation]),
-    builder: (BuildContext context, Widget? builtChild) {
-      final double opacity = resolveDesktopFadeThroughOpacity(
-        animation: animation,
-        secondaryAnimation: secondaryAnimation,
-        revealingFromPop: desktopPageTransitionObserver.lastTransitionWasPop,
-      );
-      return Opacity(opacity: opacity.clamp(0.0, 1.0), child: builtChild);
-    },
+  // secondary 停住：库浏览被详情 push 盖住时不淡出下方页，避免 pop 中段闪白。
+  // Shell 顶层 go 切换只依赖各页自己的 primary FadeThrough。
+  // fillColor 与壳层画布一致，避免透明页被 Theme.surface 盖成另一套底色。
+  return FadeThroughTransition(
+    animation: animation,
+    secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
+    fillColor: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
     child: child,
   );
 }
@@ -173,39 +114,10 @@ CustomTransitionPage<void> buildDesktopFadeThroughPage({
   );
 }
 
-bool _pendingShellFadeThrough = false;
-
-/// Request one desktop fade-through for the next shell page that opts in
-/// via [buildShellNavPage] `allowPendingFadeThrough: true` (detail back → library).
-void requestShellFadeThroughOnce() {
-  _pendingShellFadeThrough = true;
-}
-
-@visibleForTesting
-bool get debugPendingShellFadeThrough => _pendingShellFadeThrough;
-
-@visibleForTesting
-void debugResetPendingShellFadeThrough() {
-  _pendingShellFadeThrough = false;
-}
-
-/// Shell top-level nav (sidebar / drawer): instant swap, no page transition.
-///
-/// When [allowPendingFadeThrough] is true and [requestShellFadeThroughOnce]
-/// was called, consumes the one-shot and returns [buildDesktopFadeThroughPage]
-/// instead (so detail-back `go` can animate without changing sidebar nav).
+/// Shell 顶层导航（Rail / drawer / 首页→历史·垃圾桶等）：MD3 Top level fade-through。
 Page<void> buildShellNavPage({
   required GoRouterState state,
   required Widget child,
-  bool allowPendingFadeThrough = false,
 }) {
-  if (allowPendingFadeThrough && _pendingShellFadeThrough) {
-    _pendingShellFadeThrough = false;
-    return buildDesktopFadeThroughPage(state: state, child: child);
-  }
-  return NoTransitionPage<void>(
-    key: state.pageKey,
-    name: state.name,
-    child: child,
-  );
+  return buildDesktopFadeThroughPage(state: state, child: child);
 }

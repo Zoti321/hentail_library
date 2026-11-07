@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/color/hentai_color_scheme.dart';
+import 'package:hentai_library/shared/ui/theme/color/reader_color_scheme.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_motion_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_shadow_tokens.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
@@ -11,7 +11,7 @@ extension ThemeDesignX on ThemeData {
 
   AppMotionTokens get motion => extension<AppMotionTokens>()!;
 
-  HentaiColorScheme get hentai => extension<HentaiColorScheme>()!;
+  ReaderColorScheme get reader => extension<ReaderColorScheme>()!;
 }
 
 extension ThemeTokensX on BuildContext {
@@ -23,13 +23,5 @@ extension ThemeTokensX on BuildContext {
 
   AppMotionTokens get motion => _theme.motion;
 
-  HentaiColorScheme get hentai => _theme.hentai;
-}
-
-extension DeprecatedHentaiColorSchemeOnColorScheme on ColorScheme {
-  /// Prefer [ThemeTokensX.hentai] on [BuildContext]; registered on [ThemeData].
-  @Deprecated('Use context.hentai or Theme.of(context).hentai')
-  HentaiColorScheme get hentai => brightness == Brightness.dark
-      ? HentaiColorScheme.dark
-      : HentaiColorScheme.light;
+  ReaderColorScheme get reader => _theme.reader;
 }

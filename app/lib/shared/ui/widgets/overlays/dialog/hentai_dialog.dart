@@ -33,7 +33,7 @@ class HentaiDialog extends StatelessWidget {
   /// Padding around [content]. Use [EdgeInsets.zero] when body children manage insets.
   final EdgeInsetsGeometry contentPadding;
 
-  /// Dialog surface color. Defaults to [ColorScheme.hentai.cardHover].
+  /// Dialog surface color. Defaults to [ColorScheme.surface].
   final Color? backgroundColor;
 
   /// Top border above the action bar.
@@ -51,7 +51,7 @@ class HentaiDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HentaiColorScheme semantic = context.hentai;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final AppShadowTokens shadows = context.shadows;
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
@@ -71,9 +71,9 @@ class HentaiDialog extends StatelessWidget {
           width: effectiveWidth,
           constraints: BoxConstraints(maxHeight: maxDialogHeight),
           decoration: BoxDecoration(
-            color: backgroundColor ?? semantic.cardHover,
+            color: backgroundColor ?? colorScheme.surface,
             borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: semantic.borderSubtle, width: 1),
+            border: Border.all(color: colorScheme.outlineVariant, width: 1),
             boxShadow: shadows.elevatedSurface(isDark: isDark),
           ),
           child: Column(
@@ -87,7 +87,7 @@ class HentaiDialog extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: context.hentai.textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),

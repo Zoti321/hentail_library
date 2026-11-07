@@ -1,16 +1,10 @@
-use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
+use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, TransactionTrait};
 
-use crate::comic::dto::{
-    now_ms, serialize_languages, ComicDto, PageRequestDto, PagedComicResultDto,
-};
-use crate::comic::pagination::paginate;
-use crate::comic::repository::load_comics_ordered;
+use crate::comic::dto::{now_ms, serialize_languages};
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
-use crate::metadata_lock::{
-    normalize_names, normalize_tag_expression_tokens, ComicAutoLocks, ComicMetaField,
-};
+use crate::metadata_lock::{normalize_names, ComicAutoLocks, ComicMetaField};
 use crate::sync::writer::{
     replace_comic_authors, replace_comic_characters, replace_comic_parodies, replace_comic_tags,
 };
@@ -210,94 +204,6 @@ pub async fn set_comic_meta_locks(
     touch_comic(&txn, comic_id).await?;
     txn.commit().await.map_err(map_db_err)?;
     Ok(())
-}
-
-pub async fn search_comic_ids_by_tag_expression(
-    must_include: Vec<String>,
-    optional_or: Vec<String>,
-    must_exclude: Vec<String>,
-) -> Result<Vec<String>, HentaiError> {
-    let includes = normalize_tag_expression_tokens(&must_include);
-    let optional = normalize_tag_expression_tokens(&optional_or);
-    let excludes = normalize_tag_expression_tokens(&must_exclude);
-    if includes.is_empty() && optional.is_empty() && excludes.is_empty() {
-        return Ok(vec![]);
-    }
-    let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
-        return Ok(vec![]);
-    };
-    let mut sql = format!(
-        "SELECT c.comic_id FROM comics c INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
-         WHERE c.library_id = ? AND {}",
-        super::visibility::visible_comic_sql("c")
-    );
-    let mut values: Vec<sea_orm::Value> = vec![sea_orm::Value::String(Some(Box::new(library_id)))];
-    super::filter_predicate::append_metadata_expression_predicates(
-        &mut sql,
-        &mut values,
-        &includes,
-        &optional,
-        &excludes,
-    );
-    let db = connection()?;
-    let rows = db
-        .query_all(Statement::from_sql_and_values(
-            sea_orm::DatabaseBackend::Sqlite,
-            sql,
-            values,
-        ))
-        .await
-        .map_err(map_db_err)?;
-    rows.into_iter()
-        .map(|row| {
-            row.try_get_by_index::<String>(0)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
-        })
-        .collect()
-}
-
-pub async fn search_by_tag_expression(
-    must_include: Vec<String>,
-    optional_or: Vec<String>,
-    must_exclude: Vec<String>,
-) -> Result<Vec<ComicDto>, HentaiError> {
-    let page =
-        search_by_tag_expression_page(must_include, optional_or, must_exclude, 1, i32::MAX).await?;
-    Ok(page.items)
-}
-
-pub async fn search_by_tag_expression_page(
-    must_include: Vec<String>,
-    optional_or: Vec<String>,
-    must_exclude: Vec<String>,
-    page: i32,
-    page_size: i32,
-) -> Result<PagedComicResultDto, HentaiError> {
-    let page = page.max(1);
-    let page_size = page_size.max(1);
-    let ids = search_comic_ids_by_tag_expression(must_include, optional_or, must_exclude).await?;
-    let total_count = ids.len() as i64;
-    if total_count == 0 {
-        return Ok(PagedComicResultDto {
-            items: vec![],
-            total_count: 0,
-            page,
-            page_size,
-        });
-    }
-    // 越界页保持原样，只把窗口按总行数截断（与关键字搜索同属顺序翻页路径）。
-    let window = paginate(PageRequestDto { page, page_size }, total_count);
-    let start = window.offset.min(total_count) as usize;
-    let end = (start as i64 + window.page_size as i64).min(total_count) as usize;
-    let page_ids = ids[start..end].to_vec();
-    let db = connection()?;
-    let items = load_comics_ordered(&db, page_ids).await?;
-    Ok(PagedComicResultDto {
-        items,
-        total_count,
-        page: window.page,
-        page_size: window.page_size,
-    })
 }
 
 #[cfg(test)]

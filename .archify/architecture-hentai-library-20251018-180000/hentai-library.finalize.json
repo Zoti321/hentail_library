@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
-  "ok": true,
+  "ok": false,
   "command": "finalize",
-  "status": "pass",
+  "status": "fail",
   "type": "architecture",
   "quality": "showcase",
-  "startedAt": "2026-10-18T10:01:59.653Z",
+  "startedAt": "2026-11-03T05:01:26.199Z",
   "specification": {
     "path": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\candidate.json",
-    "sha256": "0059ad52d2ce894c8a6bab9814977138963abbdf95934333d7eaef1731273b3c",
-    "bytes": 5653
+    "sha256": "5234c7905a9fa4d790ed531f764f457e251721953609d27e768a808f23665c5b",
+    "bytes": 5983
   },
   "artifact": {
     "path": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
-    "sha256": "7242d3e6ce7a99ffdecc46c38ddb6cb37c3ee50255f1f666388c5f841e18807e",
-    "bytes": 826166
+    "sha256": "44010d935b235d0016dc87593ba13c50116328d9f05992f5e1ee1057baced3e4",
+    "bytes": 826683
   },
   "stages": {
     "validate": {
@@ -23,7 +23,7 @@
       "durationMs": null,
       "execution": "embedded-in-deliver",
       "command": [
-        "D:\\node\\node.exe",
+        "D:\\Dev\\node\\node.exe",
         "C:\\Users\\banki\\.agents\\skills\\archify\\bin\\archify.mjs",
         "deliver",
         "architecture",
@@ -40,8 +40,8 @@
         "ok": true,
         "command": "validate",
         "specification": {
-          "sha256": "0059ad52d2ce894c8a6bab9814977138963abbdf95934333d7eaef1731273b3c",
-          "bytes": 5653
+          "sha256": "5234c7905a9fa4d790ed531f764f457e251721953609d27e768a808f23665c5b",
+          "bytes": 5983
         },
         "validation": {
           "checksPassed": 9,
@@ -56,9 +56,9 @@
     "deliver": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 1657,
+      "durationMs": 1555,
       "command": [
-        "D:\\node\\node.exe",
+        "D:\\Dev\\node\\node.exe",
         "C:\\Users\\banki\\.agents\\skills\\archify\\bin\\archify.mjs",
         "deliver",
         "architecture",
@@ -72,19 +72,19 @@
       ],
       "receipt": {
         "schemaVersion": 1,
-        "receiptId": "11d4b6ba-131f-404c-b3e2-186cc6790d40",
+        "receiptId": "16f03c01-b8fa-477b-8b96-0bea2ca85176",
         "ok": true,
         "command": "deliver",
         "type": "architecture",
         "input": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\candidate.json",
         "output": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
         "specification": {
-          "sha256": "0059ad52d2ce894c8a6bab9814977138963abbdf95934333d7eaef1731273b3c",
-          "bytes": 5653
+          "sha256": "5234c7905a9fa4d790ed531f764f457e251721953609d27e768a808f23665c5b",
+          "bytes": 5983
         },
         "artifact": {
-          "sha256": "7242d3e6ce7a99ffdecc46c38ddb6cb37c3ee50255f1f666388c5f841e18807e",
-          "bytes": 826166
+          "sha256": "44010d935b235d0016dc87593ba13c50116328d9f05992f5e1ee1057baced3e4",
+          "bytes": 826683
         },
         "validation": {
           "checksPassed": 9,
@@ -97,7 +97,7 @@
         "evidence": {
           "verified": true,
           "repository": "https://github.com/Zoti321/hentail_library",
-          "revision": "a62c3d1293f91ec392bc0555bd089e1bd6314f87",
+          "revision": "791c1fae952a5b8b2aa5c129dc236852d74be189",
           "references": 11
         },
         "update": {
@@ -116,9 +116,9 @@
     "check": {
       "status": "pass",
       "exitCode": 0,
-      "durationMs": 498,
+      "durationMs": 376,
       "command": [
-        "D:\\node\\node.exe",
+        "D:\\Dev\\node\\node.exe",
         "C:\\Users\\banki\\.agents\\skills\\archify\\bin\\archify.mjs",
         "check",
         "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
@@ -128,8 +128,8 @@
         "ok": true,
         "file": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
         "artifact": {
-          "sha256": "7242d3e6ce7a99ffdecc46c38ddb6cb37c3ee50255f1f666388c5f841e18807e",
-          "bytes": 826166
+          "sha256": "44010d935b235d0016dc87593ba13c50116328d9f05992f5e1ee1057baced3e4",
+          "bytes": 826683
         },
         "checks": [
           {
@@ -282,15 +282,15 @@
           "issues": []
         },
         "provenance": "current",
-        "deliveryReceiptId": "11d4b6ba-131f-404c-b3e2-186cc6790d40"
+        "deliveryReceiptId": "16f03c01-b8fa-477b-8b96-0bea2ca85176"
       }
     },
     "browser-check": {
-      "status": "pass",
-      "exitCode": 0,
-      "durationMs": 4665,
+      "status": "fail",
+      "exitCode": 1,
+      "durationMs": 207,
       "command": [
-        "D:\\node\\node.exe",
+        "D:\\Dev\\node\\node.exe",
         "C:\\Users\\banki\\.agents\\skills\\archify\\bin\\archify.mjs",
         "browser-check",
         "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
@@ -300,714 +300,62 @@
       "execution": "in-process",
       "receipt": {
         "schemaVersion": 1,
-        "ok": true,
+        "ok": false,
         "command": "browser-check",
         "evidenceKind": "automated-browser",
-        "status": "pass",
+        "status": "fail",
         "visualReview": "not-requested",
         "provenance": "current",
-        "deliveryReceiptId": "11d4b6ba-131f-404c-b3e2-186cc6790d40",
+        "deliveryReceiptId": "16f03c01-b8fa-477b-8b96-0bea2ca85176",
         "artifact": {
           "path": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
-          "sha256": "7242d3e6ce7a99ffdecc46c38ddb6cb37c3ee50255f1f666388c5f841e18807e",
-          "bytes": 826166
+          "sha256": "44010d935b235d0016dc87593ba13c50116328d9f05992f5e1ee1057baced3e4",
+          "bytes": 826683
         },
         "state": {
           "detail": "read",
           "motion": "still"
         },
         "chrome": {
-          "status": "available",
-          "executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+          "status": "not-checked",
+          "executable": null
         },
-        "diagnostics": [],
+        "diagnostics": [
+          {
+            "code": "viewer/evidence-path-conflict",
+            "severity": "error",
+            "message": "browser-check will not replace the existing unowned evidence path \"E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json\".",
+            "subject": {
+              "artifact": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
+              "evidencePath": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json"
+            },
+            "evidence": {
+              "reason": {
+                "code": "ownership-artifact-mismatch"
+              }
+            },
+            "supportedFixes": [
+              "move the conflicting file aside, or choose a separate --out-dir, then rerun browser-check"
+            ]
+          }
+        ],
         "containment": {
-          "status": "pass",
+          "status": "fail",
           "policy": "fit-or-reader-declared-readable-vertical-scroll",
-          "viewports": [
-            {
-              "width": 1440,
-              "height": 900,
-              "theme": "light",
-              "innerWidth": 1440,
-              "innerHeight": 900,
-              "scrollWidth": 1440,
-              "scrollHeight": 900,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1233,
-              "diagramWidth": 1203,
-              "pageComposition": {
-                "bodyPaddingPx": 12,
-                "headerPx": 52,
-                "diagramChromePx": 78,
-                "svgPx": 746,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 1600,
-              "height": 1000,
-              "theme": "light",
-              "innerWidth": 1600,
-              "innerHeight": 1000,
-              "scrollWidth": 1600,
-              "scrollHeight": 1000,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1288,
-              "diagramWidth": 1258,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 60,
-                "diagramChromePx": 84,
-                "svgPx": 780,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 1920,
-              "height": 1080,
-              "theme": "light",
-              "innerWidth": 1920,
-              "innerHeight": 1080,
-              "scrollWidth": 1920,
-              "scrollHeight": 1080,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1417,
-              "diagramWidth": 1387,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 60,
-                "diagramChromePx": 84,
-                "svgPx": 860,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 2048,
-              "height": 1320,
-              "theme": "light",
-              "innerWidth": 2048,
-              "innerHeight": 1320,
-              "scrollWidth": 2048,
-              "scrollHeight": 1320,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1865,
-              "diagramWidth": 1528.5,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 68,
-                "diagramChromePx": 228,
-                "svgPx": 948,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 55,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 0,
-              "viewerChromeActive": false,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            }
-          ]
+          "viewports": []
         },
         "themeStates": {
-          "status": "pass",
-          "viewports": [
-            {
-              "width": 1440,
-              "height": 900,
-              "requestedTheme": "light",
-              "resolvedTheme": "light",
-              "ok": true
-            },
-            {
-              "width": 1600,
-              "height": 1000,
-              "requestedTheme": "light",
-              "resolvedTheme": "light",
-              "ok": true
-            },
-            {
-              "width": 1920,
-              "height": 1080,
-              "requestedTheme": "light",
-              "resolvedTheme": "light",
-              "ok": true
-            },
-            {
-              "width": 2048,
-              "height": 1320,
-              "requestedTheme": "light",
-              "resolvedTheme": "light",
-              "ok": true
-            },
-            {
-              "width": 1440,
-              "height": 900,
-              "requestedTheme": "dark",
-              "resolvedTheme": "dark",
-              "ok": true
-            },
-            {
-              "width": 2048,
-              "height": 1320,
-              "requestedTheme": "dark",
-              "resolvedTheme": "dark",
-              "ok": true
-            }
-          ]
+          "status": "fail",
+          "viewports": []
         },
         "readability": {
-          "status": "pass",
+          "status": "fail",
           "minimumProjectedNodeTextPx": 6,
-          "viewports": [
-            {
-              "width": 1440,
-              "height": 900,
-              "theme": "light",
-              "innerWidth": 1440,
-              "innerHeight": 900,
-              "scrollWidth": 1440,
-              "scrollHeight": 900,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1233,
-              "diagramWidth": 1203,
-              "pageComposition": {
-                "bodyPaddingPx": 12,
-                "headerPx": 52,
-                "diagramChromePx": 78,
-                "svgPx": 746,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 1600,
-              "height": 1000,
-              "theme": "light",
-              "innerWidth": 1600,
-              "innerHeight": 1000,
-              "scrollWidth": 1600,
-              "scrollHeight": 1000,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1288,
-              "diagramWidth": 1258,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 60,
-                "diagramChromePx": 84,
-                "svgPx": 780,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 1920,
-              "height": 1080,
-              "theme": "light",
-              "innerWidth": 1920,
-              "innerHeight": 1080,
-              "scrollWidth": 1920,
-              "scrollHeight": 1080,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1417,
-              "diagramWidth": 1387,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 60,
-                "diagramChromePx": 84,
-                "svgPx": 860,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 2048,
-              "height": 1320,
-              "theme": "light",
-              "innerWidth": 2048,
-              "innerHeight": 1320,
-              "scrollWidth": 2048,
-              "scrollHeight": 1320,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1865,
-              "diagramWidth": 1528.5,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 68,
-                "diagramChromePx": 228,
-                "svgPx": 948,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 55,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 0,
-              "viewerChromeActive": false,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            }
-          ]
+          "viewports": []
         },
         "viewerChrome": {
-          "status": "pass",
-          "viewports": [
-            {
-              "width": 1440,
-              "height": 900,
-              "theme": "light",
-              "innerWidth": 1440,
-              "innerHeight": 900,
-              "scrollWidth": 1440,
-              "scrollHeight": 900,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1233,
-              "diagramWidth": 1203,
-              "pageComposition": {
-                "bodyPaddingPx": 12,
-                "headerPx": 52,
-                "diagramChromePx": 78,
-                "svgPx": 746,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 1600,
-              "height": 1000,
-              "theme": "light",
-              "innerWidth": 1600,
-              "innerHeight": 1000,
-              "scrollWidth": 1600,
-              "scrollHeight": 1000,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1288,
-              "diagramWidth": 1258,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 60,
-                "diagramChromePx": 84,
-                "svgPx": 780,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 1920,
-              "height": 1080,
-              "theme": "light",
-              "innerWidth": 1920,
-              "innerHeight": 1080,
-              "scrollWidth": 1920,
-              "scrollHeight": 1080,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1417,
-              "diagramWidth": 1387,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 60,
-                "diagramChromePx": 84,
-                "svgPx": 860,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 10,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 54,
-              "viewerChromeActive": true,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            },
-            {
-              "width": 2048,
-              "height": 1320,
-              "theme": "light",
-              "innerWidth": 2048,
-              "innerHeight": 1320,
-              "scrollWidth": 2048,
-              "scrollHeight": 1320,
-              "overflowX": false,
-              "overflowY": false,
-              "verticalScrollAccepted": false,
-              "overflowDisposition": "contained",
-              "readerLayout": "adaptive",
-              "readerOverflow": null,
-              "readerFit": "intrinsic-height",
-              "ok": true,
-              "readerWidth": 1865,
-              "diagramWidth": 1528.5,
-              "pageComposition": {
-                "bodyPaddingPx": 64,
-                "headerPx": 68,
-                "diagramChromePx": 228,
-                "svgPx": 948,
-                "cardsPx": 0,
-                "viewBoxHeight": 632
-              },
-              "viewBoxWidth": 1019,
-              "minimumProjectedNodeTextPx": 8,
-              "minimumProjectedNonEdgeTextPx": 9,
-              "minimumProjectedEdgeTextPx": 8,
-              "minimumProjectedNodeText": "浏览 / 阅读",
-              "minimumProjectedNodeTextDetail": "edge",
-              "minimumProjectedNodeTextOwner": {
-                "kind": "edge",
-                "id": "user-to-ui",
-                "from": "user",
-                "to": "flutter-ui"
-              },
-              "minimumRequiredNodeTextPx": 6,
-              "readabilityOk": true,
-              "hasLegend": true,
-              "hasNavigationDock": true,
-              "legendDockIntersectionArea": 0,
-              "dockStageIntersectionArea": 0,
-              "dockStageGap": 55,
-              "requiredDockStageGap": 10,
-              "viewerChromeStageOk": true,
-              "viewerChromeReserve": 0,
-              "viewerChromeActive": false,
-              "viewerChromeOk": true,
-              "resolvedTheme": "light"
-            }
-          ]
+          "status": "fail",
+          "viewports": []
         },
         "captures": {
           "status": "not-requested",
@@ -1017,27 +365,49 @@
         "sidecars": {
           "receipt": "hentai-library.browser-check.json",
           "files": []
-        }
+        },
+        "error": "browser-check will not replace the existing unowned evidence path \"E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json\"."
       }
     }
   },
-  "diagnostics": [],
+  "diagnostics": [
+    {
+      "code": "viewer/evidence-path-conflict",
+      "severity": "error",
+      "message": "browser-check will not replace the existing unowned evidence path \"E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json\".",
+      "subject": {
+        "artifact": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.html",
+        "evidencePath": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json"
+      },
+      "evidence": {
+        "reason": {
+          "code": "ownership-artifact-mismatch"
+        }
+      },
+      "supportedFixes": [
+        "move the conflicting file aside, or choose a separate --out-dir, then rerun browser-check"
+      ]
+    }
+  ],
   "evidence": {
     "receipt": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.finalize.json",
     "summaryReceipt": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.finalize-summary.json",
     "browserCheckReceipt": "E:\\projects\\hentai_library\\.archify\\architecture-hentai-library-20251018-180000\\hentai-library.browser-check.json"
   },
   "visualReview": "not-requested",
-  "finishedAt": "2026-10-18T10:02:10.394Z",
-  "durationMs": 10741,
+  "failedStage": "browser-check",
+  "finishedAt": "2026-11-03T05:01:29.289Z",
+  "durationMs": 3090,
   "update": {
-    "status": "current",
+    "status": "update_available",
     "installedVersion": "3.1.0",
-    "availableVersion": "3.1.0",
-    "releaseNotes": null,
-    "checkedAt": "2026-10-18T10:01:35.680Z",
+    "availableVersion": "3.2.0",
+    "releaseNotes": "https://github.com/tt-a1i/archify/releases/tag/v3.2.0",
+    "severity": "normal",
+    "checkedAt": "2026-11-03T05:00:46.373Z",
     "source": "cache",
-    "noticeRequired": false,
-    "noticeText": null
+    "noticeRequired": true,
+    "noticeText": "Archify update: 3.1.0 → 3.2.0. A previous check at 2026-11-03T05:00:46.373Z found a newer release. Release notes: https://github.com/tt-a1i/archify/releases/tag/v3.2.0. The installed Skill has not changed; ask to snooze or ignore this reminder.",
+    "eventKey": "archify@sha256:70e210265c59f24dcbdf2a502ff671104b5454e7ee7d3554aecd86bad32384f5"
   }
 }

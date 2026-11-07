@@ -9,7 +9,8 @@ pub struct Model {
     #[sea_orm(unique)]
     pub root_path: String,
     pub name: String,
-    pub enabled_format_groups: String,
+    #[sea_orm(column_name = "enabled_format_groups")]
+    pub enabled_resource_format_categories: String,
     pub created_at: i64,
     /// Basic auth username for Remote library; empty for Local.
     pub username: String,

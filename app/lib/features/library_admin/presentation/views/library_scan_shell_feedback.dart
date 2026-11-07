@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/terminal_spinner.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_scan_toasts.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
 
-/// Shell-global silent Library sync completion Toasts + visible busy strip.
+/// Shell-global silent Library sync completion snackbar.
 ///
 /// Mounted on [ResponsiveAppShell] so feedback does not depend on Library page
 /// overflow being in the tree.
@@ -36,53 +32,6 @@ class LibraryScanShellFeedback extends ConsumerWidget {
       ));
     });
 
-    final bool silentBusy = ref.watch(
-      scanLibraryControllerProvider.select(
-        (ScanLibraryState s) => s.running && s.silent,
-      ),
-    );
-    if (!silentBusy) {
-      return const SizedBox.shrink();
-    }
-
-    final l10n = context.l10n;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final bool deep = ref.watch(
-      scanLibraryControllerProvider.select(
-        (ScanLibraryState s) => s.scanMode == ScanMode.full,
-      ),
-    );
-
-    return Material(
-      color: colorScheme.primary.withValues(alpha: 0.08),
-      child: Container(
-        width: double.infinity,
-        height: 30,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: context.hentai.borderSubtle),
-          ),
-        ),
-        child: Row(
-          children: <Widget>[
-            TerminalSpinner(color: colorScheme.primary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                deep ? l10n.libraryScanningDeep : l10n.libraryScanning,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: context.hentai.textPrimary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }

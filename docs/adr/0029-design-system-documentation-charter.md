@@ -4,6 +4,8 @@
 
 Accepted
 
+> **实现修订（2026-10-27）**：MD3E Lab 活跃开发期，`design-system/hentai-library/` 不作为 Lab UI 的 Agent 规范入口；目录冻结为只读归档，Lab 验收以 Widgetbook + `app/lib/md3e/` 为准。见 **ADR-0030**。生产 `shared/ui` 真源与本文「可执行真值」表仍适用；解冻文档或迁生产视觉时需新 ADR 或显式宣布结束冻结。
+
 ## Context
 
 仓库已有 Flutter 主题与组件实现（ADR-0028）、UI 四层边界（ADR-0027），以及 `design-system/hentai-library/MASTER.md` 与按路由的 `pages/*` override。贡献者与 Agent 需要明确：`design-system/` 不仅是可选的设计笔记，而是与 `AGENTS.md` 对齐的 **UI 规范入口**；同时 ui-ux-pro-max 的 `--persist` 默认写入同一路径结构，若职责不清易出现「Skill 泛化建议覆盖人工 MASTER」或「文档与 `buildAppTheme` 数值分叉」。

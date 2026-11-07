@@ -4,13 +4,14 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'comic.dart';
 import 'init.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`
 
-void recordReadingFrb({required ReadingHistoryDto history}) =>
+Future<void> recordReadingFrb({required ReadingHistoryDto history}) =>
     RustLib.instance.api.crateApiHistoryRecordReadingFrb(history: history);
 
 Future<ReadingHistoryDto?> getReadingByComicIdFrb({required String comicId}) =>
@@ -19,14 +20,15 @@ Future<ReadingHistoryDto?> getReadingByComicIdFrb({required String comicId}) =>
     );
 
 Future<PagedReadingHistoryDto> fetchReadingPageFrb({
-  required int page,
-  required int pageSize,
+  required PageRequestDto request,
   String? keyword,
 }) => RustLib.instance.api.crateApiHistoryFetchReadingPageFrb(
-  page: page,
-  pageSize: pageSize,
+  request: request,
   keyword: keyword,
 );
+
+Future<List<ReadPageIndexDto>> listReadPageIndexesFrb() =>
+    RustLib.instance.api.crateApiHistoryListReadPageIndexesFrb();
 
 int deleteReadingByComicIdFrb({required String comicId}) => RustLib.instance.api
     .crateApiHistoryDeleteReadingByComicIdFrb(comicId: comicId);
@@ -39,17 +41,25 @@ int deleteReadingByComicIdsFrb({required List<String> comicIds}) => RustLib
 int clearAllReadingFrb() =>
     RustLib.instance.api.crateApiHistoryClearAllReadingFrb();
 
-Stream<List<ReadingHistoryDto>> watchReadingHistoriesFrb() =>
-    RustLib.instance.api.crateApiHistoryWatchReadingHistoriesFrb();
+Stream<int> watchReadingHistoryChangesFrb() =>
+    RustLib.instance.api.crateApiHistoryWatchReadingHistoryChangesFrb();
 
 class PagedReadingHistoryDto {
   final List<ReadingHistoryDto> items;
   final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
 
-  const PagedReadingHistoryDto({required this.items, required this.totalCount});
+  const PagedReadingHistoryDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
 
   @override
-  int get hashCode => items.hashCode ^ totalCount.hashCode;
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -57,7 +67,27 @@ class PagedReadingHistoryDto {
       other is PagedReadingHistoryDto &&
           runtimeType == other.runtimeType &&
           items == other.items &&
-          totalCount == other.totalCount;
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
+}
+
+class ReadPageIndexDto {
+  final String comicId;
+  final int pageIndex;
+
+  const ReadPageIndexDto({required this.comicId, required this.pageIndex});
+
+  @override
+  int get hashCode => comicId.hashCode ^ pageIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReadPageIndexDto &&
+          runtimeType == other.runtimeType &&
+          comicId == other.comicId &&
+          pageIndex == other.pageIndex;
 }
 
 class ReadingHistoryDto {
@@ -65,12 +95,14 @@ class ReadingHistoryDto {
   final String title;
   final PlatformInt64 lastReadTimeMs;
   final int? pageIndex;
+  final int? pageCount;
 
   const ReadingHistoryDto({
     required this.comicId,
     required this.title,
     required this.lastReadTimeMs,
     this.pageIndex,
+    this.pageCount,
   });
 
   @override
@@ -78,7 +110,8 @@ class ReadingHistoryDto {
       comicId.hashCode ^
       title.hashCode ^
       lastReadTimeMs.hashCode ^
-      pageIndex.hashCode;
+      pageIndex.hashCode ^
+      pageCount.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -88,5 +121,6 @@ class ReadingHistoryDto {
           comicId == other.comicId &&
           title == other.title &&
           lastReadTimeMs == other.lastReadTimeMs &&
-          pageIndex == other.pageIndex;
+          pageIndex == other.pageIndex &&
+          pageCount == other.pageCount;
 }

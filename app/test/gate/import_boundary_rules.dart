@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-import 'wayfinder_layout_helpers.dart';
+import 'lib_layout_scan_helpers.dart';
 
-/// Module ids for Wayfinder import-boundary Gate (#220).
+/// Feature / module ids for import-boundary Gate (#220).
 ///
 /// Keep in sync with `scripts/research/cross_feature_import_audit.py` (`classify`).
 const Set<String> kImportBoundaryModules = <String>{
@@ -12,7 +12,10 @@ const Set<String> kImportBoundaryModules = <String>{
   'home',
   'library_admin',
   'library_browse',
+  'comic',
+  'series',
   'read_session',
+  'reading_history',
   'comic_trash',
   'named_metadata',
   'app_settings',
@@ -27,6 +30,48 @@ final RegExp _importUriRe = RegExp(
   r"^import\s+'package:hentai_library/([^']+)';",
   multiLine: true,
 );
+
+/// `export` of own `presentation/` from `public/` (R12); M1/M2/M3 stay import-only.
+final RegExp _exportUriRe = RegExp(
+  r"^export\s+'package:hentai_library/([^']+)';",
+  multiLine: true,
+);
+
+/// lib-relative paths allowed to `export` own feature `presentation/` (R12).
+/// Source: `app/test/gate/public_presentation_export_allowlist.txt` (only shrink).
+Set<String>? _publicPresentationExportAllowlistCache;
+
+Set<String> publicPresentationExportAllowlist({Directory? gateDir}) {
+  final Set<String>? cached = _publicPresentationExportAllowlistCache;
+  if (cached != null && gateDir == null) {
+    return cached;
+  }
+  final Directory dir =
+      gateDir ?? Directory(p.join(Directory.current.path, 'test', 'gate'));
+  final File file = File(
+    p.join(dir.path, 'public_presentation_export_allowlist.txt'),
+  );
+  final Set<String> entries = <String>{};
+  if (file.existsSync()) {
+    for (final String raw in file.readAsLinesSync()) {
+      final String line = raw.trim();
+      if (line.isEmpty || line.startsWith('#')) {
+        continue;
+      }
+      entries.add(line.replaceAll(r'\', '/'));
+    }
+  }
+  if (gateDir == null) {
+    _publicPresentationExportAllowlistCache = entries;
+  }
+  return entries;
+}
+
+bool isPublicPresentationExportAllowlisted(String libRelativePosix) {
+  return publicPresentationExportAllowlist().contains(
+    libRelativePosix.replaceAll(r'\', '/'),
+  );
+}
 
 final RegExp _exportOnlyShimRe = RegExp(
   r"^\s*export\s+'package:hentai_library/[^']+';\s*$",
@@ -125,6 +170,52 @@ bool isDomainLayerPath(String libRelativePosix) {
   return path.contains('/domain/');
 }
 
+bool isApplicationLayerPath(String libRelativePosix) {
+  final String path = libRelativePosix.replaceAll(r'\', '/');
+  return path.startsWith('features/') && path.contains('/application/');
+}
+
+/// Cross-feature allowlist (#427 / ADR-0034): `features/<owner>/public/**` only.
+bool isFeaturePublicPath(String importPath) {
+  final String path = importPath.replaceAll(r'\', '/');
+  if (!path.startsWith('features/')) {
+    return false;
+  }
+  final List<String> parts = path.split('/');
+  if (parts.length < 3) {
+    return false;
+  }
+  if (parts[2] == 'public') {
+    return true;
+  }
+  return parts.length == 3 && parts[2] == 'public.dart';
+}
+
+bool isFeaturePublicLayerPath(String libRelativePosix) {
+  final String path = libRelativePosix.replaceAll(r'\', '/');
+  return path.startsWith('features/') && path.contains('/public/');
+}
+
+bool _importTargetsFeatureApplication(String importPath) {
+  return importPath.startsWith('features/') &&
+      importPath.contains('/application/');
+}
+
+bool _importTargetsDataLayer(String importPath) {
+  if (importPath.startsWith('shared/data/')) {
+    return true;
+  }
+  return importPath.startsWith('features/') && importPath.contains('/data/');
+}
+
+bool _importTargetsPresentationLayer(String importPath) {
+  if (isPresentationLayerPath(importPath)) {
+    return true;
+  }
+  return importPath.startsWith('features/') &&
+      importPath.contains('/presentation/');
+}
+
 bool isFrbImportAllowedSource(String libRelativePosix) {
   final String path = libRelativePosix.replaceAll(r'\', '/');
   if (path == 'main.dart') {
@@ -216,6 +307,32 @@ List<ImportViolation> collectImportViolations(Directory libDir) {
         targetModule: targetModule,
       );
     }
+    // R12 also covers `export` of own presentation from public/ (ADR-0034).
+    // Cross-feature deep `export` (e.g. browse bridges) stay import-only for M1.
+    if (isFeaturePublicLayerPath(rel) && isProductModule(sourceModule)) {
+      for (final RegExpMatch match in _exportUriRe.allMatches(contents)) {
+        final String importPath = match.group(1)!;
+        if (!importPath.startsWith('features/$sourceModule/presentation/')) {
+          continue;
+        }
+        final String importUri = '$_packagePrefix$importPath';
+        final String? targetModule = resolveImportTargetModule(
+          importPath,
+          libDir,
+        );
+        if (targetModule == null) {
+          continue;
+        }
+        _checkStructuralRules(
+          found: found,
+          sourceRel: rel,
+          sourceModule: sourceModule,
+          importPath: importPath,
+          importUri: importUri,
+          targetModule: targetModule,
+        );
+      }
+    }
   }
   return found;
 }
@@ -244,6 +361,54 @@ void _checkStructuralRules({
         ),
       );
     }
+    if (_importTargetsFeatureApplication(importPath)) {
+      found.add(
+        violation(
+          ruleId: 'R6',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+    }
+  }
+
+  if (isApplicationLayerPath(sourceRel)) {
+    if (_importTargetsDataLayer(importPath)) {
+      found.add(
+        violation(
+          ruleId: 'R7',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+    }
+    if (_importTargetsPresentationLayer(importPath)) {
+      found.add(
+        violation(
+          ruleId: 'R8',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+    }
+    if (importPath.startsWith('flutter/') ||
+        importPath.startsWith('flutter_')) {
+      found.add(
+        violation(
+          ruleId: 'R9',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+    }
   }
 
   if (targetModule == 'frb_generated' && !isFrbImportAllowedSource(sourceRel)) {
@@ -251,6 +416,18 @@ void _checkStructuralRules({
       found.add(
         violation(
           ruleId: 'R3',
+          sourceModule: sourceModule,
+          targetModule: targetModule,
+          sourceFile: sourceRel,
+          importUri: importUri,
+        ),
+      );
+      return;
+    }
+    if (isApplicationLayerPath(sourceRel)) {
+      found.add(
+        violation(
+          ruleId: 'R10',
           sourceModule: sourceModule,
           targetModule: targetModule,
           sourceFile: sourceRel,
@@ -283,7 +460,9 @@ void _checkStructuralRules({
     );
   }
 
-  if (sourceModule == 'library_browse') {
+  if (sourceModule == 'library_browse' ||
+      sourceModule == 'comic' ||
+      sourceModule == 'series') {
     if (importPath.startsWith('features/read_session/')) {
       found.add(
         violation(
@@ -295,6 +474,35 @@ void _checkStructuralRules({
         ),
       );
     }
+  }
+
+  if (sourceModule == 'shared' &&
+      importPath.startsWith('features/') &&
+      isFeaturePublicPath(importPath)) {
+    found.add(
+      violation(
+        ruleId: 'R11',
+        sourceModule: sourceModule,
+        targetModule: targetModule,
+        sourceFile: sourceRel,
+        importUri: importUri,
+      ),
+    );
+  }
+
+  if (isFeaturePublicLayerPath(sourceRel) &&
+      isProductModule(sourceModule) &&
+      importPath.startsWith('features/$sourceModule/presentation/') &&
+      !isPublicPresentationExportAllowlisted(sourceRel)) {
+    found.add(
+      violation(
+        ruleId: 'R12',
+        sourceModule: sourceModule,
+        targetModule: targetModule,
+        sourceFile: sourceRel,
+        importUri: importUri,
+      ),
+    );
   }
 }
 
@@ -337,15 +545,17 @@ void _checkModuleGraphRules({
     return;
   }
 
-  found.add(
-    violation(
-      ruleId: 'M1',
-      sourceModule: sourceModule,
-      targetModule: targetModule,
-      sourceFile: sourceRel,
-      importUri: importUri,
-    ),
-  );
+  if (!isFeaturePublicPath(importPath)) {
+    found.add(
+      violation(
+        ruleId: 'M1',
+        sourceModule: sourceModule,
+        targetModule: targetModule,
+        sourceFile: sourceRel,
+        importUri: importUri,
+      ),
+    );
+  }
 
   final bool targetIsPresentation =
       isPresentationLayerPath(importPath) ||
@@ -379,4 +589,89 @@ List<ImportViolation> ratchetViolations(List<ImportViolation> all) {
 
 Set<String> violationKeySet(List<ImportViolation> violations) {
   return violations.map(violationKey).toSet();
+}
+
+/// Directed edges `sourceModule -> targetModule` for public-only cross-feature imports.
+Map<String, Set<String>> collectPublicCrossFeatureAdjacency(Directory libDir) {
+  final Map<String, Set<String>> adjacency = <String, Set<String>>{};
+  final Iterable<File> dartFiles = libDir
+      .listSync(recursive: true)
+      .whereType<File>()
+      .where((File f) => f.path.endsWith('.dart'));
+
+  for (final File file in dartFiles) {
+    final String rel = p.posix.normalize(
+      p.relative(file.path, from: libDir.path).replaceAll(r'\', '/'),
+    );
+    if (isGeneratedDartFile(rel)) {
+      continue;
+    }
+    final String contents = file.readAsStringSync();
+    if (!isCanonicalLibRelativePath(rel) &&
+        isStranglerExportOnlyShim(contents)) {
+      continue;
+    }
+    final String sourceModule = classifyLibPath(rel);
+    if (!isProductModule(sourceModule)) {
+      continue;
+    }
+    for (final RegExpMatch match in _importUriRe.allMatches(contents)) {
+      final String importPath = match.group(1)!;
+      if (!isFeaturePublicPath(importPath)) {
+        continue;
+      }
+      final String? targetModule = resolveImportTargetModule(
+        importPath,
+        libDir,
+      );
+      if (targetModule == null ||
+          !isProductModule(targetModule) ||
+          sourceModule == targetModule) {
+        continue;
+      }
+      adjacency.putIfAbsent(sourceModule, () => <String>{}).add(targetModule);
+    }
+  }
+  return adjacency;
+}
+
+/// Returns one cycle as module ids, or null if acyclic.
+List<String>? findPublicCrossFeatureCycle(Map<String, Set<String>> adjacency) {
+  final Set<String> allNodes = <String>{
+    ...adjacency.keys,
+    for (final Set<String> targets in adjacency.values) ...targets,
+  };
+  final Set<String> visited = <String>{};
+  final Set<String> inStack = <String>{};
+  List<String>? cycle;
+
+  void dfs(String node, List<String> path) {
+    if (cycle != null) {
+      return;
+    }
+    if (inStack.contains(node)) {
+      final int start = path.indexOf(node);
+      cycle = <String>[...path.sublist(start), node];
+      return;
+    }
+    if (visited.contains(node)) {
+      return;
+    }
+    visited.add(node);
+    inStack.add(node);
+    path.add(node);
+    for (final String next in adjacency[node] ?? const <String>{}) {
+      dfs(next, path);
+    }
+    path.removeLast();
+    inStack.remove(node);
+  }
+
+  for (final String node in allNodes) {
+    dfs(node, <String>[]);
+    if (cycle != null) {
+      break;
+    }
+  }
+  return cycle;
 }

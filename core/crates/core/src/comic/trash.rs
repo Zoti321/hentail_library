@@ -5,9 +5,8 @@ use std::path::Path;
 
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, TransactionTrait, Value};
 
-use crate::comic::dto::{now_ms, ComicDto, PageRequestDto};
+use crate::comic::dto::{now_ms, PageRequestDto};
 use crate::comic::pagination::paginate;
-use crate::comic::repository::load_comics_ordered;
 use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
@@ -29,7 +28,14 @@ pub struct ComicPurgeResultDto {
 
 #[derive(Debug, Clone)]
 pub struct TrashedComicDto {
-    pub comic: ComicDto,
+    pub comic_id: String,
+    pub path: String,
+    pub resource_type: String,
+    pub resource_size: i64,
+    pub created_at: i64,
+    pub last_updated_at: i64,
+    pub title: String,
+    pub page_count: i32,
     pub deleted_at: i64,
     pub library_name: String,
     /// `local` / `remote`.
@@ -179,22 +185,23 @@ async fn purge_one(db: &DatabaseConnection, target: &PurgeTarget) -> Result<(), 
 
 /// 「已删除」列表：跨全部 Library，按删除时间倒序。
 pub async fn fetch_trashed_comics_page(
-    page: i32,
-    page_size: i32,
+    request: PageRequestDto,
 ) -> Result<PagedTrashedComicResultDto, HentaiError> {
     let db = connection()?;
     let total_count = count_trashed_comics().await?.total;
     // 越界页保持原样：本路径是顺序翻页，不钳到末页。
-    let window = paginate(PageRequestDto { page, page_size }, total_count);
+    let window = paginate(request, total_count);
     let page = window.page;
     let page_size = window.page_size;
     let offset = window.offset;
     let rows = db
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
-            "SELECT c.comic_id, c.deleted_at, l.name, l.kind \
+            "SELECT c.comic_id, c.path, c.resource_type, c.resource_size, c.created_at, \
+             c.last_updated_at, m.title, m.page_count, c.deleted_at, l.name, l.kind \
              FROM comics c \
              INNER JOIN libraries l ON l.library_id = c.library_id \
+             INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
              WHERE c.deleted_at IS NOT NULL \
              ORDER BY c.deleted_at DESC, c.comic_id ASC \
              LIMIT ? OFFSET ?",
@@ -205,32 +212,30 @@ pub async fn fetch_trashed_comics_page(
         ))
         .await
         .map_err(map_db_err)?;
-    let mut rows_meta = Vec::with_capacity(rows.len());
+    let mut items = Vec::with_capacity(rows.len());
     for row in rows {
-        rows_meta.push((
-            row_string(&row, 0)?,
-            row.try_get_by_index::<i64>(1)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
-            row_string(&row, 2)?,
-            row_string(&row, 3)?,
-        ));
-    }
-    let comic_ids = rows_meta.iter().map(|(id, ..)| id.clone()).collect();
-    let mut comics: HashMap<String, ComicDto> = load_comics_ordered(&db, comic_ids)
-        .await?
-        .into_iter()
-        .map(|comic| (comic.comic_id.clone(), comic))
-        .collect();
-    let mut items = Vec::with_capacity(rows_meta.len());
-    for (comic_id, deleted_at, library_name, library_kind) in rows_meta {
-        let Some(comic) = comics.remove(&comic_id) else {
-            continue;
-        };
         items.push(TrashedComicDto {
-            comic,
-            deleted_at,
-            library_name,
-            library_kind,
+            comic_id: row_string(&row, 0)?,
+            path: row_string(&row, 1)?,
+            resource_type: row_string(&row, 2)?,
+            resource_size: row
+                .try_get_by_index::<i64>(3)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+            created_at: row
+                .try_get_by_index::<i64>(4)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+            last_updated_at: row
+                .try_get_by_index::<i64>(5)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+            title: row_string(&row, 6)?,
+            page_count: row
+                .try_get_by_index::<i32>(7)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+            deleted_at: row
+                .try_get_by_index::<i64>(8)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?,
+            library_name: row_string(&row, 9)?,
+            library_kind: row_string(&row, 10)?,
         });
     }
     Ok(PagedTrashedComicResultDto {

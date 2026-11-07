@@ -1,50 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/theme.dart';
-
-import 'widgetbook_directories.dart';
-
+import 'package:hentai_library/shared/ui/widgets/desktop/window_manager_bindings.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-/// Dev-only design catalog entry (not wired to production [go_router]).
+import 'catalog/widgetbook_directories.dart';
+import 'shell/md3e_viewports.dart';
+import 'shell/md3e_widgetbook_app.dart';
+import 'shell/md3e_widgetbook_theme_addon.dart';
+
+/// Dev-only MD3E Lab catalog (not wired to production [go_router]).
 ///
 /// Run: `flutter run -t widgetbook/main.dart`
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initWindowManager();
   runApp(
-    Widgetbook.material(
+    Widgetbook(
       directories: buildWidgetbookDirectories(),
+      appBuilder: md3eWidgetbookAppBuilder,
       addons: <WidgetbookAddon<dynamic>>[
-        MaterialThemeAddon(
-          themes: <WidgetbookTheme<ThemeData>>[
-            WidgetbookTheme(
-              name: 'Light',
-              data: buildAppTheme(Brightness.light),
-            ),
-            WidgetbookTheme(name: 'Dark', data: buildAppTheme(Brightness.dark)),
-          ],
-        ),
-        ViewportAddon(<ViewportData>[
-          const ViewportData(
-            name: 'Compact',
-            width: 390,
-            height: 844,
-            pixelRatio: 1,
-            platform: TargetPlatform.android,
-          ),
-          const ViewportData(
-            name: 'Medium',
-            width: 800,
-            height: 900,
-            pixelRatio: 1,
-            platform: TargetPlatform.windows,
-          ),
-          const ViewportData(
-            name: 'Expanded',
-            width: 1280,
-            height: 800,
-            pixelRatio: 1,
-            platform: TargetPlatform.windows,
-          ),
-        ]),
+        buildMd3eWidgetbookThemeAddon(),
+        ViewportAddon(buildMd3eWidgetbookViewports()),
       ],
     ),
   );

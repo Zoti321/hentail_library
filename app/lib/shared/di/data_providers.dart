@@ -1,19 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/domain/ports/comic_page_source_port.dart';
+import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
+import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
+import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
-import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/author_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_lookup_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_trash_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/comic_thumbnail_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/home_page_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/named_facet_dictionary_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/reading_history_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/series_repository.dart';
-import 'package:hentai_library/shared/domain/repositories/tag_repository.dart';
+import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/author_repository.dart';
+import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
+import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
+import 'package:hentai_library/features/comic/domain/comic_thumbnail_repository.dart';
+import 'package:hentai_library/features/home/domain/home_page_repository.dart';
+import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
+import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
+import 'package:hentai_library/features/series/domain/series_repository.dart';
+import 'package:hentai_library/features/named_metadata/domain/tag_repository.dart';
 
 Never _unimplemented(String name) =>
     throw UnimplementedError('$name 未注入，请在 bootstrap 中 override');
@@ -67,6 +69,11 @@ final Provider<LibraryRepository> libraryRepoProvider =
       (Ref ref) => _unimplemented('libraryRepoProvider'),
     );
 
+final Provider<RemoteLibraryCredentialsPort>
+remoteLibraryCredentialsPortProvider = Provider<RemoteLibraryCredentialsPort>(
+  (Ref ref) => _unimplemented('remoteLibraryCredentialsPortProvider'),
+);
+
 final Provider<ReadingHistoryRepository> readingHistoryRepoProvider =
     Provider<ReadingHistoryRepository>(
       (Ref ref) => _unimplemented('readingHistoryRepoProvider'),
@@ -86,6 +93,11 @@ final Provider<ReaderSessionPort> readerSessionPortProvider =
     Provider<ReaderSessionPort>(
       (Ref ref) => _unimplemented('readerSessionPortProvider'),
     );
+
+final Provider<ComicTrashReaderSessionPort>
+comicTrashReaderSessionPortProvider = Provider<ComicTrashReaderSessionPort>(
+  (Ref ref) => _unimplemented('comicTrashReaderSessionPortProvider'),
+);
 
 final Provider<ComicPageSourcePort> comicPageSourcePortProvider =
     Provider<ComicPageSourcePort>(

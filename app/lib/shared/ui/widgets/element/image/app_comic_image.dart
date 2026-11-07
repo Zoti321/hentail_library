@@ -25,9 +25,11 @@ class AppComicImage extends StatelessWidget {
     this.loadingPlaceholder,
     this.errorPlaceholder,
     this.filterQuality = FilterQuality.medium,
+    this.gaplessPlayback = false,
     this.useReaderImageCache = false,
     this.readerImageProviderBuilder,
     this.onDecodeError,
+    this.onImageSize,
   });
 
   final String? filePath;
@@ -44,9 +46,16 @@ class AppComicImage extends StatelessWidget {
   final Widget? loadingPlaceholder;
   final Widget? errorPlaceholder;
   final FilterQuality filterQuality;
+
+  /// 封面 Hero 等场景：provider 切换时保留上一帧，对齐 Kazumi 详情侧
+  /// `fadeInDuration: Duration.zero`（避免加载占位闪一下）。
+  final bool gaplessPlayback;
   final bool useReaderImageCache;
   final ReaderComicImageProviderBuilder? readerImageProviderBuilder;
   final VoidCallback? onDecodeError;
+
+  /// Fired once per successful decode with intrinsic pixel size.
+  final ValueChanged<Size>? onImageSize;
 
   @override
   Widget build(BuildContext context) {
@@ -78,16 +87,8 @@ class AppComicImage extends StatelessWidget {
         cacheWidth: cacheWidth,
         cacheHeight: cacheHeight,
         filterQuality: filterQuality,
-        loadStateChanged: (ExtendedImageState state) {
-          if (state.extendedImageLoadState == LoadState.failed) {
-            onDecodeError?.call();
-            return fallback;
-          }
-          if (state.extendedImageLoadState == LoadState.loading) {
-            return _buildLoadingPlaceholder();
-          }
-          return null;
-        },
+        gaplessPlayback: gaplessPlayback,
+        loadStateChanged: _loadStateChanged(fallback),
       );
     }
 
@@ -103,16 +104,8 @@ class AppComicImage extends StatelessWidget {
       cacheWidth: cacheWidth,
       cacheHeight: cacheHeight,
       filterQuality: filterQuality,
-      loadStateChanged: (ExtendedImageState state) {
-        if (state.extendedImageLoadState == LoadState.failed) {
-          onDecodeError?.call();
-          return fallback;
-        }
-        if (state.extendedImageLoadState == LoadState.loading) {
-          return _buildLoadingPlaceholder();
-        }
-        return null;
-      },
+      gaplessPlayback: gaplessPlayback,
+      loadStateChanged: _loadStateChanged(fallback),
     );
   }
 
@@ -123,17 +116,42 @@ class AppComicImage extends StatelessWidget {
       fit: fit,
       alignment: alignment,
       filterQuality: filterQuality,
-      loadStateChanged: (ExtendedImageState state) {
-        if (state.extendedImageLoadState == LoadState.failed) {
-          onDecodeError?.call();
-          return fallback;
-        }
-        if (state.extendedImageLoadState == LoadState.loading) {
-          return _buildLoadingPlaceholder();
-        }
-        return null;
-      },
+      gaplessPlayback: gaplessPlayback,
+      loadStateChanged: _loadStateChanged(fallback),
     );
+  }
+
+  /// [gaplessPlayback] 时不替换 loading 占位，避免 Hero 落地瞬间闪一下。
+  Widget? Function(ExtendedImageState state) _loadStateChanged(
+    Widget fallback,
+  ) {
+    return (ExtendedImageState state) {
+      if (state.extendedImageLoadState == LoadState.failed) {
+        onDecodeError?.call();
+        return fallback;
+      }
+      if (state.extendedImageLoadState == LoadState.loading) {
+        if (gaplessPlayback) {
+          return null;
+        }
+        return _buildLoadingPlaceholder();
+      }
+      if (state.extendedImageLoadState == LoadState.completed) {
+        final ValueChanged<Size>? reportSize = onImageSize;
+        final ImageInfo? info = state.extendedImageInfo;
+        if (reportSize != null && info != null) {
+          final int width = info.image.width;
+          final int height = info.image.height;
+          if (width > 0 && height > 0) {
+            // Defer so we never setState during build of ExtendedImage.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              reportSize(Size(width.toDouble(), height.toDouble()));
+            });
+          }
+        }
+      }
+      return null;
+    };
   }
 
   Widget _buildLoadingPlaceholder() {

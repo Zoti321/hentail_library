@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/shared/ui/patterns/comic_detail/comic_detail_meta_chip_row.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
+
+/// Parody → Author → Character → Tag（漫画 / 系列详情共用）。
+class DetailMetadataChipRows extends StatelessWidget {
+  const DetailMetadataChipRows({
+    super.key,
+    this.parodies = const <String>[],
+    this.authors = const <String>[],
+    this.characters = const <String>[],
+    this.tags = const <String>[],
+    this.onChipTap,
+    this.onAuthorTap,
+  });
+
+  final List<String> parodies;
+  final List<String> authors;
+  final List<String> characters;
+  final List<String> tags;
+  final ValueChanged<String>? onChipTap;
+
+  /// 作者 chip 点击（生产：打开作者详情）；为空时与其它 chip 一样走 [onChipTap]。
+  final ValueChanged<String>? onAuthorTap;
+
+  bool get isEmpty =>
+      parodies.isEmpty && authors.isEmpty && characters.isEmpty && tags.isEmpty;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final AppLocalizations l10n = context.l10n;
+    final M3ESpacing spacing = M3ETheme.of(context).spacing;
+    final List<Widget> rows = <Widget>[];
+
+    void addRow(
+      String label,
+      List<String> items, {
+      ValueChanged<String>? onTap,
+    }) {
+      if (items.isEmpty) {
+        return;
+      }
+      rows.add(
+        ComicDetailMetaChipRow(
+          label: label,
+          items: items,
+          onItemTap: onTap ?? onChipTap,
+        ),
+      );
+    }
+
+    addRow(l10n.comicDetailParodies, parodies);
+    addRow(l10n.comicDetailAuthors, authors, onTap: onAuthorTap ?? onChipTap);
+    addRow(l10n.comicDetailCharacters, characters);
+    addRow(l10n.comicDetailTags, tags);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: spacing.md,
+      children: rows,
+    );
+  }
+}

@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 

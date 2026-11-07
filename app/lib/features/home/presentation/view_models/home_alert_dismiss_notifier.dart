@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:hentai_library/shared/domain/models/read_models/home_page_read_models.dart';
+import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,14 +29,6 @@ class HomeAlertDismissStore extends _$HomeAlertDismissStore {
     ref.invalidateSelf();
   }
 
-  /// Library resource probe 成功后，只清掉该 Library 的待同步 dismiss。
-  Future<void> clearPendingDismissAfterProbe(String libraryId) {
-    return _clearForLibraryKind(
-      libraryId,
-      HomeLibraryAlertKind.pendingResourcesDetected,
-    );
-  }
-
   /// 从这条 Home library alert 触发 Library sync 之后，清掉该 Library 的全部 dismiss。
   Future<void> clearDismissAfterAlertSync(String libraryId) {
     return _clearForLibrary(libraryId);
@@ -46,17 +38,6 @@ class HomeAlertDismissStore extends _$HomeAlertDismissStore {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final Map<String, HomeAlertDismissEntry> map = _readMap(prefs);
     map.removeWhere((String key, _) => key.startsWith('$libraryId:'));
-    await _writeMap(prefs, map);
-    ref.invalidateSelf();
-  }
-
-  Future<void> _clearForLibraryKind(
-    String libraryId,
-    HomeLibraryAlertKind kind,
-  ) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final Map<String, HomeAlertDismissEntry> map = _readMap(prefs);
-    map.remove('$libraryId:${kind.name}');
     await _writeMap(prefs, map);
     ref.invalidateSelf();
   }

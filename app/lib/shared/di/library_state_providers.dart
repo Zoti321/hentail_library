@@ -1,28 +1,27 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/domain/library/current_library_port.dart';
-import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_edit_command_port.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
+import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart';
 import 'package:hentai_library/shared/domain/library/comic_detail_return_series_port.dart';
-import 'package:hentai_library/shared/domain/library/current_library_state.dart';
-import 'package:hentai_library/shared/domain/library/library_scan_command_port.dart';
-import 'package:hentai_library/shared/domain/library/library_reorder_mode_port.dart';
-import 'package:hentai_library/shared/domain/library/library_revision_state.dart';
+import 'package:hentai_library/features/library_admin/domain/libraries_state.dart';
+import 'package:hentai_library/features/library_admin/domain/library_scan_command_port.dart';
+import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
+import 'package:hentai_library/features/library_admin/domain/library_revision_state.dart';
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/shared/domain/library/library_scan_activity_state.dart';
+import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.dart';
 
 /// 跨 feature 共享的库状态与端口 Provider 声明（#261a）。
 ///
-/// 这里只声明、不实现：默认值抛 [UnimplementedError]，
-/// 由 bootstrap 的 `ProviderScope(overrides: ...)` 注入 library_admin 的实现。
-/// 消费方在后续 slice（261e）中改为依赖这些 Provider。
+/// 实现与 `createX…Port` 工厂见 owner
+/// `features/library_admin/public.dart`（bootstrap override 注入）。
 
-final Provider<CurrentLibraryPort> currentLibraryPortProvider =
-    Provider<CurrentLibraryPort>(
-      (Ref ref) => throw UnimplementedError(
-        'currentLibraryPortProvider 未注入，请在 bootstrap 中 override',
-      ),
-    );
+final Provider<LibrariesPort> librariesPortProvider = Provider<LibrariesPort>(
+  (Ref ref) => throw UnimplementedError(
+    'librariesPortProvider 未注入，请在 bootstrap 中 override',
+  ),
+);
 
 final Provider<LibraryReorderModePort> libraryReorderModePortProvider =
     Provider<LibraryReorderModePort>(
@@ -52,6 +51,15 @@ comicMetadataBulkEditCommandPortProvider =
       ),
     );
 
+/// 导出当前库元数据：实现位于 metadata_backup，由 bootstrap 注入，library_browse 不直接依赖 metadata_backup。
+final Provider<Future<void> Function(BuildContext context, String libraryId)>
+libraryMetadataExportActionProvider =
+    Provider<Future<void> Function(BuildContext context, String libraryId)>(
+      (Ref ref) => throw UnimplementedError(
+        'libraryMetadataExportActionProvider 未注入，请在 bootstrap 中 override',
+      ),
+    );
+
 final Provider<LibraryScanCommandPort> libraryScanCommandPortProvider =
     Provider<LibraryScanCommandPort>(
       (Ref ref) => throw UnimplementedError(
@@ -66,10 +74,10 @@ comicDetailReturnSeriesPortProvider = Provider<ComicDetailReturnSeriesPort>(
   ),
 );
 
-final Provider<AsyncValue<CurrentLibraryState>> currentLibraryStateProvider =
-    Provider<AsyncValue<CurrentLibraryState>>(
+final Provider<AsyncValue<LibrariesState>> librariesStateProvider =
+    Provider<AsyncValue<LibrariesState>>(
       (Ref ref) => throw UnimplementedError(
-        'currentLibraryStateProvider 未注入，请在 bootstrap 中 override',
+        'librariesStateProvider 未注入，请在 bootstrap 中 override',
       ),
     );
 
@@ -115,6 +123,14 @@ libraryMetadataRefreshRunningStateProvider = Provider<bool>(
     'libraryMetadataRefreshRunningStateProvider 未注入，请在 bootstrap 中 override',
   ),
 );
+
+/// 正在做「单库」元数据刷新时该库的 libraryId；否则为 null（列表行 busy 态用）。
+final Provider<String?> libraryMetadataRefreshTargetLibraryIdStateProvider =
+    Provider<String?>(
+      (Ref ref) => throw UnimplementedError(
+        'libraryMetadataRefreshTargetLibraryIdStateProvider 未注入，请在 bootstrap 中 override',
+      ),
+    );
 
 /// 书库是否处于变更型后台任务中（扫描 / 元数据刷新 / 批量编辑任一运行），供 trash 等命令门控。
 final Provider<bool> libraryMutationBusyStateProvider = Provider<bool>(

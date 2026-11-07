@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_types.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/shared/domain/library/comic_metadata_bulk_patch_result.dart';
+import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 
 String comicMetadataBulkPatchMessage(
   AppLocalizations l10n,
@@ -28,12 +28,12 @@ void showComicMetadataBulkPatchToast(
 ) {
   final String message = comicMetadataBulkPatchMessage(context.l10n, result);
   if (result.cancelled || result.failed > 0) {
-    showInfoToast(context, message);
+    showInfoSnackbar(context, message);
     return;
   }
   if (result.succeeded == 0 && result.unchanged > 0) {
-    showInfoToast(context, message);
+    showInfoSnackbar(context, message);
     return;
   }
-  showSuccessToast(context, message);
+  showSuccessSnackbar(context, message);
 }

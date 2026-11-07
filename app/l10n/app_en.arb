@@ -1,8 +1,6 @@
 {
   "@@locale": "en",
   "libraryTitle": "Library",
-  "allLibrariesBrowsePlaceholderTitle": "All libraries",
-  "allLibrariesBrowsePlaceholderBody": "Browsing all libraries together is coming later. Pick a library from the sidebar.",
   "sidebarAddLibraryTooltip": "Add library",
   "sidebarAddLocalLibrary": "Add local library",
   "sidebarAddRemoteLibrary": "Add remote library",
@@ -75,10 +73,29 @@
   "localePreferenceSystem": "System",
   "localePreferenceZhCn": "Chinese",
   "localePreferenceEn": "English",
+  "settingsFontLabel": "UI font",
+  "fontPreferenceMiSans": "Mi Sans",
+  "fontPreferenceNotoSans": "Noto Sans",
   "settingsThemeLabel": "App theme",
   "themePreferenceSystem": "System",
   "themePreferenceLight": "Light",
   "themePreferenceDark": "Dark",
+  "settingsDynamicColorLabel": "Dynamic color",
+  "settingsDynamicColorDescription": "Use colors from the system wallpaper. Disables the manual color scheme while on.",
+  "settingsColorSchemeLabel": "Color scheme",
+  "colorSchemePreferenceBrand": "Violet",
+  "colorSchemePreferenceTeal": "Celadon",
+  "colorSchemePreferenceCyan": "Sky",
+  "colorSchemePreferenceBlue": "Cornflower",
+  "colorSchemePreferenceIndigo": "Indigo",
+  "colorSchemePreferenceDeepPurple": "Grape",
+  "colorSchemePreferenceViolet": "Violet",
+  "colorSchemePreferencePink": "Rose",
+  "colorSchemePreferenceSakura": "Sakura",
+  "colorSchemePreferenceYellow": "Amber",
+  "colorSchemePreferenceOrange": "Marigold",
+  "colorSchemePreferenceDeepOrange": "Cinnabar",
+  "colorSchemePreferenceGreen": "Moss",
   "navHome": "Home",
   "navMetadata": "Manage",
   "navHistory": "History",
@@ -97,6 +114,9 @@
   "shellRetrying": "Retrying…",
   "shellProcessing": "Processing…",
   "homeTitle": "Home",
+  "homeShortcutsSectionTitle": "Shortcuts",
+  "homeHistoryCardCaption": "View reading log",
+  "homeTrashCardCaption": "Restore or delete",
   "homeScanLibrary": "Scan library",
   "homeGreetingLateNight": "Good evening",
   "homeGreetingEarlyMorning": "Good morning",
@@ -135,13 +155,6 @@
     "placeholders": {
       "libraryName": { "type": "String" },
       "days": { "type": "int" }
-    }
-  },
-  "homeAlertPendingResources": "{libraryName}: {count} new/changed Resources detected — sync recommended",
-  "@homeAlertPendingResources": {
-    "placeholders": {
-      "libraryName": { "type": "String" },
-      "count": { "type": "int" }
     }
   },
   "homeStatSeries": "Series",
@@ -186,8 +199,21 @@
   "historyTitle": "Reading history",
   "historyClearAction": "Clear reading history",
   "historyClearedToast": "Reading history cleared",
-  "historyRecordSummary": "{count, plural, one{1 entry · kept for 30 days max} other{{count} entries · kept for 30 days max}}",
+  "historyRecordSummary": "{count, plural, one{1 entry · kept for up to 1 year} other{{count} entries · kept for up to 1 year}}",
   "@historyRecordSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historySectionToday": "Today",
+  "historySectionYesterday": "Yesterday",
+  "historySectionThisWeek": "This week",
+  "historySectionThisMonth": "This month",
+  "historySectionEarlier": "Earlier",
+  "historySectionItemCount": "{count, plural, one{1 entry} other{{count} entries}}",
+  "@historySectionItemCount": {
     "placeholders": {
       "count": {
         "type": "int"
@@ -228,6 +254,13 @@
   "settingsGroupMetadataBackup": "Metadata backup",
   "settingsGroupDiagnostics": "Diagnostics & support",
   "settingsGroupAbout": "About",
+  "settingsMasterMenuGroupTitle": "App",
+  "settingsSectionAppearance": "Appearance & language",
+  "settingsSectionReading": "Reading",
+  "settingsSectionLibraryBrowse": "Library & browsing",
+  "settingsSectionDiagnostics": "Diagnostics",
+  "settingsSectionApplicationData": "Application data",
+  "settingsSectionUpdates": "Updates",
   "settingsMetadataBackupAutoGroupTitle": "Automatic backup",
   "settingsMetadataBackupManualGroupTitle": "Manual backup",
   "settingsMetadataBackupAutoToggleLabel": "Automatic metadata backup",
@@ -303,6 +336,8 @@
       }
     }
   },
+  "settingsHealthyModeLabel": "Healthy mode",
+  "settingsHealthyModeDescription": "Hide R18 comics in library, search and history. Ratings are not changed.",
   "settingsDiagnosticModeLabel": "Verbose diagnostics",
   "settingsDiagnosticModeDescriptionEnabled": "Enabled: Dart and Rust log more detail",
   "settingsDiagnosticModeDescriptionDisabled": "Temporarily increase log verbosity to help reproduce issues",
@@ -385,6 +420,7 @@
   "libraryDeepScan": "Deep scan",
   "libraryScrollToTop": "Back to top",
   "libraryFilterSection": "Filter",
+  "libraryGroupSection": "Group",
   "librarySortSection": "Sort",
   "libraryAgeRestrictionFilter": "Age restriction",
   "libraryMediaTypeFilter": "Media type",
@@ -401,7 +437,7 @@
   "libraryMetadataFilterEmpty": "No matches",
   "libraryMetadataFilterIncludeAny": "Match any",
   "libraryMetadataFilterIncludeAll": "Match all",
-  "libraryResetAllFilters": "Reset all",
+  "libraryResetAllFilters": "Restore defaults",
   "libraryComingSoon": "Coming soon",
   "libraryComicSortTitle": "Title",
   "libraryComicSortCreatedAt": "Date added",
@@ -411,6 +447,11 @@
   "libraryComicSortFileSize": "File size",
   "libraryComicSortPageCount": "Page count",
   "libraryExpandBySeries": "Expand by series",
+  "libraryGroupBySeries": "Group by series",
+  "libraryGroupNone": "No grouping",
+  "libraryGroupBySerializationStatus": "Group by serialization status",
+  "settingsPreferLibraryRootSeriesLabel": "Pin library root series",
+  "settingsPreferLibraryRootSeriesDescription": "When browsing series, keep the library root series at the top of the list.",
   "librarySeriesSortName": "Name",
   "librarySeriesSortComicCount": "Comic count",
   "librarySeriesSortRandom": "Random",
@@ -516,6 +557,7 @@
   "comicDetailTags": "Tags",
   "comicDetailParodies": "Parody",
   "comicDetailCharacters": "Characters",
+  "comicDetailResourceInfo": "Resource info",
   "comicDetailResourceFormat": "Format",
   "comicDetailResourceSize": "Size",
   "comicDetailResourcePath": "Path",
@@ -715,6 +757,19 @@
   "metadataSearchNameHint": "Search by name…",
   "metadataRename": "Rename",
   "metadataMerge": "Merge",
+  "metadataMergeConfirmTitle": "Confirm merge",
+  "metadataMergeConfirmBody": "Merge {sourceCount} tags into \"{target}\"? Comic attachments from the source tags move to the target, and the source tags are deleted.",
+  "@metadataMergeConfirmBody": {
+    "placeholders": {
+      "sourceCount": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "metadataMergeConfirmDontAskAgain": "Don't ask again",
   "metadataDelete": "Delete",
   "metadataMoreActions": "More actions",
   "metadataAllAuthors": "All authors",
@@ -727,6 +782,38 @@
       "count": {
         "type": "int"
       }
+    }
+  },
+  "metadataAuthorCount": "{count, plural, one{1 author} other{{count} authors}}",
+  "@metadataAuthorCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataTagCount": "{count, plural, one{1 tag} other{{count} tags}}",
+  "@metadataTagCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataParodyCount": "{count, plural, one{1 parody} other{{count} parodies}}",
+  "@metadataParodyCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "metadataCharacterCount": "{count, plural, one{1 character} other{{count} characters}}",
+  "@metadataCharacterCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "navRailExpand": "Expand navigation",
+  "navRailCollapse": "Collapse navigation",
+  "paginationPageSemantic": "Page {page}",
+  "@paginationPageSemantic": {
+    "placeholders": {
+      "page": {"type": "int"}
     }
   },
   "metadataRenameAuthor": "Rename author",
@@ -796,6 +883,8 @@
   "dialogEditMetadataTitle": "Edit metadata",
   "dialogEditMetadataTabGeneral": "General",
   "dialogEditMetadataTabAuthorsTags": "Authors & tags",
+  "dialogEditMetadataTabFieldLocks": "Field locks",
+  "dialogEditMetadataTabContent": "Content",
   "smartFacetMatchToggleLabel": "Smart match",
   "smartFacetMatchHintTooltip": "Suggested by smart match",
   "formSeriesNameLabel": "Series name",
@@ -901,9 +990,9 @@
       "date": {"type": "String"}
     }
   },
-  "updateRemindLater": "Remind me later",
+  "updateRemindLater": "Later",
   "updateViewDetails": "View details",
-  "updateNow": "Update now",
+  "updateNow": "Update",
   "updateManualDownloadToast": "Download the installer for your system manually",
   "updateDownloadingTitle": "Downloading update",
   "updateDownloadFailed": "Download failed. Please retry.",
@@ -922,8 +1011,14 @@
       "count": {"type": "int"}
     }
   },
-  "confirmRemovePathTitle": "Confirm removal",
-  "confirmRemovePathContent": "This local library and its comics will be deleted immediately. This cannot be undone.",
+  "homeLibraryDeleteConfirmTitle": "Delete \"{name}\"?",
+  "@homeLibraryDeleteConfirmTitle": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "homeLibraryDeleteConfirmBody": "This will remove the library from the app. Comic files stay in place.",
+  "homeLibraryDeleteConfirmAcknowledge": "I understand comic files will not be deleted",
   "confirmClearHistoryTitle": "Confirm clear",
   "confirmClearHistoryContent": "All reading history will be cleared. This cannot be undone.",
   "breadcrumbReturnLibrary": "Back to library",
@@ -973,6 +1068,14 @@
       "page": {"type": "int"}
     }
   },
+  "readingProgressPageOfTotal": "{current}/{total}",
+  "@readingProgressPageOfTotal": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "historyGoToComicDetail": "Go to comic details",
   "historyDeleteRecord": "Delete entry",
   "bootstrapStartupFailed": "Startup failed: {error}",
   "@bootstrapStartupFailed": {

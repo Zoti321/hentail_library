@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Finished silent Library sync outcome for shell-global Toast copy.
+/// Finished silent Library sync outcome for shell-global snackbar copy.
 typedef LibraryScanCompletion = ({
   bool cancelled,
   String? error,
@@ -15,7 +15,7 @@ typedef LibraryScanCompletion = ({
 
 enum _LibraryScanToastKind { cancelled, error, warning, success }
 
-/// Whether a controller transition should surface a silent-scan completion Toast.
+/// Whether a controller transition should surface a silent-scan completion snackbar.
 bool shouldShowLibraryScanCompletionToast({
   required bool? previousSilent,
   required bool? previousRunning,
@@ -58,23 +58,14 @@ String libraryScanCompletionMessage(
   };
 }
 
-AppToastType libraryScanCompletionToastType(LibraryScanCompletion completion) {
-  return switch (_kindFor(completion)) {
-    _LibraryScanToastKind.cancelled ||
-    _LibraryScanToastKind.warning => AppToastType.info,
-    _LibraryScanToastKind.error => AppToastType.error,
-    _LibraryScanToastKind.success => AppToastType.success,
-  };
-}
-
 void showLibraryScanCompletionToast(
   BuildContext context,
   LibraryScanCompletion completion,
 ) {
   final String message = libraryScanCompletionMessage(context.l10n, completion);
-  showCustomToast(
+  M3ESnackbar.show(
     context,
     message: message,
-    type: libraryScanCompletionToastType(completion),
+    duration: const Duration(milliseconds: 4000),
   );
 }

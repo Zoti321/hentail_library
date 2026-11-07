@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Home Feature 架构",
+    "subtitle": "features/home · 默认路由 /home",
+    "locale": "zh-CN",
+    "output": ".archify/architecture-hentai-library-20251018-180000/home-feature.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/Zoti321/hentail_library.git",
+      "provider": "github",
+      "revision": "791c1fae952a5b8b2aa5c129dc236852d74be189"
+    },
+    "views": [
+      {
+        "id": "dashboard",
+        "label": "仪表盘数据",
+        "focus": ["home-ui", "home-providers", "home-repo", "frb-home", "core-home", "sqlite"],
+        "note": "聚合计数、库提醒与 per-library 统计经 FRB 流式订阅"
+      },
+      {
+        "id": "probe",
+        "label": "空闲探测",
+        "focus": ["app-root", "probe-coordinator", "home-repo", "frb-probe", "core-home"],
+        "note": "首页可见且扫描未运行时在 idle 调度 probeLibrary"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "用户",
+      "sublabel": "打开主页",
+      "pos": [40, 48],
+      "size": [110, 58]
+    },
+    {
+      "id": "go-router",
+      "type": "frontend",
+      "label": "GoRouter",
+      "sublabel": "initial /home",
+      "pos": [190, 48],
+      "size": [120, 58],
+      "sources": [
+        { "path": "app/lib/features/bootstrap/presentation/views/routing/app_router.dart", "line": 27, "end_line": 41 }
+      ]
+    },
+    {
+      "id": "home-ui",
+      "type": "frontend",
+      "label": "HomeMd3ePage",
+      "sublabel": "MD3E 生产首页",
+      "pos": [350, 48],
+      "size": [140, 58],
+      "sources": [
+        { "path": "app/lib/features/home/presentation/views/home_md3e/home_md3e_page.dart", "line": 11, "end_line": 49 },
+        { "path": "app/lib/features/home/presentation/views/home_md3e/md3e_home_page.dart", "line": 14, "end_line": 77 }
+      ]
+    },
+    {
+      "id": "library-admin-slot",
+      "type": "frontend",
+      "label": "库管理面板",
+      "sublabel": "library_admin public",
+      "pos": [190, 280],
+      "size": [140, 58],
+      "sources": [
+        { "path": "app/lib/features/home/presentation/views/home_md3e/home_md3e_page.dart", "line": 6, "end_line": 48 }
+      ]
+    },
+    {
+      "id": "home-providers",
+      "type": "frontend",
+      "label": "Riverpod 流",
+      "sublabel": "计数 / 提醒 / facet",
+      "pos": [530, 48],
+      "size": [150, 58],
+      "sources": [
+        { "path": "app/lib/features/home/presentation/view_models/home_page_dashboard_notifier.dart", "line": 25, "end_line": 71 },
+        { "path": "app/lib/features/home/presentation/view_models/home_facet_counts_provider.dart", "line": 8, "end_line": 22 }
+      ]
+    },
+    {
+      "id": "facet-repos",
+      "type": "frontend",
+      "label": "字典 Repository",
+      "sublabel": "原作 / 角色 listAll",
+      "pos": [530, 168],
+      "size": [150, 58],
+      "sources": [
+        { "path": "app/lib/features/home/presentation/view_models/home_facet_counts_provider.dart", "line": 17, "end_line": 21 }
+      ]
+    },
+    {
+      "id": "home-repo",
+      "type": "frontend",
+      "label": "HomePageRepositoryImpl",
+      "sublabel": "guardFrbStream",
+      "pos": [720, 48],
+      "size": [160, 58],
+      "sources": [
+        { "path": "app/lib/features/home/data/repositories/home_page_repository_impl.dart", "line": 7, "end_line": 56 }
+      ]
+    },
+    {
+      "id": "app-root",
+      "type": "frontend",
+      "label": "App 根",
+      "sublabel": "keepAlive 协调器",
+      "pos": [40, 280],
+      "size": [120, 58],
+      "sources": [
+        { "path": "app/lib/features/bootstrap/presentation/views/app.dart", "line": 40, "end_line": 42 }
+      ]
+    },
+    {
+      "id": "probe-coordinator",
+      "type": "frontend",
+      "label": "HomeProbeCoordinator",
+      "sublabel": "可见 + idle 门控",
+      "pos": [720, 168],
+      "size": [160, 58],
+      "sources": [
+        { "path": "app/lib/features/home/presentation/view_models/home_probe_coordinator_notifier.dart", "line": 50, "end_line": 186 }
+      ]
+    },
+    {
+      "id": "frb-home",
+      "type": "backend",
+      "label": "FRB home API",
+      "sublabel": "watch_*_frb",
+      "pos": [910, 48],
+      "size": [140, 58],
+      "sources": [
+        { "path": "core/crates/flutter/src/api/home.rs", "line": 137, "end_line": 175 }
+      ]
+    },
+    {
+      "id": "frb-probe",
+      "type": "backend",
+      "label": "FRB probe API",
+      "sublabel": "probeLibraryFrb",
+      "pos": [910, 168],
+      "size": [140, 58],
+      "sources": [
+        { "path": "app/lib/features/home/data/repositories/home_page_repository_impl.dart", "line": 43, "end_line": 55 }
+      ]
+    },
+    {
+      "id": "core-home",
+      "type": "backend",
+      "label": "hentai_core home",
+      "sublabel": "revision 订阅",
+      "pos": [1080, 48],
+      "size": [150, 58],
+      "sources": [
+        { "path": "core/crates/core/src/home/mod.rs", "line": 192, "end_line": 237 }
+      ]
+    },
+    {
+      "id": "sqlite",
+      "type": "database",
+      "label": "SQLite",
+      "sublabel": "Comic / Library",
+      "pos": [1080, 168],
+      "size": [150, 58],
+      "sources": [
+        { "path": "core/crates/core/src/home/mod.rs", "line": 196, "end_line": 200 }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "features/home (MVVM + public)",
+      "wraps": ["go-router", "home-ui", "home-providers", "home-repo", "probe-coordinator", "facet-repos"]
+    },
+    {
+      "kind": "region",
+      "label": "Rust home + FRB",
+      "wraps": ["frb-home", "frb-probe", "core-home", "sqlite"]
+    }
+  ],
+  "connections": [
+    {
+      "id": "user-route",
+      "from": "user",
+      "to": "go-router",
+      "label": "导航",
+      "variant": "emphasis"
+    },
+    {
+      "id": "route-page",
+      "from": "go-router",
+      "to": "home-ui",
+      "label": "HomeMd3ePage"
+    },
+    {
+      "id": "page-providers",
+      "from": "home-ui",
+      "to": "home-providers",
+      "label": "ref.watch"
+    },
+    {
+      "id": "page-admin",
+      "from": "home-ui",
+      "to": "library-admin-slot",
+      "label": "注入面板",
+      "variant": "dashed"
+    },
+    {
+      "id": "providers-repo",
+      "from": "home-providers",
+      "to": "home-repo",
+      "label": "homePageRepoProvider"
+    },
+    {
+      "id": "facet-dict",
+      "from": "home-providers",
+      "to": "facet-repos",
+      "label": "homeFacetCounts",
+      "variant": "dashed"
+    },
+    {
+      "id": "repo-frb",
+      "from": "home-repo",
+      "to": "frb-home",
+      "label": "watch streams",
+      "variant": "emphasis"
+    },
+    {
+      "id": "frb-core",
+      "from": "frb-home",
+      "to": "core-home",
+      "label": "core_watch_*"
+    },
+    {
+      "id": "core-db",
+      "from": "core-home",
+      "to": "sqlite",
+      "label": "load / subscribe"
+    },
+    {
+      "id": "app-probe",
+      "from": "app-root",
+      "to": "probe-coordinator",
+      "label": "ref.watch",
+      "variant": "dashed"
+    },
+    {
+      "id": "probe-repo",
+      "from": "probe-coordinator",
+      "to": "home-repo",
+      "label": "probeLibrary"
+    },
+    {
+      "id": "probe-frb",
+      "from": "home-repo",
+      "to": "frb-probe",
+      "label": "guardFrb",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "probe-core",
+      "from": "frb-probe",
+      "to": "core-home",
+      "label": "资源探测",
+      "fromSide": "left",
+      "toSide": "bottom",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "返回总览",
+      "items": [
+        "系统级架构：同目录 hentai-library.html",
+        "public API 见 features/home/public.dart（ADR-0034）"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "仪表盘",
+      "items": [
+        "homePageCountsStream / homeLibraryAlertsStream 经 Rust revision 推送",
+        "R18 过滤与扫描节流由 Riverpod + throttleWhile 统一门控"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "跨 Feature",
+      "items": [
+        "HomeLibraryManagementPanel 来自 library_admin public",
+        "homeLibraryStatsStream 经 shared/di 供 shell 与面板共用"
+      ]
+    }
+  ]
+}

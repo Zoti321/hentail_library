@@ -13,12 +13,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryTitle => '漫画库';
 
   @override
-  String get allLibrariesBrowsePlaceholderTitle => '全部库浏览';
-
-  @override
-  String get allLibrariesBrowsePlaceholderBody => '跨库聚合浏览后续实现。请从侧栏选择具体漫画库。';
-
-  @override
   String get sidebarAddLibraryTooltip => '新建漫画库';
 
   @override
@@ -191,6 +185,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localePreferenceEn => 'English';
 
   @override
+  String get settingsFontLabel => '界面字体';
+
+  @override
+  String get fontPreferenceMiSans => '小米字体';
+
+  @override
+  String get fontPreferenceNotoSans => 'Noto Sans';
+
+  @override
   String get settingsThemeLabel => '应用主题';
 
   @override
@@ -201,6 +204,54 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get themePreferenceDark => '深色';
+
+  @override
+  String get settingsDynamicColorLabel => '动态配色';
+
+  @override
+  String get settingsDynamicColorDescription => '跟随系统壁纸取色；开启后不可选手动配色方案';
+
+  @override
+  String get settingsColorSchemeLabel => '配色方案';
+
+  @override
+  String get colorSchemePreferenceBrand => '紫罗兰色';
+
+  @override
+  String get colorSchemePreferenceTeal => '青瓷色';
+
+  @override
+  String get colorSchemePreferenceCyan => '天青色';
+
+  @override
+  String get colorSchemePreferenceBlue => '矢车菊色';
+
+  @override
+  String get colorSchemePreferenceIndigo => '靛蓝色';
+
+  @override
+  String get colorSchemePreferenceDeepPurple => '葡萄色';
+
+  @override
+  String get colorSchemePreferenceViolet => '紫罗兰色';
+
+  @override
+  String get colorSchemePreferencePink => '蔷薇色';
+
+  @override
+  String get colorSchemePreferenceSakura => '樱花色';
+
+  @override
+  String get colorSchemePreferenceYellow => '琥珀色';
+
+  @override
+  String get colorSchemePreferenceOrange => '金盏花色';
+
+  @override
+  String get colorSchemePreferenceDeepOrange => '朱砂色';
+
+  @override
+  String get colorSchemePreferenceGreen => '苔绿色';
 
   @override
   String get navHome => '首页';
@@ -255,6 +306,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeTitle => '首页';
+
+  @override
+  String get homeShortcutsSectionTitle => '快捷入口';
+
+  @override
+  String get homeHistoryCardCaption => '查看阅读记录';
+
+  @override
+  String get homeTrashCardCaption => '可恢复删除';
 
   @override
   String get homeScanLibrary => '扫描漫画库';
@@ -313,11 +373,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String homeAlertStaleSync(String libraryName, int days) {
     return '$libraryName 距上次同步已 $days 天，建议同步';
-  }
-
-  @override
-  String homeAlertPendingResources(String libraryName, int count) {
-    return '$libraryName 发现 $count 个新/变更 Resource，建议同步';
   }
 
   @override
@@ -395,7 +450,32 @@ class AppLocalizationsZh extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count 条记录 • 最长保留 30 天',
+      other: '$count 条记录 • 最长保留 1 年',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historySectionToday => '今天';
+
+  @override
+  String get historySectionYesterday => '昨天';
+
+  @override
+  String get historySectionThisWeek => '本周';
+
+  @override
+  String get historySectionThisMonth => '本月';
+
+  @override
+  String get historySectionEarlier => '更早';
+
+  @override
+  String historySectionItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条',
     );
     return '$_temp0';
   }
@@ -502,6 +582,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsGroupAbout => '关于';
+
+  @override
+  String get settingsMasterMenuGroupTitle => '应用';
+
+  @override
+  String get settingsSectionAppearance => '外观与语言';
+
+  @override
+  String get settingsSectionReading => '阅读';
+
+  @override
+  String get settingsSectionLibraryBrowse => '库与浏览';
+
+  @override
+  String get settingsSectionDiagnostics => '诊断';
+
+  @override
+  String get settingsSectionApplicationData => '应用数据';
+
+  @override
+  String get settingsSectionUpdates => '更新';
 
   @override
   String get settingsMetadataBackupAutoGroupTitle => '自动备份';
@@ -676,6 +777,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String settingsMetadataBackupExportSuccess(String fileName) {
     return '元数据已导出至 $fileName';
   }
+
+  @override
+  String get settingsHealthyModeLabel => '健康模式';
+
+  @override
+  String get settingsHealthyModeDescription => '库、搜索与历史中隐藏 R18 Comic，不修改分级';
 
   @override
   String get settingsDiagnosticModeLabel => '详细诊断';
@@ -859,6 +966,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryFilterSection => '筛选';
 
   @override
+  String get libraryGroupSection => '分组';
+
+  @override
   String get librarySortSection => '排序';
 
   @override
@@ -907,7 +1017,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryMetadataFilterIncludeAll => '满足全部';
 
   @override
-  String get libraryResetAllFilters => '重置全部';
+  String get libraryResetAllFilters => '恢复默认';
 
   @override
   String get libraryComingSoon => '即将推出';
@@ -935,6 +1045,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get libraryExpandBySeries => '按系列展开';
+
+  @override
+  String get libraryGroupBySeries => '按系列分组';
+
+  @override
+  String get libraryGroupNone => '不分组';
+
+  @override
+  String get libraryGroupBySerializationStatus => '按连载状态分组';
+
+  @override
+  String get settingsPreferLibraryRootSeriesLabel => '置顶库根系列';
+
+  @override
+  String get settingsPreferLibraryRootSeriesDescription =>
+      '浏览系列列表时，将库根系列固定在列表最前。';
 
   @override
   String get librarySeriesSortName => '名称';
@@ -1049,6 +1175,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get comicDetailCharacters => '角色';
+
+  @override
+  String get comicDetailResourceInfo => '资源信息';
 
   @override
   String get comicDetailResourceFormat => '资源格式';
@@ -1445,6 +1574,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataMerge => '合并';
 
   @override
+  String get metadataMergeConfirmTitle => '确认合并';
+
+  @override
+  String metadataMergeConfirmBody(int sourceCount, String target) {
+    return '将 $sourceCount 个标签合并到「$target」？来源标签的漫画附着会转移到目标，来源标签将被删除。';
+  }
+
+  @override
+  String get metadataMergeConfirmDontAskAgain => '以后不再提示';
+
+  @override
   String get metadataDelete => '删除';
 
   @override
@@ -1470,6 +1610,57 @@ class AppLocalizationsZh extends AppLocalizations {
       other: '共 $count 条',
     );
     return '$_temp0';
+  }
+
+  @override
+  String metadataAuthorCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 位作者',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataTagCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个标签',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataParodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 部原作',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String metadataCharacterCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 位角色',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get navRailExpand => '展开导航';
+
+  @override
+  String get navRailCollapse => '收起导航';
+
+  @override
+  String paginationPageSemantic(int page) {
+    return '第 $page 页';
   }
 
   @override
@@ -1657,6 +1848,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dialogEditMetadataTabAuthorsTags => '作者&标签';
+
+  @override
+  String get dialogEditMetadataTabFieldLocks => '字段锁';
+
+  @override
+  String get dialogEditMetadataTabContent => '内容';
 
   @override
   String get smartFacetMatchToggleLabel => '智能匹配';
@@ -1859,13 +2056,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get updateRemindLater => '稍后提醒';
+  String get updateRemindLater => '稍后';
 
   @override
   String get updateViewDetails => '查看详情';
 
   @override
-  String get updateNow => '立即更新';
+  String get updateNow => '更新';
 
   @override
   String get updateManualDownloadToast => '请手动下载适合您系统的安装包';
@@ -1898,10 +2095,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get confirmRemovePathTitle => '确认移除';
+  String homeLibraryDeleteConfirmTitle(String name) {
+    return '删除「$name」？';
+  }
 
   @override
-  String get confirmRemovePathContent => '将删除该本地库及其漫画记录。此操作立即生效且不可撤销。';
+  String get homeLibraryDeleteConfirmBody => '将从应用中移除此库。漫画文件会保留在原位置。';
+
+  @override
+  String get homeLibraryDeleteConfirmAcknowledge => '我了解不会删除漫画文件';
 
   @override
   String get confirmClearHistoryTitle => '确认清空';
@@ -1991,6 +2193,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String readingProgressPage(int page) {
     return '第 $page 页';
   }
+
+  @override
+  String readingProgressPageOfTotal(int current, int total) {
+    return '$current/$total';
+  }
+
+  @override
+  String get historyGoToComicDetail => '跳转到详情页';
 
   @override
   String get historyDeleteRecord => '删除记录';

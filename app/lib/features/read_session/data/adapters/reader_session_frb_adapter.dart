@@ -1,20 +1,20 @@
-import 'package:hentai_library/shared/data/adapters/reader_frb_mapper.dart';
-import 'package:hentai_library/shared/data/adapters/remote_credentials_frb.dart';
+import 'package:hentai_library/features/read_session/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/ports/reader_session_port.dart';
-import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
+import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
+import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 
 /// [ReaderSessionPort] 委托 Rust 阅读会话 open/close/clear。
 class ReaderSessionFrbAdapter implements ReaderSessionPort {
-  const ReaderSessionFrbAdapter({required this._libraryRepository});
+  const ReaderSessionFrbAdapter({required this._remoteCredentials});
 
-  final LibraryRepository _libraryRepository;
+  final RemoteLibraryCredentialsPort _remoteCredentials;
 
   @override
   Future<void> openComic(Comic comic) async {
-    await pushRemoteLibraryCredentials(_libraryRepository);
+    await _remoteCredentials.pushStoredRemoteCredentialsToRust();
     try {
       await rust.openReaderFrb(
         comicId: comic.comicId,
@@ -22,18 +22,13 @@ class ReaderSessionFrbAdapter implements ReaderSessionPort {
         resourceType: mapResourceType(comic.resourceType),
       );
     } on HentaiErrorDto catch (error) {
-      throwReaderException(
-        error,
-        resourceType: comic.resourceType,
-        path: comic.path,
-        comicId: comic.comicId,
-      );
+      throwReaderException(error, path: comic.path, comicId: comic.comicId);
     }
   }
 
   @override
   Future<void> closeComic(String comicId) async {
-    rust.closeReaderFrb(comicId: comicId);
+    await rust.closeReaderFrb(comicId: comicId);
   }
 
   @override

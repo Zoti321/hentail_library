@@ -1,8 +1,8 @@
 use hentai_core::{
-    add_author as core_add, add_author_link as core_add_link, count_all_authors as core_count,
+    add_author as core_add, add_author_link as core_add_link,
     delete_author_link as core_delete_link, delete_authors_by_names,
-    fetch_authors_page as core_fetch, get_author_detail as core_detail, list_all_authors,
-    list_author_links as core_list_links, load_author_image as core_load_image, paginate,
+    fetch_authors_page_result as core_fetch_page, get_author_detail as core_detail,
+    list_all_authors, list_author_links as core_list_links, load_author_image as core_load_image,
     rename_author as core_rename, resolve_author_image as core_image,
     update_author_link as core_update_link, watch_authors, AuthorIdentity, AuthorImageRef,
     AuthorImageSlot, AuthorImageSource, AuthorLinkDto, AuthorLinkPlatform,
@@ -173,25 +173,19 @@ pub async fn list_all_authors_frb() -> Result<Vec<AuthorIdentityFrbDto>, HentaiE
 pub async fn fetch_authors_page_frb(
     request: PageRequestDto,
 ) -> Result<AuthorPagedDto, HentaiErrorDto> {
-    let total = core_count().await.map_err(HentaiErrorDto::from)?;
-    let window = paginate(request.into(), total).clamped();
-    if total <= 0 {
-        return Ok(AuthorPagedDto {
-            items: vec![],
-            total_count: 0,
-            page: 1,
-            page_size: window.page_size,
-        });
-    }
-    let items = core_fetch(window.page_size, window.offset as i32)
+    core_fetch_page(request.into())
         .await
-        .map_err(HentaiErrorDto::from)?;
-    Ok(AuthorPagedDto {
-        items: items.into_iter().map(AuthorIdentityFrbDto::from).collect(),
-        total_count: total,
-        page: window.page,
-        page_size: window.page_size,
-    })
+        .map(|page| AuthorPagedDto {
+            items: page
+                .items
+                .into_iter()
+                .map(AuthorIdentityFrbDto::from)
+                .collect(),
+            total_count: page.total_count,
+            page: page.page,
+            page_size: page.page_size,
+        })
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]

@@ -231,7 +231,7 @@ class _OutlinedMetaChipLabel extends StatelessWidget {
             style: TextStyle(
               fontSize: tokens.text.labelXs,
               height: 1.2,
-              color: context.hentai.textTertiary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
           ),

@@ -3,11 +3,12 @@ import 'dart:io';
 
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/app_settings/data/repositories/app_setting_storage.dart';
-import 'package:hentai_library/shared/domain/library/format_group.dart';
-import 'package:hentai_library/shared/domain/models/app_setting_migration.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
+import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/shared/domain/repositories/app_setting_repository.dart';
+import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
+import 'package:hentai_library/features/series/domain/library_prefer_library_root_series.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,7 +70,12 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
         return defaultSettings();
       }
       final Map<String, dynamic> json = jsonDecode(raw) as Map<String, dynamic>;
-      return AppSetting.fromJson(json);
+      AppSetting setting = AppSetting.fromJson(json);
+      setting = await _migratePreferLibraryRootSeriesFromBrowsePrefs(
+        prefs,
+        setting,
+      );
+      return setting;
     } catch (e, st) {
       logError(AppLog.dataRepo('app_setting'), '加载设置失败，已回退默认值', e, st);
       return defaultSettings();
@@ -108,21 +114,22 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   }
 
   @override
-  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async {
+  Future<List<ResourceFormatCategory>?>
+  peekLegacyEnabledResourceFormatCategories() async {
     try {
       final Map<String, dynamic>? raw = await _readLegacyJsonMap();
       if (raw != null) {
-        return legacyEnabledFormatGroupsFromJson(raw);
+        return legacyEnabledResourceFormatCategoriesFromJson(raw);
       }
       final SharedPreferences prefs = await _prefs();
       final String? staged = prefs.getString(
-        AppSettingStorageKeys.legacyImportFormatGroups,
+        AppSettingStorageKeys.legacyImportResourceFormatCategories,
       );
       if (staged == null || staged.isEmpty) {
         return null;
       }
       final Object? decoded = jsonDecode(staged);
-      return formatGroupsFromStorage(decoded);
+      return resourceFormatCategoriesFromStorage(decoded);
     } catch (_) {
       return null;
     }
@@ -132,7 +139,9 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   Future<void> clearLegacyImportPayload() async {
     final SharedPreferences prefs = await _prefs();
     await prefs.remove(AppSettingStorageKeys.legacyImportAutoScan);
-    await prefs.remove(AppSettingStorageKeys.legacyImportFormatGroups);
+    await prefs.remove(
+      AppSettingStorageKeys.legacyImportResourceFormatCategories,
+    );
   }
 
   Future<void> _importLegacySettingsJsonIfPresent(
@@ -153,12 +162,11 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
         legacyAutoScan,
       );
     }
-    final List<FormatGroup> legacyGroups = legacyEnabledFormatGroupsFromJson(
-      raw,
-    );
+    final List<ResourceFormatCategory> legacyGroups =
+        legacyEnabledResourceFormatCategoriesFromJson(raw);
     await prefs.setString(
-      AppSettingStorageKeys.legacyImportFormatGroups,
-      jsonEncode(formatGroupsToStorage(legacyGroups)),
+      AppSettingStorageKeys.legacyImportResourceFormatCategories,
+      jsonEncode(resourceFormatCategoriesToStorage(legacyGroups)),
     );
 
     final AppSetting setting = AppSetting.fromJson(raw);
@@ -179,4 +187,22 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
   }
 
   static AppSetting defaultSettings() => AppSetting();
+
+  Future<AppSetting> _migratePreferLibraryRootSeriesFromBrowsePrefs(
+    SharedPreferences prefs,
+    AppSetting setting,
+  ) async {
+    if (!prefs.containsKey(LibraryPreferLibraryRootSeries.storageKey)) {
+      return setting;
+    }
+    final bool legacy = LibraryPreferLibraryRootSeries.fromStorage(
+      prefs.getBool(LibraryPreferLibraryRootSeries.storageKey),
+    );
+    final AppSetting migrated = setting.copyWith(
+      preferLibraryRootSeries: legacy,
+    );
+    await save(migrated);
+    await prefs.remove(LibraryPreferLibraryRootSeries.storageKey);
+    return migrated;
+  }
 }

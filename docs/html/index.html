@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MD3E Lab 文档</title>
+    <link rel="stylesheet" href="assets/site.css" />
+  </head>
+  <body>
+    <nav class="site-nav">
+      <div class="wrap">
+        <a href="index.html"><strong>MD3E Lab</strong></a>
+        <span class="sep">·</span>
+        <a href="overview.html">说明</a>
+        <a href="pages.html">页面</a>
+        <a href="widgetbook.html">Widgetbook</a>
+        <a href="signoff.html">收口清单</a>
+      </div>
+    </nav>
+    <main class="wrap">
+      <h1>MD3E Lab 文档</h1>
+      <p class="lead">
+        Hentai Library MD3E Lab / Cutover 的浏览器可读说明，与
+        <code>app/widgetbook/</code> 目录对齐。生产 UI 真源为
+        <code>shared/ui</code> 与各 feature 页；本目录非 ADR / Gate 真源。
+      </p>
+
+      <div class="callout">
+        <strong>如何预览 UI</strong>
+        在 <code>app/</code> 下执行：
+        <code>flutter run -t widgetbook/main.dart</code>。验收以 Widgetbook + 本目录 HTML 为准（ADR-0030）。
+      </div>
+
+      <h2>文档</h2>
+      <ul class="card-list">
+        <li>
+          <a href="overview.html">
+            Lab 范围与阶段
+            <span class="desc">Lab / Pilot / Cutover · 代码布局 · 生产 MD3E 主壳</span>
+          </a>
+        </li>
+        <li>
+          <a href="pages.html">
+            预览页面目录
+            <span class="desc">全部 Md3e*Page · 生产功能对应 · Lab 状态</span>
+          </a>
+        </li>
+        <li>
+          <a href="widgetbook.html">
+            Widgetbook 组件树
+            <span class="desc">widgets · patterns · scenarios · pages 用例名</span>
+          </a>
+        </li>
+        <li>
+          <a href="signoff.html">
+            Lab 全应用收口清单
+            <span class="desc">按领域对照生产 / Lab / Widgetbook · 阅读器见 #sec-reader</span>
+          </a>
+        </li>
+      </ul>
+
+      <h2>代码入口</h2>
+      <ul class="compact">
+        <li><code>app/lib/shared/ui/</code> — 生产主题 / layout / widgets / patterns</li>
+        <li><code>app/lib/features/*/presentation/</code> — 生产 MD3E 页（命名收尾中）</li>
+        <li><code>app/widgetbook/</code> — Lab 预览入口与目录</li>
+        <li><code>integrate/md3e</code> — 集成分支</li>
+      </ul>
+
+      <footer>更新：2026-11-06 · 分支参考 integrate/md3e</footer>
+    </main>
+  </body>
+</html>

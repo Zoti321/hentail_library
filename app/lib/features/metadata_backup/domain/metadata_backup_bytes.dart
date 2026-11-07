@@ -1,12 +1,20 @@
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:typed_data';
 
-Uint8List decodeMetadataBackupFileBytes(List<int> rawBytes, String path) {
+Future<Uint8List> decodeMetadataBackupFileBytes(
+  List<int> rawBytes,
+  String path,
+) async {
   final String lower = path.toLowerCase();
   if (lower.endsWith('.gz') || lower.endsWith('.hlmeta.json.gz')) {
-    return Uint8List.fromList(GZipCodec().decode(rawBytes));
+    return Isolate.run(() => Uint8List.fromList(GZipCodec().decode(rawBytes)));
   }
   return Uint8List.fromList(rawBytes);
+}
+
+Future<Uint8List> encodeMetadataBackupGzip(Uint8List raw) {
+  return Isolate.run(() => Uint8List.fromList(GZipCodec().encode(raw)));
 }
 
 bool isMetadataBackupFilePath(String path) {

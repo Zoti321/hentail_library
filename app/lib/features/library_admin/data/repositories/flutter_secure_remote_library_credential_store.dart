@@ -1,5 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:hentai_library/shared/domain/repositories/remote_library_credential_store.dart';
+import 'package:hentai_library/features/library_admin/domain/remote_library_credential_store.dart';
 
 class FlutterSecureRemoteLibraryCredentialStore
     implements RemoteLibraryCredentialStore {

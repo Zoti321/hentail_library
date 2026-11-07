@@ -1,10 +1,10 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/shared/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/shared/data/adapters/frb_error_mapper.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_port.dart';
-import 'package:hentai_library/shared/domain/library/sync_library_types.dart';
+import 'package:hentai_library/shared/data/frb/frb_call_guard.dart';
+import 'package:hentai_library/shared/data/frb/frb_error_mapper.dart';
+import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
+import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/shared/domain/repositories/library_repository.dart';
+import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 
@@ -81,9 +81,7 @@ Future<List<rust.RemoteLibraryCredentialDto>> loadRemoteCredentialsForSync({
   String? targetLibraryId,
 }) async {
   final List<LocalLibrary> libraries = await libraryRepository.list();
-  final String? scopedId =
-      targetLibraryId ??
-      (syncAll ? null : await libraryRepository.getCurrentId());
+  final String? scopedId = targetLibraryId;
   final List<rust.RemoteLibraryCredentialDto> out =
       <rust.RemoteLibraryCredentialDto>[];
   for (final LocalLibrary library in libraries) {

@@ -11,7 +11,7 @@ use hentai_core::{
     update_series_user_meta as core_update_meta, watch_home_series_comic_order_map,
     PagedSeriesComicsResultDto as CorePagedSeriesComics, PagedSeriesResultDto as CorePagedSeries,
     SeriesComicsMetadataDto as CoreSeriesComicsMetadata, SeriesDto as CoreSeries,
-    SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
+    SeriesFilterDto as CoreSeriesFilter, SeriesGrouping, SeriesItemDto as CoreItem,
     SeriesReadingContextDto as CoreSeriesReadingContext, SeriesSortFieldDto as CoreSeriesSortField,
     SeriesSortOptionDto as CoreSeriesSort, SetSeriesMetaLocksDto as CoreSetSeriesMetaLocks,
     UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
@@ -72,6 +72,21 @@ pub enum SeriesSortFieldDto {
 pub struct SeriesSortOptionDto {
     pub field: SeriesSortFieldDto,
     pub descending: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeriesGroupingDto {
+    None,
+    BySerializationStatus,
+}
+
+impl From<SeriesGroupingDto> for SeriesGrouping {
+    fn from(value: SeriesGroupingDto) -> Self {
+        match value {
+            SeriesGroupingDto::None => Self::None,
+            SeriesGroupingDto::BySerializationStatus => Self::BySerializationStatus,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -277,9 +292,10 @@ pub async fn count_all_series_frb() -> Result<i64, HentaiErrorDto> {
 pub async fn fetch_series_page_frb(
     request: PageRequestDto,
     filter: SeriesFilterDto,
+    grouping: SeriesGroupingDto,
     sort: SeriesSortOptionDto,
 ) -> Result<PagedSeriesResultDto, HentaiErrorDto> {
-    core_fetch_page(request.into(), filter.into(), sort.into())
+    core_fetch_page(request.into(), filter.into(), grouping.into(), sort.into())
         .await
         .map(PagedSeriesResultDto::from)
         .map_err(HentaiErrorDto::from)
@@ -392,8 +408,9 @@ pub fn set_series_item_sort_order_locked_frb(
 #[flutter_rust_bridge::frb]
 pub async fn search_series_by_keyword_frb(
     keyword: String,
+    library_id: Option<String>,
 ) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
-    search_series_by_keyword(&keyword)
+    search_series_by_keyword(&keyword, library_id)
         .await
         .map(map_series_list)
         .map_err(HentaiErrorDto::from)
@@ -404,8 +421,9 @@ pub async fn search_series_by_tag_expression_frb(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
+    library_id: Option<String>,
 ) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
-    search_series_by_tag_expression(must_include, optional_or, must_exclude)
+    search_series_by_tag_expression(must_include, optional_or, must_exclude, library_id)
         .await
         .map(map_series_list)
         .map_err(HentaiErrorDto::from)

@@ -32,7 +32,7 @@ Future<ReaderPageListDto> loadPageListFrb({
   resourceType: resourceType,
 );
 
-Uint8List loadPageBytesFrb({
+Future<Uint8List> loadPageBytesFrb({
   required String comicId,
   required String path,
   required String resourceType,
@@ -75,7 +75,7 @@ Future<void> clearReaderPageCacheFrb({required String comicId}) => RustLib
     .api
     .crateApiReaderClearReaderPageCacheFrb(comicId: comicId);
 
-void closeReaderFrb({required String comicId}) =>
+Future<void> closeReaderFrb({required String comicId}) =>
     RustLib.instance.api.crateApiReaderCloseReaderFrb(comicId: comicId);
 
 void clearReaderSessionsFrb() =>

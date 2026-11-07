@@ -7,7 +7,7 @@ use crate::comic::{now_ms, ComicDto};
 use crate::db::map_db_err;
 use crate::entity::{comic_meta, comic_tags, comic_thumbnails, comics, prelude::*};
 use crate::error::HentaiError;
-use crate::history::normalize_reading_history_titles;
+use crate::history::{normalize_reading_history_titles, purge_expired_reading_histories};
 use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
 use crate::path_migration::{apply_comic_rekeys, apply_series_rekeys};
 use crate::util::compute_sort_key;
@@ -43,6 +43,7 @@ pub async fn apply_scan_replace_plan(
         tracing::debug!(?skipped, "scan upsert skipped comics without pages");
     }
     normalize_reading_history_titles(&txn).await?;
+    purge_expired_reading_histories(&txn).await?;
     rebuild_series_from_comics(&txn, Some(library_id)).await?;
     txn.commit().await.map_err(map_db_err)?;
     Ok(())

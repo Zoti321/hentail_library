@@ -2,7 +2,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/features/library_browse/domain/comic_catalog_repository.dart';
+import 'package:hentai_library/features/comic/domain/comic_catalog_repository.dart';
 import 'package:test/test.dart';
 
 class _RecordingComicRepo implements ComicCatalogRepository {
@@ -14,6 +14,7 @@ class _RecordingComicRepo implements ComicCatalogRepository {
   Future<PagedResult<Comic>> searchByKeywordPage({
     required String keyword,
     required PageRequest request,
+    required String libraryId,
   }) async {
     keywordPageRequests.add(request);
     final DateTime now = DateTime.utc(2026);
@@ -51,6 +52,7 @@ void main() {
       final PagedResult<Comic> page = await repo.searchByKeywordPage(
         keyword: 'foo',
         request: pageRequest(page: 1, pageSize: 2),
+        libraryId: 'lib-1',
       );
 
       expect(page.items.length, 2);

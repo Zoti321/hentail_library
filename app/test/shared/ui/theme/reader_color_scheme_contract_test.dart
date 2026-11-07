@@ -1,0 +1,74 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
+
+void main() {
+  group('Reader color extension contract', () {
+    test('registers immersive reader extension', () {
+      for (final Brightness brightness in <Brightness>[
+        Brightness.light,
+        Brightness.dark,
+      ]) {
+        final ThemeData theme = buildAppTheme(brightness);
+        expect(theme.extension<ReaderColorScheme>(), isNotNull);
+        expect(
+          theme.extension<ReaderColorScheme>()!.readerBackground,
+          ReaderColorScheme.immersiveBackground,
+        );
+      }
+    });
+
+    test('reader background stays dark across colorSchemeId', () {
+      final Color brandBg = buildAppTheme(
+        Brightness.light,
+        colorSchemeId: 'brand',
+      ).reader.readerBackground;
+      final Color tealBg = buildAppTheme(
+        Brightness.light,
+        colorSchemeId: 'teal',
+      ).reader.readerBackground;
+      expect(brandBg, tealBg);
+      expect(brandBg.computeLuminance(), lessThan(0.2));
+    });
+
+    test('reader accent follows seed while background stays fixed', () {
+      final ThemeData brand = buildAppTheme(
+        Brightness.dark,
+        colorSchemeId: 'brand',
+      );
+      final ThemeData teal = buildAppTheme(
+        Brightness.dark,
+        colorSchemeId: 'teal',
+      );
+      expect(teal.colorScheme.primary, isNot(brand.colorScheme.primary));
+      expect(teal.reader.readerBackground, brand.reader.readerBackground);
+      expect(teal.reader.activeButtonBg, isNot(brand.reader.activeButtonBg));
+      expect(teal.reader.activeButtonBg, teal.colorScheme.primary);
+    });
+  });
+
+  group('buildAppTheme extensions after semantic shrink', () {
+    test('registers layout, reader, shadow, and motion extensions', () {
+      for (final Brightness brightness in <Brightness>[
+        Brightness.light,
+        Brightness.dark,
+      ]) {
+        final ThemeData theme = buildAppTheme(brightness);
+        expect(theme.extension<AppThemeTokens>(), isNotNull);
+        expect(theme.extension<ReaderColorScheme>(), isNotNull);
+        expect(theme.extension<AppShadowTokens>(), isNotNull);
+        expect(theme.extension<AppMotionTokens>(), isNotNull);
+      }
+    });
+
+    test('spacing and radius sample still matches tokens', () {
+      final AppThemeTokens tokens = buildAppTheme(Brightness.light)
+          .extension<AppThemeTokens>()!;
+      expect(tokens.spacing.md, 12);
+      expect(tokens.spacing.xl, 20);
+      expect(tokens.radius.sm, 6);
+      expect(tokens.radius.pill, 999);
+      expect(tokens.layout.contentHorizontalPadding, 48);
+    });
+  });
+}

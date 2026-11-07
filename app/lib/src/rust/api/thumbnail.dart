@@ -145,8 +145,10 @@ class SeriesThumbnailDto {
 sealed class ThumbnailEventDto with _$ThumbnailEventDto {
   const ThumbnailEventDto._();
 
-  const factory ThumbnailEventDto.ready({required String comicId}) =
-      ThumbnailEventDto_Ready;
+  const factory ThumbnailEventDto.ready({
+    required String comicId,
+    Uint8List? thumbnail,
+  }) = ThumbnailEventDto_Ready;
   const factory ThumbnailEventDto.progress({
     required int done,
     required int total,

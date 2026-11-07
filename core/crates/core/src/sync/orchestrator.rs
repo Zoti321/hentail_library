@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::db::connection;
 use crate::error::HentaiError;
 use crate::library::{
-    find_library_by_id, get_current_library_id, list_libraries, record_library_sync_failure,
-    record_library_sync_success, LibraryDto,
+    find_library_by_id, list_libraries, record_library_sync_failure, record_library_sync_success,
+    LibraryDto,
 };
 use crate::probe::rebuild_snapshot_from_scan_items;
 use crate::reader::clear_reader_sessions;
@@ -82,13 +82,7 @@ async fn sync_library_locked(
         } else if sync_all {
             list_libraries().await?
         } else {
-            match get_current_library_id().await? {
-                Some(id) => match find_library_by_id(&id).await? {
-                    Some(lib) => vec![lib],
-                    None => Vec::new(),
-                },
-                None => Vec::new(),
-            }
+            Vec::new()
         };
 
     if targets.is_empty() {
@@ -230,7 +224,7 @@ async fn sync_one_library(
         &ctx,
         handle,
         force_full_parse,
-        &library.enabled_format_groups,
+        &library.enabled_resource_format_categories,
     )?;
     for item in &mut scan_items {
         item.comic.library_id = library.library_id.clone();
@@ -295,7 +289,7 @@ async fn sync_remote_library(
         &library.root_path,
         &ctx,
         handle,
-        &library.enabled_format_groups,
+        &library.enabled_resource_format_categories,
     )?;
     let mut scan_items = match outcome {
         RemoteScanOutcome::Unreachable { message } => {
