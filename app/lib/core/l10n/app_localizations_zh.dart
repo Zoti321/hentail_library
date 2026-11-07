@@ -1165,6 +1165,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get comicDetailCharacters => '角色';
 
   @override
+  String get comicDetailResourceInfo => '资源信息';
+
+  @override
   String get comicDetailResourceFormat => '资源格式';
 
   @override

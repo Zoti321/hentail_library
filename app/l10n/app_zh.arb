@@ -555,6 +555,7 @@
   "comicDetailTags": "标签",
   "comicDetailParodies": "原作",
   "comicDetailCharacters": "角色",
+  "comicDetailResourceInfo": "资源信息",
   "comicDetailResourceFormat": "资源格式",
   "comicDetailResourceSize": "资源大小",
   "comicDetailResourcePath": "资源路径",

@@ -2174,6 +2174,12 @@ abstract class AppLocalizations {
   /// **'角色'**
   String get comicDetailCharacters;
 
+  /// No description provided for @comicDetailResourceInfo.
+  ///
+  /// In zh, this message translates to:
+  /// **'资源信息'**
+  String get comicDetailResourceInfo;
+
   /// No description provided for @comicDetailResourceFormat.
   ///
   /// In zh, this message translates to:

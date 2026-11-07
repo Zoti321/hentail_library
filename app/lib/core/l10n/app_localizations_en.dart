@@ -1212,6 +1212,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailCharacters => 'Characters';
 
   @override
+  String get comicDetailResourceInfo => 'Resource info';
+
+  @override
   String get comicDetailResourceFormat => 'Format';
 
   @override

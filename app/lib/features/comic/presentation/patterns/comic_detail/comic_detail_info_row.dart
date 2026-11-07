@@ -15,17 +15,15 @@ class ComicDetailInfoRow extends StatelessWidget {
   final String value;
   final String? tooltip;
 
+  static const int _valueMaxLines = 2;
+
   @override
   Widget build(BuildContext context) {
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ETypeScale type = theme.typeScale;
     final M3EColorScheme scheme = theme.colorScheme;
-
-    final Widget valueWidget = Text(
-      value,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      style: type.bodySmall.copyWith(color: scheme.onSurfaceVariant),
+    final TextStyle valueStyle = type.bodySmall.copyWith(
+      color: scheme.onSurfaceVariant,
     );
 
     return Row(
@@ -43,9 +41,31 @@ class ComicDetailInfoRow extends StatelessWidget {
         ),
         SizedBox(width: theme.spacing.lg),
         Expanded(
-          child: tooltip == null
-              ? valueWidget
-              : Tooltip(message: tooltip, child: valueWidget),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final Widget valueWidget = Text(
+                value,
+                maxLines: _valueMaxLines,
+                overflow: TextOverflow.ellipsis,
+                style: valueStyle,
+              );
+              if (tooltip == null) {
+                return valueWidget;
+              }
+
+              final TextPainter painter = TextPainter(
+                text: TextSpan(text: value, style: valueStyle),
+                maxLines: _valueMaxLines,
+                textDirection: Directionality.of(context),
+                textScaler: MediaQuery.textScalerOf(context),
+              )..layout(maxWidth: constraints.maxWidth);
+
+              if (!painter.didExceedMaxLines) {
+                return valueWidget;
+              }
+              return Tooltip(message: tooltip, child: valueWidget);
+            },
+          ),
         ),
       ],
     );

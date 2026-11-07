@@ -553,6 +553,7 @@
   "comicDetailTags": "Tags",
   "comicDetailParodies": "Parody",
   "comicDetailCharacters": "Characters",
+  "comicDetailResourceInfo": "Resource info",
   "comicDetailResourceFormat": "Format",
   "comicDetailResourceSize": "Size",
   "comicDetailResourcePath": "Path",
