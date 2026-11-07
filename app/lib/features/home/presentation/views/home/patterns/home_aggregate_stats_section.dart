@@ -275,8 +275,9 @@ class _HomeStatPalette {
       comicsForeground = scheme.onPrimaryContainer,
       seriesBackground = scheme.secondaryContainer,
       seriesForeground = scheme.onSecondaryContainer,
-      authorsBackground = scheme.tertiaryContainer,
-      authorsForeground = scheme.onTertiaryContainer,
+      // 浅紫 secondary，避开 tertiary 芥末黄；与系列/垃圾桶同系但不同行。
+      authorsBackground = scheme.secondaryContainer,
+      authorsForeground = scheme.onSecondaryContainer,
       parodiesBackground = scheme.surfaceContainerHighest,
       parodiesForeground = scheme.onSurface,
       charactersBackground = scheme.emphasis,
