@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_bytes.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_export_options.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_repository.dart';
 
@@ -19,7 +20,9 @@ class MetadataExportUseCase {
       libraryId: options.libraryId,
       includeOrphanFacets: options.includeOrphanFacets,
     );
-    final List<int> output = options.gzip ? GZipCodec().encode(raw) : raw;
+    final List<int> output = options.gzip
+        ? await encodeMetadataBackupGzip(raw)
+        : raw;
     final String outputPath = ensureMetadataBackupExportExtension(
       savePath,
       extension,

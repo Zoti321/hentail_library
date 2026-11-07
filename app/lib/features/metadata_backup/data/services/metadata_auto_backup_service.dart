@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/features/metadata_backup/data/metadata_backup_paths.dart';
 import 'package:hentai_library/features/metadata_backup/domain/metadata_auto_backup_logic.dart';
+import 'package:hentai_library/features/metadata_backup/domain/metadata_backup_bytes.dart';
 import 'package:path/path.dart' as p;
 
 typedef MetadataAutoBackupExportInvoker = Uint8List Function();
@@ -28,7 +29,7 @@ Future<MetadataAutoBackupRunResult> runMetadataAutoBackup({
   await Directory(directoryPath).create(recursive: true);
 
   final Uint8List raw = export();
-  final List<int> compressed = GZipCodec().encode(raw);
+  final List<int> compressed = await encodeMetadataBackupGzip(raw);
   final String fileName = metadataAutoBackupFileName(timestamp);
   final String outputPath = p.join(directoryPath, fileName);
   await File(outputPath).writeAsBytes(compressed, flush: true);

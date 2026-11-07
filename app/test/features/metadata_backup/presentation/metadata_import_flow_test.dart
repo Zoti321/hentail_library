@@ -245,9 +245,9 @@ void main() {
     expect(shortened, contains('…'));
   });
 
-  test('decodeMetadataBackupFileBytes accepts gzip payloads', () {
+  test('decodeMetadataBackupFileBytes accepts gzip payloads', () async {
     final List<int> gz = GZipCodec().encode(<int>[123, 125]);
-    final Uint8List decoded = decodeMetadataBackupFileBytes(
+    final Uint8List decoded = await decodeMetadataBackupFileBytes(
       gz,
       'backup.hlmeta.json.gz',
     );

@@ -12,7 +12,7 @@ class MetadataImportUseCase {
 
   final MetadataBackupRepository _repository;
 
-  Uint8List decodeBackupFileBytes(List<int> rawBytes, String path) {
+  Future<Uint8List> decodeBackupFileBytes(List<int> rawBytes, String path) {
     return decodeMetadataBackupFileBytes(rawBytes, path);
   }
 

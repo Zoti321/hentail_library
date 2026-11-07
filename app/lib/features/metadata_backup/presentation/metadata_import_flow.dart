@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,10 @@ Future<void> runMetadataImportFlow(
 
   try {
     final List<int> rawBytes = file.bytes ?? await File(path).readAsBytes();
-    final jsonBytes = useCase.decodeBackupFileBytes(rawBytes, path);
+    final Uint8List jsonBytes = await useCase.decodeBackupFileBytes(
+      rawBytes,
+      path,
+    );
     final MetadataBackupManifest manifest = useCase.peekManifest(jsonBytes);
 
     if (!context.mounted) {
