@@ -55,7 +55,7 @@ Future<void> runPdfReaderPlatformSmoke() async {
   );
   expect(list.pageCount, 1);
 
-  final page0 = loadPageBytesFrb(
+  final page0 = await loadPageBytesFrb(
     comicId: comicId,
     path: pdfPath,
     resourceType: 'pdf',
@@ -66,5 +66,5 @@ Future<void> runPdfReaderPlatformSmoke() async {
   expect(page0[1], 0xD8);
   expect(page0[2], 0xFF);
 
-  closeReaderFrb(comicId: comicId);
+  await closeReaderFrb(comicId: comicId);
 }

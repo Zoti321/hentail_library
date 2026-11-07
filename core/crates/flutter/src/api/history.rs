@@ -77,9 +77,10 @@ impl From<&ReadingHistoryDto> for CoreReading {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn record_reading_frb(history: ReadingHistoryDto) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_record_reading(&(&history).into()))
+#[flutter_rust_bridge::frb]
+pub async fn record_reading_frb(history: ReadingHistoryDto) -> Result<(), HentaiErrorDto> {
+    core_record_reading(&(&history).into())
+        .await
         .map_err(HentaiErrorDto::from)
 }
 

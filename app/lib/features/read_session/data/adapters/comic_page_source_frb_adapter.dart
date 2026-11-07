@@ -67,7 +67,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
           ReaderPageBytes(:final Uint8List data) => data,
         };
       }
-      return rust.loadPageBytesFrb(
+      return await rust.loadPageBytesFrb(
         comicId: comic.comicId,
         path: comic.path,
         resourceType: mapResourceType(comic.resourceType),

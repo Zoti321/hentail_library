@@ -16,7 +16,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   @override
   Future<void> recordReading(ReadingHistory history) async {
     try {
-      guardFrbSync(
+      await guardFrb(
         () => rust.recordReadingFrb(history: toReadingHistoryDto(history)),
         fallbackMessage: '记录阅读进度失败',
       );

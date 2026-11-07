@@ -131,7 +131,7 @@ abstract class RustLibApi extends BaseApi {
 
   void crateApiReaderClearReaderSessionsFrb();
 
-  void crateApiReaderCloseReaderFrb({required String comicId});
+  Future<void> crateApiReaderCloseReaderFrb({required String comicId});
 
   String crateApiComicComicIdFromPathFrb({required String rawPath});
 
@@ -337,7 +337,7 @@ abstract class RustLibApi extends BaseApi {
 
   List<SeriesComicOrderEntryDto> crateApiSeriesLoadHomeSeriesComicOrderMapFrb();
 
-  Uint8List crateApiReaderLoadPageBytesFrb({
+  Future<Uint8List> crateApiReaderLoadPageBytesFrb({
     required String comicId,
     required String path,
     required String resourceType,
@@ -391,7 +391,9 @@ abstract class RustLibApi extends BaseApi {
     required List<String> comicIds,
   });
 
-  void crateApiHistoryRecordReadingFrb({required ReadingHistoryDto history});
+  Future<void> crateApiHistoryRecordReadingFrb({
+    required ReadingHistoryDto history,
+  });
 
   Future<void> crateApiComicRefreshComicMetadataFrb({required String comicId});
 
@@ -915,17 +917,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "clear_reader_sessions_frb", argNames: []);
 
   @override
-  void crateApiReaderCloseReaderFrb({required String comicId}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<void> crateApiReaderCloseReaderFrb({required String comicId}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
-          decodeErrorData: null,
+          decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiReaderCloseReaderFrbConstMeta,
         argValues: [comicId],
@@ -2663,21 +2670,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Uint8List crateApiReaderLoadPageBytesFrb({
+  Future<Uint8List> crateApiReaderLoadPageBytesFrb({
     required String comicId,
     required String path,
     required String resourceType,
     required int pageIndex,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
           sse_encode_String(path, serializer);
           sse_encode_String(resourceType, serializer);
           sse_encode_i_32(pageIndex, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 66)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 66,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -2986,13 +2998,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiHistoryRecordReadingFrb({required ReadingHistoryDto history}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<void> crateApiHistoryRecordReadingFrb({
+    required ReadingHistoryDto history,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_reading_history_dto(history, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 75)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 75,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,

@@ -28,7 +28,7 @@ class ReaderSessionFrbAdapter implements ReaderSessionPort {
 
   @override
   Future<void> closeComic(String comicId) async {
-    rust.closeReaderFrb(comicId: comicId);
+    await rust.closeReaderFrb(comicId: comicId);
   }
 
   @override
