@@ -8,6 +8,8 @@ import 'package:hentai_library/shared/ui/widgets/element/image/cover_letterbox.d
 ///
 /// No [cacheWidth]: library thumbs are already ≤512px; omitting ResizeImage
 /// keeps the same [ImageProvider] while Hero resizes the flight child.
+/// Soft-crop prefers a JPEG/PNG header peek so first paint already matches
+/// the settled fit (avoids Hero landing contain→cover jitter).
 class CardLetterboxedCoverImage extends StatefulWidget {
   const CardLetterboxedCoverImage({
     super.key,
@@ -34,7 +36,6 @@ class CardLetterboxedCoverImage extends StatefulWidget {
 }
 
 class _CardLetterboxedCoverImageState extends State<CardLetterboxedCoverImage> {
-  BoxFit _resolvedFit = BoxFit.contain;
   Size? _imageSize;
 
   @override
@@ -43,41 +44,29 @@ class _CardLetterboxedCoverImageState extends State<CardLetterboxedCoverImage> {
     if (oldWidget.cover.filePath != widget.cover.filePath ||
         !identical(oldWidget.cover.memoryBytes, widget.cover.memoryBytes)) {
       _imageSize = null;
-      _resolvedFit = widget.fit ?? BoxFit.contain;
-    } else if (oldWidget.fit != widget.fit && widget.fit != null) {
-      _resolvedFit = widget.fit!;
     }
   }
 
-  void _applySoftFit(Size size, double boxAspect) {
-    if (!mounted || widget.fit != null) {
+  void _onImageSize(Size size) {
+    if (!mounted || _imageSize == size) {
       return;
     }
-    final BoxFit next = coverFitForAspects(
-      imageAspect: size.width / size.height,
-      boxAspect: boxAspect,
-    );
-    if (next != _resolvedFit) {
-      setState(() => _resolvedFit = next);
+    // Header peek already drove the same fit — record size without rebuild.
+    final Size? peeked = peekCoverImageSize(widget.cover.memoryBytes);
+    if (_imageSize == null && peeked == size) {
+      _imageSize = size;
+      return;
     }
+    setState(() => _imageSize = size);
   }
 
-  void _onImageSize(Size size, double boxAspect) {
-    if (!mounted) {
-      return;
-    }
-    if (_imageSize == size && widget.fit == null) {
-      return;
-    }
-    _imageSize = size;
+  BoxFit _fitForBoxAspect(double boxAspect) {
     if (widget.fit != null) {
-      return;
+      return widget.fit!;
     }
-    // 路由 / Hero 动画中途改 fit 会触发重绘闪烁；等落地后再软裁切。
-    runAfterCoverRouteSettled(
-      context,
-      () => _applySoftFit(size, boxAspect),
-    );
+    final Size? known =
+        _imageSize ?? peekCoverImageSize(widget.cover.memoryBytes);
+    return coverFitForImageSize(imageSize: known, boxAspect: boxAspect);
   }
 
   @override
@@ -89,7 +78,9 @@ class _CardLetterboxedCoverImageState extends State<CardLetterboxedCoverImage> {
         final double boxAspect = boxWidth > 0 && boxHeight > 0
             ? boxWidth / boxHeight
             : 0;
-        final BoxFit fit = widget.fit ?? _resolvedFit;
+        final BoxFit fit = boxAspect > 0
+            ? _fitForBoxAspect(boxAspect)
+            : (widget.fit ?? BoxFit.contain);
         return ColoredBox(
           color: coverLetterboxColor(context),
           child: AppComicImage(
@@ -107,9 +98,7 @@ class _CardLetterboxedCoverImageState extends State<CardLetterboxedCoverImage> {
               kind: ComicCoverPlaceholderKind.error,
             ),
             onDecodeError: widget.onDecodeError,
-            onImageSize: boxAspect > 0
-                ? (Size size) => _onImageSize(size, boxAspect)
-                : null,
+            onImageSize: boxAspect > 0 ? _onImageSize : null,
           ),
         );
       },

@@ -38,7 +38,6 @@ class AdaptiveComicCover extends StatefulWidget {
 }
 
 class _AdaptiveComicCoverState extends State<AdaptiveComicCover> {
-  BoxFit _resolvedFit = BoxFit.contain;
   Size? _imageSize;
 
   @override
@@ -49,7 +48,6 @@ class _AdaptiveComicCoverState extends State<AdaptiveComicCover> {
     if (oldCover?.filePath != nextCover?.filePath ||
         !identical(oldCover?.memoryBytes, nextCover?.memoryBytes)) {
       _imageSize = null;
-      _resolvedFit = BoxFit.contain;
     }
   }
 
@@ -57,28 +55,26 @@ class _AdaptiveComicCoverState extends State<AdaptiveComicCover> {
     return widget.backgroundColor ?? coverLetterboxColor(context);
   }
 
-  void _applySoftFit(Size size) {
-    if (!mounted) {
+  void _onImageSize(Size size) {
+    if (!mounted || _imageSize == size) {
       return;
     }
-    final BoxFit next = coverFitForAspects(
-      imageAspect: size.width / size.height,
-      boxAspect: widget.containerAspectRatio,
-    );
-    if (next != _resolvedFit) {
-      setState(() => _resolvedFit = next);
+    // Header peek already drove the same fit — record size without rebuild.
+    final Size? peeked = peekCoverImageSize(widget.coverDisplay?.memoryBytes);
+    if (_imageSize == null && peeked == size) {
+      _imageSize = size;
+      return;
     }
+    setState(() => _imageSize = size);
   }
 
-  void _onImageSize(Size size) {
-    if (!mounted) {
-      return;
-    }
-    if (_imageSize == size) {
-      return;
-    }
-    _imageSize = size;
-    runAfterCoverRouteSettled(context, () => _applySoftFit(size));
+  BoxFit get _resolvedFit {
+    final Size? known =
+        _imageSize ?? peekCoverImageSize(widget.coverDisplay?.memoryBytes);
+    return coverFitForImageSize(
+      imageSize: known,
+      boxAspect: widget.containerAspectRatio,
+    );
   }
 
   @override
