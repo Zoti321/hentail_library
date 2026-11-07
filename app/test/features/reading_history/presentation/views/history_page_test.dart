@@ -8,11 +8,10 @@ import 'package:hentai_library/shared/domain/models/value_objects/page_request.d
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/reading_history/domain/reading_history_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
-
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 
 import '../../../../support/pump_localized_app.dart';
 
@@ -88,9 +87,15 @@ Future<void> _pumpHistoryPage(
 }) async {
   configureTestView(tester, Size(viewportWidth, 800));
 
+  // Match production [App] builder: ambient M3E already carries app font.
+  final AssembledAppTheme assembled = assembleAppTheme(Brightness.light);
   await pumpLocalizedApp(
     tester,
-    home: const Scaffold(body: HistoryPage()),
+    theme: assembled.material,
+    home: M3ETheme(
+      data: assembled.m3e,
+      child: const Scaffold(body: HistoryPage()),
+    ),
     overrides: _historyPageTestOverrides(),
   );
   await tester.pump();

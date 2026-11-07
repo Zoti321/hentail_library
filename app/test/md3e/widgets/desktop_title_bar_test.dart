@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../widgetbook/lab/theme/md3e_theme.dart';
 
+import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar_metrics.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -10,7 +11,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import '../../support/pump_app.dart';
 
 void main() {
-  testWidgets('DesktopTitleBar is compact (36dp) with shell chrome color', (
+  testWidgets('DesktopTitleBar is compact (36dp) with browse canvas color', (
     WidgetTester tester,
   ) async {
     final M3EThemeData m3e = buildThemeData();
@@ -39,7 +40,7 @@ void main() {
           )
           .first,
     );
-    expect(chrome.color, m3e.colorScheme.surfaceContainerLow);
+    expect(chrome.color, labBrowseCanvasColor(m3e.colorScheme));
   });
 
   testWidgets('title bar has no search field and shows window controls', (
