@@ -104,9 +104,13 @@ class _SeriesCustomCoverImageState extends State<_SeriesCustomCoverImage> {
   @override
   Widget build(BuildContext context) {
     if (_decodeFailed) {
-      return const ComicCoverPlaceholder(
-        variant: ComicCoverPlaceholderVariant.card,
-        kind: ComicCoverPlaceholderKind.error,
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => setState(() => _decodeFailed = false),
+        child: const ComicCoverPlaceholder(
+          variant: ComicCoverPlaceholderVariant.card,
+          kind: ComicCoverPlaceholderKind.error,
+        ),
       );
     }
     return CardLetterboxedCoverImage(

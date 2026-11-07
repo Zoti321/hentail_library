@@ -14,10 +14,14 @@ class HistoryListItem extends ConsumerWidget {
     super.key,
     required this.item,
     required this.onDeleteRecord,
+    this.gridIndex,
+    this.coverViewportScope,
   });
 
   final HistoryCardItem item;
   final VoidCallback onDeleteRecord;
+  final int? gridIndex;
+  final String? coverViewportScope;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,7 +37,11 @@ class HistoryListItem extends ConsumerWidget {
 
     return ReadingHistoryListItem(
       title: item.title,
-      cover: ComicCoverContent(comicId: item.comicId),
+      cover: ComicCoverContent(
+        comicId: item.comicId,
+        gridIndex: gridIndex,
+        coverViewportScope: coverViewportScope,
+      ),
       currentPage: currentPage,
       totalPages: totalPages,
       lastReadTime: item.lastReadTime,

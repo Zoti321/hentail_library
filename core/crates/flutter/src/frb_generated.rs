@@ -6939,8 +6939,10 @@ impl SseDecode for crate::api::thumbnail::ThumbnailEventDto {
         match tag_ {
             0 => {
                 let mut var_comicId = <String>::sse_decode(deserializer);
+                let mut var_thumbnail = <Option<Vec<u8>>>::sse_decode(deserializer);
                 return crate::api::thumbnail::ThumbnailEventDto::Ready {
                     comic_id: var_comicId,
+                    thumbnail: var_thumbnail,
                 };
             }
             1 => {
@@ -9571,9 +9573,15 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::tag::TagDictionaryImportResul
 impl flutter_rust_bridge::IntoDart for crate::api::thumbnail::ThumbnailEventDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
-            crate::api::thumbnail::ThumbnailEventDto::Ready { comic_id } => {
-                [0.into_dart(), comic_id.into_into_dart().into_dart()].into_dart()
-            }
+            crate::api::thumbnail::ThumbnailEventDto::Ready {
+                comic_id,
+                thumbnail,
+            } => [
+                0.into_dart(),
+                comic_id.into_into_dart().into_dart(),
+                thumbnail.into_into_dart().into_dart(),
+            ]
+            .into_dart(),
             crate::api::thumbnail::ThumbnailEventDto::Progress {
                 done,
                 total,
@@ -11403,9 +11411,13 @@ impl SseEncode for crate::api::thumbnail::ThumbnailEventDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         match self {
-            crate::api::thumbnail::ThumbnailEventDto::Ready { comic_id } => {
+            crate::api::thumbnail::ThumbnailEventDto::Ready {
+                comic_id,
+                thumbnail,
+            } => {
                 <i32>::sse_encode(0, serializer);
                 <String>::sse_encode(comic_id, serializer);
+                <Option<Vec<u8>>>::sse_encode(thumbnail, serializer);
             }
             crate::api::thumbnail::ThumbnailEventDto::Progress {
                 done,

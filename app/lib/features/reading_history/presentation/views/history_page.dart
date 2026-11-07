@@ -7,6 +7,7 @@ import 'package:hentai_library/features/reading_history/presentation/view_models
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_controller.dart';
 import 'package:hentai_library/features/reading_history/presentation/view_models/history_paged_feed_state.dart';
 import 'package:hentai_library/features/reading_history/presentation/views/history_page_actions.dart';
+import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
@@ -110,6 +111,10 @@ class _HistoryBrowseFeed extends ConsumerWidget {
       ),
     );
 
+    final Map<String, int> coverIndexById = <String, int>{
+      for (int i = 0; i < items.length; i++) items[i].comicId: i,
+    };
+
     return HistoryBrowsePage<HistoryCardItem>(
       items: items,
       totalCount: totalCount,
@@ -123,6 +128,8 @@ class _HistoryBrowseFeed extends ConsumerWidget {
         return HistoryListItem(
           key: ValueKey<String>(item.comicId),
           item: item,
+          gridIndex: coverIndexById[item.comicId],
+          coverViewportScope: CoverViewportScopes.readingHistory,
           onDeleteRecord: () => deleteReadingHistoryRecord(
             context: context,
             ref: ref,

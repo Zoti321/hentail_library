@@ -164,6 +164,15 @@ class ComicCover extends _$ComicCover {
     state = const ComicCoverError();
   }
 
+  /// 解码失败后点按重试：清 Error 并重新 ensure。
+  void retryLoad() {
+    if (state is! ComicCoverError) {
+      return;
+    }
+    state = const ComicCoverLoading();
+    unawaited(_load());
+  }
+
   Future<void> _ensurePriorityUpgrade() async {
     final String? comicId = _comicId;
     if (comicId == null || !ref.mounted) {
@@ -272,8 +281,8 @@ class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
 
   void _onEvent(ThumbnailEvent event) {
     switch (event) {
-      case ThumbnailReady(:final String comicId):
-        unawaited(_onThumbnailReady(comicId));
+      case ThumbnailReady(:final String comicId, :final Uint8List? thumbnail):
+        unawaited(_onThumbnailReady(comicId, thumbnail));
       case ThumbnailProgress(
         :final int done,
         :final int total,
@@ -287,12 +296,18 @@ class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
     }
   }
 
-  Future<void> _onThumbnailReady(String comicId) async {
+  Future<void> _onThumbnailReady(
+    String comicId,
+    Uint8List? embeddedThumbnail,
+  ) async {
     try {
-      final record = await ref
-          .read(comicThumbnailRepoProvider)
-          .findByComicId(comicId);
-      final Uint8List? bytes = record?.thumbnail;
+      Uint8List? bytes = embeddedThumbnail;
+      if (bytes == null || bytes.isEmpty) {
+        final record = await ref
+            .read(comicThumbnailRepoProvider)
+            .findByComicId(comicId);
+        bytes = record?.thumbnail;
+      }
       if (bytes == null || bytes.isEmpty || !ref.mounted) {
         return;
       }

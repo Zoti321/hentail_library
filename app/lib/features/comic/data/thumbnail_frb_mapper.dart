@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
@@ -12,9 +14,10 @@ rust.ThumbnailPriorityDto mapThumbnailPriority(ThumbnailPriority priority) {
 
 ThumbnailEvent mapThumbnailEvent(rust.ThumbnailEventDto event) {
   return switch (event) {
-    rust.ThumbnailEventDto_Ready(:final String comicId) => ThumbnailReady(
-      comicId,
-    ),
+    rust.ThumbnailEventDto_Ready(
+      :final String comicId,
+      :final Uint8List? thumbnail,
+    ) => ThumbnailReady(comicId, thumbnail: thumbnail),
     rust.ThumbnailEventDto_Progress(
       :final int done,
       :final int total,

@@ -75,7 +75,10 @@ pub enum ThumbnailPriorityDto {
 
 #[derive(Debug, Clone)]
 pub enum ThumbnailEventDto {
-    Ready { comic_id: String },
+    Ready {
+        comic_id: String,
+        thumbnail: Option<Vec<u8>>,
+    },
     Progress { done: i32, total: i32, failed: i32 },
 }
 
@@ -89,7 +92,13 @@ fn map_priority(priority: ThumbnailPriorityDto) -> CorePriority {
 
 fn map_event(event: CoreEvent) -> ThumbnailEventDto {
     match event {
-        CoreEvent::Ready { comic_id } => ThumbnailEventDto::Ready { comic_id },
+        CoreEvent::Ready {
+            comic_id,
+            thumbnail,
+        } => ThumbnailEventDto::Ready {
+            comic_id,
+            thumbnail,
+        },
         CoreEvent::Progress {
             done,
             total,

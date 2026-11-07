@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/data/thumbnail_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
@@ -26,7 +28,23 @@ void main() {
     );
 
     expect(mapped, isA<ThumbnailReady>());
-    expect((mapped as ThumbnailReady).comicId, 'comic-1');
+    final ThumbnailReady ready = mapped as ThumbnailReady;
+    expect(ready.comicId, 'comic-1');
+    expect(ready.thumbnail, isNull);
+  });
+
+  test('mapThumbnailEvent maps ready event with embedded thumbnail bytes', () {
+    final ThumbnailEvent mapped = mapThumbnailEvent(
+      rust.ThumbnailEventDto.ready(
+        comicId: 'comic-2',
+        thumbnail: Uint8List.fromList(<int>[1, 2, 3]),
+      ),
+    );
+
+    expect(mapped, isA<ThumbnailReady>());
+    final ThumbnailReady ready = mapped as ThumbnailReady;
+    expect(ready.comicId, 'comic-2');
+    expect(ready.thumbnail, <int>[1, 2, 3]);
   });
 
   test('mapThumbnailEvent maps progress counters', () {

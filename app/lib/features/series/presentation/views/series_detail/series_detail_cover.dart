@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
+import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_renderer.dart';
 import 'package:hentai_library/features/series/di/series_cover_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/thumbnail/series_cover_source.dart';
@@ -46,13 +47,16 @@ class SeriesDetailCover extends ConsumerWidget {
   }
 
   Widget _fallbackComicCover(WidgetRef ref, String coverComicId) {
-    ref
-        .read(comicCoverProvider(coverComicId).notifier)
-        .ensureLoaded(priority: ThumbnailPriority.critical);
+    final ComicCover notifier = ref.read(
+      comicCoverProvider(coverComicId).notifier,
+    );
+    notifier.ensureLoaded(priority: ThumbnailPriority.critical);
     final ComicCoverState state = ref.watch(comicCoverProvider(coverComicId));
-    return _cover(
-      comicCoverSourceOrPrevious(state),
-      ComicCoverPlaceholderKind.loading,
+    return ComicCoverRenderer(
+      state: state,
+      variant: ComicCoverPaintVariant.detail,
+      onDecodeError: notifier.markDecodeError,
+      onRetry: notifier.retryLoad,
     );
   }
 

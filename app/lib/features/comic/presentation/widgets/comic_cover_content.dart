@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
 import 'package:hentai_library/features/comic/di/cover_viewport.dart';
+import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_renderer.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
-import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 根据 [ComicCoverState] 渲染封面区域（卡片宽高比 2:3）。
@@ -57,42 +56,17 @@ class ComicCoverContent extends ConsumerWidget {
     }
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
-    final Widget cover = switch (state) {
-      ComicCoverReady(:final data) => CardLetterboxedCoverImage(
-        cover: data,
-        fit: fit,
-        alignment: alignment,
-        onDecodeError: () {
-          ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
-        },
-      ),
-      ComicCoverLoading(:final previous) when previous != null =>
-        CardLetterboxedCoverImage(
-          cover: previous,
-          fit: fit,
-          alignment: alignment,
-          onDecodeError: () {
-            ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
-          },
-        ),
-      ComicCoverLoading() => const ComicCoverPlaceholder(
-        variant: ComicCoverPlaceholderVariant.card,
-        kind: ComicCoverPlaceholderKind.loading,
-      ),
-      ComicCoverNoCover() => const ComicCoverPlaceholder(
-        variant: ComicCoverPlaceholderVariant.card,
-        kind: ComicCoverPlaceholderKind.noCover,
-      ),
-      ComicCoverError() => const ComicCoverPlaceholder(
-        variant: ComicCoverPlaceholderVariant.card,
-        kind: ComicCoverPlaceholderKind.error,
-      ),
-    };
-
     Widget result = CatalogCoverHero.wrap(
       tag: CatalogCoverHero.comicTag(comicId),
       enabled: enableHero,
-      child: cover,
+      child: ComicCoverRenderer(
+        state: state,
+        variant: ComicCoverPaintVariant.card,
+        fit: fit,
+        alignment: alignment,
+        onDecodeError: notifier.markDecodeError,
+        onRetry: notifier.retryLoad,
+      ),
     );
 
     final int? index = gridIndex;

@@ -6608,7 +6608,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
       case 0:
-        return ThumbnailEventDto_Ready(comicId: dco_decode_String(raw[1]));
+        return ThumbnailEventDto_Ready(
+          comicId: dco_decode_String(raw[1]),
+          thumbnail: dco_decode_opt_list_prim_u_8_strict(raw[2]),
+        );
       case 1:
         return ThumbnailEventDto_Progress(
           done: dco_decode_i_32(raw[1]),
@@ -9008,7 +9011,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     switch (tag_) {
       case 0:
         var var_comicId = sse_decode_String(deserializer);
-        return ThumbnailEventDto_Ready(comicId: var_comicId);
+        var var_thumbnail = sse_decode_opt_list_prim_u_8_strict(deserializer);
+        return ThumbnailEventDto_Ready(
+          comicId: var_comicId,
+          thumbnail: var_thumbnail,
+        );
       case 1:
         var var_done = sse_decode_i_32(deserializer);
         var var_total = sse_decode_i_32(deserializer);
@@ -11194,9 +11201,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
-      case ThumbnailEventDto_Ready(comicId: final comicId):
+      case ThumbnailEventDto_Ready(
+        comicId: final comicId,
+        thumbnail: final thumbnail,
+      ):
         sse_encode_i_32(0, serializer);
         sse_encode_String(comicId, serializer);
+        sse_encode_opt_list_prim_u_8_strict(thumbnail, serializer);
       case ThumbnailEventDto_Progress(
         done: final done,
         total: final total,
