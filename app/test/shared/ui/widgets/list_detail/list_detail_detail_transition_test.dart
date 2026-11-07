@@ -64,6 +64,68 @@ void main() {
       expect(find.text('pane-a'), findsNothing);
     });
 
+    testWidgets('keeps short incoming pane top-aligned during tall→short', (
+      WidgetTester tester,
+    ) async {
+      Object switchKey = 'tall';
+      await pumpApp(
+        tester,
+        home: Scaffold(
+          body: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () => setState(() => switchKey = 'short'),
+                    child: const Text('to-short'),
+                  ),
+                  ListDetailDetailTransition(
+                    switchKey: switchKey,
+                    reverse: true,
+                    child: switchKey == 'tall'
+                        ? const SizedBox(
+                            key: Key('tall-pane'),
+                            height: 240,
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: Text('tall'),
+                            ),
+                          )
+                        : const SizedBox(
+                            key: Key('short-pane'),
+                            height: 80,
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: Text('short'),
+                            ),
+                          ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+
+      final double tallTop = tester.getTopLeft(find.byKey(const Key('tall-pane'))).dy;
+
+      await tester.tap(find.text('to-short'));
+      await tester.pump();
+
+      expect(find.byKey(const Key('short-pane')), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.byKey(const Key('short-pane'))).dy,
+        tallTop,
+      );
+
+      await tester.pumpAndSettle();
+      expect(
+        tester.getTopLeft(find.byKey(const Key('short-pane'))).dy,
+        tallTop,
+      );
+    });
+
     testWidgets('reduce motion skips PageTransitionSwitcher', (
       WidgetTester tester,
     ) async {
