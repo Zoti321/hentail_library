@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
@@ -58,14 +57,10 @@ class _AdaptiveComicCoverState extends State<AdaptiveComicCover> {
     return widget.backgroundColor ?? coverLetterboxColor(context);
   }
 
-  void _onImageSize(Size size) {
+  void _applySoftFit(Size size) {
     if (!mounted) {
       return;
     }
-    if (_imageSize == size) {
-      return;
-    }
-    _imageSize = size;
     final BoxFit next = coverFitForAspects(
       imageAspect: size.width / size.height,
       boxAspect: widget.containerAspectRatio,
@@ -75,35 +70,36 @@ class _AdaptiveComicCoverState extends State<AdaptiveComicCover> {
     }
   }
 
+  void _onImageSize(Size size) {
+    if (!mounted) {
+      return;
+    }
+    if (_imageSize == size) {
+      return;
+    }
+    _imageSize = size;
+    runAfterCoverRouteSettled(context, () => _applySoftFit(size));
+  }
+
   @override
   Widget build(BuildContext context) {
     return _wrapChrome(
       context,
       AspectRatio(
         aspectRatio: widget.containerAspectRatio,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final ImageDecodeCacheSize cacheSize = decodeCacheSizeForContext(
-              context,
-              logicalWidth: constraints.maxWidth,
-              logicalHeight: constraints.maxHeight,
-            );
-            return ColoredBox(
-              color: _resolveBackgroundColor(context),
-              child: AppComicImage(
-                memoryBytes: widget.coverDisplay?.memoryBytes,
-                filePath: widget.coverDisplay?.filePath,
-                fit: _resolvedFit,
-                filterQuality: widget.filterQuality,
-                cacheWidth: cacheSize.cacheWidth,
-                gaplessPlayback: widget.gaplessPlayback,
-                placeholder: widget.placeholder,
-                errorPlaceholder: widget.errorPlaceholder ?? widget.placeholder,
-                onDecodeError: widget.onDecodeError,
-                onImageSize: _onImageSize,
-              ),
-            );
-          },
+        child: ColoredBox(
+          color: _resolveBackgroundColor(context),
+          child: AppComicImage(
+            memoryBytes: widget.coverDisplay?.memoryBytes,
+            filePath: widget.coverDisplay?.filePath,
+            fit: _resolvedFit,
+            filterQuality: widget.filterQuality,
+            gaplessPlayback: widget.gaplessPlayback,
+            placeholder: widget.placeholder,
+            errorPlaceholder: widget.errorPlaceholder ?? widget.placeholder,
+            onDecodeError: widget.onDecodeError,
+            onImageSize: _onImageSize,
+          ),
         ),
       ),
     );

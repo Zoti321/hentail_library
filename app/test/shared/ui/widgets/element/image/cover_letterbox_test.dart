@@ -91,4 +91,21 @@ void main() {
     ).colorScheme;
     expect(resolved, scheme.surfaceContainerHighest);
   });
+
+  testWidgets('coverRouteTransitionActive is false on settled route', (
+    WidgetTester tester,
+  ) async {
+    late bool active;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (BuildContext context) {
+            active = coverRouteTransitionActive(context);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+    expect(active, isFalse);
+  });
 }

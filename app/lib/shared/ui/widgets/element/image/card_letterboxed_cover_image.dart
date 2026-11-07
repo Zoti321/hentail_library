@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/comic_cover_placeholder.dart';
@@ -7,8 +6,8 @@ import 'package:hentai_library/shared/ui/widgets/element/image/cover_letterbox.d
 
 /// Catalog-card cover: MD3 letterbox + soft-crop [BoxFit] after decode.
 ///
-/// Decode uses [cacheWidth] only so intrinsic aspect is preserved until fit
-/// is chosen. Unknown size defaults to [BoxFit.contain].
+/// No [cacheWidth]: library thumbs are already ≤512px; omitting ResizeImage
+/// keeps the same [ImageProvider] while Hero resizes the flight child.
 class CardLetterboxedCoverImage extends StatefulWidget {
   const CardLetterboxedCoverImage({
     super.key,
@@ -16,7 +15,8 @@ class CardLetterboxedCoverImage extends StatefulWidget {
     this.onDecodeError,
     this.fit,
     this.alignment = Alignment.center,
-    this.gaplessPlayback = false,
+    /// Hero / 软裁切切换时保留上一帧，避免飞行中露出 letterbox 纯色。
+    this.gaplessPlayback = true,
   });
 
   final ComicCoverSource cover;
@@ -26,7 +26,6 @@ class CardLetterboxedCoverImage extends StatefulWidget {
   final BoxFit? fit;
   final AlignmentGeometry alignment;
 
-  /// 网格默认 false，降低离屏 cell 对已解码帧的牵制；Hero/详情可开。
   final bool gaplessPlayback;
 
   @override
@@ -50,15 +49,8 @@ class _CardLetterboxedCoverImageState extends State<CardLetterboxedCoverImage> {
     }
   }
 
-  void _onImageSize(Size size, double boxAspect) {
-    if (!mounted) {
-      return;
-    }
-    if (_imageSize == size && widget.fit == null) {
-      return;
-    }
-    _imageSize = size;
-    if (widget.fit != null) {
+  void _applySoftFit(Size size, double boxAspect) {
+    if (!mounted || widget.fit != null) {
       return;
     }
     final BoxFit next = coverFitForAspects(
@@ -70,6 +62,24 @@ class _CardLetterboxedCoverImageState extends State<CardLetterboxedCoverImage> {
     }
   }
 
+  void _onImageSize(Size size, double boxAspect) {
+    if (!mounted) {
+      return;
+    }
+    if (_imageSize == size && widget.fit == null) {
+      return;
+    }
+    _imageSize = size;
+    if (widget.fit != null) {
+      return;
+    }
+    // 路由 / Hero 动画中途改 fit 会触发重绘闪烁；等落地后再软裁切。
+    runAfterCoverRouteSettled(
+      context,
+      () => _applySoftFit(size, boxAspect),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -79,11 +89,6 @@ class _CardLetterboxedCoverImageState extends State<CardLetterboxedCoverImage> {
         final double boxAspect = boxWidth > 0 && boxHeight > 0
             ? boxWidth / boxHeight
             : 0;
-        final ImageDecodeCacheSize cacheSize = decodeCacheSizeForContext(
-          context,
-          logicalWidth: boxWidth,
-          logicalHeight: boxHeight,
-        );
         final BoxFit fit = widget.fit ?? _resolvedFit;
         return ColoredBox(
           color: coverLetterboxColor(context),
@@ -92,7 +97,6 @@ class _CardLetterboxedCoverImageState extends State<CardLetterboxedCoverImage> {
             memoryBytes: widget.cover.memoryBytes,
             fit: fit,
             alignment: widget.alignment,
-            cacheWidth: cacheSize.cacheWidth,
             gaplessPlayback: widget.gaplessPlayback,
             placeholder: const ComicCoverPlaceholder(
               variant: ComicCoverPlaceholderVariant.card,
