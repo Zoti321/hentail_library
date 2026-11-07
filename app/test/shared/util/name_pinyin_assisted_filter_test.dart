@@ -47,4 +47,46 @@ void main() {
       expect(nameMatchesPinyinAssistedFilter('Alpha', '4'), isFalse);
     });
   });
+
+  group('NamePinyinIndex', () {
+    test('matches same results as on-the-fly filter', () async {
+      final List<String> names = <String>[
+        '历史',
+        '中国历史',
+        'Alpha',
+        'CLAMP',
+      ];
+      final NamePinyinIndex index = await buildNamePinyinIndex(names);
+      for (final String name in names) {
+        for (final String query in <String>[
+          '',
+          '   ',
+          'lishi',
+          'ls',
+          '史',
+          'cla',
+          'zzz',
+          'li3shi4',
+          '3',
+        ]) {
+          expect(
+            index.matches(name, query),
+            nameMatchesPinyinAssistedFilter(name, query),
+            reason: 'name=$name query=$query',
+          );
+        }
+      }
+    });
+
+    test('builds large lists via isolate without changing match semantics', () async {
+      final List<String> names = <String>[
+        for (int i = 0; i < kNamePinyinIndexIsolateThreshold; i++) '项$i',
+        '历史',
+      ];
+      final NamePinyinIndex index = await buildNamePinyinIndex(names);
+      expect(index.length, names.length);
+      expect(index.matches('历史', 'lishi'), isTrue);
+      expect(index.matches('历史', 'zzz'), isFalse);
+    });
+  });
 }

@@ -101,11 +101,9 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
         final List<String> all = await ref
             .read(namedFacetManagementRepoProvider)
             .listAll(kind);
+        final NamePinyinIndex index = await buildNamePinyinIndex(all);
         final List<String> filtered = all
-            .where(
-              (String item) =>
-                  nameMatchesPinyinAssistedFilter(item, state.query),
-            )
+            .where((String item) => index.matches(item, state.query))
             .toList();
         state = state.copyWith(
           items: filtered,

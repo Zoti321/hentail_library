@@ -15,7 +15,7 @@ double namedFacetMenuBodyMinHeight(double panelMaxHeight) {
   return math.min(panelMaxHeight, _kNamedFacetMultiSelectMenuEmptyMinHeight);
 }
 
-class _NamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
+class _NamedFacetMultiSelectMenuPanel<T> extends ConsumerStatefulWidget {
   const _NamedFacetMultiSelectMenuPanel({
     super.key,
     required this.width,
@@ -52,17 +52,52 @@ class _NamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
   final String? smartMatchedTooltip;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<T>> asyncItems = ref.watch(itemsProvider);
+  ConsumerState<_NamedFacetMultiSelectMenuPanel<T>> createState() =>
+      _NamedFacetMultiSelectMenuPanelState<T>();
+}
+
+class _NamedFacetMultiSelectMenuPanelState<T>
+    extends ConsumerState<_NamedFacetMultiSelectMenuPanel<T>> {
+  NamePinyinIndex? _pinyinIndex;
+  List<T>? _indexedItems;
+  List<T>? _buildingItems;
+  int _indexBuildGeneration = 0;
+
+  void _schedulePinyinIndexBuild(List<T> items, List<String> names) {
+    if (identical(items, _indexedItems) && _pinyinIndex != null) {
+      return;
+    }
+    if (identical(items, _buildingItems)) {
+      return;
+    }
+    final int generation = ++_indexBuildGeneration;
+    _buildingItems = items;
+    unawaited(
+      buildNamePinyinIndex(names).then((NamePinyinIndex index) {
+        if (!mounted || generation != _indexBuildGeneration) {
+          return;
+        }
+        setState(() {
+          _indexedItems = items;
+          _pinyinIndex = index;
+          _buildingItems = null;
+        });
+      }),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AsyncValue<List<T>> asyncItems = ref.watch(widget.itemsProvider);
     final double panelMaxHeight = namedFacetMenuPanelMaxHeight(context);
     final double bodyMinHeight = namedFacetMenuBodyMinHeight(panelMaxHeight);
     return asyncItems.when(
       loading: () {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          onVisibleRemainingChanged(const <String>[]);
+          widget.onVisibleRemainingChanged(const <String>[]);
         });
         return _NamedFacetMenuShell(
-          width: width,
+          width: widget.width,
           maxHeight: panelMaxHeight,
           minHeight: bodyMinHeight,
           child: SizedBox(
@@ -80,10 +115,10 @@ class _NamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
       },
       error: (Object err, StackTrace? st) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          onVisibleRemainingChanged(const <String>[]);
+          widget.onVisibleRemainingChanged(const <String>[]);
         });
         return _NamedFacetMenuShell(
-          width: width,
+          width: widget.width,
           maxHeight: panelMaxHeight,
           minHeight: bodyMinHeight,
           child: SizedBox(
@@ -98,16 +133,16 @@ class _NamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
-                      copy.listLoadFailed,
+                      widget.copy.listLoadFailed,
                       textAlign: TextAlign.center,
                       style: M3ETheme.of(context).typeScale.bodyMedium
                           .copyWith(fontWeight: FontWeight.w600),
                     ),
                     SizedBox(height: M3ETheme.of(context).spacing.sm),
                     M3EButton(
-                      onPressed: onRetry,
+                      onPressed: widget.onRetry,
                       style: M3EButtonStyle.text,
-                      child: Text(copy.retryLabel),
+                      child: Text(widget.copy.retryLabel),
                     ),
                   ],
                 ),
@@ -117,35 +152,44 @@ class _NamedFacetMultiSelectMenuPanel<T> extends ConsumerWidget {
         );
       },
       data: (List<T> items) {
-        final Set<String> selected = selectedNames.toSet();
+        final List<String> catalogNames = items
+            .map(widget.resolveName)
+            .toList(growable: false);
+        _schedulePinyinIndexBuild(items, catalogNames);
+
+        final Set<String> selected = widget.selectedNames.toSet();
+        final NamePinyinIndex? index = _pinyinIndex;
+        final bool useIndex =
+            index != null && identical(items, _indexedItems);
         final List<T> remaining = items
-            .where((T item) => !selected.contains(resolveName(item)))
-            .where(
-              (T item) => nameMatchesPinyinAssistedFilter(
-                resolveName(item),
-                filterQuery,
-              ),
-            )
+            .where((T item) => !selected.contains(widget.resolveName(item)))
+            .where((T item) {
+              final String name = widget.resolveName(item);
+              if (useIndex) {
+                return index.matches(name, widget.filterQuery);
+              }
+              return nameMatchesPinyinAssistedFilter(name, widget.filterQuery);
+            })
             .toList();
         final List<String> remainingNames = remaining
-            .map(resolveName)
+            .map(widget.resolveName)
             .toList(growable: false);
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          onVisibleRemainingChanged(remainingNames);
+          widget.onVisibleRemainingChanged(remainingNames);
         });
         return _NamedFacetMenuList<T>(
-          width: width,
+          width: widget.width,
           items: remaining,
           allCatalogEmpty: items.isEmpty,
-          scrollController: scrollController,
-          highlightedIndexListenable: highlightedIndexListenable,
-          highlightedRowKey: highlightedRowKey,
-          onHighlightIndex: onHighlightIndex,
-          onAdd: onAdd,
-          resolveName: resolveName,
-          resolveSmartMatched: resolveSmartMatched,
-          smartMatchedTooltip: smartMatchedTooltip,
-          copy: copy,
+          scrollController: widget.scrollController,
+          highlightedIndexListenable: widget.highlightedIndexListenable,
+          highlightedRowKey: widget.highlightedRowKey,
+          onHighlightIndex: widget.onHighlightIndex,
+          onAdd: widget.onAdd,
+          resolveName: widget.resolveName,
+          resolveSmartMatched: widget.resolveSmartMatched,
+          smartMatchedTooltip: widget.smartMatchedTooltip,
+          copy: widget.copy,
         );
       },
     );
