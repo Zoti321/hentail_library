@@ -46,7 +46,8 @@ import 'package:hentai_library/features/library_browse/presentation/integrations
 
 /// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 网格 + 分页。
 ///
-/// 数据来自库目录控制器（真实 provider）。筛选排序面板为 [LibraryFilterSortSheet]。
+/// 根节点只保留 Facade 滚动监听、选择态布尔与本地 viewMode；
+/// 页头 / 工具栏 / 目录+分页各自下沉为独立 Consumer，避免勾选与阅读进度带动整页重建。
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
 
@@ -75,26 +76,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
   }
 
-  void _openFilterSortSheet() {
-    LibraryFilterSortSheet.show(context);
-  }
-
-  void _openComicDetail(String comicId) {
-    ref.read(comicDetailReturnSeriesProvider.notifier).clear();
-    ref
-        .read(appRouterProvider)
-        .pushNamed(
-          ContentBreadcrumbLabels.comicDetail,
-          pathParameters: <String, String>{'id': comicId},
-        );
-  }
-
-  void _openSeriesDetail(String seriesId) {
-    ref
-        .read(appRouterProvider)
-        .push('/series/${Uri.encodeComponent(seriesId)}');
-  }
-
   @override
   Widget build(BuildContext context) {
     // 保持非当前 Tab 的目录预热（与 Baseline 库页一致）。
@@ -112,73 +93,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       _scrollToContentTop();
     });
 
-    final LibraryPageFacadeState facade = ref.watch(libraryPageFacadeProvider);
-    final LibraryPageFacadeNotifier facadeNotifier = ref.read(
-      libraryPageFacadeProvider.notifier,
-    );
-    final LibraryComicsCatalogState? comicsCatalog = stableCatalogSnapshot(
-      ref.watch(libraryComicsCatalogControllerProvider),
-    );
-    final LibrarySeriesCatalogState? seriesCatalog = stableCatalogSnapshot(
-      ref.watch(librarySeriesCatalogControllerProvider),
-    );
-    final String? browseLibraryId = ref.watch(browseLibraryIdProvider);
-    final LibrariesState? librariesState = ref
-        .watch(librariesStateProvider)
-        .asData
-        ?.value;
-    final LocalLibrary? browseLibrary = browseLibraryId == null
-        ? null
-        : librariesState?.findById(browseLibraryId);
-    final String? libraryName = browseLibrary == null
-        ? null
-        : localLibraryDisplayName(browseLibrary);
-    final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
-    final bool scanning = ref.watch(
-      libraryScanActivityStateProvider.select(
-        (LibraryScanActivityState state) => state.running,
+    final bool librarySelection = ref.watch(
+      catalogSelectionProvider.select(
+        (CatalogSelectionState state) => state.isLibraryBrowseSelection,
       ),
     );
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
     final WindowSizeClass sizeClass = layout.sizeClass;
     final double horizontal = layout.horizontalInset;
-    final LibraryDisplayTarget target = facade.displayTarget;
-    final LibraryPagination? pagination = switch (target) {
-      LibraryDisplayTarget.comics => comicsCatalog?.pagination,
-      LibraryDisplayTarget.series => seriesCatalog?.pagination,
-    };
-
-    final bool librarySelection = selection.isLibraryBrowseSelection;
-    final Widget modeHeader = librarySelection
-        ? LibrarySelectionHeader(
-            pageComicIds: <String>[
-              for (final Comic comic in comicsCatalog?.items ?? const <Comic>[])
-                comic.comicId,
-            ],
-          )
-        : LibraryPageHeader(
-            title: libraryName,
-            filterSortActive: facade.isFilterSortCustomized,
-            pageSize: target == LibraryDisplayTarget.comics
-                ? facade.comicsPageSize
-                : facade.seriesPageSize,
-            onPageSizeChanged: (int size) {
-              facadeNotifier.setPageSize(size);
-            },
-            onFilterSort: _openFilterSortSheet,
-            overflowMenuEntries: buildLibraryOverflowEntries(
-              context: context,
-              ref: ref,
-              scanning: scanning,
-              showSelectionEntry: target == LibraryDisplayTarget.comics,
-            ),
-          );
-
-    final Widget header = ModeChromeTransition(
-      switchKey: librarySelection,
-      reverse: !librarySelection,
-      child: modeHeader,
-    );
 
     return PopScope(
       canPop: !librarySelection,
@@ -197,7 +119,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               slivers: <Widget>[
                 SliverPersistentHeader(
                   pinned: true,
-                  delegate: PageHeaderDelegate(layout: layout, child: header),
+                  delegate: PageHeaderDelegate(
+                    layout: layout,
+                    child: const _LibraryModeHeader(),
+                  ),
                 ),
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(
@@ -206,14 +131,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     horizontal,
                     0,
                   ),
-                  sliver: SliverToBoxAdapter(
-                    child: LibraryCatalogToolbar(
-                      displayTarget: target,
-                      comicCount: comicsCatalog?.pagination.totalCount ?? 0,
-                      seriesCount: seriesCatalog?.pagination.totalCount ?? 0,
-                      onDisplayTargetChanged:
-                          facadeNotifier.selectDisplayTarget,
-                    ),
+                  sliver: const SliverToBoxAdapter(
+                    child: _LibraryCatalogToolbarSlot(),
                   ),
                 ),
                 SliverPadding(
@@ -237,34 +156,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     ),
                   ),
                 ),
-                ..._buildCatalog(
-                  context,
-                  target: target,
-                  horizontal: horizontal,
-                  comicsCatalog: comicsCatalog,
-                  seriesCatalog: seriesCatalog,
-                  selection: selection,
-                  viewMode: _viewMode,
-                ),
-                if (pagination != null && pagination.totalPages > 1)
-                  SliverPadding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontal,
-                      Spacing.space16,
-                      horizontal,
-                      LibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
-                    ),
-                    sliver: SliverToBoxAdapter(
-                      child: Pagination(
-                        page: pagination.page,
-                        totalPages: pagination.totalPages,
-                        totalItems: pagination.totalCount,
-                        onPageChanged: (int page) {
-                          facadeNotifier.setPage(target, page);
-                        },
-                      ),
-                    ),
-                  ),
+                _LibraryCatalogRegion(viewMode: _viewMode),
               ],
             ),
             ExpressiveLibraryScrollToTopButton(
@@ -275,6 +167,200 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         ),
       ),
     );
+  }
+}
+
+/// 页头：选择态 / 库名 / 筛选旗标；不订阅阅读进度与网格内容。
+class _LibraryModeHeader extends ConsumerWidget {
+  const _LibraryModeHeader();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool librarySelection = ref.watch(
+      catalogSelectionProvider.select(
+        (CatalogSelectionState state) => state.isLibraryBrowseSelection,
+      ),
+    );
+
+    final Widget modeHeader = librarySelection
+        ? LibrarySelectionHeader(
+            pageComicIds: ref.watch(
+              libraryComicsCatalogControllerProvider.select(
+                (AsyncValue<LibraryComicsCatalogState> async) {
+                  final LibraryComicsCatalogState? catalog =
+                      stableCatalogSnapshot(async);
+                  return <String>[
+                    for (final Comic comic
+                        in catalog?.items ?? const <Comic>[])
+                      comic.comicId,
+                  ];
+                },
+              ),
+            ),
+          )
+        : const _LibraryBrowsePageHeader();
+
+    return ModeChromeTransition(
+      switchKey: librarySelection,
+      reverse: !librarySelection,
+      child: modeHeader,
+    );
+  }
+}
+
+class _LibraryBrowsePageHeader extends ConsumerWidget {
+  const _LibraryBrowsePageHeader();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryPageFacadeState facade = ref.watch(libraryPageFacadeProvider);
+    final LibraryPageFacadeNotifier facadeNotifier = ref.read(
+      libraryPageFacadeProvider.notifier,
+    );
+    final String? browseLibraryId = ref.watch(browseLibraryIdProvider);
+    final String? libraryName = ref.watch(
+      librariesStateProvider.select((AsyncValue<LibrariesState> async) {
+        if (browseLibraryId == null) {
+          return null;
+        }
+        final LibrariesState? state = async.asData?.value;
+        final LocalLibrary? library = state?.findById(browseLibraryId);
+        return library == null ? null : localLibraryDisplayName(library);
+      }),
+    );
+    final bool scanning = ref.watch(
+      libraryScanActivityStateProvider.select(
+        (LibraryScanActivityState state) => state.running,
+      ),
+    );
+    final LibraryDisplayTarget target = facade.displayTarget;
+
+    return LibraryPageHeader(
+      title: libraryName,
+      filterSortActive: facade.isFilterSortCustomized,
+      pageSize: target == LibraryDisplayTarget.comics
+          ? facade.comicsPageSize
+          : facade.seriesPageSize,
+      onPageSizeChanged: facadeNotifier.setPageSize,
+      onFilterSort: () => LibraryFilterSortSheet.show(context),
+      overflowMenuEntries: buildLibraryOverflowEntries(
+        context: context,
+        ref: ref,
+        scanning: scanning,
+        showSelectionEntry: target == LibraryDisplayTarget.comics,
+      ),
+    );
+  }
+}
+
+/// 工具栏：只订阅 Tab 目标与两套目录的 totalCount。
+class _LibraryCatalogToolbarSlot extends ConsumerWidget {
+  const _LibraryCatalogToolbarSlot();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget target = ref.watch(
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
+    );
+    final int comicCount = ref.watch(libraryDisplayedComicCountProvider);
+    final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
+
+    return LibraryCatalogToolbar(
+      displayTarget: target,
+      comicCount: comicCount,
+      seriesCount: seriesCount,
+      onDisplayTargetChanged: ref
+          .read(libraryPageFacadeProvider.notifier)
+          .selectDisplayTarget,
+    );
+  }
+}
+
+/// 目录网格/列表 + 分页：订阅 catalog / selection / 阅读进度。
+class _LibraryCatalogRegion extends ConsumerWidget {
+  const _LibraryCatalogRegion({required this.viewMode});
+
+  final CatalogViewMode viewMode;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget target = ref.watch(
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
+    );
+    final LibraryComicsCatalogState? comicsCatalog = stableCatalogSnapshot(
+      ref.watch(libraryComicsCatalogControllerProvider),
+    );
+    final LibrarySeriesCatalogState? seriesCatalog = stableCatalogSnapshot(
+      ref.watch(librarySeriesCatalogControllerProvider),
+    );
+    final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
+    // 无条件订阅，避免 comics/series 分支切换时变更 watch 集合。
+    final Map<String, int> readPages =
+        ref.watch(comicReadPageIndexByIdProvider).value ??
+        const <String, int>{};
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
+    final double horizontal = layout.horizontalInset;
+    final LibraryPagination? pagination = switch (target) {
+      LibraryDisplayTarget.comics => comicsCatalog?.pagination,
+      LibraryDisplayTarget.series => seriesCatalog?.pagination,
+    };
+
+    return SliverMainAxisGroup(
+      slivers: <Widget>[
+        ..._buildCatalog(
+          context,
+          ref,
+          target: target,
+          horizontal: horizontal,
+          comicsCatalog: comicsCatalog,
+          seriesCatalog: seriesCatalog,
+          selection: selection,
+          viewMode: viewMode,
+          readPages: readPages,
+        ),
+        if (pagination != null && pagination.totalPages > 1)
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              horizontal,
+              Spacing.space16,
+              horizontal,
+              LibraryBrowsePageMetrics.scrollBottomInset(layout.sizeClass),
+            ),
+            sliver: SliverToBoxAdapter(
+              child: Pagination(
+                page: pagination.page,
+                totalPages: pagination.totalPages,
+                totalItems: pagination.totalCount,
+                onPageChanged: (int page) {
+                  ref
+                      .read(libraryPageFacadeProvider.notifier)
+                      .setPage(target, page);
+                },
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _openComicDetail(WidgetRef ref, String comicId) {
+    ref.read(comicDetailReturnSeriesProvider.notifier).clear();
+    ref
+        .read(appRouterProvider)
+        .pushNamed(
+          ContentBreadcrumbLabels.comicDetail,
+          pathParameters: <String, String>{'id': comicId},
+        );
+  }
+
+  void _openSeriesDetail(WidgetRef ref, String seriesId) {
+    ref
+        .read(appRouterProvider)
+        .push('/series/${Uri.encodeComponent(seriesId)}');
   }
 
   /// 列表模式：列数由窗口尺寸与平台决定（见 [comicListColumnCount]），与 Widgetbook Lab 一致。
@@ -335,13 +421,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   List<Widget> _buildCatalog(
-    BuildContext context, {
+    BuildContext context,
+    WidgetRef ref, {
     required LibraryDisplayTarget target,
     required double horizontal,
     required CatalogViewMode viewMode,
     required LibraryComicsCatalogState? comicsCatalog,
     required LibrarySeriesCatalogState? seriesCatalog,
     required CatalogSelectionState selection,
+    required Map<String, int> readPages,
   }) {
     final AppLocalizations l10n = context.l10n;
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
@@ -363,9 +451,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           ];
         }
         final List<Comic> comics = comicsCatalog.items;
-        final Map<String, int> readPages =
-            ref.watch(comicReadPageIndexByIdProvider).value ??
-            const <String, int>{};
         if (viewMode == CatalogViewMode.list) {
           return <Widget>[
             _buildCatalogListSliver(
@@ -391,7 +476,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     ),
                     selectionMode: librarySelection,
                     selected: selection.selectedIds.contains(comic.comicId),
-                    onTap: () => _openComicDetail(comic.comicId),
+                    onTap: () => _openComicDetail(ref, comic.comicId),
                     onSelectionChanged: (_) => ref
                         .read(catalogSelectionProvider.notifier)
                         .toggle(comic.comicId),
@@ -431,7 +516,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     ),
                     selectionMode: librarySelection,
                     selected: selection.selectedIds.contains(comic.comicId),
-                    onTap: () => _openComicDetail(comic.comicId),
+                    onTap: () => _openComicDetail(ref, comic.comicId),
                     onSelectionChanged: (_) => ref
                         .read(catalogSelectionProvider.notifier)
                         .toggle(comic.comicId),
@@ -475,7 +560,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     gridIndex: index,
                     coverViewportScope: CoverViewportScopes.library,
                   ),
-                  onTap: () => _openSeriesDetail(s.id),
+                  onTap: () => _openSeriesDetail(ref, s.id),
                 );
               },
             ),
@@ -503,7 +588,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     gridIndex: index,
                     coverViewportScope: CoverViewportScopes.library,
                   ),
-                  onTap: () => _openSeriesDetail(s.id),
+                  onTap: () => _openSeriesDetail(ref, s.id),
                 );
               },
             ),

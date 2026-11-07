@@ -138,8 +138,12 @@ class _SeriesDetailPageState extends ConsumerState<SeriesDetailLayout> {
     final double horizontalPadding = layout.horizontalInset;
     final double introTop = layout.headerToBodyGap;
 
-    final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
-    final bool seriesSelection = selection.isSeriesDetailSelection;
+    // 只订阅选择模式布尔，避免勾选 selectedIds 重建简介与整页壳。
+    final bool seriesSelection = ref.watch(
+      catalogSelectionProvider.select(
+        (CatalogSelectionState state) => state.isSeriesDetailSelection,
+      ),
+    );
     final List<String> pageComicIds = <String>[
       for (final SeriesDetailComicItem item in widget.entry.comics)
         if (item.comic != null) item.comic!.comicId,

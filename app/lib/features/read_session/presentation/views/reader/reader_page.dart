@@ -190,25 +190,6 @@ class ReaderPage extends HookConsumerWidget {
       return null;
     }, <Object?>[seriesBoundaryPrompt, context]);
 
-    final ({
-      bool showControls,
-      int currentIndex,
-      ReadingMode readingMode,
-      bool autoPlayEnabled,
-    })
-    chrome = ref.watch(
-      readerControllerProvider(viewKey)
-          .select((AsyncValue<ReaderState> asyncState) {
-            final ReaderState? state = asyncState.asData?.value;
-            return (
-              showControls: state?.showControls ?? false,
-              currentIndex: state?.currentIndex ?? 1,
-              readingMode: state?.readingMode ?? ReadingMode.paged,
-              autoPlayEnabled: state?.autoPlayEnabled ?? false,
-            );
-          }),
-    );
-
     Future<void> exitReader() => controller.executeExitReader(
       context: context,
       routeContext: routeContext,
@@ -249,101 +230,149 @@ class ReaderPage extends HookConsumerWidget {
                   );
                 },
               ),
-              data: (ReaderPageShellData shell) {
-                if (shell.totalPages == 0) {
-                  return Center(child: Text(context.l10n.readerNoImages));
-                }
-                final ReaderNavContextData? seriesNavContext =
-                    shell.sessionContext.hasSeriesContext
-                    ? shell.sessionContext.navContext
-                    : null;
-
-                Future<void> requestNextPage() => controller.requestNextPage(
-                  navContext: seriesNavContext,
-                  session: routeContext.session,
-                  router: GoRouter.of(context),
-                );
-                Future<void> requestPrevPage() => controller.requestPrevPage(
-                  navContext: seriesNavContext,
-                  session: routeContext.session,
-                  router: GoRouter.of(context),
-                );
-
-                final bool supportsAutoPlay =
-                    chrome.readingMode.supportsAutoPlay;
-                final String? seriesId = shell.sessionContext.seriesId;
-                final bool isSeriesRead =
-                    seriesId != null && seriesId.trim().isNotEmpty;
-
-                return Stack(
-                  fit: StackFit.expand,
-                  children: <Widget>[
-                    ReaderLayout(
-                      title: shell.comic.title,
-                      currentPage: chrome.currentIndex,
-                      totalPages: shell.totalPages,
-                      chromeVisible: chrome.showControls,
-                      isFullscreen: readerFullscreen,
-                      autoPlayEnabled:
-                          supportsAutoPlay && chrome.autoPlayEnabled,
-                      viewportStatus: ReaderViewportStatus.ready,
-                      onBack: () {
-                        unawaited(exitReader());
-                      },
-                      onToggleFullscreen: () {
-                        unawaited(controller.toggleFullscreen());
-                      },
-                      onPageChanged: controller.setIndex,
-                      onPreviousPage: () {
-                        unawaited(requestPrevPage());
-                      },
-                      onNextPage: () {
-                        unawaited(requestNextPage());
-                      },
-                      onToggleChromeFromKeyboard: controller.toggleShowControls,
-                      onAutoPlayChanged: supportsAutoPlay
-                          ? controller.setAutoPlayEnabled
-                          : null,
-                      onOpenSettings: () {
-                        unawaited(ReaderSettingsSheet.show(context));
-                      },
-                      onOpenSeriesCatalog: seriesNavContext == null
-                          ? null
-                          : () => _openSeriesCatalog(
-                              context,
-                              ref,
-                              routeContext: routeContext,
-                              navContext: seriesNavContext,
-                            ),
-                      moreMenuEntries: _buildMoreMenuEntries(
-                        context,
-                        ref,
-                        viewKey: viewKey,
-                        seriesId: isSeriesRead ? seriesId : null,
-                      ),
-                      contentBuilder: (FocusNode focusNode) =>
-                          _ReaderPageContent(
-                            viewKey: viewKey,
-                            routeContext: routeContext,
-                            focusNode: focusNode,
-                            initialPage: frozenInitialPage.value ?? 0,
-                            preferredPageIndex:
-                                shell.sessionContext.preferredPageIndex,
-                            seriesNavContext: seriesNavContext,
-                          ),
-                    ),
-                    ReaderAutoPlayBinder(
-                      viewKey: viewKey,
-                      routeContext: routeContext,
-                      seriesNavContext: seriesNavContext,
-                    ),
-                  ],
-                );
-              },
+              // 翻页 chrome 下沉到 [_ReaderReadyBody]，避免根节点订阅 currentIndex。
+              data: (ReaderPageShellData shell) => _ReaderReadyBody(
+                viewKey: viewKey,
+                routeContext: routeContext,
+                shell: shell,
+                readerFullscreen: readerFullscreen,
+                initialPage: frozenInitialPage.value ?? 0,
+                onExit: exitReader,
+              ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// 就绪态阅读壳：仅此处订阅翻页 / chrome，父级 [ReaderPage] 只 watch Facade。
+class _ReaderReadyBody extends ConsumerWidget {
+  const _ReaderReadyBody({
+    required this.viewKey,
+    required this.routeContext,
+    required this.shell,
+    required this.readerFullscreen,
+    required this.initialPage,
+    required this.onExit,
+  });
+
+  final ReaderControllerKey viewKey;
+  final ReaderRouteContext routeContext;
+  final ReaderPageShellData shell;
+  final bool readerFullscreen;
+  final int initialPage;
+  final Future<void> Function() onExit;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (shell.totalPages == 0) {
+      return Center(child: Text(context.l10n.readerNoImages));
+    }
+
+    final ({
+      bool showControls,
+      int currentIndex,
+      ReadingMode readingMode,
+      bool autoPlayEnabled,
+    })
+    chrome = ref.watch(
+      readerControllerProvider(viewKey)
+          .select((AsyncValue<ReaderState> asyncState) {
+            final ReaderState? state = asyncState.asData?.value;
+            return (
+              showControls: state?.showControls ?? false,
+              currentIndex: state?.currentIndex ?? 1,
+              readingMode: state?.readingMode ?? ReadingMode.paged,
+              autoPlayEnabled: state?.autoPlayEnabled ?? false,
+            );
+          }),
+    );
+
+    final ReaderController controller = ref.read(
+      readerControllerProvider(viewKey).notifier,
+    );
+    final ReaderNavContextData? seriesNavContext =
+        shell.sessionContext.hasSeriesContext
+        ? shell.sessionContext.navContext
+        : null;
+
+    Future<void> requestNextPage() => controller.requestNextPage(
+      navContext: seriesNavContext,
+      session: routeContext.session,
+      router: GoRouter.of(context),
+    );
+    Future<void> requestPrevPage() => controller.requestPrevPage(
+      navContext: seriesNavContext,
+      session: routeContext.session,
+      router: GoRouter.of(context),
+    );
+
+    final bool supportsAutoPlay = chrome.readingMode.supportsAutoPlay;
+    final String? seriesId = shell.sessionContext.seriesId;
+    final bool isSeriesRead = seriesId != null && seriesId.trim().isNotEmpty;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        ReaderLayout(
+          title: shell.comic.title,
+          currentPage: chrome.currentIndex,
+          totalPages: shell.totalPages,
+          chromeVisible: chrome.showControls,
+          isFullscreen: readerFullscreen,
+          autoPlayEnabled: supportsAutoPlay && chrome.autoPlayEnabled,
+          viewportStatus: ReaderViewportStatus.ready,
+          onBack: () {
+            unawaited(onExit());
+          },
+          onToggleFullscreen: () {
+            unawaited(controller.toggleFullscreen());
+          },
+          onPageChanged: controller.setIndex,
+          onPreviousPage: () {
+            unawaited(requestPrevPage());
+          },
+          onNextPage: () {
+            unawaited(requestNextPage());
+          },
+          onToggleChromeFromKeyboard: controller.toggleShowControls,
+          onAutoPlayChanged: supportsAutoPlay
+              ? controller.setAutoPlayEnabled
+              : null,
+          onOpenSettings: () {
+            unawaited(ReaderSettingsSheet.show(context));
+          },
+          onOpenSeriesCatalog: seriesNavContext == null
+              ? null
+              : () => _openSeriesCatalog(
+                  context,
+                  ref,
+                  routeContext: routeContext,
+                  navContext: seriesNavContext,
+                ),
+          moreMenuEntries: _buildMoreMenuEntries(
+            context,
+            ref,
+            viewKey: viewKey,
+            seriesId: isSeriesRead ? seriesId : null,
+          ),
+          contentBuilder: (FocusNode focusNode) => _ReaderPageContent(
+            viewKey: viewKey,
+            routeContext: routeContext,
+            focusNode: focusNode,
+            initialPage: initialPage,
+            preferredPageIndex: shell.sessionContext.preferredPageIndex,
+            seriesNavContext: seriesNavContext,
+          ),
+        ),
+        ReaderAutoPlayBinder(
+          viewKey: viewKey,
+          routeContext: routeContext,
+          seriesNavContext: seriesNavContext,
+        ),
+      ],
     );
   }
 }

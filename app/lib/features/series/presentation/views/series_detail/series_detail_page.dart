@@ -92,11 +92,38 @@ class _SeriesDetailContentState extends ConsumerState<_SeriesDetailContent> {
 
   @override
   Widget build(BuildContext context) {
-    final Series series = widget.series;
-    final String seriesId = series.id;
+    return _SeriesDetailLoaded(series: widget.series);
+  }
+}
+
+/// 订阅系列元数据；目录分页下沉到 [_SeriesDetailCatalogLayout]。
+class _SeriesDetailLoaded extends ConsumerWidget {
+  const _SeriesDetailLoaded({required this.series});
+
+  final Series series;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final SeriesComicsMetadata? metadata = ref
-        .watch(seriesComicsMetadataProvider(seriesId))
+        .watch(seriesComicsMetadataProvider(series.id))
         .value;
+    return _SeriesDetailCatalogLayout(series: series, metadata: metadata);
+  }
+}
+
+/// 只订阅目录与页大小，组装 [SeriesDetailLayout]。
+class _SeriesDetailCatalogLayout extends ConsumerWidget {
+  const _SeriesDetailCatalogLayout({
+    required this.series,
+    required this.metadata,
+  });
+
+  final Series series;
+  final SeriesComicsMetadata? metadata;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final String seriesId = series.id;
     final SeriesDetailComicsCatalogState? catalog = ref
         .watch(seriesDetailComicsCatalogControllerProvider(seriesId))
         .value;
@@ -137,7 +164,7 @@ class _SeriesDetailContentState extends ConsumerState<_SeriesDetailContent> {
         M3EMenuEntry(
           label: l10n.refreshMetadata,
           leading: const Icon(LucideIcons.refreshCw),
-          onPressed: () => _refreshMetadata(context),
+          onPressed: () => _refreshMetadata(context, ref, series),
         ),
         M3EMenuEntry(
           label: l10n.catalogSelectionEnter,
@@ -171,42 +198,48 @@ class _SeriesDetailContentState extends ConsumerState<_SeriesDetailContent> {
       },
     );
   }
+}
 
-  Future<void> _refreshMetadata(BuildContext context) async {
-    try {
-      final MetadataRefreshBatchResult result = await ref
-          .read(libraryMetadataRefreshCommandPortProvider)
-          .refreshSeries(seriesId: widget.series.id, name: widget.series.name);
-      if (!context.mounted) {
-        return;
-      }
-      showMetadataRefreshBatchToast(context, result);
-    } catch (err) {
-      if (context.mounted) {
-        showErrorSnackbar(context, err);
-      }
+Future<void> _refreshMetadata(
+  BuildContext context,
+  WidgetRef ref,
+  Series series,
+) async {
+  try {
+    final MetadataRefreshBatchResult result = await ref
+        .read(libraryMetadataRefreshCommandPortProvider)
+        .refreshSeries(seriesId: series.id, name: series.name);
+    if (!context.mounted) {
+      return;
+    }
+    showMetadataRefreshBatchToast(context, result);
+  } catch (err) {
+    if (context.mounted) {
+      showErrorSnackbar(context, err);
     }
   }
+}
 
-  void _showInExplorer(BuildContext context, Series series) {
-    final AppLocalizations l10n = context.l10n;
-    showInFileExplorer(series.folderPath)
-        .catchError((Object error, StackTrace stackTrace) {
-          if (!context.mounted) {
-            return;
-          }
-          if (error is AppException) {
-            showErrorSnackbar(context, error);
-            return;
-          }
-          showErrorSnackbar(
-            context,
-            AppException(
-              l10n.comicDetailShowInExplorerFailed,
-              cause: error,
-              stackTrace: stackTrace,
-            ),
-          );
-        });
-  }
+void _showInExplorer(BuildContext context, Series series) {
+  final AppLocalizations l10n = context.l10n;
+  showInFileExplorer(series.folderPath).catchError((
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    if (!context.mounted) {
+      return;
+    }
+    if (error is AppException) {
+      showErrorSnackbar(context, error);
+      return;
+    }
+    showErrorSnackbar(
+      context,
+      AppException(
+        l10n.comicDetailShowInExplorerFailed,
+        cause: error,
+        stackTrace: stackTrace,
+      ),
+    );
+  });
 }

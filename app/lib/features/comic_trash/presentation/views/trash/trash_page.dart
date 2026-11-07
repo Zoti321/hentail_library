@@ -21,17 +21,15 @@ import 'package:material_symbols_icons/symbols.dart';
 const double _kTrashLoadMoreThreshold = 400;
 
 /// 「已删除」页（MD3E 生产版）：跨全部 Library 的 Comic trash，可恢复或永久删除。
+///
+/// 页头与列表各自细粒度 select，避免勾选或 `isLoadingMore` 带动整页重建。
 class TrashPage extends ConsumerWidget {
   const TrashPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final PageLayoutSpec layout = PageLayoutSpec.of(context);
-    final double horizontal = layout.horizontalInset;
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final AsyncValue<TrashPageState> async = ref.watch(
-      trashPageControllerProvider,
-    );
 
     return ColoredBox(
       color: labBrowseCanvasColor(scheme),
@@ -58,7 +56,7 @@ class TrashPage extends ConsumerWidget {
                 ),
               ),
             ),
-            ..._trashBodySlivers(context, ref, layout, horizontal, async),
+            const _TrashBody(),
           ],
         ),
       ),
@@ -66,25 +64,63 @@ class TrashPage extends ConsumerWidget {
   }
 }
 
-List<Widget> _trashBodySlivers(
-  BuildContext context,
-  WidgetRef ref,
-  PageLayoutSpec layout,
-  double horizontal,
-  AsyncValue<TrashPageState> async,
-) {
-  final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-  final AppLocalizations l10n = context.l10n;
-  final EdgeInsets padding = EdgeInsets.fromLTRB(
-    horizontal,
-    layout.headerToBodyGap,
-    horizontal,
-    layout.bodyBottomInset,
-  );
+/// 列表区：loading / error / empty / 列表字段各自 select。
+class _TrashBody extends ConsumerWidget {
+  const _TrashBody();
 
-  return async.when(
-    loading: () => <Widget>[
-      SliverPadding(
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
+    final double horizontal = layout.horizontalInset;
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
+    final EdgeInsets padding = EdgeInsets.fromLTRB(
+      horizontal,
+      layout.headerToBodyGap,
+      horizontal,
+      layout.bodyBottomInset,
+    );
+
+    // 无条件订阅，避免 loading/error/data 分支切换时变更 watch 集合。
+    final bool initialLoading = ref.watch(
+      trashPageControllerProvider.select(
+        (AsyncValue<TrashPageState> async) =>
+            async.isLoading && !async.hasValue,
+      ),
+    );
+    final Object? loadError = ref.watch(
+      trashPageControllerProvider.select(
+        (AsyncValue<TrashPageState> async) =>
+            async.hasError ? async.error : null,
+      ),
+    );
+    final List<TrashedComic> items = ref.watch(
+      trashPageControllerProvider.select(
+        (AsyncValue<TrashPageState> async) =>
+            async.asData?.value.items ?? const <TrashedComic>[],
+      ),
+    );
+    final int totalCount = ref.watch(
+      trashPageControllerProvider.select(
+        (AsyncValue<TrashPageState> async) =>
+            async.asData?.value.totalCount ?? 0,
+      ),
+    );
+    final Set<String> selectedIds = ref.watch(
+      trashPageControllerProvider.select(
+        (AsyncValue<TrashPageState> async) =>
+            async.asData?.value.selectedIds ?? const <String>{},
+      ),
+    );
+    final bool isLoadingMore = ref.watch(
+      trashPageControllerProvider.select(
+        (AsyncValue<TrashPageState> async) =>
+            async.asData?.value.isLoadingMore ?? false,
+      ),
+    );
+
+    if (initialLoading) {
+      return SliverPadding(
         padding: padding,
         sliver: SliverToBoxAdapter(
           child: Padding(
@@ -92,10 +128,11 @@ List<Widget> _trashBodySlivers(
             child: const Center(child: CircularProgressIndicator()),
           ),
         ),
-      ),
-    ],
-    error: (Object _, StackTrace _) => <Widget>[
-      SliverPadding(
+      );
+    }
+
+    if (loadError != null) {
+      return SliverPadding(
         padding: padding,
         sliver: SliverToBoxAdapter(
           child: Padding(
@@ -108,61 +145,59 @@ List<Widget> _trashBodySlivers(
             ),
           ),
         ),
-      ),
-    ],
-    data: (TrashPageState state) {
-      if (state.isEmpty) {
-        return <Widget>[
-          SliverPadding(
-            padding: padding,
-            sliver: SliverToBoxAdapter(child: _TrashEmptyState(scheme: scheme)),
-          ),
-        ];
-      }
-      final TrashPageController controller = ref.read(
-        trashPageControllerProvider.notifier,
       );
-      return <Widget>[
-        SliverPadding(
-          padding: padding,
-          sliver: SliverMainAxisGroup(
-            slivers: <Widget>[
-              SliverToBoxAdapter(
-                child: Text(
-                  l10n.trashPageSummary(state.totalCount),
-                  style: Theme.of(context).textTheme.bodySmall
-                      ?.copyWith(color: scheme.onSurfaceVariant),
-                ),
+    }
+
+    if (items.isEmpty) {
+      return SliverPadding(
+        padding: padding,
+        sliver: SliverToBoxAdapter(child: _TrashEmptyState(scheme: scheme)),
+      );
+    }
+
+    final TrashPageController controller = ref.read(
+      trashPageControllerProvider.notifier,
+    );
+
+    return SliverPadding(
+      padding: padding,
+      sliver: SliverMainAxisGroup(
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: Text(
+              l10n.trashPageSummary(totalCount),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: scheme.onSurfaceVariant,
               ),
-              SliverToBoxAdapter(child: SizedBox(height: layout.listItemGap)),
-              TrashListSliver(
-                itemCount: state.items.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final TrashedComic item = state.items[index];
-                  return TrashListItem(
-                    key: ValueKey<String>(item.comic.comicId),
-                    item: item,
-                    selected: state.selectedIds.contains(item.comic.comicId),
-                    onToggleSelected: () =>
-                        controller.toggleSelected(item.comic.comicId),
-                  );
-                },
-              ),
-              if (state.isLoadingMore)
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                ),
-            ],
+            ),
           ),
-        ),
-      ];
-    },
-  );
+          SliverToBoxAdapter(child: SizedBox(height: layout.listItemGap)),
+          TrashListSliver(
+            itemCount: items.length,
+            itemBuilder: (BuildContext context, int index) {
+              final TrashedComic item = items[index];
+              return TrashListItem(
+                key: ValueKey<String>(item.comic.comicId),
+                item: item,
+                selected: selectedIds.contains(item.comic.comicId),
+                onToggleSelected: () =>
+                    controller.toggleSelected(item.comic.comicId),
+              );
+            },
+          ),
+          if (isLoadingMore)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 class _TrashHeader extends ConsumerWidget {
@@ -175,13 +210,22 @@ class _TrashHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
-    final TrashPageState? state = ref
-        .watch(trashPageControllerProvider)
-        .asData
-        ?.value;
-    final bool hasItems = state != null && !state.isEmpty;
-    final int selectedCount = state?.selectedIds.length ?? 0;
+    final bool hasItems = ref.watch(
+      trashPageControllerProvider.select((AsyncValue<TrashPageState> async) {
+        final TrashPageState? state = async.asData?.value;
+        return state != null && !state.isEmpty;
+      }),
+    );
+    final int selectedCount = ref.watch(
+      trashPageControllerProvider.select(
+        (AsyncValue<TrashPageState> async) =>
+            async.asData?.value.selectedIds.length ?? 0,
+      ),
+    );
     final bool hasSelection = selectedCount > 0;
+
+    TrashPageState? readState() =>
+        ref.read(trashPageControllerProvider).asData?.value;
 
     return PinnedToolbarChrome(
       child: Row(
@@ -207,8 +251,9 @@ class _TrashHeader extends ConsumerWidget {
               padding: const EdgeInsets.only(right: 8),
               child: Text(
                 l10n.trashSelectedCount(selectedCount),
-                style: Theme.of(context).textTheme.bodyMedium
-                    ?.copyWith(color: scheme.onSurfaceVariant),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
             ),
           M3EIconButton(
@@ -227,13 +272,19 @@ class _TrashHeader extends ConsumerWidget {
                 : l10n.trashRestoreAll,
             onPressed: hasItems
                 ? hasSelection
-                      ? () => restoreTrashedComics(
-                          context,
-                          ref,
-                          state.selectedItems
-                              .map((TrashedComic item) => item.comic.comicId)
-                              .toList(),
-                        )
+                      ? () {
+                          final TrashPageState? state = readState();
+                          if (state == null) {
+                            return;
+                          }
+                          restoreTrashedComics(
+                            context,
+                            ref,
+                            state.selectedItems
+                                .map((TrashedComic item) => item.comic.comicId)
+                                .toList(),
+                          );
+                        }
                       : () => restoreAllTrashedComics(context, ref)
                 : null,
           ),
@@ -254,16 +305,28 @@ class _TrashHeader extends ConsumerWidget {
                 : l10n.trashPurgeAll,
             onPressed: hasItems
                 ? hasSelection
-                      ? () => purgeTrashedComics(
-                          context,
-                          ref,
-                          state.selectedItems,
-                        )
-                      : () => purgeAllTrashedComics(
-                          context,
-                          ref,
-                          state.allPurgeCounts,
-                        )
+                      ? () {
+                          final TrashPageState? state = readState();
+                          if (state == null) {
+                            return;
+                          }
+                          purgeTrashedComics(
+                            context,
+                            ref,
+                            state.selectedItems,
+                          );
+                        }
+                      : () {
+                          final TrashPageState? state = readState();
+                          if (state == null) {
+                            return;
+                          }
+                          purgeAllTrashedComics(
+                            context,
+                            ref,
+                            state.allPurgeCounts,
+                          );
+                        }
                 : null,
           ),
         ],
@@ -290,14 +353,16 @@ class _TrashEmptyState extends StatelessWidget {
             Icon(Symbols.delete, size: 48, color: scheme.outline),
             Text(
               l10n.trashEmptyTitle,
-              style: Theme.of(context).textTheme.titleMedium
-                  ?.copyWith(color: scheme.onSurface),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: scheme.onSurface),
             ),
             Text(
               l10n.trashEmptyDescription,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium
-                  ?.copyWith(color: scheme.onSurfaceVariant),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ],
         ),
