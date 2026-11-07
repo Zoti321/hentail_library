@@ -38,6 +38,14 @@ void main() {
         colorSchemeIdForPreference(AppColorSchemePreference.deepOrange),
         'deepOrange',
       );
+      expect(
+        colorSchemeIdForPreference(AppColorSchemePreference.sakura),
+        'sakura',
+      );
+      expect(
+        colorSchemeIdForPreference(AppColorSchemePreference.green),
+        'green',
+      );
     });
   });
 }

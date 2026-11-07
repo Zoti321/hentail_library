@@ -209,28 +209,40 @@ class AppLocalizationsZh extends AppLocalizations {
   String get colorSchemePreferenceBrand => '紫罗兰色';
 
   @override
-  String get colorSchemePreferenceTeal => '青色';
+  String get colorSchemePreferenceTeal => '青瓷色';
 
   @override
-  String get colorSchemePreferenceBlue => '蓝色';
+  String get colorSchemePreferenceCyan => '天青色';
+
+  @override
+  String get colorSchemePreferenceBlue => '矢车菊色';
 
   @override
   String get colorSchemePreferenceIndigo => '靛蓝色';
 
   @override
+  String get colorSchemePreferenceDeepPurple => '葡萄色';
+
+  @override
   String get colorSchemePreferenceViolet => '紫罗兰色';
 
   @override
-  String get colorSchemePreferencePink => '粉红色';
+  String get colorSchemePreferencePink => '蔷薇色';
 
   @override
-  String get colorSchemePreferenceYellow => '黄色';
+  String get colorSchemePreferenceSakura => '樱花色';
 
   @override
-  String get colorSchemePreferenceOrange => '橙色';
+  String get colorSchemePreferenceYellow => '琥珀色';
 
   @override
-  String get colorSchemePreferenceDeepOrange => '深橙色';
+  String get colorSchemePreferenceOrange => '金盏花色';
+
+  @override
+  String get colorSchemePreferenceDeepOrange => '朱砂色';
+
+  @override
+  String get colorSchemePreferenceGreen => '苔绿色';
 
   @override
   String get navHome => '首页';

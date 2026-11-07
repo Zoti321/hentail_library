@@ -473,13 +473,19 @@ abstract class AppLocalizations {
   /// No description provided for @colorSchemePreferenceTeal.
   ///
   /// In zh, this message translates to:
-  /// **'青色'**
+  /// **'青瓷色'**
   String get colorSchemePreferenceTeal;
+
+  /// No description provided for @colorSchemePreferenceCyan.
+  ///
+  /// In zh, this message translates to:
+  /// **'天青色'**
+  String get colorSchemePreferenceCyan;
 
   /// No description provided for @colorSchemePreferenceBlue.
   ///
   /// In zh, this message translates to:
-  /// **'蓝色'**
+  /// **'矢车菊色'**
   String get colorSchemePreferenceBlue;
 
   /// No description provided for @colorSchemePreferenceIndigo.
@@ -487,6 +493,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'靛蓝色'**
   String get colorSchemePreferenceIndigo;
+
+  /// No description provided for @colorSchemePreferenceDeepPurple.
+  ///
+  /// In zh, this message translates to:
+  /// **'葡萄色'**
+  String get colorSchemePreferenceDeepPurple;
 
   /// No description provided for @colorSchemePreferenceViolet.
   ///
@@ -497,26 +509,38 @@ abstract class AppLocalizations {
   /// No description provided for @colorSchemePreferencePink.
   ///
   /// In zh, this message translates to:
-  /// **'粉红色'**
+  /// **'蔷薇色'**
   String get colorSchemePreferencePink;
+
+  /// No description provided for @colorSchemePreferenceSakura.
+  ///
+  /// In zh, this message translates to:
+  /// **'樱花色'**
+  String get colorSchemePreferenceSakura;
 
   /// No description provided for @colorSchemePreferenceYellow.
   ///
   /// In zh, this message translates to:
-  /// **'黄色'**
+  /// **'琥珀色'**
   String get colorSchemePreferenceYellow;
 
   /// No description provided for @colorSchemePreferenceOrange.
   ///
   /// In zh, this message translates to:
-  /// **'橙色'**
+  /// **'金盏花色'**
   String get colorSchemePreferenceOrange;
 
   /// No description provided for @colorSchemePreferenceDeepOrange.
   ///
   /// In zh, this message translates to:
-  /// **'深橙色'**
+  /// **'朱砂色'**
   String get colorSchemePreferenceDeepOrange;
+
+  /// No description provided for @colorSchemePreferenceGreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'苔绿色'**
+  String get colorSchemePreferenceGreen;
 
   /// No description provided for @navHome.
   ///

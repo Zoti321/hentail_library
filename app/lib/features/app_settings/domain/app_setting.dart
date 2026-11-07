@@ -93,27 +93,35 @@ enum AppThemePreference {
 /// 固定配色方案 id（非 Material Dynamic Color 运行时）；与 [AppThemePreference] 正交。
 ///
 /// Seed 色映射见 `shared/ui/theme` 的 [colorSchemeSeedForId]；`brand` 为产品默认
-///（定稿紫罗兰 / 与 `violet` 同 seed），其余对齐 Kazumi 预设色板。
+///（定稿紫罗兰 / 与 `violet` 同 seed）。展示名用植物 / 矿物色名（如青瓷色）。
 @JsonEnum(alwaysCreate: true)
 enum AppColorSchemePreference {
   @JsonValue('brand')
   brand,
   @JsonValue('teal')
   teal,
+  @JsonValue('cyan')
+  cyan,
   @JsonValue('blue')
   blue,
   @JsonValue('indigo')
   indigo,
+  @JsonValue('deepPurple')
+  deepPurple,
   @JsonValue('violet')
   violet,
   @JsonValue('pink')
   pink,
+  @JsonValue('sakura')
+  sakura,
   @JsonValue('yellow')
   yellow,
   @JsonValue('orange')
   orange,
   @JsonValue('deepOrange')
   deepOrange,
+  @JsonValue('green')
+  green,
 }
 
 /// 应用语言：中文 / English / 跟随系统。

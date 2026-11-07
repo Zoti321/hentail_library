@@ -215,28 +215,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorSchemePreferenceBrand => 'Violet';
 
   @override
-  String get colorSchemePreferenceTeal => 'Teal';
+  String get colorSchemePreferenceTeal => 'Celadon';
 
   @override
-  String get colorSchemePreferenceBlue => 'Blue';
+  String get colorSchemePreferenceCyan => 'Sky';
+
+  @override
+  String get colorSchemePreferenceBlue => 'Cornflower';
 
   @override
   String get colorSchemePreferenceIndigo => 'Indigo';
 
   @override
+  String get colorSchemePreferenceDeepPurple => 'Grape';
+
+  @override
   String get colorSchemePreferenceViolet => 'Violet';
 
   @override
-  String get colorSchemePreferencePink => 'Pink';
+  String get colorSchemePreferencePink => 'Rose';
 
   @override
-  String get colorSchemePreferenceYellow => 'Yellow';
+  String get colorSchemePreferenceSakura => 'Sakura';
 
   @override
-  String get colorSchemePreferenceOrange => 'Orange';
+  String get colorSchemePreferenceYellow => 'Amber';
 
   @override
-  String get colorSchemePreferenceDeepOrange => 'Deep orange';
+  String get colorSchemePreferenceOrange => 'Marigold';
+
+  @override
+  String get colorSchemePreferenceDeepOrange => 'Cinnabar';
+
+  @override
+  String get colorSchemePreferenceGreen => 'Moss';
 
   @override
   String get navHome => 'Home';

@@ -50,12 +50,16 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       AppColorSchemePreference.brand ||
       AppColorSchemePreference.violet => colorSchemePreferenceBrand,
       AppColorSchemePreference.teal => colorSchemePreferenceTeal,
+      AppColorSchemePreference.cyan => colorSchemePreferenceCyan,
       AppColorSchemePreference.blue => colorSchemePreferenceBlue,
       AppColorSchemePreference.indigo => colorSchemePreferenceIndigo,
+      AppColorSchemePreference.deepPurple => colorSchemePreferenceDeepPurple,
       AppColorSchemePreference.pink => colorSchemePreferencePink,
+      AppColorSchemePreference.sakura => colorSchemePreferenceSakura,
       AppColorSchemePreference.yellow => colorSchemePreferenceYellow,
       AppColorSchemePreference.orange => colorSchemePreferenceOrange,
       AppColorSchemePreference.deepOrange => colorSchemePreferenceDeepOrange,
+      AppColorSchemePreference.green => colorSchemePreferenceGreen,
     };
   }
 
