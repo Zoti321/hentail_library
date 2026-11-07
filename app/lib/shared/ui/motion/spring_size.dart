@@ -4,6 +4,9 @@ import 'package:motor/motor.dart';
 
 /// 尺寸展开 / 收起：高度因子由 M3E 空间弹簧驱动，展开时允许越过终点回弹。
 ///
+/// 适合小面积控件（chip 槽等）。大块列表 / 分组内容请用 [SpringExpandPanel]
+///（对齐 M3E expandable：高度 clamp、淡入、轻微上滑，避免滚动区橡皮筋）。
+///
 /// 收起到弹簧底部（≤0）时不再渲染子树，尺寸为零。开启"减少动效"时直接切换。
 class SpringSize extends StatefulWidget {
   const SpringSize({

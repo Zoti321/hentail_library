@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_it
 
 /// 阅读历史卡片网格（盒模型）：按宽度决定 1–3 列，整组一次构建。
 ///
-/// 用于时间分组 [SpringSize] 折叠动画；水平留白由外层负责。
+/// 用于时间分组 [SpringExpandPanel] 折叠动画；水平留白由外层负责。
 class ReadingHistoryListGrid extends StatelessWidget {
   const ReadingHistoryListGrid({
     super.key,
