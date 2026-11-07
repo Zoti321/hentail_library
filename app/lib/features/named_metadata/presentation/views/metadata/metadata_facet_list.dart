@@ -11,10 +11,11 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 当前维度的名称列表（chip 流）：加载 / 错误 / 空 / 列表 / 底部状态。
-class MetadataFacetSliver extends ConsumerWidget {
-  const MetadataFacetSliver({
+///
+/// 盒模型内容，供页面用 [PeerContentTransition] + [SliverToBoxAdapter] 挂载。
+class MetadataFacetContent extends ConsumerWidget {
+  const MetadataFacetContent({
     required this.kind,
-    required this.horizontalPadding,
     required this.onCreatePressed,
     this.draftChip,
     this.mergeTarget,
@@ -32,7 +33,6 @@ class MetadataFacetSliver extends ConsumerWidget {
   final Widget? draftChip;
 
   final ManagedNamedFacetKind kind;
-  final double horizontalPadding;
   final String? mergeTarget;
   final Set<String> mergeSources;
   final ValueChanged<String>? onMergeTargetSelected;
@@ -44,18 +44,19 @@ class MetadataFacetSliver extends ConsumerWidget {
     final NamedFacetManagementState state = ref.watch(
       namedFacetManagementControllerProvider(kind),
     );
-    final Widget child;
     if (state.isLoading && state.items.isEmpty) {
-      child = const _FacetLoading();
-    } else if (state.error != null && state.items.isEmpty) {
-      child = _FacetError(
+      return const _FacetLoading();
+    }
+    if (state.error != null && state.items.isEmpty) {
+      return _FacetError(
         message: '${state.error}',
         onRetry: () => ref
             .read(namedFacetManagementControllerProvider(kind).notifier)
             .refresh(),
       );
-    } else if (state.items.isEmpty) {
-      child = Column(
+    }
+    if (state.items.isEmpty) {
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           _FacetEmpty(
@@ -67,21 +68,16 @@ class MetadataFacetSliver extends ConsumerWidget {
             Wrap(spacing: 8, runSpacing: 8, children: <Widget>[draftChip!]),
         ],
       );
-    } else {
-      child = _FacetList(
-        kind: kind,
-        state: state,
-        draftChip: draftChip,
-        mergeTarget: mergeTarget,
-        mergeSources: mergeSources,
-        onMergeTargetSelected: onMergeTargetSelected,
-        onMergeSourceSelected: onMergeSourceSelected,
-        onMergeSelectionExited: onMergeSelectionExited,
-      );
     }
-    return SliverPadding(
-      padding: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, 32),
-      sliver: SliverToBoxAdapter(child: child),
+    return _FacetList(
+      kind: kind,
+      state: state,
+      draftChip: draftChip,
+      mergeTarget: mergeTarget,
+      mergeSources: mergeSources,
+      onMergeTargetSelected: onMergeTargetSelected,
+      onMergeSourceSelected: onMergeSourceSelected,
+      onMergeSelectionExited: onMergeSelectionExited,
     );
   }
 }

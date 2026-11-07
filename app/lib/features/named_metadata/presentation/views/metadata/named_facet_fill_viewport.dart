@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/shared/ui/motion/peer_content_transition.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Near-bottom / fill-viewport threshold shared with scroll-driven load-more.
@@ -62,13 +63,24 @@ class NamedFacetFillViewportBinder extends HookConsumerWidget {
       });
     }
 
+    // 维度切换时等 PeerContentTransition 结束后再补页，避免过渡中撑高列表。
+    useEffect(
+      () {
+        final Timer timer = Timer(
+          PeerContentTransition.transitionDuration,
+          scheduleTryFill,
+        );
+        return timer.cancel;
+      },
+      <Object?>[kind],
+    );
+
     useEffect(
       () {
         scheduleTryFill();
         return null;
       },
       <Object?>[
-        kind,
         scrollController,
         viewportSize.width,
         viewportSize.height,

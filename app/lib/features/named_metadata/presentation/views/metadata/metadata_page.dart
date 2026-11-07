@@ -19,6 +19,7 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
+import 'package:hentai_library/shared/ui/motion/peer_content_transition.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,9 +40,9 @@ class _MetadataAddIntent extends Intent {
 
 class _MetadataManagementPageState
     extends ConsumerState<MetadataManagementPage> {
-  final Set<int> _visitedTabIndexes = <int>{};
   final ScrollController _scrollController = ScrollController();
   int? _selectedTabIndex;
+  bool _facetTransitionReverse = false;
   bool _showInlineCreateField = false;
 
   @override
@@ -64,7 +65,6 @@ class _MetadataManagementPageState
         .queryParameters['tab'];
     final int selectedIndex = _selectedTabIndex ?? _tabIndexFromQuery(tabParam);
     _selectedTabIndex ??= selectedIndex;
-    _visitedTabIndexes.add(selectedIndex);
 
     return Shortcuts(
       shortcuts: const <ShortcutActivator, Intent>{
@@ -164,24 +164,31 @@ class _MetadataManagementPageState
                 ),
               ),
             ),
-            if (_visitedTabIndexes.contains(selectedIndex))
-              MetadataFacetSliver(
-                kind: kind,
-                horizontalPadding: horizontal,
-                onCreatePressed: () => _onCreatePressed(context, kind),
-                draftChip: showInlineCreate
-                    ? ManagementDraftEntityChip(
-                        onCommit: (String name) =>
-                            _commitDraftEntity(kind, name),
-                        onDismiss: _dismissDraftEntity,
-                      )
-                    : null,
-                mergeTarget: state.mergeTarget,
-                mergeSources: state.mergeSources,
-                onMergeTargetSelected: controller.enterMerge,
-                onMergeSourceSelected: controller.toggleMergeSource,
-                onMergeSelectionExited: controller.exitMerge,
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(horizontal, 0, horizontal, 32),
+              sliver: SliverToBoxAdapter(
+                child: PeerContentTransition(
+                  switchKey: kind,
+                  reverse: _facetTransitionReverse,
+                  child: MetadataFacetContent(
+                    kind: kind,
+                    onCreatePressed: () => _onCreatePressed(context, kind),
+                    draftChip: showInlineCreate
+                        ? ManagementDraftEntityChip(
+                            onCommit: (String name) =>
+                                _commitDraftEntity(kind, name),
+                            onDismiss: _dismissDraftEntity,
+                          )
+                        : null,
+                    mergeTarget: state.mergeTarget,
+                    mergeSources: state.mergeSources,
+                    onMergeTargetSelected: controller.enterMerge,
+                    onMergeSourceSelected: controller.toggleMergeSource,
+                    onMergeSelectionExited: controller.exitMerge,
+                  ),
+                ),
               ),
+            ),
           ],
         ),
         NamedFacetFillViewportBinder(
@@ -203,13 +210,13 @@ class _MetadataManagementPageState
     if (_selectedTabIndex == index) {
       return;
     }
-    final ManagedNamedFacetKind previousKind = metadataTabKind(
-      _selectedTabIndex ?? 1,
-    );
+    final int previousIndex = _selectedTabIndex ?? 1;
+    final ManagedNamedFacetKind previousKind = metadataTabKind(previousIndex);
     ref
         .read(namedFacetManagementControllerProvider(previousKind).notifier)
         .exitMerge();
     setState(() {
+      _facetTransitionReverse = index < previousIndex;
       _selectedTabIndex = index;
       _showInlineCreateField = false;
     });
@@ -218,9 +225,15 @@ class _MetadataManagementPageState
   }
 
   void _scrollToContentTop() {
-    if (_scrollController.hasClients) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) {
+        return;
+      }
+      if (_scrollController.offset <= 0) {
+        return;
+      }
       _scrollController.jumpTo(0);
-    }
+    });
   }
 
   Future<void> _mergeSelectedNames(ManagedNamedFacetKind kind) async {
