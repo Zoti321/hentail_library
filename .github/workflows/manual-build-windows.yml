@@ -1,0 +1,107 @@
+# Manual Build Windows：单平台手动打 Windows 安装包 + portable zip，不走 Release 拓扑（不跑 Gate、不发 GitHub Release）。
+# 触发：仅手动 workflow_dispatch。可指定版本（默认取 pubspec）。
+name: Build Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semantic version without v prefix (default: pubspec version)"
+        required: false
+        type: string
+        default: ""
+
+concurrency:
+  group: build-windows-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: "3.47.8"
+  FRB_CODEGEN_VERSION: "2.13.0"
+
+jobs:
+  build-windows:
+    name: build-windows
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            name="$(sed -n 's/^version:[[:space:]]*\([^+[:space:]]*\).*/\1/p' app/pubspec.yaml | head -n1)"
+            if [ -z "$name" ]; then
+              echo "Failed to parse version from app/pubspec.yaml" >&2
+              exit 1
+            fi
+            echo "name=${name}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      - name: flutter build windows
+        working-directory: app
+        run: >
+          flutter build windows --release
+          --build-name=${{ steps.version.outputs.name }}
+          --build-number=${{ github.run_number }}
+
+      - name: Setup Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      - name: Build Windows installer
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.name }}"
+          $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
+          New-Item -ItemType Directory -Force -Path $dist | Out-Null
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            $iscc = "C:\Program Files\Inno Setup 6\ISCC.exe"
+          }
+          if (-not (Test-Path $iscc)) {
+            throw "ISCC.exe not found after Inno Setup install"
+          }
+          & $iscc `
+            "/DMyAppVersion=$version" `
+            "/DOutputDir=$dist" `
+            "app\windows\packaging\installer.iss"
+
+      - name: Sign Windows artifacts (self-signed or secret PFX)
+        shell: pwsh
+        env:
+          WINDOWS_CODESIGN_PFX_BASE64: ${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 }}
+          WINDOWS_CODESIGN_PFX_PASSWORD: ${{ secrets.WINDOWS_CODESIGN_PFX_PASSWORD }}
+        run: |
+          $version = "${{ steps.version.outputs.name }}"
+          $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
+          $exe = Join-Path $env:GITHUB_WORKSPACE "app\build\windows\x64\runner\Release\hentai_library.exe"
+          $setup = Join-Path $dist "hentai_library_Setup_${version}_x64.exe"
+          & "${{ github.workspace }}/app/tool/sign_windows_release.ps1" -Files @($exe, $setup)
+
+      - name: Package portable zip
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.name }}"
+          $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
+          $zip = Join-Path $dist "hentai_library_${version}_windows_x64_portable.zip"
+          Compress-Archive -Path "app\build\windows\x64\runner\Release\*" -DestinationPath $zip
+          Get-ChildItem $dist | Format-Table Name, Length
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: windows
+          path: |
+            dist/hentai_library_*_windows_x64*.zip
+            dist/hentai_library_*Setup*.exe
+          if-no-files-found: error
+          retention-days: 14

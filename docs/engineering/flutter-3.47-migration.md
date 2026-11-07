@@ -10,7 +10,7 @@
 
 | 项 | 目标 | 文件 |
 | --- | --- | --- |
-| `FLUTTER_VERSION` **3.47.8** | gate / nightly / release / watch / manual-build-android / manual-build-ios |
+| `FLUTTER_VERSION` **3.47.8** | gate / nightly / release / watch / manual-build-windows / manual-build-android / manual-build-ios |
 | FRB codegen **2.13.0** | 与各 workflow + `app/pubspec` + `core/crates/flutter/Cargo.toml` |
 
 ## 2. Dart / pubspec（必做）— 已完成

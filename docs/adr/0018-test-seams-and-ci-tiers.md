@@ -82,6 +82,7 @@ Release (release.yml)            tag v* / workflow_dispatch
 └── release-manual-summary       手动构建且不发布时
 
 Manual build（非 tier；仅 workflow_dispatch）
+├── manual-build-windows.yml
 ├── manual-build-android.yml
 └── manual-build-ios.yml
 ```
