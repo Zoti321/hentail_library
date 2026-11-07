@@ -14,12 +14,16 @@ class CardLetterboxedCoverImage extends StatelessWidget {
     this.onDecodeError,
     this.fit = BoxFit.contain,
     this.alignment = Alignment.center,
+    this.gaplessPlayback = false,
   });
 
   final ComicCoverSource cover;
   final VoidCallback? onDecodeError;
   final BoxFit fit;
   final AlignmentGeometry alignment;
+
+  /// 网格默认 false，降低离屏 cell 对已解码帧的牵制；Hero/详情可开。
+  final bool gaplessPlayback;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +42,7 @@ class CardLetterboxedCoverImage extends StatelessWidget {
             fit: fit,
             alignment: alignment,
             cacheWidth: cacheSize.cacheWidth,
-            gaplessPlayback: true,
+            gaplessPlayback: gaplessPlayback,
             placeholder: const ComicCoverPlaceholder(
               variant: ComicCoverPlaceholderVariant.card,
               kind: ComicCoverPlaceholderKind.loading,

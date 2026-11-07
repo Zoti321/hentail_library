@@ -8,7 +8,6 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:riverpod/misc.dart' show ProviderListenable;
 
 class ReadingHistoryCard extends HookConsumerWidget {
   const ReadingHistoryCard({
@@ -20,7 +19,7 @@ class ReadingHistoryCard extends HookConsumerWidget {
     required this.onTap,
     this.onDelete,
     this.gridIndex,
-    this.coverViewport,
+    this.coverViewportScope,
   });
 
   final String comicId;
@@ -33,8 +32,8 @@ class ReadingHistoryCard extends HookConsumerWidget {
   /// History grid index for cover viewport prioritization; leave null off-grid.
   final int? gridIndex;
 
-  /// Optional cover viewport set (e.g. History page notifier).
-  final ProviderListenable<Set<int>>? coverViewport;
+  /// [coverViewportProvider] scope；与 [gridIndex] 同时提供时启用视口优先级。
+  final String? coverViewportScope;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -110,7 +109,7 @@ class ReadingHistoryCard extends HookConsumerWidget {
                           child: ComicCoverContent(
                             comicId: comicId,
                             gridIndex: gridIndex,
-                            coverViewport: coverViewport,
+                            coverViewportScope: coverViewportScope,
                           ),
                         ),
                       ),

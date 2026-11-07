@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:meta/meta.dart';
+
 /// Limits concurrent comic-cover FRB loads from the Flutter side.
 class ComicCoverLoadGate {
   ComicCoverLoadGate._();
@@ -36,5 +38,17 @@ class ComicCoverLoadGate {
       return;
     }
     _waitQueue.removeFirst().complete();
+  }
+
+  /// Test-only: drain waiters and reset counters between cases.
+  @visibleForTesting
+  static void debugReset() {
+    _active = 0;
+    while (_waitQueue.isNotEmpty) {
+      final Completer<void> waiter = _waitQueue.removeFirst();
+      if (!waiter.isCompleted) {
+        waiter.complete();
+      }
+    }
   }
 }

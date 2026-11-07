@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
@@ -9,30 +10,28 @@ class AdaptiveComicCover extends StatelessWidget {
     super.key,
     required this.coverDisplay,
     required this.containerAspectRatio,
-    this.fallbackAspectRatio = 2 / 3,
-    this.fit = BoxFit.cover,
     this.filterQuality = FilterQuality.medium,
     this.placeholder = const SizedBox.expand(),
     this.errorPlaceholder,
     this.backgroundColor,
     this.clipBorderRadius,
     this.showShadow = false,
+    this.gaplessPlayback = true,
     this.onDecodeError,
   });
 
   final ComicCoverSource? coverDisplay;
   final double containerAspectRatio;
-  final double fallbackAspectRatio;
-  final BoxFit fit;
   final FilterQuality filterQuality;
   final Widget placeholder;
   final Widget? errorPlaceholder;
   final Color? backgroundColor;
   final BorderRadius? clipBorderRadius;
   final bool showShadow;
-  final VoidCallback? onDecodeError;
 
-  BoxFit get _effectiveFit => BoxFit.contain;
+  /// 详情 / Hero 场景默认 true，避免交接闪烁。
+  final bool gaplessPlayback;
+  final VoidCallback? onDecodeError;
 
   Color _resolveBackgroundColor() {
     return backgroundColor ?? Colors.white;
@@ -42,30 +41,31 @@ class AdaptiveComicCover extends StatelessWidget {
   Widget build(BuildContext context) {
     return _wrapChrome(
       context,
-      _buildAspectRatioCover(context, containerAspectRatio),
-    );
-  }
-
-  Widget _buildAspectRatioCover(BuildContext context, double aspectRatio) {
-    return AspectRatio(
-      aspectRatio: aspectRatio,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return ColoredBox(
-            color: _resolveBackgroundColor(),
-            child: AppComicImage(
-              memoryBytes: coverDisplay?.memoryBytes,
-              filePath: coverDisplay?.filePath,
-              fit: _effectiveFit,
-              filterQuality: filterQuality,
-              // 对齐 Kazumi 详情侧 fadeIn/Out = 0，避免 Hero 交接时加载闪烁。
-              gaplessPlayback: true,
-              placeholder: placeholder,
-              errorPlaceholder: errorPlaceholder ?? placeholder,
-              onDecodeError: onDecodeError,
-            ),
-          );
-        },
+      AspectRatio(
+        aspectRatio: containerAspectRatio,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final ImageDecodeCacheSize cacheSize = decodeCacheSizeForContext(
+              context,
+              logicalWidth: constraints.maxWidth,
+              logicalHeight: constraints.maxHeight,
+            );
+            return ColoredBox(
+              color: _resolveBackgroundColor(),
+              child: AppComicImage(
+                memoryBytes: coverDisplay?.memoryBytes,
+                filePath: coverDisplay?.filePath,
+                fit: BoxFit.contain,
+                filterQuality: filterQuality,
+                cacheWidth: cacheSize.cacheWidth,
+                gaplessPlayback: gaplessPlayback,
+                placeholder: placeholder,
+                errorPlaceholder: errorPlaceholder ?? placeholder,
+                onDecodeError: onDecodeError,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

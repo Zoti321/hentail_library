@@ -106,6 +106,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       if (!libraryPageShouldScrollToTop(previous, next)) {
         return;
       }
+      ref
+          .read(coverViewportProvider(CoverViewportScopes.library).notifier)
+          .clear();
       _scrollToContentTop();
     });
 
@@ -377,7 +380,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   child: ComicListItem(
                     title: comic.title,
                     pageLabel: l10n.comicDetailPageCount(comic.pageCount),
-                    cover: ComicCoverContent(comicId: comic.comicId),
+                    cover: ComicCoverContent(
+                      comicId: comic.comicId,
+                      gridIndex: index,
+                      coverViewportScope: CoverViewportScopes.library,
+                    ),
                     readProgress: comicReadProgressFor(
                       pageIndex: readPages[comic.comicId],
                       pageCount: comic.pageCount,
@@ -413,7 +420,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   child: ComicCard(
                     title: comic.title,
                     subtitle: l10n.comicDetailPageCount(comic.pageCount),
-                    cover: ComicCoverContent(comicId: comic.comicId),
+                    cover: ComicCoverContent(
+                      comicId: comic.comicId,
+                      gridIndex: index,
+                      coverViewportScope: CoverViewportScopes.library,
+                    ),
                     readProgress: comicReadProgressFor(
                       pageIndex: readPages[comic.comicId],
                       pageCount: comic.pageCount,
@@ -459,7 +470,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   pageLabel: context.l10n.seriesVolumeCountLabel(
                     s.items.length,
                   ),
-                  cover: SeriesCoverContent(seriesId: s.id),
+                  cover: SeriesCoverContent(
+                    seriesId: s.id,
+                    gridIndex: index,
+                    coverViewportScope: CoverViewportScopes.library,
+                  ),
                   onTap: () => _openSeriesDetail(s.id),
                 );
               },
@@ -483,7 +498,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   key: ValueKey<String>('library-series-${s.id}'),
                   title: s.name,
                   subtitle: context.l10n.seriesVolumeCountLabel(s.items.length),
-                  cover: SeriesCoverContent(seriesId: s.id),
+                  cover: SeriesCoverContent(
+                    seriesId: s.id,
+                    gridIndex: index,
+                    coverViewportScope: CoverViewportScopes.library,
+                  ),
                   onTap: () => _openSeriesDetail(s.id),
                 );
               },

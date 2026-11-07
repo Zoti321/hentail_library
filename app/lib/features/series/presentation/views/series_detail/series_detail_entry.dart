@@ -15,7 +15,7 @@ SeriesDetailViewObject seriesDetailEntry({
   required List<SeriesComicPageItem> pageItems,
   required int page,
   required int pageSize,
-  Widget Function(String comicId)? comicCoverBuilder,
+  Widget Function(String comicId, int index)? comicCoverBuilder,
 }) {
   final bool hasMetadata =
       metadata != null &&
@@ -37,12 +37,15 @@ SeriesDetailViewObject seriesDetailEntry({
     characters: metadata?.characters ?? const <String>[],
     tags: metadata?.tags ?? const <String>[],
     comics: <SeriesDetailComicItem>[
-      for (final SeriesComicPageItem item in pageItems)
+      for (int index = 0; index < pageItems.length; index++)
         SeriesDetailComicItem(
-          title: item.comic.title,
-          pageCount: item.comic.pageCount,
-          comic: item.comic,
-          cover: comicCoverBuilder?.call(item.comic.comicId),
+          title: pageItems[index].comic.title,
+          pageCount: pageItems[index].comic.pageCount,
+          comic: pageItems[index].comic,
+          cover: comicCoverBuilder?.call(
+            pageItems[index].comic.comicId,
+            index,
+          ),
         ),
     ],
     initialPage: page,

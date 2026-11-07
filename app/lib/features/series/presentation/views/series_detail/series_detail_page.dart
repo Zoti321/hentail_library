@@ -13,6 +13,7 @@ import 'package:hentai_library/features/series/presentation/views/series_detail/
 import 'package:hentai_library/features/series/presentation/views/series_detail/series_detail_layout.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
+import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
 import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -112,8 +113,11 @@ class _SeriesDetailContentState extends ConsumerState<_SeriesDetailContent> {
       pageItems: items,
       page: page,
       pageSize: pageSize,
-      comicCoverBuilder: (String comicId) =>
-          ComicCoverContent(comicId: comicId),
+      comicCoverBuilder: (String comicId, int index) => ComicCoverContent(
+        comicId: comicId,
+        gridIndex: index,
+        coverViewportScope: CoverViewportScopes.seriesDetail(seriesId),
+      ),
     );
     final AppLocalizations l10n = context.l10n;
 
