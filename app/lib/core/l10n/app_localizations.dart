@@ -878,6 +878,12 @@ abstract class AppLocalizations {
   /// **'本周'**
   String get historySectionThisWeek;
 
+  /// No description provided for @historySectionThisMonth.
+  ///
+  /// In zh, this message translates to:
+  /// **'本月'**
+  String get historySectionThisMonth;
+
   /// No description provided for @historySectionEarlier.
   ///
   /// In zh, this message translates to:

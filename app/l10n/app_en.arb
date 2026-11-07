@@ -207,6 +207,7 @@
   "historySectionToday": "Today",
   "historySectionYesterday": "Yesterday",
   "historySectionThisWeek": "This week",
+  "historySectionThisMonth": "This month",
   "historySectionEarlier": "Earlier",
   "historySectionItemCount": "{count, plural, one{1 entry} other{{count} entries}}",
   "@historySectionItemCount": {

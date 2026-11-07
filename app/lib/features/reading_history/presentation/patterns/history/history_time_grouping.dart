@@ -1,13 +1,16 @@
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
-/// 阅读历史四档时间分桶（纯逻辑 + 分桶标题文案）。
-enum HistoryTimeSection { today, yesterday, thisWeek, earlier }
+/// 阅读历史五档时间分桶（对齐最长保留 1 年；纯逻辑 + 分桶标题文案）。
+///
+/// 顺序：今天 → 昨天 → 本周 → 本月 → 更早（年内其余）。
+enum HistoryTimeSection { today, yesterday, thisWeek, thisMonth, earlier }
 
 /// 展示顺序（仅渲染非空分组）。
 const List<HistoryTimeSection> kHistoryTimeSectionOrder = <HistoryTimeSection>[
   HistoryTimeSection.today,
   HistoryTimeSection.yesterday,
   HistoryTimeSection.thisWeek,
+  HistoryTimeSection.thisMonth,
   HistoryTimeSection.earlier,
 ];
 
@@ -24,7 +27,7 @@ DateTime _startOfLocalDay(DateTime value) {
   return DateTime(local.year, local.month, local.day);
 }
 
-/// 将 [lastReadAt] 映射到四档分桶（相对 [clock]）。
+/// 将 [lastReadAt] 映射到五档分桶（相对 [clock]）。
 HistoryTimeSection historyTimeSectionFor(DateTime lastReadAt, DateTime clock) {
   final DateTime today = _startOfLocalDay(clock);
   final DateTime readDay = _startOfLocalDay(lastReadAt);
@@ -40,10 +43,14 @@ HistoryTimeSection historyTimeSectionFor(DateTime lastReadAt, DateTime clock) {
   if (!readDay.isBefore(weekStart) && readDay.isBefore(yesterday)) {
     return HistoryTimeSection.thisWeek;
   }
+  final DateTime monthStart = DateTime(today.year, today.month);
+  if (!readDay.isBefore(monthStart) && readDay.isBefore(weekStart)) {
+    return HistoryTimeSection.thisMonth;
+  }
   return HistoryTimeSection.earlier;
 }
 
-/// 按四档分桶分组；空桶省略；桶内保持 [items] 原顺序。
+/// 按五档分桶分组；空桶省略；桶内保持 [items] 原顺序。
 List<HistoryTimeGroup<T>> groupHistoryByTimeSection<T>(
   List<T> items,
   DateTime Function(T item) lastReadAt, {
@@ -81,6 +88,7 @@ String historyTimeSectionLabel(
     HistoryTimeSection.today => l10n.historySectionToday,
     HistoryTimeSection.yesterday => l10n.historySectionYesterday,
     HistoryTimeSection.thisWeek => l10n.historySectionThisWeek,
+    HistoryTimeSection.thisMonth => l10n.historySectionThisMonth,
     HistoryTimeSection.earlier => l10n.historySectionEarlier,
   };
 }

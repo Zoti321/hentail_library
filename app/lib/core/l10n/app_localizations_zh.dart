@@ -456,6 +456,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historySectionThisWeek => '本周';
 
   @override
+  String get historySectionThisMonth => '本月';
+
+  @override
   String get historySectionEarlier => '更早';
 
   @override

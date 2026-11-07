@@ -207,6 +207,7 @@
   "historySectionToday": "今天",
   "historySectionYesterday": "昨天",
   "historySectionThisWeek": "本周",
+  "historySectionThisMonth": "本月",
   "historySectionEarlier": "更早",
   "historySectionItemCount": "{count, plural, other{{count} 条}}",
   "@historySectionItemCount": {

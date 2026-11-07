@@ -468,6 +468,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historySectionThisWeek => 'This week';
 
   @override
+  String get historySectionThisMonth => 'This month';
+
+  @override
   String get historySectionEarlier => 'Earlier';
 
   @override

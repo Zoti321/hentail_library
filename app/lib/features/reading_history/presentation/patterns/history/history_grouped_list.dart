@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/ui/motion/spring_value.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 四档时间分组 + 可折叠组标题（sliver）+ 组内懒加载列表。
+/// 五档时间分组 + 可折叠组标题（sliver）+ 组内卡片网格。
 class ReadingHistoryGroupedList<T> extends StatefulWidget {
   const ReadingHistoryGroupedList({
     super.key,
