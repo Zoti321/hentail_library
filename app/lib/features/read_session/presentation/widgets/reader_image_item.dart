@@ -42,16 +42,12 @@ class ReaderImageItem extends ConsumerStatefulWidget {
 
 class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
   bool _reloadScheduled = false;
-  String? _checkedCachePath;
-  String? _reloadedMissingCachePath;
 
   @override
   void didUpdateWidget(ReaderImageItem oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageData != widget.imageData) {
       _reloadScheduled = false;
-      _checkedCachePath = null;
-      _reloadedMissingCachePath = null;
     }
   }
 
@@ -65,7 +61,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
 
     if (imageData is ReaderDirPageImageData) {
       final String dirPath = imageData.file.path.trim();
-      if (dirPath.isEmpty || !isUsableReaderCacheFile(dirPath)) {
+      if (dirPath.isEmpty) {
         return _wrapWithContextMenu(context, errorPlaceholder);
       }
       return _wrapWithContextMenu(
@@ -155,22 +151,10 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     required FilterQuality filterQuality,
     required int? cacheWidth,
   }) {
-    // One-shot per path: keepAlive may still hold FilePath after disk eviction.
-    // Avoid handing a missing path to ExtendedImage (can stick in LoadState.loading).
+    // Disk may be gone after cache eviction while keepAlive still holds FilePath.
+    // Do not sync-stat in build; rely on ImageProvider failure → onDecodeError.
     if (_reloadScheduled) {
       return loadingSurface;
-    }
-    if (_checkedCachePath != path) {
-      _checkedCachePath = path;
-      if (!isUsableReaderCacheFile(path)) {
-        if (_reloadedMissingCachePath == path) {
-          // Already invalidated once for this path; don't loop forever.
-          return errorPlaceholder;
-        }
-        _reloadedMissingCachePath = path;
-        _scheduleReaderPageReload(archiveData);
-        return loadingSurface;
-      }
     }
     return ReaderPageFadeIn(
       enabled: widget.enableCrossfade,
@@ -206,7 +190,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     _reloadScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _reloadScheduled = false;
-      _checkedCachePath = null;
       if (!mounted) {
         return;
       }
