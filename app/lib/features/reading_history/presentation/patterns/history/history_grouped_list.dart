@@ -5,6 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_time_grouping.dart';
 import 'package:hentai_library/shared/ui/layout/reading_history_list_layout.dart';
+import 'package:hentai_library/shared/ui/motion/spring_size.dart';
 import 'package:hentai_library/shared/ui/motion/spring_value.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -91,15 +92,20 @@ class _HistoryGroupSection<T> extends StatelessWidget {
             onPressed: onHeaderPressed,
           ),
         ),
-        if (expanded) ...<Widget>[
-          SliverToBoxAdapter(child: SizedBox(height: spacing.xs)),
-          ReadingHistoryListLayout(
-            itemCount: group.items.length,
-            itemBuilder: (BuildContext context, int index) {
-              return itemBuilder(context, group.items[index]);
-            },
+        SliverToBoxAdapter(
+          child: SpringSize(
+            expanded: expanded,
+            child: Padding(
+              padding: EdgeInsets.only(top: spacing.xs),
+              child: ReadingHistoryListGrid(
+                itemCount: group.items.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return itemBuilder(context, group.items[index]);
+                },
+              ),
+            ),
           ),
-        ],
+        ),
       ],
     );
   }

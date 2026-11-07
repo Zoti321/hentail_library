@@ -1060,6 +1060,7 @@
       "total": {"type": "int"}
     }
   },
+  "historyGoToComicDetail": "跳转到详情页",
   "historyDeleteRecord": "删除记录",
   "bootstrapStartupFailed": "启动失败：{error}",
   "@bootstrapStartupFailed": {

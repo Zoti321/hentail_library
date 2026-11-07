@@ -1058,6 +1058,7 @@
       "total": {"type": "int"}
     }
   },
+  "historyGoToComicDetail": "Go to comic details",
   "historyDeleteRecord": "Delete entry",
   "bootstrapStartupFailed": "Startup failed: {error}",
   "@bootstrapStartupFailed": {

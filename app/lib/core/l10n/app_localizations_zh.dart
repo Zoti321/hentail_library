@@ -2177,6 +2177,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get historyGoToComicDetail => '跳转到详情页';
+
+  @override
   String get historyDeleteRecord => '删除记录';
 
   @override

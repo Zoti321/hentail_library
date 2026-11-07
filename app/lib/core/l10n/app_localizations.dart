@@ -3948,6 +3948,12 @@ abstract class AppLocalizations {
   /// **'{current}/{total}'**
   String readingProgressPageOfTotal(int current, int total);
 
+  /// No description provided for @historyGoToComicDetail.
+  ///
+  /// In zh, this message translates to:
+  /// **'跳转到详情页'**
+  String get historyGoToComicDetail;
+
   /// No description provided for @historyDeleteRecord.
   ///
   /// In zh, this message translates to:

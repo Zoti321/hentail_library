@@ -5,6 +5,8 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/reading_history/presentation/models/history_card_item.dart';
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_progress.dart';
+import 'package:hentai_library/shared/di/app_router_provider.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 
@@ -22,6 +24,13 @@ class HistoryListItem extends ConsumerWidget {
   final VoidCallback onDeleteRecord;
   final int? gridIndex;
   final String? coverViewportScope;
+
+  void _openComicDetail(WidgetRef ref) {
+    ref.read(comicDetailReturnSeriesPortProvider).clear();
+    ref
+        .read(appRouterProvider)
+        .push('/comic/${Uri.encodeComponent(item.comicId)}');
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,6 +57,10 @@ class HistoryListItem extends ConsumerWidget {
       onTap: openReader,
       onContinueReading: openReader,
       moreMenuEntries: <ReadingHistoryMoreMenuEntry>[
+        ReadingHistoryMoreMenuEntry(
+          label: l10n.historyGoToComicDetail,
+          onSelected: () => _openComicDetail(ref),
+        ),
         ReadingHistoryMoreMenuEntry(
           label: l10n.historyDeleteRecord,
           onSelected: onDeleteRecord,

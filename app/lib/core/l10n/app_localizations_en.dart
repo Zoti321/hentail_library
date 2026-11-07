@@ -2256,6 +2256,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get historyGoToComicDetail => 'Go to comic details';
+
+  @override
   String get historyDeleteRecord => 'Delete entry';
 
   @override
