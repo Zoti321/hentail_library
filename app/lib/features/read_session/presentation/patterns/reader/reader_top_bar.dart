@@ -133,8 +133,11 @@ class ReaderTopBar extends StatelessWidget {
     required String semanticLabel,
     VoidCallback? onPressed,
   }) {
+    final double iconSize = ReaderChromeMetrics.actionIconSizeOf(
+      MediaQuery.sizeOf(context).width,
+    );
     return M3EIconButton(
-      icon: Icon(icon, size: ReaderChromeMetrics.actionIconSize),
+      icon: Icon(icon, size: iconSize),
       variant: M3EIconButtonVariant.standard,
       size: M3EIconButtonSize.sm,
       tooltip: tooltip,

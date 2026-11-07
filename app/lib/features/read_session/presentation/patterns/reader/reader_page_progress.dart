@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/shared/ui/layout/reader_chrome_metrics.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome_scope.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_page_copy.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -42,6 +43,7 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
     );
     final double sliderValue = (_dragValue ?? widget.currentPage.toDouble())
         .clamp(1.0, _safeTotal.toDouble());
+    final double viewportWidth = MediaQuery.sizeOf(context).width;
 
     return Semantics(
       label: ReaderPageCopy.pageProgressLabel(_displayPage, _safeTotal),
@@ -57,6 +59,13 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
               min: 1,
               max: _safeTotal.toDouble(),
               size: M3ESliderSize.xs,
+              trackThickness:
+                  ReaderChromeMetrics.progressSliderTrackThicknessOf(
+                    viewportWidth,
+                  ),
+              thumbLength: ReaderChromeMetrics.progressSliderThumbLengthOf(
+                viewportWidth,
+              ),
               haptic: M3EHapticFeedback.light,
               semanticFormatterCallback: (double value) =>
                   ReaderPageCopy.pageProgressLabel(

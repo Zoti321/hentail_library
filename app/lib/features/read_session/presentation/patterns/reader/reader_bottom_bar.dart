@@ -32,21 +32,22 @@ class ReaderBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final MediaQueryData media = MediaQuery.of(context);
+    final double width = media.size.width;
     final bool canPrev = currentPage > 1;
     final bool canNext = totalPages > 0 && currentPage < totalPages;
     final EdgeInsets padding = EdgeInsets.fromLTRB(
-      ReaderChromeMetrics.chromeContentHorizontalPadding(media.size.width),
-      8,
-      ReaderChromeMetrics.chromeContentHorizontalPadding(media.size.width),
-      media.padding.bottom + ReaderChromeMetrics.edgeGap,
+      ReaderChromeMetrics.chromeContentHorizontalPadding(width),
+      ReaderChromeMetrics.bottomBarTopPaddingOf(width),
+      ReaderChromeMetrics.chromeContentHorizontalPadding(width),
+      media.padding.bottom + ReaderChromeMetrics.edgeGapOf(width),
     );
 
     return ReaderChromeBand(
       edge: ReaderChromeBandEdge.bottom,
       padding: padding,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minHeight: ReaderChromeMetrics.bottomBarMinHeight,
+        constraints: BoxConstraints(
+          minHeight: ReaderChromeMetrics.bottomBarMinHeightOf(width),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -56,7 +57,9 @@ class ReaderBottomBar extends StatelessWidget {
               totalPages: totalPages,
               onPageChanged: onPageChanged,
             ),
-            const SizedBox(height: 2),
+            SizedBox(
+              height: ReaderChromeMetrics.progressControlsGapOf(width),
+            ),
             Row(
               children: <Widget>[
                 _iconButton(
@@ -107,8 +110,11 @@ class ReaderBottomBar extends StatelessWidget {
     VoidCallback? onPressed,
     bool filled = false,
   }) {
+    final double iconSize = ReaderChromeMetrics.actionIconSizeOf(
+      MediaQuery.sizeOf(context).width,
+    );
     return M3EIconButton(
-      icon: Icon(icon, size: ReaderChromeMetrics.actionIconSize),
+      icon: Icon(icon, size: iconSize),
       variant: filled
           ? M3EIconButtonVariant.tonal
           : M3EIconButtonVariant.standard,
