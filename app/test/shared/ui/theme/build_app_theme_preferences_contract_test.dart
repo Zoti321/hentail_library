@@ -41,6 +41,20 @@ void main() {
       );
     });
 
+    test('brand seed equals violet preference (product brand color)', () {
+      expect(colorSchemeSeedForId('brand'), kBrandSeedColor);
+      expect(colorSchemeSeedForId('violet'), kBrandSeedColor);
+      final ThemeData brand = buildAppTheme(
+        Brightness.light,
+        colorSchemeId: 'brand',
+      );
+      final ThemeData violet = buildAppTheme(
+        Brightness.light,
+        colorSchemeId: 'violet',
+      );
+      expect(violet.colorScheme.primary, brand.colorScheme.primary);
+    });
+
     test('non-brand colorSchemeId changes primary seed palette', () {
       final ThemeData brand = buildAppTheme(
         Brightness.light,

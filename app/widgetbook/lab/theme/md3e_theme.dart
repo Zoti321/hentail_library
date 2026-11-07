@@ -8,7 +8,7 @@ export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart'
         buildAppM3eThemeData,
         flutterColorSchemeFromM3e,
         kAppFontFamily,
-        kLabSeedColor,
+        kBrandSeedColor,
         withAppFontFamily;
 
 M3EColorScheme _md3eColorSchemeFor({

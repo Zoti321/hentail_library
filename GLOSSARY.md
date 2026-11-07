@@ -303,7 +303,7 @@ _Avoid_: 安全模式、青少年模式、R18 过滤
 ### Design & UI
 
 **MD3E design system**:
-生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。实现落在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。壳层与组件色消费以 **M3E color roles** 为主；Lab 默认紫 seed 仍为临时品牌色，非最终定稿。不替代 Rust 业务真值。
+生产主壳的 Material 3 Expressive 取向设计系统（Cutover 主体已完成）。实现落在 `shared/ui` 与各 feature 的 MD3E 页；主题经 `buildAppTheme` 单源装配。壳层与组件色消费以 **M3E color roles** 为主；品牌 seed 定稿为配色方案「紫罗兰色」（`kBrandSeedColor` / 与偏好 `violet` 同色）。不替代 Rust 业务真值。
 _Avoid_: M3 皮肤（太泛）、新主题（未指明 MD3E）、仍称并行于 Baseline
 
 **Tone-based color system**:

@@ -16,23 +16,22 @@ const Set<String> kKnownColorSchemeIds = <String>{
 
 /// Seed for [buildAppTheme] / [buildAppM3eThemeData] 的 `colorSchemeId`。
 ///
-/// 色值参考 Kazumi `colorThemeTypes`；`brand` 使用产品默认 Lab 紫 seed。
+/// 色值参考 Kazumi `colorThemeTypes`；`brand` 定稿为紫罗兰
+///（[kBrandSeedColor]），与偏好 id `violet` 同色、id 仍正交。
 Color colorSchemeSeedForId(String colorSchemeId) {
   assert(
     kKnownColorSchemeIds.contains(colorSchemeId),
     '未知 colorSchemeId: $colorSchemeId',
   );
   return switch (colorSchemeId) {
-    'brand' => kLabSeedColor,
+    'brand' || 'violet' => kBrandSeedColor,
     'teal' => Colors.teal,
     'blue' => Colors.blue,
     'indigo' => Colors.indigo,
-    // Kazumi 紫罗兰；与当前 brand Lab 紫同值，偏好 id 仍正交。
-    'violet' => const Color(0xFF6750A4),
     'pink' => Colors.pink,
     'yellow' => Colors.yellow,
     'orange' => Colors.orange,
     'deepOrange' => Colors.deepOrange,
-    _ => kLabSeedColor,
+    _ => kBrandSeedColor,
   };
 }

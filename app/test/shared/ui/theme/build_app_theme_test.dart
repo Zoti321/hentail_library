@@ -9,12 +9,12 @@ void main() {
     test('light primary uses fidelity seed scheme not default tonalSpot', () {
       final ThemeData theme = buildAppTheme(Brightness.light);
       final Color fidelityPrimary = material_ui.ColorScheme.fromSeed(
-        seedColor: kLabSeedColor,
+        seedColor: kBrandSeedColor,
         brightness: Brightness.light,
         dynamicSchemeVariant: material_ui.DynamicSchemeVariant.fidelity,
       ).primary;
       final Color tonalSpotPrimary = M3EColorScheme.fromSeed(
-        kLabSeedColor,
+        kBrandSeedColor,
         brightness: Brightness.light,
       ).primary;
       expect(theme.colorScheme.primary, fidelityPrimary);

@@ -93,7 +93,7 @@ enum AppThemePreference {
 /// 固定配色方案 id（非 Material Dynamic Color 运行时）；与 [AppThemePreference] 正交。
 ///
 /// Seed 色映射见 `shared/ui/theme` 的 [colorSchemeSeedForId]；`brand` 为产品默认
-///（当前 Lab 紫 seed），其余对齐 Kazumi 预设色板。
+///（定稿紫罗兰 / 与 `violet` 同 seed），其余对齐 Kazumi 预设色板。
 @JsonEnum(alwaysCreate: true)
 enum AppColorSchemePreference {
   @JsonValue('brand')

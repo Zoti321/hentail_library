@@ -19,7 +19,7 @@ ADR-0028 将颜色定为两层：`ColorScheme` + 大表语义扩展 `HentaiColor
 3. **消费**：壳层与共享组件以 M3E / Flutter color roles 为主。禁止新代码依赖大表壳层语义色。
 4. **扩展**：仅 **Reader color extension**（恒暗沉浸底，不跟壳层 seed / 应用浅色主题把阅读页变浅）。
 5. **动态配色**：`useDynamicColor` 开启时，经 `DynamicColorBuilder` 取系统 `ColorScheme.primary` 作为 seed，再走同一 fidelity 装配；平台无动态色时回退固定配色方案。开启期间设置页禁用「配色方案」项，但保留已选 preference。
-6. **品牌 seed**：仍为临时 Lab 紫；不定稿。
+6. **品牌 seed**：定稿为配色方案「紫罗兰色」（Kazumi / `0xFF6750A4`，常量 `kBrandSeedColor`）。偏好 id `brand` 与 `violet` 同色、JSON id 仍正交。
 7. **相对 ADR-0028**：废弃「大表 `HentaiColorScheme` 作为通用第二层」；保留 ThemeExtension 机制仅用于阅读器等白名单场景。ADR-0032 的单源装配入口不变。
 
 ## Consequences

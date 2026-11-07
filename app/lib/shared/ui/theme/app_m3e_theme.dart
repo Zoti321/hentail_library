@@ -6,8 +6,14 @@ import 'package:material_ui/material_ui.dart' as material_ui;
 /// App UI font ([pubspec.yaml] `MI_Sans_Regular`); aligned with production shell.
 const String kAppFontFamily = 'MI_Sans_Regular';
 
-/// MD3E default seed (Widgetbook Lab purple). Production uses the same seed.
-const Color kLabSeedColor = Color(0xFF6750A4);
+/// 产品品牌 seed：配色方案「紫罗兰色」(`violet` / Kazumi `0xFF6750A4`)。
+///
+/// `AppColorSchemePreference.brand` 与 `violet` 共用此色；默认主题即紫罗兰。
+const Color kBrandSeedColor = Color(0xFF6750A4);
+
+/// @Deprecated('Use kBrandSeedColor') — Lab 时期别名，保留给过渡引用。
+@Deprecated('Use kBrandSeedColor')
+const Color kLabSeedColor = kBrandSeedColor;
 
 /// Tone-based color system：seed → MCU fidelity scheme → M3E roles。
 ///
@@ -15,7 +21,7 @@ const Color kLabSeedColor = Color(0xFF6750A4);
 /// [ColorScheme.fromSeed] 薄封装后再 [M3EColorScheme.fromColorScheme]。
 M3EColorScheme m3eColorSchemeForBrightness(
   Brightness brightness, {
-  Color seed = kLabSeedColor,
+  Color seed = kBrandSeedColor,
 }) {
   final material_ui.ColorScheme seeded = material_ui.ColorScheme.fromSeed(
     seedColor: seed,
@@ -54,7 +60,7 @@ M3EThemeData applyShellNavRailOverrides(M3EThemeData base) {
 /// Expressive theme for app shell and MD3E widgets (seed + nav-rail metrics).
 M3EThemeData buildAppM3eThemeData(
   Brightness brightness, {
-  Color seed = kLabSeedColor,
+  Color seed = kBrandSeedColor,
 }) {
   final M3EThemeData base = M3EThemeData(
     colorScheme: m3eColorSchemeForBrightness(brightness, seed: seed),
