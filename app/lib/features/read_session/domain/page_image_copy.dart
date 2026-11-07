@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
@@ -8,12 +7,15 @@ import 'package:hentai_library/features/read_session/domain/comic_page_source_po
 
 typedef PageImagePngEncoder = Future<Uint8List> Function(Uint8List imageBytes);
 
+/// Copy a reader page to the clipboard (load → encode PNG → write).
+///
+/// PNG encoding is injected; the engine-backed default lives in data adapters.
 class PageImageCopy {
   PageImageCopy({
     required this._pageSource,
     required this._clipboardImage,
-    PageImagePngEncoder? encodePng,
-  }) : _encodePng = encodePng ?? encodePageImagePng;
+    required PageImagePngEncoder encodePng,
+  }) : _encodePng = encodePng;
 
   final ComicPageSourcePort _pageSource;
   final ClipboardImagePort _clipboardImage;
@@ -63,26 +65,6 @@ class PageImageCopy {
         stackTrace: stackTrace,
       );
     }
-  }
-}
-
-Future<Uint8List> encodePageImagePng(Uint8List imageBytes) async {
-  final ui.Codec codec = await ui.instantiateImageCodec(imageBytes);
-  try {
-    final ui.FrameInfo frame = await codec.getNextFrame();
-    try {
-      final ByteData? pngData = await frame.image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
-      if (pngData == null) {
-        throw StateError('png encode returned null');
-      }
-      return pngData.buffer.asUint8List();
-    } finally {
-      frame.image.dispose();
-    }
-  } finally {
-    codec.dispose();
   }
 }
 

@@ -5,8 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
+import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
+import 'package:hentai_library/features/read_session/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
+import 'package:hentai_library/features/read_session/di/session_providers.dart';
+import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
+import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
 import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
 import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
@@ -18,6 +24,7 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -103,6 +110,56 @@ GoRouter _testRouter() => GoRouter(
   ],
 );
 
+class _NoOpHistoryCommands implements ReadingHistoryCommandPort {
+  @override
+  Future<void> recordReading({
+    required String comicId,
+    required String title,
+    required DateTime lastReadTime,
+    required int pageIndex,
+  }) async {}
+
+  @override
+  Future<int?> readResumePageIndex(String comicId) async => null;
+}
+
+class _UnusedComicLookup implements ComicLookupRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _UnusedPageSource implements ComicPageSourcePort {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _UnusedSessionPort implements ReaderSessionPort {
+  @override
+  Future<void> openComic(Comic comic) async {}
+
+  @override
+  Future<void> closeComic(String comicId) async {}
+
+  @override
+  Future<void> clear() async {}
+}
+
+/// Controller build now begins a history session; keep I/O stubs unused.
+Override _stubCoordinatorOverride() {
+  final _NoOpHistoryCommands history = _NoOpHistoryCommands();
+  return readSessionCoordinatorProvider.overrideWithValue(
+    ReadSessionCoordinator(
+      sessionService: ReaderSessionService(
+        comicRepo: _UnusedComicLookup(),
+        pageSource: _UnusedPageSource(),
+        readingHistoryCommands: history,
+        sessionPort: _UnusedSessionPort(),
+      ),
+      readingHistoryCommands: history,
+    ),
+  );
+}
+
 ReaderNavContextData _navContext({
   String? previousComicId,
   String? nextComicId,
@@ -153,6 +210,7 @@ ProviderContainer _createContainer({
     overrides: <Override>[
       ...sharedLibraryStateOverrides(),
       ...bootstrapCompositionOverrides(),
+      _stubCoordinatorOverride(),
       appSettingRepoProvider.overrideWithValue(
         MemoryAppSettingRepository(initial: initialSetting),
       ),
@@ -236,6 +294,7 @@ void main() {
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
+          _stubCoordinatorOverride(),
           appSettingRepoProvider.overrideWithValue(
             MemoryAppSettingRepository(
               initial: AppSetting(readingMode: ReadingMode.paged),
@@ -309,6 +368,7 @@ void main() {
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
+          _stubCoordinatorOverride(),
           appSettingRepoProvider.overrideWithValue(
             MemoryAppSettingRepository(
               initial: AppSetting(readingMode: ReadingMode.paged),

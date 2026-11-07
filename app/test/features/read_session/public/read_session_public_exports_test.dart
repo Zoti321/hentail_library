@@ -13,6 +13,5 @@ void main() {
     expect(ReaderRouteArgs, isNotNull);
     expect(openReadSession, isNotNull);
     expect(readerFullscreenControllerProvider, isNotNull);
-    expect(comicImagesProvider, isNotNull);
   });
 }

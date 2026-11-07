@@ -5,7 +5,6 @@ export 'public/di/comic_page_source_port_factory.dart';
 export 'public/di/read_session_launch_factory.dart';
 export 'public/di/reader_session_port_factory.dart';
 export 'public/presentation/open_read_session.dart';
-export 'public/presentation/read_session_providers_exports.dart';
 export 'public/presentation/reader_route_args.dart';
 export 'public/presentation/reader_shell_exports.dart';
 export 'public/read_session_launch_port.dart';

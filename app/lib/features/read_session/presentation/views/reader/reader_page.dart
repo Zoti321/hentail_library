@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/read_session/di/session_providers.dart';
 import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
 import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
@@ -88,14 +87,12 @@ class ReaderPage extends HookConsumerWidget {
 
     final bool readerReady = shellAsync.hasValue;
     final ReaderPageShellData? loadedShell = shellAsync.asData?.value;
-    final ObjectRef<int?> frozenOpenIndex = useRef<int?>(null);
     final ObjectRef<int?> frozenInitialPage = useRef<int?>(null);
     final ObjectRef<String?> frozenSessionKey = useRef<String?>(null);
     final String sessionKey =
         '${routeContext.comicId}|${routeContext.incognito}|${routeContext.startFromFirstPage}';
     if (frozenSessionKey.value != sessionKey) {
       frozenSessionKey.value = sessionKey;
-      frozenOpenIndex.value = null;
       frozenInitialPage.value = null;
     }
 
@@ -108,35 +105,8 @@ class ReaderPage extends HookConsumerWidget {
               ?.value
               .currentIndex ??
           1;
-      frozenOpenIndex.value = openIndex;
       frozenInitialPage.value = openIndex - 1;
     }
-
-    useEffect(
-      () {
-        if (!readerReady ||
-            loadedShell == null ||
-            frozenOpenIndex.value == null) {
-          return null;
-        }
-        unawaited(
-          ref
-              .read(readSessionCoordinatorProvider)
-              .beginReadSession(
-                comic: loadedShell.comic,
-                incognito: routeContext.incognito,
-                initialPageIndex: frozenOpenIndex.value!,
-              ),
-        );
-        return null;
-      },
-      <Object?>[
-        routeContext.comicId,
-        routeContext.incognito,
-        routeContext.startFromFirstPage,
-        readerReady,
-      ],
-    );
 
     final ReaderController controller = ref.read(
       readerControllerProvider(viewKey).notifier,

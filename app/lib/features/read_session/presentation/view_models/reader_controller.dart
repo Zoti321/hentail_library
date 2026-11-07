@@ -94,6 +94,13 @@ class ReaderController extends _$ReaderController
     final bool carryAutoPlay = ref
         .read(readerAutoPlayCarryProvider.notifier)
         .take();
+    await ref
+        .read(readSessionCoordinatorProvider)
+        .beginReadSession(
+          comic: snapshot.comic,
+          incognito: incognito,
+          initialPageIndex: snapshot.resumePageIndex,
+        );
     return ReaderState(
       comic: snapshot.comic,
       readingMode: initialMode,

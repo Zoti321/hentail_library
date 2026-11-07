@@ -76,7 +76,7 @@ Uint8List _encodedPng() => Uint8List.fromList(<int>[
 PageImageCopy _subject({
   required _FakeComicPageSourcePort pageSource,
   required _FakeClipboardImagePort clipboard,
-  PageImagePngEncoder? encodePng,
+  required PageImagePngEncoder encodePng,
 }) {
   return PageImageCopy(
     pageSource: pageSource,
