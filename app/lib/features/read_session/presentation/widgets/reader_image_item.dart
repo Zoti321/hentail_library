@@ -134,6 +134,11 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
   }
 
   void _rememberImageSize(Size size) {
+    // AppComicImage reports size in a post-frame callback; the slot may
+    // already be scrolled off and disposed.
+    if (!mounted) {
+      return;
+    }
     ref
         .read(readerPageAspectRatiosProvider.notifier)
         .remember(
