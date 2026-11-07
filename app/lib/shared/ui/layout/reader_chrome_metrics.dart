@@ -37,27 +37,21 @@ abstract final class ReaderChromeMetrics {
   static double edgeGapOf(double viewportWidth) =>
       denseChrome(viewportWidth) ? _denseEdgeGap : edgeGap;
 
-  static double bottomBarMinHeightOf(double viewportWidth) => denseChrome(
-    viewportWidth,
-  )
+  static double bottomBarMinHeightOf(double viewportWidth) =>
+      denseChrome(viewportWidth)
       ? _denseBottomBarMinHeight
       : bottomBarMinHeight;
 
-  static double bottomBarTopPaddingOf(double viewportWidth) => denseChrome(
-    viewportWidth,
-  )
+  static double bottomBarTopPaddingOf(double viewportWidth) =>
+      denseChrome(viewportWidth)
       ? _denseBottomBarTopPadding
       : bottomBarTopPadding;
 
-  static double actionIconSizeOf(double viewportWidth) => denseChrome(
-    viewportWidth,
-  )
-      ? _denseActionIconSize
-      : actionIconSize;
+  static double actionIconSizeOf(double viewportWidth) =>
+      denseChrome(viewportWidth) ? _denseActionIconSize : actionIconSize;
 
-  static double progressControlsGapOf(double viewportWidth) => denseChrome(
-    viewportWidth,
-  )
+  static double progressControlsGapOf(double viewportWidth) =>
+      denseChrome(viewportWidth)
       ? _denseProgressControlsGap
       : progressControlsGap;
 

@@ -13,10 +13,7 @@ void main() {
       await pumpApp(
         tester,
         home: const Scaffold(
-          body: PeerContentTransition(
-            switchKey: 0,
-            child: Text('peer'),
-          ),
+          body: PeerContentTransition(switchKey: 0, child: Text('peer')),
         ),
       );
 
@@ -53,26 +50,17 @@ void main() {
         ),
       );
 
-      expect(
-        tester.getSize(find.byType(PageTransitionSwitcher)).height,
-        200,
-      );
+      expect(tester.getSize(find.byType(PageTransitionSwitcher)).height, 200);
 
       await tester.tap(find.text('next'));
       await tester.pump();
       // 过渡中高度取 max(离开, 进入)，避免进入项单独定高导致裁切闪白。
-      expect(
-        tester.getSize(find.byType(PageTransitionSwitcher)).height,
-        200,
-      );
+      expect(tester.getSize(find.byType(PageTransitionSwitcher)).height, 200);
 
       await tester.pumpAndSettle();
       expect(find.text('short'), findsOneWidget);
       expect(find.text('tall'), findsNothing);
-      expect(
-        tester.getSize(find.byType(PageTransitionSwitcher)).height,
-        80,
-      );
+      expect(tester.getSize(find.byType(PageTransitionSwitcher)).height, 80);
     });
 
     testWidgets('reduce motion skips PageTransitionSwitcher', (
@@ -83,10 +71,7 @@ void main() {
         home: const MediaQuery(
           data: MediaQueryData(disableAnimations: true),
           child: Scaffold(
-            body: PeerContentTransition(
-              switchKey: 0,
-              child: Text('peer'),
-            ),
+            body: PeerContentTransition(switchKey: 0, child: Text('peer')),
           ),
         ),
       );

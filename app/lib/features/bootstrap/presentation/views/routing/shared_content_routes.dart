@@ -13,7 +13,6 @@ import 'package:hentai_library/features/named_metadata/public.dart';
 import 'package:hentai_library/features/read_session/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/routing/route_not_found_page.dart';
 
-
 typedef ComicDetailBuilder = Widget Function(
   BuildContext context,
   String comicId,

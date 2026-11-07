@@ -156,10 +156,7 @@ class _ReadingHistoryListRow extends StatelessWidget {
     final bool isLastRow = row == rowCount - 1;
     return Padding(
       padding: EdgeInsets.only(bottom: isLastRow ? 0 : layout.gap),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: cells,
-      ),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: cells),
     );
   }
 }

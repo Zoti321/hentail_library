@@ -94,43 +94,44 @@ void main() {
     );
   });
 
-  testWidgets('wide layout detail category switch uses horizontal shared axis', (
-    WidgetTester tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(1280, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    await pumpApp(
-      tester,
-      home: const Center(
-        child: SizedBox(
-          width: 1280,
-          height: 800,
-          child: SettingsLayout(
-            initialCategory: SettingsCategory.personalization,
+  testWidgets(
+    'wide layout detail category switch uses horizontal shared axis',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(1280, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await pumpApp(
+        tester,
+        home: const Center(
+          child: SizedBox(
+            width: 1280,
+            height: 800,
+            child: SettingsLayout(
+              initialCategory: SettingsCategory.personalization,
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    expect(find.byKey(const Key('_settings_detail')), findsOneWidget);
+      expect(find.byKey(const Key('_settings_detail')), findsOneWidget);
 
-    await tester.tap(
-      find
-          .descendant(
-            of: find.byKey(const Key('_settings_master')),
-            matching: find.byType(InkWell),
-          )
-          .at(1),
-    );
-    await tester.pump();
+      await tester.tap(
+        find
+            .descendant(
+              of: find.byKey(const Key('_settings_master')),
+              matching: find.byType(InkWell),
+            )
+            .at(1),
+      );
+      await tester.pump();
 
-    expect(find.byType(PageTransitionSwitcher), findsWidgets);
-    final SharedAxisTransition axis = tester.widget(
-      find.byType(SharedAxisTransition).first,
-    );
-    expect(axis.transitionType, SharedAxisTransitionType.horizontal);
+      expect(find.byType(PageTransitionSwitcher), findsWidgets);
+      final SharedAxisTransition axis = tester.widget(
+        find.byType(SharedAxisTransition).first,
+      );
+      expect(axis.transitionType, SharedAxisTransitionType.horizontal);
 
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('_settings_detail')), findsOneWidget);
-  });
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('_settings_detail')), findsOneWidget);
+    },
+  );
 }

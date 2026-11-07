@@ -69,48 +69,52 @@ class _AppRootState extends ConsumerState<_AppRoot> {
             material_ui.ColorScheme? lightDynamic,
             material_ui.ColorScheme? darkDynamic,
           ) {
-        final AssembledAppTheme light = assembleAppTheme(
-          Brightness.light,
-          seed: resolveAppThemeSeed(
-            useDynamicColor: themePrefs.useDynamicColor,
-            platformPrimary: lightDynamic?.primary,
-            colorSchemeId: colorSchemeId,
-          ),
-          font: font,
-        );
-        final AssembledAppTheme dark = assembleAppTheme(
-          Brightness.dark,
-          seed: resolveAppThemeSeed(
-            useDynamicColor: themePrefs.useDynamicColor,
-            platformPrimary: darkDynamic?.primary,
-            colorSchemeId: colorSchemeId,
-          ),
-          font: font,
-        );
-        return MaterialApp.router(
-          locale: locale,
-          // Prefer zh as first entry so unmatched device locales fall back to Chinese.
-          supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          title: appWindowTitle(),
-          debugShowCheckedModeBanner: false,
-          theme: light.material,
-          darkTheme: dark.material,
-          themeMode: themeMode,
-          routerConfig: appRouter,
-          builder: (BuildContext context, Widget? child) {
-            final AssembledAppTheme assembled =
-                Theme.of(context).brightness == Brightness.dark ? dark : light;
-            return M3ETheme(
-              data: assembled.m3e,
-              child: AnnotatedRegion<SystemUiOverlayStyle>(
-                value: appSystemUiOverlayStyle(Theme.of(context).colorScheme),
-                child: child ?? const SizedBox.shrink(),
+            final AssembledAppTheme light = assembleAppTheme(
+              Brightness.light,
+              seed: resolveAppThemeSeed(
+                useDynamicColor: themePrefs.useDynamicColor,
+                platformPrimary: lightDynamic?.primary,
+                colorSchemeId: colorSchemeId,
               ),
+              font: font,
+            );
+            final AssembledAppTheme dark = assembleAppTheme(
+              Brightness.dark,
+              seed: resolveAppThemeSeed(
+                useDynamicColor: themePrefs.useDynamicColor,
+                platformPrimary: darkDynamic?.primary,
+                colorSchemeId: colorSchemeId,
+              ),
+              font: font,
+            );
+            return MaterialApp.router(
+              locale: locale,
+              // Prefer zh as first entry so unmatched device locales fall back to Chinese.
+              supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              title: appWindowTitle(),
+              debugShowCheckedModeBanner: false,
+              theme: light.material,
+              darkTheme: dark.material,
+              themeMode: themeMode,
+              routerConfig: appRouter,
+              builder: (BuildContext context, Widget? child) {
+                final AssembledAppTheme assembled =
+                    Theme.of(context).brightness == Brightness.dark
+                    ? dark
+                    : light;
+                return M3ETheme(
+                  data: assembled.m3e,
+                  child: AnnotatedRegion<SystemUiOverlayStyle>(
+                    value: appSystemUiOverlayStyle(
+                      Theme.of(context).colorScheme,
+                    ),
+                    child: child ?? const SizedBox.shrink(),
+                  ),
+                );
+              },
             );
           },
-        );
-      },
     );
   }
 }

@@ -112,10 +112,7 @@ void main() {
           .set(Uint8List.fromList(<int>[i & 0xff]));
     }
 
-    expect(
-      container.read(comicCoverThumbnailCacheProvider('c0')),
-      isNull,
-    );
+    expect(container.read(comicCoverThumbnailCacheProvider('c0')), isNull);
     expect(
       container.read(
         comicCoverThumbnailCacheProvider(

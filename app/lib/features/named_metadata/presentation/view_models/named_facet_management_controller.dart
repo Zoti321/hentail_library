@@ -222,10 +222,7 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
     if (kind == ManagedNamedFacetKind.author) {
       return;
     }
-    state = state.copyWith(
-      mergeTarget: target,
-      mergeSources: const <String>{},
-    );
+    state = state.copyWith(mergeTarget: target, mergeSources: const <String>{});
   }
 
   void toggleMergeSource(String source) {

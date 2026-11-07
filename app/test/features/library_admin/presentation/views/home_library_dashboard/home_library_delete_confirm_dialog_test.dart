@@ -39,10 +39,7 @@ void main() {
     await tester.tap(find.text('打开'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text(l10n.homeLibraryDeleteConfirmAcknowledge),
-      findsOneWidget,
-    );
+    expect(find.text(l10n.homeLibraryDeleteConfirmAcknowledge), findsOneWidget);
     expect(find.text(l10n.homeLibraryDeleteConfirmBody), findsOneWidget);
 
     final Finder deleteButton = find.descendant(
@@ -57,19 +54,13 @@ void main() {
 
     await tester.tap(deleteButton);
     await tester.pumpAndSettle();
-    expect(
-      find.text(l10n.homeLibraryDeleteConfirmAcknowledge),
-      findsOneWidget,
-    );
+    expect(find.text(l10n.homeLibraryDeleteConfirmAcknowledge), findsOneWidget);
 
     await tester.tap(find.byType(M3ECheckbox));
     await tester.pumpAndSettle();
 
     await tester.tap(deleteButton);
     await tester.pumpAndSettle();
-    expect(
-      find.text(l10n.homeLibraryDeleteConfirmAcknowledge),
-      findsNothing,
-    );
+    expect(find.text(l10n.homeLibraryDeleteConfirmAcknowledge), findsNothing);
   });
 }

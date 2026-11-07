@@ -90,7 +90,9 @@ Size? _peekJpegSize(Uint8List bytes) {
     }
     final int marker = bytes[i++];
     // Standalone markers without length.
-    if (marker == 0xD8 || marker == 0xD9 || (marker >= 0xD0 && marker <= 0xD7)) {
+    if (marker == 0xD8 ||
+        marker == 0xD9 ||
+        (marker >= 0xD0 && marker <= 0xD7)) {
       continue;
     }
     if (i + 1 >= bytes.length) {

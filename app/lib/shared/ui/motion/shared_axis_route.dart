@@ -14,8 +14,7 @@ const Duration kSharedAxisRouteDuration = Duration(milliseconds: 300);
 PageRoute<T> sharedAxisRoute<T>(
   BuildContext context, {
   required WidgetBuilder builder,
-  SharedAxisTransitionType transitionType =
-      SharedAxisTransitionType.horizontal,
+  SharedAxisTransitionType transitionType = SharedAxisTransitionType.horizontal,
   Color? fillColor,
 }) {
   final Duration duration = LabMotion.motionDurationOf(
@@ -59,8 +58,7 @@ PageRoute<T> sharedAxisRoute<T>(
 CustomTransitionPage<void> buildSharedAxisPage({
   required GoRouterState state,
   required Widget child,
-  SharedAxisTransitionType transitionType =
-      SharedAxisTransitionType.horizontal,
+  SharedAxisTransitionType transitionType = SharedAxisTransitionType.horizontal,
   Color? fillColor,
   Duration? transitionDuration,
   bool reverse = false,
@@ -100,8 +98,7 @@ Widget sharedAxisTransitionWrapper({
   required Animation<double> animation,
   required Animation<double> secondaryAnimation,
   required Widget child,
-  SharedAxisTransitionType transitionType =
-      SharedAxisTransitionType.horizontal,
+  SharedAxisTransitionType transitionType = SharedAxisTransitionType.horizontal,
   Color? fillColor,
   bool reverse = false,
 }) {
@@ -109,8 +106,7 @@ Widget sharedAxisTransitionWrapper({
     return child;
   }
   final Color resolvedFill =
-      fillColor ??
-      labBrowseCanvasColor(M3ETheme.of(context).colorScheme);
+      fillColor ?? labBrowseCanvasColor(M3ETheme.of(context).colorScheme);
   final bool mirrorHorizontal =
       reverse && transitionType == SharedAxisTransitionType.horizontal;
   final Widget axisChild = mirrorHorizontal

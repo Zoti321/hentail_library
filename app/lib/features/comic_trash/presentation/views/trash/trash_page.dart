@@ -166,9 +166,8 @@ class _TrashBody extends ConsumerWidget {
           SliverToBoxAdapter(
             child: Text(
               l10n.trashPageSummary(totalCount),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
+              style: Theme.of(context).textTheme.bodySmall
+                  ?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: layout.listItemGap)),
@@ -189,9 +188,7 @@ class _TrashBody extends ConsumerWidget {
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
+                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
             ),
         ],
@@ -251,9 +248,8 @@ class _TrashHeader extends ConsumerWidget {
               padding: const EdgeInsets.only(right: 8),
               child: Text(
                 l10n.trashSelectedCount(selectedCount),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ),
           M3EIconButton(
@@ -310,11 +306,7 @@ class _TrashHeader extends ConsumerWidget {
                           if (state == null) {
                             return;
                           }
-                          purgeTrashedComics(
-                            context,
-                            ref,
-                            state.selectedItems,
-                          );
+                          purgeTrashedComics(context, ref, state.selectedItems);
                         }
                       : () {
                           final TrashPageState? state = readState();
@@ -353,16 +345,14 @@ class _TrashEmptyState extends StatelessWidget {
             Icon(Symbols.delete, size: 48, color: scheme.outline),
             Text(
               l10n.trashEmptyTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(color: scheme.onSurface),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(color: scheme.onSurface),
             ),
             Text(
               l10n.trashEmptyDescription,
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: scheme.onSurfaceVariant),
             ),
           ],
         ),

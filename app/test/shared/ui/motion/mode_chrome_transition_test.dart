@@ -13,10 +13,7 @@ void main() {
       await pumpApp(
         tester,
         home: const Scaffold(
-          body: ModeChromeTransition(
-            switchKey: false,
-            child: Text('browse'),
-          ),
+          body: ModeChromeTransition(switchKey: false, child: Text('browse')),
         ),
       );
 
@@ -70,10 +67,7 @@ void main() {
         home: const MediaQuery(
           data: MediaQueryData(disableAnimations: true),
           child: Scaffold(
-            body: ModeChromeTransition(
-              switchKey: false,
-              child: Text('browse'),
-            ),
+            body: ModeChromeTransition(switchKey: false, child: Text('browse')),
           ),
         ),
       );

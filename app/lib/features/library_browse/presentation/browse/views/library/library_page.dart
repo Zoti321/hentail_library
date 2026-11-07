@@ -196,17 +196,16 @@ class _LibraryModeHeader extends ConsumerWidget {
     final Widget modeHeader = librarySelection
         ? LibrarySelectionHeader(
             pageComicIds: ref.watch(
-              libraryComicsCatalogControllerProvider.select(
-                (AsyncValue<LibraryComicsCatalogState> async) {
-                  final LibraryComicsCatalogState? catalog =
-                      stableCatalogSnapshot(async);
-                  return <String>[
-                    for (final Comic comic
-                        in catalog?.items ?? const <Comic>[])
-                      comic.comicId,
-                  ];
-                },
-              ),
+              libraryComicsCatalogControllerProvider.select((
+                AsyncValue<LibraryComicsCatalogState> async,
+              ) {
+                final LibraryComicsCatalogState? catalog =
+                    stableCatalogSnapshot(async);
+                return <String>[
+                  for (final Comic comic in catalog?.items ?? const <Comic>[])
+                    comic.comicId,
+                ];
+              }),
             ),
           )
         : const _LibraryBrowsePageHeader();

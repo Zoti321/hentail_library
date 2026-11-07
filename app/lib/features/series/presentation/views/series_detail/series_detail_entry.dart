@@ -42,10 +42,7 @@ SeriesDetailViewObject seriesDetailEntry({
           title: pageItems[index].comic.title,
           pageCount: pageItems[index].comic.pageCount,
           comic: pageItems[index].comic,
-          cover: comicCoverBuilder?.call(
-            pageItems[index].comic.comicId,
-            index,
-          ),
+          cover: comicCoverBuilder?.call(pageItems[index].comic.comicId, index),
         ),
     ],
     initialPage: page,

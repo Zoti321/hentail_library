@@ -18,8 +18,10 @@ const List<String> kAppFontFamilyNotoCjkFallbacks = <String>[
 
 /// Active UI font from Material / M3E text styles（overlays that lost family）.
 String appFontFamilyOf(BuildContext context) {
-  final String? fromTextTheme =
-      Theme.of(context).textTheme.bodyMedium?.fontFamily;
+  final String? fromTextTheme = Theme.of(context)
+      .textTheme
+      .bodyMedium
+      ?.fontFamily;
   if (fromTextTheme != null && fromTextTheme.isNotEmpty) {
     return fromTextTheme;
   }
@@ -33,10 +35,7 @@ String appFontFamilyOf(BuildContext context) {
 
 /// Resolved primary family + fallbacks for one user font preference.
 final class AppFontSpec {
-  const AppFontSpec({
-    required this.family,
-    this.fallbacks = const <String>[],
-  });
+  const AppFontSpec({required this.family, this.fallbacks = const <String>[]});
 
   final String family;
   final List<String> fallbacks;

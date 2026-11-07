@@ -152,8 +152,7 @@ ThemeData buildMaterialTheme(
 }) {
   final M3EThemeData resolved =
       m3e ?? buildAppM3eThemeData(brightness, font: font);
-  final String family =
-      resolved.typeScale.bodyLarge.fontFamily ?? font.family;
+  final String family = resolved.typeScale.bodyLarge.fontFamily ?? font.family;
   return ThemeData(
     useMaterial3: true,
     fontFamily: family,

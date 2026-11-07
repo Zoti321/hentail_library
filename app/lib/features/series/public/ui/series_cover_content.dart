@@ -46,8 +46,9 @@ class SeriesCoverContent extends ConsumerWidget {
         kind: ComicCoverPlaceholderKind.error,
       ),
       data: (SeriesCoverSource source) => switch (source) {
-        SeriesCoverCustomThumbnail(:final thumbnail) =>
-          _SeriesCustomCoverImage(thumbnail: thumbnail),
+        SeriesCoverCustomThumbnail(:final thumbnail) => _SeriesCustomCoverImage(
+          thumbnail: thumbnail,
+        ),
         SeriesCoverFallbackComic(:final comicId) => ComicCoverContent(
           comicId: comicId,
           priority: priority,

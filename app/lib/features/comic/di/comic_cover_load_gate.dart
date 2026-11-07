@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 /// Limits concurrent comic-cover FRB loads from the Flutter side.
 class ComicCoverLoadGate {

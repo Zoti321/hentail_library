@@ -24,8 +24,8 @@ double desktopFadeThroughEnterOpacity(double t) {
   if (t >= 1.0) {
     return 1.0;
   }
-  final double local = (t - kFadeThroughIncomingStart) /
-      (1.0 - kFadeThroughIncomingStart);
+  final double local =
+      (t - kFadeThroughIncomingStart) / (1.0 - kFadeThroughIncomingStart);
   return const Cubic(0.0, 0.0, 0.2, 1.0).transform(local.clamp(0.0, 1.0));
 }
 
@@ -41,8 +41,7 @@ double desktopFadeThroughExitOpacity(double t) {
     return 0.0;
   }
   final double local = t / kFadeThroughOutgoingEnd;
-  return 1.0 -
-      const Cubic(0.4, 0.0, 1.0, 1.0).transform(local.clamp(0.0, 1.0));
+  return 1.0 - const Cubic(0.4, 0.0, 1.0, 1.0).transform(local.clamp(0.0, 1.0));
 }
 
 Widget desktopFadeThroughTransitionWrapper({

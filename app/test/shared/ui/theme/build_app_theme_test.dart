@@ -21,13 +21,16 @@ void main() {
       expect(theme.colorScheme.primary, isNot(tonalSpotPrimary));
     });
 
-    test('Material ThemeData primary matches M3ETheme assembly for same seed', () {
-      final AssembledAppTheme assembled = assembleAppTheme(Brightness.light);
-      expect(
-        assembled.material.colorScheme.primary,
-        assembled.m3e.colorScheme.primary,
-      );
-    });
+    test(
+      'Material ThemeData primary matches M3ETheme assembly for same seed',
+      () {
+        final AssembledAppTheme assembled = assembleAppTheme(Brightness.light);
+        expect(
+          assembled.material.colorScheme.primary,
+          assembled.m3e.colorScheme.primary,
+        );
+      },
+    );
 
     test('registers layout, semantic, shadow, and motion extensions', () {
       for (final Brightness brightness in <Brightness>[

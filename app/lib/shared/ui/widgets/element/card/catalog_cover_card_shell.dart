@@ -56,7 +56,9 @@ class CatalogCoverCardShell extends HookWidget {
           borderRadius: cardRadius,
           color: cs.surface,
           border: Border.all(
-            color: isFocused.value ? cs.primary : Theme.of(context).colorScheme.outlineVariant,
+            color: isFocused.value
+                ? cs.primary
+                : Theme.of(context).colorScheme.outlineVariant,
           ),
           boxShadow: context.shadows.catalogCard(highlighted: highlighted),
         ),

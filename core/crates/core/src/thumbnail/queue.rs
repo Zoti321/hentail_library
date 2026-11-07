@@ -29,7 +29,11 @@ pub enum ThumbnailEvent {
         comic_id: String,
         thumbnail: Option<Vec<u8>>,
     },
-    Progress { done: i32, total: i32, failed: i32 },
+    Progress {
+        done: i32,
+        total: i32,
+        failed: i32,
+    },
 }
 
 #[derive(Debug, Default)]

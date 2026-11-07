@@ -4,10 +4,7 @@ import 'package:hentai_library/core/constants/libraries_routes.dart';
 void main() {
   group('LibrariesRoutes', () {
     test('redirects /local to home', () {
-      expect(
-        LibrariesRoutes.redirectPath(locationPath: '/local'),
-        '/home',
-      );
+      expect(LibrariesRoutes.redirectPath(locationPath: '/local'), '/home');
     });
 
     test('redirects bare /libraries to home', () {
@@ -32,24 +29,21 @@ void main() {
 
   group('librariesSidebarSelection', () {
     test('legacy all path does not activate a library', () {
-      expect(
-        librariesSidebarSelection(path: LibrariesRoutes.legacyAll),
-        (activeLibraryId: null),
-      );
+      expect(librariesSidebarSelection(path: LibrariesRoutes.legacyAll), (
+        activeLibraryId: null,
+      ));
     });
 
     test('library browse path highlights that library', () {
-      expect(
-        librariesSidebarSelection(path: '/libraries/lib-a'),
-        (activeLibraryId: 'lib-a'),
-      );
+      expect(librariesSidebarSelection(path: '/libraries/lib-a'), (
+        activeLibraryId: 'lib-a',
+      ));
     });
 
     test('comic detail does not imply a library selection', () {
-      expect(
-        librariesSidebarSelection(path: '/comic/c1'),
-        (activeLibraryId: null),
-      );
+      expect(librariesSidebarSelection(path: '/comic/c1'), (
+        activeLibraryId: null,
+      ));
     });
   });
 

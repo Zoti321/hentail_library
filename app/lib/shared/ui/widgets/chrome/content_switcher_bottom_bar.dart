@@ -31,7 +31,11 @@ class ContentSwitcherBottomBar extends StatelessWidget {
       elevation: 0,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
         ),
         child: SafeArea(
           top: false,

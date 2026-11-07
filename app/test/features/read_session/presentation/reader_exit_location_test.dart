@@ -18,10 +18,7 @@ void main() {
     });
 
     test('goes to home when cannot pop and comic id blank', () {
-      expect(
-        resolveReaderExitNavigation(canPop: false, comicId: ' '),
-        '/home',
-      );
+      expect(resolveReaderExitNavigation(canPop: false, comicId: ' '), '/home');
     });
   });
 

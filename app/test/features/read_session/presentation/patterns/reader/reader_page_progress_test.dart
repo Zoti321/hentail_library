@@ -7,28 +7,29 @@ import '../../../../../support/pump_app.dart';
 
 void main() {
   group('ReaderPageProgress', () {
-    testWidgets('onChangeEnd uses last onChanged when callback value is stale', (
-      WidgetTester tester,
-    ) async {
-      int? committedPage;
-      await pumpApp(
-        tester,
-        home: Scaffold(
-          body: ReaderPageProgress(
-            currentPage: 10,
-            totalPages: 100,
-            onPageChanged: (int page) => committedPage = page,
+    testWidgets(
+      'onChangeEnd uses last onChanged when callback value is stale',
+      (WidgetTester tester) async {
+        int? committedPage;
+        await pumpApp(
+          tester,
+          home: Scaffold(
+            body: ReaderPageProgress(
+              currentPage: 10,
+              totalPages: 100,
+              onPageChanged: (int page) => committedPage = page,
+            ),
           ),
-        ),
-      );
+        );
 
-      final M3ESlider slider = tester.widget(find.byType(M3ESlider));
-      slider.onChanged!(50);
-      await tester.pump();
-      // 模拟 M3E 在父级 rebuild 前用旧 widget.value 调 onChangeEnd。
-      slider.onChangeEnd!(10);
+        final M3ESlider slider = tester.widget(find.byType(M3ESlider));
+        slider.onChanged!(50);
+        await tester.pump();
+        // 模拟 M3E 在父级 rebuild 前用旧 widget.value 调 onChangeEnd。
+        slider.onChangeEnd!(10);
 
-      expect(committedPage, 50);
-    });
+        expect(committedPage, 50);
+      },
+    );
   });
 }

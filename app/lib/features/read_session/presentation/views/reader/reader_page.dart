@@ -58,10 +58,7 @@ class ReaderPage extends HookConsumerWidget {
     final ThemeData ambient = Theme.of(context);
     final ThemeData theme = ambient.brightness == Brightness.dark
         ? ambient
-        : buildAppTheme(
-            Brightness.dark,
-            seed: ambient.colorScheme.primary,
-          );
+        : buildAppTheme(Brightness.dark, seed: ambient.colorScheme.primary);
 
     if (routeContext.comicId.isEmpty) {
       return Theme(

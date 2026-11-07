@@ -61,9 +61,8 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
   _BulkEditTab _tab = _BulkEditTab.general;
   bool _detailTransitionReverse = false;
 
-  BulkMetadataEditSessionNotifier get _sessionNotifier => ref.read(
-    bulkMetadataEditSessionProvider(widget.comicIds).notifier,
-  );
+  BulkMetadataEditSessionNotifier get _sessionNotifier =>
+      ref.read(bulkMetadataEditSessionProvider(widget.comicIds).notifier);
 
   BulkMetadataEditSession get _session => _sessionNotifier.session;
 

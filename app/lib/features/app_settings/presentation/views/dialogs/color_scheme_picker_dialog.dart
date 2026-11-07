@@ -65,7 +65,9 @@ class _ColorSchemePickerDialog extends StatelessWidget {
     // `violet` 与 brand 同色；UI 只展示 brand（文案为紫罗兰色），JSON 仍保留 violet。
     final List<AppColorSchemePreference> preferences = AppColorSchemePreference
         .values
-        .where((AppColorSchemePreference p) => p != AppColorSchemePreference.violet)
+        .where(
+          (AppColorSchemePreference p) => p != AppColorSchemePreference.violet,
+        )
         .toList(growable: false);
     final AppColorSchemePreference effectiveSelected =
         selected == AppColorSchemePreference.violet
@@ -177,8 +179,9 @@ class _PaletteCard extends StatelessWidget {
     final Color tertiary = Color(Hct.from(hct.hue + 50, 20.0, 85.0).toInt());
     final Color primaryContainer = Color(Hct.from(hct.hue, 30.0, 50.0).toInt());
     final Color checkbox = Color(Hct.from(hct.hue, 30.0, 40.0).toInt());
-    final Color surfaceContainerLow =
-        M3ETheme.of(context).colorScheme.surfaceContainerLow;
+    final Color surfaceContainerLow = M3ETheme.of(context)
+        .colorScheme
+        .surfaceContainerLow;
 
     return SizedBox(
       width: _PaletteMetrics.cardSize,

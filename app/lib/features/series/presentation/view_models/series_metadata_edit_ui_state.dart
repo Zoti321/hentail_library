@@ -2,11 +2,7 @@ import 'package:hentai_library/features/series/presentation/patterns/metadata_ed
 import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 
 /// [SeriesMetadataEditSession.save] 结果。
-enum SeriesMetadataEditSaveResult {
-  succeeded,
-  busy,
-  validationFailed,
-}
+enum SeriesMetadataEditSaveResult { succeeded, busy, validationFailed }
 
 /// 系列元数据编辑会话 UI 状态（不可变）。
 class SeriesMetadataEditUiState {

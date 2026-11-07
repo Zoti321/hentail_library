@@ -181,9 +181,7 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
               ),
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                sliver: SliverToBoxAdapter(
-                  child: _buildScrollBody(),
-                ),
+                sliver: SliverToBoxAdapter(child: _buildScrollBody()),
               ),
             ],
           ),

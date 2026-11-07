@@ -88,11 +88,7 @@ class SeriesMetadataEditViewState
         draft: session.draft,
         locks: session.locks,
         onLockChanged:
-            ({
-              bool? name,
-              bool? serializationStatus,
-              bool? totalCount,
-            }) {
+            ({bool? name, bool? serializationStatus, bool? totalCount}) {
               unawaited(() async {
                 try {
                   await notifier.setLock(

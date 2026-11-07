@@ -88,9 +88,8 @@ class ComicCoverContent extends ConsumerWidget {
       return priority;
     }
     final bool inViewport = ref.watch(
-      coverViewportProvider(
-        scope,
-      ).select((Set<int> indices) => indices.contains(index)),
+      coverViewportProvider(scope)
+          .select((Set<int> indices) => indices.contains(index)),
     );
     return inViewport ? ThumbnailPriority.high : ThumbnailPriority.low;
   }

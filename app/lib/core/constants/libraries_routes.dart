@@ -48,7 +48,8 @@ LibrariesSidebarSelection librariesSidebarSelection({required String path}) {
 
 /// 二级库列表高亮：仅当路由为 `/libraries/:id` 时返回该 id，否则为空。
 String librariesSidebarSelectedLibraryId({required String path}) {
-  final String? activeId = librariesSidebarSelection(path: path).activeLibraryId;
+  final String? activeId = librariesSidebarSelection(path: path)
+      .activeLibraryId;
   if (activeId != null && activeId.isNotEmpty) {
     return activeId;
   }

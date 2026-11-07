@@ -64,28 +64,18 @@ class NamedFacetFillViewportBinder extends HookConsumerWidget {
     }
 
     // 维度切换时等 PeerContentTransition 结束后再补页，避免过渡中撑高列表。
-    useEffect(
-      () {
-        final Timer timer = Timer(
-          PeerContentTransition.transitionDuration,
-          scheduleTryFill,
-        );
-        return timer.cancel;
-      },
-      <Object?>[kind],
-    );
+    useEffect(() {
+      final Timer timer = Timer(
+        PeerContentTransition.transitionDuration,
+        scheduleTryFill,
+      );
+      return timer.cancel;
+    }, <Object?>[kind]);
 
-    useEffect(
-      () {
-        scheduleTryFill();
-        return null;
-      },
-      <Object?>[
-        scrollController,
-        viewportSize.width,
-        viewportSize.height,
-      ],
-    );
+    useEffect(() {
+      scheduleTryFill();
+      return null;
+    }, <Object?>[scrollController, viewportSize.width, viewportSize.height]);
 
     ref.listen<NamedFacetManagementState>(
       namedFacetManagementControllerProvider(kind),

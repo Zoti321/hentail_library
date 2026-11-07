@@ -159,8 +159,7 @@ class _NamedFacetMultiSelectMenuPanelState<T>
 
         final Set<String> selected = widget.selectedNames.toSet();
         final NamePinyinIndex? index = _pinyinIndex;
-        final bool useIndex =
-            index != null && identical(items, _indexedItems);
+        final bool useIndex = index != null && identical(items, _indexedItems);
         final List<T> remaining = items
             .where((T item) => !selected.contains(widget.resolveName(item)))
             .where((T item) {

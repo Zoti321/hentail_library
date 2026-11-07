@@ -156,12 +156,7 @@ class ComicMetadataEditSession extends _$ComicMetadataEditSession {
         ),
       );
     } catch (error, stackTrace) {
-      logError(
-        AppLog.ui('editMetadata'),
-        '加载系列排序成员失败（可忽略）',
-        error,
-        stackTrace,
-      );
+      logError(AppLog.ui('editMetadata'), '加载系列排序成员失败（可忽略）', error, stackTrace);
     }
   }
 }

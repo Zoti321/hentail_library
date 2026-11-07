@@ -77,8 +77,7 @@ void main() {
         expect(
           container.read(browseLibraryIdProvider),
           'lib-b',
-          reason:
-              'dispose release of the previous effect must not wipe the new claim',
+          reason: 'dispose release of the previous effect must not wipe the new claim',
         );
       },
     );

@@ -88,9 +88,7 @@ class _SpringExpandPanelState extends State<SpringExpandPanel>
         final double progress = _controller.value;
         // 与 M3EExpandableSublist 一致：高度不回弹；位移可用略过冲的 t。
         final double t = progress.clamp(0.0, 1.2);
-        final double heightFactor = progress <= 0
-            ? 0.0
-            : t.clamp(0.0, 1.0);
+        final double heightFactor = progress <= 0 ? 0.0 : t.clamp(0.0, 1.0);
         if (heightFactor <= _hiddenFactor) {
           return const SizedBox.shrink();
         }

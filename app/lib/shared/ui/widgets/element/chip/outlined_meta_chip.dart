@@ -67,7 +67,8 @@ class OutlinedMetaChip extends HookWidget {
         : Colors.transparent;
     final Color restBackground =
         backgroundColor ?? (showBorder ? cs.surface : Colors.transparent);
-    final Color effectiveTextColor = textColor ?? Theme.of(context).colorScheme.onSurfaceVariant;
+    final Color effectiveTextColor =
+        textColor ?? Theme.of(context).colorScheme.onSurfaceVariant;
     final EdgeInsets padding = compact
         ? const EdgeInsets.symmetric(horizontal: 10, vertical: 4)
         : const EdgeInsets.symmetric(horizontal: 12, vertical: 6);

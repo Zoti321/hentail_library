@@ -108,7 +108,11 @@ class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
       return this;
     }
     return ReaderColorScheme(
-      readerBackground: Color.lerp(readerBackground, other.readerBackground, t)!,
+      readerBackground: Color.lerp(
+        readerBackground,
+        other.readerBackground,
+        t,
+      )!,
       readerTextMuted: Color.lerp(readerTextMuted, other.readerTextMuted, t)!,
       floatingUiBackground: Color.lerp(
         floatingUiBackground,

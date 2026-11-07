@@ -61,7 +61,8 @@ class MetadataFacetChip extends ConsumerWidget {
         M3EMenuEntry(
           label: l10n.metadataRename,
           leading: const Icon(LucideIcons.pencil),
-          onPressed: () => unawaited(renameNamedFacet(context, ref, kind, name)),
+          onPressed: () =>
+              unawaited(renameNamedFacet(context, ref, kind, name)),
         ),
         M3EMenuEntry(
           label: l10n.metadataMerge,

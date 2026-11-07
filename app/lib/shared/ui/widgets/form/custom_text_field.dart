@@ -87,7 +87,10 @@ class CustomTextField extends HookWidget {
               focusNode: focusNode,
               onChanged: onChanged,
               onSubmitted: onSubmitted,
-              style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface),
+              style: TextStyle(
+                fontSize: 13,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               cursorColor: colorScheme.onSurface,
               cursorWidth: 0.8,
               cursorHeight: 16,

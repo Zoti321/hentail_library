@@ -261,9 +261,8 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                 color: backgroundColor ?? cs.surface,
                 borderRadius: BorderRadius.circular(radius),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant.withValues(
-                    alpha: (1 - t).clamp(0.0, 1.0),
-                  ),
+                  color: Theme.of(context).colorScheme.outlineVariant
+                      .withValues(alpha: (1 - t).clamp(0.0, 1.0)),
                   width: 1,
                 ),
                 boxShadow: shadowOpacity <= 0

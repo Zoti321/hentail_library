@@ -17,7 +17,8 @@ ThumbnailEvent mapThumbnailEvent(rust.ThumbnailEventDto event) {
     rust.ThumbnailEventDto_Ready(
       :final String comicId,
       :final Uint8List? thumbnail,
-    ) => ThumbnailReady(comicId, thumbnail: thumbnail),
+    ) =>
+      ThumbnailReady(comicId, thumbnail: thumbnail),
     rust.ThumbnailEventDto_Progress(
       :final int done,
       :final int total,

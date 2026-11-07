@@ -222,24 +222,22 @@ Future<void> _refreshMetadata(
 
 void _showInExplorer(BuildContext context, Series series) {
   final AppLocalizations l10n = context.l10n;
-  showInFileExplorer(series.folderPath).catchError((
-    Object error,
-    StackTrace stackTrace,
-  ) {
-    if (!context.mounted) {
-      return;
-    }
-    if (error is AppException) {
-      showErrorSnackbar(context, error);
-      return;
-    }
-    showErrorSnackbar(
-      context,
-      AppException(
-        l10n.comicDetailShowInExplorerFailed,
-        cause: error,
-        stackTrace: stackTrace,
-      ),
-    );
-  });
+  showInFileExplorer(series.folderPath)
+      .catchError((Object error, StackTrace stackTrace) {
+        if (!context.mounted) {
+          return;
+        }
+        if (error is AppException) {
+          showErrorSnackbar(context, error);
+          return;
+        }
+        showErrorSnackbar(
+          context,
+          AppException(
+            l10n.comicDetailShowInExplorerFailed,
+            cause: error,
+            stackTrace: stackTrace,
+          ),
+        );
+      });
 }

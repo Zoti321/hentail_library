@@ -88,7 +88,11 @@ class DetailNotFoundStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DetailStatusScaffold(
-      leading: Icon(icon, size: 48, color: Theme.of(context).colorScheme.onSurfaceVariant),
+      leading: Icon(
+        icon,
+        size: 48,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
       label: label,
       action: TextButton.icon(
         onPressed: () => goDefaultLibraryBrowseFromContext(context),

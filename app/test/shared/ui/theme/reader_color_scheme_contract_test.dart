@@ -62,9 +62,8 @@ void main() {
     });
 
     test('spacing and radius sample still matches tokens', () {
-      final AppThemeTokens tokens = buildAppTheme(
-        Brightness.light,
-      ).extension<AppThemeTokens>()!;
+      final AppThemeTokens tokens = buildAppTheme(Brightness.light)
+          .extension<AppThemeTokens>()!;
       expect(tokens.spacing.md, 12);
       expect(tokens.spacing.xl, 20);
       expect(tokens.radius.sm, 6);

@@ -23,14 +23,8 @@ void main() {
 
       final FilledButton button = tester.widget(find.byType(FilledButton));
       final ButtonStyle style = button.style!;
-      expect(
-        style.backgroundColor!.resolve(<WidgetState>{}),
-        cs.error,
-      );
-      expect(
-        style.foregroundColor!.resolve(<WidgetState>{}),
-        cs.onError,
-      );
+      expect(style.backgroundColor!.resolve(<WidgetState>{}), cs.error);
+      expect(style.foregroundColor!.resolve(<WidgetState>{}), cs.onError);
     });
 
     testWidgets('keeps error hue when disabled', (WidgetTester tester) async {

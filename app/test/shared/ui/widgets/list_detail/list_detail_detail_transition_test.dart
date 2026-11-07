@@ -108,7 +108,9 @@ void main() {
         ),
       );
 
-      final double tallTop = tester.getTopLeft(find.byKey(const Key('tall-pane'))).dy;
+      final double tallTop = tester
+          .getTopLeft(find.byKey(const Key('tall-pane')))
+          .dy;
 
       await tester.tap(find.text('to-short'));
       await tester.pump();

@@ -70,9 +70,9 @@ class ComicCoverThumbnailLru extends _$ComicCoverThumbnailLru {
       }
       _order.remove(oldest);
       // Drop keep-alive bytes only; active [comicCoverProvider] keeps Ready state.
-      ref.read(comicCoverThumbnailCacheProvider(oldest).notifier).clear(
-        notifyLru: false,
-      );
+      ref
+          .read(comicCoverThumbnailCacheProvider(oldest).notifier)
+          .clear(notifyLru: false);
     }
   }
 }
@@ -100,6 +100,7 @@ class ComicCoverThumbnailCache extends _$ComicCoverThumbnailCache {
 class ComicCover extends _$ComicCover {
   String? _comicId;
   bool _loadInFlight = false;
+
   /// 默认 low：同帧内 widget 可 [promotePriority] 到 high/critical 再 ensure。
   ThumbnailPriority _priority = ThumbnailPriority.low;
 

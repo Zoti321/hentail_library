@@ -151,7 +151,9 @@ class DesktopSidebar extends HookWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainerLow,
             border: Border(
-              right: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+              right: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
             ),
           ),
           padding: EdgeInsets.fromLTRB(
@@ -177,9 +179,15 @@ class DesktopSidebar extends HookWidget {
                       iconSize: 18,
                       size: 36,
                       borderRadius: tokens.radius.md,
-                      foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                      hoverColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      overlayColor: Theme.of(context).colorScheme.surfaceContainerHighest
+                      foregroundColor: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant,
+                      hoverColor: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                      overlayColor: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
                           .withAlpha(110),
                       delayTooltipThreeSeconds: false,
                       onPressed: onToggleExpanded,
@@ -248,7 +256,9 @@ class _SidebarButtonState extends State<_SidebarButton> {
     final ThemeData theme = Theme.of(context);
     final double t = widget.expandProgress.clamp(0.0, 1.0);
 
-    final Color idleBackground = Theme.of(context).colorScheme.surfaceContainerLow;
+    final Color idleBackground = Theme.of(context)
+        .colorScheme
+        .surfaceContainerLow;
     final Color backgroundColor = widget.isActive
         ? Theme.of(context).colorScheme.surfaceContainerHigh
         : (_isHovered
@@ -306,8 +316,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
                     boxShadow: widget.isActive
                         ? <BoxShadow>[
                             BoxShadow(
-                              color:
-                                  Theme.of(context).colorScheme.shadow,
+                              color: Theme.of(context).colorScheme.shadow,
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),

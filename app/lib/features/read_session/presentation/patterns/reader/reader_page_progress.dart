@@ -78,9 +78,7 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
                 // 优先用 onChanged 已写入的 _dragValue，否则桌面点轨不会落页。
                 final double resolved = _dragValue ?? value;
                 setState(() => _dragValue = null);
-                widget.onPageChanged(
-                  resolved.round().clamp(1, _safeTotal),
-                );
+                widget.onPageChanged(resolved.round().clamp(1, _safeTotal));
               },
             ),
           ),

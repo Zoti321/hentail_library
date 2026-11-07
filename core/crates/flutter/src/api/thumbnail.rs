@@ -79,7 +79,11 @@ pub enum ThumbnailEventDto {
         comic_id: String,
         thumbnail: Option<Vec<u8>>,
     },
-    Progress { done: i32, total: i32, failed: i32 },
+    Progress {
+        done: i32,
+        total: i32,
+        failed: i32,
+    },
 }
 
 fn map_priority(priority: ThumbnailPriorityDto) -> CorePriority {

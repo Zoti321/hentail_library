@@ -127,7 +127,9 @@ class ReadingHistoryCard extends HookConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -136,14 +138,18 @@ class ReadingHistoryCard extends HookConsumerWidget {
                                   Icon(
                                     LucideIcons.clock,
                                     size: 12,
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     context.l10n.relativeTimeAgo(lastReadTime),
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                     ),
                                   ),
                                 ],
@@ -155,7 +161,9 @@ class ReadingHistoryCard extends HookConsumerWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
                                   ),
                                 ),
                               ],
@@ -175,7 +183,9 @@ class ReadingHistoryCard extends HookConsumerWidget {
                               iconSize: 18,
                               size: 32,
                               borderRadius: tokens.radius.md,
-                              foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                              foregroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                               hoverColor: theme.hoverColor,
                               overlayColor: theme.hoverColor.withAlpha(110),
                               delayTooltipThreeSeconds: true,

@@ -104,7 +104,9 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
             decoration: BoxDecoration(
               color: cs.surface,
               borderRadius: BorderRadius.circular(tokens.radius.md),
-              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outlineVariant,
+              ),
               boxShadow: context.shadows.raisedPanel(),
             ),
             child: GhostButton.icon(

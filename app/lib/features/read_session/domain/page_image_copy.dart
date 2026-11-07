@@ -14,8 +14,8 @@ class PageImageCopy {
   PageImageCopy({
     required this._pageSource,
     required this._clipboardImage,
-    required PageImagePngEncoder encodePng,
-  }) : _encodePng = encodePng;
+    required this._encodePng,
+  });
 
   final ComicPageSourcePort _pageSource;
   final ClipboardImagePort _clipboardImage;

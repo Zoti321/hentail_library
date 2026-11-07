@@ -17,6 +17,7 @@ class CardLetterboxedCoverImage extends StatefulWidget {
     this.onDecodeError,
     this.fit,
     this.alignment = Alignment.center,
+
     /// Hero / 软裁切切换时保留上一帧，避免飞行中露出 letterbox 纯色。
     this.gaplessPlayback = true,
   });

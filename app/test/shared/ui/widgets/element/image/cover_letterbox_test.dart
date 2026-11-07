@@ -32,27 +32,18 @@ void main() {
 
     test('within 8% tolerance uses cover', () {
       expect(
-        coverFitForAspects(
-          imageAspect: boxAspect * 1.07,
-          boxAspect: boxAspect,
-        ),
+        coverFitForAspects(imageAspect: boxAspect * 1.07, boxAspect: boxAspect),
         BoxFit.cover,
       );
       expect(
-        coverFitForAspects(
-          imageAspect: boxAspect * 0.93,
-          boxAspect: boxAspect,
-        ),
+        coverFitForAspects(imageAspect: boxAspect * 0.93, boxAspect: boxAspect),
         BoxFit.cover,
       );
     });
 
     test('beyond tolerance uses contain', () {
       expect(
-        coverFitForAspects(
-          imageAspect: boxAspect * 1.09,
-          boxAspect: boxAspect,
-        ),
+        coverFitForAspects(imageAspect: boxAspect * 1.09, boxAspect: boxAspect),
         BoxFit.contain,
       );
       expect(
@@ -83,9 +74,7 @@ void main() {
 
   group('peekCoverImageSize', () {
     test('reads JPEG SOF dimensions', () {
-      final Size? size = peekCoverImageSize(
-        _tinyJpeg(width: 200, height: 300),
-      );
+      final Size? size = peekCoverImageSize(_tinyJpeg(width: 200, height: 300));
       expect(size, const Size(200, 300));
     });
 
@@ -103,30 +92,30 @@ void main() {
     );
   });
 
-  testWidgets('coverLetterboxColor tracks ColorScheme.surfaceContainerHighest', (
-    WidgetTester tester,
-  ) async {
-    late Color resolved;
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple,
-            brightness: Brightness.dark,
+  testWidgets(
+    'coverLetterboxColor tracks ColorScheme.surfaceContainerHighest',
+    (WidgetTester tester) async {
+      late Color resolved;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.dark,
+            ),
+          ),
+          home: Builder(
+            builder: (BuildContext context) {
+              resolved = coverLetterboxColor(context);
+              return const SizedBox.shrink();
+            },
           ),
         ),
-        home: Builder(
-          builder: (BuildContext context) {
-            resolved = coverLetterboxColor(context);
-            return const SizedBox.shrink();
-          },
-        ),
-      ),
-    );
+      );
 
-    final ColorScheme scheme = Theme.of(
-      tester.element(find.byType(SizedBox)),
-    ).colorScheme;
-    expect(resolved, scheme.surfaceContainerHighest);
-  });
+      final ColorScheme scheme = Theme.of(tester.element(find.byType(SizedBox)))
+          .colorScheme;
+      expect(resolved, scheme.surfaceContainerHighest);
+    },
+  );
 }

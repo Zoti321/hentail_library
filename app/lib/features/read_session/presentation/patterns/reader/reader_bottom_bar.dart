@@ -57,9 +57,7 @@ class ReaderBottomBar extends StatelessWidget {
               totalPages: totalPages,
               onPageChanged: onPageChanged,
             ),
-            SizedBox(
-              height: ReaderChromeMetrics.progressControlsGapOf(width),
-            ),
+            SizedBox(height: ReaderChromeMetrics.progressControlsGapOf(width)),
             Row(
               children: <Widget>[
                 _iconButton(
