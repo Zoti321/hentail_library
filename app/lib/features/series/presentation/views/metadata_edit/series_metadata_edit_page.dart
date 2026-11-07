@@ -1,22 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/features/series/presentation/view_models/series_metadata_editor_notifier.dart';
-import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
-import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 import 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_form.dart';
+import 'package:hentai_library/features/series/presentation/view_models/series_metadata_edit_session_notifier.dart';
+import 'package:hentai_library/features/series/presentation/view_models/series_metadata_edit_ui_state.dart';
+import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/series_metadata_form.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 export 'package:hentai_library/features/series/presentation/views/metadata_edit/series_metadata_edit_layout.dart';
 export 'package:hentai_library/features/series/presentation/patterns/metadata_edit/series_metadata_edit_draft.dart';
 
-/// 系列元数据编辑视图（已加载实体）：Lab 表单 + Lab 编辑壳，保存走生产 notifier。
+/// 系列元数据编辑视图：草稿在会话 Notifier；[save] 供外层 GlobalKey 调用。
 class SeriesMetadataEditFormLayout extends ConsumerStatefulWidget {
   const SeriesMetadataEditFormLayout({
     super.key,
@@ -34,90 +33,29 @@ class SeriesMetadataEditFormLayout extends ConsumerStatefulWidget {
 
 class SeriesMetadataEditViewState
     extends ConsumerState<SeriesMetadataEditFormLayout> {
-  late SeriesMetadataEditDraft _draft;
-  late SeriesMetaLocks _locks;
-  String? _nameError;
-  String? _totalCountError;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _draft = seriesMetadataDraftFromSeries(widget.series);
-    _locks = widget.series.locks;
-  }
-
-  Future<void> _setLock({
-    bool? name,
-    bool? serializationStatus,
-    bool? totalCount,
-  }) async {
-    if (_saving) {
-      return;
-    }
-    try {
-      await ref
-          .read(seriesMetadataEditorProvider.notifier)
-          .setLocks(
-            widget.series.id,
-            name: name,
-            serializationStatus: serializationStatus,
-            totalCount: totalCount,
-          );
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _locks = _locks.copyWith(
-          name: name,
-          serializationStatus: serializationStatus,
-          totalCount: totalCount,
-        );
-      });
-    } catch (error, stackTrace) {
-      logError(AppLog.ui('editSeries'), '设置系列元数据字段锁失败', error, stackTrace);
-      if (mounted) {
-        showErrorSnackbar(context, context.l10n.commonSaveFailedToast);
-      }
-    }
-  }
-
   /// 供全屏底栏确认按钮调用。
   Future<void> save() async {
-    if (_saving) {
-      return;
-    }
-    setState(() => _saving = true);
+    final AppLocalizations l10n = context.l10n;
+    final SeriesMetadataEditSession notifier = ref.read(
+      seriesMetadataEditSessionProvider(widget.series).notifier,
+    );
     try {
-      final SeriesMetadataApplyResult result = await ref
-          .read(seriesMetadataEditorProvider.notifier)
-          .apply(
-            seriesMetadataFormFromDraft(_draft, widget.series),
-            widget.series,
-          );
+      final SeriesMetadataEditSaveResult result = await notifier.save();
       if (!mounted) {
         return;
       }
       switch (result) {
-        case SeriesMetadataApplyInvalid(
-          :final SeriesMetadataFormValidation validation,
-        ):
-          setState(() {
-            _nameError = validation.nameError;
-            _totalCountError = validation.totalCountError;
-          });
-        case SeriesMetadataApplySucceeded():
-          showSuccessSnackbar(context, context.l10n.commonSavedToast);
+        case SeriesMetadataEditSaveResult.succeeded:
+          showSuccessSnackbar(context, l10n.commonSavedToast);
           _leave();
+        case SeriesMetadataEditSaveResult.validationFailed:
+        case SeriesMetadataEditSaveResult.busy:
+          break;
       }
     } catch (error, stackTrace) {
       logError(AppLog.ui('editSeries'), '保存系列元数据失败', error, stackTrace);
       if (mounted) {
-        showErrorSnackbar(context, context.l10n.commonSaveFailedToast);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _saving = false);
+        showErrorSnackbar(context, l10n.commonSaveFailedToast);
       }
     }
   }
@@ -131,27 +69,53 @@ class SeriesMetadataEditViewState
 
   @override
   Widget build(BuildContext context) {
+    final SeriesMetadataEditUiState session = ref.watch(
+      seriesMetadataEditSessionProvider(widget.series),
+    );
+    final SeriesMetadataEditSession notifier = ref.read(
+      seriesMetadataEditSessionProvider(widget.series).notifier,
+    );
     final AppLocalizations l10n = context.l10n;
+
     return MetadataEditSurface(
       presentation: widget.presentation,
       title: l10n.dialogEditSeriesTitle,
       onCancel: _leave,
       onSave: save,
-      saving: _saving,
+      saving: session.saving,
       maxWidth: 560,
       body: SeriesMetadataEditForm(
-        draft: _draft,
-        locks: _locks,
-        onLockChanged: _setLock,
-        nameError: _nameError,
-        totalCountError: _totalCountError,
-        onDraftChanged: (SeriesMetadataEditDraft value) {
-          setState(() {
-            _draft = value;
-            _nameError = null;
-            _totalCountError = null;
-          });
-        },
+        draft: session.draft,
+        locks: session.locks,
+        onLockChanged:
+            ({
+              bool? name,
+              bool? serializationStatus,
+              bool? totalCount,
+            }) {
+              unawaited(() async {
+                try {
+                  await notifier.setLock(
+                    name: name,
+                    serializationStatus: serializationStatus,
+                    totalCount: totalCount,
+                  );
+                } catch (error, stackTrace) {
+                  logError(
+                    AppLog.ui('editSeries'),
+                    '设置系列元数据字段锁失败',
+                    error,
+                    stackTrace,
+                  );
+                  if (mounted) {
+                    showErrorSnackbar(context, l10n.commonSaveFailedToast);
+                  }
+                }
+              }());
+            },
+        nameError: session.nameError,
+        totalCountError: session.totalCountError,
+        onDraftChanged: notifier.updateDraft,
       ),
     );
   }

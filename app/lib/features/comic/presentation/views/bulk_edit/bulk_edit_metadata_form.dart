@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/comic/presentation/draft/bulk_metadata_edit_session.dart';
+import 'package:hentai_library/features/comic/presentation/view_models/bulk_metadata_edit_session_notifier.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/metadata_edit_form_metrics.dart';
 import 'package:hentai_library/shared/ui/patterns/dialog/confirm_dialog.dart';
@@ -22,7 +22,6 @@ import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 /// 批量编辑表单（MD3E）：expanded+ 为 list-detail（常规 / 作者&标签 + 详情区滚动），
 /// 较窄宽度为顶部分段 + 纵向滚动。
@@ -59,34 +58,19 @@ List<BulkMetadataEditFieldKind> _fieldsFor(_BulkEditTab tab) {
 }
 
 class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
-  final BulkMetadataEditSession _session = BulkMetadataEditSession();
   _BulkEditTab _tab = _BulkEditTab.general;
   bool _detailTransitionReverse = false;
-  bool _loading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadMixedHints();
-  }
+  BulkMetadataEditSessionNotifier get _sessionNotifier => ref.read(
+    bulkMetadataEditSessionProvider(widget.comicIds).notifier,
+  );
 
-  Future<void> _loadMixedHints() async {
-    final List<Comic> comics = await ref.read(
-      bulkEditComicsByIdsProvider(widget.comicIds).future,
-    );
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _session.applyMixedHintsFromComics(comics);
-      _loading = false;
-    });
-  }
+  BulkMetadataEditSession get _session => _sessionNotifier.session;
 
   /// 保存入口：校验有改动 → 二次确认 → 返回 patch。无改动时静默返回（与旧弹窗一致）。
   Future<void> confirm() async {
     final AppLocalizations l10n = context.l10n;
-    final ComicMetadataBulkPatch? patch = _session.buildPatch();
+    final ComicMetadataBulkPatch? patch = _sessionNotifier.buildPatch();
     if (patch == null) {
       return;
     }
@@ -107,25 +91,25 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
     Navigator.of(context).pop(patch);
   }
 
-  void _edited(BulkMetadataEditFieldKind kind) {
-    setState(() => _session.markDirty(kind));
-  }
-
   void _addMultiValue(BulkMetadataEditFieldKind kind, String name) {
-    final BulkMetadataEditMultiValueFieldState field =
-        _session.multiFields[kind]!;
-    if (field.values.contains(name)) {
-      return;
-    }
-    field.values = <String>[...field.values, name];
-    _edited(kind);
+    _sessionNotifier.mutate((BulkMetadataEditSession session) {
+      final BulkMetadataEditMultiValueFieldState field =
+          session.multiFields[kind]!;
+      if (field.values.contains(name)) {
+        return;
+      }
+      field.values = <String>[...field.values, name];
+      session.markDirty(kind);
+    });
   }
 
   void _removeMultiValue(BulkMetadataEditFieldKind kind, String name) {
-    final BulkMetadataEditMultiValueFieldState field =
-        _session.multiFields[kind]!;
-    field.values = field.values.where((String v) => v != name).toList();
-    _edited(kind);
+    _sessionNotifier.mutate((BulkMetadataEditSession session) {
+      final BulkMetadataEditMultiValueFieldState field =
+          session.multiFields[kind]!;
+      field.values = field.values.where((String v) => v != name).toList();
+      session.markDirty(kind);
+    });
   }
 
   void _toggleLanguage(String canonical) {
@@ -304,7 +288,10 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    final BulkMetadataEditUiState editUi = ref.watch(
+      bulkMetadataEditSessionProvider(widget.comicIds),
+    );
+    if (editUi.loading) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(24),
@@ -370,8 +357,10 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
             description: Text(label),
             value: _session.contentRatingField.isR18,
             onChanged: (bool value) {
-              _session.contentRatingField.isR18 = value;
-              _edited(kind);
+              _sessionNotifier.mutate((BulkMetadataEditSession session) {
+                session.contentRatingField.isR18 = value;
+                session.markDirty(kind);
+              });
             },
           ),
         ],
@@ -434,8 +423,10 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
             maxLines: 4,
             enabled: enabled,
             onChanged: (String value) {
-              _session.descriptionField.description = value;
-              _edited(kind);
+              _sessionNotifier.mutate((BulkMetadataEditSession session) {
+                session.descriptionField.description = value;
+                session.markDirty(kind);
+              });
             },
           )
         : _Disabled(
@@ -447,10 +438,12 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
                   : DateFormat('yyyy-MM-dd')
                         .format(_session.publishedAtField.publishedAt!),
               onChanged: (String value) {
-                _session.publishedAtField.publishedAt = DateTime.tryParse(
-                  value.trim(),
-                );
-                _edited(kind);
+                _sessionNotifier.mutate((BulkMetadataEditSession session) {
+                  session.publishedAtField.publishedAt = DateTime.tryParse(
+                    value.trim(),
+                  );
+                  session.markDirty(kind);
+                });
               },
             ),
           );
@@ -477,10 +470,14 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
                 .toList(growable: false),
             selectedIndex: state.op.index,
             onSelected: (int index) {
-              setState(() {
-                state.op = ComicMetadataBulkScalarOp.values[index];
+              _sessionNotifier.mutate((BulkMetadataEditSession session) {
+                final BulkMetadataEditScalarFieldState field =
+                    kind == BulkMetadataEditFieldKind.description
+                    ? session.descriptionField
+                    : session.publishedAtField;
+                field.op = ComicMetadataBulkScalarOp.values[index];
+                session.markDirty(kind);
               });
-              _edited(kind);
             },
           ),
           gap,
@@ -501,10 +498,11 @@ class BulkEditMetadataFormState extends ConsumerState<BulkEditMetadataForm> {
               .toList(growable: false),
           selectedIndex: state.op.index,
           onSelected: (int index) {
-            setState(() {
-              state.op = ComicMetadataBulkMultiValueOp.values[index];
+            _sessionNotifier.mutate((BulkMetadataEditSession session) {
+              session.multiFields[kind]!.op =
+                  ComicMetadataBulkMultiValueOp.values[index];
+              session.markDirty(kind);
             });
-            _edited(kind);
           },
         ),
         gap,

@@ -1,25 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_editor_notifier.dart';
-import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
-import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_smart_facet_scope.dart';
-import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_form.dart';
+import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_edit_session_notifier.dart';
+import 'package:hentai_library/features/comic/presentation/view_models/comic_metadata_edit_ui_state.dart';
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/comic_meta_locks.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/features/library_browse/public/catalog/for_comic_and_series.dart';
 
 export 'package:hentai_library/features/comic/presentation/views/metadata_edit/comic_metadata_edit_layout.dart';
 export 'package:hentai_library/features/comic/presentation/patterns/metadata_edit/comic_metadata_edit_draft.dart';
 
-/// 漫画元数据编辑视图（已加载实体）：Lab 表单 + Lab 编辑壳，保存走生产 notifier。
+/// 漫画元数据编辑视图（已加载实体）：草稿在会话 Notifier；[save] 供外层 GlobalKey 调用。
 class ComicMetadataEditFormLayout extends ConsumerStatefulWidget {
   const ComicMetadataEditFormLayout({
     super.key,
@@ -37,155 +33,31 @@ class ComicMetadataEditFormLayout extends ConsumerStatefulWidget {
 
 class ComicMetadataEditViewState
     extends ConsumerState<ComicMetadataEditFormLayout> {
-  late ComicMetadataEditDraft _draft;
-  late ComicMetaLocks _locks;
-  SeriesItemMembership? _seed;
-  String? _titleError;
-  bool _saving = false;
-  late ComicMetadataSmartFacetScope _smartFacetScope;
-
-  @override
-  void initState() {
-    super.initState();
-    _draft = comicMetadataDraftFromComic(widget.comic);
-    _locks = widget.comic.locks;
-    _smartFacetScope = comicMetadataSmartFacetScopeForComic(widget.comic);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadSeriesSortMembership();
-    });
-  }
-
-  Future<void> _loadSeriesSortMembership() async {
-    try {
-      final SeriesItemMembership? membership = await ref
-          .read(comicMetadataEditorProvider.notifier)
-          .findSeriesMembership(widget.comic.comicId);
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _seed = membership;
-        if (membership != null) {
-          _smartFacetScope = comicMetadataSmartFacetScopeForComic(
-            widget.comic,
-            seriesId: membership.seriesId,
-          );
-          _draft = _draft.copyWith(
-            seriesSortOrderText: _formatSortOrder(membership.sortOrder),
-          );
-        }
-      });
-    } catch (_) {
-      // 没有系列归属或读取失败时不显示排序字段。
-    }
-  }
-
-  Future<void> _setLock({
-    bool? title,
-    bool? description,
-    bool? publishedAt,
-    bool? contentRating,
-    bool? authors,
-    bool? tags,
-    bool? languages,
-    bool? parodies,
-    bool? characters,
-  }) async {
-    if (_saving) {
-      return;
-    }
-    try {
-      await ref
-          .read(comicMetadataEditorProvider.notifier)
-          .setLocks(
-            widget.comic.comicId,
-            title: title,
-            description: description,
-            publishedAt: publishedAt,
-            contentRating: contentRating,
-            authors: authors,
-            tags: tags,
-            languages: languages,
-            parodies: parodies,
-            characters: characters,
-          );
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _locks = _locks.copyWith(
-          title: title,
-          description: description,
-          publishedAt: publishedAt,
-          contentRating: contentRating,
-          authors: authors,
-          tags: tags,
-          languages: languages,
-          parodies: parodies,
-          characters: characters,
-        );
-      });
-    } catch (error, stackTrace) {
-      logError(AppLog.ui('editMetadata'), '设置元数据字段锁失败', error, stackTrace);
-      if (mounted) {
-        showErrorSnackbar(context, context.l10n.commonSaveFailedToast);
-      }
-    }
-  }
-
   /// 供全屏底栏确认按钮调用。
   Future<void> save() async {
-    if (_saving) {
-      return;
-    }
-    final String? titleError = _draft.validateTitle();
-    if (titleError != null) {
-      setState(() => _titleError = titleError);
-      return;
-    }
-
-    final SeriesItemMembership? seed = _seed;
-    final String? sortText = _draft.seriesSortOrderText;
-    double? sortOrder;
-    if (seed != null && sortText != null) {
-      final String trimmed = sortText.trim();
-      final double? parsed = double.tryParse(trimmed);
-      if (trimmed.isEmpty || parsed == null || !parsed.isFinite) {
-        showErrorSnackbar(context, context.l10n.formSeriesItemSortOrderInvalid);
+    final AppLocalizations l10n = context.l10n;
+    final ComicMetadataEditSession notifier = ref.read(
+      comicMetadataEditSessionProvider(widget.comic).notifier,
+    );
+    try {
+      final ComicMetadataEditSaveResult result = await notifier.save();
+      if (!mounted) {
         return;
       }
-      sortOrder = parsed;
-    }
-
-    setState(() => _saving = true);
-    try {
-      final ComicMetadataEditorNotifier editor = ref.read(
-        comicMetadataEditorProvider.notifier,
-      );
-      await editor.apply(
-        comicMetadataFormFromDraft(_draft, widget.comic).normalized,
-        widget.comic,
-      );
-      if (seed != null && sortOrder != null) {
-        await editor.persistSeriesSort(
-          comicId: widget.comic.comicId,
-          seed: seed,
-          sortOrder: sortOrder,
-          draftLocked: seed.sortOrderLocked,
-        );
-      }
-      if (mounted) {
-        showSuccessSnackbar(context, context.l10n.commonSavedToast);
-        _leave();
+      switch (result) {
+        case ComicMetadataEditSaveResult.succeeded:
+          showSuccessSnackbar(context, l10n.commonSavedToast);
+          _leave();
+        case ComicMetadataEditSaveResult.seriesSortInvalid:
+          showErrorSnackbar(context, l10n.formSeriesItemSortOrderInvalid);
+        case ComicMetadataEditSaveResult.titleInvalid:
+        case ComicMetadataEditSaveResult.busy:
+          break;
       }
     } catch (error, stackTrace) {
       logError(AppLog.ui('editMetadata'), '保存漫画元数据失败', error, stackTrace);
       if (mounted) {
-        showErrorSnackbar(context, context.l10n.commonSaveFailedToast);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _saving = false);
+        showErrorSnackbar(context, l10n.commonSaveFailedToast);
       }
     }
   }
@@ -199,41 +71,65 @@ class ComicMetadataEditViewState
 
   @override
   Widget build(BuildContext context) {
+    final ComicMetadataEditUiState session = ref.watch(
+      comicMetadataEditSessionProvider(widget.comic),
+    );
+    final ComicMetadataEditSession notifier = ref.read(
+      comicMetadataEditSessionProvider(widget.comic).notifier,
+    );
     final AppLocalizations l10n = context.l10n;
+
     return MetadataEditSurface(
       presentation: widget.presentation,
       title: l10n.dialogEditMetadataTitle,
       onCancel: _leave,
       onSave: save,
-      saving: _saving,
+      saving: session.saving,
       body: ComicMetadataEditForm(
-        draft: _draft,
-        locks: _locks,
-        onLockChanged: _setLock,
-        titleError: _titleError,
-        smartFacetScope: _smartFacetScope,
-        onDraftChanged: (ComicMetadataEditDraft value) {
-          setState(() {
-            _draft = value;
-            _smartFacetScope = (
-              comicId: _smartFacetScope.comicId,
-              title: value.title,
-              resourcePath: _smartFacetScope.resourcePath,
-              seriesId: _smartFacetScope.seriesId,
-            );
-            if (_titleError != null && value.validateTitle() == null) {
-              _titleError = null;
-            }
-          });
-        },
+        draft: session.draft,
+        locks: session.locks,
+        onLockChanged:
+            ({
+              bool? title,
+              bool? description,
+              bool? publishedAt,
+              bool? contentRating,
+              bool? authors,
+              bool? tags,
+              bool? languages,
+              bool? parodies,
+              bool? characters,
+            }) {
+              unawaited(() async {
+                try {
+                  await notifier.setLock(
+                    title: title,
+                    description: description,
+                    publishedAt: publishedAt,
+                    contentRating: contentRating,
+                    authors: authors,
+                    tags: tags,
+                    languages: languages,
+                    parodies: parodies,
+                    characters: characters,
+                  );
+                } catch (error, stackTrace) {
+                  logError(
+                    AppLog.ui('editMetadata'),
+                    '设置元数据字段锁失败',
+                    error,
+                    stackTrace,
+                  );
+                  if (mounted) {
+                    showErrorSnackbar(context, l10n.commonSaveFailedToast);
+                  }
+                }
+              }());
+            },
+        titleError: session.titleError,
+        smartFacetScope: session.smartFacetScope,
+        onDraftChanged: notifier.updateDraft,
       ),
     );
   }
-}
-
-String _formatSortOrder(double value) {
-  if (value == value.roundToDouble()) {
-    return value.round().toString();
-  }
-  return value.toString();
 }

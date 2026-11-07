@@ -42,8 +42,6 @@ class _MetadataManagementPageState
   final Set<int> _visitedTabIndexes = <int>{};
   final ScrollController _scrollController = ScrollController();
   int? _selectedTabIndex;
-  String? _mergeTarget;
-  final Set<String> _mergeSources = <String>{};
   bool _showInlineCreateField = false;
 
   @override
@@ -108,11 +106,14 @@ class _MetadataManagementPageState
     final NamedFacetManagementState state = ref.watch(
       namedFacetManagementControllerProvider(kind),
     );
+    final NamedFacetManagementController controller = ref.read(
+      namedFacetManagementControllerProvider(kind).notifier,
+    );
     final int count = state.hasSearchQuery
         ? state.items.length
         : state.totalCount;
     final double horizontal = layout.horizontalInset;
-    final bool mergeMode = _mergeTarget != null;
+    final bool mergeMode = state.isMergeMode;
     final bool useMobileCreateDialog =
         managementCreateInteractionOf(context) ==
         ManagementCreateInteraction.mobileDialog;
@@ -131,10 +132,10 @@ class _MetadataManagementPageState
                 layout: layout,
                 child: MetadataHeader(
                   onOpenNavigation: appShellPageNavigationOpener(context),
-                  mergeSelectionCount: mergeMode ? 1 + _mergeSources.length : 0,
-                  onExitMergeSelection: mergeMode ? _exitMergeSelection : null,
+                  mergeSelectionCount: state.mergeSelectionCount,
+                  onExitMergeSelection: mergeMode ? controller.exitMerge : null,
                   onMergeSelection: mergeMode
-                      ? () => unawaited(_mergeSelectedNames())
+                      ? () => unawaited(_mergeSelectedNames(kind))
                       : null,
                 ),
               ),
@@ -175,11 +176,11 @@ class _MetadataManagementPageState
                         onDismiss: _dismissDraftEntity,
                       )
                     : null,
-                mergeTarget: _mergeTarget,
-                mergeSources: _mergeSources,
-                onMergeTargetSelected: _enterMergeSelection,
-                onMergeSourceSelected: _selectMergeSource,
-                onMergeSelectionExited: _exitMergeSelection,
+                mergeTarget: state.mergeTarget,
+                mergeSources: state.mergeSources,
+                onMergeTargetSelected: controller.enterMerge,
+                onMergeSourceSelected: controller.toggleMergeSource,
+                onMergeSelectionExited: controller.exitMerge,
               ),
           ],
         ),
@@ -202,7 +203,12 @@ class _MetadataManagementPageState
     if (_selectedTabIndex == index) {
       return;
     }
-    _exitMergeSelection();
+    final ManagedNamedFacetKind previousKind = metadataTabKind(
+      _selectedTabIndex ?? 1,
+    );
+    ref
+        .read(namedFacetManagementControllerProvider(previousKind).notifier)
+        .exitMerge();
     setState(() {
       _selectedTabIndex = index;
       _showInlineCreateField = false;
@@ -217,37 +223,15 @@ class _MetadataManagementPageState
     }
   }
 
-  void _enterMergeSelection(String target) {
-    if (metadataTabKind(_selectedTabIndex ?? 1) ==
-        ManagedNamedFacetKind.author) {
+  Future<void> _mergeSelectedNames(ManagedNamedFacetKind kind) async {
+    final NamedFacetManagementState state = ref.read(
+      namedFacetManagementControllerProvider(kind),
+    );
+    final String? target = state.mergeTarget;
+    final List<String> sources = state.mergeSources.toList(growable: false);
+    if (target == null || sources.isEmpty) {
       return;
     }
-    setState(() {
-      _mergeTarget = target;
-      _mergeSources.clear();
-    });
-  }
-
-  void _selectMergeSource(String source) {
-    if (_mergeTarget == null || source == _mergeTarget) return;
-    setState(() {
-      if (!_mergeSources.add(source)) _mergeSources.remove(source);
-    });
-  }
-
-  void _exitMergeSelection() {
-    if (_mergeTarget == null && _mergeSources.isEmpty) return;
-    setState(() {
-      _mergeTarget = null;
-      _mergeSources.clear();
-    });
-  }
-
-  Future<void> _mergeSelectedNames() async {
-    final String? target = _mergeTarget;
-    final List<String> sources = _mergeSources.toList(growable: false);
-    if (target == null || sources.isEmpty) return;
-    final ManagedNamedFacetKind kind = metadataTabKind(_selectedTabIndex ?? 1);
     final prefs = await SharedPreferences.getInstance();
     final bool skip = prefs.getBool(_kMergeConfirmSkipKey) ?? false;
     if (!skip && mounted) {
@@ -258,18 +242,21 @@ class _MetadataManagementPageState
         onSkipChanged: (bool value) =>
             prefs.setBool(_kMergeConfirmSkipKey, value),
       );
-      if (!confirmed || !mounted) return;
+      if (!confirmed || !mounted) {
+        return;
+      }
     }
     try {
       await ref
           .read(namedFacetManagementControllerProvider(kind).notifier)
           .merge(targetName: target, sourceNames: sources);
       if (mounted) {
-        _exitMergeSelection();
         showSuccessSnackbar(context, '合并完成');
       }
     } catch (error) {
-      if (mounted) showErrorSnackbar(context, error);
+      if (mounted) {
+        showErrorSnackbar(context, error);
+      }
     }
   }
 
