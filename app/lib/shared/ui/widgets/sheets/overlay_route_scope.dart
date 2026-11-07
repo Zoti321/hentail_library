@@ -17,18 +17,34 @@ final class OverlayRouteScopeSnapshot {
 
   factory OverlayRouteScopeSnapshot.capture(BuildContext anchorContext) {
     final M3EThemeData m3e = M3ETheme.of(anchorContext);
+    final AppFontSpec font = AppFontSpec(
+      family: m3e.typeScale.bodyLarge.fontFamily ?? kAppFontFamily,
+      fallbacks: m3e.typeScale.bodyLarge.fontFamilyFallback ?? const <String>[],
+    );
     return OverlayRouteScopeSnapshot._(
       locale: Localizations.localeOf(anchorContext),
       m3e: m3e,
-      materialTheme: buildMaterialTheme(m3e.colorScheme.brightness, m3e: m3e),
+      materialTheme: buildMaterialTheme(
+        m3e.colorScheme.brightness,
+        m3e: m3e,
+        font: font,
+      ),
     );
   }
 
   OverlayRouteScopeSnapshot withM3e(M3EThemeData m3e) {
+    final AppFontSpec font = AppFontSpec(
+      family: m3e.typeScale.bodyLarge.fontFamily ?? kAppFontFamily,
+      fallbacks: m3e.typeScale.bodyLarge.fontFamilyFallback ?? const <String>[],
+    );
     return OverlayRouteScopeSnapshot._(
       locale: locale,
       m3e: m3e,
-      materialTheme: buildMaterialTheme(m3e.colorScheme.brightness, m3e: m3e),
+      materialTheme: buildMaterialTheme(
+        m3e.colorScheme.brightness,
+        m3e: m3e,
+        font: font,
+      ),
     );
   }
 
@@ -55,7 +71,10 @@ Widget overlayRouteScope({
       child: Theme(
         data: scope.materialTheme,
         child: DefaultTextStyle.merge(
-          style: const TextStyle(fontFamily: kAppFontFamily),
+          style: TextStyle(
+            fontFamily:
+                scope.m3e.typeScale.bodyLarge.fontFamily ?? kAppFontFamily,
+          ),
           child: Material(type: MaterialType.transparency, child: child),
         ),
       ),

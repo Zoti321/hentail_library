@@ -8,7 +8,7 @@ part 'app_setting.g.dart';
 @freezed
 abstract class AppSetting with _$AppSetting {
   factory AppSetting({
-    @Default(4) int version,
+    @Default(5) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
     @Default(AppColorSchemePreference.brand)
     AppColorSchemePreference colorSchemePreference,
@@ -16,6 +16,7 @@ abstract class AppSetting with _$AppSetting {
     /// 系统动态配色：开启后以平台强调色为 seed（ADR-0037）。
     @Default(false) bool useDynamicColor,
     @Default(AppLocalePreference.system) AppLocalePreference localePreference,
+    @Default(AppFontPreference.miSans) AppFontPreference fontPreference,
     @Default(kDefaultReadingMode) ReadingMode readingMode,
     @Default(kDefaultWebtoonMarginPercent) int webtoonMarginPercent,
     @Default(kDefaultWebtoonZoomMode) WebtoonZoomMode webtoonZoomMode,
@@ -133,4 +134,13 @@ enum AppLocalePreference {
   zhCn,
   @JsonValue('en')
   en,
+}
+
+/// UI 字体族：小米字体 / Noto Sans（SC/JP 仅作 i18n fallback，不进设置项）。
+@JsonEnum(alwaysCreate: true)
+enum AppFontPreference {
+  @JsonValue('miSans')
+  miSans,
+  @JsonValue('notoSans')
+  notoSans,
 }

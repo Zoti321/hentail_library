@@ -8,4 +8,6 @@ abstract class AppThemePreferencesPort {
 
   /// 开启时装配改用系统动态色 seed，并禁用手动配色方案项。
   bool get useDynamicColor;
+
+  AppFontPreference get fontPreference;
 }

@@ -76,6 +76,13 @@ extension AppLocalizationsLabelsX on AppLocalizations {
     }
   }
 
+  String fontPreferenceLabel(AppFontPreference preference) {
+    return switch (preference) {
+      AppFontPreference.miSans => fontPreferenceMiSans,
+      AppFontPreference.notoSans => fontPreferenceNotoSans,
+    };
+  }
+
   String homeGreetingPhraseForHour(int hour) {
     if (hour < 5) {
       return homeGreetingLateNight;

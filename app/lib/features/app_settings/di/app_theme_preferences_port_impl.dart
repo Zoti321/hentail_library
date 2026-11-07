@@ -17,6 +17,9 @@ class _AppThemePreferencesFromSetting implements AppThemePreferencesPort {
 
   @override
   bool get useDynamicColor => _setting.useDynamicColor;
+
+  @override
+  AppFontPreference get fontPreference => _setting.fontPreference;
 }
 
 /// 由 bootstrap 通过 `shared/di` 的 [appThemePreferencesPortProvider] 注入。

@@ -422,6 +422,24 @@ abstract class AppLocalizations {
   /// **'English'**
   String get localePreferenceEn;
 
+  /// No description provided for @settingsFontLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'界面字体'**
+  String get settingsFontLabel;
+
+  /// No description provided for @fontPreferenceMiSans.
+  ///
+  /// In zh, this message translates to:
+  /// **'小米字体'**
+  String get fontPreferenceMiSans;
+
+  /// No description provided for @fontPreferenceNotoSans.
+  ///
+  /// In zh, this message translates to:
+  /// **'Noto Sans'**
+  String get fontPreferenceNotoSans;
+
   /// No description provided for @settingsThemeLabel.
   ///
   /// In zh, this message translates to:

@@ -11,6 +11,7 @@ import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart';
 import 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
 
+export 'package:hentai_library/shared/ui/theme/app_font.dart';
 export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 export 'package:hentai_library/shared/ui/theme/color/app_color_scheme_seeds.dart';
 export 'package:hentai_library/shared/ui/theme/color/app_shadow_palette.dart';
@@ -73,20 +74,28 @@ AssembledAppTheme assembleAppTheme(
   Brightness brightness, {
   String colorSchemeId = 'brand',
   Color? seed,
+  AppFontSpec font = const AppFontSpec(family: kAppFontFamily),
 }) {
   final Color resolvedSeed = seed ?? colorSchemeSeedForId(colorSchemeId);
-  final M3EThemeData m3e = buildAppM3eThemeData(brightness, seed: resolvedSeed);
+  final M3EThemeData m3e = buildAppM3eThemeData(
+    brightness,
+    seed: resolvedSeed,
+    font: font,
+  );
   return AssembledAppTheme(
     seed: resolvedSeed,
     m3e: m3e,
-    material: materialThemeFromM3e(m3e),
+    material: materialThemeFromM3e(m3e, font: font),
   );
 }
 
 /// Builds production [ThemeData] from an already-assembled [M3EThemeData].
 ///
 /// Does not re-run `ColorScheme.fromSeed`.
-ThemeData materialThemeFromM3e(M3EThemeData m3e) {
+ThemeData materialThemeFromM3e(
+  M3EThemeData m3e, {
+  AppFontSpec font = const AppFontSpec(family: kAppFontFamily),
+}) {
   final ColorScheme colorScheme = flutterColorSchemeFromM3e(m3e.colorScheme);
   final Brightness brightness = colorScheme.brightness;
   final AppThemeTokens tokens = brightness == Brightness.dark
@@ -101,6 +110,7 @@ ThemeData materialThemeFromM3e(M3EThemeData m3e) {
   final RoundedRectangleBorder buttonShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(tokens.radius.md),
   );
+  final String family = m3e.typeScale.bodyLarge.fontFamily ?? font.family;
 
   return ThemeData(
     useMaterial3: true,
@@ -111,7 +121,8 @@ ThemeData materialThemeFromM3e(M3EThemeData m3e) {
     splashFactory: NoSplash.splashFactory,
     highlightColor: Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
-    fontFamily: kAppFontFamily,
+    fontFamily: family,
+    fontFamilyFallback: font.fallbacks,
     appBarTheme: _buildAppBarThemeData(colorScheme),
     navigationRailTheme: _buildNavRailThemeData(colorScheme),
     filledButtonTheme: FilledButtonThemeData(
@@ -147,11 +158,13 @@ ThemeData buildAppTheme(
   Brightness brightness, {
   String colorSchemeId = 'brand',
   Color? seed,
+  AppFontSpec font = const AppFontSpec(family: kAppFontFamily),
 }) {
   return assembleAppTheme(
     brightness,
     colorSchemeId: colorSchemeId,
     seed: seed,
+    font: font,
   ).material;
 }
 

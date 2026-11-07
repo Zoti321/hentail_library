@@ -185,6 +185,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localePreferenceEn => 'English';
 
   @override
+  String get settingsFontLabel => '界面字体';
+
+  @override
+  String get fontPreferenceMiSans => '小米字体';
+
+  @override
+  String get fontPreferenceNotoSans => 'Noto Sans';
+
+  @override
   String get settingsThemeLabel => '应用主题';
 
   @override

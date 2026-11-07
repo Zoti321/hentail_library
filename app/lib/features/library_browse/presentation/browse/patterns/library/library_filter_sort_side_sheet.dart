@@ -112,7 +112,7 @@ abstract final class LibraryFilterSortSideSheet {
     return m3e.sideSheetTheme.copyWith(
       horizontalPadding: 16,
       topElementsGap: 8,
-      headlineTextStyle: const TextStyle(fontFamily: kAppFontFamily),
+      headlineTextStyle: TextStyle(fontFamily: appFontFamilyOf(context)),
     );
   }
 

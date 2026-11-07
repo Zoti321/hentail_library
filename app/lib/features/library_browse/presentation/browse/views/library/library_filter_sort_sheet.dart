@@ -52,7 +52,7 @@ abstract final class LibraryFilterSortSheet {
       theme: M3ETheme.of(context).sideSheetTheme.copyWith(
         horizontalPadding: 16,
         topElementsGap: 8,
-        headlineTextStyle: const TextStyle(fontFamily: kAppFontFamily),
+        headlineTextStyle: TextStyle(fontFamily: appFontFamilyOf(context)),
       ),
       scrollable: true,
       useRootNavigator: true,

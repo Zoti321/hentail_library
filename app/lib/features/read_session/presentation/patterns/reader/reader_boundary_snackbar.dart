@@ -92,7 +92,7 @@ class _ReaderBoundarySnackbarState extends State<ReaderBoundarySnackbar>
         child: SlideTransition(
           position: _offset,
           child: DefaultTextStyle.merge(
-            style: const TextStyle(fontFamily: kAppFontFamily),
+            style: TextStyle(fontFamily: appFontFamilyOf(context)),
             child: M3EComponentTheme(
               builder: (BuildContext context) =>
                   M3ESnackbar(message: widget.message),

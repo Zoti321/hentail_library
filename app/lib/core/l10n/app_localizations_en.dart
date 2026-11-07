@@ -190,6 +190,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localePreferenceEn => 'English';
 
   @override
+  String get settingsFontLabel => 'UI font';
+
+  @override
+  String get fontPreferenceMiSans => 'Mi Sans';
+
+  @override
+  String get fontPreferenceNotoSans => 'Noto Sans';
+
+  @override
   String get settingsThemeLabel => 'App theme';
 
   @override

@@ -78,6 +78,7 @@ List<Widget> _personalizationSections(AppLocalizations l10n) {
         _ThemeTile(),
         _DynamicColorTile(),
         _ColorSchemeTile(),
+        _FontTile(),
         _LocaleTile(),
       ],
     ),
@@ -207,6 +208,33 @@ class _ColorSchemeTile extends ConsumerWidget {
             .read(settingsProvider.notifier)
             .setColorSchemePreference(picked);
       },
+    );
+  }
+}
+
+class _FontTile extends ConsumerWidget {
+  const _FontTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final AppFontPreference preference = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) =>
+            async.asData?.value.fontPreference ?? AppFontPreference.miSans,
+      ),
+    );
+    return SettingsNavigationTile(
+      leading: Symbols.text_fields,
+      title: Text(l10n.settingsFontLabel),
+      value: Text(l10n.fontPreferenceLabel(preference)),
+      onTap: () => _pickSettingOption<AppFontPreference>(
+        context,
+        options: AppFontPreference.values,
+        selected: preference,
+        labelOf: l10n.fontPreferenceLabel,
+        onSelected: ref.read(settingsProvider.notifier).setFontPreference,
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show
         AppColorSchemePreference,
+        AppFontPreference,
         AppLocalePreference,
         AppSetting,
         AppThemePreference;
@@ -55,6 +56,12 @@ class SettingsNotifier extends _$SettingsNotifier {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
     await updateSettings(current.copyWith(localePreference: value));
+  }
+
+  Future<void> setFontPreference(AppFontPreference value) async {
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(fontPreference: value));
   }
 
   Future<void> setAutoUpdate(bool value) async {

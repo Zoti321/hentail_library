@@ -18,7 +18,7 @@ abstract final class ReaderAdaptivePanel {
       horizontalPadding: 16,
       topElementsGap: 8,
       headlineTextStyle: m3e.typeScale.titleLarge.copyWith(
-        fontFamily: kAppFontFamily,
+        fontFamily: m3e.typeScale.bodyLarge.fontFamily ?? kAppFontFamily,
       ),
     );
   }

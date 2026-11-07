@@ -10,6 +10,7 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
+import 'package:hentai_library/features/app_settings/domain/app_font_preference.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
 import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
@@ -50,6 +51,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
     final String colorSchemeId = colorSchemeIdForPreference(
       themePrefs.colorSchemePreference,
     );
+    final AppFontSpec font = appFontSpecFor(themePrefs.fontPreference);
     final Locale? locale = ref.watch(
       settingsProvider.select((AsyncValue<AppSetting> async) {
         final AsyncData<AppSetting>? data = async.asData;
@@ -74,6 +76,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
             platformPrimary: lightDynamic?.primary,
             colorSchemeId: colorSchemeId,
           ),
+          font: font,
         );
         final AssembledAppTheme dark = assembleAppTheme(
           Brightness.dark,
@@ -82,6 +85,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
             platformPrimary: darkDynamic?.primary,
             colorSchemeId: colorSchemeId,
           ),
+          font: font,
         );
         return MaterialApp.router(
           locale: locale,

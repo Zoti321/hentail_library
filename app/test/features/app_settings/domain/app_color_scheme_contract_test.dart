@@ -6,9 +6,10 @@ void main() {
   group('color scheme and dynamic color contract fields', () {
     test('defaults on fresh aggregate', () {
       final AppSetting setting = AppSetting();
-      expect(setting.version, 4);
+      expect(setting.version, 5);
       expect(setting.colorSchemePreference, AppColorSchemePreference.brand);
       expect(setting.useDynamicColor, isFalse);
+      expect(setting.fontPreference, AppFontPreference.miSans);
     });
 
     test('migrateAppSettingJson fills reserved keys for legacy JSON', () {
@@ -17,12 +18,14 @@ void main() {
         'themePreference': 'dark',
       });
 
-      expect(setting.version, 4);
+      expect(setting.version, 5);
       expect(setting.themePreference, AppThemePreference.dark);
       expect(setting.colorSchemePreference, AppColorSchemePreference.brand);
       expect(setting.useDynamicColor, isFalse);
+      expect(setting.fontPreference, AppFontPreference.miSans);
       expect(setting.toJson()['colorSchemePreference'], 'brand');
       expect(setting.toJson()['useDynamicColor'], isFalse);
+      expect(setting.toJson()['fontPreference'], 'miSans');
     });
 
     test('persists non-brand colorSchemePreference', () {

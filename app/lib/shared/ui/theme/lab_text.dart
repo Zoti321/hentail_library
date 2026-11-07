@@ -3,7 +3,9 @@ import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 TextStyle labTextStyle(M3EThemeData theme, TextStyle base) {
-  return base.copyWith(fontFamily: kAppFontFamily);
+  return base.copyWith(
+    fontFamily: theme.typeScale.bodyLarge.fontFamily ?? kAppFontFamily,
+  );
 }
 
 /// 与 [M3EButton] 默认 label 字号一致，并强制 Lab 字体（ButtonStyle 会覆盖 label Text）。

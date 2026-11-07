@@ -686,7 +686,7 @@ class DesktopShellState extends State<DesktopShell> {
     );
 
     final Widget wrappedShell = DefaultTextStyle.merge(
-      style: const TextStyle(fontFamily: kAppFontFamily),
+      style: TextStyle(fontFamily: appFontFamilyOf(context)),
       child: shell,
     );
 

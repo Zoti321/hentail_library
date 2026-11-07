@@ -31,6 +31,40 @@ void main() {
         expect(setting.toJson().containsKey('readerAutoPlayEnabled'), isFalse);
       },
     );
+
+    test('fills default fontPreference and bumps version to 5', () {
+      final AppSetting setting = AppSetting.fromJson(<String, dynamic>{
+        'version': 4,
+        'themePreference': 'light',
+      });
+
+      expect(setting.version, 5);
+      expect(setting.fontPreference, AppFontPreference.miSans);
+      expect(setting.toJson()['fontPreference'], 'miSans');
+    });
+
+    test('round-trips explicit fontPreference', () {
+      final AppSetting setting = AppSetting(
+        fontPreference: AppFontPreference.notoSans,
+      );
+      expect(
+        AppSetting.fromJson(setting.toJson()).fontPreference,
+        AppFontPreference.notoSans,
+      );
+    });
+
+    test('maps legacy SC/JP fontPreference onto notoSans', () {
+      final AppSetting fromSc = AppSetting.fromJson(<String, dynamic>{
+        'version': 5,
+        'fontPreference': 'notoSansSc',
+      });
+      final AppSetting fromJp = AppSetting.fromJson(<String, dynamic>{
+        'version': 5,
+        'fontPreference': 'notoSansJp',
+      });
+      expect(fromSc.fontPreference, AppFontPreference.notoSans);
+      expect(fromJp.fontPreference, AppFontPreference.notoSans);
+    });
   });
 
   group('legacy import helpers', () {

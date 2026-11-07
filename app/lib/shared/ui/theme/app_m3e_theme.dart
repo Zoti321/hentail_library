@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/theme/app_font.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 
-/// App UI font ([pubspec.yaml] `MI_Sans_Regular`); aligned with production shell.
-const String kAppFontFamily = 'MI_Sans_Regular';
+export 'package:hentai_library/shared/ui/theme/app_font.dart';
 
 /// 产品品牌 seed：配色方案「紫罗兰色」(`violet` / Kazumi `0xFF6750A4`)。
 ///
@@ -27,16 +27,38 @@ M3EColorScheme m3eColorSchemeForBrightness(
   return M3EColorScheme.fromColorScheme(seeded);
 }
 
-/// Applies app font to [M3EThemeData.fontFamily] and [M3EThemeData.typography].
-M3EThemeData withAppFontFamily(M3EThemeData base) {
+/// Applies app font to [M3EThemeData] typography via [copyWith] font hooks.
+///
+/// When [fontFamily] is omitted, keeps the family already on [base] type scale
+/// (production shell), otherwise falls back to [kAppFontFamily].
+M3EThemeData withAppFontFamily(
+  M3EThemeData base, {
+  String? fontFamily,
+  List<String>? fontFamilyFallback,
+}) {
+  final String family =
+      fontFamily ?? base.typeScale.bodyLarge.fontFamily ?? kAppFontFamily;
+  final List<String>? fallbacks =
+      fontFamilyFallback ?? base.typeScale.bodyLarge.fontFamilyFallback;
   return base.copyWith(
-    fontFamily: kAppFontFamily,
-    typography: base.typography.apply(fontFamily: kAppFontFamily),
+    fontFamily: family,
+    fontFamilyFallback: fallbacks,
+    typography: base.typography.apply(
+      fontFamily: family,
+      fontFamilyFallback: fallbacks,
+    ),
   );
 }
 
-M3EThemeData applyShellNavRailOverrides(M3EThemeData base) {
-  final M3EThemeData withFont = withAppFontFamily(base);
+M3EThemeData applyShellNavRailOverrides(
+  M3EThemeData base, {
+  AppFontSpec font = const AppFontSpec(family: kAppFontFamily),
+}) {
+  final M3EThemeData withFont = withAppFontFamily(
+    base,
+    fontFamily: font.family,
+    fontFamilyFallback: font.fallbacks,
+  );
   final M3EColorScheme colors = withFont.colorScheme;
   return withFont.copyWith(
     navigationRailTheme: withFont.navigationRailTheme.copyWith(
@@ -57,6 +79,7 @@ M3EThemeData applyShellNavRailOverrides(M3EThemeData base) {
 M3EThemeData buildAppM3eThemeData(
   Brightness brightness, {
   Color seed = kBrandSeedColor,
+  AppFontSpec font = const AppFontSpec(family: kAppFontFamily),
 }) {
   final M3EThemeData base = M3EThemeData(
     colorScheme: m3eColorSchemeForBrightness(brightness, seed: seed),
@@ -74,6 +97,7 @@ M3EThemeData buildAppM3eThemeData(
         ),
       ),
     ),
+    font: font,
   );
 }
 
@@ -121,11 +145,19 @@ ColorScheme flutterColorSchemeFromM3e(M3EColorScheme scheme) {
 ///
 /// Production shell should prefer [assembleAppTheme] / [materialThemeFromM3e]
 ///（含 tokens 与 Reader 扩展）。此处仅同步 colorScheme + 字体。
-ThemeData buildMaterialTheme(Brightness brightness, {M3EThemeData? m3e}) {
-  final M3EThemeData resolved = m3e ?? buildAppM3eThemeData(brightness);
+ThemeData buildMaterialTheme(
+  Brightness brightness, {
+  M3EThemeData? m3e,
+  AppFontSpec font = const AppFontSpec(family: kAppFontFamily),
+}) {
+  final M3EThemeData resolved =
+      m3e ?? buildAppM3eThemeData(brightness, font: font);
+  final String family =
+      resolved.typeScale.bodyLarge.fontFamily ?? font.family;
   return ThemeData(
     useMaterial3: true,
-    fontFamily: kAppFontFamily,
+    fontFamily: family,
+    fontFamilyFallback: font.fallbacks,
     colorScheme: flutterColorSchemeFromM3e(resolved.colorScheme),
   );
 }

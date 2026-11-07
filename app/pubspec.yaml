@@ -117,3 +117,12 @@ flutter:
     - family: MI_Sans_Regular
       fonts:
         - asset: assets/fonts/MiSans-Regular.ttf
+    - family: NotoSans
+      fonts:
+        - asset: assets/fonts/NotoSans-VariableFont_wdth_wght.ttf
+    - family: NotoSansSC
+      fonts:
+        - asset: assets/fonts/NotoSansSC-VariableFont_wght.ttf
+    - family: NotoSansJP
+      fonts:
+        - asset: assets/fonts/NotoSansJP-VariableFont_wght.ttf
