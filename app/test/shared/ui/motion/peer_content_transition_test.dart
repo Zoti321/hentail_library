@@ -7,26 +7,25 @@ import '../../../support/pump_app.dart';
 
 void main() {
   group('PeerContentTransition', () {
-    test('incomingEntryIndex matches PageTransitionSwitcher insert rules', () {
-      expect(
-        PeerContentTransition.incomingEntryIndex(1, reverse: false),
-        0,
+    testWidgets('uses PageTransitionSwitcher with overlapping peer axis', (
+      WidgetTester tester,
+    ) async {
+      await pumpApp(
+        tester,
+        home: const Scaffold(
+          body: PeerContentTransition(
+            switchKey: 0,
+            child: Text('peer'),
+          ),
+        ),
       );
-      expect(
-        PeerContentTransition.incomingEntryIndex(2, reverse: false),
-        1,
-      );
-      expect(
-        PeerContentTransition.incomingEntryIndex(2, reverse: true),
-        0,
-      );
-      expect(
-        PeerContentTransition.incomingEntryIndex(3, reverse: true),
-        1,
-      );
+
+      expect(find.byType(PageTransitionSwitcher), findsOneWidget);
+      expect(find.byType(AnimatedSize), findsOneWidget);
+      expect(find.text('peer'), findsOneWidget);
     });
 
-    testWidgets('uses horizontal SharedAxis and sizes to incoming child', (
+    testWidgets('keeps taller outgoing height during first transition frame', (
       WidgetTester tester,
     ) async {
       int key = 0;
@@ -54,7 +53,6 @@ void main() {
         ),
       );
 
-      expect(find.byType(PageTransitionSwitcher), findsOneWidget);
       expect(
         tester.getSize(find.byType(PageTransitionSwitcher)).height,
         200,
@@ -62,15 +60,19 @@ void main() {
 
       await tester.tap(find.text('next'));
       await tester.pump();
-      // 过渡首帧起高度应由进入项（短）决定，而不是取 max(旧, 新)。
+      // 过渡中高度取 max(离开, 进入)，避免进入项单独定高导致裁切闪白。
       expect(
         tester.getSize(find.byType(PageTransitionSwitcher)).height,
-        80,
+        200,
       );
 
       await tester.pumpAndSettle();
       expect(find.text('short'), findsOneWidget);
       expect(find.text('tall'), findsNothing);
+      expect(
+        tester.getSize(find.byType(PageTransitionSwitcher)).height,
+        80,
+      );
     });
 
     testWidgets('reduce motion skips PageTransitionSwitcher', (

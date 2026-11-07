@@ -88,6 +88,16 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       if (!libraryPageShouldScrollToTop(previous, next)) {
         return;
       }
+      // 漫画↔系列：勿清封面视口（避免进入页首帧 inViewport=false 占位闪一下），
+      // 已滚过的列表瞬时回顶，不与 Peer 淡入叠一段 300ms 滚动。
+      final bool displayTargetChanged =
+          previous != null && previous.displayTarget != next.displayTarget;
+      if (displayTargetChanged) {
+        if (_scrollController.hasClients && _scrollController.offset > 0) {
+          _scrollController.jumpTo(0);
+        }
+        return;
+      }
       ref
           .read(coverViewportProvider(CoverViewportScopes.library).notifier)
           .clear();
