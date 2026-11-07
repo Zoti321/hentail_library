@@ -22,7 +22,7 @@ Future<void> _pumpLauncher(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('forward route uses horizontal SharedAxisTransition', (
+  testWidgets('forward route uses scaled SharedAxisTransition', (
     WidgetTester tester,
   ) async {
     await _pumpLauncher(tester);
@@ -35,7 +35,7 @@ void main() {
     final SharedAxisTransition axis = tester.widget(
       find.byType(SharedAxisTransition).first,
     );
-    expect(axis.transitionType, SharedAxisTransitionType.horizontal);
+    expect(axis.transitionType, SharedAxisTransitionType.scaled);
 
     await tester.pumpAndSettle();
     expect(find.byType(ReaderPageLabHost), findsOneWidget);

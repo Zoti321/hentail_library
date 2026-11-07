@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
 
@@ -10,6 +11,8 @@ import '../../preview/md3e_reader_page_preview_data.dart';
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 
 /// Lab：详情 / 目录 → [ReaderPageLabHost]（preview 会话；不接 read_session FRB）。
+///
+/// 与生产 `/reader` 一致：Shared Axis Z（层级下钻）。
 Future<void> openLabReader(
   BuildContext context, {
   ReaderPagePreviewData? preview,
@@ -22,6 +25,7 @@ Future<void> openLabReader(
   return Navigator.of(context, rootNavigator: false).push<void>(
     sharedAxisRoute<void>(
       context,
+      transitionType: SharedAxisTransitionType.scaled,
       builder: (BuildContext routeContext) {
         return overlayRouteScope(
           scope: scope,

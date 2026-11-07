@@ -14,7 +14,7 @@ class _FakeGoRouterState extends Fake implements GoRouterState {
 
 void main() {
   group('buildSharedAxisPage', () {
-    test('returns horizontal SharedAxis page for reader-style push', () {
+    test('returns SharedAxis page with standard duration', () {
       final CustomTransitionPage<void> page = buildSharedAxisPage(
         state: _FakeGoRouterState(),
         child: const SizedBox(),
@@ -22,6 +22,44 @@ void main() {
 
       expect(page.transitionDuration, kSharedAxisRouteDuration);
       expect(page.reverseTransitionDuration, kSharedAxisRouteDuration);
+    });
+
+    testWidgets('reader-style page uses scaled SharedAxisTransition', (
+      WidgetTester tester,
+    ) async {
+      final CustomTransitionPage<void> page = buildSharedAxisPage(
+        state: _FakeGoRouterState(),
+        transitionType: SharedAxisTransitionType.scaled,
+        fillColor: Colors.black,
+        child: const Text('reader'),
+      );
+
+      final AnimationController primary = AnimationController(
+        vsync: tester,
+        value: 1,
+      );
+      addTearDown(primary.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (BuildContext context) {
+              return page.transitionsBuilder(
+                context,
+                primary,
+                const AlwaysStoppedAnimation<double>(0),
+                page.child,
+              );
+            },
+          ),
+        ),
+      );
+
+      final SharedAxisTransition axis = tester.widget(
+        find.byType(SharedAxisTransition),
+      );
+      expect(axis.transitionType, SharedAxisTransitionType.scaled);
+      expect(find.text('reader'), findsOneWidget);
     });
   });
 
@@ -55,6 +93,39 @@ void main() {
         find.byType(SharedAxisTransition),
       );
       expect(axis.transitionType, SharedAxisTransitionType.horizontal);
+      expect(find.text('reader'), findsOneWidget);
+    });
+
+    testWidgets('uses scaled SharedAxisTransition when requested', (
+      WidgetTester tester,
+    ) async {
+      final AnimationController primary = AnimationController(
+        vsync: tester,
+        value: 1,
+      );
+      addTearDown(primary.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (BuildContext context) {
+              return sharedAxisTransitionWrapper(
+                context: context,
+                animation: primary,
+                secondaryAnimation: const AlwaysStoppedAnimation<double>(0),
+                transitionType: SharedAxisTransitionType.scaled,
+                fillColor: Colors.black,
+                child: const Text('reader'),
+              );
+            },
+          ),
+        ),
+      );
+
+      final SharedAxisTransition axis = tester.widget(
+        find.byType(SharedAxisTransition),
+      );
+      expect(axis.transitionType, SharedAxisTransitionType.scaled);
       expect(find.text('reader'), findsOneWidget);
     });
 

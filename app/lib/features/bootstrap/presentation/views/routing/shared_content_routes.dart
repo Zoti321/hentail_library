@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/ui/motion/catalog_detail_page.dart';
@@ -126,9 +127,10 @@ List<RouteBase> buildSharedContentRoutes({
         final ReaderRouteArgs args = ReaderRouteArgs.fromQuery(
           state.uri.queryParameters,
         );
-        // 详情 → 阅读：M3 forward/back + Lab shared-axis（非 Shell 顶层 fade-through）。
+        // 详情 → 阅读：Shared Axis Z（层级下钻进沉浸页；非水平同级、非 Shell fade-through）。
         return buildSharedAxisPage(
           state: state,
+          transitionType: SharedAxisTransitionType.scaled,
           fillColor: context.reader.readerBackground,
           transitionDuration: LabMotion.motionDurationOf(
             context,
