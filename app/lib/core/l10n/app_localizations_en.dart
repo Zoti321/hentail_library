@@ -1623,6 +1623,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataMerge => 'Merge';
 
   @override
+  String get metadataMergeConfirmTitle => 'Confirm merge';
+
+  @override
+  String metadataMergeConfirmBody(int sourceCount, String target) {
+    return 'Merge $sourceCount tags into \"$target\"? Comic attachments from the source tags move to the target, and the source tags are deleted.';
+  }
+
+  @override
+  String get metadataMergeConfirmDontAskAgain => 'Don\'t ask again';
+
+  @override
   String get metadataDelete => 'Delete';
 
   @override

@@ -756,6 +756,19 @@
   "metadataSearchNameHint": "搜索名称…",
   "metadataRename": "重命名",
   "metadataMerge": "合并",
+  "metadataMergeConfirmTitle": "确认合并",
+  "metadataMergeConfirmBody": "将 {sourceCount} 个标签合并到「{target}」？来源标签的漫画附着会转移到目标，来源标签将被删除。",
+  "@metadataMergeConfirmBody": {
+    "placeholders": {
+      "sourceCount": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "metadataMergeConfirmDontAskAgain": "以后不再提示",
   "metadataDelete": "删除",
   "metadataMoreActions": "更多操作",
   "metadataAllAuthors": "全部作者",

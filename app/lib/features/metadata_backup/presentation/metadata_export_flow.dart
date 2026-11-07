@@ -19,12 +19,10 @@ Future<void> runMetadataExportFlow(
   required MetadataExportOptions initialOptions,
   MetadataExportUseCase? exportUseCase,
 }) async {
-  final MetadataExportOptions? options =
-      await showDialog<MetadataExportOptions>(
-        context: context,
-        builder: (BuildContext context) =>
-            MetadataExportOptionsDialog(initialOptions: initialOptions),
-      );
+  final MetadataExportOptions? options = await showMetadataExportOptionsDialog(
+    context: context,
+    initialOptions: initialOptions,
+  );
   if (options == null || !context.mounted) {
     return;
   }

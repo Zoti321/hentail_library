@@ -754,6 +754,19 @@
   "metadataSearchNameHint": "Search by name…",
   "metadataRename": "Rename",
   "metadataMerge": "Merge",
+  "metadataMergeConfirmTitle": "Confirm merge",
+  "metadataMergeConfirmBody": "Merge {sourceCount} tags into \"{target}\"? Comic attachments from the source tags move to the target, and the source tags are deleted.",
+  "@metadataMergeConfirmBody": {
+    "placeholders": {
+      "sourceCount": {
+        "type": "int"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "metadataMergeConfirmDontAskAgain": "Don't ask again",
   "metadataDelete": "Delete",
   "metadataMoreActions": "More actions",
   "metadataAllAuthors": "All authors",

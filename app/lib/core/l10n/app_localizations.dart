@@ -2924,6 +2924,24 @@ abstract class AppLocalizations {
   /// **'合并'**
   String get metadataMerge;
 
+  /// No description provided for @metadataMergeConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认合并'**
+  String get metadataMergeConfirmTitle;
+
+  /// No description provided for @metadataMergeConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'将 {sourceCount} 个标签合并到「{target}」？来源标签的漫画附着会转移到目标，来源标签将被删除。'**
+  String metadataMergeConfirmBody(int sourceCount, String target);
+
+  /// No description provided for @metadataMergeConfirmDontAskAgain.
+  ///
+  /// In zh, this message translates to:
+  /// **'以后不再提示'**
+  String get metadataMergeConfirmDontAskAgain;
+
   /// No description provided for @metadataDelete.
   ///
   /// In zh, this message translates to:

@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_actions.dart';
 import 'package:hentai_library/shared/di/author_detail_providers.dart';
-import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/named_facet_context_menu.dart';
+import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -48,21 +51,32 @@ class MetadataFacetChip extends ConsumerWidget {
     };
   }
 
-  void _showMenu(BuildContext context, WidgetRef ref, Offset position) {
-    NamedFacetContextMenu.show(
-      context,
-      position: position,
-      mergeEnabled: !_isAuthor,
-      onAction: (NamedFacetContextAction action) {
-        switch (action) {
-          case NamedFacetContextAction.rename:
-            unawaited(renameNamedFacet(context, ref, kind, name));
-          case NamedFacetContextAction.merge:
-            onMergeTargetSelected?.call(name);
-          case NamedFacetContextAction.delete:
-            unawaited(deleteNamedFacet(context, ref, kind, name));
-        }
-      },
+  void _showMenu(BuildContext context, WidgetRef ref, Offset globalPosition) {
+    final AppLocalizations l10n = context.l10n;
+    final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
+    showPointerContextMenu<void>(
+      context: context,
+      globalPosition: globalPosition,
+      children: <M3EMenuNode>[
+        M3EMenuEntry(
+          label: l10n.metadataRename,
+          leading: const Icon(LucideIcons.pencil),
+          onPressed: () => unawaited(renameNamedFacet(context, ref, kind, name)),
+        ),
+        M3EMenuEntry(
+          label: l10n.metadataMerge,
+          leading: const Icon(LucideIcons.merge),
+          enabled: !_isAuthor,
+          onPressed: () => onMergeTargetSelected?.call(name),
+        ),
+        M3EMenuEntry(
+          label: l10n.metadataDelete,
+          leading: Icon(LucideIcons.trash2, color: scheme.error),
+          isDestructive: true,
+          onPressed: () =>
+              unawaited(deleteNamedFacet(context, ref, kind, name)),
+        ),
+      ],
     );
   }
 
@@ -88,32 +102,24 @@ class MetadataFacetChip extends ConsumerWidget {
     final bool desktop = _isDesktop(context);
     final bool inMergeMode = mergeTarget != null;
 
-    final Color selectedColor = isMergeTarget
-        ? scheme.primaryContainer
-        : scheme.errorContainer;
+    final String label = (!_isAuthor && attachmentCount != null)
+        ? '$name $attachmentCount'
+        : name;
 
-    final Widget chip = FilterChip(
-      showCheckmark: false,
+    final Widget? leading = isMergeTarget
+        ? Icon(Symbols.merge, size: 16, color: scheme.primary)
+        : isMergeSource
+        ? Icon(Symbols.link_off, size: 16, color: scheme.error)
+        : verified
+        ? Icon(Symbols.verified, size: 16, color: scheme.primary)
+        : null;
+
+    final Widget chip = M3EChip(
+      label: label,
+      type: selected ? M3EChipType.filter : M3EChipType.suggestion,
       selected: selected,
-      selectedColor: selectedColor,
-      avatar: verified
-          ? Icon(Symbols.verified, size: 16, color: scheme.primary)
-          : null,
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Flexible(child: Text(name, overflow: TextOverflow.ellipsis)),
-          if (!_isAuthor && attachmentCount != null) ...<Widget>[
-            const SizedBox(width: 6),
-            Text(
-              '$attachmentCount',
-              style: Theme.of(context).textTheme.labelSmall
-                  ?.copyWith(color: scheme.onSurfaceVariant),
-            ),
-          ],
-        ],
-      ),
-      onSelected: (_) => _onTap(context, ref),
+      leading: leading,
+      onPressed: () => _onTap(context, ref),
     );
 
     if (_isAuthor || inMergeMode) {

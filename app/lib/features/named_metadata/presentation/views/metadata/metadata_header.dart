@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
+import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/filled_button.dart';
+import 'package:hentai_library/shared/ui/theme/lab_text.dart';
+import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 粘滞头：普通模式为标题 + 操作；合并模式为取消 + 「合并 N 个 tags」。
+/// 粘滞头：普通模式为标题 + 右侧更多；合并模式为取消 + 右侧 M3E filled 合并。
 ///
 /// 上下留白与水平留白由外层 [PageHeaderDelegate] 提供，本组件只负责工具行。
 class MetadataHeader extends StatelessWidget {
@@ -27,10 +30,17 @@ class MetadataHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
+    final bool mergeMode = onExitMergeSelection != null;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final TextStyle mergeLabelStyle = labButtonLabelStyle(
+      theme,
+      M3EButtonSize.sm,
+    );
 
     final Widget content;
-    if (onExitMergeSelection != null) {
+    if (mergeMode) {
       content = Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           M3EIconButton(
             icon: const Icon(Symbols.close),
@@ -41,15 +51,18 @@ class MetadataHeader extends StatelessWidget {
             onPressed: onExitMergeSelection,
           ),
           const Spacer(),
-          ExpressiveFilledButton(
-            label: '${l10n.metadataMerge} $mergeSelectionCount tags',
-            icon: Symbols.merge,
+          M3EButton(
             onPressed: mergeSelectionCount > 1 ? onMergeSelection : null,
+            style: M3EButtonStyle.filled,
+            decoration: M3EButtonDecoration(textStyle: mergeLabelStyle),
+            icon: const Icon(Symbols.merge),
+            label: Text('${l10n.metadataMerge} $mergeSelectionCount tags'),
           ),
         ],
       );
     } else {
       content = Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           if (onOpenNavigation != null) ...<Widget>[
             M3EIconButton(
@@ -62,12 +75,47 @@ class MetadataHeader extends StatelessWidget {
             ),
             const SizedBox(width: 8),
           ],
-          Flexible(child: PageTitle(l10n.navMetadata)),
-          const Spacer(),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: PageTitle(l10n.navMetadata),
+            ),
+          ),
+          AnchoredMenu(
+            position: M3EMenuAnchorPosition.bottomEnd,
+            children: <M3EMenuNode>[
+              M3EMenuEntry(
+                label: l10n.settingsMetadataBackupExportLabel,
+                leading: const Icon(Icons.download_outlined),
+                onPressed: () => runMetadataExportFlow(
+                  context,
+                  initialOptions: const MetadataExportOptions(),
+                ),
+              ),
+            ],
+            anchorBuilder: (BuildContext context, VoidCallback open) {
+              return M3EIconButton(
+                icon: const Icon(Symbols.more_vert),
+                variant: M3EIconButtonVariant.standard,
+                size: M3EIconButtonSize.sm,
+                tooltip: l10n.metadataMoreActions,
+                semanticLabel: l10n.metadataMoreActions,
+                onPressed: open,
+              );
+            },
+          ),
         ],
       );
     }
 
-    return SizedBox(height: PageLayoutSpec.toolbarRowHeight, child: content);
+    return SizedBox(
+      height: PageLayoutSpec.toolbarRowHeight,
+      width: double.infinity,
+      child: ModeChromeTransition(
+        switchKey: mergeMode,
+        reverse: !mergeMode,
+        child: content,
+      ),
+    );
   }
 }

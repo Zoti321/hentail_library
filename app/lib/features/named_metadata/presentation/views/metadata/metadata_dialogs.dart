@@ -52,13 +52,13 @@ class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
       M3EButtonSize.sm,
     );
     return M3EDialog(
-      title: '确认合并',
+      title: l10n.metadataMergeConfirmTitle,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            '将 ${widget.sourceCount} 个 tag 合并到「${widget.target}」？源 tag 的 Comic 附着会转移到目标，源 tag 将被删除。',
+            l10n.metadataMergeConfirmBody(widget.sourceCount, widget.target),
             style: theme.typeScale.bodyMedium.copyWith(
               color: scheme.onSurfaceVariant,
             ),
@@ -68,13 +68,14 @@ class _MergeConfirmDialogState extends State<_MergeConfirmDialog> {
             onTap: () => _setSkip(!_skip),
             child: Row(
               children: <Widget>[
-                Checkbox(
+                M3ECheckbox(
                   value: _skip,
                   onChanged: (bool? v) => _setSkip(v ?? false),
+                  focusable: true,
                 ),
                 Expanded(
                   child: Text(
-                    '以后不再提示',
+                    l10n.metadataMergeConfirmDontAskAgain,
                     style: theme.typeScale.bodyMedium.copyWith(
                       color: scheme.onSurface,
                     ),

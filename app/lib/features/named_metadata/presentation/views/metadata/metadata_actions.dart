@@ -4,33 +4,25 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_controller.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_dialogs.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_rename_entity_dialog.dart';
 import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
-import 'package:hentai_library/shared/ui/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 
-/// 重命名（沿用共享的名称编辑框）。
+/// 重命名（M3E dialog + [ManagementEntityNameField]）。
 Future<void> renameNamedFacet(
   BuildContext context,
   WidgetRef ref,
   ManagedNamedFacetKind kind,
   String name,
-) async {
-  final l10n = context.l10n;
-  await showDialog<void>(
+) {
+  return showManagementRenameEntityDialog(
     context: context,
-    builder: (BuildContext dialogContext) => TagNameEditorDialog(
-      title: l10n.metadataRenameTitle(kind),
-      labelText: l10n.metadataNewName,
-      hintText: l10n.metadataRenameHint(kind),
-      initialValue: name,
-      shouldCloseOnUnchanged: true,
-      onSubmit: (String value) async {
-        await ref
-            .read(namedFacetManagementControllerProvider(kind).notifier)
-            .rename(name, value);
-      },
-    ),
+    facet: kind,
+    initialName: name,
+    onRename: (String value) => ref
+        .read(namedFacetManagementControllerProvider(kind).notifier)
+        .rename(name, value),
   );
 }
 

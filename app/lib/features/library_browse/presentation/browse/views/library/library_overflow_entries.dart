@@ -56,13 +56,5 @@ List<M3EMenuNode> buildLibraryOverflowEntries({
             targetLibraryId: browseLibraryId,
           ),
     ),
-    if (browseLibraryId != null)
-      M3EMenuEntry(
-        label: l10n.settingsMetadataBackupExportLabel,
-        leading: const Icon(Icons.download_outlined),
-        onPressed: () => ref
-            .read(libraryMetadataExportActionProvider)
-            .call(context, browseLibraryId),
-      ),
   ];
 }

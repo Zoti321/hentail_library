@@ -1565,6 +1565,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataMerge => '合并';
 
   @override
+  String get metadataMergeConfirmTitle => '确认合并';
+
+  @override
+  String metadataMergeConfirmBody(int sourceCount, String target) {
+    return '将 $sourceCount 个标签合并到「$target」？来源标签的漫画附着会转移到目标，来源标签将被删除。';
+  }
+
+  @override
+  String get metadataMergeConfirmDontAskAgain => '以后不再提示';
+
+  @override
   String get metadataDelete => '删除';
 
   @override
