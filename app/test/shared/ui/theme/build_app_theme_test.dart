@@ -22,9 +22,11 @@ void main() {
     });
 
     test('Material ThemeData primary matches M3ETheme assembly for same seed', () {
-      final ThemeData theme = buildAppTheme(Brightness.light);
-      final M3EThemeData m3e = buildAppM3eThemeData(Brightness.light);
-      expect(theme.colorScheme.primary, m3e.colorScheme.primary);
+      final AssembledAppTheme assembled = assembleAppTheme(Brightness.light);
+      expect(
+        assembled.material.colorScheme.primary,
+        assembled.m3e.colorScheme.primary,
+      );
     });
 
     test('registers layout, semantic, shadow, and motion extensions', () {

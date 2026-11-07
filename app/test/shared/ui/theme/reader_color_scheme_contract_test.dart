@@ -13,7 +13,7 @@ void main() {
         expect(theme.extension<ReaderColorScheme>(), isNotNull);
         expect(
           theme.extension<ReaderColorScheme>()!.readerBackground,
-          ReaderColorScheme.immersive.readerBackground,
+          ReaderColorScheme.immersiveBackground,
         );
       }
     });
@@ -31,17 +31,19 @@ void main() {
       expect(brandBg.computeLuminance(), lessThan(0.2));
     });
 
-    test('shell primary still follows seed while reader does not', () {
+    test('reader accent follows seed while background stays fixed', () {
       final ThemeData brand = buildAppTheme(
-        Brightness.light,
+        Brightness.dark,
         colorSchemeId: 'brand',
       );
       final ThemeData teal = buildAppTheme(
-        Brightness.light,
+        Brightness.dark,
         colorSchemeId: 'teal',
       );
       expect(teal.colorScheme.primary, isNot(brand.colorScheme.primary));
       expect(teal.reader.readerBackground, brand.reader.readerBackground);
+      expect(teal.reader.activeButtonBg, isNot(brand.reader.activeButtonBg));
+      expect(teal.reader.activeButtonBg, teal.colorScheme.primary);
     });
   });
 

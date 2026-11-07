@@ -11,10 +11,6 @@ const String kAppFontFamily = 'MI_Sans_Regular';
 /// `AppColorSchemePreference.brand` 与 `violet` 共用此色；默认主题即紫罗兰。
 const Color kBrandSeedColor = Color(0xFF6750A4);
 
-/// @Deprecated('Use kBrandSeedColor') — Lab 时期别名，保留给过渡引用。
-@Deprecated('Use kBrandSeedColor')
-const Color kLabSeedColor = kBrandSeedColor;
-
 /// Tone-based color system：seed → MCU fidelity scheme → M3E roles。
 ///
 /// `M3EColorScheme.fromSeed` 不透传 variant，故经 material_ui
@@ -121,7 +117,10 @@ ColorScheme flutterColorSchemeFromM3e(M3EColorScheme scheme) {
   );
 }
 
-/// Flutter [ThemeData] for legacy widgets alongside [M3ETheme] (overlays, dialogs).
+/// Thin Flutter [ThemeData] for overlays / lab host that already hold [M3EThemeData].
+///
+/// Production shell should prefer [assembleAppTheme] / [materialThemeFromM3e]
+///（含 tokens 与 Reader 扩展）。此处仅同步 colorScheme + 字体。
 ThemeData buildMaterialTheme(Brightness brightness, {M3EThemeData? m3e}) {
   final M3EThemeData resolved = m3e ?? buildAppM3eThemeData(brightness);
   return ThemeData(

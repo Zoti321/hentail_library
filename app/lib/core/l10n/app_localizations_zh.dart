@@ -206,7 +206,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsColorSchemeLabel => '配色方案';
 
   @override
-  String get colorSchemePreferenceBrand => '默认';
+  String get colorSchemePreferenceBrand => '紫罗兰色';
 
   @override
   String get colorSchemePreferenceTeal => '青色';

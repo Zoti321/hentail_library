@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @colorSchemePreferenceBrand.
   ///
   /// In zh, this message translates to:
-  /// **'默认'**
+  /// **'紫罗兰色'**
   String get colorSchemePreferenceBrand;
 
   /// No description provided for @colorSchemePreferenceTeal.

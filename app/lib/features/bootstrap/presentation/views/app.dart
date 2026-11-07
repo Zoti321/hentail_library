@@ -67,15 +67,21 @@ class _AppRootState extends ConsumerState<_AppRoot> {
             material_ui.ColorScheme? lightDynamic,
             material_ui.ColorScheme? darkDynamic,
           ) {
-        final Color lightSeed = resolveAppThemeSeed(
-          useDynamicColor: themePrefs.useDynamicColor,
-          platformPrimary: lightDynamic?.primary,
-          colorSchemeId: colorSchemeId,
+        final AssembledAppTheme light = assembleAppTheme(
+          Brightness.light,
+          seed: resolveAppThemeSeed(
+            useDynamicColor: themePrefs.useDynamicColor,
+            platformPrimary: lightDynamic?.primary,
+            colorSchemeId: colorSchemeId,
+          ),
         );
-        final Color darkSeed = resolveAppThemeSeed(
-          useDynamicColor: themePrefs.useDynamicColor,
-          platformPrimary: darkDynamic?.primary,
-          colorSchemeId: colorSchemeId,
+        final AssembledAppTheme dark = assembleAppTheme(
+          Brightness.dark,
+          seed: resolveAppThemeSeed(
+            useDynamicColor: themePrefs.useDynamicColor,
+            platformPrimary: darkDynamic?.primary,
+            colorSchemeId: colorSchemeId,
+          ),
         );
         return MaterialApp.router(
           locale: locale,
@@ -84,21 +90,15 @@ class _AppRootState extends ConsumerState<_AppRoot> {
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           title: appWindowTitle(),
           debugShowCheckedModeBanner: false,
-          theme: buildAppTheme(Brightness.light, seed: lightSeed),
-          darkTheme: buildAppTheme(Brightness.dark, seed: darkSeed),
+          theme: light.material,
+          darkTheme: dark.material,
           themeMode: themeMode,
           routerConfig: appRouter,
           builder: (BuildContext context, Widget? child) {
-            final Brightness brightness = Theme.of(context).brightness;
-            final Color seed = brightness == Brightness.dark
-                ? darkSeed
-                : lightSeed;
-            final M3EThemeData m3e = buildAppM3eThemeData(
-              brightness,
-              seed: seed,
-            );
+            final AssembledAppTheme assembled =
+                Theme.of(context).brightness == Brightness.dark ? dark : light;
             return M3ETheme(
-              data: m3e,
+              data: assembled.m3e,
               child: AnnotatedRegion<SystemUiOverlayStyle>(
                 value: appSystemUiOverlayStyle(Theme.of(context).colorScheme),
                 child: child ?? const SizedBox.shrink(),

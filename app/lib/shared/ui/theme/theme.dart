@@ -24,6 +24,19 @@ export 'package:hentai_library/shared/ui/theme/tokens/app_spacing_tokens.dart';
 export 'package:hentai_library/shared/ui/theme/tokens/app_text_tokens.dart';
 export 'package:hentai_library/shared/ui/theme/tokens/app_theme_tokens.dart';
 
+/// One seed → fidelity M3E + production [ThemeData]（ADR-0037 单次装配）。
+final class AssembledAppTheme {
+  const AssembledAppTheme({
+    required this.seed,
+    required this.m3e,
+    required this.material,
+  });
+
+  final Color seed;
+  final M3EThemeData m3e;
+  final ThemeData material;
+}
+
 /// Shell / theme-boundary system bar style for everyday browsing chrome.
 SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
   final bool isDark = colorScheme.brightness == Brightness.dark;
@@ -55,18 +68,27 @@ Color resolveAppThemeSeed({
   return colorSchemeSeedForId(colorSchemeId);
 }
 
-/// Single assembly entry for app [ThemeData] (light/dark).
-///
-/// [colorSchemeId] selects a fixed seed palette; [seed] overrides it when the
-/// caller already resolved a dynamic or custom seed.
-ThemeData buildAppTheme(
+/// Assembles M3E + Material from one seed（`fromSeed` 只跑一次）.
+AssembledAppTheme assembleAppTheme(
   Brightness brightness, {
   String colorSchemeId = 'brand',
   Color? seed,
 }) {
   final Color resolvedSeed = seed ?? colorSchemeSeedForId(colorSchemeId);
   final M3EThemeData m3e = buildAppM3eThemeData(brightness, seed: resolvedSeed);
+  return AssembledAppTheme(
+    seed: resolvedSeed,
+    m3e: m3e,
+    material: materialThemeFromM3e(m3e),
+  );
+}
+
+/// Builds production [ThemeData] from an already-assembled [M3EThemeData].
+///
+/// Does not re-run `ColorScheme.fromSeed`.
+ThemeData materialThemeFromM3e(M3EThemeData m3e) {
   final ColorScheme colorScheme = flutterColorSchemeFromM3e(m3e.colorScheme);
+  final Brightness brightness = colorScheme.brightness;
   final AppThemeTokens tokens = brightness == Brightness.dark
       ? AppThemeTokens.dark()
       : AppThemeTokens.light();
@@ -89,7 +111,7 @@ ThemeData buildAppTheme(
     splashFactory: NoSplash.splashFactory,
     highlightColor: Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
-    fontFamily: 'MI_Sans_Regular',
+    fontFamily: kAppFontFamily,
     appBarTheme: _buildAppBarThemeData(colorScheme),
     navigationRailTheme: _buildNavRailThemeData(colorScheme),
     filledButtonTheme: FilledButtonThemeData(
@@ -110,11 +132,27 @@ ThemeData buildAppTheme(
     ),
     extensions: <ThemeExtension<dynamic>>[
       tokens,
-      ReaderColorScheme.immersive,
+      ReaderColorScheme.immersiveFor(colorScheme),
       shadows,
       motion,
     ],
   );
+}
+
+/// Single assembly entry for app [ThemeData] (light/dark).
+///
+/// [colorSchemeId] selects a fixed seed palette; [seed] overrides it when the
+/// caller already resolved a dynamic or custom seed.
+ThemeData buildAppTheme(
+  Brightness brightness, {
+  String colorSchemeId = 'brand',
+  Color? seed,
+}) {
+  return assembleAppTheme(
+    brightness,
+    colorSchemeId: colorSchemeId,
+    seed: seed,
+  ).material;
 }
 
 AppBarTheme _buildAppBarThemeData(ColorScheme colorScheme) {

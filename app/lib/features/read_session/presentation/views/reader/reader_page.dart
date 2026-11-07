@@ -55,7 +55,14 @@ class ReaderPage extends HookConsumerWidget {
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
     );
-    final ThemeData theme = buildAppTheme(Brightness.dark);
+    // 强制暗色沉浸壳，但 seed 跟当前应用主题（含动态配色）对齐。
+    final ThemeData ambient = Theme.of(context);
+    final ThemeData theme = ambient.brightness == Brightness.dark
+        ? ambient
+        : buildAppTheme(
+            Brightness.dark,
+            seed: ambient.colorScheme.primary,
+          );
 
     if (routeContext.comicId.isEmpty) {
       return Theme(

@@ -1,7 +1,8 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:material_3_expressive/foundations/foundations.dart';
+import 'package:material_ui/material_ui.dart' as material_ui;
 
 export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart'
     show
@@ -11,50 +12,34 @@ export 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart'
         kBrandSeedColor,
         withAppFontFamily;
 
-M3EColorScheme _md3eColorSchemeFor({
-  Object? dynamicSource,
-  required Brightness brightness,
-}) {
-  if (dynamicSource != null) {
-    final dynamic scheme = dynamicSource;
-    final Color seed = scheme.primary as Color;
-    final Brightness resolved = scheme.brightness as Brightness? ?? brightness;
-    return M3EColorScheme.fromSeed(seed, brightness: resolved);
+Color _seedFromDynamic(Object? dynamicSource) {
+  if (dynamicSource is material_ui.ColorScheme) {
+    return dynamicSource.primary;
   }
-  return m3eColorSchemeForBrightness(brightness);
+  return kBrandSeedColor;
 }
 
-M3EThemeData _applyMd3eLabOverrides(M3EThemeData base) =>
-    applyShellNavRailOverrides(base);
-
-/// Builds [M3EThemeData] for the MD3E lab (seed + optional OS dynamic color).
+/// Lab / Widgetbook：与生产同一 [assembleAppTheme] 入口（fidelity Tone-based）。
 M3EThemeData buildThemeData({
   Object? lightDynamic,
   Object? darkDynamic,
   Brightness brightness = Brightness.light,
 }) {
-  final M3EColorScheme scheme = brightness == Brightness.dark
-      ? _md3eColorSchemeFor(
-          dynamicSource: darkDynamic,
-          brightness: Brightness.dark,
-        )
-      : _md3eColorSchemeFor(
-          dynamicSource: lightDynamic,
-          brightness: Brightness.light,
-        );
-
-  return _applyMd3eLabOverrides(M3EThemeData(colorScheme: scheme));
+  final Object? dynamicSource = brightness == Brightness.dark
+      ? darkDynamic
+      : lightDynamic;
+  return assembleAppTheme(
+    brightness,
+    seed: _seedFromDynamic(dynamicSource),
+  ).m3e;
 }
 
 /// Flutter [ThemeData] for [MaterialApp] / legacy widgets alongside [M3ETheme].
 ThemeData buildMaterialTheme(Brightness brightness, {M3EThemeData? m3e}) {
-  final M3EThemeData resolved =
-      m3e ?? buildThemeData(brightness: brightness);
-  return ThemeData(
-    useMaterial3: true,
-    fontFamily: kAppFontFamily,
-    colorScheme: flutterColorSchemeFromM3e(resolved.colorScheme),
-  );
+  if (m3e != null) {
+    return materialThemeFromM3e(m3e);
+  }
+  return assembleAppTheme(brightness).material;
 }
 
 /// Provides [M3EThemeData] and respects platform dynamic color when present.
@@ -72,27 +57,29 @@ class Md3eDynamicTheme extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
-      builder: (Object? lightDynamic, Object? darkDynamic) {
-        final M3EThemeData lightM3e = buildThemeData(
-          lightDynamic: lightDynamic,
-          darkDynamic: darkDynamic,
-          brightness: Brightness.light,
-        );
-        final M3EThemeData darkM3e = buildThemeData(
-          lightDynamic: lightDynamic,
-          darkDynamic: darkDynamic,
-          brightness: Brightness.dark,
-        );
-        return M3ETheme(
-          data: lightM3e,
-          child: builder(
-            context,
-            lightM3e,
-            buildMaterialTheme(Brightness.light, m3e: lightM3e),
-            buildMaterialTheme(Brightness.dark, m3e: darkM3e),
-          ),
-        );
-      },
+      builder:
+          (
+            material_ui.ColorScheme? lightDynamic,
+            material_ui.ColorScheme? darkDynamic,
+          ) {
+            final AssembledAppTheme light = assembleAppTheme(
+              Brightness.light,
+              seed: _seedFromDynamic(lightDynamic),
+            );
+            final AssembledAppTheme dark = assembleAppTheme(
+              Brightness.dark,
+              seed: _seedFromDynamic(darkDynamic),
+            );
+            return M3ETheme(
+              data: light.m3e,
+              child: builder(
+                context,
+                light.m3e,
+                light.material,
+                dark.material,
+              ),
+            );
+          },
     );
   }
 }

@@ -212,7 +212,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsColorSchemeLabel => 'Color scheme';
 
   @override
-  String get colorSchemePreferenceBrand => 'Default';
+  String get colorSchemePreferenceBrand => 'Violet';
 
   @override
   String get colorSchemePreferenceTeal => 'Teal';

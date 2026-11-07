@@ -62,8 +62,15 @@ class _ColorSchemePickerDialog extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final M3EThemeData theme = M3ETheme.of(context);
     final M3ESpacing spacing = theme.spacing;
-    final List<AppColorSchemePreference> preferences =
-        AppColorSchemePreference.values;
+    // `violet` 与 brand 同色；UI 只展示 brand（文案为紫罗兰色），JSON 仍保留 violet。
+    final List<AppColorSchemePreference> preferences = AppColorSchemePreference
+        .values
+        .where((AppColorSchemePreference p) => p != AppColorSchemePreference.violet)
+        .toList(growable: false);
+    final AppColorSchemePreference effectiveSelected =
+        selected == AppColorSchemePreference.violet
+        ? AppColorSchemePreference.brand
+        : selected;
 
     return M3EDialog(
       title: l10n.settingsColorSchemeLabel,
@@ -92,7 +99,7 @@ class _ColorSchemePickerDialog extends StatelessWidget {
               return _ColorSchemeOption(
                 preference: preference,
                 label: l10n.colorSchemePreferenceLabel(preference),
-                selected: preference == selected,
+                selected: preference == effectiveSelected,
                 onTap: () => Navigator.of(context).pop(preference),
               );
             },

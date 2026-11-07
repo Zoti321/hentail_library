@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Reader color extension：阅读器沉浸底与弱化文字（恒暗，不跟壳层 seed）。
+/// Reader color extension：阅读器沉浸底与弱化文字（恒暗底，不跟应用浅色主题变浅）。
+///
+/// 强调色跟随壳层 [ColorScheme]（暗色用 primary，浅色壳用 inversePrimary），
+/// 保证在恒暗底上可读，并与当前配色 / 品牌 seed 同源。
 @immutable
 class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
   const ReaderColorScheme({
@@ -20,6 +23,9 @@ class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
     required this.readerSliderOverlay,
   });
 
+  /// 恒暗阅读画布（不随 seed / 应用明暗改变）。
+  static const Color immersiveBackground = Color(0xFF09090B);
+
   final Color readerBackground;
   final Color readerTextMuted;
   final Color floatingUiBackground;
@@ -35,23 +41,28 @@ class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
   final Color readerPanelSubtleBorder;
   final Color readerSliderOverlay;
 
-  /// 恒暗阅读器色；与应用明暗 / 配色方案无关。
-  static const ReaderColorScheme immersive = ReaderColorScheme(
-    readerBackground: Color(0xFF09090B),
-    readerTextMuted: Color(0xB3FFFFFF),
-    floatingUiBackground: Color(0xCC000000),
-    activeButtonBg: Color(0xFF6EB3FF),
-    sliderActive: Color(0xFF6EB3FF),
-    sliderInactive: Color(0x33FFFFFF),
-    readerTextIconPrimary: Color(0xE6FFFFFF),
-    readerTextSecondary: Color(0x99FFFFFF),
-    readerTextOnWhite: Color(0xFF000000),
-    readerPanelBackground: Color(0xCC000000),
-    readerPanelBorder: Color(0x14FFFFFF),
-    readerPanelSubtle: Color(0x28000000),
-    readerPanelSubtleBorder: Color(0x00FFFFFF),
-    readerSliderOverlay: Color(0x336EB3FF),
-  );
+  /// 由壳层 [ColorScheme] 派生强调色；背景等沉浸底保持恒暗。
+  factory ReaderColorScheme.immersiveFor(ColorScheme shell) {
+    final Color accent = shell.brightness == Brightness.dark
+        ? shell.primary
+        : shell.inversePrimary;
+    return ReaderColorScheme(
+      readerBackground: immersiveBackground,
+      readerTextMuted: const Color(0xB3FFFFFF),
+      floatingUiBackground: const Color(0xCC000000),
+      activeButtonBg: accent,
+      sliderActive: accent,
+      sliderInactive: const Color(0x33FFFFFF),
+      readerTextIconPrimary: const Color(0xE6FFFFFF),
+      readerTextSecondary: const Color(0x99FFFFFF),
+      readerTextOnWhite: const Color(0xFF000000),
+      readerPanelBackground: const Color(0xCC000000),
+      readerPanelBorder: const Color(0x14FFFFFF),
+      readerPanelSubtle: const Color(0x28000000),
+      readerPanelSubtleBorder: const Color(0x00FFFFFF),
+      readerSliderOverlay: accent.withValues(alpha: 0.2),
+    );
+  }
 
   @override
   ReaderColorScheme copyWith({

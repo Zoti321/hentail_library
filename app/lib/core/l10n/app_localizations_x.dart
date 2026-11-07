@@ -46,11 +46,12 @@ extension AppLocalizationsLabelsX on AppLocalizations {
 
   String colorSchemePreferenceLabel(AppColorSchemePreference preference) {
     return switch (preference) {
-      AppColorSchemePreference.brand => colorSchemePreferenceBrand,
+      // brand 文案已定稿为紫罗兰色；遗留 violet 偏好显示同一标签。
+      AppColorSchemePreference.brand ||
+      AppColorSchemePreference.violet => colorSchemePreferenceBrand,
       AppColorSchemePreference.teal => colorSchemePreferenceTeal,
       AppColorSchemePreference.blue => colorSchemePreferenceBlue,
       AppColorSchemePreference.indigo => colorSchemePreferenceIndigo,
-      AppColorSchemePreference.violet => colorSchemePreferenceViolet,
       AppColorSchemePreference.pink => colorSchemePreferencePink,
       AppColorSchemePreference.yellow => colorSchemePreferenceYellow,
       AppColorSchemePreference.orange => colorSchemePreferenceOrange,

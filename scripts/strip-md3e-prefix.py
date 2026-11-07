@@ -70,7 +70,7 @@ SYMBOL_OVERRIDES: dict[str, str] = {
     "_Md3eMetadataImportResultDialog": "_MetadataImportResultPanel",
     "_LibraryMd3eForm": "_LibraryFormFields",
     "_ReaderMd3eContent": "_ReaderPageContent",
-    "kMd3eLabSeedColor": "kLabSeedColor",
+    "kMd3eLabSeedColor": "kBrandSeedColor",
 }
 
 

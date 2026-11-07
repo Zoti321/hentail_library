@@ -315,8 +315,8 @@ _Avoid_: toneBased（壳层 surface 配对 API）、HCT 系统（单指色空间
 _Avoid_: Monet（Android 实现绰号）、dynamic scheme variant（MCU 的 fidelity/tonalSpot 等）
 
 **Reader color extension**:
-阅读器沉浸场景专用的小范围主题色扩展；与壳层配色方案解耦，保持恒暗阅读底，不随应用明暗或 seed 重算整套壳层语义色。
-_Avoid_: HentaiColorScheme（整表语义扩展）、阅读器跟主题（指跟壳层 seed/明暗全量联动时）
+阅读器沉浸场景专用的小范围主题色扩展；画布等沉浸底恒暗、不随应用浅色主题变浅；强调色（滑块/激活钮）从当前壳层 `ColorScheme` 派生以跟配色 / 品牌 seed。
+_Avoid_: HentaiColorScheme（整表语义扩展）、阅读器跟主题（指跟壳层明暗把阅读底变浅时）
 
 **Baseline UI**:
 历史 Fluent 取向共享 UI / 主题装配；Cutover 主体完成后**不再**是生产功能视图主壳。残余命名或个别遗留控件属收尾债，不表示双轨仍在。
