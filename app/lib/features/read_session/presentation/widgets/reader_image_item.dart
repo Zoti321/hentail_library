@@ -13,6 +13,7 @@ import 'package:hentai_library/features/read_session/di/page_image_copy_provider
 import 'package:hentai_library/features/read_session/presentation/image/reader_image_cache.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_image_filter_quality.dart';
 import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_page_fade_in.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_aspect_ratios.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -79,6 +80,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
               cacheWidth: cacheWidth,
               loadingPlaceholder: loadingSurface,
               errorPlaceholder: errorPlaceholder,
+              onImageSize: _rememberImageSize,
             ),
           ),
         ),
@@ -121,6 +123,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
                 cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,
                 errorPlaceholder: errorPlaceholder,
+                onImageSize: _rememberImageSize,
               ),
             ),
           ),
@@ -128,6 +131,17 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         return _wrapWithContextMenu(context, content);
       },
     );
+  }
+
+  void _rememberImageSize(Size size) {
+    ref
+        .read(readerPageAspectRatiosProvider.notifier)
+        .remember(
+          comicId: widget.comic.comicId,
+          pageIndexZeroBased: widget.imageData.archivePageIndex,
+          width: size.width,
+          height: size.height,
+        );
   }
 
   Widget _wrapWithContextMenu(BuildContext context, Widget child) {
@@ -169,6 +183,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           cacheWidth: cacheWidth,
           loadingPlaceholder: loadingSurface,
           errorPlaceholder: errorPlaceholder,
+          onImageSize: _rememberImageSize,
           onDecodeError: () => _scheduleReaderPageReload(archiveData),
         ),
       ),

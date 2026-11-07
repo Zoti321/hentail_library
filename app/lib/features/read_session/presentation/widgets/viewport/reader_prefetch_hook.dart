@@ -45,13 +45,14 @@ void useReaderPrefetchWindow({
           return;
         }
         unawaited(() async {
-          await controller.warmWindow(
+          final bool windowChanged = await controller.warmWindow(
             comicId: comicId,
             centerPageOneBased: centerPageOneBased,
             totalPages: totalPages,
             extraPageIndexesOneBased: extraPageIndexesOneBased,
+            imageList: imageList,
           );
-          if (!context.mounted) {
+          if (!context.mounted || !windowChanged) {
             return;
           }
           await controller.precacheWindow(
@@ -60,6 +61,7 @@ void useReaderPrefetchWindow({
             pageIndexesOneBased: targets,
             imageList: imageList,
             cacheWidth: cacheWidth,
+            skipPageOneBased: centerPageOneBased,
           );
         }());
       });

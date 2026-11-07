@@ -95,7 +95,7 @@ class ReaderSessionService {
     required String comicId,
     required int archivePageIndex,
   }) async {
-    final Comic? comic = await _comicRepo.findById(comicId);
+    final Comic? comic = await _resolveOpenedComic(comicId);
     if (comic == null) {
       throw ReadSessionPageLoadException.comicNotFound(comicId);
     }
@@ -125,7 +125,7 @@ class ReaderSessionService {
     if (archivePageIndexes.isEmpty) {
       return;
     }
-    final Comic? comic = await _comicRepo.findById(comicId);
+    final Comic? comic = await _resolveOpenedComic(comicId);
     if (comic == null || comic.resourceType == ResourceType.dir) {
       return;
     }
@@ -134,6 +134,16 @@ class ReaderSessionService {
       pageIndexes: archivePageIndexes,
       generation: generation,
     );
+  }
+
+  /// Prefer in-session comic to avoid a findById FRB on every page load/prefetch.
+  Future<Comic?> _resolveOpenedComic(String comicId) async {
+    final ({Comic comic, List<ReadSessionPage> pages})? opened =
+        _openedPages[comicId];
+    if (opened != null) {
+      return opened.comic;
+    }
+    return _comicRepo.findById(comicId);
   }
 
   Future<void> clearPageCache({required String comicId}) {

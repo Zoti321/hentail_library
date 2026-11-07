@@ -7,6 +7,7 @@ import 'package:hentai_library/features/read_session/presentation/view_models/re
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/read_session/presentation/image/reader_image_cache.dart';
 import 'package:hentai_library/features/read_session/di/session_providers.dart';
+import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_aspect_ratios.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -33,6 +34,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       state = Map<String, int>.from(state)..remove(comicId);
     }
     clearReaderImageCache();
+    ref.read(readerPageAspectRatiosProvider.notifier).clearComic(comicId);
     // Fire-and-forget: async FRB must not block exit navigation (P2-4).
     unawaited(
       ref.read(readerSessionServiceProvider).clearPageCache(comicId: comicId),
@@ -40,14 +42,17 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     ref.invalidate(comicReaderPageProvider);
   }
 
-  Future<void> warmWindow({
+  /// Returns whether the warm window changed (callers should skip neighbor
+  /// precache when false — same window, already warmed).
+  Future<bool> warmWindow({
     required String comicId,
     required int centerPageOneBased,
     required int totalPages,
     Iterable<int> extraPageIndexesOneBased = const <int>[],
+    List<ReaderPageImageData> imageList = const <ReaderPageImageData>[],
   }) async {
     if (totalPages <= 0) {
-      return;
+      return false;
     }
     final Set<int> targets = computePrefetchWindow(
       centerPageOneBased: centerPageOneBased,
@@ -60,13 +65,18 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       previousWindow: previous,
       nextWindow: targets,
     )) {
-      return;
+      return false;
     }
-    // Drop keepAlive FilePaths for pages Rust is about to evict from disk cache.
+    // Drop keepAlive FilePaths + path→bytes for pages Rust will evict.
     for (final int pageOneBased in pagesLeavingPrefetchWindow(
       previousWindow: previous,
       nextWindow: targets,
     )) {
+      _forgetPathBytesForPage(
+        comicId: comicId,
+        pageOneBased: pageOneBased,
+        imageList: imageList,
+      );
       ref.invalidate(
         comicReaderPageProvider(comicId: comicId, pageIndex: pageOneBased - 1),
       );
@@ -94,6 +104,27 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
               .toList(growable: false),
           generation: generation,
         );
+    return true;
+  }
+
+  void _forgetPathBytesForPage({
+    required String comicId,
+    required int pageOneBased,
+    required List<ReaderPageImageData> imageList,
+  }) {
+    if (pageOneBased >= 1 && pageOneBased <= imageList.length) {
+      final ReaderPageImageData imageData = imageList[pageOneBased - 1];
+      if (imageData is ReaderDirPageImageData) {
+        removeReaderPathBytes(imageData.file.path);
+      }
+    }
+    final AsyncValue<ReaderPagePayload> pageAsync = ref.read(
+      comicReaderPageProvider(comicId: comicId, pageIndex: pageOneBased - 1),
+    );
+    final ReaderPagePayload? page = pageAsync.asData?.value;
+    if (page is ReaderPageFilePath) {
+      removeReaderPathBytes(page.path);
+    }
   }
 
   Future<void> precacheWindow({
@@ -102,6 +133,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     required Set<int> pageIndexesOneBased,
     required List<ReaderPageImageData> imageList,
     int? cacheWidth,
+    int? skipPageOneBased,
   }) async {
     if (pageIndexesOneBased.isEmpty || imageList.isEmpty) {
       return;
@@ -109,6 +141,10 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     final int generation = state[comicId] ?? 0;
     ensureReaderImageCacheConfigured();
     for (final int pageOneBased in pageIndexesOneBased) {
+      if (skipPageOneBased != null && pageOneBased == skipPageOneBased) {
+        // Center is already on-tree; avoid double decode via precache.
+        continue;
+      }
       if (!_isPrecacheStillValid(
             comicId: comicId,
             generation: generation,
