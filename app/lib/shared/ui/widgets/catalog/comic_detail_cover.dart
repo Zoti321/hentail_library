@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/comic_detail_page_metrics.dart';
+import 'package:hentai_library/shared/ui/widgets/element/image/cover_letterbox.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 详情页封面占位（2:3，轻阴影）。
@@ -21,13 +22,13 @@ class AppComicDetailCover extends StatelessWidget {
       ComicDetailPageMetrics.coverCornerRadius,
     );
 
-    // 白底与列表 letterbox 封面一致，避免 Hero 落地时露出 surfaceContainer 闪一下。
+    // 与卡片 letterbox token 一致，避免 Hero 落地时底色跳变。
     return Material(
       elevation: M3EElevation.level1,
       shadowColor: scheme.shadow.withValues(alpha: 0.18),
       borderRadius: radius,
       clipBehavior: Clip.antiAlias,
-      color: Colors.white,
+      color: coverLetterboxColor(context),
       child: SizedBox(
         width: resolvedWidth,
         height: height,

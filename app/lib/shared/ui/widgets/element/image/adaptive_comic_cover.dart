@@ -3,9 +3,10 @@ import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
+import 'package:hentai_library/shared/ui/widgets/element/image/cover_letterbox.dart';
 
-/// Adaptive comic cover with a fixed container aspect ratio and letterboxing.
-class AdaptiveComicCover extends StatelessWidget {
+/// Adaptive comic cover with a fixed container aspect ratio and soft letterbox.
+class AdaptiveComicCover extends StatefulWidget {
   const AdaptiveComicCover({
     super.key,
     required this.coverDisplay,
@@ -33,8 +34,45 @@ class AdaptiveComicCover extends StatelessWidget {
   final bool gaplessPlayback;
   final VoidCallback? onDecodeError;
 
-  Color _resolveBackgroundColor() {
-    return backgroundColor ?? Colors.white;
+  @override
+  State<AdaptiveComicCover> createState() => _AdaptiveComicCoverState();
+}
+
+class _AdaptiveComicCoverState extends State<AdaptiveComicCover> {
+  BoxFit _resolvedFit = BoxFit.contain;
+  Size? _imageSize;
+
+  @override
+  void didUpdateWidget(covariant AdaptiveComicCover oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final ComicCoverSource? oldCover = oldWidget.coverDisplay;
+    final ComicCoverSource? nextCover = widget.coverDisplay;
+    if (oldCover?.filePath != nextCover?.filePath ||
+        !identical(oldCover?.memoryBytes, nextCover?.memoryBytes)) {
+      _imageSize = null;
+      _resolvedFit = BoxFit.contain;
+    }
+  }
+
+  Color _resolveBackgroundColor(BuildContext context) {
+    return widget.backgroundColor ?? coverLetterboxColor(context);
+  }
+
+  void _onImageSize(Size size) {
+    if (!mounted) {
+      return;
+    }
+    if (_imageSize == size) {
+      return;
+    }
+    _imageSize = size;
+    final BoxFit next = coverFitForAspects(
+      imageAspect: size.width / size.height,
+      boxAspect: widget.containerAspectRatio,
+    );
+    if (next != _resolvedFit) {
+      setState(() => _resolvedFit = next);
+    }
   }
 
   @override
@@ -42,7 +80,7 @@ class AdaptiveComicCover extends StatelessWidget {
     return _wrapChrome(
       context,
       AspectRatio(
-        aspectRatio: containerAspectRatio,
+        aspectRatio: widget.containerAspectRatio,
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             final ImageDecodeCacheSize cacheSize = decodeCacheSizeForContext(
@@ -51,17 +89,18 @@ class AdaptiveComicCover extends StatelessWidget {
               logicalHeight: constraints.maxHeight,
             );
             return ColoredBox(
-              color: _resolveBackgroundColor(),
+              color: _resolveBackgroundColor(context),
               child: AppComicImage(
-                memoryBytes: coverDisplay?.memoryBytes,
-                filePath: coverDisplay?.filePath,
-                fit: BoxFit.contain,
-                filterQuality: filterQuality,
+                memoryBytes: widget.coverDisplay?.memoryBytes,
+                filePath: widget.coverDisplay?.filePath,
+                fit: _resolvedFit,
+                filterQuality: widget.filterQuality,
                 cacheWidth: cacheSize.cacheWidth,
-                gaplessPlayback: gaplessPlayback,
-                placeholder: placeholder,
-                errorPlaceholder: errorPlaceholder ?? placeholder,
-                onDecodeError: onDecodeError,
+                gaplessPlayback: widget.gaplessPlayback,
+                placeholder: widget.placeholder,
+                errorPlaceholder: widget.errorPlaceholder ?? widget.placeholder,
+                onDecodeError: widget.onDecodeError,
+                onImageSize: _onImageSize,
               ),
             );
           },
@@ -71,12 +110,12 @@ class AdaptiveComicCover extends StatelessWidget {
   }
 
   Widget _wrapChrome(BuildContext context, Widget child) {
-    final BorderRadius? borderRadius = clipBorderRadius;
+    final BorderRadius? borderRadius = widget.clipBorderRadius;
     Widget result = child;
     if (borderRadius != null) {
       result = ClipRRect(borderRadius: borderRadius, child: result);
     }
-    if (!showShadow) {
+    if (!widget.showShadow) {
       return result;
     }
     return DecoratedBox(

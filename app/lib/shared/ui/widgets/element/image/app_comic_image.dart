@@ -29,6 +29,7 @@ class AppComicImage extends StatelessWidget {
     this.useReaderImageCache = false,
     this.readerImageProviderBuilder,
     this.onDecodeError,
+    this.onImageSize,
   });
 
   final String? filePath;
@@ -52,6 +53,9 @@ class AppComicImage extends StatelessWidget {
   final bool useReaderImageCache;
   final ReaderComicImageProviderBuilder? readerImageProviderBuilder;
   final VoidCallback? onDecodeError;
+
+  /// Fired once per successful decode with intrinsic pixel size.
+  final ValueChanged<Size>? onImageSize;
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +135,20 @@ class AppComicImage extends StatelessWidget {
           return null;
         }
         return _buildLoadingPlaceholder();
+      }
+      if (state.extendedImageLoadState == LoadState.completed) {
+        final ValueChanged<Size>? reportSize = onImageSize;
+        final ImageInfo? info = state.extendedImageInfo;
+        if (reportSize != null && info != null) {
+          final int width = info.image.width;
+          final int height = info.image.height;
+          if (width > 0 && height > 0) {
+            // Defer so we never setState during build of ExtendedImage.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              reportSize(Size(width.toDouble(), height.toDouble()));
+            });
+          }
+        }
       }
       return null;
     };

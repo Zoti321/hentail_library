@@ -14,7 +14,7 @@ class ComicCoverRenderer extends StatelessWidget {
     super.key,
     required this.state,
     required this.variant,
-    this.fit = BoxFit.contain,
+    this.fit,
     this.alignment = Alignment.center,
     this.onDecodeError,
     this.onRetry,
@@ -22,7 +22,9 @@ class ComicCoverRenderer extends StatelessWidget {
 
   final ComicCoverState state;
   final ComicCoverPaintVariant variant;
-  final BoxFit fit;
+
+  /// Non-null forces fit (e.g. banner [BoxFit.cover]); null enables soft-crop.
+  final BoxFit? fit;
   final AlignmentGeometry alignment;
   final VoidCallback? onDecodeError;
   final VoidCallback? onRetry;
@@ -73,7 +75,6 @@ class ComicCoverRenderer extends StatelessWidget {
     return AdaptiveComicCover(
       coverDisplay: source,
       containerAspectRatio: 2 / 3,
-      backgroundColor: Colors.white,
       showShadow: false,
       gaplessPlayback: true,
       placeholder: placeholder,

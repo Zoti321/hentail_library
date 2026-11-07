@@ -71,7 +71,6 @@ class SeriesDetailCover extends ConsumerWidget {
     return AdaptiveComicCover(
       coverDisplay: coverDisplay,
       containerAspectRatio: _aspectRatio,
-      backgroundColor: Colors.white,
       showShadow: false,
       placeholder: placeholder,
       errorPlaceholder: placeholder,

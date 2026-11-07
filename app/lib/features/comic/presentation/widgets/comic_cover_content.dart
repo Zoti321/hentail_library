@@ -16,13 +16,13 @@ class ComicCoverContent extends ConsumerWidget {
     this.gridIndex,
     this.coverViewportScope,
     this.attachViewportSensor = true,
-    this.fit = BoxFit.contain,
+    this.fit,
     this.alignment = Alignment.center,
     this.enableHero = true,
   });
 
-  /// [BoxFit.cover] 时填满并裁剪（横幅、头像）。
-  final BoxFit fit;
+  /// 非空时强制拟合（如横幅 [BoxFit.cover]）；默认软裁切 letterbox。
+  final BoxFit? fit;
 
   /// [BoxFit.cover] 裁剪时保留的区域。
   final AlignmentGeometry alignment;
