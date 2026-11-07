@@ -65,8 +65,13 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
                   ),
               onChanged: (double value) => setState(() => _dragValue = value),
               onChangeEnd: (double value) {
+                // M3ESlider 在 TapUp/微拖结束时可能仍传受控的旧 widget.value；
+                // 优先用 onChanged 已写入的 _dragValue，否则桌面点轨不会落页。
+                final double resolved = _dragValue ?? value;
                 setState(() => _dragValue = null);
-                widget.onPageChanged(value.round());
+                widget.onPageChanged(
+                  resolved.round().clamp(1, _safeTotal),
+                );
               },
             ),
           ),
