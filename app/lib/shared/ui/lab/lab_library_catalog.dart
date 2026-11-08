@@ -35,6 +35,7 @@ abstract final class LabLibraryCatalog {
         seriesCount: 71,
         lastSyncedAt: now.subtract(const Duration(days: 9)),
         hint: HomeLibraryRowHint.syncWarning,
+        staleDays: 9,
       ),
       HomeLibraryDashboardRow(
         libraryId: 'lab-remote-offline',

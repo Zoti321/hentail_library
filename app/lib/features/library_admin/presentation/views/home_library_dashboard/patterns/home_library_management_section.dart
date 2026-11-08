@@ -3,7 +3,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 
-import 'home_library_management_copy.dart';
 import 'home_library_row_presentation.dart';
 
 import 'package:hentai_library/shared/ui/widgets/lists/reorder_exclude.dart';
@@ -14,7 +13,7 @@ import 'package:hentai_library/shared/ui/widgets/settings/split_list_group.dart'
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 首页「我的漫画库」：汇总 + 可操作的库列表（Lab；数据由调用方注入）。
+/// 首页「我的漫画库」：汇总 + 可操作的库列表（数据由调用方注入）。
 ///
 /// 列表样式与设置页一致（[SplitListGroup] 分段圆角）。
 class HomeLibraryManagementSection extends StatelessWidget {
@@ -57,14 +56,12 @@ class HomeLibraryManagementSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    HomeLibraryManagementCopy.sectionTitle,
+                    l10n.homeLibraryManagementSectionTitle,
                     style: type.titleLarge.copyWith(color: scheme.onSurface),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    HomeLibraryManagementCopy.libraryCountSubtitle(
-                      libraries.length,
-                    ),
+                    l10n.homeLibraryManagementCountSubtitle(libraries.length),
                     style: type.bodyMedium.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
@@ -235,7 +232,7 @@ class _HomeLibraryRowContent extends StatelessWidget {
     final M3ETypeScale type = M3ETheme.of(context).typeScale;
 
     final String statsLine = homeLibraryStatsLine(l10n, row);
-    final String? statusLine = homeLibraryStatusLine(row);
+    final String? statusLine = homeLibraryStatusLine(l10n, row);
     final String? syncLine = homeLibrarySyncLine(context, row.lastSyncedAt);
 
     return Row(

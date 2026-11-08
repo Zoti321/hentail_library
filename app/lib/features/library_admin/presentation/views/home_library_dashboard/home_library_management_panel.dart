@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
+import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_row_health.dart';
 import 'package:hentai_library/shared/di/home_library_stats_providers.dart';
 import 'package:hentai_library/shared/di/library_command_providers.dart';
 import 'package:hentai_library/shared/domain/ports/library_management_port.dart';
@@ -61,18 +62,30 @@ class HomeLibraryManagementPanel extends HookConsumerWidget {
     final Map<String, HomeLibraryStat> statsById = <String, HomeLibraryStat>{
       for (final HomeLibraryStat stat in stats) stat.libraryId: stat,
     };
+    final DateTime now = DateTime.now();
     final List<HomeLibraryDashboardRow> rows = ordered
         .map((LocalLibrary library) {
           final HomeLibraryStat? stat = statsById[library.libraryId];
+          final int comicCount = stat?.comicCount ?? 0;
+          final DateTime? lastSyncedAt = stat?.lastSuccessfulSyncAt;
+          final ({HomeLibraryRowHint hint, int? staleDays}) health =
+              resolveHomeLibraryRowHealth(
+                now: now,
+                scanInterval: library.scanInterval,
+                lastSuccessfulSyncAt: lastSyncedAt,
+                comicCount: comicCount,
+              );
           return HomeLibraryDashboardRow(
             libraryId: library.libraryId,
             displayName: localLibraryDisplayName(library),
             kind: isRemoteLibrary(library)
                 ? HomeLibraryKind.remote
                 : HomeLibraryKind.local,
-            comicCount: stat?.comicCount ?? 0,
+            comicCount: comicCount,
             seriesCount: stat?.seriesCount ?? 0,
-            lastSyncedAt: stat?.lastSuccessfulSyncAt,
+            lastSyncedAt: lastSyncedAt,
+            hint: health.hint,
+            staleDays: health.staleDays,
             scanInProgress: scanRunning,
             metadataRefreshInProgress: refreshingLibraryId == library.libraryId,
           );

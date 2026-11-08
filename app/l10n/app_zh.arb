@@ -1000,6 +1000,24 @@
   },
   "homeLibraryDeleteConfirmBody": "将从应用中移除此库。漫画文件会保留在原位置。",
   "homeLibraryDeleteConfirmAcknowledge": "我了解不会删除漫画文件",
+  "homeLibraryManagementSectionTitle": "我的漫画库",
+  "homeLibraryManagementCountSubtitle": "共 {count} 个库",
+  "@homeLibraryManagementCountSubtitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeLibraryLastSyncLabel": "上次同步",
+  "homeLibraryScanInProgressHint": "扫描进行中…",
+  "homeLibraryMetadataRefreshInProgressHint": "元数据刷新中…",
+  "homeLibrarySyncWarningHint": "已超过 {staleDays} 天未同步",
+  "@homeLibrarySyncWarningHint": {
+    "placeholders": {
+      "staleDays": {"type": "int"}
+    }
+  },
+  "homeLibrarySyncRecommendedHint": "建议同步",
+  "homeLibraryUnreachableHint": "无法连接远程库",
   "confirmClearHistoryTitle": "确认清空",
   "confirmClearHistoryContent": "将清空全部阅读历史记录。此操作不可撤销。",
   "breadcrumbReturnLibrary": "返回漫画库",

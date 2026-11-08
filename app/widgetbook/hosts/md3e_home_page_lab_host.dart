@@ -7,17 +7,22 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 import '../lab/navigation/md3e_library_edit_navigation.dart';
 
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
-import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_copy.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-
 import 'package:hentai_library/features/named_metadata/public.dart';
 
 import '../preview/md3e_home_page_preview_data.dart';
 import 'md3e_history_browse_page_lab_host.dart';
 import 'md3e_management_browse_page_lab_host.dart';
+
+/// Lab-only snackbars：预览不接真实 Library sync / metadata refresh。
+abstract final class _HomePageLabPreviewCopy {
+  static const String scanPreviewSnackBar = 'Lab 预览：未执行 Library sync';
+  static const String metadataRefreshPreviewSnackBar =
+      'Lab 预览：未执行 Metadata refresh';
+}
 
 /// Widgetbook / Lab：在本地维护库列表顺序；生产侧由 notifier + repository 接同样回调形状。
 ///
@@ -159,7 +164,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                HomeLibraryManagementCopy.labScanPreviewSnackBar,
+                _HomePageLabPreviewCopy.scanPreviewSnackBar,
               ),
             ),
           );
@@ -171,7 +176,7 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                HomeLibraryManagementCopy.labMetadataRefreshPreviewSnackBar,
+                _HomePageLabPreviewCopy.metadataRefreshPreviewSnackBar,
               ),
             ),
           );

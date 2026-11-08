@@ -3828,6 +3828,54 @@ abstract class AppLocalizations {
   /// **'我了解不会删除漫画文件'**
   String get homeLibraryDeleteConfirmAcknowledge;
 
+  /// No description provided for @homeLibraryManagementSectionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的漫画库'**
+  String get homeLibraryManagementSectionTitle;
+
+  /// No description provided for @homeLibraryManagementCountSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'共 {count} 个库'**
+  String homeLibraryManagementCountSubtitle(int count);
+
+  /// No description provided for @homeLibraryLastSyncLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次同步'**
+  String get homeLibraryLastSyncLabel;
+
+  /// No description provided for @homeLibraryScanInProgressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描进行中…'**
+  String get homeLibraryScanInProgressHint;
+
+  /// No description provided for @homeLibraryMetadataRefreshInProgressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据刷新中…'**
+  String get homeLibraryMetadataRefreshInProgressHint;
+
+  /// No description provided for @homeLibrarySyncWarningHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'已超过 {staleDays} 天未同步'**
+  String homeLibrarySyncWarningHint(int staleDays);
+
+  /// No description provided for @homeLibrarySyncRecommendedHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'建议同步'**
+  String get homeLibrarySyncRecommendedHint;
+
+  /// No description provided for @homeLibraryUnreachableHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法连接远程库'**
+  String get homeLibraryUnreachableHint;
+
   /// No description provided for @confirmClearHistoryTitle.
   ///
   /// In zh, this message translates to:

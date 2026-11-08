@@ -335,7 +335,7 @@ Cutover 前单个 feature（首选应用设置）可选接入 MD3E 组件与主�
 _Avoid_: Beta 换肤
 
 **MD3E Cutover**:
-按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。主体已完成（路由 MD3E 化、Lab 删除、主题单源）；剩余主要为去 `md3e_` 生产前缀与文档/命名收尾。完成判定与 spec 分批规则见 ADR-0031。
+按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。主体已完成（路由 MD3E 化、Lab 删除、主题单源）；生产库管理路径文件名已去 `md3e_` 前缀（如 `production_shell_adapters`）。剩余主要为 Widgetbook/Lab 目录与个别文档命名收尾。完成判定与 spec 分批规则见 ADR-0031。
 _Avoid_: 大重构（无阶段含义时）
 
 **MD3E pattern**:

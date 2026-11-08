@@ -2078,6 +2078,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeLibraryDeleteConfirmAcknowledge => '我了解不会删除漫画文件';
 
   @override
+  String get homeLibraryManagementSectionTitle => '我的漫画库';
+
+  @override
+  String homeLibraryManagementCountSubtitle(int count) {
+    return '共 $count 个库';
+  }
+
+  @override
+  String get homeLibraryLastSyncLabel => '上次同步';
+
+  @override
+  String get homeLibraryScanInProgressHint => '扫描进行中…';
+
+  @override
+  String get homeLibraryMetadataRefreshInProgressHint => '元数据刷新中…';
+
+  @override
+  String homeLibrarySyncWarningHint(int staleDays) {
+    return '已超过 $staleDays 天未同步';
+  }
+
+  @override
+  String get homeLibrarySyncRecommendedHint => '建议同步';
+
+  @override
+  String get homeLibraryUnreachableHint => '无法连接远程库';
+
+  @override
   String get confirmClearHistoryTitle => '确认清空';
 
   @override

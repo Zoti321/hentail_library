@@ -998,6 +998,24 @@
   },
   "homeLibraryDeleteConfirmBody": "This will remove the library from the app. Comic files stay in place.",
   "homeLibraryDeleteConfirmAcknowledge": "I understand comic files will not be deleted",
+  "homeLibraryManagementSectionTitle": "My libraries",
+  "homeLibraryManagementCountSubtitle": "{count, plural, =0{No libraries} one{1 library} other{{count} libraries}}",
+  "@homeLibraryManagementCountSubtitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "homeLibraryLastSyncLabel": "Last sync",
+  "homeLibraryScanInProgressHint": "Scanning…",
+  "homeLibraryMetadataRefreshInProgressHint": "Refreshing metadata…",
+  "homeLibrarySyncWarningHint": "Not synced for {staleDays} days",
+  "@homeLibrarySyncWarningHint": {
+    "placeholders": {
+      "staleDays": {"type": "int"}
+    }
+  },
+  "homeLibrarySyncRecommendedHint": "Sync recommended",
+  "homeLibraryUnreachableHint": "Remote library unreachable",
   "confirmClearHistoryTitle": "Confirm clear",
   "confirmClearHistoryContent": "All reading history will be cleared. This cannot be undone.",
   "breadcrumbReturnLibrary": "Back to library",

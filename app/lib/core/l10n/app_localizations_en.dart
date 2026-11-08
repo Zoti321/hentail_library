@@ -2150,6 +2150,41 @@ class AppLocalizationsEn extends AppLocalizations {
       'I understand comic files will not be deleted';
 
   @override
+  String get homeLibraryManagementSectionTitle => 'My libraries';
+
+  @override
+  String homeLibraryManagementCountSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count libraries',
+      one: '1 library',
+      zero: 'No libraries',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeLibraryLastSyncLabel => 'Last sync';
+
+  @override
+  String get homeLibraryScanInProgressHint => 'Scanning…';
+
+  @override
+  String get homeLibraryMetadataRefreshInProgressHint => 'Refreshing metadata…';
+
+  @override
+  String homeLibrarySyncWarningHint(int staleDays) {
+    return 'Not synced for $staleDays days';
+  }
+
+  @override
+  String get homeLibrarySyncRecommendedHint => 'Sync recommended';
+
+  @override
+  String get homeLibraryUnreachableHint => 'Remote library unreachable';
+
+  @override
   String get confirmClearHistoryTitle => 'Confirm clear';
 
   @override
