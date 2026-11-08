@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_picker_row.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
@@ -16,7 +15,6 @@ abstract final class ShellLibraryPickerSheet {
     required String selectedLibraryId,
     required ValueChanged<String> onLibrarySelected,
   }) {
-    final String title = context.l10n.libraryTitle;
     final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
       context,
     );
@@ -39,10 +37,6 @@ abstract final class ShellLibraryPickerSheet {
                 m3e.spacing.lg,
               ),
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(bottom: m3e.spacing.md),
-                  child: Text(title, style: m3e.typeScale.titleLarge),
-                ),
                 for (final HomeLibraryDashboardRow row in libraries)
                   ShellLibraryPickerRow(
                     row: row,

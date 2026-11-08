@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -16,12 +14,10 @@ abstract final class ComicDetailSeriesCatalogSheet {
     required int currentIndex,
     required ValueChanged<int> onSelectIndex,
   }) {
-    final AppLocalizations l10n = context.l10n;
     final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
       context,
     );
     final M3EThemeData m3e = withAppFontFamily(M3ETheme.of(context));
-    final String title = l10n.comicDetailSeriesCatalog;
 
     return M3EBottomSheet.show<void>(
       context,
@@ -41,10 +37,6 @@ abstract final class ComicDetailSeriesCatalogSheet {
                 m3e.spacing.lg,
               ),
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(bottom: m3e.spacing.md),
-                  child: Text(title, style: m3e.typeScale.titleLarge),
-                ),
                 for (int i = 0; i < catalog.length; i++) ...<Widget>[
                   if (i > 0 && itemGap > 0) SizedBox(height: itemGap),
                   M3EMenuItem(

@@ -54,7 +54,6 @@ void main() {
 
     await tester.tap(find.byIcon(Symbols.list_alt));
     await tester.pumpAndSettle();
-    expect(find.text('系列目录'), findsWidgets);
     expect(find.text('第二话'), findsOneWidget);
 
     await tester.tap(find.text('第二话'));
