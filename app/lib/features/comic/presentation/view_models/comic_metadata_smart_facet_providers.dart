@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/features/named_metadata/public/named_metadata_form.dart';
 import 'package:hentai_library/features/comic/domain/smart_facet_match.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';

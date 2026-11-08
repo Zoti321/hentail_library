@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/features/named_metadata/public/named_metadata_cross_feature_types.dart';
 
 /// Comic metadata form candidate after Smart facet match ranking.
 typedef SmartFacetMatchCandidate = ({
