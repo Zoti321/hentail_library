@@ -4,19 +4,17 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_filter_metadata_names_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_sort_section.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
-import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_change_bus.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
@@ -34,59 +32,6 @@ typedef LibraryMetadataFilterToggle = Future<void> Function(String name);
 typedef LibraryMetadataIncludeModeChanged = Future<void> Function(
   LibraryMetadataIncludeMode mode,
 );
-
-final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((
-  Ref ref,
-) {
-  return ref
-      .watch(libraryTagDictionaryStateProvider)
-      .whenData(
-        (List<Tag> tags) =>
-            tags.map((Tag tag) => tag.name).toList(growable: false),
-      );
-});
-
-/// 作者筛选的候选值为作者 id（显示名由 [LibraryAuthorFilterGroup] 的 labelFor 解析）。
-final libraryFilterAuthorNamesProvider = Provider<AsyncValue<List<String>>>((
-  Ref ref,
-) {
-  return ref.watch(libraryAuthorDictionaryStateProvider).whenData((
-    List<Author> authors,
-  ) {
-    final List<Author> sorted = List<Author>.of(authors)
-      ..sort((Author a, Author b) => a.name.compareTo(b.name));
-    return sorted
-        .where((Author author) => author.id != null)
-        .map((Author author) => '${author.id}')
-        .toList();
-  });
-});
-
-/// 原作筛选候选：全局字典（与标签 / 作者一致，非库内 distinct）。
-final libraryFilterParodyNamesProvider = FutureProvider<List<String>>((
-  Ref ref,
-) async {
-  ref.watch(
-    libraryChangeBusProvider.select(
-      (LibraryChangeState s) => s.dictionaryRevision,
-    ),
-  );
-  final List<String> names = await ref.watch(parodyRepoProvider).listAll();
-  return (List<String>.of(names)..sort());
-});
-
-/// 角色筛选候选：全局字典（与标签 / 作者一致，非库内 distinct）。
-final libraryFilterCharacterNamesProvider = FutureProvider<List<String>>((
-  Ref ref,
-) async {
-  ref.watch(
-    libraryChangeBusProvider.select(
-      (LibraryChangeState s) => s.dictionaryRevision,
-    ),
-  );
-  final List<String> names = await ref.watch(characterRepoProvider).listAll();
-  return (List<String>.of(names)..sort());
-});
 
 LibraryMetadataFilterSelection _includeOnlySelection(Set<String> names) {
   return LibraryMetadataFilterSelection(
