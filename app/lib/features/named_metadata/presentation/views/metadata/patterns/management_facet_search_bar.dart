@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -10,6 +11,11 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 ///
 /// **Clear 同步**：[M3ESearchBar.showClearButton] 只调用 [TextEditingController.clear]，
 /// 不会走 [M3ESearchBar.onChanged]；因此本组件监听 [controller]，保证清空也会通知业务层。
+///
+/// **指针再聚焦**：桌面 [EditableText.selectAllOnFocus] 默认为 true；MD3E 外壳在
+/// `onPointerDown` 里先 [FocusNode.requestFocus]（外部聚焦），会先全选，随后手势
+/// 再把光标放到点击处/末尾。指针触发的聚焦在全选后收成末尾折叠选区，避免闪一下全选；
+/// Tab 聚焦仍保留平台默认全选。
 class ManagementFacetSearchBar extends StatefulWidget {
   const ManagementFacetSearchBar({
     super.key,
@@ -41,12 +47,22 @@ class ManagementFacetSearchBar extends StatefulWidget {
 
 class _ManagementFacetSearchBarState extends State<ManagementFacetSearchBar> {
   late String _lastEmitted;
+  FocusNode? _ownedFocusNode;
+  bool _pointerDown = false;
+  bool _focusListenerAttached = false;
+
+  FocusNode get _focusNode => widget.focusNode ?? _ownedFocusNode!;
 
   @override
   void initState() {
     super.initState();
     _lastEmitted = widget.controller.text;
     widget.controller.addListener(_handleControllerTick);
+    if (widget.focusNode == null) {
+      _ownedFocusNode = FocusNode(debugLabel: 'facetSearch');
+    }
+    // 等 [M3ESearchBar]/EditableText 注册完 focus listener 后再挂，才能在全选之后改选区。
+    SchedulerBinding.instance.addPostFrameCallback((_) => _ensureFocusListener());
   }
 
   @override
@@ -57,12 +73,42 @@ class _ManagementFacetSearchBarState extends State<ManagementFacetSearchBar> {
       _lastEmitted = widget.controller.text;
       widget.controller.addListener(_handleControllerTick);
     }
+    if (oldWidget.focusNode != widget.focusNode) {
+      _detachFocusListener(oldWidget.focusNode ?? _ownedFocusNode);
+      if (widget.focusNode == null && _ownedFocusNode == null) {
+        _ownedFocusNode = FocusNode(debugLabel: 'facetSearch');
+      } else if (widget.focusNode != null && _ownedFocusNode != null) {
+        _ownedFocusNode!.dispose();
+        _ownedFocusNode = null;
+      }
+      SchedulerBinding.instance.addPostFrameCallback(
+        (_) => _ensureFocusListener(),
+      );
+    }
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(_handleControllerTick);
+    _detachFocusListener(_focusNode);
+    _ownedFocusNode?.dispose();
     super.dispose();
+  }
+
+  void _ensureFocusListener() {
+    if (!mounted || _focusListenerAttached) {
+      return;
+    }
+    _focusNode.addListener(_handleFocusForPointerRefocus);
+    _focusListenerAttached = true;
+  }
+
+  void _detachFocusListener(FocusNode? node) {
+    if (!_focusListenerAttached || node == null) {
+      return;
+    }
+    node.removeListener(_handleFocusForPointerRefocus);
+    _focusListenerAttached = false;
   }
 
   void _handleControllerTick() {
@@ -72,6 +118,28 @@ class _ManagementFacetSearchBarState extends State<ManagementFacetSearchBar> {
     }
     _lastEmitted = text;
     widget.onChanged(text);
+  }
+
+  void _handleFocusForPointerRefocus() {
+    if (!_focusNode.hasFocus) {
+      _pointerDown = false;
+      return;
+    }
+    if (!_pointerDown) {
+      return;
+    }
+    _pointerDown = false;
+    final String text = widget.controller.text;
+    if (text.isEmpty) {
+      return;
+    }
+    final TextSelection selection = widget.controller.selection;
+    final bool looksLikeSelectAll =
+        selection.baseOffset == 0 && selection.extentOffset == text.length;
+    if (!looksLikeSelectAll) {
+      return;
+    }
+    widget.controller.selection = TextSelection.collapsed(offset: text.length);
   }
 
   @override
@@ -113,29 +181,32 @@ class _ManagementFacetSearchBarState extends State<ManagementFacetSearchBar> {
                 );
           final double height = ManagementFacetSearchBar.height;
 
-          final Widget searchBar = SizedBox(
-            width: compact ? null : barWidth,
-            height: height,
-            child: M3ESearchBar(
-              controller: widget.controller,
-              focusNode: widget.focusNode,
-              hintText: widget.hintText,
-              leading: const Icon(M3EIcons.search, size: 20),
-              trailing: null,
-              enabled: true,
-              expandOnFocus: true,
-              showClearButton: true,
-              margin: 0,
-              focusedMargin: 0,
-              textStyle: WidgetStatePropertyAll<TextStyle>(denseLabel),
-              hintStyle: WidgetStatePropertyAll<TextStyle>(denseHint),
-              constraints: BoxConstraints(
-                minWidth: compact ? 0 : barWidth,
-                maxWidth: compact ? double.infinity : barWidth,
-                minHeight: height,
-                maxHeight: height,
+          final Widget searchBar = Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) => _pointerDown = true,
+            child: SizedBox(
+              width: compact ? null : barWidth,
+              height: height,
+              child: M3ESearchBar(
+                controller: widget.controller,
+                focusNode: _focusNode,
+                hintText: widget.hintText,
+                leading: const Icon(M3EIcons.search, size: 20),
+                trailing: null,
+                enabled: true,
+                expandOnFocus: true,
+                showClearButton: true,
+                margin: 0,
+                focusedMargin: 0,
+                textStyle: WidgetStatePropertyAll<TextStyle>(denseLabel),
+                hintStyle: WidgetStatePropertyAll<TextStyle>(denseHint),
+                constraints: BoxConstraints(
+                  minWidth: compact ? 0 : barWidth,
+                  maxWidth: compact ? double.infinity : barWidth,
+                  minHeight: height,
+                  maxHeight: height,
+                ),
               ),
-              // 输入与 clear 均经 controller listener → [widget.onChanged]。
             ),
           );
 

@@ -147,4 +147,44 @@ void main() {
     expect(controller.text, isEmpty);
     expect(changes, contains(''));
   });
+
+  testWidgets('pointer refocus does not keep select-all on desktop', (
+    WidgetTester tester,
+  ) async {
+    final TextEditingController controller = TextEditingController(text: 'alpha');
+    addTearDown(controller.dispose);
+    final FocusNode focusNode = FocusNode();
+    addTearDown(focusNode.dispose);
+
+    await pumpApp(
+      tester,
+      home: Scaffold(
+        body: Column(
+          children: <Widget>[
+            ManagementFacetSearchBar(
+              controller: controller,
+              focusNode: focusNode,
+              hintText: '搜索名称…',
+              onChanged: (_) {},
+            ),
+            const SizedBox(height: 24),
+            TextButton(onPressed: focusNode.unfocus, child: const Text('blur')),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(M3ESearchBar));
+    await tester.pump();
+    focusNode.unfocus();
+    await tester.pump();
+
+    // Simulate MD3E external requestFocus (select-all) after a pointer down.
+    await tester.tap(find.byType(M3ESearchBar));
+    await tester.pump();
+
+    expect(controller.selection.isCollapsed, isTrue);
+    expect(controller.selection.baseOffset, controller.text.length);
+  });
 }
