@@ -187,4 +187,53 @@ void main() {
     expect(controller.selection.isCollapsed, isTrue);
     expect(controller.selection.baseOffset, controller.text.length);
   });
+
+  testWidgets(
+    'collapses select-all when focus already applied before outer pointer',
+    (WidgetTester tester) async {
+      final TextEditingController controller = TextEditingController(
+        text: 'alpha',
+      );
+      addTearDown(controller.dispose);
+      final FocusNode focusNode = FocusNode();
+      addTearDown(focusNode.dispose);
+
+      await pumpApp(
+        tester,
+        home: Scaffold(
+          body: Column(
+            children: <Widget>[
+              ManagementFacetSearchBar(
+                controller: controller,
+                focusNode: focusNode,
+                hintText: '搜索名称…',
+                onChanged: (_) {},
+              ),
+              TextButton(
+                onPressed: focusNode.requestFocus,
+                child: const Text('focus'),
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tab/程序聚焦保留全选；随后 pointer 落到已聚焦字段时应收掉全选闪烁。
+      await tester.tap(find.text('focus'));
+      await tester.pump();
+      controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: controller.text.length,
+      );
+      await tester.pump();
+      expect(controller.selection.isCollapsed, isFalse);
+
+      await tester.tap(find.byType(M3ESearchBar));
+      await tester.pump();
+
+      expect(controller.selection.isCollapsed, isTrue);
+      expect(controller.selection.baseOffset, controller.text.length);
+    },
+  );
 }

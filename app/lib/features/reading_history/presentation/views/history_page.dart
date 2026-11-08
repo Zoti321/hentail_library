@@ -12,6 +12,7 @@ import 'package:hentai_library/features/reading_history/presentation/widgets/his
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
+import 'package:hentai_library/shared/ui/widgets/inputs/app_dense_search_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kHistoryLoadMoreThreshold = 400;
@@ -26,6 +27,19 @@ class HistoryPage extends ConsumerStatefulWidget {
 
 class _HistoryPageState extends ConsumerState<HistoryPage> {
   DateTime? _lastLoadMoreAttemptAt;
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is! ScrollUpdateNotification) {
@@ -80,7 +94,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
             )
           : NotificationListener<ScrollNotification>(
               onNotification: _onScrollNotification,
-              child: const _HistoryBrowseFeed(),
+              child: _HistoryBrowseFeed(searchController: _searchController),
             ),
     );
   }
@@ -88,7 +102,9 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
 
 /// 仅订阅列表与分页 UI 相关字段，避免 `isLoadingMore` 触发整页 rebuild。
 class _HistoryBrowseFeed extends ConsumerWidget {
-  const _HistoryBrowseFeed();
+  const _HistoryBrowseFeed({required this.searchController});
+
+  final TextEditingController searchController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -104,6 +120,12 @@ class _HistoryBrowseFeed extends ConsumerWidget {
             async.asData?.value.totalCount ?? 0,
       ),
     );
+    final String keyword = ref.watch(
+      historyPagedFeedControllerProvider.select(
+        (AsyncValue<HistoryPagedFeedState> async) =>
+            async.asData?.value.keyword ?? '',
+      ),
+    );
     final bool isLoadingMore = ref.watch(
       historyPagedFeedControllerProvider.select(
         (AsyncValue<HistoryPagedFeedState> async) =>
@@ -114,6 +136,7 @@ class _HistoryBrowseFeed extends ConsumerWidget {
     final Map<String, int> coverIndexById = <String, int>{
       for (int i = 0; i < items.length; i++) items[i].comicId: i,
     };
+    final bool hasSearchQuery = keyword.isNotEmpty;
 
     return HistoryBrowsePage<HistoryCardItem>(
       items: items,
@@ -124,6 +147,19 @@ class _HistoryBrowseFeed extends ConsumerWidget {
       onOpenNavigation: appShellPageNavigationOpener(context),
       onBack: () => popOrGoHome(context),
       onClearAll: () => clearAllReadingHistory(context, ref),
+      emptyMessage: hasSearchQuery ? context.l10n.historyNoMatch : null,
+      searchField: AppDenseSearchBar(
+        controller: searchController,
+        hintText: context.l10n.historySearchHint,
+        matchCountLabel: hasSearchQuery
+            ? context.l10n.filterResultCount(totalCount)
+            : null,
+        onChanged: (String value) {
+          ref
+              .read(historyPagedFeedControllerProvider.notifier)
+              .setKeyword(value);
+        },
+      ),
       itemBuilder: (BuildContext context, HistoryCardItem item) {
         return HistoryListItem(
           key: ValueKey<String>(item.comicId),

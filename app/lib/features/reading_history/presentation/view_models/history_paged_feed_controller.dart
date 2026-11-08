@@ -104,12 +104,23 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
 
   void setKeyword(String value) {
     _pendingKeyword = value;
-    _keywordDebounce?.run(() {
-      final String normalized = _pendingKeyword.trim();
-      if (normalized == _effectiveKeyword) {
+    final String normalized = value.trim();
+    // 清空立即生效（clear 按钮不经 debounce）；输入仍防抖。
+    if (normalized.isEmpty) {
+      _keywordDebounce?.cancel();
+      if (_effectiveKeyword.isEmpty) {
         return;
       }
-      _effectiveKeyword = normalized;
+      _effectiveKeyword = '';
+      ref.invalidateSelf();
+      return;
+    }
+    _keywordDebounce?.run(() {
+      final String next = _pendingKeyword.trim();
+      if (next == _effectiveKeyword) {
+        return;
+      }
+      _effectiveKeyword = next;
       ref.invalidateSelf();
     });
   }
