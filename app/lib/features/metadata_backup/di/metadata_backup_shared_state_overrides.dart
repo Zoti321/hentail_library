@@ -15,7 +15,4 @@ List<Override> metadataBackupSharedStateOverrides() => <Override>[
       initialOptions: MetadataExportOptions(libraryId: libraryId),
     ),
   ),
-  recentMetadataBackupAtReaderProvider.overrideWithValue(
-    readRecentMetadataBackupAt,
-  ),
 ];

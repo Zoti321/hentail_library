@@ -8,9 +8,6 @@ typedef MetadataBackupSettingsSectionBuilder = Widget Function(
   BuildContext context,
 );
 
-/// 读取最近一次元数据备份时间（清除应用数据确认框展示用）。
-typedef RecentMetadataBackupAtReader = Future<DateTime?> Function();
-
 final Provider<MetadataBackupSettingsSectionBuilder>
 metadataBackupSettingsSectionBuilderProvider =
     Provider<MetadataBackupSettingsSectionBuilder>(
@@ -18,10 +15,3 @@ metadataBackupSettingsSectionBuilderProvider =
         'metadataBackupSettingsSectionBuilderProvider 未注入，请在 bootstrap 中 override',
       ),
     );
-
-final Provider<RecentMetadataBackupAtReader>
-recentMetadataBackupAtReaderProvider = Provider<RecentMetadataBackupAtReader>(
-  (Ref ref) => throw UnimplementedError(
-    'recentMetadataBackupAtReaderProvider 未注入，请在 bootstrap 中 override',
-  ),
-);

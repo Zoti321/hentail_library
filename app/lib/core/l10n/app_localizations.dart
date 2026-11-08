@@ -1190,12 +1190,6 @@ abstract class AppLocalizations {
   /// **'诊断'**
   String get settingsSectionDiagnostics;
 
-  /// No description provided for @settingsSectionApplicationData.
-  ///
-  /// In zh, this message translates to:
-  /// **'应用数据'**
-  String get settingsSectionApplicationData;
-
   /// No description provided for @settingsSectionUpdates.
   ///
   /// In zh, this message translates to:
@@ -1573,72 +1567,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'打包应用与核心日志，便于反馈问题'**
   String get settingsExportLogsDescription;
-
-  /// No description provided for @settingsClearApplicationDataLabel.
-  ///
-  /// In zh, this message translates to:
-  /// **'清除全部应用数据'**
-  String get settingsClearApplicationDataLabel;
-
-  /// No description provided for @settingsClearApplicationDataDescription.
-  ///
-  /// In zh, this message translates to:
-  /// **'删除数据库、自动元数据备份、日志与缓存；不删除库根目录中的漫画文件'**
-  String get settingsClearApplicationDataDescription;
-
-  /// No description provided for @settingsClearApplicationDataDisabledSyncRunning.
-  ///
-  /// In zh, this message translates to:
-  /// **'库同步进行中，请稍后再试'**
-  String get settingsClearApplicationDataDisabledSyncRunning;
-
-  /// No description provided for @settingsUninstallDataInfoLabel.
-  ///
-  /// In zh, this message translates to:
-  /// **'卸载与数据保留'**
-  String get settingsUninstallDataInfoLabel;
-
-  /// No description provided for @settingsUninstallDataInfoDescription.
-  ///
-  /// In zh, this message translates to:
-  /// **'卸载可能删除应用沙箱数据；桌面版默认保留应用数据，也可在卸载向导中勾选删除'**
-  String get settingsUninstallDataInfoDescription;
-
-  /// No description provided for @confirmClearApplicationDataTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'清除全部应用数据？'**
-  String get confirmClearApplicationDataTitle;
-
-  /// No description provided for @confirmClearApplicationDataContent.
-  ///
-  /// In zh, this message translates to:
-  /// **'将删除当前应用数据目录中的全部本机状态（含 SQLite、自动元数据备份、日志与缓存），以及应用偏好设置。不会删除库根目录中的漫画文件，也不会删除您手动导出到外置目录的元数据备份。'**
-  String get confirmClearApplicationDataContent;
-
-  /// No description provided for @confirmClearApplicationDataRecentBackup.
-  ///
-  /// In zh, this message translates to:
-  /// **'最近自动元数据备份：{timestamp}'**
-  String confirmClearApplicationDataRecentBackup(String timestamp);
-
-  /// No description provided for @confirmClearApplicationDataRecentBackupEmpty.
-  ///
-  /// In zh, this message translates to:
-  /// **'尚无自动元数据备份记录'**
-  String get confirmClearApplicationDataRecentBackupEmpty;
-
-  /// No description provided for @wipeCompleteRestartMessage.
-  ///
-  /// In zh, this message translates to:
-  /// **'应用数据已清除。请重新启动应用以完成重置。'**
-  String get wipeCompleteRestartMessage;
-
-  /// No description provided for @wipeFailedManualDeleteMessage.
-  ///
-  /// In zh, this message translates to:
-  /// **'无法完全删除应用数据目录。请关闭应用后手动删除以下目录，然后重启应用：\n{path}'**
-  String wipeFailedManualDeleteMessage(String path);
 
   /// No description provided for @settingsAutoScanLabel.
   ///

@@ -638,9 +638,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSectionDiagnostics => 'Diagnostics';
 
   @override
-  String get settingsSectionApplicationData => 'Application data';
-
-  @override
   String get settingsSectionUpdates => 'Updates';
 
   @override
@@ -863,49 +860,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsExportLogsDescription =>
       'Bundle app and core logs for troubleshooting';
-
-  @override
-  String get settingsClearApplicationDataLabel => 'Clear all application data';
-
-  @override
-  String get settingsClearApplicationDataDescription =>
-      'Removes the database, automatic metadata backups, logs, and cache; library root files stay';
-
-  @override
-  String get settingsClearApplicationDataDisabledSyncRunning =>
-      'Library sync is running; try again later';
-
-  @override
-  String get settingsUninstallDataInfoLabel => 'Uninstall and data retention';
-
-  @override
-  String get settingsUninstallDataInfoDescription =>
-      'Uninstalling may remove the app sandbox on mobile. On desktop, data is kept by default; you can delete it in the uninstaller';
-
-  @override
-  String get confirmClearApplicationDataTitle => 'Clear all application data?';
-
-  @override
-  String get confirmClearApplicationDataContent =>
-      'This removes all on-device app state in the current application data directory (SQLite, automatic metadata backups, logs, and cache), plus app preferences. Library root files and manually exported metadata backups are not deleted.';
-
-  @override
-  String confirmClearApplicationDataRecentBackup(String timestamp) {
-    return 'Latest automatic metadata backup: $timestamp';
-  }
-
-  @override
-  String get confirmClearApplicationDataRecentBackupEmpty =>
-      'No automatic metadata backup on record';
-
-  @override
-  String get wipeCompleteRestartMessage =>
-      'Application data cleared. Restart the app to finish resetting.';
-
-  @override
-  String wipeFailedManualDeleteMessage(String path) {
-    return 'Could not fully delete the application data directory. Close the app, manually delete this folder, then restart:\n$path';
-  }
 
   @override
   String get settingsAutoScanLabel => 'Auto scan';

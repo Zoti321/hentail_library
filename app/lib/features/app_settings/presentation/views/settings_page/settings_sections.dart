@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/app_settings/presentation/app_data_wipe_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/log_export_flow.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/app_update_controller.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/diagnostic_mode_notifier.dart';
@@ -12,7 +11,6 @@ import 'package:hentai_library/features/app_settings/presentation/views/dialogs/
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_list.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
@@ -150,13 +148,6 @@ List<Widget> _storageAndLogsSections(AppLocalizations l10n) {
     SettingsSection(
       title: Text(l10n.settingsSectionDiagnostics),
       tiles: const <Widget>[_DiagnosticModeTile(), _ExportLogsTile()],
-    ),
-    SettingsSection(
-      title: Text(l10n.settingsSectionApplicationData),
-      tiles: const <Widget>[
-        _ClearApplicationDataTile(),
-        _UninstallDataInfoTile(),
-      ],
     ),
   ];
 }
@@ -665,46 +656,6 @@ class _ExportLogsTile extends ConsumerWidget {
         context,
         diagnosticVerbose: ref.read(diagnosticModeProvider),
       ),
-    );
-  }
-}
-
-class _ClearApplicationDataTile extends ConsumerWidget {
-  const _ClearApplicationDataTile();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final AppLocalizations l10n = context.l10n;
-    final bool syncRunning = ref.watch(libraryScanRunningStateProvider);
-    return SettingsNavigationTile(
-      leading: Symbols.delete_forever,
-      title: Text(l10n.settingsClearApplicationDataLabel),
-      description: Text(
-        syncRunning
-            ? l10n.settingsClearApplicationDataDisabledSyncRunning
-            : l10n.settingsClearApplicationDataDescription,
-      ),
-      enabled: !syncRunning,
-      onTap: () => runAppDataWipeFlow(
-        context,
-        readRecentMetadataBackupAt: ref.read(
-          recentMetadataBackupAtReaderProvider,
-        ),
-      ),
-    );
-  }
-}
-
-class _UninstallDataInfoTile extends StatelessWidget {
-  const _UninstallDataInfoTile();
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    return SettingsNavigationTile(
-      leading: Symbols.info,
-      title: Text(l10n.settingsUninstallDataInfoLabel),
-      description: Text(l10n.settingsUninstallDataInfoDescription),
     );
   }
 }

@@ -385,17 +385,6 @@ List<Widget> _sectionsForCategory(
             ),
         ],
       ),
-      if (showUnwiredTiles)
-        SettingsSection(
-          title: Text(l10n.settingsSectionApplicationData),
-          tiles: <Widget>[
-            SettingsNavigationTile(
-              leading: Symbols.delete_forever,
-              title: Text(l10n.settingsClearApplicationDataLabel),
-              onTap: () {},
-            ),
-          ],
-        ),
     ],
   };
 }
