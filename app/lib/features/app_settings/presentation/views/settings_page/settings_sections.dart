@@ -78,8 +78,8 @@ List<Widget> _appearanceSections() {
     SettingsSection(
       tiles: <Widget>[
         _ThemeTile(),
-        _DynamicColorTile(),
         _ColorSchemeTile(),
+        _DynamicColorTile(),
         _FontTile(),
         _LocaleTile(),
       ],
