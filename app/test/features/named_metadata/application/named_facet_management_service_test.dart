@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/named_metadata/application/named_facet_management_service.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
-import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 
@@ -48,16 +48,24 @@ class _RecordingRepo implements NamedFacetManagementRepository {
   }
 
   @override
+  Future<Map<String, int>> countAttachmentsBatch(
+    ManagedNamedFacetKind kind,
+    List<String> names,
+  ) async {
+    return <String, int>{for (final String name in names) name: 0};
+  }
+
+  @override
   Future<List<String>> listAll(ManagedNamedFacetKind kind) async =>
       const <String>[];
 
   @override
-  Future<PagedResult<String>> fetchPage(
+  Future<PagedResult<NamedFacetFormCandidate>> fetchPage(
     ManagedNamedFacetKind kind,
     PageRequest request,
   ) async {
-    return PagedResult<String>(
-      items: const <String>[],
+    return PagedResult<NamedFacetFormCandidate>(
+      items: const <NamedFacetFormCandidate>[],
       totalCount: 0,
       page: request.page,
       pageSize: request.pageSize,
@@ -98,9 +106,6 @@ void main() {
       targetName: 'keep',
       sourceNames: <String>['a', 'keep', 'b'],
     );
-    expect(repo.merges, <(String, String)>[
-      ('a', 'keep'),
-      ('b', 'keep'),
-    ]);
+    expect(repo.merges, <(String, String)>[('a', 'keep'), ('b', 'keep')]);
   });
 }

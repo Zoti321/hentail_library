@@ -42,10 +42,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(l10n.metadataMergeConfirmTitle), findsOneWidget);
-    expect(
-      find.text(l10n.metadataMergeConfirmBody(2, '目标标签')),
-      findsOneWidget,
-    );
+    expect(find.text(l10n.metadataMergeConfirmBody(2, '目标标签')), findsOneWidget);
     expect(find.text(l10n.metadataMergeConfirmDontAskAgain), findsOneWidget);
 
     await tester.tap(find.byType(M3ECheckbox));

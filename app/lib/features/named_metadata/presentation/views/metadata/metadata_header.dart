@@ -115,9 +115,8 @@ class MetadataHeader extends ConsumerWidget {
               M3EMenuEntry(
                 label: l10n.metadataImportTagDictionaryMenuLabel,
                 leading: const Icon(Icons.upload_file_outlined),
-                onPressed: () => unawaited(
-                  importTagDictionaryFromFile(context, ref),
-                ),
+                onPressed: () =>
+                    unawaited(importTagDictionaryFromFile(context, ref)),
               ),
             ],
             anchorBuilder: (BuildContext context, VoidCallback open) {

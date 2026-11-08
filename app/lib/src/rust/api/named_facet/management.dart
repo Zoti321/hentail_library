@@ -71,3 +71,12 @@ Future<PlatformInt64> countNamedFacetAttachmentsFrb({
       facet: facet,
       name: name,
     );
+
+Future<List<NamedFacetFormEntryFrbDto>> countNamedFacetAttachmentsBatchFrb({
+  required JunctionNamedFacetFrb facet,
+  required List<String> names,
+}) => RustLib.instance.api
+    .crateApiNamedFacetManagementCountNamedFacetAttachmentsBatchFrb(
+      facet: facet,
+      names: names,
+    );

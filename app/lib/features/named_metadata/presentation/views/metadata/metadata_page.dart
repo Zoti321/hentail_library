@@ -62,9 +62,9 @@ class _MetadataManagementPageState
 
   @override
   Widget build(BuildContext context) {
-    final String? tabParam = GoRouterState.of(
-      context,
-    ).uri.queryParameters['tab'];
+    final String? tabParam = GoRouterState.of(context)
+        .uri
+        .queryParameters['tab'];
     final int queryIndex = _tabIndexFromQuery(tabParam);
     // 首页统计卡等深链改 query 时，同步本地 tab（保留切换方向）。
     if (_selectedTabIndex != queryIndex) {
@@ -112,17 +112,31 @@ class _MetadataManagementPageState
     required int selectedIndex,
   }) {
     final ManagedNamedFacetKind kind = metadataTabKind(selectedIndex);
-    final NamedFacetManagementState state = ref.watch(
-      namedFacetManagementViewModelProvider(kind),
+    final (
+      bool hasSearchQuery,
+      int itemCount,
+      int totalCount,
+      String? mergeTarget,
+      Set<String> mergeSources,
+      int mergeSelectionCount,
+    ) = ref.watch(
+      namedFacetManagementViewModelProvider(kind).select(
+        (NamedFacetManagementState s) => (
+          s.hasSearchQuery,
+          s.items.length,
+          s.totalCount,
+          s.mergeTarget,
+          s.mergeSources,
+          s.mergeSelectionCount,
+        ),
+      ),
     );
     final NamedFacetManagementViewModel viewModel = ref.read(
       namedFacetManagementViewModelProvider(kind).notifier,
     );
-    final int count = state.hasSearchQuery
-        ? state.items.length
-        : state.totalCount;
+    final int count = hasSearchQuery ? itemCount : totalCount;
     final double horizontal = layout.horizontalInset;
-    final bool mergeMode = state.isMergeMode;
+    final bool mergeMode = mergeTarget != null;
     final bool useMobileCreateDialog =
         managementCreateInteractionOf(context) ==
         ManagementCreateInteraction.mobileDialog;
@@ -142,7 +156,7 @@ class _MetadataManagementPageState
                 child: MetadataHeader(
                   onOpenNavigation: appShellPageNavigationOpener(context),
                   onBack: () => popOrGoHome(context),
-                  mergeSelectionCount: state.mergeSelectionCount,
+                  mergeSelectionCount: mergeSelectionCount,
                   onExitMergeSelection: mergeMode ? viewModel.exitMerge : null,
                   onMergeSelection: mergeMode
                       ? () => unawaited(_mergeSelectedNames(kind))
@@ -190,8 +204,8 @@ class _MetadataManagementPageState
                             onDismiss: _dismissDraftEntity,
                           )
                         : null,
-                    mergeTarget: state.mergeTarget,
-                    mergeSources: state.mergeSources,
+                    mergeTarget: mergeTarget,
+                    mergeSources: mergeSources,
                     onMergeTargetSelected: viewModel.enterMerge,
                     onMergeSourceSelected: viewModel.toggleMergeSource,
                     onMergeSelectionExited: viewModel.exitMerge,

@@ -10,6 +10,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// Near-bottom / fill-viewport threshold shared with scroll-driven load-more.
 const double kNamedFacetLoadMoreExtentThreshold = 240;
 
+/// Cap automatic fill-viewport [loadMore] chains per facet enter / viewport resize.
+const int kNamedFacetFillViewportMaxAutoPages = 3;
+
 /// Whether Named facet management should auto-call [loadMore] after layout.
 ///
 /// True when more pages remain, the list is not searching/loading, the last
@@ -48,44 +51,71 @@ class NamedFacetFillViewportBinder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ObjectRef<bool> fillScheduledRef = useRef(false);
+    final ObjectRef<int> autoFillDepthRef = useRef(0);
     final Size viewportSize = MediaQuery.sizeOf(context);
 
-    void scheduleTryFill() {
+    void scheduleTryFill({required bool resetDepth}) {
       if (fillScheduledRef.value) {
         return;
       }
       fillScheduledRef.value = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         fillScheduledRef.value = false;
+        if (resetDepth) {
+          autoFillDepthRef.value = 0;
+        }
         unawaited(
-          _tryFill(ref: ref, scrollController: scrollController, kind: kind),
+          _tryFill(
+            ref: ref,
+            scrollController: scrollController,
+            kind: kind,
+            autoFillDepthRef: autoFillDepthRef,
+          ),
         );
       });
     }
 
     // 维度切换时等 PeerContentTransition 结束后再补页，避免过渡中撑高列表。
     useEffect(() {
+      autoFillDepthRef.value = 0;
       final Timer timer = Timer(
         PeerContentTransition.transitionDuration,
-        scheduleTryFill,
+        () => scheduleTryFill(resetDepth: true),
       );
       return timer.cancel;
     }, <Object?>[kind]);
 
     useEffect(() {
-      scheduleTryFill();
+      scheduleTryFill(resetDepth: true);
       return null;
     }, <Object?>[scrollController, viewportSize.width, viewportSize.height]);
 
-    ref.listen<NamedFacetManagementState>(
-      namedFacetManagementViewModelProvider(kind),
-      (NamedFacetManagementState? previous, NamedFacetManagementState next) {
-        if (next.hasMore &&
-            !next.hasSearchQuery &&
-            !next.isLoading &&
-            !next.isLoadingMore &&
-            next.error == null) {
-          scheduleTryFill();
+    ref.listen(
+      namedFacetManagementViewModelProvider(kind).select(
+        (NamedFacetManagementState s) => (
+          s.hasMore,
+          s.hasSearchQuery,
+          s.isLoading,
+          s.isLoadingMore,
+          s.error == null,
+          s.items.length,
+        ),
+      ),
+      (previous, next) {
+        final (
+          bool hasMore,
+          bool hasSearchQuery,
+          bool isLoading,
+          bool isLoadingMore,
+          bool noError,
+          _,
+        ) = next;
+        if (hasMore &&
+            !hasSearchQuery &&
+            !isLoading &&
+            !isLoadingMore &&
+            noError) {
+          scheduleTryFill(resetDepth: false);
         }
       },
     );
@@ -98,8 +128,12 @@ Future<void> _tryFill({
   required WidgetRef ref,
   required ScrollController scrollController,
   required ManagedNamedFacetKind kind,
+  required ObjectRef<int> autoFillDepthRef,
 }) async {
   if (!scrollController.hasClients) {
+    return;
+  }
+  if (autoFillDepthRef.value >= kNamedFacetFillViewportMaxAutoPages) {
     return;
   }
   final NamedFacetManagementState state = ref.read(
@@ -117,6 +151,7 @@ Future<void> _tryFill({
   )) {
     return;
   }
+  autoFillDepthRef.value += 1;
   await ref
       .read(namedFacetManagementViewModelProvider(kind).notifier)
       .loadMore();

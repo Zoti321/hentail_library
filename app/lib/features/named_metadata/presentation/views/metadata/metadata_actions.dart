@@ -88,11 +88,8 @@ Future<TagDictionaryImportResult?> importTagDictionary(
     context: context,
     onCancel: viewModel.cancel,
     bodyText: l10n.metadataImportTagDictionaryDialogBody,
-    runImport: ({void Function(int, int)? onDownloadProgress}) =>
-        viewModel.importFromNetwork(
-          url: url,
-          onDownloadProgress: onDownloadProgress,
-        ),
+    runImport: ({void Function(int, int)? onDownloadProgress}) => viewModel
+        .importFromNetwork(url: url, onDownloadProgress: onDownloadProgress),
   );
 }
 
@@ -116,10 +113,7 @@ Future<void> importTagDictionaryFromFile(
   final Uint8List? bytes = await _readPickedJsonBytes(file);
   if (bytes == null || bytes.isEmpty) {
     if (context.mounted) {
-      showErrorSnackbar(
-        context,
-        l10n.metadataImportTagDictionaryInvalidFile,
-      );
+      showErrorSnackbar(context, l10n.metadataImportTagDictionaryInvalidFile);
     }
     return;
   }

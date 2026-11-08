@@ -27,7 +27,8 @@ impl From<NamedFacetFormEntry> for NamedFacetFormEntryFrbDto {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NamedFacetPagedNamesDto {
-    pub items: Vec<String>,
+    /// Dictionary facets include real attachment counts; Author rows are 0.
+    pub items: Vec<NamedFacetFormEntryFrbDto>,
     pub total_count: i64,
     pub page: i32,
     pub page_size: i32,

@@ -9,24 +9,16 @@ import '../../../../../support/pump_app.dart';
 void main() {
   final AppLocalizationsZh l10n = AppLocalizationsZh();
 
-  Future<void> pumpHeader(
-    WidgetTester tester, {
-    required Widget header,
-  }) {
+  Future<void> pumpHeader(WidgetTester tester, {required Widget header}) {
     return pumpApp(
       tester,
-      home: Scaffold(
-        body: SizedBox(width: 900, height: 200, child: header),
-      ),
+      home: Scaffold(body: SizedBox(width: 900, height: 200, child: header)),
     );
   }
 
   testWidgets('普通模式显示「管理」标题与更多菜单入口', (WidgetTester tester) async {
     await tester.binding.setSurfaceSize(const Size(900, 600));
-    await pumpHeader(
-      tester,
-      header: MetadataHeader(onBack: () {}),
-    );
+    await pumpHeader(tester, header: MetadataHeader(onBack: () {}));
     await tester.pumpAndSettle();
 
     expect(find.text(l10n.navMetadata), findsOneWidget);

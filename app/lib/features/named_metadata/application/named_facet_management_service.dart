@@ -54,6 +54,13 @@ class NamedFacetManagementService {
     return _repository.countAttachments(kind, name);
   }
 
+  Future<Map<String, int>> countAttachmentsBatch(
+    ManagedNamedFacetKind kind,
+    List<String> names,
+  ) {
+    return _repository.countAttachmentsBatch(kind, names);
+  }
+
   String? _normalizedNameOrNull(String name) {
     if (validateNamedFacetFormCandidateName(name) != null) {
       return null;

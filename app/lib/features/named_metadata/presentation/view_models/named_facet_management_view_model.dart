@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:hentai_library/features/named_metadata/di/named_facet_management.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
@@ -11,6 +12,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'named_facet_management_view_model.g.dart';
 
 const int kNamedFacetManagementPageSize = 80;
+const Duration kNamedFacetSearchDebounce = Duration(milliseconds: 280);
 
 class NamedFacetManagementState {
   const NamedFacetManagementState({
@@ -88,9 +90,16 @@ const Object _sentinel = Object();
 @Riverpod(keepAlive: true)
 class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
   int _page = 1;
+  List<String>? _searchAllNames;
+  NamePinyinIndex? _searchPinyinIndex;
+  Timer? _searchDebounce;
+  int _searchGeneration = 0;
 
   @override
   NamedFacetManagementState build(ManagedNamedFacetKind kind) {
+    ref.onDispose(() {
+      _searchDebounce?.cancel();
+    });
     Future<void>.microtask(refresh);
     return NamedFacetManagementState.initial();
   }
@@ -99,25 +108,11 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
     state = state.copyWith(isLoading: true, isLoadingMore: false, error: null);
     try {
       if (state.hasSearchQuery) {
-        final List<String> all = await ref
-            .read(namedFacetManagementRepoProvider)
-            .listAll(kind);
-        final NamePinyinIndex index = await buildNamePinyinIndex(all);
-        final List<String> filtered = all
-            .where((String item) => index.matches(item, state.query))
-            .toList();
-        state = state.copyWith(
-          items: filtered,
-          totalCount: filtered.length,
-          isLoading: false,
-          isLoadingMore: false,
-          hasMore: false,
-          error: null,
-        );
-        unawaited(_prefetchAttachmentCounts(filtered));
+        await _refreshSearch();
         return;
       }
 
+      _invalidateSearchCache();
       _page = 1;
       final result = await ref
           .read(namedFacetManagementRepoProvider)
@@ -126,14 +121,16 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
             pageRequest(page: _page, pageSize: kNamedFacetManagementPageSize),
           );
       state = state.copyWith(
-        items: result.items,
+        items: <String>[
+          for (final NamedFacetFormCandidate entry in result.items) entry.name,
+        ],
         totalCount: result.totalCount,
         isLoading: false,
         isLoadingMore: false,
         hasMore: result.items.length < result.totalCount,
+        attachmentCounts: _countsFromEntries(result.items),
         error: null,
       );
-      unawaited(_prefetchAttachmentCounts(result.items));
     } catch (error) {
       state = state.copyWith(
         isLoading: false,
@@ -144,13 +141,30 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
     }
   }
 
+  /// Immediate query apply (tests / programmatic). UI should prefer [setQueryDebounced].
   Future<void> setQuery(String value) async {
+    _searchDebounce?.cancel();
     final String next = value.trim();
     if (next == state.query) {
       return;
     }
     state = state.copyWith(query: next);
     await refresh();
+  }
+
+  void setQueryDebounced(String value) {
+    final String next = value.trim();
+    if (next == state.query) {
+      return;
+    }
+    _searchDebounce?.cancel();
+    final int generation = ++_searchGeneration;
+    _searchDebounce = Timer(kNamedFacetSearchDebounce, () {
+      if (!ref.mounted || generation != _searchGeneration) {
+        return;
+      }
+      unawaited(setQuery(next));
+    });
   }
 
   Future<void> loadMore() async {
@@ -173,15 +187,21 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
             ),
           );
       _page = result.page;
-      final List<String> merged = <String>[...state.items, ...result.items];
+      final List<String> pageNames = <String>[
+        for (final NamedFacetFormCandidate entry in result.items) entry.name,
+      ];
+      final List<String> merged = <String>[...state.items, ...pageNames];
+      final Map<String, int> counts = Map<String, int>.of(
+        state.attachmentCounts,
+      )..addAll(_countsFromEntries(result.items));
       state = state.copyWith(
         items: merged,
         totalCount: result.totalCount,
         isLoadingMore: false,
         hasMore: merged.length < result.totalCount,
+        attachmentCounts: counts,
         error: null,
       );
-      unawaited(_prefetchAttachmentCounts(result.items));
     } catch (error) {
       state = state.copyWith(isLoadingMore: false, error: error);
     }
@@ -208,6 +228,7 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
   Future<void> refreshAfterTagDictionaryChange() async {
     ref.invalidate(allTagsProvider);
     if (kind == ManagedNamedFacetKind.tag) {
+      _invalidateSearchCache();
       await refresh();
     }
   }
@@ -258,23 +279,57 @@ class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
         .countAttachments(kind, name);
   }
 
-  Future<void> _prefetchAttachmentCounts(List<String> names) async {
-    if (kind == ManagedNamedFacetKind.author || names.isEmpty) {
-      return;
+  Future<void> _refreshSearch() async {
+    final List<String> all = await _ensureSearchSnapshot();
+    final NamePinyinIndex index = _searchPinyinIndex!;
+    final List<String> filtered = all
+        .where((String item) => index.matches(item, state.query))
+        .toList();
+    Map<String, int> counts = const <String, int>{};
+    if (kind != ManagedNamedFacetKind.author && filtered.isNotEmpty) {
+      counts = await ref
+          .read(namedFacetManagementServiceProvider)
+          .countAttachmentsBatch(kind, filtered);
     }
-    final Map<String, int> next = Map<String, int>.of(state.attachmentCounts);
-    await Future.wait(
-      names.map((String name) async {
-        try {
-          next[name] = await ref
-              .read(namedFacetManagementServiceProvider)
-              .countAttachments(kind, name);
-        } catch (_) {}
-      }),
-    );
     if (!ref.mounted) {
       return;
     }
-    state = state.copyWith(attachmentCounts: next);
+    state = state.copyWith(
+      items: filtered,
+      totalCount: filtered.length,
+      isLoading: false,
+      isLoadingMore: false,
+      hasMore: false,
+      attachmentCounts: counts,
+      error: null,
+    );
+  }
+
+  Future<List<String>> _ensureSearchSnapshot() async {
+    final List<String>? cached = _searchAllNames;
+    if (cached != null && _searchPinyinIndex != null) {
+      return cached;
+    }
+    final List<String> all = await ref
+        .read(namedFacetManagementRepoProvider)
+        .listAll(kind);
+    _searchAllNames = all;
+    _searchPinyinIndex = await buildNamePinyinIndex(all);
+    return all;
+  }
+
+  void _invalidateSearchCache() {
+    _searchAllNames = null;
+    _searchPinyinIndex = null;
+  }
+
+  Map<String, int> _countsFromEntries(List<NamedFacetFormCandidate> entries) {
+    if (kind == ManagedNamedFacetKind.author) {
+      return const <String, int>{};
+    }
+    return <String, int>{
+      for (final NamedFacetFormCandidate entry in entries)
+        entry.name: entry.attachmentCount,
+    };
   }
 }

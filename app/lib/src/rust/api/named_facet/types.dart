@@ -35,7 +35,8 @@ class NamedFacetFormEntryFrbDto {
 }
 
 class NamedFacetPagedNamesDto {
-  final List<String> items;
+  /// Dictionary facets include real attachment counts; Author rows are 0.
+  final List<NamedFacetFormEntryFrbDto> items;
   final PlatformInt64 totalCount;
   final int page;
   final int pageSize;

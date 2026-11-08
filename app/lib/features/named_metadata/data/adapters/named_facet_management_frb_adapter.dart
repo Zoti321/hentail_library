@@ -83,4 +83,14 @@ class NamedFacetManagementFrbAdapter {
     );
     return result.toInt();
   }
+
+  Future<List<rust_named_facet_types.NamedFacetFormEntryFrbDto>>
+  countAttachmentsBatch(ManagedNamedFacetKind kind, List<String> names) =>
+      guardFrb(
+        () => rust_named_facet.countNamedFacetAttachmentsBatchFrb(
+          facet: kind.toFrb(),
+          names: names,
+        ),
+        fallbackMessage: namedFacetFallbackCopyOf(kind).count,
+      );
 }
