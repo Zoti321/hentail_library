@@ -15,7 +15,7 @@ abstract final class LibraryBrowsePageMetrics {
   static const double scrollToTopShowViewportRatio = 1;
   static const double scrollToTopHideViewportRatio = 0.85;
 
-  /// FAB 圆角（regular 规格默认 16；较大尺寸也统一为 16）。
+  /// FAB 圆角（与 Material 3 regular FAB 默认 16 一致）。
   static const double scrollToTopCornerRadius = Spacing.space16;
 
   /// Gap between tabs row and view-mode controls.
