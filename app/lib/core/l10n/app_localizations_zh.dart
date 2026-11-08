@@ -1367,25 +1367,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerSettingsReadingMode => '阅读模式';
 
   @override
-  String get readerSettingsAutoPlay => '自动播放';
+  String get readerSettingsAutoPlay => '自动翻页';
 
   @override
-  String get readerSettingsAutoPlayMode => '自动播放模式';
+  String get readerSettingsAutoPlayMode => '翻页范围';
 
   @override
-  String get readerSettingsPlayInterval => '播放间隔';
+  String get readerSettingsPlayInterval => '翻页间隔';
 
   @override
   String get readerSettingsSecondsSuffix => '秒';
 
   @override
-  String get autoPlayModeComicOnce => '单本播放';
+  String get autoPlayModeComicOnce => '本话一次';
 
   @override
-  String get autoPlayModeComicLoop => '单本循环';
+  String get autoPlayModeComicLoop => '本话循环';
 
   @override
-  String get autoPlayModeSeriesOnce => '系列播放';
+  String get autoPlayModeSeriesOnce => '系列一次';
 
   @override
   String get autoPlayModeSeriesLoop => '系列循环';
@@ -1394,13 +1394,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerSettingsWebtoonMode => 'Webtoon 模式';
 
   @override
-  String get readerSettingsPagedOptions => '分页阅读器选项';
+  String get readerSettingsPagedOptions => '翻页模式';
 
   @override
   String get readerSettingsHorizontalMargin => '左右边距';
 
   @override
-  String get readerSettingsMarginNone => '无 (0%)';
+  String get readerSettingsMarginNone => '无（0%）';
 
   @override
   String readerSettingsMarginPercent(int percent) {
@@ -1408,7 +1408,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get readerSettingsZoomMode => '缩放模式';
+  String get readerSettingsZoomMode => '显示比例';
 
   @override
   String get readerSettingsPageLayout => '页面布局';
@@ -1511,10 +1511,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerNextPage => '下一页';
 
   @override
-  String get readerDisableAutoPlay => '关闭自动播放';
+  String get readerDisableAutoPlay => '关闭自动翻页';
 
   @override
-  String get readerEnableAutoPlay => '开启自动播放';
+  String get readerEnableAutoPlay => '开启自动翻页';
 
   @override
   String get readerInvalidParams => '阅读参数错误：缺少 comic_id';

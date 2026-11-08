@@ -1418,13 +1418,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerSettingsReadingMode => 'Reading mode';
 
   @override
-  String get readerSettingsAutoPlay => 'Auto-play';
+  String get readerSettingsAutoPlay => 'Auto-advance';
 
   @override
-  String get readerSettingsAutoPlayMode => 'Auto-play mode';
+  String get readerSettingsAutoPlayMode => 'Advance scope';
 
   @override
-  String get readerSettingsPlayInterval => 'Play interval';
+  String get readerSettingsPlayInterval => 'Advance interval';
 
   @override
   String get readerSettingsSecondsSuffix => 'sec';
@@ -1445,10 +1445,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerSettingsWebtoonMode => 'Webtoon mode';
 
   @override
-  String get readerSettingsPagedOptions => 'Paged reader options';
+  String get readerSettingsPagedOptions => 'Paged mode';
 
   @override
-  String get readerSettingsHorizontalMargin => 'Horizontal margin';
+  String get readerSettingsHorizontalMargin => 'Side margins';
 
   @override
   String get readerSettingsMarginNone => 'None (0%)';
@@ -1459,7 +1459,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get readerSettingsZoomMode => 'Zoom mode';
+  String get readerSettingsZoomMode => 'Scale';
 
   @override
   String get readerSettingsPageLayout => 'Page layout';
@@ -1562,10 +1562,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerNextPage => 'Next page';
 
   @override
-  String get readerDisableAutoPlay => 'Disable auto-play';
+  String get readerDisableAutoPlay => 'Disable auto-advance';
 
   @override
-  String get readerEnableAutoPlay => 'Enable auto-play';
+  String get readerEnableAutoPlay => 'Enable auto-advance';
 
   @override
   String get readerInvalidParams => 'Invalid reader params: missing comic_id';

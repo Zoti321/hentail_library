@@ -2543,19 +2543,19 @@ abstract class AppLocalizations {
   /// No description provided for @readerSettingsAutoPlay.
   ///
   /// In zh, this message translates to:
-  /// **'自动播放'**
+  /// **'自动翻页'**
   String get readerSettingsAutoPlay;
 
   /// No description provided for @readerSettingsAutoPlayMode.
   ///
   /// In zh, this message translates to:
-  /// **'自动播放模式'**
+  /// **'翻页范围'**
   String get readerSettingsAutoPlayMode;
 
   /// No description provided for @readerSettingsPlayInterval.
   ///
   /// In zh, this message translates to:
-  /// **'播放间隔'**
+  /// **'翻页间隔'**
   String get readerSettingsPlayInterval;
 
   /// No description provided for @readerSettingsSecondsSuffix.
@@ -2567,19 +2567,19 @@ abstract class AppLocalizations {
   /// No description provided for @autoPlayModeComicOnce.
   ///
   /// In zh, this message translates to:
-  /// **'单本播放'**
+  /// **'本话一次'**
   String get autoPlayModeComicOnce;
 
   /// No description provided for @autoPlayModeComicLoop.
   ///
   /// In zh, this message translates to:
-  /// **'单本循环'**
+  /// **'本话循环'**
   String get autoPlayModeComicLoop;
 
   /// No description provided for @autoPlayModeSeriesOnce.
   ///
   /// In zh, this message translates to:
-  /// **'系列播放'**
+  /// **'系列一次'**
   String get autoPlayModeSeriesOnce;
 
   /// No description provided for @autoPlayModeSeriesLoop.
@@ -2597,7 +2597,7 @@ abstract class AppLocalizations {
   /// No description provided for @readerSettingsPagedOptions.
   ///
   /// In zh, this message translates to:
-  /// **'分页阅读器选项'**
+  /// **'翻页模式'**
   String get readerSettingsPagedOptions;
 
   /// No description provided for @readerSettingsHorizontalMargin.
@@ -2609,7 +2609,7 @@ abstract class AppLocalizations {
   /// No description provided for @readerSettingsMarginNone.
   ///
   /// In zh, this message translates to:
-  /// **'无 (0%)'**
+  /// **'无（0%）'**
   String get readerSettingsMarginNone;
 
   /// No description provided for @readerSettingsMarginPercent.
@@ -2621,7 +2621,7 @@ abstract class AppLocalizations {
   /// No description provided for @readerSettingsZoomMode.
   ///
   /// In zh, this message translates to:
-  /// **'缩放模式'**
+  /// **'显示比例'**
   String get readerSettingsZoomMode;
 
   /// No description provided for @readerSettingsPageLayout.
@@ -2819,13 +2819,13 @@ abstract class AppLocalizations {
   /// No description provided for @readerDisableAutoPlay.
   ///
   /// In zh, this message translates to:
-  /// **'关闭自动播放'**
+  /// **'关闭自动翻页'**
   String get readerDisableAutoPlay;
 
   /// No description provided for @readerEnableAutoPlay.
   ///
   /// In zh, this message translates to:
-  /// **'开启自动播放'**
+  /// **'开启自动翻页'**
   String get readerEnableAutoPlay;
 
   /// No description provided for @readerInvalidParams.

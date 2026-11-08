@@ -184,6 +184,61 @@ List<Widget> _sectionsForCategory(
           ),
         ],
       ),
+      SettingsSection(
+        title: Text(l10n.readerSettingsPagedOptions),
+        tiles: <Widget>[
+          SettingsNavigationTile(
+            leading: Symbols.view_day,
+            title: Text(l10n.readerSettingsPageLayout),
+            value: Text(labState.pagedLayoutLabel),
+            onTap: () {
+              onChanged(
+                labState.copyWith(
+                  pagedLayoutLabel: nextOption(
+                    labState.pagedLayoutLabel,
+                    optionLabels.pagedLayoutOptions,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      SettingsSection(
+        title: Text(l10n.readerSettingsWebtoonMode),
+        tiles: <Widget>[
+          SettingsNavigationTile(
+            leading: Symbols.width_normal,
+            title: Text(l10n.readerSettingsHorizontalMargin),
+            value: Text(labState.webtoonMarginLabel),
+            onTap: () {
+              onChanged(
+                labState.copyWith(
+                  webtoonMarginLabel: nextOption(
+                    labState.webtoonMarginLabel,
+                    optionLabels.webtoonMarginOptions,
+                  ),
+                ),
+              );
+            },
+          ),
+          SettingsNavigationTile(
+            leading: Symbols.zoom_in,
+            title: Text(l10n.readerSettingsZoomMode),
+            value: Text(labState.webtoonZoomLabel),
+            onTap: () {
+              onChanged(
+                labState.copyWith(
+                  webtoonZoomLabel: nextOption(
+                    labState.webtoonZoomLabel,
+                    optionLabels.webtoonZoomOptions,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     ],
     SettingsCategory.libraryBrowse => <Widget>[
       if (showUnwiredTiles)
@@ -315,13 +370,29 @@ List<Widget> _sectionsForCategory(
 /// 阅读模式 preview 取值（与生产分类展示名对齐，循环切换）。
 const List<String> kSettingsReadingModeLabels = <String>['翻页', 'Webtoon'];
 
-/// 自动播放模式 preview 取值。
+/// 自动翻页范围 preview 取值。
 const List<String> kSettingsAutoPlayModeLabels = <String>[
   '本话一次',
   '本话循环',
   '系列一次',
   '系列循环',
 ];
+
+const List<String> kSettingsPagedLayoutLabels = <String>[
+  '单页',
+  '双页',
+  '双页（封面独立）',
+];
+
+const List<String> kSettingsWebtoonMarginLabels = <String>[
+  '无（0%）',
+  '10%',
+  '20%',
+  '30%',
+  '40%',
+];
+
+const List<String> kSettingsWebtoonZoomLabels = <String>['适应宽度', '原始尺寸'];
 
 /// 设置页可选项文案：Lab 使用默认值，生产 Pilot 注入 l10n 文案（顺序与枚举 `values` 一致）。
 class SettingsOptionLabels {
@@ -330,12 +401,18 @@ class SettingsOptionLabels {
     this.localeOptions = const <String>['简体中文', 'English'],
     this.readingModeOptions = kSettingsReadingModeLabels,
     this.autoPlayModeOptions = kSettingsAutoPlayModeLabels,
+    this.pagedLayoutOptions = kSettingsPagedLayoutLabels,
+    this.webtoonMarginOptions = kSettingsWebtoonMarginLabels,
+    this.webtoonZoomOptions = kSettingsWebtoonZoomLabels,
   });
 
   final List<String> themeOptions;
   final List<String> localeOptions;
   final List<String> readingModeOptions;
   final List<String> autoPlayModeOptions;
+  final List<String> pagedLayoutOptions;
+  final List<String> webtoonMarginOptions;
+  final List<String> webtoonZoomOptions;
 }
 
 /// 循环切换到下一个可选项；当前值不在列表中时从第一项开始。
@@ -354,6 +431,9 @@ class SettingsLabState {
     this.readingModeLabel = '翻页',
     this.autoPlayModeLabel = '本话一次',
     this.autoPlayIntervalSeconds = 5,
+    this.pagedLayoutLabel = '单页',
+    this.webtoonMarginLabel = '20%',
+    this.webtoonZoomLabel = '适应宽度',
     this.healthyMode = false,
   });
 
@@ -365,6 +445,9 @@ class SettingsLabState {
   final String readingModeLabel;
   final String autoPlayModeLabel;
   final int autoPlayIntervalSeconds;
+  final String pagedLayoutLabel;
+  final String webtoonMarginLabel;
+  final String webtoonZoomLabel;
   final bool healthyMode;
 
   SettingsLabState copyWith({
@@ -376,6 +459,9 @@ class SettingsLabState {
     String? readingModeLabel,
     String? autoPlayModeLabel,
     int? autoPlayIntervalSeconds,
+    String? pagedLayoutLabel,
+    String? webtoonMarginLabel,
+    String? webtoonZoomLabel,
     bool? healthyMode,
   }) {
     return SettingsLabState(
@@ -388,6 +474,9 @@ class SettingsLabState {
       autoPlayModeLabel: autoPlayModeLabel ?? this.autoPlayModeLabel,
       autoPlayIntervalSeconds:
           autoPlayIntervalSeconds ?? this.autoPlayIntervalSeconds,
+      pagedLayoutLabel: pagedLayoutLabel ?? this.pagedLayoutLabel,
+      webtoonMarginLabel: webtoonMarginLabel ?? this.webtoonMarginLabel,
+      webtoonZoomLabel: webtoonZoomLabel ?? this.webtoonZoomLabel,
       healthyMode: healthyMode ?? this.healthyMode,
     );
   }

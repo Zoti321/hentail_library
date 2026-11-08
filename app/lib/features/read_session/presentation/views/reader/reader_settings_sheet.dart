@@ -57,7 +57,6 @@ class _ReaderSettingsBody extends ConsumerWidget {
     final ReadingMode mode = settings.readingMode;
     final ReaderModeCategory category = mode.category;
     final PagedLayout pagedLayout = mode.pagedLayout ?? PagedLayout.single;
-    final bool isWebtoon = mode.isWebtoon;
     final int interval = settings.readerAutoPlayIntervalSeconds;
 
     void applyReadingMode(ReadingMode value) {
@@ -90,68 +89,6 @@ class _ReaderSettingsBody extends ConsumerWidget {
             ),
           ],
         ),
-        if (!isWebtoon)
-          ContentSection.group(
-            title: l10n.readerSettingsPagedOptions,
-            children: <Widget>[
-              SettingsNavigationTile(
-                leading: Symbols.view_day,
-                title: Text(l10n.readerSettingsPageLayout),
-                value: Text(l10n.pagedLayoutLabel(pagedLayout)),
-                onTap: () => _pickOption<PagedLayout>(
-                  context,
-                  title: l10n.readerSettingsPageLayout,
-                  options: PagedLayout.values,
-                  current: pagedLayout,
-                  labelOf: l10n.pagedLayoutLabel,
-                  onSelected: (PagedLayout value) {
-                    applyReadingMode(value.toReadingMode());
-                  },
-                ),
-              ),
-            ],
-          ),
-        if (isWebtoon)
-          ContentSection.group(
-            title: l10n.readerSettingsWebtoonMode,
-            children: <Widget>[
-              SettingsNavigationTile(
-                leading: Symbols.width_normal,
-                title: Text(l10n.readerSettingsHorizontalMargin),
-                enabled: settings.webtoonZoomMode == WebtoonZoomMode.fitWidth,
-                value: Text(
-                  l10n.readerWebtoonMarginLabel(settings.webtoonMarginPercent),
-                ),
-                onTap: () => _pickOption<int>(
-                  context,
-                  title: l10n.readerSettingsHorizontalMargin,
-                  options: _kWebtoonMarginOptions,
-                  current: settings.webtoonMarginPercent,
-                  labelOf: l10n.readerWebtoonMarginLabel,
-                  onSelected: (int value) {
-                    unawaited(port.setWebtoonMarginPercent(value));
-                  },
-                ),
-              ),
-              SettingsNavigationTile(
-                leading: Symbols.zoom_in,
-                title: Text(l10n.readerSettingsZoomMode),
-                value: Text(
-                  l10n.webtoonZoomModeLabel(settings.webtoonZoomMode),
-                ),
-                onTap: () => _pickOption<WebtoonZoomMode>(
-                  context,
-                  title: l10n.readerSettingsZoomMode,
-                  options: WebtoonZoomMode.values,
-                  current: settings.webtoonZoomMode,
-                  labelOf: l10n.webtoonZoomModeLabel,
-                  onSelected: (WebtoonZoomMode value) {
-                    unawaited(port.setWebtoonZoomMode(value));
-                  },
-                ),
-              ),
-            ],
-          ),
         ContentSection.group(
           title: l10n.readerSettingsAutoPlay,
           children: <Widget>[
@@ -198,6 +135,66 @@ class _ReaderSettingsBody extends ConsumerWidget {
                           ),
                   ),
                 ],
+              ),
+            ),
+          ],
+        ),
+        ContentSection.group(
+          title: l10n.readerSettingsPagedOptions,
+          children: <Widget>[
+            SettingsNavigationTile(
+              leading: Symbols.view_day,
+              title: Text(l10n.readerSettingsPageLayout),
+              value: Text(l10n.pagedLayoutLabel(pagedLayout)),
+              onTap: () => _pickOption<PagedLayout>(
+                context,
+                title: l10n.readerSettingsPageLayout,
+                options: PagedLayout.values,
+                current: pagedLayout,
+                labelOf: l10n.pagedLayoutLabel,
+                onSelected: (PagedLayout value) {
+                  applyReadingMode(value.toReadingMode());
+                },
+              ),
+            ),
+          ],
+        ),
+        ContentSection.group(
+          title: l10n.readerSettingsWebtoonMode,
+          children: <Widget>[
+            SettingsNavigationTile(
+              leading: Symbols.width_normal,
+              title: Text(l10n.readerSettingsHorizontalMargin),
+              enabled: settings.webtoonZoomMode == WebtoonZoomMode.fitWidth,
+              value: Text(
+                l10n.readerWebtoonMarginLabel(settings.webtoonMarginPercent),
+              ),
+              onTap: () => _pickOption<int>(
+                context,
+                title: l10n.readerSettingsHorizontalMargin,
+                options: _kWebtoonMarginOptions,
+                current: settings.webtoonMarginPercent,
+                labelOf: l10n.readerWebtoonMarginLabel,
+                onSelected: (int value) {
+                  unawaited(port.setWebtoonMarginPercent(value));
+                },
+              ),
+            ),
+            SettingsNavigationTile(
+              leading: Symbols.zoom_in,
+              title: Text(l10n.readerSettingsZoomMode),
+              value: Text(
+                l10n.webtoonZoomModeLabel(settings.webtoonZoomMode),
+              ),
+              onTap: () => _pickOption<WebtoonZoomMode>(
+                context,
+                title: l10n.readerSettingsZoomMode,
+                options: WebtoonZoomMode.values,
+                current: settings.webtoonZoomMode,
+                labelOf: l10n.webtoonZoomModeLabel,
+                onSelected: (WebtoonZoomMode value) {
+                  unawaited(port.setWebtoonZoomMode(value));
+                },
               ),
             ),
           ],
