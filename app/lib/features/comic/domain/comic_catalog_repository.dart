@@ -1,3 +1,4 @@
+import 'package:hentai_library/features/comic/domain/comic_browse_list_item.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_grouping.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_filter.dart';
 import 'package:hentai_library/features/comic/domain/library_comic_sort_option.dart';
@@ -10,6 +11,14 @@ abstract class ComicCatalogRepository {
   Future<int> countAll();
 
   Future<PagedResult<Comic>> fetchComicsPage({
+    required PageRequest request,
+    required LibraryComicFilter filter,
+    required LibraryComicGrouping grouping,
+    required LibraryComicSortOption sortOption,
+  });
+
+  /// 库浏览列表瘦投影（跳过 authors/tags 等关系载荷）。
+  Future<PagedResult<ComicBrowseListItem>> fetchComicsBrowsePage({
     required PageRequest request,
     required LibraryComicFilter filter,
     required LibraryComicGrouping grouping,

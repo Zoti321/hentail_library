@@ -14,17 +14,27 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 首页「全库统计」：Kazumi 风 bento 色块 + 历史 / 垃圾桶入口卡片。
+///
+/// 仅作者 / 原作 / 角色 / 标签改用 shortcut 布局并跳转管理 tab；漫画 / 系列保持原 metric 样式。
 class HomeAggregateStatsSection extends StatelessWidget {
   const HomeAggregateStatsSection({
     super.key,
     required this.counts,
     this.onOpenHistory,
     this.onOpenTrash,
+    this.onOpenAuthors,
+    this.onOpenParodies,
+    this.onOpenCharacters,
+    this.onOpenTags,
   });
 
   final HomeAggregateCounts counts;
   final VoidCallback? onOpenHistory;
   final VoidCallback? onOpenTrash;
+  final VoidCallback? onOpenAuthors;
+  final VoidCallback? onOpenParodies;
+  final VoidCallback? onOpenCharacters;
+  final VoidCallback? onOpenTags;
 
   bool get _showsShortcutCards => onOpenHistory != null && onOpenTrash != null;
 
@@ -78,7 +88,6 @@ class HomeAggregateStatsSection extends StatelessWidget {
     Widget authorCard() {
       return HomeBentoStatCard(
         label: l10n.homeStatAuthors,
-        valueText: formatCount(counts.authorCount),
         caption: counts.authorCount == 0
             ? l10n.homeNoAuthors
             : l10n.homeAuthorCount(counts.authorCount),
@@ -91,39 +100,42 @@ class HomeAggregateStatsSection extends StatelessWidget {
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(8),
         ),
+        layout: HomeBentoStatLayout.shortcut,
+        onPressed: onOpenAuthors,
       );
     }
 
     Widget parodyCard() {
       return HomeBentoStatCard(
         label: l10n.metadataTabParodies,
-        valueText: formatCount(counts.parodyCount),
         caption: l10n.metadataParodyCount(counts.parodyCount),
         icon: Symbols.theaters,
         backgroundColor: palette.parodiesBackground,
         onBackgroundColor: palette.parodiesForeground,
         borderRadius: const BorderRadius.all(Radius.circular(16)),
         minHeight: 108,
+        layout: HomeBentoStatLayout.shortcut,
+        onPressed: onOpenParodies,
       );
     }
 
     Widget characterCard() {
       return HomeBentoStatCard(
         label: l10n.metadataTabCharacters,
-        valueText: formatCount(counts.characterCount),
         caption: l10n.metadataCharacterCount(counts.characterCount),
         icon: Symbols.face_3,
         backgroundColor: palette.charactersBackground,
         onBackgroundColor: palette.charactersForeground,
         borderRadius: BorderRadius.circular(16),
         emphasis: HomeBentoStatEmphasis.compact,
+        layout: HomeBentoStatLayout.shortcut,
+        onPressed: onOpenCharacters,
       );
     }
 
     Widget tagCard({required bool wide}) {
       return HomeBentoStatCard(
         label: l10n.homeStatTags,
-        valueText: formatCount(counts.tagCount),
         caption: l10n.homeTagCount(counts.tagCount),
         icon: Symbols.label,
         backgroundColor: palette.tagsBackground,
@@ -133,10 +145,12 @@ class HomeAggregateStatsSection extends StatelessWidget {
             : BorderRadius.circular(40),
         minHeight: wide ? 88 : 96,
         emphasis: HomeBentoStatEmphasis.compact,
+        layout: HomeBentoStatLayout.shortcut,
         contentPadding: HomePageMetrics.statCardContentPadding(
           sizeClass,
           tagPill: true,
         ),
+        onPressed: onOpenTags,
       );
     }
 

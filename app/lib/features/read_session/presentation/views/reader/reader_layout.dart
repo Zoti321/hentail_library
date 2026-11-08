@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome_scope.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_interaction_scope.dart';
@@ -19,6 +20,7 @@ class ReaderLayout extends StatefulWidget {
     this.subtitle,
     this.isFullscreen = false,
     this.autoPlayEnabled = false,
+    this.autoPlayIntervalSeconds = kReaderAutoPlayIntervalDefault,
     this.onBack,
     this.onOpenSettings,
     this.onToggleFullscreen,
@@ -44,6 +46,7 @@ class ReaderLayout extends StatefulWidget {
   final bool chromeVisible;
   final bool isFullscreen;
   final bool autoPlayEnabled;
+  final int autoPlayIntervalSeconds;
   final ValueChanged<ReaderViewportTapZone>? onTapZone;
   final VoidCallback? onBack;
   final VoidCallback? onOpenSettings;
@@ -108,6 +111,7 @@ class _ReaderPageState extends State<ReaderLayout> {
               totalPages: widget.totalPages,
               isFullscreen: widget.isFullscreen,
               autoPlayEnabled: widget.autoPlayEnabled,
+              autoPlayIntervalSeconds: widget.autoPlayIntervalSeconds,
               onBack: widget.onBack,
               onOpenSettings: widget.onOpenSettings,
               onToggleFullscreen: widget.onToggleFullscreen,

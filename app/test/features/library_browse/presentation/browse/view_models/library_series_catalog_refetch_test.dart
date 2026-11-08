@@ -8,6 +8,7 @@ import 'package:hentai_library/features/series/domain/library_series_sort_option
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart';
@@ -47,6 +48,22 @@ class _CountingSeriesRepo implements SeriesRepository {
     fetchCount++;
     return PagedResult<Series>(
       items: const <Series>[],
+      page: request.page,
+      pageSize: request.pageSize,
+      totalCount: 0,
+    );
+  }
+
+  @override
+  Future<PagedResult<SeriesBrowseListItem>> fetchBrowsePage({
+    required PageRequest request,
+    required LibrarySeriesFilter filter,
+    required LibrarySeriesGrouping grouping,
+    required LibrarySeriesSortOption sortOption,
+  }) async {
+    fetchCount++;
+    return PagedResult<SeriesBrowseListItem>(
+      items: const <SeriesBrowseListItem>[],
       page: request.page,
       pageSize: request.pageSize,
       totalCount: 0,

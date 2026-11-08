@@ -1,11 +1,12 @@
 use hentai_core::{
     add_author, add_named_facet_name, count_author_attachments, count_named_facet_attachments,
-    delete_authors_by_names, delete_named_facet_by_names, fetch_management_facet_names_page,
-    list_all_author_names, list_all_named_facet_names, merge_named_facet_name, reject_author_merge,
-    rename_author, rename_named_facet_name, ManagementFacetKind,
+    count_named_facet_attachments_batch, delete_authors_by_names, delete_named_facet_by_names,
+    fetch_management_facet_names_page, list_all_author_names, list_all_named_facet_names,
+    merge_named_facet_name, reject_author_merge, rename_author, rename_named_facet_name,
+    ManagementFacetKind,
 };
 
-use super::types::{JunctionNamedFacetFrb, NamedFacetPagedNamesDto};
+use super::types::{JunctionNamedFacetFrb, NamedFacetFormEntryFrbDto, NamedFacetPagedNamesDto};
 use crate::api::comic::PageRequestDto;
 use crate::api::init::HentaiErrorDto;
 use crate::named_facet_route::{route, NamedFacetRoute};
@@ -39,7 +40,11 @@ pub async fn fetch_named_facet_page_frb(
         .await
         .map_err(HentaiErrorDto::from)?;
     Ok(NamedFacetPagedNamesDto {
-        items: page.items,
+        items: page
+            .items
+            .into_iter()
+            .map(NamedFacetFormEntryFrbDto::from)
+            .collect(),
         total_count: page.total_count,
         page: page.page,
         page_size: page.page_size,
@@ -116,6 +121,30 @@ pub async fn count_named_facet_attachments_frb(
         NamedFacetRoute::Author => count_author_attachments(&name).await,
     }
     .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn count_named_facet_attachments_batch_frb(
+    facet: JunctionNamedFacetFrb,
+    names: Vec<String>,
+) -> Result<Vec<NamedFacetFormEntryFrbDto>, HentaiErrorDto> {
+    match route(facet) {
+        NamedFacetRoute::Dictionary(facet) => {
+            Ok(count_named_facet_attachments_batch(facet, &names)
+                .await
+                .map_err(HentaiErrorDto::from)?
+                .into_iter()
+                .map(NamedFacetFormEntryFrbDto::from)
+                .collect())
+        }
+        NamedFacetRoute::Author => Ok(names
+            .into_iter()
+            .map(|name| NamedFacetFormEntryFrbDto {
+                name,
+                attachment_count: 0,
+            })
+            .collect()),
+    }
 }
 
 #[cfg(test)]

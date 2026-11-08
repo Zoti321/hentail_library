@@ -10,7 +10,7 @@ import 'package:motor/motor.dart';
 /// - 展开时内容自下方 [slideExtent] 滑入（进度可略过冲以带动位移回弹）
 ///
 /// 与 [SpringSize] 不同：后者允许 `heightFactor > 1` 的尺寸过冲，适合小控件；
-/// 本组件用于时间分组网格等大面积内容。
+/// 本组件用于时间分组网格等大面积内容；分组网格应对外报告完整高度并在内部虚拟化行。
 class SpringExpandPanel extends StatefulWidget {
   const SpringExpandPanel({
     super.key,

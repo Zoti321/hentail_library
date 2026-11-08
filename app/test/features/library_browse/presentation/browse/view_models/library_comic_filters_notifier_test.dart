@@ -86,8 +86,8 @@ void main() {
     await notifier.toggleTag('glasses');
     await notifier.toggleAuthor('1');
     await notifier.toggleIncludeSet(LibraryIncludeSetKind.language, 'zh');
-    await notifier.toggleIncludeSet(LibraryIncludeSetKind.parody, 'p');
-    await notifier.toggleIncludeSet(LibraryIncludeSetKind.character, 'c');
+    await notifier.toggleParody('p');
+    await notifier.toggleCharacter('c');
     await notifier.setNeedsMetadataOnly(true);
     await notifier.setGrouping(LibraryComicGrouping.none);
     await notifier.setSortField(LibraryComicSortField.createdAt);
@@ -102,8 +102,8 @@ void main() {
     expect(state.tagFilter.isActive, isFalse);
     expect(state.authorFilter.isActive, isFalse);
     expect(state.languageFilter, isEmpty);
-    expect(state.parodyFilter, isEmpty);
-    expect(state.characterFilter, isEmpty);
+    expect(state.parodyFilter.isActive, isFalse);
+    expect(state.characterFilter.isActive, isFalse);
     expect(state.needsMetadataOnly, LibraryNeedsMetadataOnly.defaultValue);
     expect(state.grouping, LibraryComicGrouping.defaultValue);
     expect(state.sortOption.field, kLibraryDefaultSortOption.field);
@@ -191,4 +191,41 @@ void main() {
       expect(state.authorFilter.includeNames(), <String>{'42'});
     },
   );
+
+  test('parody and character tri-state stay session-scoped', () async {
+    final ProviderContainer first = createContainer();
+    await first.read(libraryComicFiltersProvider.future);
+    final LibraryComicFiltersNotifier notifier = first.read(
+      libraryComicFiltersProvider.notifier,
+    );
+    await notifier.toggleParody('Fate');
+    await notifier.setParodyIncludeMode(LibraryMetadataIncludeMode.all);
+    await notifier.toggleCharacter('Saber');
+    await notifier.toggleCharacter('Saber');
+
+    LibraryComicFiltersState state = await first.read(
+      libraryComicFiltersProvider.future,
+    );
+    expect(
+      state.parodyFilter.pickStateFor('Fate'),
+      LibraryTriStatePick.include,
+    );
+    expect(state.parodyFilter.includeMode, LibraryMetadataIncludeMode.all);
+    expect(
+      state.characterFilter.pickStateFor('Saber'),
+      LibraryTriStatePick.exclude,
+    );
+
+    final LibraryComicFilter filter = first.read(
+      libraryComicFilterQueryProvider,
+    );
+    expect(filter.parodiesAll, <String>{'Fate'});
+    expect(filter.charactersExclude, <String>{'Saber'});
+    first.dispose();
+
+    final ProviderContainer second = createContainer();
+    state = await second.read(libraryComicFiltersProvider.future);
+    expect(state.parodyFilter.isActive, isFalse);
+    expect(state.characterFilter.isActive, isFalse);
+  });
 }

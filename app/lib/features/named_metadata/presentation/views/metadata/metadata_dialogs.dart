@@ -175,21 +175,23 @@ class _DestructiveConfirmDialog extends StatelessWidget {
   }
 }
 
-/// 标签词典导入进度：下载期间展示进度，完成后以结果关闭。
+/// 标签词典导入进度：下载或本地写入期间展示进度，完成后以结果关闭。
 Future<TagDictionaryImportResult?> showMetadataTagDictionaryImportDialog({
   required BuildContext context,
   required VoidCallback onCancel,
+  required String bodyText,
   required Future<TagDictionaryImportResult?> Function({
     void Function(int received, int total)? onDownloadProgress,
   })
-  importFromNetwork,
+  runImport,
 }) {
   return LabDialogPresenter.showBasic<TagDictionaryImportResult>(
     context,
     barrierDismissible: false,
     dialog: _TagDictionaryImportDialog(
       onCancel: onCancel,
-      importFromNetwork: importFromNetwork,
+      bodyText: bodyText,
+      runImport: runImport,
     ),
   );
 }
@@ -197,14 +199,16 @@ Future<TagDictionaryImportResult?> showMetadataTagDictionaryImportDialog({
 class _TagDictionaryImportDialog extends StatefulWidget {
   const _TagDictionaryImportDialog({
     required this.onCancel,
-    required this.importFromNetwork,
+    required this.bodyText,
+    required this.runImport,
   });
 
   final VoidCallback onCancel;
+  final String bodyText;
   final Future<TagDictionaryImportResult?> Function({
     void Function(int received, int total)? onDownloadProgress,
   })
-  importFromNetwork;
+  runImport;
 
   @override
   State<_TagDictionaryImportDialog> createState() =>
@@ -222,7 +226,7 @@ class _TagDictionaryImportDialogState
   }
 
   Future<void> _run() async {
-    final TagDictionaryImportResult? result = await widget.importFromNetwork(
+    final TagDictionaryImportResult? result = await widget.runImport(
       onDownloadProgress: (int received, int total) {
         if (!mounted) {
           return;
@@ -252,7 +256,7 @@ class _TagDictionaryImportDialogState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Text(
-            l10n.metadataImportTagDictionaryDialogBody,
+            widget.bodyText,
             style: theme.typeScale.bodyMedium.copyWith(
               color: scheme.onSurfaceVariant,
             ),

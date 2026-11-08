@@ -10,10 +10,6 @@
 与应用身份绑定的一整份本机应用数据树（含库文件、本地设置、日志与缓存等）。日常发布使用 `default`；非正式构建（Debug / Profile）使用独立的 `dev`，二者互不共享。与 Library（同一库文件内的多根集合）无关。详见 ADR-0010。
 _Avoid_: 开发库、发布库、数据库环境（易与 Library 混淆）
 
-**Application data wipe**:
-用户主动清除当前 **App data profile** 下全部本机应用状态（SQLite、自动元数据备份 `metadata_backups/`、日志、缓存及 App preference / Library browse preference）。不删除 Library root Resource，不删除用户目录手动导出的 `.hlmeta.json.gz`；不是 Comic deletion，也不是卸载应用本身。详见 ADR-0019。
-_Avoid_: 卸载应用、删库、清空漫画
-
 **Application layer**（Dart 应用层）:
 Wayfinder feature 内可选目录 `features/*/application/`：无 Flutter 的用例编排（Service / Coordinator）。与上文 **Application data**（磁盘上的应用数据）无关。Gate L1 R6–R10。详见 ADR-0033。
 _Avoid_: 把 Application data 目录称为 Application 层；在 application 层 import presentation / FRB
@@ -168,8 +164,12 @@ _Avoid_: 连载筛选（那是 Filter）、折叠分组标题
 Library browse preference（分组方式 `bySeries`）：Comics 浏览列表保持扁平（无分组标题、无折叠），按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 无 Series 归属的 Comic 整块垫底」决定系列块顺序；**块内仍按当前 Comics 排序字段**排列。默认开启；与排序正交，不是视觉分组或折叠，也不共用 Prefer library root series 开关。
 _Avoid_: 按系列展开、expand by series、按系列折叠、系列模式列表
 
+**Default library display target**:
+App preference：进入库浏览时默认打开的 Library display target（Comics 或 Series）；默认 Comics。不是会话内临时 Tab 切换，也不是 Library browse preference。
+_Avoid_: 默认库 Tab（口语可用；领域与 issue 用本词）、默认界面、homepage tab
+
 **App preference**:
-应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Healthy mode、**Prefer library root series**（Series 浏览列表置顶库根系列，默认开启）、Smart facet match（Comic metadata form 候选排序，默认开启）等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
+应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好、Healthy mode、**Prefer library root series**（Series 浏览列表置顶库根系列，默认开启）、Smart facet match（Comic metadata form 候选排序，默认开启）、**Default library display target** 等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
 _Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
 
 **Library browse preference**:
@@ -189,7 +189,7 @@ _Avoid_: 设置侧边栏（易与应用侧栏混淆）、AdaptiveScaffold、sett
 _Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）
 
 **Tag dictionary import**:
-从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/engineering/maintainer.md` § Tag dictionary import。UI 入口待接入自维护词库后启用。
+从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/engineering/maintainer.md` § Tag dictionary import。生产入口：元数据管理页（`/metadata`）更多菜单「导入标签字典」（本地 JSON）。
 _Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:
@@ -335,7 +335,7 @@ Cutover 前单个 feature（首选应用设置）可选接入 MD3E 组件与主�
 _Avoid_: Beta 换肤
 
 **MD3E Cutover**:
-按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。主体已完成（路由 MD3E 化、Lab 删除、主题单源）；剩余主要为去 `md3e_` 生产前缀与文档/命名收尾。完成判定与 spec 分批规则见 ADR-0031。
+按 feature 将生产 UI 从 Baseline UI 迁到 MD3E 并收缩双轨。主体已完成（路由 MD3E 化、Lab 删除、主题单源）；生产库管理路径文件名已去 `md3e_` 前缀（如 `production_shell_adapters`）。剩余主要为 Widgetbook/Lab 目录与个别文档命名收尾。完成判定与 spec 分批规则见 ADR-0031。
 _Avoid_: 大重构（无阶段含义时）
 
 **MD3E pattern**:

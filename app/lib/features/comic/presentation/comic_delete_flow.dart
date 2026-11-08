@@ -15,6 +15,23 @@ Future<void> confirmAndTrashComic(
   WidgetRef ref,
   Comic comic, {
   FutureOr<void> Function()? onTrashed,
+}) {
+  return confirmAndTrashComicById(
+    context,
+    ref,
+    comicId: comic.comicId,
+    title: comic.title,
+    onTrashed: onTrashed,
+  );
+}
+
+/// 与 [confirmAndTrashComic] 相同，仅需 id / 标题（库页 Browse VO 路径）。
+Future<void> confirmAndTrashComicById(
+  BuildContext context,
+  WidgetRef ref, {
+  required String comicId,
+  required String title,
+  FutureOr<void> Function()? onTrashed,
 }) async {
   final l10n = context.l10n;
   final bool confirmed = await showConfirmDialog(
@@ -24,7 +41,7 @@ Future<void> confirmAndTrashComic(
       builder: (BuildContext dialogContext) {
         final M3EThemeData theme = M3ETheme.of(dialogContext);
         return Text(
-          l10n.comicTrashConfirmContent(comic.title),
+          l10n.comicTrashConfirmContent(title),
           style: theme.typeScale.bodyMedium.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -37,9 +54,7 @@ Future<void> confirmAndTrashComic(
     return;
   }
   try {
-    await ref.read(comicTrashCommandPortProvider).trash(<String>[
-      comic.comicId,
-    ]);
+    await ref.read(comicTrashCommandPortProvider).trash(<String>[comicId]);
     if (!context.mounted) {
       return;
     }

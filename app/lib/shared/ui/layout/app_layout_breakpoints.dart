@@ -6,10 +6,10 @@ abstract final class AppLayoutBreakpoints {
   /// 桌面窗口最小高度（逻辑像素）；宽度优先对齐真机，高度保留垂直压窗空间。
   static const double minWindowHeight = 480;
 
-  /// 窄屏：抽屉导航、单列布局。
+  /// 窄屏：底部导航、单列布局。
   static const double compact = 600;
 
-  /// 中屏：折叠侧栏图标轨（M3 expanded 下限 840）。
+  /// 中屏：底部导航；≥ 此值起用 NavigationRail（M3 expanded 下限 840）。
   static const double medium = 840;
 
   static bool isCompact(double width) => width < compact;

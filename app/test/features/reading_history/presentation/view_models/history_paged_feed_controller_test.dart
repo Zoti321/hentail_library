@@ -231,6 +231,22 @@ void main() {
     expect(repo.keywords.last, 'alpha');
   });
 
+  test('setKeyword empty applies immediately without debounce', () async {
+    await container.read(historyPagedFeedControllerProvider.future);
+    notifier().setKeyword('alpha');
+    await Future<void>.delayed(const Duration(milliseconds: 350));
+    await container.read(historyPagedFeedControllerProvider.future);
+    expect(repo.keywords.last, 'alpha');
+
+    final int beforeClear = repo.keywords.length;
+    notifier().setKeyword('');
+    await container.read(historyPagedFeedControllerProvider.future);
+
+    expect(repo.keywords.length, greaterThan(beforeClear));
+    expect(repo.keywords.last, isNull);
+    expect(state()?.items, hasLength(2));
+  });
+
   test(
     'deleteHistory deletes in repository and drops the item locally',
     () async {

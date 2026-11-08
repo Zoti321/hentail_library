@@ -14,18 +14,18 @@ void main() {
     await pumpApp(
       tester,
       home: const SettingsPageLabHost(
-        initialCategory: SettingsCategory.personalization,
+        initialCategory: SettingsCategory.reading,
       ),
     );
 
-    expect(find.text('阅读模式'), findsOneWidget);
-    expect(find.text('单页'), findsOneWidget);
+    expect(find.text('阅读模式'), findsWidgets);
+    expect(find.text('翻页'), findsOneWidget);
 
-    await tester.tap(find.text('阅读模式'));
+    await tester.tap(find.text('翻页'));
     await tester.pumpAndSettle();
 
-    expect(find.text('单页'), findsNothing);
-    expect(find.text('双页'), findsOneWidget);
+    expect(find.text('翻页'), findsNothing);
+    expect(find.text('Webtoon'), findsOneWidget);
   });
 
   testWidgets('Healthy mode 开关切换 preview 状态', (WidgetTester tester) async {
@@ -35,7 +35,7 @@ void main() {
     await pumpApp(
       tester,
       home: const SettingsPageLabHost(
-        initialCategory: SettingsCategory.personalization,
+        initialCategory: SettingsCategory.libraryBrowse,
       ),
     );
 

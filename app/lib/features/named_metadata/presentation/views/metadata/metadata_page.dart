@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_dialogs.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_facet_list.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_header.dart';
@@ -16,11 +17,14 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_create_entity_dialog.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_create_interaction.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_draft_entity_chip.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_facet_search_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/motion/peer_content_transition.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kMergeConfirmSkipKey = 'metadata_merge_confirm_skip';
@@ -41,6 +45,7 @@ class _MetadataAddIntent extends Intent {
 class _MetadataManagementPageState
     extends ConsumerState<MetadataManagementPage> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
   int? _selectedTabIndex;
   bool _facetTransitionReverse = false;
   bool _showInlineCreateField = false;
@@ -55,6 +60,7 @@ class _MetadataManagementPageState
   void dispose() {
     _scrollController.removeListener(_handleScrollLoadMore);
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -63,8 +69,22 @@ class _MetadataManagementPageState
     final String? tabParam = GoRouterState.of(context)
         .uri
         .queryParameters['tab'];
-    final int selectedIndex = _selectedTabIndex ?? _tabIndexFromQuery(tabParam);
-    _selectedTabIndex ??= selectedIndex;
+    final int queryIndex = _tabIndexFromQuery(tabParam);
+    // 首页统计卡等深链改 query 时，同步本地 tab（保留切换方向）。
+    if (_selectedTabIndex != queryIndex) {
+      final int previousIndex = _selectedTabIndex ?? queryIndex;
+      _facetTransitionReverse = queryIndex < previousIndex;
+      _selectedTabIndex = queryIndex;
+      _showInlineCreateField = false;
+      final ManagedNamedFacetKind syncedKind = metadataTabKind(queryIndex);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        _syncSearchFieldToKind(syncedKind);
+      });
+    }
+    final int selectedIndex = _selectedTabIndex!;
 
     return Shortcuts(
       shortcuts: const <ShortcutActivator, Intent>{
@@ -103,17 +123,30 @@ class _MetadataManagementPageState
     required int selectedIndex,
   }) {
     final ManagedNamedFacetKind kind = metadataTabKind(selectedIndex);
-    final NamedFacetManagementState state = ref.watch(
-      namedFacetManagementControllerProvider(kind),
+    final (
+      bool hasSearchQuery,
+      int itemCount,
+      int totalCount,
+      String? mergeTarget,
+      Set<String> mergeSources,
+      int mergeSelectionCount,
+    ) = ref.watch(
+      namedFacetManagementViewModelProvider(kind).select(
+        (NamedFacetManagementState s) => (
+          s.hasSearchQuery,
+          s.items.length,
+          s.totalCount,
+          s.mergeTarget,
+          s.mergeSources,
+          s.mergeSelectionCount,
+        ),
+      ),
     );
-    final NamedFacetManagementController controller = ref.read(
-      namedFacetManagementControllerProvider(kind).notifier,
+    final NamedFacetManagementViewModel viewModel = ref.read(
+      namedFacetManagementViewModelProvider(kind).notifier,
     );
-    final int count = state.hasSearchQuery
-        ? state.items.length
-        : state.totalCount;
     final double horizontal = layout.horizontalInset;
-    final bool mergeMode = state.isMergeMode;
+    final bool mergeMode = mergeTarget != null;
     final bool useMobileCreateDialog =
         managementCreateInteractionOf(context) ==
         ManagementCreateInteraction.mobileDialog;
@@ -132,8 +165,9 @@ class _MetadataManagementPageState
                 layout: layout,
                 child: MetadataHeader(
                   onOpenNavigation: appShellPageNavigationOpener(context),
-                  mergeSelectionCount: state.mergeSelectionCount,
-                  onExitMergeSelection: mergeMode ? controller.exitMerge : null,
+                  onBack: () => popOrGoHome(context),
+                  mergeSelectionCount: mergeSelectionCount,
+                  onExitMergeSelection: mergeMode ? viewModel.exitMerge : null,
                   onMergeSelection: mergeMode
                       ? () => unawaited(_mergeSelectedNames(kind))
                       : null,
@@ -148,20 +182,35 @@ class _MetadataManagementPageState
                 0,
               ),
               sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    ManagementCatalogToolbar(
-                      facet: kind,
-                      facetCount: count,
-                      onFacetChanged: (ManagedNamedFacetKind value) =>
-                          _handleTabSelected(
-                            kManagedNamedFacetTabOrder.indexOf(value),
-                          ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                child: ManagementCatalogToolbar(
+                  facet: kind,
+                  // 始终为维度总数；过滤命中数改挂搜索行右侧。
+                  facetCount: totalCount,
+                  onFacetChanged: (ManagedNamedFacetKind value) =>
+                      _handleTabSelected(
+                        kManagedNamedFacetTabOrder.indexOf(value),
+                      ),
                 ),
+              ),
+            ),
+            M3ESliverSearchBar(
+              scrollBehavior: M3ESearchBarScrollBehavior.scrollAway,
+              height: ManagementFacetSearchBar.height,
+              padding: EdgeInsets.fromLTRB(horizontal, 12, horizontal, 12),
+              child: ManagementFacetSearchBar(
+                controller: _searchController,
+                hintText: context.l10n.metadataSearchNameHint,
+                matchCountLabel: hasSearchQuery
+                    ? context.l10n.filterResultCount(itemCount)
+                    : null,
+                onChanged: (String value) {
+                  // 清空立即生效（clear 按钮不经 debounce）；输入仍防抖。
+                  if (value.trim().isEmpty) {
+                    unawaited(viewModel.setQuery(''));
+                    return;
+                  }
+                  viewModel.setQueryDebounced(value);
+                },
               ),
             ),
             SliverPadding(
@@ -180,11 +229,11 @@ class _MetadataManagementPageState
                             onDismiss: _dismissDraftEntity,
                           )
                         : null,
-                    mergeTarget: state.mergeTarget,
-                    mergeSources: state.mergeSources,
-                    onMergeTargetSelected: controller.enterMerge,
-                    onMergeSourceSelected: controller.toggleMergeSource,
-                    onMergeSelectionExited: controller.exitMerge,
+                    mergeTarget: mergeTarget,
+                    mergeSources: mergeSources,
+                    onMergeTargetSelected: viewModel.enterMerge,
+                    onMergeSourceSelected: viewModel.toggleMergeSource,
+                    onMergeSelectionExited: viewModel.exitMerge,
                   ),
                 ),
               ),
@@ -213,15 +262,30 @@ class _MetadataManagementPageState
     final int previousIndex = _selectedTabIndex ?? 1;
     final ManagedNamedFacetKind previousKind = metadataTabKind(previousIndex);
     ref
-        .read(namedFacetManagementControllerProvider(previousKind).notifier)
+        .read(namedFacetManagementViewModelProvider(previousKind).notifier)
         .exitMerge();
     setState(() {
       _facetTransitionReverse = index < previousIndex;
       _selectedTabIndex = index;
       _showInlineCreateField = false;
     });
-    context.go('/metadata?tab=${_tabQueryForIndex(index)}');
+    _syncSearchFieldToKind(metadataTabKind(index));
+    // replace：仅改 query，保留首页 push 进来的栈，返回仍可 pop。
+    context.replace('/metadata?tab=${_tabQueryForIndex(index)}');
     _scrollToContentTop();
+  }
+
+  void _syncSearchFieldToKind(ManagedNamedFacetKind kind) {
+    final String query = ref
+        .read(namedFacetManagementViewModelProvider(kind))
+        .query;
+    if (_searchController.text == query) {
+      return;
+    }
+    _searchController.value = TextEditingValue(
+      text: query,
+      selection: TextSelection.collapsed(offset: query.length),
+    );
   }
 
   void _scrollToContentTop() {
@@ -238,7 +302,7 @@ class _MetadataManagementPageState
 
   Future<void> _mergeSelectedNames(ManagedNamedFacetKind kind) async {
     final NamedFacetManagementState state = ref.read(
-      namedFacetManagementControllerProvider(kind),
+      namedFacetManagementViewModelProvider(kind),
     );
     final String? target = state.mergeTarget;
     final List<String> sources = state.mergeSources.toList(growable: false);
@@ -261,10 +325,10 @@ class _MetadataManagementPageState
     }
     try {
       await ref
-          .read(namedFacetManagementControllerProvider(kind).notifier)
+          .read(namedFacetManagementViewModelProvider(kind).notifier)
           .merge(targetName: target, sourceNames: sources);
       if (mounted) {
-        showSuccessSnackbar(context, '合并完成');
+        showSuccessSnackbar(context, context.l10n.metadataMergeCompletedToast);
       }
     } catch (error) {
       if (mounted) {
@@ -304,7 +368,7 @@ class _MetadataManagementPageState
 
   void _addEntity(ManagedNamedFacetKind kind, String name) {
     unawaited(
-      ref.read(namedFacetManagementControllerProvider(kind).notifier).add(name),
+      ref.read(namedFacetManagementViewModelProvider(kind).notifier).add(name),
     );
   }
 
@@ -315,7 +379,7 @@ class _MetadataManagementPageState
     final ScrollPosition position = _scrollController.position;
     final ManagedNamedFacetKind kind = metadataTabKind(_selectedTabIndex ?? 1);
     final NamedFacetManagementState state = ref.read(
-      namedFacetManagementControllerProvider(kind),
+      namedFacetManagementViewModelProvider(kind),
     );
     if (!namedFacetShouldAutoLoadMore(
       hasMore: state.hasMore,
@@ -328,7 +392,7 @@ class _MetadataManagementPageState
     )) {
       return;
     }
-    ref.read(namedFacetManagementControllerProvider(kind).notifier).loadMore();
+    ref.read(namedFacetManagementViewModelProvider(kind).notifier).loadMore();
   }
 }
 

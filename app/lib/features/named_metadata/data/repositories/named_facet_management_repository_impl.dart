@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/named_metadata/data/adapters/named_facet_management_frb_adapter.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
@@ -16,13 +17,19 @@ class NamedFacetManagementRepositoryImpl
       _adapter.listAll(kind);
 
   @override
-  Future<PagedResult<String>> fetchPage(
+  Future<PagedResult<NamedFacetFormCandidate>> fetchPage(
     ManagedNamedFacetKind kind,
     PageRequest request,
   ) async {
     final page = await _adapter.fetchPage(kind, request);
-    return PagedResult<String>(
-      items: page.items,
+    return PagedResult<NamedFacetFormCandidate>(
+      items: <NamedFacetFormCandidate>[
+        for (final entry in page.items)
+          namedFacetFormCandidate(
+            name: entry.name,
+            attachmentCount: entry.attachmentCount.toInt(),
+          ),
+      ],
       totalCount: page.totalCount.toInt(),
       page: page.page,
       pageSize: page.pageSize,
@@ -63,4 +70,18 @@ class NamedFacetManagementRepositoryImpl
   @override
   Future<int> countAttachments(ManagedNamedFacetKind kind, String name) =>
       _adapter.countAttachments(kind, name);
+
+  @override
+  Future<Map<String, int>> countAttachmentsBatch(
+    ManagedNamedFacetKind kind,
+    List<String> names,
+  ) async {
+    if (names.isEmpty) {
+      return const <String, int>{};
+    }
+    final entries = await _adapter.countAttachmentsBatch(kind, names);
+    return <String, int>{
+      for (final entry in entries) entry.name: entry.attachmentCount.toInt(),
+    };
+  }
 }

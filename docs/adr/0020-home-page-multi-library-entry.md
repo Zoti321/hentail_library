@@ -37,4 +37,4 @@ Accepted
 
 > **实现修订（2026-11-02）**：生产 MD3E 首页（`Md3eHomePage`）已移除 **继续阅读 Top N** 与 **Recently added** 区块；继续阅读走 **`/history`**（`reading_history` feature）。Dart 侧已删除对应 Riverpod / `HomePageRepository` 方法与 read model；Rust `watch_continue_reading_top5` / `watch_recently_added_on_home` FRB 暂保留供 core 测试与后续收口。
 
-> **实现修订（2026-11-03）**：库管理 UI 主入口为 **`/home`** 内 `HomeLibraryManagementPanel`（`Md3eHomeLibraryManagementSection`）。Legacy **`LibrariesSidebarSection` / `LibrariesAppSidebar`**（desktop sidebar Libraries 分区 + 行内溢出菜单）已从生产路径移除并删除源码。Shell 使用 **MD3E Navigation rail**（`ApplicationShell` + `md3e_production_shell_adapters.dart`）；库 flyout 数据与 Home 行共用 `list_libraries` 顺序与 dashboard stats。
+> **实现修订（2026-11-03）**：库管理 UI 主入口为 **`/home`** 内 `HomeLibraryManagementPanel`（`HomeLibraryManagementSection`）。Legacy **`LibrariesSidebarSection` / `LibrariesAppSidebar`**（desktop sidebar Libraries 分区 + 行内溢出菜单）已从生产路径移除并删除源码。Shell 使用 **MD3E Navigation rail**（`ApplicationShell` + `production_shell_adapters.dart`）；库 flyout 数据与 Home 行共用 `list_libraries` 顺序与 dashboard stats。

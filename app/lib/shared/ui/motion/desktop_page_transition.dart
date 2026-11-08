@@ -114,7 +114,7 @@ CustomTransitionPage<void> buildDesktopFadeThroughPage({
   );
 }
 
-/// Shell 顶层导航（Rail / drawer / 首页→历史·垃圾桶等）：MD3 Top level fade-through。
+/// Shell 顶层导航（Rail / drawer / 首页→历史·垃圾桶·管理等）：MD3 Top level fade-through。
 Page<void> buildShellNavPage({
   required GoRouterState state,
   required Widget child,

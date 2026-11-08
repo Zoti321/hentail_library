@@ -13,7 +13,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kManagementCreateDialogMaxWidth = 400;
 
-/// 移动端：FAB 打开的新建实体 Dialog（outlined 字段 + 操作）。
+/// 移动端新建命名元数据 Dialog（生产与 Lab 共用；经 [LabDialogPresenter] 呈现）。
 Future<void> showManagementCreateEntityDialog({
   required BuildContext context,
   required ManagedNamedFacetKind facet,

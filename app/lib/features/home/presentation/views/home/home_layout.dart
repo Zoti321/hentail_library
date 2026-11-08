@@ -20,6 +20,10 @@ class HomeLayout extends StatelessWidget {
     this.onOpenNavigation,
     this.onOpenHistory,
     this.onOpenTrash,
+    this.onOpenAuthors,
+    this.onOpenParodies,
+    this.onOpenCharacters,
+    this.onOpenTags,
   });
 
   final HomeAggregateCounts aggregateCounts;
@@ -27,6 +31,10 @@ class HomeLayout extends StatelessWidget {
   final VoidCallback? onOpenNavigation;
   final VoidCallback? onOpenHistory;
   final VoidCallback? onOpenTrash;
+  final VoidCallback? onOpenAuthors;
+  final VoidCallback? onOpenParodies;
+  final VoidCallback? onOpenCharacters;
+  final VoidCallback? onOpenTags;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +80,10 @@ class HomeLayout extends StatelessWidget {
                     counts: aggregateCounts,
                     onOpenHistory: onOpenHistory,
                     onOpenTrash: onOpenTrash,
+                    onOpenAuthors: onOpenAuthors,
+                    onOpenParodies: onOpenParodies,
+                    onOpenCharacters: onOpenCharacters,
+                    onOpenTags: onOpenTags,
                   ),
                   SizedBox(
                     height: HomePageMetrics.sectionVerticalSpacing(sizeClass),

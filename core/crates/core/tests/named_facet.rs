@@ -4,9 +4,10 @@ mod common;
 
 use hentai_core::{
     add_named_facet_name, connection, count_all_named_facet_names, count_named_facet_attachments,
-    create_local_library, delete_named_facet_by_names, fetch_named_facet_page, init_db_at_path,
-    list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
-    merge_named_facet_name, rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
+    count_named_facet_attachments_batch, create_local_library, delete_named_facet_by_names,
+    fetch_named_facet_page, init_db_at_path, list_all_named_facet_names,
+    list_distinct_named_facet_names, list_named_facet_for_form, merge_named_facet_name,
+    rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -426,13 +427,15 @@ fn generic_named_facet_dictionary_crud_and_paging_work_for_all_facets() {
                     2,
                     "{facet:?}"
                 );
+                let page = fetch_named_facet_page(facet, 1, 0)
+                    .await
+                    .unwrap_or_else(|_| panic!("page {facet:?}"));
                 assert_eq!(
-                    fetch_named_facet_page(facet, 1, 0)
-                        .await
-                        .unwrap_or_else(|_| panic!("page {facet:?}")),
-                    vec!["Alpha".to_string()],
+                    page.iter().map(|e| e.name.as_str()).collect::<Vec<_>>(),
+                    vec!["Alpha"],
                     "{facet:?}"
                 );
+                assert_eq!(page[0].attachment_count, 0, "{facet:?}");
 
                 replace_comic_named_facet(&db, facet, "c-a", &["Alpha".to_string()])
                     .await
@@ -480,6 +483,69 @@ fn generic_named_facet_dictionary_crud_and_paging_work_for_all_facets() {
                     .unwrap_or_else(|_| panic!("list after delete {facet:?}"));
                 assert_eq!(after_delete, vec!["Gamma".to_string()], "{facet:?}");
             }
+        });
+    });
+}
+
+#[test]
+fn management_page_and_batch_return_attachment_counts() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let root = temp.path().join("lib");
+        std::fs::create_dir_all(&root).expect("mkdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let lib = create_local_library(&root.to_string_lossy(), None)
+                .await
+                .expect("create library");
+            let db = connection().expect("connection");
+            clear_facet_tables(&db).await;
+            seed_comic(&db, "c1", &lib.library_id, "E:/lib/a.cbz").await;
+            seed_comic(&db, "c2", &lib.library_id, "E:/lib/b.cbz").await;
+
+            replace_comic_named_facet(
+                &db,
+                JunctionNamedFacet::Tag,
+                "c1",
+                &["Alpha".to_string(), "Beta".to_string()],
+            )
+            .await
+            .expect("c1");
+            replace_comic_named_facet(&db, JunctionNamedFacet::Tag, "c2", &["Alpha".to_string()])
+                .await
+                .expect("c2");
+            add_named_facet_name(JunctionNamedFacet::Tag, "Unused")
+                .await
+                .expect("unused");
+
+            let page = fetch_named_facet_page(JunctionNamedFacet::Tag, 10, 0)
+                .await
+                .expect("page");
+            let pairs: Vec<(&str, i64)> = page
+                .iter()
+                .map(|e| (e.name.as_str(), e.attachment_count))
+                .collect();
+            assert_eq!(pairs, vec![("Alpha", 2), ("Beta", 1), ("Unused", 0)],);
+
+            let batch = count_named_facet_attachments_batch(
+                JunctionNamedFacet::Tag,
+                &[
+                    "Beta".to_string(),
+                    "Missing".to_string(),
+                    "Alpha".to_string(),
+                ],
+            )
+            .await
+            .expect("batch");
+            assert_eq!(
+                batch
+                    .iter()
+                    .map(|e| (e.name.as_str(), e.attachment_count))
+                    .collect::<Vec<_>>(),
+                vec![("Beta", 1), ("Missing", 0), ("Alpha", 2)],
+            );
         });
     });
 }

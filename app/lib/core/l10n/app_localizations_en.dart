@@ -190,7 +190,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localePreferenceEn => 'English';
 
   @override
-  String get settingsFontLabel => 'UI font';
+  String get settingsFontLabel => 'Font';
 
   @override
   String get fontPreferenceMiSans => 'Mi Sans';
@@ -199,7 +199,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fontPreferenceNotoSans => 'Noto Sans';
 
   @override
-  String get settingsThemeLabel => 'App theme';
+  String get settingsThemeLabel => 'Theme';
 
   @override
   String get themePreferenceSystem => 'System';
@@ -215,10 +215,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsDynamicColorDescription =>
-      'Use colors from the system wallpaper. Disables the manual color scheme while on.';
+      'Use wallpaper colors; manual schemes are unavailable while on';
 
   @override
-  String get settingsColorSchemeLabel => 'Color scheme';
+  String get settingsColorSchemeLabel => 'Color';
+
+  @override
+  String get settingsDefaultLibraryDisplayTargetLabel =>
+      'Default library browse';
+
+  @override
+  String get settingsDefaultLibraryDisplayTargetDescription =>
+      'Open Comics or Series when entering the library';
 
   @override
   String get colorSchemePreferenceBrand => 'Violet';
@@ -588,22 +596,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notFoundGoLibrary => 'Go to library';
 
   @override
-  String get settingsGroupPersonalization => 'Personalization';
+  String get settingsMasterGroupApp => 'App';
 
   @override
-  String get settingsGroupMetadataBackup => 'Metadata backup';
+  String get settingsMasterGroupOther => 'Other';
 
   @override
-  String get settingsGroupDiagnostics => 'Diagnostics & support';
+  String get settingsMasterGroupLibraryAdmin => 'Library management';
+
+  @override
+  String get settingsGroupAppearance => 'Appearance';
+
+  @override
+  String get settingsGroupInterface => 'Interface';
+
+  @override
+  String get settingsGroupReading => 'Reading';
+
+  @override
+  String get settingsGroupLibraryBrowse => 'Library browsing';
 
   @override
   String get settingsGroupAbout => 'About';
 
   @override
-  String get settingsMasterMenuGroupTitle => 'App';
+  String get settingsGroupUpdates => 'Updates';
 
   @override
-  String get settingsSectionAppearance => 'Appearance & language';
+  String get settingsGroupStorageAndLogs => 'Storage & logs';
+
+  @override
+  String get settingsGroupMetadataBackup => 'Metadata backup';
 
   @override
   String get settingsSectionReading => 'Reading';
@@ -613,9 +636,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSectionDiagnostics => 'Diagnostics';
-
-  @override
-  String get settingsSectionApplicationData => 'Application data';
 
   @override
   String get settingsSectionUpdates => 'Updates';
@@ -628,11 +648,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsMetadataBackupAutoToggleLabel =>
-      'Automatic metadata backup';
+      'Back up metadata automatically';
 
   @override
   String get settingsMetadataBackupAutoToggleDescription =>
-      'Keep rotating gzip backups under app data (enabled by default)';
+      'Keep rotating gzip backups in app data (on by default)';
 
   @override
   String get settingsMetadataBackupStoragePathLabel => 'Backup folder';
@@ -818,21 +838,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsHealthyModeDescription =>
-      'Hide R18 comics in library, search and history. Ratings are not changed.';
+      'Hide R18 comics in library, search, and history without changing ratings';
 
   @override
   String get settingsDiagnosticModeLabel => 'Verbose diagnostics';
 
   @override
   String get settingsDiagnosticModeDescriptionEnabled =>
-      'Enabled: Dart and Rust log more detail';
+      'On: Dart and Rust write more detailed logs';
 
   @override
   String get settingsDiagnosticModeDescriptionDisabled =>
-      'Temporarily increase log verbosity to help reproduce issues';
+      'Temporarily increase log detail to help diagnose issues';
 
   @override
-  String get settingsDiagnosticModeEnabledBadge => 'Enabled';
+  String get settingsDiagnosticModeEnabledBadge => 'On';
 
   @override
   String get settingsExportLogsLabel => 'Export logs';
@@ -840,49 +860,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsExportLogsDescription =>
       'Bundle app and core logs for troubleshooting';
-
-  @override
-  String get settingsClearApplicationDataLabel => 'Clear all application data';
-
-  @override
-  String get settingsClearApplicationDataDescription =>
-      'Removes the database, automatic metadata backups, logs, and cache; does not delete comics in library roots';
-
-  @override
-  String get settingsClearApplicationDataDisabledSyncRunning =>
-      'Library sync is running; try again later';
-
-  @override
-  String get settingsUninstallDataInfoLabel => 'Uninstall and data retention';
-
-  @override
-  String get settingsUninstallDataInfoDescription =>
-      'Uninstalling may remove the app sandbox on mobile. On desktop, uninstall keeps application data by default; you can opt in to delete it in the uninstaller';
-
-  @override
-  String get confirmClearApplicationDataTitle => 'Clear all application data?';
-
-  @override
-  String get confirmClearApplicationDataContent =>
-      'This removes all on-device app state in the current application data directory (SQLite, automatic metadata backups, logs, and cache), plus app preferences. Library root files and manually exported metadata backups are not deleted.';
-
-  @override
-  String confirmClearApplicationDataRecentBackup(String timestamp) {
-    return 'Latest automatic metadata backup: $timestamp';
-  }
-
-  @override
-  String get confirmClearApplicationDataRecentBackupEmpty =>
-      'No automatic metadata backup on record';
-
-  @override
-  String get wipeCompleteRestartMessage =>
-      'Application data cleared. Restart the app to finish resetting.';
-
-  @override
-  String wipeFailedManualDeleteMessage(String path) {
-    return 'Could not fully delete the application data directory. Close the app, manually delete this folder, then restart:\n$path';
-  }
 
   @override
   String get settingsAutoScanLabel => 'Auto scan';
@@ -964,10 +941,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get librarySearchKeywordEmpty => 'Keyword cannot be empty';
 
   @override
-  String get libraryFilterSortTooltip => 'Filter & sort';
+  String get libraryFilterSortTooltip => 'Filter, group & sort';
 
   @override
-  String get libraryFilterSortSemantic => 'Open filter & sort';
+  String get libraryFilterSortSemantic => 'Open filter, group & sort';
 
   @override
   String get libraryPageSizeTooltip => 'Items per page';
@@ -1104,7 +1081,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPreferLibraryRootSeriesDescription =>
-      'When browsing series, keep the library root series at the top of the list.';
+      'Keep the library root series at the top of the series list';
 
   @override
   String get librarySeriesSortName => 'Name';
@@ -1403,13 +1380,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerSettingsReadingMode => 'Reading mode';
 
   @override
-  String get readerSettingsAutoPlay => 'Auto-play';
+  String get readerSettingsAutoPlay => 'Auto-advance';
 
   @override
-  String get readerSettingsAutoPlayMode => 'Auto-play mode';
+  String get readerSettingsAutoPlayMode => 'Advance scope';
 
   @override
-  String get readerSettingsPlayInterval => 'Play interval';
+  String get readerSettingsPlayInterval => 'Advance interval';
 
   @override
   String get readerSettingsSecondsSuffix => 'sec';
@@ -1430,10 +1407,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerSettingsWebtoonMode => 'Webtoon mode';
 
   @override
-  String get readerSettingsPagedOptions => 'Paged reader options';
+  String get readerSettingsPagedOptions => 'Paged mode';
 
   @override
-  String get readerSettingsHorizontalMargin => 'Horizontal margin';
+  String get readerSettingsHorizontalMargin => 'Side margins';
 
   @override
   String get readerSettingsMarginNone => 'None (0%)';
@@ -1444,7 +1421,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get readerSettingsZoomMode => 'Zoom mode';
+  String get readerSettingsZoomMode => 'Scale';
 
   @override
   String get readerSettingsPageLayout => 'Page layout';
@@ -1465,16 +1442,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readingModeDualPage => 'Dual page';
 
   @override
-  String get readingModeDualPageNoCover => 'Dual page (cover separate)';
-
-  @override
   String get readingModePagedSingle => 'Single page';
 
   @override
   String get readingModePagedDual => 'Dual page';
-
-  @override
-  String get readingModePagedDualNoCover => 'Dual page (cover separate)';
 
   @override
   String get readingModeWebtoonFitWidth => 'Fit width';
@@ -1547,10 +1518,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerNextPage => 'Next page';
 
   @override
-  String get readerDisableAutoPlay => 'Disable auto-play';
+  String get readerDisableAutoPlay => 'Disable auto-advance';
 
   @override
-  String get readerEnableAutoPlay => 'Enable auto-play';
+  String get readerEnableAutoPlay => 'Enable auto-advance';
 
   @override
   String get readerInvalidParams => 'Invalid reader params: missing comic_id';
@@ -1641,6 +1612,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metadataMergeConfirmDontAskAgain => 'Don\'t ask again';
+
+  @override
+  String get metadataMergeCompletedToast => 'Merge complete';
+
+  @override
+  String metadataMergeSelectionLabel(int count) {
+    return 'Merge $count';
+  }
 
   @override
   String get metadataDelete => 'Delete';
@@ -1841,11 +1820,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataTagsDeletedAllToast => 'All tags deleted';
 
   @override
+  String get metadataImportTagDictionaryMenuLabel => 'Import tag dictionary';
+
+  @override
+  String get metadataImportTagDictionaryPickDialogTitle =>
+      'Choose tag dictionary JSON';
+
+  @override
+  String get metadataImportTagDictionaryInvalidFile =>
+      'Please choose a valid JSON tag dictionary file';
+
+  @override
   String get metadataImportTagDictionaryDialogTitle => 'Import tag dictionary';
 
   @override
   String get metadataImportTagDictionaryDialogBody =>
       'Downloading the tag dictionary and updating global tags…';
+
+  @override
+  String get metadataImportTagDictionaryDialogBodyLocal =>
+      'Updating global tags…';
 
   @override
   String metadataImportTagDictionarySummary(
@@ -2177,6 +2171,41 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeLibraryDeleteConfirmAcknowledge =>
       'I understand comic files will not be deleted';
+
+  @override
+  String get homeLibraryManagementSectionTitle => 'My libraries';
+
+  @override
+  String homeLibraryManagementCountSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count libraries',
+      one: '1 library',
+      zero: 'No libraries',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeLibraryLastSyncLabel => 'Last sync';
+
+  @override
+  String get homeLibraryScanInProgressHint => 'Scanning…';
+
+  @override
+  String get homeLibraryMetadataRefreshInProgressHint => 'Refreshing metadata…';
+
+  @override
+  String homeLibrarySyncWarningHint(int staleDays) {
+    return 'Not synced for $staleDays days';
+  }
+
+  @override
+  String get homeLibrarySyncRecommendedHint => 'Sync recommended';
+
+  @override
+  String get homeLibraryUnreachableHint => 'Remote library unreachable';
 
   @override
   String get confirmClearHistoryTitle => 'Confirm clear';

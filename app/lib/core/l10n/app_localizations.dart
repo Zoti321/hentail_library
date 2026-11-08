@@ -401,7 +401,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLanguageLabel.
   ///
   /// In zh, this message translates to:
-  /// **'界面语言'**
+  /// **'语言'**
   String get settingsLanguageLabel;
 
   /// No description provided for @localePreferenceSystem.
@@ -425,7 +425,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsFontLabel.
   ///
   /// In zh, this message translates to:
-  /// **'界面字体'**
+  /// **'字体'**
   String get settingsFontLabel;
 
   /// No description provided for @fontPreferenceMiSans.
@@ -443,7 +443,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsThemeLabel.
   ///
   /// In zh, this message translates to:
-  /// **'应用主题'**
+  /// **'主题'**
   String get settingsThemeLabel;
 
   /// No description provided for @themePreferenceSystem.
@@ -473,14 +473,26 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDynamicColorDescription.
   ///
   /// In zh, this message translates to:
-  /// **'跟随系统壁纸取色；开启后不可选手动配色方案'**
+  /// **'使用系统壁纸颜色；开启后无法选手动配色'**
   String get settingsDynamicColorDescription;
 
   /// No description provided for @settingsColorSchemeLabel.
   ///
   /// In zh, this message translates to:
-  /// **'配色方案'**
+  /// **'配色'**
   String get settingsColorSchemeLabel;
+
+  /// No description provided for @settingsDefaultLibraryDisplayTargetLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认库浏览'**
+  String get settingsDefaultLibraryDisplayTargetLabel;
+
+  /// No description provided for @settingsDefaultLibraryDisplayTargetDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'进入漫画库时先打开漫画或系列'**
+  String get settingsDefaultLibraryDisplayTargetDescription;
 
   /// No description provided for @colorSchemePreferenceBrand.
   ///
@@ -1094,23 +1106,47 @@ abstract class AppLocalizations {
   /// **'去漫画库'**
   String get notFoundGoLibrary;
 
-  /// No description provided for @settingsGroupPersonalization.
+  /// No description provided for @settingsMasterGroupApp.
   ///
   /// In zh, this message translates to:
-  /// **'个性化'**
-  String get settingsGroupPersonalization;
+  /// **'应用'**
+  String get settingsMasterGroupApp;
 
-  /// No description provided for @settingsGroupMetadataBackup.
+  /// No description provided for @settingsMasterGroupOther.
   ///
   /// In zh, this message translates to:
-  /// **'元数据备份'**
-  String get settingsGroupMetadataBackup;
+  /// **'其他'**
+  String get settingsMasterGroupOther;
 
-  /// No description provided for @settingsGroupDiagnostics.
+  /// No description provided for @settingsMasterGroupLibraryAdmin.
   ///
   /// In zh, this message translates to:
-  /// **'诊断与支持'**
-  String get settingsGroupDiagnostics;
+  /// **'漫画库管理'**
+  String get settingsMasterGroupLibraryAdmin;
+
+  /// No description provided for @settingsGroupAppearance.
+  ///
+  /// In zh, this message translates to:
+  /// **'外观'**
+  String get settingsGroupAppearance;
+
+  /// No description provided for @settingsGroupInterface.
+  ///
+  /// In zh, this message translates to:
+  /// **'界面'**
+  String get settingsGroupInterface;
+
+  /// No description provided for @settingsGroupReading.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读'**
+  String get settingsGroupReading;
+
+  /// No description provided for @settingsGroupLibraryBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'库浏览'**
+  String get settingsGroupLibraryBrowse;
 
   /// No description provided for @settingsGroupAbout.
   ///
@@ -1118,17 +1154,23 @@ abstract class AppLocalizations {
   /// **'关于'**
   String get settingsGroupAbout;
 
-  /// No description provided for @settingsMasterMenuGroupTitle.
+  /// No description provided for @settingsGroupUpdates.
   ///
   /// In zh, this message translates to:
-  /// **'应用'**
-  String get settingsMasterMenuGroupTitle;
+  /// **'更新'**
+  String get settingsGroupUpdates;
 
-  /// No description provided for @settingsSectionAppearance.
+  /// No description provided for @settingsGroupStorageAndLogs.
   ///
   /// In zh, this message translates to:
-  /// **'外观与语言'**
-  String get settingsSectionAppearance;
+  /// **'存储与日志'**
+  String get settingsGroupStorageAndLogs;
+
+  /// No description provided for @settingsGroupMetadataBackup.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据备份'**
+  String get settingsGroupMetadataBackup;
 
   /// No description provided for @settingsSectionReading.
   ///
@@ -1147,12 +1189,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'诊断'**
   String get settingsSectionDiagnostics;
-
-  /// No description provided for @settingsSectionApplicationData.
-  ///
-  /// In zh, this message translates to:
-  /// **'应用数据'**
-  String get settingsSectionApplicationData;
 
   /// No description provided for @settingsSectionUpdates.
   ///
@@ -1175,7 +1211,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsMetadataBackupAutoToggleLabel.
   ///
   /// In zh, this message translates to:
-  /// **'元数据自动备份'**
+  /// **'自动备份元数据'**
   String get settingsMetadataBackupAutoToggleLabel;
 
   /// No description provided for @settingsMetadataBackupAutoToggleDescription.
@@ -1493,7 +1529,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsHealthyModeDescription.
   ///
   /// In zh, this message translates to:
-  /// **'库、搜索与历史中隐藏 R18 Comic，不修改分级'**
+  /// **'在库、搜索与历史中隐藏 R18 漫画，不改动分级'**
   String get settingsHealthyModeDescription;
 
   /// No description provided for @settingsDiagnosticModeLabel.
@@ -1505,13 +1541,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDiagnosticModeDescriptionEnabled.
   ///
   /// In zh, this message translates to:
-  /// **'已开启：Dart 与 Rust 记录更详细日志'**
+  /// **'已开启：记录更详细的 Dart 与 Rust 日志'**
   String get settingsDiagnosticModeDescriptionEnabled;
 
   /// No description provided for @settingsDiagnosticModeDescriptionDisabled.
   ///
   /// In zh, this message translates to:
-  /// **'临时提高日志详细程度，便于复现问题'**
+  /// **'临时提高日志详细程度，便于排查问题'**
   String get settingsDiagnosticModeDescriptionDisabled;
 
   /// No description provided for @settingsDiagnosticModeEnabledBadge.
@@ -1529,74 +1565,8 @@ abstract class AppLocalizations {
   /// No description provided for @settingsExportLogsDescription.
   ///
   /// In zh, this message translates to:
-  /// **'打包应用与核心日志，便于问题反馈'**
+  /// **'打包应用与核心日志，便于反馈问题'**
   String get settingsExportLogsDescription;
-
-  /// No description provided for @settingsClearApplicationDataLabel.
-  ///
-  /// In zh, this message translates to:
-  /// **'清除全部应用数据'**
-  String get settingsClearApplicationDataLabel;
-
-  /// No description provided for @settingsClearApplicationDataDescription.
-  ///
-  /// In zh, this message translates to:
-  /// **'删除数据库、自动元数据备份、日志与缓存；不删除库根目录中的漫画文件'**
-  String get settingsClearApplicationDataDescription;
-
-  /// No description provided for @settingsClearApplicationDataDisabledSyncRunning.
-  ///
-  /// In zh, this message translates to:
-  /// **'库同步进行中，请稍后再试'**
-  String get settingsClearApplicationDataDisabledSyncRunning;
-
-  /// No description provided for @settingsUninstallDataInfoLabel.
-  ///
-  /// In zh, this message translates to:
-  /// **'卸载与数据保留'**
-  String get settingsUninstallDataInfoLabel;
-
-  /// No description provided for @settingsUninstallDataInfoDescription.
-  ///
-  /// In zh, this message translates to:
-  /// **'卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除'**
-  String get settingsUninstallDataInfoDescription;
-
-  /// No description provided for @confirmClearApplicationDataTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'清除全部应用数据？'**
-  String get confirmClearApplicationDataTitle;
-
-  /// No description provided for @confirmClearApplicationDataContent.
-  ///
-  /// In zh, this message translates to:
-  /// **'将删除当前应用数据目录中的全部本机状态（含 SQLite、自动元数据备份、日志与缓存），以及应用偏好设置。不会删除库根目录中的漫画文件，也不会删除您手动导出到外置目录的元数据备份。'**
-  String get confirmClearApplicationDataContent;
-
-  /// No description provided for @confirmClearApplicationDataRecentBackup.
-  ///
-  /// In zh, this message translates to:
-  /// **'最近自动元数据备份：{timestamp}'**
-  String confirmClearApplicationDataRecentBackup(String timestamp);
-
-  /// No description provided for @confirmClearApplicationDataRecentBackupEmpty.
-  ///
-  /// In zh, this message translates to:
-  /// **'尚无自动元数据备份记录'**
-  String get confirmClearApplicationDataRecentBackupEmpty;
-
-  /// No description provided for @wipeCompleteRestartMessage.
-  ///
-  /// In zh, this message translates to:
-  /// **'应用数据已清除。请重新启动应用以完成重置。'**
-  String get wipeCompleteRestartMessage;
-
-  /// No description provided for @wipeFailedManualDeleteMessage.
-  ///
-  /// In zh, this message translates to:
-  /// **'无法完全删除应用数据目录。请关闭应用后手动删除以下目录，然后重启应用：\n{path}'**
-  String wipeFailedManualDeleteMessage(String path);
 
   /// No description provided for @settingsAutoScanLabel.
   ///
@@ -1733,13 +1703,13 @@ abstract class AppLocalizations {
   /// No description provided for @libraryFilterSortTooltip.
   ///
   /// In zh, this message translates to:
-  /// **'筛选与排序'**
+  /// **'筛选、分组与排序'**
   String get libraryFilterSortTooltip;
 
   /// No description provided for @libraryFilterSortSemantic.
   ///
   /// In zh, this message translates to:
-  /// **'打开筛选与排序'**
+  /// **'打开筛选、分组与排序'**
   String get libraryFilterSortSemantic;
 
   /// No description provided for @libraryPageSizeTooltip.
@@ -2009,7 +1979,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPreferLibraryRootSeriesDescription.
   ///
   /// In zh, this message translates to:
-  /// **'浏览系列列表时，将库根系列固定在列表最前。'**
+  /// **'在系列列表中，将库根系列固定显示在最前'**
   String get settingsPreferLibraryRootSeriesDescription;
 
   /// No description provided for @librarySeriesSortName.
@@ -2513,19 +2483,19 @@ abstract class AppLocalizations {
   /// No description provided for @readerSettingsAutoPlay.
   ///
   /// In zh, this message translates to:
-  /// **'自动播放'**
+  /// **'自动翻页'**
   String get readerSettingsAutoPlay;
 
   /// No description provided for @readerSettingsAutoPlayMode.
   ///
   /// In zh, this message translates to:
-  /// **'自动播放模式'**
+  /// **'翻页范围'**
   String get readerSettingsAutoPlayMode;
 
   /// No description provided for @readerSettingsPlayInterval.
   ///
   /// In zh, this message translates to:
-  /// **'播放间隔'**
+  /// **'翻页间隔'**
   String get readerSettingsPlayInterval;
 
   /// No description provided for @readerSettingsSecondsSuffix.
@@ -2537,19 +2507,19 @@ abstract class AppLocalizations {
   /// No description provided for @autoPlayModeComicOnce.
   ///
   /// In zh, this message translates to:
-  /// **'单本播放'**
+  /// **'本话一次'**
   String get autoPlayModeComicOnce;
 
   /// No description provided for @autoPlayModeComicLoop.
   ///
   /// In zh, this message translates to:
-  /// **'单本循环'**
+  /// **'本话循环'**
   String get autoPlayModeComicLoop;
 
   /// No description provided for @autoPlayModeSeriesOnce.
   ///
   /// In zh, this message translates to:
-  /// **'系列播放'**
+  /// **'系列一次'**
   String get autoPlayModeSeriesOnce;
 
   /// No description provided for @autoPlayModeSeriesLoop.
@@ -2567,7 +2537,7 @@ abstract class AppLocalizations {
   /// No description provided for @readerSettingsPagedOptions.
   ///
   /// In zh, this message translates to:
-  /// **'分页阅读器选项'**
+  /// **'翻页模式'**
   String get readerSettingsPagedOptions;
 
   /// No description provided for @readerSettingsHorizontalMargin.
@@ -2579,7 +2549,7 @@ abstract class AppLocalizations {
   /// No description provided for @readerSettingsMarginNone.
   ///
   /// In zh, this message translates to:
-  /// **'无 (0%)'**
+  /// **'无（0%）'**
   String get readerSettingsMarginNone;
 
   /// No description provided for @readerSettingsMarginPercent.
@@ -2591,7 +2561,7 @@ abstract class AppLocalizations {
   /// No description provided for @readerSettingsZoomMode.
   ///
   /// In zh, this message translates to:
-  /// **'缩放模式'**
+  /// **'显示比例'**
   String get readerSettingsZoomMode;
 
   /// No description provided for @readerSettingsPageLayout.
@@ -2630,12 +2600,6 @@ abstract class AppLocalizations {
   /// **'双页'**
   String get readingModeDualPage;
 
-  /// No description provided for @readingModeDualPageNoCover.
-  ///
-  /// In zh, this message translates to:
-  /// **'双页（封面独立）'**
-  String get readingModeDualPageNoCover;
-
   /// No description provided for @readingModePagedSingle.
   ///
   /// In zh, this message translates to:
@@ -2647,12 +2611,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'双页'**
   String get readingModePagedDual;
-
-  /// No description provided for @readingModePagedDualNoCover.
-  ///
-  /// In zh, this message translates to:
-  /// **'双页（封面独立）'**
-  String get readingModePagedDualNoCover;
 
   /// No description provided for @readingModeWebtoonFitWidth.
   ///
@@ -2789,13 +2747,13 @@ abstract class AppLocalizations {
   /// No description provided for @readerDisableAutoPlay.
   ///
   /// In zh, this message translates to:
-  /// **'关闭自动播放'**
+  /// **'关闭自动翻页'**
   String get readerDisableAutoPlay;
 
   /// No description provided for @readerEnableAutoPlay.
   ///
   /// In zh, this message translates to:
-  /// **'开启自动播放'**
+  /// **'开启自动翻页'**
   String get readerEnableAutoPlay;
 
   /// No description provided for @readerInvalidParams.
@@ -2959,6 +2917,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'以后不再提示'**
   String get metadataMergeConfirmDontAskAgain;
+
+  /// No description provided for @metadataMergeCompletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并完成'**
+  String get metadataMergeCompletedToast;
+
+  /// No description provided for @metadataMergeSelectionLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并 {count} 项'**
+  String metadataMergeSelectionLabel(int count);
 
   /// No description provided for @metadataDelete.
   ///
@@ -3266,6 +3236,24 @@ abstract class AppLocalizations {
   /// **'已删除全部标签'**
   String get metadataTagsDeletedAllToast;
 
+  /// No description provided for @metadataImportTagDictionaryMenuLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入标签字典'**
+  String get metadataImportTagDictionaryMenuLabel;
+
+  /// No description provided for @metadataImportTagDictionaryPickDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择标签字典 JSON'**
+  String get metadataImportTagDictionaryPickDialogTitle;
+
+  /// No description provided for @metadataImportTagDictionaryInvalidFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'请选择有效的 JSON 标签字典文件'**
+  String get metadataImportTagDictionaryInvalidFile;
+
   /// No description provided for @metadataImportTagDictionaryDialogTitle.
   ///
   /// In zh, this message translates to:
@@ -3277,6 +3265,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'正在下载标签字典并写入全局 Tag…'**
   String get metadataImportTagDictionaryDialogBody;
+
+  /// No description provided for @metadataImportTagDictionaryDialogBodyLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在写入全局 Tag…'**
+  String get metadataImportTagDictionaryDialogBodyLocal;
 
   /// No description provided for @metadataImportTagDictionarySummary.
   ///
@@ -3869,6 +3863,54 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'我了解不会删除漫画文件'**
   String get homeLibraryDeleteConfirmAcknowledge;
+
+  /// No description provided for @homeLibraryManagementSectionTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'我的漫画库'**
+  String get homeLibraryManagementSectionTitle;
+
+  /// No description provided for @homeLibraryManagementCountSubtitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'共 {count} 个库'**
+  String homeLibraryManagementCountSubtitle(int count);
+
+  /// No description provided for @homeLibraryLastSyncLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次同步'**
+  String get homeLibraryLastSyncLabel;
+
+  /// No description provided for @homeLibraryScanInProgressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描进行中…'**
+  String get homeLibraryScanInProgressHint;
+
+  /// No description provided for @homeLibraryMetadataRefreshInProgressHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据刷新中…'**
+  String get homeLibraryMetadataRefreshInProgressHint;
+
+  /// No description provided for @homeLibrarySyncWarningHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'已超过 {staleDays} 天未同步'**
+  String homeLibrarySyncWarningHint(int staleDays);
+
+  /// No description provided for @homeLibrarySyncRecommendedHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'建议同步'**
+  String get homeLibrarySyncRecommendedHint;
+
+  /// No description provided for @homeLibraryUnreachableHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法连接远程库'**
+  String get homeLibraryUnreachableHint;
 
   /// No description provided for @confirmClearHistoryTitle.
   ///

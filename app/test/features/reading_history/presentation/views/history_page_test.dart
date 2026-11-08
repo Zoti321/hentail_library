@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_browse_page.dart';
 import 'package:hentai_library/features/reading_history/presentation/patterns/history/history_page_header.dart';
+import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_item.dart';
 import 'package:hentai_library/features/reading_history/public.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
@@ -17,7 +18,7 @@ import '../../../../support/pump_localized_app.dart';
 
 void main() {
   group('History production page', () {
-    testWidgets('compact page shows nav menu and MD3E header', (
+    testWidgets('compact page shows MD3E header without nav menu', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 360);
@@ -26,7 +27,7 @@ void main() {
       expect(find.byType(HistoryBrowsePage<HistoryCardItem>), findsOneWidget);
       expect(find.byType(HistoryPageHeader), findsOneWidget);
       expect(find.text('阅读历史'), findsOneWidget);
-      expect(find.byIcon(Symbols.menu), findsOneWidget);
+      expect(find.byIcon(Symbols.menu), findsNothing);
     });
 
     testWidgets('medium page hides nav menu', (WidgetTester tester) async {
@@ -38,7 +39,7 @@ void main() {
       expect(find.byIcon(Symbols.menu), findsNothing);
     });
 
-    testWidgets('places summary below header without search field', (
+    testWidgets('places summary and search field below header', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 700);
@@ -47,10 +48,43 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.textContaining('条记录'), findsOneWidget);
-      expect(find.text('搜索历史记录...'), findsNothing);
+      expect(find.text('搜索历史记录...'), findsOneWidget);
       final Offset title = tester.getTopLeft(find.text('阅读历史'));
       final Offset subtitle = tester.getTopLeft(find.textContaining('条记录'));
       expect(subtitle.dy, greaterThan(title.dy));
+    });
+
+    testWidgets('filters list by search keyword and clears immediately', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHistoryPage(tester, viewportWidth: 700);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      Finder listTitle(String title) => find.descendant(
+        of: find.byType(HistoryListItem),
+        matching: find.text(title),
+      );
+
+      expect(listTitle('Alpha'), findsOneWidget);
+      expect(listTitle('Beta'), findsOneWidget);
+
+      await tester.enterText(find.byType(EditableText), 'Alpha');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pumpAndSettle();
+
+      expect(listTitle('Alpha'), findsOneWidget);
+      expect(listTitle('Beta'), findsNothing);
+      expect(find.textContaining('1 个结果'), findsOneWidget);
+
+      await tester.tap(find.byIcon(M3EIcons.close));
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(listTitle('Alpha'), findsOneWidget);
+      expect(listTitle('Beta'), findsOneWidget);
+      expect(find.textContaining('个结果'), findsNothing);
     });
 
     testWidgets('renders grouped history list items', (
@@ -110,6 +144,23 @@ List<Override> _historyPageTestOverrides() {
 }
 
 class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
+  static final List<ReadingHistory> _all = <ReadingHistory>[
+    ReadingHistory(
+      comicId: 'c1',
+      title: 'Alpha',
+      lastReadTime: DateTime.fromMillisecondsSinceEpoch(3000),
+      pageIndex: 3,
+      pageCount: 20,
+    ),
+    ReadingHistory(
+      comicId: 'c2',
+      title: 'Beta',
+      lastReadTime: DateTime.fromMillisecondsSinceEpoch(2000),
+      pageIndex: 2,
+      pageCount: 10,
+    ),
+  ];
+
   @override
   Stream<void> watchHistoryChanges() {
     return const Stream<void>.empty();
@@ -123,24 +174,18 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
     PageRequest request, {
     String? keyword,
   }) async {
+    final String needle = keyword?.trim().toLowerCase() ?? '';
+    final List<ReadingHistory> items = needle.isEmpty
+        ? _all
+        : _all
+              .where(
+                (ReadingHistory item) =>
+                    item.title.toLowerCase().contains(needle),
+              )
+              .toList(growable: false);
     return PagedResult<ReadingHistory>(
-      items: <ReadingHistory>[
-        ReadingHistory(
-          comicId: 'c1',
-          title: 'Alpha',
-          lastReadTime: DateTime.fromMillisecondsSinceEpoch(3000),
-          pageIndex: 3,
-          pageCount: 20,
-        ),
-        ReadingHistory(
-          comicId: 'c2',
-          title: 'Beta',
-          lastReadTime: DateTime.fromMillisecondsSinceEpoch(2000),
-          pageIndex: 2,
-          pageCount: 10,
-        ),
-      ],
-      totalCount: 2,
+      items: items,
+      totalCount: items.length,
       page: request.page,
       pageSize: request.pageSize,
     );

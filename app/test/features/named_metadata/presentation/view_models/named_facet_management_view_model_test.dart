@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_controller.dart';
+import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
@@ -18,6 +19,8 @@ class _SharedTagNames {
   _SharedTagNames(this.names);
 
   final List<String> names;
+  int countAttachmentsCalls = 0;
+  int countAttachmentsBatchCalls = 0;
 }
 
 class _FakeNamedFacetManagementRepository
@@ -32,12 +35,15 @@ class _FakeNamedFacetManagementRepository
   }
 
   @override
-  Future<PagedResult<String>> fetchPage(
+  Future<PagedResult<NamedFacetFormCandidate>> fetchPage(
     ManagedNamedFacetKind kind,
     PageRequest request,
   ) async {
-    return PagedResult<String>(
-      items: List<String>.of(_tags.names),
+    return PagedResult<NamedFacetFormCandidate>(
+      items: <NamedFacetFormCandidate>[
+        for (final String name in _tags.names)
+          namedFacetFormCandidate(name: name, attachmentCount: 3),
+      ],
       totalCount: _tags.names.length,
       page: request.page,
       pageSize: request.pageSize,
@@ -71,7 +77,17 @@ class _FakeNamedFacetManagementRepository
 
   @override
   Future<int> countAttachments(ManagedNamedFacetKind kind, String name) async {
+    _tags.countAttachmentsCalls += 1;
     return 0;
+  }
+
+  @override
+  Future<Map<String, int>> countAttachmentsBatch(
+    ManagedNamedFacetKind kind,
+    List<String> names,
+  ) async {
+    _tags.countAttachmentsBatchCalls += 1;
+    return <String, int>{for (final String name in names) name: 7};
   }
 }
 
@@ -118,17 +134,17 @@ void main() {
       final _SharedTagNames tags = _SharedTagNames(<String>['alpha']);
       final ProviderContainer container = _container(tags);
       container.read(
-        namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
       );
       await pumpEventQueue();
 
       final TagDictionaryImportResult? result = await container
-          .read(tagDictionaryImportControllerProvider.notifier)
+          .read(tagDictionaryImportViewModelProvider.notifier)
           .importFromBytes(Uint8List(0));
 
       expect(result?.added, 1);
       final NamedFacetManagementState page = container.read(
-        namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
       );
       expect(page.items, <String>['alpha', 'gamma']);
       expect(page.totalCount, 2);
@@ -139,4 +155,44 @@ void main() {
       );
     },
   );
+
+  test(
+    'refresh loads attachment counts from page without N+1 prefetch',
+    () async {
+      final _SharedTagNames tags = _SharedTagNames(<String>['alpha', 'beta']);
+      final ProviderContainer container = _container(tags);
+      container.read(
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
+      );
+      await pumpEventQueue();
+
+      final NamedFacetManagementState page = container.read(
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
+      );
+      expect(page.attachmentCounts, <String, int>{'alpha': 3, 'beta': 3});
+      expect(tags.countAttachmentsCalls, 0);
+      expect(tags.countAttachmentsBatchCalls, 0);
+    },
+  );
+
+  test('search uses batch counts and caches pinyin snapshot', () async {
+    final _SharedTagNames tags = _SharedTagNames(<String>['alpha', 'beta']);
+    final ProviderContainer container = _container(tags);
+    final NamedFacetManagementViewModel vm = container.read(
+      namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag).notifier,
+    );
+    await pumpEventQueue();
+
+    await vm.setQuery('alp');
+    final NamedFacetManagementState page = container.read(
+      namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
+    );
+    expect(page.items, <String>['alpha']);
+    expect(page.attachmentCounts, <String, int>{'alpha': 7});
+    expect(tags.countAttachmentsBatchCalls, 1);
+    expect(tags.countAttachmentsCalls, 0);
+
+    await vm.setQuery('bet');
+    expect(tags.countAttachmentsBatchCalls, 2);
+  });
 }

@@ -3,6 +3,7 @@ import 'package:hentai_library/features/series/data/series_frb_mapper.dart';
 import 'package:hentai_library/features/series/domain/library_series_grouping.dart';
 import 'package:hentai_library/features/series/domain/library_series_projection.dart';
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
+import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
@@ -40,6 +41,37 @@ class SeriesRepositoryImpl implements SeriesRepository {
       fallbackMessage: '读取系列分页失败',
     );
     return mapPagedSeriesResult(page);
+  }
+
+  @override
+  Future<PagedResult<SeriesBrowseListItem>> fetchBrowsePage({
+    required PageRequest request,
+    required LibrarySeriesFilter filter,
+    required LibrarySeriesGrouping grouping,
+    required LibrarySeriesSortOption sortOption,
+  }) async {
+    final rust_series.PagedSeriesBrowseResultDto page = await guardFrb(
+      () => rust_series.fetchSeriesBrowsePageFrb(
+        request: mapSeriesPageRequest(request),
+        filter: mapLibrarySeriesFilter(filter),
+        grouping: mapSeriesGrouping(grouping),
+        sort: mapSeriesSortOption(sortOption: sortOption),
+      ),
+      fallbackMessage: '读取系列浏览分页失败',
+    );
+    return PagedResult<SeriesBrowseListItem>(
+      items: <SeriesBrowseListItem>[
+        for (final rust_series.SeriesBrowseItemDto item in page.items)
+          SeriesBrowseListItem(
+            id: item.seriesId,
+            name: item.name,
+            volumeCount: item.volumeCount,
+          ),
+      ],
+      page: page.page,
+      pageSize: page.pageSize,
+      totalCount: page.totalCount.toInt(),
+    );
   }
 
   @override

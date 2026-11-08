@@ -1,4 +1,4 @@
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/features/comic/domain/comic_browse_list_item.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';
@@ -50,7 +50,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     }
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
-    final PagedResult<Comic> page = await _fetchPage();
+    final PagedResult<ComicBrowseListItem> page = await _fetchPage();
     final int tableTotalCount = await ref
         .read(comicCatalogRepositoryProvider)
         .countAll();
@@ -70,17 +70,17 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     );
   }
 
-  Future<PagedResult<Comic>> _fetchPage() async {
+  Future<PagedResult<ComicBrowseListItem>> _fetchPage() async {
     final LibraryComicFilter filter = ref.read(libraryComicFilterQueryProvider);
     final LibraryComicFiltersState filters =
         ref.read(libraryComicFiltersProvider).value ??
         LibraryComicFiltersState.defaults;
     final int pageSize = ref.read(libraryComicsTabPageSizeProvider);
-    return _pagination.fetchPage<Comic>(
+    return _pagination.fetchPage<ComicBrowseListItem>(
       pageSize: pageSize,
       fetch: (request) => ref
           .read(comicCatalogRepositoryProvider)
-          .fetchComicsPage(
+          .fetchComicsBrowsePage(
             request: request,
             filter: filter,
             grouping: filters.grouping,

@@ -43,16 +43,17 @@ pub use author::{
 };
 pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
-    apply_comic_metadata_bulk_patch, count_all, count_trashed_comics, fetch_comics_page,
-    fetch_trashed_comics_page, find_comic_by_id, find_comics_by_ids, is_comic_trashed,
-    list_trashed_comic_ids, now_ms, paginate, purge_comics, read_data_version, restore_comics,
-    search_by_keyword, search_by_keyword_page, search_by_tag_expression,
+    apply_comic_metadata_bulk_patch, count_all, count_trashed_comics, fetch_comics_browse_page,
+    fetch_comics_page, fetch_trashed_comics_page, find_comic_by_id, find_comics_by_ids,
+    is_comic_trashed, list_trashed_comic_ids, now_ms, paginate, purge_comics, read_data_version,
+    restore_comics, search_by_keyword, search_by_keyword_page, search_by_tag_expression,
     search_by_tag_expression_page, set_comic_meta_locks, trash_comics, update_comic_user_meta,
-    BulkPatchResultDto, ComicDto, ComicFilterDto, ComicGrouping, ComicMetaLocks,
-    ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto, ComicSortOptionDto,
-    MultiValueOp, MultiValuePatch, PageRequestDto, PageWindow, PagedComicResultDto,
-    PagedTrashedComicResultDto, PublishedAtPatch, ScalarPatch, SetComicMetaLocksDto,
-    TrashedComicCountsDto, TrashedComicDto, UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
+    BulkPatchResultDto, ComicBrowseItemDto, ComicDto, ComicFilterDto, ComicGrouping,
+    ComicMetaLocks, ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto,
+    ComicSortOptionDto, MultiValueOp, MultiValuePatch, PageRequestDto, PageWindow,
+    PagedComicBrowseResultDto, PagedComicResultDto, PagedTrashedComicResultDto, PublishedAtPatch,
+    ScalarPatch, SetComicMetaLocksDto, TrashedComicCountsDto, TrashedComicDto,
+    UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
@@ -89,11 +90,11 @@ pub use metadata_backup::{
 };
 pub use named_facet::{
     add_named_facet_name, count_all_named_facet_names, count_named_facet_attachments,
-    delete_named_facet_by_names, fetch_management_facet_names_page, fetch_named_facet_names_page,
-    fetch_named_facet_page, list_all_named_facet_names, list_distinct_named_facet_names,
-    list_named_facet_for_form, merge_named_facet_name, rename_named_facet_name,
-    replace_comic_named_facet, JunctionNamedFacet, ManagementFacetKind, NamedFacetFormEntry,
-    PagedStringNamesDto,
+    count_named_facet_attachments_batch, delete_named_facet_by_names,
+    fetch_management_facet_names_page, fetch_named_facet_names_page, fetch_named_facet_page,
+    list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
+    merge_named_facet_name, rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
+    ManagementFacetKind, NamedFacetFormEntry, PagedStringNamesDto,
 };
 pub use parody::{list_all_parodies, list_distinct_parodies};
 pub use probe::rebuild_snapshot_from_scan_items;
@@ -103,12 +104,13 @@ pub use reader::{
     writeback_with_access, ReaderPageDto, ReaderPageListDto,
 };
 pub use series::{
-    count_all_series, fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
-    find_series_by_id, find_series_item_by_comic_id, get_series_reading_context_by_comic_id,
-    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
-    set_series_item_sort_order_locked, set_series_items_order, set_series_meta_locks,
-    update_series_item_sort_order, update_series_user_meta, watch_home_series_comic_order_map,
-    PagedSeriesComicsResultDto, PagedSeriesResultDto, SeriesComicPageItemDto,
+    count_all_series, fetch_series_browse_page, fetch_series_comics_metadata,
+    fetch_series_comics_page, fetch_series_page, find_series_by_id, find_series_item_by_comic_id,
+    get_series_reading_context_by_comic_id, load_home_series_comic_order_map,
+    search_series_by_keyword, search_series_by_tag_expression, set_series_item_sort_order_locked,
+    set_series_items_order, set_series_meta_locks, update_series_item_sort_order,
+    update_series_user_meta, watch_home_series_comic_order_map, PagedSeriesBrowseResultDto,
+    PagedSeriesComicsResultDto, PagedSeriesResultDto, SeriesBrowseItemDto, SeriesComicPageItemDto,
     SeriesComicsMetadataDto, SeriesDto, SeriesFilterDto, SeriesGrouping, SeriesItemDto,
     SeriesMetaLocks, SeriesReadingContextDto, SeriesSortFieldDto, SeriesSortOptionDto,
     SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,

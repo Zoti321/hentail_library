@@ -11,8 +11,8 @@ use crate::formats::{
     open_sevenz_backend, open_sevenz_backend_kept, PdfBackend, RarBackend, SevenZBackend,
 };
 use crate::resource::{
-    basename, extension_lower, is_comic_image_extension, local_access, ResourceAccess,
-    ResourceKind, ResourceStream,
+    basename, collect_epub_spine_image_names, extension_lower, is_comic_image_extension,
+    local_access, ResourceAccess, ResourceKind, ResourceStream,
 };
 use crate::sync::remote::normalize_remote_location_key;
 use crate::util::natural_sort::compare_filename_natural;
@@ -286,6 +286,8 @@ fn open_path_bound_sevenz(
 }
 
 fn collect_epub_image_indices(archive: &mut StreamArchive) -> Result<Vec<usize>, HentaiError> {
+    let mut name_to_index: std::collections::HashMap<String, usize> =
+        std::collections::HashMap::new();
     let mut all_images: Vec<(usize, String)> = Vec::new();
     for i in 0..archive.len() {
         let entry = archive
@@ -301,9 +303,25 @@ fn collect_epub_image_indices(archive: &mut StreamArchive) -> Result<Vec<usize>,
             .map(|e| format!(".{}", e.to_lowercase()))
             .unwrap_or_default();
         if is_comic_image_extension(&ext) {
+            name_to_index.insert(name.clone(), i);
             all_images.push((i, name));
         }
     }
+
+    let spine_names = collect_epub_spine_image_names(archive)?;
+    if !spine_names.is_empty() {
+        let mut indices = Vec::with_capacity(spine_names.len());
+        for name in spine_names {
+            if let Some(idx) = name_to_index.get(&name) {
+                indices.push(*idx);
+            }
+        }
+        if !indices.is_empty() {
+            return Ok(indices);
+        }
+    }
+
+    // OPF/spine 不可用时回退：按文件名自然序（与 ZIP/目录后端一致）。
     all_images.sort_by(|a, b| {
         compare_filename_natural(&basename(Path::new(&a.1)), &basename(Path::new(&b.1)))
     });
@@ -379,5 +397,128 @@ mod tests {
         };
         let page = read_zip_page(&zip, 0).expect("page");
         assert_eq!(page, b"fake-jpeg");
+    }
+
+    /// 手动样例：`EPUB_ORDER_FIXTURE=/path/to/comic.epub cargo test --lib epub_real_fixture -- --ignored`
+    #[test]
+    #[ignore = "requires EPUB_ORDER_FIXTURE path to a real comic epub"]
+    fn epub_real_fixture_first_pages_follow_spine() {
+        let path = std::env::var("EPUB_ORDER_FIXTURE").expect("EPUB_ORDER_FIXTURE");
+        let backend = open_backend(&path, "epub").expect("open real epub");
+        let ReaderBackend::Epub(epub) = backend else {
+            panic!("expected epub");
+        };
+        let mut archive = epub.archive.lock().expect("lock");
+        let spine = collect_epub_spine_image_names(&mut *archive).expect("spine");
+        drop(archive);
+        assert!(!spine.is_empty());
+        assert_eq!(epub.image_entries.len(), spine.len());
+        for (page_index, expected_name) in spine.iter().take(12).enumerate() {
+            let idx = epub.image_entries[page_index];
+            let mut archive = epub.archive.lock().expect("lock");
+            let entry = archive.by_index(idx).expect("entry");
+            let actual = entry.name().replace('\\', "/");
+            assert_eq!(
+                actual, *expected_name,
+                "page {page_index} should follow spine"
+            );
+        }
+    }
+
+    /// 文件名自然序与 OPF spine 不一致时，阅读页序必须跟随 spine（经 xhtml 内图片）。
+    #[test]
+    fn epub_page_order_follows_opf_spine_not_filename_sort() {
+        let bytes = build_spine_ordered_epub();
+        let mut fake = FakeResourceAccess::new();
+        fake.insert_file("/lib/comic.epub", bytes);
+
+        let backend = open_backend_with(&fake, "/lib/comic.epub", "epub").expect("open");
+        let ReaderBackend::Epub(epub) = backend else {
+            panic!("expected epub backend");
+        };
+
+        assert_eq!(
+            epub.image_entries.len(),
+            3,
+            "orphan images must not become pages"
+        );
+        assert_eq!(read_epub_page(&epub, 0).expect("p0"), b"PAGE-C");
+        assert_eq!(read_epub_page(&epub, 1).expect("p1"), b"PAGE-A");
+        assert_eq!(read_epub_page(&epub, 2).expect("p2"), b"PAGE-B");
+    }
+
+    fn build_spine_ordered_epub() -> Vec<u8> {
+        let mut bytes = Vec::new();
+        {
+            let mut zip = ZipWriter::new(Cursor::new(&mut bytes));
+            let options = SimpleFileOptions::default();
+
+            zip.start_file("META-INF/container.xml", options)
+                .expect("container");
+            zip.write_all(
+                br#"<?xml version="1.0"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
+  </rootfiles>
+</container>"#,
+            )
+            .expect("write container");
+
+            zip.start_file("OEBPS/content.opf", options).expect("opf");
+            zip.write_all(
+                br#"<?xml version="1.0"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="uid">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:title>spine-order</dc:title>
+    <dc:identifier id="uid">spine-order</dc:identifier>
+  </metadata>
+  <manifest>
+    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>
+    <item id="p1" href="html/page1.xhtml" media-type="application/xhtml+xml"/>
+    <item id="p2" href="html/page2.xhtml" media-type="application/xhtml+xml"/>
+    <item id="p3" href="html/page3.xhtml" media-type="application/xhtml+xml"/>
+    <item id="img_a" href="image/a.png" media-type="image/png"/>
+    <item id="img_b" href="image/b.png" media-type="image/png"/>
+    <item id="img_c" href="image/c.png" media-type="image/png"/>
+    <item id="img_orphan" href="image/00-orphan.png" media-type="image/png"/>
+  </manifest>
+  <spine toc="ncx">
+    <itemref idref="p1"/>
+    <itemref idref="p2"/>
+    <itemref idref="p3"/>
+  </spine>
+</package>"#,
+            )
+            .expect("write opf");
+
+            for (name, img) in [
+                ("OEBPS/html/page1.xhtml", "image/c.png"),
+                ("OEBPS/html/page2.xhtml", "image/a.png"),
+                ("OEBPS/html/page3.xhtml", "image/b.png"),
+            ] {
+                zip.start_file(name, options).expect("xhtml");
+                let body = format!(
+                    r#"<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <body><img src="../{img}"/></body>
+</html>"#
+                );
+                zip.write_all(body.as_bytes()).expect("write xhtml");
+            }
+
+            for (name, payload) in [
+                ("OEBPS/image/a.png", b"PAGE-A".as_slice()),
+                ("OEBPS/image/b.png", b"PAGE-B".as_slice()),
+                ("OEBPS/image/c.png", b"PAGE-C".as_slice()),
+                ("OEBPS/image/00-orphan.png", b"ORPHAN".as_slice()),
+            ] {
+                zip.start_file(name, options).expect("img");
+                zip.write_all(payload).expect("write img");
+            }
+
+            zip.finish().expect("finish");
+        }
+        bytes
     }
 }

@@ -38,6 +38,6 @@ JSON：
 
 或 `["标签A", "标签B"]`。trim 非空；库内按 name 精确匹配跳过；不删不改已有 Tag；不附着 Comic。
 
-实现：`import_tag_dictionary`（Rust）、`TagDictionaryImportController` / Dialog（Flutter）。接入自维护词库：发布 JSON + UI 调 `importFromNetwork` / `importFromBytes`。
+实现：`import_tag_dictionary`（Rust）、`TagDictionaryImportController` / Dialog（Flutter）。生产 UI：`/metadata` 更多菜单 → 选本地 JSON → `importFromBytes`；亦保留 `importFromNetwork` 供脚本/测试。
 
 Issue/文档用 **Tag dictionary import**，勿再以 EhTagTranslation 为默认数据源。

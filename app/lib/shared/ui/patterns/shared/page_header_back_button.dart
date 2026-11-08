@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/ui/patterns/library/library_page_header_me
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 首页下钻的二级页（阅读历史、垃圾桶等）：能 pop 则 pop，否则回 `/home`。
+/// 首页下钻的二级页（阅读历史、垃圾桶、管理等）：能 pop 则 pop，否则回 `/home`。
 void popOrGoHome(BuildContext context) {
   if (context.canPop()) {
     context.pop();

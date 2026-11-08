@@ -15,4 +15,21 @@ void main() {
       expect(clampReaderAutoPlayInterval(61), kReaderAutoPlayIntervalMax);
     });
   });
+
+  group('readerAutoPlaySliderWavelength', () {
+    test('maps default interval to M3E token wavelength', () {
+      expect(
+        readerAutoPlaySliderWavelength(kReaderAutoPlayIntervalDefault),
+        40,
+      );
+    });
+
+    test('grows with interval and clamps extremes', () {
+      expect(readerAutoPlaySliderWavelength(1), 16);
+      expect(readerAutoPlaySliderWavelength(2), 16);
+      expect(readerAutoPlaySliderWavelength(3), 24);
+      expect(readerAutoPlaySliderWavelength(60), 96);
+      expect(readerAutoPlaySliderWavelength(999), 96);
+    });
+  });
 }

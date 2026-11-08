@@ -93,6 +93,24 @@ impl JunctionNamedFacet {
              ORDER BY attachment_count DESC, d.name ASC"
         )
     }
+
+    /// Management page candidates: name + global attachment count.
+    ///
+    /// Order: `name` ASC (matches legacy management paging). Unused dictionary rows are 0.
+    pub fn management_page_sql(self) -> String {
+        let dict = self.dict_table();
+        let junction = self.junction_table();
+        let visible = visible_comic_id_sql("j.comic_id");
+        let name_col = self.junction_name_column();
+        format!(
+            "SELECT d.name AS name, COUNT(j.{name_col}) AS attachment_count \
+             FROM {dict} d \
+             LEFT JOIN {junction} j ON j.{name_col} = d.name AND {visible} \
+             GROUP BY d.name \
+             ORDER BY d.name ASC \
+             LIMIT ? OFFSET ?"
+        )
+    }
 }
 
 /// Named metadata facet row for Comic metadata form MultiSelect candidates.
@@ -189,29 +207,37 @@ pub async fn fetch_named_facet_page(
     facet: JunctionNamedFacet,
     limit: i32,
     offset: i32,
-) -> Result<Vec<String>, HentaiError> {
+) -> Result<Vec<NamedFacetFormEntry>, HentaiError> {
     let db = connection()?;
-    let dict = facet.dict_table();
     let rows = db
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
-            format!("SELECT name FROM {dict} ORDER BY name ASC LIMIT ? OFFSET ?"),
+            facet.management_page_sql(),
             [Value::Int(Some(limit)), Value::Int(Some(offset))],
         ))
         .await
         .map_err(map_db_err)?;
     rows.into_iter()
         .map(|row| {
-            row.try_get_by_index::<String>(0)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+            let name = row
+                .try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            let attachment_count = row
+                .try_get_by_index::<i64>(1)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            Ok(NamedFacetFormEntry {
+                name,
+                attachment_count,
+            })
         })
         .collect()
 }
 
-/// Paged dictionary name list (Tag / Parody / Character management).
+/// Paged management name list (dictionary facets include attachment counts;
+/// Author rows use `attachment_count = 0`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PagedStringNamesDto {
-    pub items: Vec<String>,
+    pub items: Vec<NamedFacetFormEntry>,
     pub total_count: i64,
     pub page: i32,
     pub page_size: i32,
@@ -251,7 +277,14 @@ pub async fn fetch_management_facet_names_page(
         ManagementFacetKind::Author => {
             let page = crate::author::fetch_author_names_page_result(request).await?;
             Ok(PagedStringNamesDto {
-                items: page.items,
+                items: page
+                    .items
+                    .into_iter()
+                    .map(|name| NamedFacetFormEntry {
+                        name,
+                        attachment_count: 0,
+                    })
+                    .collect(),
                 total_count: page.total_count,
                 page: page.page,
                 page_size: page.page_size,
@@ -518,6 +551,61 @@ pub async fn count_named_facet_attachments(
         })
 }
 
+/// Batch attachment counts for the given dictionary names (missing names → 0).
+pub async fn count_named_facet_attachments_batch(
+    facet: JunctionNamedFacet,
+    names: &[String],
+) -> Result<Vec<NamedFacetFormEntry>, HentaiError> {
+    if names.is_empty() {
+        return Ok(vec![]);
+    }
+
+    let db = connection()?;
+    let junction = facet.junction_table();
+    let name_col = facet.junction_name_column();
+    let placeholders = std::iter::repeat_n("?", names.len())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let sql = format!(
+        "SELECT j.{name_col} AS name, COUNT(*) AS attachment_count \
+         FROM {junction} j \
+         WHERE j.{name_col} IN ({placeholders}) AND {} \
+         GROUP BY j.{name_col}",
+        visible_comic_id_sql("j.comic_id")
+    );
+    let values: Vec<Value> = names
+        .iter()
+        .map(|name| Value::String(Some(Box::new(name.clone()))))
+        .collect();
+    let rows = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            sql,
+            values,
+        ))
+        .await
+        .map_err(map_db_err)?;
+
+    let mut counted = std::collections::HashMap::<String, i64>::with_capacity(rows.len());
+    for row in rows {
+        let name = row
+            .try_get_by_index::<String>(0)
+            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        let attachment_count = row
+            .try_get_by_index::<i64>(1)
+            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        counted.insert(name, attachment_count);
+    }
+
+    Ok(names
+        .iter()
+        .map(|name| NamedFacetFormEntry {
+            name: name.clone(),
+            attachment_count: counted.get(name).copied().unwrap_or(0),
+        })
+        .collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -548,6 +636,22 @@ mod tests {
             assert!(sql.contains(facet.junction_table()), "{facet:?}");
             assert!(sql.contains("attachment_count DESC"), "{facet:?}");
             assert!(sql.contains("d.name ASC"), "{facet:?}");
+        }
+    }
+
+    #[test]
+    fn management_page_sql_counts_and_orders_name_asc() {
+        for facet in [
+            JunctionNamedFacet::Tag,
+            JunctionNamedFacet::Parody,
+            JunctionNamedFacet::Character,
+        ] {
+            let sql = facet.management_page_sql();
+            assert!(sql.contains(facet.dict_table()), "{facet:?}");
+            assert!(sql.contains(facet.junction_table()), "{facet:?}");
+            assert!(sql.contains("ORDER BY d.name ASC"), "{facet:?}");
+            assert!(sql.contains("LIMIT ? OFFSET ?"), "{facet:?}");
+            assert!(!sql.contains("attachment_count DESC"), "{facet:?}");
         }
     }
 }

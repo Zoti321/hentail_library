@@ -18,8 +18,7 @@ export 'package:hentai_library/features/app_settings/presentation/patterns/setti
 class SettingsLayout extends StatefulWidget {
   const SettingsLayout({
     super.key,
-    this.initialCategory = SettingsCategory.personalization,
-    this.masterGroupTitle,
+    this.initialCategory = SettingsCategory.appearance,
     this.labState = const SettingsLabState(),
     this.onLabStateChanged,
     this.onBack,
@@ -30,7 +29,6 @@ class SettingsLayout extends StatefulWidget {
   });
 
   final SettingsCategory initialCategory;
-  final String? masterGroupTitle;
   final SettingsLabState labState;
   final ValueChanged<SettingsLabState>? onLabStateChanged;
 
@@ -46,7 +44,8 @@ class SettingsLayout extends StatefulWidget {
   /// 为 null 时使用 Lab mock 分类内容；生产注入真实 section。
   final SettingsSectionsBuilder? sectionsBuilder;
 
-  /// 列表页（非 list-detail）返回：由外层决定回到哪里（壳层上一目的地 / 路由）。
+  /// 窄屏列表页的系统返回：由外层决定回到哪里（壳层上一目的地 / 路由）。
+  /// 顶栏返回仅在窄屏二级详情显示；一级列表不再展示返回按钮（medium- 用底部导航）。
   final VoidCallback? onBack;
 
   @override
@@ -85,11 +84,9 @@ class _SettingsPageState extends State<SettingsLayout> {
   }
 
   int _settingsCategoryOrderIndex(SettingsCategory category) {
-    final List<SettingsCategory> visible =
-        widget.visibleCategories?.toList(growable: false) ??
-        kSettingsCategories
-            .map((SettingsCategoryInfo e) => e.category)
-            .toList(growable: false);
+    final List<SettingsCategory> visible = settingsCategoryOrder(
+      visibleCategories: widget.visibleCategories,
+    );
     final int index = visible.indexOf(category);
     return index >= 0 ? index : category.index;
   }
@@ -143,17 +140,16 @@ class _SettingsPageState extends State<SettingsLayout> {
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Builder(
               builder: (BuildContext context) {
-                final SettingsCategoryInfo selectedInfo = kSettingsCategories
-                    .firstWhere(
-                      (SettingsCategoryInfo e) => e.category == _selected,
-                    );
+                final SettingsCategoryInfo selectedInfo = settingsCategoryInfo(
+                  _selected,
+                );
                 final String? headerTitle =
                     (!listDetailWide && _showingNarrowDetail)
                     ? selectedInfo.label(l10n)
                     : null;
                 return SettingsPageHeader(
                   title: headerTitle,
-                  showBack: !listDetailWide,
+                  showBack: !listDetailWide && _showingNarrowDetail,
                   onBack: _handleBack,
                 );
               },
@@ -174,14 +170,10 @@ class _SettingsPageState extends State<SettingsLayout> {
                     constraints.maxWidth,
                   );
 
-                  final String masterGroupTitle =
-                      widget.masterGroupTitle ??
-                      l10n.settingsMasterMenuGroupTitle;
                   final Widget master = SettingsMasterMenu(
                     key: const Key('_settings_master'),
                     wide: wide,
                     selected: _selected,
-                    masterGroupTitle: masterGroupTitle,
                     visibleCategories: widget.visibleCategories,
                     onSelect: (SettingsCategory category) {
                       _selectCategory(category, wide: wide);

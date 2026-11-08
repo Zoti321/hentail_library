@@ -33,7 +33,7 @@ MVVM 规则不变：View 不直接调 Repository。Shell/Layout/纯 Component **
 - **跨 feature UI 命令类型**：`shared/domain/ports/`（含 `BuildContext` 的契约，如 `AuthorDetailPort`）及 `shared/domain/library/*_port.dart`；**不再**使用 `shared/application/ports/`（#434）。其他 feature **import** owner `features/<id>/public.dart`；`shared/di` 声明 Provider token，bootstrap 注入实现（ADR-0034）
 - **Component**：`app/lib/shared/ui/widgets/`（按类目）
 - **bootstrap**：应用入口、路由表、将 feature 实现注入 Shell 插槽的**组合根**（composition root）
-- **库管理 UI** 留在 **library_admin**（`HomeLibraryManagementPanel` @ Home；`md3e_production_shell_adapters` 供 rail flyout）；**不**再使用 legacy `LibrariesAppSidebar` 注入 `DesktopSidebar`。
+- **库管理 UI** 留在 **library_admin**（`HomeLibraryManagementPanel` @ Home；`production_shell_adapters` 供 rail flyout）；**不**再使用 legacy `LibrariesAppSidebar` 注入 `DesktopSidebar`。
 - **组合根** 为 bootstrap 的 `ApplicationShell`（MD3E `ResponsiveAppShell` + navigation slot）。
 
 ### 3. 依赖门禁

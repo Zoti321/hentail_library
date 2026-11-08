@@ -1,7 +1,7 @@
-/// Lab 首页「管库」列表行（预览 / 将来接生产 read model）。
+/// 首页「我的漫画库」列表行模型（生产 Panel / Lab 预览共用）。
 enum HomeLibraryKind { local, remote }
 
-/// 与侧栏 overflow 顺序一致的操作项。
+/// 与行 overflow 菜单顺序一致的操作项。
 enum HomeLibraryManagementAction {
   scan,
   deepScan,
@@ -21,6 +21,7 @@ class HomeLibraryDashboardRow {
     required this.seriesCount,
     this.lastSyncedAt,
     this.hint = HomeLibraryRowHint.none,
+    this.staleDays,
     this.scanInProgress = false,
     this.metadataRefreshInProgress = false,
   });
@@ -32,6 +33,9 @@ class HomeLibraryDashboardRow {
   final int seriesCount;
   final DateTime? lastSyncedAt;
   final HomeLibraryRowHint hint;
+
+  /// `hint == syncWarning` 时的「已超过 N 天」；无上次成功同步时可为 null。
+  final int? staleDays;
   final bool scanInProgress;
   final bool metadataRefreshInProgress;
 
@@ -45,6 +49,7 @@ class HomeLibraryDashboardRow {
     int? seriesCount,
     DateTime? lastSyncedAt,
     HomeLibraryRowHint? hint,
+    int? staleDays,
     bool? scanInProgress,
     bool? metadataRefreshInProgress,
   }) {
@@ -56,6 +61,7 @@ class HomeLibraryDashboardRow {
       seriesCount: seriesCount ?? this.seriesCount,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       hint: hint ?? this.hint,
+      staleDays: staleDays ?? this.staleDays,
       scanInProgress: scanInProgress ?? this.scanInProgress,
       metadataRefreshInProgress:
           metadataRefreshInProgress ?? this.metadataRefreshInProgress,

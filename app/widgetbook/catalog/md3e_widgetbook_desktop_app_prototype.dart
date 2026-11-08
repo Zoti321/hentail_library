@@ -1,6 +1,6 @@
 part of 'md3e_widgetbook_directories.dart';
 
-/// Lab 全壳原型：同一棵树随 Viewport 在 &lt;840（modal expanded rail）与 expanded+（标准 rail）间切换。
+/// Lab 全壳原型：同一棵树随 Viewport 在 &lt;840（底部导航）与 expanded+（标准 rail）间切换。
 class _Md3eLabAppPrototype extends StatelessWidget {
   const _Md3eLabAppPrototype();
 
@@ -31,8 +31,6 @@ class _Md3eLabAppPrototype extends StatelessWidget {
         return _Md3eLibraryBrowsePagePreview(
           libraryDisplayName: navigation.selectedLibraryDisplayName,
         );
-      case ShellNavigation.managementDestinationIndex:
-        return const ManagementBrowsePageLabHost();
       case ShellNavigation.settingsDestinationIndex:
         return SettingsPageLabHost(
           onBack: navigation.onBackToPreviousDestination,

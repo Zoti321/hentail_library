@@ -20,7 +20,6 @@ abstract final class AppNavigation {
   static List<ShellNavItem> desktopMainNavItems(AppLocalizations l10n) =>
       <ShellNavItem>[
         (id: navIdHome, label: l10n.navHome, icon: LucideIcons.house),
-        (id: navIdMetadata, label: l10n.navMetadata, icon: LucideIcons.layers),
       ];
 
   static List<ShellNavItem> desktopSystemNavItems(
@@ -42,6 +41,8 @@ abstract final class AppNavigation {
       case '/metadata':
       case '/tags':
       case '/authors':
+      case '/parodies':
+      case '/characters':
         return navIdMetadata;
       case '/series':
         return '';

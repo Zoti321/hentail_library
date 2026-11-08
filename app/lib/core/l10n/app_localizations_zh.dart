@@ -173,7 +173,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get settingsLanguageLabel => '界面语言';
+  String get settingsLanguageLabel => '语言';
 
   @override
   String get localePreferenceSystem => '跟随系统';
@@ -185,7 +185,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localePreferenceEn => 'English';
 
   @override
-  String get settingsFontLabel => '界面字体';
+  String get settingsFontLabel => '字体';
 
   @override
   String get fontPreferenceMiSans => '小米字体';
@@ -194,7 +194,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fontPreferenceNotoSans => 'Noto Sans';
 
   @override
-  String get settingsThemeLabel => '应用主题';
+  String get settingsThemeLabel => '主题';
 
   @override
   String get themePreferenceSystem => '跟随系统';
@@ -209,10 +209,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsDynamicColorLabel => '动态配色';
 
   @override
-  String get settingsDynamicColorDescription => '跟随系统壁纸取色；开启后不可选手动配色方案';
+  String get settingsDynamicColorDescription => '使用系统壁纸颜色；开启后无法选手动配色';
 
   @override
-  String get settingsColorSchemeLabel => '配色方案';
+  String get settingsColorSchemeLabel => '配色';
+
+  @override
+  String get settingsDefaultLibraryDisplayTargetLabel => '默认库浏览';
+
+  @override
+  String get settingsDefaultLibraryDisplayTargetDescription => '进入漫画库时先打开漫画或系列';
 
   @override
   String get colorSchemePreferenceBrand => '紫罗兰色';
@@ -572,22 +578,37 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notFoundGoLibrary => '去漫画库';
 
   @override
-  String get settingsGroupPersonalization => '个性化';
+  String get settingsMasterGroupApp => '应用';
 
   @override
-  String get settingsGroupMetadataBackup => '元数据备份';
+  String get settingsMasterGroupOther => '其他';
 
   @override
-  String get settingsGroupDiagnostics => '诊断与支持';
+  String get settingsMasterGroupLibraryAdmin => '漫画库管理';
+
+  @override
+  String get settingsGroupAppearance => '外观';
+
+  @override
+  String get settingsGroupInterface => '界面';
+
+  @override
+  String get settingsGroupReading => '阅读';
+
+  @override
+  String get settingsGroupLibraryBrowse => '库浏览';
 
   @override
   String get settingsGroupAbout => '关于';
 
   @override
-  String get settingsMasterMenuGroupTitle => '应用';
+  String get settingsGroupUpdates => '更新';
 
   @override
-  String get settingsSectionAppearance => '外观与语言';
+  String get settingsGroupStorageAndLogs => '存储与日志';
+
+  @override
+  String get settingsGroupMetadataBackup => '元数据备份';
 
   @override
   String get settingsSectionReading => '阅读';
@@ -599,9 +620,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsSectionDiagnostics => '诊断';
 
   @override
-  String get settingsSectionApplicationData => '应用数据';
-
-  @override
   String get settingsSectionUpdates => '更新';
 
   @override
@@ -611,7 +629,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsMetadataBackupManualGroupTitle => '手动备份';
 
   @override
-  String get settingsMetadataBackupAutoToggleLabel => '元数据自动备份';
+  String get settingsMetadataBackupAutoToggleLabel => '自动备份元数据';
 
   @override
   String get settingsMetadataBackupAutoToggleDescription =>
@@ -782,17 +800,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsHealthyModeLabel => '健康模式';
 
   @override
-  String get settingsHealthyModeDescription => '库、搜索与历史中隐藏 R18 Comic，不修改分级';
+  String get settingsHealthyModeDescription => '在库、搜索与历史中隐藏 R18 漫画，不改动分级';
 
   @override
   String get settingsDiagnosticModeLabel => '详细诊断';
 
   @override
   String get settingsDiagnosticModeDescriptionEnabled =>
-      '已开启：Dart 与 Rust 记录更详细日志';
+      '已开启：记录更详细的 Dart 与 Rust 日志';
 
   @override
-  String get settingsDiagnosticModeDescriptionDisabled => '临时提高日志详细程度，便于复现问题';
+  String get settingsDiagnosticModeDescriptionDisabled => '临时提高日志详细程度，便于排查问题';
 
   @override
   String get settingsDiagnosticModeEnabledBadge => '已开启';
@@ -801,47 +819,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsExportLogsLabel => '导出日志';
 
   @override
-  String get settingsExportLogsDescription => '打包应用与核心日志，便于问题反馈';
-
-  @override
-  String get settingsClearApplicationDataLabel => '清除全部应用数据';
-
-  @override
-  String get settingsClearApplicationDataDescription =>
-      '删除数据库、自动元数据备份、日志与缓存；不删除库根目录中的漫画文件';
-
-  @override
-  String get settingsClearApplicationDataDisabledSyncRunning => '库同步进行中，请稍后再试';
-
-  @override
-  String get settingsUninstallDataInfoLabel => '卸载与数据保留';
-
-  @override
-  String get settingsUninstallDataInfoDescription =>
-      '卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除';
-
-  @override
-  String get confirmClearApplicationDataTitle => '清除全部应用数据？';
-
-  @override
-  String get confirmClearApplicationDataContent =>
-      '将删除当前应用数据目录中的全部本机状态（含 SQLite、自动元数据备份、日志与缓存），以及应用偏好设置。不会删除库根目录中的漫画文件，也不会删除您手动导出到外置目录的元数据备份。';
-
-  @override
-  String confirmClearApplicationDataRecentBackup(String timestamp) {
-    return '最近自动元数据备份：$timestamp';
-  }
-
-  @override
-  String get confirmClearApplicationDataRecentBackupEmpty => '尚无自动元数据备份记录';
-
-  @override
-  String get wipeCompleteRestartMessage => '应用数据已清除。请重新启动应用以完成重置。';
-
-  @override
-  String wipeFailedManualDeleteMessage(String path) {
-    return '无法完全删除应用数据目录。请关闭应用后手动删除以下目录，然后重启应用：\n$path';
-  }
+  String get settingsExportLogsDescription => '打包应用与核心日志，便于反馈问题';
 
   @override
   String get settingsAutoScanLabel => '自动扫描';
@@ -921,10 +899,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get librarySearchKeywordEmpty => '关键词不能为空';
 
   @override
-  String get libraryFilterSortTooltip => '筛选与排序';
+  String get libraryFilterSortTooltip => '筛选、分组与排序';
 
   @override
-  String get libraryFilterSortSemantic => '打开筛选与排序';
+  String get libraryFilterSortSemantic => '打开筛选、分组与排序';
 
   @override
   String get libraryPageSizeTooltip => '每页数量';
@@ -1060,7 +1038,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsPreferLibraryRootSeriesDescription =>
-      '浏览系列列表时，将库根系列固定在列表最前。';
+      '在系列列表中，将库根系列固定显示在最前';
 
   @override
   String get librarySeriesSortName => '名称';
@@ -1352,25 +1330,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerSettingsReadingMode => '阅读模式';
 
   @override
-  String get readerSettingsAutoPlay => '自动播放';
+  String get readerSettingsAutoPlay => '自动翻页';
 
   @override
-  String get readerSettingsAutoPlayMode => '自动播放模式';
+  String get readerSettingsAutoPlayMode => '翻页范围';
 
   @override
-  String get readerSettingsPlayInterval => '播放间隔';
+  String get readerSettingsPlayInterval => '翻页间隔';
 
   @override
   String get readerSettingsSecondsSuffix => '秒';
 
   @override
-  String get autoPlayModeComicOnce => '单本播放';
+  String get autoPlayModeComicOnce => '本话一次';
 
   @override
-  String get autoPlayModeComicLoop => '单本循环';
+  String get autoPlayModeComicLoop => '本话循环';
 
   @override
-  String get autoPlayModeSeriesOnce => '系列播放';
+  String get autoPlayModeSeriesOnce => '系列一次';
 
   @override
   String get autoPlayModeSeriesLoop => '系列循环';
@@ -1379,13 +1357,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerSettingsWebtoonMode => 'Webtoon 模式';
 
   @override
-  String get readerSettingsPagedOptions => '分页阅读器选项';
+  String get readerSettingsPagedOptions => '翻页模式';
 
   @override
   String get readerSettingsHorizontalMargin => '左右边距';
 
   @override
-  String get readerSettingsMarginNone => '无 (0%)';
+  String get readerSettingsMarginNone => '无（0%）';
 
   @override
   String readerSettingsMarginPercent(int percent) {
@@ -1393,7 +1371,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get readerSettingsZoomMode => '缩放模式';
+  String get readerSettingsZoomMode => '显示比例';
 
   @override
   String get readerSettingsPageLayout => '页面布局';
@@ -1414,16 +1392,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readingModeDualPage => '双页';
 
   @override
-  String get readingModeDualPageNoCover => '双页（封面独立）';
-
-  @override
   String get readingModePagedSingle => '单页';
 
   @override
   String get readingModePagedDual => '双页';
-
-  @override
-  String get readingModePagedDualNoCover => '双页（封面独立）';
 
   @override
   String get readingModeWebtoonFitWidth => '适应宽度';
@@ -1496,10 +1468,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerNextPage => '下一页';
 
   @override
-  String get readerDisableAutoPlay => '关闭自动播放';
+  String get readerDisableAutoPlay => '关闭自动翻页';
 
   @override
-  String get readerEnableAutoPlay => '开启自动播放';
+  String get readerEnableAutoPlay => '开启自动翻页';
 
   @override
   String get readerInvalidParams => '阅读参数错误：缺少 comic_id';
@@ -1583,6 +1555,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get metadataMergeConfirmDontAskAgain => '以后不再提示';
+
+  @override
+  String get metadataMergeCompletedToast => '合并完成';
+
+  @override
+  String metadataMergeSelectionLabel(int count) {
+    return '合并 $count 项';
+  }
 
   @override
   String get metadataDelete => '删除';
@@ -1775,10 +1755,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataTagsDeletedAllToast => '已删除全部标签';
 
   @override
+  String get metadataImportTagDictionaryMenuLabel => '导入标签字典';
+
+  @override
+  String get metadataImportTagDictionaryPickDialogTitle => '选择标签字典 JSON';
+
+  @override
+  String get metadataImportTagDictionaryInvalidFile => '请选择有效的 JSON 标签字典文件';
+
+  @override
   String get metadataImportTagDictionaryDialogTitle => '导入标签字典';
 
   @override
   String get metadataImportTagDictionaryDialogBody => '正在下载标签字典并写入全局 Tag…';
+
+  @override
+  String get metadataImportTagDictionaryDialogBodyLocal => '正在写入全局 Tag…';
 
   @override
   String metadataImportTagDictionarySummary(
@@ -2104,6 +2096,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeLibraryDeleteConfirmAcknowledge => '我了解不会删除漫画文件';
+
+  @override
+  String get homeLibraryManagementSectionTitle => '我的漫画库';
+
+  @override
+  String homeLibraryManagementCountSubtitle(int count) {
+    return '共 $count 个库';
+  }
+
+  @override
+  String get homeLibraryLastSyncLabel => '上次同步';
+
+  @override
+  String get homeLibraryScanInProgressHint => '扫描进行中…';
+
+  @override
+  String get homeLibraryMetadataRefreshInProgressHint => '元数据刷新中…';
+
+  @override
+  String homeLibrarySyncWarningHint(int staleDays) {
+    return '已超过 $staleDays 天未同步';
+  }
+
+  @override
+  String get homeLibrarySyncRecommendedHint => '建议同步';
+
+  @override
+  String get homeLibraryUnreachableHint => '无法连接远程库';
 
   @override
   String get confirmClearHistoryTitle => '确认清空';

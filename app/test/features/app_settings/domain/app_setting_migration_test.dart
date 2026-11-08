@@ -3,6 +3,7 @@ import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 
 void main() {
   group('migrateAppSettingJson', () {
@@ -13,6 +14,15 @@ void main() {
 
       expect(setting.readingMode, ReadingMode.webtoon);
       expect(setting.toJson().containsKey('readerIsVertical'), isFalse);
+    });
+
+    test('maps legacy dualPageNoCover onto dualPage', () {
+      final AppSetting setting = AppSetting.fromJson(<String, dynamic>{
+        'readingMode': 'dualPageNoCover',
+      });
+
+      expect(setting.readingMode, ReadingMode.dualPage);
+      expect(setting.toJson()['readingMode'], 'dualPage');
     });
 
     test(
@@ -32,13 +42,13 @@ void main() {
       },
     );
 
-    test('fills default fontPreference and bumps version to 5', () {
+    test('fills default fontPreference and bumps version to 6', () {
       final AppSetting setting = AppSetting.fromJson(<String, dynamic>{
         'version': 4,
         'themePreference': 'light',
       });
 
-      expect(setting.version, 5);
+      expect(setting.version, 6);
       expect(setting.fontPreference, AppFontPreference.miSans);
       expect(setting.toJson()['fontPreference'], 'miSans');
     });
@@ -64,6 +74,33 @@ void main() {
       });
       expect(fromSc.fontPreference, AppFontPreference.notoSans);
       expect(fromJp.fontPreference, AppFontPreference.notoSans);
+    });
+
+    test(
+      'fills defaultLibraryDisplayTarget as comics and bumps version to 6',
+      () {
+        final AppSetting setting = AppSetting.fromJson(<String, dynamic>{
+          'version': 5,
+          'themePreference': 'light',
+        });
+
+        expect(setting.version, 6);
+        expect(
+          setting.defaultLibraryDisplayTarget,
+          LibraryDisplayTarget.comics,
+        );
+        expect(setting.toJson()['defaultLibraryDisplayTarget'], 'comics');
+      },
+    );
+
+    test('round-trips explicit defaultLibraryDisplayTarget', () {
+      final AppSetting setting = AppSetting(
+        defaultLibraryDisplayTarget: LibraryDisplayTarget.series,
+      );
+      expect(
+        AppSetting.fromJson(setting.toJson()).defaultLibraryDisplayTarget,
+        LibraryDisplayTarget.series,
+      );
     });
   });
 

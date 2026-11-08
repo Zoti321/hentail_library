@@ -222,6 +222,7 @@ class _Md3eReaderPageLabHostState extends State<ReaderPageLabHost> {
           chromeVisible: _chromeVisible,
           isFullscreen: _fullscreen,
           autoPlayEnabled: _settings.autoPlayEnabled,
+          autoPlayIntervalSeconds: _settings.autoPlayIntervalSeconds,
           onTapZone: _handleTapZone,
           onToggleChromeFromKeyboard: _toggleChromeFromKeyboard,
           onBack: widget.onBack,

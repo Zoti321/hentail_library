@@ -9,6 +9,7 @@ import 'package:hentai_library/shared/domain/models/models.dart'
         AppThemePreference;
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings_notifier.g.dart';
@@ -80,6 +81,14 @@ class SettingsNotifier extends _$SettingsNotifier {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
     await updateSettings(current.copyWith(preferLibraryRootSeries: value));
+  }
+
+  Future<void> setDefaultLibraryDisplayTarget(
+    LibraryDisplayTarget value,
+  ) async {
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(defaultLibraryDisplayTarget: value));
   }
 
   Future<void> setDismissedUpdateVersion(String value) async {

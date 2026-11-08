@@ -12,7 +12,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 const double _kManagementRenameDialogMaxWidth = 400;
 
-/// 管理页重命名：M3E dialog + [ManagementEntityNameField]。
+/// 命名元数据重命名 Dialog（生产与 Lab 共用；经 [LabDialogPresenter] 呈现）。
 Future<void> showManagementRenameEntityDialog({
   required BuildContext context,
   required ManagedNamedFacetKind facet,

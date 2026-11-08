@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_facet_chips.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/filled_button.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
@@ -41,27 +41,45 @@ class MetadataFacetContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final NamedFacetManagementState state = ref.watch(
-      namedFacetManagementControllerProvider(kind),
+    final (
+      bool isLoading,
+      Object? error,
+      List<String> items,
+      bool hasSearchQuery,
+      Map<String, int> attachmentCounts,
+      bool isLoadingMore,
+      bool hasMore,
+    ) = ref.watch(
+      namedFacetManagementViewModelProvider(kind).select(
+        (NamedFacetManagementState s) => (
+          s.isLoading,
+          s.error,
+          s.items,
+          s.hasSearchQuery,
+          s.attachmentCounts,
+          s.isLoadingMore,
+          s.hasMore,
+        ),
+      ),
     );
-    if (state.isLoading && state.items.isEmpty) {
+    if (isLoading && items.isEmpty) {
       return const _FacetLoading();
     }
-    if (state.error != null && state.items.isEmpty) {
+    if (error != null && items.isEmpty) {
       return _FacetError(
-        message: '${state.error}',
+        message: '$error',
         onRetry: () => ref
-            .read(namedFacetManagementControllerProvider(kind).notifier)
+            .read(namedFacetManagementViewModelProvider(kind).notifier)
             .refresh(),
       );
     }
-    if (state.items.isEmpty) {
+    if (items.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           _FacetEmpty(
             kind: kind,
-            hasSearchQuery: state.hasSearchQuery,
+            hasSearchQuery: hasSearchQuery,
             onCreate: onCreatePressed,
           ),
           if (draftChip != null)
@@ -71,7 +89,12 @@ class MetadataFacetContent extends ConsumerWidget {
     }
     return _FacetList(
       kind: kind,
-      state: state,
+      items: items,
+      attachmentCounts: attachmentCounts,
+      hasSearchQuery: hasSearchQuery,
+      isLoadingMore: isLoadingMore,
+      hasMore: hasMore,
+      error: error,
       draftChip: draftChip,
       mergeTarget: mergeTarget,
       mergeSources: mergeSources,
@@ -85,8 +108,13 @@ class MetadataFacetContent extends ConsumerWidget {
 class _FacetList extends ConsumerWidget {
   const _FacetList({
     required this.kind,
-    required this.state,
+    required this.items,
+    required this.attachmentCounts,
+    required this.hasSearchQuery,
+    required this.isLoadingMore,
+    required this.hasMore,
     required this.mergeSources,
+    this.error,
     this.draftChip,
     this.mergeTarget,
     this.onMergeTargetSelected,
@@ -95,7 +123,12 @@ class _FacetList extends ConsumerWidget {
   });
 
   final ManagedNamedFacetKind kind;
-  final NamedFacetManagementState state;
+  final List<String> items;
+  final Map<String, int> attachmentCounts;
+  final bool hasSearchQuery;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final Object? error;
   final Widget? draftChip;
   final String? mergeTarget;
   final Set<String> mergeSources;
@@ -106,36 +139,32 @@ class _FacetList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
-    final List<Author> authors = ref
-        .watch(allAuthorsProvider)
-        .maybeWhen(data: (List<Author> a) => a, orElse: () => const <Author>[]);
-    final bool hasError = state.error != null;
+    final Set<String> verifiedAuthors = kind == ManagedNamedFacetKind.author
+        ? ref
+              .watch(allAuthorsProvider)
+              .maybeWhen(
+                data: (List<Author> authors) => <String>{
+                  for (final Author a in authors)
+                    if (a.verified) a.name,
+                },
+                orElse: () => const <String>{},
+              )
+        : const <String>{};
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text(
-            context.l10n.metadataListTitle(kind),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: <Widget>[
-            for (final String name in state.items)
+            for (final String name in items)
               MetadataFacetChip(
+                key: ValueKey<String>('facet-chip-$name'),
                 kind: kind,
                 name: name,
-                attachmentCount: state.attachmentCounts[name],
-                verified:
-                    kind == ManagedNamedFacetKind.author &&
-                    authors.any((Author a) => a.name == name && a.verified),
+                attachmentCount: attachmentCounts[name],
+                verified: verifiedAuthors.contains(name),
                 mergeTarget: mergeTarget,
                 isMergeSource: mergeSources.contains(name),
                 onMergeTargetSelected: onMergeTargetSelected,
@@ -145,22 +174,37 @@ class _FacetList extends ConsumerWidget {
             ?draftChip,
           ],
         ),
-        if (hasError) ...<Widget>[
+        if (error != null) ...<Widget>[
           const SizedBox(height: 12),
-          Text('${state.error}', style: TextStyle(color: scheme.error)),
+          Text('$error', style: TextStyle(color: scheme.error)),
         ],
         const SizedBox(height: 16),
-        _FacetFooter(kind: kind, state: state),
+        _FacetFooter(
+          kind: kind,
+          hasSearchQuery: hasSearchQuery,
+          isLoadingMore: isLoadingMore,
+          hasMore: hasMore,
+          itemCount: items.length,
+        ),
       ],
     );
   }
 }
 
 class _FacetFooter extends ConsumerWidget {
-  const _FacetFooter({required this.kind, required this.state});
+  const _FacetFooter({
+    required this.kind,
+    required this.hasSearchQuery,
+    required this.isLoadingMore,
+    required this.hasMore,
+    required this.itemCount,
+  });
 
   final ManagedNamedFacetKind kind;
-  final NamedFacetManagementState state;
+  final bool hasSearchQuery;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final int itemCount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -168,21 +212,21 @@ class _FacetFooter extends ConsumerWidget {
     final M3EColorScheme scheme = M3ETheme.of(context).colorScheme;
     final TextStyle style = TextStyle(color: scheme.onSurfaceVariant);
 
-    if (state.hasSearchQuery) {
+    if (hasSearchQuery) {
       return Text(
-        l10n.metadataTotalCount(state.items.length),
+        l10n.metadataTotalCount(itemCount),
         textAlign: TextAlign.center,
         style: style,
       );
     }
-    if (state.isLoadingMore) {
+    if (isLoadingMore) {
       return Text(
         l10n.metadataLoadingMore,
         textAlign: TextAlign.center,
         style: style,
       );
     }
-    if (!state.hasMore) {
+    if (!hasMore) {
       return Text(
         l10n.metadataListEnd,
         textAlign: TextAlign.center,
@@ -194,7 +238,7 @@ class _FacetFooter extends ConsumerWidget {
         label: l10n.metadataLoadMore,
         icon: Symbols.expand_more,
         onPressed: () => ref
-            .read(namedFacetManagementControllerProvider(kind).notifier)
+            .read(namedFacetManagementViewModelProvider(kind).notifier)
             .loadMore(),
       ),
     );

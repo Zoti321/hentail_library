@@ -13,4 +13,13 @@ abstract final class ComicCardHost {
   static void confirmTrash(BuildContext context, WidgetRef ref, Comic comic) {
     confirmAndTrashComic(context, ref, comic);
   }
+
+  static void confirmTrashById(
+    BuildContext context,
+    WidgetRef ref, {
+    required String comicId,
+    required String title,
+  }) {
+    confirmAndTrashComicById(context, ref, comicId: comicId, title: title);
+  }
 }

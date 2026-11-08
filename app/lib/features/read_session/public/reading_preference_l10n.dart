@@ -24,7 +24,6 @@ extension ReadingPreferenceL10n on AppLocalizations {
     return switch (layout) {
       PagedLayout.single => readingModePagedSingle,
       PagedLayout.dual => readingModePagedDual,
-      PagedLayout.dualNoCover => readingModePagedDualNoCover,
     };
   }
 
@@ -40,7 +39,6 @@ extension ReadingPreferenceL10n on AppLocalizations {
       ReadingMode.paged => readingModePaged,
       ReadingMode.webtoon => readingModeWebtoon,
       ReadingMode.dualPage => readingModeDualPage,
-      ReadingMode.dualPageNoCover => readingModeDualPageNoCover,
     };
   }
 

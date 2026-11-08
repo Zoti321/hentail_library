@@ -121,14 +121,6 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
     });
   }
 
-  void _seriesPrev() {
-    _selectSeriesIndex(_entry.seriesCurrentIndex - 1);
-  }
-
-  void _seriesNext() {
-    _selectSeriesIndex(_entry.seriesCurrentIndex + 1);
-  }
-
   Widget _buildScrollBody() {
     final Widget content = ComicDetailScrollContent(
       entry: _entry,
@@ -163,8 +155,6 @@ class _ComicDetailPageState extends State<ComicDetailLayout> {
       seriesCatalog: _entry.seriesCatalog,
       seriesCurrentIndex: _entry.seriesCurrentIndex,
       onSeriesSelectIndex: _selectSeriesIndex,
-      onSeriesPrev: _seriesPrev,
-      onSeriesNext: _seriesNext,
     );
 
     return ColoredBox(

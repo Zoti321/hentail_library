@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/library_browse_page_metrics.dart';
-import 'package:hentai_library/features/named_metadata/public.dart';
+import 'package:hentai_library/features/named_metadata/public/ui/metadata_lab_patterns.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 
-/// 管理页 Lab 壳层：粘滞标题 + 胶囊维度条 + 流式 chip 列表。
+/// Widgetbook / Lab 管理页壳（不挂生产路由）；与生产页共用 `Management*` patterns。
 class ManagementBrowsePage extends StatefulWidget {
   const ManagementBrowsePage({
     super.key,

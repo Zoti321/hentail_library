@@ -45,10 +45,12 @@ void main() {
     await _pumpSheet(tester);
 
     expect(find.text('阅读模式'), findsWidgets);
-    expect(find.text('自动播放'), findsOneWidget);
-    expect(find.text('自动播放模式'), findsOneWidget);
-    expect(find.text('播放间隔'), findsOneWidget);
-    expect(find.text('单本播放'), findsOneWidget);
+    expect(find.text('自动翻页'), findsOneWidget);
+    expect(find.text('翻页范围'), findsOneWidget);
+    expect(find.text('翻页间隔'), findsOneWidget);
+    expect(find.text('本话一次'), findsOneWidget);
+    expect(find.text('翻页模式'), findsOneWidget);
+    expect(find.text('Webtoon 模式'), findsOneWidget);
     expect(find.text('5 秒'), findsOneWidget);
   });
 

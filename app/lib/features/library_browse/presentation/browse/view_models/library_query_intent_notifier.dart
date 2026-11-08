@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent.dart';
 import 'package:hentai_library/core/util/debouncer.dart';
@@ -19,7 +21,29 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
     ref.onDispose(() {
       _filterQueryDebouncer.dispose();
     });
-    return LibraryQueryIntent();
+    ref.listen<LibraryDisplayTarget>(
+      settingsProvider.select(
+        (async) =>
+            async.asData?.value.defaultLibraryDisplayTarget ??
+            LibraryDisplayTarget.comics,
+      ),
+      (LibraryDisplayTarget? previous, LibraryDisplayTarget next) {
+        if (previous == next) {
+          return;
+        }
+        state = state.copyWith(displayTarget: next);
+      },
+    );
+    return LibraryQueryIntent(displayTarget: _defaultLibraryDisplayTarget());
+  }
+
+  LibraryDisplayTarget _defaultLibraryDisplayTarget() {
+    return ref
+            .read(settingsProvider)
+            .asData
+            ?.value
+            .defaultLibraryDisplayTarget ??
+        LibraryDisplayTarget.comics;
   }
 
   void setFilterQuery(String? query) {
@@ -39,7 +63,7 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
   void resetFilter() {
     state = state.copyWith(
       keyword: '',
-      displayTarget: LibraryDisplayTarget.comics,
+      displayTarget: _defaultLibraryDisplayTarget(),
     );
   }
 }

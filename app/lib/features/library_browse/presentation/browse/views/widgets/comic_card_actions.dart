@@ -4,6 +4,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/shell_file_explorer.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
@@ -14,15 +15,30 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 包裹 MD3E 漫画卡片：仅桌面端鼠标右键弹出 [M3EMenu]（与详情页顶栏 ⋮ 同款
 /// 宽度与样式：阅读、编辑元数据、在资源管理器中显示、删除）；移动端无上下文菜单。
+///
+/// 库页传入 [ComicBrowseViewObject]；详情等仍可传完整 [Comic]。
 class ComicCardActions extends ConsumerWidget {
-  const ComicCardActions({
+  ComicCardActions({
     super.key,
-    required this.comic,
+    required Comic comic,
     required this.child,
     this.enabled = true,
-  });
+  }) : comicId = comic.comicId,
+       title = comic.title,
+       path = comic.path;
 
-  final Comic comic;
+  ComicCardActions.fromBrowse({
+    super.key,
+    required ComicBrowseViewObject item,
+    required this.child,
+    this.enabled = true,
+  }) : comicId = item.comicId,
+       title = item.title,
+       path = item.path;
+
+  final String comicId;
+  final String title;
+  final String path;
   final Widget child;
 
   /// 选择模式下设为 false，桌面端右键不弹出操作菜单。
@@ -63,34 +79,42 @@ class ComicCardActions extends ConsumerWidget {
         M3EMenuEntry(
           label: l10n.comicDetailRead,
           leading: const Icon(LucideIcons.bookOpen),
-          onPressed: () => ComicCardHost.openReader(ref, comic.comicId),
+          onPressed: () => ComicCardHost.openReader(ref, comicId),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailEditMetadata,
           leading: const Icon(LucideIcons.squarePen),
-          onPressed: () =>
-              showComicMetadataEdit(context: context, comic: comic),
+          onPressed: () => showComicMetadataEditById(
+            context: context,
+            ref: ref,
+            comicId: comicId,
+          ),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailShowInExplorer,
           leading: const Icon(LucideIcons.folderOpen),
-          onPressed: () => _showInExplorer(context, comic),
+          onPressed: () => _showInExplorer(context, path),
         ),
         M3EMenuEntry(
           label: l10n.comicDetailDelete,
           leading: Icon(LucideIcons.trash2, color: scheme.error),
           isDestructive: true,
-          onPressed: () => ComicCardHost.confirmTrash(context, ref, comic),
+          onPressed: () => ComicCardHost.confirmTrashById(
+            context,
+            ref,
+            comicId: comicId,
+            title: title,
+          ),
         ),
       ],
     );
   }
 
-  Future<void> _showInExplorer(BuildContext context, Comic comic) async {
+  Future<void> _showInExplorer(BuildContext context, String comicPath) async {
     try {
-      await showInFileExplorer(comic.path);
+      await showInFileExplorer(comicPath);
     } on Object catch (error, stackTrace) {
-      debugPrint('showInFileExplorer failed for "${comic.path}": $error');
+      debugPrint('showInFileExplorer failed for "$comicPath": $error');
       if (!context.mounted) {
         return;
       }

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell.dart';
-import 'package:hentai_library/shared/ui/shell/shell_compact_app_bar.dart';
 import 'package:hentai_library/shared/ui/shell/shell_rail_library_hover_metrics.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/navigation_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -52,21 +52,22 @@ void main() {
     );
 
     expect(find.byType(ExpressiveNavigationRail), findsOneWidget);
+    expect(find.byType(ExpressiveNavigationBar), findsNothing);
     expect(find.byType(DesktopTitleBar), findsOneWidget);
     expect(find.byType(DesktopShellPane), findsOneWidget);
   });
 
   testWidgets(
-    'below expanded breakpoint uses compact app bar without desktop title bar',
+    'below expanded breakpoint uses bottom navigation without drawer menu',
     (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(600, 768));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       await pumpApp(tester, home: DesktopShell(width: 600, height: 768));
 
-      expect(find.byType(ShellCompactAppBar), findsOneWidget);
+      expect(find.byType(ExpressiveNavigationBar), findsOneWidget);
       expect(find.byType(ExpressiveNavigationRail), findsNothing);
-      expect(find.byIcon(Icons.menu), findsOneWidget);
+      expect(find.byIcon(Icons.menu), findsNothing);
     },
   );
 
@@ -114,52 +115,57 @@ void main() {
     },
   );
 
-  testWidgets('compact and medium drill into library secondary from modal rail', (
-    WidgetTester tester,
-  ) async {
-    Future<void> pumpAndSelectLibrary(double width) async {
-      const String targetId = 'lab-remote-nas';
-      final String targetName = LabLibraryCatalog.displayNameForId(targetId);
-      ShellNavigationSnapshot? lastSnapshot;
+  testWidgets(
+    'compact and medium open library picker sheet from bottom navigation',
+    (WidgetTester tester) async {
+      Future<void> pumpAndSelectLibrary(double width) async {
+        const String targetId = 'lab-remote-nas';
+        final String targetName = LabLibraryCatalog.displayNameForId(targetId);
+        ShellNavigationSnapshot? lastSnapshot;
 
-      await tester.binding.setSurfaceSize(Size(width, 768));
-      await pumpApp(
-        tester,
-        home: DesktopShell(
-          width: width,
-          height: 768,
-          paneBuilder: (_, navigation) {
-            lastSnapshot = navigation;
-            return Text(
-              '${navigation.selectedLibraryId}:${navigation.selectedLibraryDisplayName}',
-            );
-          },
-        ),
-      );
+        await tester.binding.setSurfaceSize(Size(width, 768));
+        await pumpApp(
+          tester,
+          home: DesktopShell(
+            width: width,
+            height: 768,
+            paneBuilder: (_, navigation) {
+              lastSnapshot = navigation;
+              return Text(
+                '${navigation.destinationIndex}:${navigation.selectedLibraryId}',
+              );
+            },
+          ),
+        );
 
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+        expect(find.byType(ExpressiveNavigationBar), findsOneWidget);
+        await tester.tap(find.text('漫画库'));
+        await tester.pumpAndSettle();
+        expect(find.text(targetName), findsOneWidget);
 
-      await tester.tap(find.text('漫画库'));
-      await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+        await tester.tap(find.text(targetName));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text(targetName));
-      await tester.pumpAndSettle();
+        expect(
+          lastSnapshot?.destinationIndex,
+          ShellNavigation.libraryDestinationIndex,
+        );
+        expect(lastSnapshot?.selectedLibraryId, targetId);
+        expect(
+          find.text('${ShellNavigation.libraryDestinationIndex}:$targetId'),
+          findsOneWidget,
+        );
+      }
 
-      expect(lastSnapshot?.selectedLibraryId, targetId);
-      expect(find.text('$targetId:$targetName'), findsOneWidget);
-    }
+      addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-
-    await pumpAndSelectLibrary(390);
-    await pumpAndSelectLibrary(600);
-  });
+      await pumpAndSelectLibrary(390);
+      await pumpAndSelectLibrary(600);
+    },
+  );
 
   testWidgets(
-    'compact settings hides shell menu and back returns to previous destination',
+    'compact settings keeps bottom nav and back returns to previous destination',
     (WidgetTester tester) async {
       ShellNavigationSnapshot? lastSnapshot;
 
@@ -178,18 +184,16 @@ void main() {
       );
 
       final int previousIndex = lastSnapshot!.destinationIndex;
-      expect(find.byIcon(Icons.menu), findsOneWidget);
+      expect(find.byType(ExpressiveNavigationBar), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.menu));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(ShellRailSymbols.settings));
+      await tester.tap(find.text('设置'));
       await tester.pumpAndSettle();
 
       expect(
         lastSnapshot?.destinationIndex,
         ShellNavigation.settingsDestinationIndex,
       );
-      expect(find.byIcon(Icons.menu), findsNothing);
+      expect(find.byType(ExpressiveNavigationBar), findsOneWidget);
       expect(lastSnapshot?.onBackToPreviousDestination, isNotNull);
 
       lastSnapshot!.onBackToPreviousDestination!();
@@ -197,7 +201,6 @@ void main() {
 
       expect(lastSnapshot?.destinationIndex, previousIndex);
       expect(find.text('pane:$previousIndex'), findsOneWidget);
-      expect(find.byIcon(Icons.menu), findsOneWidget);
     },
   );
 

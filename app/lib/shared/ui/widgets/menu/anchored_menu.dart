@@ -32,7 +32,7 @@ Offset menuGlobalToRootOverlayLocal(
   return overlayBox.globalToLocal(globalPosition);
 }
 
-/// Width of [M3EIconButtonSize.sm] default target ([DetailHeaderToolbar] ⋮).
+/// Width of [M3EIconButtonSize.sm] default target ([DetailHeaderMoreButton] ⋮).
 ///
 /// [M3EMenuPlacer] menu width = `anchor.width + 176`; toolbar overflow uses the
 /// full icon-button anchor rect — pointer context menus use the same width basis.

@@ -24,7 +24,7 @@ final LibraryComicSortOption kLibraryDefaultSortOption =
     LibraryComicSortOption();
 
 /// 会话级 include-only 筛选维度（不落盘，仅在浏览期间保留）。
-enum LibraryIncludeSetKind { language, parody, character }
+enum LibraryIncludeSetKind { language }
 
 /// Comics Tab 的完整 Library browse preference（筛选 + 排序意图）。
 ///
@@ -40,8 +40,8 @@ class LibraryComicFiltersState {
     required this.grouping,
     required this.sortOption,
     this.languageFilter = const <String>{},
-    this.parodyFilter = const <String>{},
-    this.characterFilter = const <String>{},
+    this.parodyFilter = const LibraryMetadataFilterSelection(),
+    this.characterFilter = const LibraryMetadataFilterSelection(),
   });
 
   /// 默认（未筛选）状态；加载完成前的占位值。
@@ -63,15 +63,15 @@ class LibraryComicFiltersState {
   final LibraryComicGrouping grouping;
   final LibraryComicSortOption sortOption;
 
-  /// 会话级 include-only 维度。
+  /// 会话级 include-only 维度（语言闭集）。
   final Set<String> languageFilter;
-  final Set<String> parodyFilter;
-  final Set<String> characterFilter;
+
+  /// 会话级原作 / 角色三态筛选（不落盘）。
+  final LibraryMetadataFilterSelection parodyFilter;
+  final LibraryMetadataFilterSelection characterFilter;
 
   Set<String> includeSetFor(LibraryIncludeSetKind kind) => switch (kind) {
     LibraryIncludeSetKind.language => languageFilter,
-    LibraryIncludeSetKind.parody => parodyFilter,
-    LibraryIncludeSetKind.character => characterFilter,
   };
 
   LibraryComicFiltersState copyWith({
@@ -83,8 +83,8 @@ class LibraryComicFiltersState {
     LibraryComicGrouping? grouping,
     LibraryComicSortOption? sortOption,
     Set<String>? languageFilter,
-    Set<String>? parodyFilter,
-    Set<String>? characterFilter,
+    LibraryMetadataFilterSelection? parodyFilter,
+    LibraryMetadataFilterSelection? characterFilter,
   }) {
     return LibraryComicFiltersState(
       ageRestriction: ageRestriction ?? this.ageRestriction,
@@ -115,8 +115,8 @@ class LibraryComicFiltersState {
             other.grouping == grouping &&
             other.sortOption == sortOption &&
             setEquals(other.languageFilter, languageFilter) &&
-            setEquals(other.parodyFilter, parodyFilter) &&
-            setEquals(other.characterFilter, characterFilter);
+            other.parodyFilter == parodyFilter &&
+            other.characterFilter == characterFilter;
   }
 
   @override
@@ -129,8 +129,8 @@ class LibraryComicFiltersState {
     grouping,
     sortOption,
     Object.hashAllUnordered(languageFilter),
-    Object.hashAllUnordered(parodyFilter),
-    Object.hashAllUnordered(characterFilter),
+    parodyFilter,
+    characterFilter,
   );
 }
 
@@ -204,7 +204,7 @@ const String _sortStorageKey = 'library_sort_comics';
 /// Comics Tab 的 Library browse preference（筛选 + 排序）唯一事实来源。
 ///
 /// 持有持久化偏好（年龄、媒体类型、标签、作者、仅待补元数据、按系列分组、排序）
-/// 与会话级 include-set（语言 / parody / character）；命令方法负责写回
+/// 与会话级维度（语言 include-set、原作/角色三态）；命令方法负责写回
 /// SharedPreferences。派生 [libraryComicFilterQueryProvider] 供 Rust 查询消费。
 @Riverpod(keepAlive: true)
 class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
@@ -379,11 +379,41 @@ class LibraryComicFiltersNotifier extends _$LibraryComicFiltersNotifier
   ) {
     return switch (kind) {
       LibraryIncludeSetKind.language => current.copyWith(languageFilter: value),
-      LibraryIncludeSetKind.parody => current.copyWith(parodyFilter: value),
-      LibraryIncludeSetKind.character => current.copyWith(
-        characterFilter: value,
-      ),
     };
+  }
+
+  Future<void> toggleParody(String name) async {
+    final LibraryComicFiltersState current = await future;
+    _apply(
+      current.copyWith(parodyFilter: current.parodyFilter.withToggled(name)),
+    );
+  }
+
+  Future<void> setParodyIncludeMode(LibraryMetadataIncludeMode mode) async {
+    final LibraryComicFiltersState current = await future;
+    _apply(
+      current.copyWith(
+        parodyFilter: current.parodyFilter.withIncludeMode(mode),
+      ),
+    );
+  }
+
+  Future<void> toggleCharacter(String name) async {
+    final LibraryComicFiltersState current = await future;
+    _apply(
+      current.copyWith(
+        characterFilter: current.characterFilter.withToggled(name),
+      ),
+    );
+  }
+
+  Future<void> setCharacterIncludeMode(LibraryMetadataIncludeMode mode) async {
+    final LibraryComicFiltersState current = await future;
+    _apply(
+      current.copyWith(
+        characterFilter: current.characterFilter.withIncludeMode(mode),
+      ),
+    );
   }
 
   Future<void> setNeedsMetadataOnly(bool enabled) async {
@@ -460,8 +490,8 @@ final Provider<LibraryComicFilter> libraryComicFilterQueryProvider =
         tagFilter: filters.tagFilter,
         authorFilter: filters.authorFilter,
         languages: filters.languageFilter,
-        parodies: filters.parodyFilter,
-        characters: filters.characterFilter,
+        parodyFilter: filters.parodyFilter,
+        characterFilter: filters.characterFilter,
         needsMetadataOnly: filters.needsMetadataOnly,
         keyword: keyword,
         libraryId: libraryId,
@@ -480,8 +510,8 @@ final Provider<bool> libraryComicFiltersIsCustomizedProvider = Provider<bool>((
       filters.tagFilter.isActive ||
       filters.authorFilter.isActive ||
       filters.languageFilter.isNotEmpty ||
-      filters.parodyFilter.isNotEmpty ||
-      filters.characterFilter.isNotEmpty ||
+      filters.parodyFilter.isActive ||
+      filters.characterFilter.isActive ||
       filters.grouping != LibraryComicGrouping.defaultValue ||
       filters.needsMetadataOnly != LibraryNeedsMetadataOnly.defaultValue) {
     return true;

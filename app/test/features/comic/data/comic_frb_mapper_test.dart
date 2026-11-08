@@ -20,19 +20,31 @@ void main() {
     expect(mapped.descending, isTrue);
   });
 
-  test('mapLibraryFilter maps language parody and character include sets', () {
-    final LibraryComicFilter filter = LibraryComicFilter(
-      languages: <String>{'Chinese', ' Japanese '},
-      parodies: <String>{'Naruto'},
-      characters: <String>{'Sakura'},
-    );
+  test(
+    'mapLibraryFilter maps language parody and character all/any/exclude',
+    () {
+      final LibraryComicFilter filter = LibraryComicFilter(
+        languages: <String>{'Chinese', ' Japanese '},
+        parodiesAll: <String>{'Fate'},
+        parodiesAny: <String>{'Naruto'},
+        parodiesExclude: <String>{'Original'},
+        charactersAny: <String>{'Sakura'},
+        charactersExclude: <String>{'Extra'},
+      );
 
-    final rust.ComicFilterDto mapped = mapLibraryFilter(filter);
+      final rust.ComicFilterDto mapped = mapLibraryFilter(filter);
 
-    expect(mapped.languages, unorderedEquals(<String>['chinese', 'japanese']));
-    expect(mapped.parodies, unorderedEquals(<String>['naruto']));
-    expect(mapped.characters, unorderedEquals(<String>['sakura']));
-  });
+      expect(
+        mapped.languages,
+        unorderedEquals(<String>['chinese', 'japanese']),
+      );
+      expect(mapped.parodiesAll, unorderedEquals(<String>['fate']));
+      expect(mapped.parodiesAny, unorderedEquals(<String>['naruto']));
+      expect(mapped.parodiesExclude, unorderedEquals(<String>['original']));
+      expect(mapped.charactersAny, unorderedEquals(<String>['sakura']));
+      expect(mapped.charactersExclude, unorderedEquals(<String>['extra']));
+    },
+  );
 
   test('mapLibraryFilter forwards needs metadata flag', () {
     expect(mapLibraryFilter(LibraryComicFilter()).needsMetadataOnly, isFalse);

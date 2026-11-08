@@ -1,7 +1,12 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/browse_view_object_mappers.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -37,6 +42,16 @@ Comic _comic(String id, String title) {
     lastUpdatedAt: now,
     title: title,
     pageCount: 1,
+  );
+}
+
+ComicBrowseViewObject _comicViewObject(String id, String title) {
+  return comicBrowseViewObjectFromComic(_comic(id, title));
+}
+
+SeriesBrowseViewObject _seriesViewObject(String id, String name) {
+  return seriesBrowseViewObjectFromSeries(
+    Series(id: id, name: name, folderPath: '/$id'),
   );
 }
 
@@ -121,16 +136,16 @@ class _FixedCatalogSelection extends CatalogSelectionNotifier {
 Future<void> _pumpLibraryPage(
   WidgetTester tester, {
   required LibraryDisplayTarget target,
-  required List<Comic> comics,
-  List<Series> series = const <Series>[],
+  required List<ComicBrowseViewObject> comics,
+  List<SeriesBrowseViewObject> series = const <SeriesBrowseViewObject>[],
   CatalogSelectionState? selection,
 }) async {
   configureTestView(tester, const Size(900, 800));
 
   final List<Override> coverOverrides = <Override>[
-    for (final Comic comic in comics)
+    for (final ComicBrowseViewObject comic in comics)
       comicCoverProvider(comic.comicId).overrideWith(_NoCoverComicCover.new),
-    for (final Series s in series)
+    for (final SeriesBrowseViewObject s in series)
       seriesCoverSourceProvider(s.id)
           .overrideWith((Ref ref) async => const SeriesCoverMissing()),
   ];
@@ -188,7 +203,10 @@ void main() {
     await _pumpLibraryPage(
       tester,
       target: LibraryDisplayTarget.comics,
-      comics: <Comic>[_comic('c1', 'Comic One'), _comic('c2', 'Comic Two')],
+      comics: <ComicBrowseViewObject>[
+        _comicViewObject('c1', 'Comic One'),
+        _comicViewObject('c2', 'Comic Two'),
+      ],
     );
 
     expect(tester.takeException(), isNull);
@@ -202,10 +220,8 @@ void main() {
     await _pumpLibraryPage(
       tester,
       target: LibraryDisplayTarget.series,
-      comics: const <Comic>[],
-      series: <Series>[
-        Series(id: 's1', name: 'Series Alpha', folderPath: '/alpha'),
-      ],
+      comics: const <ComicBrowseViewObject>[],
+      series: <SeriesBrowseViewObject>[_seriesViewObject('s1', 'Series Alpha')],
     );
 
     expect(tester.takeException(), isNull);
@@ -213,22 +229,27 @@ void main() {
     expect(find.text('Series Alpha'), findsOneWidget);
   });
 
-  testWidgets('long-pressing a comic card opens the comic action menu', (
+  testWidgets('right-clicking a comic card opens the comic action menu', (
     WidgetTester tester,
   ) async {
-    await _pumpLibraryPage(
-      tester,
-      target: LibraryDisplayTarget.comics,
-      comics: <Comic>[_comic('c1', 'Comic One')],
-    );
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    try {
+      await _pumpLibraryPage(
+        tester,
+        target: LibraryDisplayTarget.comics,
+        comics: <ComicBrowseViewObject>[_comicViewObject('c1', 'Comic One')],
+      );
 
-    await tester.longPress(find.byType(ComicCard));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byType(ComicCard), buttons: kSecondaryButton);
+      await tester.pumpAndSettle();
 
-    expect(find.text(l10n.comicDetailRead), findsOneWidget);
-    expect(find.text(l10n.comicDetailEditMetadata), findsOneWidget);
-    expect(find.text(l10n.comicDetailShowInExplorer), findsOneWidget);
-    expect(find.text(l10n.comicDetailDelete), findsOneWidget);
+      expect(find.text(l10n.comicDetailRead), findsOneWidget);
+      expect(find.text(l10n.comicDetailEditMetadata), findsOneWidget);
+      expect(find.text(l10n.comicDetailShowInExplorer), findsOneWidget);
+      expect(find.text(l10n.comicDetailDelete), findsOneWidget);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 
   testWidgets('empty comics catalog shows the empty-library title', (
@@ -237,7 +258,7 @@ void main() {
     await _pumpLibraryPage(
       tester,
       target: LibraryDisplayTarget.comics,
-      comics: const <Comic>[],
+      comics: const <ComicBrowseViewObject>[],
     );
 
     expect(find.text(l10n.libraryEmptyTitle), findsOneWidget);
@@ -249,7 +270,10 @@ void main() {
     await _pumpLibraryPage(
       tester,
       target: LibraryDisplayTarget.comics,
-      comics: <Comic>[_comic('c1', 'Comic One'), _comic('c2', 'Comic Two')],
+      comics: <ComicBrowseViewObject>[
+        _comicViewObject('c1', 'Comic One'),
+        _comicViewObject('c2', 'Comic Two'),
+      ],
       selection: const CatalogSelectionState(
         active: true,
         host: CatalogSelectionHost.libraryBrowse,

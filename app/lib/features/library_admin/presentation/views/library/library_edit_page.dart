@@ -7,10 +7,14 @@ import 'package:hentai_library/features/library_admin/presentation/patterns/libr
 import 'package:hentai_library/shared/ui/patterns/metadata_edit/metadata_edit_surface.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 
-/// Lab 中 Library 编辑页的打开意图（Widgetbook / 路由）。
+/// Widgetbook 中 Library 编辑页的打开意图。
+///
+/// 生产路径走 `showLibraryFormDialog`；两者共用 [LibraryEditForm]。
 enum LibraryEditPageIntent { editLocal, editRemote, createLocal, createRemote }
 
-/// Library 创建/编辑 Lab 页（Widgetbook / 路由）。
+/// Library 创建/编辑 **Lab / Widgetbook** 页（不挂生产路由）。
+///
+/// 表单字段与生产 Dialog 共用 [LibraryEditForm]；保存为模拟延迟，目录选择为占位。
 class LibraryEditPage extends StatefulWidget {
   const LibraryEditPage({
     super.key,

@@ -10,6 +10,7 @@ void main() {
       expect(NamedFacetManagementRepository, isNotNull);
       expect(NamedFacetDictionaryRepository, isNotNull);
       expect(NamedFacetFormKind, isNotNull);
+      expect(NamedFacetFormListing, isNotNull);
       expect(namedFacetFormCandidate, isNotNull);
       expect(createAuthorRepository, isNotNull);
       expect(createTagRepository, isNotNull);

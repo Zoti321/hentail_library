@@ -4,9 +4,11 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
+import 'package:hentai_library/features/comic/public/ui/comic_cover_content.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author_detail.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_source.dart';
 import 'package:hentai_library/shared/ui/models/comic_cover_state.dart';
+import 'package:hentai_library/shared/ui/widgets/catalog/catalog_cover_hero.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/view_models/author_detail_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/author/views/author_detail/author_image_view.dart';
@@ -115,6 +117,91 @@ void main() {
     expect(find.byKey(AuthorImageView.hdImageKey), findsNothing);
     expect(find.byKey(AuthorImageView.slotLoadingKey), findsNothing);
   });
+
+  testWidgets('does not wrap fallback comic cover in a Hero', (
+    WidgetTester tester,
+  ) async {
+    await _pump(tester, () => Completer<Uint8List?>().future);
+
+    expect(find.byType(Hero), findsNothing);
+  });
+
+  testWidgets(
+    'author banner/avatar fallbacks do not duplicate comic-cover hero tags',
+    (WidgetTester tester) async {
+      const String comicId = 'comic-1';
+      await pumpLocalizedApp(
+        tester,
+        overrides: <Override>[
+          comicCoverProvider(comicId).overrideWith(
+            () =>
+                FixedComicCover(ComicCoverReady(ComicCoverSource.bytes(_png))),
+          ),
+          authorImageProvider(_request)
+              .overrideWith((Ref ref) => Completer<Uint8List?>().future),
+          authorImageProvider((authorId: 1, slot: AuthorImageSlot.avatar))
+              .overrideWith((Ref ref) => Completer<Uint8List?>().future),
+        ],
+        home: Scaffold(
+          body: Builder(
+            builder: (BuildContext context) {
+              return Column(
+                children: <Widget>[
+                  SizedBox(
+                    width: 400,
+                    height: 100,
+                    child: AuthorImageView(
+                      authorId: 1,
+                      slot: AuthorImageSlot.background,
+                      comicId: comicId,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 96,
+                    height: 96,
+                    child: AuthorImageView(
+                      authorId: 1,
+                      slot: AuthorImageSlot.avatar,
+                      comicId: comicId,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 96,
+                    height: 144,
+                    child: ComicCoverContent(comicId: comicId),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) {
+                            return Scaffold(
+                              body: CatalogCoverHero.wrap(
+                                tag: CatalogCoverHero.comicTag(comicId),
+                                child: const SizedBox(width: 200, height: 300),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: const Text('open'),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('open'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets(
     'shows corner slot loading only after platform image url is confirmed',

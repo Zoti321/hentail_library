@@ -52,24 +52,31 @@ class LibraryPageFacadeNotifier extends _$LibraryPageFacadeNotifier {
   @override
   LibraryPageFacadeState build() {
     final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
+    // 只 watch 活跃 Tab 的目录页码，避免首屏双 catalog 同时冷启动。
+    final int? comicsPage = intent.displayTarget == LibraryDisplayTarget.comics
+        ? ref.watch(
+            libraryComicsCatalogControllerProvider.select(
+              (AsyncValue<LibraryComicsCatalogState> async) =>
+                  async.value?.pagination.page,
+            ),
+          )
+        : null;
+    final int? seriesPage = intent.displayTarget == LibraryDisplayTarget.series
+        ? ref.watch(
+            librarySeriesCatalogControllerProvider.select(
+              (AsyncValue<LibrarySeriesCatalogState> async) =>
+                  async.value?.pagination.page,
+            ),
+          )
+        : null;
     return (
       displayTarget: intent.displayTarget,
       keyword: intent.keyword,
       isFilterSortCustomized: ref.watch(
         libraryActiveFilterSortIsCustomizedProvider,
       ),
-      comicsPage: ref.watch(
-        libraryComicsCatalogControllerProvider.select(
-          (AsyncValue<LibraryComicsCatalogState> async) =>
-              async.value?.pagination.page,
-        ),
-      ),
-      seriesPage: ref.watch(
-        librarySeriesCatalogControllerProvider.select(
-          (AsyncValue<LibrarySeriesCatalogState> async) =>
-              async.value?.pagination.page,
-        ),
-      ),
+      comicsPage: comicsPage,
+      seriesPage: seriesPage,
       comicsPageSize: ref.watch(libraryComicsTabPageSizeProvider),
       seriesPageSize: ref.watch(librarySeriesTabPageSizeProvider),
     );

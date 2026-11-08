@@ -7,6 +7,6 @@ abstract final class DesktopTitleBarMetrics {
   static const double windowControlsTrailing = 0;
   static const double windowControlsWidth = 144;
 
-  /// Leading ☰ when shell uses modal drawer (&lt; expanded breakpoint).
+  /// Leading ☰ 槽宽（可选；medium- 主导航已改用底部栏）。
   static const double navigationMenuWidth = 48;
 }

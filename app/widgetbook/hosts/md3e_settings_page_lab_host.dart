@@ -6,14 +6,12 @@ import 'package:hentai_library/features/app_settings/presentation/patterns/setti
 class SettingsPageLabHost extends StatefulWidget {
   const SettingsPageLabHost({
     super.key,
-    this.initialCategory = SettingsCategory.personalization,
-    this.masterGroupTitle,
+    this.initialCategory = SettingsCategory.appearance,
     this.initialLabState = const SettingsLabState(),
     this.onBack,
   });
 
   final SettingsCategory initialCategory;
-  final String? masterGroupTitle;
   final SettingsLabState initialLabState;
   final VoidCallback? onBack;
 
@@ -33,7 +31,6 @@ class _Md3eSettingsPageLabHostState extends State<SettingsPageLabHost> {
   Widget build(BuildContext context) {
     return SettingsLayout(
       initialCategory: widget.initialCategory,
-      masterGroupTitle: widget.masterGroupTitle,
       labState: _labState,
       onLabStateChanged: _onLabStateChanged,
       onBack: widget.onBack,

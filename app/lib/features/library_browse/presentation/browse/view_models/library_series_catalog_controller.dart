@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
@@ -62,7 +62,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
-    final PagedResult<Series> page = await _fetchPage();
+    final PagedResult<SeriesBrowseListItem> page = await _fetchPage();
     final int tableTotalCount = await ref.read(seriesRepoProvider).countAll();
 
     return LibrarySeriesCatalogState(
@@ -79,7 +79,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
   }
 
-  Future<PagedResult<Series>> _fetchPage() async {
+  Future<PagedResult<SeriesBrowseListItem>> _fetchPage() async {
     final LibrarySeriesFilter filter = ref.read(
       librarySeriesFiltersQueryProvider,
     );
@@ -90,11 +90,11 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
       librarySeriesTabGroupingProvider,
     );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);
-    return _pagination.fetchPage<Series>(
+    return _pagination.fetchPage<SeriesBrowseListItem>(
       pageSize: pageSize,
       fetch: (request) => ref
           .read(seriesRepoProvider)
-          .fetchPage(
+          .fetchBrowsePage(
             request: request,
             filter: filter,
             grouping: grouping,

@@ -16,7 +16,6 @@ features/library_browse/public/catalog/for_comic_and_series.dart
 features/library_browse/public/presentation/library_browse_bootstrap_exports.dart
 features/library_browse/public/ui/author_detail_page.dart
 features/library_browse/public/ui/library_page.dart
-features/named_metadata/public/presentation/metadata_management_exports.dart
 features/named_metadata/public/ui/metadata_lab_patterns.dart
 features/named_metadata/public/ui/metadata_page.dart
 features/read_session/public/presentation/open_read_session.dart

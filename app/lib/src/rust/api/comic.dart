@@ -13,7 +13,7 @@ import 'sync.dart';
 part 'comic.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_bulk_patch`, `map_multi_value_op`, `map_multi_value_patch`, `map_published_at_patch`, `map_scalar_patch`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 void initDbFrb({required String appDataDir, required String dbFileName}) =>
     RustLib.instance.api.crateApiComicInitDbFrb(
@@ -30,6 +30,18 @@ Future<PagedComicResultDto> fetchComicsPageFrb({
   required ComicGroupingDto grouping,
   required ComicSortOptionDto sort,
 }) => RustLib.instance.api.crateApiComicFetchComicsPageFrb(
+  request: request,
+  filter: filter,
+  grouping: grouping,
+  sort: sort,
+);
+
+Future<PagedComicBrowseResultDto> fetchComicsBrowsePageFrb({
+  required PageRequestDto request,
+  required ComicFilterDto filter,
+  required ComicGroupingDto grouping,
+  required ComicSortOptionDto sort,
+}) => RustLib.instance.api.crateApiComicFetchComicsBrowsePageFrb(
   request: request,
   filter: filter,
   grouping: grouping,
@@ -159,6 +171,35 @@ class BulkPatchResultFrbDto {
           errorSamples == other.errorSamples;
 }
 
+/// 库浏览列表瘦 DTO：不含 authors/tags 等关系字段。
+class ComicBrowseItemDto {
+  final String comicId;
+  final String path;
+  final String title;
+  final int pageCount;
+
+  const ComicBrowseItemDto({
+    required this.comicId,
+    required this.path,
+    required this.title,
+    required this.pageCount,
+  });
+
+  @override
+  int get hashCode =>
+      comicId.hashCode ^ path.hashCode ^ title.hashCode ^ pageCount.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ComicBrowseItemDto &&
+          runtimeType == other.runtimeType &&
+          comicId == other.comicId &&
+          path == other.path &&
+          title == other.title &&
+          pageCount == other.pageCount;
+}
+
 class ComicDto {
   final String comicId;
   final String path;
@@ -262,8 +303,12 @@ class ComicFilterDto {
   final List<String> authorsAny;
   final List<String> authorsExclude;
   final List<String> languages;
-  final List<String> parodies;
-  final List<String> characters;
+  final List<String> parodiesAll;
+  final List<String> parodiesAny;
+  final List<String> parodiesExclude;
+  final List<String> charactersAll;
+  final List<String> charactersAny;
+  final List<String> charactersExclude;
   final bool needsMetadataOnly;
   final String? libraryId;
 
@@ -279,8 +324,12 @@ class ComicFilterDto {
     required this.authorsAny,
     required this.authorsExclude,
     required this.languages,
-    required this.parodies,
-    required this.characters,
+    required this.parodiesAll,
+    required this.parodiesAny,
+    required this.parodiesExclude,
+    required this.charactersAll,
+    required this.charactersAny,
+    required this.charactersExclude,
     required this.needsMetadataOnly,
     this.libraryId,
   });
@@ -298,8 +347,12 @@ class ComicFilterDto {
       authorsAny.hashCode ^
       authorsExclude.hashCode ^
       languages.hashCode ^
-      parodies.hashCode ^
-      characters.hashCode ^
+      parodiesAll.hashCode ^
+      parodiesAny.hashCode ^
+      parodiesExclude.hashCode ^
+      charactersAll.hashCode ^
+      charactersAny.hashCode ^
+      charactersExclude.hashCode ^
       needsMetadataOnly.hashCode ^
       libraryId.hashCode;
 
@@ -319,8 +372,12 @@ class ComicFilterDto {
           authorsAny == other.authorsAny &&
           authorsExclude == other.authorsExclude &&
           languages == other.languages &&
-          parodies == other.parodies &&
-          characters == other.characters &&
+          parodiesAll == other.parodiesAll &&
+          parodiesAny == other.parodiesAny &&
+          parodiesExclude == other.parodiesExclude &&
+          charactersAll == other.charactersAll &&
+          charactersAny == other.charactersAny &&
+          charactersExclude == other.charactersExclude &&
           needsMetadataOnly == other.needsMetadataOnly &&
           libraryId == other.libraryId;
 }
@@ -493,6 +550,34 @@ class PageRequestDto {
       identical(this, other) ||
       other is PageRequestDto &&
           runtimeType == other.runtimeType &&
+          page == other.page &&
+          pageSize == other.pageSize;
+}
+
+class PagedComicBrowseResultDto {
+  final List<ComicBrowseItemDto> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
+
+  const PagedComicBrowseResultDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PagedComicBrowseResultDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
           page == other.page &&
           pageSize == other.pageSize;
 }

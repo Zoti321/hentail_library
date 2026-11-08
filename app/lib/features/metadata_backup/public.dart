@@ -3,7 +3,6 @@
 /// Bootstrap 槽位注入与跨 feature 类型经本 barrel；实现细节留在 feature 内。
 library;
 
-export 'data/services/recent_metadata_backup_at.dart';
 export 'public/di/metadata_backup_shared_state_overrides.dart';
 export 'domain/metadata_export_options.dart';
 export 'presentation/metadata_export_flow.dart';

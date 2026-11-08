@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/shared/ui/widgets/feedback/terminal_spinner.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/comic_metadata_bulk_patch_controller.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Shell-global bulk metadata patch busy strip.
+/// Shell-global bulk metadata patch busy strip（MD3E）。
 class ComicMetadataBulkPatchShellFeedback extends ConsumerWidget {
   const ComicMetadataBulkPatchShellFeedback({super.key});
 
@@ -22,42 +21,50 @@ class ComicMetadataBulkPatchShellFeedback extends ConsumerWidget {
       comicMetadataBulkPatchControllerProvider.select((s) => s.comicCount),
     );
     final l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3EColorScheme scheme = theme.colorScheme;
+    final TextStyle labelStyle = theme.typeScale.labelMedium.copyWith(
+      color: scheme.onSurface,
+      fontWeight: FontWeight.w500,
+    );
 
     return Material(
-      color: cs.primary.withValues(alpha: 0.08),
+      color: scheme.primary.withValues(alpha: 0.08),
       child: Container(
         width: double.infinity,
         height: 30,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-          ),
+          border: Border(bottom: BorderSide(color: scheme.outlineVariant)),
         ),
         child: Row(
           children: <Widget>[
-            TerminalSpinner(color: cs.primary),
+            SizedBox(
+              width: 14,
+              height: 14,
+              child: M3EProgressIndicator.circular(
+                size: 14,
+                strokeWidth: 2,
+                color: scheme.primary,
+                showTrack: false,
+              ),
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 l10n.bulkEditMetadataBusy(count),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                style: labelStyle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            GhostButton.text(
-              text: l10n.bulkEditMetadataCancelBatch,
+            M3EButton(
               onPressed: () => ref
                   .read(comicMetadataBulkPatchControllerProvider.notifier)
                   .cancel(),
+              style: M3EButtonStyle.text,
+              size: M3EButtonSize.sm,
+              label: Text(l10n.bulkEditMetadataCancelBatch),
             ),
           ],
         ),

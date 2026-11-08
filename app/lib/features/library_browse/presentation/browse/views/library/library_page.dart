@@ -5,6 +5,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/content_breadcrumb_labels.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
@@ -19,6 +21,7 @@ import 'package:hentai_library/features/library_browse/presentation/browse/views
 import 'package:hentai_library/features/library_browse/presentation/browse/views/widgets/comic_card_actions.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_grid.dart';
+import 'package:hentai_library/shared/ui/layout/catalog_grid_metrics.dart';
 import 'package:hentai_library/shared/ui/layout/catalog_list_layout.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';
@@ -28,7 +31,6 @@ import 'package:hentai_library/features/library_browse/presentation/browse/patte
 import 'package:hentai_library/features/library_browse/presentation/browse/patterns/library/library_page_header.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
-import 'package:hentai_library/shared/ui/motion/peer_content_transition.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/expressive_library_scroll_to_top_button.dart';
@@ -36,8 +38,6 @@ import 'package:hentai_library/shared/ui/widgets/pagination/pagination.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/library_scroll_to_top_button.dart';
@@ -45,10 +45,11 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 
-/// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 网格 + 分页。
+/// 库页（MD3E 生产实现）：页头 + 漫画 / 系列 Tab + 真 Sliver 网格 + 分页。
 ///
-/// 根节点只保留 Facade 滚动监听、选择态布尔与本地 viewMode；
-/// 页头 / 工具栏 / 目录+分页各自下沉为独立 Consumer，避免勾选与阅读进度带动整页重建。
+/// 双 Tab 以 [IndexedStack] 保活，隐藏侧 [TickerMode] 关闭；目录用
+/// [CatalogGridSliver] / [CatalogListSliver] 懒构建，避免 shrinkWrap 整页 layout
+/// 与 Peer 过渡双树。
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
 
@@ -57,20 +58,55 @@ class LibraryPage extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
-  final ScrollController _scrollController = ScrollController();
+  final ScrollController _comicsScrollController = ScrollController();
+  final ScrollController _seriesScrollController = ScrollController();
   CatalogViewMode _viewMode = CatalogViewMode.grid;
+
+  /// 首帧后再挂非活跃 Tab / 预热其 catalog，避免与活跃 Tab 抢首屏。
+  bool _keepAlivePeerTab = false;
+  bool _warmInactiveCatalogs = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _keepAlivePeerTab = true;
+        _warmInactiveCatalogs = true;
+      });
+    });
+  }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _comicsScrollController.dispose();
+    _seriesScrollController.dispose();
     super.dispose();
   }
 
-  void _scrollToContentTop() {
-    if (!_scrollController.hasClients) {
+  ScrollController _controllerFor(LibraryDisplayTarget target) {
+    return switch (target) {
+      LibraryDisplayTarget.comics => _comicsScrollController,
+      LibraryDisplayTarget.series => _seriesScrollController,
+    };
+  }
+
+  void _jumpActiveToTop(LibraryDisplayTarget target) {
+    final ScrollController controller = _controllerFor(target);
+    if (controller.hasClients && controller.offset > 0) {
+      controller.jumpTo(0);
+    }
+  }
+
+  void _scrollActiveToTop(LibraryDisplayTarget target) {
+    final ScrollController controller = _controllerFor(target);
+    if (!controller.hasClients) {
       return;
     }
-    _scrollController.animateTo(
+    controller.animateTo(
       0,
       duration: kLibraryScrollToTopScrollDuration,
       curve: Curves.easeOutCubic,
@@ -79,8 +115,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // 保持非当前 Tab 的目录预热（与 Baseline 库页一致）。
-    ref.watch(libraryCatalogInactiveSubscriptionProvider);
+    if (_warmInactiveCatalogs) {
+      ref.watch(libraryCatalogInactiveSubscriptionProvider);
+    }
+
     ref.listen<LibraryPageFacadeState>(libraryPageFacadeProvider, (
       LibraryPageFacadeState? previous,
       LibraryPageFacadeState next,
@@ -88,20 +126,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       if (!libraryPageShouldScrollToTop(previous, next)) {
         return;
       }
-      // 漫画↔系列：勿清封面视口（避免进入页首帧 inViewport=false 占位闪一下），
-      // 已滚过的列表瞬时回顶，不与 Peer 淡入叠一段 300ms 滚动。
       final bool displayTargetChanged =
           previous != null && previous.displayTarget != next.displayTarget;
       if (displayTargetChanged) {
-        if (_scrollController.hasClients && _scrollController.offset > 0) {
-          _scrollController.jumpTo(0);
-        }
+        // 漫画↔系列：勿清封面视口（避免进入页首帧 inViewport=false 占位闪一下），
+        // 已滚过的列表瞬时回顶。
+        _jumpActiveToTop(next.displayTarget);
         return;
       }
       ref
           .read(coverViewportProvider(CoverViewportScopes.library).notifier)
           .clear();
-      _scrollToContentTop();
+      _scrollActiveToTop(next.displayTarget);
     });
 
     final bool librarySelection = ref.watch(
@@ -109,9 +145,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         (CatalogSelectionState state) => state.isLibraryBrowseSelection,
       ),
     );
-    final PageLayoutSpec layout = PageLayoutSpec.of(context);
-    final WindowSizeClass sizeClass = layout.sizeClass;
-    final double horizontal = layout.horizontalInset;
+    final LibraryDisplayTarget target = ref.watch(
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
+    );
+    final bool mountComics =
+        target == LibraryDisplayTarget.comics || _keepAlivePeerTab;
+    final bool mountSeries =
+        target == LibraryDisplayTarget.series || _keepAlivePeerTab;
 
     return PopScope(
       canPop: !librarySelection,
@@ -124,59 +166,121 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         backgroundColor: labBrowseCanvasColor(M3ETheme.of(context).colorScheme),
         body: Stack(
           children: <Widget>[
-            CustomScrollView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: <Widget>[
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: PageHeaderDelegate(
-                    layout: layout,
-                    child: const _LibraryModeHeader(),
-                  ),
+            IndexedStack(
+              index: target == LibraryDisplayTarget.comics ? 0 : 1,
+              children: <Widget>[
+                TickerMode(
+                  enabled: target == LibraryDisplayTarget.comics,
+                  child: mountComics
+                      ? _LibraryTabScrollView(
+                          scrollController: _comicsScrollController,
+                          target: LibraryDisplayTarget.comics,
+                          viewMode: _viewMode,
+                          warmPeerCounts: _warmInactiveCatalogs,
+                          onViewModeChanged: (CatalogViewMode mode) {
+                            setState(() => _viewMode = mode);
+                          },
+                        )
+                      : const SizedBox.shrink(),
                 ),
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    horizontal,
-                    layout.headerToBodyGap,
-                    horizontal,
-                    0,
-                  ),
-                  sliver: const SliverToBoxAdapter(
-                    child: _LibraryCatalogToolbarSlot(),
-                  ),
+                TickerMode(
+                  enabled: target == LibraryDisplayTarget.series,
+                  child: mountSeries
+                      ? _LibraryTabScrollView(
+                          scrollController: _seriesScrollController,
+                          target: LibraryDisplayTarget.series,
+                          viewMode: _viewMode,
+                          warmPeerCounts: _warmInactiveCatalogs,
+                          onViewModeChanged: (CatalogViewMode mode) {
+                            setState(() => _viewMode = mode);
+                          },
+                        )
+                      : const SizedBox.shrink(),
                 ),
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    horizontal,
-                    LibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(
-                      sizeClass,
-                    ),
-                    horizontal,
-                    0,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: CatalogViewModeButtonGroup(
-                        mode: _viewMode,
-                        onModeChanged: (CatalogViewMode mode) {
-                          setState(() => _viewMode = mode);
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                _LibraryCatalogRegion(viewMode: _viewMode),
               ],
             ),
             ExpressiveLibraryScrollToTopButton(
-              scrollController: _scrollController,
-              horizontalPadding: horizontal,
+              scrollController: _controllerFor(target),
+              horizontalPadding: PageLayoutSpec.of(context).horizontalInset,
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+/// 单 Tab 完整滚动树：页头 + 工具栏 + 视口模式 + 真 Sliver 目录 + 分页。
+class _LibraryTabScrollView extends ConsumerWidget {
+  const _LibraryTabScrollView({
+    required this.scrollController,
+    required this.target,
+    required this.viewMode,
+    required this.warmPeerCounts,
+    required this.onViewModeChanged,
+  });
+
+  final ScrollController scrollController;
+  final LibraryDisplayTarget target;
+  final CatalogViewMode viewMode;
+  final bool warmPeerCounts;
+  final ValueChanged<CatalogViewMode> onViewModeChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final PageLayoutSpec layout = PageLayoutSpec.of(context);
+    final WindowSizeClass sizeClass = layout.sizeClass;
+    final double horizontal = layout.horizontalInset;
+
+    return CustomScrollView(
+      controller: scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: <Widget>[
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: PageHeaderDelegate(
+            layout: layout,
+            child: const _LibraryModeHeader(),
+          ),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            horizontal,
+            layout.headerToBodyGap,
+            horizontal,
+            0,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: _LibraryCatalogToolbarSlot(warmPeerCounts: warmPeerCounts),
+          ),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            horizontal,
+            LibraryBrowsePageMetrics.catalogToolbarToViewModeSpacing(sizeClass),
+            horizontal,
+            0,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: CatalogViewModeButtonGroup(
+                mode: viewMode,
+                onModeChanged: onViewModeChanged,
+              ),
+            ),
+          ),
+        ),
+        ..._LibraryCatalogSlivers.build(
+          context,
+          ref,
+          target: target,
+          viewMode: viewMode,
+          horizontal: horizontal,
+          headerToBodyGap: layout.headerToBodyGap,
+          bottomInset: LibraryBrowsePageMetrics.scrollBottomInset(sizeClass),
+        ),
+      ],
     );
   }
 }
@@ -202,8 +306,9 @@ class _LibraryModeHeader extends ConsumerWidget {
                 final LibraryComicsCatalogState? catalog =
                     stableCatalogSnapshot(async);
                 return <String>[
-                  for (final Comic comic in catalog?.items ?? const <Comic>[])
-                    comic.comicId,
+                  for (final ComicBrowseViewObject item
+                      in catalog?.items ?? const <ComicBrowseViewObject>[])
+                    item.comicId,
                 ];
               }),
             ),
@@ -263,9 +368,11 @@ class _LibraryBrowsePageHeader extends ConsumerWidget {
   }
 }
 
-/// 工具栏：只订阅 Tab 目标与两套目录的 totalCount。
+/// 工具栏：订阅 Tab 目标；非活跃侧计数可延后到 [warmPeerCounts]。
 class _LibraryCatalogToolbarSlot extends ConsumerWidget {
-  const _LibraryCatalogToolbarSlot();
+  const _LibraryCatalogToolbarSlot({required this.warmPeerCounts});
+
+  final bool warmPeerCounts;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -274,8 +381,14 @@ class _LibraryCatalogToolbarSlot extends ConsumerWidget {
         (LibraryPageFacadeState state) => state.displayTarget,
       ),
     );
-    final int comicCount = ref.watch(libraryDisplayedComicCountProvider);
-    final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
+    final int comicCount =
+        target == LibraryDisplayTarget.comics || warmPeerCounts
+        ? ref.watch(libraryDisplayedComicCountProvider)
+        : 0;
+    final int seriesCount =
+        target == LibraryDisplayTarget.series || warmPeerCounts
+        ? ref.watch(libraryDisplayedSeriesCountProvider)
+        : 0;
 
     return LibraryCatalogToolbar(
       displayTarget: target,
@@ -288,38 +401,42 @@ class _LibraryCatalogToolbarSlot extends ConsumerWidget {
   }
 }
 
-/// 目录网格/列表 + 分页：订阅 catalog / selection / 阅读进度。
-class _LibraryCatalogRegion extends ConsumerWidget {
-  const _LibraryCatalogRegion({required this.viewMode});
-
-  final CatalogViewMode viewMode;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryDisplayTarget target = ref.watch(
-      libraryPageFacadeProvider.select(
-        (LibraryPageFacadeState state) => state.displayTarget,
-      ),
-    );
-    final LibraryComicsCatalogState? comicsCatalog = stableCatalogSnapshot(
-      ref.watch(libraryComicsCatalogControllerProvider),
-    );
-    final LibrarySeriesCatalogState? seriesCatalog = stableCatalogSnapshot(
-      ref.watch(librarySeriesCatalogControllerProvider),
-    );
+/// 目录 + 分页 sliver 工厂（按当前 Tab 目标只构建一侧内容树）。
+abstract final class _LibraryCatalogSlivers {
+  static List<Widget> build(
+    BuildContext context,
+    WidgetRef ref, {
+    required LibraryDisplayTarget target,
+    required CatalogViewMode viewMode,
+    required double horizontal,
+    required double headerToBodyGap,
+    required double bottomInset,
+  }) {
+    // 各 Tab 只订阅本侧 catalog；非活跃侧由首帧后的 inactive subscription /
+    // IndexedStack peer mount 预热，避免首屏双 fetch。
+    final LibraryComicsCatalogState? comicsCatalog =
+        target == LibraryDisplayTarget.comics
+        ? stableCatalogSnapshot(
+            ref.watch(libraryComicsCatalogControllerProvider),
+          )
+        : null;
+    final LibrarySeriesCatalogState? seriesCatalog =
+        target == LibraryDisplayTarget.series
+        ? stableCatalogSnapshot(
+            ref.watch(librarySeriesCatalogControllerProvider),
+          )
+        : null;
+    final Map<String, int> readPages = target == LibraryDisplayTarget.comics
+        ? (ref.watch(comicReadPageIndexByIdProvider).value ??
+              const <String, int>{})
+        : const <String, int>{};
     final CatalogSelectionState selection = ref.watch(catalogSelectionProvider);
-    // 无条件订阅，避免 comics/series 分支切换时变更 watch 集合。
-    final Map<String, int> readPages =
-        ref.watch(comicReadPageIndexByIdProvider).value ??
-        const <String, int>{};
-    final PageLayoutSpec layout = PageLayoutSpec.of(context);
-    final double horizontal = layout.horizontalInset;
     final LibraryPagination? pagination = switch (target) {
       LibraryDisplayTarget.comics => comicsCatalog?.pagination,
       LibraryDisplayTarget.series => seriesCatalog?.pagination,
     };
 
-    final Widget catalogBody = _buildCatalogBody(
+    final List<Widget> catalogSlivers = _catalogBodySlivers(
       context,
       ref,
       target: target,
@@ -330,42 +447,45 @@ class _LibraryCatalogRegion extends ConsumerWidget {
       readPages: readPages,
     );
 
-    return SliverPadding(
-      padding: EdgeInsets.fromLTRB(
-        horizontal,
-        layout.headerToBodyGap,
-        horizontal,
-        LibraryBrowsePageMetrics.scrollBottomInset(layout.sizeClass),
-      ),
-      sliver: SliverToBoxAdapter(
-        child: PeerContentTransition(
-          switchKey: target,
-          reverse: target == LibraryDisplayTarget.comics,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              catalogBody,
-              if (pagination != null && pagination.totalPages > 1) ...<Widget>[
-                SizedBox(height: Spacing.space16),
-                Pagination(
-                  page: pagination.page,
-                  totalPages: pagination.totalPages,
-                  totalItems: pagination.totalCount,
-                  onPageChanged: (int page) {
-                    ref
-                        .read(libraryPageFacadeProvider.notifier)
-                        .setPage(target, page);
-                  },
-                ),
-              ],
-            ],
-          ),
+    return <Widget>[
+      SliverPadding(
+        padding: EdgeInsets.fromLTRB(
+          horizontal,
+          headerToBodyGap,
+          horizontal,
+          0,
         ),
+        sliver: catalogSlivers.length == 1
+            ? catalogSlivers.first
+            : SliverMainAxisGroup(slivers: catalogSlivers),
       ),
-    );
+      if (pagination != null && pagination.totalPages > 1)
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            horizontal,
+            Spacing.space16,
+            horizontal,
+            bottomInset,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: Pagination(
+              page: pagination.page,
+              totalPages: pagination.totalPages,
+              totalItems: pagination.totalCount,
+              onPageChanged: (int page) {
+                ref
+                    .read(libraryPageFacadeProvider.notifier)
+                    .setPage(target, page);
+              },
+            ),
+          ),
+        )
+      else
+        SliverToBoxAdapter(child: SizedBox(height: bottomInset)),
+    ];
   }
 
-  void _openComicDetail(WidgetRef ref, String comicId) {
+  static void _openComicDetail(WidgetRef ref, String comicId) {
     ref.read(comicDetailReturnSeriesProvider.notifier).clear();
     ref
         .read(appRouterProvider)
@@ -375,62 +495,13 @@ class _LibraryCatalogRegion extends ConsumerWidget {
         );
   }
 
-  void _openSeriesDetail(WidgetRef ref, String seriesId) {
+  static void _openSeriesDetail(WidgetRef ref, String seriesId) {
     ref
         .read(appRouterProvider)
         .push('/series/${Uri.encodeComponent(seriesId)}');
   }
 
-  /// 列表模式：列数由窗口尺寸与平台决定（见 [comicListColumnCount]），与 Widgetbook Lab 一致。
-  Widget _buildCatalogListBox(
-    BuildContext context, {
-    required int itemCount,
-    required Widget Function(BuildContext context, int index) itemBuilder,
-  }) {
-    final PageLayoutSpec layout = PageLayoutSpec.of(context);
-    final int columns = comicListColumnCount(layout.sizeClass);
-    if (columns == 1) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          for (int index = 0; index < itemCount; index++)
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: index == itemCount - 1 ? 0 : layout.listItemGap,
-              ),
-              child: itemBuilder(context, index),
-            ),
-        ],
-      );
-    }
-    final int rowCount = (itemCount + columns - 1) ~/ columns;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: rowIndex == rowCount - 1 ? 0 : layout.listItemGap,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                for (int column = 0; column < columns; column++) ...<Widget>[
-                  if (column > 0) SizedBox(width: layout.listItemGap),
-                  Expanded(
-                    child: rowIndex * columns + column < itemCount
-                        ? itemBuilder(context, rowIndex * columns + column)
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildCatalogBody(
+  static List<Widget> _catalogBodySlivers(
     BuildContext context,
     WidgetRef ref, {
     required LibraryDisplayTarget target,
@@ -445,157 +516,177 @@ class _LibraryCatalogRegion extends ConsumerWidget {
     switch (target) {
       case LibraryDisplayTarget.comics:
         if (comicsCatalog == null) {
-          return const _LibraryLoadingBody();
+          return const <Widget>[_LibraryLoadingSliver()];
         }
         if (comicsCatalog.items.isEmpty) {
-          return _LibraryEmptyState(
-            title: comicsCatalog.isComicTableEmpty
-                ? l10n.libraryEmptyTitle
-                : l10n.libraryNoMatchTitle,
-          );
+          return <Widget>[
+            _LibraryEmptySliver(
+              title: comicsCatalog.isComicTableEmpty
+                  ? l10n.libraryEmptyTitle
+                  : l10n.libraryNoMatchTitle,
+            ),
+          ];
         }
-        final List<Comic> comics = comicsCatalog.items;
+        final List<ComicBrowseViewObject> comics = comicsCatalog.items;
         if (viewMode == CatalogViewMode.list) {
-          return _buildCatalogListBox(
-            context,
+          return <Widget>[
+            CatalogListSliver(
+              itemCount: comics.length,
+              itemBuilder: (BuildContext context, int index) {
+                final ComicBrowseViewObject comic = comics[index];
+                return ComicCardActions.fromBrowse(
+                  item: comic,
+                  enabled: !librarySelection,
+                  child: ComicListItem(
+                    title: comic.title,
+                    pageLabel: l10n.comicDetailPageCount(comic.pageCount),
+                    cover: ComicCoverContent(
+                      comicId: comic.comicId,
+                      gridIndex: index,
+                      coverViewportScope: CoverViewportScopes.library,
+                    ),
+                    readProgress: comicReadProgressFor(
+                      pageIndex: readPages[comic.comicId],
+                      pageCount: comic.pageCount,
+                    ),
+                    selectionMode: librarySelection,
+                    selected: selection.selectedIds.contains(comic.comicId),
+                    onTap: () => _openComicDetail(ref, comic.comicId),
+                    onSelectionChanged: (_) => ref
+                        .read(catalogSelectionProvider.notifier)
+                        .toggle(comic.comicId),
+                  ),
+                );
+              },
+            ),
+          ];
+        }
+        return <Widget>[
+          CatalogGridSliver(
+            horizontalMargin: 0,
             itemCount: comics.length,
-            itemBuilder: (BuildContext context, int index) {
-              final Comic comic = comics[index];
-              return ComicCardActions(
-                comic: comic,
-                enabled: !librarySelection,
-                child: ComicListItem(
-                  title: comic.title,
-                  pageLabel: l10n.comicDetailPageCount(comic.pageCount),
-                  cover: ComicCoverContent(
-                    comicId: comic.comicId,
+            itemBuilder:
+                (BuildContext context, int index, CatalogGridLayout _) {
+                  final ComicBrowseViewObject comic = comics[index];
+                  return ComicCardActions.fromBrowse(
+                    key: ValueKey<String>(comic.comicId),
+                    item: comic,
+                    enabled: !librarySelection,
+                    child: ComicCard(
+                      title: comic.title,
+                      subtitle: l10n.comicDetailPageCount(comic.pageCount),
+                      cover: ComicCoverContent(
+                        comicId: comic.comicId,
+                        gridIndex: index,
+                        coverViewportScope: CoverViewportScopes.library,
+                      ),
+                      readProgress: comicReadProgressFor(
+                        pageIndex: readPages[comic.comicId],
+                        pageCount: comic.pageCount,
+                      ),
+                      selectionMode: librarySelection,
+                      selected: selection.selectedIds.contains(comic.comicId),
+                      onTap: () => _openComicDetail(ref, comic.comicId),
+                      onSelectionChanged: (_) => ref
+                          .read(catalogSelectionProvider.notifier)
+                          .toggle(comic.comicId),
+                    ),
+                  );
+                },
+          ),
+        ];
+      case LibraryDisplayTarget.series:
+        if (seriesCatalog == null) {
+          return const <Widget>[_LibraryLoadingSliver()];
+        }
+        if (seriesCatalog.items.isEmpty) {
+          return <Widget>[
+            _LibraryEmptySliver(
+              title: seriesCatalog.isSeriesTableEmpty
+                  ? l10n.librarySeriesEmptyTitle
+                  : l10n.libraryNoMatchTitle,
+            ),
+          ];
+        }
+        final List<SeriesBrowseViewObject> series = seriesCatalog.items;
+        if (viewMode == CatalogViewMode.list) {
+          return <Widget>[
+            CatalogListSliver(
+              itemCount: series.length,
+              itemBuilder: (BuildContext context, int index) {
+                final SeriesBrowseViewObject s = series[index];
+                return ComicListItem(
+                  title: s.name,
+                  pageLabel: context.l10n.seriesVolumeCountLabel(s.volumeCount),
+                  cover: SeriesCoverContent(
+                    seriesId: s.id,
                     gridIndex: index,
                     coverViewportScope: CoverViewportScopes.library,
                   ),
-                  readProgress: comicReadProgressFor(
-                    pageIndex: readPages[comic.comicId],
-                    pageCount: comic.pageCount,
-                  ),
-                  selectionMode: librarySelection,
-                  selected: selection.selectedIds.contains(comic.comicId),
-                  onTap: () => _openComicDetail(ref, comic.comicId),
-                  onSelectionChanged: (_) => ref
-                      .read(catalogSelectionProvider.notifier)
-                      .toggle(comic.comicId),
-                ),
-              );
-            },
-          );
+                  onTap: () => _openSeriesDetail(ref, s.id),
+                );
+              },
+            ),
+          ];
         }
-        return CatalogGridBox(
-          itemCount: comics.length,
-          itemBuilder: (BuildContext context, int index, _) {
-            final Comic comic = comics[index];
-            return ComicCardActions(
-              key: ValueKey<String>(comic.comicId),
-              comic: comic,
-              enabled: !librarySelection,
-              child: ComicCard(
-                title: comic.title,
-                subtitle: l10n.comicDetailPageCount(comic.pageCount),
-                cover: ComicCoverContent(
-                  comicId: comic.comicId,
-                  gridIndex: index,
-                  coverViewportScope: CoverViewportScopes.library,
-                ),
-                readProgress: comicReadProgressFor(
-                  pageIndex: readPages[comic.comicId],
-                  pageCount: comic.pageCount,
-                ),
-                selectionMode: librarySelection,
-                selected: selection.selectedIds.contains(comic.comicId),
-                onTap: () => _openComicDetail(ref, comic.comicId),
-                onSelectionChanged: (_) => ref
-                    .read(catalogSelectionProvider.notifier)
-                    .toggle(comic.comicId),
-              ),
-            );
-          },
-        );
-      case LibraryDisplayTarget.series:
-        if (seriesCatalog == null) {
-          return const _LibraryLoadingBody();
-        }
-        if (seriesCatalog.items.isEmpty) {
-          return _LibraryEmptyState(
-            title: seriesCatalog.isSeriesTableEmpty
-                ? l10n.librarySeriesEmptyTitle
-                : l10n.libraryNoMatchTitle,
-          );
-        }
-        final List<Series> series = seriesCatalog.items;
-        if (viewMode == CatalogViewMode.list) {
-          return _buildCatalogListBox(
-            context,
+        return <Widget>[
+          CatalogGridSliver(
+            horizontalMargin: 0,
+            hasSubtitle: true,
             itemCount: series.length,
-            itemBuilder: (BuildContext context, int index) {
-              final Series s = series[index];
-              return ComicListItem(
-                title: s.name,
-                pageLabel: context.l10n.seriesVolumeCountLabel(s.items.length),
-                cover: SeriesCoverContent(
-                  seriesId: s.id,
-                  gridIndex: index,
-                  coverViewportScope: CoverViewportScopes.library,
-                ),
-                onTap: () => _openSeriesDetail(ref, s.id),
-              );
-            },
-          );
-        }
-        return CatalogGridBox(
-          hasSubtitle: true,
-          itemCount: series.length,
-          itemBuilder: (BuildContext context, int index, _) {
-            final Series s = series[index];
-            return ComicCard(
-              key: ValueKey<String>('library-series-${s.id}'),
-              title: s.name,
-              subtitle: context.l10n.seriesVolumeCountLabel(s.items.length),
-              cover: SeriesCoverContent(
-                seriesId: s.id,
-                gridIndex: index,
-                coverViewportScope: CoverViewportScopes.library,
-              ),
-              onTap: () => _openSeriesDetail(ref, s.id),
-            );
-          },
-        );
+            itemBuilder:
+                (BuildContext context, int index, CatalogGridLayout _) {
+                  final SeriesBrowseViewObject s = series[index];
+                  return ComicCard(
+                    key: ValueKey<String>('library-series-${s.id}'),
+                    title: s.name,
+                    subtitle: context.l10n.seriesVolumeCountLabel(
+                      s.volumeCount,
+                    ),
+                    cover: SeriesCoverContent(
+                      seriesId: s.id,
+                      gridIndex: index,
+                      coverViewportScope: CoverViewportScopes.library,
+                    ),
+                    onTap: () => _openSeriesDetail(ref, s.id),
+                  );
+                },
+          ),
+        ];
     }
   }
 }
 
-class _LibraryLoadingBody extends StatelessWidget {
-  const _LibraryLoadingBody();
+class _LibraryLoadingSliver extends StatelessWidget {
+  const _LibraryLoadingSliver();
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 48),
-      child: Center(child: CircularProgressIndicator()),
+    return const SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 48),
+        child: Center(child: CircularProgressIndicator()),
+      ),
     );
   }
 }
 
-class _LibraryEmptyState extends StatelessWidget {
-  const _LibraryEmptyState({required this.title});
+class _LibraryEmptySliver extends StatelessWidget {
+  const _LibraryEmptySliver({required this.title});
 
   final String title;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 64),
-      child: Center(
-        child: Text(
-          title,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 64),
+        child: Center(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ),

@@ -7,19 +7,17 @@ import 'package:material_symbols_icons/symbols.dart';
 abstract final class ShellRailSymbols {
   static const IconData home = Symbols.home;
   static const IconData library = Symbols.auto_stories;
-  static const IconData metadata = Symbols.layers;
   static const IconData settings = Symbols.settings;
 }
 
 /// Primary shell destination indices for the **Lab default** rail
-/// ([labDefaultShellRailDestinations]).
+/// ([labDefaultShellRailDestinations]：首页 / 漫画库 / 设置；管理页经首页统计卡进入）。
 abstract final class ShellNavigation {
   static const int homeDestinationIndex = 0;
   static const int libraryDestinationIndex = 1;
-  static const int managementDestinationIndex = 2;
-  static const int settingsDestinationIndex = 3;
+  static const int settingsDestinationIndex = 2;
 
-  /// [ExpressiveNavigationRail.selectedIndex]：无对应 Rail 目的地（如 `/history`）。
+  /// [ExpressiveNavigationRail.selectedIndex]：无对应 Rail 目的地（如 `/history`、`/metadata`）。
   static const int noDestinationIndex = -1;
 
   static const double librarySecondaryPanelWidth = 280;
@@ -110,7 +108,7 @@ class ShellNavigationSnapshot {
   final String selectedLibraryId;
   final String selectedLibraryDisplayName;
 
-  /// compact 下从设置等目的地返回上一目的地；expanded+ 或无上一目的地时为 null。
+  /// medium- 下从设置等目的地返回上一目的地；expanded+ 或无上一目的地时为 null。
   final VoidCallback? onBackToPreviousDestination;
 }
 
@@ -135,11 +133,6 @@ List<ShellRailDestination> labDefaultShellRailDestinations(
       label: l10n.libraryTitle,
       icon: ShellRailSymbols.library,
       isLibraryFlyoutAnchor: true,
-    ),
-    ShellRailDestination(
-      navId: 'metadata',
-      label: l10n.navMetadata,
-      icon: ShellRailSymbols.metadata,
     ),
     ShellRailDestination(
       navId: 'settings',

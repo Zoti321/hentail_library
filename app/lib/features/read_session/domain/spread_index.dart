@@ -14,8 +14,6 @@ class SpreadIndex {
     return switch (mode) {
       ReadingMode.paged || ReadingMode.webtoon => totalPages,
       ReadingMode.dualPage => (totalPages + 1) ~/ 2,
-      ReadingMode.dualPageNoCover =>
-        totalPages == 1 ? 1 : 1 + ((totalPages - 1 + 1) ~/ 2),
     };
   }
 
@@ -35,10 +33,6 @@ class SpreadIndex {
     return switch (mode) {
       ReadingMode.paged || ReadingMode.webtoon => <int>[spreadIndex + 1],
       ReadingMode.dualPage => _dualPageSpread(
-        totalPages: totalPages,
-        spreadIndex: spreadIndex,
-      ),
-      ReadingMode.dualPageNoCover => _dualPageNoCoverSpread(
         totalPages: totalPages,
         spreadIndex: spreadIndex,
       ),
@@ -72,8 +66,6 @@ class SpreadIndex {
     return switch (mode) {
       ReadingMode.paged || ReadingMode.webtoon => pageIndex - 1,
       ReadingMode.dualPage => (pageIndex - 1) ~/ 2,
-      ReadingMode.dualPageNoCover =>
-        pageIndex == 1 ? 0 : 1 + ((pageIndex - 2) ~/ 2),
     };
   }
 
@@ -210,24 +202,6 @@ class SpreadIndex {
     required int spreadIndex,
   }) {
     final int left = spreadIndex * 2 + 1;
-    if (left > totalPages) {
-      return const <int>[];
-    }
-    final int right = left + 1;
-    if (right > totalPages) {
-      return <int>[left];
-    }
-    return <int>[left, right];
-  }
-
-  static List<int> _dualPageNoCoverSpread({
-    required int totalPages,
-    required int spreadIndex,
-  }) {
-    if (spreadIndex == 0) {
-      return <int>[1];
-    }
-    final int left = spreadIndex * 2;
     if (left > totalPages) {
       return const <int>[];
     }
