@@ -60,6 +60,9 @@ class AuthorImageView extends ConsumerWidget {
                 comicId: comicId!,
                 fit: BoxFit.cover,
                 alignment: alignment,
+                // 横幅/头像仅为占位底图；与作品区同一 comicId 时不能再挂
+                // comic-cover Hero，否则同页重复 tag 会在路由过渡时断言失败。
+                enableHero: false,
               ),
             if (hd != null && hd.isNotEmpty)
               Image.memory(
