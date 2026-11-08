@@ -4,27 +4,32 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_distinct_metadata_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/views/library/library_sort_section.dart';
-import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
+import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
+import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
+import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/library_change_bus.dart';
+import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_metadata_filter_selection.dart';
-import 'package:hentai_library/features/library_browse/domain/browse/library_tri_state_pick.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:hentai_library/features/library_browse/presentation/integrations/series_presentation_bridge.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 const Duration _kFilterAccordionDuration = Duration(milliseconds: 200);
 const Curve _kFilterAccordionCurve = Curves.easeOutCubic;
 const double _kFilterOptionRowHeight = 40;
 const double _kFilterMetadataListHeight = 240;
+const double _kFilterMetadataSearchHeight = 36;
+const double _kFilterMetadataSearchIconSize = 18;
 
 typedef LibraryMetadataFilterToggle = Future<void> Function(String name);
 typedef LibraryMetadataIncludeModeChanged = Future<void> Function(
@@ -58,6 +63,32 @@ final libraryFilterAuthorNamesProvider = Provider<AsyncValue<List<String>>>((
   });
 });
 
+/// 原作筛选候选：全局字典（与标签 / 作者一致，非库内 distinct）。
+final libraryFilterParodyNamesProvider = FutureProvider<List<String>>((
+  Ref ref,
+) async {
+  ref.watch(
+    libraryChangeBusProvider.select(
+      (LibraryChangeState s) => s.dictionaryRevision,
+    ),
+  );
+  final List<String> names = await ref.watch(parodyRepoProvider).listAll();
+  return (List<String>.of(names)..sort());
+});
+
+/// 角色筛选候选：全局字典（与标签 / 作者一致，非库内 distinct）。
+final libraryFilterCharacterNamesProvider = FutureProvider<List<String>>((
+  Ref ref,
+) async {
+  ref.watch(
+    libraryChangeBusProvider.select(
+      (LibraryChangeState s) => s.dictionaryRevision,
+    ),
+  );
+  final List<String> names = await ref.watch(characterRepoProvider).listAll();
+  return (List<String>.of(names)..sort());
+});
+
 LibraryMetadataFilterSelection _includeOnlySelection(Set<String> names) {
   return LibraryMetadataFilterSelection(
     picks: <String, LibraryTriStatePick>{
@@ -68,8 +99,8 @@ LibraryMetadataFilterSelection _includeOnlySelection(Set<String> names) {
 
 /// 库页筛选抽屉的「筛选」区（MD3E 生产实现，数据绑定 Riverpod）。
 ///
-/// 漫画 Tab：年龄限制、媒体类型、标签、作者、语言、同人、角色、整理；
-/// 系列 Tab：年龄限制、连载状态。分组与顺序与 Baseline 抽屉一致。
+/// 漫画 Tab：年龄限制、媒体类型、语言、整理，底部成组为作者 → 原作 → 角色 → 标签；
+/// 系列 Tab：年龄限制、连载状态。
 class LibraryFilterSection extends StatelessWidget {
   const LibraryFilterSection({super.key});
 
@@ -81,12 +112,12 @@ class LibraryFilterSection extends StatelessWidget {
         _AgeRestrictionFilterGroup(),
         _MediaTypeFilterGroup(),
         _SerializationStatusFilterGroup(),
-        _TagFilterGroup(),
-        _AuthorFilterGroup(),
         _LanguageFilterGroup(),
+        _OrganizeFilterGroup(),
+        _AuthorFilterGroup(),
         _ParodyFilterGroup(),
         _CharacterFilterGroup(),
-        _OrganizeFilterGroup(),
+        _TagFilterGroup(),
       ],
     );
   }
@@ -327,7 +358,7 @@ class _ParodyFilterGroup extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     final AsyncValue<List<String>> parodiesAsync = ref.watch(
-      libraryDistinctParodiesProvider,
+      libraryFilterParodyNamesProvider,
     );
     final Set<String> selected = ref.watch(
       libraryComicFiltersProvider.select(
@@ -335,8 +366,7 @@ class _ParodyFilterGroup extends ConsumerWidget {
             state.value?.parodyFilter ?? const <String>{},
       ),
     );
-    final List<String> names =
-        (parodiesAsync.value ?? const <String>[]).toList()..sort();
+    final List<String> names = parodiesAsync.value ?? const <String>[];
     final notifier = ref.read(libraryComicFiltersProvider.notifier);
     return _MetadataFilterGroup(
       title: context.l10n.libraryParodyFilter,
@@ -362,7 +392,7 @@ class _CharacterFilterGroup extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     final AsyncValue<List<String>> charactersAsync = ref.watch(
-      libraryDistinctCharactersProvider,
+      libraryFilterCharacterNamesProvider,
     );
     final Set<String> selected = ref.watch(
       libraryComicFiltersProvider.select(
@@ -370,8 +400,7 @@ class _CharacterFilterGroup extends ConsumerWidget {
             state.value?.characterFilter ?? const <String>{},
       ),
     );
-    final List<String> names =
-        (charactersAsync.value ?? const <String>[]).toList()..sort();
+    final List<String> names = charactersAsync.value ?? const <String>[];
     final notifier = ref.read(libraryComicFiltersProvider.notifier);
     return _MetadataFilterGroup(
       title: context.l10n.libraryCharacterFilter,
@@ -577,36 +606,61 @@ class _MetadataFilterGroup extends StatefulWidget {
 }
 
 class _MetadataFilterGroupState extends State<_MetadataFilterGroup> {
+  String _query = '';
+
   String _labelOf(String name) => widget.labelFor?.call(name) ?? name;
+
+  bool _matches(String name) {
+    final String haystack = _labelOf(name);
+    if (!widget.enablePinyinAssistedNameMatch) {
+      final String normalized = _query.trim().toLowerCase();
+      return normalized.isEmpty || haystack.toLowerCase().contains(normalized);
+    }
+    return nameMatchesPinyinAssistedFilter(haystack, _query);
+  }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppLocalizations l10n = context.l10n;
-    final List<String> filteredNames = widget.names;
+    final List<String> filteredNames = widget.names
+        .where(_matches)
+        .toList(growable: false);
+    final bool showIncludeMode =
+        !widget.includeOnly && widget.onIncludeModeChanged != null;
 
     return _FilterAccordion(
       title: widget.title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          if (!widget.includeOnly && widget.onIncludeModeChanged != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                kLibrarySortSectionInset,
-                8,
-                kLibrarySortSectionInset,
-                8,
-              ),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: _IncludeModeIconButton(
-                  mode: widget.selection.includeMode,
-                  onChanged: widget.onIncludeModeChanged!,
-                ),
-              ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              kLibrarySortSectionInset,
+              8,
+              kLibrarySortSectionInset,
+              8,
             ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: _CompactMetadataSearchBar(
+                    onChanged: (String value) =>
+                        setState(() => _query = value),
+                  ),
+                ),
+                if (showIncludeMode)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4),
+                    child: _IncludeModeIconButton(
+                      mode: widget.selection.includeMode,
+                      onChanged: widget.onIncludeModeChanged!,
+                    ),
+                  ),
+              ],
+            ),
+          ),
           if (widget.isLoading)
             const Padding(
               padding: EdgeInsets.all(16),
@@ -673,6 +727,55 @@ class _MetadataFilterGroupState extends State<_MetadataFilterGroup> {
   }
 }
 
+/// 手风琴内小号 [M3ESearchBar]：无 hint，高度低于管理页 dense bar。
+class _CompactMetadataSearchBar extends StatelessWidget {
+  const _CompactMetadataSearchBar({required this.onChanged});
+
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final M3EThemeData theme = M3ETheme.of(context);
+    final M3ESearchBarTheme compactTheme = theme.searchBarTheme.copyWith(
+      minHeight: _kFilterMetadataSearchHeight,
+      maxWidth: double.infinity,
+      minWidth: 0,
+      iconSize: _kFilterMetadataSearchIconSize,
+      tapTargetSize: _kFilterMetadataSearchHeight,
+      leadingSpace: 4,
+      trailingSpace: 4,
+      expandOnFocus: false,
+    );
+    final TextStyle textStyle = theme.typeScale.bodySmall.copyWith(
+      color: theme.colorScheme.onSurface,
+    );
+
+    return M3ETheme(
+      data: theme.copyWith(searchBarTheme: compactTheme),
+      child: SizedBox(
+        height: _kFilterMetadataSearchHeight,
+        child: M3ESearchBar(
+          onChanged: onChanged,
+          leading: const Icon(
+            M3EIcons.search,
+            size: _kFilterMetadataSearchIconSize,
+          ),
+          expandOnFocus: false,
+          showClearButton: true,
+          margin: 0,
+          focusedMargin: 0,
+          textStyle: WidgetStatePropertyAll<TextStyle>(textStyle),
+          constraints: const BoxConstraints(
+            minWidth: 0,
+            minHeight: _kFilterMetadataSearchHeight,
+            maxHeight: _kFilterMetadataSearchHeight,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _IncludeModeIconButton extends StatelessWidget {
   const _IncludeModeIconButton({required this.mode, required this.onChanged});
 
@@ -689,7 +792,7 @@ class _IncludeModeIconButton extends StatelessWidget {
         ? l10n.libraryMetadataFilterIncludeAll
         : l10n.libraryMetadataFilterIncludeAny;
     return GhostButton.icon(
-      icon: isAll ? LucideIcons.circleCheck : LucideIcons.circleDashed,
+      icon: isAll ? LucideIcons.listChecks : LucideIcons.circleDot,
       tooltip: label,
       semanticLabel: label,
       iconSize: 16,

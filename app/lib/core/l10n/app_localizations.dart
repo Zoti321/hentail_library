@@ -1703,13 +1703,13 @@ abstract class AppLocalizations {
   /// No description provided for @libraryFilterSortTooltip.
   ///
   /// In zh, this message translates to:
-  /// **'筛选与排序'**
+  /// **'筛选、分组与排序'**
   String get libraryFilterSortTooltip;
 
   /// No description provided for @libraryFilterSortSemantic.
   ///
   /// In zh, this message translates to:
-  /// **'打开筛选与排序'**
+  /// **'打开筛选、分组与排序'**
   String get libraryFilterSortSemantic;
 
   /// No description provided for @libraryPageSizeTooltip.

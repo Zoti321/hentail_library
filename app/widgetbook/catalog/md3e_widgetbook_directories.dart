@@ -927,7 +927,7 @@ class _Md3eLibraryFilterSortSideSheetPreviewState
                 style: M3EButtonStyle.filled,
                 size: M3EButtonSize.sm,
                 shape: M3EButtonShape.round,
-                label: const Text('打开筛选与排序'),
+                label: const Text('打开筛选、分组与排序'),
               ),
             ),
           );

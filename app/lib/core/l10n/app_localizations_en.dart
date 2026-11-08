@@ -941,10 +941,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get librarySearchKeywordEmpty => 'Keyword cannot be empty';
 
   @override
-  String get libraryFilterSortTooltip => 'Filter & sort';
+  String get libraryFilterSortTooltip => 'Filter, group & sort';
 
   @override
-  String get libraryFilterSortSemantic => 'Open filter & sort';
+  String get libraryFilterSortSemantic => 'Open filter, group & sort';
 
   @override
   String get libraryPageSizeTooltip => 'Items per page';

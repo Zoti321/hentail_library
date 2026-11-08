@@ -899,10 +899,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get librarySearchKeywordEmpty => '关键词不能为空';
 
   @override
-  String get libraryFilterSortTooltip => '筛选与排序';
+  String get libraryFilterSortTooltip => '筛选、分组与排序';
 
   @override
-  String get libraryFilterSortSemantic => '打开筛选与排序';
+  String get libraryFilterSortSemantic => '打开筛选、分组与排序';
 
   @override
   String get libraryPageSizeTooltip => '每页数量';
