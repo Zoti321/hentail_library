@@ -1,14 +1,29 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_migration.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 
 part 'app_setting.freezed.dart';
 part 'app_setting.g.dart';
 
+LibraryDisplayTarget defaultLibraryDisplayTargetFromJson(Object? raw) {
+  return switch (raw) {
+    'series' => LibraryDisplayTarget.series,
+    _ => LibraryDisplayTarget.comics,
+  };
+}
+
+String defaultLibraryDisplayTargetToJson(LibraryDisplayTarget value) {
+  return switch (value) {
+    LibraryDisplayTarget.comics => 'comics',
+    LibraryDisplayTarget.series => 'series',
+  };
+}
+
 @freezed
 abstract class AppSetting with _$AppSetting {
   factory AppSetting({
-    @Default(5) int version,
+    @Default(6) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
     @Default(AppColorSchemePreference.brand)
     AppColorSchemePreference colorSchemePreference,
@@ -38,6 +53,15 @@ abstract class AppSetting with _$AppSetting {
 
     /// Series 浏览：Library root series 固定排在列表最前（Library browse preference）。
     @Default(true) bool preferLibraryRootSeries,
+
+    /// Default library display target：进入库浏览时默认 Comics / Series。
+    @Default(LibraryDisplayTarget.comics)
+    // ignore: invalid_annotation_target
+    @JsonKey(
+      fromJson: defaultLibraryDisplayTargetFromJson,
+      toJson: defaultLibraryDisplayTargetToJson,
+    )
+    LibraryDisplayTarget defaultLibraryDisplayTarget,
   }) = _AppSetting;
 
   const AppSetting._();

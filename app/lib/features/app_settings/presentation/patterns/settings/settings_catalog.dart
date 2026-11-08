@@ -59,9 +59,8 @@ class SettingsCategoryInfo {
   String description(AppLocalizations l10n) {
     return switch (category) {
       SettingsCategory.appearance =>
-        '${l10n.settingsThemeLabel} · ${l10n.settingsColorSchemeLabel}',
-      SettingsCategory.interface =>
-        '${l10n.settingsLanguageLabel} · ${l10n.settingsFontLabel}',
+        '${l10n.settingsThemeLabel} · ${l10n.settingsFontLabel} · ${l10n.settingsLanguageLabel}',
+      SettingsCategory.interface => l10n.settingsDefaultLibraryDisplayTargetLabel,
       SettingsCategory.reading =>
         '${l10n.readerSettingsReadingMode} · ${l10n.readerSettingsAutoPlay}',
       SettingsCategory.libraryBrowse =>

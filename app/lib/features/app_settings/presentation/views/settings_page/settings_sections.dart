@@ -18,6 +18,7 @@ import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
 import 'package:hentai_library/features/comic/public/smart_facet_match_preference.dart';
 import 'package:hentai_library/features/read_session/public/reading_preference_l10n.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -81,6 +82,8 @@ List<Widget> _appearanceSections() {
         _ThemeTile(),
         _DynamicColorTile(),
         _ColorSchemeTile(),
+        _FontTile(),
+        _LocaleTile(),
       ],
     ),
   ];
@@ -90,8 +93,7 @@ List<Widget> _interfaceSections() {
   return const <Widget>[
     SettingsSection(
       tiles: <Widget>[
-        _FontTile(),
-        _LocaleTile(),
+        _DefaultLibraryDisplayTargetTile(),
       ],
     ),
   ];
@@ -331,6 +333,37 @@ class _LocaleTile extends ConsumerWidget {
         selected: preference,
         labelOf: l10n.localePreferenceLabel,
         onSelected: ref.read(settingsProvider.notifier).setLocalePreference,
+      ),
+    );
+  }
+}
+
+class _DefaultLibraryDisplayTargetTile extends ConsumerWidget {
+  const _DefaultLibraryDisplayTargetTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final LibraryDisplayTarget preference = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) =>
+            async.asData?.value.defaultLibraryDisplayTarget ??
+            LibraryDisplayTarget.comics,
+      ),
+    );
+    return SettingsNavigationTile(
+      leading: Symbols.tab,
+      title: Text(l10n.settingsDefaultLibraryDisplayTargetLabel),
+      description: Text(l10n.settingsDefaultLibraryDisplayTargetDescription),
+      value: Text(l10n.libraryDisplayTargetTabLabel(preference)),
+      onTap: () => _pickSettingOption<LibraryDisplayTarget>(
+        context,
+        options: LibraryDisplayTarget.values,
+        selected: preference,
+        labelOf: l10n.libraryDisplayTargetTabLabel,
+        onSelected: ref
+            .read(settingsProvider.notifier)
+            .setDefaultLibraryDisplayTarget,
       ),
     );
   }

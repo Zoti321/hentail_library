@@ -106,12 +106,21 @@ List<Widget> _sectionsForCategory(
               );
             },
           ),
-        ],
-      ),
-    ],
-    SettingsCategory.interface => <Widget>[
-      SettingsSection(
-        tiles: <Widget>[
+          SettingsNavigationTile(
+            leading: Symbols.text_fields,
+            title: Text(l10n.settingsFontLabel),
+            value: Text(labState.fontLabel),
+            onTap: () {
+              onChanged(
+                labState.copyWith(
+                  fontLabel: nextOption(
+                    labState.fontLabel,
+                    optionLabels.fontOptions,
+                  ),
+                ),
+              );
+            },
+          ),
           SettingsNavigationTile(
             leading: Symbols.language,
             title: Text(l10n.settingsLanguageLabel),
@@ -122,6 +131,30 @@ List<Widget> _sectionsForCategory(
                   localeLabel: nextOption(
                     labState.localeLabel,
                     optionLabels.localeOptions,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    ],
+    SettingsCategory.interface => <Widget>[
+      SettingsSection(
+        tiles: <Widget>[
+          SettingsNavigationTile(
+            leading: Symbols.tab,
+            title: Text(l10n.settingsDefaultLibraryDisplayTargetLabel),
+            description: Text(
+              l10n.settingsDefaultLibraryDisplayTargetDescription,
+            ),
+            value: Text(labState.defaultLibraryDisplayTargetLabel),
+            onTap: () {
+              onChanged(
+                labState.copyWith(
+                  defaultLibraryDisplayTargetLabel: nextOption(
+                    labState.defaultLibraryDisplayTargetLabel,
+                    optionLabels.defaultLibraryDisplayTargetOptions,
                   ),
                 ),
               );
@@ -398,6 +431,8 @@ class SettingsOptionLabels {
   const SettingsOptionLabels({
     this.themeOptions = const <String>['深色', '浅色'],
     this.localeOptions = const <String>['简体中文', 'English'],
+    this.fontOptions = const <String>['小米字体', 'Noto Sans'],
+    this.defaultLibraryDisplayTargetOptions = const <String>['漫画', '系列'],
     this.readingModeOptions = kSettingsReadingModeLabels,
     this.autoPlayModeOptions = kSettingsAutoPlayModeLabels,
     this.pagedLayoutOptions = kSettingsPagedLayoutLabels,
@@ -407,6 +442,8 @@ class SettingsOptionLabels {
 
   final List<String> themeOptions;
   final List<String> localeOptions;
+  final List<String> fontOptions;
+  final List<String> defaultLibraryDisplayTargetOptions;
   final List<String> readingModeOptions;
   final List<String> autoPlayModeOptions;
   final List<String> pagedLayoutOptions;
@@ -424,6 +461,8 @@ class SettingsLabState {
   const SettingsLabState({
     this.themeLabel = '深色',
     this.localeLabel = '简体中文',
+    this.fontLabel = '小米字体',
+    this.defaultLibraryDisplayTargetLabel = '漫画',
     this.autoMetadataBackup = true,
     this.diagnosticMode = false,
     this.autoUpdate = true,
@@ -438,6 +477,8 @@ class SettingsLabState {
 
   final String themeLabel;
   final String localeLabel;
+  final String fontLabel;
+  final String defaultLibraryDisplayTargetLabel;
   final bool autoMetadataBackup;
   final bool diagnosticMode;
   final bool autoUpdate;
@@ -452,6 +493,8 @@ class SettingsLabState {
   SettingsLabState copyWith({
     String? themeLabel,
     String? localeLabel,
+    String? fontLabel,
+    String? defaultLibraryDisplayTargetLabel,
     bool? autoMetadataBackup,
     bool? diagnosticMode,
     bool? autoUpdate,
@@ -466,6 +509,10 @@ class SettingsLabState {
     return SettingsLabState(
       themeLabel: themeLabel ?? this.themeLabel,
       localeLabel: localeLabel ?? this.localeLabel,
+      fontLabel: fontLabel ?? this.fontLabel,
+      defaultLibraryDisplayTargetLabel:
+          defaultLibraryDisplayTargetLabel ??
+          this.defaultLibraryDisplayTargetLabel,
       autoMetadataBackup: autoMetadataBackup ?? this.autoMetadataBackup,
       diagnosticMode: diagnosticMode ?? this.diagnosticMode,
       autoUpdate: autoUpdate ?? this.autoUpdate,

@@ -173,7 +173,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get settingsLanguageLabel => '界面语言';
+  String get settingsLanguageLabel => '语言';
 
   @override
   String get localePreferenceSystem => '跟随系统';
@@ -185,7 +185,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get localePreferenceEn => 'English';
 
   @override
-  String get settingsFontLabel => '界面字体';
+  String get settingsFontLabel => '字体';
 
   @override
   String get fontPreferenceMiSans => '小米字体';
@@ -194,7 +194,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fontPreferenceNotoSans => 'Noto Sans';
 
   @override
-  String get settingsThemeLabel => '应用主题';
+  String get settingsThemeLabel => '主题';
 
   @override
   String get themePreferenceSystem => '跟随系统';
@@ -209,10 +209,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsDynamicColorLabel => '动态配色';
 
   @override
-  String get settingsDynamicColorDescription => '跟随系统壁纸取色；开启后不可选手动配色方案';
+  String get settingsDynamicColorDescription => '使用系统壁纸颜色；开启后无法选手动配色';
 
   @override
-  String get settingsColorSchemeLabel => '配色方案';
+  String get settingsColorSchemeLabel => '配色';
+
+  @override
+  String get settingsDefaultLibraryDisplayTargetLabel => '默认库浏览';
+
+  @override
+  String get settingsDefaultLibraryDisplayTargetDescription => '进入漫画库时先打开漫画或系列';
 
   @override
   String get colorSchemePreferenceBrand => '紫罗兰色';
@@ -581,22 +587,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsMasterGroupLibraryAdmin => '漫画库管理';
 
   @override
-  String get settingsGroupAppearance => '外观设置';
+  String get settingsGroupAppearance => '外观';
 
   @override
-  String get settingsGroupInterface => '界面设置';
+  String get settingsGroupInterface => '界面';
 
   @override
-  String get settingsGroupReading => '阅读设置';
+  String get settingsGroupReading => '阅读';
 
   @override
-  String get settingsGroupLibraryBrowse => '库浏览设置';
+  String get settingsGroupLibraryBrowse => '库浏览';
 
   @override
   String get settingsGroupAbout => '关于';
 
   @override
-  String get settingsGroupUpdates => '更新设置';
+  String get settingsGroupUpdates => '更新';
 
   @override
   String get settingsGroupStorageAndLogs => '存储与日志';
@@ -626,7 +632,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsMetadataBackupManualGroupTitle => '手动备份';
 
   @override
-  String get settingsMetadataBackupAutoToggleLabel => '元数据自动备份';
+  String get settingsMetadataBackupAutoToggleLabel => '自动备份元数据';
 
   @override
   String get settingsMetadataBackupAutoToggleDescription =>
@@ -797,17 +803,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsHealthyModeLabel => '健康模式';
 
   @override
-  String get settingsHealthyModeDescription => '库、搜索与历史中隐藏 R18 Comic，不修改分级';
+  String get settingsHealthyModeDescription => '在库、搜索与历史中隐藏 R18 漫画，不改动分级';
 
   @override
   String get settingsDiagnosticModeLabel => '详细诊断';
 
   @override
   String get settingsDiagnosticModeDescriptionEnabled =>
-      '已开启：Dart 与 Rust 记录更详细日志';
+      '已开启：记录更详细的 Dart 与 Rust 日志';
 
   @override
-  String get settingsDiagnosticModeDescriptionDisabled => '临时提高日志详细程度，便于复现问题';
+  String get settingsDiagnosticModeDescriptionDisabled => '临时提高日志详细程度，便于排查问题';
 
   @override
   String get settingsDiagnosticModeEnabledBadge => '已开启';
@@ -816,7 +822,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsExportLogsLabel => '导出日志';
 
   @override
-  String get settingsExportLogsDescription => '打包应用与核心日志，便于问题反馈';
+  String get settingsExportLogsDescription => '打包应用与核心日志，便于反馈问题';
 
   @override
   String get settingsClearApplicationDataLabel => '清除全部应用数据';
@@ -833,7 +839,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsUninstallDataInfoDescription =>
-      '卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除';
+      '卸载可能删除应用沙箱数据；桌面版默认保留应用数据，也可在卸载向导中勾选删除';
 
   @override
   String get confirmClearApplicationDataTitle => '清除全部应用数据？';
@@ -1075,7 +1081,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsPreferLibraryRootSeriesDescription =>
-      '浏览系列列表时，将库根系列固定在列表最前。';
+      '在系列列表中，将库根系列固定显示在最前';
 
   @override
   String get librarySeriesSortName => '名称';

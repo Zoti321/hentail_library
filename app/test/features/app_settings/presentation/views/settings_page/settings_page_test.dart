@@ -7,6 +7,7 @@ import 'package:hentai_library/features/app_settings/presentation/view_models/se
 import 'package:hentai_library/features/app_settings/presentation/views/settings_page/settings_page.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
+import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 
 import '../../../../../support/pump_localized_app.dart';
@@ -21,6 +22,8 @@ class _RecordingSettingsNotifier extends SettingsNotifier {
       <AppColorSchemePreference>[];
   final List<bool> dynamicColorCalls = <bool>[];
   final List<bool> healthyCalls = <bool>[];
+  final List<LibraryDisplayTarget> defaultLibraryDisplayTargetCalls =
+      <LibraryDisplayTarget>[];
 
   @override
   Future<AppSetting> build() async => _initial;
@@ -44,6 +47,13 @@ class _RecordingSettingsNotifier extends SettingsNotifier {
   @override
   Future<void> setHealthyMode(bool value) async {
     healthyCalls.add(value);
+  }
+
+  @override
+  Future<void> setDefaultLibraryDisplayTarget(
+    LibraryDisplayTarget value,
+  ) async {
+    defaultLibraryDisplayTargetCalls.add(value);
   }
 }
 
@@ -177,4 +187,42 @@ void main() {
 
     expect(notifier.healthyCalls, <bool>[true]);
   });
+
+  testWidgets(
+    'appearance hosts font and language; interface hosts Default library display target',
+    (WidgetTester tester) async {
+      final _RecordingSettingsNotifier notifier = await _pumpPage(tester);
+      final AppLocalizations l10n = lookupAppLocalizations(const Locale('zh'));
+
+      expect(find.text(l10n.settingsFontLabel), findsOneWidget);
+      expect(find.text(l10n.settingsLanguageLabel), findsOneWidget);
+      expect(
+        find.text(l10n.settingsDefaultLibraryDisplayTargetLabel),
+        findsNothing,
+      );
+
+      await tester.tap(find.text(l10n.settingsGroupInterface));
+      await tester.pumpAndSettle();
+
+      expect(find.text(l10n.settingsFontLabel), findsNothing);
+      expect(
+        find.text(l10n.settingsDefaultLibraryDisplayTargetLabel),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.text(l10n.settingsDefaultLibraryDisplayTargetLabel),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.text(l10n.libraryDisplayTargetTabLabel(LibraryDisplayTarget.series)).last,
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        notifier.defaultLibraryDisplayTargetCalls,
+        <LibraryDisplayTarget>[LibraryDisplayTarget.series],
+      );
+    },
+  );
 }

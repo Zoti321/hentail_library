@@ -401,7 +401,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLanguageLabel.
   ///
   /// In zh, this message translates to:
-  /// **'界面语言'**
+  /// **'语言'**
   String get settingsLanguageLabel;
 
   /// No description provided for @localePreferenceSystem.
@@ -425,7 +425,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsFontLabel.
   ///
   /// In zh, this message translates to:
-  /// **'界面字体'**
+  /// **'字体'**
   String get settingsFontLabel;
 
   /// No description provided for @fontPreferenceMiSans.
@@ -443,7 +443,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsThemeLabel.
   ///
   /// In zh, this message translates to:
-  /// **'应用主题'**
+  /// **'主题'**
   String get settingsThemeLabel;
 
   /// No description provided for @themePreferenceSystem.
@@ -473,14 +473,26 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDynamicColorDescription.
   ///
   /// In zh, this message translates to:
-  /// **'跟随系统壁纸取色；开启后不可选手动配色方案'**
+  /// **'使用系统壁纸颜色；开启后无法选手动配色'**
   String get settingsDynamicColorDescription;
 
   /// No description provided for @settingsColorSchemeLabel.
   ///
   /// In zh, this message translates to:
-  /// **'配色方案'**
+  /// **'配色'**
   String get settingsColorSchemeLabel;
+
+  /// No description provided for @settingsDefaultLibraryDisplayTargetLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'默认库浏览'**
+  String get settingsDefaultLibraryDisplayTargetLabel;
+
+  /// No description provided for @settingsDefaultLibraryDisplayTargetDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'进入漫画库时先打开漫画或系列'**
+  String get settingsDefaultLibraryDisplayTargetDescription;
 
   /// No description provided for @colorSchemePreferenceBrand.
   ///
@@ -1115,25 +1127,25 @@ abstract class AppLocalizations {
   /// No description provided for @settingsGroupAppearance.
   ///
   /// In zh, this message translates to:
-  /// **'外观设置'**
+  /// **'外观'**
   String get settingsGroupAppearance;
 
   /// No description provided for @settingsGroupInterface.
   ///
   /// In zh, this message translates to:
-  /// **'界面设置'**
+  /// **'界面'**
   String get settingsGroupInterface;
 
   /// No description provided for @settingsGroupReading.
   ///
   /// In zh, this message translates to:
-  /// **'阅读设置'**
+  /// **'阅读'**
   String get settingsGroupReading;
 
   /// No description provided for @settingsGroupLibraryBrowse.
   ///
   /// In zh, this message translates to:
-  /// **'库浏览设置'**
+  /// **'库浏览'**
   String get settingsGroupLibraryBrowse;
 
   /// No description provided for @settingsGroupAbout.
@@ -1145,7 +1157,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsGroupUpdates.
   ///
   /// In zh, this message translates to:
-  /// **'更新设置'**
+  /// **'更新'**
   String get settingsGroupUpdates;
 
   /// No description provided for @settingsGroupStorageAndLogs.
@@ -1205,7 +1217,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsMetadataBackupAutoToggleLabel.
   ///
   /// In zh, this message translates to:
-  /// **'元数据自动备份'**
+  /// **'自动备份元数据'**
   String get settingsMetadataBackupAutoToggleLabel;
 
   /// No description provided for @settingsMetadataBackupAutoToggleDescription.
@@ -1523,7 +1535,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsHealthyModeDescription.
   ///
   /// In zh, this message translates to:
-  /// **'库、搜索与历史中隐藏 R18 Comic，不修改分级'**
+  /// **'在库、搜索与历史中隐藏 R18 漫画，不改动分级'**
   String get settingsHealthyModeDescription;
 
   /// No description provided for @settingsDiagnosticModeLabel.
@@ -1535,13 +1547,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDiagnosticModeDescriptionEnabled.
   ///
   /// In zh, this message translates to:
-  /// **'已开启：Dart 与 Rust 记录更详细日志'**
+  /// **'已开启：记录更详细的 Dart 与 Rust 日志'**
   String get settingsDiagnosticModeDescriptionEnabled;
 
   /// No description provided for @settingsDiagnosticModeDescriptionDisabled.
   ///
   /// In zh, this message translates to:
-  /// **'临时提高日志详细程度，便于复现问题'**
+  /// **'临时提高日志详细程度，便于排查问题'**
   String get settingsDiagnosticModeDescriptionDisabled;
 
   /// No description provided for @settingsDiagnosticModeEnabledBadge.
@@ -1559,7 +1571,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsExportLogsDescription.
   ///
   /// In zh, this message translates to:
-  /// **'打包应用与核心日志，便于问题反馈'**
+  /// **'打包应用与核心日志，便于反馈问题'**
   String get settingsExportLogsDescription;
 
   /// No description provided for @settingsClearApplicationDataLabel.
@@ -1589,7 +1601,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsUninstallDataInfoDescription.
   ///
   /// In zh, this message translates to:
-  /// **'卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除'**
+  /// **'卸载可能删除应用沙箱数据；桌面版默认保留应用数据，也可在卸载向导中勾选删除'**
   String get settingsUninstallDataInfoDescription;
 
   /// No description provided for @confirmClearApplicationDataTitle.
@@ -2039,7 +2051,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPreferLibraryRootSeriesDescription.
   ///
   /// In zh, this message translates to:
-  /// **'浏览系列列表时，将库根系列固定在列表最前。'**
+  /// **'在系列列表中，将库根系列固定显示在最前'**
   String get settingsPreferLibraryRootSeriesDescription;
 
   /// No description provided for @librarySeriesSortName.

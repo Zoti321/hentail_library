@@ -190,7 +190,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get localePreferenceEn => 'English';
 
   @override
-  String get settingsFontLabel => 'UI font';
+  String get settingsFontLabel => 'Font';
 
   @override
   String get fontPreferenceMiSans => 'Mi Sans';
@@ -199,7 +199,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fontPreferenceNotoSans => 'Noto Sans';
 
   @override
-  String get settingsThemeLabel => 'App theme';
+  String get settingsThemeLabel => 'Theme';
 
   @override
   String get themePreferenceSystem => 'System';
@@ -215,10 +215,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsDynamicColorDescription =>
-      'Use colors from the system wallpaper. Disables the manual color scheme while on.';
+      'Use wallpaper colors; manual schemes are unavailable while on';
 
   @override
-  String get settingsColorSchemeLabel => 'Color scheme';
+  String get settingsColorSchemeLabel => 'Color';
+
+  @override
+  String get settingsDefaultLibraryDisplayTargetLabel =>
+      'Default library browse';
+
+  @override
+  String get settingsDefaultLibraryDisplayTargetDescription =>
+      'Open Comics or Series when entering the library';
 
   @override
   String get colorSchemePreferenceBrand => 'Violet';
@@ -643,11 +651,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsMetadataBackupAutoToggleLabel =>
-      'Automatic metadata backup';
+      'Back up metadata automatically';
 
   @override
   String get settingsMetadataBackupAutoToggleDescription =>
-      'Keep rotating gzip backups under app data (enabled by default)';
+      'Keep rotating gzip backups in app data (on by default)';
 
   @override
   String get settingsMetadataBackupStoragePathLabel => 'Backup folder';
@@ -833,21 +841,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsHealthyModeDescription =>
-      'Hide R18 comics in library, search and history. Ratings are not changed.';
+      'Hide R18 comics in library, search, and history without changing ratings';
 
   @override
   String get settingsDiagnosticModeLabel => 'Verbose diagnostics';
 
   @override
   String get settingsDiagnosticModeDescriptionEnabled =>
-      'Enabled: Dart and Rust log more detail';
+      'On: Dart and Rust write more detailed logs';
 
   @override
   String get settingsDiagnosticModeDescriptionDisabled =>
-      'Temporarily increase log verbosity to help reproduce issues';
+      'Temporarily increase log detail to help diagnose issues';
 
   @override
-  String get settingsDiagnosticModeEnabledBadge => 'Enabled';
+  String get settingsDiagnosticModeEnabledBadge => 'On';
 
   @override
   String get settingsExportLogsLabel => 'Export logs';
@@ -861,7 +869,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsClearApplicationDataDescription =>
-      'Removes the database, automatic metadata backups, logs, and cache; does not delete comics in library roots';
+      'Removes the database, automatic metadata backups, logs, and cache; library root files stay';
 
   @override
   String get settingsClearApplicationDataDisabledSyncRunning =>
@@ -872,7 +880,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsUninstallDataInfoDescription =>
-      'Uninstalling may remove the app sandbox on mobile. On desktop, uninstall keeps application data by default; you can opt in to delete it in the uninstaller';
+      'Uninstalling may remove the app sandbox on mobile. On desktop, data is kept by default; you can delete it in the uninstaller';
 
   @override
   String get confirmClearApplicationDataTitle => 'Clear all application data?';
@@ -1119,7 +1127,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPreferLibraryRootSeriesDescription =>
-      'When browsing series, keep the library root series at the top of the list.';
+      'Keep the library root series at the top of the series list';
 
   @override
   String get librarySeriesSortName => 'Name';
