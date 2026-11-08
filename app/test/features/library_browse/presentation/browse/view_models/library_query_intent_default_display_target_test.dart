@@ -21,29 +21,26 @@ class _FixedSettingsNotifier extends SettingsNotifier {
 }
 
 void main() {
-  test(
-    'LibraryQueryIntent seeds displayTarget from Default library display target',
-    () async {
-      final ProviderContainer container = ProviderContainer(
-        overrides: <Override>[
-          settingsProvider.overrideWith(
-            () => _FixedSettingsNotifier(
-              AppSetting(
-                defaultLibraryDisplayTarget: LibraryDisplayTarget.series,
-              ),
+  test('LibraryQueryIntent seeds displayTarget from Default library display target', () async {
+    final ProviderContainer container = ProviderContainer(
+      overrides: <Override>[
+        settingsProvider.overrideWith(
+          () => _FixedSettingsNotifier(
+            AppSetting(
+              defaultLibraryDisplayTarget: LibraryDisplayTarget.series,
             ),
           ),
-        ],
-      );
-      addTearDown(container.dispose);
-      await container.read(settingsProvider.future);
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    await container.read(settingsProvider.future);
 
-      expect(
-        container.read(libraryQueryIntentProvider).displayTarget,
-        LibraryDisplayTarget.series,
-      );
-    },
-  );
+    expect(
+      container.read(libraryQueryIntentProvider).displayTarget,
+      LibraryDisplayTarget.series,
+    );
+  });
 
   test(
     'changing Default library display target updates the current displayTarget',

@@ -644,8 +644,7 @@ class _MetadataFilterGroupState extends State<_MetadataFilterGroup> {
               children: <Widget>[
                 Expanded(
                   child: _CompactMetadataSearchBar(
-                    onChanged: (String value) =>
-                        setState(() => _query = value),
+                    onChanged: (String value) => setState(() => _query = value),
                   ),
                 ),
                 if (showIncludeMode)

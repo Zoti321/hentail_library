@@ -125,7 +125,9 @@ void main() {
   testWidgets('forwards onChanged when clear button empties the field', (
     WidgetTester tester,
   ) async {
-    final TextEditingController controller = TextEditingController(text: 'alpha');
+    final TextEditingController controller = TextEditingController(
+      text: 'alpha',
+    );
     addTearDown(controller.dispose);
     final List<String> changes = <String>[];
 
@@ -151,7 +153,9 @@ void main() {
   testWidgets('pointer refocus does not keep select-all on desktop', (
     WidgetTester tester,
   ) async {
-    final TextEditingController controller = TextEditingController(text: 'alpha');
+    final TextEditingController controller = TextEditingController(
+      text: 'alpha',
+    );
     addTearDown(controller.dispose);
     final FocusNode focusNode = FocusNode();
     addTearDown(focusNode.dispose);

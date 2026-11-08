@@ -63,7 +63,9 @@ class _AppDenseSearchBarState extends State<AppDenseSearchBar> {
       _ownedFocusNode = FocusNode(debugLabel: 'denseSearch');
     }
     // 等 [M3ESearchBar]/EditableText 注册完 focus listener 后再挂，才能在全选之后改选区。
-    SchedulerBinding.instance.addPostFrameCallback((_) => _ensureFocusListener());
+    SchedulerBinding.instance.addPostFrameCallback(
+      (_) => _ensureFocusListener(),
+    );
   }
 
   @override

@@ -63,7 +63,10 @@ class CatalogListSliver extends StatelessWidget {
 
     final int rowCount = (itemCount + columns - 1) ~/ columns;
     return SliverList(
-      delegate: SliverChildBuilderDelegate((BuildContext context, int rowIndex) {
+      delegate: SliverChildBuilderDelegate((
+        BuildContext context,
+        int rowIndex,
+      ) {
         return Padding(
           padding: EdgeInsets.only(
             bottom: rowIndex == rowCount - 1 ? 0 : layout.listItemGap,

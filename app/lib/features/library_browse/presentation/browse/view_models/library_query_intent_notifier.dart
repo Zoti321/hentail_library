@@ -38,7 +38,11 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
   }
 
   LibraryDisplayTarget _defaultLibraryDisplayTarget() {
-    return ref.read(settingsProvider).asData?.value.defaultLibraryDisplayTarget ??
+    return ref
+            .read(settingsProvider)
+            .asData
+            ?.value
+            .defaultLibraryDisplayTarget ??
         LibraryDisplayTarget.comics;
   }
 

@@ -47,11 +47,7 @@ class DetailHeaderBackButton extends StatelessWidget {
 
 /// 详情顶栏编辑按钮。
 class DetailHeaderEditButton extends StatelessWidget {
-  const DetailHeaderEditButton({
-    super.key,
-    this.onEdit,
-    required this.tooltip,
-  });
+  const DetailHeaderEditButton({super.key, this.onEdit, required this.tooltip});
 
   final VoidCallback? onEdit;
   final String tooltip;

@@ -134,17 +134,13 @@ void main() {
         tester,
         overrides: <Override>[
           comicCoverProvider(comicId).overrideWith(
-            () => FixedComicCover(
-              ComicCoverReady(ComicCoverSource.bytes(_png)),
-            ),
+            () =>
+                FixedComicCover(ComicCoverReady(ComicCoverSource.bytes(_png))),
           ),
-          authorImageProvider(_request).overrideWith(
-            (Ref ref) => Completer<Uint8List?>().future,
-          ),
-          authorImageProvider((
-            authorId: 1,
-            slot: AuthorImageSlot.avatar,
-          )).overrideWith((Ref ref) => Completer<Uint8List?>().future),
+          authorImageProvider(_request)
+              .overrideWith((Ref ref) => Completer<Uint8List?>().future),
+          authorImageProvider((authorId: 1, slot: AuthorImageSlot.avatar))
+              .overrideWith((Ref ref) => Completer<Uint8List?>().future),
         ],
         home: Scaffold(
           body: Builder(

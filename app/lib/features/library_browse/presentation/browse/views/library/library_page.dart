@@ -416,11 +416,15 @@ abstract final class _LibraryCatalogSlivers {
     // IndexedStack peer mount 预热，避免首屏双 fetch。
     final LibraryComicsCatalogState? comicsCatalog =
         target == LibraryDisplayTarget.comics
-        ? stableCatalogSnapshot(ref.watch(libraryComicsCatalogControllerProvider))
+        ? stableCatalogSnapshot(
+            ref.watch(libraryComicsCatalogControllerProvider),
+          )
         : null;
     final LibrarySeriesCatalogState? seriesCatalog =
         target == LibraryDisplayTarget.series
-        ? stableCatalogSnapshot(ref.watch(librarySeriesCatalogControllerProvider))
+        ? stableCatalogSnapshot(
+            ref.watch(librarySeriesCatalogControllerProvider),
+          )
         : null;
     final Map<String, int> readPages = target == LibraryDisplayTarget.comics
         ? (ref.watch(comicReadPageIndexByIdProvider).value ??
@@ -445,7 +449,12 @@ abstract final class _LibraryCatalogSlivers {
 
     return <Widget>[
       SliverPadding(
-        padding: EdgeInsets.fromLTRB(horizontal, headerToBodyGap, horizontal, 0),
+        padding: EdgeInsets.fromLTRB(
+          horizontal,
+          headerToBodyGap,
+          horizontal,
+          0,
+        ),
         sliver: catalogSlivers.length == 1
             ? catalogSlivers.first
             : SliverMainAxisGroup(slivers: catalogSlivers),
@@ -464,7 +473,9 @@ abstract final class _LibraryCatalogSlivers {
               totalPages: pagination.totalPages,
               totalItems: pagination.totalCount,
               onPageChanged: (int page) {
-                ref.read(libraryPageFacadeProvider.notifier).setPage(target, page);
+                ref
+                    .read(libraryPageFacadeProvider.notifier)
+                    .setPage(target, page);
               },
             ),
           ),
@@ -554,33 +565,34 @@ abstract final class _LibraryCatalogSlivers {
           CatalogGridSliver(
             horizontalMargin: 0,
             itemCount: comics.length,
-            itemBuilder: (BuildContext context, int index, CatalogGridLayout _) {
-              final ComicBrowseViewObject comic = comics[index];
-              return ComicCardActions.fromBrowse(
-                key: ValueKey<String>(comic.comicId),
-                item: comic,
-                enabled: !librarySelection,
-                child: ComicCard(
-                  title: comic.title,
-                  subtitle: l10n.comicDetailPageCount(comic.pageCount),
-                  cover: ComicCoverContent(
-                    comicId: comic.comicId,
-                    gridIndex: index,
-                    coverViewportScope: CoverViewportScopes.library,
-                  ),
-                  readProgress: comicReadProgressFor(
-                    pageIndex: readPages[comic.comicId],
-                    pageCount: comic.pageCount,
-                  ),
-                  selectionMode: librarySelection,
-                  selected: selection.selectedIds.contains(comic.comicId),
-                  onTap: () => _openComicDetail(ref, comic.comicId),
-                  onSelectionChanged: (_) => ref
-                      .read(catalogSelectionProvider.notifier)
-                      .toggle(comic.comicId),
-                ),
-              );
-            },
+            itemBuilder:
+                (BuildContext context, int index, CatalogGridLayout _) {
+                  final ComicBrowseViewObject comic = comics[index];
+                  return ComicCardActions.fromBrowse(
+                    key: ValueKey<String>(comic.comicId),
+                    item: comic,
+                    enabled: !librarySelection,
+                    child: ComicCard(
+                      title: comic.title,
+                      subtitle: l10n.comicDetailPageCount(comic.pageCount),
+                      cover: ComicCoverContent(
+                        comicId: comic.comicId,
+                        gridIndex: index,
+                        coverViewportScope: CoverViewportScopes.library,
+                      ),
+                      readProgress: comicReadProgressFor(
+                        pageIndex: readPages[comic.comicId],
+                        pageCount: comic.pageCount,
+                      ),
+                      selectionMode: librarySelection,
+                      selected: selection.selectedIds.contains(comic.comicId),
+                      onTap: () => _openComicDetail(ref, comic.comicId),
+                      onSelectionChanged: (_) => ref
+                          .read(catalogSelectionProvider.notifier)
+                          .toggle(comic.comicId),
+                    ),
+                  );
+                },
           ),
         ];
       case LibraryDisplayTarget.series:
@@ -622,20 +634,23 @@ abstract final class _LibraryCatalogSlivers {
             horizontalMargin: 0,
             hasSubtitle: true,
             itemCount: series.length,
-            itemBuilder: (BuildContext context, int index, CatalogGridLayout _) {
-              final SeriesBrowseViewObject s = series[index];
-              return ComicCard(
-                key: ValueKey<String>('library-series-${s.id}'),
-                title: s.name,
-                subtitle: context.l10n.seriesVolumeCountLabel(s.volumeCount),
-                cover: SeriesCoverContent(
-                  seriesId: s.id,
-                  gridIndex: index,
-                  coverViewportScope: CoverViewportScopes.library,
-                ),
-                onTap: () => _openSeriesDetail(ref, s.id),
-              );
-            },
+            itemBuilder:
+                (BuildContext context, int index, CatalogGridLayout _) {
+                  final SeriesBrowseViewObject s = series[index];
+                  return ComicCard(
+                    key: ValueKey<String>('library-series-${s.id}'),
+                    title: s.name,
+                    subtitle: context.l10n.seriesVolumeCountLabel(
+                      s.volumeCount,
+                    ),
+                    cover: SeriesCoverContent(
+                      seriesId: s.id,
+                      gridIndex: index,
+                      coverViewportScope: CoverViewportScopes.library,
+                    ),
+                    onTap: () => _openSeriesDetail(ref, s.id),
+                  );
+                },
           ),
         ];
     }

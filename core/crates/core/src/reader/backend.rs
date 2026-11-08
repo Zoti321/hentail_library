@@ -437,7 +437,11 @@ mod tests {
             panic!("expected epub backend");
         };
 
-        assert_eq!(epub.image_entries.len(), 3, "orphan images must not become pages");
+        assert_eq!(
+            epub.image_entries.len(),
+            3,
+            "orphan images must not become pages"
+        );
         assert_eq!(read_epub_page(&epub, 0).expect("p0"), b"PAGE-C");
         assert_eq!(read_epub_page(&epub, 1).expect("p1"), b"PAGE-A");
         assert_eq!(read_epub_page(&epub, 2).expect("p2"), b"PAGE-B");

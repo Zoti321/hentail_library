@@ -14,7 +14,6 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-
 import '../../../../support/pump_localized_app.dart';
 
 void main() {

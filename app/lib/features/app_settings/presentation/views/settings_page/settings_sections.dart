@@ -89,11 +89,7 @@ List<Widget> _appearanceSections() {
 
 List<Widget> _interfaceSections() {
   return const <Widget>[
-    SettingsSection(
-      tiles: <Widget>[
-        _DefaultLibraryDisplayTargetTile(),
-      ],
-    ),
+    SettingsSection(tiles: <Widget>[_DefaultLibraryDisplayTargetTile()]),
   ];
 }
 
@@ -112,10 +108,7 @@ List<Widget> _readingSections(AppLocalizations l10n) {
     ),
     SettingsSection(
       title: Text(l10n.readerSettingsAutoPlay),
-      tiles: const <Widget>[
-        _AutoPlayModeTile(),
-        _AutoPlayIntervalTile(),
-      ],
+      tiles: const <Widget>[_AutoPlayModeTile(), _AutoPlayIntervalTile()],
     ),
     SettingsSection(
       title: Text(l10n.readerSettingsPagedOptions),
@@ -123,10 +116,7 @@ List<Widget> _readingSections(AppLocalizations l10n) {
     ),
     SettingsSection(
       title: Text(l10n.readerSettingsWebtoonMode),
-      tiles: const <Widget>[
-        _WebtoonMarginTile(),
-        _WebtoonZoomModeTile(),
-      ],
+      tiles: const <Widget>[_WebtoonMarginTile(), _WebtoonZoomModeTile()],
     ),
   ];
 }
@@ -154,9 +144,7 @@ List<Widget> _storageAndLogsSections(AppLocalizations l10n) {
 
 List<Widget> _updatesSections() {
   return const <Widget>[
-    SettingsSection(
-      tiles: <Widget>[_AutoUpdateTile(), _CheckUpdateTile()],
-    ),
+    SettingsSection(tiles: <Widget>[_AutoUpdateTile(), _CheckUpdateTile()]),
   ];
 }
 
@@ -417,7 +405,9 @@ class _PagedLayoutTile extends ConsumerWidget {
         selected: pagedLayout,
         labelOf: l10n.pagedLayoutLabel,
         onSelected: (PagedLayout value) {
-          ref.read(settingsProvider.notifier).setReadingMode(value.toReadingMode());
+          ref
+              .read(settingsProvider.notifier)
+              .setReadingMode(value.toReadingMode());
         },
       ),
     );

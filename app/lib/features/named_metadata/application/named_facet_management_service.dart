@@ -1,14 +1,11 @@
 import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
-import 'package:hentai_library/shared/domain/models/managed_named_facet_kind.dart';
 
 /// Named metadata facet 管理写用例：新增 / 重命名 / 删除 / 合并（ADR-0033）。
 ///
 /// 无 Flutter / Riverpod / FRB；列表查询与合并 UI 态仍由 ViewModel 持有。
 class NamedFacetManagementService {
-  const NamedFacetManagementService({
-    required NamedFacetManagementRepository repository,
-  }) : _repository = repository;
+  const NamedFacetManagementService({required this._repository});
 
   final NamedFacetManagementRepository _repository;
 

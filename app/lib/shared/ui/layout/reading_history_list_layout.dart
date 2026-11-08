@@ -169,7 +169,8 @@ class _VirtualizedReadingHistoryListRowsState
     if (oldWidget.itemCount != widget.itemCount ||
         oldWidget.layout.columnCount != widget.layout.columnCount ||
         oldWidget.layout.gap != widget.layout.gap ||
-        oldWidget.layout.itemSpec.rowHeight != widget.layout.itemSpec.rowHeight) {
+        oldWidget.layout.itemSpec.rowHeight !=
+            widget.layout.itemSpec.rowHeight) {
       _scheduleVisibleWindowUpdate();
     }
   }
@@ -263,7 +264,8 @@ class _VirtualizedReadingHistoryListRowsState
       first = 0;
       last = _estimateLastRow();
     } else {
-      final RenderObject? viewportRender = scrollable.context.findRenderObject();
+      final RenderObject? viewportRender = scrollable.context
+          .findRenderObject();
       if (viewportRender is! RenderBox || !viewportRender.hasSize) {
         first = 0;
         last = _estimateLastRow();

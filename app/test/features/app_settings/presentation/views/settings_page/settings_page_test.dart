@@ -215,14 +215,17 @@ void main() {
       );
       await tester.pumpAndSettle();
       await tester.tap(
-        find.text(l10n.libraryDisplayTargetTabLabel(LibraryDisplayTarget.series)).last,
+        find
+            .text(
+              l10n.libraryDisplayTargetTabLabel(LibraryDisplayTarget.series),
+            )
+            .last,
       );
       await tester.pumpAndSettle();
 
-      expect(
-        notifier.defaultLibraryDisplayTargetCalls,
-        <LibraryDisplayTarget>[LibraryDisplayTarget.series],
-      );
+      expect(notifier.defaultLibraryDisplayTargetCalls, <LibraryDisplayTarget>[
+        LibraryDisplayTarget.series,
+      ]);
     },
   );
 }

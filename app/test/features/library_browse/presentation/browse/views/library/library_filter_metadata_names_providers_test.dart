@@ -24,17 +24,16 @@ void main() {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         parodyRepoProvider.overrideWithValue(
-          _FakeNamedFacetDictionaryRepository(
-            all: <String>['Touhou', 'Fate'],
-          ),
+          _FakeNamedFacetDictionaryRepository(all: <String>['Touhou', 'Fate']),
         ),
       ],
     );
     addTearDown(container.dispose);
 
-    expect(await container.read(libraryFilterParodyNamesProvider.future), <
-      String
-    >['Fate', 'Touhou']);
+    expect(
+      await container.read(libraryFilterParodyNamesProvider.future),
+      <String>['Fate', 'Touhou'],
+    );
   });
 
   test('libraryFilterCharacterNamesProvider reads sorted listAll', () async {
@@ -47,9 +46,10 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    expect(await container.read(libraryFilterCharacterNamesProvider.future), <
-      String
-    >['Marisa', 'Reimu']);
+    expect(
+      await container.read(libraryFilterCharacterNamesProvider.future),
+      <String>['Marisa', 'Reimu'],
+    );
   });
 
   test('empty dictionary yields empty candidate list', () async {

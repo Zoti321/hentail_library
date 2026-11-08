@@ -431,10 +431,7 @@ fn generic_named_facet_dictionary_crud_and_paging_work_for_all_facets() {
                     .await
                     .unwrap_or_else(|_| panic!("page {facet:?}"));
                 assert_eq!(
-                    page
-                        .iter()
-                        .map(|e| e.name.as_str())
-                        .collect::<Vec<_>>(),
+                    page.iter().map(|e| e.name.as_str()).collect::<Vec<_>>(),
                     vec!["Alpha"],
                     "{facet:?}"
                 );
@@ -530,14 +527,15 @@ fn management_page_and_batch_return_attachment_counts() {
                 .iter()
                 .map(|e| (e.name.as_str(), e.attachment_count))
                 .collect();
-            assert_eq!(
-                pairs,
-                vec![("Alpha", 2), ("Beta", 1), ("Unused", 0)],
-            );
+            assert_eq!(pairs, vec![("Alpha", 2), ("Beta", 1), ("Unused", 0)],);
 
             let batch = count_named_facet_attachments_batch(
                 JunctionNamedFacet::Tag,
-                &["Beta".to_string(), "Missing".to_string(), "Alpha".to_string()],
+                &[
+                    "Beta".to_string(),
+                    "Missing".to_string(),
+                    "Alpha".to_string(),
+                ],
             )
             .await
             .expect("batch");

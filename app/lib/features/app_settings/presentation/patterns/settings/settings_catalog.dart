@@ -60,7 +60,8 @@ class SettingsCategoryInfo {
     return switch (category) {
       SettingsCategory.appearance =>
         '${l10n.settingsThemeLabel} · ${l10n.settingsFontLabel} · ${l10n.settingsLanguageLabel}',
-      SettingsCategory.interface => l10n.settingsDefaultLibraryDisplayTargetLabel,
+      SettingsCategory.interface =>
+        l10n.settingsDefaultLibraryDisplayTargetLabel,
       SettingsCategory.reading =>
         '${l10n.readerSettingsReadingMode} · ${l10n.readerSettingsAutoPlay}',
       SettingsCategory.libraryBrowse =>

@@ -152,9 +152,7 @@ void main() {
         );
         expect(lastSnapshot?.selectedLibraryId, targetId);
         expect(
-          find.text(
-            '${ShellNavigation.libraryDestinationIndex}:$targetId',
-          ),
+          find.text('${ShellNavigation.libraryDestinationIndex}:$targetId'),
           findsOneWidget,
         );
       }

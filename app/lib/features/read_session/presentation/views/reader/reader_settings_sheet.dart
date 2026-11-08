@@ -183,9 +183,7 @@ class _ReaderSettingsBody extends ConsumerWidget {
             SettingsNavigationTile(
               leading: Symbols.zoom_in,
               title: Text(l10n.readerSettingsZoomMode),
-              value: Text(
-                l10n.webtoonZoomModeLabel(settings.webtoonZoomMode),
-              ),
+              value: Text(l10n.webtoonZoomModeLabel(settings.webtoonZoomMode)),
               onTap: () => _pickOption<WebtoonZoomMode>(
                 context,
                 title: l10n.readerSettingsZoomMode,

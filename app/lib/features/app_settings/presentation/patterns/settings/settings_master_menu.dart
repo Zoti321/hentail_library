@@ -26,18 +26,22 @@ class SettingsMasterMenu extends StatelessWidget {
 
   List<({SettingsMasterGroupInfo group, List<SettingsCategoryInfo> items})>
   _visibleGroups() {
-    return <({SettingsMasterGroupInfo group, List<SettingsCategoryInfo> items})>[
-      for (final SettingsMasterGroupInfo group in kSettingsMasterGroups)
-        (
-          group: group,
-          items: <SettingsCategoryInfo>[
-            for (final SettingsCategory category in group.categories)
-              if (visibleCategories == null ||
-                  visibleCategories!.contains(category))
-                settingsCategoryInfo(category),
-          ],
-        ),
-    ].where((entry) => entry.items.isNotEmpty).toList(growable: false);
+    return <
+          ({SettingsMasterGroupInfo group, List<SettingsCategoryInfo> items})
+        >[
+          for (final SettingsMasterGroupInfo group in kSettingsMasterGroups)
+            (
+              group: group,
+              items: <SettingsCategoryInfo>[
+                for (final SettingsCategory category in group.categories)
+                  if (visibleCategories == null ||
+                      visibleCategories!.contains(category))
+                    settingsCategoryInfo(category),
+              ],
+            ),
+        ]
+        .where((entry) => entry.items.isNotEmpty)
+        .toList(growable: false);
   }
 
   @override

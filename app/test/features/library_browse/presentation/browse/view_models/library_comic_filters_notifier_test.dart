@@ -206,14 +206,19 @@ void main() {
     LibraryComicFiltersState state = await first.read(
       libraryComicFiltersProvider.future,
     );
-    expect(state.parodyFilter.pickStateFor('Fate'), LibraryTriStatePick.include);
+    expect(
+      state.parodyFilter.pickStateFor('Fate'),
+      LibraryTriStatePick.include,
+    );
     expect(state.parodyFilter.includeMode, LibraryMetadataIncludeMode.all);
     expect(
       state.characterFilter.pickStateFor('Saber'),
       LibraryTriStatePick.exclude,
     );
 
-    final LibraryComicFilter filter = first.read(libraryComicFilterQueryProvider);
+    final LibraryComicFilter filter = first.read(
+      libraryComicFilterQueryProvider,
+    );
     expect(filter.parodiesAll, <String>{'Fate'});
     expect(filter.charactersExclude, <String>{'Saber'});
     first.dispose();

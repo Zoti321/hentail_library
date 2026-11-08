@@ -40,7 +40,11 @@ pub async fn fetch_named_facet_page_frb(
         .await
         .map_err(HentaiErrorDto::from)?;
     Ok(NamedFacetPagedNamesDto {
-        items: page.items.into_iter().map(NamedFacetFormEntryFrbDto::from).collect(),
+        items: page
+            .items
+            .into_iter()
+            .map(NamedFacetFormEntryFrbDto::from)
+            .collect(),
         total_count: page.total_count,
         page: page.page,
         page_size: page.page_size,
@@ -125,12 +129,14 @@ pub async fn count_named_facet_attachments_batch_frb(
     names: Vec<String>,
 ) -> Result<Vec<NamedFacetFormEntryFrbDto>, HentaiErrorDto> {
     match route(facet) {
-        NamedFacetRoute::Dictionary(facet) => Ok(count_named_facet_attachments_batch(facet, &names)
-            .await
-            .map_err(HentaiErrorDto::from)?
-            .into_iter()
-            .map(NamedFacetFormEntryFrbDto::from)
-            .collect()),
+        NamedFacetRoute::Dictionary(facet) => {
+            Ok(count_named_facet_attachments_batch(facet, &names)
+                .await
+                .map_err(HentaiErrorDto::from)?
+                .into_iter()
+                .map(NamedFacetFormEntryFrbDto::from)
+                .collect())
+        }
         NamedFacetRoute::Author => Ok(names
             .into_iter()
             .map(|name| NamedFacetFormEntryFrbDto {

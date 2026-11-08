@@ -50,9 +50,10 @@ String? homeLibraryStatusLine(
     return l10n.homeLibraryMetadataRefreshInProgressHint;
   }
   return switch (row.hint) {
-    HomeLibraryRowHint.syncWarning => row.staleDays == null
-        ? l10n.homeLibrarySyncRecommendedHint
-        : l10n.homeLibrarySyncWarningHint(row.staleDays!),
+    HomeLibraryRowHint.syncWarning =>
+      row.staleDays == null
+          ? l10n.homeLibrarySyncRecommendedHint
+          : l10n.homeLibrarySyncWarningHint(row.staleDays!),
     HomeLibraryRowHint.unreachable => l10n.homeLibraryUnreachableHint,
     HomeLibraryRowHint.none => null,
   };

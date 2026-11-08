@@ -400,10 +400,7 @@ const List<String> kSettingsAutoPlayModeLabels = <String>[
   '系列循环',
 ];
 
-const List<String> kSettingsPagedLayoutLabels = <String>[
-  '单页',
-  '双页',
-];
+const List<String> kSettingsPagedLayoutLabels = <String>['单页', '双页'];
 
 const List<String> kSettingsWebtoonMarginLabels = <String>[
   '无（0%）',

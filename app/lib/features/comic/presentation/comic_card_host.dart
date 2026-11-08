@@ -20,11 +20,6 @@ abstract final class ComicCardHost {
     required String comicId,
     required String title,
   }) {
-    confirmAndTrashComicById(
-      context,
-      ref,
-      comicId: comicId,
-      title: title,
-    );
+    confirmAndTrashComicById(context, ref, comicId: comicId, title: title);
   }
 }

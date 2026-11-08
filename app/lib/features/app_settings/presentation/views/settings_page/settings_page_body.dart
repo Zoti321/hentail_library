@@ -140,8 +140,9 @@ class _SettingsPageState extends State<SettingsLayout> {
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Builder(
               builder: (BuildContext context) {
-                final SettingsCategoryInfo selectedInfo =
-                    settingsCategoryInfo(_selected);
+                final SettingsCategoryInfo selectedInfo = settingsCategoryInfo(
+                  _selected,
+                );
                 final String? headerTitle =
                     (!listDetailWide && _showingNarrowDetail)
                     ? selectedInfo.label(l10n)

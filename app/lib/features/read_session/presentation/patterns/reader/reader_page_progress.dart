@@ -53,8 +53,9 @@ class _ReaderPageProgressState extends State<ReaderPageProgress> {
   }) {
     final double? trackThickness =
         ReaderChromeMetrics.progressSliderTrackThicknessOf(viewportWidth);
-    final double? thumbLength =
-        ReaderChromeMetrics.progressSliderThumbLengthOf(viewportWidth);
+    final double? thumbLength = ReaderChromeMetrics.progressSliderThumbLengthOf(
+      viewportWidth,
+    );
     String semanticLabel(double value) => ReaderPageCopy.pageProgressLabel(
       value.round().clamp(1, _safeTotal),
       _safeTotal,

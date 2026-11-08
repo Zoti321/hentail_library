@@ -48,12 +48,12 @@ pub use comic::{
     is_comic_trashed, list_trashed_comic_ids, now_ms, paginate, purge_comics, read_data_version,
     restore_comics, search_by_keyword, search_by_keyword_page, search_by_tag_expression,
     search_by_tag_expression_page, set_comic_meta_locks, trash_comics, update_comic_user_meta,
-    BulkPatchResultDto, ComicBrowseItemDto, ComicDto, ComicFilterDto, ComicGrouping, ComicMetaLocks,
-    ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto, ComicSortOptionDto,
-    MultiValueOp, MultiValuePatch, PageRequestDto, PageWindow, PagedComicBrowseResultDto,
-    PagedComicResultDto, PagedTrashedComicResultDto, PublishedAtPatch, ScalarPatch,
-    SetComicMetaLocksDto, TrashedComicCountsDto, TrashedComicDto, UpdateComicUserMetaDto,
-    BULK_PATCH_MAX_IDS,
+    BulkPatchResultDto, ComicBrowseItemDto, ComicDto, ComicFilterDto, ComicGrouping,
+    ComicMetaLocks, ComicMetadataBulkPatch, ComicPurgeResultDto, ComicSortFieldDto,
+    ComicSortOptionDto, MultiValueOp, MultiValuePatch, PageRequestDto, PageWindow,
+    PagedComicBrowseResultDto, PagedComicResultDto, PagedTrashedComicResultDto, PublishedAtPatch,
+    ScalarPatch, SetComicMetaLocksDto, TrashedComicCountsDto, TrashedComicDto,
+    UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};

@@ -17,17 +17,13 @@ void main() {
       const int itemCount = 50;
       final int rowCount = (itemCount + columns - 1) ~/ columns;
       final double expected =
-          rowCount * layout.itemSpec.rowHeight +
-          (rowCount - 1) * layout.gap;
+          rowCount * layout.itemSpec.rowHeight + (rowCount - 1) * layout.gap;
 
       expect(
         readingHistoryGridTotalHeight(itemCount: itemCount, layout: layout),
         expected,
       );
-      expect(
-        readingHistoryGridTotalHeight(itemCount: 0, layout: layout),
-        0,
-      );
+      expect(readingHistoryGridTotalHeight(itemCount: 0, layout: layout), 0);
     });
 
     testWidgets('does not mount every item for a large bucket', (
@@ -48,10 +44,7 @@ void main() {
                     child: ReadingHistoryListGrid(
                       itemCount: itemCount,
                       itemBuilder: (BuildContext context, int index) {
-                        return SizedBox(
-                          height: 48,
-                          child: Text('item-$index'),
-                        );
+                        return SizedBox(height: 48, child: Text('item-$index'));
                       },
                     ),
                   ),

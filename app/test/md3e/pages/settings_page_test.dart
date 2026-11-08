@@ -18,9 +18,7 @@ void main() {
         child: SizedBox(
           width: 1280,
           height: 800,
-          child: SettingsLayout(
-            initialCategory: SettingsCategory.appearance,
-          ),
+          child: SettingsLayout(initialCategory: SettingsCategory.appearance),
         ),
       ),
     );

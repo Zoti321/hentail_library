@@ -904,8 +904,7 @@ async fn count_visible_series_members(
     if series_ids.is_empty() {
         return Ok(HashMap::new());
     }
-    let placeholders = std::iter::repeat("?")
-        .take(series_ids.len())
+    let placeholders = std::iter::repeat_n("?", series_ids.len())
         .collect::<Vec<_>>()
         .join(", ");
     let sql = format!(

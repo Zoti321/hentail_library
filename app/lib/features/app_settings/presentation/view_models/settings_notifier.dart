@@ -88,9 +88,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   ) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    await updateSettings(
-      current.copyWith(defaultLibraryDisplayTarget: value),
-    );
+    await updateSettings(current.copyWith(defaultLibraryDisplayTarget: value));
   }
 
   Future<void> setDismissedUpdateVersion(String value) async {

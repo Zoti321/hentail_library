@@ -95,9 +95,7 @@ struct ManifestItem {
     media_type: String,
 }
 
-fn parse_opf_manifest_and_spine(
-    opf: &str,
-) -> Option<(HashMap<String, ManifestItem>, Vec<String>)> {
+fn parse_opf_manifest_and_spine(opf: &str) -> Option<(HashMap<String, ManifestItem>, Vec<String>)> {
     let mut manifest = HashMap::new();
     let mut spine = Vec::new();
 
@@ -112,17 +110,8 @@ fn parse_opf_manifest_and_spine(
                 continue;
             };
             let href = normalize_zip_path(href_raw);
-            let media_type = attrs
-                .get("media-type")
-                .cloned()
-                .unwrap_or_default();
-            manifest.insert(
-                id,
-                ManifestItem {
-                    href,
-                    media_type,
-                },
-            );
+            let media_type = attrs.get("media-type").cloned().unwrap_or_default();
+            manifest.insert(id, ManifestItem { href, media_type });
         } else if line.starts_with("itemref ")
             || line.starts_with("itemref\t")
             || line.starts_with("itemref\n")
@@ -296,8 +285,8 @@ fn parent_dir(path: &str) -> String {
 
 fn join_opf_href(base_dir: &str, href: &str) -> String {
     let href = href.replace('\\', "/");
-    if href.starts_with('/') {
-        return normalize_zip_path(&href[1..]);
+    if let Some(stripped) = href.strip_prefix('/') {
+        return normalize_zip_path(stripped);
     }
     if base_dir.is_empty() {
         return normalize_zip_path(&href);

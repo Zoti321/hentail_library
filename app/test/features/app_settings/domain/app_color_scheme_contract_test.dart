@@ -11,10 +11,7 @@ void main() {
       expect(setting.colorSchemePreference, AppColorSchemePreference.brand);
       expect(setting.useDynamicColor, isFalse);
       expect(setting.fontPreference, AppFontPreference.miSans);
-      expect(
-        setting.defaultLibraryDisplayTarget,
-        LibraryDisplayTarget.comics,
-      );
+      expect(setting.defaultLibraryDisplayTarget, LibraryDisplayTarget.comics);
     });
 
     test('migrateAppSettingJson fills reserved keys for legacy JSON', () {
@@ -28,10 +25,7 @@ void main() {
       expect(setting.colorSchemePreference, AppColorSchemePreference.brand);
       expect(setting.useDynamicColor, isFalse);
       expect(setting.fontPreference, AppFontPreference.miSans);
-      expect(
-        setting.defaultLibraryDisplayTarget,
-        LibraryDisplayTarget.comics,
-      );
+      expect(setting.defaultLibraryDisplayTarget, LibraryDisplayTarget.comics);
       expect(setting.toJson()['colorSchemePreference'], 'brand');
       expect(setting.toJson()['useDynamicColor'], isFalse);
       expect(setting.toJson()['fontPreference'], 'miSans');
