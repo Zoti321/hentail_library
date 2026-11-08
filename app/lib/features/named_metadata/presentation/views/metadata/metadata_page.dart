@@ -145,7 +145,6 @@ class _MetadataManagementPageState
     final NamedFacetManagementViewModel viewModel = ref.read(
       namedFacetManagementViewModelProvider(kind).notifier,
     );
-    final int count = hasSearchQuery ? itemCount : totalCount;
     final double horizontal = layout.horizontalInset;
     final bool mergeMode = mergeTarget != null;
     final bool useMobileCreateDialog =
@@ -185,7 +184,8 @@ class _MetadataManagementPageState
               sliver: SliverToBoxAdapter(
                 child: ManagementCatalogToolbar(
                   facet: kind,
-                  facetCount: count,
+                  // 始终为维度总数；过滤命中数改挂搜索行右侧。
+                  facetCount: totalCount,
                   onFacetChanged: (ManagedNamedFacetKind value) =>
                       _handleTabSelected(
                         kManagedNamedFacetTabOrder.indexOf(value),
@@ -200,7 +200,17 @@ class _MetadataManagementPageState
               child: ManagementFacetSearchBar(
                 controller: _searchController,
                 hintText: context.l10n.metadataSearchNameHint,
-                onChanged: (String value) => viewModel.setQueryDebounced(value),
+                matchCountLabel: hasSearchQuery
+                    ? context.l10n.filterResultCount(itemCount)
+                    : null,
+                onChanged: (String value) {
+                  // 清空立即生效（clear 按钮不经 debounce）；输入仍防抖。
+                  if (value.trim().isEmpty) {
+                    unawaited(viewModel.setQuery(''));
+                    return;
+                  }
+                  viewModel.setQueryDebounced(value);
+                },
               ),
             ),
             SliverPadding(

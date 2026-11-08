@@ -67,6 +67,38 @@ void main() {
     expect(barLeft, closeTo(24, 0.5));
   });
 
+  testWidgets('shows match count to the right of the search bar', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1024, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final TextEditingController controller = TextEditingController();
+    addTearDown(controller.dispose);
+
+    await pumpApp(
+      tester,
+      home: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: ManagementFacetSearchBar(
+            controller: controller,
+            hintText: 'Search by name…',
+            matchCountLabel: '3 个结果',
+            onChanged: (_) {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('3 个结果'), findsOneWidget);
+    final double barRight = tester.getTopRight(find.byType(M3ESearchBar)).dx;
+    final double labelLeft = tester.getTopLeft(find.text('3 个结果')).dx;
+    expect(labelLeft, greaterThan(barRight));
+  });
+
   testWidgets('forwards onChanged when typing', (WidgetTester tester) async {
     final TextEditingController controller = TextEditingController();
     addTearDown(controller.dispose);
@@ -88,5 +120,31 @@ void main() {
     await tester.pump();
 
     expect(changes, contains('alpha'));
+  });
+
+  testWidgets('forwards onChanged when clear button empties the field', (
+    WidgetTester tester,
+  ) async {
+    final TextEditingController controller = TextEditingController(text: 'alpha');
+    addTearDown(controller.dispose);
+    final List<String> changes = <String>[];
+
+    await pumpApp(
+      tester,
+      home: Scaffold(
+        body: ManagementFacetSearchBar(
+          controller: controller,
+          hintText: '搜索名称…',
+          onChanged: changes.add,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(M3EIcons.close));
+    await tester.pump();
+
+    expect(controller.text, isEmpty);
+    expect(changes, contains(''));
   });
 }
