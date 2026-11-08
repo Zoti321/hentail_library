@@ -50,6 +50,10 @@ class HomePage extends ConsumerWidget {
       onOpenNavigation: appShellPageNavigationOpener(context),
       onOpenHistory: () => context.go('/history'),
       onOpenTrash: () => context.go('/trash'),
+      onOpenAuthors: () => context.go('/metadata?tab=authors'),
+      onOpenParodies: () => context.go('/metadata?tab=parodies'),
+      onOpenCharacters: () => context.go('/metadata?tab=characters'),
+      onOpenTags: () => context.go('/metadata?tab=tags'),
       libraryManagementSection: const HomeLibraryManagementPanel(),
     );
   }

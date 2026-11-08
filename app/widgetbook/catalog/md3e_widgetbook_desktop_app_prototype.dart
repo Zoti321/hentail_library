@@ -31,8 +31,6 @@ class _Md3eLabAppPrototype extends StatelessWidget {
         return _Md3eLibraryBrowsePagePreview(
           libraryDisplayName: navigation.selectedLibraryDisplayName,
         );
-      case ShellNavigation.managementDestinationIndex:
-        return const ManagementBrowsePageLabHost();
       case ShellNavigation.settingsDestinationIndex:
         return SettingsPageLabHost(
           onBack: navigation.onBackToPreviousDestination,

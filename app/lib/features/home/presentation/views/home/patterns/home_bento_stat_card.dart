@@ -6,13 +6,16 @@ import 'package:hentai_library/shared/ui/motion/motion.dart';
 import 'package:hentai_library/shared/ui/widgets/settings/tonal_surface.dart';
 import 'package:material_3_expressive/components/lists/components/m3e_card_radius_motion.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-/// Kazumi 风统计块：独立底色 + 可变圆角 + M3E state layer（无业务动作）。
+/// Kazumi 风统计块：独立底色 + 可变圆角 + M3E state layer。
+///
+/// 布局对齐 [HomeNavShortcutCard]：左上图标、右上跳转箭头（可点时）、
+/// 左下标题 +「{数字} {单位}」副文案。
 class HomeBentoStatCard extends StatefulWidget {
   const HomeBentoStatCard({
     super.key,
     required this.label,
-    required this.valueText,
     required this.caption,
     required this.icon,
     required this.backgroundColor,
@@ -25,7 +28,6 @@ class HomeBentoStatCard extends StatefulWidget {
   });
 
   final String label;
-  final String valueText;
   final String caption;
   final IconData icon;
   final Color backgroundColor;
@@ -54,27 +56,18 @@ class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
     final M3ECardTheme cardTheme = theme.cardTheme.copyWith(
       stateLayerColor: widget.onBackgroundColor,
     );
-    final double valueSize = switch (widget.emphasis) {
-      HomeBentoStatEmphasis.hero => 36,
-      HomeBentoStatEmphasis.standard => 28,
-      HomeBentoStatEmphasis.compact => 24,
-    };
     final bool reduceMotion = LabMotion.reduceMotionOf(context);
     final WindowSizeClass sizeClass = PageLayoutSpec.of(context).sizeClass;
     final EdgeInsets padding =
         widget.contentPadding ??
         HomePageMetrics.statCardContentPadding(sizeClass);
 
-    final bool showValue = widget.valueText.trim().isNotEmpty;
     final bool showCaption = widget.caption.trim().isNotEmpty;
-    final bool compactHeaderOnly = !showValue && !showCaption;
     final VoidCallback? onPressed = widget.onPressed;
-    final String semanticsLabel = switch ((showValue, showCaption)) {
-      (true, true) => '${widget.label}, ${widget.valueText}, ${widget.caption}',
-      (true, false) => '${widget.label}, ${widget.valueText}',
-      (false, true) => '${widget.label}, ${widget.caption}',
-      (false, false) => widget.label,
-    };
+    final Color fg = widget.onBackgroundColor;
+    final String semanticsLabel = showCaption
+        ? '${widget.label}, ${widget.caption}'
+        : widget.label;
 
     final Widget content = ConstrainedBox(
       constraints: BoxConstraints(minHeight: widget.minHeight),
@@ -82,55 +75,49 @@ class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
         padding: padding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: compactHeaderOnly
-              ? MainAxisAlignment.center
-              : MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Row(
               children: <Widget>[
                 _IconBadge(
                   icon: widget.icon,
-                  color: widget.onBackgroundColor,
-                  filled:
-                      widget.emphasis == HomeBentoStatEmphasis.hero ||
-                      compactHeaderOnly,
+                  color: fg,
+                  filled: widget.emphasis == HomeBentoStatEmphasis.hero,
                 ),
                 const Spacer(),
-                Text(
-                  widget.label,
-                  style: type.labelLarge.copyWith(
-                    color: widget.onBackgroundColor.withValues(alpha: 0.88),
+                if (onPressed != null)
+                  Icon(
+                    Symbols.arrow_forward,
+                    size: 20,
+                    color: fg.withValues(alpha: 0.55),
                   ),
-                ),
               ],
             ),
-            if (showValue) ...<Widget>[
-              const SizedBox(height: 8),
-              Text(
-                widget.valueText,
-                style: type.headlineLarge.copyWith(
-                  fontSize: valueSize,
-                  height: 1.05,
-                  fontWeight: FontWeight.w600,
-                  color: widget.onBackgroundColor,
-                  letterSpacing: -0.5,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  widget.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: type.titleMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: fg,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-            ] else if (!compactHeaderOnly)
-              const SizedBox(height: 12),
-            if (showCaption)
-              Text(
-                widget.caption,
-                maxLines: showValue ? 1 : 2,
-                overflow: TextOverflow.ellipsis,
-                style: (showValue ? type.bodySmall : type.titleMedium).copyWith(
-                  color: showValue
-                      ? widget.onBackgroundColor.withValues(alpha: 0.72)
-                      : widget.onBackgroundColor.withValues(alpha: 0.92),
-                  height: showValue ? null : 1.25,
-                ),
-              ),
+                if (showCaption) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.caption,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: type.bodySmall.copyWith(
+                      color: fg.withValues(alpha: 0.72),
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ],
         ),
       ),

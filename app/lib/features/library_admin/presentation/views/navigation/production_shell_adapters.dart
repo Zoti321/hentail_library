@@ -22,11 +22,6 @@ List<ShellRailDestination> productionShellRailDestinations(
       isLibraryFlyoutAnchor: true,
     ),
     ShellRailDestination(
-      navId: AppNavigation.navIdMetadata,
-      label: l10n.navMetadata,
-      icon: ShellRailSymbols.metadata,
-    ),
-    ShellRailDestination(
       navId: AppNavigation.navIdSettings,
       label: l10n.navSettings,
       icon: ShellRailSymbols.settings,
@@ -61,7 +56,9 @@ List<HomeLibraryDashboardRow> dashboardRowsForLibraries({
 String productionSelectedNavId({required String path}) {
   final String flatNavId = AppNavigation.activeNavIdForPath(path);
   if (flatNavId == AppNavigation.navIdHistory ||
-      flatNavId == AppNavigation.navIdTrash) {
+      flatNavId == AppNavigation.navIdTrash ||
+      flatNavId == AppNavigation.navIdMetadata) {
+    // 管理 / 历史 / 垃圾桶不在 Rail 上；保持无选中目的地。
     return '';
   }
   if (flatNavId.isNotEmpty) {

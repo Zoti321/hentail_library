@@ -13,8 +13,11 @@ import 'package:hentai_library/features/library_admin/presentation/views/home_li
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_list_order.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 
+import 'package:hentai_library/features/named_metadata/public.dart';
+
 import '../preview/md3e_home_page_preview_data.dart';
 import 'md3e_history_browse_page_lab_host.dart';
+import 'md3e_management_browse_page_lab_host.dart';
 
 /// Widgetbook / Lab：在本地维护库列表顺序；生产侧由 notifier + repository 接同样回调形状。
 ///
@@ -203,6 +206,17 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
     unawaited(_defaultLibraryAction(libraryId, action));
   }
 
+  void _openManagement(ManagedNamedFacetKind facet) {
+    unawaited(
+      Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) =>
+              ManagementBrowsePageLabHost(initialFacet: facet),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return HomeLayout(
@@ -229,6 +243,10 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
           ),
         );
       },
+      onOpenAuthors: () => _openManagement(ManagedNamedFacetKind.author),
+      onOpenParodies: () => _openManagement(ManagedNamedFacetKind.parody),
+      onOpenCharacters: () => _openManagement(ManagedNamedFacetKind.character),
+      onOpenTags: () => _openManagement(ManagedNamedFacetKind.tag),
       libraryManagementSection: HomeLibraryManagementSection(
         libraries: _libraries,
         onLibraryOpen: widget.onLibraryOpen,

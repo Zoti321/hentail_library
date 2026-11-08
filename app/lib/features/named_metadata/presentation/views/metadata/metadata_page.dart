@@ -60,11 +60,18 @@ class _MetadataManagementPageState
 
   @override
   Widget build(BuildContext context) {
-    final String? tabParam = GoRouterState.of(context)
-        .uri
-        .queryParameters['tab'];
-    final int selectedIndex = _selectedTabIndex ?? _tabIndexFromQuery(tabParam);
-    _selectedTabIndex ??= selectedIndex;
+    final String? tabParam = GoRouterState.of(
+      context,
+    ).uri.queryParameters['tab'];
+    final int queryIndex = _tabIndexFromQuery(tabParam);
+    // 首页统计卡等深链改 query 时，同步本地 tab（保留切换方向）。
+    if (_selectedTabIndex != queryIndex) {
+      final int previousIndex = _selectedTabIndex ?? queryIndex;
+      _facetTransitionReverse = queryIndex < previousIndex;
+      _selectedTabIndex = queryIndex;
+      _showInlineCreateField = false;
+    }
+    final int selectedIndex = _selectedTabIndex!;
 
     return Shortcuts(
       shortcuts: const <ShortcutActivator, Intent>{

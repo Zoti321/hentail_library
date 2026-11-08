@@ -9,22 +9,31 @@ import 'package:hentai_library/features/home/presentation/views/home/patterns/ho
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_copy.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_nav_shortcut_card.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_shortcut_card_colors.dart';
-import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 首页「全库统计」：Kazumi 风 bento 色块 + 历史 / 垃圾桶入口卡片。
+///
+/// 作者 / 原作 / 角色 / 标签可跳转管理页对应 tab；漫画 / 系列仅展示。
 class HomeAggregateStatsSection extends StatelessWidget {
   const HomeAggregateStatsSection({
     super.key,
     required this.counts,
     this.onOpenHistory,
     this.onOpenTrash,
+    this.onOpenAuthors,
+    this.onOpenParodies,
+    this.onOpenCharacters,
+    this.onOpenTags,
   });
 
   final HomeAggregateCounts counts;
   final VoidCallback? onOpenHistory;
   final VoidCallback? onOpenTrash;
+  final VoidCallback? onOpenAuthors;
+  final VoidCallback? onOpenParodies;
+  final VoidCallback? onOpenCharacters;
+  final VoidCallback? onOpenTags;
 
   bool get _showsShortcutCards => onOpenHistory != null && onOpenTrash != null;
 
@@ -35,18 +44,13 @@ class HomeAggregateStatsSection extends StatelessWidget {
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
     final AppLocalizations l10n = context.l10n;
-    final String locale = Localizations.localeOf(context).toString();
-    final NumberFormat numberFormat = NumberFormat.decimalPattern(locale);
     final double gap = HomePageMetrics.statCardGap(sizeClass);
     final double tagsTopGap = HomePageMetrics.statTagsRowTopGap(sizeClass);
     final _HomeStatPalette palette = _HomeStatPalette(scheme);
 
-    String formatCount(int value) => numberFormat.format(value);
-
     Widget comicCard({required HomeBentoStatEmphasis emphasis}) {
       return HomeBentoStatCard(
         label: HomePageCopy.comicsStatLabel,
-        valueText: formatCount(counts.comicCount),
         caption: l10n.homeComicTotal(counts.comicCount),
         icon: Symbols.auto_stories,
         backgroundColor: palette.comicsBackground,
@@ -65,7 +69,6 @@ class HomeAggregateStatsSection extends StatelessWidget {
     Widget seriesCard() {
       return HomeBentoStatCard(
         label: l10n.homeStatSeries,
-        valueText: formatCount(counts.seriesCount),
         caption: l10n.homeSeriesCount(counts.seriesCount),
         icon: Symbols.collections_bookmark,
         backgroundColor: palette.seriesBackground,
@@ -78,7 +81,6 @@ class HomeAggregateStatsSection extends StatelessWidget {
     Widget authorCard() {
       return HomeBentoStatCard(
         label: l10n.homeStatAuthors,
-        valueText: formatCount(counts.authorCount),
         caption: counts.authorCount == 0
             ? l10n.homeNoAuthors
             : l10n.homeAuthorCount(counts.authorCount),
@@ -91,39 +93,39 @@ class HomeAggregateStatsSection extends StatelessWidget {
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(8),
         ),
+        onPressed: onOpenAuthors,
       );
     }
 
     Widget parodyCard() {
       return HomeBentoStatCard(
         label: l10n.metadataTabParodies,
-        valueText: formatCount(counts.parodyCount),
         caption: l10n.metadataParodyCount(counts.parodyCount),
         icon: Symbols.theaters,
         backgroundColor: palette.parodiesBackground,
         onBackgroundColor: palette.parodiesForeground,
         borderRadius: const BorderRadius.all(Radius.circular(16)),
         minHeight: 108,
+        onPressed: onOpenParodies,
       );
     }
 
     Widget characterCard() {
       return HomeBentoStatCard(
         label: l10n.metadataTabCharacters,
-        valueText: formatCount(counts.characterCount),
         caption: l10n.metadataCharacterCount(counts.characterCount),
         icon: Symbols.face_3,
         backgroundColor: palette.charactersBackground,
         onBackgroundColor: palette.charactersForeground,
         borderRadius: BorderRadius.circular(16),
         emphasis: HomeBentoStatEmphasis.compact,
+        onPressed: onOpenCharacters,
       );
     }
 
     Widget tagCard({required bool wide}) {
       return HomeBentoStatCard(
         label: l10n.homeStatTags,
-        valueText: formatCount(counts.tagCount),
         caption: l10n.homeTagCount(counts.tagCount),
         icon: Symbols.label,
         backgroundColor: palette.tagsBackground,
@@ -137,6 +139,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
           sizeClass,
           tagPill: true,
         ),
+        onPressed: onOpenTags,
       );
     }
 
