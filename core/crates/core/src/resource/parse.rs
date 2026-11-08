@@ -14,6 +14,7 @@ use crate::formats::{
 };
 
 use super::access::{local_access, ResourceAccess, ResourceKind};
+use super::epub::collect_epub_spine_image_names;
 use super::media::{
     basename, basename_without_extension, extension_lower, is_comic_image_extension,
 };
@@ -562,6 +563,10 @@ fn extract_xml_text(line: &str) -> Option<String> {
 fn count_epub_images<R: std::io::Read + std::io::Seek>(
     archive: &mut ZipArchive<R>,
 ) -> Result<i32, HentaiError> {
+    let spine = collect_epub_spine_image_names(archive)?;
+    if !spine.is_empty() {
+        return Ok(spine.len() as i32);
+    }
     let mut count = 0i32;
     for i in 0..archive.len() {
         let entry = archive

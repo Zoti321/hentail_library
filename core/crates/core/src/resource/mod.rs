@@ -5,6 +5,7 @@
 //! thumbnail use [media] helpers and [access] (no dependency on sync).
 
 pub mod access;
+mod epub;
 mod media;
 mod parse;
 mod stat;
@@ -13,6 +14,7 @@ pub use access::{
     local_access, FakeResourceAccess, LocalResourceAccess, ResourceAccess, ResourceEntry,
     ResourceKind, ResourceStat, ResourceStream, WebDavResourceAccess,
 };
+pub(crate) use epub::collect_epub_spine_image_names;
 pub use media::{
     basename, basename_without_extension, can_generate_thumbnail, extension_lower,
     is_comic_image_extension,
