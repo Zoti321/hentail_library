@@ -25,8 +25,12 @@ _Avoid_: deep import 其他 feature 的 presentation / data / di；让 `shared/*
 _Avoid_: 书架（UI 可用）；全部库浏览、合并库、全局书架（产品不做）
 
 **Home page**:
-应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**提供常驻 Library sync 入口。详见 ADR-0020。
+应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、Home page counts、Reading activity stats 摘要卡、Home library alert；**不**提供常驻 Library sync 入口。装配与表现属 `home`；计数与阅读行为指标的领域 owner 为 `reading_stats`。详见 ADR-0020。
 _Avoid_: 当前库仪表盘、首页扫描、Home dashboard（口语可用；文档与 issue 用 Home page）
+
+**Home page counts**:
+跨全部 Library 的目录聚合计数：Comic、Series，以及全局字典口径的 Author / Parody / Character / Tag 数量；只统计未 trash 的 Comic 所影响的可见态势。由 `reading_stats` 提供，Home page 展示；不是 Reading activity stats。
+_Avoid_: 全库统计、首页统计（口语可用；与阅读行为指标混淆时用本词）、看过数量
 
 **Home library alert**:
 Home page 上可 dismiss 的、按 Library 粒度的态势条：远程根不可达、上次 Library sync 失败、距上次成功 sync 过久而建议再次 sync、Library resource probe 发现待同步 Resource 等。用户可从 alert 对该 Library 触发 Library sync；非常驻全局扫描按钮。
@@ -367,12 +371,24 @@ _Avoid_: Standalone read、Series read、单本模式、系列模式、Comic rea
 _Avoid_: 系列阅读模式、Series read、系列会话
 
 **Reading history**:
-用户对某 Comic 最近一次阅读的时间与页码记录；跨 Library 全局保留与展示。从库/详情/历史等重新打开该 Comic 时恢复页码；阅读器内切到同系列另一卷时，先落盘当前 Comic 进度（无痕除外），目标卷从第 1 页打开。无痕 Read session 不读写 Reading history。
+用户对某 Comic 最近一次阅读的时间与页码记录；跨 Library 全局保留与展示。从库/详情/历史等重新打开该 Comic 时恢复页码；阅读器内切到同系列另一卷时，先落盘当前 Comic 进度（无痕除外），目标卷从第 1 页打开。无痕 Read session 不读写 Reading history。不是 Reading activity stats；清空 Reading history 不清除 Reading activity stats。
 _Avoid_: 阅读记录、系列进度、Series reading history
 
 **Reading progress (history list)**:
 历史列表等界面展示的「当前页 / 总页数」。当前页来自 Reading history；总页数对应该 Comic 的编目页数，不是 Reading history 的持久化字段。
 _Avoid_: 进度条数据、page count 字段（口语）
+
+**Reading activity stats**:
+用户在本应用内的终身阅读行为指标：Finished comic 数量与 Reading duration；由 `reading_stats` 持久化并在 Home page 以独立卡片展示。与 Home page counts、Reading history 分离。
+_Avoid_: 看过统计、阅读记录统计、Home page counts（库存计数）
+
+**Finished comic**:
+非无痕 Read session 中首次到达该 Comic 最后一页（当前页 ≥ 编目总页数且总页数 > 0）的 Comic。计数为不重复 Comic 数；一旦成立则粘性保留（后续 pageCount 变化不撤销）。仅未 trash 且仍在库中的计入展示；Comic trash 暂不计入、restore 后若仍标记则加回；Comic purge 或 Library 删除去掉标记；Path migration 随 comicId rekey。存量可由已达末页的 Reading history 回填。不是「看过」、不要求会话满 10 秒，也不是手动标为已读。
+_Avoid_: 看过漫画、已读（口语可用；领域与 issue 用 Finished comic）、mark as read
+
+**Reading duration**:
+合格非无痕 Read session 在前台累计的阅读时长。会话有效阅读达到至少 10 秒后才形成记录，一旦合格则整段时长计入（含前 10 秒）；离开 Read session 或进入后台则停止计入。终身累计；不回填历史；不因 Comic trash / purge 回退。首版无按日/周聚合、无闲置翻页封顶、无用户一键清零入口。
+_Avoid_: 阅读时间估计、Time to Read（Kindle 剩余时间语义）、看过时长
 
 **Scroll layout**:
 阅读器纵向连续滚动的版式；适用于长条阅读体验。
