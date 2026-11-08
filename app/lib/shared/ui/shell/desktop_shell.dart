@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
+import 'package:hentai_library/shared/ui/shell/shell_library_picker_sheet.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_column.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_layout.dart';
 import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
@@ -298,6 +299,11 @@ class DesktopShellState extends State<DesktopShell> {
     List<ShellRailDestination> specs,
     int index,
   ) {
+    final int libraryIndex = _libraryAnchorIndex(specs);
+    if (index == libraryIndex) {
+      _openLibraryPickerSheet(context);
+      return;
+    }
     if (_isControlled) {
       widget.onNavIdSelected!(shellNavIdForDestinationIndex(specs, index));
       return;
@@ -308,6 +314,15 @@ class DesktopShellState extends State<DesktopShell> {
       }
       _selectedIndex = index;
     });
+  }
+
+  void _openLibraryPickerSheet(BuildContext context) {
+    ShellLibraryPickerSheet.show(
+      context,
+      libraries: widget.libraries,
+      selectedLibraryId: _effectiveSelectedLibraryId,
+      onLibrarySelected: _onLibrarySelected,
+    );
   }
 
   void _toggleRailExtended() {

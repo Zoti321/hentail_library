@@ -115,44 +115,56 @@ void main() {
     },
   );
 
-  testWidgets('compact and medium select library from bottom navigation', (
-    WidgetTester tester,
-  ) async {
-    Future<void> pumpAndSelectLibrary(double width) async {
-      ShellNavigationSnapshot? lastSnapshot;
+  testWidgets(
+    'compact and medium open library picker sheet from bottom navigation',
+    (WidgetTester tester) async {
+      Future<void> pumpAndSelectLibrary(double width) async {
+        const String targetId = 'lab-remote-nas';
+        final String targetName = LabLibraryCatalog.displayNameForId(targetId);
+        ShellNavigationSnapshot? lastSnapshot;
 
-      await tester.binding.setSurfaceSize(Size(width, 768));
-      await pumpApp(
-        tester,
-        home: DesktopShell(
-          width: width,
-          height: 768,
-          paneBuilder: (_, navigation) {
-            lastSnapshot = navigation;
-            return Text('pane:${navigation.destinationIndex}');
-          },
-        ),
-      );
+        await tester.binding.setSurfaceSize(Size(width, 768));
+        await pumpApp(
+          tester,
+          home: DesktopShell(
+            width: width,
+            height: 768,
+            paneBuilder: (_, navigation) {
+              lastSnapshot = navigation;
+              return Text(
+                '${navigation.destinationIndex}:${navigation.selectedLibraryId}',
+              );
+            },
+          ),
+        );
 
-      expect(find.byType(ExpressiveNavigationBar), findsOneWidget);
-      await tester.tap(find.text('漫画库'));
-      await tester.pumpAndSettle();
+        expect(find.byType(ExpressiveNavigationBar), findsOneWidget);
+        await tester.tap(find.text('漫画库'));
+        await tester.pumpAndSettle();
+        expect(find.text(targetName), findsOneWidget);
 
-      expect(
-        lastSnapshot?.destinationIndex,
-        ShellNavigation.libraryDestinationIndex,
-      );
-      expect(
-        find.text('pane:${ShellNavigation.libraryDestinationIndex}'),
-        findsOneWidget,
-      );
-    }
+        await tester.tap(find.text(targetName));
+        await tester.pumpAndSettle();
 
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+        expect(
+          lastSnapshot?.destinationIndex,
+          ShellNavigation.libraryDestinationIndex,
+        );
+        expect(lastSnapshot?.selectedLibraryId, targetId);
+        expect(
+          find.text(
+            '${ShellNavigation.libraryDestinationIndex}:$targetId',
+          ),
+          findsOneWidget,
+        );
+      }
 
-    await pumpAndSelectLibrary(390);
-    await pumpAndSelectLibrary(600);
-  });
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await pumpAndSelectLibrary(390);
+      await pumpAndSelectLibrary(600);
+    },
+  );
 
   testWidgets(
     'compact settings keeps bottom nav and back returns to previous destination',

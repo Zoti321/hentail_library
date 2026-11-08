@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/comic/presentation/patterns/comic_detail/comic_detail_series_catalog_sheet.dart';
+import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 系列上一本 / 目录菜单 / 下一本。
+///
+/// medium-（&lt; [Breakpoints.expanded]）仅保留「系列目录」图标，点击打开 bottom sheet。
 class ComicDetailSeriesNav extends StatelessWidget {
   const ComicDetailSeriesNav({
     super.key,
@@ -26,9 +30,38 @@ class ComicDetailSeriesNav extends StatelessWidget {
   bool get _hasPrev => currentIndex > 0;
   bool get _hasNext => currentIndex < catalog.length - 1;
 
+  void _openCatalogSheet(BuildContext context) {
+    ComicDetailSeriesCatalogSheet.show(
+      context,
+      catalog: catalog,
+      currentIndex: currentIndex,
+      onSelectIndex: (int index) => onSelectIndex?.call(index),
+    );
+  }
+
+  Widget _catalogButton(BuildContext context, {required VoidCallback? onPressed}) {
+    final AppLocalizations l10n = context.l10n;
+    return _ComicDetailSeriesNavIconButton(
+      icon: Symbols.list_alt,
+      tooltip: l10n.comicDetailSeriesCatalog,
+      semanticLabel: l10n.comicDetailSeriesCatalog,
+      enabled: catalog.isNotEmpty && onPressed != null,
+      onPressed: onPressed,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
+    final bool useSheet =
+        MediaQuery.sizeOf(context).width < Breakpoints.expanded;
+
+    if (useSheet) {
+      return _catalogButton(
+        context,
+        onPressed: catalog.isEmpty ? null : () => _openCatalogSheet(context),
+      );
+    }
 
     final List<M3EMenuNode> menuChildren = <M3EMenuNode>[
       for (int i = 0; i < catalog.length; i++)
@@ -56,13 +89,7 @@ class ComicDetailSeriesNav extends StatelessWidget {
           children: menuChildren,
           enabled: catalog.isNotEmpty,
           anchorBuilder: (BuildContext context, VoidCallback open) {
-            return _ComicDetailSeriesNavIconButton(
-              icon: Symbols.list_alt,
-              tooltip: l10n.comicDetailSeriesCatalog,
-              semanticLabel: l10n.comicDetailSeriesCatalog,
-              enabled: catalog.isNotEmpty,
-              onPressed: open,
-            );
+            return _catalogButton(context, onPressed: open);
           },
         ),
         const SizedBox(width: 4),
