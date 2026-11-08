@@ -17,7 +17,7 @@ import '../../../../support/pump_localized_app.dart';
 
 void main() {
   group('History production page', () {
-    testWidgets('compact page shows nav menu and MD3E header', (
+    testWidgets('compact page shows MD3E header without nav menu', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 360);
@@ -26,7 +26,7 @@ void main() {
       expect(find.byType(HistoryBrowsePage<HistoryCardItem>), findsOneWidget);
       expect(find.byType(HistoryPageHeader), findsOneWidget);
       expect(find.text('阅读历史'), findsOneWidget);
-      expect(find.byIcon(Symbols.menu), findsOneWidget);
+      expect(find.byIcon(Symbols.menu), findsNothing);
     });
 
     testWidgets('medium page hides nav menu', (WidgetTester tester) async {

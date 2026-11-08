@@ -41,7 +41,7 @@ void main() {
   });
 
   testWidgets(
-    'compact list back button calls onBack; detail back returns to list',
+    'compact root hides back; detail back returns to list; system back calls onBack',
     (WidgetTester tester) async {
       int backCount = 0;
       await pumpApp(
@@ -52,7 +52,7 @@ void main() {
           child: SettingsLayout(onBack: () => backCount++),
         ),
       );
-      expect(find.byIcon(Symbols.arrow_back), findsOneWidget);
+      expect(find.byIcon(Symbols.arrow_back), findsNothing);
 
       await tester.tap(
         find
@@ -64,15 +64,17 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('_settings_detail')), findsOneWidget);
+      expect(find.byIcon(Symbols.arrow_back), findsOneWidget);
       expect(backCount, 0);
 
       await tester.tap(find.byIcon(Symbols.arrow_back));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('_settings_master')), findsOneWidget);
       expect(find.byKey(const Key('_settings_detail')), findsNothing);
+      expect(find.byIcon(Symbols.arrow_back), findsNothing);
       expect(backCount, 0);
 
-      await tester.tap(find.byIcon(Symbols.arrow_back));
+      await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
       expect(backCount, 1);
     },

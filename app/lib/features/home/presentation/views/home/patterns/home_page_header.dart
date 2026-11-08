@@ -7,7 +7,7 @@ import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 首页顶栏：compact 可打开导航；标题为 [AppLocalizations.navHome]。
+/// 首页顶栏：标题为 [AppLocalizations.navHome]（主导航由壳层底部栏 / Rail 承担）。
 class HomePageHeader extends StatelessWidget {
   const HomePageHeader({super.key, this.onOpenNavigation});
 

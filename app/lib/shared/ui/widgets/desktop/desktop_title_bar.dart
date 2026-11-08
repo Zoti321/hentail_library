@@ -8,7 +8,7 @@ import 'package:window_manager/window_manager.dart';
 /// Desktop window title strip: optional ☰ menu (left) + window controls (right).
 ///
 /// No global search (removed); the empty middle is a window drag area.
-/// When [showNavigationMenu] is true (drawer shell), ☰ opens app navigation.
+/// When [showNavigationMenu] is true, ☰ invokes [onNavigationMenuPressed].
 class DesktopTitleBar extends StatelessWidget {
   const DesktopTitleBar({
     super.key,

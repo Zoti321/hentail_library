@@ -46,7 +46,8 @@ class SettingsLayout extends StatefulWidget {
   /// 为 null 时使用 Lab mock 分类内容；生产注入真实 section。
   final SettingsSectionsBuilder? sectionsBuilder;
 
-  /// 列表页（非 list-detail）返回：由外层决定回到哪里（壳层上一目的地 / 路由）。
+  /// 窄屏列表页的系统返回：由外层决定回到哪里（壳层上一目的地 / 路由）。
+  /// 顶栏返回仅在窄屏二级详情显示；一级列表不再展示返回按钮（medium- 用底部导航）。
   final VoidCallback? onBack;
 
   @override
@@ -153,7 +154,7 @@ class _SettingsPageState extends State<SettingsLayout> {
                     : null;
                 return SettingsPageHeader(
                   title: headerTitle,
-                  showBack: !listDetailWide,
+                  showBack: !listDetailWide && _showingNarrowDetail,
                   onBack: _handleBack,
                 );
               },

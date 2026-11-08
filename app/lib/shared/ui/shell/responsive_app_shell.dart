@@ -13,16 +13,16 @@ export 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 export 'package:hentai_library/shared/ui/shell/app_shell_sidebar_slot.dart';
 export 'package:hentai_library/shared/ui/shell/app_shell_slot.dart';
 
-/// 壳层外部（页头菜单等）通过此 key 打开 MD3E 紧凑导航。
+/// 壳层 [DesktopShell] 的 GlobalKey（兼容旧「打开抽屉」API）。
 final GlobalKey<DesktopShellState> appShellDesktopShellKey =
     GlobalKey<DesktopShellState>();
 
-/// 打开紧凑（< expanded）导航：即 [DesktopShell] 的 modal rail。名称保留以兼容既有 provider。
+/// 兼容旧 provider：medium- 已改用底部导航，此回调为空操作。
 void openAppShellNavigationDrawer() {
   appShellDesktopShellKey.currentState?.openNavigationRail();
 }
 
-/// App shell：MD3E 桌面壳（rail / 紧凑 modal 导航）或阅读器路由的标题栏，外加路由正文。
+/// App shell：MD3E 桌面壳（expanded+ rail / medium- 底部导航）或阅读器路由的标题栏，外加路由正文。
 ///
 /// 壳层级反馈通过 [shellFeedbackBelowTitleBar] 注入。
 class ResponsiveAppShell extends StatelessWidget {

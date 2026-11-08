@@ -6,8 +6,6 @@ import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/lab/lab_library_catalog.dart';
-import 'package:hentai_library/shared/ui/shell/shell_compact_app_bar.dart';
-import 'package:hentai_library/shared/ui/shell/shell_compact_modal_rail.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_column.dart';
 import 'package:hentai_library/shared/ui/shell/shell_library_secondary_layout.dart';
 import 'package:hentai_library/shared/ui/shell/shell_navigation.dart';
@@ -15,6 +13,7 @@ import 'package:hentai_library/shared/ui/shell/shell_rail_library_hover_metrics.
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/desktop_title_bar.dart';
+import 'package:hentai_library/shared/ui/widgets/desktop/navigation_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/desktop/navigation_rail.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
@@ -37,8 +36,8 @@ abstract final class DesktopShellMetrics {
 
 /// Lab shell: navigation + content pane.
 ///
-/// &lt; [Breakpoints.expanded]: compact app bar + modal navigation (compact/medium:
-/// chevron + drill-in library secondary). ≥ expanded: standard rail + library flyout.
+/// &lt; [Breakpoints.expanded]: bottom [ExpressiveNavigationBar].
+/// ≥ expanded: standard rail + library flyout.
 class DesktopShell extends StatefulWidget {
   DesktopShell({
     super.key,
@@ -98,7 +97,7 @@ class DesktopShell extends StatefulWidget {
   final bool showNavigationMenu;
   final VoidCallback? onNavigationMenuPressed;
 
-  /// 紧凑 / 中屏（< expanded）且运行在桌面窗口时，顶部改用带窗口控件的标题栏（☰ 打开 modal 导航）。
+  /// 紧凑 / 中屏（< expanded）且运行在桌面窗口时，顶部改用带窗口控件的标题栏。
   final bool compactShowsWindowControls;
 
   @override
@@ -111,9 +110,7 @@ class DesktopShellState extends State<DesktopShell> {
   int _selectedIndex = ShellNavigation.homeDestinationIndex;
   late String _selectedLibraryId = widget.initialLibraryId;
   bool _librarySecondaryOpen = false;
-  bool _compactModalRailOpen = false;
   int? _previousCompactDestinationIndex;
-  bool _compactModalLibrarySecondaryOpen = false;
   Timer? _secondaryOpenTimer;
   Timer? _secondaryCloseTimer;
   bool? _usesExpandedNavigation;
@@ -218,13 +215,6 @@ class DesktopShellState extends State<DesktopShell> {
     _usesExpandedNavigation = expandedNav;
     _cancelLibrarySecondaryTimers();
     _librarySecondaryOpen = false;
-    _compactModalRailOpen = false;
-    _compactModalLibrarySecondaryOpen = false;
-  }
-
-  /// Compact + medium (&lt; expanded): modal drill-in for library secondary.
-  static bool _modalLibraryDrillInEnabledForWidth(double width) {
-    return width < Breakpoints.expanded;
   }
 
   void _cancelLibrarySecondaryTimers() {
@@ -291,11 +281,7 @@ class DesktopShellState extends State<DesktopShell> {
   void _onLibrarySelected(String libraryId) {
     if (_isControlled) {
       widget.onLibrarySelected!(libraryId);
-      setState(() {
-        _librarySecondaryOpen = false;
-        _compactModalRailOpen = false;
-        _compactModalLibrarySecondaryOpen = false;
-      });
+      setState(() => _librarySecondaryOpen = false);
       _cancelLibrarySecondaryTimers();
       return;
     }
@@ -303,28 +289,17 @@ class DesktopShellState extends State<DesktopShell> {
       _selectedLibraryId = libraryId;
       _selectedIndex = ShellNavigation.libraryDestinationIndex;
       _librarySecondaryOpen = false;
-      _compactModalRailOpen = false;
-      _compactModalLibrarySecondaryOpen = false;
     });
     _cancelLibrarySecondaryTimers();
   }
 
-  void _onCompactRailDestinationSelected(
+  void _onBottomNavDestinationSelected(
     BuildContext context,
     List<ShellRailDestination> specs,
     int index,
   ) {
-    final int libraryIndex = _libraryAnchorIndex(specs);
-    if (index == libraryIndex) {
-      setState(() => _compactModalLibrarySecondaryOpen = true);
-      return;
-    }
     if (_isControlled) {
       widget.onNavIdSelected!(shellNavIdForDestinationIndex(specs, index));
-      setState(() {
-        _compactModalRailOpen = false;
-        _compactModalLibrarySecondaryOpen = false;
-      });
       return;
     }
     setState(() {
@@ -332,8 +307,6 @@ class DesktopShellState extends State<DesktopShell> {
         _previousCompactDestinationIndex = _selectedIndex;
       }
       _selectedIndex = index;
-      _compactModalRailOpen = false;
-      _compactModalLibrarySecondaryOpen = false;
     });
   }
 
@@ -345,56 +318,27 @@ class DesktopShellState extends State<DesktopShell> {
     setState(() => _railExtended = !_railExtended);
   }
 
-  void _onCompactLibrarySecondaryBack() {
-    setState(() => _compactModalLibrarySecondaryOpen = false);
-  }
-
-  void _dismissCompactModalRail() {
-    setState(() {
-      _compactModalRailOpen = false;
-      _compactModalLibrarySecondaryOpen = false;
-    });
-  }
-
-  void _openCompactModalRail() {
-    setState(() {
-      _compactModalRailOpen = true;
-      _compactModalLibrarySecondaryOpen = false;
-    });
-  }
-
-  /// 壳层外部（页头菜单等）打开紧凑 modal 导航；展开态下无操作。
-  void openNavigationRail() {
-    if (!mounted || (_usesExpandedNavigation ?? false)) {
-      return;
-    }
-    _openCompactModalRail();
-  }
+  /// 兼容旧 API：medium- 已改用底部导航，不再打开抽屉。
+  void openNavigationRail() {}
 
   Widget _buildCompactContentColumn({
     required BuildContext context,
     required List<ShellRailDestination> specs,
+    required List<ExpressiveNavigationRailDestination> destinations,
     required DesktopShellSurfaceRoles surfaces,
     required Widget pane,
   }) {
-    final int settingsIndex = shellSettingsDestinationIndex(specs);
-    final bool isSettings = _effectiveSelectedIndex(context) == settingsIndex;
     final Widget paneWithChrome = DesktopShellPane(
       showDecoration: false,
       child: pane,
     );
-    // 桌面窗口需要窗口控件（关闭 / 最小化）；移动端保持纯菜单栏。
-    // 设置页自带返回/标题工具栏，不再显示壳层左上角菜单按钮。
+    // 桌面窗口需要窗口控件（关闭 / 最小化）；主导航改由底部栏承担。
     final Widget? topBar = widget.compactShowsWindowControls
-        ? DesktopTitleBar(
+        ? const DesktopTitleBar(
             showWindowControls: true,
             backgroundColor: Colors.transparent,
-            showNavigationMenu: !isSettings,
-            onNavigationMenuPressed: _openCompactModalRail,
           )
-        : (isSettings
-              ? null
-              : ShellCompactAppBar(onMenuPressed: _openCompactModalRail));
+        : null;
     return ColoredBox(
       color: surfaces.contentPaneBackground,
       child: Column(
@@ -402,10 +346,13 @@ class DesktopShellState extends State<DesktopShell> {
         children: <Widget>[
           ?topBar,
           ...widget.belowTitleBar,
-          Expanded(
-            child: isSettings
-                ? SafeArea(bottom: false, child: paneWithChrome)
-                : paneWithChrome,
+          Expanded(child: paneWithChrome),
+          ExpressiveNavigationBar(
+            destinations: destinations,
+            selectedIndex: _effectiveSelectedIndex(context),
+            onDestinationSelected: (int index) =>
+                _onBottomNavDestinationSelected(context, specs, index),
+            backgroundColor: surfaces.navigationRailBackground,
           ),
         ],
       ),
@@ -596,11 +543,12 @@ class DesktopShellState extends State<DesktopShell> {
         : _buildCompactContentColumn(
             context: context,
             specs: specs,
+            destinations: destinations,
             surfaces: surfaces,
             pane: pane,
           );
 
-    final Widget chrome = ColoredBox(
+    return ColoredBox(
       color: surfaces.shellBackground,
       child: usesExpandedNav
           ? _buildExpandedNavigation(
@@ -615,33 +563,6 @@ class DesktopShellState extends State<DesktopShell> {
               shellHeight: shellHeight,
             )
           : contentColumn,
-    );
-
-    return Stack(
-      children: <Widget>[
-        chrome,
-        if (!usesExpandedNav) ...<Widget>[
-          ShellCompactModalRailOverlay(
-            open: _compactModalRailOpen,
-            height: shellHeight,
-            m3eTheme: m3e,
-            surfaceBackground: surfaces.navigationRailBackground,
-            destinations: destinations,
-            selectedIndex: _effectiveSelectedIndex(context),
-            onDismiss: _dismissCompactModalRail,
-            onDestinationSelected: (int index) =>
-                _onCompactRailDestinationSelected(context, specs, index),
-            libraryDrillInEnabled: _modalLibraryDrillInEnabledForWidth(
-              shellWidth,
-            ),
-            librarySecondaryOpen: _compactModalLibrarySecondaryOpen,
-            libraries: widget.libraries,
-            selectedLibraryId: _effectiveSelectedLibraryId,
-            onLibrarySecondaryBack: _onCompactLibrarySecondaryBack,
-            onLibrarySelected: _onLibrarySelected,
-          ),
-        ],
-      ],
     );
   }
 
