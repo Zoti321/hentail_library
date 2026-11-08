@@ -8,7 +8,8 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 阅读历史页滚动区正文（sliver）：摘要 + 搜索 + 分组列表或空状态。
 ///
-/// 需放在 `SliverPadding` 内以获得水平留白；列表部分全部懒构建。
+/// 需放在 `SliverPadding` 内以获得水平留白；分组列表在
+/// `SpringExpandPanel` 内用盒模型网格，组内按行虚拟化构建。
 class HistoryBrowseContent<T> extends StatelessWidget {
   const HistoryBrowseContent({
     super.key,
