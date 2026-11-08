@@ -11,65 +11,44 @@ void main() {
       );
     });
 
-    test('dualPageNoCover counts cover spread separately', () {
-      expect(
-        SpreadIndex.totalSpreads(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 1,
-        ),
-        1,
-      );
-      expect(
-        SpreadIndex.totalSpreads(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 4,
-        ),
-        3,
-      );
-    });
-
     test('dualPage pairs all pages', () {
       expect(
         SpreadIndex.totalSpreads(mode: ReadingMode.dualPage, totalPages: 3),
         2,
       );
+      expect(
+        SpreadIndex.totalSpreads(mode: ReadingMode.dualPage, totalPages: 4),
+        2,
+      );
     });
   });
 
-  group('SpreadIndex.pagesInSpread dualPageNoCover', () {
-    test('cover alone then pairs', () {
+  group('SpreadIndex.pagesInSpread dualPage', () {
+    test('pairs pages and leaves odd last page alone', () {
       expect(
         SpreadIndex.pagesInSpread(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 4,
+          mode: ReadingMode.dualPage,
+          totalPages: 3,
           spreadIndex: 0,
         ),
-        <int>[1],
+        <int>[1, 2],
       );
       expect(
         SpreadIndex.pagesInSpread(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 4,
+          mode: ReadingMode.dualPage,
+          totalPages: 3,
           spreadIndex: 1,
         ),
-        <int>[2, 3],
-      );
-      expect(
-        SpreadIndex.pagesInSpread(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 4,
-          spreadIndex: 2,
-        ),
-        <int>[4],
+        <int>[3],
       );
     });
   });
 
   group('SpreadIndex.spreadIndexForPage', () {
-    test('maps page back to spread for dualPageNoCover', () {
+    test('maps page back to spread for dualPage', () {
       expect(
         SpreadIndex.spreadIndexForPage(
-          mode: ReadingMode.dualPageNoCover,
+          mode: ReadingMode.dualPage,
           totalPages: 4,
           pageIndex: 1,
         ),
@@ -77,51 +56,24 @@ void main() {
       );
       expect(
         SpreadIndex.spreadIndexForPage(
-          mode: ReadingMode.dualPageNoCover,
+          mode: ReadingMode.dualPage,
+          totalPages: 4,
+          pageIndex: 2,
+        ),
+        0,
+      );
+      expect(
+        SpreadIndex.spreadIndexForPage(
+          mode: ReadingMode.dualPage,
           totalPages: 4,
           pageIndex: 3,
         ),
         1,
       );
-      expect(
-        SpreadIndex.spreadIndexForPage(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 4,
-          pageIndex: 4,
-        ),
-        2,
-      );
     });
   });
 
   group('SpreadIndex.nextPrimaryPage', () {
-    test('dualPageNoCover skips by spread', () {
-      expect(
-        SpreadIndex.nextPrimaryPage(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 4,
-          currentPageIndex: 1,
-        ),
-        2,
-      );
-      expect(
-        SpreadIndex.nextPrimaryPage(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 4,
-          currentPageIndex: 3,
-        ),
-        4,
-      );
-      expect(
-        SpreadIndex.nextPrimaryPage(
-          mode: ReadingMode.dualPageNoCover,
-          totalPages: 4,
-          currentPageIndex: 4,
-        ),
-        isNull,
-      );
-    });
-
     test('dualPage pairs advance two pages at a time', () {
       expect(
         SpreadIndex.nextPrimaryPage(
@@ -131,24 +83,32 @@ void main() {
         ),
         3,
       );
+      expect(
+        SpreadIndex.nextPrimaryPage(
+          mode: ReadingMode.dualPage,
+          totalPages: 3,
+          currentPageIndex: 3,
+        ),
+        isNull,
+      );
     });
   });
 
   group('SpreadIndex.isOnLastSpread', () {
-    test('detects last spread for dualPageNoCover', () {
+    test('detects last spread for dualPage', () {
       expect(
         SpreadIndex.isOnLastSpread(
-          mode: ReadingMode.dualPageNoCover,
+          mode: ReadingMode.dualPage,
           totalPages: 4,
-          currentPageIndex: 4,
+          currentPageIndex: 3,
         ),
         isTrue,
       );
       expect(
         SpreadIndex.isOnLastSpread(
-          mode: ReadingMode.dualPageNoCover,
+          mode: ReadingMode.dualPage,
           totalPages: 4,
-          currentPageIndex: 2,
+          currentPageIndex: 1,
         ),
         isFalse,
       );
@@ -214,36 +174,27 @@ void main() {
       );
     });
 
-    test('dualPageNoCover to webtoon uses max page in spread', () {
+    test('dualPage to webtoon uses max page in spread', () {
       expect(
         SpreadIndex.remapPageForModeSwitch(
-          fromMode: ReadingMode.dualPageNoCover,
+          fromMode: ReadingMode.dualPage,
           toMode: ReadingMode.webtoon,
-          currentPageIndex: 2,
+          currentPageIndex: 1,
           totalPages: 4,
         ),
-        3,
+        2,
       );
     });
 
     test('single-page spread keeps page when leaving dual mode', () {
       expect(
         SpreadIndex.remapPageForModeSwitch(
-          fromMode: ReadingMode.dualPageNoCover,
+          fromMode: ReadingMode.dualPage,
           toMode: ReadingMode.paged,
-          currentPageIndex: 1,
-          totalPages: 4,
+          currentPageIndex: 5,
+          totalPages: 5,
         ),
-        1,
-      );
-      expect(
-        SpreadIndex.remapPageForModeSwitch(
-          fromMode: ReadingMode.dualPageNoCover,
-          toMode: ReadingMode.paged,
-          currentPageIndex: 4,
-          totalPages: 4,
-        ),
-        4,
+        5,
       );
     });
 
@@ -251,23 +202,11 @@ void main() {
       expect(
         SpreadIndex.remapPageForModeSwitch(
           fromMode: ReadingMode.paged,
-          toMode: ReadingMode.dualPageNoCover,
+          toMode: ReadingMode.dualPage,
           currentPageIndex: 5,
           totalPages: 10,
         ),
         5,
-      );
-    });
-
-    test('dualPage variants do not remap', () {
-      expect(
-        SpreadIndex.remapPageForModeSwitch(
-          fromMode: ReadingMode.dualPage,
-          toMode: ReadingMode.dualPageNoCover,
-          currentPageIndex: 3,
-          totalPages: 10,
-        ),
-        3,
       );
     });
 

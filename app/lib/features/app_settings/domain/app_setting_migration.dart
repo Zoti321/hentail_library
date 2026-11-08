@@ -8,6 +8,8 @@ Map<String, dynamic> migrateAppSettingJson(Map<String, dynamic> json) {
     final Object? rawMode = migrated['readingMode'];
     if (rawMode == 'continuousVertical') {
       migrated['readingMode'] = readingModeToJson(ReadingMode.webtoon);
+    } else if (rawMode == 'dualPageNoCover') {
+      migrated['readingMode'] = readingModeToJson(ReadingMode.dualPage);
     } else {
       migrated['readingMode'] = readingModeToJson(readingModeFromJson(rawMode));
     }

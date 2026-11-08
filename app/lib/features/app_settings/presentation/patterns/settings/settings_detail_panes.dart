@@ -381,7 +381,6 @@ const List<String> kSettingsAutoPlayModeLabels = <String>[
 const List<String> kSettingsPagedLayoutLabels = <String>[
   '单页',
   '双页',
-  '双页（封面独立）',
 ];
 
 const List<String> kSettingsWebtoonMarginLabels = <String>[

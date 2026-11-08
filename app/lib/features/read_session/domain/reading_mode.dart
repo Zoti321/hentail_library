@@ -9,15 +9,13 @@ enum ReadingMode {
   webtoon,
   @JsonValue('dualPage')
   dualPage,
-  @JsonValue('dualPageNoCover')
-  dualPageNoCover,
 }
 
 /// 顶栏阅读设置 Dialog 中的一级模式。
 enum ReaderModeCategory { paged, webtoon }
 
 /// 翻页模式下的页面布局（二级选项）。
-enum PagedLayout { single, dual, dualNoCover }
+enum PagedLayout { single, dual }
 
 /// Scroll layout 缩放模式（二级选项）。
 enum WebtoonZoomMode { fitWidth, originalSize }
@@ -42,7 +40,6 @@ extension PagedLayoutX on PagedLayout {
   ReadingMode toReadingMode() => switch (this) {
     PagedLayout.single => ReadingMode.paged,
     PagedLayout.dual => ReadingMode.dualPage,
-    PagedLayout.dualNoCover => ReadingMode.dualPageNoCover,
   };
 }
 
@@ -53,8 +50,7 @@ extension ReadingModeX on ReadingMode {
 
   bool get supportsAutoPlay => !isWebtoon;
 
-  bool get isDualPageMode =>
-      this == ReadingMode.dualPage || this == ReadingMode.dualPageNoCover;
+  bool get isDualPageMode => this == ReadingMode.dualPage;
 
   bool get usesSpreadNavigation => isDualPageMode;
 
@@ -64,7 +60,6 @@ extension ReadingModeX on ReadingMode {
   PagedLayout? get pagedLayout => switch (this) {
     ReadingMode.paged => PagedLayout.single,
     ReadingMode.dualPage => PagedLayout.dual,
-    ReadingMode.dualPageNoCover => PagedLayout.dualNoCover,
     ReadingMode.webtoon => null,
   };
 }
@@ -75,6 +70,10 @@ ReadingMode readingModeFromJson(Object? json) {
   if (json is String) {
     if (json == 'continuousVertical') {
       return ReadingMode.webtoon;
+    }
+    // 旧版「双页（封面独立）」并入普通双页。
+    if (json == 'dualPageNoCover') {
+      return ReadingMode.dualPage;
     }
     for (final MapEntry<ReadingMode, String> entry
         in _$ReadingModeEnumMap.entries) {
@@ -92,5 +91,4 @@ const _$ReadingModeEnumMap = {
   ReadingMode.paged: 'paged',
   ReadingMode.webtoon: 'webtoon',
   ReadingMode.dualPage: 'dualPage',
-  ReadingMode.dualPageNoCover: 'dualPageNoCover',
 };

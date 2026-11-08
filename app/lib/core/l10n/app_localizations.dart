@@ -2660,12 +2660,6 @@ abstract class AppLocalizations {
   /// **'双页'**
   String get readingModeDualPage;
 
-  /// No description provided for @readingModeDualPageNoCover.
-  ///
-  /// In zh, this message translates to:
-  /// **'双页（封面独立）'**
-  String get readingModeDualPageNoCover;
-
   /// No description provided for @readingModePagedSingle.
   ///
   /// In zh, this message translates to:
@@ -2677,12 +2671,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'双页'**
   String get readingModePagedDual;
-
-  /// No description provided for @readingModePagedDualNoCover.
-  ///
-  /// In zh, this message translates to:
-  /// **'双页（封面独立）'**
-  String get readingModePagedDualNoCover;
 
   /// No description provided for @readingModeWebtoonFitWidth.
   ///

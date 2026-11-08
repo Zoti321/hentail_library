@@ -288,7 +288,6 @@ class DualPageViewport extends HookConsumerWidget {
                     comic: comic,
                     pages: pages,
                     imageList: imageList,
-                    readingMode: activeMode,
                   );
                 },
               ),
@@ -362,13 +361,11 @@ class _DualSpreadPage extends StatelessWidget {
     required this.comic,
     required this.pages,
     required this.imageList,
-    required this.readingMode,
   });
 
   final Comic comic;
   final List<int> pages;
   final List<ReaderPageImageData> imageList;
-  final ReadingMode readingMode;
 
   @override
   Widget build(BuildContext context) {
@@ -387,24 +384,18 @@ class _DualSpreadPage extends StatelessWidget {
       if (imageData == null) {
         return const SizedBox.expand();
       }
-      final bool coverOnRight =
-          readingMode == ReadingMode.dualPageNoCover && pageIndex == 1;
-      final Alignment alignment = coverOnRight
-          ? Alignment.centerLeft
-          : Alignment.centerRight;
       return Row(
         children: <Widget>[
-          if (coverOnRight) const Expanded(child: SizedBox.shrink()),
           Expanded(
             child: ReaderImageItem(
               comic: comic,
               imageData: imageData,
               slotLogicalWidth: slotLogicalWidth,
-              alignment: alignment,
+              alignment: Alignment.centerRight,
               enableCrossfade: enableCrossfade,
             ),
           ),
-          if (!coverOnRight) const Expanded(child: SizedBox.shrink()),
+          const Expanded(child: SizedBox.shrink()),
         ],
       );
     }

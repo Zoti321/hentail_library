@@ -1480,16 +1480,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readingModeDualPage => 'Dual page';
 
   @override
-  String get readingModeDualPageNoCover => 'Dual page (cover separate)';
-
-  @override
   String get readingModePagedSingle => 'Single page';
 
   @override
   String get readingModePagedDual => 'Dual page';
-
-  @override
-  String get readingModePagedDualNoCover => 'Dual page (cover separate)';
 
   @override
   String get readingModeWebtoonFitWidth => 'Fit width';

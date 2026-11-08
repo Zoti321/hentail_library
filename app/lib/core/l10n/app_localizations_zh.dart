@@ -1429,16 +1429,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readingModeDualPage => '双页';
 
   @override
-  String get readingModeDualPageNoCover => '双页（封面独立）';
-
-  @override
   String get readingModePagedSingle => '单页';
 
   @override
   String get readingModePagedDual => '双页';
-
-  @override
-  String get readingModePagedDualNoCover => '双页（封面独立）';
 
   @override
   String get readingModeWebtoonFitWidth => '适应宽度';

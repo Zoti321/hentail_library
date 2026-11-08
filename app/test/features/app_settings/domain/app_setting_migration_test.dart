@@ -15,6 +15,15 @@ void main() {
       expect(setting.toJson().containsKey('readerIsVertical'), isFalse);
     });
 
+    test('maps legacy dualPageNoCover onto dualPage', () {
+      final AppSetting setting = AppSetting.fromJson(<String, dynamic>{
+        'readingMode': 'dualPageNoCover',
+      });
+
+      expect(setting.readingMode, ReadingMode.dualPage);
+      expect(setting.toJson()['readingMode'], 'dualPage');
+    });
+
     test(
       'drops legacy autoScan and enabledFormatGroups from AppSetting JSON',
       () {
