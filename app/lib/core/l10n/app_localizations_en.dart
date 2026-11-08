@@ -588,22 +588,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notFoundGoLibrary => 'Go to library';
 
   @override
-  String get settingsGroupPersonalization => 'Personalization';
+  String get settingsMasterGroupApp => 'App';
 
   @override
-  String get settingsGroupMetadataBackup => 'Metadata backup';
+  String get settingsMasterGroupOther => 'Other';
 
   @override
-  String get settingsGroupDiagnostics => 'Diagnostics & support';
+  String get settingsMasterGroupLibraryAdmin => 'Library management';
+
+  @override
+  String get settingsGroupAppearance => 'Appearance';
+
+  @override
+  String get settingsGroupInterface => 'Interface';
+
+  @override
+  String get settingsGroupReading => 'Reading';
+
+  @override
+  String get settingsGroupLibraryBrowse => 'Library browsing';
 
   @override
   String get settingsGroupAbout => 'About';
 
   @override
-  String get settingsMasterMenuGroupTitle => 'App';
+  String get settingsGroupUpdates => 'Updates';
 
   @override
-  String get settingsSectionAppearance => 'Appearance & language';
+  String get settingsGroupStorageAndLogs => 'Storage & logs';
+
+  @override
+  String get settingsGroupMetadataBackup => 'Metadata backup';
 
   @override
   String get settingsSectionReading => 'Reading';

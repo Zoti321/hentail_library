@@ -1094,23 +1094,47 @@ abstract class AppLocalizations {
   /// **'去漫画库'**
   String get notFoundGoLibrary;
 
-  /// No description provided for @settingsGroupPersonalization.
+  /// No description provided for @settingsMasterGroupApp.
   ///
   /// In zh, this message translates to:
-  /// **'个性化'**
-  String get settingsGroupPersonalization;
+  /// **'应用'**
+  String get settingsMasterGroupApp;
 
-  /// No description provided for @settingsGroupMetadataBackup.
+  /// No description provided for @settingsMasterGroupOther.
   ///
   /// In zh, this message translates to:
-  /// **'元数据备份'**
-  String get settingsGroupMetadataBackup;
+  /// **'其他'**
+  String get settingsMasterGroupOther;
 
-  /// No description provided for @settingsGroupDiagnostics.
+  /// No description provided for @settingsMasterGroupLibraryAdmin.
   ///
   /// In zh, this message translates to:
-  /// **'诊断与支持'**
-  String get settingsGroupDiagnostics;
+  /// **'漫画库管理'**
+  String get settingsMasterGroupLibraryAdmin;
+
+  /// No description provided for @settingsGroupAppearance.
+  ///
+  /// In zh, this message translates to:
+  /// **'外观设置'**
+  String get settingsGroupAppearance;
+
+  /// No description provided for @settingsGroupInterface.
+  ///
+  /// In zh, this message translates to:
+  /// **'界面设置'**
+  String get settingsGroupInterface;
+
+  /// No description provided for @settingsGroupReading.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读设置'**
+  String get settingsGroupReading;
+
+  /// No description provided for @settingsGroupLibraryBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'库浏览设置'**
+  String get settingsGroupLibraryBrowse;
 
   /// No description provided for @settingsGroupAbout.
   ///
@@ -1118,17 +1142,23 @@ abstract class AppLocalizations {
   /// **'关于'**
   String get settingsGroupAbout;
 
-  /// No description provided for @settingsMasterMenuGroupTitle.
+  /// No description provided for @settingsGroupUpdates.
   ///
   /// In zh, this message translates to:
-  /// **'应用'**
-  String get settingsMasterMenuGroupTitle;
+  /// **'更新设置'**
+  String get settingsGroupUpdates;
 
-  /// No description provided for @settingsSectionAppearance.
+  /// No description provided for @settingsGroupStorageAndLogs.
   ///
   /// In zh, this message translates to:
-  /// **'外观与语言'**
-  String get settingsSectionAppearance;
+  /// **'存储与日志'**
+  String get settingsGroupStorageAndLogs;
+
+  /// No description provided for @settingsGroupMetadataBackup.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据备份'**
+  String get settingsGroupMetadataBackup;
 
   /// No description provided for @settingsSectionReading.
   ///

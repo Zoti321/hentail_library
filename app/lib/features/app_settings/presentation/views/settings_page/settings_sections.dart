@@ -15,9 +15,9 @@ import 'package:hentai_library/shared/ui/widgets/settings/settings_tile.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/features/app_settings/presentation/patterns/settings/reading_mode_l10n.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
 import 'package:hentai_library/features/comic/public/smart_facet_match_preference.dart';
+import 'package:hentai_library/features/read_session/public/reading_preference_l10n.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -32,12 +32,16 @@ List<Widget> settingsSectionsFor(
 ) {
   final AppLocalizations l10n = context.l10n;
   return switch (category) {
-    SettingsCategory.personalization => _personalizationSections(l10n),
+    SettingsCategory.appearance => _appearanceSections(),
+    SettingsCategory.interface => _interfaceSections(),
+    SettingsCategory.reading => const <Widget>[_ReadingSettingsCategory()],
+    SettingsCategory.libraryBrowse => _libraryBrowseSections(),
     SettingsCategory.metadataBackup => const <Widget>[
       _MetadataBackupCategory(),
     ],
-    SettingsCategory.diagnostics => _diagnosticsSections(l10n),
-    SettingsCategory.about => _aboutSections(l10n),
+    SettingsCategory.about => const <Widget>[_AboutVersionSection()],
+    SettingsCategory.updates => _updatesSections(),
+    SettingsCategory.storageAndLogs => _storageAndLogsSections(l10n),
   };
 }
 
@@ -70,25 +74,39 @@ Future<void> _pickSettingOption<T extends Object>(
   }
 }
 
-List<Widget> _personalizationSections(AppLocalizations l10n) {
-  return <Widget>[
+List<Widget> _appearanceSections() {
+  return const <Widget>[
     SettingsSection(
-      title: Text(l10n.settingsSectionAppearance),
-      tiles: const <Widget>[
+      tiles: <Widget>[
         _ThemeTile(),
         _DynamicColorTile(),
         _ColorSchemeTile(),
+      ],
+    ),
+  ];
+}
+
+List<Widget> _interfaceSections() {
+  return const <Widget>[
+    SettingsSection(
+      tiles: <Widget>[
         _FontTile(),
         _LocaleTile(),
       ],
     ),
+  ];
+}
+
+/// 条漫边距可选值（百分比），与阅读页设置面板对齐，步长 5。
+final List<int> _kWebtoonMarginOptions = List<int>.generate(
+  9,
+  (int i) => i * 5,
+);
+
+List<Widget> _libraryBrowseSections() {
+  return const <Widget>[
     SettingsSection(
-      title: Text(l10n.settingsSectionReading),
-      tiles: const <Widget>[_ReadingModeTile()],
-    ),
-    SettingsSection(
-      title: Text(l10n.settingsSectionLibraryBrowse),
-      tiles: const <Widget>[
+      tiles: <Widget>[
         _SmartFacetMatchTile(),
         _HealthyModeTile(),
         _PreferLibraryRootSeriesTile(),
@@ -97,7 +115,7 @@ List<Widget> _personalizationSections(AppLocalizations l10n) {
   ];
 }
 
-List<Widget> _diagnosticsSections(AppLocalizations l10n) {
+List<Widget> _storageAndLogsSections(AppLocalizations l10n) {
   return <Widget>[
     SettingsSection(
       title: Text(l10n.settingsSectionDiagnostics),
@@ -113,13 +131,37 @@ List<Widget> _diagnosticsSections(AppLocalizations l10n) {
   ];
 }
 
-List<Widget> _aboutSections(AppLocalizations l10n) {
-  return <Widget>[
+List<Widget> _updatesSections() {
+  return const <Widget>[
     SettingsSection(
-      title: Text(l10n.settingsSectionUpdates),
-      tiles: const <Widget>[_AutoUpdateTile(), _CheckUpdateTile()],
+      tiles: <Widget>[_AutoUpdateTile(), _CheckUpdateTile()],
     ),
   ];
+}
+
+class _AboutVersionSection extends ConsumerWidget {
+  const _AboutVersionSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final AsyncValue<PackageInfo> packageInfoAsync = ref.watch(
+      packageInfoProvider,
+    );
+    final String versionLabel = packageInfoAsync.maybeWhen(
+      data: (PackageInfo info) => l10n.settingsCurrentVersion(info.version),
+      orElse: () => l10n.settingsCurrentVersionLoading,
+    );
+    return SettingsSection(
+      tiles: <Widget>[
+        SettingsNavigationTile(
+          leading: Symbols.info,
+          title: Text(l10n.settingsMetadataBackupImportManifestAppVersion),
+          value: Text(versionLabel),
+        ),
+      ],
+    );
+  }
 }
 
 class _ThemeTile extends ConsumerWidget {
@@ -266,29 +308,152 @@ class _LocaleTile extends ConsumerWidget {
   }
 }
 
-class _ReadingModeTile extends ConsumerWidget {
-  const _ReadingModeTile();
+/// 设置 → 阅读设置：与阅读页 [ReaderSettingsSheet] 可配置项对齐。
+class _ReadingSettingsCategory extends ConsumerWidget {
+  const _ReadingSettingsCategory();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
-    final ReadingMode mode = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> async) =>
-            async.asData?.value.readingMode ?? kDefaultReadingMode,
-      ),
-    );
-    return SettingsNavigationTile(
-      leading: Symbols.menu_book,
-      title: Text(l10n.readerSettingsReadingMode),
-      value: Text(l10n.readingModeLabel(mode)),
-      onTap: () => _pickSettingOption<ReadingMode>(
-        context,
-        options: ReadingMode.values,
-        selected: mode,
-        labelOf: l10n.readingModeLabel,
-        onSelected: ref.read(settingsProvider.notifier).setReadingMode,
-      ),
+    final AppSetting? settings = ref.watch(settingsProvider).asData?.value;
+    if (settings == null) {
+      return const SizedBox(
+        height: 120,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final SettingsNotifier notifier = ref.read(settingsProvider.notifier);
+    final ReadingMode mode = settings.readingMode;
+    final ReaderModeCategory category = mode.category;
+    final PagedLayout pagedLayout = mode.pagedLayout ?? PagedLayout.single;
+    final bool isWebtoon = mode.isWebtoon;
+    final int interval = settings.readerAutoPlayIntervalSeconds;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SettingsSection(
+          title: Text(l10n.readerSettingsReadingMode),
+          tiles: <Widget>[
+            SettingsNavigationTile(
+              leading: Symbols.menu_book,
+              title: Text(l10n.readerSettingsReadingMode),
+              value: Text(l10n.readerModeCategoryLabel(category)),
+              onTap: () => _pickSettingOption<ReaderModeCategory>(
+                context,
+                options: ReaderModeCategory.values,
+                selected: category,
+                labelOf: l10n.readerModeCategoryLabel,
+                onSelected: (ReaderModeCategory value) {
+                  notifier.setReadingMode(switch (value) {
+                    ReaderModeCategory.paged => pagedLayout.toReadingMode(),
+                    ReaderModeCategory.webtoon => ReadingMode.webtoon,
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        if (!isWebtoon)
+          SettingsSection(
+            title: Text(l10n.readerSettingsPagedOptions),
+            tiles: <Widget>[
+              SettingsNavigationTile(
+                leading: Symbols.view_day,
+                title: Text(l10n.readerSettingsPageLayout),
+                value: Text(l10n.pagedLayoutLabel(pagedLayout)),
+                onTap: () => _pickSettingOption<PagedLayout>(
+                  context,
+                  options: PagedLayout.values,
+                  selected: pagedLayout,
+                  labelOf: l10n.pagedLayoutLabel,
+                  onSelected: (PagedLayout value) {
+                    notifier.setReadingMode(value.toReadingMode());
+                  },
+                ),
+              ),
+            ],
+          ),
+        if (isWebtoon)
+          SettingsSection(
+            title: Text(l10n.readerSettingsWebtoonMode),
+            tiles: <Widget>[
+              SettingsNavigationTile(
+                leading: Symbols.width_normal,
+                title: Text(l10n.readerSettingsHorizontalMargin),
+                enabled: settings.webtoonZoomMode == WebtoonZoomMode.fitWidth,
+                value: Text(
+                  l10n.readerWebtoonMarginLabel(settings.webtoonMarginPercent),
+                ),
+                onTap: () => _pickSettingOption<int>(
+                  context,
+                  options: _kWebtoonMarginOptions,
+                  selected: settings.webtoonMarginPercent,
+                  labelOf: l10n.readerWebtoonMarginLabel,
+                  onSelected: notifier.setWebtoonMarginPercent,
+                ),
+              ),
+              SettingsNavigationTile(
+                leading: Symbols.zoom_in,
+                title: Text(l10n.readerSettingsZoomMode),
+                value: Text(
+                  l10n.webtoonZoomModeLabel(settings.webtoonZoomMode),
+                ),
+                onTap: () => _pickSettingOption<WebtoonZoomMode>(
+                  context,
+                  options: WebtoonZoomMode.values,
+                  selected: settings.webtoonZoomMode,
+                  labelOf: l10n.webtoonZoomModeLabel,
+                  onSelected: notifier.setWebtoonZoomMode,
+                ),
+              ),
+            ],
+          ),
+        SettingsSection(
+          title: Text(l10n.readerSettingsAutoPlay),
+          tiles: <Widget>[
+            SettingsNavigationTile(
+              leading: Symbols.repeat,
+              title: Text(l10n.readerSettingsAutoPlayMode),
+              value: Text(l10n.autoPlayModeLabel(settings.autoPlayMode)),
+              onTap: () => _pickSettingOption<AutoPlayMode>(
+                context,
+                options: AutoPlayMode.values,
+                selected: settings.autoPlayMode,
+                labelOf: l10n.autoPlayModeLabel,
+                onSelected: notifier.setAutoPlayMode,
+              ),
+            ),
+            SettingsNavigationTile(
+              leading: Symbols.timer,
+              title: Text(l10n.readerSettingsPlayInterval),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  IconButton(
+                    icon: const Icon(Symbols.remove),
+                    onPressed: interval <= kReaderAutoPlayIntervalMin
+                        ? null
+                        : () => notifier.setReaderAutoPlayIntervalSeconds(
+                            clampReaderAutoPlayInterval(interval - 1),
+                          ),
+                  ),
+                  Text('$interval ${l10n.readerSettingsSecondsSuffix}'),
+                  IconButton(
+                    icon: const Icon(Symbols.add),
+                    onPressed: interval >= kReaderAutoPlayIntervalMax
+                        ? null
+                        : () => notifier.setReaderAutoPlayIntervalSeconds(
+                            clampReaderAutoPlayInterval(interval + 1),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

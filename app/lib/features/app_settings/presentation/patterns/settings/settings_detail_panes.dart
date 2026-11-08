@@ -44,9 +44,7 @@ class SettingsDetailPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final SettingsCategoryInfo info = kSettingsCategories.firstWhere(
-      (SettingsCategoryInfo e) => e.category == category,
-    );
+    final SettingsCategoryInfo info = settingsCategoryInfo(category);
     final List<Widget> sections =
         sectionsBuilder?.call(context, category) ??
         _sectionsForCategory(
@@ -90,9 +88,8 @@ List<Widget> _sectionsForCategory(
 ) {
   final AppLocalizations l10n = context.l10n;
   return switch (category) {
-    SettingsCategory.personalization => <Widget>[
+    SettingsCategory.appearance => <Widget>[
       SettingsSection(
-        title: Text(l10n.settingsSectionAppearance),
         tiles: <Widget>[
           SettingsNavigationTile(
             leading: Symbols.dark_mode,
@@ -109,6 +106,12 @@ List<Widget> _sectionsForCategory(
               );
             },
           ),
+        ],
+      ),
+    ],
+    SettingsCategory.interface => <Widget>[
+      SettingsSection(
+        tiles: <Widget>[
           SettingsNavigationTile(
             leading: Symbols.language,
             title: Text(l10n.settingsLanguageLabel),
@@ -126,8 +129,10 @@ List<Widget> _sectionsForCategory(
           ),
         ],
       ),
+    ],
+    SettingsCategory.reading => <Widget>[
       SettingsSection(
-        title: Text(l10n.settingsSectionReading),
+        title: Text(l10n.readerSettingsReadingMode),
         tiles: <Widget>[
           SettingsNavigationTile(
             leading: Symbols.menu_book,
@@ -146,9 +151,43 @@ List<Widget> _sectionsForCategory(
           ),
         ],
       ),
+      SettingsSection(
+        title: Text(l10n.readerSettingsAutoPlay),
+        tiles: <Widget>[
+          SettingsNavigationTile(
+            leading: Symbols.repeat,
+            title: Text(l10n.readerSettingsAutoPlayMode),
+            value: Text(labState.autoPlayModeLabel),
+            onTap: () {
+              onChanged(
+                labState.copyWith(
+                  autoPlayModeLabel: nextOption(
+                    labState.autoPlayModeLabel,
+                    optionLabels.autoPlayModeOptions,
+                  ),
+                ),
+              );
+            },
+          ),
+          SettingsNavigationTile(
+            leading: Symbols.timer,
+            title: Text(l10n.readerSettingsPlayInterval),
+            value: Text(
+              '${labState.autoPlayIntervalSeconds} ${l10n.readerSettingsSecondsSuffix}',
+            ),
+            onTap: () {
+              final int next = labState.autoPlayIntervalSeconds >= 10
+                  ? 1
+                  : labState.autoPlayIntervalSeconds + 1;
+              onChanged(labState.copyWith(autoPlayIntervalSeconds: next));
+            },
+          ),
+        ],
+      ),
+    ],
+    SettingsCategory.libraryBrowse => <Widget>[
       if (showUnwiredTiles)
         SettingsSection(
-          title: Text(l10n.settingsSectionLibraryBrowse),
           tiles: <Widget>[
             SettingsSwitchTile(
               leading: Symbols.shield,
@@ -201,7 +240,39 @@ List<Widget> _sectionsForCategory(
         ],
       ),
     ],
-    SettingsCategory.diagnostics => <Widget>[
+    SettingsCategory.about => <Widget>[
+      SettingsSection(
+        tiles: <Widget>[
+          SettingsNavigationTile(
+            leading: Symbols.info,
+            title: Text(l10n.settingsMetadataBackupImportManifestAppVersion),
+            value: Text(l10n.settingsCurrentVersion('0.0.0-lab')),
+          ),
+        ],
+      ),
+    ],
+    SettingsCategory.updates => <Widget>[
+      SettingsSection(
+        tiles: <Widget>[
+          SettingsSwitchTile(
+            leading: Symbols.download,
+            title: Text(l10n.settingsAutoUpdateLabel),
+            value: labState.autoUpdate,
+            onChanged: (bool value) {
+              onChanged(labState.copyWith(autoUpdate: value));
+            },
+          ),
+          if (showUnwiredTiles)
+            SettingsNavigationTile(
+              leading: Symbols.system_update,
+              title: Text(l10n.settingsCheckForUpdatesLabel),
+              value: Text(l10n.settingsCurrentVersion('0.0.0-lab')),
+              onTap: () {},
+            ),
+        ],
+      ),
+    ],
+    SettingsCategory.storageAndLogs => <Widget>[
       SettingsSection(
         title: Text(l10n.settingsSectionDiagnostics),
         tiles: <Widget>[
@@ -226,38 +297,30 @@ List<Widget> _sectionsForCategory(
             ),
         ],
       ),
-    ],
-    SettingsCategory.about => <Widget>[
-      SettingsSection(
-        title: Text(l10n.settingsSectionUpdates),
-        tiles: <Widget>[
-          SettingsSwitchTile(
-            leading: Symbols.download,
-            title: Text(l10n.settingsAutoUpdateLabel),
-            value: labState.autoUpdate,
-            onChanged: (bool value) {
-              onChanged(labState.copyWith(autoUpdate: value));
-            },
-          ),
-          if (showUnwiredTiles)
+      if (showUnwiredTiles)
+        SettingsSection(
+          title: Text(l10n.settingsSectionApplicationData),
+          tiles: <Widget>[
             SettingsNavigationTile(
-              leading: Symbols.info,
-              title: Text(l10n.settingsCheckForUpdatesLabel),
-              value: Text(l10n.settingsCurrentVersion('0.0.0-lab')),
+              leading: Symbols.delete_forever,
+              title: Text(l10n.settingsClearApplicationDataLabel),
               onTap: () {},
             ),
-        ],
-      ),
+          ],
+        ),
     ],
   };
 }
 
-/// 阅读模式 preview 取值（与生产 `ReadingMode` 展示名对齐，循环切换）。
-const List<String> kSettingsReadingModeLabels = <String>[
-  '单页',
-  '双页',
-  '双页（封面独立）',
-  'Webtoon',
+/// 阅读模式 preview 取值（与生产分类展示名对齐，循环切换）。
+const List<String> kSettingsReadingModeLabels = <String>['翻页', 'Webtoon'];
+
+/// 自动播放模式 preview 取值。
+const List<String> kSettingsAutoPlayModeLabels = <String>[
+  '本话一次',
+  '本话循环',
+  '系列一次',
+  '系列循环',
 ];
 
 /// 设置页可选项文案：Lab 使用默认值，生产 Pilot 注入 l10n 文案（顺序与枚举 `values` 一致）。
@@ -266,11 +329,13 @@ class SettingsOptionLabels {
     this.themeOptions = const <String>['深色', '浅色'],
     this.localeOptions = const <String>['简体中文', 'English'],
     this.readingModeOptions = kSettingsReadingModeLabels,
+    this.autoPlayModeOptions = kSettingsAutoPlayModeLabels,
   });
 
   final List<String> themeOptions;
   final List<String> localeOptions;
   final List<String> readingModeOptions;
+  final List<String> autoPlayModeOptions;
 }
 
 /// 循环切换到下一个可选项；当前值不在列表中时从第一项开始。
@@ -286,7 +351,9 @@ class SettingsLabState {
     this.autoMetadataBackup = true,
     this.diagnosticMode = false,
     this.autoUpdate = true,
-    this.readingModeLabel = '单页',
+    this.readingModeLabel = '翻页',
+    this.autoPlayModeLabel = '本话一次',
+    this.autoPlayIntervalSeconds = 5,
     this.healthyMode = false,
   });
 
@@ -296,6 +363,8 @@ class SettingsLabState {
   final bool diagnosticMode;
   final bool autoUpdate;
   final String readingModeLabel;
+  final String autoPlayModeLabel;
+  final int autoPlayIntervalSeconds;
   final bool healthyMode;
 
   SettingsLabState copyWith({
@@ -305,6 +374,8 @@ class SettingsLabState {
     bool? diagnosticMode,
     bool? autoUpdate,
     String? readingModeLabel,
+    String? autoPlayModeLabel,
+    int? autoPlayIntervalSeconds,
     bool? healthyMode,
   }) {
     return SettingsLabState(
@@ -314,6 +385,9 @@ class SettingsLabState {
       diagnosticMode: diagnosticMode ?? this.diagnosticMode,
       autoUpdate: autoUpdate ?? this.autoUpdate,
       readingModeLabel: readingModeLabel ?? this.readingModeLabel,
+      autoPlayModeLabel: autoPlayModeLabel ?? this.autoPlayModeLabel,
+      autoPlayIntervalSeconds:
+          autoPlayIntervalSeconds ?? this.autoPlayIntervalSeconds,
       healthyMode: healthyMode ?? this.healthyMode,
     );
   }

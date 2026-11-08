@@ -572,22 +572,37 @@ class AppLocalizationsZh extends AppLocalizations {
   String get notFoundGoLibrary => '去漫画库';
 
   @override
-  String get settingsGroupPersonalization => '个性化';
+  String get settingsMasterGroupApp => '应用';
 
   @override
-  String get settingsGroupMetadataBackup => '元数据备份';
+  String get settingsMasterGroupOther => '其他';
 
   @override
-  String get settingsGroupDiagnostics => '诊断与支持';
+  String get settingsMasterGroupLibraryAdmin => '漫画库管理';
+
+  @override
+  String get settingsGroupAppearance => '外观设置';
+
+  @override
+  String get settingsGroupInterface => '界面设置';
+
+  @override
+  String get settingsGroupReading => '阅读设置';
+
+  @override
+  String get settingsGroupLibraryBrowse => '库浏览设置';
 
   @override
   String get settingsGroupAbout => '关于';
 
   @override
-  String get settingsMasterMenuGroupTitle => '应用';
+  String get settingsGroupUpdates => '更新设置';
 
   @override
-  String get settingsSectionAppearance => '外观与语言';
+  String get settingsGroupStorageAndLogs => '存储与日志';
+
+  @override
+  String get settingsGroupMetadataBackup => '元数据备份';
 
   @override
   String get settingsSectionReading => '阅读';

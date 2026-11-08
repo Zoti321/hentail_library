@@ -18,8 +18,7 @@ export 'package:hentai_library/features/app_settings/presentation/patterns/setti
 class SettingsLayout extends StatefulWidget {
   const SettingsLayout({
     super.key,
-    this.initialCategory = SettingsCategory.personalization,
-    this.masterGroupTitle,
+    this.initialCategory = SettingsCategory.appearance,
     this.labState = const SettingsLabState(),
     this.onLabStateChanged,
     this.onBack,
@@ -30,7 +29,6 @@ class SettingsLayout extends StatefulWidget {
   });
 
   final SettingsCategory initialCategory;
-  final String? masterGroupTitle;
   final SettingsLabState labState;
   final ValueChanged<SettingsLabState>? onLabStateChanged;
 
@@ -86,11 +84,9 @@ class _SettingsPageState extends State<SettingsLayout> {
   }
 
   int _settingsCategoryOrderIndex(SettingsCategory category) {
-    final List<SettingsCategory> visible =
-        widget.visibleCategories?.toList(growable: false) ??
-        kSettingsCategories
-            .map((SettingsCategoryInfo e) => e.category)
-            .toList(growable: false);
+    final List<SettingsCategory> visible = settingsCategoryOrder(
+      visibleCategories: widget.visibleCategories,
+    );
     final int index = visible.indexOf(category);
     return index >= 0 ? index : category.index;
   }
@@ -144,10 +140,8 @@ class _SettingsPageState extends State<SettingsLayout> {
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Builder(
               builder: (BuildContext context) {
-                final SettingsCategoryInfo selectedInfo = kSettingsCategories
-                    .firstWhere(
-                      (SettingsCategoryInfo e) => e.category == _selected,
-                    );
+                final SettingsCategoryInfo selectedInfo =
+                    settingsCategoryInfo(_selected);
                 final String? headerTitle =
                     (!listDetailWide && _showingNarrowDetail)
                     ? selectedInfo.label(l10n)
@@ -175,14 +169,10 @@ class _SettingsPageState extends State<SettingsLayout> {
                     constraints.maxWidth,
                   );
 
-                  final String masterGroupTitle =
-                      widget.masterGroupTitle ??
-                      l10n.settingsMasterMenuGroupTitle;
                   final Widget master = SettingsMasterMenu(
                     key: const Key('_settings_master'),
                     wide: wide,
                     selected: _selected,
-                    masterGroupTitle: masterGroupTitle,
                     visibleCategories: widget.visibleCategories,
                     onSelect: (SettingsCategory category) {
                       _selectCategory(category, wide: wide);

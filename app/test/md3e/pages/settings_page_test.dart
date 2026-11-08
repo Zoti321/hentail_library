@@ -19,7 +19,7 @@ void main() {
           width: 1280,
           height: 800,
           child: SettingsLayout(
-            initialCategory: SettingsCategory.personalization,
+            initialCategory: SettingsCategory.appearance,
           ),
         ),
       ),
