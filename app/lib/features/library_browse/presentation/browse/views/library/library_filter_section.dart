@@ -19,7 +19,6 @@ import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/comic_language.dart';
-import 'package:hentai_library/shared/ui/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -360,10 +359,10 @@ class _ParodyFilterGroup extends ConsumerWidget {
     final AsyncValue<List<String>> parodiesAsync = ref.watch(
       libraryFilterParodyNamesProvider,
     );
-    final Set<String> selected = ref.watch(
+    final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
         (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.parodyFilter ?? const <String>{},
+            state.value?.parodyFilter ?? const LibraryMetadataFilterSelection(),
       ),
     );
     final List<String> names = parodiesAsync.value ?? const <String>[];
@@ -371,11 +370,10 @@ class _ParodyFilterGroup extends ConsumerWidget {
     return _MetadataFilterGroup(
       title: context.l10n.libraryParodyFilter,
       names: names,
-      selection: _includeOnlySelection(selected),
-      includeOnly: true,
+      selection: selection,
       isLoading: parodiesAsync.isLoading && !parodiesAsync.hasValue,
-      onToggle: (String name) =>
-          notifier.toggleIncludeSet(LibraryIncludeSetKind.parody, name),
+      onToggle: notifier.toggleParody,
+      onIncludeModeChanged: notifier.setParodyIncludeMode,
     );
   }
 }
@@ -394,10 +392,11 @@ class _CharacterFilterGroup extends ConsumerWidget {
     final AsyncValue<List<String>> charactersAsync = ref.watch(
       libraryFilterCharacterNamesProvider,
     );
-    final Set<String> selected = ref.watch(
+    final LibraryMetadataFilterSelection selection = ref.watch(
       libraryComicFiltersProvider.select(
         (AsyncValue<LibraryComicFiltersState> state) =>
-            state.value?.characterFilter ?? const <String>{},
+            state.value?.characterFilter ??
+            const LibraryMetadataFilterSelection(),
       ),
     );
     final List<String> names = charactersAsync.value ?? const <String>[];
@@ -405,11 +404,10 @@ class _CharacterFilterGroup extends ConsumerWidget {
     return _MetadataFilterGroup(
       title: context.l10n.libraryCharacterFilter,
       names: names,
-      selection: _includeOnlySelection(selected),
-      includeOnly: true,
+      selection: selection,
       isLoading: charactersAsync.isLoading && !charactersAsync.hasValue,
-      onToggle: (String name) =>
-          notifier.toggleIncludeSet(LibraryIncludeSetKind.character, name),
+      onToggle: notifier.toggleCharacter,
+      onIncludeModeChanged: notifier.setCharacterIncludeMode,
     );
   }
 }
@@ -728,10 +726,42 @@ class _MetadataFilterGroupState extends State<_MetadataFilterGroup> {
 }
 
 /// 手风琴内小号 [M3ESearchBar]：无 hint，高度低于管理页 dense bar。
-class _CompactMetadataSearchBar extends StatelessWidget {
+class _CompactMetadataSearchBar extends StatefulWidget {
   const _CompactMetadataSearchBar({required this.onChanged});
 
   final ValueChanged<String> onChanged;
+
+  @override
+  State<_CompactMetadataSearchBar> createState() =>
+      _CompactMetadataSearchBarState();
+}
+
+class _CompactMetadataSearchBarState extends State<_CompactMetadataSearchBar> {
+  late final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_handleControllerTick);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_handleControllerTick);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleControllerTick() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _clear() {
+    _controller.clear();
+    widget.onChanged('');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -749,19 +779,32 @@ class _CompactMetadataSearchBar extends StatelessWidget {
     final TextStyle textStyle = theme.typeScale.bodySmall.copyWith(
       color: theme.colorScheme.onSurface,
     );
+    final bool showClear = _controller.text.isNotEmpty;
 
     return M3ETheme(
       data: theme.copyWith(searchBarTheme: compactTheme),
       child: SizedBox(
         height: _kFilterMetadataSearchHeight,
         child: M3ESearchBar(
-          onChanged: onChanged,
+          controller: _controller,
+          onChanged: widget.onChanged,
           leading: const Icon(
             M3EIcons.search,
             size: _kFilterMetadataSearchIconSize,
           ),
+          trailing: showClear
+              ? <Widget>[
+                  M3EIconButton(
+                    icon: const Icon(M3EIcons.close, size: 16),
+                    tooltip: 'Clear',
+                    onPressed: _clear,
+                    variant: M3EIconButtonVariant.standard,
+                    size: M3EIconButtonSize.xs,
+                  ),
+                ]
+              : null,
           expandOnFocus: false,
-          showClearButton: true,
+          showClearButton: false,
           margin: 0,
           focusedMargin: 0,
           textStyle: WidgetStatePropertyAll<TextStyle>(textStyle),
@@ -784,26 +827,25 @@ class _IncludeModeIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
     final bool isAll = mode == LibraryMetadataIncludeMode.all;
     final String label = isAll
         ? l10n.libraryMetadataFilterIncludeAll
         : l10n.libraryMetadataFilterIncludeAny;
-    return GhostButton.icon(
-      icon: isAll ? LucideIcons.listChecks : LucideIcons.circleDot,
+    return M3EIconButton(
+      icon: Icon(
+        isAll ? LucideIcons.listChecks : LucideIcons.circleDot,
+        size: 16,
+        color: isAll ? cs.primary : cs.onSurfaceVariant,
+      ),
       tooltip: label,
       semanticLabel: label,
-      iconSize: 16,
-      size: 32,
-      borderRadius: 8,
-      foregroundColor: isAll ? cs.primary : cs.onSurfaceVariant,
-      hoverColor: theme.hoverColor,
-      overlayColor: theme.hoverColor,
       onPressed: () => onChanged(
         isAll ? LibraryMetadataIncludeMode.any : LibraryMetadataIncludeMode.all,
       ),
+      variant: M3EIconButtonVariant.standard,
+      size: M3EIconButtonSize.sm,
     );
   }
 }

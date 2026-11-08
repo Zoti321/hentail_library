@@ -253,12 +253,35 @@ pub(super) fn build_catalog_where_clause(
         ComicNameFacet::Language,
         &filter.languages,
     );
-    push_facet_any_in(&mut parts, values, ComicNameFacet::Parody, &filter.parodies);
+    for parody in &filter.parodies_all {
+        push_facet_eq(&mut parts, values, ComicNameFacet::Parody, parody);
+    }
+    push_facet_any_in(
+        &mut parts,
+        values,
+        ComicNameFacet::Parody,
+        &filter.parodies_any,
+    );
+    push_facet_exclude_in(
+        &mut parts,
+        values,
+        ComicNameFacet::Parody,
+        &filter.parodies_exclude,
+    );
+    for character in &filter.characters_all {
+        push_facet_eq(&mut parts, values, ComicNameFacet::Character, character);
+    }
     push_facet_any_in(
         &mut parts,
         values,
         ComicNameFacet::Character,
-        &filter.characters,
+        &filter.characters_any,
+    );
+    push_facet_exclude_in(
+        &mut parts,
+        values,
+        ComicNameFacet::Character,
+        &filter.characters_exclude,
     );
     if filter.needs_metadata_only {
         parts.push(NEEDS_METADATA_SQL.to_string());
@@ -360,8 +383,8 @@ mod tests {
         let sql = build_catalog_where_clause(
             &ComicFilterDto {
                 languages: vec!["chinese".to_string()],
-                parodies: vec!["naruto".to_string()],
-                characters: vec!["sakura".to_string()],
+                parodies_any: vec!["naruto".to_string()],
+                characters_any: vec!["sakura".to_string()],
                 ..Default::default()
             },
             &mut values,
@@ -370,6 +393,28 @@ mod tests {
         assert!(sql.contains("comic_parodies"));
         assert!(sql.contains("comic_characters"));
         assert_eq!(values.len(), 3);
+    }
+
+    #[test]
+    fn catalog_where_parodies_characters_all_any_exclude() {
+        let mut values = Vec::new();
+        let sql = build_catalog_where_clause(
+            &ComicFilterDto {
+                parodies_all: vec!["fate".to_string()],
+                parodies_any: vec!["touhou".to_string()],
+                parodies_exclude: vec!["original".to_string()],
+                characters_all: vec!["saber".to_string()],
+                characters_exclude: vec!["extra".to_string()],
+                ..Default::default()
+            },
+            &mut values,
+        );
+        assert!(sql.contains("lower(cp.parody_name) = ?"));
+        assert!(sql.contains("lower(cp.parody_name) IN (?)"));
+        assert!(sql.contains("NOT EXISTS (SELECT 1 FROM comic_parodies"));
+        assert!(sql.contains("lower(cc.character_name) = ?"));
+        assert!(sql.contains("NOT EXISTS (SELECT 1 FROM comic_characters"));
+        assert_eq!(values.len(), 5);
     }
 
     #[test]

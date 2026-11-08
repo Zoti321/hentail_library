@@ -303,8 +303,12 @@ class ComicFilterDto {
   final List<String> authorsAny;
   final List<String> authorsExclude;
   final List<String> languages;
-  final List<String> parodies;
-  final List<String> characters;
+  final List<String> parodiesAll;
+  final List<String> parodiesAny;
+  final List<String> parodiesExclude;
+  final List<String> charactersAll;
+  final List<String> charactersAny;
+  final List<String> charactersExclude;
   final bool needsMetadataOnly;
   final String? libraryId;
 
@@ -320,8 +324,12 @@ class ComicFilterDto {
     required this.authorsAny,
     required this.authorsExclude,
     required this.languages,
-    required this.parodies,
-    required this.characters,
+    required this.parodiesAll,
+    required this.parodiesAny,
+    required this.parodiesExclude,
+    required this.charactersAll,
+    required this.charactersAny,
+    required this.charactersExclude,
     required this.needsMetadataOnly,
     this.libraryId,
   });
@@ -339,8 +347,12 @@ class ComicFilterDto {
       authorsAny.hashCode ^
       authorsExclude.hashCode ^
       languages.hashCode ^
-      parodies.hashCode ^
-      characters.hashCode ^
+      parodiesAll.hashCode ^
+      parodiesAny.hashCode ^
+      parodiesExclude.hashCode ^
+      charactersAll.hashCode ^
+      charactersAny.hashCode ^
+      charactersExclude.hashCode ^
       needsMetadataOnly.hashCode ^
       libraryId.hashCode;
 
@@ -360,8 +372,12 @@ class ComicFilterDto {
           authorsAny == other.authorsAny &&
           authorsExclude == other.authorsExclude &&
           languages == other.languages &&
-          parodies == other.parodies &&
-          characters == other.characters &&
+          parodiesAll == other.parodiesAll &&
+          parodiesAny == other.parodiesAny &&
+          parodiesExclude == other.parodiesExclude &&
+          charactersAll == other.charactersAll &&
+          charactersAny == other.charactersAny &&
+          charactersExclude == other.charactersExclude &&
           needsMetadataOnly == other.needsMetadataOnly &&
           libraryId == other.libraryId;
 }

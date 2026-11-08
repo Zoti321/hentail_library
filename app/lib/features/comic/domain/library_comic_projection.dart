@@ -16,8 +16,10 @@ class LibraryComicProjection {
     required LibraryMetadataFilterSelection tagFilter,
     required LibraryMetadataFilterSelection authorFilter,
     Set<String> languages = const <String>{},
-    Set<String> parodies = const <String>{},
-    Set<String> characters = const <String>{},
+    LibraryMetadataFilterSelection parodyFilter =
+        const LibraryMetadataFilterSelection(),
+    LibraryMetadataFilterSelection characterFilter =
+        const LibraryMetadataFilterSelection(),
     bool needsMetadataOnly = false,
     String? keyword,
     String? libraryId,
@@ -27,6 +29,9 @@ class LibraryComicProjection {
         : keyword!.trim();
     final LibraryMetadataFilterSets tagSets = tagFilter.toFilterSets();
     final LibraryMetadataFilterSets authorSets = authorFilter.toFilterSets();
+    final LibraryMetadataFilterSets parodySets = parodyFilter.toFilterSets();
+    final LibraryMetadataFilterSets characterSets = characterFilter
+        .toFilterSets();
     return LibraryComicFilter(
       showR18: ageRestriction.comicShowR18(),
       query: query,
@@ -40,11 +45,22 @@ class LibraryComicProjection {
       authorsAny: _mapAuthorIds(authorSets.any),
       authorsExclude: _mapAuthorIds(authorSets.exclude),
       languages: languages.isEmpty ? null : languages,
-      parodies: parodies.isEmpty ? null : parodies,
-      characters: characters.isEmpty ? null : characters,
+      parodiesAll: _mapStringSet(parodySets.all),
+      parodiesAny: _mapStringSet(parodySets.any),
+      parodiesExclude: _mapStringSet(parodySets.exclude),
+      charactersAll: _mapStringSet(characterSets.all),
+      charactersAny: _mapStringSet(characterSets.any),
+      charactersExclude: _mapStringSet(characterSets.exclude),
       needsMetadataOnly: needsMetadataOnly,
       libraryId: libraryId,
     );
+  }
+
+  Set<String>? _mapStringSet(Set<String> names) {
+    if (names.isEmpty) {
+      return null;
+    }
+    return names;
   }
 
   Set<LibraryTagPick>? _mapTagNames(Set<String> names) {

@@ -108,6 +108,32 @@ void main() {
       });
     });
 
+    test('buildListFilter maps parody and character all/any/exclude', () {
+      final LibraryComicFilter filter = projection.buildListFilter(
+        ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+        mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+        tagFilter: emptyMetadataFilter,
+        authorFilter: emptyMetadataFilter,
+        parodyFilter: LibraryMetadataFilterSelection(
+          picks: <String, LibraryTriStatePick>{
+            'Fate': LibraryTriStatePick.include,
+            'Original': LibraryTriStatePick.exclude,
+          },
+          includeMode: LibraryMetadataIncludeMode.all,
+        ),
+        characterFilter: LibraryMetadataFilterSelection(
+          picks: <String, LibraryTriStatePick>{
+            'Saber': LibraryTriStatePick.include,
+          },
+          includeMode: LibraryMetadataIncludeMode.any,
+        ),
+      );
+      expect(filter.parodiesAll, <String>{'Fate'});
+      expect(filter.parodiesExclude, <String>{'Original'});
+      expect(filter.charactersAny, <String>{'Saber'});
+      expect(filter.charactersAll, isNull);
+    });
+
     test('buildListFilter leaves needs metadata off by default', () {
       final LibraryComicFilter filter = projection.buildListFilter(
         ageRestriction: LibraryAgeRestrictionFilter.unrestricted,

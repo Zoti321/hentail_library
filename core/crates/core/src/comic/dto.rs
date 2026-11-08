@@ -16,10 +16,24 @@ pub struct ComicFilterDto {
     pub authors_exclude: Vec<String>,
     /// Language names to include (OR semantics); empty = no filter.
     pub languages: Vec<String>,
-    /// Parody names to include (OR semantics); empty = no filter.
-    pub parodies: Vec<String>,
-    /// Character names to include (OR semantics); empty = no filter.
-    pub characters: Vec<String>,
+    /// Parody names that must all match (AND); empty = no filter.
+    #[serde(default)]
+    pub parodies_all: Vec<String>,
+    /// Parody names that match any (OR); empty = no filter.
+    #[serde(default)]
+    pub parodies_any: Vec<String>,
+    /// Parody names to exclude; empty = no filter.
+    #[serde(default)]
+    pub parodies_exclude: Vec<String>,
+    /// Character names that must all match (AND); empty = no filter.
+    #[serde(default)]
+    pub characters_all: Vec<String>,
+    /// Character names that match any (OR); empty = no filter.
+    #[serde(default)]
+    pub characters_any: Vec<String>,
+    /// Character names to exclude; empty = no filter.
+    #[serde(default)]
+    pub characters_exclude: Vec<String>,
     /// Keep only Comics in **Needs metadata** state (see `GLOSSARY.md`).
     #[serde(default)]
     pub needs_metadata_only: bool,
@@ -41,8 +55,12 @@ impl Default for ComicFilterDto {
             authors_any: vec![],
             authors_exclude: vec![],
             languages: vec![],
-            parodies: vec![],
-            characters: vec![],
+            parodies_all: vec![],
+            parodies_any: vec![],
+            parodies_exclude: vec![],
+            characters_all: vec![],
+            characters_any: vec![],
+            characters_exclude: vec![],
             needs_metadata_only: false,
             library_id: None,
         }
@@ -63,8 +81,12 @@ impl ComicFilterDto {
             authors_any: normalize_match_tokens(&self.authors_any),
             authors_exclude: normalize_match_tokens(&self.authors_exclude),
             languages: normalize_match_tokens(&self.languages),
-            parodies: normalize_match_tokens(&self.parodies),
-            characters: normalize_match_tokens(&self.characters),
+            parodies_all: normalize_match_tokens(&self.parodies_all),
+            parodies_any: normalize_match_tokens(&self.parodies_any),
+            parodies_exclude: normalize_match_tokens(&self.parodies_exclude),
+            characters_all: normalize_match_tokens(&self.characters_all),
+            characters_any: normalize_match_tokens(&self.characters_any),
+            characters_exclude: normalize_match_tokens(&self.characters_exclude),
             needs_metadata_only: self.needs_metadata_only,
             library_id: self
                 .library_id

@@ -162,7 +162,7 @@ mod tests {
     fn parodies_filter_joins_comic_parodies() {
         let sql = build_ids_page_query(
             &ComicFilterDto {
-                parodies: vec!["naruto".to_string()],
+                parodies_any: vec!["naruto".to_string()],
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
@@ -179,7 +179,7 @@ mod tests {
     fn characters_filter_joins_comic_characters() {
         let sql = build_ids_page_query(
             &ComicFilterDto {
-                characters: vec!["sakura".to_string()],
+                characters_any: vec!["sakura".to_string()],
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
