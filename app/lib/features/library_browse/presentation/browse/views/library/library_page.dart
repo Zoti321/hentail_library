@@ -5,8 +5,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/content_breadcrumb_labels.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_vo.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_vo.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
@@ -306,8 +306,8 @@ class _LibraryModeHeader extends ConsumerWidget {
                 final LibraryComicsCatalogState? catalog =
                     stableCatalogSnapshot(async);
                 return <String>[
-                  for (final ComicBrowseVO item
-                      in catalog?.items ?? const <ComicBrowseVO>[])
+                  for (final ComicBrowseViewObject item
+                      in catalog?.items ?? const <ComicBrowseViewObject>[])
                     item.comicId,
                 ];
               }),
@@ -516,13 +516,13 @@ abstract final class _LibraryCatalogSlivers {
             ),
           ];
         }
-        final List<ComicBrowseVO> comics = comicsCatalog.items;
+        final List<ComicBrowseViewObject> comics = comicsCatalog.items;
         if (viewMode == CatalogViewMode.list) {
           return <Widget>[
             CatalogListSliver(
               itemCount: comics.length,
               itemBuilder: (BuildContext context, int index) {
-                final ComicBrowseVO comic = comics[index];
+                final ComicBrowseViewObject comic = comics[index];
                 return ComicCardActions.fromBrowse(
                   item: comic,
                   enabled: !librarySelection,
@@ -555,7 +555,7 @@ abstract final class _LibraryCatalogSlivers {
             horizontalMargin: 0,
             itemCount: comics.length,
             itemBuilder: (BuildContext context, int index, CatalogGridLayout _) {
-              final ComicBrowseVO comic = comics[index];
+              final ComicBrowseViewObject comic = comics[index];
               return ComicCardActions.fromBrowse(
                 key: ValueKey<String>(comic.comicId),
                 item: comic,
@@ -596,13 +596,13 @@ abstract final class _LibraryCatalogSlivers {
             ),
           ];
         }
-        final List<SeriesBrowseVO> series = seriesCatalog.items;
+        final List<SeriesBrowseViewObject> series = seriesCatalog.items;
         if (viewMode == CatalogViewMode.list) {
           return <Widget>[
             CatalogListSliver(
               itemCount: series.length,
               itemBuilder: (BuildContext context, int index) {
-                final SeriesBrowseVO s = series[index];
+                final SeriesBrowseViewObject s = series[index];
                 return ComicListItem(
                   title: s.name,
                   pageLabel: context.l10n.seriesVolumeCountLabel(s.volumeCount),
@@ -623,7 +623,7 @@ abstract final class _LibraryCatalogSlivers {
             hasSubtitle: true,
             itemCount: series.length,
             itemBuilder: (BuildContext context, int index, CatalogGridLayout _) {
-              final SeriesBrowseVO s = series[index];
+              final SeriesBrowseViewObject s = series[index];
               return ComicCard(
                 key: ValueKey<String>('library-series-${s.id}'),
                 title: s.name,

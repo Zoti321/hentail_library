@@ -4,7 +4,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/shell_file_explorer.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_vo.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/integrations/comic_presentation_bridge.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/views/metadata_edit/metadata_edit_presenters.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
@@ -16,7 +16,7 @@ import 'package:material_3_expressive/material_3_expressive.dart';
 /// 包裹 MD3E 漫画卡片：仅桌面端鼠标右键弹出 [M3EMenu]（与详情页顶栏 ⋮ 同款
 /// 宽度与样式：阅读、编辑元数据、在资源管理器中显示、删除）；移动端无上下文菜单。
 ///
-/// 库页传入 [ComicBrowseVO]；详情等仍可传完整 [Comic]。
+/// 库页传入 [ComicBrowseViewObject]；详情等仍可传完整 [Comic]。
 class ComicCardActions extends ConsumerWidget {
   ComicCardActions({
     super.key,
@@ -29,7 +29,7 @@ class ComicCardActions extends ConsumerWidget {
 
   ComicCardActions.fromBrowse({
     super.key,
-    required ComicBrowseVO item,
+    required ComicBrowseViewObject item,
     required this.child,
     this.enabled = true,
   }) : comicId = item.comicId,

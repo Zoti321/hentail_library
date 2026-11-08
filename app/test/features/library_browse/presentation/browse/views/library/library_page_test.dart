@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
 import 'package:hentai_library/features/library_browse/presentation/catalog/view_models/catalog_selection_notifier.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/models/browse_vo_mappers.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_vo.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_vo.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/browse_view_object_mappers.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/series_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -45,12 +45,12 @@ Comic _comic(String id, String title) {
   );
 }
 
-ComicBrowseVO _comicVo(String id, String title) {
-  return comicBrowseVoFromComic(_comic(id, title));
+ComicBrowseViewObject _comicViewObject(String id, String title) {
+  return comicBrowseViewObjectFromComic(_comic(id, title));
 }
 
-SeriesBrowseVO _seriesVo(String id, String name) {
-  return seriesBrowseVoFromSeries(
+SeriesBrowseViewObject _seriesViewObject(String id, String name) {
+  return seriesBrowseViewObjectFromSeries(
     Series(id: id, name: name, folderPath: '/$id'),
   );
 }
@@ -136,16 +136,16 @@ class _FixedCatalogSelection extends CatalogSelectionNotifier {
 Future<void> _pumpLibraryPage(
   WidgetTester tester, {
   required LibraryDisplayTarget target,
-  required List<ComicBrowseVO> comics,
-  List<SeriesBrowseVO> series = const <SeriesBrowseVO>[],
+  required List<ComicBrowseViewObject> comics,
+  List<SeriesBrowseViewObject> series = const <SeriesBrowseViewObject>[],
   CatalogSelectionState? selection,
 }) async {
   configureTestView(tester, const Size(900, 800));
 
   final List<Override> coverOverrides = <Override>[
-    for (final ComicBrowseVO comic in comics)
+    for (final ComicBrowseViewObject comic in comics)
       comicCoverProvider(comic.comicId).overrideWith(_NoCoverComicCover.new),
-    for (final SeriesBrowseVO s in series)
+    for (final SeriesBrowseViewObject s in series)
       seriesCoverSourceProvider(s.id)
           .overrideWith((Ref ref) async => const SeriesCoverMissing()),
   ];
@@ -203,9 +203,9 @@ void main() {
     await _pumpLibraryPage(
       tester,
       target: LibraryDisplayTarget.comics,
-      comics: <ComicBrowseVO>[
-        _comicVo('c1', 'Comic One'),
-        _comicVo('c2', 'Comic Two'),
+      comics: <ComicBrowseViewObject>[
+        _comicViewObject('c1', 'Comic One'),
+        _comicViewObject('c2', 'Comic Two'),
       ],
     );
 
@@ -220,8 +220,8 @@ void main() {
     await _pumpLibraryPage(
       tester,
       target: LibraryDisplayTarget.series,
-      comics: const <ComicBrowseVO>[],
-      series: <SeriesBrowseVO>[_seriesVo('s1', 'Series Alpha')],
+      comics: const <ComicBrowseViewObject>[],
+      series: <SeriesBrowseViewObject>[_seriesViewObject('s1', 'Series Alpha')],
     );
 
     expect(tester.takeException(), isNull);
@@ -237,7 +237,7 @@ void main() {
       await _pumpLibraryPage(
         tester,
         target: LibraryDisplayTarget.comics,
-        comics: <ComicBrowseVO>[_comicVo('c1', 'Comic One')],
+        comics: <ComicBrowseViewObject>[_comicViewObject('c1', 'Comic One')],
       );
 
       await tester.tap(find.byType(ComicCard), buttons: kSecondaryButton);
@@ -258,7 +258,7 @@ void main() {
     await _pumpLibraryPage(
       tester,
       target: LibraryDisplayTarget.comics,
-      comics: const <ComicBrowseVO>[],
+      comics: const <ComicBrowseViewObject>[],
     );
 
     expect(find.text(l10n.libraryEmptyTitle), findsOneWidget);
@@ -270,9 +270,9 @@ void main() {
     await _pumpLibraryPage(
       tester,
       target: LibraryDisplayTarget.comics,
-      comics: <ComicBrowseVO>[
-        _comicVo('c1', 'Comic One'),
-        _comicVo('c2', 'Comic Two'),
+      comics: <ComicBrowseViewObject>[
+        _comicViewObject('c1', 'Comic One'),
+        _comicViewObject('c2', 'Comic Two'),
       ],
       selection: const CatalogSelectionState(
         active: true,

@@ -20,7 +20,7 @@ import 'package:hentai_library/features/comic/domain/comic_catalog_repository.da
 import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
 import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
-import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_vo.dart';
+import 'package:hentai_library/features/library_browse/presentation/browse/models/comic_browse_view_object.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_state.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
@@ -128,7 +128,7 @@ class _OverriddenComicsCatalog extends LibraryComicsCatalogController {
   @override
   Future<LibraryComicsCatalogState> build() async {
     return const LibraryComicsCatalogState(
-      items: <ComicBrowseVO>[],
+      items: <ComicBrowseViewObject>[],
       pagination: LibraryPagination(
         page: 3,
         totalPages: 7,
