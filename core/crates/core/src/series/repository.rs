@@ -54,6 +54,22 @@ pub struct PagedSeriesResultDto {
     pub page_size: i32,
 }
 
+/// 库浏览系列列表瘦投影：不含成员 items，只带可见成员数。
+#[derive(Debug, Clone)]
+pub struct SeriesBrowseItemDto {
+    pub series_id: String,
+    pub name: String,
+    pub volume_count: i32,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedSeriesBrowseResultDto {
+    pub items: Vec<SeriesBrowseItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct SeriesComicsMetadataDto {
     pub authors: Vec<String>,
@@ -107,12 +123,54 @@ pub async fn fetch_series_page(
     grouping: SeriesGrouping,
     sort: SeriesSortOptionDto,
 ) -> Result<PagedSeriesResultDto, HentaiError> {
+    let page = fetch_series_page_ids(request, filter, grouping, sort).await?;
+    let db = connection()?;
+    let items = load_series_by_ids(&db, page.series_ids).await?;
+    Ok(PagedSeriesResultDto {
+        items,
+        total_count: page.total_count,
+        page: page.page,
+        page_size: page.page_size,
+    })
+}
+
+/// 库浏览系列列表：不加载成员 items，只返回名称与可见成员数。
+pub async fn fetch_series_browse_page(
+    request: PageRequestDto,
+    filter: SeriesFilterDto,
+    grouping: SeriesGrouping,
+    sort: SeriesSortOptionDto,
+) -> Result<PagedSeriesBrowseResultDto, HentaiError> {
+    let page = fetch_series_page_ids(request, filter, grouping, sort).await?;
+    let db = connection()?;
+    let items = load_series_browse_by_ids(&db, page.series_ids).await?;
+    Ok(PagedSeriesBrowseResultDto {
+        items,
+        total_count: page.total_count,
+        page: page.page,
+        page_size: page.page_size,
+    })
+}
+
+struct SeriesPageIds {
+    series_ids: Vec<String>,
+    total_count: i64,
+    page: i32,
+    page_size: i32,
+}
+
+async fn fetch_series_page_ids(
+    request: PageRequestDto,
+    filter: SeriesFilterDto,
+    grouping: SeriesGrouping,
+    sort: SeriesSortOptionDto,
+) -> Result<SeriesPageIds, HentaiError> {
     let db = connection()?;
     let mut filter = filter.normalized();
     filter.library_id = crate::library::resolve_browse_library_id(filter.library_id).await?;
     if filter.library_id.is_none() {
-        return Ok(PagedSeriesResultDto {
-            items: vec![],
+        return Ok(SeriesPageIds {
+            series_ids: vec![],
             total_count: 0,
             page: 1,
             page_size: request.page_size.max(1),
@@ -121,8 +179,8 @@ pub async fn fetch_series_page(
     let total_count = count_filtered_series(&db, &filter).await?;
     let window = paginate(request, total_count).clamped();
     if total_count <= 0 {
-        return Ok(PagedSeriesResultDto {
-            items: vec![],
+        return Ok(SeriesPageIds {
+            series_ids: vec![],
             total_count: 0,
             page: 1,
             page_size: window.page_size,
@@ -138,9 +196,8 @@ pub async fn fetch_series_page(
         window.offset as i32,
     );
     let series_ids = query_series_ids(&db, &ids_query).await?;
-    let items = load_series_by_ids(&db, series_ids).await?;
-    Ok(PagedSeriesResultDto {
-        items,
+    Ok(SeriesPageIds {
+        series_ids,
         total_count,
         page: window.page,
         page_size: window.page_size,
@@ -808,6 +865,74 @@ async fn load_series_by_ids(
         );
     }
     Ok(ids.into_iter().filter_map(|id| by_id.remove(&id)).collect())
+}
+
+async fn load_series_browse_by_ids(
+    db: &DatabaseConnection,
+    ids: Vec<String>,
+) -> Result<Vec<SeriesBrowseItemDto>, HentaiError> {
+    if ids.is_empty() {
+        return Ok(vec![]);
+    }
+    let series_rows = Series::find()
+        .filter(series::Column::SeriesId.is_in(ids.clone()))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let volume_counts = count_visible_series_members(db, &ids).await?;
+    let mut by_id: HashMap<String, series::Model> = series_rows
+        .into_iter()
+        .map(|row| (row.series_id.clone(), row))
+        .collect();
+    Ok(ids
+        .into_iter()
+        .filter_map(|id| {
+            let row = by_id.remove(&id)?;
+            Some(SeriesBrowseItemDto {
+                series_id: row.series_id,
+                name: row.name,
+                volume_count: volume_counts.get(&id).copied().unwrap_or(0),
+            })
+        })
+        .collect())
+}
+
+async fn count_visible_series_members(
+    db: &DatabaseConnection,
+    series_ids: &[String],
+) -> Result<HashMap<String, i32>, HentaiError> {
+    if series_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let placeholders = std::iter::repeat("?")
+        .take(series_ids.len())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let sql = format!(
+        "SELECT si.series_id, COUNT(*) AS cnt \
+         FROM series_items si \
+         WHERE si.series_id IN ({placeholders}) \
+           AND {} \
+         GROUP BY si.series_id",
+        visible_comic_id_sql("si.comic_id")
+    );
+    let values: Vec<sea_orm::Value> = series_ids
+        .iter()
+        .map(|id| sea_orm::Value::String(Some(Box::new(id.clone()))))
+        .collect();
+    let stmt = Statement::from_sql_and_values(sea_orm::DatabaseBackend::Sqlite, sql, values);
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    let mut map = HashMap::new();
+    for row in rows {
+        let series_id = row
+            .try_get_by_index::<String>(0)
+            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        let count = row
+            .try_get_by_index::<i64>(1)
+            .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+        map.insert(series_id, count as i32);
+    }
+    Ok(map)
 }
 
 pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, f64>, HentaiError> {

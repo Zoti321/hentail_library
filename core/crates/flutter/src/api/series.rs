@@ -1,5 +1,6 @@
 use hentai_core::{
-    count_all_series, fetch_series_comics_metadata as core_fetch_series_comics_metadata,
+    count_all_series, fetch_series_browse_page as core_fetch_browse_page,
+    fetch_series_comics_metadata as core_fetch_series_comics_metadata,
     fetch_series_comics_page as core_fetch_series_comics_page,
     fetch_series_page as core_fetch_page, find_series_by_id as core_find,
     find_series_item_by_comic_id as core_find_series_item,
@@ -9,11 +10,13 @@ use hentai_core::{
     set_series_meta_locks as core_set_meta_locks,
     update_series_item_sort_order as core_update_item_sort_order,
     update_series_user_meta as core_update_meta, watch_home_series_comic_order_map,
+    PagedSeriesBrowseResultDto as CorePagedSeriesBrowse,
     PagedSeriesComicsResultDto as CorePagedSeriesComics, PagedSeriesResultDto as CorePagedSeries,
-    SeriesComicsMetadataDto as CoreSeriesComicsMetadata, SeriesDto as CoreSeries,
-    SeriesFilterDto as CoreSeriesFilter, SeriesGrouping, SeriesItemDto as CoreItem,
-    SeriesReadingContextDto as CoreSeriesReadingContext, SeriesSortFieldDto as CoreSeriesSortField,
-    SeriesSortOptionDto as CoreSeriesSort, SetSeriesMetaLocksDto as CoreSetSeriesMetaLocks,
+    SeriesBrowseItemDto as CoreSeriesBrowse, SeriesComicsMetadataDto as CoreSeriesComicsMetadata,
+    SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesGrouping,
+    SeriesItemDto as CoreItem, SeriesReadingContextDto as CoreSeriesReadingContext,
+    SeriesSortFieldDto as CoreSeriesSortField, SeriesSortOptionDto as CoreSeriesSort,
+    SetSeriesMetaLocksDto as CoreSetSeriesMetaLocks,
     UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
 
@@ -298,6 +301,60 @@ pub async fn fetch_series_page_frb(
     core_fetch_page(request.into(), filter.into(), grouping.into(), sort.into())
         .await
         .map(PagedSeriesResultDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+/// 库浏览系列列表瘦 DTO：不含成员 items。
+#[derive(Debug, Clone)]
+pub struct SeriesBrowseItemDto {
+    pub series_id: String,
+    pub name: String,
+    pub volume_count: i32,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedSeriesBrowseResultDto {
+    pub items: Vec<SeriesBrowseItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
+impl From<CoreSeriesBrowse> for SeriesBrowseItemDto {
+    fn from(value: CoreSeriesBrowse) -> Self {
+        Self {
+            series_id: value.series_id,
+            name: value.name,
+            volume_count: value.volume_count,
+        }
+    }
+}
+
+impl From<CorePagedSeriesBrowse> for PagedSeriesBrowseResultDto {
+    fn from(value: CorePagedSeriesBrowse) -> Self {
+        Self {
+            items: value
+                .items
+                .into_iter()
+                .map(SeriesBrowseItemDto::from)
+                .collect(),
+            total_count: value.total_count,
+            page: value.page,
+            page_size: value.page_size,
+        }
+    }
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn fetch_series_browse_page_frb(
+    request: PageRequestDto,
+    filter: SeriesFilterDto,
+    grouping: SeriesGroupingDto,
+    sort: SeriesSortOptionDto,
+) -> Result<PagedSeriesBrowseResultDto, HentaiErrorDto> {
+    core_fetch_browse_page(request.into(), filter.into(), grouping.into(), sort.into())
+        .await
+        .map(PagedSeriesBrowseResultDto::from)
         .map_err(HentaiErrorDto::from)
 }
 

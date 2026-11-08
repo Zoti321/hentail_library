@@ -13,8 +13,10 @@ import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/features/comic/domain/comic_browse_list_item.dart';
 import 'package:hentai_library/features/comic/domain/comic_catalog_repository.dart';
 import 'package:hentai_library/features/comic/di/comic_repository_providers.dart';
+import 'package:hentai_library/features/series/domain/series_browse_list_item.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart';
@@ -51,6 +53,21 @@ class _FakeComicRepo implements ComicCatalogRepository {
   }
 
   @override
+  Future<PagedResult<ComicBrowseListItem>> fetchComicsBrowsePage({
+    required PageRequest request,
+    required LibraryComicFilter filter,
+    required LibraryComicGrouping grouping,
+    required LibraryComicSortOption sortOption,
+  }) async {
+    return PagedResult<ComicBrowseListItem>(
+      items: const <ComicBrowseListItem>[],
+      page: request.page,
+      pageSize: request.pageSize,
+      totalCount: 0,
+    );
+  }
+
+  @override
   Future<int> countAll() async => 0;
 
   @override
@@ -67,6 +84,21 @@ class _FakeSeriesRepo implements SeriesRepository {
   }) async {
     return PagedResult<Series>(
       items: const <Series>[],
+      page: request.page,
+      pageSize: request.pageSize,
+      totalCount: 0,
+    );
+  }
+
+  @override
+  Future<PagedResult<SeriesBrowseListItem>> fetchBrowsePage({
+    required PageRequest request,
+    required LibrarySeriesFilter filter,
+    required LibrarySeriesGrouping grouping,
+    required LibrarySeriesSortOption sortOption,
+  }) async {
+    return PagedResult<SeriesBrowseListItem>(
+      items: const <SeriesBrowseListItem>[],
       page: request.page,
       pageSize: request.pageSize,
       totalCount: 0,

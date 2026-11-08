@@ -1,6 +1,7 @@
 use hentai_core::{
-    self, count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, init_db,
-    search_by_keyword, search_by_keyword_page, search_by_tag_expression_page, ComicGrouping,
+    self, count_all, fetch_comics_browse_page, fetch_comics_page, find_comic_by_id,
+    find_comics_by_ids, init_db, search_by_keyword, search_by_keyword_page,
+    search_by_tag_expression_page, ComicGrouping,
 };
 
 use super::init::HentaiErrorDto;
@@ -202,6 +203,49 @@ impl From<hentai_core::PagedComicResultDto> for PagedComicResultDto {
     }
 }
 
+/// 库浏览列表瘦 DTO：不含 authors/tags 等关系字段。
+#[derive(Debug, Clone)]
+pub struct ComicBrowseItemDto {
+    pub comic_id: String,
+    pub path: String,
+    pub title: String,
+    pub page_count: i32,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedComicBrowseResultDto {
+    pub items: Vec<ComicBrowseItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
+impl From<hentai_core::ComicBrowseItemDto> for ComicBrowseItemDto {
+    fn from(value: hentai_core::ComicBrowseItemDto) -> Self {
+        Self {
+            comic_id: value.comic_id,
+            path: value.path,
+            title: value.title,
+            page_count: value.page_count,
+        }
+    }
+}
+
+impl From<hentai_core::PagedComicBrowseResultDto> for PagedComicBrowseResultDto {
+    fn from(value: hentai_core::PagedComicBrowseResultDto) -> Self {
+        Self {
+            items: value
+                .items
+                .into_iter()
+                .map(ComicBrowseItemDto::from)
+                .collect(),
+            total_count: value.total_count,
+            page: value.page,
+            page_size: value.page_size,
+        }
+    }
+}
+
 #[flutter_rust_bridge::frb(sync)]
 pub fn init_db_frb(app_data_dir: String, db_file_name: String) -> Result<(), HentaiErrorDto> {
     init_db(&app_data_dir, &db_file_name).map_err(HentaiErrorDto::from)
@@ -222,6 +266,19 @@ pub async fn fetch_comics_page_frb(
     fetch_comics_page(request.into(), filter.into(), grouping.into(), sort.into())
         .await
         .map(PagedComicResultDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn fetch_comics_browse_page_frb(
+    request: PageRequestDto,
+    filter: ComicFilterDto,
+    grouping: ComicGroupingDto,
+    sort: ComicSortOptionDto,
+) -> Result<PagedComicBrowseResultDto, HentaiErrorDto> {
+    fetch_comics_browse_page(request.into(), filter.into(), grouping.into(), sort.into())
+        .await
+        .map(PagedComicBrowseResultDto::from)
         .map_err(HentaiErrorDto::from)
 }
 

@@ -12,7 +12,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'sync.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Future<PlatformInt64> countAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesCountAllSeriesFrb();
@@ -23,6 +23,18 @@ Future<PagedSeriesResultDto> fetchSeriesPageFrb({
   required SeriesGroupingDto grouping,
   required SeriesSortOptionDto sort,
 }) => RustLib.instance.api.crateApiSeriesFetchSeriesPageFrb(
+  request: request,
+  filter: filter,
+  grouping: grouping,
+  sort: sort,
+);
+
+Future<PagedSeriesBrowseResultDto> fetchSeriesBrowsePageFrb({
+  required PageRequestDto request,
+  required SeriesFilterDto filter,
+  required SeriesGroupingDto grouping,
+  required SeriesSortOptionDto sort,
+}) => RustLib.instance.api.crateApiSeriesFetchSeriesBrowsePageFrb(
   request: request,
   filter: filter,
   grouping: grouping,
@@ -135,6 +147,34 @@ Future<RefreshLibraryResultFrbDto> refreshLibraryMetadataFrb({
   libraryId: libraryId,
   handle: handle,
 );
+
+class PagedSeriesBrowseResultDto {
+  final List<SeriesBrowseItemDto> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
+
+  const PagedSeriesBrowseResultDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PagedSeriesBrowseResultDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
+}
 
 class PagedSeriesComicsResultDto {
   final List<SeriesComicPageItemDto> items;
@@ -249,6 +289,31 @@ class RefreshSeriesResultFrbDto {
           succeeded == other.succeeded &&
           failed == other.failed &&
           cancelled == other.cancelled;
+}
+
+/// 库浏览系列列表瘦 DTO：不含成员 items。
+class SeriesBrowseItemDto {
+  final String seriesId;
+  final String name;
+  final int volumeCount;
+
+  const SeriesBrowseItemDto({
+    required this.seriesId,
+    required this.name,
+    required this.volumeCount,
+  });
+
+  @override
+  int get hashCode => seriesId.hashCode ^ name.hashCode ^ volumeCount.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesBrowseItemDto &&
+          runtimeType == other.runtimeType &&
+          seriesId == other.seriesId &&
+          name == other.name &&
+          volumeCount == other.volumeCount;
 }
 
 class SeriesComicOrderEntryDto {

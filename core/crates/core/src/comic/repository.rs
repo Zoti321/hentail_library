@@ -15,7 +15,8 @@ use crate::error::HentaiError;
 use crate::history::reading_history_retention_cutoff_ms;
 
 use super::dto::{
-    now_ms, ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
+    now_ms, ComicBrowseItemDto, ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto,
+    PagedComicBrowseResultDto, PagedComicResultDto,
 };
 use super::filter_predicate;
 use super::grouping::ComicGrouping;
@@ -47,12 +48,54 @@ pub async fn fetch_comics_page(
     grouping: ComicGrouping,
     sort: ComicSortOptionDto,
 ) -> Result<PagedComicResultDto, HentaiError> {
+    let page = fetch_comics_page_ids(request, filter, grouping, sort).await?;
+    let db = connection()?;
+    let items = load_comics_ordered(&db, page.comic_ids).await?;
+    Ok(PagedComicResultDto {
+        items,
+        total_count: page.total_count,
+        page: page.page,
+        page_size: page.page_size,
+    })
+}
+
+/// 库浏览列表：只返回卡面字段，跳过 authors/tags 等关系加载。
+pub async fn fetch_comics_browse_page(
+    request: PageRequestDto,
+    filter: ComicFilterDto,
+    grouping: ComicGrouping,
+    sort: ComicSortOptionDto,
+) -> Result<PagedComicBrowseResultDto, HentaiError> {
+    let page = fetch_comics_page_ids(request, filter, grouping, sort).await?;
+    let db = connection()?;
+    let items = load_comics_browse_ordered(&db, page.comic_ids).await?;
+    Ok(PagedComicBrowseResultDto {
+        items,
+        total_count: page.total_count,
+        page: page.page,
+        page_size: page.page_size,
+    })
+}
+
+struct ComicsPageIds {
+    comic_ids: Vec<String>,
+    total_count: i64,
+    page: i32,
+    page_size: i32,
+}
+
+async fn fetch_comics_page_ids(
+    request: PageRequestDto,
+    filter: ComicFilterDto,
+    grouping: ComicGrouping,
+    sort: ComicSortOptionDto,
+) -> Result<ComicsPageIds, HentaiError> {
     let db = connection()?;
     let mut filter = filter.normalized();
     filter.library_id = crate::library::resolve_browse_library_id(filter.library_id).await?;
     if filter.library_id.is_none() {
-        return Ok(PagedComicResultDto {
-            items: vec![],
+        return Ok(ComicsPageIds {
+            comic_ids: vec![],
             total_count: 0,
             page: 1,
             page_size: request.page_size.max(1),
@@ -61,8 +104,8 @@ pub async fn fetch_comics_page(
     let total_count = count_filtered(&db, &filter).await?;
     let window = paginate(request, total_count).clamped();
     if total_count <= 0 {
-        return Ok(PagedComicResultDto {
-            items: vec![],
+        return Ok(ComicsPageIds {
+            comic_ids: vec![],
             total_count: 0,
             page: 1,
             page_size: window.page_size,
@@ -78,9 +121,8 @@ pub async fn fetch_comics_page(
         window.offset as i32,
     );
     let comic_ids = query_string_ids(&db, &ids_query).await?;
-    let items = load_comics_ordered(&db, comic_ids).await?;
-    Ok(PagedComicResultDto {
-        items,
+    Ok(ComicsPageIds {
+        comic_ids,
         total_count,
         page: window.page,
         page_size: window.page_size,
@@ -516,6 +558,50 @@ pub async fn load_comics_ordered(
                 characters: meta.characters_locked,
             },
             library_id: model.library_id,
+        });
+    }
+    Ok(result)
+}
+
+/// 浏览列表瘦加载：仅 comics + comic_meta 的标题/页数，不拉关系表。
+async fn load_comics_browse_ordered(
+    db: &DatabaseConnection,
+    comic_ids: Vec<String>,
+) -> Result<Vec<ComicBrowseItemDto>, HentaiError> {
+    if comic_ids.is_empty() {
+        return Ok(vec![]);
+    }
+    let models = Comics::find()
+        .filter(Expr::col(comics::Column::ComicId).is_in(comic_ids.clone()))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let meta_models = ComicMeta::find()
+        .filter(Expr::col(comic_meta::Column::ComicId).is_in(comic_ids.clone()))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut by_id: HashMap<String, comics::Model> = models
+        .into_iter()
+        .map(|m| (m.comic_id.clone(), m))
+        .collect();
+    let meta_by_id: HashMap<String, comic_meta::Model> = meta_models
+        .into_iter()
+        .map(|m| (m.comic_id.clone(), m))
+        .collect();
+    let mut result = Vec::with_capacity(comic_ids.len());
+    for id in comic_ids {
+        let Some(model) = by_id.remove(&id) else {
+            continue;
+        };
+        let Some(meta) = meta_by_id.get(&model.comic_id) else {
+            continue;
+        };
+        result.push(ComicBrowseItemDto {
+            comic_id: model.comic_id,
+            path: model.path,
+            title: meta.title.clone(),
+            page_count: meta.page_count,
         });
     }
     Ok(result)

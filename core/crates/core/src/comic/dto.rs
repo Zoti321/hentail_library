@@ -175,6 +175,23 @@ pub struct PagedComicResultDto {
     pub page_size: i32,
 }
 
+/// 库浏览列表瘦投影：卡面所需字段，不含 authors/tags 等关系。
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ComicBrowseItemDto {
+    pub comic_id: String,
+    pub path: String,
+    pub title: String,
+    pub page_count: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PagedComicBrowseResultDto {
+    pub items: Vec<ComicBrowseItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
 pub fn now_ms() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)

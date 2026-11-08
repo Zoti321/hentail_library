@@ -7,12 +7,13 @@ mod write;
 pub use dto::{SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto};
 pub use grouping::SeriesGrouping;
 pub use repository::{
-    count_all_series, fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
-    find_series_by_id, find_series_item_by_comic_id, get_series_reading_context_by_comic_id,
-    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
-    set_series_items_order, watch_home_series_comic_order_map, PagedSeriesComicsResultDto,
-    PagedSeriesResultDto, SeriesComicPageItemDto, SeriesComicsMetadataDto, SeriesDto,
-    SeriesItemDto, SeriesMetaLocks, SeriesReadingContextDto,
+    count_all_series, fetch_series_browse_page, fetch_series_comics_metadata,
+    fetch_series_comics_page, fetch_series_page, find_series_by_id, find_series_item_by_comic_id,
+    get_series_reading_context_by_comic_id, load_home_series_comic_order_map,
+    search_series_by_keyword, search_series_by_tag_expression, set_series_items_order,
+    watch_home_series_comic_order_map, PagedSeriesBrowseResultDto, PagedSeriesComicsResultDto,
+    PagedSeriesResultDto, SeriesBrowseItemDto, SeriesComicPageItemDto, SeriesComicsMetadataDto,
+    SeriesDto, SeriesItemDto, SeriesMetaLocks, SeriesReadingContextDto,
 };
 pub use write::{
     set_series_item_sort_order_locked, set_series_meta_locks, update_series_item_sort_order,

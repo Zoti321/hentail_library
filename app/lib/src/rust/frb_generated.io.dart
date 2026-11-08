@@ -241,6 +241,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BulkPatchResultFrbDto dco_decode_bulk_patch_result_frb_dto(dynamic raw);
 
   @protected
+  ComicBrowseItemDto dco_decode_comic_browse_item_dto(dynamic raw);
+
+  @protected
   ComicDto dco_decode_comic_dto(dynamic raw);
 
   @protected
@@ -348,6 +351,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<ComicBrowseItemDto> dco_decode_list_comic_browse_item_dto(dynamic raw);
+
+  @protected
   List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
 
   @protected
@@ -406,6 +412,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ResourceFormatCategoryDto> dco_decode_list_resource_format_category_dto(
     dynamic raw,
   );
+
+  @protected
+  List<SeriesBrowseItemDto> dco_decode_list_series_browse_item_dto(dynamic raw);
 
   @protected
   List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
@@ -527,10 +536,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PageRequestDto dco_decode_page_request_dto(dynamic raw);
 
   @protected
+  PagedComicBrowseResultDto dco_decode_paged_comic_browse_result_dto(
+    dynamic raw,
+  );
+
+  @protected
   PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw);
 
   @protected
   PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw);
+
+  @protected
+  PagedSeriesBrowseResultDto dco_decode_paged_series_browse_result_dto(
+    dynamic raw,
+  );
 
   @protected
   PagedSeriesComicsResultDto dco_decode_paged_series_comics_result_dto(
@@ -589,6 +608,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ScanIntervalDto dco_decode_scan_interval_dto(dynamic raw);
+
+  @protected
+  SeriesBrowseItemDto dco_decode_series_browse_item_dto(dynamic raw);
 
   @protected
   SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw);
@@ -949,6 +971,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ComicBrowseItemDto sse_decode_comic_browse_item_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ComicDto sse_decode_comic_dto(SseDeserializer deserializer);
 
   @protected
@@ -1086,6 +1113,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<ComicBrowseItemDto> sse_decode_list_comic_browse_item_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
 
   @protected
@@ -1152,6 +1184,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ResourceFormatCategoryDto> sse_decode_list_resource_format_category_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<SeriesBrowseItemDto> sse_decode_list_series_browse_item_dto(
     SseDeserializer deserializer,
   );
 
@@ -1297,12 +1334,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer);
 
   @protected
+  PagedComicBrowseResultDto sse_decode_paged_comic_browse_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   PagedComicResultDto sse_decode_paged_comic_result_dto(
     SseDeserializer deserializer,
   );
 
   @protected
   PagedReadingHistoryDto sse_decode_paged_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  PagedSeriesBrowseResultDto sse_decode_paged_series_browse_result_dto(
     SseDeserializer deserializer,
   );
 
@@ -1375,6 +1422,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ScanIntervalDto sse_decode_scan_interval_dto(SseDeserializer deserializer);
+
+  @protected
+  SeriesBrowseItemDto sse_decode_series_browse_item_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
@@ -1831,6 +1883,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_comic_browse_item_dto(
+    ComicBrowseItemDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_comic_dto(ComicDto self, SseSerializer serializer);
 
   @protected
@@ -1999,6 +2057,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_comic_browse_item_dto(
+    List<ComicBrowseItemDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
 
   @protected
@@ -2091,6 +2155,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_resource_format_category_dto(
     List<ResourceFormatCategoryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_series_browse_item_dto(
+    List<SeriesBrowseItemDto> self,
     SseSerializer serializer,
   );
 
@@ -2272,6 +2342,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_paged_comic_browse_result_dto(
+    PagedComicBrowseResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_paged_comic_result_dto(
     PagedComicResultDto self,
     SseSerializer serializer,
@@ -2280,6 +2356,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_paged_reading_history_dto(
     PagedReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_paged_series_browse_result_dto(
+    PagedSeriesBrowseResultDto self,
     SseSerializer serializer,
   );
 
@@ -2367,6 +2449,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_scan_interval_dto(
     ScanIntervalDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_series_browse_item_dto(
+    SeriesBrowseItemDto self,
     SseSerializer serializer,
   );
 
