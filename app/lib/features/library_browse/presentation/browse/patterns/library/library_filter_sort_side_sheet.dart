@@ -12,7 +12,6 @@ import 'package:hentai_library/shared/ui/patterns/library/library_filter_sort_me
 import 'package:hentai_library/shared/ui/widgets/sheets/overlay_route_scope.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/domain/library/library_media_type_filter.dart';
-import 'package:hentai_library/shared/ui/theme/app_m3e_theme.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -107,15 +106,6 @@ abstract final class LibraryFilterSortSideSheet {
     );
   }
 
-  static M3ESideSheetTheme _sheetTheme(BuildContext context) {
-    final M3EThemeData m3e = M3ETheme.of(context);
-    return m3e.sideSheetTheme.copyWith(
-      horizontalPadding: 16,
-      topElementsGap: 8,
-      headlineTextStyle: TextStyle(fontFamily: appFontFamilyOf(context)),
-    );
-  }
-
   static bool detachedFor(BuildContext context) {
     return libraryFilterSortSideSheetDetachedForViewport(
       MediaQuery.sizeOf(context).width,
@@ -130,6 +120,9 @@ abstract final class LibraryFilterSortSideSheet {
     bool useRootNavigator = true,
   }) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
+    final AppLocalizations l10n = context.l10n;
+    final M3EThemeData m3e = M3ETheme.of(context);
+    final String title = l10n.libraryFilterSortTooltip;
     final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
       context,
     );
@@ -146,7 +139,10 @@ abstract final class LibraryFilterSortSideSheet {
         context,
         useRootNavigator: useRootNavigator,
         expandToFullScreen: true,
-        theme: M3ETheme.of(context).bottomSheetTheme,
+        // 全屏头（含标题）仅在 fullScreen detent 可见；直接以全屏打开。
+        initialValue: M3EBottomSheetValue.fullScreen,
+        fullScreenTitle: title,
+        theme: m3e.bottomSheetTheme,
         builder: (BuildContext sheetContext) {
           return PrimaryScrollController.none(
             child: SingleChildScrollView(child: modalBody),
@@ -157,10 +153,10 @@ abstract final class LibraryFilterSortSideSheet {
 
     return M3ESideSheet.show<void>(
       context,
-      title: '',
+      title: title,
       width: libraryFilterSortSideSheetWidthForViewport(viewportWidth),
       detached: libraryFilterSortSideSheetDetachedForViewport(viewportWidth),
-      theme: _sheetTheme(context),
+      theme: libraryFilterSortSideSheetTheme(m3e),
       scrollable: true,
       useRootNavigator: useRootNavigator,
       body: modalBody,

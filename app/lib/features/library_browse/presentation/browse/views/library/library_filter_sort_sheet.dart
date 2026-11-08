@@ -20,10 +20,12 @@ abstract final class LibraryFilterSortSheet {
 
   static Future<void> show(BuildContext context) {
     final double viewportWidth = MediaQuery.sizeOf(context).width;
+    final AppLocalizations l10n = context.l10n;
     final OverlayRouteScopeSnapshot scope = OverlayRouteScopeSnapshot.capture(
       context,
     );
     final M3EThemeData m3e = withAppFontFamily(M3ETheme.of(context));
+    final String title = l10n.libraryFilterSortTooltip;
     final Widget body = overlayRouteScope(
       scope: scope,
       child: M3ETheme(data: m3e, child: const LibraryFilterSortContent()),
@@ -34,7 +36,10 @@ abstract final class LibraryFilterSortSheet {
         context,
         useRootNavigator: true,
         expandToFullScreen: true,
-        theme: M3ETheme.of(context).bottomSheetTheme,
+        // 全屏头（含标题）仅在 fullScreen detent 可见；直接以全屏打开。
+        initialValue: M3EBottomSheetValue.fullScreen,
+        fullScreenTitle: title,
+        theme: m3e.bottomSheetTheme,
         builder: (BuildContext sheetContext) {
           return PrimaryScrollController.none(
             child: SingleChildScrollView(child: body),
@@ -45,15 +50,10 @@ abstract final class LibraryFilterSortSheet {
 
     return M3ESideSheet.show<void>(
       context,
-      title: '',
+      title: title,
       width: libraryFilterSortSideSheetWidthForViewport(viewportWidth),
       detached: libraryFilterSortSideSheetDetachedForViewport(viewportWidth),
-      // 侧栏标题由 sheet 自身上下文读取主题，需显式指定应用字体。
-      theme: M3ETheme.of(context).sideSheetTheme.copyWith(
-        horizontalPadding: 16,
-        topElementsGap: 8,
-        headlineTextStyle: TextStyle(fontFamily: appFontFamilyOf(context)),
-      ),
+      theme: libraryFilterSortSideSheetTheme(m3e),
       scrollable: true,
       useRootNavigator: true,
       body: body,

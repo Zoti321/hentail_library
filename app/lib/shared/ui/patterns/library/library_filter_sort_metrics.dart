@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
+import 'package:hentai_library/shared/ui/theme/app_font.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// 书库筛选抽屉内容相对左缘的内边距（对齐生产 `kLibraryFilterSortDrawerContentInset`）。
 const double kLibraryFilterSortDrawerContentInset = 16;
@@ -68,6 +70,20 @@ bool libraryFilterSortSideSheetDetachedForViewport(double viewportWidth) {
 /// 筛选排序面板：compact / medium（宽度小于 840）用 [M3EBottomSheet]，expanded+ 用 [M3ESideSheet]。
 bool libraryFilterSortPrefersBottomSheetForViewport(double viewportWidth) {
   return viewportWidth < Breakpoints.expanded;
+}
+
+/// Side sheet 标题排版：与阅读设置面板一致用 titleLarge，并保证应用字体。
+///
+/// [topElementsGap] 用 M3 默认 12，给标题与「筛选」分区留出呼吸感（曾为空标题时压到 8）。
+M3ESideSheetTheme libraryFilterSortSideSheetTheme(M3EThemeData m3e) {
+  return m3e.sideSheetTheme.copyWith(
+    horizontalPadding: 16,
+    topElementsGap: 12,
+    headlineMaxLines: 1,
+    headlineTextStyle: m3e.typeScale.titleLarge.copyWith(
+      fontFamily: m3e.typeScale.bodyLarge.fontFamily ?? kAppFontFamily,
+    ),
+  );
 }
 
 /// 筛选 / 排序列表行与手风琴头的触控与字号（按书库三档布局）。
