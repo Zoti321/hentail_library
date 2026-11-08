@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_bottom_bar.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome_overlay.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_top_bar.dart';
@@ -15,6 +16,7 @@ class ReaderChrome extends StatelessWidget {
     this.subtitle,
     this.isFullscreen = false,
     this.autoPlayEnabled = false,
+    this.autoPlayIntervalSeconds = kReaderAutoPlayIntervalDefault,
     this.onBack,
     this.onOpenSettings,
     this.onToggleFullscreen,
@@ -33,6 +35,7 @@ class ReaderChrome extends StatelessWidget {
   final int totalPages;
   final bool isFullscreen;
   final bool autoPlayEnabled;
+  final int autoPlayIntervalSeconds;
   final VoidCallback? onBack;
   final VoidCallback? onOpenSettings;
   final VoidCallback? onToggleFullscreen;
@@ -64,6 +67,7 @@ class ReaderChrome extends StatelessWidget {
         onPreviousPage: onPreviousPage,
         onNextPage: onNextPage,
         autoPlayEnabled: autoPlayEnabled,
+        autoPlayIntervalSeconds: autoPlayIntervalSeconds,
         onAutoPlayChanged: onAutoPlayChanged,
       ),
     );

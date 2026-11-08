@@ -21,7 +21,10 @@ import 'package:hentai_library/features/read_session/presentation/views/reader/r
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_catalog_sheet.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_series_volume.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_interval.dart';
 import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:hentai_library/shared/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -277,6 +280,13 @@ class _ReaderReadyBody extends ConsumerWidget {
     );
 
     final bool supportsAutoPlay = chrome.readingMode.supportsAutoPlay;
+    final int autoPlayIntervalSeconds = ref.watch(
+      appSettingsStateProvider.select(
+        (AsyncValue<AppSetting> value) =>
+            value.asData?.value.readerAutoPlayIntervalSeconds ??
+            kReaderAutoPlayIntervalDefault,
+      ),
+    );
     final String? seriesId = shell.sessionContext.seriesId;
     final bool isSeriesRead = seriesId != null && seriesId.trim().isNotEmpty;
 
@@ -290,6 +300,7 @@ class _ReaderReadyBody extends ConsumerWidget {
           chromeVisible: chrome.showControls,
           isFullscreen: readerFullscreen,
           autoPlayEnabled: supportsAutoPlay && chrome.autoPlayEnabled,
+          autoPlayIntervalSeconds: autoPlayIntervalSeconds,
           viewportStatus: ReaderViewportStatus.ready,
           onBack: () {
             unawaited(onExit());

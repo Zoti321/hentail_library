@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/features/read_session/domain/auto_play_interval.dart';
 import 'package:hentai_library/shared/ui/layout/reader_chrome_metrics.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome_band.dart';
 import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_page_progress.dart';
@@ -17,6 +18,7 @@ class ReaderBottomBar extends StatelessWidget {
     required this.onPreviousPage,
     required this.onNextPage,
     this.autoPlayEnabled = false,
+    this.autoPlayIntervalSeconds = kReaderAutoPlayIntervalDefault,
     this.onAutoPlayChanged,
   });
 
@@ -26,6 +28,7 @@ class ReaderBottomBar extends StatelessWidget {
   final VoidCallback? onPreviousPage;
   final VoidCallback? onNextPage;
   final bool autoPlayEnabled;
+  final int autoPlayIntervalSeconds;
   final ValueChanged<bool>? onAutoPlayChanged;
 
   @override
@@ -56,6 +59,8 @@ class ReaderBottomBar extends StatelessWidget {
               currentPage: currentPage,
               totalPages: totalPages,
               onPageChanged: onPageChanged,
+              autoPlayEnabled: autoPlayEnabled,
+              autoPlayIntervalSeconds: autoPlayIntervalSeconds,
             ),
             SizedBox(height: ReaderChromeMetrics.progressControlsGapOf(width)),
             Row(
