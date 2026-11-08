@@ -1,5 +1,10 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_controller.dart';
@@ -75,14 +80,91 @@ Future<TagDictionaryImportResult?> importTagDictionary(
   WidgetRef ref, {
   required String url,
 }) {
+  final AppLocalizations l10n = context.l10n;
   final controller = ref.read(tagDictionaryImportControllerProvider.notifier);
   return showMetadataTagDictionaryImportDialog(
     context: context,
     onCancel: controller.cancel,
-    importFromNetwork: ({void Function(int, int)? onDownloadProgress}) =>
+    bodyText: l10n.metadataImportTagDictionaryDialogBody,
+    runImport: ({void Function(int, int)? onDownloadProgress}) =>
         controller.importFromNetwork(
           url: url,
           onDownloadProgress: onDownloadProgress,
         ),
   );
+}
+
+/// 从本地 JSON 文件导入标签词典（管理页更多菜单入口）。
+Future<void> importTagDictionaryFromFile(
+  BuildContext context,
+  WidgetRef ref,
+) async {
+  final AppLocalizations l10n = context.l10n;
+  final FilePickerResult? picked = await FilePicker.pickFiles(
+    dialogTitle: l10n.metadataImportTagDictionaryPickDialogTitle,
+    type: FileType.custom,
+    allowedExtensions: const <String>['json'],
+    withData: true,
+  );
+  if (picked == null || picked.files.isEmpty || !context.mounted) {
+    return;
+  }
+
+  final PlatformFile file = picked.files.single;
+  final Uint8List? bytes = await _readPickedJsonBytes(file);
+  if (bytes == null || bytes.isEmpty) {
+    if (context.mounted) {
+      showErrorSnackbar(
+        context,
+        l10n.metadataImportTagDictionaryInvalidFile,
+      );
+    }
+    return;
+  }
+  if (!context.mounted) {
+    return;
+  }
+
+  final controller = ref.read(tagDictionaryImportControllerProvider.notifier);
+  final TagDictionaryImportResult? result =
+      await showMetadataTagDictionaryImportDialog(
+        context: context,
+        onCancel: controller.cancel,
+        bodyText: l10n.metadataImportTagDictionaryDialogBodyLocal,
+        runImport: ({void Function(int, int)? onDownloadProgress}) =>
+            controller.importFromBytes(bytes),
+      );
+  if (!context.mounted) {
+    return;
+  }
+  if (result == null) {
+    final String? error = ref.read(tagDictionaryImportControllerProvider).error;
+    if (error != null && error.isNotEmpty) {
+      showErrorSnackbar(context, error);
+    }
+    return;
+  }
+  showSuccessSnackbar(
+    context,
+    l10n.metadataImportTagDictionarySummary(
+      result.added,
+      result.skippedExisting,
+      result.skippedFilteredOrEmptyOrDedupe,
+    ),
+  );
+}
+
+Future<Uint8List?> _readPickedJsonBytes(PlatformFile file) async {
+  if (file.bytes != null && file.bytes!.isNotEmpty) {
+    return Uint8List.fromList(file.bytes!);
+  }
+  final String? path = file.path;
+  if (path == null || path.isEmpty) {
+    return null;
+  }
+  try {
+    return await File(path).readAsBytes();
+  } catch (_) {
+    return null;
+  }
 }

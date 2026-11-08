@@ -2918,6 +2918,18 @@ abstract class AppLocalizations {
   /// **'以后不再提示'**
   String get metadataMergeConfirmDontAskAgain;
 
+  /// No description provided for @metadataMergeCompletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并完成'**
+  String get metadataMergeCompletedToast;
+
+  /// No description provided for @metadataMergeSelectionLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'合并 {count} 项'**
+  String metadataMergeSelectionLabel(int count);
+
   /// No description provided for @metadataDelete.
   ///
   /// In zh, this message translates to:
@@ -3224,6 +3236,24 @@ abstract class AppLocalizations {
   /// **'已删除全部标签'**
   String get metadataTagsDeletedAllToast;
 
+  /// No description provided for @metadataImportTagDictionaryMenuLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入标签字典'**
+  String get metadataImportTagDictionaryMenuLabel;
+
+  /// No description provided for @metadataImportTagDictionaryPickDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择标签字典 JSON'**
+  String get metadataImportTagDictionaryPickDialogTitle;
+
+  /// No description provided for @metadataImportTagDictionaryInvalidFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'请选择有效的 JSON 标签字典文件'**
+  String get metadataImportTagDictionaryInvalidFile;
+
   /// No description provided for @metadataImportTagDictionaryDialogTitle.
   ///
   /// In zh, this message translates to:
@@ -3235,6 +3265,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'正在下载标签字典并写入全局 Tag…'**
   String get metadataImportTagDictionaryDialogBody;
+
+  /// No description provided for @metadataImportTagDictionaryDialogBodyLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在写入全局 Tag…'**
+  String get metadataImportTagDictionaryDialogBodyLocal;
 
   /// No description provided for @metadataImportTagDictionarySummary.
   ///

@@ -6,7 +6,7 @@ import 'package:hentai_library/shared/ui/widgets/selection/segmented_capsule_bar
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// Body 顶行：左侧互斥胶囊维度 + 右侧当前维度数量（随列表滚动）。
+/// 元数据管理 Body 顶行：左侧互斥胶囊维度 + 右侧当前维度数量（生产与 Lab 共用）。
 class ManagementCatalogToolbar extends StatelessWidget {
   const ManagementCatalogToolbar({
     super.key,

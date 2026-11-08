@@ -1614,6 +1614,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataMergeConfirmDontAskAgain => 'Don\'t ask again';
 
   @override
+  String get metadataMergeCompletedToast => 'Merge complete';
+
+  @override
+  String metadataMergeSelectionLabel(int count) {
+    return 'Merge $count';
+  }
+
+  @override
   String get metadataDelete => 'Delete';
 
   @override
@@ -1812,11 +1820,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataTagsDeletedAllToast => 'All tags deleted';
 
   @override
+  String get metadataImportTagDictionaryMenuLabel => 'Import tag dictionary';
+
+  @override
+  String get metadataImportTagDictionaryPickDialogTitle =>
+      'Choose tag dictionary JSON';
+
+  @override
+  String get metadataImportTagDictionaryInvalidFile =>
+      'Please choose a valid JSON tag dictionary file';
+
+  @override
   String get metadataImportTagDictionaryDialogTitle => 'Import tag dictionary';
 
   @override
   String get metadataImportTagDictionaryDialogBody =>
       'Downloading the tag dictionary and updating global tags…';
+
+  @override
+  String get metadataImportTagDictionaryDialogBodyLocal =>
+      'Updating global tags…';
 
   @override
   String metadataImportTagDictionarySummary(

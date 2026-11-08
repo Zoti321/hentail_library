@@ -4,7 +4,9 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
 
-/// 管理页粘滞头：仅左侧标题（间距与字阶来自 [PageLayoutSpec]）。
+/// Lab / Widgetbook 管理页粘滞头：仅左侧标题（间距与字阶来自 [PageLayoutSpec]）。
+///
+/// 生产头栏见 `MetadataHeader`（含返回、更多菜单、合并模式）。
 class ManagementPageHeader extends StatelessWidget {
   const ManagementPageHeader({super.key, this.title});
 

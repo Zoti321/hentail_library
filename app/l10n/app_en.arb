@@ -749,6 +749,13 @@
     }
   },
   "metadataMergeConfirmDontAskAgain": "Don't ask again",
+  "metadataMergeCompletedToast": "Merge complete",
+  "metadataMergeSelectionLabel": "Merge {count}",
+  "@metadataMergeSelectionLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "metadataDelete": "Delete",
   "metadataMoreActions": "More actions",
   "metadataAllAuthors": "All authors",
@@ -832,8 +839,12 @@
   "metadataListEnd": "All items loaded",
   "metadataDeleteAllTags": "Delete all",
   "metadataTagsDeletedAllToast": "All tags deleted",
+  "metadataImportTagDictionaryMenuLabel": "Import tag dictionary",
+  "metadataImportTagDictionaryPickDialogTitle": "Choose tag dictionary JSON",
+  "metadataImportTagDictionaryInvalidFile": "Please choose a valid JSON tag dictionary file",
   "metadataImportTagDictionaryDialogTitle": "Import tag dictionary",
   "metadataImportTagDictionaryDialogBody": "Downloading the tag dictionary and updating global tags…",
+  "metadataImportTagDictionaryDialogBodyLocal": "Updating global tags…",
   "metadataImportTagDictionarySummary": "Added {added}, skipped existing {skippedExisting}, skipped filtered/empty/deduped {skippedFiltered}",
   "@metadataImportTagDictionarySummary": {
     "placeholders": {

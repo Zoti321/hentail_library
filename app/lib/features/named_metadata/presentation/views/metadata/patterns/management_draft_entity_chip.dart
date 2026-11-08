@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/ui/patterns/shared/suggestion_chip_surface
 import 'package:material_3_expressive/components/text_fields/utils/m3e_text_field_selection_controls.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
-/// 桌面端 FAB 草稿 chip：与普通 suggestion chip 同壳，仅光标 + 可输入文本。
+/// 桌面端新建草稿 chip（生产与 Lab 共用）：与 suggestion chip 同壳，仅光标 + 可输入文本。
 const double kManagementDraftEntityChipWidth = 96;
 
 class ManagementDraftEntityChip extends StatefulWidget {

@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/metadata_backup/public.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_actions.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
 import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
@@ -15,7 +19,7 @@ import 'package:material_symbols_icons/symbols.dart';
 /// 粘滞头：普通模式为返回 + 标题 + 右侧更多；合并模式为取消 + 右侧 M3E filled 合并。
 ///
 /// 上下留白与水平留白由外层 [PageHeaderDelegate] 提供，本组件只负责工具行。
-class MetadataHeader extends StatelessWidget {
+class MetadataHeader extends ConsumerWidget {
   const MetadataHeader({
     this.onOpenNavigation,
     this.onBack,
@@ -32,7 +36,7 @@ class MetadataHeader extends StatelessWidget {
   final VoidCallback? onMergeSelection;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final bool mergeMode = onExitMergeSelection != null;
     final M3EThemeData theme = M3ETheme.of(context);
@@ -60,7 +64,7 @@ class MetadataHeader extends StatelessWidget {
             style: M3EButtonStyle.filled,
             decoration: M3EButtonDecoration(textStyle: mergeLabelStyle),
             icon: const Icon(Symbols.merge),
-            label: Text('${l10n.metadataMerge} $mergeSelectionCount tags'),
+            label: Text(l10n.metadataMergeSelectionLabel(mergeSelectionCount)),
           ),
         ],
       );
@@ -106,6 +110,13 @@ class MetadataHeader extends StatelessWidget {
                 onPressed: () => runMetadataExportFlow(
                   context,
                   initialOptions: const MetadataExportOptions(),
+                ),
+              ),
+              M3EMenuEntry(
+                label: l10n.metadataImportTagDictionaryMenuLabel,
+                leading: const Icon(Icons.upload_file_outlined),
+                onPressed: () => unawaited(
+                  importTagDictionaryFromFile(context, ref),
                 ),
               ),
             ],

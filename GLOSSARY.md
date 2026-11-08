@@ -189,7 +189,7 @@ _Avoid_: 设置侧边栏（易与应用侧栏混淆）、AdaptiveScaffold、sett
 _Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）
 
 **Tag dictionary import**:
-从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/engineering/maintainer.md` § Tag dictionary import。UI 入口待接入自维护词库后启用。
+从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/engineering/maintainer.md` § Tag dictionary import。生产入口：元数据管理页（`/metadata`）更多菜单「导入标签字典」（本地 JSON）。
 _Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:

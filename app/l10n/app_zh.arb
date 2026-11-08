@@ -751,6 +751,13 @@
     }
   },
   "metadataMergeConfirmDontAskAgain": "以后不再提示",
+  "metadataMergeCompletedToast": "合并完成",
+  "metadataMergeSelectionLabel": "合并 {count} 项",
+  "@metadataMergeSelectionLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "metadataDelete": "删除",
   "metadataMoreActions": "更多操作",
   "metadataAllAuthors": "全部作者",
@@ -834,8 +841,12 @@
   "metadataListEnd": "已显示全部",
   "metadataDeleteAllTags": "删除所有",
   "metadataTagsDeletedAllToast": "已删除全部标签",
+  "metadataImportTagDictionaryMenuLabel": "导入标签字典",
+  "metadataImportTagDictionaryPickDialogTitle": "选择标签字典 JSON",
+  "metadataImportTagDictionaryInvalidFile": "请选择有效的 JSON 标签字典文件",
   "metadataImportTagDictionaryDialogTitle": "导入标签字典",
   "metadataImportTagDictionaryDialogBody": "正在下载标签字典并写入全局 Tag…",
+  "metadataImportTagDictionaryDialogBodyLocal": "正在写入全局 Tag…",
   "metadataImportTagDictionarySummary": "新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空名/去重跳过 {skippedFiltered} 条",
   "@metadataImportTagDictionarySummary": {
     "placeholders": {

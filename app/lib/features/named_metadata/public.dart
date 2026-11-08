@@ -1,4 +1,4 @@
-/// named_metadata 模块 public API（ADR-0034 / MD3E 迁移序）。
+/// named_metadata 模块 public API（ADR-0034）。
 library;
 
 export 'public/di/named_metadata_dictionary_providers.dart';

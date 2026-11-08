@@ -1557,6 +1557,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataMergeConfirmDontAskAgain => '以后不再提示';
 
   @override
+  String get metadataMergeCompletedToast => '合并完成';
+
+  @override
+  String metadataMergeSelectionLabel(int count) {
+    return '合并 $count 项';
+  }
+
+  @override
   String get metadataDelete => '删除';
 
   @override
@@ -1747,10 +1755,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataTagsDeletedAllToast => '已删除全部标签';
 
   @override
+  String get metadataImportTagDictionaryMenuLabel => '导入标签字典';
+
+  @override
+  String get metadataImportTagDictionaryPickDialogTitle => '选择标签字典 JSON';
+
+  @override
+  String get metadataImportTagDictionaryInvalidFile => '请选择有效的 JSON 标签字典文件';
+
+  @override
   String get metadataImportTagDictionaryDialogTitle => '导入标签字典';
 
   @override
   String get metadataImportTagDictionaryDialogBody => '正在下载标签字典并写入全局 Tag…';
+
+  @override
+  String get metadataImportTagDictionaryDialogBodyLocal => '正在写入全局 Tag…';
 
   @override
   String metadataImportTagDictionarySummary(

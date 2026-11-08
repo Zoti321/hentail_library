@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_dialogs.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_facet_list.dart';
@@ -274,7 +275,7 @@ class _MetadataManagementPageState
           .read(namedFacetManagementControllerProvider(kind).notifier)
           .merge(targetName: target, sourceNames: sources);
       if (mounted) {
-        showSuccessSnackbar(context, '合并完成');
+        showSuccessSnackbar(context, context.l10n.metadataMergeCompletedToast);
       }
     } catch (error) {
       if (mounted) {
