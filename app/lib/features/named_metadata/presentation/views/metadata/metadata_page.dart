@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_dialogs.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_facet_list.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_header.dart';
@@ -113,10 +113,10 @@ class _MetadataManagementPageState
   }) {
     final ManagedNamedFacetKind kind = metadataTabKind(selectedIndex);
     final NamedFacetManagementState state = ref.watch(
-      namedFacetManagementControllerProvider(kind),
+      namedFacetManagementViewModelProvider(kind),
     );
-    final NamedFacetManagementController controller = ref.read(
-      namedFacetManagementControllerProvider(kind).notifier,
+    final NamedFacetManagementViewModel viewModel = ref.read(
+      namedFacetManagementViewModelProvider(kind).notifier,
     );
     final int count = state.hasSearchQuery
         ? state.items.length
@@ -143,7 +143,7 @@ class _MetadataManagementPageState
                   onOpenNavigation: appShellPageNavigationOpener(context),
                   onBack: () => popOrGoHome(context),
                   mergeSelectionCount: state.mergeSelectionCount,
-                  onExitMergeSelection: mergeMode ? controller.exitMerge : null,
+                  onExitMergeSelection: mergeMode ? viewModel.exitMerge : null,
                   onMergeSelection: mergeMode
                       ? () => unawaited(_mergeSelectedNames(kind))
                       : null,
@@ -192,9 +192,9 @@ class _MetadataManagementPageState
                         : null,
                     mergeTarget: state.mergeTarget,
                     mergeSources: state.mergeSources,
-                    onMergeTargetSelected: controller.enterMerge,
-                    onMergeSourceSelected: controller.toggleMergeSource,
-                    onMergeSelectionExited: controller.exitMerge,
+                    onMergeTargetSelected: viewModel.enterMerge,
+                    onMergeSourceSelected: viewModel.toggleMergeSource,
+                    onMergeSelectionExited: viewModel.exitMerge,
                   ),
                 ),
               ),
@@ -223,7 +223,7 @@ class _MetadataManagementPageState
     final int previousIndex = _selectedTabIndex ?? 1;
     final ManagedNamedFacetKind previousKind = metadataTabKind(previousIndex);
     ref
-        .read(namedFacetManagementControllerProvider(previousKind).notifier)
+        .read(namedFacetManagementViewModelProvider(previousKind).notifier)
         .exitMerge();
     setState(() {
       _facetTransitionReverse = index < previousIndex;
@@ -249,7 +249,7 @@ class _MetadataManagementPageState
 
   Future<void> _mergeSelectedNames(ManagedNamedFacetKind kind) async {
     final NamedFacetManagementState state = ref.read(
-      namedFacetManagementControllerProvider(kind),
+      namedFacetManagementViewModelProvider(kind),
     );
     final String? target = state.mergeTarget;
     final List<String> sources = state.mergeSources.toList(growable: false);
@@ -272,7 +272,7 @@ class _MetadataManagementPageState
     }
     try {
       await ref
-          .read(namedFacetManagementControllerProvider(kind).notifier)
+          .read(namedFacetManagementViewModelProvider(kind).notifier)
           .merge(targetName: target, sourceNames: sources);
       if (mounted) {
         showSuccessSnackbar(context, context.l10n.metadataMergeCompletedToast);
@@ -315,7 +315,7 @@ class _MetadataManagementPageState
 
   void _addEntity(ManagedNamedFacetKind kind, String name) {
     unawaited(
-      ref.read(namedFacetManagementControllerProvider(kind).notifier).add(name),
+      ref.read(namedFacetManagementViewModelProvider(kind).notifier).add(name),
     );
   }
 
@@ -326,7 +326,7 @@ class _MetadataManagementPageState
     final ScrollPosition position = _scrollController.position;
     final ManagedNamedFacetKind kind = metadataTabKind(_selectedTabIndex ?? 1);
     final NamedFacetManagementState state = ref.read(
-      namedFacetManagementControllerProvider(kind),
+      namedFacetManagementViewModelProvider(kind),
     );
     if (!namedFacetShouldAutoLoadMore(
       hasMore: state.hasMore,
@@ -339,7 +339,7 @@ class _MetadataManagementPageState
     )) {
       return;
     }
-    ref.read(namedFacetManagementControllerProvider(kind).notifier).loadMore();
+    ref.read(namedFacetManagementViewModelProvider(kind).notifier).loadMore();
   }
 }
 

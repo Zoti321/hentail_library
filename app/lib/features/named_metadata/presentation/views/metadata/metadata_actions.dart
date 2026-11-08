@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_dialogs.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_rename_entity_dialog.dart';
 import 'package:hentai_library/features/named_metadata/domain/tag_dictionary_import_result.dart';
@@ -26,7 +26,7 @@ Future<void> renameNamedFacet(
     facet: kind,
     initialName: name,
     onRename: (String value) => ref
-        .read(namedFacetManagementControllerProvider(kind).notifier)
+        .read(namedFacetManagementViewModelProvider(kind).notifier)
         .rename(name, value),
   );
 }
@@ -41,7 +41,7 @@ Future<void> deleteNamedFacet(
   final int count;
   try {
     count = await ref
-        .read(namedFacetManagementControllerProvider(kind).notifier)
+        .read(namedFacetManagementViewModelProvider(kind).notifier)
         .countAttachments(name);
   } catch (error) {
     if (context.mounted) {
@@ -62,7 +62,7 @@ Future<void> deleteNamedFacet(
   }
   try {
     await ref
-        .read(namedFacetManagementControllerProvider(kind).notifier)
+        .read(namedFacetManagementViewModelProvider(kind).notifier)
         .delete(name);
     if (context.mounted) {
       showSuccessSnackbar(context, context.l10n.metadataDeletedToast(kind));
@@ -81,13 +81,15 @@ Future<TagDictionaryImportResult?> importTagDictionary(
   required String url,
 }) {
   final AppLocalizations l10n = context.l10n;
-  final controller = ref.read(tagDictionaryImportControllerProvider.notifier);
+  final TagDictionaryImportViewModel viewModel = ref.read(
+    tagDictionaryImportViewModelProvider.notifier,
+  );
   return showMetadataTagDictionaryImportDialog(
     context: context,
-    onCancel: controller.cancel,
+    onCancel: viewModel.cancel,
     bodyText: l10n.metadataImportTagDictionaryDialogBody,
     runImport: ({void Function(int, int)? onDownloadProgress}) =>
-        controller.importFromNetwork(
+        viewModel.importFromNetwork(
           url: url,
           onDownloadProgress: onDownloadProgress,
         ),
@@ -125,20 +127,22 @@ Future<void> importTagDictionaryFromFile(
     return;
   }
 
-  final controller = ref.read(tagDictionaryImportControllerProvider.notifier);
+  final TagDictionaryImportViewModel viewModel = ref.read(
+    tagDictionaryImportViewModelProvider.notifier,
+  );
   final TagDictionaryImportResult? result =
       await showMetadataTagDictionaryImportDialog(
         context: context,
-        onCancel: controller.cancel,
+        onCancel: viewModel.cancel,
         bodyText: l10n.metadataImportTagDictionaryDialogBodyLocal,
         runImport: ({void Function(int, int)? onDownloadProgress}) =>
-            controller.importFromBytes(bytes),
+            viewModel.importFromBytes(bytes),
       );
   if (!context.mounted) {
     return;
   }
   if (result == null) {
-    final String? error = ref.read(tagDictionaryImportControllerProvider).error;
+    final String? error = ref.read(tagDictionaryImportViewModelProvider).error;
     if (error != null && error.isNotEmpty) {
       showErrorSnackbar(context, error);
     }

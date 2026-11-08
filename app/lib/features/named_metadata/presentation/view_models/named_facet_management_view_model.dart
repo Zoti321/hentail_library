@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hentai_library/features/named_metadata/di/named_facet_management.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/shared/util/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
@@ -7,7 +8,7 @@ import 'package:hentai_library/features/named_metadata/domain/named_facet_manage
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'named_facet_management_controller.g.dart';
+part 'named_facet_management_view_model.g.dart';
 
 const int kNamedFacetManagementPageSize = 80;
 
@@ -85,7 +86,7 @@ class NamedFacetManagementState {
 const Object _sentinel = Object();
 
 @Riverpod(keepAlive: true)
-class NamedFacetManagementController extends _$NamedFacetManagementController {
+class NamedFacetManagementViewModel extends _$NamedFacetManagementViewModel {
   int _page = 1;
 
   @override
@@ -187,26 +188,19 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
   }
 
   Future<void> add(String name) async {
-    await ref.read(namedFacetManagementRepoProvider).add(kind, name);
+    await ref.read(namedFacetManagementServiceProvider).add(kind, name);
     await refresh();
   }
 
   Future<void> rename(String oldName, String newName) async {
-    final String trimmed = newName.trim();
-    if (trimmed.isEmpty || trimmed == oldName) {
-      return;
-    }
     await ref
-        .read(namedFacetManagementRepoProvider)
-        .rename(kind, oldName, trimmed);
+        .read(namedFacetManagementServiceProvider)
+        .rename(kind, oldName, newName);
     await refresh();
   }
 
   Future<void> delete(String name) async {
-    await ref.read(namedFacetManagementRepoProvider).deleteByNames(
-      kind,
-      <String>[name],
-    );
+    await ref.read(namedFacetManagementServiceProvider).delete(kind, name);
     await refresh();
   }
 
@@ -251,17 +245,16 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
     required String targetName,
     required List<String> sourceNames,
   }) async {
-    final repo = ref.read(namedFacetManagementRepoProvider);
-    for (final String sourceName in sourceNames) {
-      await repo.merge(kind, sourceName, targetName);
-    }
+    await ref
+        .read(namedFacetManagementServiceProvider)
+        .merge(kind: kind, targetName: targetName, sourceNames: sourceNames);
     exitMerge();
     await refresh();
   }
 
   Future<int> countAttachments(String name) {
     return ref
-        .read(namedFacetManagementRepoProvider)
+        .read(namedFacetManagementServiceProvider)
         .countAttachments(kind, name);
   }
 
@@ -274,7 +267,7 @@ class NamedFacetManagementController extends _$NamedFacetManagementController {
       names.map((String name) async {
         try {
           next[name] = await ref
-              .read(namedFacetManagementRepoProvider)
+              .read(namedFacetManagementServiceProvider)
               .countAttachments(kind, name);
         } catch (_) {}
       }),

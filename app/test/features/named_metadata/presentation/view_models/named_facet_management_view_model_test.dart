@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
@@ -118,17 +118,17 @@ void main() {
       final _SharedTagNames tags = _SharedTagNames(<String>['alpha']);
       final ProviderContainer container = _container(tags);
       container.read(
-        namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
       );
       await pumpEventQueue();
 
       final TagDictionaryImportResult? result = await container
-          .read(tagDictionaryImportControllerProvider.notifier)
+          .read(tagDictionaryImportViewModelProvider.notifier)
           .importFromBytes(Uint8List(0));
 
       expect(result?.added, 1);
       final NamedFacetManagementState page = container.read(
-        namedFacetManagementControllerProvider(ManagedNamedFacetKind.tag),
+        namedFacetManagementViewModelProvider(ManagedNamedFacetKind.tag),
       );
       expect(page.items, <String>['alpha', 'gamma']);
       expect(page.totalCount, 2);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/author_management_notifier.dart';
-import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/metadata_facet_chips.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/filled_button.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
@@ -42,7 +42,7 @@ class MetadataFacetContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final NamedFacetManagementState state = ref.watch(
-      namedFacetManagementControllerProvider(kind),
+      namedFacetManagementViewModelProvider(kind),
     );
     if (state.isLoading && state.items.isEmpty) {
       return const _FacetLoading();
@@ -51,7 +51,7 @@ class MetadataFacetContent extends ConsumerWidget {
       return _FacetError(
         message: '${state.error}',
         onRetry: () => ref
-            .read(namedFacetManagementControllerProvider(kind).notifier)
+            .read(namedFacetManagementViewModelProvider(kind).notifier)
             .refresh(),
       );
     }
@@ -194,7 +194,7 @@ class _FacetFooter extends ConsumerWidget {
         label: l10n.metadataLoadMore,
         icon: Symbols.expand_more,
         onPressed: () => ref
-            .read(namedFacetManagementControllerProvider(kind).notifier)
+            .read(namedFacetManagementViewModelProvider(kind).notifier)
             .loadMore(),
       ),
     );
