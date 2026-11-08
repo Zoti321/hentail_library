@@ -20,6 +20,7 @@ import 'package:hentai_library/shared/ui/widgets/navigation/management_create_en
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/motion/peer_content_transition.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -139,6 +140,7 @@ class _MetadataManagementPageState
                 layout: layout,
                 child: MetadataHeader(
                   onOpenNavigation: appShellPageNavigationOpener(context),
+                  onBack: () => popOrGoHome(context),
                   mergeSelectionCount: state.mergeSelectionCount,
                   onExitMergeSelection: mergeMode ? controller.exitMerge : null,
                   onMergeSelection: mergeMode
@@ -227,7 +229,8 @@ class _MetadataManagementPageState
       _selectedTabIndex = index;
       _showInlineCreateField = false;
     });
-    context.go('/metadata?tab=${_tabQueryForIndex(index)}');
+    // replace：仅改 query，保留首页 push 进来的栈，返回仍可 pop。
+    context.replace('/metadata?tab=${_tabQueryForIndex(index)}');
     _scrollToContentTop();
   }
 

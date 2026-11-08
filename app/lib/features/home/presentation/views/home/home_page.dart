@@ -48,12 +48,13 @@ class HomePage extends ConsumerWidget {
         tagCount: counts.tagCount,
       ),
       onOpenNavigation: appShellPageNavigationOpener(context),
-      onOpenHistory: () => context.go('/history'),
-      onOpenTrash: () => context.go('/trash'),
-      onOpenAuthors: () => context.go('/metadata?tab=authors'),
-      onOpenParodies: () => context.go('/metadata?tab=parodies'),
-      onOpenCharacters: () => context.go('/metadata?tab=characters'),
-      onOpenTags: () => context.go('/metadata?tab=tags'),
+      // 与历史 / 垃圾桶同款：push + Shell fade-through，返回可走 reverse。
+      onOpenHistory: () => context.push('/history'),
+      onOpenTrash: () => context.push('/trash'),
+      onOpenAuthors: () => context.push('/metadata?tab=authors'),
+      onOpenParodies: () => context.push('/metadata?tab=parodies'),
+      onOpenCharacters: () => context.push('/metadata?tab=characters'),
+      onOpenTags: () => context.push('/metadata?tab=tags'),
       libraryManagementSection: const HomeLibraryManagementPanel(),
     );
   }

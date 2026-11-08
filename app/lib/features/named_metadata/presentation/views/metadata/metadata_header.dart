@@ -4,18 +4,21 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/metadata_backup/public.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/shared/ui/motion/mode_chrome_transition.dart';
+import 'package:hentai_library/shared/ui/patterns/library/library_page_header_metrics.dart';
+import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_title.dart';
 import 'package:hentai_library/shared/ui/theme/lab_text.dart';
 import 'package:hentai_library/shared/ui/widgets/menu/anchored_menu.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 粘滞头：普通模式为标题 + 右侧更多；合并模式为取消 + 右侧 M3E filled 合并。
+/// 粘滞头：普通模式为返回 + 标题 + 右侧更多；合并模式为取消 + 右侧 M3E filled 合并。
 ///
 /// 上下留白与水平留白由外层 [PageHeaderDelegate] 提供，本组件只负责工具行。
 class MetadataHeader extends StatelessWidget {
   const MetadataHeader({
     this.onOpenNavigation,
+    this.onBack,
     this.mergeSelectionCount = 0,
     this.onExitMergeSelection,
     this.onMergeSelection,
@@ -23,6 +26,7 @@ class MetadataHeader extends StatelessWidget {
   });
 
   final VoidCallback? onOpenNavigation;
+  final VoidCallback? onBack;
   final int mergeSelectionCount;
   final VoidCallback? onExitMergeSelection;
   final VoidCallback? onMergeSelection;
@@ -61,19 +65,31 @@ class MetadataHeader extends StatelessWidget {
         ],
       );
     } else {
+      final bool showMenu =
+          PageLayoutSpec.of(context).sizeClass.isCompact &&
+          onOpenNavigation != null;
+      final M3EColorScheme scheme = theme.colorScheme;
       content = Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          if (onOpenNavigation != null) ...<Widget>[
+          if (onBack != null) ...<Widget>[
+            PageHeaderBackButton(onPressed: onBack!),
+            const SizedBox(width: 4),
+          ],
+          if (showMenu) ...<Widget>[
             M3EIconButton(
-              icon: const Icon(Symbols.menu),
+              icon: Icon(
+                Symbols.menu,
+                size: LibraryPageHeaderMetrics.actionIconSize,
+                color: scheme.onSurfaceVariant,
+              ),
               variant: M3EIconButtonVariant.standard,
               size: M3EIconButtonSize.sm,
               tooltip: l10n.shellOpenNavMenu,
               semanticLabel: l10n.shellOpenNavMenu,
               onPressed: onOpenNavigation,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
           ],
           Expanded(
             child: Align(
