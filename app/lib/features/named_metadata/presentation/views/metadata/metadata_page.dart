@@ -17,12 +17,14 @@ import 'package:hentai_library/features/named_metadata/presentation/views/metada
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_create_entity_dialog.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_create_interaction.dart';
 import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_draft_entity_chip.dart';
+import 'package:hentai_library/features/named_metadata/presentation/views/metadata/patterns/management_facet_search_bar.dart';
 import 'package:hentai_library/shared/ui/widgets/navigation/management_create_entity_fab.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_management_repository.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/motion/peer_content_transition.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header_back_button.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
+import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _kMergeConfirmSkipKey = 'metadata_merge_confirm_skip';
@@ -43,6 +45,7 @@ class _MetadataAddIntent extends Intent {
 class _MetadataManagementPageState
     extends ConsumerState<MetadataManagementPage> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
   int? _selectedTabIndex;
   bool _facetTransitionReverse = false;
   bool _showInlineCreateField = false;
@@ -57,6 +60,7 @@ class _MetadataManagementPageState
   void dispose() {
     _scrollController.removeListener(_handleScrollLoadMore);
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -72,6 +76,13 @@ class _MetadataManagementPageState
       _facetTransitionReverse = queryIndex < previousIndex;
       _selectedTabIndex = queryIndex;
       _showInlineCreateField = false;
+      final ManagedNamedFacetKind syncedKind = metadataTabKind(queryIndex);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        _syncSearchFieldToKind(syncedKind);
+      });
     }
     final int selectedIndex = _selectedTabIndex!;
 
@@ -172,20 +183,24 @@ class _MetadataManagementPageState
                 0,
               ),
               sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    ManagementCatalogToolbar(
-                      facet: kind,
-                      facetCount: count,
-                      onFacetChanged: (ManagedNamedFacetKind value) =>
-                          _handleTabSelected(
-                            kManagedNamedFacetTabOrder.indexOf(value),
-                          ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                child: ManagementCatalogToolbar(
+                  facet: kind,
+                  facetCount: count,
+                  onFacetChanged: (ManagedNamedFacetKind value) =>
+                      _handleTabSelected(
+                        kManagedNamedFacetTabOrder.indexOf(value),
+                      ),
                 ),
+              ),
+            ),
+            M3ESliverSearchBar(
+              scrollBehavior: M3ESearchBarScrollBehavior.scrollAway,
+              height: ManagementFacetSearchBar.height,
+              padding: EdgeInsets.fromLTRB(horizontal, 12, horizontal, 12),
+              child: ManagementFacetSearchBar(
+                controller: _searchController,
+                hintText: context.l10n.metadataSearchNameHint,
+                onChanged: (String value) => viewModel.setQueryDebounced(value),
               ),
             ),
             SliverPadding(
@@ -244,9 +259,23 @@ class _MetadataManagementPageState
       _selectedTabIndex = index;
       _showInlineCreateField = false;
     });
+    _syncSearchFieldToKind(metadataTabKind(index));
     // replace：仅改 query，保留首页 push 进来的栈，返回仍可 pop。
     context.replace('/metadata?tab=${_tabQueryForIndex(index)}');
     _scrollToContentTop();
+  }
+
+  void _syncSearchFieldToKind(ManagedNamedFacetKind kind) {
+    final String query = ref
+        .read(namedFacetManagementViewModelProvider(kind))
+        .query;
+    if (_searchController.text == query) {
+      return;
+    }
+    _searchController.value = TextEditingValue(
+      text: query,
+      selection: TextSelection.collapsed(offset: query.length),
+    );
   }
 
   void _scrollToContentTop() {

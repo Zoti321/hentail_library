@@ -154,16 +154,6 @@ class _FacetList extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text(
-            context.l10n.metadataListTitle(kind),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
         Wrap(
           spacing: 8,
           runSpacing: 8,
