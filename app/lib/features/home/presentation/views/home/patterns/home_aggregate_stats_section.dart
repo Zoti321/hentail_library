@@ -9,12 +9,13 @@ import 'package:hentai_library/features/home/presentation/views/home/patterns/ho
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_copy.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_nav_shortcut_card.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_shortcut_card_colors.dart';
+import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// 首页「全库统计」：Kazumi 风 bento 色块 + 历史 / 垃圾桶入口卡片。
 ///
-/// 作者 / 原作 / 角色 / 标签可跳转管理页对应 tab；漫画 / 系列仅展示。
+/// 仅作者 / 原作 / 角色 / 标签改用 shortcut 布局并跳转管理 tab；漫画 / 系列保持原 metric 样式。
 class HomeAggregateStatsSection extends StatelessWidget {
   const HomeAggregateStatsSection({
     super.key,
@@ -44,13 +45,18 @@ class HomeAggregateStatsSection extends StatelessWidget {
     final M3EColorScheme scheme = theme.colorScheme;
     final M3ETypeScale type = theme.typeScale;
     final AppLocalizations l10n = context.l10n;
+    final String locale = Localizations.localeOf(context).toString();
+    final NumberFormat numberFormat = NumberFormat.decimalPattern(locale);
     final double gap = HomePageMetrics.statCardGap(sizeClass);
     final double tagsTopGap = HomePageMetrics.statTagsRowTopGap(sizeClass);
     final _HomeStatPalette palette = _HomeStatPalette(scheme);
 
+    String formatCount(int value) => numberFormat.format(value);
+
     Widget comicCard({required HomeBentoStatEmphasis emphasis}) {
       return HomeBentoStatCard(
         label: HomePageCopy.comicsStatLabel,
+        valueText: formatCount(counts.comicCount),
         caption: l10n.homeComicTotal(counts.comicCount),
         icon: Symbols.auto_stories,
         backgroundColor: palette.comicsBackground,
@@ -69,6 +75,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
     Widget seriesCard() {
       return HomeBentoStatCard(
         label: l10n.homeStatSeries,
+        valueText: formatCount(counts.seriesCount),
         caption: l10n.homeSeriesCount(counts.seriesCount),
         icon: Symbols.collections_bookmark,
         backgroundColor: palette.seriesBackground,
@@ -93,6 +100,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(8),
         ),
+        layout: HomeBentoStatLayout.shortcut,
         onPressed: onOpenAuthors,
       );
     }
@@ -106,6 +114,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
         onBackgroundColor: palette.parodiesForeground,
         borderRadius: const BorderRadius.all(Radius.circular(16)),
         minHeight: 108,
+        layout: HomeBentoStatLayout.shortcut,
         onPressed: onOpenParodies,
       );
     }
@@ -119,6 +128,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
         onBackgroundColor: palette.charactersForeground,
         borderRadius: BorderRadius.circular(16),
         emphasis: HomeBentoStatEmphasis.compact,
+        layout: HomeBentoStatLayout.shortcut,
         onPressed: onOpenCharacters,
       );
     }
@@ -135,6 +145,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
             : BorderRadius.circular(40),
         minHeight: wide ? 88 : 96,
         emphasis: HomeBentoStatEmphasis.compact,
+        layout: HomeBentoStatLayout.shortcut,
         contentPadding: HomePageMetrics.statCardContentPadding(
           sizeClass,
           tagPill: true,

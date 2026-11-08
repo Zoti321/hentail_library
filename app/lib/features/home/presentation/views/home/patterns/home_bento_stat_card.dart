@@ -8,10 +8,16 @@ import 'package:material_3_expressive/components/lists/components/m3e_card_radiu
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// 首页 bento 统计卡布局。
+enum HomeBentoStatLayout {
+  /// 原样式：右上标签文案 + 中间大数字 + 底部 caption。
+  metric,
+
+  /// 管理入口：右上箭头 + 标题 +「{数字} {单位}」（对齐 [HomeNavShortcutCard]）。
+  shortcut,
+}
+
 /// Kazumi 风统计块：独立底色 + 可变圆角 + M3E state layer。
-///
-/// 布局对齐 [HomeNavShortcutCard]：左上图标、右上跳转箭头（可点时）、
-/// 左下标题 +「{数字} {单位}」副文案。
 class HomeBentoStatCard extends StatefulWidget {
   const HomeBentoStatCard({
     super.key,
@@ -21,13 +27,16 @@ class HomeBentoStatCard extends StatefulWidget {
     required this.backgroundColor,
     required this.onBackgroundColor,
     required this.borderRadius,
+    this.valueText = '',
     this.minHeight = 96,
     this.emphasis = HomeBentoStatEmphasis.standard,
+    this.layout = HomeBentoStatLayout.metric,
     this.contentPadding,
     this.onPressed,
   });
 
   final String label;
+  final String valueText;
   final String caption;
   final IconData icon;
   final Color backgroundColor;
@@ -35,6 +44,7 @@ class HomeBentoStatCard extends StatefulWidget {
   final BorderRadius borderRadius;
   final double minHeight;
   final HomeBentoStatEmphasis emphasis;
+  final HomeBentoStatLayout layout;
   final EdgeInsets? contentPadding;
   final VoidCallback? onPressed;
 
@@ -61,67 +71,41 @@ class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
     final EdgeInsets padding =
         widget.contentPadding ??
         HomePageMetrics.statCardContentPadding(sizeClass);
-
-    final bool showCaption = widget.caption.trim().isNotEmpty;
     final VoidCallback? onPressed = widget.onPressed;
-    final Color fg = widget.onBackgroundColor;
-    final String semanticsLabel = showCaption
-        ? '${widget.label}, ${widget.caption}'
-        : widget.label;
 
-    final Widget content = ConstrainedBox(
-      constraints: BoxConstraints(minHeight: widget.minHeight),
-      child: Padding(
+    final Widget content = switch (widget.layout) {
+      HomeBentoStatLayout.metric => _MetricBody(
+        label: widget.label,
+        valueText: widget.valueText,
+        caption: widget.caption,
+        icon: widget.icon,
+        onBackgroundColor: widget.onBackgroundColor,
+        minHeight: widget.minHeight,
+        emphasis: widget.emphasis,
         padding: padding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                _IconBadge(
-                  icon: widget.icon,
-                  color: fg,
-                  filled: widget.emphasis == HomeBentoStatEmphasis.hero,
-                ),
-                const Spacer(),
-                if (onPressed != null)
-                  Icon(
-                    Symbols.arrow_forward,
-                    size: 20,
-                    color: fg.withValues(alpha: 0.55),
-                  ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  widget.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: type.titleMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: fg,
-                  ),
-                ),
-                if (showCaption) ...<Widget>[
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.caption,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: type.bodySmall.copyWith(
-                      color: fg.withValues(alpha: 0.72),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ),
+        type: type,
       ),
-    );
+      HomeBentoStatLayout.shortcut => _ShortcutBody(
+        label: widget.label,
+        caption: widget.caption,
+        icon: widget.icon,
+        onBackgroundColor: widget.onBackgroundColor,
+        minHeight: widget.minHeight,
+        emphasis: widget.emphasis,
+        padding: padding,
+        type: type,
+        showTrailingArrow: onPressed != null,
+      ),
+    };
+
+    final bool showValue = widget.valueText.trim().isNotEmpty;
+    final bool showCaption = widget.caption.trim().isNotEmpty;
+    final String semanticsLabel = switch ((showValue, showCaption)) {
+      (true, true) => '${widget.label}, ${widget.valueText}, ${widget.caption}',
+      (true, false) => '${widget.label}, ${widget.valueText}',
+      (false, true) => '${widget.label}, ${widget.caption}',
+      (false, false) => widget.label,
+    };
 
     return Semantics(
       button: onPressed != null,
@@ -165,6 +149,186 @@ class _HomeBentoStatCardState extends State<HomeBentoStatCard> {
 }
 
 enum HomeBentoStatEmphasis { hero, standard, compact }
+
+class _MetricBody extends StatelessWidget {
+  const _MetricBody({
+    required this.label,
+    required this.valueText,
+    required this.caption,
+    required this.icon,
+    required this.onBackgroundColor,
+    required this.minHeight,
+    required this.emphasis,
+    required this.padding,
+    required this.type,
+  });
+
+  final String label;
+  final String valueText;
+  final String caption;
+  final IconData icon;
+  final Color onBackgroundColor;
+  final double minHeight;
+  final HomeBentoStatEmphasis emphasis;
+  final EdgeInsets padding;
+  final M3ETypeScale type;
+
+  @override
+  Widget build(BuildContext context) {
+    final double valueSize = switch (emphasis) {
+      HomeBentoStatEmphasis.hero => 36,
+      HomeBentoStatEmphasis.standard => 28,
+      HomeBentoStatEmphasis.compact => 24,
+    };
+    final bool showValue = valueText.trim().isNotEmpty;
+    final bool showCaption = caption.trim().isNotEmpty;
+    final bool compactHeaderOnly = !showValue && !showCaption;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: minHeight),
+      child: Padding(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: compactHeaderOnly
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                _IconBadge(
+                  icon: icon,
+                  color: onBackgroundColor,
+                  filled:
+                      emphasis == HomeBentoStatEmphasis.hero ||
+                      compactHeaderOnly,
+                ),
+                const Spacer(),
+                Text(
+                  label,
+                  style: type.labelLarge.copyWith(
+                    color: onBackgroundColor.withValues(alpha: 0.88),
+                  ),
+                ),
+              ],
+            ),
+            if (showValue) ...<Widget>[
+              const SizedBox(height: 8),
+              Text(
+                valueText,
+                style: type.headlineLarge.copyWith(
+                  fontSize: valueSize,
+                  height: 1.05,
+                  fontWeight: FontWeight.w600,
+                  color: onBackgroundColor,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 4),
+            ] else if (!compactHeaderOnly)
+              const SizedBox(height: 12),
+            if (showCaption)
+              Text(
+                caption,
+                maxLines: showValue ? 1 : 2,
+                overflow: TextOverflow.ellipsis,
+                style: (showValue ? type.bodySmall : type.titleMedium).copyWith(
+                  color: showValue
+                      ? onBackgroundColor.withValues(alpha: 0.72)
+                      : onBackgroundColor.withValues(alpha: 0.92),
+                  height: showValue ? null : 1.25,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ShortcutBody extends StatelessWidget {
+  const _ShortcutBody({
+    required this.label,
+    required this.caption,
+    required this.icon,
+    required this.onBackgroundColor,
+    required this.minHeight,
+    required this.emphasis,
+    required this.padding,
+    required this.type,
+    required this.showTrailingArrow,
+  });
+
+  final String label;
+  final String caption;
+  final IconData icon;
+  final Color onBackgroundColor;
+  final double minHeight;
+  final HomeBentoStatEmphasis emphasis;
+  final EdgeInsets padding;
+  final M3ETypeScale type;
+  final bool showTrailingArrow;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color fg = onBackgroundColor;
+    final bool showCaption = caption.trim().isNotEmpty;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: minHeight),
+      child: Padding(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                _IconBadge(
+                  icon: icon,
+                  color: fg,
+                  filled: emphasis == HomeBentoStatEmphasis.hero,
+                ),
+                const Spacer(),
+                if (showTrailingArrow)
+                  Icon(
+                    Symbols.arrow_forward,
+                    size: 20,
+                    color: fg.withValues(alpha: 0.55),
+                  ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: type.titleMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: fg,
+                  ),
+                ),
+                if (showCaption) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text(
+                    caption,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: type.bodySmall.copyWith(
+                      color: fg.withValues(alpha: 0.72),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _IconBadge extends StatelessWidget {
   const _IconBadge({
