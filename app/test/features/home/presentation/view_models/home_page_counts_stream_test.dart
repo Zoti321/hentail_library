@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/library_browse/public/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
@@ -14,6 +15,7 @@ void main() {
   test('homePageCountsStream exposes one Home page counts seam via reading_stats port', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...eventBusOverrides(),
         homePageCountsPortProvider.overrideWithValue(
           _FakeHomePageCountsPort(
             const HomePageCounts(

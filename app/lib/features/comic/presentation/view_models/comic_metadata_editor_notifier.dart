@@ -4,7 +4,7 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_change_bus.dart';
+import 'package:hentai_library/shared/di/event_bus_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -25,7 +25,7 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
       form,
       original,
       notifyExternalChange: _notifyExternalChange,
-      publish: ref.read(libraryChangeBusProvider.notifier).publish,
+      events: ref.read(appEventBusProvider),
     );
   }
 

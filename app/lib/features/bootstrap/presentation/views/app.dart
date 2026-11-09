@@ -8,6 +8,7 @@ import 'package:hentai_library/core/util/app_theme_mode.dart';
 import 'package:hentai_library/core/util/app_window_title.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
+import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:hentai_library/features/app_settings/domain/app_font_preference.dart';
@@ -38,6 +39,8 @@ class _AppRoot extends ConsumerStatefulWidget {
 class _AppRootState extends ConsumerState<_AppRoot> {
   @override
   Widget build(BuildContext context) {
+    // ADR-0039：在应用启动即订阅领域事件，避免发布时 reducer 尚未 build 而丢事件。
+    ref.watch(domainEventRevisionsProvider);
     ref.watch(appStartupCoordinatorProvider);
     ref.watch(metadataAutoBackupCoordinatorProvider);
     ref.watch(appUpdateCoordinatorProvider);

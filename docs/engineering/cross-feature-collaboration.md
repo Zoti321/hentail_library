@@ -1,17 +1,29 @@
-# Cross-feature 协作（Riverpod + ADR-0034）
+# Cross-feature 协作（Riverpod + ADR-0034 / ADR-0039）
 
-**决策**：ADR-0034（#426/#435）、[`gate.md`](gate.md) import 门禁。
+**决策**：ADR-0034（#426/#435）public only、ADR-0039（命令走 Port，事实走领域事件）、[`gate.md`](gate.md) import 门禁。
 
-## 心智模型（四段）
+## 心智模型（五段）
 
 | 段 | 位置 | 谁 import |
 | --- | --- | --- |
 | **契约** | `shared/domain/ports/`、owner `public/` | 跨 feature 读类型 / UI 命令 |
+| **事件** | `shared/domain/events/`（sealed `DomainEvent` + 子类） | 任意 feature 发布 / 消费 |
 | **Token** | `shared/di/*_providers.dart` | 任意 feature / shared 需要 `ref.read` 时 |
-| **实现** | owner `features/<id>/di/`（含 codegen 封面图） | 仅同 feature 或 **bootstrap** overrides |
+| **实现** | owner `features/<id>/di/`（含 codegen 封面图）、`shared/data/events/` | 仅同 feature 或 **bootstrap** overrides |
 | **接线** | `features/bootstrap/di/overrides/` | 仅 bootstrap |
 
 Consumer **不要** deep import 邻居的 `features/<other>/di/`，除非 baseline 已记录的遗留 M1（应逐步删掉）。
+
+## 命令 vs 事件
+
+| 需求 | 用什么 |
+| --- | --- |
+| 要它做事，要结果 / 可能失败 | Port（`shared/domain/ports/**`）+ `shared/di` token |
+| 发生了某事，订阅方未知 | `DomainEvent`；发布在 application / data，投影在 `DomainEventRevisions` |
+| UI 按当前值重建 | `domainEventRevisionsProvider.select(...)` |
+| 需要 `BuildContext` | owner `public/ui/**` 命令 |
+
+新增事件：在 `shared/domain/events/` 加子类（part of `domain_event.dart`）→ 在 `DomainEventRevisions._reduce` 归类（sealed switch 会强制）→ application 层构造注入 `DomainEventPublisher` 发布。门禁见 `domain_event_rules_test.dart`（E1/E2/E4）。
 
 ## 典型用法
 

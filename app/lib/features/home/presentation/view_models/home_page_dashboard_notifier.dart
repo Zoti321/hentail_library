@@ -4,7 +4,7 @@ import 'package:hentai_library/core/util/stream_throttle.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/domain/home_page_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_change_bus.dart';
+import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/reading_stats_providers.dart';
 import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
@@ -35,8 +35,8 @@ Stream<HomePageCounts> homePageCountsStream(Ref ref) {
   ref.watch(libraryRevisionThrottleBusyStateProvider);
   // 字典变更时重建，确保 parody/character 与管理页口径一致。
   ref.watch(
-    libraryChangeBusProvider.select(
-      (LibraryChangeState s) => s.dictionaryRevision,
+    domainEventRevisionsProvider.select(
+      (DomainEventRevisionsState s) => s.dictionaryRevision,
     ),
   );
   return throttleWhile(

@@ -1,8 +1,6 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
-import 'package:hentai_library/shared/di/library_change_bus.dart';
-import 'package:hentai_library/features/library_admin/domain/library_change.dart';
 import 'package:hentai_library/features/library_admin/di/comic_metadata_bulk_patch.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/metadata_refresh_controller.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/scan_library_controller.dart';
@@ -63,11 +61,6 @@ class ComicMetadataBulkPatchController
       final ComicMetadataBulkPatchResult result = await ref
           .read(comicMetadataBulkPatchCoordinatorProvider)
           .apply(comicIds: comicIds, patch: patch);
-      if (result.succeeded > 0) {
-        ref
-            .read(libraryChangeBusProvider.notifier)
-            .publish(const LibraryChange(metadataSaved: true));
-      }
       state = ComicMetadataBulkPatchState(batchResult: result);
       return result;
     } catch (e, st) {

@@ -1,7 +1,7 @@
+import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/features/comic/domain/comic_user_metadata_repository.dart';
-import 'package:hentai_library/features/library_admin/public.dart';
 
 /// 浏览侧保存 Comic 元数据草稿的结果。仓储异常仍向上抛，由 UI toast。
 sealed class ComicMetadataApplyResult {
@@ -35,19 +35,18 @@ final class ComicMetadataApplySucceeded extends ComicMetadataApplyResult {
   final bool charactersWritten;
 }
 
-/// 按草稿相对原 Comic 的差异写入用户元数据，并发布 Library change。
+/// 按草稿相对原 Comic 的差异写入用户元数据，并发布 [ComicMetadataPersisted]。
 Future<ComicMetadataApplyResult> applyComicMetadataForm(
   ComicUserMetadataRepository repository,
   ComicMetadataForm form,
   Comic original, {
+  required DomainEventPublisher events,
   required void Function() notifyExternalChange,
-  required void Function(LibraryChange change) publish,
 }) async {
   switch (form.diffAgainst(original)) {
     case ComicMetadataDraftInvalid(:final validation):
       return ComicMetadataApplyInvalid(validation);
     case ComicMetadataDraftUnchanged():
-      publish(const LibraryChange(metadataSaved: false));
       return const ComicMetadataApplySucceeded();
     case ComicMetadataDraftChanges(
       :final title,
@@ -74,12 +73,11 @@ Future<ComicMetadataApplyResult> applyComicMetadataForm(
         parodies: parodies,
         characters: characters,
       );
-      publish(
-        LibraryChange(
+      events.publish(
+        ComicMetadataPersisted(
           tagsWritten: tags != null,
           parodiesWritten: parodies != null,
           charactersWritten: characters != null,
-          metadataSaved: true,
         ),
       );
       notifyExternalChange();

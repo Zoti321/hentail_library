@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_dictionary_providers.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
@@ -24,6 +25,7 @@ void main() {
     () async {
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
+          ...eventBusOverrides(),
           parodyRepoProvider.overrideWithValue(
             _FakeNamedFacetDictionaryRepository(
               all: <String>['Fate', 'Touhou'],
@@ -43,6 +45,7 @@ void main() {
   test('allCharactersProvider reads listAll through NamedFacetDictionaryRepository', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...eventBusOverrides(),
         characterRepoProvider.overrideWithValue(
           _FakeNamedFacetDictionaryRepository(all: <String>['Reimu']),
         ),

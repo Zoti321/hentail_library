@@ -1,8 +1,7 @@
 import 'package:hentai_library/features/library_admin/data/adapters/comic_metadata_bulk_patch_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/application/comic_metadata_bulk_patch_coordinator.dart';
-import 'package:hentai_library/shared/di/library_change_bus.dart';
-import 'package:hentai_library/features/library_admin/domain/library_change.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/event_bus_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -19,26 +18,9 @@ ComicMetadataBulkPatchFrbAdapter comicMetadataBulkPatchFrbAdapter(Ref ref) {
 ComicMetadataBulkPatchCoordinator comicMetadataBulkPatchCoordinator(Ref ref) {
   return ComicMetadataBulkPatchCoordinator(
     adapter: ref.read(comicMetadataBulkPatchFrbAdapterProvider),
+    events: ref.read(appEventBusProvider),
     onSucceeded: () {
       ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
     },
-    onDictionariesChanged:
-        ({
-          required bool tagsWritten,
-          required bool authorsWritten,
-          required bool parodiesWritten,
-          required bool charactersWritten,
-        }) {
-          ref
-              .read(libraryChangeBusProvider.notifier)
-              .publish(
-                LibraryChange(
-                  tagsWritten: tagsWritten,
-                  authorsWritten: authorsWritten,
-                  parodiesWritten: parodiesWritten,
-                  charactersWritten: charactersWritten,
-                ),
-              );
-        },
   );
 }

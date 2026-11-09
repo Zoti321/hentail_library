@@ -7,6 +7,7 @@ import 'package:hentai_library/features/bootstrap/presentation/view_models/app_s
 import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -36,6 +37,7 @@ List<Override> _smokeTestOverrides() {
     appUpdateCoordinatorProvider.overrideWith(_FakeAppUpdateCoordinator.new),
     appStartupCoordinatorProvider.overrideWith(_FakeAppStartupCoordinator.new),
     ...dataProviderOverrides(),
+    ...eventBusOverrides(),
     ...sharedLibraryStateOverrides(),
     ...bootstrapCompositionOverrides(),
   ];

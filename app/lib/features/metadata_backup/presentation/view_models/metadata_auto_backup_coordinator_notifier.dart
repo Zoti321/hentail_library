@@ -11,7 +11,7 @@ import 'package:hentai_library/features/metadata_backup/di/metadata_backup_repos
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_auto_backup_notifier.dart';
 import 'package:hentai_library/features/metadata_backup/presentation/view_models/metadata_last_auto_backup_notifier.dart';
 import 'package:hentai_library/core/util/debouncer.dart';
-import 'package:hentai_library/shared/di/library_change_bus.dart';
+import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata_auto_backup_coordinator_notifier.g.dart';
@@ -35,8 +35,8 @@ class MetadataAutoBackupCoordinatorNotifier
       _metadataSaveDebouncer?.dispose();
     });
     ref.listen<int>(
-      libraryChangeBusProvider.select(
-        (LibraryChangeState s) => s.metadataSaveRevision,
+      domainEventRevisionsProvider.select(
+        (DomainEventRevisionsState s) => s.metadataSaveRevision,
       ),
       (int? previous, int next) {
         if (previous != null && previous != next) {

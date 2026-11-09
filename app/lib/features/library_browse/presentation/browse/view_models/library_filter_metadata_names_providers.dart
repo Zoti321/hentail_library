@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/library_change_bus.dart';
+import 'package:hentai_library/shared/di/domain_event_revisions.dart';
 import 'package:hentai_library/shared/di/library_dictionary_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/tag.dart';
@@ -37,8 +37,8 @@ final libraryFilterParodyNamesProvider = FutureProvider<List<String>>((
   Ref ref,
 ) async {
   ref.watch(
-    libraryChangeBusProvider.select(
-      (LibraryChangeState s) => s.dictionaryRevision,
+    domainEventRevisionsProvider.select(
+      (DomainEventRevisionsState s) => s.dictionaryRevision,
     ),
   );
   final List<String> names = await ref.watch(parodyRepoProvider).listAll();
@@ -50,8 +50,8 @@ final libraryFilterCharacterNamesProvider = FutureProvider<List<String>>((
   Ref ref,
 ) async {
   ref.watch(
-    libraryChangeBusProvider.select(
-      (LibraryChangeState s) => s.dictionaryRevision,
+    domainEventRevisionsProvider.select(
+      (DomainEventRevisionsState s) => s.dictionaryRevision,
     ),
   );
   final List<String> names = await ref.watch(characterRepoProvider).listAll();

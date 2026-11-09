@@ -117,3 +117,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0036](./0036-comic-series-wayfinder-modules.md) | Comic / Series Wayfinder 模块切分（#457） | Accepted |
 | [0037](./0037-tone-based-color-system-m3e-roles.md) | Tone-based color system 与 M3E roles 为主（#470） | Accepted |
 | [0038](./0038-reader-module-rename.md) | Product module `read_session` 更名为 `reader` | Accepted |
+| [0039](./0039-domain-events-for-cross-feature-notification.md) | 跨 feature 协作 — 命令走 Port，事实走领域事件 | Accepted |
