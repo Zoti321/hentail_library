@@ -9,6 +9,7 @@ import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/reading_stats_providers.dart';
 import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
 import 'package:hentai_library/shared/domain/ports/home_page_counts_port.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_page_dashboard_notifier.g.dart';
@@ -31,7 +32,11 @@ Stream<HomePageCounts> homePageCountsStream(Ref ref) {
   final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
   ref.watch(libraryRevisionThrottleBusyStateProvider);
   // 字典变更时重建，确保 parody/character 与管理页口径一致。
-  ref.watch(libraryChangeBusProvider);
+  ref.watch(
+    libraryChangeBusProvider.select(
+      (LibraryChangeState s) => s.dictionaryRevision,
+    ),
+  );
   return throttleWhile(
     port.watchHomePageCounts(excludeR18: excludeR18),
     shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
