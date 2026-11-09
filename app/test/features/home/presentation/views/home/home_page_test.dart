@@ -36,8 +36,9 @@ void main() {
     );
 
     expect(find.text(HomePageCopy.aggregateStatsSectionTitle), findsOneWidget);
+    expect(find.text(HomePageCopy.activityStatsTitle), findsOneWidget);
     expect(find.text('读完'), findsOneWidget);
-    expect(find.text('阅读时长'), findsWidgets);
+    expect(find.text('阅读时长'), findsOneWidget);
     expect(find.text('阅读历史'), findsOneWidget);
     expect(find.text('查看阅读记录'), findsOneWidget);
     expect(find.text('垃圾桶'), findsOneWidget);

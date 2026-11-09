@@ -7,6 +7,7 @@ import 'package:hentai_library/features/home/presentation/views/home/home_page_m
 import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:hentai_library/shared/ui/patterns/home/reading_duration_format.dart';
+import 'package:hentai_library/features/home/presentation/views/home/patterns/home_activity_stats_capsule.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_bento_stat_card.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_copy.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_nav_shortcut_card.dart';
@@ -15,9 +16,9 @@ import 'package:intl/intl.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// 首页「全库统计」：Kazumi 风 bento 色块 + 历史 / 垃圾桶入口卡片。
+/// 首页「全库统计」：阅读活动胶囊 + Kazumi 风 bento 色块 + 历史 / 垃圾桶入口。
 ///
-/// 仅作者 / 原作 / 角色 / 标签改用 shortcut 布局并跳转管理 tab；漫画 / 系列保持原 metric 样式。
+/// 读完 / 时长合并为胶囊双指标；作者 / 原作 / 角色 / 标签用 shortcut 跳转管理 tab。
 class HomeAggregateStatsSection extends StatelessWidget {
   const HomeAggregateStatsSection({
     super.key,
@@ -57,43 +58,16 @@ class HomeAggregateStatsSection extends StatelessWidget {
 
     String formatCount(int value) => numberFormat.format(value);
 
-    Widget finishedCard() {
-      return HomeBentoStatCard(
-        label: l10n.homeStatFinishedComics,
-        valueText: formatCount(activityStats.finishedCount),
-        caption: l10n.homeFinishedComicCount(activityStats.finishedCount),
-        icon: Symbols.task_alt,
-        backgroundColor: palette.finishedBackground,
-        onBackgroundColor: palette.finishedForeground,
-        borderRadius: BorderRadius.circular(20),
-        minHeight: 104,
-      );
-    }
-
-    Widget durationCard() {
-      return HomeBentoStatCard(
-        label: l10n.homeStatReadingDuration,
-        valueText: formatReadingDurationForDisplay(
+    Widget activityCapsule() {
+      return HomeActivityStatsCapsule(
+        title: HomePageCopy.activityStatsTitle,
+        leftValue: formatCount(activityStats.finishedCount),
+        leftLabel: l10n.homeStatFinishedComics,
+        rightValue: formatReadingDurationForDisplay(
           activityStats.totalDuration,
           l10n,
         ),
-        caption: l10n.homeStatReadingDuration,
-        icon: Symbols.timer,
-        backgroundColor: palette.durationBackground,
-        onBackgroundColor: palette.durationForeground,
-        borderRadius: BorderRadius.circular(20),
-        minHeight: 104,
-      );
-    }
-
-    Widget activityRow() {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Expanded(child: finishedCard()),
-          SizedBox(width: gap),
-          Expanded(child: durationCard()),
-        ],
+        rightLabel: l10n.homeStatReadingDuration,
       );
     }
 
@@ -247,7 +221,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
       WindowSizeClass.compact => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          activityRow(),
+          activityCapsule(),
           SizedBox(height: gap),
           comicCard(emphasis: HomeBentoStatEmphasis.hero),
           if (_showsShortcutCards) ...<Widget>[
@@ -279,7 +253,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
       _ => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          activityRow(),
+          activityCapsule(),
           SizedBox(height: gap),
           IntrinsicHeight(
             child: Row(
@@ -333,11 +307,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
 
 class _HomeStatPalette {
   _HomeStatPalette(M3EColorScheme scheme)
-    : finishedBackground = scheme.tertiaryContainer,
-      finishedForeground = scheme.onTertiaryContainer,
-      durationBackground = scheme.primaryContainer,
-      durationForeground = scheme.onPrimaryContainer,
-      comicsBackground = scheme.primaryContainer,
+    : comicsBackground = scheme.primaryContainer,
       comicsForeground = scheme.onPrimaryContainer,
       seriesBackground = scheme.secondaryContainer,
       seriesForeground = scheme.onSecondaryContainer,
@@ -355,10 +325,6 @@ class _HomeStatPalette {
       trashBackground = HomeShortcutCardColors.trashBackground(scheme),
       trashForeground = HomeShortcutCardColors.trashForeground(scheme);
 
-  final Color finishedBackground;
-  final Color finishedForeground;
-  final Color durationBackground;
-  final Color durationForeground;
   final Color comicsBackground;
   final Color comicsForeground;
   final Color seriesBackground;

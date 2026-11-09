@@ -2,5 +2,7 @@
 abstract final class HomePageCopy {
   static const String aggregateStatsSectionTitle = '全库统计';
 
+  static const String activityStatsTitle = '阅读统计';
+
   static const String comicsStatLabel = '漫画';
 }
