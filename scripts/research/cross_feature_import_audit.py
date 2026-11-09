@@ -23,6 +23,7 @@ MODULES = frozenset(
         "library_browse",
         "read_session",
         "reading_history",
+        "reading_stats",
         "comic_trash",
         "named_metadata",
         "app_settings",

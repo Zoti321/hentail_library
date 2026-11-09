@@ -3,10 +3,11 @@ import 'package:hentai_library/features/home/presentation/view_models/home_alert
 import 'package:hentai_library/core/util/stream_throttle.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/domain/home_page_repository.dart';
-import 'package:hentai_library/features/named_metadata/domain/named_facet_dictionary_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_change_bus.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/di/reading_stats_providers.dart';
+import 'package:hentai_library/shared/domain/ports/home_page_counts_port.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_page_dashboard_notifier.g.dart';
@@ -22,32 +23,19 @@ LibraryAgeRestrictionFilter _comicsAgeRestriction(Ref ref) {
   return ref.watch(libraryComicAgeRestrictionStateProvider);
 }
 
-/// Home page counts 单一装配缝：FRB 库存聚合 + 字典口径 Parody/Character。
+/// Home page counts 单一装配缝：经 `reading_stats` public Port。
 @Riverpod(keepAlive: true)
 Stream<HomePageCounts> homePageCountsStream(Ref ref) {
-  final HomePageRepository repository = ref.watch(homePageRepoProvider);
-  final NamedFacetDictionaryRepository parodyRepo = ref.watch(
-    parodyRepoProvider,
-  );
-  final NamedFacetDictionaryRepository characterRepo = ref.watch(
-    characterRepoProvider,
-  );
+  final HomePageCountsPort port = ref.watch(homePageCountsPortProvider);
   final bool excludeR18 = _homeExcludeR18(_comicsAgeRestriction(ref));
   ref.watch(libraryRevisionThrottleBusyStateProvider);
   // 字典变更时重建，确保 parody/character 与管理页口径一致。
   ref.watch(libraryChangeBusProvider);
   return throttleWhile(
-    repository.watchHomePageCounts(excludeR18: excludeR18),
+    port.watchHomePageCounts(excludeR18: excludeR18),
     shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
     interval: _kHomeScanThrottleInterval,
-  ).asyncMap((HomePageCounts base) async {
-    final List<String> parodies = await parodyRepo.listAll();
-    final List<String> characters = await characterRepo.listAll();
-    return base.copyWith(
-      parodyCount: parodies.length,
-      characterCount: characters.length,
-    );
-  });
+  );
 }
 
 @Riverpod(keepAlive: true)

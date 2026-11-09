@@ -16,6 +16,7 @@ const Set<String> kImportBoundaryModules = <String>{
   'series',
   'read_session',
   'reading_history',
+  'reading_stats',
   'comic_trash',
   'named_metadata',
   'app_settings',
