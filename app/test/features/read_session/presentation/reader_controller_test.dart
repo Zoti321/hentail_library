@@ -25,6 +25,7 @@ import 'package:hentai_library/features/read_session/presentation/routing/reader
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
+import 'package:hentai_library/shared/domain/ports/record_read_session_activity_port.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -144,6 +145,17 @@ class _UnusedSessionPort implements ReaderSessionPort {
   Future<void> clear() async {}
 }
 
+class _NoOpActivityCommands implements RecordReadSessionActivityPort {
+  @override
+  Future<void> record({
+    required String comicId,
+    required bool incognito,
+    required Duration foregroundElapsed,
+    required int pageIndex,
+    required int pageCount,
+  }) async {}
+}
+
 /// Controller build now begins a history session; keep I/O stubs unused.
 Override _stubCoordinatorOverride() {
   final _NoOpHistoryCommands history = _NoOpHistoryCommands();
@@ -156,6 +168,7 @@ Override _stubCoordinatorOverride() {
         sessionPort: _UnusedSessionPort(),
       ),
       readingHistoryCommands: history,
+      activityCommands: _NoOpActivityCommands(),
     ),
   );
 }

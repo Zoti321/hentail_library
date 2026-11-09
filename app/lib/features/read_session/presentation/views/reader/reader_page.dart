@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
 import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
+import 'package:hentai_library/features/read_session/di/session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
 import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
@@ -113,6 +114,19 @@ class ReaderPage extends HookConsumerWidget {
       readerControllerProvider(viewKey).notifier,
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
+
+    // 前台计时：进后台结算活动时长，回前台重新开表。
+    useEffect(() {
+      final AppLifecycleListener listener = AppLifecycleListener(
+        onPause: () {
+          unawaited(ref.read(readSessionCoordinatorProvider).pauseForeground());
+        },
+        onResume: () {
+          ref.read(readSessionCoordinatorProvider).resumeForeground();
+        },
+      );
+      return listener.dispose;
+    }, const <Object?>[]);
 
     useEffect(() {
       if (!keepControlsOpen || hasAppliedKeepControls.value) {

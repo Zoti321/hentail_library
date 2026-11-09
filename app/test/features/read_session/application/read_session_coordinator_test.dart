@@ -1,6 +1,7 @@
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
+import 'package:hentai_library/shared/domain/ports/record_read_session_activity_port.dart';
 import 'package:hentai_library/features/read_session/domain/read_session.dart';
 import 'package:hentai_library/features/read_session/application/read_session_coordinator.dart';
 import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
@@ -22,6 +23,45 @@ class _RecordingReadingHistoryCommands implements ReadingHistoryCommandPort {
 
   @override
   Future<int?> readResumePageIndex(String comicId) async => null;
+}
+
+class _RecordingActivityCommands implements RecordReadSessionActivityPort {
+  final List<
+    ({
+      String comicId,
+      bool incognito,
+      Duration foregroundElapsed,
+      int pageIndex,
+      int pageCount,
+    })
+  >
+  records =
+      <
+        ({
+          String comicId,
+          bool incognito,
+          Duration foregroundElapsed,
+          int pageIndex,
+          int pageCount,
+        })
+      >[];
+
+  @override
+  Future<void> record({
+    required String comicId,
+    required bool incognito,
+    required Duration foregroundElapsed,
+    required int pageIndex,
+    required int pageCount,
+  }) async {
+    records.add((
+      comicId: comicId,
+      incognito: incognito,
+      foregroundElapsed: foregroundElapsed,
+      pageIndex: pageIndex,
+      pageCount: pageCount,
+    ));
+  }
 }
 
 class _RecordingReaderSessionService implements ReaderSessionService {
@@ -55,15 +95,21 @@ Comic _comic({String id = 'c1', String title = 'Test Comic'}) {
 
 void main() {
   late _RecordingReadingHistoryCommands readingCommands;
+  late _RecordingActivityCommands activityCommands;
   late _RecordingReaderSessionService sessionService;
   late ReadSessionCoordinator coordinator;
+  late DateTime now;
 
   setUp(() {
     readingCommands = _RecordingReadingHistoryCommands();
+    activityCommands = _RecordingActivityCommands();
     sessionService = _RecordingReaderSessionService();
+    now = DateTime.utc(2026, 1, 1, 12);
     coordinator = ReadSessionCoordinator(
       sessionService: sessionService,
       readingHistoryCommands: readingCommands,
+      activityCommands: activityCommands,
+      now: () => now,
     );
   });
 
@@ -75,6 +121,7 @@ void main() {
     );
 
     expect(readingCommands.records, isEmpty);
+    expect(activityCommands.records, isEmpty);
     expect(coordinator.hasActiveSession, isFalse);
   });
 
@@ -87,33 +134,72 @@ void main() {
     expect(coordinator.hasActiveSession, isTrue);
   });
 
-  test('updatePage and flushProgress persist latest page', () async {
+  test('updatePage and flushProgress persist latest page only', () async {
     await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 1);
     readingCommands.records.clear();
+    activityCommands.records.clear();
 
+    now = now.add(const Duration(seconds: 5));
     coordinator.updatePage(7);
     await coordinator.flushProgress();
 
     expect(readingCommands.records, hasLength(1));
     expect(readingCommands.records.single.pageIndex, 7);
+    expect(activityCommands.records, isEmpty);
   });
 
-  test('endSession clears active session after flush', () async {
+  test('endSession reports foreground elapsed once', () async {
     await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 3);
     readingCommands.records.clear();
+    activityCommands.records.clear();
 
+    now = now.add(const Duration(seconds: 45));
     coordinator.updatePage(5);
     await coordinator.endSession();
 
     expect(readingCommands.records, hasLength(1));
     expect(readingCommands.records.single.pageIndex, 5);
     expect(coordinator.hasActiveSession, isFalse);
+    expect(activityCommands.records, hasLength(1));
+    expect(activityCommands.records.single.comicId, 'c1');
+    expect(activityCommands.records.single.pageIndex, 5);
+    expect(activityCommands.records.single.pageCount, 10);
+    expect(
+      activityCommands.records.single.foregroundElapsed,
+      const Duration(seconds: 45),
+    );
   });
 
-  test('exitReadSession flushes history and closes I/O session', () async {
+  test('pauseForeground reports then resume continues without double count', () async {
+    await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 1);
+    activityCommands.records.clear();
+
+    now = now.add(const Duration(seconds: 20));
+    await coordinator.pauseForeground();
+    expect(activityCommands.records, hasLength(1));
+    expect(
+      activityCommands.records.single.foregroundElapsed,
+      const Duration(seconds: 20),
+    );
+
+    now = now.add(const Duration(seconds: 30));
+    coordinator.resumeForeground();
+    now = now.add(const Duration(seconds: 15));
+    await coordinator.endSession();
+
+    expect(activityCommands.records, hasLength(2));
+    expect(
+      activityCommands.records.last.foregroundElapsed,
+      const Duration(seconds: 15),
+    );
+  });
+
+  test('exitReadSession flushes history, reports activity, closes I/O', () async {
     await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 2);
     readingCommands.records.clear();
+    activityCommands.records.clear();
 
+    now = now.add(const Duration(seconds: 12));
     coordinator.updatePage(6);
     await coordinator.exitReadSession(
       comicId: 'c1',
@@ -123,11 +209,16 @@ void main() {
 
     expect(readingCommands.records, hasLength(1));
     expect(readingCommands.records.single.pageIndex, 6);
+    expect(activityCommands.records, hasLength(1));
+    expect(
+      activityCommands.records.single.foregroundElapsed,
+      const Duration(seconds: 12),
+    );
     expect(coordinator.hasActiveSession, isFalse);
     expect(sessionService.closedComicIds, <String>['c1']);
   });
 
-  test('exitReadSession skips history when incognito', () async {
+  test('exitReadSession skips history and activity when incognito', () async {
     await coordinator.exitReadSession(
       comicId: 'c1',
       incognito: true,
@@ -135,6 +226,7 @@ void main() {
     );
 
     expect(readingCommands.records, isEmpty);
+    expect(activityCommands.records, isEmpty);
     expect(sessionService.closedComicIds, <String>['c1']);
   });
 
@@ -143,7 +235,9 @@ void main() {
     () async {
       await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 3);
       readingCommands.records.clear();
+      activityCommands.records.clear();
 
+      now = now.add(const Duration(seconds: 11));
       final SeriesSwitchPlan plan = await coordinator.prepareSeriesSwitch(
         currentSession: const ReadSessionRouteParams(comicId: 'c1'),
         targetComicId: 'c2',
@@ -152,6 +246,11 @@ void main() {
 
       expect(readingCommands.records, hasLength(1));
       expect(readingCommands.records.single.pageIndex, 8);
+      expect(activityCommands.records, hasLength(1));
+      expect(
+        activityCommands.records.single.foregroundElapsed,
+        const Duration(seconds: 11),
+      );
       expect(coordinator.hasActiveSession, isFalse);
       expect(sessionService.closedComicIds, <String>['c1']);
       expect(plan.closeComicId, 'c1');
