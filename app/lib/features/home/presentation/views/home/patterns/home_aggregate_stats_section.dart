@@ -4,7 +4,9 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/layout/breakpoints.dart';
 import 'package:hentai_library/shared/ui/layout/page_layout_spec.dart';
 import 'package:hentai_library/features/home/presentation/views/home/home_page_metrics.dart';
+import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
+import 'package:hentai_library/shared/ui/patterns/home/reading_duration_format.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_bento_stat_card.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_copy.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_nav_shortcut_card.dart';
@@ -20,6 +22,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
   const HomeAggregateStatsSection({
     super.key,
     required this.counts,
+    required this.activityStats,
     this.onOpenHistory,
     this.onOpenTrash,
     this.onOpenAuthors,
@@ -29,6 +32,7 @@ class HomeAggregateStatsSection extends StatelessWidget {
   });
 
   final HomeAggregateCounts counts;
+  final ReadingActivityStats activityStats;
   final VoidCallback? onOpenHistory;
   final VoidCallback? onOpenTrash;
   final VoidCallback? onOpenAuthors;
@@ -52,6 +56,46 @@ class HomeAggregateStatsSection extends StatelessWidget {
     final _HomeStatPalette palette = _HomeStatPalette(scheme);
 
     String formatCount(int value) => numberFormat.format(value);
+
+    Widget finishedCard() {
+      return HomeBentoStatCard(
+        label: l10n.homeStatFinishedComics,
+        valueText: formatCount(activityStats.finishedCount),
+        caption: l10n.homeFinishedComicCount(activityStats.finishedCount),
+        icon: Symbols.task_alt,
+        backgroundColor: palette.finishedBackground,
+        onBackgroundColor: palette.finishedForeground,
+        borderRadius: BorderRadius.circular(20),
+        minHeight: 104,
+      );
+    }
+
+    Widget durationCard() {
+      return HomeBentoStatCard(
+        label: l10n.homeStatReadingDuration,
+        valueText: formatReadingDurationForDisplay(
+          activityStats.totalDuration,
+          l10n,
+        ),
+        caption: l10n.homeStatReadingDuration,
+        icon: Symbols.timer,
+        backgroundColor: palette.durationBackground,
+        onBackgroundColor: palette.durationForeground,
+        borderRadius: BorderRadius.circular(20),
+        minHeight: 104,
+      );
+    }
+
+    Widget activityRow() {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(child: finishedCard()),
+          SizedBox(width: gap),
+          Expanded(child: durationCard()),
+        ],
+      );
+    }
 
     Widget comicCard({required HomeBentoStatEmphasis emphasis}) {
       return HomeBentoStatCard(
@@ -203,6 +247,8 @@ class HomeAggregateStatsSection extends StatelessWidget {
       WindowSizeClass.compact => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          activityRow(),
+          SizedBox(height: gap),
           comicCard(emphasis: HomeBentoStatEmphasis.hero),
           if (_showsShortcutCards) ...<Widget>[
             SizedBox(height: gap),
@@ -233,6 +279,8 @@ class HomeAggregateStatsSection extends StatelessWidget {
       _ => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          activityRow(),
+          SizedBox(height: gap),
           IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -285,7 +333,11 @@ class HomeAggregateStatsSection extends StatelessWidget {
 
 class _HomeStatPalette {
   _HomeStatPalette(M3EColorScheme scheme)
-    : comicsBackground = scheme.primaryContainer,
+    : finishedBackground = scheme.tertiaryContainer,
+      finishedForeground = scheme.onTertiaryContainer,
+      durationBackground = scheme.primaryContainer,
+      durationForeground = scheme.onPrimaryContainer,
+      comicsBackground = scheme.primaryContainer,
       comicsForeground = scheme.onPrimaryContainer,
       seriesBackground = scheme.secondaryContainer,
       seriesForeground = scheme.onSecondaryContainer,
@@ -303,6 +355,10 @@ class _HomeStatPalette {
       trashBackground = HomeShortcutCardColors.trashBackground(scheme),
       trashForeground = HomeShortcutCardColors.trashForeground(scheme);
 
+  final Color finishedBackground;
+  final Color finishedForeground;
+  final Color durationBackground;
+  final Color durationForeground;
   final Color comicsBackground;
   final Color comicsForeground;
   final Color seriesBackground;

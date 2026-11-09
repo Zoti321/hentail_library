@@ -6,6 +6,7 @@ import 'package:hentai_library/features/library_admin/presentation/views/library
 
 import '../lab/navigation/md3e_library_edit_navigation.dart';
 
+import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_library_dashboard_models.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_management_section.dart';
 import 'package:hentai_library/features/library_admin/presentation/views/home_library_dashboard/patterns/home_library_delete_confirm_dialog.dart';
@@ -226,6 +227,10 @@ class _Md3eHomePageLabHostState extends State<HomePageLabHost> {
   Widget build(BuildContext context) {
     return HomeLayout(
       aggregateCounts: HomePagePreviewData.sampleAggregateCounts(),
+      activityStats: const ReadingActivityStats(
+        finishedCount: 12,
+        totalDuration: Duration(hours: 3, minutes: 20),
+      ),
       onOpenNavigation: widget.onOpenNavigation,
       onOpenHistory: () {
         unawaited(

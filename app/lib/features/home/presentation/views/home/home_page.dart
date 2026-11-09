@@ -3,6 +3,7 @@ import 'package:hentai_library/features/home/presentation/view_models/home_page_
 import 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
+import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +33,12 @@ class HomePage extends ConsumerWidget {
           data: (HomePageCounts data) => data,
           orElse: () => _emptyCounts,
         );
+    final ReadingActivityStats activityStats = ref
+        .watch(readingActivityStatsStreamProvider)
+        .maybeWhen(
+          data: (ReadingActivityStats data) => data,
+          orElse: () => ReadingActivityStats.empty,
+        );
 
     return HomeLayout(
       aggregateCounts: HomeAggregateCounts(
@@ -42,6 +49,7 @@ class HomePage extends ConsumerWidget {
         characterCount: counts.characterCount,
         tagCount: counts.tagCount,
       ),
+      activityStats: activityStats,
       onOpenNavigation: appShellPageNavigationOpener(context),
       // 与历史 / 垃圾桶同款：push + Shell fade-through，返回可走 reverse。
       onOpenHistory: () => context.push('/history'),

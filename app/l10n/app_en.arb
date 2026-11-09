@@ -162,6 +162,45 @@
   "homeStatSeries": "Series",
   "homeStatTags": "Tags",
   "homeStatAuthors": "Authors",
+  "homeStatFinishedComics": "Finished",
+  "homeFinishedComicCount": "{count, plural, one{1 comic} other{{count} comics}}",
+  "@homeFinishedComicCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStatReadingDuration": "Reading duration",
+  "homeReadingDurationZero": "Under 1 minute",
+  "homeReadingDurationMinutes": "{minutes, plural, one{1 minute} other{{minutes} minutes}}",
+  "@homeReadingDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeReadingDurationHoursMinutes": "{hours, plural, one{1 hour} other{{hours} hours}} {minutes, plural, one{1 min} other{{minutes} min}}",
+  "@homeReadingDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeReadingDurationHours": "{hours, plural, one{1 hour} other{{hours} hours}}",
+  "@homeReadingDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+
   "homeComicTotal": "{count, plural, one{1 comic total} other{{count} comics total}}",
   "@homeComicTotal": {
     "placeholders": {

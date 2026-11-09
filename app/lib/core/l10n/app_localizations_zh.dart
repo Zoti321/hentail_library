@@ -391,6 +391,40 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeStatAuthors => '作者';
 
   @override
+  String get homeStatFinishedComics => '读完';
+
+  @override
+  String homeFinishedComicCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 本',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeStatReadingDuration => '阅读时长';
+
+  @override
+  String get homeReadingDurationZero => '不足 1 分钟';
+
+  @override
+  String homeReadingDurationMinutes(int minutes) {
+    return '$minutes 分钟';
+  }
+
+  @override
+  String homeReadingDurationHoursMinutes(int hours, int minutes) {
+    return '$hours 小时 $minutes 分';
+  }
+
+  @override
+  String homeReadingDurationHours(int hours) {
+    return '$hours 小时';
+  }
+
+  @override
   String homeComicTotal(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

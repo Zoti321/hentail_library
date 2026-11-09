@@ -20,6 +20,7 @@ pub mod parody;
 pub mod path_migration;
 pub mod probe;
 pub mod reader;
+pub mod reading_activity;
 pub mod resource;
 pub mod revision;
 pub mod runtime;
@@ -69,6 +70,9 @@ pub use home::{
     watch_library_home_stats, watch_recently_added_on_home, HomeContinueReadingDto,
     HomeLibraryAlertDto, HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
     LibraryHomeStatDto,
+};
+pub use reading_activity::{
+    load_reading_activity_stats, watch_reading_activity_stats, ReadingActivityStatsDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,

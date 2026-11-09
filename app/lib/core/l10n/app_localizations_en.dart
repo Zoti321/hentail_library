@@ -400,6 +400,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeStatAuthors => 'Authors';
 
   @override
+  String get homeStatFinishedComics => 'Finished';
+
+  @override
+  String homeFinishedComicCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count comics',
+      one: '1 comic',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeStatReadingDuration => 'Reading duration';
+
+  @override
+  String get homeReadingDurationZero => 'Under 1 minute';
+
+  @override
+  String homeReadingDurationMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes',
+      one: '1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeReadingDurationHoursMinutes(int hours, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours',
+      one: '1 hour',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes min',
+      one: '1 min',
+    );
+    return '$_temp0 $_temp1';
+  }
+
+  @override
+  String homeReadingDurationHours(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours',
+      one: '1 hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String homeComicTotal(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

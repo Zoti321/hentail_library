@@ -162,6 +162,45 @@
   "homeStatSeries": "系列",
   "homeStatTags": "标签",
   "homeStatAuthors": "作者",
+  "homeStatFinishedComics": "读完",
+  "homeFinishedComicCount": "{count, plural, other{{count} 本}}",
+  "@homeFinishedComicCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStatReadingDuration": "阅读时长",
+  "homeReadingDurationZero": "不足 1 分钟",
+  "homeReadingDurationMinutes": "{minutes} 分钟",
+  "@homeReadingDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeReadingDurationHoursMinutes": "{hours} 小时 {minutes} 分",
+  "@homeReadingDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeReadingDurationHours": "{hours} 小时",
+  "@homeReadingDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+
   "homeComicTotal": "共 {count, plural, other{{count} 本}}",
   "@homeComicTotal": {
     "placeholders": {

@@ -17,6 +17,7 @@ import 'api/named_facet/management.dart';
 import 'api/named_facet/types.dart';
 import 'api/named_facet_dictionary.dart';
 import 'api/reader.dart';
+import 'api/reading_activity.dart';
 import 'api/series.dart';
 import 'api/shutdown.dart';
 import 'api/sync.dart';
@@ -87,7 +88,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -507846831;
+  int get rustContentHash => 1759552399;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -633,6 +634,9 @@ abstract class RustLibApi extends BaseApi {
   Stream<List<LibraryHomeStatDto>> crateApiHomeWatchLibraryHomeStatsFrb({
     required bool excludeR18,
   });
+
+  Stream<ReadingActivityStatsDto>
+  crateApiReadingActivityWatchReadingActivityStatsFrb();
 
   Stream<int> crateApiHistoryWatchReadingHistoryChangesFrb();
 
@@ -4915,6 +4919,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Stream<ReadingActivityStatsDto>
+  crateApiReadingActivityWatchReadingActivityStatsFrb() {
+    final sink = RustStreamSink<ReadingActivityStatsDto>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_StreamSink_reading_activity_stats_dto_Sse(
+              sink,
+              serializer,
+            );
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 128,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_hentai_error_dto,
+          ),
+          constMeta:
+              kCrateApiReadingActivityWatchReadingActivityStatsFrbConstMeta,
+          argValues: [sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta
+  get kCrateApiReadingActivityWatchReadingActivityStatsFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "watch_reading_activity_stats_frb",
+        argNames: ["sink"],
+      );
+
+  @override
   Stream<int> crateApiHistoryWatchReadingHistoryChangesFrb() {
     final sink = RustStreamSink<int>();
     unawaited(
@@ -4926,7 +4971,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 128,
+              funcId: 129,
               port: port_,
             );
           },
@@ -4967,7 +5012,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 129,
+              funcId: 130,
               port: port_,
             );
           },
@@ -5002,7 +5047,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 130,
+              funcId: 131,
               port: port_,
             );
           },
@@ -5117,6 +5162,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RustStreamSink<List<SeriesComicOrderEntryDto>>
   dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  RustStreamSink<ReadingActivityStatsDto>
+  dco_decode_StreamSink_reading_activity_stats_dto_Sse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
@@ -6489,6 +6541,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ReadingActivityStatsDto dco_decode_reading_activity_stats_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ReadingActivityStatsDto(
+      finishedCount: dco_decode_i_32(arr[0]),
+      totalDurationMs: dco_decode_i_64(arr[1]),
+    );
+  }
+
+  @protected
   ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -7093,6 +7157,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RustStreamSink<List<SeriesComicOrderEntryDto>>
   sse_decode_StreamSink_list_series_comic_order_entry_dto_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  RustStreamSink<ReadingActivityStatsDto>
+  sse_decode_StreamSink_reading_activity_stats_dto_Sse(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -8921,6 +8994,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ReadingActivityStatsDto sse_decode_reading_activity_stats_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_finishedCount = sse_decode_i_32(deserializer);
+    var var_totalDurationMs = sse_decode_i_64(deserializer);
+    return ReadingActivityStatsDto(
+      finishedCount: var_finishedCount,
+      totalDurationMs: var_totalDurationMs,
+    );
+  }
+
+  @protected
   ReadingHistoryDto sse_decode_reading_history_dto(
     SseDeserializer deserializer,
   ) {
@@ -9700,6 +9786,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       self.setupAndSerialize(
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_series_comic_order_entry_dto,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_StreamSink_reading_activity_stats_dto_Sse(
+    RustStreamSink<ReadingActivityStatsDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_reading_activity_stats_dto,
           decodeErrorData: sse_decode_AnyhowException,
         ),
       ),
@@ -11287,6 +11390,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.resourceType, serializer);
     sse_encode_i_32(self.pageCount, serializer);
     sse_encode_list_String(self.dirPagePaths, serializer);
+  }
+
+  @protected
+  void sse_encode_reading_activity_stats_dto(
+    ReadingActivityStatsDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.finishedCount, serializer);
+    sse_encode_i_64(self.totalDurationMs, serializer);
   }
 
   @protected

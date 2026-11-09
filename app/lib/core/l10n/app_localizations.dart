@@ -818,6 +818,48 @@ abstract class AppLocalizations {
   /// **'作者'**
   String get homeStatAuthors;
 
+  /// No description provided for @homeStatFinishedComics.
+  ///
+  /// In zh, this message translates to:
+  /// **'读完'**
+  String get homeStatFinishedComics;
+
+  /// No description provided for @homeFinishedComicCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{count, plural, other{{count} 本}}'**
+  String homeFinishedComicCount(int count);
+
+  /// No description provided for @homeStatReadingDuration.
+  ///
+  /// In zh, this message translates to:
+  /// **'阅读时长'**
+  String get homeStatReadingDuration;
+
+  /// No description provided for @homeReadingDurationZero.
+  ///
+  /// In zh, this message translates to:
+  /// **'不足 1 分钟'**
+  String get homeReadingDurationZero;
+
+  /// No description provided for @homeReadingDurationMinutes.
+  ///
+  /// In zh, this message translates to:
+  /// **'{minutes} 分钟'**
+  String homeReadingDurationMinutes(int minutes);
+
+  /// No description provided for @homeReadingDurationHoursMinutes.
+  ///
+  /// In zh, this message translates to:
+  /// **'{hours} 小时 {minutes} 分'**
+  String homeReadingDurationHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @homeReadingDurationHours.
+  ///
+  /// In zh, this message translates to:
+  /// **'{hours} 小时'**
+  String homeReadingDurationHours(int hours);
+
   /// No description provided for @homeComicTotal.
   ///
   /// In zh, this message translates to:

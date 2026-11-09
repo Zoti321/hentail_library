@@ -7,6 +7,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/ui/shell/desktop_shell_surfaces.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_aggregate_stats_section.dart';
+import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 import 'package:hentai_library/shared/ui/patterns/shared/page_header.dart';
 import 'package:hentai_library/features/home/presentation/views/home/patterns/home_page_header.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
@@ -16,6 +17,7 @@ class HomeLayout extends StatelessWidget {
   const HomeLayout({
     super.key,
     required this.aggregateCounts,
+    required this.activityStats,
     required this.libraryManagementSection,
     this.onOpenNavigation,
     this.onOpenHistory,
@@ -27,6 +29,7 @@ class HomeLayout extends StatelessWidget {
   });
 
   final HomeAggregateCounts aggregateCounts;
+  final ReadingActivityStats activityStats;
   final Widget libraryManagementSection;
   final VoidCallback? onOpenNavigation;
   final VoidCallback? onOpenHistory;
@@ -78,6 +81,7 @@ class HomeLayout extends StatelessWidget {
                   ),
                   HomeAggregateStatsSection(
                     counts: aggregateCounts,
+                    activityStats: activityStats,
                     onOpenHistory: onOpenHistory,
                     onOpenTrash: onOpenTrash,
                     onOpenAuthors: onOpenAuthors,

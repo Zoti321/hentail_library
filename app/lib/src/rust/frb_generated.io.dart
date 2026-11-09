@@ -17,6 +17,7 @@ import 'api/named_facet/management.dart';
 import 'api/named_facet/types.dart';
 import 'api/named_facet_dictionary.dart';
 import 'api/reader.dart';
+import 'api/reading_activity.dart';
 import 'api/series.dart';
 import 'api/shutdown.dart';
 import 'api/sync.dart';
@@ -94,6 +95,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   RustStreamSink<List<SeriesComicOrderEntryDto>>
   dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<ReadingActivityStatsDto>
+  dco_decode_StreamSink_reading_activity_stats_dto_Sse(dynamic raw);
 
   @protected
   RustStreamSink<SyncLibraryProgressDto>
@@ -581,6 +586,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw);
 
   @protected
+  ReadingActivityStatsDto dco_decode_reading_activity_stats_dto(dynamic raw);
+
+  @protected
   ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw);
 
   @protected
@@ -772,6 +780,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   RustStreamSink<List<SeriesComicOrderEntryDto>>
   sse_decode_StreamSink_list_series_comic_order_entry_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RustStreamSink<ReadingActivityStatsDto>
+  sse_decode_StreamSink_reading_activity_stats_dto_Sse(
     SseDeserializer deserializer,
   );
 
@@ -1391,6 +1405,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ReadingActivityStatsDto sse_decode_reading_activity_stats_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ReadingHistoryDto sse_decode_reading_history_dto(
     SseDeserializer deserializer,
   );
@@ -1639,6 +1658,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(
     RustStreamSink<List<SeriesComicOrderEntryDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_reading_activity_stats_dto_Sse(
+    RustStreamSink<ReadingActivityStatsDto> self,
     SseSerializer serializer,
   );
 
@@ -2407,6 +2432,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_reader_page_list_dto(
     ReaderPageListDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_reading_activity_stats_dto(
+    ReadingActivityStatsDto self,
     SseSerializer serializer,
   );
 

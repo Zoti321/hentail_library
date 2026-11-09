@@ -4,4 +4,7 @@ import 'package:riverpod/misc.dart' show Override;
 
 List<Override> readingStatsSharedStateOverrides() => <Override>[
   homePageCountsPortProvider.overrideWith(createHomePageCountsPort),
+  readingActivityStatsPortProvider.overrideWithValue(
+    createReadingActivityStatsPort(),
+  ),
 ];

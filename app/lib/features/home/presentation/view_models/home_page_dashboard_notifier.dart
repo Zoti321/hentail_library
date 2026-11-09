@@ -8,7 +8,9 @@ import 'package:hentai_library/shared/di/library_change_bus.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/reading_stats_providers.dart';
 import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
+import 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 import 'package:hentai_library/shared/domain/ports/home_page_counts_port.dart';
+import 'package:hentai_library/shared/domain/ports/reading_activity_stats_port.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -39,6 +41,20 @@ Stream<HomePageCounts> homePageCountsStream(Ref ref) {
   );
   return throttleWhile(
     port.watchHomePageCounts(excludeR18: excludeR18),
+    shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
+    interval: _kHomeScanThrottleInterval,
+  );
+}
+
+/// Reading activity stats 装配缝：经 `reading_stats` Port。
+@Riverpod(keepAlive: true)
+Stream<ReadingActivityStats> readingActivityStatsStream(Ref ref) {
+  final ReadingActivityStatsPort port = ref.watch(
+    readingActivityStatsPortProvider,
+  );
+  ref.watch(libraryRevisionThrottleBusyStateProvider);
+  return throttleWhile(
+    port.watchActivityStats(),
     shouldThrottle: () => ref.read(libraryRevisionThrottleBusyStateProvider),
     interval: _kHomeScanThrottleInterval,
   );
