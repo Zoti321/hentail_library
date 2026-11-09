@@ -44,6 +44,9 @@ class HomePageRepositoryImpl implements HomePageRepository {
       tagCount: dto.tagCount,
       seriesCount: dto.seriesCount,
       authorCount: dto.authorCount,
+      // Parody / Character 由 homePageCountsStream 按字典口径合并。
+      parodyCount: 0,
+      characterCount: 0,
       libraryCount: dto.libraryCount,
     );
   }

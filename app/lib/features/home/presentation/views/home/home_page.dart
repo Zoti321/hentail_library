@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
-import 'package:hentai_library/features/home/presentation/view_models/home_facet_counts_provider.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
@@ -20,6 +19,8 @@ class HomePage extends ConsumerWidget {
     tagCount: 0,
     seriesCount: 0,
     authorCount: 0,
+    parodyCount: 0,
+    characterCount: 0,
     libraryCount: 0,
   );
 
@@ -31,20 +32,14 @@ class HomePage extends ConsumerWidget {
           data: (HomePageCounts data) => data,
           orElse: () => _emptyCounts,
         );
-    final HomeFacetCounts facets = ref
-        .watch(homeFacetCountsProvider)
-        .maybeWhen(
-          data: (HomeFacetCounts data) => data,
-          orElse: () => (parodyCount: 0, characterCount: 0),
-        );
 
     return HomeLayout(
       aggregateCounts: HomeAggregateCounts(
         comicCount: counts.comicCount,
         seriesCount: counts.seriesCount,
         authorCount: counts.authorCount,
-        parodyCount: facets.parodyCount,
-        characterCount: facets.characterCount,
+        parodyCount: counts.parodyCount,
+        characterCount: counts.characterCount,
         tagCount: counts.tagCount,
       ),
       onOpenNavigation: appShellPageNavigationOpener(context),
