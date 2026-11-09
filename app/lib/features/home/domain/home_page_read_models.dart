@@ -1,5 +1,4 @@
 export 'package:hentai_library/shared/domain/library/home_library_stat.dart';
-export 'package:hentai_library/shared/domain/library/home_page_counts.dart';
 
 enum HomeLibraryAlertKind { remoteUnreachable, syncFailed, staleSync }
 

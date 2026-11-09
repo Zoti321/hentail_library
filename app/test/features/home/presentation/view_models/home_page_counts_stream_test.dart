@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/library_browse/public/library_age_restriction_filter.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/shared/di/reading_stats_providers.dart';
+import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
 import 'package:hentai_library/shared/domain/ports/home_page_counts_port.dart';
 import 'package:riverpod/misc.dart' show Override;
 

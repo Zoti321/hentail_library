@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/home/domain/home_page_read_models.dart';
 import 'package:hentai_library/features/home/presentation/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/features/home/presentation/views/home/home_layout.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/shared/domain/library/home_page_counts.dart';
 import 'package:hentai_library/shared/ui/layout/app_shell_navigation.dart';
 import 'package:hentai_library/shared/ui/patterns/home/home_aggregate_counts.dart';
 import 'package:go_router/go_router.dart';

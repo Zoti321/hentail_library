@@ -7,14 +7,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
   const HomePageRepositoryImpl();
 
   @override
-  Stream<HomePageCounts> watchHomePageCounts({required bool excludeR18}) {
-    return guardFrbStream(
-      () => rust.watchHomePageCountsFrb(excludeR18: excludeR18).map(_mapCounts),
-      fallbackMessage: '读取首页统计失败',
-    );
-  }
-
-  @override
   Stream<List<HomeLibraryAlert>> watchHomeLibraryAlerts() {
     return guardFrbStream(
       () => rust.watchHomeLibraryAlertsFrb().map(
@@ -35,19 +27,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
                 rows.map(_mapLibraryStat).toList(growable: false),
           ),
       fallbackMessage: '读取库统计失败',
-    );
-  }
-
-  HomePageCounts _mapCounts(rust.HomePageCountsDto dto) {
-    return HomePageCounts(
-      comicCount: dto.comicCount,
-      tagCount: dto.tagCount,
-      seriesCount: dto.seriesCount,
-      authorCount: dto.authorCount,
-      // Parody / Character 由 homePageCountsStream 按字典口径合并。
-      parodyCount: 0,
-      characterCount: 0,
-      libraryCount: dto.libraryCount,
     );
   }
 
