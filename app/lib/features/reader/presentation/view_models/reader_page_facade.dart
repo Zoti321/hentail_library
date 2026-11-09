@@ -1,8 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_fullscreen_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/series_reader_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

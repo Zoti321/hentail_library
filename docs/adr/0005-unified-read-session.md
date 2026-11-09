@@ -4,6 +4,8 @@
 
 Accepted
 
+> **实现修订（2026-11-09）**：Flutter Wayfinder **product module** 目录由 `features/reader/` 更名为 `features/reader/`（ADR-0038）。本文 **Read session** 会话语义不变；模块路径与跨 feature 启动口见 ADR-0038 与 `docs/engineering/reader-ddd-lexicon.md`。
+
 ## Context
 
 领域上曾区分 **Standalone read** 与 **Series read**：入口可带 `seriesId`，进度分别写入 Reading history 与 Series reading history。Series 已由 Library sync 按 Folder series（直接父目录）生成，一本 Comic 至多属于一个 Series。

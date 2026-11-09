@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/continuous_vertical_viewport.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/dual_page_viewport.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/paged_viewport.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/continuous_vertical_viewport.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/dual_page_viewport.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/paged_viewport.dart';
 
 class ReaderViewportHost extends StatelessWidget {
   const ReaderViewportHost({

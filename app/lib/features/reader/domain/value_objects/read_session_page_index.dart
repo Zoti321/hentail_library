@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/read_session/domain/read_session_rule_exceptions.dart';
+import 'package:hentai_library/features/reader/domain/read_session_exceptions.dart';
 
 /// 阅读会话页码值对象（1-based）。
 final class ReadSessionPageIndex {
@@ -8,10 +8,10 @@ final class ReadSessionPageIndex {
 
   factory ReadSessionPageIndex.tryParse(int raw, {required int totalPages}) {
     if (raw < 1) {
-      throw ReadSessionRuleException.invalidPageIndex(raw);
+      throw ReadSessionException.invalidPageIndex(raw);
     }
     if (totalPages > 0 && raw > totalPages) {
-      throw ReadSessionRuleException.pageIndexExceedsTotal(
+      throw ReadSessionException.pageIndexExceedsTotal(
         pageIndex: raw,
         totalPages: totalPages,
       );

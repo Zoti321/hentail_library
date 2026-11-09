@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:hentai_library/features/read_session/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/features/reader/data/mappers/reader_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
-import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
+import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/domain/read_session_page.dart';
+import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 

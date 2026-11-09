@@ -39,7 +39,7 @@ MD3E Lab（`app/lib/md3e/`，见 ADR-0030）已完成 UI 范围收口，设置�
 
 4. **终态**：全部 feature Cutover 完成后，删除 `app/lib/md3e/` 目录，去除生产文件名中的 `md3e_` 前缀，并以门禁测试禁止生产代码 import `md3e/`。
 
-5. **迁移顺序**：`app_settings`（继续完善 Pilot）→ `comic_trash` → `named_metadata` → `home` → `library_browse`（同时收纳 `library_admin` 与 `metadata_backup` 的 UI）→ `read_session`。桌面 / 移动应用外壳（shell）在所有 feature 迁完后统一迁移。
+5. **迁移顺序**：`app_settings`（继续完善 Pilot）→ `comic_trash` → `named_metadata` → `home` → `library_browse`（同时收纳 `library_admin` 与 `metadata_backup` 的 UI）→ `reader`。桌面 / 移动应用外壳（shell）在所有 feature 迁完后统一迁移。
 
 ## Consequences
 

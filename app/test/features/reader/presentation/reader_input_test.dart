@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
-import 'package:hentai_library/features/read_session/presentation/reader_input.dart';
+import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
+import 'package:hentai_library/features/reader/presentation/reader_input.dart';
 
 void main() {
   group('resolveReaderTapZone', () {

@@ -1,32 +1,32 @@
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
-import 'package:hentai_library/features/read_session/domain/spread_index.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('SpreadIndex.totalSpreads', () {
+  group('SpreadNavigation.totalSpreads', () {
     test('paged equals page count', () {
       expect(
-        SpreadIndex.totalSpreads(mode: ReadingMode.paged, totalPages: 5),
+        SpreadNavigation.totalSpreads(mode: ReadingMode.paged, totalPages: 5),
         5,
       );
     });
 
     test('dualPage pairs all pages', () {
       expect(
-        SpreadIndex.totalSpreads(mode: ReadingMode.dualPage, totalPages: 3),
+        SpreadNavigation.totalSpreads(mode: ReadingMode.dualPage, totalPages: 3),
         2,
       );
       expect(
-        SpreadIndex.totalSpreads(mode: ReadingMode.dualPage, totalPages: 4),
+        SpreadNavigation.totalSpreads(mode: ReadingMode.dualPage, totalPages: 4),
         2,
       );
     });
   });
 
-  group('SpreadIndex.pagesInSpread dualPage', () {
+  group('SpreadNavigation.pagesInSpread dualPage', () {
     test('pairs pages and leaves odd last page alone', () {
       expect(
-        SpreadIndex.pagesInSpread(
+        SpreadNavigation.pagesInSpread(
           mode: ReadingMode.dualPage,
           totalPages: 3,
           spreadIndex: 0,
@@ -34,7 +34,7 @@ void main() {
         <int>[1, 2],
       );
       expect(
-        SpreadIndex.pagesInSpread(
+        SpreadNavigation.pagesInSpread(
           mode: ReadingMode.dualPage,
           totalPages: 3,
           spreadIndex: 1,
@@ -44,10 +44,10 @@ void main() {
     });
   });
 
-  group('SpreadIndex.spreadIndexForPage', () {
+  group('SpreadNavigation.spreadIndexForPage', () {
     test('maps page back to spread for dualPage', () {
       expect(
-        SpreadIndex.spreadIndexForPage(
+        SpreadNavigation.spreadIndexForPage(
           mode: ReadingMode.dualPage,
           totalPages: 4,
           pageIndex: 1,
@@ -55,7 +55,7 @@ void main() {
         0,
       );
       expect(
-        SpreadIndex.spreadIndexForPage(
+        SpreadNavigation.spreadIndexForPage(
           mode: ReadingMode.dualPage,
           totalPages: 4,
           pageIndex: 2,
@@ -63,7 +63,7 @@ void main() {
         0,
       );
       expect(
-        SpreadIndex.spreadIndexForPage(
+        SpreadNavigation.spreadIndexForPage(
           mode: ReadingMode.dualPage,
           totalPages: 4,
           pageIndex: 3,
@@ -73,10 +73,10 @@ void main() {
     });
   });
 
-  group('SpreadIndex.nextPrimaryPage', () {
+  group('SpreadNavigation.nextPrimaryPage', () {
     test('dualPage pairs advance two pages at a time', () {
       expect(
-        SpreadIndex.nextPrimaryPage(
+        SpreadNavigation.nextPrimaryPage(
           mode: ReadingMode.dualPage,
           totalPages: 3,
           currentPageIndex: 1,
@@ -84,7 +84,7 @@ void main() {
         3,
       );
       expect(
-        SpreadIndex.nextPrimaryPage(
+        SpreadNavigation.nextPrimaryPage(
           mode: ReadingMode.dualPage,
           totalPages: 3,
           currentPageIndex: 3,
@@ -94,10 +94,10 @@ void main() {
     });
   });
 
-  group('SpreadIndex.isOnLastSpread', () {
+  group('SpreadNavigation.isOnLastSpread', () {
     test('detects last spread for dualPage', () {
       expect(
-        SpreadIndex.isOnLastSpread(
+        SpreadNavigation.isOnLastSpread(
           mode: ReadingMode.dualPage,
           totalPages: 4,
           currentPageIndex: 3,
@@ -105,7 +105,7 @@ void main() {
         isTrue,
       );
       expect(
-        SpreadIndex.isOnLastSpread(
+        SpreadNavigation.isOnLastSpread(
           mode: ReadingMode.dualPage,
           totalPages: 4,
           currentPageIndex: 1,
@@ -115,10 +115,10 @@ void main() {
     });
   });
 
-  group('SpreadIndex.isOnFirstSpread', () {
+  group('SpreadNavigation.isOnFirstSpread', () {
     test('detects first spread for paged and dualPage', () {
       expect(
-        SpreadIndex.isOnFirstSpread(
+        SpreadNavigation.isOnFirstSpread(
           mode: ReadingMode.paged,
           totalPages: 5,
           currentPageIndex: 1,
@@ -126,7 +126,7 @@ void main() {
         isTrue,
       );
       expect(
-        SpreadIndex.isOnFirstSpread(
+        SpreadNavigation.isOnFirstSpread(
           mode: ReadingMode.paged,
           totalPages: 5,
           currentPageIndex: 2,
@@ -134,7 +134,7 @@ void main() {
         isFalse,
       );
       expect(
-        SpreadIndex.isOnFirstSpread(
+        SpreadNavigation.isOnFirstSpread(
           mode: ReadingMode.dualPage,
           totalPages: 5,
           currentPageIndex: 1,
@@ -142,7 +142,7 @@ void main() {
         isTrue,
       );
       expect(
-        SpreadIndex.isOnFirstSpread(
+        SpreadNavigation.isOnFirstSpread(
           mode: ReadingMode.dualPage,
           totalPages: 5,
           currentPageIndex: 3,
@@ -152,10 +152,10 @@ void main() {
     });
   });
 
-  group('SpreadIndex.remapPageForModeSwitch', () {
+  group('SpreadNavigation.remapPageForModeSwitch', () {
     test('dualPage to paged uses max page in spread', () {
       expect(
-        SpreadIndex.remapPageForModeSwitch(
+        SpreadNavigation.remapPageForModeSwitch(
           fromMode: ReadingMode.dualPage,
           toMode: ReadingMode.paged,
           currentPageIndex: 3,
@@ -164,7 +164,7 @@ void main() {
         4,
       );
       expect(
-        SpreadIndex.remapPageForModeSwitch(
+        SpreadNavigation.remapPageForModeSwitch(
           fromMode: ReadingMode.dualPage,
           toMode: ReadingMode.paged,
           currentPageIndex: 5,
@@ -176,7 +176,7 @@ void main() {
 
     test('dualPage to webtoon uses max page in spread', () {
       expect(
-        SpreadIndex.remapPageForModeSwitch(
+        SpreadNavigation.remapPageForModeSwitch(
           fromMode: ReadingMode.dualPage,
           toMode: ReadingMode.webtoon,
           currentPageIndex: 1,
@@ -188,7 +188,7 @@ void main() {
 
     test('single-page spread keeps page when leaving dual mode', () {
       expect(
-        SpreadIndex.remapPageForModeSwitch(
+        SpreadNavigation.remapPageForModeSwitch(
           fromMode: ReadingMode.dualPage,
           toMode: ReadingMode.paged,
           currentPageIndex: 5,
@@ -200,7 +200,7 @@ void main() {
 
     test('paged to dual keeps current page', () {
       expect(
-        SpreadIndex.remapPageForModeSwitch(
+        SpreadNavigation.remapPageForModeSwitch(
           fromMode: ReadingMode.paged,
           toMode: ReadingMode.dualPage,
           currentPageIndex: 5,
@@ -212,7 +212,7 @@ void main() {
 
     test('paged to webtoon does not remap', () {
       expect(
-        SpreadIndex.remapPageForModeSwitch(
+        SpreadNavigation.remapPageForModeSwitch(
           fromMode: ReadingMode.paged,
           toMode: ReadingMode.webtoon,
           currentPageIndex: 7,

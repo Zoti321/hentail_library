@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../widgetbook/hosts/md3e_reader_page_lab_host.dart';
 
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_page_copy.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_page_copy.dart';
 
 import '../../../widgetbook/preview/md3e_reader_page_preview_data.dart';
 
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../support/pump_app.dart';

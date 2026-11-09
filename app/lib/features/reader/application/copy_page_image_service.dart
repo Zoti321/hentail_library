@@ -2,16 +2,16 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/read_session/domain/clipboard_image_port.dart';
-import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart';
+import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 
 typedef PageImagePngEncoder = Future<Uint8List> Function(Uint8List imageBytes);
 
 /// Copy a reader page to the clipboard (load → encode PNG → write).
 ///
 /// PNG encoding is injected; the engine-backed default lives in data adapters.
-class PageImageCopy {
-  PageImageCopy({
+class CopyPageImageService {
+  CopyPageImageService({
     required this._pageSource,
     required this._clipboardImage,
     required this._encodePng,
@@ -32,14 +32,14 @@ class PageImageCopy {
         pageIndex: archivePageIndex,
       );
     } on Object catch (error, stackTrace) {
-      throw PageImageCopyException.loadFailed(
+      throw CopyPageImageException.loadFailed(
         archivePageIndex: archivePageIndex,
         cause: error,
         stackTrace: stackTrace,
       );
     }
     if (sourceBytes == null || sourceBytes.isEmpty) {
-      throw PageImageCopyException.loadFailed(
+      throw CopyPageImageException.loadFailed(
         archivePageIndex: archivePageIndex,
         cause: StateError('empty page bytes'),
       );
@@ -49,7 +49,7 @@ class PageImageCopy {
     try {
       pngBytes = await _encodePng(sourceBytes);
     } on Object catch (error, stackTrace) {
-      throw PageImageCopyException.encodeFailed(
+      throw CopyPageImageException.encodeFailed(
         archivePageIndex: archivePageIndex,
         cause: error,
         stackTrace: stackTrace,
@@ -59,7 +59,7 @@ class PageImageCopy {
     try {
       await _clipboardImage.writePng(pngBytes);
     } on Object catch (error, stackTrace) {
-      throw PageImageCopyException.clipboardWriteFailed(
+      throw CopyPageImageException.clipboardWriteFailed(
         archivePageIndex: archivePageIndex,
         cause: error,
         stackTrace: stackTrace,
@@ -68,39 +68,39 @@ class PageImageCopy {
   }
 }
 
-class PageImageCopyException extends AppException {
-  PageImageCopyException._(super.message, {super.cause, super.stackTrace});
+class CopyPageImageException extends AppException {
+  CopyPageImageException._(super.message, {super.cause, super.stackTrace});
 
-  factory PageImageCopyException.loadFailed({
+  factory CopyPageImageException.loadFailed({
     required int archivePageIndex,
     required Object cause,
     StackTrace? stackTrace,
   }) {
-    return PageImageCopyException._(
+    return CopyPageImageException._(
       '加载页图失败（第 ${archivePageIndex + 1} 页）',
       cause: cause,
       stackTrace: stackTrace,
     );
   }
 
-  factory PageImageCopyException.encodeFailed({
+  factory CopyPageImageException.encodeFailed({
     required int archivePageIndex,
     required Object cause,
     StackTrace? stackTrace,
   }) {
-    return PageImageCopyException._(
+    return CopyPageImageException._(
       '转换页图失败（第 ${archivePageIndex + 1} 页）',
       cause: cause,
       stackTrace: stackTrace,
     );
   }
 
-  factory PageImageCopyException.clipboardWriteFailed({
+  factory CopyPageImageException.clipboardWriteFailed({
     required int archivePageIndex,
     required Object cause,
     StackTrace? stackTrace,
   }) {
-    return PageImageCopyException._(
+    return CopyPageImageException._(
       '写入剪贴板失败（第 ${archivePageIndex + 1} 页）',
       cause: cause,
       stackTrace: stackTrace,

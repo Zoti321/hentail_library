@@ -21,7 +21,7 @@ MODULES = frozenset(
         "home",
         "library_admin",
         "library_browse",
-        "read_session",
+        "reader",
         "reading_history",
         "reading_stats",
         "comic_trash",
@@ -116,7 +116,7 @@ def main() -> None:
             if target == "frb_generated" and not rel.startswith("shared/data/"):
                 non_data_to_frb.append(rel)
 
-            if mod == "library_browse" and imp.startswith("features/read_session/"):
+            if mod == "library_browse" and imp.startswith("features/reader/"):
                 browse_to_reading.append(f"{rel} -> {imp}")
 
             if mod != target and mod in MODULES and target in MODULES:

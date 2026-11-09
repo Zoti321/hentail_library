@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-/// Engine-backed PNG encoder for [PageImageCopy] (kept out of domain).
+/// Engine-backed PNG encoder for [CopyPageImageService] (kept out of domain).
 Future<Uint8List> encodePageImagePng(Uint8List imageBytes) async {
   final ui.Codec codec = await ui.instantiateImageCodec(imageBytes);
   try {

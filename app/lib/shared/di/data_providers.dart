@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
-import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
+import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting_repository.dart';
 import 'package:hentai_library/features/named_metadata/domain/author_repository.dart';
 import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
@@ -89,14 +89,14 @@ final Provider<HomePageRepository> homePageRepoProvider =
       (Ref ref) => _unimplemented('homePageRepoProvider'),
     );
 
-final Provider<ReaderSessionPort> readerSessionPortProvider =
-    Provider<ReaderSessionPort>(
-      (Ref ref) => _unimplemented('readerSessionPortProvider'),
+final Provider<NativeReaderPort> nativeReaderPortProvider =
+    Provider<NativeReaderPort>(
+      (Ref ref) => _unimplemented('nativeReaderPortProvider'),
     );
 
-final Provider<ComicTrashReaderSessionPort>
-comicTrashReaderSessionPortProvider = Provider<ComicTrashReaderSessionPort>(
-  (Ref ref) => _unimplemented('comicTrashReaderSessionPortProvider'),
+final Provider<ComicTrashNativeReaderPort>
+comicTrashNativeReaderPortProvider = Provider<ComicTrashNativeReaderPort>(
+  (Ref ref) => _unimplemented('comicTrashNativeReaderPortProvider'),
 );
 
 final Provider<ComicPageSourcePort> comicPageSourcePortProvider =

@@ -53,7 +53,7 @@ class _TrashComicRepo implements ComicTrashRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _NoopReaderSessionPort implements ComicTrashReaderSessionPort {
+class _NoopNativeReaderPort implements ComicTrashNativeReaderPort {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -95,8 +95,8 @@ Future<void> _pumpTrash(WidgetTester tester, List<TrashedComic> items) async {
     overrides: <Override>[
       libraryRevisionPortProvider.overrideWithValue(revision),
       comicTrashRepositoryProvider.overrideWithValue(_TrashComicRepo(items)),
-      comicTrashReaderSessionPortProvider.overrideWithValue(
-        _NoopReaderSessionPort(),
+      comicTrashNativeReaderPortProvider.overrideWithValue(
+        _NoopNativeReaderPort(),
       ),
       for (final TrashedComic item in items)
         comicCoverProvider(item.comic.comicId)

@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:hentai_library/features/read_session/presentation/reader_exit_location.dart';
+import 'package:hentai_library/features/reader/presentation/reader_exit_location.dart';
 
 void main() {
   group('resolveReaderExitNavigation', () {

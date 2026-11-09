@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader/reader_cover_actions.dart';
+import 'package:hentai_library/features/reader/presentation/views/reader/reader_cover_actions.dart';
 
 void main() {
   group('readerCoverPageIndex', () {

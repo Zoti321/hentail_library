@@ -17,3 +17,5 @@
 Shared Kernel（ADR-0035）中 FRB 映射 DTO 保持现有 `models/entity` 与 `value_objects/form` 布局；新增纯 Dart 规约优先放在 owner feature 的 `domain/`。
 
 应用层异常（`core/errors/app_exception.dart`）与 `DomainException` 分离：domain 抛出规则违反，data/presentation 映射为用户可见错误。
+
+**Reader 模块**（`features/reader/`，ADR-0038）额外冻结名实对照：见 [`reader-ddd-lexicon.md`](./reader-ddd-lexicon.md)。`domain/read_session.dart` 只放 `ReadSession` 实体，不得存放路由参数。

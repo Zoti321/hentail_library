@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/read_session/data/mappers/reader_frb_mapper.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
+import 'package:hentai_library/features/reader/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
 void main() {

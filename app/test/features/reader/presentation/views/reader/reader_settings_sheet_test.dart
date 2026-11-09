@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:hentai_library/features/read_session/presentation/views/reader/reader_settings_sheet.dart';
+import 'package:hentai_library/features/reader/presentation/views/reader/reader_settings_sheet.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;

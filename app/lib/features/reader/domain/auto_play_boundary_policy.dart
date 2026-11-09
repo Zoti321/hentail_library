@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 
 /// Decision taken after a full Auto-play interval dwell on the last spread.
 sealed class AutoPlayBoundaryDecision {
@@ -22,37 +22,38 @@ final class AutoPlayBoundarySwitchComic extends AutoPlayBoundaryDecision {
   final String comicId;
 }
 
-/// Resolves the last-spread Auto-play boundary action for [mode].
+/// Auto-play 末 spread 边界策略（领域 Policy）。
 ///
-/// [nextComicId] / [firstComicId] come from Series reading context when
-/// present; either may be null when there is no series or no neighbor volume.
-/// [currentComicId] avoids a no-op switch when the only volume is itself.
-AutoPlayBoundaryDecision resolveAutoPlayBoundary({
-  required AutoPlayMode mode,
-  required String currentComicId,
-  required String? nextComicId,
-  required String? firstComicId,
-}) {
-  switch (mode) {
-    case AutoPlayMode.comicOnce:
-      return const AutoPlayBoundaryStop();
-    case AutoPlayMode.comicLoop:
-      return const AutoPlayBoundaryJumpToFirstPage();
-    case AutoPlayMode.seriesOnce:
-      final String? next = nextComicId;
-      if (next != null && next != currentComicId) {
-        return AutoPlayBoundarySwitchComic(next);
-      }
-      return const AutoPlayBoundaryStop();
-    case AutoPlayMode.seriesLoop:
-      final String? next = nextComicId;
-      if (next != null && next != currentComicId) {
-        return AutoPlayBoundarySwitchComic(next);
-      }
-      final String? first = firstComicId;
-      if (first != null && first != currentComicId) {
-        return AutoPlayBoundarySwitchComic(first);
-      }
-      return const AutoPlayBoundaryJumpToFirstPage();
+/// [nextComicId] / [firstComicId] 来自 Series reading context；无系列或无邻卷时可为 null。
+/// [currentComicId] 避免单卷时无意义切卷。
+abstract final class AutoPlayBoundaryPolicy {
+  static AutoPlayBoundaryDecision resolve({
+    required AutoPlayMode mode,
+    required String currentComicId,
+    required String? nextComicId,
+    required String? firstComicId,
+  }) {
+    switch (mode) {
+      case AutoPlayMode.comicOnce:
+        return const AutoPlayBoundaryStop();
+      case AutoPlayMode.comicLoop:
+        return const AutoPlayBoundaryJumpToFirstPage();
+      case AutoPlayMode.seriesOnce:
+        final String? next = nextComicId;
+        if (next != null && next != currentComicId) {
+          return AutoPlayBoundarySwitchComic(next);
+        }
+        return const AutoPlayBoundaryStop();
+      case AutoPlayMode.seriesLoop:
+        final String? next = nextComicId;
+        if (next != null && next != currentComicId) {
+          return AutoPlayBoundarySwitchComic(next);
+        }
+        final String? first = firstComicId;
+        if (first != null && first != currentComicId) {
+          return AutoPlayBoundarySwitchComic(first);
+        }
+        return const AutoPlayBoundaryJumpToFirstPage();
+    }
   }
 }

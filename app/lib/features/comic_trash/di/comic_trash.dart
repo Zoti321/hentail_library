@@ -7,5 +7,5 @@ part 'comic_trash.g.dart';
 @Riverpod(keepAlive: true)
 ComicTrashService comicTrashService(Ref ref) => ComicTrashService(
   comicRepository: ref.read(comicTrashRepositoryProvider),
-  readerSessionPort: ref.read(comicTrashReaderSessionPortProvider),
+  readerSessionPort: ref.read(comicTrashNativeReaderPortProvider),
 );

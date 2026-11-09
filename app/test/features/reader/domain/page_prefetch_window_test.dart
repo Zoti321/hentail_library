@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_logic.dart';
+import 'package:hentai_library/features/reader/domain/page_prefetch_window.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -6,22 +6,22 @@ import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
-import 'package:hentai_library/features/read_session/application/read_session_coordinator.dart';
-import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
-import 'package:hentai_library/features/read_session/di/session_providers.dart';
-import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
-import 'package:hentai_library/features/read_session/domain/read_session.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_auto_play_carry.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_series_navigation.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
-import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
+import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
+import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/application/open_reader_args.dart';
+import 'package:hentai_library/features/reader/domain/read_session_page.dart';
+import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
+import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_series_navigation.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
@@ -58,9 +58,9 @@ Comic _comic({int pageCount = 10}) {
   );
 }
 
-ReaderSessionSnapshot _snapshot({int pageCount = 10, int resumePage = 1}) {
+OpenedReadSession _snapshot({int pageCount = 10, int resumePage = 1}) {
   final Comic comic = _comic(pageCount: pageCount);
-  return ReaderSessionSnapshot(
+  return OpenedReadSession(
     comic: comic,
     pages: List<ReadSessionPage>.generate(
       pageCount,
@@ -80,7 +80,7 @@ class _RecordingSeriesNavigation extends ReaderSeriesNavigation {
   @override
   Future<void> switchComic({
     required GoRouter router,
-    required ReadSessionRouteParams currentSession,
+    required OpenReaderArgs currentSession,
     required String targetComicId,
   }) async {
     switchedTo.add(targetComicId);
@@ -134,7 +134,7 @@ class _UnusedPageSource implements ComicPageSourcePort {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _UnusedSessionPort implements ReaderSessionPort {
+class _UnusedSessionPort implements NativeReaderPort {
   @override
   Future<void> openComic(Comic comic) async {}
 
@@ -161,7 +161,7 @@ Override _stubCoordinatorOverride() {
   final _NoOpHistoryCommands history = _NoOpHistoryCommands();
   return readSessionCoordinatorProvider.overrideWithValue(
     ReadSessionCoordinator(
-      sessionService: ReaderSessionService(
+      sessionService: OpenReadSessionService(
         comicRepo: _UnusedComicLookup(),
         pageSource: _UnusedPageSource(),
         readingHistoryCommands: history,
@@ -214,11 +214,11 @@ ReaderNavContextData _navContext({
 ProviderContainer _createContainer({
   required AppSetting initialSetting,
   ReaderControllerKey key = _key,
-  ReaderSessionSnapshot? snapshot,
+  OpenedReadSession? snapshot,
   _RecordingSeriesNavigation? seriesNavigation,
   _FakePrefetchController? prefetch,
 }) {
-  final ReaderSessionSnapshot session = snapshot ?? _snapshot();
+  final OpenedReadSession session = snapshot ?? _snapshot();
   return ProviderContainer(
     overrides: <Override>[
       ...sharedLibraryStateOverrides(),
@@ -283,7 +283,7 @@ void main() {
         incognito: false,
         startFromFirstPage: false,
       );
-      final ReaderSessionSnapshot otherSnapshot = ReaderSessionSnapshot(
+      final OpenedReadSession otherSnapshot = OpenedReadSession(
         comic: Comic(
           comicId: otherKey.comicId,
           path: '/tmp/${otherKey.comicId}.cbz',
@@ -357,7 +357,7 @@ void main() {
         incognito: false,
         startFromFirstPage: true,
       );
-      final ReaderSessionSnapshot otherSnapshot = ReaderSessionSnapshot(
+      final OpenedReadSession otherSnapshot = OpenedReadSession(
         comic: Comic(
           comicId: otherKey.comicId,
           path: '/tmp/${otherKey.comicId}.cbz',
@@ -515,7 +515,7 @@ void main() {
 
   group('requestPrevPage series retreat', () {
     const String previousComicId = 'previous-series-comic';
-    const ReadSessionRouteParams session = ReadSessionRouteParams(
+    const OpenReaderArgs session = OpenReaderArgs(
       comicId: _comicId,
       incognito: true,
     );
@@ -659,7 +659,7 @@ void main() {
 
   group('advanceAutoPlay', () {
     const String nextComicId = 'next-series-comic';
-    const ReadSessionRouteParams session = ReadSessionRouteParams(
+    const OpenReaderArgs session = OpenReaderArgs(
       comicId: _comicId,
       incognito: true,
     );

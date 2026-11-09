@@ -2,9 +2,9 @@ import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 import 'package:hentai_library/shared/domain/ports/record_read_session_activity_port.dart';
-import 'package:hentai_library/features/read_session/domain/read_session.dart';
-import 'package:hentai_library/features/read_session/application/read_session_coordinator.dart';
-import 'package:hentai_library/features/read_session/application/reader_session_service.dart';
+import 'package:hentai_library/features/reader/application/open_reader_args.dart';
+import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:test/test.dart';
 
 class _RecordingReadingHistoryCommands implements ReadingHistoryCommandPort {
@@ -64,8 +64,8 @@ class _RecordingActivityCommands implements RecordReadSessionActivityPort {
   }
 }
 
-class _RecordingReaderSessionService implements ReaderSessionService {
-  _RecordingReaderSessionService() : closedComicIds = <String>[];
+class _RecordingOpenReadSessionService implements OpenReadSessionService {
+  _RecordingOpenReadSessionService() : closedComicIds = <String>[];
 
   final List<String> closedComicIds;
 
@@ -96,14 +96,14 @@ Comic _comic({String id = 'c1', String title = 'Test Comic'}) {
 void main() {
   late _RecordingReadingHistoryCommands readingCommands;
   late _RecordingActivityCommands activityCommands;
-  late _RecordingReaderSessionService sessionService;
+  late _RecordingOpenReadSessionService sessionService;
   late ReadSessionCoordinator coordinator;
   late DateTime now;
 
   setUp(() {
     readingCommands = _RecordingReadingHistoryCommands();
     activityCommands = _RecordingActivityCommands();
-    sessionService = _RecordingReaderSessionService();
+    sessionService = _RecordingOpenReadSessionService();
     now = DateTime.utc(2026, 1, 1, 12);
     coordinator = ReadSessionCoordinator(
       sessionService: sessionService,
@@ -239,7 +239,7 @@ void main() {
 
       now = now.add(const Duration(seconds: 11));
       final SeriesSwitchPlan plan = await coordinator.prepareSeriesSwitch(
-        currentSession: const ReadSessionRouteParams(comicId: 'c1'),
+        currentSession: const OpenReaderArgs(comicId: 'c1'),
         targetComicId: 'c2',
         currentPageIndex: 8,
       );

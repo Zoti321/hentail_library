@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_facade.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/series_reader_provider.dart';
-import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_fullscreen_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_page_facade.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/series_reader_provider.dart';
+import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 

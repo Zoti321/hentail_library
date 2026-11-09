@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_keyboard.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_keyboard.dart';
 
 /// 阅读页键盘快捷键与焦点（Lab；对齐 M3E 文档中 app bar 的 Tab/Space 交互习惯）。
 class ReaderInteractionScope extends StatelessWidget {

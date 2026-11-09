@@ -29,7 +29,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
       case SeriesBoundaryPrompt.none:
         return next;
       case SeriesBoundaryPrompt.advance:
-        if (SpreadIndex.isOnLastSpread(
+        if (SpreadNavigation.isOnLastSpread(
           mode: next.readingMode,
           totalPages: next.totalPages,
           currentPageIndex: next.currentIndex,
@@ -38,7 +38,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
         }
         return next.copyWith(seriesBoundaryPrompt: SeriesBoundaryPrompt.none);
       case SeriesBoundaryPrompt.retreat:
-        if (SpreadIndex.isOnFirstSpread(
+        if (SpreadNavigation.isOnFirstSpread(
           mode: next.readingMode,
           totalPages: next.totalPages,
           currentPageIndex: next.currentIndex,
@@ -51,7 +51,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
 
   void nextPage() {
     _updateDataState((s) {
-      final int? next = SpreadIndex.nextPrimaryPage(
+      final int? next = SpreadNavigation.nextPrimaryPage(
         mode: s.readingMode,
         totalPages: s.totalPages,
         currentPageIndex: s.currentIndex,
@@ -65,7 +65,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
 
   Future<void> requestNextPage({
     ReaderNavContextData? navContext,
-    ReadSessionRouteParams? session,
+    OpenReaderArgs? session,
     GoRouter? router,
   }) async {
     final ReaderState? current = state.asData?.value;
@@ -73,7 +73,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
       return;
     }
     await _requestSeriesBoundaryPage(
-      onBoundary: SpreadIndex.isOnLastSpread(
+      onBoundary: SpreadNavigation.isOnLastSpread(
         mode: current.readingMode,
         totalPages: current.totalPages,
         currentPageIndex: current.currentIndex,
@@ -88,7 +88,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
 
   void prevPage() {
     _updateDataState((s) {
-      final int? prev = SpreadIndex.previousPrimaryPage(
+      final int? prev = SpreadNavigation.previousPrimaryPage(
         mode: s.readingMode,
         totalPages: s.totalPages,
         currentPageIndex: s.currentIndex,
@@ -102,7 +102,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
 
   Future<void> requestPrevPage({
     ReaderNavContextData? navContext,
-    ReadSessionRouteParams? session,
+    OpenReaderArgs? session,
     GoRouter? router,
   }) async {
     final ReaderState? current = state.asData?.value;
@@ -110,7 +110,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
       return;
     }
     await _requestSeriesBoundaryPage(
-      onBoundary: SpreadIndex.isOnFirstSpread(
+      onBoundary: SpreadNavigation.isOnFirstSpread(
         mode: current.readingMode,
         totalPages: current.totalPages,
         currentPageIndex: current.currentIndex,
@@ -127,7 +127,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
     required bool onBoundary,
     required SeriesBoundaryPrompt prompt,
     required ReaderComicListItem? targetItem,
-    required ReadSessionRouteParams? session,
+    required OpenReaderArgs? session,
     required GoRouter? router,
     required void Function() turnPage,
   }) async {

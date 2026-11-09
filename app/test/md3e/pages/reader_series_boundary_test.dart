@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../widgetbook/hosts/md3e_reader_page_lab_host.dart';
 
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_page_copy.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_boundary_snackbar.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_page_copy.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_boundary_snackbar.dart';
 
 import '../../../widgetbook/preview/md3e_reader_page_preview_data.dart';
 import '../../../widgetbook/lab/theme/md3e_theme.dart';

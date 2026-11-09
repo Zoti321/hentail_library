@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_constants.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_constants.dart';
 
 class ReaderPageFadeIn extends StatefulWidget {
   const ReaderPageFadeIn({

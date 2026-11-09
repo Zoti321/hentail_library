@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_logic.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/image/reader_image_cache.dart';
-import 'package:hentai_library/features/read_session/di/session_providers.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_aspect_ratios.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
+import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
+import 'package:hentai_library/features/reader/domain/page_prefetch_window.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reader/presentation/image/reader_image_cache.dart';
+import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_page_aspect_ratios.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_prefetch_controller.g.dart';
@@ -37,7 +37,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     ref.read(readerPageAspectRatiosProvider.notifier).clearComic(comicId);
     // Fire-and-forget: async FRB must not block exit navigation (P2-4).
     unawaited(
-      ref.read(readerSessionServiceProvider).clearPageCache(comicId: comicId),
+      ref.read(openReadSessionServiceProvider).clearPageCache(comicId: comicId),
     );
     ref.invalidate(comicReaderPageProvider);
   }
@@ -96,7 +96,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
           .then<void>((_) {}, onError: (_, StackTrace _) {}),
     );
     await ref
-        .read(readerSessionServiceProvider)
+        .read(openReadSessionServiceProvider)
         .prefetchPages(
           comicId: comicId,
           archivePageIndexes: targets

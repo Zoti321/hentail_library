@@ -1,6 +1,6 @@
 export 'session/reader_session_bindings.dart';
 export 'view_models/reader_prefetch_controller.dart';
-export 'view_models/reader_prefetch_logic.dart';
+export 'package:hentai_library/features/reader/domain/page_prefetch_window.dart';
 export 'view_models/reader_controller.dart';
 export 'view_models/reader_series_navigation.dart';
 export 'view_models/reader_fullscreen_controller.dart';

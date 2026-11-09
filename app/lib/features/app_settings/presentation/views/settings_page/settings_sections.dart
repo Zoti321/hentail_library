@@ -15,7 +15,7 @@ import 'package:hentai_library/shared/di/settings_slot_providers.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/features/app_settings/domain/reader_session_preference_types.dart';
 import 'package:hentai_library/features/comic/public/smart_facet_match_preference.dart';
-import 'package:hentai_library/features/read_session/public/reading_preference_l10n.dart';
+import 'package:hentai_library/features/reader/public/reading_preference_l10n.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 import 'package:material_symbols_icons/symbols.dart';

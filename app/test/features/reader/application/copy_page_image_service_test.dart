@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/read_session/domain/clipboard_image_port.dart';
-import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
-import 'package:hentai_library/features/read_session/domain/page_image_copy.dart';
+import 'package:hentai_library/features/reader/domain/clipboard_image_port.dart';
+import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/application/copy_page_image_service.dart';
 
 class _FakeComicPageSourcePort implements ComicPageSourcePort {
   _FakeComicPageSourcePort({this.pageBytes, this.error});
@@ -73,12 +73,12 @@ Uint8List _encodedPng() => Uint8List.fromList(<int>[
   0xAA,
 ]);
 
-PageImageCopy _subject({
+CopyPageImageService _subject({
   required _FakeComicPageSourcePort pageSource,
   required _FakeClipboardImagePort clipboard,
   required PageImagePngEncoder encodePng,
 }) {
-  return PageImageCopy(
+  return CopyPageImageService(
     pageSource: pageSource,
     clipboardImage: clipboard,
     encodePng: encodePng,
@@ -86,14 +86,14 @@ PageImageCopy _subject({
 }
 
 void main() {
-  group('PageImageCopy', () {
+  group('CopyPageImageService', () {
     test('loads requested page bytes, encodes PNG, writes clipboard', () async {
       final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
         pageBytes: _sourceBytes(),
       );
       final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
       final List<Uint8List> encodedInputs = <Uint8List>[];
-      final PageImageCopy subject = _subject(
+      final CopyPageImageService subject = _subject(
         pageSource: pageSource,
         clipboard: clipboard,
         encodePng: (Uint8List bytes) async {
@@ -116,7 +116,7 @@ void main() {
           error: StateError('io failed'),
         );
         final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
-        final PageImageCopy subject = _subject(
+        final CopyPageImageService subject = _subject(
           pageSource: pageSource,
           clipboard: clipboard,
           encodePng: (_) async => _encodedPng(),
@@ -125,8 +125,8 @@ void main() {
         await expectLater(
           () => subject.execute(comic: _comic(), archivePageIndex: 1),
           throwsA(
-            isA<PageImageCopyException>().having(
-              (PageImageCopyException e) => e.message,
+            isA<CopyPageImageException>().having(
+              (CopyPageImageException e) => e.message,
               'message',
               '加载页图失败（第 2 页）',
             ),
@@ -141,7 +141,7 @@ void main() {
         pageBytes: null,
       );
       final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
-      final PageImageCopy subject = _subject(
+      final CopyPageImageService subject = _subject(
         pageSource: pageSource,
         clipboard: clipboard,
         encodePng: (_) async => _encodedPng(),
@@ -149,7 +149,7 @@ void main() {
 
       await expectLater(
         () => subject.execute(comic: _comic(), archivePageIndex: 0),
-        throwsA(isA<PageImageCopyException>()),
+        throwsA(isA<CopyPageImageException>()),
       );
       expect(clipboard.writes, isEmpty);
     });
@@ -161,7 +161,7 @@ void main() {
           pageBytes: _sourceBytes(),
         );
         final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort();
-        final PageImageCopy subject = _subject(
+        final CopyPageImageService subject = _subject(
           pageSource: pageSource,
           clipboard: clipboard,
           encodePng: (_) async => throw StateError('bad image'),
@@ -170,8 +170,8 @@ void main() {
         await expectLater(
           () => subject.execute(comic: _comic(), archivePageIndex: 0),
           throwsA(
-            isA<PageImageCopyException>().having(
-              (PageImageCopyException e) => e.message,
+            isA<CopyPageImageException>().having(
+              (CopyPageImageException e) => e.message,
               'message',
               '转换页图失败（第 1 页）',
             ),
@@ -188,7 +188,7 @@ void main() {
       final _FakeClipboardImagePort clipboard = _FakeClipboardImagePort(
         error: StateError('clipboard unavailable'),
       );
-      final PageImageCopy subject = _subject(
+      final CopyPageImageService subject = _subject(
         pageSource: pageSource,
         clipboard: clipboard,
         encodePng: (_) async => _encodedPng(),
@@ -197,8 +197,8 @@ void main() {
       await expectLater(
         () => subject.execute(comic: _comic(), archivePageIndex: 2),
         throwsA(
-          isA<PageImageCopyException>().having(
-            (PageImageCopyException e) => e.message,
+          isA<CopyPageImageException>().having(
+            (CopyPageImageException e) => e.message,
             'message',
             '写入剪贴板失败（第 3 页）',
           ),

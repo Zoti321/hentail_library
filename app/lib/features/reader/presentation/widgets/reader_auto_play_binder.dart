@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/shared/ui/motion/app_motion.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

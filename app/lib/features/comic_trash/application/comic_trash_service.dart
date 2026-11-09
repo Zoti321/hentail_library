@@ -13,7 +13,7 @@ class ComicTrashService {
   });
 
   final ComicTrashRepository _comicRepository;
-  final ComicTrashReaderSessionPort _readerSessionPort;
+  final ComicTrashNativeReaderPort _readerSessionPort;
 
   Future<void> trashComics(Iterable<String> comicIds) async {
     final List<String> ids = ComicTrashTargetIdsSpecification.normalize(

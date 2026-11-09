@@ -1,11 +1,11 @@
-import 'package:hentai_library/features/read_session/domain/read_session.dart';
-import 'package:hentai_library/features/read_session/presentation/routing/reader_route_args.dart';
+import 'package:hentai_library/features/reader/application/open_reader_args.dart';
+import 'package:hentai_library/features/reader/presentation/routing/reader_route_args.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
-import 'package:hentai_library/shared/domain/ports/read_session_launch_port.dart';
+import 'package:hentai_library/shared/domain/ports/reader_launch_port.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ReadSessionLaunchPortAdapter implements ReadSessionLaunchPort {
-  ReadSessionLaunchPortAdapter(this._ref);
+class ReaderLaunchPortAdapter implements ReaderLaunchPort {
+  ReaderLaunchPortAdapter(this._ref);
 
   final Ref _ref;
 
@@ -16,7 +16,7 @@ class ReadSessionLaunchPortAdapter implements ReadSessionLaunchPort {
     bool keepControlsOpen = false,
     bool startFromFirstPage = false,
   }) async {
-    final ReadSessionRouteParams session = ReadSessionRouteParams(
+    final OpenReaderArgs session = OpenReaderArgs(
       comicId: comicId,
       incognito: incognito,
       keepControlsOpen: keepControlsOpen,
@@ -32,5 +32,5 @@ class ReadSessionLaunchPortAdapter implements ReadSessionLaunchPort {
   }
 }
 
-ReadSessionLaunchPort createReadSessionLaunchPort(Ref ref) =>
-    ReadSessionLaunchPortAdapter(ref);
+ReaderLaunchPort createReaderLaunchPort(Ref ref) =>
+    ReaderLaunchPortAdapter(ref);

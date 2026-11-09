@@ -12,7 +12,7 @@ mixin _ReaderControllerAutoPlay
   /// 返回 false 时页面应取消定时器：自动播放已停止，或已开始切卷。
   Future<bool> advanceAutoPlay({
     required ReaderNavContextData? navContext,
-    required ReadSessionRouteParams session,
+    required OpenReaderArgs session,
     required GoRouter router,
   }) async {
     final ReaderState? current = state.asData?.value;
@@ -22,7 +22,7 @@ mixin _ReaderControllerAutoPlay
     if (!current.readingMode.supportsAutoPlay || current.totalPages <= 0) {
       return false;
     }
-    final bool onLastSpread = SpreadIndex.isOnLastSpread(
+    final bool onLastSpread = SpreadNavigation.isOnLastSpread(
       mode: current.readingMode,
       totalPages: current.totalPages,
       currentPageIndex: current.currentIndex,
@@ -38,7 +38,7 @@ mixin _ReaderControllerAutoPlay
     final String? firstComicId = items != null && items.isNotEmpty
         ? items.first.comicId
         : null;
-    final AutoPlayBoundaryDecision decision = resolveAutoPlayBoundary(
+    final AutoPlayBoundaryDecision decision = AutoPlayBoundaryPolicy.resolve(
       mode: mode,
       currentComicId: session.comicId,
       nextComicId: navContext?.nextItem?.comicId,

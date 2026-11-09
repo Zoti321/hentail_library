@@ -10,13 +10,13 @@
 | 语义 | Owner 真源 |
 | --- | --- |
 | `comic_trash/*`、`TrashedComic` read model | `features/comic_trash/domain/` |
-| `reading/*` | `features/read_session/domain/` |
+| `reading/*`（Read session 域类型） | `features/reader/domain/`（ADR-0038；旧 `read_session`） |
 | 库 browse 壳（跨 Tab 偏好、作者、catalog 壳） | `features/library_browse/domain/browse/`（**不含** comic/series Tab 规则） |
 | Comic 仓储、Comics Tab 规则、展示标题、smart facet | `features/comic/domain/` |
 | Series 仓储、Series Tab 规则 | `features/series/domain/` |
 | 库 admin（扫描、revision、current library 等） | `features/library_admin/domain/` |
 | `comic_display_title` 等 | `features/comic/domain/` |
-| read_session / app_settings 端口实现类型 | 各 owner `domain/` |
+| reader / app_settings 端口实现类型 | 各 owner `domain/` |
 | `repositories/*` 契约 | 各 owner `features/*/domain/` |
 | **reading_history** | `features/reading_history/domain/` |
 | `app_setting*` | `features/app_settings/domain/` |
@@ -54,7 +54,7 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 - `ports/library_management_port.dart`
 - `ports/library_revision_port.dart`、`ports/library_revision_signal_port.dart`
 - `ports/series_reading_context_port.dart`
-- `ports/read_session_launch_port.dart`
+- `ports/reader_launch_port.dart`（旧名 `read_session_launch_port`；ADR-0038）
 - `library/comic_detail_return_series_port.dart`（实现 @ `comic`）
 
 `shared/di` 声明跨 feature 协作用的 Riverpod token（#426）；实现与 `createXxx()` 在 owner `di/` / `public/di/`，由 `features/bootstrap/di/overrides/` 注入。跨 feature UI 封面等用 **`comic/public.dart`**、**`series/public.dart`** 或 browse 壳 public。

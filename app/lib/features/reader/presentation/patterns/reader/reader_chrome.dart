@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_interval.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_bottom_bar.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome_overlay.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_top_bar.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_bottom_bar.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_chrome_overlay.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_top_bar.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 顶/底 chrome 组合（overlay + bars）。显隐由外层驱动；滚动隐藏待接视口后改用 [M3EAppBarController]。

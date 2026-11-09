@@ -72,7 +72,7 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 ### Positive
 
 - Cross-feature 边界可扫描、可文档化；与模块 export 心智一致。
-- #429–#435 已落地：admin / browse / read_session / comic_trash 等 owner `public/` 与 Gate 同步。
+- #429–#435 已落地：admin / browse / reader / comic_trash 等 owner `public/` 与 Gate 同步。
 
 > **实现修订（2026-11-02）**：移除 `shared/application/ports/`；UI 命令契约在 `shared/domain/ports/`（如 `AuthorDetailPort`、`LibraryManagementPort`）。跨 feature **import 类型**请用 owner `public.dart`；`shared/di` 仍自 shared 层 import 契约（R11 禁止 shared→feature public）。
 
@@ -87,4 +87,4 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 - ADR-0017、ADR-0027、ADR-0033
 - #425–#435（epic + implementation spec，已关闭）
 - `app/test/gate/import_boundary_rules.dart`、`docs/engineering/gate.md`
-- Owner public 示例：`features/library_admin/public.dart`、`library_browse/public.dart`、`read_session/public.dart`、`comic_trash/public.dart`
+- Owner public 示例：`features/library_admin/public.dart`、`library_browse/public.dart`、`reader/public.dart`、`comic_trash/public.dart`

@@ -1,14 +1,14 @@
-import 'package:hentai_library/features/read_session/domain/auto_play_boundary.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_boundary_policy.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('resolveAutoPlayBoundary', () {
+  group('AutoPlayBoundaryPolicy.resolve', () {
     const String current = 'vol-1';
 
     test('comicOnce always stops', () {
       expect(
-        resolveAutoPlayBoundary(
+        AutoPlayBoundaryPolicy.resolve(
           mode: AutoPlayMode.comicOnce,
           currentComicId: current,
           nextComicId: 'vol-2',
@@ -20,7 +20,7 @@ void main() {
 
     test('comicLoop always jumps to first page', () {
       expect(
-        resolveAutoPlayBoundary(
+        AutoPlayBoundaryPolicy.resolve(
           mode: AutoPlayMode.comicLoop,
           currentComicId: current,
           nextComicId: 'vol-2',
@@ -31,7 +31,7 @@ void main() {
     });
 
     test('seriesOnce switches to next when available', () {
-      final AutoPlayBoundaryDecision decision = resolveAutoPlayBoundary(
+      final AutoPlayBoundaryDecision decision = AutoPlayBoundaryPolicy.resolve(
         mode: AutoPlayMode.seriesOnce,
         currentComicId: current,
         nextComicId: 'vol-2',
@@ -43,7 +43,7 @@ void main() {
 
     test('seriesOnce stops on last volume', () {
       expect(
-        resolveAutoPlayBoundary(
+        AutoPlayBoundaryPolicy.resolve(
           mode: AutoPlayMode.seriesOnce,
           currentComicId: 'vol-2',
           nextComicId: null,
@@ -55,7 +55,7 @@ void main() {
 
     test('seriesOnce without series context degrades to comicOnce', () {
       expect(
-        resolveAutoPlayBoundary(
+        AutoPlayBoundaryPolicy.resolve(
           mode: AutoPlayMode.seriesOnce,
           currentComicId: current,
           nextComicId: null,
@@ -66,7 +66,7 @@ void main() {
     });
 
     test('seriesLoop switches to next when available', () {
-      final AutoPlayBoundaryDecision decision = resolveAutoPlayBoundary(
+      final AutoPlayBoundaryDecision decision = AutoPlayBoundaryPolicy.resolve(
         mode: AutoPlayMode.seriesLoop,
         currentComicId: current,
         nextComicId: 'vol-2',
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('seriesLoop on last volume switches to first volume', () {
-      final AutoPlayBoundaryDecision decision = resolveAutoPlayBoundary(
+      final AutoPlayBoundaryDecision decision = AutoPlayBoundaryPolicy.resolve(
         mode: AutoPlayMode.seriesLoop,
         currentComicId: 'vol-2',
         nextComicId: null,
@@ -89,7 +89,7 @@ void main() {
 
     test('seriesLoop without series context degrades to comicLoop', () {
       expect(
-        resolveAutoPlayBoundary(
+        AutoPlayBoundaryPolicy.resolve(
           mode: AutoPlayMode.seriesLoop,
           currentComicId: current,
           nextComicId: null,
@@ -101,7 +101,7 @@ void main() {
 
     test('seriesLoop with single-volume series jumps to first page', () {
       expect(
-        resolveAutoPlayBoundary(
+        AutoPlayBoundaryPolicy.resolve(
           mode: AutoPlayMode.seriesLoop,
           currentComicId: current,
           nextComicId: null,

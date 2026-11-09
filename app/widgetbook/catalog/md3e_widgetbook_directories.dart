@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../preview/md3e_comic_detail_page_preview_data.dart';
 import '../preview/md3e_series_detail_page_preview_data.dart';
 
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
 import 'package:hentai_library/shared/ui/widgets/actions/catalog_view_mode_button_group.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_card.dart';
 import 'package:hentai_library/shared/ui/widgets/catalog/comic_list_item.dart';

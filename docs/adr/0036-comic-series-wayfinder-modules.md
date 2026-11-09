@@ -22,9 +22,9 @@ Accepted
 
 ### 2. Cross-feature public 依赖（无环）
 
-- 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public（封面/展示）；`read_session` / `home` / `reading_history` / `comic_trash` → `comic` public；`bootstrap` → 各 module public。
+- 允许：`library_browse` → `comic` / `series` public；`series` → `comic` public（封面/展示）；`reader` / `home` / `reading_history` / `comic_trash` → `comic` public；`bootstrap` → 各 module public。
 - **禁止**：`comic` → `series` public；reading context 经 **`shared/di` + `SeriesReadingContextPort`**（series 实现）。
-- Gate：`kImportBoundaryModules` 含 `comic`、`series`；**R5** 扩展至 `comic` / `series`（禁止 import `read_session`）。
+- Gate：`kImportBoundaryModules` 含 `comic`、`series`；**R5** 扩展至 `comic` / `series`（禁止 import `reader`）。
 
 ### 3. Application 层（ADR-0033）
 
@@ -41,7 +41,7 @@ Accepted
 ### Positive
 
 - Module 图与 Issue 边界一致；L3b 可删除 `series_metadata_form` → feature domain 边。
-- `read_session` 与详情页经窄 Port 协作，避免 public 环。
+- `reader` 与详情页经窄 Port 协作，避免 public 环。
 
 ### Negative
 

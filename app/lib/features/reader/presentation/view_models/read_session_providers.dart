@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:hentai_library/shared/di/reading_history_providers.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
-import 'package:hentai_library/features/read_session/di/session_providers.dart';
+import 'package:hentai_library/features/reader/domain/read_session_page.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
+import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
+import 'package:hentai_library/features/reader/di/session_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'read_session_providers.g.dart';
@@ -20,14 +20,14 @@ ReaderPageImageData _mapReadSessionPageToUi(ReadSessionPage page) {
 }
 
 @Riverpod()
-Future<ReaderSessionSnapshot> readerSessionOpen(
+Future<OpenedReadSession> readerSessionOpen(
   Ref ref, {
   required String comicId,
   bool incognito = false,
   bool startFromFirstPage = false,
 }) {
   return ref
-      .read(readerSessionServiceProvider)
+      .read(openReadSessionServiceProvider)
       .open(
         comicId: comicId,
         incognito: incognito,
@@ -42,7 +42,7 @@ Future<List<ReaderPageImageData>> comicImages(
   String? chapterId,
 }) async {
   final List<ReadSessionPage> pages = await ref
-      .read(readerSessionServiceProvider)
+      .read(openReadSessionServiceProvider)
       .loadPages(comicId);
   return pages.map(_mapReadSessionPageToUi).toList(growable: false);
 }
@@ -55,7 +55,7 @@ Future<ReaderPagePayload> comicReaderPage(
   required int pageIndex,
 }) {
   return ref
-      .read(readerSessionServiceProvider)
+      .read(openReadSessionServiceProvider)
       .loadReaderPage(comicId: comicId, archivePageIndex: pageIndex);
 }
 

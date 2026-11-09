@@ -24,7 +24,7 @@ LAB_PAGES = {
 
 # Production page → feature lib path (under app/lib/).
 PAGE_DEST: dict[str, str] = {
-    "pages/md3e_reader_page.dart": "features/read_session/presentation/views/reader_md3e/reader_page.dart",
+    "pages/md3e_reader_page.dart": "features/reader/presentation/views/reader_md3e/reader_page.dart",
     "pages/md3e_settings_page.dart": "features/app_settings/presentation/views/settings_page/settings_page_body.dart",
     "pages/md3e_comic_detail_page.dart": "features/library_browse/presentation/views/comic_detail_md3e/comic_detail_page.dart",
     "pages/md3e_series_detail_page.dart": "features/library_browse/presentation/views/series_detail_md3e/series_detail_page.dart",
@@ -108,7 +108,7 @@ def lib_dest_for(rel: str) -> str | None:
 
     feature_prefixes = [
         ("patterns/history/", "features/home/presentation/patterns/history/"),
-        ("patterns/reader/", "features/read_session/presentation/patterns/reader/"),
+        ("patterns/reader/", "features/reader/presentation/patterns/reader/"),
         ("patterns/comic_detail/", "features/library_browse/presentation/patterns/comic_detail/"),
         ("patterns/series_detail/", "features/library_browse/presentation/patterns/series_detail/"),
         ("patterns/metadata_edit/", "features/library_browse/presentation/patterns/metadata_edit/"),

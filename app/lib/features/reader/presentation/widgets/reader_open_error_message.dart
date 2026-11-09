@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
+import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
 
 /// 将 Read session 打开失败映射为本地化分类文案。
 String readSessionOpenFailureMessage(BuildContext context, Object error) {

@@ -1,11 +1,11 @@
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/features/read_session/domain/read_session.dart';
-import 'package:hentai_library/features/read_session/application/read_session_coordinator.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_auto_play_carry.dart';
-import 'package:hentai_library/features/read_session/di/session_providers.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/routing/reader_route_args.dart';
+import 'package:hentai_library/features/reader/application/open_reader_args.dart';
+import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
+import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_controller.dart';
+import 'package:hentai_library/features/reader/presentation/routing/reader_route_args.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_series_navigation.g.dart';
@@ -17,7 +17,7 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
 
   Future<void> switchComic({
     required GoRouter router,
-    required ReadSessionRouteParams currentSession,
+    required OpenReaderArgs currentSession,
     required String targetComicId,
   }) async {
     if (targetComicId == currentSession.comicId) {

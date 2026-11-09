@@ -35,8 +35,8 @@ class _RecordingComicRepository implements ComicTrashRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _RecordingReaderSessionPort implements ComicTrashReaderSessionPort {
-  _RecordingReaderSessionPort(this.calls);
+class _RecordingNativeReaderPort implements ComicTrashNativeReaderPort {
+  _RecordingNativeReaderPort(this.calls);
 
   final List<String> calls;
 
@@ -57,7 +57,7 @@ void main() {
     comicRepo = _RecordingComicRepository();
     service = ComicTrashService(
       comicRepository: comicRepo,
-      readerSessionPort: _RecordingReaderSessionPort(comicRepo.calls),
+      readerSessionPort: _RecordingNativeReaderPort(comicRepo.calls),
     );
   });
 

@@ -4,15 +4,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/session/reader_session_bindings.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_constants.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_pages.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_prefetch_binder.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/resume_visible_sync_gate.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/reader_image_item.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_constants.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_pages.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_prefetch_binder.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/resume_visible_sync_gate.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PagedViewport extends HookConsumerWidget {

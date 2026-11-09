@@ -1,8 +1,8 @@
-import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
+import 'package:hentai_library/shared/di/reader_launch_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-Future<void> openReadSession(
+Future<void> openReader(
   WidgetRef ref, {
   required String comicId,
   bool incognito = false,
@@ -10,7 +10,7 @@ Future<void> openReadSession(
   bool startFromFirstPage = false,
 }) {
   return ref
-      .read(readSessionLaunchPortProvider)
+      .read(readerLaunchPortProvider)
       .openComic(
         comicId: comicId,
         incognito: incognito,
@@ -19,10 +19,10 @@ Future<void> openReadSession(
       );
 }
 
-Future<void> openComicReadSession(
+Future<void> openComicInReader(
   WidgetRef ref, {
   required Comic comic,
   bool incognito = false,
 }) {
-  return openReadSession(ref, comicId: comic.comicId, incognito: incognito);
+  return openReader(ref, comicId: comic.comicId, incognito: incognito);
 }

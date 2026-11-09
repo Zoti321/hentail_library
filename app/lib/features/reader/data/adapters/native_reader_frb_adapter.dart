@@ -1,14 +1,14 @@
-import 'package:hentai_library/features/read_session/data/mappers/reader_frb_mapper.dart';
+import 'package:hentai_library/features/reader/data/mappers/reader_frb_mapper.dart';
 import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
+import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 
-/// [ReaderSessionPort] 委托 Rust 阅读会话 open/close/clear。
-class ReaderSessionFrbAdapter implements ReaderSessionPort {
-  const ReaderSessionFrbAdapter({required this._remoteCredentials});
+/// [NativeReaderPort] 委托 Rust 阅读会话 open/close/clear。
+class NativeReaderFrbAdapter implements NativeReaderPort {
+  const NativeReaderFrbAdapter({required this._remoteCredentials});
 
   final RemoteLibraryCredentialsPort _remoteCredentials;
 

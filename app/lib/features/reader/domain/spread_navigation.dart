@@ -1,9 +1,7 @@
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 
-/// Spread 索引与页码映射（页码均为 1-based）。
-class SpreadIndex {
-  const SpreadIndex._();
-
+/// Spread 翻页策略：索引与页码映射（页码均为 1-based）。
+abstract final class SpreadNavigation {
   static int totalSpreads({
     required ReadingMode mode,
     required int totalPages,

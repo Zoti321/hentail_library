@@ -10,7 +10,7 @@ Epic [#436](https://github.com/Zoti321/hentail_library/issues/436) 将各限界�
 
 | 区域 | 典型路径 | 主要消费者 |
 |------|----------|------------|
-| 实体 DTO | `models/entity/comic/**`（Comic、Series、Author、Tag 等） | library_browse、read_session、home、named_metadata、comic_trash、shared/data FRB mapper、`shared/ui` |
+| 实体 DTO | `models/entity/comic/**`（Comic、Series、Author、Tag 等） | library_browse、reader、home、named_metadata、comic_trash、shared/data FRB mapper、`shared/ui` |
 | 枚举与展示辅助 | `models/enums.dart` | 库筛选、阅读、UI 组件 |
 | 分页值对象 | `models/value_objects/page_request.dart`、`paged_result.dart`、`page_jump.dart` | 各 Repository 契约、FRB 分页 |
 | 缩略图 seam | `thumbnail/**` | 封面/缩略图组件、Series cover、FRB 事件 |
@@ -22,7 +22,7 @@ Rust `core/` 仍为扫描、sync 与 catalog 谓词真值（ADR-0002）；Dart �
 1. **保留 Shared Kernel @ `shared/domain`**（本 ADR）。
 2. **`library_browse` single-owner**：实体迁入 `features/library_browse/domain/`，经 `library_browse/public` 对外；`shared/ui` 与其余 feature 改 import public。  
    - 优点：目录归属与「库页/catalog UX」叙事一致。  
-   - 缺点：read_session、home、comic_trash、named_metadata、bootstrap、`shared/data` 适配器与 **`shared/ui` 大面积改边**；易触发 ADR-0034「public 第二套 DTO」反模式；与 FRB 映射层分散在 multi-feature data 的现状冲突。
+   - 缺点：reader、home、comic_trash、named_metadata、bootstrap、`shared/data` 适配器与 **`shared/ui` 大面积改边**；易触发 ADR-0034「public 第二套 DTO」反模式；与 FRB 映射层分散在 multi-feature data 的现状冲突。
 
 在 #437–#444 已完成的迁移中，**catalog 行为**（筛选 intent、投影、展示标题等）已 owner 化；**内核 DTO 仍留在 shared** 与现行 Gate（R11、L3b、strangler）一致。
 
@@ -42,7 +42,7 @@ Rust `core/` 仍为扫描、sync 与 catalog 谓词真值（ADR-0002）；Dart �
 | 语义 owner | 已 / 将 位于 feature `domain/` 的内容 | 仍 @ Shared Kernel 的内容 |
 |------------|----------------------------------------|---------------------------|
 | library_browse | 筛选/排序/投影、`comic_display_title` 等 | Comic/Series 等 **实体 DTO**、分页 VO |
-| read_session | 阅读域类型、会话端口 | 打开阅读时使用的 **Comic** 等映射类型 |
+| reader | 阅读域类型、会话端口（ADR-0038；旧 read_session） | 打开阅读时使用的 **Comic** 等映射类型 |
 | 其他 feature | 各自 Repository 契约、read model（#443–#444） | 通过 import **`shared/domain`** 引用内核类型 |
 
 ### 2. 与 ADR-0034 的关系

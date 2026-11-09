@@ -1,9 +1,9 @@
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
+import 'package:hentai_library/features/reader/domain/read_session_page.dart';
 
-/// 打开阅读会话时的完整快照：漫画、页列表与恢复页码（1-based）。
-class ReaderSessionSnapshot {
-  const ReaderSessionSnapshot({
+/// 打开 Read session 的应用读模型：漫画、页列表与恢复页码（1-based）。
+class OpenedReadSession {
+  const OpenedReadSession({
     required this.comic,
     required this.pages,
     required this.resumePageIndex,

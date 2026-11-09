@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/reader_viewport_host.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/reader_viewport_host.dart';
 
 class ReaderContent extends StatelessWidget {
   const ReaderContent({

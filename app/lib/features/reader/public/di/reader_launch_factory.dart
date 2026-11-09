@@ -1,4 +1,4 @@
 library;
 
-export 'package:hentai_library/features/read_session/di/read_session_launch_port.dart'
-    show createReadSessionLaunchPort;
+export 'package:hentai_library/features/reader/di/reader_launch_port.dart'
+    show createReaderLaunchPort;

@@ -14,7 +14,7 @@ const Set<String> kImportBoundaryModules = <String>{
   'library_browse',
   'comic',
   'series',
-  'read_session',
+  'reader',
   'reading_history',
   'reading_stats',
   'comic_trash',
@@ -464,7 +464,7 @@ void _checkStructuralRules({
   if (sourceModule == 'library_browse' ||
       sourceModule == 'comic' ||
       sourceModule == 'series') {
-    if (importPath.startsWith('features/read_session/')) {
+    if (importPath.startsWith('features/reader/')) {
       found.add(
         violation(
           ruleId: 'R5',

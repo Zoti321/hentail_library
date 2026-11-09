@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/core/image/image_cache_config.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_logic.dart'
+import 'package:hentai_library/features/reader/domain/page_prefetch_window.dart'
     show kReaderImageCacheMaxEntries;
 
 /// 阅读器专用内存图缓存名；与 [AppComicImage] 显示及 [precacheImage] 预热共用。

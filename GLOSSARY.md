@@ -362,9 +362,13 @@ _Avoid_: View（展示壳类名）、Page（无生产路由绑定时）
 
 ### Reading
 
+**Reader**:
+Wayfinder product module（`features/reader/`）：阅读器——页图 I/O、视口、chrome、设置、系列切卷导航，以及 Read session 生命周期编排。Owner 目录名是 Reader，不是 `read_session`。详见 ADR-0038；命名词典 `docs/engineering/reader-ddd-lexicon.md`。
+_Avoid_: read_session 模块（旧目录名）、Reading module（易与 reading_history / reading_stats 混淆）
+
 **Read session**:
-由 comicId 打开的阅读会话；不区分「单本 / 系列」两种模式。进度只写入 Reading history。入口参数仅为 comicId（及无痕等开关），不传 seriesId。退出阅读器一律回到该 Comic 的详情页。Local library 可读本地文件；Remote library 经 Resource access 流式读取，不整本缓存到磁盘。详见 ADR-0005。
-_Avoid_: Standalone read、Series read、单本模式、系列模式、Comic read（易与 Comic 实体混淆）
+由 comicId 打开的阅读会话；不区分「单本 / 系列」两种模式。进度只写入 Reading history。入口参数仅为 comicId（及无痕等开关），不传 seriesId。退出阅读器一律回到该 Comic 的详情页。Local library 可读本地文件；Remote library 经 Resource access 流式读取，不整本缓存到磁盘。领域实体与编排落在 **Reader** 模块（`features/reader/domain/`）；不是 product module 目录名。详见 ADR-0005、ADR-0038。
+_Avoid_: Standalone read、Series read、单本模式、系列模式、Comic read（易与 Comic 实体混淆）、用 Read session 指代整个阅读器模块
 
 **Series reading context**:
 由 comicId 在 core 侧派生的可选系列信息（seriesId、系列名、有序成员 comicId 列表、当前下标）；供阅读器展示位置、上一卷/下一卷与卷列表跳转。不是会话模式，也不持久化进度。无系列归属时为空。卷列表项展示标题由 Flutter 用现有 Comic 标题格式拼出（如 `{序号}-{title}`）。详见 ADR-0005。

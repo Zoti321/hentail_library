@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_interval.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome_scope.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_interaction_scope.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_tap_zone.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_chrome.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_chrome_scope.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_interaction_scope.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_tap_zone.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 /// Lab 漫画阅读页：letterbox + 画布 extend 至 chrome 下（同 [Scaffold.extendBodyBehindAppBar] 思路）。

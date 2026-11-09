@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_tap_zone.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_placeholder.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_viewport_status_panel.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_tap_zone.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_placeholder.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_viewport_status_panel.dart';
 
 /// 阅读画布手势层：三分区点击（chrome 显隐与翻页由外层处理）。
 class ReaderViewport extends StatelessWidget {

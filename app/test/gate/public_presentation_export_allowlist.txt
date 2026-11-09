@@ -18,9 +18,9 @@ features/library_browse/public/ui/author_detail_page.dart
 features/library_browse/public/ui/library_page.dart
 features/named_metadata/public/ui/metadata_lab_patterns.dart
 features/named_metadata/public/ui/metadata_page.dart
-features/read_session/public/presentation/open_read_session.dart
-features/read_session/public/presentation/reader_route_args.dart
-features/read_session/public/presentation/reader_shell_exports.dart
-features/read_session/public/ui/reader_page.dart
+features/reader/public/presentation/open_reader.dart
+features/reader/public/presentation/reader_route_args.dart
+features/reader/public/presentation/reader_shell_exports.dart
+features/reader/public/ui/reader_page.dart
 features/reading_history/public/ui/history_page.dart
 features/series/public/ui/series_detail_page.dart

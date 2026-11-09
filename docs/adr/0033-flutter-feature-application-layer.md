@@ -35,7 +35,7 @@ Wayfinder feature 模块已有 `domain` / `data` / `presentation`，但 `*Servic
 
 ### 4. 迁移
 
-#419 / #420–#424 已落地：read_session、comic_trash、library_admin application 迁移与 library_browse 草稿归位。新用例编排仍按本节落 `application/`。
+#419 / #420–#424 已落地：reader、comic_trash、library_admin application 迁移与 library_browse 草稿归位。新用例编排仍按本节落 `application/`。
 
 > **实现修订（2026-11-02）**：Epic [#436](https://github.com/Zoti321/hentail_library/issues/436)（#437–#444）将 purge/阅读/库筛选·管理/Repository/周边 read model 等 **Dart 域真源**迁入各 owner `features/<id>/domain/`；`shared/domain/**` 对迁出符号仅保留 **export-only strangler**（`app/test/gate/strangler_shims.txt`）。Catalog 实体与分页/thumbnail 内核仍 @ shared（**ADR-0035**）。归属表与仍留 shared 的 UI 契约见 [`docs/engineering/shared-domain-ownership.md`](../engineering/shared-domain-ownership.md)。
 

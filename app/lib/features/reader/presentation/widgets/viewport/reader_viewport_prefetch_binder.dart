@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_prefetch_hook.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Watches [currentIndex] only for prefetch; keeps list/PageView free of that subscription.

@@ -1,83 +1,23 @@
-import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/shared/domain/exceptions/domain_exception.dart';
 
-/// Read session / Resource access 失败的用户可见分类（映射自 core error kinds）。
-enum ReadSessionFailureKind {
-  /// 目录中找不到 Comic，或 Resource 路径不存在。
-  resourceNotFound,
+/// Read session 规则违反（领域异常）。
+final class ReadSessionException extends DomainException {
+  const ReadSessionException._(super.message, {super.code});
 
-  /// Remote library 主机不可达 / TLS 失败等。
-  remoteUnreachable,
-
-  /// Remote library 鉴权失败。
-  remoteAuthFailed,
-
-  /// 打开或 Resource access 超时。
-  timedOut,
-
-  /// Comic 处于 trash（「已删除」），拒绝打开。
-  comicTrashed,
-
-  /// 空页、损坏、类型不匹配等无效内容。
-  invalidOrEmptyContent,
-
-  /// 未归入以上类别的加载失败。
-  loadFailed,
-}
-
-/// 阅读会话无法加载页面（与「零页」区分）。
-class ReadSessionPageLoadException extends AppException {
-  ReadSessionPageLoadException._(
-    super.message, {
-    required this.kind,
-    super.cause,
-    super.stackTrace,
-  });
-
-  final ReadSessionFailureKind kind;
-
-  factory ReadSessionPageLoadException.comicNotFound(String comicId) {
-    return ReadSessionPageLoadException._(
-      '漫画不存在: $comicId',
-      kind: ReadSessionFailureKind.resourceNotFound,
+  factory ReadSessionException.invalidPageIndex(int pageIndex) {
+    return ReadSessionException._(
+      '阅读页码须为 1-based 正整数，收到 $pageIndex',
+      code: 'read_session.invalid_page_index',
     );
   }
 
-  factory ReadSessionPageLoadException.emptyPages({
-    required String comicId,
-    required String path,
+  factory ReadSessionException.pageIndexExceedsTotal({
+    required int pageIndex,
+    required int totalPages,
   }) {
-    return ReadSessionPageLoadException._(
-      '漫画没有可阅读的页面: comicId=$comicId, path=$path',
-      kind: ReadSessionFailureKind.invalidOrEmptyContent,
-    );
-  }
-
-  factory ReadSessionPageLoadException.timedOut({
-    required String comicId,
-    required String path,
-    Object? cause,
-    StackTrace? stackTrace,
-  }) {
-    return ReadSessionPageLoadException._(
-      '打开漫画超时: comicId=$comicId, path=$path',
-      kind: ReadSessionFailureKind.timedOut,
-      cause: cause,
-      stackTrace: stackTrace,
-    );
-  }
-
-  factory ReadSessionPageLoadException.loadFailed({
-    required String comicId,
-    required String path,
-    required Object cause,
-    StackTrace? stackTrace,
-    ReadSessionFailureKind kind = ReadSessionFailureKind.loadFailed,
-  }) {
-    return ReadSessionPageLoadException._(
-      '加载漫画页面失败: comicId=$comicId, path=$path',
-      kind: kind,
-      cause: cause,
-      stackTrace: stackTrace,
+    return ReadSessionException._(
+      '页码 $pageIndex 超过总页数 $totalPages',
+      code: 'read_session.page_index_exceeds_total',
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_interval.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_page_progress.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_interval.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_page_progress.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
 
 import '../../../../../support/pump_app.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
+import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
 
 /// Maps a horizontal tap to the classic reader thirds.
 ReaderTapZone resolveReaderTapZone({

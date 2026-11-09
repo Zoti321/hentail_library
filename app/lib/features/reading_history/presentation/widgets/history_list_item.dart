@@ -7,7 +7,7 @@ import 'package:hentai_library/features/reading_history/presentation/models/hist
 import 'package:hentai_library/features/reading_history/presentation/widgets/history_list_progress.dart';
 import 'package:hentai_library/shared/di/app_router_provider.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:hentai_library/shared/di/read_session_launch_providers.dart';
+import 'package:hentai_library/shared/di/reader_launch_providers.dart';
 import 'package:hentai_library/shared/ui/widgets/history/reading_history_list_item.dart';
 
 /// 生产 `/history` 列表行：打开阅读器 + 删除记录。
@@ -41,7 +41,7 @@ class HistoryListItem extends ConsumerWidget {
       currentPage: currentPage,
     );
     void openReader() {
-      ref.read(readSessionLaunchPortProvider).openComic(comicId: item.comicId);
+      ref.read(readerLaunchPortProvider).openComic(comicId: item.comicId);
     }
 
     return ReadingHistoryListItem(

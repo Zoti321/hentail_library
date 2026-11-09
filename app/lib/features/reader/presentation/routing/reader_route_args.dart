@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/read_session/domain/read_session.dart';
+import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 
 class ReaderRouteArgs {
   const ReaderRouteArgs({
@@ -19,7 +19,7 @@ class ReaderRouteArgs {
   final bool incognito;
   final bool startFromFirstPage;
 
-  ReadSessionRouteParams get session => ReadSessionRouteParams(
+  OpenReaderArgs get session => OpenReaderArgs(
     comicId: comicId,
     keepControlsOpen: keepControlsOpen,
     incognito: incognito,
@@ -40,7 +40,7 @@ class ReaderRouteArgs {
     );
   }
 
-  factory ReaderRouteArgs.fromSession(ReadSessionRouteParams session) {
+  factory ReaderRouteArgs.fromSession(OpenReaderArgs session) {
     return ReaderRouteArgs(
       comicId: session.comicId,
       keepControlsOpen: session.keepControlsOpen,

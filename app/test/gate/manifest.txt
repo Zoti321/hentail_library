@@ -32,9 +32,9 @@ test/features/series/presentation/views/series_detail/series_detail_entry_test.d
 test/features/comic/presentation/views/comic_detail/comic_detail_entry_test.dart
 test/features/library_browse/presentation/author/views/author_detail/author_detail_body_test.dart
 test/features/library_browse/presentation/author/views/author_detail/author_image_view_test.dart
-test/features/read_session/presentation/reader_viewport_pages_test.dart
-test/features/read_session/presentation/reader_open_error_message_test.dart
-test/features/read_session/presentation/views/reader
+test/features/reader/presentation/reader_viewport_pages_test.dart
+test/features/reader/presentation/reader_open_error_message_test.dart
+test/features/reader/presentation/views/reader
 test/features/library_admin/presentation/views/library/library_form_dialog_test.dart
 test/features/series/presentation/views/metadata_edit/series_metadata_edit_view_test.dart
 
@@ -42,7 +42,7 @@ test/features/series/presentation/views/metadata_edit/series_metadata_edit_view_
 test/shared/ui/motion/app_motion_test.dart
 test/shared/ui/motion/desktop_page_transition_test.dart
 test/shared/ui/widgets/foundation/pointer_target_test.dart
-test/features/read_session/presentation/reader_input_test.dart
+test/features/reader/presentation/reader_input_test.dart
 test/shared/ui/theme/reader_color_scheme_contract_test.dart
 test/features/library_browse/presentation/browse/view_models/stable_page_count_test.dart
 test/features/library_browse/presentation/catalog/view_models/catalog_pagination_engine_test.dart
@@ -54,10 +54,10 @@ test/features/library_browse/presentation/browse/view_models/library_page_facade
 test/features/library_browse/presentation/browse/view_models/library_series_filters_notifier_test.dart
 test/features/series/presentation/view_models/series_item_sort_persist_test.dart
 test/features/series/presentation/view_models/series_metadata_editor_notifier_test.dart
-test/features/read_session/presentation/reader_exit_location_test.dart
-test/features/read_session/presentation/reader_page_crossfade_policy_test.dart
-test/features/read_session/presentation/resume_visible_sync_gate_test.dart
-test/features/read_session/presentation/view_models/reader_cover_editor_notifier_test.dart
+test/features/reader/presentation/reader_exit_location_test.dart
+test/features/reader/presentation/reader_page_crossfade_policy_test.dart
+test/features/reader/presentation/resume_visible_sync_gate_test.dart
+test/features/reader/presentation/view_models/reader_cover_editor_notifier_test.dart
 test/features/app_settings/presentation/view_models/locale_preference_persist_test.dart
 test/features/app_settings/presentation/view_models/reading_mode_persist_test.dart
 test/features/reading_history/presentation/view_models/history_load_more_throttle_test.dart
@@ -83,4 +83,4 @@ test/features/library_admin/presentation/view_models/metadata_refresh_controller
 test/features/library_admin/presentation/views/navigation/libraries_routes_test.dart
 test/features/comic_trash/presentation/view_models/trash_page_state_test.dart
 test/features/comic_trash/presentation/views/trash
-test/features/read_session/application
+test/features/reader/application

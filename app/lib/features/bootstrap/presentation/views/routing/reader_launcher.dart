@@ -1,1 +1,1 @@
-export 'package:hentai_library/features/read_session/public/presentation/open_read_session.dart';
+export 'package:hentai_library/features/reader/public/presentation/open_reader.dart';

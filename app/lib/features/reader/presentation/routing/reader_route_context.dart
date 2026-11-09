@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/read_session/domain/read_session.dart';
+import 'package:hentai_library/features/reader/application/open_reader_args.dart';
 
 class ReaderComicListItem {
   const ReaderComicListItem({
@@ -42,7 +42,7 @@ class ReaderRouteContext {
   final bool incognito;
   final bool startFromFirstPage;
 
-  ReadSessionRouteParams get session => ReadSessionRouteParams(
+  OpenReaderArgs get session => OpenReaderArgs(
     comicId: comicId,
     incognito: incognito,
     startFromFirstPage: startFromFirstPage,

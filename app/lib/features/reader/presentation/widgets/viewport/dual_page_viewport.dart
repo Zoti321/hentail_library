@@ -4,18 +4,18 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_prefetch_hook.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_constants.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_viewport_pages.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/resume_visible_sync_gate.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_prefetch_hook.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_constants.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_pages.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/resume_visible_sync_gate.dart';
 
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
-import 'package:hentai_library/features/read_session/domain/spread_index.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/session/reader_session_bindings.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/reader_image_item.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class DualPageViewport extends HookConsumerWidget {
@@ -73,11 +73,11 @@ class DualPageViewport extends HookConsumerWidget {
       _ => const <ReaderPageImageData>[],
     };
     final int safeTotalPages = totalPages > 0 ? totalPages : 1;
-    final int spreadCount = SpreadIndex.totalSpreads(
+    final int spreadCount = SpreadNavigation.totalSpreads(
       mode: activeMode,
       totalPages: safeTotalPages,
     );
-    final int initialSpread = SpreadIndex.spreadIndexForPage(
+    final int initialSpread = SpreadNavigation.spreadIndexForPage(
       mode: activeMode,
       totalPages: safeTotalPages,
       pageIndex: initialPage + 1,
@@ -147,7 +147,7 @@ class DualPageViewport extends HookConsumerWidget {
       if (!pageController.hasClients || imageList.isEmpty) {
         return;
       }
-      final int currentSpread = SpreadIndex.spreadIndexForPage(
+      final int currentSpread = SpreadNavigation.spreadIndexForPage(
         mode: activeMode,
         totalPages: safeTotalPages,
         pageIndex: currentIndex,
@@ -192,7 +192,7 @@ class DualPageViewport extends HookConsumerWidget {
             value.asData?.value.currentIndex ?? 1,
       ),
       (int? previous, int next) {
-        final int currentSpread = SpreadIndex.spreadIndexForPage(
+        final int currentSpread = SpreadNavigation.spreadIndexForPage(
           mode: activeMode,
           totalPages: safeTotalPages,
           pageIndex: next,
@@ -262,7 +262,7 @@ class DualPageViewport extends HookConsumerWidget {
                     return;
                   }
                   final int safeTotalPages = totalPages > 0 ? totalPages : 1;
-                  final int primaryPage = SpreadIndex.primaryPageForSpread(
+                  final int primaryPage = SpreadNavigation.primaryPageForSpread(
                     mode: activeMode,
                     totalPages: safeTotalPages,
                     spreadIndex: spreadIndex,
@@ -279,7 +279,7 @@ class DualPageViewport extends HookConsumerWidget {
                 },
                 itemCount: spreadCount,
                 itemBuilder: (BuildContext context, int spreadIndex) {
-                  final List<int> pages = SpreadIndex.pagesInSpread(
+                  final List<int> pages = SpreadNavigation.pagesInSpread(
                     mode: activeMode,
                     totalPages: safeTotalPages,
                     spreadIndex: spreadIndex,
@@ -332,12 +332,12 @@ class _DualPagePrefetchBinder extends HookConsumerWidget {
             value.asData?.value.currentIndex ?? 1,
       ),
     );
-    final int currentSpread = SpreadIndex.spreadIndexForPage(
+    final int currentSpread = SpreadNavigation.spreadIndexForPage(
       mode: readingMode,
       totalPages: totalPages,
       pageIndex: currentIndex,
     );
-    final List<int> spreadPages = SpreadIndex.pagesInSpread(
+    final List<int> spreadPages = SpreadNavigation.pagesInSpread(
       mode: readingMode,
       totalPages: totalPages,
       spreadIndex: currentSpread,

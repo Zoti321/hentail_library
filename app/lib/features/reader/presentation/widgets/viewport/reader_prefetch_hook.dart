@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/image/image_decode_cache_size.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_logic.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_controller.dart';
+import 'package:hentai_library/features/reader/domain/page_prefetch_window.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void useReaderPrefetchWindow({

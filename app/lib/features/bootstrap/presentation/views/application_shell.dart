@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/public.dart';
-import 'package:hentai_library/features/read_session/public.dart';
+import 'package:hentai_library/features/reader/public.dart';
 import 'package:hentai_library/shared/di/app_shell_providers.dart';
 import 'package:hentai_library/shared/ui/shell/responsive_app_shell.dart';
 

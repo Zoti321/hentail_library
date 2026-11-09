@@ -72,7 +72,7 @@ class AuditDartTestsTest(unittest.TestCase):
             "thin-edge",
         )
         self.assertEqual(
-            classify_rubric("test/features/read_session/domain/spread_test.dart", False),
+            classify_rubric("test/features/reader/domain/spread_test.dart", False),
             "thin-edge",
         )
         self.assertEqual(

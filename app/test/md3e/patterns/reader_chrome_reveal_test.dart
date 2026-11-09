@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/read_session/presentation/patterns/reader/reader_chrome_overlay.dart';
+import 'package:hentai_library/features/reader/presentation/patterns/reader/reader_chrome_overlay.dart';
 
 import '../../support/pump_app.dart';
 

@@ -3,20 +3,20 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
-import 'package:hentai_library/features/read_session/domain/comic_page_source_port.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_port.dart';
+import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
+import 'package:hentai_library/features/reader/domain/native_reader_port.dart';
 import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_exceptions.dart';
-import 'package:hentai_library/features/read_session/domain/read_session_page.dart';
-import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
+import 'package:hentai_library/features/reader/application/read_session_page_load_exception.dart';
+import 'package:hentai_library/features/reader/domain/read_session_page.dart';
+import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
+import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
 
-/// 阅读 I/O 编排：显式 open/close、页码约定与 session snapshot。
+/// 阅读 I/O 编排：显式 open/close、页码约定与 [OpenedReadSession]。
 ///
 /// 同一 comicId 在 close 前复用页列表，避免 open 与 loadPages 双次列页。
-class ReaderSessionService {
-  ReaderSessionService({
+class OpenReadSessionService {
+  OpenReadSessionService({
     required this._comicRepo,
     required this._pageSource,
     required this._readingHistoryCommands,
@@ -30,7 +30,7 @@ class ReaderSessionService {
   final ComicLookupRepository _comicRepo;
   final ComicPageSourcePort _pageSource;
   final ReadingHistoryCommandPort _readingHistoryCommands;
-  final ReaderSessionPort _sessionPort;
+  final NativeReaderPort _sessionPort;
   final Duration _openTimeout;
   final Map<String, ({Comic comic, List<ReadSessionPage> pages})> _openedPages =
       <String, ({Comic comic, List<ReadSessionPage> pages})>{};
@@ -50,7 +50,7 @@ class ReaderSessionService {
     return fallback.clamp(1, totalPages);
   }
 
-  Future<ReaderSessionSnapshot> open({
+  Future<OpenedReadSession> open({
     required String comicId,
     bool incognito = false,
     bool startFromFirstPage = false,
@@ -65,7 +65,7 @@ class ReaderSessionService {
             ),
             totalPages: opened.pages.length,
           );
-    return ReaderSessionSnapshot(
+    return OpenedReadSession(
       comic: opened.comic,
       pages: opened.pages,
       resumePageIndex: resumePageIndex,

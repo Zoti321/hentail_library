@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_boundary.dart';
-import 'package:hentai_library/features/read_session/domain/read_session.dart';
-import 'package:hentai_library/features/read_session/domain/spread_index.dart';
-import 'package:hentai_library/features/read_session/domain/auto_play_mode.dart';
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
-import 'package:hentai_library/features/read_session/domain/reader_session_snapshot.dart';
-import 'package:hentai_library/features/read_session/domain/reader_tap_zone.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_auto_play_carry.dart';
-import 'package:hentai_library/features/read_session/presentation/reader_exit_location.dart';
-import 'package:hentai_library/features/read_session/presentation/routing/reader_route_context.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_boundary_policy.dart';
+import 'package:hentai_library/features/reader/application/open_reader_args.dart';
+import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
+import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
+import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
+import 'package:hentai_library/features/reader/presentation/reader_exit_location.dart';
+import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/features/read_session/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
-import 'package:hentai_library/features/read_session/di/session_providers.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_fullscreen_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_prefetch_controller.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_series_navigation.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
+import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_fullscreen_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_series_navigation.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -73,7 +73,7 @@ class ReaderController extends _$ReaderController
     final String id = key.comicId;
     final bool incognito = key.incognito;
     final bool startFromFirstPage = key.startFromFirstPage;
-    final ReaderSessionSnapshot snapshot = await ref.watch(
+    final OpenedReadSession snapshot = await ref.watch(
       readerSessionOpenProvider(
         comicId: id,
         incognito: incognito,
@@ -137,7 +137,7 @@ class ReaderController extends _$ReaderController
       if (s.readingMode == value) {
         return s;
       }
-      final int remappedIndex = SpreadIndex.remapPageForModeSwitch(
+      final int remappedIndex = SpreadNavigation.remapPageForModeSwitch(
         fromMode: s.readingMode,
         toMode: value,
         currentPageIndex: s.currentIndex,
@@ -158,7 +158,7 @@ class ReaderController extends _$ReaderController
   Future<void> handleTapZone(
     ReaderTapZone zone, {
     ReaderNavContextData? navContext,
-    ReadSessionRouteParams? session,
+    OpenReaderArgs? session,
     GoRouter? router,
   }) async {
     final current = state.asData?.value;
@@ -182,7 +182,7 @@ class ReaderController extends _$ReaderController
   Future<void> _handleHorizontalTap(
     ReaderTapZone zone, {
     ReaderNavContextData? navContext,
-    ReadSessionRouteParams? session,
+    OpenReaderArgs? session,
     GoRouter? router,
   }) async {
     if (zone == ReaderTapZone.left) {

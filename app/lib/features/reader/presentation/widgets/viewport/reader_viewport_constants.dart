@@ -1,4 +1,4 @@
-import 'package:hentai_library/features/read_session/domain/reading_mode.dart';
+import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 
 const Duration kReaderPageCrossfadeDuration = Duration(milliseconds: 150);
 

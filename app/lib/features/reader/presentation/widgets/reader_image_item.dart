@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/read_session/domain/reader_page_payload.dart';
+import 'package:hentai_library/features/reader/domain/reader_page_payload.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hentai_library/shared/ui/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/shared/ui/widgets/overlays/context_menu/common.dart';
 import 'package:hentai_library/shared/ui/theme/theme.dart';
-import 'package:hentai_library/features/read_session/di/page_image_copy_providers.dart';
-import 'package:hentai_library/features/read_session/presentation/image/reader_image_cache.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_image_filter_quality.dart';
-import 'package:hentai_library/features/read_session/presentation/widgets/viewport/reader_page_fade_in.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/reader_page_aspect_ratios.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_page_data.dart';
-import 'package:hentai_library/features/read_session/presentation/view_models/read_session_providers.dart';
+import 'package:hentai_library/features/reader/di/page_image_copy_providers.dart';
+import 'package:hentai_library/features/reader/presentation/image/reader_image_cache.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_image_filter_quality.dart';
+import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_page_fade_in.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_page_aspect_ratios.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -261,7 +261,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
   Future<void> _copyPageImage(BuildContext context) async {
     try {
       await ref
-          .read(pageImageCopyProvider)
+          .read(copyPageImageServiceProvider)
           .execute(
             comic: widget.comic,
             archivePageIndex: widget.imageData.archivePageIndex,
