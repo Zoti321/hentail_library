@@ -32,6 +32,25 @@ Set<int> pagesLeavingPrefetchWindow({
   return previousWindow.difference(nextWindow);
 }
 
+/// 窗口外、但仍可能握着 keepAlive FilePath 的页（含 PageView 预建邻页）。
+///
+/// [touchedPages] 覆盖「从未进入过 previousWindow、却被 UI 触发过 load」的页；
+/// 仅用 [pagesLeavingPrefetchWindow] 会漏掉它们，驱逐后会卡在失效路径上。
+Set<int> pagesToInvalidateOutsidePrefetchWindow({
+  required Set<int>? previousWindow,
+  required Set<int> nextWindow,
+  Set<int> touchedPages = const <int>{},
+}) {
+  final Set<int> candidates = <int>{
+    ...?previousWindow,
+    ...touchedPages,
+  };
+  if (candidates.isEmpty) {
+    return const <int>{};
+  }
+  return candidates.difference(nextWindow);
+}
+
 /// 计算以 [centerPageOneBased] 为中心的预加载页码集合（1-based）。
 Set<int> computePrefetchWindow({
   required int centerPageOneBased,

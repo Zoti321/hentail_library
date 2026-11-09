@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -14,10 +15,14 @@ import 'package:hentai_library/features/reader/presentation/image/reader_image_c
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_image_filter_quality.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_page_fade_in.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_page_aspect_ratios.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_notifier.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+/// 磁盘缓存被预取窗口驱逐后，同路径 ExtendedImage 失败态不会自动重挂载；限制重试次数。
+const int _kReaderPageReloadMaxAttempts = 3;
 
 class ReaderImageItem extends ConsumerStatefulWidget {
   const ReaderImageItem({
@@ -43,12 +48,15 @@ class ReaderImageItem extends ConsumerStatefulWidget {
 
 class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
   bool _reloadScheduled = false;
+  int _reloadNonce = 0;
+  int _reloadAttempts = 0;
 
   @override
   void didUpdateWidget(ReaderImageItem oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageData != widget.imageData) {
       _reloadScheduled = false;
+      _reloadAttempts = 0;
     }
   }
 
@@ -72,6 +80,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           child: Align(
             alignment: widget.alignment,
             child: AppComicImage(
+              key: ValueKey<int>(_reloadNonce),
               filePath: imageData.file.path,
               fit: widget.fit,
               filterQuality: filterQuality,
@@ -90,16 +99,28 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       return _wrapWithContextMenu(context, errorPlaceholder);
     }
     final ReaderArchivePageImageData archiveData = imageData;
+    ref
+        .read(readerPrefetchNotifierProvider.notifier)
+        .notePageTouched(
+          comicId: archiveData.comicId,
+          pageOneBased: archiveData.pageIndex + 1,
+        );
     final AsyncValue<ReaderPagePayload> pageAsync = ref.watch(
       comicReaderPageProvider(
         comicId: archiveData.comicId,
         pageIndex: archiveData.pageIndex,
       ),
     );
+    // skipLoadingOnRefresh:false — invalidate 后必须卸掉失败态 ExtendedImage，
+    // 否则同路径 FilePath 重解压后仍卡在 LoadState.failed（slider 大跳典型）。
     return pageAsync.when(
+      skipLoadingOnReload: false,
+      skipLoadingOnRefresh: false,
       loading: () => _wrapWithContextMenu(context, loadingSurface),
-      error: (_, StackTrace _) =>
-          _wrapWithContextMenu(context, errorPlaceholder),
+      error: (_, StackTrace _) {
+        _scheduleReaderPageReload(archiveData);
+        return _wrapWithContextMenu(context, errorPlaceholder);
+      },
       data: (ReaderPagePayload page) {
         final Widget content = switch (page) {
           ReaderPageFilePath(:final String path) => _buildArchiveFilePathPage(
@@ -115,6 +136,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
             child: Align(
               alignment: widget.alignment,
               child: AppComicImage(
+                key: ValueKey<int>(_reloadNonce),
                 memoryBytes: data,
                 fit: widget.fit,
                 filterQuality: filterQuality,
@@ -171,8 +193,12 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     required int? cacheWidth,
   }) {
     // Disk may be gone after cache eviction while keepAlive still holds FilePath.
-    // Do not sync-stat in build; rely on ImageProvider failure → onDecodeError.
     if (_reloadScheduled) {
+      return loadingSurface;
+    }
+    // 同步探测：避免先画出 error 图标再等 ExtendedImage failed 回调。
+    if (!isUsableReaderCacheFile(path)) {
+      _scheduleReaderPageReload(archiveData, stalePath: path);
       return loadingSurface;
     }
     return ReaderPageFadeIn(
@@ -180,6 +206,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       child: Align(
         alignment: widget.alignment,
         child: AppComicImage(
+          key: ValueKey<int>(_reloadNonce),
           filePath: path,
           fit: widget.fit,
           filterQuality: filterQuality,
@@ -189,7 +216,8 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           loadingPlaceholder: loadingSurface,
           errorPlaceholder: errorPlaceholder,
           onImageSize: _rememberImageSize,
-          onDecodeError: () => _scheduleReaderPageReload(archiveData),
+          onDecodeError: () =>
+              _scheduleReaderPageReload(archiveData, stalePath: path),
         ),
       ),
     );
@@ -203,36 +231,66 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     ).cacheWidth;
   }
 
-  void _scheduleReaderPageReload(ReaderArchivePageImageData archiveData) {
-    if (_reloadScheduled) {
+  void _scheduleReaderPageReload(
+    ReaderArchivePageImageData archiveData, {
+    String? stalePath,
+  }) {
+    if (_reloadScheduled || _reloadAttempts >= _kReaderPageReloadMaxAttempts) {
       return;
     }
     _reloadScheduled = true;
+    _reloadAttempts += 1;
+    // onDecodeError / error when() 可能在 build 中触发 — 延后 setState/invalidate。
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _reloadScheduled = false;
+      unawaited(_runReaderPageReload(archiveData, stalePath: stalePath));
+    });
+  }
+
+  Future<void> _runReaderPageReload(
+    ReaderArchivePageImageData archiveData, {
+    String? stalePath,
+  }) async {
+    try {
       if (!mounted) {
         return;
       }
+      final String? path = stalePath?.trim();
+      if (path != null && path.isNotEmpty) {
+        await forgetReaderCachedFile(path);
+      }
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _reloadNonce += 1;
+      });
       ref.invalidate(
         comicReaderPageProvider(
           comicId: archiveData.comicId,
           pageIndex: archiveData.pageIndex,
         ),
       );
-    });
+    } finally {
+      // 允许后续 loading/error/data 再次调度重载。
+      if (mounted) {
+        _reloadScheduled = false;
+      }
+    }
   }
 
   Widget _buildReaderLoadingSurface(BuildContext context) {
-    return ColoredBox(color: context.reader.readerBackground);
+    return ColoredBox(color: context.reader.readerPlaceholderSurface);
   }
 
   Widget _buildReaderImageErrorPlaceholder(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Icon(
-        LucideIcons.bookImage,
-        size: 24,
-        color: context.reader.readerTextMuted,
+    return ColoredBox(
+      color: context.reader.readerPlaceholderSurface,
+      child: Center(
+        child: Icon(
+          Symbols.broken_image,
+          size: 24,
+          color: context.reader.readerTextMuted,
+        ),
       ),
     );
   }
@@ -247,7 +305,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       height: 48,
       builder: (VoidCallback onClose) => ContextMenuContainer(
         child: ContextMenuActionItem(
-          icon: LucideIcons.copy,
+          icon: Symbols.content_copy,
           label: context.l10n.readerCopyPageImage,
           onTap: () {
             onClose();

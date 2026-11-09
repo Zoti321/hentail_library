@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
   const ReaderColorScheme({
     required this.readerBackground,
+    required this.readerPlaceholderSurface,
     required this.readerTextMuted,
     required this.floatingUiBackground,
     required this.activeButtonBg,
@@ -26,7 +27,11 @@ class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
   /// 恒暗阅读画布（不随 seed / 应用明暗改变）。
   static const Color immersiveBackground = Color(0xFF09090B);
 
+  /// 页槽加载/错误占位：略亮于画布，避免与 letterbox 糊成一块。
+  static const Color placeholderSurface = Color(0xFF1C1C1F);
+
   final Color readerBackground;
+  final Color readerPlaceholderSurface;
   final Color readerTextMuted;
   final Color floatingUiBackground;
   final Color activeButtonBg;
@@ -48,6 +53,7 @@ class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
         : shell.inversePrimary;
     return ReaderColorScheme(
       readerBackground: immersiveBackground,
+      readerPlaceholderSurface: placeholderSurface,
       readerTextMuted: const Color(0xB3FFFFFF),
       floatingUiBackground: const Color(0xCC000000),
       activeButtonBg: accent,
@@ -67,6 +73,7 @@ class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
   @override
   ReaderColorScheme copyWith({
     Color? readerBackground,
+    Color? readerPlaceholderSurface,
     Color? readerTextMuted,
     Color? floatingUiBackground,
     Color? activeButtonBg,
@@ -83,6 +90,8 @@ class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
   }) {
     return ReaderColorScheme(
       readerBackground: readerBackground ?? this.readerBackground,
+      readerPlaceholderSurface:
+          readerPlaceholderSurface ?? this.readerPlaceholderSurface,
       readerTextMuted: readerTextMuted ?? this.readerTextMuted,
       floatingUiBackground: floatingUiBackground ?? this.floatingUiBackground,
       activeButtonBg: activeButtonBg ?? this.activeButtonBg,
@@ -111,6 +120,11 @@ class ReaderColorScheme extends ThemeExtension<ReaderColorScheme> {
       readerBackground: Color.lerp(
         readerBackground,
         other.readerBackground,
+        t,
+      )!,
+      readerPlaceholderSurface: Color.lerp(
+        readerPlaceholderSurface,
+        other.readerPlaceholderSurface,
         t,
       )!,
       readerTextMuted: Color.lerp(readerTextMuted, other.readerTextMuted, t)!,

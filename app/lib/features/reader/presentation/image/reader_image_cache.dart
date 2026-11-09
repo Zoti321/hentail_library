@@ -38,6 +38,22 @@ void removeReaderPathBytes(String path) {
   _readerPathBytes.remove(trimmed);
 }
 
+/// 丢掉 path→bytes，并 evict 命名 ImageCache 中同路径条目（失败态重载前调用）。
+///
+/// 调用方应 await：否则 remount 可能仍命中失败态 ImageCache 条目。
+Future<void> forgetReaderCachedFile(String path) async {
+  final String trimmed = path.trim();
+  if (trimmed.isEmpty) {
+    return;
+  }
+  removeReaderPathBytes(trimmed);
+  ensureReaderImageCacheConfigured();
+  await ExtendedFileImageProvider(
+    File(trimmed),
+    imageCacheName: kReaderImageCacheName,
+  ).evict();
+}
+
 void clearReaderPathBytes() {
   _readerPathBytes.clear();
 }

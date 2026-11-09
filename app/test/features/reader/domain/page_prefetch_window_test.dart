@@ -56,4 +56,28 @@ void main() {
       expect(previous.difference(next), isNotEmpty);
     });
   });
+
+  group('pagesToInvalidateOutsidePrefetchWindow', () {
+    test('includes touched pages never present in previous window', () {
+      expect(
+        pagesToInvalidateOutsidePrefetchWindow(
+          previousWindow: <int>{1, 2, 3},
+          nextWindow: <int>{20, 21, 22},
+          touchedPages: <int>{1, 2, 3, 4},
+        ),
+        <int>{1, 2, 3, 4},
+      );
+    });
+
+    test('keeps pages that remain in the next window', () {
+      expect(
+        pagesToInvalidateOutsidePrefetchWindow(
+          previousWindow: <int>{8, 9, 10},
+          nextWindow: <int>{9, 10, 11},
+          touchedPages: <int>{8, 9, 10, 12},
+        ),
+        <int>{8, 12},
+      );
+    });
+  });
 }

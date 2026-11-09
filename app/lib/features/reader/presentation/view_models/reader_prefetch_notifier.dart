@@ -16,6 +16,8 @@ part 'reader_prefetch_notifier.g.dart';
 @Riverpod(keepAlive: true, name: 'readerPrefetchNotifierProvider')
 class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
   final Map<String, Set<int>> _lastWarmWindows = <String, Set<int>>{};
+  /// 会话内被 UI/预热触达过的页（1-based）；含 PageView 预建邻页。
+  final Map<String, Set<int>> _touchedPages = <String, Set<int>>{};
 
   @override
   Map<String, int> build() => <String, int>{};
@@ -26,10 +28,21 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
     return next;
   }
 
+  /// PageView / 视口触达某页时登记，供窗口外失效覆盖「从未进过 warm window」的 keepAlive。
+  void notePageTouched({required String comicId, required int pageOneBased}) {
+    if (pageOneBased < 1) {
+      return;
+    }
+    _touchedPages
+        .putIfAbsent(comicId, () => <int>{})
+        .add(pageOneBased);
+  }
+
   void clearComic(String comicId) {
     // Invalidate Flutter-side prefetch generation before disk clear.
     bumpGeneration(comicId);
     _lastWarmWindows.remove(comicId);
+    _touchedPages.remove(comicId);
     if (state.containsKey(comicId)) {
       state = Map<String, int>.from(state)..remove(comicId);
     }
@@ -60,6 +73,8 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
       neighborCount: kReaderPrefetchNeighborCount,
       extraPageIndexesOneBased: extraPageIndexesOneBased,
     );
+    final Set<int> touched = _touchedPages.putIfAbsent(comicId, () => <int>{});
+    touched.addAll(targets);
     final Set<int>? previous = _lastWarmWindows[comicId];
     if (!shouldBumpPrefetchGeneration(
       previousWindow: previous,
@@ -67,10 +82,12 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
     )) {
       return false;
     }
-    // Drop keepAlive FilePaths + path→bytes for pages Rust will evict.
-    for (final int pageOneBased in pagesLeavingPrefetchWindow(
+    // Drop keepAlive FilePaths + path→bytes for pages Rust will evict
+    //（含 PageView 触达、却从未进入 previousWindow 的页）。
+    for (final int pageOneBased in pagesToInvalidateOutsidePrefetchWindow(
       previousWindow: previous,
       nextWindow: targets,
+      touchedPages: touched,
     )) {
       _forgetPathBytesForPage(
         comicId: comicId,
@@ -104,6 +121,20 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
               .toList(growable: false),
           generation: generation,
         );
+    // Prefetch 末尾会 evict；邻页可能在 await 期间被 PageView load 后又被删盘。
+    // 再扫一遍窗口外触达页的 keepAlive，避免卡在失效 FilePath。
+    final Set<int> staleAfterEvict =
+        (_touchedPages[comicId] ?? const <int>{}).difference(targets);
+    for (final int pageOneBased in staleAfterEvict) {
+      _forgetPathBytesForPage(
+        comicId: comicId,
+        pageOneBased: pageOneBased,
+        imageList: imageList,
+      );
+      ref.invalidate(
+        comicReaderPageProvider(comicId: comicId, pageIndex: pageOneBased - 1),
+      );
+    }
     return true;
   }
 

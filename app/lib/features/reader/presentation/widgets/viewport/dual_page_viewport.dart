@@ -337,11 +337,26 @@ class _DualPagePrefetchBinder extends HookConsumerWidget {
       totalPages: totalPages,
       pageIndex: currentIndex,
     );
-    final List<int> spreadPages = SpreadNavigation.pagesInSpread(
-      mode: readingMode,
-      totalPages: totalPages,
-      spreadIndex: currentSpread,
-    );
+    // 当前 spread + 左右邻 spread：覆盖 PageView 默认缓存邻页，避免
+    // prefetch evict 删盘后 keepAlive 仍握着失效 FilePath。
+    final List<int> prefetchExtras = <int>[
+      ...SpreadNavigation.pagesInSpread(
+        mode: readingMode,
+        totalPages: totalPages,
+        spreadIndex: currentSpread,
+      ),
+      if (currentSpread > 0)
+        ...SpreadNavigation.pagesInSpread(
+          mode: readingMode,
+          totalPages: totalPages,
+          spreadIndex: currentSpread - 1,
+        ),
+      ...SpreadNavigation.pagesInSpread(
+        mode: readingMode,
+        totalPages: totalPages,
+        spreadIndex: currentSpread + 1,
+      ),
+    ];
     useReaderPrefetchWindow(
       ref: ref,
       context: context,
@@ -350,7 +365,7 @@ class _DualPagePrefetchBinder extends HookConsumerWidget {
       totalPages: totalPages,
       slotLogicalWidth: slotLogicalWidth,
       imageList: imageList,
-      extraPageIndexesOneBased: spreadPages,
+      extraPageIndexesOneBased: prefetchExtras,
     );
     return const SizedBox.shrink();
   }

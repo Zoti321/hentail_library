@@ -35,6 +35,7 @@ import 'package:hentai_library/shared/ui/theme/theme.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_3_expressive/material_3_expressive.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 export 'package:hentai_library/features/reader/presentation/views/reader/reader_layout.dart';
 
@@ -540,7 +541,7 @@ List<M3EMenuNode> _buildMoreMenuEntries(
   return <M3EMenuNode>[
     M3EMenuEntry(
       label: l10n.readerSetComicCover,
-      leading: const Icon(Icons.image_outlined),
+      leading: const Icon(Symbols.image),
       onPressed: () {
         unawaited(
           setComicCoverFromReader(context, ref, viewKey: viewKey, l10n: l10n),
@@ -550,7 +551,7 @@ List<M3EMenuNode> _buildMoreMenuEntries(
     if (seriesId != null)
       M3EMenuEntry(
         label: l10n.readerSetSeriesCover,
-        leading: const Icon(Icons.collections_outlined),
+        leading: const Icon(Symbols.collections),
         onPressed: () {
           unawaited(
             setSeriesCoverFromReader(
