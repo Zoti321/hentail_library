@@ -23,6 +23,10 @@ Future<void> recordReadingActivityFrb({
   markFinished: markFinished,
 );
 
+/// 从 Reading history 幂等回填 Finished comic；不发明时长。返回候选写入行数。
+Future<int> backfillFinishedComicsFromHistoryFrb() => RustLib.instance.api
+    .crateApiReadingActivityBackfillFinishedComicsFromHistoryFrb();
+
 class ReadingActivityStatsDto {
   final int finishedCount;
   final PlatformInt64 totalDurationMs;

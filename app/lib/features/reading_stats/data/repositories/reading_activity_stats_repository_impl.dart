@@ -10,9 +10,17 @@ class ReadingActivityStatsRepositoryImpl
 
   @override
   Stream<ReadingActivityStats> watchActivityStats() {
-    return guardFrbStream(
-      () => rust.watchReadingActivityStatsFrb().map(_mapStats),
-      fallbackMessage: '读取阅读行为统计失败',
+    // 迁移也会回填；此处经 FRB 再跑一遍（幂等），避免 reading_stats 依赖 history public。
+    return Stream<int>.fromFuture(
+      guardFrb(
+        () => rust.backfillFinishedComicsFromHistoryFrb(),
+        fallbackMessage: '回填读完标记失败',
+      ),
+    ).asyncExpand(
+      (_) => guardFrbStream(
+        () => rust.watchReadingActivityStatsFrb().map(_mapStats),
+        fallbackMessage: '读取阅读行为统计失败',
+      ),
     );
   }
 

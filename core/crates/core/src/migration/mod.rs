@@ -25,6 +25,7 @@ mod m20261003_000023_author_stable_identity;
 mod m20261004_000024_comic_thumbnail_source_page;
 mod m20261006_000025_author_platform_images;
 mod m20261109_000026_reading_activity_stats;
+mod m20261109_000027_backfill_finished_from_history;
 
 pub struct Migrator;
 
@@ -57,6 +58,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20261004_000024_comic_thumbnail_source_page::Migration),
             Box::new(m20261006_000025_author_platform_images::Migration),
             Box::new(m20261109_000026_reading_activity_stats::Migration),
+            Box::new(m20261109_000027_backfill_finished_from_history::Migration),
         ]
     }
 }

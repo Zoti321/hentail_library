@@ -1,4 +1,5 @@
 use hentai_core::{
+    backfill_finished_comics_from_history as core_backfill_finished_comics_from_history,
     record_reading_activity as core_record_reading_activity,
     watch_reading_activity_stats as core_watch_reading_activity_stats,
     ReadingActivityStatsDto as CoreReadingActivityStats,
@@ -41,6 +42,14 @@ pub async fn record_reading_activity_frb(
     mark_finished: bool,
 ) -> Result<(), HentaiErrorDto> {
     core_record_reading_activity(&comic_id, add_duration_ms, mark_finished)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
+/// 从 Reading history 幂等回填 Finished comic；不发明时长。返回候选写入行数。
+#[flutter_rust_bridge::frb]
+pub async fn backfill_finished_comics_from_history_frb() -> Result<i32, HentaiErrorDto> {
+    core_backfill_finished_comics_from_history()
         .await
         .map_err(HentaiErrorDto::from)
 }
