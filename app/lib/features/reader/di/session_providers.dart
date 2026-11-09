@@ -15,11 +15,13 @@ final Provider<OpenReadSessionService> openReadSessionServiceProvider =
       );
     });
 
-final Provider<ReadSessionApplicationService> readSessionApplicationServiceProvider =
-    Provider<ReadSessionApplicationService>((Ref ref) {
-      return ReadSessionApplicationService(
-        sessionService: ref.read(openReadSessionServiceProvider),
-        readingHistoryCommands: ref.read(readingHistoryCommandPortProvider),
-        activityCommands: ref.read(recordReadSessionActivityPortProvider),
-      );
-    });
+final Provider<ReadSessionApplicationService>
+readSessionApplicationServiceProvider = Provider<ReadSessionApplicationService>(
+  (Ref ref) {
+    return ReadSessionApplicationService(
+      sessionService: ref.read(openReadSessionServiceProvider),
+      readingHistoryCommands: ref.read(readingHistoryCommandPortProvider),
+      activityCommands: ref.read(recordReadSessionActivityPortProvider),
+    );
+  },
+);

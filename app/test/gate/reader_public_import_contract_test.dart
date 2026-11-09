@@ -19,9 +19,7 @@ void main() {
       isTrue,
     );
     expect(
-      isFeaturePublicPath(
-        'features/reader/domain/native_reader_port.dart',
-      ),
+      isFeaturePublicPath('features/reader/domain/native_reader_port.dart'),
       isFalse,
     );
 

@@ -12,10 +12,11 @@ ClipboardImagePort createClipboardImagePort() =>
 final Provider<ClipboardImagePort> clipboardImagePortProvider =
     Provider<ClipboardImagePort>((Ref ref) => createClipboardImagePort());
 
-final Provider<CopyPageImageService> copyPageImageServiceProvider = Provider<CopyPageImageService>(
-  (Ref ref) => CopyPageImageService(
-    pageSource: ref.read(comicPageSourcePortProvider),
-    clipboardImage: ref.read(clipboardImagePortProvider),
-    encodePng: encodePageImagePng,
-  ),
-);
+final Provider<CopyPageImageService> copyPageImageServiceProvider =
+    Provider<CopyPageImageService>(
+      (Ref ref) => CopyPageImageService(
+        pageSource: ref.read(comicPageSourcePortProvider),
+        clipboardImage: ref.read(clipboardImagePortProvider),
+        encodePng: encodePageImagePng,
+      ),
+    );

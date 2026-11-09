@@ -16,6 +16,7 @@ part 'reader_prefetch_notifier.g.dart';
 @Riverpod(keepAlive: true, name: 'readerPrefetchNotifierProvider')
 class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
   final Map<String, Set<int>> _lastWarmWindows = <String, Set<int>>{};
+
   /// 会话内被 UI/预热触达过的页（1-based）；含 PageView 预建邻页。
   final Map<String, Set<int>> _touchedPages = <String, Set<int>>{};
 
@@ -33,9 +34,7 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
     if (pageOneBased < 1) {
       return;
     }
-    _touchedPages
-        .putIfAbsent(comicId, () => <int>{})
-        .add(pageOneBased);
+    _touchedPages.putIfAbsent(comicId, () => <int>{}).add(pageOneBased);
   }
 
   void clearComic(String comicId) {
@@ -123,8 +122,8 @@ class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
         );
     // Prefetch 末尾会 evict；邻页可能在 await 期间被 PageView load 后又被删盘。
     // 再扫一遍窗口外触达页的 keepAlive，避免卡在失效 FilePath。
-    final Set<int> staleAfterEvict =
-        (_touchedPages[comicId] ?? const <int>{}).difference(targets);
+    final Set<int> staleAfterEvict = (_touchedPages[comicId] ?? const <int>{})
+        .difference(targets);
     for (final int pageOneBased in staleAfterEvict) {
       _forgetPathBytesForPage(
         comicId: comicId,

@@ -40,15 +40,12 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     );
     // Do not watch currentIndex here — scroll setIndex must not rebuild the list.
     final int seedIndex =
-        ref
-            .read(readerViewModelProvider(viewKey))
-            .asData
-            ?.value
-            .currentIndex ??
+        ref.read(readerViewModelProvider(viewKey)).asData?.value.currentIndex ??
         1;
     final Comic? comic = ref.watch(
-      readerViewModelProvider(viewKey)
-          .select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
+      readerViewModelProvider(
+        viewKey,
+      ).select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
     );
     if (comic == null) {
       return const SizedBox.expand();

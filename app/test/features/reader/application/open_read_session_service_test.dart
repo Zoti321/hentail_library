@@ -171,7 +171,9 @@ void main() {
     });
 
     test('open throws when page list is empty', () async {
-      final OpenReadSessionService service = _service(pages: <ReadSessionPage>[]);
+      final OpenReadSessionService service = _service(
+        pages: <ReadSessionPage>[],
+      );
       expect(
         () => service.open(comicId: 'c1'),
         throwsA(isA<ReadSessionPageLoadException>()),
@@ -273,7 +275,9 @@ void main() {
     });
 
     test('open classifies empty pages as invalidOrEmptyContent', () async {
-      final OpenReadSessionService service = _service(pages: <ReadSessionPage>[]);
+      final OpenReadSessionService service = _service(
+        pages: <ReadSessionPage>[],
+      );
       await expectLater(
         service.open(comicId: 'c1'),
         throwsA(

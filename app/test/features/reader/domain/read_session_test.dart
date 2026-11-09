@@ -35,10 +35,7 @@ void main() {
         initialPageIndex: 1,
         foregroundStartedAt: DateTime.utc(2026, 1, 1),
       );
-      expect(
-        () => session.updatePage(0),
-        throwsA(isA<ReadSessionException>()),
-      );
+      expect(() => session.updatePage(0), throwsA(isA<ReadSessionException>()));
     });
 
     test('foreground accrual pauses and takes elapsed', () {

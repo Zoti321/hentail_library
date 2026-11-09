@@ -99,10 +99,7 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
             return;
           }
           unawaited(() async {
-            final ({
-              bool keepTicking,
-              ReaderReplaceReaderRouteIntent? replace,
-            })
+            final ({bool keepTicking, ReaderReplaceReaderRouteIntent? replace})
             tick = await viewModel.advanceAutoPlay(
               navContext: seriesNavContext,
               session: routeContext.session,

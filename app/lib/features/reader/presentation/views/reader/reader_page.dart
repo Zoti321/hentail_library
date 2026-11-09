@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
 import 'package:hentai_library/features/reader/presentation/reader_input.dart';
-import 'package:hentai_library/features/reader/di/session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/navigation/apply_reader_navigation_intent.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_chrome_notifier.dart';
@@ -85,24 +84,23 @@ class ReaderPage extends HookConsumerWidget {
       startFromFirstPage: routeContext.startFromFirstPage,
     );
     final AsyncValue<ReaderPageViewShell> viewShellAsync = ref.watch(
-      readerViewModelProvider(viewKey).select((
-        AsyncValue<ReaderUiState> asyncState,
-      ) {
-        if (asyncState.hasError) {
-          return AsyncError<ReaderPageViewShell>(
-            asyncState.error!,
-            asyncState.stackTrace!,
-          );
-        }
-        final ReaderUiState? state = asyncState.asData?.value;
-        if (state == null) {
-          return const AsyncLoading<ReaderPageViewShell>();
-        }
-        return AsyncData<ReaderPageViewShell>((
-          comic: state.comic,
-          totalPages: state.totalPages,
-        ));
-      }),
+      readerViewModelProvider(viewKey)
+          .select((AsyncValue<ReaderUiState> asyncState) {
+            if (asyncState.hasError) {
+              return AsyncError<ReaderPageViewShell>(
+                asyncState.error!,
+                asyncState.stackTrace!,
+              );
+            }
+            final ReaderUiState? state = asyncState.asData?.value;
+            if (state == null) {
+              return const AsyncLoading<ReaderPageViewShell>();
+            }
+            return AsyncData<ReaderPageViewShell>((
+              comic: state.comic,
+              totalPages: state.totalPages,
+            ));
+          }),
     );
     final AsyncValue<ReadSessionContextData> sessionAsync = ref.watch(
       readSessionContextForReaderProvider(

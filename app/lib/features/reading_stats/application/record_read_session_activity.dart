@@ -17,15 +17,17 @@ class RecordReadSessionActivity implements RecordReadSessionActivityPort {
     required int pageIndex,
     required int pageCount,
   }) {
-    final Duration? accrued = ReadingDurationAccrualDomainService.accruedDuration(
-      incognito: incognito,
-      foregroundElapsed: foregroundElapsed,
-    );
-    final bool markFinished = FinishedComicPolicyDomainService.shouldMarkFinished(
-      incognito: incognito,
-      pageIndex: pageIndex,
-      pageCount: pageCount,
-    );
+    final Duration? accrued =
+        ReadingDurationAccrualDomainService.accruedDuration(
+          incognito: incognito,
+          foregroundElapsed: foregroundElapsed,
+        );
+    final bool markFinished =
+        FinishedComicPolicyDomainService.shouldMarkFinished(
+          incognito: incognito,
+          pageIndex: pageIndex,
+          pageCount: pageCount,
+        );
     if (accrued == null && !markFinished) {
       return Future<void>.value();
     }

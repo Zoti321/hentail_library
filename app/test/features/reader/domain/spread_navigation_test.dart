@@ -13,11 +13,17 @@ void main() {
 
     test('dualPage pairs all pages', () {
       expect(
-        SpreadNavigation.totalSpreads(mode: ReadingMode.dualPage, totalPages: 3),
+        SpreadNavigation.totalSpreads(
+          mode: ReadingMode.dualPage,
+          totalPages: 3,
+        ),
         2,
       );
       expect(
-        SpreadNavigation.totalSpreads(mode: ReadingMode.dualPage, totalPages: 4),
+        SpreadNavigation.totalSpreads(
+          mode: ReadingMode.dualPage,
+          totalPages: 4,
+        ),
         2,
       );
     });

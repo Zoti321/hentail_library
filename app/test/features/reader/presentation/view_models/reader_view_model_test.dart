@@ -101,7 +101,6 @@ class _FakePrefetchController extends ReaderPrefetchNotifier {
   }
 }
 
-
 class _NoOpHistoryCommands implements ReadingHistoryCommandPort {
   @override
   Future<void> recordReading({
@@ -566,14 +565,8 @@ void main() {
         previousComicId: previousComicId,
       );
 
-      await controller.requestPrevPage(
-        navContext: nav,
-        session: session,
-      );
-      await controller.requestPrevPage(
-        navContext: nav,
-        session: session,
-      );
+      await controller.requestPrevPage(navContext: nav, session: session);
+      await controller.requestPrevPage(navContext: nav, session: session);
 
       expect(navigation.switchedTo, <String>[previousComicId]);
       expect(

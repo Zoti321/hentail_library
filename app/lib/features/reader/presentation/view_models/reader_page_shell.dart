@@ -23,10 +23,7 @@ AsyncValue<ReaderPageShellData> combineReaderPageShell(
     );
   }
   if (session.hasError) {
-    return AsyncError<ReaderPageShellData>(
-      session.error!,
-      session.stackTrace!,
-    );
+    return AsyncError<ReaderPageShellData>(session.error!, session.stackTrace!);
   }
   final ReaderPageViewShell? view = viewShell.asData?.value;
   final ReadSessionContextData? sessionData = session.asData?.value;

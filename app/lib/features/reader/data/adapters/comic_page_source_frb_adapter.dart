@@ -57,7 +57,9 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         pageIndex: pageIndex,
       );
       return switch (page) {
-        ReaderPageFilePath(:final String path) => await File(path).readAsBytes(),
+        ReaderPageFilePath(:final String path) => await File(
+          path,
+        ).readAsBytes(),
         ReaderPageBytes(:final Uint8List data) => data,
       };
     } on HentaiErrorDto catch (error) {

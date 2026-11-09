@@ -41,10 +41,7 @@ Set<int> pagesToInvalidateOutsidePrefetchWindow({
   required Set<int> nextWindow,
   Set<int> touchedPages = const <int>{},
 }) {
-  final Set<int> candidates = <int>{
-    ...?previousWindow,
-    ...touchedPages,
-  };
+  final Set<int> candidates = <int>{...?previousWindow, ...touchedPages};
   if (candidates.isEmpty) {
     return const <int>{};
   }

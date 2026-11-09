@@ -48,33 +48,30 @@ ProviderContainer _container({String title = 'Shell'}) {
           .overrideWith(() => _StubReaderViewModel(title)),
       readSessionContextForReaderProvider(comicId: _comicId)
           .overrideWith((Ref ref) async => _sessionContext()),
-      readerChromeNotifierProvider.overrideWith(
-        _FakeReaderChromeNotifier.new,
-      ),
+      readerChromeNotifierProvider.overrideWith(_FakeReaderChromeNotifier.new),
     ],
   );
 }
 
 AsyncValue<ReaderPageViewShell> _watchViewShell(ProviderContainer container) {
   return container.read(
-    readerViewModelProvider(_viewKey).select((
-      AsyncValue<ReaderUiState> asyncState,
-    ) {
-      if (asyncState.hasError) {
-        return AsyncError<ReaderPageViewShell>(
-          asyncState.error!,
-          asyncState.stackTrace!,
-        );
-      }
-      final ReaderUiState? state = asyncState.asData?.value;
-      if (state == null) {
-        return const AsyncLoading<ReaderPageViewShell>();
-      }
-      return AsyncData<ReaderPageViewShell>((
-        comic: state.comic,
-        totalPages: state.totalPages,
-      ));
-    }),
+    readerViewModelProvider(_viewKey)
+        .select((AsyncValue<ReaderUiState> asyncState) {
+          if (asyncState.hasError) {
+            return AsyncError<ReaderPageViewShell>(
+              asyncState.error!,
+              asyncState.stackTrace!,
+            );
+          }
+          final ReaderUiState? state = asyncState.asData?.value;
+          if (state == null) {
+            return const AsyncLoading<ReaderPageViewShell>();
+          }
+          return AsyncData<ReaderPageViewShell>((
+            comic: state.comic,
+            totalPages: state.totalPages,
+          ));
+        }),
   );
 }
 
@@ -100,8 +97,7 @@ void main() {
       container.read(
         readerViewModelProvider(_viewKey).select(
           (AsyncValue<ReaderUiState> s) =>
-              s.asData?.value.seriesBoundaryPrompt ??
-              SeriesBoundaryPrompt.none,
+              s.asData?.value.seriesBoundaryPrompt ?? SeriesBoundaryPrompt.none,
         ),
       ),
       SeriesBoundaryPrompt.none,
@@ -115,23 +111,22 @@ void main() {
 
     int notifications = 0;
     container.listen(
-      readerViewModelProvider(_viewKey).select((
-        AsyncValue<ReaderUiState> asyncState,
-      ) {
-        final ReaderUiState? state = asyncState.asData?.value;
-        if (state == null) {
-          return null;
-        }
-        return (comicId: state.comic.comicId, totalPages: state.totalPages);
-      }),
+      readerViewModelProvider(_viewKey)
+          .select((AsyncValue<ReaderUiState> asyncState) {
+            final ReaderUiState? state = asyncState.asData?.value;
+            if (state == null) {
+              return null;
+            }
+            return (comicId: state.comic.comicId, totalPages: state.totalPages);
+          }),
       (previous, next) {
         notifications++;
       },
     );
 
-    final _StubReaderViewModel viewModel =
-        container.read(readerViewModelProvider(_viewKey).notifier)
-            as _StubReaderViewModel;
+    final _StubReaderViewModel viewModel = container.read(
+      readerViewModelProvider(_viewKey).notifier,
+    ) as _StubReaderViewModel;
     viewModel.turnTo(5);
     viewModel.turnTo(7);
     await Future<void>.delayed(Duration.zero);
@@ -146,31 +141,27 @@ void main() {
 
     int notifications = 0;
     container.listen(
-      readerViewModelProvider(_viewKey).select((
-        AsyncValue<ReaderUiState> asyncState,
-      ) {
-        final ReaderUiState? state = asyncState.asData?.value;
-        if (state == null) {
-          return null;
-        }
-        return (title: state.comic.title, totalPages: state.totalPages);
-      }),
+      readerViewModelProvider(_viewKey)
+          .select((AsyncValue<ReaderUiState> asyncState) {
+            final ReaderUiState? state = asyncState.asData?.value;
+            if (state == null) {
+              return null;
+            }
+            return (title: state.comic.title, totalPages: state.totalPages);
+          }),
       (previous, next) {
         notifications++;
       },
     );
 
-    final _StubReaderViewModel viewModel =
-        container.read(readerViewModelProvider(_viewKey).notifier)
-            as _StubReaderViewModel;
+    final _StubReaderViewModel viewModel = container.read(
+      readerViewModelProvider(_viewKey).notifier,
+    ) as _StubReaderViewModel;
     viewModel.replaceComicTitle('Renamed');
     await Future<void>.delayed(Duration.zero);
 
     expect(notifications, greaterThan(0));
-    expect(
-      _watchViewShell(container).requireValue.comic.title,
-      'Renamed',
-    );
+    expect(_watchViewShell(container).requireValue.comic.title, 'Renamed');
   });
 
   test('fullscreen and boundary prompt are orthogonal selects', () async {
@@ -193,9 +184,9 @@ void main() {
       },
     );
 
-    (container.read(readerChromeNotifierProvider.notifier)
-            as _FakeReaderChromeNotifier)
-        .set(true);
+    (container.read(
+      readerChromeNotifierProvider.notifier,
+    ) as _FakeReaderChromeNotifier).set(true);
     (container.read(readerViewModelProvider(_viewKey).notifier)
             as _StubReaderViewModel)
         .setSeriesBoundaryPrompt(SeriesBoundaryPrompt.advance);
@@ -206,8 +197,7 @@ void main() {
       container.read(
         readerViewModelProvider(_viewKey).select(
           (AsyncValue<ReaderUiState> s) =>
-              s.asData?.value.seriesBoundaryPrompt ??
-              SeriesBoundaryPrompt.none,
+              s.asData?.value.seriesBoundaryPrompt ?? SeriesBoundaryPrompt.none,
         ),
       ),
       SeriesBoundaryPrompt.advance,

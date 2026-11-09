@@ -49,7 +49,8 @@ class DualPageViewport extends HookConsumerWidget {
     );
     final int totalPages = ref.watch(
       readerViewModelProvider(viewKey).select(
-        (AsyncValue<ReaderUiState> value) => value.asData?.value.totalPages ?? 1,
+        (AsyncValue<ReaderUiState> value) =>
+            value.asData?.value.totalPages ?? 1,
       ),
     );
     final ReadingMode activeMode = ref.watch(
@@ -59,8 +60,9 @@ class DualPageViewport extends HookConsumerWidget {
       ),
     );
     final Comic? comic = ref.watch(
-      readerViewModelProvider(viewKey)
-          .select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
+      readerViewModelProvider(
+        viewKey,
+      ).select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
     );
     if (comic == null) {
       return const SizedBox.expand();

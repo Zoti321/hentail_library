@@ -171,11 +171,7 @@ class ReaderViewModel extends _$ReaderViewModel
       toggleShowControls();
       return null;
     }
-    return _handleHorizontalTap(
-      zone,
-      navContext: navContext,
-      session: session,
-    );
+    return _handleHorizontalTap(zone, navContext: navContext, session: session);
   }
 
   Future<ReaderReplaceReaderRouteIntent?> _handleHorizontalTap(
