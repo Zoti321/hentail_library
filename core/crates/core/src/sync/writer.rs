@@ -167,6 +167,13 @@ async fn delete_comics_side_effects_batch<C: ConnectionTrait>(
     .map_err(map_db_err)?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
+        format!("DELETE FROM comic_finished_marks WHERE comic_id IN ({placeholders})"),
+        values.clone(),
+    ))
+    .await
+    .map_err(map_db_err)?;
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM series_items WHERE comic_id IN ({placeholders})"),
         values.clone(),
     ))
@@ -363,4 +370,108 @@ pub async fn replace_comic_characters<C: ConnectionTrait>(
     character_names: &[String],
 ) -> Result<(), HentaiError> {
     replace_comic_named_facet(db, JunctionNamedFacet::Character, comic_id, character_names).await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sea_orm::Database;
+
+    #[tokio::test]
+    async fn purge_removes_finished_mark_but_not_duration() {
+        let db = Database::connect("sqlite::memory:")
+            .await
+            .expect("memory db");
+        db.execute_unprepared(
+            "CREATE TABLE comics (
+                comic_id TEXT PRIMARY KEY,
+                path TEXT NOT NULL,
+                resource_type TEXT NOT NULL,
+                resource_size INTEGER NOT NULL,
+                created_at INTEGER NOT NULL,
+                last_updated_at INTEGER NOT NULL,
+                library_id TEXT NOT NULL,
+                deleted_at INTEGER
+            )",
+        )
+        .await
+        .unwrap();
+        db.execute_unprepared(
+            "CREATE TABLE comic_reading_histories (
+                comic_id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                last_read_time INTEGER NOT NULL,
+                page_index INTEGER
+            )",
+        )
+        .await
+        .unwrap();
+        db.execute_unprepared(
+            "CREATE TABLE series_items (
+                series_id TEXT NOT NULL,
+                comic_id TEXT NOT NULL,
+                PRIMARY KEY (series_id, comic_id)
+            )",
+        )
+        .await
+        .unwrap();
+        db.execute_unprepared(
+            "CREATE TABLE comic_finished_marks (
+                comic_id TEXT NOT NULL PRIMARY KEY,
+                finished_at_ms INTEGER NOT NULL
+            )",
+        )
+        .await
+        .unwrap();
+        db.execute_unprepared(
+            "CREATE TABLE reading_duration_total (
+                id INTEGER NOT NULL PRIMARY KEY CHECK (id = 1),
+                total_ms INTEGER NOT NULL CHECK (total_ms >= 0),
+                updated_at_ms INTEGER NOT NULL
+            )",
+        )
+        .await
+        .unwrap();
+        db.execute_unprepared(
+            "INSERT INTO comics (
+                comic_id, path, resource_type, resource_size, created_at, last_updated_at, library_id, deleted_at
+             ) VALUES ('a', '/a', 'zip', 1, 1, 1, 'lib', 1)",
+        )
+        .await
+        .unwrap();
+        db.execute_unprepared(
+            "INSERT INTO comic_finished_marks (comic_id, finished_at_ms) VALUES ('a', 1)",
+        )
+        .await
+        .unwrap();
+        db.execute_unprepared(
+            "INSERT INTO reading_duration_total (id, total_ms, updated_at_ms) VALUES (1, 120000, 1)",
+        )
+        .await
+        .unwrap();
+
+        delete_comics_side_effects(&db, &["a".to_string()])
+            .await
+            .unwrap();
+
+        let mark = db
+            .query_one(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "SELECT COUNT(*) AS c FROM comic_finished_marks".to_string(),
+            ))
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(mark.try_get::<i64>("", "c").unwrap(), 0);
+
+        let duration = db
+            .query_one(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "SELECT total_ms FROM reading_duration_total WHERE id = 1".to_string(),
+            ))
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(duration.try_get::<i64>("", "total_ms").unwrap(), 120000);
+    }
 }

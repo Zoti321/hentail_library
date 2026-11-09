@@ -25,6 +25,7 @@ const COMIC_CHILD_TABLES: &[&str] = &[
     "comic_parodies",
     "comic_characters",
     "comic_reading_histories",
+    "comic_finished_marks",
     "comic_thumbnails",
     "series_items",
 ];
