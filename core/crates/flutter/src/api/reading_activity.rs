@@ -1,4 +1,5 @@
 use hentai_core::{
+    record_reading_activity as core_record_reading_activity,
     watch_reading_activity_stats as core_watch_reading_activity_stats,
     ReadingActivityStatsDto as CoreReadingActivityStats,
 };
@@ -31,4 +32,15 @@ pub async fn watch_reading_activity_stats_frb(
         })
         .await,
     )
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn record_reading_activity_frb(
+    comic_id: String,
+    add_duration_ms: Option<i64>,
+    mark_finished: bool,
+) -> Result<(), HentaiErrorDto> {
+    core_record_reading_activity(&comic_id, add_duration_ms, mark_finished)
+        .await
+        .map_err(HentaiErrorDto::from)
 }

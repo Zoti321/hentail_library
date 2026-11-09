@@ -72,7 +72,8 @@ pub use home::{
     LibraryHomeStatDto,
 };
 pub use reading_activity::{
-    load_reading_activity_stats, watch_reading_activity_stats, ReadingActivityStatsDto,
+    add_reading_duration_ms, load_reading_activity_stats, record_reading_activity,
+    upsert_finished_comic_mark, watch_reading_activity_stats, ReadingActivityStatsDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,

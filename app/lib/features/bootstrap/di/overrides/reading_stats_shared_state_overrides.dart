@@ -7,4 +7,7 @@ List<Override> readingStatsSharedStateOverrides() => <Override>[
   readingActivityStatsPortProvider.overrideWithValue(
     createReadingActivityStatsPort(),
   ),
+  recordReadSessionActivityPortProvider.overrideWithValue(
+    createRecordReadSessionActivityPort(),
+  ),
 ];

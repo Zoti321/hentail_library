@@ -7,5 +7,6 @@ void main() {
     expect(ReadingActivityStats, isNotNull);
     expect(createHomePageCountsPort, isNotNull);
     expect(createReadingActivityStatsPort, isNotNull);
+    expect(createRecordReadSessionActivityPort, isNotNull);
   });
 }

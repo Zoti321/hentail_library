@@ -16,6 +16,22 @@ class ReadingActivityStatsRepositoryImpl
     );
   }
 
+  @override
+  Future<void> recordSessionActivity({
+    required String comicId,
+    Duration? addDuration,
+    required bool markFinished,
+  }) {
+    return guardFrb(
+      () => rust.recordReadingActivityFrb(
+        comicId: comicId,
+        addDurationMs: addDuration?.inMilliseconds,
+        markFinished: markFinished,
+      ),
+      fallbackMessage: '写入阅读行为统计失败',
+    );
+  }
+
   ReadingActivityStats _mapStats(rust.ReadingActivityStatsDto dto) {
     return ReadingActivityStats(
       finishedCount: dto.finishedCount,

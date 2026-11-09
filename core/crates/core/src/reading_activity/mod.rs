@@ -2,6 +2,7 @@
 
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 
+use crate::comic::now_ms;
 use crate::comic::visibility::comic_id_not_trashed_sql;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
@@ -56,6 +57,54 @@ pub async fn watch_reading_activity_stats(
     emit(load_reading_activity_stats(&db).await?)?;
     while changes.changed().await.is_ok() {
         emit(load_reading_activity_stats(&db).await?)?;
+    }
+    Ok(())
+}
+
+/// Idempotent Finished comic mark（粘性：已存在则保留原 finished_at）。
+pub async fn upsert_finished_comic_mark(comic_id: &str, finished_at_ms: i64) -> Result<(), HentaiError> {
+    let db = connection()?;
+    db.execute(Statement::from_sql_and_values(
+        db.get_database_backend(),
+        "INSERT INTO comic_finished_marks (comic_id, finished_at_ms) VALUES (?, ?) \
+         ON CONFLICT(comic_id) DO NOTHING",
+        [comic_id.into(), finished_at_ms.into()],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    Ok(())
+}
+
+/// 累加终身 Reading duration（只增不减）。
+pub async fn add_reading_duration_ms(delta_ms: i64) -> Result<(), HentaiError> {
+    if delta_ms <= 0 {
+        return Ok(());
+    }
+    let db = connection()?;
+    let updated_at = now_ms();
+    db.execute(Statement::from_sql_and_values(
+        db.get_database_backend(),
+        "UPDATE reading_duration_total \
+         SET total_ms = total_ms + ?, updated_at_ms = ? \
+         WHERE id = 1",
+        [delta_ms.into(), updated_at.into()],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    Ok(())
+}
+
+/// 由 Dart 领域规则算好后一次性写入（可只写时长、只写 mark，或两者）。
+pub async fn record_reading_activity(
+    comic_id: &str,
+    add_duration_ms: Option<i64>,
+    mark_finished: bool,
+) -> Result<(), HentaiError> {
+    if let Some(delta) = add_duration_ms {
+        add_reading_duration_ms(delta).await?;
+    }
+    if mark_finished {
+        upsert_finished_comic_mark(comic_id, now_ms()).await?;
     }
     Ok(())
 }

@@ -7,3 +7,4 @@ export 'package:hentai_library/shared/domain/library/home_page_counts.dart';
 export 'package:hentai_library/shared/domain/library/reading_activity_stats.dart';
 export 'public/di/home_page_counts_port_factory.dart';
 export 'public/di/reading_activity_stats_port_factory.dart';
+export 'public/di/record_read_session_activity_port_factory.dart';

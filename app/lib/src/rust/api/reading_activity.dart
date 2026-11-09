@@ -13,6 +13,16 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Stream<ReadingActivityStatsDto> watchReadingActivityStatsFrb() =>
     RustLib.instance.api.crateApiReadingActivityWatchReadingActivityStatsFrb();
 
+Future<void> recordReadingActivityFrb({
+  required String comicId,
+  PlatformInt64? addDurationMs,
+  required bool markFinished,
+}) => RustLib.instance.api.crateApiReadingActivityRecordReadingActivityFrb(
+  comicId: comicId,
+  addDurationMs: addDurationMs,
+  markFinished: markFinished,
+);
+
 class ReadingActivityStatsDto {
   final int finishedCount;
   final PlatformInt64 totalDurationMs;
