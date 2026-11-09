@@ -2,10 +2,10 @@ import 'package:hentai_library/core/util/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:window_manager/window_manager.dart';
 
-part 'reader_fullscreen_controller.g.dart';
+part 'reader_chrome_notifier.g.dart';
 
-@Riverpod(keepAlive: true)
-class ReaderFullscreenController extends _$ReaderFullscreenController {
+@Riverpod(keepAlive: true, name: 'readerChromeNotifierProvider')
+class ReaderChromeNotifier extends _$ReaderChromeNotifier {
   @override
   bool build() => false;
 

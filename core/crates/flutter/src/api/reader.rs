@@ -1,6 +1,7 @@
 use hentai_core::{
     self, clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes,
-    load_page_list, load_reader_page, open_reader, prefetch_reader_pages, ReaderPageDto as CoreDto,
+    load_page_list, load_reader_page, open_reader, prefetch_reader_pages, session_path_and_type,
+    ReaderPageDto as CoreDto,
 };
 
 use super::init::HentaiErrorDto;
@@ -53,13 +54,11 @@ pub async fn open_reader_frb(
         .map_err(HentaiErrorDto::from)
 }
 
+/// 会话已 open：仅传 comic_id，path/resource_type 从会话取。
 #[flutter_rust_bridge::frb]
-pub async fn load_page_list_frb(
-    comic_id: String,
-    path: String,
-    resource_type: String,
-) -> Result<ReaderPageListDto, HentaiErrorDto> {
+pub async fn load_page_list_frb(comic_id: String) -> Result<ReaderPageListDto, HentaiErrorDto> {
     tokio::task::spawn_blocking(move || {
+        let (path, resource_type) = session_path_and_type(&comic_id)?;
         load_page_list(&comic_id, &path, &resource_type).map(ReaderPageListDto::from)
     })
     .await
@@ -71,14 +70,14 @@ pub async fn load_page_list_frb(
     .map_err(HentaiErrorDto::from)
 }
 
+/// 会话已 open：仅传 comic_id + 页码。
 #[flutter_rust_bridge::frb]
 pub async fn load_page_bytes_frb(
     comic_id: String,
-    path: String,
-    resource_type: String,
     page_index: i32,
 ) -> Result<Vec<u8>, HentaiErrorDto> {
     tokio::task::spawn_blocking(move || {
+        let (path, resource_type) = session_path_and_type(&comic_id)?;
         load_page_bytes(&comic_id, &path, &resource_type, page_index)
     })
     .await
@@ -90,14 +89,14 @@ pub async fn load_page_bytes_frb(
     .map_err(HentaiErrorDto::from)
 }
 
+/// 会话已 open：仅传 comic_id + 页码。
 #[flutter_rust_bridge::frb]
 pub async fn load_reader_page_frb(
     comic_id: String,
-    path: String,
-    resource_type: String,
     page_index: i32,
 ) -> Result<ReaderPageDto, HentaiErrorDto> {
     tokio::task::spawn_blocking(move || {
+        let (path, resource_type) = session_path_and_type(&comic_id)?;
         load_reader_page(&comic_id, &path, &resource_type, page_index).map(ReaderPageDto::from)
     })
     .await
@@ -109,16 +108,18 @@ pub async fn load_reader_page_frb(
     .map_err(HentaiErrorDto::from)
 }
 
+/// 会话已 open：仅传 comic_id + 页码列表。
 #[flutter_rust_bridge::frb]
 pub async fn prefetch_reader_pages_frb(
     comic_id: String,
-    path: String,
-    resource_type: String,
     page_indexes: Vec<i32>,
     generation: u64,
 ) -> Result<(), HentaiErrorDto> {
     tokio::spawn(async move {
         let _ = tokio::task::spawn_blocking(move || {
+            let Ok((path, resource_type)) = session_path_and_type(&comic_id) else {
+                return Ok(());
+            };
             prefetch_reader_pages(&comic_id, &path, &resource_type, &page_indexes, generation)
         })
         .await;

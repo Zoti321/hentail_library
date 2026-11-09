@@ -7,10 +7,14 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/features/reader/presentation/input/reader_tap_zone.dart';
 import 'package:hentai_library/features/reader/presentation/reader_input.dart';
 import 'package:hentai_library/features/reader/di/session_providers.dart';
+import 'package:hentai_library/features/reader/presentation/navigation/apply_reader_navigation_intent.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_page_facade.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_chrome_notifier.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_page_shell.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_series_navigation.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/series_reader_provider.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/reader_content.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/reader_open_error_panel.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
@@ -74,18 +78,50 @@ class ReaderPage extends HookConsumerWidget {
       );
     }
 
-    final ReaderPageFacadeState facade = ref.watch(
-      readerPageFacadeProvider(
+    final ReaderViewModelKey viewKey = readerViewModelKey(
+      routeContext.comicId,
+      incognito: routeContext.incognito,
+      startFromFirstPage: routeContext.startFromFirstPage,
+    );
+    final AsyncValue<ReaderPageViewShell> viewShellAsync = ref.watch(
+      readerViewModelProvider(viewKey).select((
+        AsyncValue<ReaderUiState> asyncState,
+      ) {
+        if (asyncState.hasError) {
+          return AsyncError<ReaderPageViewShell>(
+            asyncState.error!,
+            asyncState.stackTrace!,
+          );
+        }
+        final ReaderUiState? state = asyncState.asData?.value;
+        if (state == null) {
+          return const AsyncLoading<ReaderPageViewShell>();
+        }
+        return AsyncData<ReaderPageViewShell>((
+          comic: state.comic,
+          totalPages: state.totalPages,
+        ));
+      }),
+    );
+    final AsyncValue<ReadSessionContextData> sessionAsync = ref.watch(
+      readSessionContextForReaderProvider(
         comicId: routeContext.comicId,
         incognito: routeContext.incognito,
         startFromFirstPage: routeContext.startFromFirstPage,
       ),
     );
-    final ReaderControllerKey viewKey = facade.viewKey;
-    final AsyncValue<ReaderPageShellData> shellAsync = facade.shellAsync;
-    final bool readerFullscreen = facade.readerFullscreen;
-    final SeriesBoundaryPrompt seriesBoundaryPrompt =
-        facade.seriesBoundaryPrompt;
+    final AsyncValue<ReaderPageShellData> shellAsync = combineReaderPageShell(
+      viewShellAsync,
+      sessionAsync,
+    );
+    final bool readerFullscreen = ref.watch(readerChromeNotifierProvider);
+    final SeriesBoundaryPrompt seriesBoundaryPrompt = ref.watch(
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> asyncState) =>
+            asyncState.asData?.value.seriesBoundaryPrompt ??
+            SeriesBoundaryPrompt.none,
+      ),
+    );
 
     final bool readerReady = shellAsync.hasValue;
     final ReaderPageShellData? loadedShell = shellAsync.asData?.value;
@@ -102,7 +138,7 @@ class ReaderPage extends HookConsumerWidget {
     if (loadedShell != null && frozenInitialPage.value == null) {
       final int openIndex =
           ref
-              .read(readerControllerProvider(viewKey))
+              .read(readerViewModelProvider(viewKey))
               .asData
               ?.value
               .currentIndex ??
@@ -110,8 +146,8 @@ class ReaderPage extends HookConsumerWidget {
       frozenInitialPage.value = openIndex - 1;
     }
 
-    final ReaderController controller = ref.read(
-      readerControllerProvider(viewKey).notifier,
+    final ReaderViewModel viewModel = ref.read(
+      readerViewModelProvider(viewKey).notifier,
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
 
@@ -119,14 +155,14 @@ class ReaderPage extends HookConsumerWidget {
     useEffect(() {
       final AppLifecycleListener listener = AppLifecycleListener(
         onPause: () {
-          unawaited(ref.read(readSessionCoordinatorProvider).pauseForeground());
+          unawaited(viewModel.pauseForeground());
         },
         onResume: () {
-          ref.read(readSessionCoordinatorProvider).resumeForeground();
+          viewModel.resumeForeground();
         },
       );
       return listener.dispose;
-    }, const <Object?>[]);
+    }, <Object?>[viewModel]);
 
     useEffect(() {
       if (!keepControlsOpen || hasAppliedKeepControls.value) {
@@ -138,7 +174,7 @@ class ReaderPage extends HookConsumerWidget {
       hasAppliedKeepControls.value = true;
       final bool showControls =
           ref
-              .read(readerControllerProvider(viewKey))
+              .read(readerViewModelProvider(viewKey))
               .asData
               ?.value
               .showControls ??
@@ -147,10 +183,10 @@ class ReaderPage extends HookConsumerWidget {
         return null;
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        controller.setShowControls(true);
+        viewModel.setShowControls(true);
       });
       return null;
-    }, <Object?>[keepControlsOpen, readerReady, controller]);
+    }, <Object?>[keepControlsOpen, readerReady, viewModel]);
 
     useEffect(() {
       if (seriesBoundaryPrompt == SeriesBoundaryPrompt.none) {
@@ -175,10 +211,13 @@ class ReaderPage extends HookConsumerWidget {
       return null;
     }, <Object?>[seriesBoundaryPrompt, context]);
 
-    Future<void> exitReader() => controller.executeExitReader(
-      context: context,
-      routeContext: routeContext,
-    );
+    Future<void> exitReader() async {
+      final ReaderExitIntent intent = await viewModel.prepareExitReader(
+        routeContext: routeContext,
+        canPop: GoRouter.of(context).canPop(),
+      );
+      applyReaderExitIntent(context, intent);
+    }
 
     return Theme(
       data: theme,
@@ -209,7 +248,7 @@ class ReaderPage extends HookConsumerWidget {
                       startFromFirstPage: routeContext.startFromFirstPage,
                     ),
                   );
-                  ref.invalidate(readerControllerProvider(viewKey));
+                  ref.invalidate(readerViewModelProvider(viewKey));
                   ref.invalidate(
                     comicImagesProvider(comicId: routeContext.comicId),
                   );
@@ -232,7 +271,7 @@ class ReaderPage extends HookConsumerWidget {
   }
 }
 
-/// 就绪态阅读壳：仅此处订阅翻页 / chrome，父级 [ReaderPage] 只 watch Facade。
+/// 就绪态阅读壳：仅此处订阅翻页 / chrome，父级 [ReaderPage] 只 watch 外壳字段。
 class _ReaderReadyBody extends ConsumerWidget {
   const _ReaderReadyBody({
     required this.viewKey,
@@ -243,7 +282,7 @@ class _ReaderReadyBody extends ConsumerWidget {
     required this.onExit,
   });
 
-  final ReaderControllerKey viewKey;
+  final ReaderViewModelKey viewKey;
   final ReaderRouteContext routeContext;
   final ReaderPageShellData shell;
   final bool readerFullscreen;
@@ -263,9 +302,9 @@ class _ReaderReadyBody extends ConsumerWidget {
       bool autoPlayEnabled,
     })
     chrome = ref.watch(
-      readerControllerProvider(viewKey)
-          .select((AsyncValue<ReaderState> asyncState) {
-            final ReaderState? state = asyncState.asData?.value;
+      readerViewModelProvider(viewKey)
+          .select((AsyncValue<ReaderUiState> asyncState) {
+            final ReaderUiState? state = asyncState.asData?.value;
             return (
               showControls: state?.showControls ?? false,
               currentIndex: state?.currentIndex ?? 1,
@@ -275,24 +314,31 @@ class _ReaderReadyBody extends ConsumerWidget {
           }),
     );
 
-    final ReaderController controller = ref.read(
-      readerControllerProvider(viewKey).notifier,
+    final ReaderViewModel viewModel = ref.read(
+      readerViewModelProvider(viewKey).notifier,
     );
     final ReaderNavContextData? seriesNavContext =
         shell.sessionContext.hasSeriesContext
         ? shell.sessionContext.navContext
         : null;
 
-    Future<void> requestNextPage() => controller.requestNextPage(
-      navContext: seriesNavContext,
-      session: routeContext.session,
-      router: GoRouter.of(context),
-    );
-    Future<void> requestPrevPage() => controller.requestPrevPage(
-      navContext: seriesNavContext,
-      session: routeContext.session,
-      router: GoRouter.of(context),
-    );
+    Future<void> requestNextPage() async {
+      final ReaderReplaceReaderRouteIntent? intent = await viewModel
+          .requestNextPage(
+            navContext: seriesNavContext,
+            session: routeContext.session,
+          );
+      applyReaderNavigationIntent(context, intent);
+    }
+
+    Future<void> requestPrevPage() async {
+      final ReaderReplaceReaderRouteIntent? intent = await viewModel
+          .requestPrevPage(
+            navContext: seriesNavContext,
+            session: routeContext.session,
+          );
+      applyReaderNavigationIntent(context, intent);
+    }
 
     final bool supportsAutoPlay = chrome.readingMode.supportsAutoPlay;
     final int autoPlayIntervalSeconds = ref.watch(
@@ -321,18 +367,18 @@ class _ReaderReadyBody extends ConsumerWidget {
             unawaited(onExit());
           },
           onToggleFullscreen: () {
-            unawaited(controller.toggleFullscreen());
+            unawaited(viewModel.toggleFullscreen());
           },
-          onPageChanged: controller.setIndex,
+          onPageChanged: viewModel.setIndex,
           onPreviousPage: () {
             unawaited(requestPrevPage());
           },
           onNextPage: () {
             unawaited(requestNextPage());
           },
-          onToggleChromeFromKeyboard: controller.toggleShowControls,
+          onToggleChromeFromKeyboard: viewModel.toggleShowControls,
           onAutoPlayChanged: supportsAutoPlay
-              ? controller.setAutoPlayEnabled
+              ? viewModel.setAutoPlayEnabled
               : null,
           onOpenSettings: () {
             unawaited(ReaderSettingsSheet.show(context));
@@ -381,7 +427,7 @@ class _ReaderPageContent extends ConsumerWidget {
     required this.seriesNavContext,
   });
 
-  final ReaderControllerKey viewKey;
+  final ReaderViewModelKey viewKey;
   final ReaderRouteContext routeContext;
   final FocusNode focusNode;
   final int initialPage;
@@ -391,13 +437,13 @@ class _ReaderPageContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ReadingMode readingMode = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> asyncState) =>
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> asyncState) =>
             asyncState.asData?.value.readingMode ?? ReadingMode.paged,
       ),
     );
-    final ReaderController controller = ref.read(
-      readerControllerProvider(viewKey).notifier,
+    final ReaderViewModel viewModel = ref.read(
+      readerViewModelProvider(viewKey).notifier,
     );
 
     return GestureDetector(
@@ -405,21 +451,22 @@ class _ReaderPageContent extends ConsumerWidget {
       onTapUp: (TapUpDetails details) {
         focusNode.requestFocus();
         if (readingMode.isWebtoon) {
-          controller.toggleShowControls();
+          viewModel.toggleShowControls();
           return;
         }
         final ReaderTapZone zone = resolveReaderTapZone(
           globalX: details.globalPosition.dx,
           width: MediaQuery.sizeOf(context).width,
         );
-        unawaited(
-          controller.handleTapZone(
-            zone,
-            navContext: seriesNavContext,
-            session: routeContext.session,
-            router: GoRouter.of(context),
-          ),
-        );
+        unawaited(() async {
+          final ReaderReplaceReaderRouteIntent? intent = await viewModel
+              .handleTapZone(
+                zone,
+                navContext: seriesNavContext,
+                session: routeContext.session,
+              );
+          applyReaderNavigationIntent(context, intent);
+        }());
       },
       child: ReaderContent(
         key: ValueKey<String>(routeContext.comicId),
@@ -429,16 +476,22 @@ class _ReaderPageContent extends ConsumerWidget {
         initialPage: initialPage,
         preferredPageIndex: preferredPageIndex,
         readingMode: readingMode,
-        onRequestNextPage: () => controller.requestNextPage(
-          navContext: seriesNavContext,
-          session: routeContext.session,
-          router: GoRouter.of(context),
-        ),
-        onRequestPrevPage: () => controller.requestPrevPage(
-          navContext: seriesNavContext,
-          session: routeContext.session,
-          router: GoRouter.of(context),
-        ),
+        onRequestNextPage: () async {
+          final ReaderReplaceReaderRouteIntent? intent = await viewModel
+              .requestNextPage(
+                navContext: seriesNavContext,
+                session: routeContext.session,
+              );
+          applyReaderNavigationIntent(context, intent);
+        },
+        onRequestPrevPage: () async {
+          final ReaderReplaceReaderRouteIntent? intent = await viewModel
+              .requestPrevPage(
+                navContext: seriesNavContext,
+                session: routeContext.session,
+              );
+          applyReaderNavigationIntent(context, intent);
+        },
       ),
     );
   }
@@ -455,7 +508,6 @@ void _openSeriesCatalog(
     for (final ReaderComicListItem item in navContext.items)
       ReaderSeriesVolume(id: item.comicId, title: item.title),
   ];
-  final GoRouter router = GoRouter.of(context);
   ReaderSeriesCatalogSheet.show(
     context,
     volumes: volumes,
@@ -464,15 +516,15 @@ void _openSeriesCatalog(
       if (targetComicId == routeContext.comicId) {
         return;
       }
-      unawaited(
-        ref
+      unawaited(() async {
+        final ReaderReplaceReaderRouteIntent? intent = await ref
             .read(readerSeriesNavigationProvider.notifier)
-            .switchComic(
-              router: router,
+            .prepareSwitchComic(
               currentSession: routeContext.session,
               targetComicId: targetComicId,
-            ),
-      );
+            );
+        applyReaderNavigationIntent(context, intent);
+      }());
     },
   );
 }
@@ -481,7 +533,7 @@ void _openSeriesCatalog(
 List<M3EMenuNode> _buildMoreMenuEntries(
   BuildContext context,
   WidgetRef ref, {
-  required ReaderControllerKey viewKey,
+  required ReaderViewModelKey viewKey,
   required String? seriesId,
 }) {
   final AppLocalizations l10n = context.l10n;

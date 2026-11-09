@@ -29,7 +29,7 @@ class ApplicationShell extends ConsumerWidget {
             asyncValue.asData?.value.desktopSidebarExpanded ?? true,
       ),
     );
-    final bool readerFullscreen = ref.watch(readerFullscreenControllerProvider);
+    final bool readerFullscreen = ref.watch(readerChromeNotifierProvider);
     final AppShellFeedbackBelowTitleBarFactory feedbackFactory = ref.watch(
       appShellFeedbackBelowTitleBarFactoryProvider,
     );

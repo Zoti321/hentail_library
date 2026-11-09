@@ -22,50 +22,35 @@ Future<void> openReaderFrb({
   resourceType: resourceType,
 );
 
-Future<ReaderPageListDto> loadPageListFrb({
-  required String comicId,
-  required String path,
-  required String resourceType,
-}) => RustLib.instance.api.crateApiReaderLoadPageListFrb(
-  comicId: comicId,
-  path: path,
-  resourceType: resourceType,
-);
+/// 会话已 open：仅传 comic_id，path/resource_type 从会话取。
+Future<ReaderPageListDto> loadPageListFrb({required String comicId}) =>
+    RustLib.instance.api.crateApiReaderLoadPageListFrb(comicId: comicId);
 
+/// 会话已 open：仅传 comic_id + 页码。
 Future<Uint8List> loadPageBytesFrb({
   required String comicId,
-  required String path,
-  required String resourceType,
   required int pageIndex,
 }) => RustLib.instance.api.crateApiReaderLoadPageBytesFrb(
   comicId: comicId,
-  path: path,
-  resourceType: resourceType,
   pageIndex: pageIndex,
 );
 
+/// 会话已 open：仅传 comic_id + 页码。
 Future<ReaderPageDto> loadReaderPageFrb({
   required String comicId,
-  required String path,
-  required String resourceType,
   required int pageIndex,
 }) => RustLib.instance.api.crateApiReaderLoadReaderPageFrb(
   comicId: comicId,
-  path: path,
-  resourceType: resourceType,
   pageIndex: pageIndex,
 );
 
+/// 会话已 open：仅传 comic_id + 页码列表。
 Future<void> prefetchReaderPagesFrb({
   required String comicId,
-  required String path,
-  required String resourceType,
   required List<int> pageIndexes,
   required BigInt generation,
 }) => RustLib.instance.api.crateApiReaderPrefetchReaderPagesFrb(
   comicId: comicId,
-  path: path,
-  resourceType: resourceType,
   pageIndexes: pageIndexes,
   generation: generation,
 );

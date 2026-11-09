@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/navigation/apply_reader_navigation_intent.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
@@ -22,18 +23,18 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
     required this.seriesNavContext,
   });
 
-  final ReaderControllerKey viewKey;
+  final ReaderViewModelKey viewKey;
   final ReaderRouteContext routeContext;
   final ReaderNavContextData? seriesNavContext;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderController controller = ref.read(
-      readerControllerProvider(viewKey).notifier,
+    final ReaderViewModel viewModel = ref.read(
+      readerViewModelProvider(viewKey).notifier,
     );
     final bool readerAutoPlayEnabled = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> asyncState) =>
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> asyncState) =>
             asyncState.asData?.value.autoPlayEnabled ?? false,
       ),
     );
@@ -51,9 +52,9 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
     );
     final ({int currentIndex, int totalPages, ReadingMode readingMode})?
     autoPlayState = ref.watch(
-      readerControllerProvider(viewKey)
-          .select((AsyncValue<ReaderState> asyncState) {
-            final ReaderState? readerState = asyncState.asData?.value;
+      readerViewModelProvider(viewKey)
+          .select((AsyncValue<ReaderUiState> asyncState) {
+            final ReaderUiState? readerState = asyncState.asData?.value;
             if (readerState == null) {
               return null;
             }
@@ -93,18 +94,21 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
             timer?.cancel();
             return;
           }
-          if (ref.read(readerControllerProvider(viewKey)).asData?.value ==
+          if (ref.read(readerViewModelProvider(viewKey)).asData?.value ==
               null) {
             return;
           }
-          final GoRouter router = GoRouter.of(context);
           unawaited(() async {
-            final bool keepTicking = await controller.advanceAutoPlay(
+            final ({
+              bool keepTicking,
+              ReaderReplaceReaderRouteIntent? replace,
+            })
+            tick = await viewModel.advanceAutoPlay(
               navContext: seriesNavContext,
               session: routeContext.session,
-              router: router,
             );
-            if (!keepTicking) {
+            applyReaderNavigationIntent(context, tick.replace);
+            if (!tick.keepTicking) {
               timer?.cancel();
             }
           }());
@@ -123,7 +127,7 @@ class ReaderAutoPlayBinder extends HookConsumerWidget {
         nextComicId,
         firstComicId,
         routeContext.comicId,
-        controller,
+        viewModel,
         ref,
         reduceMotion,
       ],

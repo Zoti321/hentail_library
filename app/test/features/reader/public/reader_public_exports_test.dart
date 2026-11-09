@@ -12,6 +12,6 @@ void main() {
     expect(ReaderPage, isNotNull);
     expect(ReaderRouteArgs, isNotNull);
     expect(openReader, isNotNull);
-    expect(readerFullscreenControllerProvider, isNotNull);
+    expect(readerChromeNotifierProvider, isNotNull);
   });
 }

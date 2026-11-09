@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
+import 'package:hentai_library/shared/domain/ports/series_reading_context_port.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/domain/comic_lookup_repository.dart';
 import 'package:hentai_library/shared/di/reading_history_providers.dart';
-import 'package:hentai_library/features/series/domain/series_repository.dart';
+import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
 import 'package:hentai_library/shared/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/features/comic/public/comic_display_title.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/series_reader_provider.dart';
@@ -59,8 +60,8 @@ class _FakeComicRepo implements ComicLookupRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-class _FakeSeriesRepo implements SeriesRepository {
-  _FakeSeriesRepo(this._context);
+class _FakeSeriesReadingContextPort implements SeriesReadingContextPort {
+  _FakeSeriesReadingContextPort(this._context);
 
   final SeriesReadingContext? _context;
 
@@ -76,9 +77,6 @@ class _FakeSeriesRepo implements SeriesRepository {
     }
     return _context;
   }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 class _FakeHistoryCommands implements ReadingHistoryCommandPort {
@@ -87,6 +85,21 @@ class _FakeHistoryCommands implements ReadingHistoryCommandPort {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+List<Override> _overrides({
+  required _FakeComicRepo comicRepo,
+  required SeriesReadingContext? seriesContext,
+}) {
+  return <Override>[
+    comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
+    seriesReadingContextPortProvider.overrideWithValue(
+      _FakeSeriesReadingContextPort(seriesContext),
+    ),
+    readingHistoryCommandPortProvider.overrideWith(
+      (Ref ref) => _FakeHistoryCommands(),
+    ),
+  ];
 }
 
 void main() {
@@ -107,15 +120,7 @@ void main() {
       'comic-c': 'Gamma',
     });
     container = ProviderContainer(
-      overrides: <Override>[
-        comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
-        seriesRepoProvider.overrideWith(
-          (Ref ref) => _FakeSeriesRepo(seriesContext),
-        ),
-        readingHistoryCommandPortProvider.overrideWith(
-          (Ref ref) => _FakeHistoryCommands(),
-        ),
-      ],
+      overrides: _overrides(comicRepo: comicRepo, seriesContext: seriesContext),
     );
   });
 
@@ -151,15 +156,7 @@ void main() {
     });
     container.dispose();
     container = ProviderContainer(
-      overrides: <Override>[
-        comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
-        seriesRepoProvider.overrideWith(
-          (Ref ref) => _FakeSeriesRepo(seriesContext),
-        ),
-        readingHistoryCommandPortProvider.overrideWith(
-          (Ref ref) => _FakeHistoryCommands(),
-        ),
-      ],
+      overrides: _overrides(comicRepo: comicRepo, seriesContext: seriesContext),
     );
 
     final ReadSessionContextData data = await container.read(
@@ -181,13 +178,7 @@ void main() {
       container.dispose();
       comicRepo = _FakeComicRepo(<String, String>{'solo': 'Solo Title'});
       container = ProviderContainer(
-        overrides: <Override>[
-          comicLookupRepositoryProvider.overrideWith((Ref ref) => comicRepo),
-          seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo(null)),
-          readingHistoryCommandPortProvider.overrideWith(
-            (Ref ref) => _FakeHistoryCommands(),
-          ),
-        ],
+        overrides: _overrides(comicRepo: comicRepo, seriesContext: null),
       );
 
       final ReadSessionContextData data = await container.read(

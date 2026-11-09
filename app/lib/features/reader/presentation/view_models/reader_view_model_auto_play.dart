@@ -1,26 +1,26 @@
-part of 'reader_controller.dart';
+part of 'reader_view_model.dart';
 
-/// 自动播放的开关与定时器推进决策（#313）：与翻页命令分离，由 [ReaderController] 组合。
-mixin _ReaderControllerAutoPlay
-    on _$ReaderController, _ReaderControllerNavigation {
+/// 自动播放的开关与定时器推进决策（#313）：与翻页命令分离，由 [ReaderViewModel] 组合。
+mixin _ReaderViewModelAutoPlay
+    on _$ReaderViewModel, _ReaderViewModelNavigation {
   void setAutoPlayEnabled(bool value) {
-    _updateDataState((ReaderState s) => s.copyWith(autoPlayEnabled: value));
+    _updateDataState((ReaderUiState s) => s.copyWith(autoPlayEnabled: value));
   }
 
   /// 自动播放的一拍到了。定时器留在页面。
   ///
-  /// 返回 false 时页面应取消定时器：自动播放已停止，或已开始切卷。
-  Future<bool> advanceAutoPlay({
+  /// `keepTicking == false` 时页面应取消定时器：已停止或已发出切卷意图。
+  Future<({bool keepTicking, ReaderReplaceReaderRouteIntent? replace})>
+  advanceAutoPlay({
     required ReaderNavContextData? navContext,
     required OpenReaderArgs session,
-    required GoRouter router,
   }) async {
-    final ReaderState? current = state.asData?.value;
+    final ReaderUiState? current = state.asData?.value;
     if (current == null || !current.autoPlayEnabled) {
-      return false;
+      return (keepTicking: false, replace: null);
     }
     if (!current.readingMode.supportsAutoPlay || current.totalPages <= 0) {
-      return false;
+      return (keepTicking: false, replace: null);
     }
     final bool onLastSpread = SpreadNavigation.isOnLastSpread(
       mode: current.readingMode,
@@ -29,7 +29,7 @@ mixin _ReaderControllerAutoPlay
     );
     if (!onLastSpread) {
       nextPage();
-      return true;
+      return (keepTicking: true, replace: null);
     }
     final AutoPlayMode mode =
         ref.read(appSettingsStateProvider).asData?.value.autoPlayMode ??
@@ -47,19 +47,18 @@ mixin _ReaderControllerAutoPlay
     switch (decision) {
       case AutoPlayBoundaryStop():
         setAutoPlayEnabled(false);
-        return false;
+        return (keepTicking: false, replace: null);
       case AutoPlayBoundaryJumpToFirstPage():
         setIndex(1);
-        return true;
+        return (keepTicking: true, replace: null);
       case AutoPlayBoundarySwitchComic(:final String comicId):
-        await ref
+        final ReaderReplaceReaderRouteIntent? replace = await ref
             .read(readerSeriesNavigationProvider.notifier)
-            .switchComic(
-              router: router,
+            .prepareSwitchComic(
               currentSession: session,
               targetComicId: comicId,
             );
-        return false;
+        return (keepTicking: false, replace: replace);
     }
   }
 }

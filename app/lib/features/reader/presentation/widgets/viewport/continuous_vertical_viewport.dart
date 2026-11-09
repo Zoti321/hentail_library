@@ -8,7 +8,7 @@ import 'package:hentai_library/features/reader/presentation/widgets/viewport/rea
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_pages.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_prefetch_binder.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/resume_visible_sync_gate.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_page_aspect_ratios.dart';
 import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
@@ -33,7 +33,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderControllerKey viewKey = readerControllerKey(
+    final ReaderViewModelKey viewKey = readerViewModelKey(
       comicId,
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
@@ -41,14 +41,14 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     // Do not watch currentIndex here — scroll setIndex must not rebuild the list.
     final int seedIndex =
         ref
-            .read(readerControllerProvider(viewKey))
+            .read(readerViewModelProvider(viewKey))
             .asData
             ?.value
             .currentIndex ??
         1;
     final Comic? comic = ref.watch(
-      readerControllerProvider(viewKey)
-          .select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
+      readerViewModelProvider(viewKey)
+          .select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
     );
     if (comic == null) {
       return const SizedBox.expand();
@@ -62,8 +62,8 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       _ => const <ReaderPageImageData>[],
     };
 
-    final ReaderController controller = ref.read(
-      readerControllerProvider(viewKey).notifier,
+    final ReaderViewModel controller = ref.read(
+      readerViewModelProvider(viewKey).notifier,
     );
     final ItemScrollController itemScrollController = useMemoized(
       ItemScrollController.new,
@@ -149,7 +149,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       hasAppliedPreferredPage.value = true;
       final int current =
           ref
-              .read(readerControllerProvider(viewKey))
+              .read(readerViewModelProvider(viewKey))
               .asData
               ?.value
               .currentIndex ??
@@ -190,7 +190,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
         lastVisibleMainIndex.value = applyIndex;
         final int current =
             ref
-                .read(readerControllerProvider(viewKey))
+                .read(readerViewModelProvider(viewKey))
                 .asData
                 ?.value
                 .currentIndex ??
@@ -228,8 +228,8 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
 
     // External jumps (slider / resume / setIndex from chrome) — not scroll sync.
     ref.listen<int>(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
       (int? previous, int next) {

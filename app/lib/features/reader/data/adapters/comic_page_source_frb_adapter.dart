@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hentai_library/features/reader/data/mappers/reader_frb_mapper.dart';
-import 'package:hentai_library/shared/domain/models/resource_type_frb_wire.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
@@ -18,10 +17,9 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
   @override
   Future<List<ReadSessionPage>> loadPages(Comic comic) async {
     try {
+      // 会话须已 open；列表从 session 取 path/type。
       final rust.ReaderPageListDto pageList = await rust.loadPageListFrb(
         comicId: comic.comicId,
-        path: comic.path,
-        resourceType: mapResourceType(comic.resourceType),
       );
       if (pageList.pageCount <= 0) {
         return const <ReadSessionPage>[];
@@ -49,45 +47,32 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
 
   @override
   Future<Uint8List?> loadPageBytes({
-    required Comic comic,
+    required String comicId,
     required int pageIndex,
   }) async {
     try {
-      // Dir pages are file paths from the reader session; Rust load_page_bytes
-      // rejects dir. Reuse loadReaderPage then read full-resolution file bytes.
-      if (comic.resourceType == ResourceType.dir) {
-        final ReaderPagePayload page = await loadReaderPage(
-          comic: comic,
-          pageIndex: pageIndex,
-        );
-        return switch (page) {
-          ReaderPageFilePath(:final String path) => await File(
-            path,
-          ).readAsBytes(),
-          ReaderPageBytes(:final Uint8List data) => data,
-        };
-      }
-      return await rust.loadPageBytesFrb(
-        comicId: comic.comicId,
-        path: comic.path,
-        resourceType: mapResourceType(comic.resourceType),
+      // Dir：Rust load_page_bytes 拒绝目录；先走 loadReaderPage 再读文件。
+      final ReaderPagePayload page = await loadReaderPage(
+        comicId: comicId,
         pageIndex: pageIndex,
       );
+      return switch (page) {
+        ReaderPageFilePath(:final String path) => await File(path).readAsBytes(),
+        ReaderPageBytes(:final Uint8List data) => data,
+      };
     } on HentaiErrorDto catch (error) {
-      throwReaderException(error, path: comic.path, comicId: comic.comicId);
+      throwReaderException(error, comicId: comicId);
     }
   }
 
   @override
   Future<ReaderPagePayload> loadReaderPage({
-    required Comic comic,
+    required String comicId,
     required int pageIndex,
   }) async {
     try {
       final rust.ReaderPageDto page = await rust.loadReaderPageFrb(
-        comicId: comic.comicId,
-        path: comic.path,
-        resourceType: mapResourceType(comic.resourceType),
+        comicId: comicId,
         pageIndex: pageIndex,
       );
       return switch (page) {
@@ -99,13 +84,13 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         ),
       };
     } on HentaiErrorDto catch (error) {
-      throwReaderException(error, path: comic.path, comicId: comic.comicId);
+      throwReaderException(error, comicId: comicId);
     }
   }
 
   @override
   Future<void> prefetchPages({
-    required Comic comic,
+    required String comicId,
     required List<int> pageIndexes,
     required int generation,
   }) async {
@@ -114,14 +99,12 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
     }
     try {
       await rust.prefetchReaderPagesFrb(
-        comicId: comic.comicId,
-        path: comic.path,
-        resourceType: mapResourceType(comic.resourceType),
+        comicId: comicId,
         pageIndexes: pageIndexes,
         generation: BigInt.from(generation),
       );
     } on HentaiErrorDto catch (error) {
-      throwReaderException(error, path: comic.path, comicId: comic.comicId);
+      throwReaderException(error, comicId: comicId);
     }
   }
 

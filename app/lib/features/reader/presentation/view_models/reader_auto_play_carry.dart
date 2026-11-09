@@ -5,7 +5,7 @@ part 'reader_auto_play_carry.g.dart';
 /// Carries session autoplay across Series volume switches (pushReplacement).
 ///
 /// [autoPlayEnabled] stays session-only and is not persisted; this keepAlive
-/// flag restores it on the next [ReaderController] after [switchComic].
+/// flag restores it on the next [ReaderViewModel] after [prepareSwitchComic].
 @Riverpod(keepAlive: true)
 class ReaderAutoPlayCarry extends _$ReaderAutoPlayCarry {
   @override

@@ -1,11 +1,11 @@
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
-import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
+import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/di/session_providers.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_controller.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_args.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_notifier.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_series_navigation.g.dart';
@@ -15,59 +15,60 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
   @override
   void build() {}
 
-  Future<void> switchComic({
-    required GoRouter router,
+  /// 准备切卷并返回路由意图；不触碰 GoRouter。
+  Future<ReaderReplaceReaderRouteIntent?> prepareSwitchComic({
     required OpenReaderArgs currentSession,
     required String targetComicId,
   }) async {
     if (targetComicId == currentSession.comicId) {
-      return;
+      return null;
     }
-    final ReaderControllerKey viewKey = readerControllerKey(
+    final ReaderViewModelKey viewKey = readerViewModelKey(
       currentSession.comicId,
       incognito: currentSession.incognito,
       startFromFirstPage: currentSession.startFromFirstPage,
     );
     final bool carryAutoPlay =
         ref
-            .read(readerControllerProvider(viewKey))
+            .read(readerViewModelProvider(viewKey))
             .asData
             ?.value
             .autoPlayEnabled ??
         false;
     ref.read(readerAutoPlayCarryProvider.notifier).arm(carryAutoPlay);
 
-    final ReadSessionCoordinator coordinator = ref.read(
-      readSessionCoordinatorProvider,
+    final ReadSessionApplicationService sessions = ref.read(
+      readSessionApplicationServiceProvider,
     );
     int? currentPageIndex;
     if (!currentSession.incognito) {
       currentPageIndex = ref
-          .read(readerControllerProvider(viewKey))
+          .read(readerViewModelProvider(viewKey))
           .asData
           ?.value
           .currentIndex;
     }
-    final SeriesSwitchPlan plan = await coordinator.prepareSeriesSwitch(
+    final SeriesSwitchPlan plan = await sessions.prepareSeriesSwitch(
       currentSession: currentSession,
       targetComicId: targetComicId,
       currentPageIndex: currentPageIndex,
     );
     ref
-        .read(readerPrefetchControllerProvider.notifier)
+        .read(readerPrefetchNotifierProvider.notifier)
         .clearComic(plan.closeComicId);
     try {
       await ref
-          .read(readerPrefetchControllerProvider.notifier)
+          .read(readerPrefetchNotifierProvider.notifier)
           .warmOpenComic(comicId: plan.targetComicId);
     } catch (_) {
       // warm-open 失败不阻断切卷导航。
     }
-    router.pushReplacement(
+    return ReaderReplaceReaderRouteIntent(
       Uri(
         path: '/reader',
-        queryParameters: ReaderRouteArgs.fromSession(plan.nextSession)
-            .toQueryParameters(),
+        queryParameters: ReaderRouteArgs.fromSession(
+          plan.nextSession,
+        ).toQueryParameters(),
       ).toString(),
     );
   }

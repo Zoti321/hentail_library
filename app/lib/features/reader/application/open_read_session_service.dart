@@ -84,10 +84,13 @@ class OpenReadSessionService {
   }
 
   Future<Uint8List?> loadPageBytes({
-    required Comic comic,
+    required String comicId,
     required int archivePageIndex,
   }) {
-    return _pageSource.loadPageBytes(comic: comic, pageIndex: archivePageIndex);
+    return _pageSource.loadPageBytes(
+      comicId: comicId,
+      pageIndex: archivePageIndex,
+    );
   }
 
   /// [archivePageIndex] 为 0-based 归档页索引。
@@ -101,7 +104,7 @@ class OpenReadSessionService {
     }
     try {
       return await _pageSource.loadReaderPage(
-        comic: comic,
+        comicId: comicId,
         pageIndex: archivePageIndex,
       );
     } on ReadSessionPageLoadException {
@@ -130,7 +133,7 @@ class OpenReadSessionService {
       return;
     }
     await _pageSource.prefetchPages(
-      comic: comic,
+      comicId: comicId,
       pageIndexes: archivePageIndexes,
       generation: generation,
     );

@@ -2565,20 +2565,14 @@ fn wire__crate__api__reader__load_page_bytes_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_comic_id = <String>::sse_decode(&mut deserializer);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_resource_type = <String>::sse_decode(&mut deserializer);
             let api_page_index = <i32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::reader::load_page_bytes_frb(
-                            api_comic_id,
-                            api_path,
-                            api_resource_type,
-                            api_page_index,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::reader::load_page_bytes_frb(api_comic_id, api_page_index)
+                                .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -2610,18 +2604,12 @@ fn wire__crate__api__reader__load_page_list_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_comic_id = <String>::sse_decode(&mut deserializer);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_resource_type = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::reader::load_page_list_frb(
-                            api_comic_id,
-                            api_path,
-                            api_resource_type,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::reader::load_page_list_frb(api_comic_id).await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -2653,20 +2641,14 @@ fn wire__crate__api__reader__load_reader_page_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_comic_id = <String>::sse_decode(&mut deserializer);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_resource_type = <String>::sse_decode(&mut deserializer);
             let api_page_index = <i32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
                     (move || async move {
-                        let output_ok = crate::api::reader::load_reader_page_frb(
-                            api_comic_id,
-                            api_path,
-                            api_resource_type,
-                            api_page_index,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::reader::load_reader_page_frb(api_comic_id, api_page_index)
+                                .await?;
                         std::result::Result::Ok(output_ok)
                     })()
                     .await,
@@ -2810,8 +2792,6 @@ fn wire__crate__api__reader__prefetch_reader_pages_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_comic_id = <String>::sse_decode(&mut deserializer);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_resource_type = <String>::sse_decode(&mut deserializer);
             let api_page_indexes = <Vec<i32>>::sse_decode(&mut deserializer);
             let api_generation = <u64>::sse_decode(&mut deserializer);
             deserializer.end();
@@ -2820,8 +2800,6 @@ fn wire__crate__api__reader__prefetch_reader_pages_frb_impl(
                     (move || async move {
                         let output_ok = crate::api::reader::prefetch_reader_pages_frb(
                             api_comic_id,
-                            api_path,
-                            api_resource_type,
                             api_page_indexes,
                             api_generation,
                         )

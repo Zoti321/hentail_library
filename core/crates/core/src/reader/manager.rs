@@ -11,6 +11,7 @@ use super::backend::{open_backend_with, ReaderBackend};
 
 struct CachedSession {
     normalized_path: String,
+    resource_type: String,
     backend: ReaderBackend,
     /// Active acquire count (Flutter open + ephemeral leases).
     ref_count: usize,
@@ -169,6 +170,7 @@ fn acquire_reader_with(
         comic_id.to_string(),
         CachedSession {
             normalized_path,
+            resource_type: resource_type.to_string(),
             backend,
             ref_count: 1,
             reuse_logged: false,
@@ -240,6 +242,20 @@ pub fn with_session<T>(
         return Err(HentaiError::reader_session_not_open(comic_id));
     };
     f(&session.backend)
+}
+
+/// Returns `(normalized_path, resource_type)` for an open session.
+pub fn session_path_and_type(comic_id: &str) -> Result<(String, String), HentaiError> {
+    let store = store()
+        .lock()
+        .map_err(|e| HentaiError::validation(e.to_string()))?;
+    let Some(session) = store.sessions.get(comic_id) else {
+        return Err(HentaiError::reader_session_not_open(comic_id));
+    };
+    Ok((
+        session.normalized_path.clone(),
+        session.resource_type.clone(),
+    ))
 }
 
 /// Force-remove a session regardless of ref count (leave reader / cancel).

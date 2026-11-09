@@ -1,9 +1,9 @@
 export 'session/reader_session_bindings.dart';
-export 'view_models/reader_prefetch_controller.dart';
+export 'view_models/reader_prefetch_notifier.dart';
 export 'package:hentai_library/features/reader/domain/page_prefetch_window.dart';
-export 'view_models/reader_controller.dart';
+export 'view_models/reader_view_model.dart';
 export 'view_models/reader_series_navigation.dart';
-export 'view_models/reader_fullscreen_controller.dart';
+export 'view_models/reader_chrome_notifier.dart';
 export 'views/reader/reader_page.dart';
 export 'view_models/read_session_page_data.dart';
 export 'view_models/read_session_providers.dart';

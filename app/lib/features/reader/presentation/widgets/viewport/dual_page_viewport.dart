@@ -12,7 +12,7 @@ import 'package:hentai_library/features/reader/presentation/widgets/viewport/res
 
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/domain/spread_navigation.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/reader_image_item.dart';
@@ -42,25 +42,25 @@ class DualPageViewport extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderControllerKey viewKey = readerControllerKey(
+    final ReaderViewModelKey viewKey = readerViewModelKey(
       comicId,
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
     );
     final int totalPages = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) => value.asData?.value.totalPages ?? 1,
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) => value.asData?.value.totalPages ?? 1,
       ),
     );
     final ReadingMode activeMode = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) =>
             value.asData?.value.readingMode ?? readingMode,
       ),
     );
     final Comic? comic = ref.watch(
-      readerControllerProvider(viewKey)
-          .select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
+      readerViewModelProvider(viewKey)
+          .select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
     );
     if (comic == null) {
       return const SizedBox.expand();
@@ -108,7 +108,7 @@ class DualPageViewport extends HookConsumerWidget {
       }
       final int currentIndex =
           ref
-              .read(readerControllerProvider(viewKey))
+              .read(readerViewModelProvider(viewKey))
               .asData
               ?.value
               .currentIndex ??
@@ -125,7 +125,7 @@ class DualPageViewport extends HookConsumerWidget {
       hasAppliedPreferredPage.value = true;
       final int currentIndex =
           ref
-              .read(readerControllerProvider(viewKey))
+              .read(readerViewModelProvider(viewKey))
               .asData
               ?.value
               .currentIndex ??
@@ -136,7 +136,7 @@ class DualPageViewport extends HookConsumerWidget {
             return;
           }
           ref
-              .read(readerControllerProvider(viewKey).notifier)
+              .read(readerViewModelProvider(viewKey).notifier)
               .setIndex(safeIndex);
         });
       }
@@ -187,8 +187,8 @@ class DualPageViewport extends HookConsumerWidget {
     }
 
     ref.listen<int>(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
       (int? previous, int next) {
@@ -237,8 +237,8 @@ class DualPageViewport extends HookConsumerWidget {
                   return;
                 }
                 lastWheelAt.value = now;
-                final ReaderController controller = ref.read(
-                  readerControllerProvider(viewKey).notifier,
+                final ReaderViewModel controller = ref.read(
+                  readerViewModelProvider(viewKey).notifier,
                 );
                 if (dy > 0) {
                   if (onRequestNextPage != null) {
@@ -274,7 +274,7 @@ class DualPageViewport extends HookConsumerWidget {
                     return;
                   }
                   ref
-                      .read(readerControllerProvider(viewKey).notifier)
+                      .read(readerViewModelProvider(viewKey).notifier)
                       .setIndex(applyIndex);
                 },
                 itemCount: spreadCount,
@@ -317,7 +317,7 @@ class _DualPagePrefetchBinder extends HookConsumerWidget {
     required this.readingMode,
   });
 
-  final ReaderControllerKey viewKey;
+  final ReaderViewModelKey viewKey;
   final String comicId;
   final int totalPages;
   final double slotLogicalWidth;
@@ -327,8 +327,8 @@ class _DualPagePrefetchBinder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final int currentIndex = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
     );

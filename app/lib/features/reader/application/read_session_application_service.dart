@@ -5,16 +5,16 @@ import 'package:hentai_library/features/reader/domain/read_session.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 import 'package:hentai_library/shared/domain/ports/record_read_session_activity_port.dart';
 
-/// 系列切卷时 coordinator 返回的计划；UI 负责 prefetch 与路由跳转。
+/// 系列切卷时 Application Service 返回的计划；UI 负责 prefetch 与路由跳转。
 typedef SeriesSwitchPlan = ({
   String closeComicId,
   String targetComicId,
   OpenReaderArgs nextSession,
 });
 
-/// 窄协调：open → 翻页进度 → 写历史 / 活动统计 → close / 系列切卷。
-class ReadSessionCoordinator {
-  ReadSessionCoordinator({
+/// Read session 应用服务：进度落盘 / 活动统计 / close / 系列切卷编排。
+class ReadSessionApplicationService {
+  ReadSessionApplicationService({
     required this.sessionService,
     required this.readingHistoryCommands,
     required this.activityCommands,

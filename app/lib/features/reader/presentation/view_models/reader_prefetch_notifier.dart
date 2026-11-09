@@ -11,10 +11,10 @@ import 'package:hentai_library/features/reader/presentation/view_models/reader_p
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'reader_prefetch_controller.g.dart';
+part 'reader_prefetch_notifier.g.dart';
 
-@Riverpod(keepAlive: true)
-class ReaderPrefetchController extends _$ReaderPrefetchController {
+@Riverpod(keepAlive: true, name: 'readerPrefetchNotifierProvider')
+class ReaderPrefetchNotifier extends _$ReaderPrefetchNotifier {
   final Map<String, Set<int>> _lastWarmWindows = <String, Set<int>>{};
 
   @override

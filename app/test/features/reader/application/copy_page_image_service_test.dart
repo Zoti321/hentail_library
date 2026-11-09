@@ -16,7 +16,7 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
 
   @override
   Future<Uint8List?> loadPageBytes({
-    required Comic comic,
+    required String comicId,
     required int pageIndex,
   }) async {
     requestedPageIndexes.add(pageIndex);

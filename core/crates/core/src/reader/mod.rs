@@ -9,7 +9,8 @@ pub mod writeback;
 
 pub use dto::{ReaderPageDto, ReaderPageListDto};
 pub use manager::{
-    clear_reader_sessions, close_reader, open_reader, open_reader_with, with_ephemeral_reader,
+    clear_reader_sessions, close_reader, open_reader, open_reader_with, session_path_and_type,
+    with_ephemeral_reader,
 };
 pub use open::{load_page_bytes, load_page_list};
 pub use page::load_reader_page;

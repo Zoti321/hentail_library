@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_page_data.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,7 +16,7 @@ class ReaderViewportPrefetchBinder extends HookConsumerWidget {
     this.extraPageIndexesOneBased = const <int>[],
   });
 
-  final ReaderControllerKey viewKey;
+  final ReaderViewModelKey viewKey;
   final String comicId;
   final int totalPages;
   final double slotLogicalWidth;
@@ -26,8 +26,8 @@ class ReaderViewportPrefetchBinder extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final int currentIndex = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
     );

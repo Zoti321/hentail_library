@@ -28,7 +28,7 @@ class CopyPageImageService {
     final Uint8List? sourceBytes;
     try {
       sourceBytes = await _pageSource.loadPageBytes(
-        comic: comic,
+        comicId: comic.comicId,
         pageIndex: archivePageIndex,
       );
     } on Object catch (error, stackTrace) {

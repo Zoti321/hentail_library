@@ -1,19 +1,19 @@
-part of 'reader_controller.dart';
+part of 'reader_view_model.dart';
 
-/// 系列边界提示与翻页命令（#307）：由 [ReaderController] 以 mixin 组合。（自动播放见 reader_controller_auto_play.dart）
-mixin _ReaderControllerNavigation on _$ReaderController {
+/// 系列边界提示与翻页命令（#307）：由 [ReaderViewModel] 以 mixin 组合。（自动播放见 reader_view_model_auto_play.dart）
+mixin _ReaderViewModelNavigation on _$ReaderViewModel {
   void _notifyPageChanged(int pageIndex) {
-    final ReaderControllerKey key = ref.$arg as ReaderControllerKey;
+    final ReaderViewModelKey key = ref.$arg as ReaderViewModelKey;
     if (key.incognito) {
       return;
     }
-    ref.read(readSessionCoordinatorProvider).updatePage(pageIndex);
+    ref.read(readSessionApplicationServiceProvider).updatePage(pageIndex);
   }
 
-  void _updateDataState(ReaderState Function(ReaderState) updater) {
+  void _updateDataState(ReaderUiState Function(ReaderUiState) updater) {
     final current = state.asData?.value;
     if (current == null) return;
-    ReaderState next = updater(current);
+    ReaderUiState next = updater(current);
     if (next.currentIndex != current.currentIndex) {
       next = _clearStaleBoundaryPrompt(next);
     }
@@ -24,7 +24,7 @@ mixin _ReaderControllerNavigation on _$ReaderController {
   }
 
   /// Clears advance/retreat prompt once the user leaves that boundary spread.
-  ReaderState _clearStaleBoundaryPrompt(ReaderState next) {
+  ReaderUiState _clearStaleBoundaryPrompt(ReaderUiState next) {
     switch (next.seriesBoundaryPrompt) {
       case SeriesBoundaryPrompt.none:
         return next;
@@ -63,16 +63,15 @@ mixin _ReaderControllerNavigation on _$ReaderController {
     });
   }
 
-  Future<void> requestNextPage({
+  Future<ReaderReplaceReaderRouteIntent?> requestNextPage({
     ReaderNavContextData? navContext,
     OpenReaderArgs? session,
-    GoRouter? router,
   }) async {
-    final ReaderState? current = state.asData?.value;
+    final ReaderUiState? current = state.asData?.value;
     if (current == null) {
-      return;
+      return null;
     }
-    await _requestSeriesBoundaryPage(
+    return _requestSeriesBoundaryPage(
       onBoundary: SpreadNavigation.isOnLastSpread(
         mode: current.readingMode,
         totalPages: current.totalPages,
@@ -81,7 +80,6 @@ mixin _ReaderControllerNavigation on _$ReaderController {
       prompt: SeriesBoundaryPrompt.advance,
       targetItem: navContext?.nextItem,
       session: session,
-      router: router,
       turnPage: nextPage,
     );
   }
@@ -100,16 +98,15 @@ mixin _ReaderControllerNavigation on _$ReaderController {
     });
   }
 
-  Future<void> requestPrevPage({
+  Future<ReaderReplaceReaderRouteIntent?> requestPrevPage({
     ReaderNavContextData? navContext,
     OpenReaderArgs? session,
-    GoRouter? router,
   }) async {
-    final ReaderState? current = state.asData?.value;
+    final ReaderUiState? current = state.asData?.value;
     if (current == null) {
-      return;
+      return null;
     }
-    await _requestSeriesBoundaryPage(
+    return _requestSeriesBoundaryPage(
       onBoundary: SpreadNavigation.isOnFirstSpread(
         mode: current.readingMode,
         totalPages: current.totalPages,
@@ -118,54 +115,51 @@ mixin _ReaderControllerNavigation on _$ReaderController {
       prompt: SeriesBoundaryPrompt.retreat,
       targetItem: navContext?.previousItem,
       session: session,
-      router: router,
       turnPage: prevPage,
     );
   }
 
-  Future<void> _requestSeriesBoundaryPage({
+  Future<ReaderReplaceReaderRouteIntent?> _requestSeriesBoundaryPage({
     required bool onBoundary,
     required SeriesBoundaryPrompt prompt,
     required ReaderComicListItem? targetItem,
     required OpenReaderArgs? session,
-    required GoRouter? router,
     required void Function() turnPage,
   }) async {
-    final ReaderState? current = state.asData?.value;
+    final ReaderUiState? current = state.asData?.value;
     if (current == null) {
-      return;
+      return null;
     }
-    if (onBoundary && targetItem != null && session != null && router != null) {
+    if (onBoundary && targetItem != null && session != null) {
       if (current.seriesBoundaryPrompt != prompt) {
         _updateDataState(
-          (ReaderState s) => s.copyWith(seriesBoundaryPrompt: prompt),
+          (ReaderUiState s) => s.copyWith(seriesBoundaryPrompt: prompt),
         );
         try {
           await ref
-              .read(readerPrefetchControllerProvider.notifier)
+              .read(readerPrefetchNotifierProvider.notifier)
               .warmOpenComic(comicId: targetItem.comicId);
         } catch (_) {
           // warm-open 失败不阻断提示。
         }
-        return;
+        return null;
       }
       _updateDataState(
-        (ReaderState s) =>
+        (ReaderUiState s) =>
             s.copyWith(seriesBoundaryPrompt: SeriesBoundaryPrompt.none),
       );
-      await ref
+      return ref
           .read(readerSeriesNavigationProvider.notifier)
-          .switchComic(
-            router: router,
+          .prepareSwitchComic(
             currentSession: session,
             targetComicId: targetItem.comicId,
           );
-      return;
     }
     if (onBoundary) {
-      return;
+      return null;
     }
     turnPage();
+    return null;
   }
 
   void setIndex(int index) {

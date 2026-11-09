@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_boundary_policy.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
@@ -13,31 +11,32 @@ import 'package:hentai_library/features/reader/presentation/reader_exit_location
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/shared/domain/models/models.dart'
     show AppSetting;
-import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/features/reader/di/session_providers.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_fullscreen_controller.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_chrome_notifier.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_notifier.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_series_navigation.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'reader_controller.freezed.dart';
-part 'reader_controller.g.dart';
-part 'reader_controller_navigation.dart';
-part 'reader_controller_auto_play.dart';
+part 'reader_view_model.freezed.dart';
+part 'reader_view_model.g.dart';
+part 'reader_view_model_navigation.dart';
+part 'reader_view_model_auto_play.dart';
 
 /// 翻页越界切卷的二次确认方向（末页→下一卷 / 首页→上一卷）。
 enum SeriesBoundaryPrompt { none, advance, retreat }
 
-typedef ReaderControllerKey = ({
+typedef ReaderViewModelKey = ({
   String comicId,
   bool incognito,
   bool startFromFirstPage,
 });
 
-ReaderControllerKey readerControllerKey(
+ReaderViewModelKey readerViewModelKey(
   String comicId, {
   bool incognito = false,
   bool startFromFirstPage = false,
@@ -48,8 +47,8 @@ ReaderControllerKey readerControllerKey(
 );
 
 @freezed
-abstract class ReaderState with _$ReaderState {
-  factory ReaderState({
+abstract class ReaderUiState with _$ReaderUiState {
+  factory ReaderUiState({
     required Comic comic,
     @Default(ReadingMode.paged) ReadingMode readingMode,
     @Default(false) bool showControls,
@@ -58,18 +57,18 @@ abstract class ReaderState with _$ReaderState {
     @Default(SeriesBoundaryPrompt.none)
     SeriesBoundaryPrompt seriesBoundaryPrompt,
     @Default(false) bool autoPlayEnabled,
-  }) = _ReaderState;
+  }) = _ReaderUiState;
 
-  ReaderState._();
+  ReaderUiState._();
 
   int get totalPages => totalPagesOverride ?? 0;
 }
 
 @riverpod
-class ReaderController extends _$ReaderController
-    with _ReaderControllerNavigation, _ReaderControllerAutoPlay {
+class ReaderViewModel extends _$ReaderViewModel
+    with _ReaderViewModelNavigation, _ReaderViewModelAutoPlay {
   @override
-  Future<ReaderState> build(ReaderControllerKey key) async {
+  Future<ReaderUiState> build(ReaderViewModelKey key) async {
     final String id = key.comicId;
     final bool incognito = key.incognito;
     final bool startFromFirstPage = key.startFromFirstPage;
@@ -95,13 +94,13 @@ class ReaderController extends _$ReaderController
         .read(readerAutoPlayCarryProvider.notifier)
         .take();
     await ref
-        .read(readSessionCoordinatorProvider)
+        .read(readSessionApplicationServiceProvider)
         .beginReadSession(
           comic: snapshot.comic,
           incognito: incognito,
           initialPageIndex: snapshot.resumePageIndex,
         );
-    return ReaderState(
+    return ReaderUiState(
       comic: snapshot.comic,
       readingMode: initialMode,
       currentIndex: snapshot.resumePageIndex,
@@ -122,7 +121,7 @@ class ReaderController extends _$ReaderController
     }
   }
 
-  String get _comicId => (ref.$arg as ReaderControllerKey).comicId;
+  String get _comicId => (ref.$arg as ReaderViewModelKey).comicId;
 
   void toggleShowControls() {
     _updateDataState((s) => s.copyWith(showControls: !s.showControls));
@@ -133,7 +132,7 @@ class ReaderController extends _$ReaderController
   }
 
   void setReadingMode(ReadingMode value) {
-    _updateDataState((ReaderState s) {
+    _updateDataState((ReaderUiState s) {
       if (s.readingMode == value) {
         return s;
       }
@@ -155,57 +154,55 @@ class ReaderController extends _$ReaderController
     _updateDataState((s) => s.copyWith(totalPagesOverride: value));
   }
 
-  Future<void> handleTapZone(
+  Future<ReaderReplaceReaderRouteIntent?> handleTapZone(
     ReaderTapZone zone, {
     ReaderNavContextData? navContext,
     OpenReaderArgs? session,
-    GoRouter? router,
   }) async {
     final current = state.asData?.value;
-    if (current == null) return;
+    if (current == null) {
+      return null;
+    }
     if (current.showControls) {
       toggleShowControls();
-      return;
+      return null;
     }
     if (current.readingMode.isWebtoon) {
       toggleShowControls();
-      return;
+      return null;
     }
-    await _handleHorizontalTap(
+    return _handleHorizontalTap(
       zone,
       navContext: navContext,
       session: session,
-      router: router,
     );
   }
 
-  Future<void> _handleHorizontalTap(
+  Future<ReaderReplaceReaderRouteIntent?> _handleHorizontalTap(
     ReaderTapZone zone, {
     ReaderNavContextData? navContext,
     OpenReaderArgs? session,
-    GoRouter? router,
   }) async {
     if (zone == ReaderTapZone.left) {
-      await requestPrevPage(
-        navContext: navContext,
-        session: session,
-        router: router,
-      );
-    } else if (zone == ReaderTapZone.right) {
-      await requestNextPage(
-        navContext: navContext,
-        session: session,
-        router: router,
-      );
-    } else {
-      toggleShowControls();
+      return requestPrevPage(navContext: navContext, session: session);
     }
+    if (zone == ReaderTapZone.right) {
+      return requestNextPage(navContext: navContext, session: session);
+    }
+    toggleShowControls();
+    return null;
   }
 
   Future<void> toggleFullscreen() async {
-    await ref
-        .read(readerFullscreenControllerProvider.notifier)
-        .toggleFullscreen();
+    await ref.read(readerChromeNotifierProvider.notifier).toggleFullscreen();
+  }
+
+  Future<void> pauseForeground() {
+    return ref.read(readSessionApplicationServiceProvider).pauseForeground();
+  }
+
+  void resumeForeground() {
+    ref.read(readSessionApplicationServiceProvider).resumeForeground();
   }
 
   Future<void> executeSaveProgress({
@@ -214,44 +211,40 @@ class ReaderController extends _$ReaderController
     if (routeContext.incognito) {
       return;
     }
-    final ReaderState? currentState = state.asData?.value;
-    final ReadSessionCoordinator coordinator = ref.read(
-      readSessionCoordinatorProvider,
+    final ReaderUiState? currentState = state.asData?.value;
+    final ReadSessionApplicationService sessions = ref.read(
+      readSessionApplicationServiceProvider,
     );
     if (currentState != null) {
-      coordinator.updatePage(currentState.currentIndex);
+      sessions.updatePage(currentState.currentIndex);
     }
-    await coordinator.flushProgress();
+    await sessions.flushProgress();
   }
 
-  Future<void> executeExitReader({
-    required BuildContext context,
+  /// 结算会话并返回退出导航意图；由 View 执行 go_router。
+  Future<ReaderExitIntent> prepareExitReader({
     required ReaderRouteContext routeContext,
+    required bool canPop,
   }) async {
     await ref
-        .read(readerFullscreenControllerProvider.notifier)
+        .read(readerChromeNotifierProvider.notifier)
         .exitFullscreenIfNeeded();
-    final ReaderState? currentState = state.asData?.value;
+    final ReaderUiState? currentState = state.asData?.value;
     await ref
-        .read(readSessionCoordinatorProvider)
+        .read(readSessionApplicationServiceProvider)
         .exitReadSession(
           comicId: _comicId,
           incognito: routeContext.incognito,
           currentPageIndex: currentState?.currentIndex,
         );
-    ref.read(readerPrefetchControllerProvider.notifier).clearComic(_comicId);
-    if (!context.mounted) {
-      return;
-    }
-    final GoRouter router = GoRouter.of(context);
+    ref.read(readerPrefetchNotifierProvider.notifier).clearComic(_comicId);
     final String? goLocation = resolveReaderExitNavigation(
-      canPop: router.canPop(),
+      canPop: canPop,
       comicId: routeContext.comicId,
     );
     if (goLocation == null) {
-      router.pop();
-      return;
+      return const ReaderExitPopIntent();
     }
-    router.go(goLocation);
+    return ReaderExitGoIntent(goLocation);
   }
 }

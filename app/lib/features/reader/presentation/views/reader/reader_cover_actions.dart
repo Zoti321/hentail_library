@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_cover_editor_notifier.dart';
 import 'package:hentai_library/shared/ui/widgets/feedback/app_snackbar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,7 +13,7 @@ int readerCoverPageIndex(int currentIndex) =>
 Future<void> setComicCoverFromReader(
   BuildContext context,
   WidgetRef ref, {
-  required ReaderControllerKey viewKey,
+  required ReaderViewModelKey viewKey,
   required AppLocalizations l10n,
 }) {
   return _runCoverAction(
@@ -21,7 +21,7 @@ Future<void> setComicCoverFromReader(
     ref,
     viewKey: viewKey,
     notStateReadyMessage: l10n.readerStateNotReady,
-    action: (ReaderState state) => ref
+    action: (ReaderUiState state) => ref
         .read(readerCoverEditorProvider.notifier)
         .setComicCover(
           state.comic,
@@ -36,7 +36,7 @@ Future<void> setComicCoverFromReader(
 Future<void> setSeriesCoverFromReader(
   BuildContext context,
   WidgetRef ref, {
-  required ReaderControllerKey viewKey,
+  required ReaderViewModelKey viewKey,
   required String seriesId,
   required AppLocalizations l10n,
 }) {
@@ -45,7 +45,7 @@ Future<void> setSeriesCoverFromReader(
     ref,
     viewKey: viewKey,
     notStateReadyMessage: l10n.readerStateNotReady,
-    action: (ReaderState state) => ref
+    action: (ReaderUiState state) => ref
         .read(readerCoverEditorProvider.notifier)
         .setSeriesCover(
           seriesId.trim(),
@@ -60,14 +60,14 @@ Future<void> setSeriesCoverFromReader(
 Future<void> _runCoverAction(
   BuildContext context,
   WidgetRef ref, {
-  required ReaderControllerKey viewKey,
+  required ReaderViewModelKey viewKey,
   required String notStateReadyMessage,
-  required Future<void> Function(ReaderState state) action,
+  required Future<void> Function(ReaderUiState state) action,
   required String successMessage,
   required String Function(Object error) failureMessage,
 }) async {
-  final ReaderState? state = ref
-      .read(readerControllerProvider(viewKey))
+  final ReaderUiState? state = ref
+      .read(readerViewModelProvider(viewKey))
       .asData
       ?.value;
   if (state == null) {

@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
 import 'package:hentai_library/features/reader/presentation/session/reader_session_bindings.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_page_crossfade_policy.dart';
 import 'package:hentai_library/features/reader/presentation/widgets/viewport/reader_viewport_constants.dart';
@@ -37,19 +37,19 @@ class PagedViewport extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderControllerKey viewKey = readerControllerKey(
+    final ReaderViewModelKey viewKey = readerViewModelKey(
       comicId,
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
     );
     final int totalPages = ref.watch(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) => value.asData?.value.totalPages ?? 1,
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) => value.asData?.value.totalPages ?? 1,
       ),
     );
     final Comic? comic = ref.watch(
-      readerControllerProvider(viewKey)
-          .select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
+      readerViewModelProvider(viewKey)
+          .select((AsyncValue<ReaderUiState> value) => value.asData?.value.comic),
     );
     if (comic == null) {
       return const SizedBox.expand();
@@ -87,7 +87,7 @@ class PagedViewport extends HookConsumerWidget {
       }
       final int currentIndex =
           ref
-              .read(readerControllerProvider(viewKey))
+              .read(readerViewModelProvider(viewKey))
               .asData
               ?.value
               .currentIndex ??
@@ -106,7 +106,7 @@ class PagedViewport extends HookConsumerWidget {
       hasAppliedPreferredPage.value = true;
       final int currentIndex =
           ref
-              .read(readerControllerProvider(viewKey))
+              .read(readerViewModelProvider(viewKey))
               .asData
               ?.value
               .currentIndex ??
@@ -117,7 +117,7 @@ class PagedViewport extends HookConsumerWidget {
             return;
           }
           ref
-              .read(readerControllerProvider(viewKey).notifier)
+              .read(readerViewModelProvider(viewKey).notifier)
               .setIndex(safeIndex);
         });
       }
@@ -165,8 +165,8 @@ class PagedViewport extends HookConsumerWidget {
     }
 
     ref.listen<int>(
-      readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
+      readerViewModelProvider(viewKey).select(
+        (AsyncValue<ReaderUiState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
       (int? previous, int next) {
@@ -210,8 +210,8 @@ class PagedViewport extends HookConsumerWidget {
                   return;
                 }
                 lastWheelAt.value = now;
-                final ReaderController notifier = ref.read(
-                  readerControllerProvider(viewKey).notifier,
+                final ReaderViewModel notifier = ref.read(
+                  readerViewModelProvider(viewKey).notifier,
                 );
                 if (dy > 0) {
                   if (onRequestNextPage != null) {
@@ -241,7 +241,7 @@ class PagedViewport extends HookConsumerWidget {
                     return;
                   }
                   ref
-                      .read(readerControllerProvider(viewKey).notifier)
+                      .read(readerViewModelProvider(viewKey).notifier)
                       .setIndex(applyIndex);
                 },
                 itemCount: imageList.length,

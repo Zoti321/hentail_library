@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/reading_history_providers.dart';
@@ -15,9 +15,9 @@ final Provider<OpenReadSessionService> openReadSessionServiceProvider =
       );
     });
 
-final Provider<ReadSessionCoordinator> readSessionCoordinatorProvider =
-    Provider<ReadSessionCoordinator>((Ref ref) {
-      return ReadSessionCoordinator(
+final Provider<ReadSessionApplicationService> readSessionApplicationServiceProvider =
+    Provider<ReadSessionApplicationService>((Ref ref) {
+      return ReadSessionApplicationService(
         sessionService: ref.read(openReadSessionServiceProvider),
         readingHistoryCommands: ref.read(readingHistoryCommandPortProvider),
         activityCommands: ref.read(recordReadSessionActivityPortProvider),

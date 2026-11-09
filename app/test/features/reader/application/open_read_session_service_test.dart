@@ -67,7 +67,7 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
 
   @override
   Future<Uint8List?> loadPageBytes({
-    required Comic comic,
+    required String comicId,
     required int pageIndex,
   }) async {
     return null;
@@ -75,7 +75,7 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
 
   @override
   Future<ReaderPagePayload> loadReaderPage({
-    required Comic comic,
+    required String comicId,
     required int pageIndex,
   }) async {
     if (error != null) {
@@ -86,7 +86,7 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
 
   @override
   Future<void> prefetchPages({
-    required Comic comic,
+    required String comicId,
     required List<int> pageIndexes,
     required int generation,
   }) async {

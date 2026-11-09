@@ -1,12 +1,10 @@
-import 'package:flutter/widgets.dart';
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/comic/public/comic_lookup_repository.dart';
-import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:hentai_library/features/reader/di/session_providers.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
@@ -17,9 +15,10 @@ import 'package:hentai_library/features/reader/domain/opened_read_session.dart';
 import 'package:hentai_library/features/reader/domain/auto_play_mode.dart';
 import 'package:hentai_library/features/reader/domain/reading_mode.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_auto_play_carry.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_controller.dart';
-import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_controller.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_view_model.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_prefetch_notifier.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/reader_series_navigation.dart';
+import 'package:hentai_library/features/reader/presentation/view_models/reader_navigation_intent.dart';
 import 'package:hentai_library/features/reader/presentation/view_models/read_session_providers.dart';
 import 'package:hentai_library/features/reader/presentation/routing/reader_route_context.dart';
 import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
@@ -30,15 +29,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
-import '../../../support/fakes/settings_test_fakes.dart';
+import '../../../../support/fakes/settings_test_fakes.dart';
 
 const String _comicId = 'reader-controller-comic';
-const ReaderControllerKey _key = (
+const ReaderViewModelKey _key = (
   comicId: _comicId,
   incognito: false,
   startFromFirstPage: false,
 );
-const ReaderControllerKey _incognitoKey = (
+const ReaderViewModelKey _incognitoKey = (
   comicId: _comicId,
   incognito: true,
   startFromFirstPage: false,
@@ -78,16 +77,16 @@ class _RecordingSeriesNavigation extends ReaderSeriesNavigation {
   void build() {}
 
   @override
-  Future<void> switchComic({
-    required GoRouter router,
+  Future<ReaderReplaceReaderRouteIntent?> prepareSwitchComic({
     required OpenReaderArgs currentSession,
     required String targetComicId,
   }) async {
     switchedTo.add(targetComicId);
+    return ReaderReplaceReaderRouteIntent('/reader?comicId=$targetComicId');
   }
 }
 
-class _FakePrefetchController extends ReaderPrefetchController {
+class _FakePrefetchController extends ReaderPrefetchNotifier {
   final List<String> warmedOpen = <String>[];
 
   @override
@@ -102,14 +101,6 @@ class _FakePrefetchController extends ReaderPrefetchController {
   }
 }
 
-GoRouter _testRouter() => GoRouter(
-  routes: <RouteBase>[
-    GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) => const SizedBox(),
-    ),
-  ],
-);
 
 class _NoOpHistoryCommands implements ReadingHistoryCommandPort {
   @override
@@ -159,8 +150,8 @@ class _NoOpActivityCommands implements RecordReadSessionActivityPort {
 /// Controller build now begins a history session; keep I/O stubs unused.
 Override _stubCoordinatorOverride() {
   final _NoOpHistoryCommands history = _NoOpHistoryCommands();
-  return readSessionCoordinatorProvider.overrideWithValue(
-    ReadSessionCoordinator(
+  return readSessionApplicationServiceProvider.overrideWithValue(
+    ReadSessionApplicationService(
       sessionService: OpenReadSessionService(
         comicRepo: _UnusedComicLookup(),
         pageSource: _UnusedPageSource(),
@@ -213,7 +204,7 @@ ReaderNavContextData _navContext({
 
 ProviderContainer _createContainer({
   required AppSetting initialSetting,
-  ReaderControllerKey key = _key,
+  ReaderViewModelKey key = _key,
   OpenedReadSession? snapshot,
   _RecordingSeriesNavigation? seriesNavigation,
   _FakePrefetchController? prefetch,
@@ -234,18 +225,18 @@ ProviderContainer _createContainer({
       if (seriesNavigation != null)
         readerSeriesNavigationProvider.overrideWith(() => seriesNavigation),
       if (prefetch != null)
-        readerPrefetchControllerProvider.overrideWith(() => prefetch),
+        readerPrefetchNotifierProvider.overrideWith(() => prefetch),
     ],
   );
 }
 
-ReaderController _controller(
+ReaderViewModel _controller(
   ProviderContainer container,
-  ReaderControllerKey key,
-) => container.read(readerControllerProvider(key).notifier);
+  ReaderViewModelKey key,
+) => container.read(readerViewModelProvider(key).notifier);
 
-ReaderState? _state(ProviderContainer container, ReaderControllerKey key) =>
-    container.read(readerControllerProvider(key)).asData?.value;
+ReaderUiState? _state(ProviderContainer container, ReaderViewModelKey key) =>
+    container.read(readerViewModelProvider(key)).asData?.value;
 
 void main() {
   group('auto-play session state', () {
@@ -255,8 +246,8 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      final ReaderState state = await container.read(
-        readerControllerProvider(_key).future,
+      final ReaderUiState state = await container.read(
+        readerViewModelProvider(_key).future,
       );
 
       expect(state.autoPlayEnabled, isFalse);
@@ -270,7 +261,7 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        await container.read(readerControllerProvider(_key).future);
+        await container.read(readerViewModelProvider(_key).future);
         _controller(container, _key).setAutoPlayEnabled(true);
 
         expect(_state(container, _key)?.autoPlayEnabled, isTrue);
@@ -278,7 +269,7 @@ void main() {
     );
 
     test('new comic session starts with auto-play off', () async {
-      const ReaderControllerKey otherKey = (
+      const ReaderViewModelKey otherKey = (
         comicId: 'reader-controller-other',
         incognito: false,
         startFromFirstPage: false,
@@ -325,11 +316,11 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_key).future);
+      await container.read(readerViewModelProvider(_key).future);
       _controller(container, _key).setAutoPlayEnabled(true);
 
-      final ReaderState otherState = await container.read(
-        readerControllerProvider(otherKey).future,
+      final ReaderUiState otherState = await container.read(
+        readerViewModelProvider(otherKey).future,
       );
 
       expect(_state(container, _key)?.autoPlayEnabled, isTrue);
@@ -342,8 +333,8 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_key).future);
-      final ReaderController controller = _controller(container, _key);
+      await container.read(readerViewModelProvider(_key).future);
+      final ReaderViewModel controller = _controller(container, _key);
       controller.setAutoPlayEnabled(true);
       controller.setReadingMode(ReadingMode.webtoon);
 
@@ -351,8 +342,8 @@ void main() {
       expect(_state(container, _key)?.readingMode, ReadingMode.webtoon);
     });
 
-    test('armed autoplay carry restores on next ReaderController', () async {
-      const ReaderControllerKey otherKey = (
+    test('armed autoplay carry restores on next ReaderViewModel', () async {
+      const ReaderViewModelKey otherKey = (
         comicId: 'reader-controller-carry',
         incognito: false,
         startFromFirstPage: true,
@@ -397,8 +388,8 @@ void main() {
       addTearDown(container.dispose);
 
       container.read(readerAutoPlayCarryProvider.notifier).arm(true);
-      final ReaderState state = await container.read(
-        readerControllerProvider(otherKey).future,
+      final ReaderUiState state = await container.read(
+        readerViewModelProvider(otherKey).future,
       );
 
       expect(state.autoPlayEnabled, isTrue);
@@ -415,8 +406,8 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        final ReaderState state = await container.read(
-          readerControllerProvider(_key).future,
+        final ReaderUiState state = await container.read(
+          readerViewModelProvider(_key).future,
         );
 
         expect(state.readingMode, ReadingMode.webtoon);
@@ -429,7 +420,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_key).future);
+      await container.read(readerViewModelProvider(_key).future);
       await container
           .read(settingsProvider.notifier)
           .setReadingMode(ReadingMode.webtoon);
@@ -447,10 +438,10 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
       _controller(container, _incognitoKey).setReadingMode(ReadingMode.webtoon);
 
-      final ReaderState? state = _state(container, _incognitoKey);
+      final ReaderUiState? state = _state(container, _incognitoKey);
       expect(state?.readingMode, ReadingMode.webtoon);
       expect(state?.currentIndex, 7);
     });
@@ -463,7 +454,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
       _controller(container, _incognitoKey).setReadingMode(ReadingMode.webtoon);
 
       expect(_state(container, _incognitoKey)?.currentIndex, 4);
@@ -477,8 +468,8 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
 
       controller.prevPage();
       expect(_state(container, _incognitoKey)?.currentIndex, 1);
@@ -499,8 +490,8 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
 
       controller.setIndex(0);
       expect(_state(container, _incognitoKey)?.currentIndex, 2);
@@ -535,8 +526,8 @@ void main() {
         );
         addTearDown(container.dispose);
 
-        await container.read(readerControllerProvider(_incognitoKey).future);
-        final ReaderController controller = _controller(
+        await container.read(readerViewModelProvider(_incognitoKey).future);
+        final ReaderViewModel controller = _controller(
           container,
           _incognitoKey,
         );
@@ -544,7 +535,6 @@ void main() {
         await controller.requestPrevPage(
           navContext: _navContext(previousComicId: previousComicId),
           session: session,
-          router: _testRouter(),
         );
 
         expect(
@@ -570,9 +560,8 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
-      final GoRouter router = _testRouter();
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
       final ReaderNavContextData nav = _navContext(
         previousComicId: previousComicId,
       );
@@ -580,12 +569,10 @@ void main() {
       await controller.requestPrevPage(
         navContext: nav,
         session: session,
-        router: router,
       );
       await controller.requestPrevPage(
         navContext: nav,
         session: session,
-        router: router,
       );
 
       expect(navigation.switchedTo, <String>[previousComicId]);
@@ -607,13 +594,12 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
 
       await controller.requestPrevPage(
         navContext: _navContext(),
         session: session,
-        router: _testRouter(),
       );
 
       expect(
@@ -634,13 +620,12 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
 
       await controller.requestPrevPage(
         navContext: _navContext(previousComicId: previousComicId),
         session: session,
-        router: _testRouter(),
       );
       expect(
         _state(container, _incognitoKey)?.seriesBoundaryPrompt,
@@ -678,17 +663,17 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
       controller.setAutoPlayEnabled(true);
 
-      final bool keepTicking = await controller.advanceAutoPlay(
+      final tick = await controller.advanceAutoPlay(
         navContext: _navContext(nextComicId: nextComicId),
         session: session,
-        router: _testRouter(),
       );
 
-      expect(keepTicking, isFalse);
+      expect(tick.keepTicking, isFalse);
+      expect(tick.replace, isNotNull);
       expect(navigation.switchedTo, <String>[nextComicId]);
       expect(_state(container, _incognitoKey)?.currentIndex, 5);
       expect(_state(container, _incognitoKey)?.autoPlayEnabled, isTrue);
@@ -712,17 +697,17 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
       controller.setAutoPlayEnabled(true);
 
-      final bool keepTicking = await controller.advanceAutoPlay(
+      final tick = await controller.advanceAutoPlay(
         navContext: _navContext(nextComicId: nextComicId),
         session: session,
-        router: _testRouter(),
       );
 
-      expect(keepTicking, isTrue);
+      expect(tick.keepTicking, isTrue);
+      expect(tick.replace, isNull);
       expect(_state(container, _incognitoKey)?.currentIndex, 2);
       expect(navigation.switchedTo, isEmpty);
     });
@@ -741,17 +726,17 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
       controller.setAutoPlayEnabled(true);
 
-      final bool keepTicking = await controller.advanceAutoPlay(
+      final tick = await controller.advanceAutoPlay(
         navContext: _navContext(nextComicId: nextComicId),
         session: session,
-        router: _testRouter(),
       );
 
-      expect(keepTicking, isFalse);
+      expect(tick.keepTicking, isFalse);
+      expect(tick.replace, isNull);
       expect(_state(container, _incognitoKey)?.autoPlayEnabled, isFalse);
       expect(_state(container, _incognitoKey)?.currentIndex, 5);
       expect(navigation.switchedTo, isEmpty);
@@ -769,17 +754,17 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_incognitoKey).future);
-      final ReaderController controller = _controller(container, _incognitoKey);
+      await container.read(readerViewModelProvider(_incognitoKey).future);
+      final ReaderViewModel controller = _controller(container, _incognitoKey);
       controller.setAutoPlayEnabled(true);
 
-      final bool keepTicking = await controller.advanceAutoPlay(
+      final tick = await controller.advanceAutoPlay(
         navContext: _navContext(),
         session: session,
-        router: _testRouter(),
       );
 
-      expect(keepTicking, isTrue);
+      expect(tick.keepTicking, isTrue);
+      expect(tick.replace, isNull);
       expect(_state(container, _incognitoKey)?.currentIndex, 1);
       expect(_state(container, _incognitoKey)?.autoPlayEnabled, isTrue);
     });

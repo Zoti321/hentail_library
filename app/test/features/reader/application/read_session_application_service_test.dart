@@ -3,7 +3,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/reading_history_command_port.dart';
 import 'package:hentai_library/shared/domain/ports/record_read_session_activity_port.dart';
 import 'package:hentai_library/features/reader/application/open_reader_args.dart';
-import 'package:hentai_library/features/reader/application/read_session_coordinator.dart';
+import 'package:hentai_library/features/reader/application/read_session_application_service.dart';
 import 'package:hentai_library/features/reader/application/open_read_session_service.dart';
 import 'package:test/test.dart';
 
@@ -97,7 +97,7 @@ void main() {
   late _RecordingReadingHistoryCommands readingCommands;
   late _RecordingActivityCommands activityCommands;
   late _RecordingOpenReadSessionService sessionService;
-  late ReadSessionCoordinator coordinator;
+  late ReadSessionApplicationService coordinator;
   late DateTime now;
 
   setUp(() {
@@ -105,7 +105,7 @@ void main() {
     activityCommands = _RecordingActivityCommands();
     sessionService = _RecordingOpenReadSessionService();
     now = DateTime.utc(2026, 1, 1, 12);
-    coordinator = ReadSessionCoordinator(
+    coordinator = ReadSessionApplicationService(
       sessionService: sessionService,
       readingHistoryCommands: readingCommands,
       activityCommands: activityCommands,
