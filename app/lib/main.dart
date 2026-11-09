@@ -14,10 +14,7 @@ import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/api/logging.dart';
 import 'package:hentai_library/src/rust/frb_generated.dart';
 import 'package:hentai_library/shared/ui/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
-import 'package:riverpod/misc.dart' show Override;
+import 'package:hentai_library/features/bootstrap/di/bootstrap_overrides.dart';
 import 'package:hentai_library/features/bootstrap/presentation/views/app.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -109,13 +106,7 @@ class _BootstrapApp extends StatelessWidget {
             ),
           );
         }
-        return MyApp(
-          overrides: <Override>[
-            ...dataProviderOverrides(),
-            ...sharedLibraryStateOverrides(),
-            ...bootstrapCompositionOverrides(),
-          ],
-        );
+        return MyApp(overrides: bootstrapDiOverrides());
       },
     );
   }

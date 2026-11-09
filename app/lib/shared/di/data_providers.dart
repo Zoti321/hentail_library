@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/shared/di/injected_di.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/shared/domain/ports/remote_library_credentials_port.dart';
 import 'package:hentai_library/features/reader/domain/comic_page_source_port.dart';
@@ -17,94 +18,71 @@ import 'package:hentai_library/features/reading_history/domain/reading_history_r
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/features/named_metadata/domain/tag_repository.dart';
 
-Never _unimplemented(String name) =>
-    throw UnimplementedError('$name 未注入，请在 bootstrap 中 override');
+/// Repository / Port token 声明；实现由 bootstrap 经 owner `public/di` 注入。
 
 final Provider<ComicThumbnailRepository> comicThumbnailRepoProvider =
-    Provider<ComicThumbnailRepository>(
-      (Ref ref) => _unimplemented('comicThumbnailRepoProvider'),
-    );
+    injectedDi('comicThumbnailRepoProvider');
 
 final Provider<ComicLookupRepository> comicLookupRepositoryProvider =
-    Provider<ComicLookupRepository>(
-      (Ref ref) => _unimplemented('comicLookupRepositoryProvider'),
-    );
+    injectedDi('comicLookupRepositoryProvider');
 
-final Provider<ComicTrashRepository> comicTrashRepositoryProvider =
-    Provider<ComicTrashRepository>(
-      (Ref ref) => _unimplemented('comicTrashRepositoryProvider'),
-    );
-
-final Provider<SeriesRepository> seriesRepoProvider =
-    Provider<SeriesRepository>(
-      (Ref ref) => _unimplemented('seriesRepoProvider'),
-    );
-
-final Provider<TagRepository> tagRepoProvider = Provider<TagRepository>(
-  (Ref ref) => _unimplemented('tagRepoProvider'),
+final Provider<ComicTrashRepository> comicTrashRepositoryProvider = injectedDi(
+  'comicTrashRepositoryProvider',
 );
 
-final Provider<AuthorRepository> authorRepoProvider =
-    Provider<AuthorRepository>(
-      (Ref ref) => _unimplemented('authorRepoProvider'),
-    );
+final Provider<SeriesRepository> seriesRepoProvider = injectedDi(
+  'seriesRepoProvider',
+);
+
+final Provider<TagRepository> tagRepoProvider = injectedDi('tagRepoProvider');
+
+final Provider<AuthorRepository> authorRepoProvider = injectedDi(
+  'authorRepoProvider',
+);
 
 final Provider<NamedFacetManagementRepository>
-namedFacetManagementRepoProvider = Provider<NamedFacetManagementRepository>(
-  (Ref ref) => _unimplemented('namedFacetManagementRepoProvider'),
+namedFacetManagementRepoProvider = injectedDi(
+  'namedFacetManagementRepoProvider',
 );
 
-final Provider<NamedFacetDictionaryRepository> parodyRepoProvider =
-    Provider<NamedFacetDictionaryRepository>(
-      (Ref ref) => _unimplemented('parodyRepoProvider'),
-    );
+final Provider<NamedFacetDictionaryRepository> parodyRepoProvider = injectedDi(
+  'parodyRepoProvider',
+);
 
 final Provider<NamedFacetDictionaryRepository> characterRepoProvider =
-    Provider<NamedFacetDictionaryRepository>(
-      (Ref ref) => _unimplemented('characterRepoProvider'),
-    );
+    injectedDi('characterRepoProvider');
 
-final Provider<LibraryRepository> libraryRepoProvider =
-    Provider<LibraryRepository>(
-      (Ref ref) => _unimplemented('libraryRepoProvider'),
-    );
+final Provider<LibraryRepository> libraryRepoProvider = injectedDi(
+  'libraryRepoProvider',
+);
 
 final Provider<RemoteLibraryCredentialsPort>
-remoteLibraryCredentialsPortProvider = Provider<RemoteLibraryCredentialsPort>(
-  (Ref ref) => _unimplemented('remoteLibraryCredentialsPortProvider'),
+remoteLibraryCredentialsPortProvider = injectedDi(
+  'remoteLibraryCredentialsPortProvider',
 );
 
 final Provider<ReadingHistoryRepository> readingHistoryRepoProvider =
-    Provider<ReadingHistoryRepository>(
-      (Ref ref) => _unimplemented('readingHistoryRepoProvider'),
-    );
+    injectedDi('readingHistoryRepoProvider');
 
-final Provider<AppSettingRepository> appSettingRepoProvider =
-    Provider<AppSettingRepository>(
-      (Ref ref) => _unimplemented('appSettingRepoProvider'),
-    );
-
-final Provider<HomePageRepository> homePageRepoProvider =
-    Provider<HomePageRepository>(
-      (Ref ref) => _unimplemented('homePageRepoProvider'),
-    );
-
-final Provider<NativeReaderPort> nativeReaderPortProvider =
-    Provider<NativeReaderPort>(
-      (Ref ref) => _unimplemented('nativeReaderPortProvider'),
-    );
-
-final Provider<ComicTrashNativeReaderPort>
-comicTrashNativeReaderPortProvider = Provider<ComicTrashNativeReaderPort>(
-  (Ref ref) => _unimplemented('comicTrashNativeReaderPortProvider'),
+final Provider<AppSettingRepository> appSettingRepoProvider = injectedDi(
+  'appSettingRepoProvider',
 );
 
-final Provider<ComicPageSourcePort> comicPageSourcePortProvider =
-    Provider<ComicPageSourcePort>(
-      (Ref ref) => _unimplemented('comicPageSourcePortProvider'),
-    );
+final Provider<HomePageRepository> homePageRepoProvider = injectedDi(
+  'homePageRepoProvider',
+);
 
-final Provider<LibraryRevisionPort> libraryRevisionPortProvider =
-    Provider<LibraryRevisionPort>(
-      (Ref ref) => _unimplemented('libraryRevisionPortProvider'),
-    );
+final Provider<NativeReaderPort> nativeReaderPortProvider = injectedDi(
+  'nativeReaderPortProvider',
+);
+
+final Provider<ComicTrashNativeReaderPort> comicTrashNativeReaderPortProvider =
+    injectedDi('comicTrashNativeReaderPortProvider');
+
+final Provider<ComicPageSourcePort> comicPageSourcePortProvider = injectedDi(
+  'comicPageSourcePortProvider',
+);
+
+final Provider<LibraryRevisionPort> libraryRevisionPortProvider = injectedDi(
+  'libraryRevisionPortProvider',
+);

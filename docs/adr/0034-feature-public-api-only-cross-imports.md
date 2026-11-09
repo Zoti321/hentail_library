@@ -37,6 +37,8 @@ Epic [#425](https://github.com/Zoti321/hentail_library/issues/425) 与 implement
 - Consumer 仍 `ref.read` **`shared/di`** 声明的 Provider token（#426）。
 - 工厂经 owner **`public/di`** 暴露；bootstrap 在 `features/bootstrap/di/overrides/` 按 owner 拆分 override（#435）。
 
+> **实现修订（2026-11-09）**：`shared/di` 的占位 token 统一用 `app/lib/shared/di/injected_di.dart` 的 `injectedDi` / `injectedFutureDi` / `injectedFutureDiFamily` 声明，保留显式类型标注；不再手写 `throw UnimplementedError`。组合根收敛为 `features/bootstrap/di/bootstrap_overrides.dart` 的 `bootstrapDiOverrides()`（data → shared state → composition），`main.dart` 只调用它。**新增 token 必须补齐 override**，由 `app/test/gate/shared_di_override_coverage_test.dart` 静态校验「`shared/di` 声明 ⊆ 应用内 override」。
+
 ### 4. Wayfinder 布局
 
 - `features/<id>/public/` 为 **可选** 顶层 layer，与 `application`、`data` 等并列（`kWayfinderFeatureLayerDirs` 含 `public`）。

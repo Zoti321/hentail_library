@@ -1,7 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/shared/di/injected_di.dart';
+import 'package:riverpod/misc.dart' show FutureProviderFamily;
 
-final comicResolvedPageCountProvider = FutureProvider.family<int, String>(
-  (Ref ref, String comicId) => throw UnimplementedError(
-    'comicResolvedPageCountProvider 未注入，请在 bootstrap 中 override',
-  ),
-);
+final FutureProviderFamily<int, String> comicResolvedPageCountProvider =
+    injectedFutureDiFamily('comicResolvedPageCountProvider');

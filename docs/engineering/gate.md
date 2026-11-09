@@ -14,6 +14,7 @@
 | 子集 | `./scripts/run-gate.sh rust-test dart-static dart-test` |
 | 合并前 UI 怀疑回归 | 再跑 `cd app && flutter test`（含慢轨，**不进 Gate**） |
 | Import 边界 | `cd app && flutter test test/gate/import_boundary_test.dart` |
+| DI token 覆盖 | `cd app && flutter test test/gate/shared_di_override_coverage_test.dart`（`shared/di` 声明 ⊆ override，漏注入即红） |
 | Shared UI 无 feature import | `cd app && flutter test test/gate/shared_ui_no_feature_import_test.dart` |
 | Dart 测试盘存（inventory + rubric） | `python scripts/audit_dart_tests.py`（可选 `--summary-json` / `--json`；见下节） |
 

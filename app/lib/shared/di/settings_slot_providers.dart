@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/shared/di/injected_di.dart';
 
 /// 设置页「元数据备份」板块的组装槽位（#264）。
 ///
@@ -9,9 +10,6 @@ typedef MetadataBackupSettingsSectionBuilder = Widget Function(
 );
 
 final Provider<MetadataBackupSettingsSectionBuilder>
-metadataBackupSettingsSectionBuilderProvider =
-    Provider<MetadataBackupSettingsSectionBuilder>(
-      (Ref ref) => throw UnimplementedError(
-        'metadataBackupSettingsSectionBuilderProvider 未注入，请在 bootstrap 中 override',
-      ),
-    );
+metadataBackupSettingsSectionBuilderProvider = injectedDi(
+  'metadataBackupSettingsSectionBuilderProvider',
+);
