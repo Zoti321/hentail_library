@@ -12,7 +12,6 @@ import 'package:hentai_library/features/library_admin/domain/library_revision_st
 import 'package:hentai_library/shared/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_admin/domain/library_scan_activity_state.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.dart';
 
 /// 跨 feature 共享的库状态与端口 Provider 声明（#261a）。
 ///
@@ -29,9 +28,6 @@ final Provider<LibraryReorderModePort> libraryReorderModePortProvider =
 final Provider<bool> libraryReorderActiveStateProvider = injectedDi(
   'libraryReorderActiveStateProvider',
 );
-
-final Provider<LibraryRevisionSignalPort> libraryRevisionSignalPortProvider =
-    injectedDi('libraryRevisionSignalPortProvider');
 
 final Provider<ComicMetadataBulkEditCommandPort>
 comicMetadataBulkEditCommandPortProvider = injectedDi(

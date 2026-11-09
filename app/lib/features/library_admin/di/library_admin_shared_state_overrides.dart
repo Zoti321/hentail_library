@@ -15,9 +15,6 @@ List<Override> libraryAdminSharedStateOverrides() => <Override>[
   libraryReorderActiveStateProvider.overrideWith(
     (Ref ref) => ref.watch(libraryReorderModeProvider),
   ),
-  libraryRevisionSignalPortProvider.overrideWith(
-    createLibraryRevisionSignalPort,
-  ),
   comicMetadataBulkEditCommandPortProvider.overrideWith(
     createComicMetadataBulkEditCommandPort,
   ),

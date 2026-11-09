@@ -11,7 +11,7 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 | # | 机制 | 典型位置 |
 |---|------|----------|
 | 1 | DI 注入回调闭包 | `library_admin/di/{library_sync,metadata_refresh,comic_metadata_bulk_patch}.dart` 的 `onCatalogRevision` / `onSucceeded` / `onDictionariesChanged` |
-| 2 | 命令端口 | `LibraryRevisionSignalPort.notifyExternalChange()` |
+| 2 | 命令端口 | `LibraryRevisionSignalPort.notifyExternalChange()`（已并入事件，见 §5） |
 | 3 | 伪事件总线（Riverpod notifier 累加版本号） | `shared/di/library_change_bus.dart` 的 `LibraryChangeBus.publish(LibraryChange)` |
 | 4 | 数据层 revision 流 | `LibraryRevisionPort.watchRevision()`（SQLite `data_version`） |
 | 5 | 领域事件类（已定义、无订阅者） | `features/*/domain/*_events.dart`（`LibraryAdminEvent`、`ComicTrashEvent`、`ReadingHistoryEvent`、`AppSettingEvent`） |
@@ -48,7 +48,7 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 
 - **发布点**：`features/*/application/**`（首选）或 `features/*/data/**`，且必须在写入**提交成功之后**；禁止在 FRB 调用 / 事务内部发布。
 - **禁止 presentation 发布**（E2）：ViewModel 只调 Port / application 用例。
-- **订阅点**：只有 `DomainEventRevisions` 直接 `on<DomainEvent>()`；其他消费者 `ref.watch(domainEventRevisionsProvider.select(...))`，不得各自 `ref.listen` 事件。
+- **订阅点**：只有 `DomainEventRevisions` 直接 `on<DomainEvent>()`；其他消费者 `ref.watch(domainEventRevisionsProvider.select(...))`，不得各自 `ref.listen` 事件（`LibraryRevisionNotifier` 也只 `ref.listen` reducer 的 `catalogRevision`，不订阅总线）。
 - **启动即订阅**：`_AppRoot.build` 首行 `ref.watch(domainEventRevisionsProvider)`，避免发布时 reducer 尚未 build 而丢事件（广播流不重放）。
 - 事件只带 id / 标量，不带实体快照；需要当前实体请查 Repository。
 
@@ -60,16 +60,19 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 | **E2** | `.publish(` 只允许 `application/`、`data/`、`shared/domain/events/` |
 | **E4** | `implements DomainEventPublisher` 仅 `domain_event_bus.dart`；`implements DomainEventBus` 仅 `shared/data/events/` |
 
-### 5. 首批迁移（本 ADR 落地范围）
+### 5. 迁移范围（已完成）
 
-`LibraryChangeBus` / `LibraryChange` / `LibraryAdminEvent` 删除，替换为：
+`LibraryChangeBus` / `LibraryChange` / `LibraryAdminEvent` / `LibraryRevisionSignalPort` 全部删除，收敛为：
 
-- 事件：`ComicMetadataPersisted(tagsWritten, authorsWritten, parodiesWritten, charactersWritten)`；
-- 发布：`comic/application/comic_metadata_service.dart`、`library_admin/application/comic_metadata_bulk_patch_coordinator.dart`；
-- 投影：`DomainEventRevisions{dictionaryRevision, metadataSaveRevision}`；
-- 订阅：home counts、字典型 providers、`library_distinct_metadata_providers`、metadata auto backup 改 `select` 版本号。
+- 事件（`shared/domain/events/{catalog_events,comic_trash_events}.dart`，均为 `domain_event.dart` 的 part）：
+  - `ComicMetadataPersisted(tagsWritten, authorsWritten, parodiesWritten, charactersWritten)`
+  - `LibraryCatalogChanged(source)`（sync / metadata refresh / library CRUD / series 排序）
+  - `ComicsTrashed(comicIds)` / `ComicsRestored(comicIds)`
+- 发布（application 层；presentation 只调 Port / 用例）：`comic/application/comic_metadata_service.dart`、`library_admin/application/{comic_metadata_bulk_patch_coordinator,sync_library_use_case,metadata_refresh_use_case,library_write_service}.dart`、`comic_trash/application/comic_trash_service.dart`、`series/application/series_item_sort_service.dart`。
+- 投影：`DomainEventRevisions{dictionaryRevision, metadataSaveRevision, catalogRevision}` 唯一 reducer；`LibraryRevisionNotifier` 不再自带通知入口，`revision` 由 reducer 的 `catalogRevision` 驱动，叠加 `LibraryRevisionPort`（SQLite `data_version`）外部流。
+- 死事件清理：`app_settings/domain/app_setting_events.dart`、`reading_history/domain/reading_history_events.dart` 删除（无订阅方，设置 / 进度读取本就由 Riverpod 状态与仓储流承担）。
 
-`LibraryRevisionPort`（SQLite `data_version`）与 `LibraryRevisionSignalPort` **保持原样**：前者是数据层外部事实流，后者是 catalog revision 触发，不属于「写入后通知」这一组。后续批次可把 `LibraryRevisionSignalPort` 也改为事件（`publish(LibraryExternalChangeDetected())`）。
+`LibraryRevisionPort`（SQLite `data_version`）**保持为数据层外部事实流**：它不是「应用写入后的通知」，而是外部/底层写入的兜底信号。
 
 ## Consequences
 

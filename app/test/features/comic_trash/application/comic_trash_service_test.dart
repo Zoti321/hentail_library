@@ -1,8 +1,16 @@
 import 'package:hentai_library/features/comic_trash/application/comic_trash_service.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
 import 'package:test/test.dart';
+
+class _RecordingEventPublisher implements DomainEventPublisher {
+  final List<DomainEvent> events = <DomainEvent>[];
+
+  @override
+  void publish(DomainEvent event) => events.add(event);
+}
 
 class _RecordingComicRepository implements ComicTrashRepository {
   final List<String> calls = <String>[];
@@ -51,14 +59,26 @@ class _RecordingNativeReaderPort implements ComicTrashNativeReaderPort {
 
 void main() {
   late _RecordingComicRepository comicRepo;
+  late _RecordingEventPublisher events;
   late ComicTrashService service;
 
   setUp(() {
     comicRepo = _RecordingComicRepository();
+    events = _RecordingEventPublisher();
     service = ComicTrashService(
       comicRepository: comicRepo,
       readerSessionPort: _RecordingNativeReaderPort(comicRepo.calls),
+      events: events,
     );
+  });
+
+  test('publishes trashed / restored facts after write', () async {
+    await service.trashComics(<String>['c1']);
+    await service.restoreComics(<String>['c1']);
+
+    expect(events.events, hasLength(2));
+    expect(events.events.first, isA<ComicsTrashed>());
+    expect(events.events.last, isA<ComicsRestored>());
   });
 
   test('empty ids are no-ops for trash / restore / purge', () async {

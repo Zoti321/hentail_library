@@ -8,14 +8,12 @@ import 'package:hentai_library/features/library_admin/domain/library_sidebar_lay
 import 'package:hentai_library/features/library_admin/domain/sync_library_types.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/libraries_notifier.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_reorder_mode_notifier.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_edit_command_port.dart';
 import 'package:hentai_library/features/library_admin/domain/comic_metadata_bulk_patch_types.dart';
 import 'package:hentai_library/features/library_admin/domain/libraries_port.dart';
 import 'package:hentai_library/features/library_admin/domain/library_reorder_mode_port.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
-import 'package:hentai_library/shared/domain/ports/library_revision_signal_port.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class _LibrariesAdapter implements LibrariesPort {
@@ -130,23 +128,10 @@ class _LibraryReorderModeAdapter implements LibraryReorderModePort {
   void exit() => _ref.read(libraryReorderModeProvider.notifier).exit();
 }
 
-class _LibraryRevisionSignalAdapter implements LibraryRevisionSignalPort {
-  _LibraryRevisionSignalAdapter(this._ref);
-
-  final Ref _ref;
-
-  @override
-  void notifyExternalChange() =>
-      _ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-}
-
 LibrariesPort createLibrariesPort(Ref ref) => _LibrariesAdapter(ref);
 
 LibraryReorderModePort createLibraryReorderModePort(Ref ref) =>
     _LibraryReorderModeAdapter(ref);
-
-LibraryRevisionSignalPort createLibraryRevisionSignalPort(Ref ref) =>
-    _LibraryRevisionSignalAdapter(ref);
 
 ComicMetadataBulkEditCommandPort createComicMetadataBulkEditCommandPort(
   Ref ref,

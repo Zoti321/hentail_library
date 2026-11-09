@@ -40,6 +40,32 @@ void main() {
     expect(state.metadataSaveRevision, 1);
   });
 
+  test('catalog change bumps catalog revision only', () {
+    final ProviderContainer c = container();
+    c
+        .read(appEventBusProvider)
+        .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
+
+    final DomainEventRevisionsState state = c.read(
+      domainEventRevisionsProvider,
+    );
+    expect(state.catalogRevision, 1);
+    expect(state.dictionaryRevision, 0);
+    expect(state.metadataSaveRevision, 0);
+  });
+
+  test('trash / restore bump catalog revision only', () {
+    final ProviderContainer c = container();
+    c.read(appEventBusProvider).publish(const ComicsTrashed(<String>['c1']));
+    c.read(appEventBusProvider).publish(const ComicsRestored(<String>['c1']));
+
+    final DomainEventRevisionsState state = c.read(
+      domainEventRevisionsProvider,
+    );
+    expect(state.catalogRevision, 2);
+    expect(state.metadataSaveRevision, 0);
+  });
+
   test('no event published before subscribe is replayed', () {
     final ProviderContainer c = ProviderContainer(
       overrides: eventBusOverrides(),

@@ -41,7 +41,6 @@ Future<ComicMetadataApplyResult> applyComicMetadataForm(
   ComicMetadataForm form,
   Comic original, {
   required DomainEventPublisher events,
-  required void Function() notifyExternalChange,
 }) async {
   switch (form.diffAgainst(original)) {
     case ComicMetadataDraftInvalid(:final validation):
@@ -80,7 +79,6 @@ Future<ComicMetadataApplyResult> applyComicMetadataForm(
           charactersWritten: characters != null,
         ),
       );
-      notifyExternalChange();
       return ComicMetadataApplySucceeded(
         persisted: true,
         tagsWritten: tags != null,

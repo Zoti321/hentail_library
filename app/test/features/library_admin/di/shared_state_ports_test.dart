@@ -8,8 +8,11 @@ import 'package:hentai_library/features/library_admin/public.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
+import 'package:hentai_library/shared/di/event_bus_providers.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:riverpod/misc.dart' show Override, ProviderException;
+import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
 
 class _SilentRevisionPort implements LibraryRevisionPort {
   @override
@@ -54,19 +57,19 @@ void main() {
     expect(port.isActive, isFalse);
   });
 
-  test('libraryRevisionSignalPortProvider bumps libraryRevisionProvider', () {
+  test('LibraryCatalogChanged 事件 bumps libraryRevisionProvider', () {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
-        libraryRevisionSignalPortProvider.overrideWith(
-          createLibraryRevisionSignalPort,
-        ),
+        ...eventBusOverrides(),
       ],
     );
     addTearDown(container.dispose);
 
     final int before = container.read(libraryRevisionProvider).revision;
-    container.read(libraryRevisionSignalPortProvider).notifyExternalChange();
+    container
+        .read(appEventBusProvider)
+        .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
     expect(container.read(libraryRevisionProvider).revision, before + 1);
   });
 
@@ -74,6 +77,7 @@ void main() {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
         libraryRevisionPortProvider.overrideWithValue(_SilentRevisionPort()),
+        ...eventBusOverrides(),
         ...sharedLibraryStateOverrides(),
         ...bootstrapCompositionOverrides(),
       ],
@@ -81,7 +85,9 @@ void main() {
     addTearDown(container.dispose);
 
     final int before = container.read(libraryRevisionStateProvider).revision;
-    container.read(libraryRevisionSignalPortProvider).notifyExternalChange();
+    container
+        .read(appEventBusProvider)
+        .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
     expect(container.read(libraryRevisionStateProvider).revision, before + 1);
   });
 }

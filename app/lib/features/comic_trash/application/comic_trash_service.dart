@@ -1,19 +1,24 @@
 import 'package:hentai_library/features/comic_trash/domain/comic_trash_target_ids_specification.dart';
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/shared/domain/ports/comic_trash_reader_session_port.dart';
 import 'package:hentai_library/features/comic_trash/domain/comic_trash_repository.dart';
 
 /// Comic trash / restore / purge 与「已删除」列表查询（ADR-0023）。
+///
+/// 写入成功后发布 `ComicsTrashed` / `ComicsRestored`（ADR-0039）。
 class ComicTrashService {
   const ComicTrashService({
     required this._comicRepository,
     required this._readerSessionPort,
+    required this._events,
   });
 
   final ComicTrashRepository _comicRepository;
   final ComicTrashNativeReaderPort _readerSessionPort;
+  final DomainEventPublisher _events;
 
   Future<void> trashComics(Iterable<String> comicIds) async {
     final List<String> ids = ComicTrashTargetIdsSpecification.normalize(
@@ -24,6 +29,7 @@ class ComicTrashService {
     }
     await _closeSessions(ids);
     await _comicRepository.trashByIds(ids);
+    _events.publish(ComicsTrashed(ids));
   }
 
   Future<void> restoreComics(Iterable<String> comicIds) async {
@@ -34,6 +40,7 @@ class ComicTrashService {
       return;
     }
     await _comicRepository.restoreByIds(ids);
+    _events.publish(ComicsRestored(ids));
   }
 
   Future<int> restoreAll() async {
@@ -42,6 +49,7 @@ class ComicTrashService {
       return 0;
     }
     await _comicRepository.restoreByIds(ids);
+    _events.publish(ComicsRestored(ids));
     return ids.length;
   }
 

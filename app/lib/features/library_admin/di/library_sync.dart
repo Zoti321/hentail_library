@@ -2,8 +2,8 @@ import 'package:hentai_library/features/library_admin/application/sync_library_u
 import 'package:hentai_library/features/library_admin/data/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/data/local_library_root_access.dart';
 import 'package:hentai_library/features/library_admin/domain/sync_library_port.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/event_bus_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_sync.g.dart';
@@ -26,8 +26,6 @@ SyncLibraryUseCase syncLibraryUseCase(Ref ref) {
   return SyncLibraryUseCase(
     port: ref.watch(syncLibraryPortProvider),
     ensureLocalFilesystemAccess: ensureLocalFilesystemAccess,
-    onCatalogRevision: () {
-      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-    },
+    events: ref.read(appEventBusProvider),
   );
 }

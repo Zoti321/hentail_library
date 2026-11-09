@@ -11,7 +11,6 @@ export 'package:hentai_library/features/library_admin/di/shared_state_ports.dart
         createLibrariesPort,
         createLibraryMetadataRefreshCommandPort,
         createLibraryReorderModePort,
-        createLibraryRevisionSignalPort,
         createLibraryScanCommandPort;
 
 RemoteLibraryCredentialsPort createRemoteLibraryCredentialsPort(

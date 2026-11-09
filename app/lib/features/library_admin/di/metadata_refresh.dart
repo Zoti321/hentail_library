@@ -1,8 +1,8 @@
 import 'package:hentai_library/features/library_admin/application/metadata_refresh_use_case.dart';
 import 'package:hentai_library/features/library_admin/data/adapters/metadata_refresh_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_port.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/event_bus_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata_refresh.g.dart';
@@ -24,8 +24,6 @@ MetadataRefreshPort metadataRefreshPort(Ref ref) {
 MetadataRefreshUseCase metadataRefreshUseCase(Ref ref) {
   return MetadataRefreshUseCase(
     port: ref.watch(metadataRefreshPortProvider),
-    onCatalogRevision: () {
-      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-    },
+    events: ref.read(appEventBusProvider),
   );
 }

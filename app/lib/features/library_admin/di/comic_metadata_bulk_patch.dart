@@ -2,7 +2,6 @@ import 'package:hentai_library/features/library_admin/data/adapters/comic_metada
 import 'package:hentai_library/features/library_admin/application/comic_metadata_bulk_patch_coordinator.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/event_bus_providers.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_metadata_bulk_patch.g.dart';
@@ -19,8 +18,5 @@ ComicMetadataBulkPatchCoordinator comicMetadataBulkPatchCoordinator(Ref ref) {
   return ComicMetadataBulkPatchCoordinator(
     adapter: ref.read(comicMetadataBulkPatchFrbAdapterProvider),
     events: ref.read(appEventBusProvider),
-    onSucceeded: () {
-      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-    },
   );
 }

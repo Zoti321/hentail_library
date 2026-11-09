@@ -6,6 +6,7 @@ import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
 
 class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   _FakeLibraryRevisionPort(this._events);
@@ -25,6 +26,7 @@ void main() {
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),
+        ...eventBusOverrides(),
         ],
       );
       addTearDown(container.dispose);
@@ -43,6 +45,7 @@ void main() {
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),
+        ...eventBusOverrides(),
         ],
       );
       addTearDown(container.dispose);
@@ -73,6 +76,7 @@ void main() {
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),
+        ...eventBusOverrides(),
         ],
       );
       addTearDown(container.dispose);

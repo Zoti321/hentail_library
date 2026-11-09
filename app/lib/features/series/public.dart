@@ -5,6 +5,7 @@
 library;
 
 export 'public/di/series_cover_providers.dart';
+export 'public/di/series_item_sort_port_factory.dart';
 export 'public/di/series_reading_context_port_factory.dart';
 export 'public/di/series_repository_factory.dart';
 export 'public/library_series_browse_rules.dart';

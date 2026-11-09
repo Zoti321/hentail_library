@@ -1,26 +1,27 @@
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_port.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_types.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
 
-/// 元数据刷新编排：经 [MetadataRefreshPort] 调用 Rust，并在需要时 bump catalog revision。
+/// 元数据刷新编排：经 [MetadataRefreshPort] 调用 Rust，并在写入完成后发布目录变更。
 class MetadataRefreshUseCase {
   const MetadataRefreshUseCase({
     required this._port,
-    required this._onCatalogRevision,
+    required this._events,
   });
 
   final MetadataRefreshPort _port;
-  final void Function() _onCatalogRevision;
+  final DomainEventPublisher _events;
 
   Future<void> refreshComic(String comicId) async {
     await _port.refreshComic(comicId);
-    _onCatalogRevision();
+    _publishChanged();
   }
 
   Future<MetadataRefreshBatchResult> refreshSeries(String seriesId) async {
     final MetadataRefreshBatchResult batch = await _port.refreshSeries(
       seriesId,
     );
-    _onCatalogRevision();
+    _publishChanged();
     return batch;
   }
 
@@ -29,10 +30,14 @@ class MetadataRefreshUseCase {
       libraryId,
     );
     if (!result.skipped) {
-      _onCatalogRevision();
+      _publishChanged();
     }
     return result;
   }
 
   void cancelActive() => _port.cancelActive();
+
+  void _publishChanged() => _events.publish(
+    const LibraryCatalogChanged(CatalogChangeSource.metadataRefresh),
+  );
 }

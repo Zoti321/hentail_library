@@ -3,8 +3,7 @@ import 'package:hentai_library/features/comic_trash/application/comic_trash_serv
 import 'package:hentai_library/features/comic_trash/domain/trashed_comic.dart';
 import 'package:hentai_library/features/comic_trash/di/comic_trash.dart';
 import 'package:hentai_library/features/comic/public/di/comic_cover_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:hentai_library/shared/di/library_state_providers.dart';import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_trash_actions.g.dart';
 
@@ -23,22 +22,16 @@ class ComicTrashActions extends _$ComicTrashActions {
   Future<void> trash(List<String> comicIds) async {
     _ensureLibraryIdle();
     await _service.trashComics(comicIds);
-    _notifyChanged();
   }
 
   Future<void> restore(List<String> comicIds) async {
     _ensureLibraryIdle();
     await _service.restoreComics(comicIds);
-    _notifyChanged();
   }
 
   Future<int> restoreAll() async {
     _ensureLibraryIdle();
-    final int restored = await _service.restoreAll();
-    if (restored > 0) {
-      _notifyChanged();
-    }
-    return restored;
+    return _service.restoreAll();
   }
 
   Future<ComicPurgeResult> purge(List<String> comicIds) async {
@@ -68,16 +61,11 @@ class ComicTrashActions extends _$ComicTrashActions {
             requested.where((String id) => !remaining.contains(id)),
           );
     }
-    _notifyChanged();
   }
 
   void _ensureLibraryIdle() {
     if (ref.read(libraryMutationBusyStateProvider)) {
       throw AppException(kLibraryBusyMessage);
     }
-  }
-
-  void _notifyChanged() {
-    ref.read(libraryRevisionSignalPortProvider).notifyExternalChange();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:hentai_library/features/comic/public.dart';
 import 'package:hentai_library/features/series/public.dart';
 import 'package:hentai_library/shared/di/library_state_providers.dart';
+import 'package:hentai_library/shared/di/series_item_sort_providers.dart';
 import 'package:hentai_library/shared/di/series_reading_context_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -10,4 +11,5 @@ List<Override> comicSeriesSharedStateOverrides() => <Override>[
     createComicDetailReturnSeriesPort,
   ),
   seriesReadingContextPortProvider.overrideWith(createSeriesReadingContextPort),
+  seriesItemSortPortProvider.overrideWith(createSeriesItemSortPort),
 ];

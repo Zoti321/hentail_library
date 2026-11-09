@@ -23,7 +23,9 @@ Consumer **不要** deep import 邻居的 `features/<other>/di/`，除非 baseli
 | UI 按当前值重建 | `domainEventRevisionsProvider.select(...)` |
 | 需要 `BuildContext` | owner `public/ui/**` 命令 |
 
-新增事件：在 `shared/domain/events/` 加子类（part of `domain_event.dart`）→ 在 `DomainEventRevisions._reduce` 归类（sealed switch 会强制）→ application 层构造注入 `DomainEventPublisher` 发布。门禁见 `domain_event_rules_test.dart`（E1/E2/E4）。
+新增事件：在 `shared/domain/events/` 加子类（part of `domain_event.dart`）→ 在 `DomainEventRevisions._reduce` 归类（sealed switch 会强制）→ application 层构造注入 `DomainEventPublisher` 发布。门禁见 `domain_event_rules_test.dart`（E1/E2/E4）。presentation 不得 `publish`（E2）；ViewModel 需要触发目录刷新时调 Port / application 用例。
+
+当前事件：`ComicMetadataPersisted`、`LibraryCatalogChanged`、`ComicsTrashed`、`ComicsRestored`。
 
 ## 典型用法
 

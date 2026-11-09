@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/series/application/series_item_sort_service.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/features/series/domain/series_repository.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:test/test.dart';
@@ -35,6 +36,13 @@ class _LockObservingSeriesRepository implements SeriesRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _NoopPublisher implements DomainEventPublisher {
+  const _NoopPublisher();
+
+  @override
+  void publish(DomainEvent event) {}
+}
+
 void main() {
   const SeriesItemMembership unlockedSeed = (
     seriesId: 'series-1',
@@ -49,6 +57,7 @@ void main() {
 
       await persistSeriesItemSortIfChanged(
         repo: repo,
+        events: _NoopPublisher(),
         comicId: 'comic-1',
         seed: unlockedSeed,
         sortOrder: 1.5,
@@ -72,6 +81,7 @@ void main() {
 
       await persistSeriesItemSortIfChanged(
         repo: repo,
+        events: _NoopPublisher(),
         comicId: 'comic-1',
         seed: seed,
         sortOrder: 2.5,
@@ -96,6 +106,7 @@ void main() {
 
       await persistSeriesItemSortIfChanged(
         repo: repo,
+        events: _NoopPublisher(),
         comicId: 'comic-1',
         seed: seed,
         sortOrder: 3.0,
@@ -114,6 +125,7 @@ void main() {
 
       await persistSeriesItemSortIfChanged(
         repo: repo,
+        events: _NoopPublisher(),
         comicId: 'comic-1',
         seed: unlockedSeed,
         sortOrder: 1.0,
@@ -131,6 +143,7 @@ void main() {
 
       await persistSeriesItemSortIfChanged(
         repo: repo,
+        events: _NoopPublisher(),
         comicId: 'comic-1',
         seed: unlockedSeed,
         sortOrder: 1.0,

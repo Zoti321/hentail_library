@@ -1,11 +1,11 @@
 import 'package:hentai_library/features/comic/application/comic_metadata_service.dart';
 import 'package:hentai_library/features/comic/public/di/comic_repository_providers.dart';
+import 'package:hentai_library/shared/di/series_item_sort_providers.dart';
 import 'package:hentai_library/shared/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/shared/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:hentai_library/shared/di/event_bus_providers.dart';
-import 'package:hentai_library/shared/di/library_state_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_metadata_editor_notifier.g.dart';
@@ -24,7 +24,6 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
       ref.read(comicUserMetadataRepositoryProvider),
       form,
       original,
-      notifyExternalChange: _notifyExternalChange,
       events: ref.read(appEventBusProvider),
     );
   }
@@ -67,48 +66,13 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
     required double sortOrder,
     required bool draftLocked,
   }) async {
-    final bool wrote = await _persistSeriesItemSortIfChanged(
-      repo: ref.read(seriesRepoProvider),
-      comicId: comicId,
-      seed: seed,
-      sortOrder: sortOrder,
-      draftLocked: draftLocked,
-    );
-    if (wrote) {
-      _notifyExternalChange();
-    }
+    await ref
+        .read(seriesItemSortPortProvider)
+        .persistIfChanged(
+          comicId: comicId,
+          seed: seed,
+          sortOrder: sortOrder,
+          draftLocked: draftLocked,
+        );
   }
-
-  void _notifyExternalChange() {
-    ref.read(libraryRevisionSignalPortProvider).notifyExternalChange();
-  }
-}
-
-Future<bool> _persistSeriesItemSortIfChanged({
-  required dynamic repo,
-  required String comicId,
-  required SeriesItemMembership seed,
-  required double sortOrder,
-  required bool draftLocked,
-}) async {
-  final bool orderChanged = sortOrder != seed.sortOrder;
-  final bool lockChanged = draftLocked != seed.sortOrderLocked;
-  if (!orderChanged && !lockChanged) {
-    return false;
-  }
-
-  if (orderChanged) {
-    await repo.updateSeriesItemSortOrder(
-      seriesId: seed.seriesId,
-      comicId: comicId,
-      sortOrder: sortOrder,
-    );
-  } else if (lockChanged) {
-    await repo.setSeriesItemSortOrderLocked(
-      seriesId: seed.seriesId,
-      comicId: comicId,
-      locked: draftLocked,
-    );
-  }
-  return true;
 }

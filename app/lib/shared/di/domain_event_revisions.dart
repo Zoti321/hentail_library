@@ -12,18 +12,27 @@ class DomainEventRevisionsState {
   const DomainEventRevisionsState({
     this.dictionaryRevision = 0,
     this.metadataSaveRevision = 0,
+    this.catalogRevision = 0,
   });
 
+  /// 全局 Tag / Author / Parody / Character 字典可能变化。
   final int dictionaryRevision;
+
+  /// Comic 元数据已保存（自动备份等低频副作用用）。
   final int metadataSaveRevision;
+
+  /// 库 / 漫画集合可能变化（catalog 重读用）。
+  final int catalogRevision;
 
   DomainEventRevisionsState copyWith({
     int? dictionaryRevision,
     int? metadataSaveRevision,
+    int? catalogRevision,
   }) {
     return DomainEventRevisionsState(
       dictionaryRevision: dictionaryRevision ?? this.dictionaryRevision,
       metadataSaveRevision: metadataSaveRevision ?? this.metadataSaveRevision,
+      catalogRevision: catalogRevision ?? this.catalogRevision,
     );
   }
 }
@@ -53,7 +62,12 @@ class DomainEventRevisions extends Notifier<DomainEventRevisionsState> {
           dictionaryRevision:
               state.dictionaryRevision + (dictionariesWritten ? 1 : 0),
           metadataSaveRevision: state.metadataSaveRevision + 1,
+          catalogRevision: state.catalogRevision + 1,
         );
+      case LibraryCatalogChanged():
+      case ComicsTrashed():
+      case ComicsRestored():
+        state = state.copyWith(catalogRevision: state.catalogRevision + 1);
     }
   }
 }

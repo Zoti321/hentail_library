@@ -6,6 +6,7 @@
 library;
 
 part 'catalog_events.dart';
+part 'comic_trash_events.dart';
 
 /// 只表达「已经发生的事实」：不可变、无行为、无 Flutter 类型、不持久化。
 ///

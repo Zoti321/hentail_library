@@ -5,7 +5,7 @@ import 'package:hentai_library/shared/domain/models/entity/library/local_library
 import 'package:hentai_library/shared/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/features/library_admin/domain/library_repository.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/features/library_admin/presentation/view_models/library_revision_notifier.dart';
+import 'package:hentai_library/features/library_admin/di/library_write.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -43,20 +43,18 @@ class LibrariesNotifier extends _$LibrariesNotifier {
     LibraryForm form, {
     LocalLibrary? original,
   }) async {
-    final LibraryFormApplyResult result = original == null
-        ? await form.create(_repo)
-        : await form.applyTo(_repo, original);
+    final LibraryFormApplyResult result = await ref
+        .read(libraryWriteServiceProvider)
+        .submitForm(form, original: original);
     if (result is LibraryFormApplySucceeded) {
       await refresh();
-      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
     }
     return result;
   }
 
   Future<void> deleteLibrary(String libraryId) async {
-    await _repo.delete(libraryId);
+    await ref.read(libraryWriteServiceProvider).deleteLibrary(libraryId);
     await refresh();
-    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
   }
 
   Future<LibrariesState> _load() async {

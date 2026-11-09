@@ -4,10 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/shared/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
+import 'package:hentai_library/shared/di/event_bus_providers.dart';
+import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/features/bootstrap/presentation/view_models/app_startup_coordinator_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
 
 LocalLibrary _lib({required String id, bool scanOnStartup = false}) {
   return (
@@ -211,6 +214,7 @@ void main() {
             libraryRevisionPortProvider.overrideWithValue(
               _FakeLibraryRevisionPort(revisionEvents),
             ),
+            ...eventBusOverrides(),
             librariesProvider.overrideWith(
               () => _FakeLibrariesNotifier(<LocalLibrary>[
                 _lib(id: 'a', scanOnStartup: true),
@@ -226,7 +230,9 @@ void main() {
         container.read(libraryRevisionProvider);
         await scan.firstStart.timeout(const Duration(seconds: 2));
 
-        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container
+            .read(appEventBusProvider)
+            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         scan.releaseHold();
         await scan.allDone.timeout(const Duration(seconds: 2));
 
