@@ -38,7 +38,7 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 | 事件词汇表（sealed `DomainEvent` + 全部子类） | `shared/domain/events/**` | E1：子类只能声明在此（`sealed` 保证 reducer 可穷尽） |
 | 发布接口 | `shared/domain/events/domain_event_publisher.dart` | 无 Flutter、无 Riverpod；application 层构造注入 |
 | 订阅接口 | `shared/domain/events/domain_event_bus.dart` | `Stream<T> on<T extends DomainEvent>()` |
-| 实现 | `shared/data/events/event_bus_adapter.dart` | `event_bus` 包（`sync: true`）；E4：实现只允许在此 |
+| 实现 | `shared/data/events/stream_domain_event_bus.dart` | `StreamController<DomainEvent>.broadcast(sync: true)`；不依赖第三方包；E4：实现只允许在此 |
 | Token | `shared/di/event_bus_providers.dart` → `appEventBusProvider` | 只声明，bootstrap override |
 | 状态投影 | `shared/di/domain_event_revisions.dart` | 唯一 reducer；消费者 `select` 版本号 |
 
@@ -82,6 +82,7 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 - `sealed` + 穷尽 switch：新增事件类型时 reducer 编译失败，强制归位。
 - presentation 不再持有通知职责，`LibraryChange` 这类「发布用 DTO」消亡。
 - 事件声明在 shared，public 依赖图不增长。
+- 无第三方事件库依赖：总线实现就是 `StreamController.broadcast(sync: true)`（约 20 行），语义与依赖均可见。
 
 ### Negative
 

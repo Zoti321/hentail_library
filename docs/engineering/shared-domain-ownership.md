@@ -59,7 +59,7 @@ UI / 编排命令类型；发现面经 owner `public/` re-export（ADR-0034）�
 
 ## 领域事件（ADR-0039）
 
-`shared/domain/events/**` 是跨 feature 事件的**唯一**词汇表与发布/订阅接口（sealed `DomainEvent`、`DomainEventPublisher`、`DomainEventBus`）；实现 `EventBusDomainEventBus` 在 `shared/data/events/`。它不属于 Catalog Kernel，也不经 owner `public/` 暴露——所有 feature 直接 `import shared/domain/events/events.dart`。
+`shared/domain/events/**` 是跨 feature 事件的**唯一**词汇表与发布/订阅接口（sealed `DomainEvent`、`DomainEventPublisher`、`DomainEventBus`）；实现 `StreamDomainEventBus`（`StreamController.broadcast(sync: true)`，无第三方依赖）在 `shared/data/events/`。它不属于 Catalog Kernel，也不经 owner `public/` 暴露——所有 feature 直接 `import shared/domain/events/events.dart`。
 
 `shared/di` 声明跨 feature 协作用的 Riverpod token（#426）；实现与 `createXxx()` 在 owner `di/` / `public/di/`，由 `features/bootstrap/di/overrides/` 注入。跨 feature UI 封面等用 **`comic/public.dart`**、**`series/public.dart`** 或 browse 壳 public。
 
