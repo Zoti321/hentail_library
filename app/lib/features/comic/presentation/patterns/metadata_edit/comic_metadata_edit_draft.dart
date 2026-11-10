@@ -1,4 +1,5 @@
 import 'package:hentai_library/features/comic/presentation/views/comic_detail/comic_detail_view_object.dart';
+import 'package:hentai_library/shared/domain/models/value_objects/author_ref.dart';
 
 /// Lab 漫画元数据编辑草稿（无领域 / Riverpod）。
 class ComicMetadataEditDraft {
@@ -36,7 +37,7 @@ class ComicMetadataEditDraft {
       isR18: entry.showAgeRestrictionChip,
       languages: const <String>[],
       parodies: List<String>.from(entry.parodies),
-      authors: List<String>.from(entry.authors),
+      authors: <String>[for (final AuthorRef a in entry.authors) a.name],
       characters: List<String>.from(entry.characters),
       tags: List<String>.from(entry.tags),
     );
