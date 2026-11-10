@@ -17,5 +17,9 @@ final class StreamDomainEventBus implements DomainEventBus {
   @override
   void publish(DomainEvent event) => _controller.add(event);
 
-  void dispose() => _controller.close();
+  void dispose() {
+    if (!_controller.isClosed) {
+      _controller.close();
+    }
+  }
 }
