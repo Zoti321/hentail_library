@@ -4,10 +4,7 @@ import 'package:hentai_library/shared/domain/events/events.dart';
 
 /// 元数据刷新编排：经 [MetadataRefreshPort] 调用 Rust，并在写入完成后发布目录变更。
 class MetadataRefreshUseCase {
-  const MetadataRefreshUseCase({
-    required this._port,
-    required this._events,
-  });
+  const MetadataRefreshUseCase({required this._port, required this._events});
 
   final MetadataRefreshPort _port;
   final DomainEventPublisher _events;

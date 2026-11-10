@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/named_metadata/domain/named_facet_form_candidate.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/named_facet_management_view_model.dart';
 import 'package:hentai_library/features/named_metadata/presentation/view_models/tag_dictionary_import_view_model.dart';
@@ -118,7 +118,7 @@ class _FakeTagRepository implements TagRepository {
 ProviderContainer _container(_SharedTagNames tags) {
   final ProviderContainer container = ProviderContainer(
     overrides: <Override>[
-      ...eventBusOverrides(),
+      ...domainEventBusOverrides(),
       namedFacetManagementRepoProvider.overrideWithValue(
         _FakeNamedFacetManagementRepository(tags),
       ),

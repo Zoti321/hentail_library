@@ -10,6 +10,9 @@ import 'package:hentai_library/features/series/domain/library_series_projection.
 import 'package:hentai_library/features/series/domain/library_series_sort_option.dart';
 import 'package:hentai_library/features/series/domain/library_serialization_status_filter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../../../../support/settings_state_bridge.dart';
+
 import 'package:riverpod/misc.dart' show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -107,6 +110,7 @@ void main() {
   test('查询 filter 的 prefer root 来自设置页', () async {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        settingsStateBridge(),
         settingsProvider.overrideWith(
           () => _FixedSettingsNotifier(
             AppSetting(preferLibraryRootSeries: false),

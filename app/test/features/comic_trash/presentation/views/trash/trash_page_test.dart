@@ -19,7 +19,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 import '../../../../../support/pump_localized_app.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
+
+import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 
 class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   final StreamController<void> events = StreamController<void>.broadcast();
@@ -94,7 +95,7 @@ Future<void> _pumpTrash(WidgetTester tester, List<TrashedComic> items) async {
     tester,
     home: const Scaffold(body: TrashPage()),
     overrides: <Override>[
-      ...eventBusOverrides(),
+      ...domainEventBusOverrides(),
       libraryRevisionPortProvider.overrideWithValue(revision),
       comicTrashRepositoryProvider.overrideWithValue(_TrashComicRepo(items)),
       comicTrashNativeReaderPortProvider.overrideWithValue(

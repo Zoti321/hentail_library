@@ -39,7 +39,7 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 | 发布接口 | `shared/domain/events/domain_event_publisher.dart` | 无 Flutter、无 Riverpod；application 层构造注入 |
 | 订阅接口 | `shared/domain/events/domain_event_bus.dart` | `Stream<T> on<T extends DomainEvent>()` |
 | 实现 | `shared/data/events/stream_domain_event_bus.dart` | `StreamController<DomainEvent>.broadcast(sync: true)`；不依赖第三方包；E4：实现只允许在此 |
-| Token | `shared/di/event_bus_providers.dart` → `appEventBusProvider` | 只声明，bootstrap override |
+| Token | `shared/di/domain_event_bus_providers.dart` → `domainEventBusProvider` | 只声明，bootstrap override |
 | 状态投影 | `shared/di/domain_event_revisions.dart` | 唯一 reducer；消费者 `select` 版本号 |
 
 事件全部经 `shared/domain`，**不产生 public cross-feature 边**，因此不扩大 ADR-0034 的 public 有向图（也不会引入环）。`shared` 仍不得 import `features/*/public/**`（R11 不变）。
@@ -48,6 +48,7 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 
 - **发布点**：`features/*/application/**`（首选）或 `features/*/data/**`，且必须在写入**提交成功之后**；禁止在 FRB 调用 / 事务内部发布。
 - **禁止 presentation 发布**（E2）：ViewModel 只调 Port / application 用例。
+- **禁止 presentation 读总线**（E5）：需要发布者时在 owner `di/` 装配用例（如 `comic/di/comic_metadata_service.dart` 的 `comicMetadataApplyCommandProvider`），presentation 只拿命令。
 - **订阅点**：只有 `DomainEventRevisions` 直接 `on<DomainEvent>()`；其他消费者 `ref.watch(domainEventRevisionsProvider.select(...))`，不得各自 `ref.listen` 事件（`LibraryRevisionNotifier` 也只 `ref.listen` reducer 的 `catalogRevision`，不订阅总线）。
 - **启动即订阅**：`_AppRoot.build` 首行 `ref.watch(domainEventRevisionsProvider)`，避免发布时 reducer 尚未 build 而丢事件（广播流不重放）。
 - 事件只带 id / 标量，不带实体快照；需要当前实体请查 Repository。
@@ -59,6 +60,7 @@ ADR-0034（public only）解决了「谁能 import 谁」，但**同一次写入
 | **E1** | `class … extends/implements DomainEvent` 只允许 `shared/domain/events/**` |
 | **E2** | `.publish(` 只允许 `application/`、`data/`、`shared/domain/events/` |
 | **E4** | `implements DomainEventPublisher` 仅 `domain_event_bus.dart`；`implements DomainEventBus` 仅 `shared/data/events/` |
+| **E5** | `domainEventBusProvider` 仅 `shared/di/**`（声明）与 `*/di/**`（装配）；presentation 只能调用已装配用例（见 `comic/di/comic_metadata_service.dart`） |
 
 ### 5. 迁移范围（已完成）
 

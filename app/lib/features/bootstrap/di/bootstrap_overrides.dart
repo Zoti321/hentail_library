@@ -1,6 +1,6 @@
 import 'package:hentai_library/features/bootstrap/di/composition_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/data_overrides.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/features/bootstrap/di/shared_state_overrides.dart';
 import 'package:riverpod/misc.dart' show Override;
 
@@ -10,7 +10,7 @@ import 'package:riverpod/misc.dart' show Override;
 /// `main.dart` 与测试应只经此入口组装 override，避免多处拼接产生漂移。
 List<Override> bootstrapDiOverrides() => <Override>[
   ...dataProviderOverrides(),
-  ...eventBusOverrides(),
+  ...domainEventBusOverrides(),
   ...sharedLibraryStateOverrides(),
   ...bootstrapCompositionOverrides(),
 ];

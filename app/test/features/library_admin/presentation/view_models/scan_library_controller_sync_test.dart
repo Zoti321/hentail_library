@@ -10,7 +10,7 @@ import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 
 class _ScriptedSyncAdapter implements SyncLibraryPort {
   _ScriptedSyncAdapter(this._run);
@@ -56,7 +56,7 @@ void main() {
         libraryRevisionPortProvider.overrideWithValue(
           _FakeLibraryRevisionPort(events),
         ),
-        ...eventBusOverrides(),
+        ...domainEventBusOverrides(),
       ],
     );
     addTearDown(container.dispose);
@@ -83,7 +83,7 @@ void main() {
         libraryRevisionPortProvider.overrideWithValue(
           _FakeLibraryRevisionPort(events),
         ),
-        ...eventBusOverrides(),
+        ...domainEventBusOverrides(),
       ],
     );
     addTearDown(container.dispose);

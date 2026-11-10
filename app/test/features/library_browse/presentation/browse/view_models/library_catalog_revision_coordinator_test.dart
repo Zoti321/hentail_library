@@ -8,7 +8,7 @@ import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/shared/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/event_bus_providers.dart';
+import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:hentai_library/shared/di/browse_library_scope_providers.dart';
 import 'package:hentai_library/features/comic/di/comic_cover_providers.dart';
@@ -16,7 +16,7 @@ import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 import 'package:hentai_library/features/library_admin/public.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 
 class _FakeLibraryRevisionPort implements LibraryRevisionPort {
   _FakeLibraryRevisionPort(this._events);
@@ -110,7 +110,7 @@ void main() {
         overrides: <Override>[
           ...sharedLibraryStateOverrides(),
           ...bootstrapCompositionOverrides(),
-          ...eventBusOverrides(),
+          ...domainEventBusOverrides(),
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),
@@ -136,7 +136,7 @@ void main() {
       'sync revision bump refreshes active tab immediately and defers inactive',
       () {
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
 
         expect(
@@ -179,7 +179,7 @@ void main() {
         );
 
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
@@ -213,7 +213,7 @@ void main() {
         await Future<void>.delayed(Duration.zero);
 
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
@@ -223,10 +223,10 @@ void main() {
         );
 
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
@@ -257,14 +257,14 @@ void main() {
         await Future<void>.delayed(Duration.zero);
 
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
         container.read(
           libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
         );
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
@@ -294,7 +294,7 @@ void main() {
         await Future<void>.delayed(Duration.zero);
 
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
@@ -304,10 +304,10 @@ void main() {
         );
 
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
@@ -340,14 +340,14 @@ void main() {
         await Future<void>.delayed(Duration.zero);
 
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
         container.read(
           libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
         );
         container
-            .read(appEventBusProvider)
+            .read(domainEventBusProvider)
             .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
         expect(
           container.read(
@@ -379,15 +379,15 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       container
-            .read(appEventBusProvider)
-            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
+          .read(domainEventBusProvider)
+          .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
       // 每次 bump 之间读取一次，使 listener 逐次观察到 revision（避免同步批次被合并）。
       container.read(
         libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
       );
       container
-            .read(appEventBusProvider)
-            .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
+          .read(domainEventBusProvider)
+          .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
       expect(
         container.read(
           libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),

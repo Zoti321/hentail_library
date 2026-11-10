@@ -11,7 +11,7 @@ import 'package:hentai_library/shared/di/data_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 
 class _ScriptedRefreshAdapter implements MetadataRefreshPort {
   _ScriptedRefreshAdapter({this.onRefreshComic, this.onRefreshLibrary});
@@ -81,7 +81,7 @@ void main() {
         libraryRevisionPortProvider.overrideWithValue(
           _FakeLibraryRevisionPort(events),
         ),
-        ...eventBusOverrides(),
+        ...domainEventBusOverrides(),
         scanLibraryControllerProvider.overrideWith(
           _IdleScanLibraryController.new,
         ),
@@ -118,7 +118,7 @@ void main() {
         libraryRevisionPortProvider.overrideWithValue(
           _FakeLibraryRevisionPort(events),
         ),
-        ...eventBusOverrides(),
+        ...domainEventBusOverrides(),
         scanLibraryControllerProvider.overrideWith(
           _IdleScanLibraryController.new,
         ),

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/shared/di/event_bus_providers.dart';
+import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 
 /// 事件 → Riverpod 状态的唯一投影（ADR-0039）。
@@ -47,7 +47,7 @@ class DomainEventRevisions extends Notifier<DomainEventRevisionsState> {
   @override
   DomainEventRevisionsState build() {
     final StreamSubscription<DomainEvent> subscription = ref
-        .read(appEventBusProvider)
+        .read(domainEventBusProvider)
         .on<DomainEvent>()
         .listen(_reduce);
     ref.onDispose(subscription.cancel);

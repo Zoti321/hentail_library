@@ -1,10 +1,7 @@
 [
   "M1|app_settings|series|features/app_settings/data/repositories/app_setting_repository_impl.dart|package:hentai_library/features/series/domain/library_prefer_library_root_series.dart",
-  "M1|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart|package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart",
   "M1|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
-  "M1|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart|package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart",
   "M1|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
-  "M1|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart|package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart",
   "M1|library_browse|comic|features/library_browse/presentation/browse/models/browse_view_object_mappers.dart|package:hentai_library/features/comic/domain/comic_browse_list_item.dart",
   "M1|library_browse|comic|features/library_browse/presentation/browse/models/comic_browse_view_object.dart|package:hentai_library/features/comic/domain/comic_browse_list_item.dart",
   "M1|library_browse|comic|features/library_browse/presentation/browse/view_models/library_comics_catalog_controller.dart|package:hentai_library/features/comic/domain/comic_browse_list_item.dart",
@@ -12,9 +9,5 @@
   "M1|library_browse|series|features/library_browse/presentation/browse/models/series_browse_view_object.dart|package:hentai_library/features/series/domain/series_browse_list_item.dart",
   "M1|library_browse|series|features/library_browse/presentation/browse/view_models/library_series_catalog_controller.dart|package:hentai_library/features/series/domain/series_browse_list_item.dart",
   "M1|reader|app_settings|features/reader/presentation/views/reader/reader_settings_sheet.dart|package:hentai_library/features/app_settings/domain/app_setting.dart",
-  "M1|reader|app_settings|features/reader/presentation/views/reader/reader_settings_sheet.dart|package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart",
-  "M2|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_query_intent_notifier.dart|package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart",
-  "M2|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_series_filters_notifier.dart|package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart",
-  "M2|library_browse|app_settings|features/library_browse/presentation/browse/view_models/library_tab_filter_sort_providers.dart|package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart"
+  "M1|reader|app_settings|features/reader/presentation/views/reader/reader_settings_sheet.dart|package:hentai_library/features/app_settings/domain/reader_settings_command_port.dart"
 ]
-

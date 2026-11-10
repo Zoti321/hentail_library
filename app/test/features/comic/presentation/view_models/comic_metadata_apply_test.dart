@@ -110,7 +110,7 @@ void main() {
         final _RecordingComicRepository repo = _RecordingComicRepository();
         final _RecordingEventPublisher events = _RecordingEventPublisher();
         final Comic original = _comic();
-  
+
         await applyComicMetadataForm(
           repo,
           ComicMetadataForm.fromComic(original).copyWith(title: '新标题'),
@@ -122,7 +122,7 @@ void main() {
         final ComicMetadataPersisted persisted =
             events.events.single as ComicMetadataPersisted;
         expect(persisted.dictionariesWritten, isFalse);
-        },
+      },
     );
 
     test('does not publish when form is invalid', () async {

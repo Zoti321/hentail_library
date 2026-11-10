@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/features/app_settings/domain/app_setting.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/features/library_browse/domain/browse/library_age_restriction_filter.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_comic_filters_notifier.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent.dart';
@@ -221,7 +221,7 @@ final Provider<LibrarySeriesFilter> librarySeriesFiltersQueryProvider =
         ),
       );
       final bool preferLibraryRootSeries = ref.watch(
-        settingsProvider.select(
+        appSettingsStateProvider.select(
           (AsyncValue<AppSetting> async) =>
               async.asData?.value.preferLibraryRootSeries ?? true,
         ),

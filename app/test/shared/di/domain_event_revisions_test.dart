@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/bootstrap/di/overrides/event_bus_overrides.dart';
+import 'package:hentai_library/features/bootstrap/di/overrides/domain_event_bus_overrides.dart';
 import 'package:hentai_library/shared/di/domain_event_revisions.dart';
-import 'package:hentai_library/shared/di/event_bus_providers.dart';
+import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:hentai_library/shared/domain/events/events.dart';
 import 'package:test/test.dart';
 
 void main() {
   ProviderContainer container() {
     final ProviderContainer c = ProviderContainer(
-      overrides: eventBusOverrides(),
+      overrides: domainEventBusOverrides(),
     );
     addTearDown(c.dispose);
     // 订阅方须先建立订阅：事件流不重放。
@@ -19,7 +19,7 @@ void main() {
   test('dictionary write bumps both revisions', () {
     final ProviderContainer c = container();
     c
-        .read(appEventBusProvider)
+        .read(domainEventBusProvider)
         .publish(const ComicMetadataPersisted(tagsWritten: true));
 
     final DomainEventRevisionsState state = c.read(
@@ -31,7 +31,7 @@ void main() {
 
   test('metadata-only write bumps save revision only', () {
     final ProviderContainer c = container();
-    c.read(appEventBusProvider).publish(const ComicMetadataPersisted());
+    c.read(domainEventBusProvider).publish(const ComicMetadataPersisted());
 
     final DomainEventRevisionsState state = c.read(
       domainEventRevisionsProvider,
@@ -43,7 +43,7 @@ void main() {
   test('catalog change bumps catalog revision only', () {
     final ProviderContainer c = container();
     c
-        .read(appEventBusProvider)
+        .read(domainEventBusProvider)
         .publish(const LibraryCatalogChanged(CatalogChangeSource.sync));
 
     final DomainEventRevisionsState state = c.read(
@@ -56,8 +56,10 @@ void main() {
 
   test('trash / restore bump catalog revision only', () {
     final ProviderContainer c = container();
-    c.read(appEventBusProvider).publish(const ComicsTrashed(<String>['c1']));
-    c.read(appEventBusProvider).publish(const ComicsRestored(<String>['c1']));
+    c.read(domainEventBusProvider).publish(const ComicsTrashed(<String>['c1']));
+    c
+        .read(domainEventBusProvider)
+        .publish(const ComicsRestored(<String>['c1']));
 
     final DomainEventRevisionsState state = c.read(
       domainEventRevisionsProvider,
@@ -68,10 +70,10 @@ void main() {
 
   test('no event published before subscribe is replayed', () {
     final ProviderContainer c = ProviderContainer(
-      overrides: eventBusOverrides(),
+      overrides: domainEventBusOverrides(),
     );
     addTearDown(c.dispose);
-    c.read(appEventBusProvider).publish(const ComicMetadataPersisted());
+    c.read(domainEventBusProvider).publish(const ComicMetadataPersisted());
     c.read(domainEventRevisionsProvider);
 
     expect(c.read(domainEventRevisionsProvider).metadataSaveRevision, 0);

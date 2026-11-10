@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/features/app_settings/presentation/view_models/settings_notifier.dart';
+import 'package:hentai_library/shared/di/app_settings_providers.dart';
 import 'package:hentai_library/shared/domain/models/enums.dart';
 import 'package:hentai_library/features/library_browse/presentation/browse/view_models/library_query_intent.dart';
 import 'package:hentai_library/core/util/debouncer.dart';
@@ -22,7 +22,7 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
       _filterQueryDebouncer.dispose();
     });
     ref.listen<LibraryDisplayTarget>(
-      settingsProvider.select(
+      appSettingsStateProvider.select(
         (async) =>
             async.asData?.value.defaultLibraryDisplayTarget ??
             LibraryDisplayTarget.comics,
@@ -39,7 +39,7 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
 
   LibraryDisplayTarget _defaultLibraryDisplayTarget() {
     return ref
-            .read(settingsProvider)
+            .read(appSettingsStateProvider)
             .asData
             ?.value
             .defaultLibraryDisplayTarget ??

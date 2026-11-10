@@ -8,9 +8,7 @@ enum CatalogChangeSource { sync, metadataRefresh, libraryAdmin, comicTrash }
 /// 与 SQLite `data_version` 流（[LibraryRevisionPort]）的区别：本事件覆盖
 /// stream 可能已错过的、由应用自身写入触发的变更。
 final class LibraryCatalogChanged extends DomainEvent {
-  const LibraryCatalogChanged([
-    this.source = CatalogChangeSource.libraryAdmin,
-  ]);
+  const LibraryCatalogChanged([this.source = CatalogChangeSource.libraryAdmin]);
 
   final CatalogChangeSource source;
 }

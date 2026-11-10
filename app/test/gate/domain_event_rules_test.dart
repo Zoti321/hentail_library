@@ -6,7 +6,8 @@ import 'package:test/test.dart';
 /// ADR-0039 领域事件门禁：
 /// - E1：`DomainEvent` 子类只允许声明在 `lib/shared/domain/events/`；
 /// - E2：`.publish(` 只允许出现在 `application/`、`data/`（禁止 presentation 发布）；
-/// - E4：`DomainEventPublisher` / `DomainEventBus` 实现面收敛到 shared。
+/// - E4：`DomainEventPublisher` / `DomainEventBus` 实现面收敛到 shared；
+/// - E5：`domainEventBusProvider` 只允许 `shared/di` 与 `*/di/**` 触碰。
 void main() {
   late Directory libDir;
 
@@ -59,6 +60,24 @@ void main() {
     );
   });
 
+  test('E5: domainEventBusProvider only read from di/ composition', () {
+    const String token = 'domainEventBusProvider';
+    final List<String> offenders = <String>[
+      for (final File file in _dartFiles(libDir))
+        if (!_isGenerated(file.path) &&
+            file.readAsStringSync().contains(token) &&
+            !_isDiComposition(_rel(libDir, file)))
+          _rel(libDir, file),
+    ]..sort();
+    expect(
+      offenders,
+      isEmpty,
+      reason:
+          'domainEventBusProvider 只允许在 shared/di 声明、在 */di/** 装配（ADR-0039 §3）：\n'
+          '${offenders.join('\n')}',
+    );
+  });
+
   test('E4: DomainEventPublisher/Bus implementations stay in shared', () {
     final List<String> offenders = <String>[];
     for (final File file in _dartFiles(libDir)) {
@@ -98,6 +117,10 @@ final RegExp _implRe = RegExp(
 );
 
 bool _isEventDir(String rel) => rel.startsWith('shared/domain/events/');
+
+/// `shared/di/**`（声明）与任意 `*/di/**`（装配）。
+bool _isDiComposition(String rel) =>
+    rel.startsWith('shared/di/') || rel.contains('/di/');
 
 bool _isGenerated(String path) {
   final String name = p.basename(path);

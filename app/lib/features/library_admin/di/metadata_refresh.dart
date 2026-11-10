@@ -2,7 +2,7 @@ import 'package:hentai_library/features/library_admin/application/metadata_refre
 import 'package:hentai_library/features/library_admin/data/adapters/metadata_refresh_frb_adapter.dart';
 import 'package:hentai_library/features/library_admin/domain/metadata_refresh_port.dart';
 import 'package:hentai_library/shared/di/data_providers.dart';
-import 'package:hentai_library/shared/di/event_bus_providers.dart';
+import 'package:hentai_library/shared/di/domain_event_bus_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata_refresh.g.dart';
@@ -24,6 +24,6 @@ MetadataRefreshPort metadataRefreshPort(Ref ref) {
 MetadataRefreshUseCase metadataRefreshUseCase(Ref ref) {
   return MetadataRefreshUseCase(
     port: ref.watch(metadataRefreshPortProvider),
-    events: ref.read(appEventBusProvider),
+    events: ref.read(domainEventBusProvider),
   );
 }
